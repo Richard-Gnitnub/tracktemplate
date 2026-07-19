@@ -493,15 +493,11 @@ def _validate_semantic(semantic):
         raise ValueError("Production-record objects do not resolve every indexed identity")
 
 
-def ordinary_track_snapshot(module, document, enforce_expected_hash=True):
-    """Validate and fingerprint B14's fixed ordinary curve/two-track document."""
-    base = freecad_base_snapshot(module, document)
+def ordinary_track_document_state(module, document):
+    """Capture normalized ordinary-track document state without a fixed handing."""
     settings_obj = _select_role(module, document, "Settings")
     template_obj = _select_role(module, document, "Template")
-    semantic = {
-        "schema_version": ORDINARY_TRACK_SCHEMA_VERSION,
-        "boundary_data": BOUNDARY_DATA,
-        "base": base["semantic"],
+    return {
         "groups": _group_members(document),
         "objects": sorted(
             (_object_snapshot(obj) for obj in document.Objects),
@@ -514,6 +510,30 @@ def ordinary_track_snapshot(module, document, enforce_expected_hash=True):
             "template": persisted_parameter_snapshot(template_obj),
         },
     }
+
+
+def ordinary_track_document_snapshot(module, document):
+    """Fingerprint a normalized ordinary-track state for edit/rollback checks."""
+    semantic = {
+        "schema_version": ORDINARY_TRACK_SCHEMA_VERSION,
+        "boundary_data": BOUNDARY_DATA,
+    }
+    semantic.update(ordinary_track_document_state(module, document))
+    return {
+        "semantic": semantic,
+        "semantic_sha256": semantic_sha256(semantic),
+    }
+
+
+def ordinary_track_snapshot(module, document, enforce_expected_hash=True):
+    """Validate and fingerprint B14's fixed ordinary curve/two-track document."""
+    base = freecad_base_snapshot(module, document)
+    semantic = {
+        "schema_version": ORDINARY_TRACK_SCHEMA_VERSION,
+        "boundary_data": BOUNDARY_DATA,
+        "base": base["semantic"],
+    }
+    semantic.update(ordinary_track_document_state(module, document))
     _validate_semantic(semantic)
     digest = semantic_sha256(semantic)
     if (

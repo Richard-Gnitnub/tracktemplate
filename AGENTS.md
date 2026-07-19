@@ -48,6 +48,13 @@
   its property types, normalized volatile fields, identities, ordering,
   production records and shape summaries; do not change the smaller Phase 0
   fixture hash to absorb this contract.
+- `tools/freecad_bridge/ordinary_track_edit_recipe.py`,
+  `tools/freecad_bridge/run-b14-ordinary-edit` and
+  `tests/validate_phase1_ordinary_edit.py` own the bounded B14 ordinary-track
+  handedness, save/reopen, invalid-input and transaction-abort oracle. Preserve
+  the separate three-decimal dialog and exact solved persistence contracts, the
+  frozen right-hand semantic hash, exact mirrored shape contract, and
+  preference-store restoration.
 - `reference/PHASE1_INVENTORY.md` owns the in-progress workflow, dependency,
   side-effect, candidate-slice and decision inventory. Update it as Phase 1
   evidence closes; its provisional static labels are not final module
@@ -127,6 +134,13 @@ tools/freecad_bridge/run-b14-ordinary-snapshot \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
 ```
 
+Run the Phase 1 ordinary-track edit and rollback oracle on a copied fixture:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-edit \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
 Run the controlled B14 crossover recipe in a fresh isolated FreeCAD process:
 
 ```bash
@@ -170,11 +184,17 @@ Run the fast Phase 1 ordinary-track oracle checks:
 .venv/bin/python tests/validate_phase1_ordinary_track.py
 ```
 
+Run the fast Phase 1 ordinary-track edit/rollback checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_ordinary_edit.py
+```
+
 - These commands were verified with FreeCAD 1.1.1 in the current environment.
 - A successful FreeCAD smoke run must print `B15 FreeCAD 1.1 headless smoke test passed`; an exit code without that sentinel is not evidence that FreeCAD executed the assertions.
 - `tests/validate_b15.py` treats B14 as the immutable legacy oracle. If B14 is deliberately changed with explicit approval, do not automatically alter B15 or the comparison test merely to restore a pass; first determine the intended version scope and preserve the accepted checkpoint.
 - Headless checks do not replace a real GUI workflow run. For geometry, document integration, display, export, or performance changes, run the exact target macro in FreeCAD and exercise the affected guided stages.
-- Bridge runs must use the repository-local isolated profile and a copied/disposable document. Never attach the controller to an everyday FreeCAD session or an irreplaceable document, never approve an unexpected dialog, and confirm the exact bridge instance stopped after a cold, warm or acceptance run. Resolve recipe hosts by persisted centreline identity and place special trackwork by centreline chainage or a point projected to that centreline, not by UI ordering or an unanchored XYZ datum.
+- Bridge runs must use the repository-local isolated profile and a copied/disposable document. Never attach the controller to an everyday FreeCAD session or an irreplaceable document, never approve an unexpected dialog, and confirm the exact bridge instance stopped after a snapshot, edit, cold, warm or acceptance run. Resolve recipe hosts by persisted centreline identity and place special trackwork by centreline chainage or a point projected to that centreline, not by UI ordering or an unanchored XYZ datum.
 - Treat `benchmark-output/freecad-bridge/` as ignored raw evidence. Commit only sanitised reports with the exact recipe, hashes, cache/process state, validation outcome, limitations, and raw-artifact provenance.
 
 ## Completion and review

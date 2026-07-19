@@ -79,6 +79,25 @@ is not a repeated performance series. Do not turn its exceptionally slow cold
 or unchanged-result observations into pass thresholds or approved human-use
 budgets.
 
+The Phase 1 B14 ordinary-track edit/rollback characterisation uses the fixed
+ordinary-track fixture rather than a completed crossover document:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-edit \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+Its successful replacement boundary includes B14's real dialog, confirmation,
+calculation, exact-shape construction, document replacement, metadata,
+recomputes, report and success dialog. Process launch, macro load, fixture open,
+semantic-oracle work and the separately reported recompute/save/reopen boundary
+are excluded. The zero-angle and injected-abort actions occur later in the same
+process and are correctness timings, not equivalent cold measurements. The
+injected fault is not a normal performance stage. Compare a future ordinary
+editor only with the successful action under the same fixture, inputs, output
+scope and fresh-process qualifications, and also report its complete
+Validate/Export cost.
+
 The cold wrapper must:
 
 - refuse to start if its dedicated localhost bridge is already occupied;
@@ -124,9 +143,9 @@ the raw artifacts needed to audit it.
 
 ## Current instrumentation boundary
 
-The B14 report labelled **Whole workflow performance benchmark** currently measures the guided turnout/crossover workflow. It is an operator-visible special-trackwork benchmark, not yet a reconciled benchmark of the complete curve/easement-to-export product pipeline.
+The B14 report labelled **Whole workflow performance benchmark** currently measures the guided turnout/crossover workflow. It is an operator-visible special-trackwork benchmark, not yet a reconciled benchmark of the complete curve/easement-to-export product pipeline. The separate Phase 1 ordinary-track wrapper adds an external replacement and persistence boundary; it does not make the internal B14 report whole-product instrumentation.
 
-Until Phase 1 extends the instrumentation:
+Until Phase 1 reconciles the complete instrumentation:
 
 - identify the exact instrumented scope on every committed report;
 - record missing workflow stages rather than assigning them estimated timings;

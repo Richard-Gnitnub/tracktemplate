@@ -1,0 +1,394 @@
+"""Drive B14 ordinary-track replacement, validation failure and rollback."""
+
+import json
+import sys
+import time
+
+import FreeCAD as App
+
+try:
+    from PySide6 import QtCore, QtWidgets
+except ImportError:
+    try:
+        from PySide2 import QtCore, QtWidgets
+    except ImportError:
+        from PySide import QtCore
+        from PySide import QtGui as QtWidgets
+
+from tools.freecad_bridge.ordinary_track_edit_recipe import (
+    EXPECTED_TRACK_CONFIGURATION,
+    INJECTED_TRANSACTION_ERROR,
+    INVALID_ANGLE_DEGREES,
+    RIGHT_HAND_ANGLE_DEGREES,
+    TRANSACTION_FAILURE_ANGLE_DEGREES,
+    expected_remembered_input,
+    remembered_input_contract,
+    validate_handing_mirror,
+    validate_right_hand_snapshot,
+)
+from tools.freecad_bridge.ordinary_track_recipe import (
+    ordinary_track_document_snapshot,
+    ordinary_track_snapshot,
+)
+
+
+MODULE_NAME = "tracktemplate_b14_session"
+SUCCESS_TEXT = "Curve and straight-track outputs created successfully"
+ZERO_ANGLE_ERROR = "The total turn angle cannot be zero."
+
+module = sys.modules.get(MODULE_NAME)
+if module is None:
+    raise RuntimeError("Load B14 before running its ordinary-track edit recipe")
+document = App.ActiveDocument
+if document is None:
+    raise RuntimeError("Open a copied B14 ordinary-track fixture before editing")
+if not str(document.FileName or ""):
+    raise RuntimeError("The ordinary-track edit recipe requires a saved copied document")
+
+
+def _current_rss_mb():
+    reader = getattr(module, "_workflow_current_rss_mb", None)
+    return float(reader()) if callable(reader) else 0.0
+
+
+def _dialog_contract(dialog):
+    tracks = [
+        dialog._row_config(row) for row in range(dialog.track_table.rowCount())
+    ]
+    if any(config is None for config in tracks):
+        raise ValueError("The B14 curve dialog contains an incomplete track row")
+    return {
+        "transition_mm": float(dialog.transition_box.value()),
+        "radius_mm": float(dialog.radius_box.value()),
+        "angle_degrees": float(dialog.angle_box.value()),
+        "main_width_mm": float(dialog.main_width_box.value()),
+        "track_configs": tracks,
+        "output_mode": str(dialog.output_mode_box.currentText()),
+    }
+
+
+def _configure_dialog(dialog, target_angle):
+    dialog.transition_box.setValue(600.0)
+    dialog.radius_box.setValue(600.0)
+    dialog.angle_box.setValue(float(target_angle))
+    dialog.main_width_box.setValue(32.0)
+    dialog.parallel_count_box.setValue(1)
+    dialog._set_parallel_count(1)
+    dialog._populate_row(
+        0,
+        module.clone_track_config(EXPECTED_TRACK_CONFIGURATION[0], 600.0),
+    )
+    mode_index = dialog.output_mode_box.findText(module.OUTPUT_REPLACE)
+    if mode_index < 0:
+        raise ValueError("The B14 replace-output choice is unavailable")
+    dialog.output_mode_box.setCurrentIndex(mode_index)
+
+    values = dialog.values()
+    checks = {
+        "straight_routes_disabled": values[5] == [],
+        "platforms_disabled": bool(values[7]) and not any(
+            config.get("enabled", False) for config in values[7]
+        ),
+        "formation_disabled": not values[10].get("enabled", False),
+        "sectioning_disabled": not values[11].get("enabled", False),
+        "template_assembly_disabled": not values[13].get("enabled", False),
+        "assembly_labels_disabled": not values[14].get("enabled", False),
+        "production_export_disabled": not values[15].get("enabled", False),
+        "replace_output": values[17] == module.OUTPUT_REPLACE,
+    }
+    failed = sorted(name for name, passed in checks.items() if not passed)
+    if failed:
+        raise ValueError(
+            "Unexpected ordinary-track edit input(s): {}".format(", ".join(failed))
+        )
+    return {"accepted": _dialog_contract(dialog), "checks": checks}
+
+
+def _yes_button(box):
+    try:
+        choice = QtWidgets.QMessageBox.StandardButton.Yes
+    except AttributeError:
+        choice = QtWidgets.QMessageBox.Yes
+    return box.button(choice)
+
+
+def _run_scenario(name, target_angle, expected_initial_angle, expected_error=None, inject=False):
+    active_document = App.ActiveDocument
+    if active_document is None:
+        raise RuntimeError("The ordinary-track edit scenario lost its active document")
+    before = ordinary_track_document_snapshot(module, active_document)
+    state = {
+        "name": name,
+        "target_angle_degrees": float(target_angle),
+        "expected_initial_angle_degrees": float(expected_initial_angle),
+        "active": True,
+        "seen": set(),
+        "curve_dialog_count": 0,
+        "replacement_questions": [],
+        "success_dialogs": [],
+        "expected_errors": [],
+        "unexpected_dialogs": [],
+        "monitor_errors": [],
+    }
+
+    def monitor():
+        if not state["active"]:
+            return
+        try:
+            for widget in list(QtWidgets.QApplication.topLevelWidgets()):
+                if not widget.isVisible():
+                    continue
+                identity = id(widget)
+                if identity in state["seen"]:
+                    continue
+                if isinstance(widget, module.CurveInputDialog):
+                    state["seen"].add(identity)
+                    initial = _dialog_contract(widget)
+                    if initial["angle_degrees"] != float(expected_initial_angle):
+                        raise ValueError(
+                            "{} loaded angle {} instead of {} from the document".format(
+                                name,
+                                initial["angle_degrees"],
+                                expected_initial_angle,
+                            )
+                        )
+                    configured = _configure_dialog(widget, target_angle)
+                    state["initial_dialog"] = initial
+                    state["configured_dialog"] = configured
+                    state["curve_dialog_count"] += 1
+                    widget.accept()
+                    continue
+                if not isinstance(widget, QtWidgets.QMessageBox):
+                    continue
+                state["seen"].add(identity)
+                record = {
+                    "title": str(widget.windowTitle() or ""),
+                    "text": str(widget.text() or ""),
+                    "informative_text": str(widget.informativeText() or ""),
+                    "detailed_text": str(widget.detailedText() or ""),
+                }
+                yes_button = _yes_button(widget)
+                if (
+                    "Replace generated templates" in record["title"]
+                    and "No object is removed until all requested geometry has passed validation."
+                    in record["text"]
+                    and yes_button is not None
+                ):
+                    state["replacement_questions"].append(record)
+                    yes_button.click()
+                elif expected_error and expected_error in record["text"]:
+                    state["expected_errors"].append(record)
+                    widget.accept()
+                elif expected_error is None and SUCCESS_TEXT in record["text"]:
+                    state["success_dialogs"].append(record)
+                    widget.accept()
+                else:
+                    state["unexpected_dialogs"].append(record)
+                    widget.accept()
+        except Exception as error:
+            state["monitor_errors"].append(
+                "{}: {}".format(type(error).__name__, error)
+            )
+            for widget in list(QtWidgets.QApplication.topLevelWidgets()):
+                if isinstance(widget, QtWidgets.QDialog) and widget.isVisible():
+                    widget.reject()
+        QtCore.QTimer.singleShot(25, monitor)
+
+    original_reader = module.read_last_dialog_inputs
+    original_tag = module.tag_generated_object
+    injection_calls = {"count": 0}
+
+    def injected_tag(*_args, **_kwargs):
+        injection_calls["count"] += 1
+        raise RuntimeError(INJECTED_TRANSACTION_ERROR)
+
+    module.read_last_dialog_inputs = lambda _document: None
+    if inject:
+        module.tag_generated_object = injected_tag
+    wall_started = time.perf_counter()
+    cpu_started = time.process_time()
+    rss_before = _current_rss_mb()
+    objects_before = len(active_document.Objects)
+    QtCore.QTimer.singleShot(0, monitor)
+    try:
+        module.run_macro()
+    finally:
+        state["active"] = False
+        module.read_last_dialog_inputs = original_reader
+        module.tag_generated_object = original_tag
+    state["measurement"] = {
+        "wall_ms": (time.perf_counter() - wall_started) * 1000.0,
+        "process_cpu_ms": (time.process_time() - cpu_started) * 1000.0,
+        "rss_before_mb": rss_before,
+        "rss_after_mb": _current_rss_mb(),
+        "objects_before": objects_before,
+        "objects_after": len(active_document.Objects),
+    }
+    state["measurement"]["rss_delta_mb"] = (
+        state["measurement"]["rss_after_mb"] - rss_before
+    )
+    state["measurement"]["object_delta"] = (
+        state["measurement"]["objects_after"] - objects_before
+    )
+    state["injected_tag_calls"] = injection_calls["count"]
+    state["before_semantic_sha256"] = before["semantic_sha256"]
+    after = ordinary_track_document_snapshot(module, active_document)
+    state["after_semantic_sha256"] = after["semantic_sha256"]
+
+    if state["monitor_errors"]:
+        raise RuntimeError("; ".join(state["monitor_errors"]))
+    if state["curve_dialog_count"] != 1:
+        raise RuntimeError(
+            "{} expected one curve dialog, saw {}".format(
+                name, state["curve_dialog_count"]
+            )
+        )
+    if len(state["replacement_questions"]) != 1:
+        raise RuntimeError(
+            "{} expected one replacement confirmation, saw {}".format(
+                name, len(state["replacement_questions"])
+            )
+        )
+    if state["unexpected_dialogs"]:
+        raise RuntimeError(
+            "{} produced unexpected dialogs: {}".format(
+                name, state["unexpected_dialogs"]
+            )
+        )
+    if expected_error is None:
+        if len(state["success_dialogs"]) != 1 or state["expected_errors"]:
+            raise RuntimeError("{} did not report one clean success".format(name))
+        if before["semantic_sha256"] == after["semantic_sha256"]:
+            raise RuntimeError("{} did not change ordinary-track semantics".format(name))
+    else:
+        if len(state["expected_errors"]) != 1 or state["success_dialogs"]:
+            raise RuntimeError("{} did not report the expected failure".format(name))
+        if before["semantic_sha256"] != after["semantic_sha256"]:
+            raise RuntimeError("{} changed the document despite failure".format(name))
+    state["remembered_inputs"] = remembered_input_contract(
+        module.read_last_dialog_inputs(active_document)
+    )
+    if state["remembered_inputs"] != expected_remembered_input(target_angle):
+        raise RuntimeError(
+            "{} retained unexpected last-used inputs: {}".format(
+                name, state["remembered_inputs"]
+            )
+        )
+    if inject and state["injected_tag_calls"] != 1:
+        raise RuntimeError("The injected transaction failure did not run exactly once")
+    if not inject and state["injected_tag_calls"] != 0:
+        raise RuntimeError("A non-injected edit unexpectedly called the failure hook")
+    state.pop("active", None)
+    state.pop("seen", None)
+    return state, after
+
+
+parameter_group = App.ParamGet(module.LAST_INPUTS_PARAMETER_PATH)
+preference_keys = (
+    module.LAST_INPUTS_PARAMETER_KEY,
+    module.LAST_INPUTS_DOCUMENT_MAP_KEY,
+    module.MATERIAL_REPORT_PARAMETER_KEY,
+)
+preferences_before = {
+    key: str(parameter_group.GetString(key, "") or "") for key in preference_keys
+}
+result = {
+    "schema_version": 1,
+    "source_document": str(document.FileName),
+    "initial_base": ordinary_track_snapshot(module, document),
+    "scenarios": [],
+}
+
+try:
+    success, right_hand = _run_scenario(
+        "replace_left_with_right",
+        RIGHT_HAND_ANGLE_DEGREES,
+        90.0,
+    )
+    validate_right_hand_snapshot(right_hand)
+    result["scenarios"].append(success)
+    result["right_hand_snapshot"] = right_hand
+    result["handing_mirror"] = validate_handing_mirror(
+        result["initial_base"], right_hand
+    )
+
+    document = App.ActiveDocument
+    persistence_wall_started = time.perf_counter()
+    persistence_cpu_started = time.process_time()
+    persistence_rss_before = _current_rss_mb()
+    recompute_started = time.perf_counter()
+    document.recompute()
+    recompute_ms = (time.perf_counter() - recompute_started) * 1000.0
+    save_started = time.perf_counter()
+    document.save()
+    save_ms = (time.perf_counter() - save_started) * 1000.0
+    saved_path = str(document.FileName)
+    saved_name = str(document.Name)
+    close_reopen_started = time.perf_counter()
+    App.closeDocument(saved_name)
+    document = App.openDocument(saved_path)
+    close_reopen_ms = (time.perf_counter() - close_reopen_started) * 1000.0
+    persistence_measurement = {
+        "wall_ms": (time.perf_counter() - persistence_wall_started) * 1000.0,
+        "process_cpu_ms": (time.process_time() - persistence_cpu_started) * 1000.0,
+        "rss_before_mb": persistence_rss_before,
+        "rss_after_mb": _current_rss_mb(),
+        "recompute_ms": recompute_ms,
+        "save_ms": save_ms,
+        "close_reopen_ms": close_reopen_ms,
+        "objects_after_reopen": len(document.Objects),
+    }
+    persistence_measurement["rss_delta_mb"] = (
+        persistence_measurement["rss_after_mb"] - persistence_rss_before
+    )
+    reopened = ordinary_track_document_snapshot(module, document)
+    validate_right_hand_snapshot(reopened)
+    if reopened["semantic_sha256"] != right_hand["semantic_sha256"]:
+        raise RuntimeError("Save/reopen changed the right-hand ordinary-track state")
+    result["right_hand_save_reopen"] = {
+        "document": str(document.Name),
+        "path": saved_path,
+        "semantic_sha256": reopened["semantic_sha256"],
+        "measurement": persistence_measurement,
+    }
+
+    invalid, invalid_after = _run_scenario(
+        "reject_zero_angle_before_transaction",
+        INVALID_ANGLE_DEGREES,
+        RIGHT_HAND_ANGLE_DEGREES,
+        expected_error=ZERO_ANGLE_ERROR,
+    )
+    validate_right_hand_snapshot(invalid_after)
+    result["scenarios"].append(invalid)
+
+    rollback, rollback_after = _run_scenario(
+        "abort_replacement_transaction",
+        TRANSACTION_FAILURE_ANGLE_DEGREES,
+        RIGHT_HAND_ANGLE_DEGREES,
+        expected_error=INJECTED_TRANSACTION_ERROR,
+        inject=True,
+    )
+    validate_right_hand_snapshot(rollback_after)
+    result["scenarios"].append(rollback)
+
+    document = App.ActiveDocument
+    final_name = str(document.Name)
+    final_path = str(document.FileName)
+    App.closeDocument(final_name)
+    document = App.openDocument(final_path)
+    final_reopen = ordinary_track_document_snapshot(module, document)
+    validate_right_hand_snapshot(final_reopen)
+    if final_reopen["semantic_sha256"] != right_hand["semantic_sha256"]:
+        raise RuntimeError("Failure handling changed the saved right-hand document")
+    result["final_reopen_semantic_sha256"] = final_reopen["semantic_sha256"]
+finally:
+    for key, value in preferences_before.items():
+        parameter_group.SetString(key, value)
+    result["preference_store_restored"] = all(
+        str(parameter_group.GetString(key, "") or "") == value
+        for key, value in preferences_before.items()
+    )
+
+if not result["preference_store_restored"]:
+    raise RuntimeError("The ordinary-track edit recipe did not restore bridge preferences")
+print(json.dumps(result, sort_keys=True))

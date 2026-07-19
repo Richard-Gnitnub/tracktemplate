@@ -146,6 +146,34 @@ fixtures above have different binary hashes but both produce the Phase 1 deep
 semantic SHA-256
 `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656`.
 
+## Phase 1 ordinary-track edit and rollback oracle
+
+Drive B14's real curve dialog through one handedness replacement, persistence,
+invalid input and an injected transaction abort with:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-edit \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The wrapper launches a fresh isolated FreeCAD process and copies the supplied
+fixture into an ignored timestamped directory. It changes the copied default
+curve from `+90°` left-hand to `-90°` right-hand through B14's normal
+**Replace all existing generated templates** path, validates the complete
+mirrored document, saves, closes and reopens it, then proves both a zero-angle
+validation failure and a post-removal `abortTransaction()` leave the document
+unchanged. A final reopen must retain the frozen right-hand semantic SHA-256
+`4c8bf8dfc10bda8e91e7d479b630bbce2c12df576700f23e6b5bdbc276cc69d4`.
+
+The fault injection is development instrumentation: it replaces the first
+generated-object tagging call only long enough to fail inside the open
+replacement transaction after old outputs have been removed. The runner also
+checks and restores the isolated profile's affected last-used-input settings.
+It never modifies the source fixture. Raw evidence remains ignored under
+`benchmark-output/freecad-bridge/ordinary-edit-runs/`; the controlled series is
+recorded in
+[`reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md`](../../reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
+
 ## Automated B14 cold run
 
 After the local base fixture has been prepared, one command launches a fresh

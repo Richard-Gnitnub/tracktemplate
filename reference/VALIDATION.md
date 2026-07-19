@@ -140,6 +140,31 @@ Repeat `--base` to compare independent serialisations. The runner operates only
 on copies, closes them without saving, and requires the frozen deep semantic
 hash covering the fixed ordinary curve/two-track document.
 
+Fast Phase 1 ordinary-track edit/rollback contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_ordinary_edit.py
+```
+
+This protects the separate rounded dialog-input and exact persisted-input
+contracts, left/right mirror comparison, frozen right-hand semantic hash,
+source-level transaction ordering, and isolated runner/fault-injection
+structure without importing FreeCAD. Exercise the bounded real-GUI path with:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-edit \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The command acts only on a copied document. It must prove a `+90°` to `-90°`
+replacement changes only handedness fields and reflected Y bounds, survive
+save/reopen, reject zero angle without document mutation, abort a deliberately
+failed replacement transaction after generated-output removal, survive a
+second reopen, restore the isolated preference store, and leave the source
+fixture byte-identical. The accepted three-run characterisation and exact
+coverage boundary are recorded in
+[benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash

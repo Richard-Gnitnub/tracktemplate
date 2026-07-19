@@ -155,8 +155,14 @@ product-pipeline profiles and the remaining Phase 1 user decisions are still
 open. The fixed B14 ordinary curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,
 grouping, ordered production catalogue and exact-shape summaries. This closes
-the fixed create-result characterisation gap only; editing, reversal,
-rollback, Validate/Export and performance coverage remain open.
+the fixed create-result characterisation gap. A second isolated recipe now
+drives B14's real dialog through left-to-right replacement, save/reopen,
+zero-angle rejection and a deliberately failed transaction after old-output
+removal. It freezes the mirrored right-hand document, proves both failures
+leave document state unchanged, and records a comparable three-process edit
+series. Undo/redo, change-back, wider input boundaries, straight/station
+workflows, Validate/Export and the reconciled product-pipeline profile remain
+open.
 
 ### Exit gate
 
