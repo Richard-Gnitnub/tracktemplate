@@ -152,7 +152,11 @@ shadowing and alias chains. Direct B14/B15 transition and station
 characterisation now protects the leading calculation boundary. This is not
 yet a slice decision: end-to-end workflow oracles, boundary contracts,
 product-pipeline profiles and the remaining Phase 1 user decisions are still
-open.
+open. The fixed B14 ordinary curve/two-track fixture now also has a read-only
+FreeCAD document oracle covering its persisted parameter schema, identities,
+grouping, ordered production catalogue and exact-shape summaries. This closes
+the fixed create-result characterisation gap only; editing, reversal,
+rollback, Validate/Export and performance coverage remain open.
 
 ### Exit gate
 

@@ -121,6 +121,25 @@ an ordinary-Python namespace. It asserts representative and boundary values,
 invalid-input diagnostics, station clamping/interpolation/duplicate-point
 ordering, and exact B14/B15 result equality without importing FreeCAD.
 
+Fast Phase 1 ordinary-track document-oracle contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_ordinary_track.py
+```
+
+This checks volatile-value normalisation, deterministic hashing, null and valid
+shape summaries, the persisted property-schema reader, and the isolated runner
+contract without importing FreeCAD. The bounded real-FreeCAD oracle is:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-snapshot \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
+```
+
+Repeat `--base` to compare independent serialisations. The runner operates only
+on copies, closes them without saving, and requires the frozen deep semantic
+hash covering the fixed ordinary curve/two-track document.
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash

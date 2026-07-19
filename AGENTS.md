@@ -42,6 +42,12 @@
 - `tests/validate_phase1_alignment.py` directly characterises the current
   transition-length and alignment-station boundary in B14 and B15 without
   importing FreeCAD; preserve its numerical, invalid-input and ordering oracles.
+- `tools/freecad_bridge/ordinary_track_recipe.py` and
+  `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
+  semantic oracle for the fixed B14 ordinary curve/two-track document. Preserve
+  its property types, normalized volatile fields, identities, ordering,
+  production records and shape summaries; do not change the smaller Phase 0
+  fixture hash to absorb this contract.
 - `reference/PHASE1_INVENTORY.md` owns the in-progress workflow, dependency,
   side-effect, candidate-slice and decision inventory. Update it as Phase 1
   evidence closes; its provisional static labels are not final module
@@ -114,6 +120,13 @@ tools/freecad_bridge/build-b14-base
 Both commands are reproducible from tracked inputs. The fixture builder refuses
 to overwrite an existing FCStd or manifest.
 
+Run the read-only Phase 1 ordinary-track document oracle on a copied fixture:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-snapshot \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
+```
+
 Run the controlled B14 crossover recipe in a fresh isolated FreeCAD process:
 
 ```bash
@@ -149,6 +162,12 @@ Run the direct Phase 1 transition/station characterisation:
 
 ```bash
 .venv/bin/python tests/validate_phase1_alignment.py
+```
+
+Run the fast Phase 1 ordinary-track oracle checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_ordinary_track.py
 ```
 
 - These commands were verified with FreeCAD 1.1.1 in the current environment.

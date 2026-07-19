@@ -115,6 +115,37 @@ dialog and no managed turnout/crossover. The runner revalidates those semantics
 and copies the fixture into a new timestamped run directory; it never modifies
 the fixture itself.
 
+## Phase 1 ordinary-track document oracle
+
+Capture the deeper read-only persistence, identity, production-record and shape
+contract of one fixture with:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-snapshot
+```
+
+Repeat `--base` to compare independently serialised fixtures in the same
+isolated run:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-snapshot \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The runner copies every input, loads B14 without its launch dialog, opens each
+copy, captures the oracle, closes it without saving, and fails unless all
+supplied fixtures have the same semantic hash. Raw JSON and copied FCStd files
+remain ignored under `benchmark-output/freecad-bridge/ordinary-runs/`.
+
+This is characterisation evidence, not a performance benchmark. It preserves
+production-record list order and exact stable identities, but replaces the
+generated `created_at` and disabled-platform `manager_id` values with named
+placeholders. It deliberately excludes FreeCAD shape hash codes. The two B14
+fixtures above have different binary hashes but both produce the Phase 1 deep
+semantic SHA-256
+`b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656`.
+
 ## Automated B14 cold run
 
 After the local base fixture has been prepared, one command launches a fresh

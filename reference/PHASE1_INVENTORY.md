@@ -20,6 +20,8 @@ movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
 | --- | --- |
 | Inventory date | 2026-07-19 |
 | Inventory tool | `tools/phase1_inventory.py`, schema 1 |
+| Ordinary-track oracle | `tools/freecad_bridge/ordinary_track_recipe.py`, schema 1 |
+| Ordinary-track semantic SHA-256 | `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656` |
 | B14 role | Immutable legacy comparison oracle |
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
@@ -44,6 +46,19 @@ Run the first direct B14/B15 transition and station characterisation oracle:
 
 ```bash
 .venv/bin/python tests/validate_phase1_alignment.py
+```
+
+Run the fast contract checks for the deeper B14 ordinary-track document oracle:
+
+```bash
+.venv/bin/python tests/validate_phase1_ordinary_track.py
+```
+
+Capture the real FreeCAD oracle from one or more copied fixtures with:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-snapshot \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
 ```
 
 The JSON is generated evidence rather than a committed snapshot. It contains
@@ -277,9 +292,9 @@ is known to be defective.
 
 | Workflow family | Current oracle/evidence owner | Deterministic recipe or fixture | Principal Phase 1 gap |
 | --- | --- | --- | --- |
-| Curve/easement creation and editing | B15 reference; B14 oracle; direct transition/station characterisation | B14 default-base builder constructs one fixed curve | No isolated end-to-end create/edit/reverse recipe, warm profile or export-through profile; remaining curve functions lack direct oracles |
+| Curve/easement creation and editing | B15 reference; B14 oracle; direct transition/station characterisation and fixed create-result document oracle | B14 default-base builder plus `run-b14-ordinary-snapshot` | Fixed create result is characterised; edit/reverse, failure/rollback, warm profile and export-through profile remain open; remaining curve functions lack direct oracles |
 | Straight/station workflow | B15/B14 source only | None dedicated | Inputs, station semantics, edit behaviour, persistence and production output are uncharacterised |
-| Multiple-track/spacing transition | Default B14 two-track base fixture | `tools/freecad_bridge/build-b14-base` | Fixture proves construction state, not the full edit/Validate/Export workflow or edge cases |
+| Multiple-track/spacing transition | Default B14 two-track base fixture and deep document oracle | `build-b14-base` plus `run-b14-ordinary-snapshot` | Default persisted result/production catalogue is characterised; edit, Validate/Export, invalid inputs and spacing/easement edge cases remain open |
 | Standalone turnout | B15/B14 source and inherited parity checks | None dedicated | Creation/editing, handedness/orientation, straight/curved host, rollback and performance recipes |
 | Crossover geometry | B14 cold series and B15 acceptance report | Controlled `XO-001` bridge recipe | Preview/commit feasibility mismatch and curved-host coverage |
 | Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and ordinary-track timber decisions; focused failure/invalidation cases |
@@ -296,10 +311,60 @@ Existing crossover evidence remains owned by
 and
 [benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
 
+## Fixed ordinary-track document contract
+
+The Phase 0 fixture hash remains unchanged and intentionally small because it
+is the crossover-recipe precondition. Phase 1 adds a separate deeper oracle.
+In one isolated FreeCAD 1.1.1 run, the original 641,206-byte fixture and the
+independently regenerated 636,344-byte fixture had distinct binary SHA-256
+values but the same base semantic hash and the same deep semantic SHA-256
+`b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656`.
+
+The deep contract establishes:
+
+- nine named objects and exact group membership, with `SET-001` as the shared
+  template-set identity and track numbers 1 and 2 as the ordinary centreline
+  identities;
+- 38 mirrored typed configuration/calculated properties on settings and
+  template, plus settings-only `ProductionRecordIndexJSON` (39 properties on
+  settings); lengths use `App::PropertyLength` in millimetres and angles use
+  `App::PropertyAngle` in degrees;
+- ordered JSON arrays remain ordered, while the generated disabled-platform
+  `manager_id` and production-index `created_at` retain their schema keys but
+  are replaced by explicit placeholders for comparison;
+- four ordered production records: hidden 2D template cutting profile, direct
+  3D template solid, Main Track centreline engraving and Track 2 centreline
+  engraving, each with its complete stable record ID and supported formats;
+- global XY plan geometry, positive-Z template thickness, valid topology,
+  measures and bounds without relying on FreeCAD's process-sensitive shape
+  hash codes; and
+- the current exact-shape cost already present in the editable fixture: the
+  template compound has 2 solids, 2,104 faces and 6,300 edges; its hidden 2D
+  production source has 2,100 edges; the two centreline wires have 515 and 533
+  edges. These are structural observations, not performance timings.
+
+It also exposes a small but important representation boundary. The persisted
+main length and direct centreline-wire length round to `1542.476831 mm`, while
+the special-trackwork host reconstruction used by the Phase 0 base check rounds
+to `1542.475839 mm`; Track 2 is `1627.288494 mm` versus `1627.287516 mm`.
+Those differences are about one micrometre. The oracle retains both values:
+Phase 1 must identify the sampling/conversion source and agree the applicable
+tolerance before a modular API treats these representations as interchangeable.
+
+The oracle discovered and now protects two FreeCAD-specific facts rather than
+papering over them: a null `Part` shape raises if validity/type analysis is
+attempted, and the production-record index is not mirrored onto the template.
+It does not yet characterise parameter editing, reverse/right-hand generation,
+undo/redo, failure rollback, export artifacts or interaction time.
+
 ## Boundary-data inventory still required
 
-Before selecting the slice, Phase 1 must record the exact contract for each
-candidate rather than infer it from variable names:
+The fixed ordinary-track oracle now records the first concrete subset: its
+length/angle property units, global document frame, template-set/track/record
+identities, object and production-record ordering, persisted property/JSON
+schema, and volatile-field normalisation. Before selecting the slice, Phase 1
+must still record the exact contract for every candidate rather than infer it
+from variable names:
 
 - model and output units, including every degrees/radians and model/real-scale
   conversion;
@@ -340,14 +405,16 @@ edit-through-Validate/Export will be measured separately under
 | 2026-07-19 | Keep generated full inventory JSON out of Git | Accepted; the deterministic tool, source hashes, contract test and reviewed conclusions preserve the evidence without a large duplicate artifact |
 | 2026-07-19 | Treat automated responsibility labels as provisional overlapping signals | Accepted; final ownership requires boundary and workflow review |
 | 2026-07-19 | Add direct transition/station characterisation before selecting the slice | Accepted; representative, boundary, invalid-input and B14/B15 parity cases now protect the leading pure boundary |
+| 2026-07-19 | Keep the Phase 0 fixture hash small and add a separate deep ordinary-track oracle | Accepted; it preserves the crossover baseline while characterising persistence, identity, production ordering and exact shapes without changing either macro |
 | 2026-07-19 | Select the first extraction now | Deferred; transition solving leads on structural coupling, but workflow oracles, boundary contracts and representative profiles are not yet complete |
 
 ## Remaining Phase 1 work
 
 - Complete operator workflow inputs, outputs, persisted properties, guided
   stages, failure and rollback maps for every row above.
-- Create deterministic recipes or non-sensitive fixtures for curve/easement,
-  station/multiple-track, standalone turnout and end-to-end exports.
+- Extend the fixed curve/multiple-track create-result recipe through editing,
+  reversal, rollback, Validate and Export; create dedicated recipes or fixtures
+  for station/straight, standalone turnout and end-to-end exports.
 - Record candidate boundary schemas, units, frames, tolerances, identities,
   ordering, signatures and invalidation inputs.
 - Reconcile instrumentation and profile the ordinary editing and complete
