@@ -1,4 +1,4 @@
-"""Pure contracts for the Phase 1 B14 ordinary-track export paths."""
+"""Pure contracts for the Phase 1 B14 plain-line export paths."""
 
 import copy
 import csv
@@ -284,26 +284,26 @@ def validate_export_snapshot(snapshot, expected_revision=None):
     expected = sorted(_variant_names(expected_revision))
     if names != expected:
         raise ValueError(
-            "Unexpected ordinary-track export files: {}".format(names)
+            "Unexpected plain-line export files: {}".format(names)
         )
     manifest_items = [
         item for name, item in files.items() if name.lower().endswith(".csv")
     ]
     if len(manifest_items) != 1:
-        raise ValueError("Expected one ordinary-track export manifest")
+        raise ValueError("Expected one plain-line export manifest")
     manifest = manifest_items[0].get("manifest", {})
     if tuple(manifest.get("fields", [])) != MANIFEST_FIELDS:
-        raise ValueError("Unexpected ordinary-track export manifest schema")
+        raise ValueError("Unexpected plain-line export manifest schema")
     rows = manifest.get("rows", [])
     if len(rows) != EXPECTED_MANIFEST_ROW_COUNT:
         raise ValueError(
-            "Unexpected ordinary-track manifest row count: {}".format(len(rows))
+            "Unexpected plain-line manifest row count: {}".format(len(rows))
         )
     if any(row.get("Export status") != "Success" for row in rows):
-        raise ValueError("Ordinary-track manifest contains a non-success row")
+        raise ValueError("Plain-line manifest contains a non-success row")
     formats = sorted({row.get("Export format", "") for row in rows})
     if formats != ["DXF", "STEP", "STL", "SVG"]:
-        raise ValueError("Unexpected ordinary-track manifest formats: {}".format(formats))
+        raise ValueError("Unexpected plain-line manifest formats: {}".format(formats))
     if snapshot.get("directories"):
         raise ValueError(
             "Temporary export directories remain: {}".format(
@@ -329,7 +329,7 @@ def compare_logical_exports(reference, candidate):
 def create_time_export_document_snapshot(snapshot, enforce_expected_hash=True):
     """Normalise only the per-run create-time export directory in document state."""
     if not isinstance(snapshot, dict) or not isinstance(snapshot.get("semantic"), dict):
-        raise ValueError("Invalid create-time ordinary-track document snapshot")
+        raise ValueError("Invalid create-time plain-line document snapshot")
     semantic = copy.deepcopy(snapshot["semantic"])
     persistence = semantic.get("persistence", {})
     configs = []
@@ -439,7 +439,7 @@ def compare_create_time_document_to_base(base_snapshot, created_snapshot):
             values.pop("ProductionExportConfigurationJSON")
     if base != created:
         raise ValueError(
-            "Create-time export changed ordinary-track state beyond export configuration"
+            "Create-time export changed plain-line state beyond export configuration"
         )
     return True
 

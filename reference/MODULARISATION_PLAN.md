@@ -251,7 +251,7 @@ representative performance inventories remain open.
 - Add an import test proving the extracted domain code loads without FreeCAD or Qt.
 - Keep `AdvancedTurnout.FCMacro` as the working launcher.
 
-Exit gate: the empty boundary and loading approach work in both ordinary Python tests and FreeCAD.
+Exit gate: the empty boundary and loading approach work in both standalone Python tests and FreeCAD.
 
 ### Stage M3: first vertical slice
 

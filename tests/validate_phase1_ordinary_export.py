@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fast contracts for the Phase 1 B14 ordinary-track export paths."""
+"""Fast contracts for the Phase 1 B14 plain-line export paths."""
 
 import ast
 import copy
@@ -108,7 +108,7 @@ def _create_time_document_snapshot(output_directory):
     return {
         "semantic": {
             "schema_version": 1,
-            "marker": "stable ordinary-track state",
+            "marker": "stable plain-line state",
             "persistence": {
                 "settings": {
                     "values": {
@@ -461,7 +461,7 @@ def validate():
     ):
         assert required in create_driver_text
 
-    print("Phase 1 ordinary-track export validation passed")
+    print("Phase 1 plain-line export validation passed")
 
 
 if __name__ == "__main__":

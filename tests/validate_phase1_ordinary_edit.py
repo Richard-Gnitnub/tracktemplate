@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fast contracts for the Phase 1 B14 ordinary-track edit/rollback recipe."""
+"""Fast contracts for the Phase 1 B14 plain-line edit/rollback recipe."""
 
 import ast
 import copy
@@ -54,7 +54,7 @@ def validate():
     )
     expect_value_error(
         lambda: ordinary_track_edit_recipe.validate_right_hand_snapshot(None),
-        "Invalid ordinary-track document snapshot",
+        "Invalid plain-line document snapshot",
     )
 
     left_values = {
@@ -201,7 +201,7 @@ def validate():
     assert len(digest) == 64
     int(digest, 16)
 
-    print("Phase 1 ordinary-track edit/rollback validation passed")
+    print("Phase 1 plain-line edit/rollback validation passed")
 
 
 if __name__ == "__main__":

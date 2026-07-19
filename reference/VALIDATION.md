@@ -117,11 +117,12 @@ Direct Phase 1 transition/station characterisation:
 ```
 
 This extracts only the exact B14/B15 calculation definitions under test into
-an ordinary-Python namespace. It asserts representative and boundary values,
+a standalone Python namespace. It asserts representative and boundary values,
 invalid-input diagnostics, station clamping/interpolation/duplicate-point
 ordering, and exact B14/B15 result equality without importing FreeCAD.
 
-Fast Phase 1 ordinary-track document-oracle contract checks:
+Fast Phase 1 plain-line document-oracle contract checks (the test and wrapper
+retain legacy `ordinary` identifiers):
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_track.py
@@ -138,9 +139,9 @@ tools/freecad_bridge/run-b14-ordinary-snapshot \
 
 Repeat `--base` to compare independent serialisations. The runner operates only
 on copies, closes them without saving, and requires the frozen deep semantic
-hash covering the fixed ordinary curve/two-track document.
+hash covering the fixed plain-line curve/two-track document.
 
-Fast Phase 1 ordinary-track edit/rollback contract checks:
+Fast Phase 1 plain-line edit/rollback contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_edit.py
@@ -165,7 +166,7 @@ fixture byte-identical. The accepted three-run characterisation and exact
 coverage boundary are recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 
-Fast Phase 1 ordinary-track export contract checks:
+Fast Phase 1 plain-line export contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_export.py

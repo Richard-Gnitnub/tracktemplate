@@ -79,8 +79,9 @@ is not a repeated performance series. Do not turn its exceptionally slow cold
 or unchanged-result observations into pass thresholds or approved human-use
 budgets.
 
-The Phase 1 B14 ordinary-track edit/rollback characterisation uses the fixed
-ordinary-track fixture rather than a completed crossover document:
+The Phase 1 B14 plain-line edit/rollback characterisation uses the fixed
+plain-line fixture rather than a completed crossover document. Its command
+retains the legacy `ordinary` identifier:
 
 ```bash
 tools/freecad_bridge/run-b14-ordinary-edit \
@@ -93,12 +94,12 @@ recomputes, report and success dialog. Process launch, macro load, fixture open,
 semantic-oracle work and the separately reported recompute/save/reopen boundary
 are excluded. The zero-angle and injected-abort actions occur later in the same
 process and are correctness timings, not equivalent cold measurements. The
-injected fault is not a normal performance stage. Compare a future ordinary
+injected fault is not a normal performance stage. Compare a future routine
 editor only with the successful action under the same fixture, inputs, output
 scope and fresh-process qualifications, and also report its complete
 Validate/Export cost.
 
-The Phase 1 B14 ordinary-track selected-export characterisation uses the same
+The Phase 1 B14 plain-line selected-export characterisation uses the same
 fixed fixture and B14's explicit selected-production dialog:
 
 ```bash
@@ -192,7 +193,7 @@ the raw artifacts needed to audit it.
 
 ## Current instrumentation boundary
 
-The B14 report labelled **Whole workflow performance benchmark** currently measures the guided turnout/crossover workflow. It is an operator-visible special-trackwork benchmark, not yet a reconciled benchmark of the complete curve/easement-to-export product pipeline. The separate Phase 1 ordinary-track wrappers add external replacement, persistence, explicit selected-export and fixed create-through-export boundaries; they do not make the internal B14 report whole-product instrumentation or cover target-architecture deferred exact-shape reconstruction.
+The B14 report labelled **Whole workflow performance benchmark** currently measures the guided turnout/crossover workflow. It is an operator-visible special-trackwork benchmark, not yet a reconciled benchmark of the complete curve/easement-to-export product pipeline. The separate Phase 1 plain-line wrappers (whose command names retain the legacy `ordinary` identifier) add external replacement, persistence, explicit selected-export and fixed create-through-export boundaries; they do not make the internal B14 report whole-product instrumentation or cover target-architecture deferred exact-shape reconstruction.
 
 Until Phase 1 reconciles the complete instrumentation:
 
@@ -254,7 +255,7 @@ A performance change is acceptable only when:
 - applicable automated and GUI validation passes;
 - analytical and production outputs remain equivalent for the intended scope;
 - cache invalidation tests pass;
-- the targeted metric improves beyond ordinary run-to-run noise;
+- the targeted metric improves beyond normal run-to-run noise;
 - no material regression is introduced in another guided stage;
 - document state, transactions and cleanup remain correct;
 - limitations and unvalidated paths are reported.

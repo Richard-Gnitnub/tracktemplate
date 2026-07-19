@@ -258,7 +258,7 @@ The initial like-for-like cold and unchanged-result warm series are complete. Pr
   B14/B15 function equality, and complete inherited-module structural parity.
 - They do not cover every curve/easement, station, multiple-track, turnout, crossover, timbering, persistence, GUI editing, undo/redo, or production-export workflow.
 - The FreeCAD smoke test checks a bounded chair batch and object-count behaviour; it is not a whole-document integration test.
-- The deterministic B14 fixture, stable centreline/chainage recipe and reviewed bridge patch are reconstructable from tracked inputs; a fresh machine still requires the documented FreeCAD Flatpak and ordinary local tool prerequisites.
+- The deterministic B14 fixture, stable centreline/chainage recipe and reviewed bridge patch are reconstructable from tracked inputs; a fresh machine still requires the documented FreeCAD Flatpak and standard local tool prerequisites.
 - Controlled three-run cold-process and unchanged-result warm-reuse crossover series exist, but whole-product pipeline instrumentation does not yet cover curve/easement, station, multiple-track, editing, Validate, and Export paths.
 - A bounded completed-B14-to-B15 crossover save/reopen qualification now
   exists. There is still no general persistence/legacy-migration matrix or

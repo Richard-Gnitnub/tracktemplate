@@ -1,4 +1,4 @@
-"""Drive B14 ordinary-track create-time export and its final-task failure."""
+"""Drive B14 plain-line create-time export and its final-task failure."""
 
 import json
 import os
@@ -54,7 +54,7 @@ if module is None:
     raise RuntimeError("Load B14 before running its create-time export recipe")
 document = App.ActiveDocument
 if document is None or not str(document.FileName or ""):
-    raise RuntimeError("Open a saved copied B14 ordinary-track fixture before export")
+    raise RuntimeError("Open a saved copied B14 plain-line fixture before export")
 
 run_directory = pathlib.Path(str(document.FileName)).resolve().parent
 success_directory = run_directory / "create-time-export-success"

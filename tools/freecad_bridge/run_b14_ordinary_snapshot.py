@@ -33,7 +33,7 @@ for document_name in list(App.listDocuments()):
     App.closeDocument(document_name)
 remaining = sorted(App.listDocuments())
 if remaining:
-    raise RuntimeError('Could not close ordinary-track documents: {}'.format(remaining))
+    raise RuntimeError('Could not close plain-line documents: {}'.format(remaining))
 print(json.dumps({'closed': closed, 'remaining': remaining}, sort_keys=True))
 """))
 
@@ -60,7 +60,7 @@ def main():
     base_paths = [path.resolve() for path in supplied_bases]
     missing = [str(path) for path in base_paths if not path.is_file()]
     if missing:
-        raise SystemExit("B14 ordinary-track fixture not found: {}".format(", ".join(missing)))
+        raise SystemExit("B14 plain-line fixture not found: {}".format(", ".join(missing)))
 
     token_path = PROJECT_ROOT / "benchmark-output" / "freecad-bridge" / "rpc-token"
     if not token_path.is_file():
@@ -100,7 +100,7 @@ def main():
             PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "session_snapshot.py",
         ))
         if state["session_before"].get("documents"):
-            raise RuntimeError("The ordinary-track oracle requires an empty isolated session")
+            raise RuntimeError("The plain-line oracle requires an empty isolated session")
 
         load_job = submit_and_wait(
             client,
@@ -119,7 +119,7 @@ def main():
 import json
 import FreeCAD as App
 if App.listDocuments():
-    raise RuntimeError('Ordinary-track fixture capture requires no open document')
+    raise RuntimeError('Plain-line fixture capture requires no open document')
 document = App.openDocument({document_path!r})
 print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}, sort_keys=True))
 """.format(document_path=str(copied_path))))
@@ -147,7 +147,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
         })
         if len(semantic_hashes) != 1:
             raise RuntimeError(
-                "Supplied B14 fixtures are not ordinary-track semantically equivalent: {}".format(
+                "Supplied B14 fixtures are not plain-line semantically equivalent: {}".format(
                     semantic_hashes
                 )
             )
@@ -160,7 +160,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "session_snapshot.py",
         ))
         if state["session_after"].get("documents"):
-            raise RuntimeError("Ordinary-track capture leaked an open document")
+            raise RuntimeError("Plain-line capture leaked an open document")
         state["status"] = "completed"
     except (Exception, SystemExit) as error:
         state["status"] = "failed"
@@ -178,7 +178,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             json.dumps(state, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        print("Ordinary-track evidence: {}".format(run_dir), flush=True)
+        print("Plain-line evidence: {}".format(run_dir), flush=True)
 
 
 if __name__ == "__main__":

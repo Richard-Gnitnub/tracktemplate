@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the bounded B14 ordinary-track create-time export recipe."""
+"""Run the bounded B14 plain-line create-time export recipe."""
 
 import argparse
 import datetime
@@ -67,7 +67,7 @@ def main():
 
     base_path = args.base.resolve()
     if not base_path.is_file():
-        raise SystemExit("B14 ordinary-track fixture not found: {}".format(base_path))
+        raise SystemExit("B14 plain-line fixture not found: {}".format(base_path))
     source_sha256_before = sha256(base_path)
 
     token_path = PROJECT_ROOT / "benchmark-output" / "freecad-bridge" / "rpc-token"
@@ -147,7 +147,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
                 / "probes"
                 / "b14_ordinary_create_export_driver.py"
             ).read_text(encoding="utf-8"),
-            "B14 ordinary-track create-time export",
+            "B14 plain-line create-time export",
             args.timeout,
         )
         state["recipe"] = parse_json_output(export_job)
@@ -182,7 +182,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             json.dumps(state, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        print("Ordinary-track create-time export evidence: {}".format(run_dir), flush=True)
+        print("Plain-line create-time export evidence: {}".format(run_dir), flush=True)
 
 
 if __name__ == "__main__":

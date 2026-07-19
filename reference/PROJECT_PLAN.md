@@ -15,6 +15,8 @@ The documents have distinct responsibilities:
 - [TESTING_POLICY.md](TESTING_POLICY.md) defines when tests are required and when an existing oracle may change.
 - [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md) defines comparable resource measurements.
 - [VALIDATION.md](VALIDATION.md) defines correctness and integration evidence.
+- [TERMINOLOGY.md](TERMINOLOGY.md) defines canonical railway language and the
+  compatibility policy for legacy identifiers.
 - [PROVENANCE.md](PROVENANCE.md) records reference-source identity, source
   relationship, redistribution and licensing status.
 - [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md) owns the current workflow,
@@ -138,6 +140,9 @@ Choose migration order from evidence and establish oracles for behaviour that cu
 - Decide the supported FreeCAD/Python baseline and the intended legacy-document support window for the release candidate.
 - Score candidate first slices by clarity of input/output, current characterisation coverage, side effects, caller count, architectural value, and measurable resource cost.
 - Record durable choices in one concise decision log rather than scattering decisions through source comments.
+- Establish canonical railway terminology before naming modular interfaces;
+  preserve historical evidence identifiers and separately gate any accepted
+  macro wording correction.
 
 Chair analysis/presentation is a strong candidate because B15 already has focused checks. Curve/easement calculation is strategically foundational and may be purer. Neither is selected until this inventory exposes its real coupling.
 
@@ -152,7 +157,7 @@ shadowing and alias chains. Direct B14/B15 transition and station
 characterisation now protects the leading calculation boundary. This is not
 yet a slice decision: end-to-end workflow oracles, boundary contracts,
 product-pipeline profiles and the remaining Phase 1 user decisions are still
-open. The fixed B14 ordinary curve/two-track fixture now also has a read-only
+open. The fixed B14 plain-line curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,
 grouping, ordered production catalogue and exact-shape summaries. This closes
 the fixed create-result characterisation gap. A second isolated recipe now
@@ -163,7 +168,7 @@ leave document state unchanged, and records a comparable three-process edit
 series. Undo/redo, change-back, wider input boundaries, straight/station
 workflows, explicit Validate/deferred reconstruction and the reconciled
 product-pipeline profile remain open. A third isolated recipe now covers B14's
-real explicit selected-export dialog for the fixed ordinary fixture:
+real explicit selected-export dialog for the fixed plain-line fixture:
 deterministic DXF/SVG/STL/STEP and CSV,
 non-overwrite revisioning, confirmed staged overwrite, parsed output geometry,
 and byte-restoring rollback after an injected mid-commit failure. It also
@@ -178,6 +183,11 @@ gap without accepting either defect as future behaviour. Deferred exact-shape
 reconstruction, cancellation, other entity families/scopes and the reconciled
 product-pipeline profile remain open.
 
+Canonical **plain line** terminology and the compatibility treatment of the
+legacy `ordinary-*` evidence identifiers are now recorded in
+[TERMINOLOGY.md](TERMINOLOGY.md). B14/B15 remain byte-identical; user-facing
+macro wording is deferred to an approved successor version.
+
 ### Exit gate
 
 - Every release-critical workflow has an owner document/recipe, known oracle, and stated coverage gap.
@@ -190,11 +200,14 @@ product-pipeline profile remain open.
 
 ### Goal
 
-Prove that modular source can load through both ordinary Python and FreeCAD without changing product behaviour.
+Prove that modular source can load through both standalone Python and FreeCAD without changing product behaviour.
 
 ### Deliverables
 
 - Create only the `tracktemplate` package locations required by the chosen slice.
+- Use canonical `plain_line` naming in new domain and API surfaces; translate
+  legacy `ordinary_track` identifiers only at an explicit compatibility
+  boundary.
 - Establish a narrow `tracktemplate.api` façade and an explicit FreeCAD composition root.
 - Keep the working macro as the launcher while removing no legacy behaviour.
 - Add a domain import test that fails if FreeCAD, Part, Qt, pivy, or exporter dependencies enter the domain boundary.
@@ -205,7 +218,7 @@ Prove that modular source can load through both ordinary Python and FreeCAD with
 
 ### Exit gate
 
-- A clean ordinary-Python process imports the domain/API boundary without FreeCAD or Qt.
+- A clean standalone Python process imports the domain/API boundary without FreeCAD or Qt.
 - The launcher loads the package in the supported FreeCAD environment.
 - Existing B14/B15 workflows remain unchanged and current validation still passes.
 - No empty speculative package tree, circular dependency, new runtime dependency, or hidden global service has been introduced.
@@ -311,7 +324,9 @@ Migrate the mathematical and data foundations on which special trackwork depends
 
 ### Deliverables
 
-- Migrate remaining curve, easement, straight, alignment, station/chainage, spacing-transition, and multiple-track calculations in bounded slices.
+- Migrate remaining plain-line curve, easement, straight, alignment,
+  station/chainage, spacing-transition, and multiple-track calculations in
+  bounded slices.
 - Migrate track/platform preparation where it is part of the accepted workflow.
 - Extend canonical identities, signatures, persistence, preview, exact validation, and export contracts for each family.
 - Add representative normal, boundary, reverse-direction, multi-track, and tolerance-sensitive fixtures.

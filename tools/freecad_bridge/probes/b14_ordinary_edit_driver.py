@@ -1,4 +1,4 @@
-"""Drive B14 ordinary-track replacement, validation failure and rollback."""
+"""Drive B14 plain-line replacement, validation failure and rollback."""
 
 import json
 import sys
@@ -38,12 +38,12 @@ ZERO_ANGLE_ERROR = "The total turn angle cannot be zero."
 
 module = sys.modules.get(MODULE_NAME)
 if module is None:
-    raise RuntimeError("Load B14 before running its ordinary-track edit recipe")
+    raise RuntimeError("Load B14 before running its plain-line edit recipe")
 document = App.ActiveDocument
 if document is None:
-    raise RuntimeError("Open a copied B14 ordinary-track fixture before editing")
+    raise RuntimeError("Open a copied B14 plain-line fixture before editing")
 if not str(document.FileName or ""):
-    raise RuntimeError("The ordinary-track edit recipe requires a saved copied document")
+    raise RuntimeError("The plain-line edit recipe requires a saved copied document")
 
 
 def _current_rss_mb():
@@ -99,7 +99,7 @@ def _configure_dialog(dialog, target_angle):
     failed = sorted(name for name, passed in checks.items() if not passed)
     if failed:
         raise ValueError(
-            "Unexpected ordinary-track edit input(s): {}".format(", ".join(failed))
+            "Unexpected plain-line edit input(s): {}".format(", ".join(failed))
         )
     return {"accepted": _dialog_contract(dialog), "checks": checks}
 
@@ -115,7 +115,7 @@ def _yes_button(box):
 def _run_scenario(name, target_angle, expected_initial_angle, expected_error=None, inject=False):
     active_document = App.ActiveDocument
     if active_document is None:
-        raise RuntimeError("The ordinary-track edit scenario lost its active document")
+        raise RuntimeError("The plain-line edit scenario lost its active document")
     before = ordinary_track_document_snapshot(module, active_document)
     state = {
         "name": name,
@@ -259,7 +259,7 @@ def _run_scenario(name, target_angle, expected_initial_angle, expected_error=Non
         if len(state["success_dialogs"]) != 1 or state["expected_errors"]:
             raise RuntimeError("{} did not report one clean success".format(name))
         if before["semantic_sha256"] == after["semantic_sha256"]:
-            raise RuntimeError("{} did not change ordinary-track semantics".format(name))
+            raise RuntimeError("{} did not change plain-line semantics".format(name))
     else:
         if len(state["expected_errors"]) != 1 or state["success_dialogs"]:
             raise RuntimeError("{} did not report the expected failure".format(name))
@@ -344,7 +344,7 @@ try:
     reopened = ordinary_track_document_snapshot(module, document)
     validate_right_hand_snapshot(reopened)
     if reopened["semantic_sha256"] != right_hand["semantic_sha256"]:
-        raise RuntimeError("Save/reopen changed the right-hand ordinary-track state")
+        raise RuntimeError("Save/reopen changed the right-hand plain-line state")
     result["right_hand_save_reopen"] = {
         "document": str(document.Name),
         "path": saved_path,
@@ -390,5 +390,5 @@ finally:
     )
 
 if not result["preference_store_restored"]:
-    raise RuntimeError("The ordinary-track edit recipe did not restore bridge preferences")
+    raise RuntimeError("The plain-line edit recipe did not restore bridge preferences")
 print(json.dumps(result, sort_keys=True))

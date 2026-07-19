@@ -26,7 +26,7 @@ Parametric railway model
                     `--> SVG / DXF / STL / STEP / manifests
 ```
 
-The live document should remain lightweight. Exact OpenCASCADE `Part` shapes, solids, Boolean operations, and dense per-element FreeCAD objects should not be created during ordinary editing when a derived 2D representation can provide the required feedback.
+The live document should remain lightweight. Exact OpenCASCADE `Part` shapes, solids, Boolean operations, and dense per-element FreeCAD objects should not be created during routine editing when a derived 2D representation can provide the required feedback.
 
 Exact geometry is permitted at an explicit **Validate** or **Export** boundary. Validation must not be postponed until after a production file has already been written.
 

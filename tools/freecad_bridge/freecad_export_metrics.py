@@ -1,4 +1,4 @@
-"""Shared real-FreeCAD measurements for ordinary-track export artifacts."""
+"""Shared real-FreeCAD measurements for plain-line export artifacts."""
 
 import pathlib
 

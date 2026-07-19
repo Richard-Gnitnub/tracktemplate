@@ -1,4 +1,4 @@
-"""Deterministic Phase 1 oracle for the B14 ordinary two-track fixture.
+"""Deterministic Phase 1 oracle for the B14 plain-line two-track fixture.
 
 The Phase 0 base snapshot deliberately remains small because it is the
 precondition for the crossover benchmark.  This module adds a deeper,
@@ -417,9 +417,9 @@ def _validate_semantic(semantic):
         for record in objects
     }
     if object_contract != EXPECTED_OBJECT_CONTRACT:
-        raise ValueError("Unexpected ordinary-track object contract: {}".format(object_contract))
+        raise ValueError("Unexpected plain-line object contract: {}".format(object_contract))
     if semantic["groups"] != EXPECTED_GROUP_MEMBERS:
-        raise ValueError("Unexpected ordinary-track group membership: {}".format(semantic["groups"]))
+        raise ValueError("Unexpected plain-line group membership: {}".format(semantic["groups"]))
 
     settings = semantic["persistence"]["settings"]
     template = semantic["persistence"]["template"]
@@ -462,16 +462,16 @@ def _validate_semantic(semantic):
         if values.get(name) != expected
     }
     if differences:
-        raise ValueError("Unexpected ordinary-track persisted values: {}".format(differences))
+        raise ValueError("Unexpected plain-line persisted values: {}".format(differences))
     if values["TrackConfigurationJSON"] != EXPECTED_TRACK_CONFIGURATION:
-        raise ValueError("Unexpected ordinary-track TrackConfigurationJSON")
+        raise ValueError("Unexpected plain-line TrackConfigurationJSON")
     if values["StraightTrackConfigurationsJSON"] != []:
-        raise ValueError("The ordinary-track fixture unexpectedly enables straight routes")
+        raise ValueError("The plain-line fixture unexpectedly enables straight routes")
     platforms = values["PlatformConfigurationsJSON"]
     if not isinstance(platforms, list) or len(platforms) != 1:
-        raise ValueError("The ordinary-track fixture must store one disabled platform definition")
+        raise ValueError("The plain-line fixture must store one disabled platform definition")
     if platforms[0].get("enabled") is not False:
-        raise ValueError("The ordinary-track fixture unexpectedly enables its platform")
+        raise ValueError("The plain-line fixture unexpectedly enables its platform")
     if platforms[0].get("manager_id") != "<generated-manager-id>":
         raise ValueError("The platform manager identity was not explicitly normalised")
 
@@ -479,10 +479,10 @@ def _validate_semantic(semantic):
     if record_index.get("created_at") != "<generated-timestamp>":
         raise ValueError("The production timestamp was not explicitly normalised")
     if record_index.get("schema_version") != 2 or record_index.get("template_set_id") != "SET-001":
-        raise ValueError("Unexpected ordinary-track production-record index header")
+        raise ValueError("Unexpected plain-line production-record index header")
     record_contract = [_record_contract(record) for record in record_index.get("records", [])]
     if record_contract != EXPECTED_PRODUCTION_RECORDS:
-        raise ValueError("Unexpected ordinary-track production-record order/schema: {}".format(record_contract))
+        raise ValueError("Unexpected plain-line production-record order/schema: {}".format(record_contract))
     record_ids = {record[0] for record in EXPECTED_PRODUCTION_RECORDS}
     object_record_ids = {
         record["identity"]["ProductionRecordID"]
@@ -494,7 +494,7 @@ def _validate_semantic(semantic):
 
 
 def ordinary_track_document_state(module, document):
-    """Capture normalized ordinary-track document state without a fixed handing."""
+    """Capture normalized plain-line document state without a fixed handing."""
     settings_obj = _select_role(module, document, "Settings")
     template_obj = _select_role(module, document, "Template")
     return {
@@ -513,7 +513,7 @@ def ordinary_track_document_state(module, document):
 
 
 def ordinary_track_document_snapshot(module, document):
-    """Fingerprint a normalized ordinary-track state for edit/rollback checks."""
+    """Fingerprint a normalized plain-line state for edit/rollback checks."""
     semantic = {
         "schema_version": ORDINARY_TRACK_SCHEMA_VERSION,
         "boundary_data": BOUNDARY_DATA,
@@ -526,7 +526,7 @@ def ordinary_track_document_snapshot(module, document):
 
 
 def ordinary_track_snapshot(module, document, enforce_expected_hash=True):
-    """Validate and fingerprint B14's fixed ordinary curve/two-track document."""
+    """Validate and fingerprint B14's fixed plain-line curve/two-track document."""
     base = freecad_base_snapshot(module, document)
     semantic = {
         "schema_version": ORDINARY_TRACK_SCHEMA_VERSION,
@@ -542,7 +542,7 @@ def ordinary_track_snapshot(module, document, enforce_expected_hash=True):
         and digest != EXPECTED_ORDINARY_TRACK_SEMANTIC_SHA256
     ):
         raise ValueError(
-            "Unexpected ordinary-track semantic SHA-256: {} (expected {})".format(
+            "Unexpected plain-line semantic SHA-256: {} (expected {})".format(
                 digest,
                 EXPECTED_ORDINARY_TRACK_SEMANTIC_SHA256,
             )

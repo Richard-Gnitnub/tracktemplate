@@ -20,21 +20,25 @@ movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
 | --- | --- |
 | Inventory date | 2026-07-19 |
 | Inventory tool | `tools/phase1_inventory.py`, schema 1 |
-| Ordinary-track oracle | `tools/freecad_bridge/ordinary_track_recipe.py`, schema 1 |
-| Ordinary-track semantic SHA-256 | `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656` |
-| Ordinary-track edit/rollback oracle | `tools/freecad_bridge/ordinary_track_edit_recipe.py`, schema 1 |
-| Right-hand ordinary-track semantic SHA-256 | `4c8bf8dfc10bda8e91e7d479b630bbce2c12df576700f23e6b5bdbc276cc69d4` |
-| Ordinary-track selected-export oracle | `tools/freecad_bridge/ordinary_track_export_recipe.py`, schema 1 |
-| Ordinary-track logical export SHA-256 | `91922662487f92b8bdb8f92a65e09fb7b62f2f9d1461704bb7c8cd41c2a15413` |
-| Ordinary-track create-time logical export SHA-256 | `b33a2c5cfb6937d988046ad17584ed7bc2957514e77213282dfd665960bc4ffb` |
-| Ordinary-track export production-metric SHA-256 | `37dcbc20e8ecda9c1a80b3e73646b0c1127211e01488d56eeef49aa08d0789b4` for selected and create-time paths |
-| Ordinary-track create-time document SHA-256 | `a6aae6d70610ceec50a6223328db1454eca264effc12e7db5df07204707b3aa2` |
+| Plain-line oracle | `tools/freecad_bridge/ordinary_track_recipe.py`, schema 1 |
+| Plain-line semantic SHA-256 | `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656` |
+| Plain-line edit/rollback oracle | `tools/freecad_bridge/ordinary_track_edit_recipe.py`, schema 1 |
+| Right-hand plain-line semantic SHA-256 | `4c8bf8dfc10bda8e91e7d479b630bbce2c12df576700f23e6b5bdbc276cc69d4` |
+| Plain-line selected-export oracle | `tools/freecad_bridge/ordinary_track_export_recipe.py`, schema 1 |
+| Plain-line logical export SHA-256 | `91922662487f92b8bdb8f92a65e09fb7b62f2f9d1461704bb7c8cd41c2a15413` |
+| Plain-line create-time logical export SHA-256 | `b33a2c5cfb6937d988046ad17584ed7bc2957514e77213282dfd665960bc4ffb` |
+| Plain-line export production-metric SHA-256 | `37dcbc20e8ecda9c1a80b3e73646b0c1127211e01488d56eeef49aa08d0789b4` for selected and create-time paths |
+| Plain-line create-time document SHA-256 | `a6aae6d70610ceec50a6223328db1454eca264effc12e7db5df07204707b3aa2` |
 | Diagnosed create-time partial-directory SHA-256 | `05d27a32b26435eda3b776498c2b28195a943bc2499ced404450f18ce349bf29` |
 | B14 role | Immutable legacy comparison oracle |
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
 | B15 SHA-256 | `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848` |
 | Production-source changes in this tranche | None |
+
+The `ordinary_track` filenames, imports, commands and recipe IDs in this
+inventory are frozen legacy evidence identifiers. Living prose follows
+[TERMINOLOGY.md](TERMINOLOGY.md) and describes the subject as plain line.
 
 Reproduce the complete JSON inventory without importing or executing either
 macro:
@@ -56,7 +60,7 @@ Run the first direct B14/B15 transition and station characterisation oracle:
 .venv/bin/python tests/validate_phase1_alignment.py
 ```
 
-Run the fast contract checks for the deeper B14 ordinary-track document oracle:
+Run the fast contract checks for the deeper B14 plain-line document oracle:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_track.py
@@ -69,7 +73,7 @@ tools/freecad_bridge/run-b14-ordinary-snapshot \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
 ```
 
-Run the fast and real-GUI B14 ordinary-track edit/rollback oracles with:
+Run the fast and real-GUI B14 plain-line edit/rollback oracles with:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_edit.py
@@ -77,7 +81,7 @@ tools/freecad_bridge/run-b14-ordinary-edit \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 ```
 
-Run the fast and real-GUI B14 ordinary-track selected-export oracles with:
+Run the fast and real-GUI B14 plain-line selected-export oracles with:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_export.py
@@ -323,27 +327,27 @@ is known to be defective.
 | Multiple-track/spacing transition | Default B14 two-track base fixture plus deep create/edit/export document oracles | `build-b14-base` plus the four `run-b14-ordinary-*` characterisation wrappers | The fixed two-track configuration survives handedness replacement/reopen, selected export and create-time export; deferred Validate/reconstruction plus spacing/easement edit and invalid-input edge cases remain open |
 | Standalone turnout | B15/B14 source and inherited parity checks | None dedicated | Creation/editing, handedness/orientation, straight/curved host, rollback and performance recipes |
 | Crossover geometry | B14 cold series and B15 acceptance report | Controlled `XO-001` bridge recipe | Preview/commit feasibility mismatch and curved-host coverage |
-| Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and ordinary-track timber decisions; focused failure/invalidation cases |
-| Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/ordinary track coverage, input-class invalidation, late timing payload and redundant refresh defects |
+| Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and plain-line timber decisions; focused failure/invalidation cases |
+| Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/plain-line coverage, input-class invalidation, late timing payload and redundant refresh defects |
 | Optional supported chair solids | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage |
 | Host integration | Controlled crossover acceptance | `XO-001` stage 6 | Standalone turnout, removal/reversal, rollback and legacy-document variants |
-| Save/reopen | B15 crossover acceptance and B14 ordinary handedness-edit oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Undo/redo, change-back and broader entity families |
-| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed ordinary-track selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback and future deferred exact-shape reconstruction |
-| Failure recovery | Transactional source paths, strict bridge dialog policy, ordinary replacement and both export fault injections | Edit oracle proves zero-angle rejection/post-removal abort; selected export proves byte restoration; create-time export freezes the current 13-file partial result and unchanged document | Fix create-time output atomicity/final UI under a new accepted contract; add equivalent fixtures for other release-critical workflows |
+| Save/reopen | B15 crossover acceptance and B14 plain-line handedness-edit oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Undo/redo, change-back and broader entity families |
+| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback and future deferred exact-shape reconstruction |
+| Failure recovery | Transactional source paths, strict bridge dialog policy, plain-line replacement and both export fault injections | Edit oracle proves zero-angle rejection/post-removal abort; selected export proves byte restoration; create-time export freezes the current 13-file partial result and unchanged document | Fix create-time output atomicity/final UI under a new accepted contract; add equivalent fixtures for other release-critical workflows |
 
 Existing crossover evidence remains owned by
 [benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md),
 [benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md),
 and
 [benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
-The ordinary-track edit, persistence and rollback evidence is recorded in
+The plain-line edit, persistence and rollback evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
-The ordinary-track selected-production export evidence is recorded in
+The plain-line selected-production export evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
 The normal Generate-path production-export evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md).
 
-## Fixed ordinary-track document contract
+## Fixed plain-line document contract
 
 The Phase 0 fixture hash remains unchanged and intentionally small because it
 is the crossover-recipe precondition. Phase 1 adds a separate deeper oracle.
@@ -355,7 +359,7 @@ values but the same base semantic hash and the same deep semantic SHA-256
 The deep contract establishes:
 
 - nine named objects and exact group membership, with `SET-001` as the shared
-  template-set identity and track numbers 1 and 2 as the ordinary centreline
+  template-set identity and track numbers 1 and 2 as the plain-line centreline
   identities;
 - 38 mirrored typed configuration/calculated properties on settings and
   template, plus settings-only `ProductionRecordIndexJSON` (39 properties on
@@ -391,7 +395,7 @@ replacement, both current export entry points and bounded failure paths;
 undo/redo, change-back, broader parameter boundaries and deferred
 Validate/reconstruction remain open.
 
-## Ordinary-track editing, persistence and rollback contract
+## Plain-line editing, persistence and rollback contract
 
 The isolated `run-b14-ordinary-edit` recipe uses B14's real curve dialog and
 normal replacement path on a disposable copy of the fixed left-hand fixture.
@@ -402,7 +406,7 @@ reopen. The source fixture remained byte-identical in every run.
 
 The contract establishes:
 
-- ordinary-track inputs are reloaded from the persisted document when
+- plain-line inputs are reloaded from the persisted document when
   remembered UI state is absent, and the fixed dialog's three-decimal
   `559.410 mm` transition display maps back to the existing exact solved
   `559.410254727028 mm` persistence value;
@@ -433,7 +437,7 @@ then had a `758.005 ms` median. These are characterisation measurements, not
 accepted interaction budgets or a lightweight-view profile. Exact recipes,
 individual results and limitations are in the benchmark report.
 
-## Ordinary-track selected production export contract
+## Plain-line selected production export contract
 
 The isolated `run-b14-ordinary-export` recipe drives B14's real
 `SelectedProductionExportDialog` against a disposable copy of the fixed
@@ -475,7 +479,7 @@ This is the atomic explicit selected-export path. The separate create-time
 contract below prevents its stronger transaction semantics being inferred for
 the normal Generate action.
 
-## Ordinary-track create-time production export contract
+## Plain-line create-time production export contract
 
 The isolated `run-b14-ordinary-create-export` recipe drives the real curve
 dialog and normal replacement path with production export enabled. Three fresh
@@ -510,7 +514,7 @@ human-use budgets. Full evidence and limitations are in the benchmark report.
 
 ## Boundary-data inventory still required
 
-The fixed ordinary-track oracle now records the first concrete subset: its
+The fixed plain-line oracle now records the first concrete subset: its
 length/angle property units, global document frame, template-set/track/record
 identities, object and production-record ordering, persisted property/JSON
 schema, and volatile-field normalisation. Before selecting the slice, Phase 1
@@ -534,7 +538,7 @@ their semantic contract.
 ## Performance inventory status
 
 The controlled crossover cold/warm series identifies genuine dominant costs.
-The ordinary-track edit series separately records the full exact-shape
+The plain-line edit series separately records the full exact-shape
 left-to-right replacement boundary at a `2781.596 ms` median and subsequent
 recompute/save/reopen at `758.005 ms`. The selected-export series adds a
 `7885.730 ms` cold action median for the fixed retained exact shapes and splits
@@ -553,7 +557,7 @@ Before profiles select an optimisation, the defects already recorded in
 4. redundant post-reuse panel refresh; and
 5. repeated effective-status signature scans.
 
-No current timing is accepted as a human-use budget. Ordinary editing,
+No current timing is accepted as a human-use budget. Routine editing,
 explicit Validate/deferred reconstruction and complete edit-through-export
 will continue to be measured separately under
 [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md); the current selected-export series
@@ -568,10 +572,11 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-19 | Keep generated full inventory JSON out of Git | Accepted; the deterministic tool, source hashes, contract test and reviewed conclusions preserve the evidence without a large duplicate artifact |
 | 2026-07-19 | Treat automated responsibility labels as provisional overlapping signals | Accepted; final ownership requires boundary and workflow review |
 | 2026-07-19 | Add direct transition/station characterisation before selecting the slice | Accepted; representative, boundary, invalid-input and B14/B15 parity cases now protect the leading pure boundary |
-| 2026-07-19 | Keep the Phase 0 fixture hash small and add a separate deep ordinary-track oracle | Accepted; it preserves the crossover baseline while characterising persistence, identity, production ordering and exact shapes without changing either macro |
-| 2026-07-19 | Extend the ordinary-track oracle through one real handedness edit and two negative paths | Accepted; the copied-document recipe freezes mirrored semantics, save/reopen, zero-angle rejection, post-removal transaction abort and the separate last-used-input side effect without changing either macro |
+| 2026-07-19 | Keep the Phase 0 fixture hash small and add a separate deep plain-line oracle | Accepted; it preserves the crossover baseline while characterising persistence, identity, production ordering and exact shapes without changing either macro; the `ordinary_track` implementation name remains a legacy evidence identifier |
+| 2026-07-19 | Extend the plain-line oracle through one real handedness edit and two negative paths | Accepted; the copied-document recipe freezes mirrored semantics, save/reopen, zero-angle rejection, post-removal transaction abort and the separate last-used-input side effect without changing either macro |
 | 2026-07-19 | Characterise the real explicit selected-export transaction before changing export architecture | Accepted; the copied-document recipe freezes all current formats/manifest, revision and overwrite semantics, parsed artifacts, atomic rollback and cleanup, and exposes repeated probe cost without changing either macro |
 | 2026-07-19 | Characterise create-time production export independently from selected export | Accepted; the normal Generate recipe freezes successful production measures and persistence, measures the fixed end-to-end boundary, and deterministically bounds B14's partial-output/final-success-dialog defects without changing either macro or accepting them as future behaviour |
+| 2026-07-19 | Use plain line/plain-line for track without S&C | Accepted; official UK railway usage replaces the project category “ordinary track”; B14/B15 and historical evidence identifiers remain unchanged, new APIs will use `plain_line`, and macro/component wording is separately gated in [TERMINOLOGY.md](TERMINOLOGY.md) |
 | 2026-07-19 | Select the first extraction now | Deferred; transition solving leads on structural coupling, but workflow oracles, boundary contracts and representative profiles are not yet complete |
 
 ## Remaining Phase 1 work
@@ -585,7 +590,7 @@ create-time series covers fresh legacy exact-shape construction only.
   station/straight and standalone turnout.
 - Record candidate boundary schemas, units, frames, tolerances, identities,
   ordering, signatures and invalidation inputs.
-- Reconcile instrumentation and profile the proposed lightweight ordinary
+- Reconcile instrumentation and profile the proposed lightweight routine
   editing path and complete Validate/Export path without double-counting or
   treating the current exact-shape replacement measurement as its budget.
 - Decide the supported FreeCAD/Python baseline and proposed legacy-document

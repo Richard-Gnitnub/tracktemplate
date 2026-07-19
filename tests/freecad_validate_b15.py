@@ -82,6 +82,6 @@ def _run_as_script():
 
 # FreeCADCmd loads a script using its filename stem as ``__name__`` rather
 # than Python's usual ``__main__`` value. Support both execution routes while
-# keeping ordinary test-module imports side-effect free.
+# keeping standalone test-module imports side-effect free.
 if __name__ in {"__main__", "freecad_validate_b15"}:
     _run_as_script()

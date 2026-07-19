@@ -115,7 +115,12 @@ dialog and no managed turnout/crossover. The runner revalidates those semantics
 and copies the fixture into a new timestamped run directory; it never modifies
 the fixture itself.
 
-## Phase 1 ordinary-track document oracle
+## Phase 1 plain-line document oracle
+
+The `ordinary-*` command, module and output-directory names below are frozen
+legacy evidence identifiers. New project terminology follows
+[`reference/TERMINOLOGY.md`](../../reference/TERMINOLOGY.md): this fixture is
+plain line track because it contains no switches and crossings.
 
 Capture the deeper read-only persistence, identity, production-record and shape
 contract of one fixture with:
@@ -146,7 +151,7 @@ fixtures above have different binary hashes but both produce the Phase 1 deep
 semantic SHA-256
 `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656`.
 
-## Phase 1 ordinary-track edit and rollback oracle
+## Phase 1 plain-line edit and rollback oracle
 
 Drive B14's real curve dialog through one handedness replacement, persistence,
 invalid input and an injected transaction abort with:
@@ -174,7 +179,7 @@ It never modifies the source fixture. Raw evidence remains ignored under
 recorded in
 [`reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md`](../../reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 
-## Phase 1 ordinary-track selected-export oracle
+## Phase 1 plain-line selected-export oracle
 
 Drive B14's real selected-production export dialog through initial output,
 non-overwrite revisioning, confirmed overwrite and an injected commit failure:
@@ -202,7 +207,7 @@ create-time export path has the independent oracle below; cancellation, other
 scopes/entity families and future deferred exact-shape construction remain
 Phase 1 gaps.
 
-## Phase 1 ordinary-track create-time export oracle
+## Phase 1 plain-line create-time export oracle
 
 Drive production export inside B14's real curve Generate action with:
 

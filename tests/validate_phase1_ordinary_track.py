@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fast contract checks for the Phase 1 B14 ordinary-track document oracle."""
+"""Fast contract checks for the Phase 1 B14 plain-line document oracle."""
 
 import copy
 import hashlib
@@ -215,7 +215,7 @@ def validate():
     assert len(digest) == 64
     int(digest, 16)
 
-    print("Phase 1 ordinary-track oracle validation passed")
+    print("Phase 1 plain-line oracle validation passed")
 
 
 if __name__ == "__main__":

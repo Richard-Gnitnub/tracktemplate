@@ -18,6 +18,22 @@
 - Migrate incrementally behind equivalence checks. Do not attempt a whole-macro rewrite or remove a legacy path before parity evidence and user acceptance.
 - Follow `reference/PERFORMANCE_SOP.md` for measurement and `reference/VALIDATION.md` for the applicable validation matrix.
 
+## Railway terminology
+
+- `reference/TERMINOLOGY.md` is the canonical project glossary and migration
+  policy. Use **plain line** or **plain line track** for track without switches
+  and crossings; plain line may be straight, curved, transitioned or part of a
+  multiple-track layout.
+- Do not introduce **ordinary track** in new prose, UI, schema or API names.
+  Use **routine editing** and **standalone Python** for the unrelated generic
+  meanings.
+- Existing `ordinary_track*` files, commands, recipe IDs, keys and benchmark
+  paths are frozen legacy evidence identifiers. Describe their subject as
+  plain line, but do not rename those identifiers without an explicit
+  compatibility and evidence migration.
+- Do not mechanically relabel `ordinary chair`, timber or component terms;
+  review their railway/source meaning separately.
+
 ## Project phase discipline
 
 - The current delivery phase is recorded in `reference/PROJECT_PLAN.md`; Phase 0 closed on 2026-07-19 and Phase 1 is current until its inventory exit gate is explicitly accepted.
@@ -44,13 +60,14 @@
   importing FreeCAD; preserve its numerical, invalid-input and ordering oracles.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
-  semantic oracle for the fixed B14 ordinary curve/two-track document. Preserve
+  semantic oracle for the fixed B14 plain-line curve/two-track document. Their
+  `ordinary_track` names are legacy evidence identifiers. Preserve
   its property types, normalized volatile fields, identities, ordering,
   production records and shape summaries; do not change the smaller Phase 0
   fixture hash to absorb this contract.
 - `tools/freecad_bridge/ordinary_track_edit_recipe.py`,
   `tools/freecad_bridge/run-b14-ordinary-edit` and
-  `tests/validate_phase1_ordinary_edit.py` own the bounded B14 ordinary-track
+  `tests/validate_phase1_ordinary_edit.py` own the bounded B14 plain-line
   handedness, save/reopen, invalid-input and transaction-abort oracle. Preserve
   the separate three-decimal dialog and exact solved persistence contracts, the
   frozen right-hand semantic hash, exact mirrored shape contract, and
@@ -77,7 +94,7 @@
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
-- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md` and `reference/PROVENANCE.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, licence/provenance status or version role changes.
+- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md` and `reference/PROVENANCE.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, licence/provenance status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `LICENSE` and `NOTICE.md` apply GPL-3.0-or-later to the project, preserve the Templot5 source-basis attribution, and record particular thanks to Martin Wynne and Steve Cornford. Preserve both files and all applicable upstream notices.
 - `main.py` is PyCharm starter boilerplate, not the product entry point.
@@ -102,7 +119,7 @@
 
 - Follow `reference/PERFORMANCE_SOP.md`; do not invent a reduced benchmark procedure for an individual change.
 - Use the B14 turnout/crossover **Whole workflow** report as the current operator-visible special-trackwork baseline and compare equivalent starting state, settings, stage sequence and cache state. Do not describe it as whole-product coverage.
-- Measure both ordinary editing and deferred Validate/Export work so cost is not merely hidden at a later boundary.
+- Measure both routine editing and deferred Validate/Export work so cost is not merely hidden at a later boundary.
 - Preserve cache signatures and invalidation rules. A faster stale result is a correctness failure. Test both initial calculation and unchanged-result reuse when touching caches.
 - Minimise redundant document recomputes, metadata writes, display-object creation, shape construction, and repeated traversals only when output equivalence is demonstrated.
 - Keep FreeCAD object creation out of per-chair or similar hot loops where batching/compounds preserve the same result; the B15 structural test enforces this for the lightweight chair display.
@@ -142,28 +159,29 @@ tools/freecad_bridge/build-b14-base
 Both commands are reproducible from tracked inputs. The fixture builder refuses
 to overwrite an existing FCStd or manifest.
 
-Run the read-only Phase 1 ordinary-track document oracle on a copied fixture:
+Run the read-only Phase 1 plain-line document oracle on a copied fixture (the
+command retains its legacy identifier):
 
 ```bash
 tools/freecad_bridge/run-b14-ordinary-snapshot \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
 ```
 
-Run the Phase 1 ordinary-track edit and rollback oracle on a copied fixture:
+Run the Phase 1 plain-line edit and rollback oracle on a copied fixture:
 
 ```bash
 tools/freecad_bridge/run-b14-ordinary-edit \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 ```
 
-Run the Phase 1 ordinary-track selected-export oracle on a copied fixture:
+Run the Phase 1 plain-line selected-export oracle on a copied fixture:
 
 ```bash
 tools/freecad_bridge/run-b14-ordinary-export \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 ```
 
-Run the separate Phase 1 ordinary-track create-time export oracle on a copied
+Run the separate Phase 1 plain-line create-time export oracle on a copied
 fixture:
 
 ```bash
@@ -208,19 +226,19 @@ Run the direct Phase 1 transition/station characterisation:
 .venv/bin/python tests/validate_phase1_alignment.py
 ```
 
-Run the fast Phase 1 ordinary-track oracle checks:
+Run the fast Phase 1 plain-line oracle checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_track.py
 ```
 
-Run the fast Phase 1 ordinary-track edit/rollback checks:
+Run the fast Phase 1 plain-line edit/rollback checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_edit.py
 ```
 
-Run the fast Phase 1 ordinary-track export checks:
+Run the fast Phase 1 plain-line export checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_export.py

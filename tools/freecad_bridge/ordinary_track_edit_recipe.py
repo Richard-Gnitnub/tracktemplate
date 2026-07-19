@@ -1,4 +1,4 @@
-"""Contracts for Phase 1 B14 ordinary-track regeneration and rollback."""
+"""Contracts for Phase 1 B14 plain-line regeneration and rollback."""
 
 from tools.freecad_bridge.ordinary_track_recipe import (
     EXPECTED_GROUP_MEMBERS,
@@ -29,7 +29,7 @@ EXPECTED_DIALOG_TRACK_CONFIGURATION[0]["exit_transition_length"] = 559.41
 def remembered_input_contract(payload):
     """Return the accepted last-used fields relevant to this bounded recipe."""
     if not isinstance(payload, dict):
-        raise ValueError("B14 did not retain an accepted ordinary-track input payload")
+        raise ValueError("B14 did not retain an accepted plain-line input payload")
     return {
         "transition_mm": float(payload.get("transition", -1.0)),
         "radius_mm": float(payload.get("radius", -1.0)),
@@ -67,7 +67,7 @@ def _record_contract(record):
 def validate_right_hand_snapshot(snapshot, enforce_expected_hash=True):
     """Validate the fixed left-to-right replacement result and return its hash."""
     if not isinstance(snapshot, dict) or not isinstance(snapshot.get("semantic"), dict):
-        raise ValueError("Invalid ordinary-track document snapshot")
+        raise ValueError("Invalid plain-line document snapshot")
     semantic = snapshot["semantic"]
     objects = semantic.get("objects", [])
     object_contract = {
@@ -146,11 +146,11 @@ def validate_handing_mirror(left_snapshot, right_snapshot):
     left = left_snapshot.get("semantic", {})
     right = right_snapshot.get("semantic", {})
     if left.get("groups") != right.get("groups"):
-        raise ValueError("Left/right ordinary-track group membership differs")
+        raise ValueError("Left/right plain-line group membership differs")
     left_objects = {record["name"]: record for record in left.get("objects", [])}
     right_objects = {record["name"]: record for record in right.get("objects", [])}
     if set(left_objects) != set(right_objects):
-        raise ValueError("Left/right ordinary-track object names differ")
+        raise ValueError("Left/right plain-line object names differ")
 
     mirrored_shapes = []
     for name in sorted(left_objects):

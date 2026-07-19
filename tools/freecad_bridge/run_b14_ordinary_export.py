@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the bounded B14 ordinary-track selected-export recipe."""
+"""Run the bounded B14 plain-line selected-export recipe."""
 
 import argparse
 import datetime
@@ -43,7 +43,7 @@ for document_name in list(App.listDocuments()):
     App.closeDocument(document_name)
 remaining = sorted(App.listDocuments())
 if remaining:
-    raise RuntimeError('Could not close ordinary-track export documents: {}'.format(remaining))
+    raise RuntimeError('Could not close plain-line export documents: {}'.format(remaining))
 print(json.dumps({'closed': closed, 'remaining': remaining}, sort_keys=True))
 """))
 
@@ -67,7 +67,7 @@ def main():
 
     base_path = args.base.resolve()
     if not base_path.is_file():
-        raise SystemExit("B14 ordinary-track fixture not found: {}".format(base_path))
+        raise SystemExit("B14 plain-line fixture not found: {}".format(base_path))
     source_sha256_before = sha256(base_path)
 
     token_path = PROJECT_ROOT / "benchmark-output" / "freecad-bridge" / "rpc-token"
@@ -118,7 +118,7 @@ def main():
             PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "session_snapshot.py",
         ))
         if state["session_before"].get("documents"):
-            raise RuntimeError("The ordinary-track export recipe requires an empty session")
+            raise RuntimeError("The plain-line export recipe requires an empty session")
 
         load_job = submit_and_wait(
             client,
@@ -133,7 +133,7 @@ def main():
 import json
 import FreeCAD as App
 if App.listDocuments():
-    raise RuntimeError('Ordinary-track export requires no open document')
+    raise RuntimeError('Plain-line export requires no open document')
 document = App.openDocument({document_path!r})
 print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}, sort_keys=True))
 """.format(document_path=str(document_path))))
@@ -147,7 +147,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
                 / "probes"
                 / "b14_ordinary_export_driver.py"
             ).read_text(encoding="utf-8"),
-            "B14 ordinary-track selected export",
+            "B14 plain-line selected export",
             args.timeout,
         )
         state["recipe"] = parse_json_output(export_job)
@@ -182,7 +182,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             json.dumps(state, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        print("Ordinary-track export evidence: {}".format(run_dir), flush=True)
+        print("Plain-line export evidence: {}".format(run_dir), flush=True)
 
 
 if __name__ == "__main__":

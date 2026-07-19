@@ -1,4 +1,4 @@
-"""Drive B14 ordinary-track selected export, repeat, overwrite and rollback."""
+"""Drive B14 plain-line selected export, repeat, overwrite and rollback."""
 
 import json
 import os
@@ -42,10 +42,10 @@ from tools.freecad_bridge.ordinary_track_recipe import (
 MODULE_NAME = "tracktemplate_b14_session"
 module = sys.modules.get(MODULE_NAME)
 if module is None:
-    raise RuntimeError("Load B14 before running its ordinary-track export recipe")
+    raise RuntimeError("Load B14 before running its plain-line export recipe")
 document = App.ActiveDocument
 if document is None or not str(document.FileName or ""):
-    raise RuntimeError("Open a saved copied B14 ordinary-track fixture before export")
+    raise RuntimeError("Open a saved copied B14 plain-line fixture before export")
 
 run_directory = pathlib.Path(str(document.FileName)).resolve().parent
 output_directory = run_directory / "selected-export"
@@ -103,22 +103,22 @@ def _configure_export_dialog(dialog, directory, overwrite):
         raise ValueError("Selected export did not retain the template-set scope")
     if len(dialog.matching_records) != 4 or len(dialog.export_records) != 4:
         raise ValueError(
-            "Expected four ordinary-track production records, found {}/{}".format(
+            "Expected four plain-line production records, found {}/{}".format(
                 len(dialog.matching_records), len(dialog.export_records)
             )
         )
     if len((dialog.plan or {}).get("tasks", [])) != EXPECTED_TASK_COUNT:
-        raise ValueError("Unexpected ordinary-track selected-export task count")
+        raise ValueError("Unexpected plain-line selected-export task count")
     if not (dialog.plan or {}).get("manifest_path"):
-        raise ValueError("Ordinary-track selected export did not plan a manifest")
+        raise ValueError("Plain-line selected export did not plan a manifest")
     if counts.get("blocking", 0):
         raise ValueError(
-            "Ordinary-track selected export has blocking preflight issues: {}".format(
+            "Plain-line selected export has blocking preflight issues: {}".format(
                 dialog.issues
             )
         )
     if not dialog.export_button.isEnabled():
-        raise ValueError("Ordinary-track selected export button is disabled")
+        raise ValueError("Plain-line selected export button is disabled")
     return {
         "scope": {
             key: dialog.scope.get(key)
@@ -140,7 +140,7 @@ def _configure_export_dialog(dialog, directory, overwrite):
 def _run_dialog_scenario(name, overwrite=False, inject_commit_failure=False):
     active_document = App.ActiveDocument
     if active_document is None or active_document is not document:
-        raise RuntimeError("The ordinary-track export recipe lost its source document")
+        raise RuntimeError("The plain-line export recipe lost its source document")
     before = ordinary_track_document_snapshot(module, active_document)
     state = {
         "name": name,
@@ -381,7 +381,7 @@ def _run_dialog_scenario(name, overwrite=False, inject_commit_failure=False):
     if len(state["selected_export_calls"]) != 1:
         raise RuntimeError("Selected export transaction did not run exactly once")
     if before["semantic_sha256"] != after["semantic_sha256"]:
-        raise RuntimeError("Selected export changed the ordinary-track document")
+        raise RuntimeError("Selected export changed the plain-line document")
     if len(active_document.Objects) != 9:
         raise RuntimeError("Selected export leaked temporary FreeCAD objects")
     temporary_objects = [
@@ -448,7 +448,7 @@ base_variant = export_variant_snapshot(complete)
 base_digest = validate_export_snapshot(base_variant)
 if base_digest != EXPECTED_LOGICAL_EXPORT_SHA256:
     raise RuntimeError(
-        "Ordinary-track export oracle changed: {}".format(base_digest)
+        "Plain-line export oracle changed: {}".format(base_digest)
     )
 base_metrics = _format_metrics(output_directory, base_variant)
 result["initial_export"] = {
@@ -525,7 +525,7 @@ result["rollback_export"] = {
 
 final_document = ordinary_track_document_snapshot(module, document)
 if final_document["semantic_sha256"] != result["initial_document"]["semantic_sha256"]:
-    raise RuntimeError("Ordinary-track selected export changed final document semantics")
+    raise RuntimeError("Plain-line selected export changed final document semantics")
 result["final_document_semantic_sha256"] = final_document["semantic_sha256"]
 result["manifest_row_count"] = EXPECTED_MANIFEST_ROW_COUNT
 print(json.dumps(result, sort_keys=True))
