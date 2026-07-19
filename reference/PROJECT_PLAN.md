@@ -161,13 +161,17 @@ open. The fixed B14 plain-line curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,
 grouping, ordered production catalogue and exact-shape summaries. This closes
 the fixed create-result characterisation gap. A second isolated recipe now
-drives B14's real dialog through left-to-right replacement, save/reopen,
-zero-angle rejection and a deliberately failed transaction after old-output
-removal. It freezes the mirrored right-hand document, proves both failures
-leave document state unchanged, and records a comparable three-process edit
-series. Undo/redo, change-back, wider input boundaries, straight/station
-workflows, explicit Validate/deferred reconstruction and the reconciled
-product-pipeline profile remain open. A third isolated recipe now covers B14's
+drives B14's real dialog through left-to-right replacement, the complete
+undo/redo stack, explicit change-back, save/reopen, zero-angle rejection and a
+deliberately failed transaction after old-output removal. It freezes every
+intermediate semantic state, proves exact left/right recovery and preference
+separation, and records a comparable three-process edit series. It also
+exposes a bounded B14 defect: one replacement is split across geometry,
+production-schedule and material-report undo entries, whereas the accepted
+successor contract requires one atomic application-command unit. Wider input
+boundaries, straight/station workflows, explicit Validate/deferred
+reconstruction and the reconciled product-pipeline profile remain open. A
+third isolated recipe now covers B14's
 real explicit selected-export dialog for the fixed plain-line fixture:
 deterministic DXF/SVG/STL/STEP and CSV,
 non-overwrite revisioning, confirmed staged overwrite, parsed output geometry,

@@ -159,6 +159,9 @@ The export layer keeps the existing safety model:
 - Timber and chair decisions cannot change as a side effect of rendering or performance work.
 - Cache reuse must be invalidated by every input that can affect its result.
 - A lightweight preview is never evidence that exact production validation passed.
+- One accepted application command is one atomic undo unit; its related
+  derived-document updates cannot expose separately undoable incomplete
+  states.
 - Undo, redo, transactions, failure recovery and export rollback remain valid.
 - Legacy files remain readable through explicit schema/version handling.
 

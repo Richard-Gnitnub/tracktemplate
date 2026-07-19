@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fast contracts for the Phase 1 B14 plain-line edit/rollback recipe."""
+"""Fast contracts for the Phase 1 B14 plain-line edit lifecycle/rollback recipe."""
 
 import ast
 import copy
@@ -137,6 +137,7 @@ def validate():
         "not the reflection",
     )
     assert ordinary_track_edit_recipe.RIGHT_HAND_ANGLE_DEGREES == -90.0
+    assert ordinary_track_edit_recipe.EDIT_RECIPE_SCHEMA_VERSION == 2
     assert ordinary_track_edit_recipe.INVALID_ANGLE_DEGREES == 0.0
     assert ordinary_track_edit_recipe.TRANSACTION_FAILURE_ANGLE_DEGREES == -80.0
     assert "after generated-output removal" in (
@@ -180,15 +181,42 @@ def validate():
     assert "b14_ordinary_edit_driver.py" in runner_text
     for scenario in (
         '"replace_left_with_right"',
+        '"change_right_back_to_left"',
         '"reject_zero_angle_before_transaction"',
         '"abort_replacement_transaction"',
     ):
         assert scenario in probe_text
     assert "module.tag_generated_object = injected_tag" in probe_text
     assert "ordinary_track_document_snapshot" in probe_text
+    assert "active_document.undo()" in probe_text
+    assert "active_document.redo()" in probe_text
+    for history_action in (
+        '"undo_replacement_material_report"',
+        '"undo_replacement_production_schedule"',
+        '"undo_replacement_geometry"',
+        '"redo_replacement_geometry"',
+        '"redo_replacement_production_schedule"',
+        '"redo_replacement_material_report"',
+        '"undo_change_back_material_report"',
+        '"undo_change_back_production_schedule"',
+        '"undo_change_back_geometry"',
+    ):
+        assert history_action in probe_text
+    assert '"initial_document"' in probe_text
+    assert '"history_actions"' in probe_text
+    assert "UndoCount" in probe_text and "RedoCount" in probe_text
+    assert "UndoNames" in probe_text and "RedoNames" in probe_text
+    assert "Update Version {} production schedule" in probe_text
+    assert "Update Version {} material report" in probe_text
+    assert "phase1-b14-ordinary-track-edit-lifecycle-v2" in runner_text
+    assert "reported_state" in probe_text
+    assert 'state.pop("active"' not in probe_text
     assert "document.save()" in probe_text
     assert "App.closeDocument" in probe_text and "App.openDocument" in probe_text
     for measurement_field in (
+        '"action_ms"',
+        '"action_with_recompute_ms"',
+        '"validated_wall_ms"',
         '"recompute_ms"',
         '"save_ms"',
         '"close_reopen_ms"',
@@ -201,7 +229,7 @@ def validate():
     assert len(digest) == 64
     int(digest, 16)
 
-    print("Phase 1 plain-line edit/rollback validation passed")
+    print("Phase 1 plain-line edit lifecycle/rollback validation passed")
 
 
 if __name__ == "__main__":

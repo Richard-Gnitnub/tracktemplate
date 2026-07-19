@@ -79,9 +79,9 @@ is not a repeated performance series. Do not turn its exceptionally slow cold
 or unchanged-result observations into pass thresholds or approved human-use
 budgets.
 
-The Phase 1 B14 plain-line edit/rollback characterisation uses the fixed
-plain-line fixture rather than a completed crossover document. Its command
-retains the legacy `ordinary` identifier:
+The Phase 1 B14 plain-line edit lifecycle/rollback characterisation uses the
+fixed plain-line fixture rather than a completed crossover document. Its
+command retains the legacy `ordinary` identifier:
 
 ```bash
 tools/freecad_bridge/run-b14-ordinary-edit \
@@ -91,8 +91,15 @@ tools/freecad_bridge/run-b14-ordinary-edit \
 Its successful replacement boundary includes B14's real dialog, confirmation,
 calculation, exact-shape construction, document replacement, metadata,
 recomputes, report and success dialog. Process launch, macro load, fixture open,
-semantic-oracle work and the separately reported recompute/save/reopen boundary
-are excluded. The zero-angle and injected-abort actions occur later in the same
+semantic-oracle work and the separately reported history and
+recompute/save/reopen boundaries are excluded. The v2 recipe then records the
+actual synchronous Undo/Redo call, that call plus explicit recompute, and the
+complete deep-validation duration as separate fields. Only the first two
+describe the history action; the roughly one-second semantic traversal is
+harness cost and must not be presented as operator-visible Undo/Redo time.
+The synchronous measurements also exclude any later viewport repaint, so do
+not present them as a complete GUI-latency budget.
+Change-back, zero-angle and injected-abort actions occur later in the same
 process and are correctness timings, not equivalent cold measurements. The
 injected fault is not a normal performance stage. Compare a future routine
 editor only with the successful action under the same fixture, inputs, output

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the bounded B14 plain-line edit and rollback recipe."""
+"""Run the bounded B14 plain-line edit lifecycle and rollback recipe."""
 
 import argparse
 import datetime
@@ -88,7 +88,7 @@ def main():
 
     state = {
         "run_started_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "recipe_id": "phase1-b14-ordinary-track-edit-rollback-v1",
+        "recipe_id": "phase1-b14-ordinary-track-edit-lifecycle-v2",
         "macro": "AdvancedTurnout.FCMacro",
         "macro_sha256": sha256(PROJECT_ROOT / "AdvancedTurnout.FCMacro"),
         "source_fixture": str(base_path),
@@ -132,7 +132,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
                 / "probes"
                 / "b14_ordinary_edit_driver.py"
             ).read_text(encoding="utf-8"),
-            "B14 plain-line edit/rollback",
+            "B14 plain-line edit lifecycle/rollback",
             args.timeout,
         )
         state["recipe"] = parse_json_output(edit_job)
@@ -165,7 +165,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             json.dumps(state, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        print("Plain-line edit evidence: {}".format(run_dir), flush=True)
+        print("Plain-line edit lifecycle evidence: {}".format(run_dir), flush=True)
 
 
 if __name__ == "__main__":

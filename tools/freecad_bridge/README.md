@@ -151,10 +151,11 @@ fixtures above have different binary hashes but both produce the Phase 1 deep
 semantic SHA-256
 `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656`.
 
-## Phase 1 plain-line edit and rollback oracle
+## Phase 1 plain-line edit lifecycle and rollback oracle
 
-Drive B14's real curve dialog through one handedness replacement, persistence,
-invalid input and an injected transaction abort with:
+Drive B14's real curve dialog through handedness replacement, undo/redo,
+explicit change-back, persistence, invalid input and an injected transaction
+abort with:
 
 ```bash
 tools/freecad_bridge/run-b14-ordinary-edit \
@@ -165,10 +166,19 @@ The wrapper launches a fresh isolated FreeCAD process and copies the supplied
 fixture into an ignored timestamped directory. It changes the copied default
 curve from `+90°` left-hand to `-90°` right-hand through B14's normal
 **Replace all existing generated templates** path, validates the complete
-mirrored document, saves, closes and reopens it, then proves both a zero-angle
-validation failure and a post-removal `abortTransaction()` leave the document
-unchanged. A final reopen must retain the frozen right-hand semantic SHA-256
+mirrored document, validates every state across three Undo and three Redo
+operations, and explicitly changes back to the exact initial left-hand state.
+It then undoes the three change-back entries, saves, closes and reopens the
+recovered right-hand state, and proves both a zero-angle validation failure and
+a post-removal `abortTransaction()` leave the document unchanged. A final
+reopen must retain the frozen right-hand semantic SHA-256
 `4c8bf8dfc10bda8e91e7d479b630bbce2c12df576700f23e6b5bdbc276cc69d4`.
+
+The lifecycle oracle records that B14 creates separate geometry, production
+schedule and material-report history entries for one user replacement. This
+three-entry stack and its seven/eight-object intermediate states are a bounded
+legacy defect. A migrated application command must make those updates one
+atomic undo unit.
 
 The fault injection is development instrumentation: it replaces the first
 generated-object tagging call only long enough to fail inside the open
@@ -177,6 +187,8 @@ checks and restores the isolated profile's affected last-used-input settings.
 It never modifies the source fixture. Raw evidence remains ignored under
 `benchmark-output/freecad-bridge/ordinary-edit-runs/`; the controlled series is
 recorded in
+[`reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md`](../../reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md).
+The preceding v1 replacement/rollback series remains in
 [`reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md`](../../reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 
 ## Phase 1 plain-line selected-export oracle

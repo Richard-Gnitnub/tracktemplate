@@ -22,7 +22,8 @@ movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
 | Inventory tool | `tools/phase1_inventory.py`, schema 1 |
 | Plain-line oracle | `tools/freecad_bridge/ordinary_track_recipe.py`, schema 1 |
 | Plain-line semantic SHA-256 | `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656` |
-| Plain-line edit/rollback oracle | `tools/freecad_bridge/ordinary_track_edit_recipe.py`, schema 1 |
+| Plain-line edit lifecycle/rollback oracle | `tools/freecad_bridge/ordinary_track_edit_recipe.py`, schema 2 |
+| Initial complete-document semantic SHA-256 | `ed6021762297912796c93c3c126b9b86c62d56f52287d237c90075414c7ebd13` |
 | Right-hand plain-line semantic SHA-256 | `4c8bf8dfc10bda8e91e7d479b630bbce2c12df576700f23e6b5bdbc276cc69d4` |
 | Plain-line selected-export oracle | `tools/freecad_bridge/ordinary_track_export_recipe.py`, schema 1 |
 | Plain-line logical export SHA-256 | `91922662487f92b8bdb8f92a65e09fb7b62f2f9d1461704bb7c8cd41c2a15413` |
@@ -73,7 +74,7 @@ tools/freecad_bridge/run-b14-ordinary-snapshot \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
 ```
 
-Run the fast and real-GUI B14 plain-line edit/rollback oracles with:
+Run the fast and real-GUI B14 plain-line edit lifecycle/rollback oracles with:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_edit.py
@@ -322,7 +323,7 @@ is known to be defective.
 
 | Workflow family | Current oracle/evidence owner | Deterministic recipe or fixture | Principal Phase 1 gap |
 | --- | --- | --- | --- |
-| Curve/easement creation and editing | B15 reference; B14 oracle; direct transition/station characterisation; fixed create-result, handedness-edit, selected-export and create-time-export oracles | B14 default-base builder plus the four `run-b14-ordinary-*` characterisation wrappers | Fixed left-to-right replacement, persistence, negative paths and both export entry points for retained/fresh exact shapes are characterised; undo/redo, change-back, wider curve boundaries and future deferred Validate/reconstruction remain open; remaining curve functions lack direct oracles |
+| Curve/easement creation and editing | B15 reference; B14 oracle; direct transition/station characterisation; fixed create-result, edit-lifecycle, selected-export and create-time-export oracles | B14 default-base builder plus the four `run-b14-ordinary-*` characterisation wrappers | Fixed left/right replacement, undo/redo, exact change-back, persistence, negative paths and both export entry points for retained/fresh exact shapes are characterised; wider curve boundaries and future deferred Validate/reconstruction remain open; remaining curve functions lack direct oracles |
 | Straight/station workflow | B15/B14 source only | None dedicated | Inputs, station semantics, edit behaviour, persistence and production output are uncharacterised |
 | Multiple-track/spacing transition | Default B14 two-track base fixture plus deep create/edit/export document oracles | `build-b14-base` plus the four `run-b14-ordinary-*` characterisation wrappers | The fixed two-track configuration survives handedness replacement/reopen, selected export and create-time export; deferred Validate/reconstruction plus spacing/easement edit and invalid-input edge cases remain open |
 | Standalone turnout | B15/B14 source and inherited parity checks | None dedicated | Creation/editing, handedness/orientation, straight/curved host, rollback and performance recipes |
@@ -331,9 +332,9 @@ is known to be defective.
 | Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/plain-line coverage, input-class invalidation, late timing payload and redundant refresh defects |
 | Optional supported chair solids | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage |
 | Host integration | Controlled crossover acceptance | `XO-001` stage 6 | Standalone turnout, removal/reversal, rollback and legacy-document variants |
-| Save/reopen | B15 crossover acceptance and B14 plain-line handedness-edit oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Undo/redo, change-back and broader entity families |
+| Save/reopen | B15 crossover acceptance and B14 plain-line edit-lifecycle oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Broader entity families and future schema migration |
 | SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback and future deferred exact-shape reconstruction |
-| Failure recovery | Transactional source paths, strict bridge dialog policy, plain-line replacement and both export fault injections | Edit oracle proves zero-angle rejection/post-removal abort; selected export proves byte restoration; create-time export freezes the current 13-file partial result and unchanged document | Fix create-time output atomicity/final UI under a new accepted contract; add equivalent fixtures for other release-critical workflows |
+| Failure recovery | Transactional source paths, strict bridge dialog policy, plain-line edit lifecycle and both export fault injections | Edit oracle proves zero-angle rejection/post-removal abort and bounds B14's three-entry incomplete Undo states; selected export proves byte restoration; create-time export freezes the current 13-file partial result and unchanged document | Make successor edit commands and create-time output atomic under accepted contracts; add equivalent fixtures for other release-critical workflows |
 
 Existing crossover evidence remains owned by
 [benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md),
@@ -342,6 +343,8 @@ and
 [benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
 The plain-line edit, persistence and rollback evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
+Its undo/redo and explicit change-back extension is recorded in
+[benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md](benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md).
 The plain-line selected-production export evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
 The normal Generate-path production-export evidence is recorded in
@@ -391,18 +394,19 @@ The oracle discovered and now protects two FreeCAD-specific facts rather than
 papering over them: a null `Part` shape raises if validity/type analysis is
 attempted, and the production-record index is not mirrored onto the template.
 The companion edit and export oracles now cover the fixed right-hand
-replacement, both current export entry points and bounded failure paths;
-undo/redo, change-back, broader parameter boundaries and deferred
+replacement, undo/redo, exact explicit change-back, both current export entry
+points and bounded failure paths. Broader parameter boundaries and deferred
 Validate/reconstruction remain open.
 
-## Plain-line editing, persistence and rollback contract
+## Plain-line editing lifecycle, persistence and rollback contract
 
 The isolated `run-b14-ordinary-edit` recipe uses B14's real curve dialog and
 normal replacement path on a disposable copy of the fixed left-hand fixture.
-Three fresh FreeCAD 1.1.1 processes all produced right-hand semantic SHA-256
+The original three-run replacement/rollback series and the v2 three-run
+lifecycle extension all produced right-hand semantic SHA-256
 `4c8bf8dfc10bda8e91e7d479b630bbce2c12df576700f23e6b5bdbc276cc69d4`
-before save, after save/reopen, and after the negative paths plus a final
-reopen. The source fixture remained byte-identical in every run.
+before and after their applicable history, persistence and failure actions.
+The source fixture remained byte-identical in every run.
 
 The contract establishes:
 
@@ -416,6 +420,17 @@ The contract establishes:
   bounds exactly, while the only changed persisted fields on settings and
   template are `CircularArcAngle`, `TotalTurnAngle`, `TransitionAngleEach` and
   `TurnDirection`;
+- one logical B14 replacement produces three FreeCAD history entries, newest
+  first: material report, production schedule, and curve/straight production
+  templates. Successive Undo operations expose eight objects, then seven,
+  before the third restores the complete preceding nine-object state; Redo
+  mirrors the sequence;
+- explicitly changing `-90°` back to `+90°` restores the exact initial
+  complete-document SHA-256
+  `ed6021762297912796c93c3c126b9b86c62d56f52287d237c90075414c7ebd13`,
+  and three Undo operations then recover the exact right-hand state;
+- save/close/reopen preserves the complete right-hand state and resets the
+  document's observable undo/redo counts to zero;
 - the exact zero-angle diagnostic occurs before transaction opening and leaves
   the complete document semantic hash unchanged; and
 - an injected failure at the first generated-object tagging call occurs after
@@ -428,14 +443,26 @@ modularisation: B14 remembers accepted dialog and material-report preferences
 before validation and before the FreeCAD document transaction. Failed actions
 therefore retain attempted UI inputs while rolling back document state. Tests
 must not conflate these two behaviours. The isolated recipe validates the
-remembered payloads and then restores its development profile.
+remembered payloads after every history action and then restores its
+development profile.
 
-The successful replacement action had a three-process median wall time of
+The three-entry edit stack is a bounded B14 atomicity defect, not an accepted
+parity requirement. The successor contract requires one accepted application
+command to be one complete undo unit, including production-schedule and
+material-report refresh, so one Undo cannot expose an incomplete document.
+
+The original successful replacement action had a three-process median wall time of
 `2781.596 ms` (range `2769.362–2836.972 ms`) and median RSS change of
 `+234.840 MB` (range `+182.641–+299.961 MB`). Explicit recompute/save/reopen
-then had a `758.005 ms` median. These are characterisation measurements, not
-accepted interaction budgets or a lightweight-view profile. Exact recipes,
-individual results and limitations are in the benchmark report.
+then had a `758.005 ms` median. The v2 series independently observed a
+`2783.694 ms` replacement median and a later same-process `2044.726 ms`
+explicit change-back median. Its three-step action-plus-recompute medians were
+`6.724 ms` for Undo, `1.824 ms` for Redo and `2.722 ms` for undoing
+change-back. Deep semantic validation took roughly 1.2 seconds per history
+step and is harness cost, not operator-visible Undo/Redo time. These are
+characterisation measurements, not accepted interaction budgets or a
+lightweight-view profile. Exact recipes, individual results and limitations
+are in the two benchmark reports.
 
 ## Plain-line selected production export contract
 
@@ -540,7 +567,10 @@ their semantic contract.
 The controlled crossover cold/warm series identifies genuine dominant costs.
 The plain-line edit series separately records the full exact-shape
 left-to-right replacement boundary at a `2781.596 ms` median and subsequent
-recompute/save/reopen at `758.005 ms`. The selected-export series adds a
+recompute/save/reopen at `758.005 ms`; the v2 lifecycle series reproduces the
+replacement at `2783.694 ms`, records explicit change-back at `2044.726 ms`,
+and separates sub-7 ms three-step history action/recompute totals from its
+roughly 1.2-second-per-state deep-oracle cost. The selected-export series adds a
 `7885.730 ms` cold action median for the fixed retained exact shapes and splits
 that into repeated probe preflights versus the staged transaction. The
 create-time series adds a `6907.971 ms` median fixed Generate-through-export
@@ -577,14 +607,15 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-19 | Characterise the real explicit selected-export transaction before changing export architecture | Accepted; the copied-document recipe freezes all current formats/manifest, revision and overwrite semantics, parsed artifacts, atomic rollback and cleanup, and exposes repeated probe cost without changing either macro |
 | 2026-07-19 | Characterise create-time production export independently from selected export | Accepted; the normal Generate recipe freezes successful production measures and persistence, measures the fixed end-to-end boundary, and deterministically bounds B14's partial-output/final-success-dialog defects without changing either macro or accepting them as future behaviour |
 | 2026-07-19 | Use plain line/plain-line for track without S&C | Accepted; official UK railway usage replaces the project category “ordinary track”; B14/B15 and historical evidence identifiers remain unchanged, new APIs will use `plain_line`, and macro/component wording is separately gated in [TERMINOLOGY.md](TERMINOLOGY.md) |
+| 2026-07-19 | Extend the fixed plain-line edit oracle through undo/redo and exact change-back | Accepted for Phase 1 evidence; every intermediate B14 state is frozen, but its three-entry geometry/schedule/report stack is a bounded legacy defect and the successor must make one accepted command one atomic undo unit |
 | 2026-07-19 | Select the first extraction now | Deferred; transition solving leads on structural coupling, but workflow oracles, boundary contracts and representative profiles are not yet complete |
 
 ## Remaining Phase 1 work
 
 - Complete operator workflow inputs, outputs, persisted properties, guided
   stages, failure and rollback maps for every row above.
-- Extend the fixed curve/multiple-track recipe through undo/redo, change-back,
-  broader boundary cases and explicit Validate/deferred reconstruction; cover
+- Extend the fixed curve/multiple-track recipe through broader boundary cases
+  and explicit Validate/deferred reconstruction; cover
   cancellation and other export scopes, converge create-time output failure on
   an accepted atomic/UI contract, and create dedicated fixtures for
   station/straight and standalone turnout.

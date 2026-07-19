@@ -1,4 +1,4 @@
-"""Contracts for Phase 1 B14 plain-line regeneration and rollback."""
+"""Contracts for Phase 1 B14 plain-line regeneration, history and rollback."""
 
 from tools.freecad_bridge.ordinary_track_recipe import (
     EXPECTED_GROUP_MEMBERS,
@@ -10,7 +10,7 @@ from tools.freecad_bridge.ordinary_track_recipe import (
 )
 
 
-EDIT_RECIPE_SCHEMA_VERSION = 1
+EDIT_RECIPE_SCHEMA_VERSION = 2
 RIGHT_HAND_ANGLE_DEGREES = -90.0
 INVALID_ANGLE_DEGREES = 0.0
 TRANSACTION_FAILURE_ANGLE_DEGREES = -80.0

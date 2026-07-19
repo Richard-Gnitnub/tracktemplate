@@ -141,7 +141,7 @@ Repeat `--base` to compare independent serialisations. The runner operates only
 on copies, closes them without saving, and requires the frozen deep semantic
 hash covering the fixed plain-line curve/two-track document.
 
-Fast Phase 1 plain-line edit/rollback contract checks:
+Fast Phase 1 plain-line edit lifecycle/rollback contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_edit.py
@@ -149,7 +149,8 @@ Fast Phase 1 plain-line edit/rollback contract checks:
 
 This protects the separate rounded dialog-input and exact persisted-input
 contracts, left/right mirror comparison, frozen right-hand semantic hash,
-source-level transaction ordering, and isolated runner/fault-injection
+source-level transaction ordering, complete-document history sequence,
+undo/redo measurement boundaries, and isolated runner/fault-injection
 structure without importing FreeCAD. Exercise the bounded real-GUI path with:
 
 ```bash
@@ -158,12 +159,16 @@ tools/freecad_bridge/run-b14-ordinary-edit \
 ```
 
 The command acts only on a copied document. It must prove a `+90°` to `-90°`
-replacement changes only handedness fields and reflected Y bounds, survive
-save/reopen, reject zero angle without document mutation, abort a deliberately
-failed replacement transaction after generated-output removal, survive a
-second reopen, restore the isolated preference store, and leave the source
-fixture byte-identical. The accepted three-run characterisation and exact
-coverage boundary are recorded in
+replacement changes only handedness fields and reflected Y bounds; validate
+every semantic state across the exact three-entry Undo/Redo stack; prove an
+explicit change-back exactly restores the initial document; recover the
+right-hand document by undoing change-back; survive save/reopen with cleared
+history; reject zero angle without document mutation; abort a deliberately
+failed replacement transaction after generated-output removal; restore the
+isolated preference store; and leave the source fixture byte-identical. The v2
+controlled series and its bounded B14 atomicity defect are recorded in
+[benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md](benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md).
+The preceding v1 replacement/rollback evidence remains in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 
 Fast Phase 1 plain-line export contract checks:
@@ -296,8 +301,8 @@ For an affected workflow:
 
 ## Observed regression obligations
 
-The controlled B14 runs and export source/transaction audits expose
-five behaviours that need focused tests with their eventual production fixes.
+The controlled B14 runs and export source/transaction audits expose six
+behaviours that need focused tests with their eventual production fixes.
 Do not encode the current defect as the expected result merely to increase the
 test count.
 
@@ -326,6 +331,12 @@ test count.
    Preserve that diagnostic evidence, but converge the production path on an
    accepted all-files staging, manifest, rollback, cleanup and truthful-summary
    contract before this path is migrated.
+6. Plain-line edit command atomicity: B14 records geometry replacement,
+   production-schedule refresh and material-report refresh as three undo
+   transactions, exposing observable but incomplete seven- and eight-object
+   states. Preserve the lifecycle evidence, but require one
+   accepted application command to create one complete undo unit and test the
+   exact document after one Undo and one Redo.
 
 ## Future validation assets
 

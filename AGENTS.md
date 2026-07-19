@@ -68,10 +68,13 @@
 - `tools/freecad_bridge/ordinary_track_edit_recipe.py`,
   `tools/freecad_bridge/run-b14-ordinary-edit` and
   `tests/validate_phase1_ordinary_edit.py` own the bounded B14 plain-line
-  handedness, save/reopen, invalid-input and transaction-abort oracle. Preserve
-  the separate three-decimal dialog and exact solved persistence contracts, the
-  frozen right-hand semantic hash, exact mirrored shape contract, and
-  preference-store restoration.
+  handedness, undo/redo, explicit change-back, save/reopen, invalid-input and
+  transaction-abort oracle. Preserve the separate three-decimal dialog and
+  exact solved persistence contracts, the frozen complete-document semantic
+  hashes, exact mirrored shape contract, history sequence and preference-store
+  restoration. B14's three undo entries for one replacement are a bounded
+  legacy atomicity defect, not an accepted successor contract; one migrated
+  application command must be one complete undo unit.
 - `tools/freecad_bridge/ordinary_track_export_recipe.py`,
   `tools/freecad_bridge/run-b14-ordinary-export` and
   `tests/validate_phase1_ordinary_export.py` own the bounded B14 explicit
@@ -167,7 +170,8 @@ tools/freecad_bridge/run-b14-ordinary-snapshot \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
 ```
 
-Run the Phase 1 plain-line edit and rollback oracle on a copied fixture:
+Run the Phase 1 plain-line edit lifecycle and rollback oracle on a copied
+fixture:
 
 ```bash
 tools/freecad_bridge/run-b14-ordinary-edit \
@@ -232,7 +236,7 @@ Run the fast Phase 1 plain-line oracle checks:
 .venv/bin/python tests/validate_phase1_ordinary_track.py
 ```
 
-Run the fast Phase 1 plain-line edit/rollback checks:
+Run the fast Phase 1 plain-line edit lifecycle/rollback checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_edit.py
