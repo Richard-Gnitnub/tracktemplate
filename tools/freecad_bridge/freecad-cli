@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$(cd "${bridge_dir}/../.." && pwd)"
+tool_root="${project_root}/.devtools/freecad-cli"
+state_dir="${project_root}/benchmark-output/freecad-bridge"
+token_file="${state_dir}/rpc-token"
+bridge_port="${TRACKTEMPLATE_BRIDGE_PORT:-19875}"
+
+if [[ ! -d "${tool_root}/src/freecad_cli" ]]; then
+    echo "Missing development checkout: ${tool_root}" >&2
+    echo "Follow tools/freecad_bridge/README.md to create it." >&2
+    exit 2
+fi
+
+if [[ ! -s "${token_file}" ]]; then
+    echo "The dedicated FreeCAD bridge has not been launched yet." >&2
+    echo "Run tools/freecad_bridge/launch-freecad first." >&2
+    exit 2
+fi
+
+exec env PYTHONPATH="${tool_root}/src" /usr/bin/python3 -m freecad_cli \
+    --host 127.0.0.1 \
+    --port "${bridge_port}" \
+    --timeout "${TRACKTEMPLATE_BRIDGE_RPC_TIMEOUT:-30}" \
+    --token-file "${token_file}" \
+    "$@"

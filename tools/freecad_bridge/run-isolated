@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$(cd "${bridge_dir}/../.." && pwd)"
+state_dir="${project_root}/benchmark-output/freecad-bridge"
+launcher_log="${TRACKTEMPLATE_BRIDGE_LAUNCHER_LOG:-${state_dir}/isolated-launcher.log}"
+instance_file="${TRACKTEMPLATE_BRIDGE_INSTANCE_FILE:-${state_dir}/isolated-instance-id}"
+
+if [[ "$#" -eq 0 ]]; then
+    echo "Usage: tools/freecad_bridge/run-isolated COMMAND [ARG ...]" >&2
+    exit 2
+fi
+if "${bridge_dir}/freecad-cli" ping >/dev/null 2>&1; then
+    echo "A bridge session is already running; isolation requires port 19875 to be free." >&2
+    exit 2
+fi
+
+mkdir -p "${state_dir}"
+: >"${instance_file}"
+TRACKTEMPLATE_BRIDGE_INSTANCE_FILE="${instance_file}" \
+    "${bridge_dir}/launch-freecad" >"${launcher_log}" 2>&1 &
+freecad_process=$!
+
+cleanup() {
+    cleanup_status=0
+    instance_id="$(tr -d '[:space:]' <"${instance_file}" 2>/dev/null || true)"
+    if [[ "${instance_id}" =~ ^[0-9]+$ ]]; then
+        flatpak kill "${instance_id}" >/dev/null 2>&1 || true
+        for _shutdown_attempt in $(seq 1 80); do
+            if ! flatpak ps --columns=instance 2>/dev/null | grep -Fxq "${instance_id}"; then
+                break
+            fi
+            sleep 0.25
+        done
+        if flatpak ps --columns=instance 2>/dev/null | grep -Fxq "${instance_id}"; then
+            echo "The isolated FreeCAD instance ${instance_id} did not stop." >&2
+            cleanup_status=1
+        fi
+    fi
+    if kill -0 "${freecad_process}" >/dev/null 2>&1; then
+        kill "${freecad_process}" >/dev/null 2>&1 || true
+        wait "${freecad_process}" >/dev/null 2>&1 || true
+    fi
+    return "${cleanup_status}"
+}
+
+exit_cleanup() {
+    command_status=$?
+    trap - EXIT INT TERM
+    cleanup_status=0
+    cleanup || cleanup_status=$?
+    if [[ "${cleanup_status}" -ne 0 ]]; then
+        exit "${cleanup_status}"
+    fi
+    exit "${command_status}"
+}
+
+trap exit_cleanup EXIT
+trap 'exit 130' INT TERM
+
+ready=0
+for _attempt in $(seq 1 90); do
+    if "${bridge_dir}/freecad-cli" ping >/dev/null 2>&1; then
+        ready=1
+        break
+    fi
+    sleep 1
+done
+if [[ "${ready}" -ne 1 ]]; then
+    echo "The isolated FreeCAD bridge did not become ready; see ${launcher_log}." >&2
+    exit 1
+fi
+
+"$@"

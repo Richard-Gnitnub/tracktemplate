@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$(cd "${bridge_dir}/../.." && pwd)"
+state_dir="${project_root}/benchmark-output/freecad-bridge"
+launcher_log="${state_dir}/cold-run-launcher.log"
+instance_file="${state_dir}/cold-run-instance-id"
+base_fixture="${state_dir}/fixtures/b14-default-base.FCStd"
+
+if [[ ! -f "${base_fixture}" ]]; then
+    echo "Missing B14 base fixture: ${base_fixture}" >&2
+    echo "Create it with tools/freecad_bridge/build-b14-base." >&2
+    exit 2
+fi
+
+TRACKTEMPLATE_BRIDGE_LAUNCHER_LOG="${launcher_log}" \
+TRACKTEMPLATE_BRIDGE_INSTANCE_FILE="${instance_file}" \
+    exec "${bridge_dir}/run-isolated" \
+        /usr/bin/env PYTHONPATH="${project_root}/.devtools/freecad-cli/src" \
+        /usr/bin/python3 "${bridge_dir}/run_b14_crossover.py" "$@"

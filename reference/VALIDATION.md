@@ -2,7 +2,12 @@
 
 ## Purpose
 
-Validation protects railway correctness while the macro is optimised and separated into architectural layers. Tests must distinguish analytical correctness, FreeCAD integration, display behaviour and production output.
+Validation protects railway correctness while the macro is optimised and
+separated into architectural layers. Tests must distinguish analytical
+correctness, FreeCAD integration, display behaviour and production output.
+[TESTING_POLICY.md](TESTING_POLICY.md) defines the project-wide obligation to
+add tests and the limited circumstances in which an existing test oracle may
+change.
 
 ## Current version roles
 
@@ -78,7 +83,40 @@ Real FreeCAD 1.1 headless B15 smoke test:
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD tests/freecad_validate_b15.py
 ```
 
-The command is successful only when it exits with status zero **and** prints `B15 FreeCAD 1.1 headless smoke test passed`. FreeCADCmd loads command-line scripts under their filename stem rather than `__main__`; the test has an explicit runner for that execution mode.
+Fast development-bridge recipe contract checks:
+
+```bash
+.venv/bin/python tests/validate_freecad_bridge.py
+```
+
+Fresh-checkout development-bridge and deterministic B14 fixture setup:
+
+```bash
+tools/freecad_bridge/setup-freecad-cli
+tools/freecad_bridge/build-b14-base
+```
+
+The fixture command refuses to overwrite existing output. A bounded bridge
+lifecycle check may then run `tools/freecad_bridge/run-b14-cold --stages
+geometry`.
+
+The controlled representative performance sequence is:
+
+```bash
+tools/freecad_bridge/run-b14-cold
+tools/freecad_bridge/run-b14-warm --base benchmark-output/freecad-bridge/runs/<cold-run-id>/b14-crossover.FCStd
+```
+
+The warm command accepts only a completed seven-stage cold document with its
+sibling `run.json`. It performs one warm-up and exactly three measured
+unchanged-result iterations, and fails if object, cache-signature, chair-count,
+or solid-shape identity changes. These long-running GUI benchmarks are
+checkpoint/performance evidence, not part of the fast edit loop.
+
+The FreeCADCmd B15 command is successful only when it exits with status zero
+**and** prints `B15 FreeCAD 1.1 headless smoke test passed`. FreeCADCmd loads
+command-line scripts under their filename stem rather than `__main__`; the test
+has an explicit runner for that execution mode.
 
 The existing automated coverage does not validate every B14/B15 workflow. Select checks by the changed scope and report uncovered paths.
 
@@ -91,6 +129,7 @@ The existing automated coverage does not validate every B14/B15 workflow. Select
 | Cache/signature logic | Cold calculation, valid reuse and invalidation cases |
 | FreeCAD object or persistence | Headless FreeCAD plus save/reopen and cleanup checks |
 | GUI display/editing | Headless checks plus real GUI exercise |
+| Development bridge or benchmark recipe | Fast bridge contract checks plus a bounded isolated GUI lifecycle run |
 | Railway geometry/topology/timber/chair rules | Representative analytical comparisons and real workflow validation |
 | Export or exact geometry | Target-format output, manifest, rollback and deterministic repeat checks |
 | Architecture migration | Legacy/new parity, editing cost and complete Validate/Export cost |
@@ -116,6 +155,31 @@ For an affected workflow:
 - Determine whether the failure exposes a defect, an intentionally changed invariant or an obsolete test boundary.
 - Obtain agreement before changing an accepted railway or production invariant.
 - Record any check that could not be run and the risk it leaves.
+
+## Observed regression obligations
+
+The controlled B14 cold and warm runs exposed four behaviours that need focused
+tests with their eventual production fixes. Do not encode the current defect as
+the expected result merely to increase the test count.
+
+1. Crossover preview/commit feasibility: use the same persisted host-centreline
+   identities and Host A chainage for preview and transactional commit. Assert
+   that the complete minimum-radius rule covers both mapped turnout roads and
+   the connector, that a lower invalid chainage is rejected before document
+   mutation, and that the documented valid chainage is accepted.
+2. Chair timing persistence: run chair analysis, save, close and reopen the
+   document, then assert persisted `performance_timings_ms` includes metadata
+   updates, diagnostic display construction, document recompute, transaction
+   commit and total duration, and reconciles with the enclosing stage boundary.
+3. Effective-status reuse: query chair/support/layout/solid status through one
+   shared snapshot or demonstrably bounded signature reuse, assert unchanged
+   results are equivalent, then mutate each relevant input class and verify
+   correct invalidation.
+4. Supported-solid cache boundary and panel refresh: assert an unchanged valid
+   solid returns before rebuilding its plan/fit inputs, retains exact object and
+   shape identity, and does not trigger redundant parent/panel reconstruction or
+   document recompute. Then change every solid-signature input class and prove
+   that physical-fit validation and shape generation run again.
 
 ## Future validation assets
 

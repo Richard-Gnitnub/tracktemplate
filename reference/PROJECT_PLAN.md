@@ -12,6 +12,7 @@ The documents have distinct responsibilities:
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) defines the target system and non-negotiable invariants.
 - [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md) defines source boundaries and the safe extraction method.
+- [TESTING_POLICY.md](TESTING_POLICY.md) defines when tests are required and when an existing oracle may change.
 - [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md) defines comparable resource measurements.
 - [VALIDATION.md](VALIDATION.md) defines correctness and integration evidence.
 - This document owns delivery order, phase status, decision timing, and release-candidate gates.
@@ -42,6 +43,7 @@ Release-candidate scope is based on behaviour explicitly accepted from the prese
 - A phase is complete only when all exit criteria are met or the user explicitly accepts a documented exception and its risk.
 - Update the status in this document when a phase starts or closes. Do not infer completion from commits alone.
 - Mechanical extraction, cleanup, optimisation, behaviour changes, and legacy removal remain separate reviewable changes.
+- Apply [TESTING_POLICY.md](TESTING_POLICY.md) to every production change; test exceptions require an explicit risk and closure condition.
 
 ## Roadmap summary
 
@@ -75,9 +77,18 @@ Make the pre-migration state reproducible, reviewable, and recoverable before pr
 - Record the project licence/attribution status and whether any implementation is derived or translated from the Templot5 source evidence before copying archive code or preparing a public release.
 - Record the exact Python/FreeCAD environment and all current version assignments.
 - Run the verified syntax, B15 analytical/structural, and FreeCAD headless checks.
-- Define at least one reproducible representative workflow recipe and capture cold and warm whole-process reports using [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md).
+- Define at least one reproducible representative workflow recipe and capture a cold full-workflow series plus a valid unchanged-result warm/reuse series using [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md).
 - Record present validation gaps; passing the current chair-focused checks must not be described as whole-product coverage.
 - Review and push an agreed checkpoint commit. Add a checkpoint tag only after the user accepts which version is the behavioural reference.
+
+Current evidence: the exact B14 `XO-001` recipe, preliminary cold run 01, a
+like-for-like current-controller three-run cold series and a valid
+three-iteration unchanged-result warm-reuse series are preserved in
+`reference/benchmarks/`. A tracked reviewed patch reconstructs the pinned bridge
+checkout, and an automated isolated FreeCAD builder reconstructs and
+semantically validates the ignored nine-object base fixture. The Phase 0
+performance item is complete for this defined crossover scope; B14/B15
+behavioural acceptance and licence/provenance decisions remain.
 
 ### Exit gate
 
@@ -101,6 +112,9 @@ Choose migration order from evidence and establish oracles for behaviour that cu
 - Map important callers, global mutable state, import-time side effects, duplicate definitions, captured aliases, and runtime class patches.
 - Document boundary data: units, coordinate frames, tolerances, stable identities, ordering, metadata schemas, cache signatures, and invalidation inputs.
 - Profile representative cold and warm workflows and identify measured hotspots separately for calculation, recompute, persistence, display construction, exact geometry, and export.
+- Extend the current turnout/crossover timing coverage into a reconciled product-pipeline benchmark for curve/easement, station, multiple-track, editing, Validate, and Export paths before those capabilities are optimised. Test instrumentation and nested-stage accounting so measurement does not change behaviour or double-count time.
+- Close or explicitly bound the observed instrumentation defects before using subprofiles to select an optimisation: the geometry external/internal boundary gap, the prematurely persisted chair timing payload, the late supported-solid reuse check, redundant post-reuse panel refresh, and repeated effective-status signature scans.
+- Characterise and align crossover preview/commit feasibility diagnostics so preview covers the same complete mapped-turnout and connector minimum-radius rule as transactional commit.
 - Add deterministic input recipes or non-sensitive fixtures for release-critical workflows, starting with the gaps listed in [VALIDATION.md](VALIDATION.md).
 - Decide the supported FreeCAD/Python baseline and the intended legacy-document support window for the release candidate.
 - Score candidate first slices by clarity of input/output, current characterisation coverage, side effects, caller count, architectural value, and measurable resource cost.
@@ -360,7 +374,7 @@ Passing this gate produces a release candidate, not an automatic stable release.
 Every migrated capability, including those inside the larger Phase 7–9 waves, must have:
 
 1. an explicit scope, legacy oracle, callers, inputs, outputs, invariants, and side effects;
-2. characterisation coverage before movement;
+2. characterisation coverage before movement and change-specific evidence satisfying [TESTING_POLICY.md](TESTING_POLICY.md);
 3. a mechanical extraction separated from cleanup and optimisation;
 4. domain code free of FreeCAD/Qt and adapter back-imports;
 5. legacy/new equality for results, identities, ordering, findings, and relevant metadata;
@@ -402,10 +416,9 @@ Every migrated capability, including those inside the larger Phase 7–9 waves, 
 
 ## Immediate Phase 0 work order
 
-1. Add and review `.gitignore` without broad patterns that could hide source or fixtures.
-2. Resolve the intended treatment of `main.py` and the reference ZIP.
-3. Review the exact checkpoint file list and working-tree diff.
-4. Run the three verified automated/headless validation commands.
-5. Commit and push the agreed source, B15 candidate, tests, and project documentation.
-6. Capture representative GUI workflow and cold/warm performance evidence.
-7. Record B14/B15 acceptance status and close Phase 0 only when the exit gate is met.
+1. Preserve and validate the fresh-checkout bridge patch and deterministic base-fixture builder. **Complete and committed.**
+2. Capture two more equivalent B14 cold-process runs and report the three-run median/range. **Complete and committed.**
+3. Define an unchanged-result warm/reuse recipe, then capture three comparable warm runs without replaying destructive construction as a false cache test. **Complete and committed.**
+4. Record B14/B15 behavioural acceptance status.
+5. Resolve the reference ZIP redistribution and project licence/provenance decisions.
+6. Review and commit are complete. Push the checkpoint when requested, then close Phase 0 only when every exit-gate item is accepted.

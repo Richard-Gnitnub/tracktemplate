@@ -6,6 +6,7 @@
 # Python environments, bytecode, and tool caches
 /.venv/
 /venv/
+/.devtools/
 __pycache__/
 *.py[cod]
 *$py.class

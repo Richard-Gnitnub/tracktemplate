@@ -1,0 +1,512 @@
+diff --git a/addon/FreecadCli/InitGui.py b/addon/FreecadCli/InitGui.py
+index bcbba1b..cf61eaa 100644
+--- a/addon/FreecadCli/InitGui.py
++++ b/addon/FreecadCli/InitGui.py
+@@ -1,5 +1,10 @@
+ """FreeCAD GUI initialization — auto-starts the RPC server."""
+
+-from FreecadCli import rpc_server
++try:
++    from FreecadCli import rpc_server
++except ImportError:
++    # FreeCAD's --module-path points directly at this directory in the isolated
++    # development session, so the module is then available as a top-level name.
++    import rpc_server
+
+ rpc_server.start()
+diff --git a/addon/FreecadCli/rpc_server.py b/addon/FreecadCli/rpc_server.py
+index 514afd9..1b9fabd 100644
+--- a/addon/FreecadCli/rpc_server.py
++++ b/addon/FreecadCli/rpc_server.py
+@@ -1,70 +1,185 @@
+ """Thin XML-RPC server that runs inside FreeCAD.
+
+-Exposes only `ping` and `execute_code` — all business logic lives in the CLI client.
+-Code execution is dispatched to FreeCAD's main (GUI) thread via Qt.
++Code execution is dispatched to FreeCAD's main (GUI) thread via Qt.  The
++TrackTemplate development bridge also exposes asynchronous jobs so operations
++which take many minutes can be observed without holding one RPC request open.
+ """
+
++import hmac
+ import io
++import os
+ import queue
+ import sys
+ import threading
++import time
+ import traceback
++import uuid
+ from xmlrpc.server import SimpleXMLRPCServer
+
+-from PySide2 import QtCore
++try:
++    from PySide6 import QtCore
++except ImportError:
++    try:
++        from PySide2 import QtCore
++    except ImportError:
++        from PySide import QtCore
+
+ _server = None
+ _thread = None
++_jobs = {}
++_jobs_lock = threading.Lock()
+
+ HOST = "127.0.0.1"
+-PORT = 9875
++PORT = int(os.environ.get("FREECAD_CLI_PORT", "9875"))
++EXECUTION_TIMEOUT = float(os.environ.get("FREECAD_CLI_EXECUTION_TIMEOUT", "21600"))
++TOKEN_FILE = os.environ.get("FREECAD_CLI_TOKEN_FILE", "").strip()
++MAX_RETAINED_JOBS = 100
++
++
++def _read_auth_token():
++    if not TOKEN_FILE:
++        return ""
++    with open(TOKEN_FILE, encoding="utf-8") as token_handle:
++        token = token_handle.read().strip()
++    if not token:
++        raise RuntimeError("FREECAD_CLI_TOKEN_FILE is empty")
++    return token
++
++
++_auth_token = _read_auth_token()
++
++
++def _require_auth(token):
++    if _auth_token and not hmac.compare_digest(str(token), _auth_token):
++        raise PermissionError("Invalid FreeCAD CLI authentication token")
++
++
++def _trim_finished_jobs():
++    with _jobs_lock:
++        if len(_jobs) <= MAX_RETAINED_JOBS:
++            return
++        finished = sorted(
++            (
++                (job.get("finished_at", float("inf")), job_id)
++                for job_id, job in _jobs.items()
++                if job.get("status") in {"completed", "failed"}
++            )
++        )
++        for _finished_at, job_id in finished[: len(_jobs) - MAX_RETAINED_JOBS]:
++            _jobs.pop(job_id, None)
+
+
+ class _MainThreadExecutor(QtCore.QObject):
+     """Receives code execution requests and runs them on the main thread."""
+
+     execute_requested = QtCore.Signal(str, object)
++    job_requested = QtCore.Signal(str, str)
+
+     def __init__(self):
+         super().__init__()
+         self.execute_requested.connect(self._run)
++        self.job_requested.connect(self._run_job)
+
+-    def _run(self, code, result_queue):
++    @staticmethod
++    def _execute_and_capture(code):
+         stdout_capture = io.StringIO()
+         old_stdout = sys.stdout
+         try:
+             sys.stdout = stdout_capture
+             exec(code, {"__builtins__": __builtins__})
+-            result_queue.put({
++            return {
+                 "output": stdout_capture.getvalue(),
+                 "error": "",
+-            })
++            }
+         except Exception:
+-            result_queue.put({
++            return {
+                 "output": stdout_capture.getvalue(),
+                 "error": traceback.format_exc(),
+-            })
++            }
+         finally:
+             sys.stdout = old_stdout
+
++    def _run(self, code, result_queue):
++        result_queue.put(self._execute_and_capture(code))
++
++    def _run_job(self, job_id, code):
++        with _jobs_lock:
++            job = _jobs.get(job_id)
++            if job is None:
++                return
++            job["status"] = "running"
++            job["started_at"] = time.time()
++
++        result = self._execute_and_capture(code)
++        finished_at = time.time()
++        with _jobs_lock:
++            job = _jobs.get(job_id)
++            if job is None:
++                return
++            job.update(result)
++            job["status"] = "failed" if result["error"] else "completed"
++            job["finished_at"] = finished_at
++
+
+ _executor = None
+
+
+-def ping():
++def ping(token=""):
++    _require_auth(token)
+     return True
+
+
+-def execute_code(code):
++def execute_code(code, token=""):
+     """Execute Python code on FreeCAD's main thread.
+
+     Returns a dict with:
+         - output: captured stdout
+         - error: error message if execution failed (empty string on success)
+     """
+-    result_queue = queue.Queue()
++    _require_auth(token)
++    result_queue = queue.Queue(maxsize=1)
+     _executor.execute_requested.emit(code, result_queue)
+-    return result_queue.get(timeout=30)
++    try:
++        return result_queue.get(timeout=EXECUTION_TIMEOUT)
++    except queue.Empty:
++        return {
++            "output": "",
++            "error": f"Execution exceeded the server timeout of {EXECUTION_TIMEOUT:g} seconds",
++        }
++
++
++def submit_code(code, token=""):
++    """Queue Python code for main-thread execution and return a job id."""
++    _require_auth(token)
++    _trim_finished_jobs()
++    job_id = uuid.uuid4().hex
++    with _jobs_lock:
++        _jobs[job_id] = {
++            "job_id": job_id,
++            "status": "queued",
++            "submitted_at": time.time(),
++            "started_at": None,
++            "finished_at": None,
++            "output": "",
++            "error": "",
++        }
++    _executor.job_requested.emit(job_id, code)
++    return {"job_id": job_id, "status": "queued"}
++
++
++def get_job(job_id, token=""):
++    _require_auth(token)
++    with _jobs_lock:
++        job = _jobs.get(job_id)
++        if job is None:
++            return {"job_id": job_id, "status": "not_found"}
++        return dict(job)
++
++
++def list_jobs(token=""):
++    _require_auth(token)
++    with _jobs_lock:
++        return [dict(job) for job in _jobs.values()]
+
+
+ def start():
+@@ -78,10 +193,14 @@ def start():
+     _server = SimpleXMLRPCServer((HOST, PORT), allow_none=True, logRequests=False)
+     _server.register_function(ping, "ping")
+     _server.register_function(execute_code, "execute_code")
++    _server.register_function(submit_code, "submit_code")
++    _server.register_function(get_job, "get_job")
++    _server.register_function(list_jobs, "list_jobs")
+
+     _thread = threading.Thread(target=_server.serve_forever, daemon=True)
+     _thread.start()
+-    print(f"[FreecadCli] RPC server started on {HOST}:{PORT}")
++    auth_state = "token required" if _auth_token else "no token configured"
++    print(f"[FreecadCli] RPC server started on {HOST}:{PORT} ({auth_state})")
+
+
+ def stop():
+diff --git a/src/freecad_cli/cli.py b/src/freecad_cli/cli.py
+index cf4dd4b..4b8cff0 100644
+--- a/src/freecad_cli/cli.py
++++ b/src/freecad_cli/cli.py
+@@ -1,6 +1,7 @@
+ import os
+ import platform
+ import sys
++import time
+ from pathlib import Path
+
+ import click
+@@ -9,7 +10,7 @@ from freecad_cli.client import FreeCADClient
+ from freecad_cli.output import error, success
+
+ COMMAND_SECTIONS = {
+-    "Core": ["execute-code", "export", "ping", "screenshot"],
++    "Core": ["execute-code", "submit-code", "job-status", "wait-job", "list-jobs", "export", "ping", "screenshot"],
+     "Documents": ["active-document", "create-document", "list-documents", "set-active-document"],
+     "Parts Library": ["list-parts", "insert-part"],
+     "Setup": ["install-addon"],
+@@ -39,9 +40,14 @@ class SectionedGroup(click.Group):
+ @click.group(cls=SectionedGroup)
+ @click.option("--host", default="localhost", help="FreeCAD RPC server host")
+ @click.option("--port", default=9875, type=int, help="FreeCAD RPC server port")
+-@click.option("--timeout", default=5.0, type=float, help="RPC timeout in seconds")
++@click.option("--timeout", default=30.0, type=float, help="Per-request RPC timeout in seconds")
++@click.option(
++    "--token-file",
++    type=click.Path(exists=True, dir_okay=False, path_type=Path),
++    help="Read the local RPC authentication token from this file",
++)
+ @click.pass_context
+-def cli(ctx, host, port, timeout):
++def cli(ctx, host, port, timeout, token_file):
+     """Control a running FreeCAD instance via shell.
+
+     The primary command is execute-code, which runs arbitrary Python inside
+@@ -57,7 +63,23 @@ def cli(ctx, host, port, timeout):
+     All commands return JSON: {"status": "ok", "data": ...}
+     """
+     ctx.ensure_object(dict)
+-    ctx.obj["client"] = FreeCADClient(host=host, port=port, timeout=timeout)
++    token = token_file.read_text(encoding="utf-8").strip() if token_file else ""
++    if token_file and not token:
++        error(f"Token file is empty: {token_file}", "invalid_input")
++    ctx.obj["client"] = FreeCADClient(host=host, port=port, timeout=timeout, token=token)
++
++
++def _read_code(code, file_path):
++    if file_path and code:
++        error("Cannot specify both --file and a code argument", "invalid_input")
++
++    if file_path:
++        return Path(file_path).read_text()
++    if code == "-" or (code is None and not sys.stdin.isatty()):
++        return sys.stdin.read()
++    if code is None:
++        error("No code provided. Pass inline code, use --file, or pipe to stdin with '-'", "invalid_input")
++    return code
+
+
+ @cli.command()
+@@ -124,20 +146,64 @@ def execute_code(ctx, code, file_path):
+     Output is captured from stdout. Use print() to return results:
+       freecad-cli execute-code 'import json; print(json.dumps({"key": "value"}))'
+     """
+-    if file_path and code:
+-        error("Cannot specify both --file and a code argument", "invalid_input")
++    code = _read_code(code, file_path)
++    result = ctx.obj["client"].execute_code(code)
++    success(result)
+
+-    if file_path:
+-        code = Path(file_path).read_text()
+-    elif code == "-" or (code is None and not sys.stdin.isatty()):
+-        code = sys.stdin.read()
+-    elif code is None:
+-        error("No code provided. Pass inline code, use --file, or pipe to stdin with '-'", "invalid_input")
+
+-    result = ctx.obj["client"].execute_code(code)
++@cli.command("submit-code")
++@click.argument("code", required=False, default=None)
++@click.option("--file", "file_path", default=None, type=click.Path(exists=True),
++              help="Read code from a file")
++@click.pass_context
++def submit_code(ctx, code, file_path):
++    """Submit Python for asynchronous execution in FreeCAD."""
++    result = ctx.obj["client"].submit_code(_read_code(code, file_path))
++    success(result)
++
++
++@cli.command("job-status")
++@click.argument("job_id")
++@click.pass_context
++def job_status(ctx, job_id):
++    """Return the current state and result of an asynchronous job."""
++    result = ctx.obj["client"].get_job(job_id)
++    if result.get("status") == "not_found":
++        error(f"Unknown job: {job_id}", "not_found")
+     success(result)
+
+
++@cli.command("wait-job")
++@click.argument("job_id")
++@click.option("--poll-interval", default=1.0, type=float, show_default=True)
++@click.option("--wait-timeout", default=21600.0, type=float, show_default=True,
++              help="Maximum total wait in seconds")
++@click.pass_context
++def wait_job(ctx, job_id, poll_interval, wait_timeout):
++    """Poll an asynchronous job until it completes or fails."""
++    deadline = time.monotonic() + wait_timeout
++    while True:
++        result = ctx.obj["client"].get_job(job_id)
++        status = result.get("status")
++        if status == "not_found":
++            error(f"Unknown job: {job_id}", "not_found")
++        if status == "failed":
++            error(result.get("error") or "FreeCAD job failed", "job_failed")
++        if status == "completed":
++            success(result)
++            return
++        if time.monotonic() >= deadline:
++            error(f"Job did not finish within {wait_timeout:g} seconds", "timeout")
++        time.sleep(max(poll_interval, 0.05))
++
++
++@cli.command("list-jobs")
++@click.pass_context
++def list_jobs(ctx):
++    """List retained asynchronous jobs for this FreeCAD session."""
++    success(ctx.obj["client"].list_jobs())
++
++
+ @cli.command()
+ @click.option("--width", default=800, type=int, help="Screenshot width in pixels")
+ @click.pass_context
+@@ -202,4 +268,3 @@ def install_addon():
+     os.symlink(addon_src, link_path)
+     success({"path": str(link_path), "source": str(addon_src)})
+
+-
+diff --git a/src/freecad_cli/client.py b/src/freecad_cli/client.py
+index c36d7da..e96c434 100644
+--- a/src/freecad_cli/client.py
++++ b/src/freecad_cli/client.py
+@@ -6,9 +6,16 @@ from freecad_cli.output import error
+
+
+ class FreeCADClient:
+-    def __init__(self, host: str = "localhost", port: int = 9875, timeout: float = 5.0):
++    def __init__(
++        self,
++        host: str = "localhost",
++        port: int = 9875,
++        timeout: float = 30.0,
++        token: str = "",
++    ):
+         self._url = f"http://{host}:{port}"
+         self._timeout = timeout
++        self._token = token
+         self._proxy = xmlrpc.client.ServerProxy(self._url)
+
+     def _rpc_call(self, method: str, *args):
+@@ -30,13 +37,22 @@ class FreeCADClient:
+
+     def _execute(self, code: str):
+         """Send Python code to FreeCAD for execution."""
+-        result = self._rpc_call("execute_code", code)
++        result = self._rpc_call("execute_code", code, self._token)
+         if result and result.get("error"):
+             error(result["error"], "rpc_fault")
+         return result
+
+     def ping(self):
+-        return self._rpc_call("ping")
++        return self._rpc_call("ping", self._token)
++
++    def submit_code(self, code: str):
++        return self._rpc_call("submit_code", code, self._token)
++
++    def get_job(self, job_id: str):
++        return self._rpc_call("get_job", job_id, self._token)
++
++    def list_jobs(self):
++        return self._rpc_call("list_jobs", self._token)
+
+     def get_active_document(self):
+         result = self._execute("""
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+index 9ce20d1..76e1587 100644
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -137,3 +137,49 @@ def test_rpc_error_propagated():
+         mock_cls.return_value = mock
+         result = runner.invoke(cli, ["create-document", "Test"])
+         assert result.exit_code != 0
++
++
++def test_submit_code_from_file():
++    runner = CliRunner()
++    with _mock_proxy() as mock_cls:
++        mock = MagicMock()
++        mock.submit_code.return_value = {"job_id": "job-1", "status": "queued"}
++        mock_cls.return_value = mock
++        with runner.isolated_filesystem():
++            Path("job.py").write_text("print('long job')")
++            result = runner.invoke(cli, ["submit-code", "--file", "job.py"])
++            output = json.loads(result.output)
++            assert output["data"]["job_id"] == "job-1"
++            mock.submit_code.assert_called_once_with("print('long job')", "")
++
++
++def test_wait_job_returns_completed_result():
++    runner = CliRunner()
++    with _mock_proxy() as mock_cls:
++        mock = MagicMock()
++        mock.get_job.side_effect = [
++            {"job_id": "job-1", "status": "queued"},
++            {"job_id": "job-1", "status": "completed", "output": "done\n", "error": ""},
++        ]
++        mock_cls.return_value = mock
++        with patch("freecad_cli.cli.time.sleep"):
++            result = runner.invoke(
++                cli,
++                ["wait-job", "job-1", "--poll-interval", "0.05", "--wait-timeout", "5"],
++            )
++        output = json.loads(result.output)
++        assert output["data"]["status"] == "completed"
++        assert output["data"]["output"] == "done\n"
++
++
++def test_token_file_is_passed_to_rpc():
++    runner = CliRunner()
++    with _mock_proxy() as mock_cls:
++        mock = MagicMock()
++        mock.ping.return_value = True
++        mock_cls.return_value = mock
++        with runner.isolated_filesystem():
++            Path("token").write_text("secret-token\n")
++            result = runner.invoke(cli, ["--token-file", "token", "ping"])
++        assert result.exit_code == 0
++        mock.ping.assert_called_once_with("secret-token")
+diff --git a/tests/test_client.py b/tests/test_client.py
+index 243a974..d6f761b 100644
+--- a/tests/test_client.py
++++ b/tests/test_client.py
+@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
+
+ from click.testing import CliRunner
+
++from freecad_cli.client import FreeCADClient
+ from freecad_cli.cli import cli
+
+
+@@ -83,3 +84,21 @@ def test_execute_code_delegates_to_rpc():
+         output = json.loads(result.output)
+         assert output["status"] == "ok"
+         assert output["data"]["output"] == "hello\n"
++
++
++def test_async_methods_include_auth_token():
++    with patch("freecad_cli.client.xmlrpc.client.ServerProxy") as mock_proxy_cls:
++        mock_proxy = MagicMock()
++        mock_proxy.submit_code.return_value = {"job_id": "job-1", "status": "queued"}
++        mock_proxy.get_job.return_value = {"job_id": "job-1", "status": "running"}
++        mock_proxy.list_jobs.return_value = []
++        mock_proxy_cls.return_value = mock_proxy
++
++        client = FreeCADClient(token="secret")
++        assert client.submit_code("print(1)")["job_id"] == "job-1"
++        assert client.get_job("job-1")["status"] == "running"
++        assert client.list_jobs() == []
++
++        mock_proxy.submit_code.assert_called_once_with("print(1)", "secret")
++        mock_proxy.get_job.assert_called_once_with("job-1", "secret")
++        mock_proxy.list_jobs.assert_called_once_with("secret")

@@ -28,12 +28,14 @@
 
 ## Repository map
 
-- `AdvancedTurnout.FCMacro` is the current B14 baseline (`10.2A8A7B14`) and the file containing the operator-facing whole-workflow benchmark.
+- `AdvancedTurnout.FCMacro` is the current B14 baseline (`10.2A8A7B14`) and contains the operator-facing turnout/crossover workflow benchmark. Its “Whole workflow” label does not yet mean the complete curve-to-export product pipeline.
 - `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` is the B15 candidate (`10.2A8A7B15`).
 - `tests/validate_b15.py` provides fast structural and analytical checks for B15 and compares selected railway functions with the B14 baseline.
 - `tests/freecad_validate_b15.py` is the real FreeCAD 1.1 headless smoke test for the B15 chair display layer.
 - `reference/BASELINE.md` records the current Phase 0 source fingerprints, environment, validation evidence, exclusions and remaining gates.
-- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/PERFORMANCE_SOP.md` and `reference/VALIDATION.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure or version role changes.
+- `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
+- `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
+- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md` and `reference/VALIDATION.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `main.py` is PyCharm starter boilerplate, not the product entry point.
 - Each macro launches through its final `run_macro()` call. Tests that load definitions deliberately remove only that final launch call.
@@ -50,18 +52,19 @@
 - Do not silently change geometry, sampling, tolerances, topology gates, timber decisions, chair assignments, stable identities, ordering, metadata schemas, persistent property names, visibility, transaction/rollback behaviour, or exporter results.
 - Do not weaken validation, remove required work, reduce geometric fidelity, or suppress diagnostics merely to improve a timing result.
 - Preserve transactional behaviour: validate replacement geometry before committing document changes, and keep failure paths recoverable.
-- Do not change tests only to make an implementation pass. When an intended change invalidates an assertion, explain why and obtain agreement on the new invariant.
+- Follow `reference/TESTING_POLICY.md`. Add proportionate automated evidence for every non-trivial new or changed behaviour; pure/domain functions normally require direct tests, while FreeCAD/GUI orchestration may be tested through a stable integration boundary.
+- Do not change tests only to make an implementation pass. Change an existing oracle only with evidence that the test is wrong or the accepted requirement changed; explain why and obtain agreement on the new invariant.
 
 ## Performance work
 
 - Follow `reference/PERFORMANCE_SOP.md`; do not invent a reduced benchmark procedure for an individual change.
-- Use the B14 **Whole-process benchmark** as the current operator-visible baseline and compare equivalent starting state, settings, stage sequence and cache state.
+- Use the B14 turnout/crossover **Whole workflow** report as the current operator-visible special-trackwork baseline and compare equivalent starting state, settings, stage sequence and cache state. Do not describe it as whole-product coverage.
 - Measure both ordinary editing and deferred Validate/Export work so cost is not merely hidden at a later boundary.
 - Preserve cache signatures and invalidation rules. A faster stale result is a correctness failure. Test both initial calculation and unchanged-result reuse when touching caches.
 - Minimise redundant document recomputes, metadata writes, display-object creation, shape construction, and repeated traversals only when output equivalence is demonstrated.
 - Keep FreeCAD object creation out of per-chair or similar hot loops where batching/compounds preserve the same result; the B15 structural test enforces this for the lightweight chair display.
 - Do not introduce threads or processes around FreeCAD document or GUI operations without explicit approval and a dedicated correctness test.
-- If a requested performance readout is visible only in the user's UI, ask for the copied report instead of inventing or estimating its values.
+- If a requested performance readout is visible only in FreeCAD, use the approved isolated development bridge when its local prerequisites are present. Otherwise ask for the copied report instead of inventing or estimating values.
 
 ## Verified validation commands
 
@@ -85,10 +88,41 @@ Run the real FreeCAD 1.1 headless B15 smoke test:
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD tests/freecad_validate_b15.py
 ```
 
+Prepare the development-only FreeCAD bridge and its deterministic ignored B14
+base fixture when they are absent:
+
+```bash
+tools/freecad_bridge/setup-freecad-cli
+tools/freecad_bridge/build-b14-base
+```
+
+Both commands are reproducible from tracked inputs. The fixture builder refuses
+to overwrite an existing FCStd or manifest.
+
+Run the controlled B14 crossover recipe in a fresh isolated FreeCAD process:
+
+```bash
+tools/freecad_bridge/run-b14-cold
+```
+
+Run the controlled unchanged-result series from a completed full cold document:
+
+```bash
+tools/freecad_bridge/run-b14-warm --base benchmark-output/freecad-bridge/runs/<cold-run-id>/b14-crossover.FCStd
+```
+
+Run the fast development-bridge recipe contract checks:
+
+```bash
+.venv/bin/python tests/validate_freecad_bridge.py
+```
+
 - These commands were verified with FreeCAD 1.1.1 in the current environment.
 - A successful FreeCAD smoke run must print `B15 FreeCAD 1.1 headless smoke test passed`; an exit code without that sentinel is not evidence that FreeCAD executed the assertions.
 - `tests/validate_b15.py` treats B14 as a baseline. If B14 is deliberately changed, do not automatically alter B15 or the comparison test merely to restore a pass; first determine the intended version scope.
 - Headless checks do not replace a real GUI workflow run. For geometry, document integration, display, export, or performance changes, run the exact target macro in FreeCAD and exercise the affected guided stages.
+- Bridge runs must use the repository-local isolated profile and a copied/disposable document. Never attach the controller to an everyday FreeCAD session or an irreplaceable document, never approve an unexpected dialog, and confirm the exact bridge instance stopped after a cold or warm run. Resolve recipe hosts by persisted centreline identity and place special trackwork by centreline chainage or a point projected to that centreline, not by UI ordering or an unanchored XYZ datum.
+- Treat `benchmark-output/freecad-bridge/` as ignored raw evidence. Commit only sanitised reports with the exact recipe, hashes, cache/process state, validation outcome, limitations, and raw-artifact provenance.
 
 ## Completion and review
 

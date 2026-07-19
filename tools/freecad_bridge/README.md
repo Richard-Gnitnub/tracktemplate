@@ -1,0 +1,170 @@
+# FreeCAD development bridge
+
+This tooling gives the development agent a controlled FreeCAD GUI session for
+document inspection, UI observation and long-running benchmarks. It is not a
+TrackTemplateMacro runtime dependency.
+
+## Isolation and safety
+
+- The third-party `freecad-cli` checkout lives under ignored `.devtools/`.
+- FreeCAD uses ignored configuration and results under
+  `benchmark-output/freecad-bridge/`.
+- Its FreeCAD user home/data/temp paths and XDG data, configuration and cache
+  directories are isolated there as well, so installed addons and cache locks
+  from everyday FreeCAD are not shared.
+- The addon is supplied only through this session's `--module-path`; it is not
+  installed into the normal FreeCAD `Mod` directory.
+- The server binds to `127.0.0.1`, uses the dedicated port `19875`, and requires
+  a generated local token.
+- Long operations use asynchronous jobs and can be polled for up to six hours.
+- The launcher records its exact Flatpak instance ID and requests parent-death
+  cleanup; the isolated lifecycle wrapper uses that ID as a shutdown fallback.
+
+Do not open an irreplaceable document in this session. Use a copy or a
+deterministic construction recipe for benchmark work.
+
+## Local development checkout
+
+The current spike is based on upstream commit
+`660ed03f5dc6aeb2dd0e623cc4ed5880b4c90cb7` on a local
+`tracktemplate-dev-bridge` branch. Its patch adds PySide6 compatibility,
+authenticated local calls, configurable Flatpak-session settings and
+asynchronous jobs. The checkout is intentionally not vendored into the product
+repository.
+
+The checkout remains ignored, but its reviewed patch is tracked. Prepare or
+verify the pinned checkout from a fresh repository clone with:
+
+```bash
+tools/freecad_bridge/setup-freecad-cli
+```
+
+The command checks out the exact upstream commit, applies only
+`freecad-cli-tracktemplate.patch`, refuses an unexpected checkout state, and
+runs the 22 focused bridge tests without adding pytest to the product project.
+
+## Commands
+
+Start the dedicated GUI session:
+
+```bash
+tools/freecad_bridge/launch-freecad
+```
+
+From another terminal, verify the connection and inspect it:
+
+```bash
+tools/freecad_bridge/freecad-cli ping
+tools/freecad_bridge/freecad-cli execute-code --file tools/freecad_bridge/probes/session_snapshot.py
+tools/freecad_bridge/freecad-cli execute-code --file tools/freecad_bridge/probes/ui_snapshot.py
+```
+
+Load B14 without opening its main curve dialog, then show the trackwork manager:
+
+```bash
+tools/freecad_bridge/freecad-cli submit-code --file tools/freecad_bridge/probes/load_b14.py
+tools/freecad_bridge/freecad-cli execute-code --file tools/freecad_bridge/probes/show_trackwork_manager.py
+tools/freecad_bridge/freecad-cli execute-code --file tools/freecad_bridge/probes/trackwork_manager_snapshot.py
+tools/freecad_bridge/freecad-cli execute-code --file tools/freecad_bridge/probes/capture_manager_screenshot.py
+tools/freecad_bridge/freecad-cli execute-code --file tools/freecad_bridge/probes/capture_active_dialog.py
+tools/freecad_bridge/freecad-cli submit-code --file tools/freecad_bridge/probes/scan_crossover_chainages.py
+tools/freecad_bridge/freecad-cli execute-code --file tools/freecad_bridge/probes/capture_active_view.py
+```
+
+`submit-code` returns a job identifier. Use `job-status` or `wait-job` with that
+identifier. Asynchronous jobs belong to one FreeCAD process and disappear when
+that process exits.
+
+The B14 recipe below defines its document semantics, centreline identities,
+chainage, settings, stage order and cold-process qualification. Additional
+recipes must make the same choices explicit before their timings are comparable.
+
+## Reproducible B14 fixture
+
+On a fresh checkout, prepare the pinned bridge and build the ignored base
+fixture with:
+
+```bash
+tools/freecad_bridge/setup-freecad-cli
+tools/freecad_bridge/build-b14-base
+```
+
+The builder starts an empty isolated FreeCAD process, forces the explicit B14
+default inputs, rejects any unexpected dialog, validates the exact nine-object
+semantic state, and refuses to overwrite an existing fixture or manifest. It
+creates:
+
+```text
+benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd
+benchmark-output/freecad-bridge/fixtures/b14-default-base.manifest.json
+```
+
+The manifest records the macro and FCStd hashes plus a semantic hash over object
+roles/types, curve parameters, centreline identities and centreline lengths.
+FreeCAD may serialise semantically equivalent documents to different bytes, so
+the semantic hash is the fixture-equivalence contract. The original
+641,206-byte fixture and the independently regenerated 636,344-byte fixture both
+produced semantic SHA-256
+`a3486db6f02370e61432a480bfb6c9261bc9357cc2af5111f93135e3372d0a4e`.
+
+The fixture contains the untouched result of B14's default two-track curve
+dialog and no managed turnout/crossover. The runner revalidates those semantics
+and copies the fixture into a new timestamped run directory; it never modifies
+the fixture itself.
+
+## Automated B14 cold run
+
+After the local base fixture has been prepared, one command launches a fresh
+isolated FreeCAD process, copies the base document, drives every B14 crossover
+stage, saves its JSON state, report, final top view, manager image, working
+document and startup logs under ignored `benchmark-output/freecad-bridge/runs/`,
+and terminates only that process:
+
+```bash
+tools/freecad_bridge/run-b14-cold
+```
+
+A bounded lifecycle smoke test may select a prefix of the sequence:
+
+```bash
+tools/freecad_bridge/run-b14-cold --stages geometry,timber
+```
+
+The sanitised Phase 0 three-run result is recorded in
+[`reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md`](../../reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md).
+
+The pinned recipe resolves Main Track and Track 2 by persisted template-set,
+track-number and track-name identity, never by UI row order. It places the
+crossover from Host A's centreline at chainage `746.298 mm`; no free XYZ datum is
+part of the recipe. It uses the default 600 mm requested minimum radius,
+automatic handing, and the normal geometry, timber, chair, support, 2D layout,
+integration and optional 3D stages. The chainage was chosen by the read-only
+scanner because the complete resulting minimum radius is safely above 600 mm.
+Unexpected dialogs fail the run after their text is captured; only the known
+geometry and integration confirmation questions are approved. Each stage must
+also reach its expected B14 status or the run fails. The final capture rejects a
+sampled single-colour top view, so a non-empty but unrendered PNG is not accepted
+as GUI evidence.
+
+## Automated B14 warm reuse
+
+Use the completed FCStd from a successful full cold run as the explicit input:
+
+```bash
+tools/freecad_bridge/run-b14-warm --base benchmark-output/freecad-bridge/runs/<cold-run-id>/b14-crossover.FCStd
+```
+
+The runner verifies the document's sibling `run.json`, exact macro and semantic
+base, seven-stage sequence, completed state and 27-object inventory before
+copying it into a new ignored warm-run directory. A fresh isolated process
+opens that copy, performs one warm-up, then exactly three same-process
+measurements of the actual **Generate supported chair solids** panel action. It
+requires `unchanged_result_reused=True` plus stable object, cache-signature,
+chair-count and solid-shape fingerprints on every iteration. Neither the source
+nor copied document is saved.
+
+This recipe deliberately excludes timbering, model support, 2D layout and
+integration because replaying constructive or invalidating stages would be a
+false cache-reuse test. Its result is stage-specific and must not be compared
+with the full cold-workflow total. The controlled Phase 0 result is recorded in
+[`reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md`](../../reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md).

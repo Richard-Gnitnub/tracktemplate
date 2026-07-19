@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$(cd "${bridge_dir}/../.." && pwd)"
+tool_root="${project_root}/.devtools/freecad-cli"
+state_dir="${project_root}/benchmark-output/freecad-bridge"
+profile_dir="${state_dir}/profile"
+token_file="${state_dir}/rpc-token"
+instance_file="${TRACKTEMPLATE_BRIDGE_INSTANCE_FILE:-${state_dir}/instance-id}"
+bridge_port="${TRACKTEMPLATE_BRIDGE_PORT:-19875}"
+
+if [[ ! -d "${tool_root}/addon/FreecadCli" ]]; then
+    echo "Missing development checkout: ${tool_root}" >&2
+    echo "Follow tools/freecad_bridge/README.md to create it." >&2
+    exit 2
+fi
+
+mkdir -p \
+    "${profile_dir}/xdg-cache" \
+    "${profile_dir}/xdg-config" \
+    "${profile_dir}/xdg-data" \
+    "${profile_dir}/user-home" \
+    "${profile_dir}/user-data" \
+    "${profile_dir}/temp"
+if [[ ! -s "${token_file}" ]]; then
+    umask 077
+    /usr/bin/openssl rand -hex -out "${token_file}" 32
+fi
+chmod 600 "${token_file}"
+: >"${instance_file}"
+exec 3>"${instance_file}"
+
+exec flatpak run \
+    --die-with-parent \
+    --instance-id-fd=3 \
+    --env="FREECAD_CLI_PORT=${bridge_port}" \
+    --env="FREECAD_CLI_TOKEN_FILE=${token_file}" \
+    --env="FREECAD_CLI_EXECUTION_TIMEOUT=${TRACKTEMPLATE_BRIDGE_EXECUTION_TIMEOUT:-21600}" \
+    --env="FREECAD_USER_HOME=${profile_dir}/user-home" \
+    --env="FREECAD_USER_DATA=${profile_dir}/user-data" \
+    --env="FREECAD_USER_TEMP=${profile_dir}/temp" \
+    --env="TRACKTEMPLATE_REPO=${project_root}" \
+    --env="XDG_CACHE_HOME=${profile_dir}/xdg-cache" \
+    --env="XDG_CONFIG_HOME=${profile_dir}/xdg-config" \
+    --env="XDG_DATA_HOME=${profile_dir}/xdg-data" \
+    org.freecad.FreeCAD \
+    --user-cfg "${profile_dir}/user.cfg" \
+    --system-cfg "${profile_dir}/system.cfg" \
+    --log-file "${state_dir}/FreeCAD.log" \
+    --module-path "${tool_root}/addon/FreecadCli" \
+    --macro-path "${project_root}" \
+    --python-path "${project_root}" \
+    "$@"

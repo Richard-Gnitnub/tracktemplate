@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$(cd "${bridge_dir}/../.." && pwd)"
+tool_parent="${project_root}/.devtools"
+tool_root="${tool_parent}/freecad-cli"
+patch_file="${bridge_dir}/freecad-cli-tracktemplate.patch"
+upstream_url="https://github.com/yoshikouki/freecad-cli.git"
+expected_commit="660ed03f5dc6aeb2dd0e623cc4ed5880b4c90cb7"
+
+if ! command -v git >/dev/null 2>&1; then
+    echo "Git is required to prepare the development bridge." >&2
+    exit 2
+fi
+if [[ ! -s "${patch_file}" ]]; then
+    echo "Missing reviewed bridge patch: ${patch_file}" >&2
+    exit 2
+fi
+
+if [[ ! -e "${tool_root}" ]]; then
+    mkdir -p "${tool_parent}"
+    git clone "${upstream_url}" "${tool_root}"
+    git -C "${tool_root}" checkout --detach "${expected_commit}"
+elif [[ ! -d "${tool_root}/.git" ]]; then
+    echo "Refusing to replace non-Git path: ${tool_root}" >&2
+    exit 2
+fi
+
+actual_commit="$(git -C "${tool_root}" rev-parse HEAD)"
+if [[ "${actual_commit}" != "${expected_commit}" ]]; then
+    echo "Unexpected freecad-cli commit: ${actual_commit}" >&2
+    echo "Expected: ${expected_commit}" >&2
+    exit 2
+fi
+
+if git -C "${tool_root}" apply --reverse --check "${patch_file}" >/dev/null 2>&1; then
+    echo "Reviewed TrackTemplate bridge patch is already applied."
+elif git -C "${tool_root}" apply --check "${patch_file}"; then
+    git -C "${tool_root}" apply "${patch_file}"
+    echo "Applied reviewed TrackTemplate bridge patch."
+else
+    echo "The reviewed patch neither applies cleanly nor matches the current checkout." >&2
+    echo "Preserve any local work and inspect ${tool_root} manually." >&2
+    exit 1
+fi
+
+git -C "${tool_root}" diff --check
+exec env PYTHONPATH="/usr/lib/python3/dist-packages:${tool_root}/src:${tool_root}" \
+    /usr/bin/python3 "${bridge_dir}/test_freecad_cli_checkout.py"
