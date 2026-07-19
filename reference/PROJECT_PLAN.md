@@ -17,6 +17,8 @@ The documents have distinct responsibilities:
 - [VALIDATION.md](VALIDATION.md) defines correctness and integration evidence.
 - [PROVENANCE.md](PROVENANCE.md) records reference-source identity, source
   relationship, redistribution and licensing status.
+- [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md) owns the current workflow,
+  dependency, side-effect, candidate and Phase 1 decision evidence.
 - This document owns delivery order, phase status, decision timing, and release-candidate gates.
 
 If a proposed shortcut conflicts with railway correctness, production safety, or an accepted architectural invariant, the invariant wins unless the user explicitly approves a changed requirement.
@@ -138,6 +140,19 @@ Choose migration order from evidence and establish oracles for behaviour that cu
 - Record durable choices in one concise decision log rather than scattering decisions through source comments.
 
 Chair analysis/presentation is a strong candidate because B15 already has focused checks. Curve/easement calculation is strategically foundational and may be purer. Neither is selected until this inventory exposes its real coupling.
+
+Current Phase 1 evidence is maintained in
+[PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Its first static tranche is
+complete: a deterministic, non-executing AST tool records definition
+occurrences, provisional responsibilities, callers, aliases, patches,
+module-side effects and mutable-state candidates for the exact B14/B15 source
+hashes. It shows that the bounded transition-length solver has the lowest
+structural coupling, while the better-tested chair core crosses substantial
+shadowing and alias chains. Direct B14/B15 transition and station
+characterisation now protects the leading calculation boundary. This is not
+yet a slice decision: end-to-end workflow oracles, boundary contracts,
+product-pipeline profiles and the remaining Phase 1 user decisions are still
+open.
 
 ### Exit gate
 

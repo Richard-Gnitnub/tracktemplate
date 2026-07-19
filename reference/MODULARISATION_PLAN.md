@@ -1,6 +1,7 @@
 # Modularisation Plan
 
-Status: accepted direction; no source extraction has started.
+Status: accepted direction; Stage M1 dependency inventory is in progress and no
+source extraction has started.
 
 The authoritative delivery phases from the current baseline to a release candidate are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md). The `M` stages below describe only the modularisation workstream and intentionally do not create a second project phase scheme.
 
@@ -237,6 +238,11 @@ Status: **Complete with the Phase 0 closeout.**
 - Mark data that crosses FreeCAD, UI, persistence and export boundaries.
 
 Exit gate: the first extraction is selected from evidence rather than source proximity.
+
+Status: **In progress.** The reproducible static definition/caller/alias/patch
+inventory and initial candidate comparison are recorded in
+[PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Workflow, boundary-data and
+representative performance inventories remain open.
 
 ### Stage M2: package skeleton and façade
 

@@ -35,6 +35,17 @@
   B14-module AST parity after normalising the declared version, launch and
   recompute-instrumentation differences.
 - `tests/freecad_validate_b15.py` is the real FreeCAD 1.1 headless smoke test for the B15 chair display layer.
+- `tools/phase1_inventory.py` creates the deterministic read-only Phase 1 AST
+  inventory without importing or executing either macro;
+  `tests/validate_phase1_inventory.py` protects its alias, patch, caller and
+  current-source contracts.
+- `tests/validate_phase1_alignment.py` directly characterises the current
+  transition-length and alignment-station boundary in B14 and B15 without
+  importing FreeCAD; preserve its numerical, invalid-input and ordering oracles.
+- `reference/PHASE1_INVENTORY.md` owns the in-progress workflow, dependency,
+  side-effect, candidate-slice and decision inventory. Update it as Phase 1
+  evidence closes; its provisional static labels are not final module
+  ownership.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
@@ -126,6 +137,18 @@ Run the fast development-bridge recipe contract checks:
 
 ```bash
 .venv/bin/python tests/validate_freecad_bridge.py
+```
+
+Run the deterministic Phase 1 macro-inventory contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_inventory.py
+```
+
+Run the direct Phase 1 transition/station characterisation:
+
+```bash
+.venv/bin/python tests/validate_phase1_alignment.py
 ```
 
 - These commands were verified with FreeCAD 1.1.1 in the current environment.

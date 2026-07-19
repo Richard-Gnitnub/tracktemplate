@@ -100,6 +100,27 @@ Fast development-bridge recipe contract checks:
 .venv/bin/python tests/validate_freecad_bridge.py
 ```
 
+Deterministic Phase 1 macro-inventory contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_inventory.py
+```
+
+This validates the analyser against a synthetic shadowing/alias/patch fixture,
+then checks the exact immutable B14 and accepted B15 source fingerprints and
+their current structural/candidate facts. It does not execute either macro.
+
+Direct Phase 1 transition/station characterisation:
+
+```bash
+.venv/bin/python tests/validate_phase1_alignment.py
+```
+
+This extracts only the exact B14/B15 calculation definitions under test into
+an ordinary-Python namespace. It asserts representative and boundary values,
+invalid-input diagnostics, station clamping/interpolation/duplicate-point
+ordering, and exact B14/B15 result equality without importing FreeCAD.
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash
