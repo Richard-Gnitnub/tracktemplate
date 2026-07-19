@@ -174,6 +174,33 @@ It never modifies the source fixture. Raw evidence remains ignored under
 recorded in
 [`reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md`](../../reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 
+## Phase 1 ordinary-track selected-export oracle
+
+Drive B14's real selected-production export dialog through initial output,
+non-overwrite revisioning, confirmed overwrite and an injected commit failure:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-export \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The wrapper launches a fresh isolated FreeCAD process and operates only on a
+copy of the fixed nine-object fixture. It selects the complete `SET-001`
+template set, DXF/SVG/STL/STEP, individual plus combined files, a manifest and
+exporter-bound probes. The recipe validates the exact 14-file base and
+`_Rev_02` inventories, the 15-row manifest, parsed 2D bounds, STEP/STL
+topology, the frozen logical export hash, source/document non-mutation and
+staging cleanup. Its failure hook wraps the real atomic commit and fails after
+one destination replacement so the real backup restoration is exercised.
+
+Raw evidence remains ignored under
+`benchmark-output/freecad-bridge/ordinary-export-runs/`; the controlled series
+is recorded in
+[`reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md`](../../reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
+This oracle covers the explicit selected-export transaction. B14's separate
+create-time export path, cancellation, other scopes/entity families and future
+deferred exact-shape construction remain Phase 1 gaps.
+
 ## Automated B14 cold run
 
 After the local base fixture has been prepared, one command launches a fresh

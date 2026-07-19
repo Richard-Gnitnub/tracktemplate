@@ -24,6 +24,8 @@ movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
 | Ordinary-track semantic SHA-256 | `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656` |
 | Ordinary-track edit/rollback oracle | `tools/freecad_bridge/ordinary_track_edit_recipe.py`, schema 1 |
 | Right-hand ordinary-track semantic SHA-256 | `4c8bf8dfc10bda8e91e7d479b630bbce2c12df576700f23e6b5bdbc276cc69d4` |
+| Ordinary-track selected-export oracle | `tools/freecad_bridge/ordinary_track_export_recipe.py`, schema 1 |
+| Ordinary-track logical export SHA-256 | `91922662487f92b8bdb8f92a65e09fb7b62f2f9d1461704bb7c8cd41c2a15413` |
 | B14 role | Immutable legacy comparison oracle |
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
@@ -68,6 +70,14 @@ Run the fast and real-GUI B14 ordinary-track edit/rollback oracles with:
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_edit.py
 tools/freecad_bridge/run-b14-ordinary-edit \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+Run the fast and real-GUI B14 ordinary-track selected-export oracles with:
+
+```bash
+.venv/bin/python tests/validate_phase1_ordinary_export.py
+tools/freecad_bridge/run-b14-ordinary-export \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 ```
 
@@ -302,9 +312,9 @@ is known to be defective.
 
 | Workflow family | Current oracle/evidence owner | Deterministic recipe or fixture | Principal Phase 1 gap |
 | --- | --- | --- | --- |
-| Curve/easement creation and editing | B15 reference; B14 oracle; direct transition/station characterisation; fixed create-result and handedness-edit document oracles | B14 default-base builder plus `run-b14-ordinary-snapshot` and `run-b14-ordinary-edit` | Fixed left-to-right replacement, persistence, zero-angle failure and transaction abort are characterised; undo/redo, change-back, wider curve boundaries and export-through profile remain open; remaining curve functions lack direct oracles |
+| Curve/easement creation and editing | B15 reference; B14 oracle; direct transition/station characterisation; fixed create-result, handedness-edit and selected-export document oracles | B14 default-base builder plus `run-b14-ordinary-snapshot`, `run-b14-ordinary-edit` and `run-b14-ordinary-export` | Fixed left-to-right replacement, persistence, negative paths and export of retained exact shapes are characterised; undo/redo, change-back, wider curve boundaries and future deferred Validate/reconstruction remain open; remaining curve functions lack direct oracles |
 | Straight/station workflow | B15/B14 source only | None dedicated | Inputs, station semantics, edit behaviour, persistence and production output are uncharacterised |
-| Multiple-track/spacing transition | Default B14 two-track base fixture plus deep create/edit document oracles | `build-b14-base`, `run-b14-ordinary-snapshot` and `run-b14-ordinary-edit` | The fixed two-track configuration survives handedness replacement and reopen; Validate/Export plus spacing/easement edit and invalid-input edge cases remain open |
+| Multiple-track/spacing transition | Default B14 two-track base fixture plus deep create/edit/export document oracles | `build-b14-base`, `run-b14-ordinary-snapshot`, `run-b14-ordinary-edit` and `run-b14-ordinary-export` | The fixed two-track configuration survives handedness replacement/reopen and selected export; deferred Validate/reconstruction plus spacing/easement edit and invalid-input edge cases remain open |
 | Standalone turnout | B15/B14 source and inherited parity checks | None dedicated | Creation/editing, handedness/orientation, straight/curved host, rollback and performance recipes |
 | Crossover geometry | B14 cold series and B15 acceptance report | Controlled `XO-001` bridge recipe | Preview/commit feasibility mismatch and curved-host coverage |
 | Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and ordinary-track timber decisions; focused failure/invalidation cases |
@@ -312,8 +322,8 @@ is known to be defective.
 | Optional supported chair solids | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage |
 | Host integration | Controlled crossover acceptance | `XO-001` stage 6 | Standalone turnout, removal/reversal, rollback and legacy-document variants |
 | Save/reopen | B15 crossover acceptance and B14 ordinary handedness-edit oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Undo/redo, change-back and broader entity families |
-| SVG/DXF/STL/STEP and manifests | Source preflight/export paths | None end-to-end in the controlled pipeline | Deterministic target artifacts, bounds/scale, overwrite, rollback, cancellation and cleanup |
-| Failure recovery | Transactional source paths, strict bridge dialog policy and B14 ordinary replacement fault injection | `run-b14-ordinary-edit` proves zero-angle rejection and post-removal transaction abort | Equivalent unchanged-state failure fixtures for the other release-critical workflows, exports and cleanup |
+| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed ordinary-track explicit selected-export oracle | `run-b14-ordinary-export` covers one complete template-set scope, all four formats, manifest, revision, overwrite, rollback and cleanup | Create-time export, cancellation, other scopes/entity families and future deferred exact-shape reconstruction |
+| Failure recovery | Transactional source paths, strict bridge dialog policy, ordinary replacement and selected-export fault injection | `run-b14-ordinary-edit` proves zero-angle rejection/post-removal abort; `run-b14-ordinary-export` proves destination-byte restoration after mid-commit failure | Equivalent unchanged-state failure fixtures for create-time export and the other release-critical workflows |
 
 Existing crossover evidence remains owned by
 [benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md),
@@ -322,6 +332,8 @@ and
 [benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
 The ordinary-track edit, persistence and rollback evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
+The ordinary-track selected-production export evidence is recorded in
+[benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
 
 ## Fixed ordinary-track document contract
 
@@ -412,6 +424,51 @@ then had a `758.005 ms` median. These are characterisation measurements, not
 accepted interaction budgets or a lightweight-view profile. Exact recipes,
 individual results and limitations are in the benchmark report.
 
+## Ordinary-track selected production export contract
+
+The isolated `run-b14-ordinary-export` recipe drives B14's real
+`SelectedProductionExportDialog` against a disposable copy of the fixed
+left-hand fixture. Three fresh FreeCAD 1.1.1 processes produced the same
+logical 14-file SHA-256
+`91922662487f92b8bdb8f92a65e09fb7b62f2f9d1461704bb7c8cd41c2a15413`
+for initial output, `_Rev_02` repeat and confirmed overwrite. Every action left
+the document at nine objects with semantic SHA-256
+`ed6021762297912796c93c3c126b9b86c62d56f52287d237c90075414c7ebd13`.
+
+The contract establishes:
+
+- the complete `SET-001` scope resolves the fixture's four ordered production
+  records into 13 tasks and one manifest: five DXF, five SVG, one STL, two STEP
+  and one CSV file;
+- the 21-column manifest contains 15 success rows, no failure/skip row and all
+  four requested production formats;
+- non-overwrite repeat creates exactly `_Rev_02` and preserves every base file
+  byte, while confirmed overwrite replaces a deliberate sentinel and
+  preserves every revision file byte;
+- known path/time, allocator and exporter-instance metadata is normalised for
+  logical comparison, while raw hashes, DXF/SVG parsed bounds, STEP topology
+  and STL mesh metrics remain independently checked; and
+- a failure injected inside the real commit after one destination replacement
+  exercises backup restoration, leaves the complete 28-file raw-hash map
+  unchanged and leaks no staging directory.
+
+The first selected-export action had a three-process median wall time of
+`7885.730 ms` (range `7788.967–7991.619 ms`) and median RSS change of
+`+134.996 MB` (range `+131.543–+157.281 MB`). Its staged
+write/commit/cleanup transaction was `3084.831 ms` median, while three full
+DXF/SVG probe preflights consumed a combined `4035.036 ms` median. The action
+made 43 exporter dispatches for 13 deliverables. These are measured legacy
+costs, not approved interaction budgets; the repeated probes are now an
+explicit optimisation candidate whose validation and late-path safety
+contracts must be preserved.
+
+This is the atomic explicit selected-export path. The source audit separately
+shows that create-time export after `run_macro()` commits the document calls
+`run_production_export()`, which commits successful tasks individually and can
+retain them when a later task fails. That path, cancellation, other scopes and
+entity families, and deferred exact-shape reconstruction remain open rather
+than being inferred from this oracle.
+
 ## Boundary-data inventory still required
 
 The fixed ordinary-track oracle now records the first concrete subset: its
@@ -438,11 +495,13 @@ their semantic contract.
 ## Performance inventory status
 
 The controlled crossover cold/warm series identifies genuine dominant costs.
-The new ordinary-track series separately records the full exact-shape
-left-to-right replacement boundary at a `2781.596 ms` median and the subsequent
-recompute/save/reopen boundary at `758.005 ms`. It does not measure a proposed
-lightweight editor or Validate/Export, so Phase 1 still lacks a reconciled
-curve-to-export product-pipeline profile.
+The ordinary-track edit series separately records the full exact-shape
+left-to-right replacement boundary at a `2781.596 ms` median and subsequent
+recompute/save/reopen at `758.005 ms`. The selected-export series adds a
+`7885.730 ms` cold action median for the fixed retained exact shapes and splits
+that into repeated probe preflights versus the staged transaction. Neither
+series measures a proposed lightweight editor or deferred Validate/rebuild,
+so Phase 1 still lacks a reconciled curve-to-export product-pipeline profile.
 Before profiles select an optimisation, the defects already recorded in
 [VALIDATION.md](VALIDATION.md) must be closed or bounded:
 
@@ -452,9 +511,11 @@ Before profiles select an optimisation, the defects already recorded in
 4. redundant post-reuse panel refresh; and
 5. repeated effective-status signature scans.
 
-No current timing is accepted as a human-use budget. Ordinary editing and
-edit-through-Validate/Export will be measured separately under
-[PERFORMANCE_SOP.md](PERFORMANCE_SOP.md).
+No current timing is accepted as a human-use budget. Ordinary editing,
+explicit Validate/deferred reconstruction and complete edit-through-export
+will continue to be measured separately under
+[PERFORMANCE_SOP.md](PERFORMANCE_SOP.md); the current selected-export series
+covers only exact shapes already retained in the legacy fixture.
 
 ## Decision log
 
@@ -466,6 +527,7 @@ edit-through-Validate/Export will be measured separately under
 | 2026-07-19 | Add direct transition/station characterisation before selecting the slice | Accepted; representative, boundary, invalid-input and B14/B15 parity cases now protect the leading pure boundary |
 | 2026-07-19 | Keep the Phase 0 fixture hash small and add a separate deep ordinary-track oracle | Accepted; it preserves the crossover baseline while characterising persistence, identity, production ordering and exact shapes without changing either macro |
 | 2026-07-19 | Extend the ordinary-track oracle through one real handedness edit and two negative paths | Accepted; the copied-document recipe freezes mirrored semantics, save/reopen, zero-angle rejection, post-removal transaction abort and the separate last-used-input side effect without changing either macro |
+| 2026-07-19 | Characterise the real explicit selected-export transaction before changing export architecture | Accepted; the copied-document recipe freezes all current formats/manifest, revision and overwrite semantics, parsed artifacts, atomic rollback and cleanup, and exposes repeated probe cost without changing either macro |
 | 2026-07-19 | Select the first extraction now | Deferred; transition solving leads on structural coupling, but workflow oracles, boundary contracts and representative profiles are not yet complete |
 
 ## Remaining Phase 1 work
@@ -473,8 +535,9 @@ edit-through-Validate/Export will be measured separately under
 - Complete operator workflow inputs, outputs, persisted properties, guided
   stages, failure and rollback maps for every row above.
 - Extend the fixed curve/multiple-track recipe through undo/redo, change-back,
-  broader boundary cases, Validate and Export; create dedicated recipes or
-  fixtures for station/straight, standalone turnout and end-to-end exports.
+  broader boundary cases and explicit Validate/deferred reconstruction; cover
+  create-time export, cancellation and other export scopes, and create
+  dedicated fixtures for station/straight and standalone turnout.
 - Record candidate boundary schemas, units, frames, tolerances, identities,
   ordering, signatures and invalidation inputs.
 - Reconcile instrumentation and profile the proposed lightweight ordinary

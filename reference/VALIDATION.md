@@ -165,6 +165,32 @@ fixture byte-identical. The accepted three-run characterisation and exact
 coverage boundary are recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 
+Fast Phase 1 ordinary-track selected-export contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_ordinary_export.py
+```
+
+This checks the frozen filenames, manifest schema, logical-output
+normalisation, B14 source fingerprint, selected-export staging/commit/rollback
+source order and isolated runner structure without importing FreeCAD. Exercise
+the real GUI/exporter path with:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-export \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The command acts only on a copied document. It must create the exact 14-file
+DXF/SVG/STL/STEP/CSV variant, preserve it while allocating `_Rev_02`, replace
+a sentinel through confirmed atomic overwrite, and restore every destination
+byte after an injected mid-commit failure. It also parses output bounds and
+solid/mesh topology, requires the frozen logical export hash, leaves nine
+document objects and no staging directory, and keeps the source and copied
+FCStd byte-identical. The accepted three-run characterisation and limitations
+are recorded in
+[benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash
@@ -249,9 +275,10 @@ For an affected workflow:
 
 ## Observed regression obligations
 
-The controlled B14 cold and warm runs exposed four behaviours that need focused
-tests with their eventual production fixes. Do not encode the current defect as
-the expected result merely to increase the test count.
+The controlled B14 runs and the selected-export source/transaction audit expose
+five behaviours that need focused tests with their eventual production fixes.
+Do not encode the current defect as the expected result merely to increase the
+test count.
 
 1. Crossover preview/commit feasibility: use the same persisted host-centreline
    identities and Host A chainage for preview and transactional commit. Assert
@@ -271,6 +298,11 @@ the expected result merely to increase the test count.
    shape identity, and does not trigger redundant parent/panel reconstruction or
    document recompute. Then change every solid-signature input class and prove
    that physical-fit validation and shape generation run again.
+5. Create-time export transaction: B14's post-document-commit `run_macro()`
+   path calls `run_production_export()`, commits successful output tasks one at
+   a time and can retain them when a later task fails. Add a deterministic
+   later-task failure oracle and converge it with an accepted all-files staging,
+   manifest, rollback and cleanup contract before this path is migrated.
 
 ## Future validation assets
 

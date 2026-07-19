@@ -161,8 +161,16 @@ zero-angle rejection and a deliberately failed transaction after old-output
 removal. It freezes the mirrored right-hand document, proves both failures
 leave document state unchanged, and records a comparable three-process edit
 series. Undo/redo, change-back, wider input boundaries, straight/station
-workflows, Validate/Export and the reconciled product-pipeline profile remain
-open.
+workflows, explicit Validate/deferred reconstruction and the reconciled
+product-pipeline profile remain open. A third isolated recipe now covers B14's
+real explicit selected-export dialog for the fixed ordinary fixture:
+deterministic DXF/SVG/STL/STEP and CSV,
+non-overwrite revisioning, confirmed staged overwrite, parsed output geometry,
+and byte-restoring rollback after an injected mid-commit failure. It also
+identifies three full exporter-bound probe passes per export action as a
+measured hotspot. This closes the fixed selected-export gap only; create-time
+export, deferred exact-shape reconstruction, cancellation and other entity
+families/scopes remain open.
 
 ### Exit gate
 
