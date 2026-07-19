@@ -7,8 +7,6 @@ import sys
 import time
 
 import FreeCAD as App
-import Mesh
-import Part
 
 try:
     from PySide6 import QtCore, QtWidgets
@@ -33,6 +31,7 @@ from tools.freecad_bridge.ordinary_track_export_recipe import (
     sha256_file,
     validate_export_snapshot,
 )
+from tools.freecad_bridge.freecad_export_metrics import format_export_metrics
 from tools.freecad_bridge.ordinary_track_recipe import (
     ordinary_track_document_snapshot,
     ordinary_track_snapshot,
@@ -58,60 +57,8 @@ def _current_rss_mb():
     return float(reader()) if callable(reader) else 0.0
 
 
-def _rounded(value, places=9):
-    result = round(float(value), places)
-    return 0.0 if result == 0.0 else result
-
-
-def _bounds(bound_box):
-    return {
-        "XMin": _rounded(bound_box.XMin),
-        "XMax": _rounded(bound_box.XMax),
-        "XLength": _rounded(bound_box.XLength),
-        "YMin": _rounded(bound_box.YMin),
-        "YMax": _rounded(bound_box.YMax),
-        "YLength": _rounded(bound_box.YLength),
-        "ZMin": _rounded(bound_box.ZMin),
-        "ZMax": _rounded(bound_box.ZMax),
-        "ZLength": _rounded(bound_box.ZLength),
-    }
-
-
 def _format_metrics(directory, variant):
-    metrics = {}
-    for relative_name in sorted(variant.get("files", {})):
-        path = pathlib.Path(directory) / relative_name
-        logical_name = variant["files"][relative_name]["logical_name"]
-        suffix = path.suffix.lower()
-        if suffix == ".dxf":
-            values = module.validate_dxf_export_bounds(str(path))
-            metrics[logical_name] = {
-                "format": "dxf",
-                "bounds": {key: _rounded(value) for key, value in values.items()},
-            }
-        elif suffix == ".svg":
-            values = module.validate_svg_export_bounds(str(path))
-            metrics[logical_name] = {
-                "format": "svg",
-                "bounds": {key: _rounded(value) for key, value in values.items()},
-            }
-        elif suffix == ".stl":
-            mesh = Mesh.Mesh(str(path))
-            metrics[logical_name] = {
-                "format": "stl",
-                "facets": int(mesh.CountFacets),
-                "points": int(mesh.CountPoints),
-                "bounds_mm": _bounds(mesh.BoundBox),
-                "volume_mm3": _rounded(getattr(mesh, "Volume", 0.0)),
-            }
-        elif suffix == ".step":
-            shape = Part.Shape()
-            shape.read(str(path))
-            metrics[logical_name] = {
-                "format": "step",
-                "shape": shape_summary(shape),
-            }
-    return metrics
+    return format_export_metrics(module, directory, variant, shape_summary)
 
 
 def _raw_contract(snapshot):

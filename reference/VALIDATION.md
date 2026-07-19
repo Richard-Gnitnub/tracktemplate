@@ -165,16 +165,17 @@ fixture byte-identical. The accepted three-run characterisation and exact
 coverage boundary are recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 
-Fast Phase 1 ordinary-track selected-export contract checks:
+Fast Phase 1 ordinary-track export contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_export.py
 ```
 
 This checks the frozen filenames, manifest schema, logical-output
-normalisation, B14 source fingerprint, selected-export staging/commit/rollback
-source order and isolated runner structure without importing FreeCAD. Exercise
-the real GUI/exporter path with:
+normalisation, B14 source fingerprint, selected-export staging/commit/rollback,
+create-time post-document-commit/per-file ordering and both isolated runner
+structures without importing FreeCAD. Exercise the explicit selected-export
+GUI/exporter path with:
 
 ```bash
 tools/freecad_bridge/run-b14-ordinary-export \
@@ -190,6 +191,25 @@ document objects and no staging directory, and keeps the source and copied
 FCStd byte-identical. The accepted three-run characterisation and limitations
 are recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
+
+Exercise production export inside B14's normal Generate action with:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-create-export \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The copied-document recipe must perform one successful replacement/export and
+one deterministic final-task failure. It requires the frozen normalised
+document and success-output hashes, parsed production metrics identical to the
+selected-export oracle, exactly 13 tasks plus manifest, clean one-pass
+preflight with only the expected output-directory information item, nine
+objects, preference restoration and save/reopen persistence.
+The diagnostic failure must retain the frozen 13-file partial directory and
+one manifest failure row without leaking temporary objects/files. That result
+documents B14; it is not the accepted transaction contract for a migrated
+exporter. The controlled three-run evidence is recorded in
+[benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md).
 
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
@@ -275,7 +295,7 @@ For an affected workflow:
 
 ## Observed regression obligations
 
-The controlled B14 runs and the selected-export source/transaction audit expose
+The controlled B14 runs and export source/transaction audits expose
 five behaviours that need focused tests with their eventual production fixes.
 Do not encode the current defect as the expected result merely to increase the
 test count.
@@ -298,11 +318,13 @@ test count.
    shape identity, and does not trigger redundant parent/panel reconstruction or
    document recompute. Then change every solid-signature input class and prove
    that physical-fit validation and shape generation run again.
-5. Create-time export transaction: B14's post-document-commit `run_macro()`
-   path calls `run_production_export()`, commits successful output tasks one at
-   a time and can retain them when a later task fails. Add a deterministic
-   later-task failure oracle and converge it with an accepted all-files staging,
-   manifest, rollback and cleanup contract before this path is migrated.
+5. Create-time export transaction and final UI: the deterministic final-task
+   oracle now proves B14's post-document-commit `run_macro()` path retains
+   twelve task files plus its manifest when the final STEP fails, while the
+   later overall dialog still says the outputs were created successfully.
+   Preserve that diagnostic evidence, but converge the production path on an
+   accepted all-files staging, manifest, rollback, cleanup and truthful-summary
+   contract before this path is migrated.
 
 ## Future validation assets
 

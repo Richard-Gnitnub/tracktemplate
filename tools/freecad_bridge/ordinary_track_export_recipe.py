@@ -1,5 +1,6 @@
-"""Pure contracts for the Phase 1 B14 ordinary-track selected export."""
+"""Pure contracts for the Phase 1 B14 ordinary-track export paths."""
 
+import copy
 import csv
 import hashlib
 import json
@@ -34,6 +35,26 @@ EXPECTED_TASK_COUNT = 13
 EXPECTED_MANIFEST_ROW_COUNT = 15
 EXPECTED_LOGICAL_EXPORT_SHA256 = (
     "91922662487f92b8bdb8f92a65e09fb7b62f2f9d1461704bb7c8cd41c2a15413"
+)
+EXPECTED_EXPORT_METRICS_SHA256 = (
+    "37dcbc20e8ecda9c1a80b3e73646b0c1127211e01488d56eeef49aa08d0789b4"
+)
+CREATE_TIME_EXPORT_RECIPE_SCHEMA_VERSION = 1
+CREATE_TIME_EXPORT_FAILURE_MESSAGE = (
+    "Injected Phase 1 create-time export failure at the final planned task"
+)
+CREATE_TIME_EXPORT_FAILED_FILENAME = (
+    "Curve_Set_001_Combined_Solid_Assembly.step"
+)
+CREATE_TIME_OUTPUT_DIRECTORY_PLACEHOLDER = "<create-time-output-directory>"
+EXPECTED_CREATE_TIME_LOGICAL_EXPORT_SHA256 = (
+    "b33a2c5cfb6937d988046ad17584ed7bc2957514e77213282dfd665960bc4ffb"
+)
+EXPECTED_CREATE_TIME_DOCUMENT_SHA256 = (
+    "a6aae6d70610ceec50a6223328db1454eca264effc12e7db5df07204707b3aa2"
+)
+EXPECTED_CREATE_TIME_PARTIAL_EXPORT_SHA256 = (
+    "05d27a32b26435eda3b776498c2b28195a943bc2499ced404450f18ce349bf29"
 )
 
 MANIFEST_FIELDS = (
@@ -71,6 +92,13 @@ def sha256_file(path):
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def format_metrics_sha256(metrics):
+    encoded = json.dumps(
+        metrics, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    return _sha256_bytes(encoded)
 
 
 def logical_export_name(name):
@@ -296,3 +324,204 @@ def compare_logical_exports(reference, candidate):
         }
         raise ValueError("Export semantics differ: {}".format(differences))
     return reference.get("logical_sha256", "")
+
+
+def create_time_export_document_snapshot(snapshot, enforce_expected_hash=True):
+    """Normalise only the per-run create-time export directory in document state."""
+    if not isinstance(snapshot, dict) or not isinstance(snapshot.get("semantic"), dict):
+        raise ValueError("Invalid create-time ordinary-track document snapshot")
+    semantic = copy.deepcopy(snapshot["semantic"])
+    persistence = semantic.get("persistence", {})
+    configs = []
+    output_directories = []
+    for owner in ("settings", "template"):
+        values = persistence.get(owner, {}).get("values", {})
+        config = values.get("ProductionExportConfigurationJSON")
+        if not isinstance(config, dict):
+            raise ValueError(
+                "Create-time export document lacks {} production configuration".format(
+                    owner
+                )
+            )
+        output_directory = str(config.get("output_directory") or "")
+        if not output_directory:
+            raise ValueError("Create-time export document has no output directory")
+        output_directories.append(output_directory)
+        config["output_directory"] = CREATE_TIME_OUTPUT_DIRECTORY_PLACEHOLDER
+        configs.append(config)
+    if output_directories[0] != output_directories[1]:
+        raise ValueError(
+            "Create-time export settings/template output directories differ"
+        )
+    if configs[0] != configs[1]:
+        raise ValueError("Create-time export settings/template configurations differ")
+
+    config = configs[0]
+    expected_fields = {
+        "enabled": True,
+        "include_set_identifier": True,
+        "include_object_role": True,
+        "include_track_number": True,
+        "include_section_number": True,
+        "export_each_section": True,
+        "create_combined_files": True,
+        "overwrite_existing": False,
+        "create_manifest": True,
+        "open_output_directory": False,
+        "current_template_set_only": True,
+    }
+    differences = {
+        name: {"actual": config.get(name), "expected": expected}
+        for name, expected in expected_fields.items()
+        if config.get(name) != expected
+    }
+    if differences:
+        raise ValueError(
+            "Unexpected create-time production-export configuration: {}".format(
+                differences
+            )
+        )
+    formats = config.get("formats")
+    if formats != {key: True for key in EXPORT_FORMATS}:
+        raise ValueError("Create-time export does not enable all four formats")
+    selections = config.get("selections")
+    required_selections = (
+        "track_template_compound_2d",
+        "track_template_compound_3d",
+        "track_centrelines",
+    )
+    if not isinstance(selections, dict) or any(
+        selections.get(name) is not True for name in required_selections
+    ):
+        raise ValueError("Create-time export omits a fixed-fixture output selection")
+
+    encoded = json.dumps(
+        semantic, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    digest = _sha256_bytes(encoded)
+    if (
+        enforce_expected_hash
+        and EXPECTED_CREATE_TIME_DOCUMENT_SHA256
+        and digest != EXPECTED_CREATE_TIME_DOCUMENT_SHA256
+    ):
+        raise ValueError(
+            "Unexpected create-time document SHA-256: {} (expected {})".format(
+                digest, EXPECTED_CREATE_TIME_DOCUMENT_SHA256
+            )
+        )
+    return {
+        "semantic": semantic,
+        "semantic_sha256": digest,
+        "output_directory": output_directories[0],
+        "production_export_config": copy.deepcopy(config),
+    }
+
+
+def compare_create_time_document_to_base(base_snapshot, created_snapshot):
+    """Prove create-time export changed only the persisted export configuration."""
+    if not isinstance(base_snapshot, dict) or not isinstance(
+        base_snapshot.get("semantic"), dict
+    ):
+        raise ValueError("Invalid base document snapshot for create-time comparison")
+    if not isinstance(created_snapshot, dict) or not isinstance(
+        created_snapshot.get("semantic"), dict
+    ):
+        raise ValueError("Invalid created document snapshot for create-time comparison")
+    base = copy.deepcopy(base_snapshot["semantic"])
+    created = copy.deepcopy(created_snapshot["semantic"])
+    for semantic in (base, created):
+        for owner in ("settings", "template"):
+            values = semantic.get("persistence", {}).get(owner, {}).get("values", {})
+            if "ProductionExportConfigurationJSON" not in values:
+                raise ValueError(
+                    "{} lacks ProductionExportConfigurationJSON".format(owner)
+                )
+            values.pop("ProductionExportConfigurationJSON")
+    if base != created:
+        raise ValueError(
+            "Create-time export changed ordinary-track state beyond export configuration"
+        )
+    return True
+
+
+def validate_create_time_failure_snapshot(
+    snapshot,
+    reference_variant,
+    enforce_expected_hash=True,
+):
+    """Diagnose B14's known partial output after the injected final-task failure."""
+    files = snapshot.get("files", {})
+    expected = set(EXPECTED_EXPORT_FILENAMES)
+    expected.remove(CREATE_TIME_EXPORT_FAILED_FILENAME)
+    if set(files) != expected:
+        raise ValueError(
+            "Unexpected create-time failure files: {}".format(sorted(files))
+        )
+    if snapshot.get("directories"):
+        raise ValueError(
+            "Create-time failure leaked directories: {}".format(
+                snapshot.get("directories")
+            )
+        )
+
+    reference_files = reference_variant.get("files", {})
+    differences = {}
+    for name, item in sorted(files.items()):
+        if name.lower().endswith(".csv"):
+            continue
+        expected_item = reference_files.get(name, {})
+        if item.get("normalised_sha256") != expected_item.get("normalised_sha256"):
+            differences[name] = {
+                "failure": item.get("normalised_sha256"),
+                "success": expected_item.get("normalised_sha256"),
+            }
+    if differences:
+        raise ValueError(
+            "Successful create-time failure artifacts changed: {}".format(differences)
+        )
+
+    manifest_items = [
+        item for name, item in files.items() if name.lower().endswith(".csv")
+    ]
+    if len(manifest_items) != 1:
+        raise ValueError("Expected one create-time failure manifest")
+    manifest = manifest_items[0].get("manifest", {})
+    if tuple(manifest.get("fields", [])) != MANIFEST_FIELDS:
+        raise ValueError("Unexpected create-time failure manifest schema")
+    rows = manifest.get("rows", [])
+    if len(rows) != EXPECTED_MANIFEST_ROW_COUNT:
+        raise ValueError(
+            "Unexpected create-time failure manifest row count: {}".format(len(rows))
+        )
+    failure_rows = [row for row in rows if row.get("Export status") == "Failure"]
+    success_rows = [row for row in rows if row.get("Export status") == "Success"]
+    if len(failure_rows) != 1 or len(success_rows) != EXPECTED_MANIFEST_ROW_COUNT - 1:
+        raise ValueError("Create-time failure manifest has unexpected status counts")
+    failure = failure_rows[0]
+    if failure.get("Export filename") != CREATE_TIME_EXPORT_FAILED_FILENAME:
+        raise ValueError("Create-time failure manifest identifies the wrong file")
+    if failure.get("Export format") != "STEP":
+        raise ValueError("Create-time failure manifest identifies the wrong format")
+    if CREATE_TIME_EXPORT_FAILURE_MESSAGE not in failure.get("Error message", ""):
+        raise ValueError("Create-time failure manifest omits the injected reason")
+
+    digest = str(snapshot.get("content_sha256") or "")
+    if (
+        enforce_expected_hash
+        and EXPECTED_CREATE_TIME_PARTIAL_EXPORT_SHA256
+        and digest != EXPECTED_CREATE_TIME_PARTIAL_EXPORT_SHA256
+    ):
+        raise ValueError(
+            "Unexpected create-time partial-output SHA-256: {} (expected {})".format(
+                digest, EXPECTED_CREATE_TIME_PARTIAL_EXPORT_SHA256
+            )
+        )
+    return {
+        "atomic_output_set": False,
+        "content_sha256": digest,
+        "file_count": len(files),
+        "missing_file": CREATE_TIME_EXPORT_FAILED_FILENAME,
+        "manifest_success_rows": len(success_rows),
+        "manifest_failure_rows": len(failure_rows),
+        "temporary_directories": list(snapshot.get("directories", [])),
+    }

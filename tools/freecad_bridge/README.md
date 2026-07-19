@@ -198,8 +198,39 @@ Raw evidence remains ignored under
 is recorded in
 [`reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md`](../../reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
 This oracle covers the explicit selected-export transaction. B14's separate
-create-time export path, cancellation, other scopes/entity families and future
-deferred exact-shape construction remain Phase 1 gaps.
+create-time export path has the independent oracle below; cancellation, other
+scopes/entity families and future deferred exact-shape construction remain
+Phase 1 gaps.
+
+## Phase 1 ordinary-track create-time export oracle
+
+Drive production export inside B14's real curve Generate action with:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-create-export \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The wrapper launches a fresh isolated process and operates only on a copied
+nine-object fixture. Its first normal replacement enables all four formats,
+individual plus combined output and the CSV manifest in a fresh directory. It
+requires 14 successful files, the frozen create-time logical hash, parsed
+production metrics identical to selected export, stable document semantics,
+nine objects and no temporary leak.
+
+A second same-process replacement uses another fresh directory and injects a
+failure only at the final combined-solid STEP deliverable. The recipe requires
+B14's diagnosed 13-file partial result, exact manifest failure row, unchanged
+document semantics, save/reopen persistence and preference restoration. This
+fault injection characterises B14's per-file commit path; it does not accept
+partial output as the intended modular exporter contract. It also records the
+contradictory final overall “created successfully” wording as an open UI
+obligation.
+
+Raw evidence remains ignored under
+`benchmark-output/freecad-bridge/ordinary-create-export-runs/`; the controlled
+series is recorded in
+[`reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md`](../../reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md).
 
 ## Automated B14 cold run
 

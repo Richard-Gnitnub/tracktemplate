@@ -168,9 +168,15 @@ deterministic DXF/SVG/STL/STEP and CSV,
 non-overwrite revisioning, confirmed staged overwrite, parsed output geometry,
 and byte-restoring rollback after an injected mid-commit failure. It also
 identifies three full exporter-bound probe passes per export action as a
-measured hotspot. This closes the fixed selected-export gap only; create-time
-export, deferred exact-shape reconstruction, cancellation and other entity
-families/scopes remain open.
+measured hotspot. A fourth isolated recipe covers production export inside the
+normal Generate action. It freezes the successful document, all four output
+formats and parsed production measures, records a comparable three-process
+create-through-export series, and deterministically demonstrates B14's
+non-atomic partial output plus contradictory final success wording after the
+last planned task fails. This closes the fixed create-time characterisation
+gap without accepting either defect as future behaviour. Deferred exact-shape
+reconstruction, cancellation, other entity families/scopes and the reconciled
+product-pipeline profile remain open.
 
 ### Exit gate
 

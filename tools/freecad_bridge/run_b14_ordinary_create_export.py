@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the bounded B14 ordinary-track selected-export recipe."""
+"""Run the bounded B14 ordinary-track create-time export recipe."""
 
 import argparse
 import datetime
@@ -27,9 +27,9 @@ from tools.freecad_bridge.orchestration import (  # noqa: E402
 RECIPE_SOURCE_PATHS = (
     PROJECT_ROOT / "tools" / "freecad_bridge" / "freecad_export_metrics.py",
     PROJECT_ROOT / "tools" / "freecad_bridge" / "ordinary_track_export_recipe.py",
-    PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "b14_ordinary_export_driver.py",
-    PROJECT_ROOT / "tools" / "freecad_bridge" / "run-b14-ordinary-export",
-    PROJECT_ROOT / "tools" / "freecad_bridge" / "run_b14_ordinary_export.py",
+    PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "b14_ordinary_create_export_driver.py",
+    PROJECT_ROOT / "tools" / "freecad_bridge" / "run-b14-ordinary-create-export",
+    PROJECT_ROOT / "tools" / "freecad_bridge" / "run_b14_ordinary_create_export.py",
     PROJECT_ROOT / "tests" / "validate_phase1_ordinary_export.py",
 )
 
@@ -43,7 +43,7 @@ for document_name in list(App.listDocuments()):
     App.closeDocument(document_name)
 remaining = sorted(App.listDocuments())
 if remaining:
-    raise RuntimeError('Could not close ordinary-track export documents: {}'.format(remaining))
+    raise RuntimeError('Could not close create-time export documents: {}'.format(remaining))
 print(json.dumps({'closed': closed, 'remaining': remaining}, sort_keys=True))
 """))
 
@@ -79,11 +79,11 @@ def main():
         PROJECT_ROOT
         / "benchmark-output"
         / "freecad-bridge"
-        / "ordinary-export-runs"
+        / "ordinary-create-export-runs"
         / run_stamp
     )
     run_dir.mkdir(parents=True, exist_ok=False)
-    document_path = run_dir / "b14-ordinary-export.FCStd"
+    document_path = run_dir / "b14-ordinary-create-export.FCStd"
     shutil.copy2(base_path, document_path)
     result_path = run_dir / "run.json"
 
@@ -98,7 +98,7 @@ def main():
 
     state = {
         "run_started_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "recipe_id": "phase1-b14-ordinary-track-selected-export-v1",
+        "recipe_id": "phase1-b14-ordinary-track-create-time-export-v1",
         "macro": "AdvancedTurnout.FCMacro",
         "macro_sha256": sha256(PROJECT_ROOT / "AdvancedTurnout.FCMacro"),
         "recipe_source_sha256": {
@@ -118,7 +118,7 @@ def main():
             PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "session_snapshot.py",
         ))
         if state["session_before"].get("documents"):
-            raise RuntimeError("The ordinary-track export recipe requires an empty session")
+            raise RuntimeError("The create-time export recipe requires an empty session")
 
         load_job = submit_and_wait(
             client,
@@ -133,7 +133,7 @@ def main():
 import json
 import FreeCAD as App
 if App.listDocuments():
-    raise RuntimeError('Ordinary-track export requires no open document')
+    raise RuntimeError('Create-time export requires no open document')
 document = App.openDocument({document_path!r})
 print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}, sort_keys=True))
 """.format(document_path=str(document_path))))
@@ -145,9 +145,9 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
                 / "tools"
                 / "freecad_bridge"
                 / "probes"
-                / "b14_ordinary_export_driver.py"
+                / "b14_ordinary_create_export_driver.py"
             ).read_text(encoding="utf-8"),
-            "B14 ordinary-track selected export",
+            "B14 ordinary-track create-time export",
             args.timeout,
         )
         state["recipe"] = parse_json_output(export_job)
@@ -155,8 +155,8 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             "orchestrator_elapsed_seconds"
         )
         state["run_document_sha256_after"] = sha256(document_path)
-        if state["run_document_sha256_after"] != state["run_document_sha256_before"]:
-            raise RuntimeError("The export recipe saved over its copied source document")
+        if state["run_document_sha256_after"] == state["run_document_sha256_before"]:
+            raise RuntimeError("The create-time export recipe did not save its copied document")
         state["session_after_recipe"] = parse_json_output(execute_file(
             client,
             PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "session_snapshot.py",
@@ -164,7 +164,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
         source_sha256_after = sha256(base_path)
         state["source_fixture_sha256_after"] = source_sha256_after
         if source_sha256_after != source_sha256_before:
-            raise RuntimeError("The export recipe modified its source fixture")
+            raise RuntimeError("The create-time export recipe modified its source fixture")
         state["status"] = "completed"
     except (Exception, SystemExit) as error:
         state["status"] = "failed"
@@ -182,7 +182,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             json.dumps(state, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        print("Ordinary-track export evidence: {}".format(run_dir), flush=True)
+        print("Ordinary-track create-time export evidence: {}".format(run_dir), flush=True)
 
 
 if __name__ == "__main__":

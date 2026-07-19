@@ -124,6 +124,29 @@ post-action state. This selected-export transaction is not evidence for B14's
 separate create-time `run_production_export()` path, which must be measured and
 qualified independently.
 
+The independent Phase 1 create-time export characterisation drives the normal
+curve Generate action:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-create-export \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+Its comparable cold boundary begins before `CurveInputDialog` construction and
+ends after the final overall result dialog. It includes confirmation,
+calculation, fresh legacy exact-shape construction, document replacement and
+commit, one exporter-bound preflight, per-file export plus manifest,
+schedule/material report, recomputes and result UI. Process launch, macro load,
+fixture open, artifact parsing and save/reopen are outside this boundary.
+Report the complete action, preflight and actual export separately; do not add
+nested durations to the action total.
+
+The later injected final-task failure shares the process and is correctness
+evidence, not a cold performance result. Record its surviving files, manifest,
+document state and cleanup. Never describe time saved by skipping the failed
+STEP writer as an optimisation. The current legacy path is non-atomic and must
+not be used as the acceptance target for a future exporter.
+
 The cold wrapper must:
 
 - refuse to start if its dedicated localhost bridge is already occupied;
@@ -169,7 +192,7 @@ the raw artifacts needed to audit it.
 
 ## Current instrumentation boundary
 
-The B14 report labelled **Whole workflow performance benchmark** currently measures the guided turnout/crossover workflow. It is an operator-visible special-trackwork benchmark, not yet a reconciled benchmark of the complete curve/easement-to-export product pipeline. The separate Phase 1 ordinary-track wrappers add external replacement, persistence and explicit selected-export boundaries; they do not make the internal B14 report whole-product instrumentation or cover deferred exact-shape reconstruction.
+The B14 report labelled **Whole workflow performance benchmark** currently measures the guided turnout/crossover workflow. It is an operator-visible special-trackwork benchmark, not yet a reconciled benchmark of the complete curve/easement-to-export product pipeline. The separate Phase 1 ordinary-track wrappers add external replacement, persistence, explicit selected-export and fixed create-through-export boundaries; they do not make the internal B14 report whole-product instrumentation or cover target-architecture deferred exact-shape reconstruction.
 
 Until Phase 1 reconciles the complete instrumentation:
 

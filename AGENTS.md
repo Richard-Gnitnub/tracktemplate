@@ -63,6 +63,13 @@
   mid-commit rollback, parsed output metrics and source/document cleanup
   contracts. Do not treat it as coverage of create-time export or deferred
   exact-shape construction.
+- `tools/freecad_bridge/run-b14-ordinary-create-export` uses the same pure
+  export contracts plus `freecad_export_metrics.py` to own the separate B14
+  Generate-path export oracle. Preserve its frozen normalised document,
+  successful 14-file, shared production-metric and diagnosed 13-file partial
+  hashes, final-task failure row, save/reopen and preference-restoration
+  contracts. The partial output and contradictory final success wording are
+  bounded B14 defects, not accepted future behaviour.
 - `reference/PHASE1_INVENTORY.md` owns the in-progress workflow, dependency,
   side-effect, candidate-slice and decision inventory. Update it as Phase 1
   evidence closes; its provisional static labels are not final module
@@ -156,6 +163,14 @@ tools/freecad_bridge/run-b14-ordinary-export \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 ```
 
+Run the separate Phase 1 ordinary-track create-time export oracle on a copied
+fixture:
+
+```bash
+tools/freecad_bridge/run-b14-ordinary-create-export \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
 Run the controlled B14 crossover recipe in a fresh isolated FreeCAD process:
 
 ```bash
@@ -205,7 +220,7 @@ Run the fast Phase 1 ordinary-track edit/rollback checks:
 .venv/bin/python tests/validate_phase1_ordinary_edit.py
 ```
 
-Run the fast Phase 1 ordinary-track selected-export checks:
+Run the fast Phase 1 ordinary-track export checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_ordinary_export.py
@@ -215,7 +230,7 @@ Run the fast Phase 1 ordinary-track selected-export checks:
 - A successful FreeCAD smoke run must print `B15 FreeCAD 1.1 headless smoke test passed`; an exit code without that sentinel is not evidence that FreeCAD executed the assertions.
 - `tests/validate_b15.py` treats B14 as the immutable legacy oracle. If B14 is deliberately changed with explicit approval, do not automatically alter B15 or the comparison test merely to restore a pass; first determine the intended version scope and preserve the accepted checkpoint.
 - Headless checks do not replace a real GUI workflow run. For geometry, document integration, display, export, or performance changes, run the exact target macro in FreeCAD and exercise the affected guided stages.
-- Bridge runs must use the repository-local isolated profile and a copied/disposable document. Never attach the controller to an everyday FreeCAD session or an irreplaceable document, never approve an unexpected dialog, and confirm the exact bridge instance stopped after a snapshot, edit, export, cold, warm or acceptance run. Resolve recipe hosts by persisted centreline identity and place special trackwork by centreline chainage or a point projected to that centreline, not by UI ordering or an unanchored XYZ datum.
+- Bridge runs must use the repository-local isolated profile and a copied/disposable document. Never attach the controller to an everyday FreeCAD session or an irreplaceable document, never approve an unexpected dialog, and confirm the exact bridge instance stopped after a snapshot, edit, selected/create-time export, cold, warm or acceptance run. Resolve recipe hosts by persisted centreline identity and place special trackwork by centreline chainage or a point projected to that centreline, not by UI ordering or an unanchored XYZ datum.
 - Treat `benchmark-output/freecad-bridge/` as ignored raw evidence. Commit only sanitised reports with the exact recipe, hashes, cache/process state, validation outcome, limitations, and raw-artifact provenance.
 
 ## Completion and review
