@@ -1,0 +1,45 @@
+# IDE and local workspace state
+/.idea/
+/.vscode/
+*.iml
+
+# Python environments, bytecode, and tool caches
+/.venv/
+/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local credentials and machine-specific configuration
+.env
+.env.*
+!.env.example
+
+# PyCharm starter file; this is not a product entry point
+/main.py
+
+# Local source evidence pending redistribution/provenance confirmation
+/reference/t5_files_556b_06_feb_2025.zip
+
+# Repository-local generated output locations
+/benchmark-output/
+/benchmark-results/
+/exports/
+/output/
+/tmp/
+
+# FreeCAD backup/recovery files; intentional .FCStd fixtures remain trackable
+*.FCStd1
+*.FCStd2
+*.FCBak
+
+# Editor and operating-system noise
+.DS_Store
+*~
+*.swp
+*.swo
