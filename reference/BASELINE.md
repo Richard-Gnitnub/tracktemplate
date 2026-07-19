@@ -1,6 +1,6 @@
 # Phase 0 Baseline Record
 
-Status: automated checkpoint evidence captured on 2026-07-19. Phase 0 remains open for the representative GUI/performance baseline, B14/B15 acceptance, licence/provenance decisions, checkpoint review, and GitHub push.
+Status: automated checkpoint evidence captured and published on 2026-07-19. Phase 0 remains open for the representative GUI/performance baseline, B14/B15 acceptance, and licence/provenance decisions.
 
 ## Purpose
 
@@ -18,6 +18,8 @@ This record identifies the exact pre-modular source, environment, validations, e
 | Phase 0 capture date | 2026-07-19, Europe/London |
 
 The B14 file has no working-tree diff from the starting commit. Phase 0 documentation and test work has not changed either macro.
+
+The reviewed source checkpoint was committed as `989869c` (`Establish Phase 0 baseline checkpoint`) and pushed to `origin/main` on 2026-07-19.
 
 ## Version roles and source fingerprints
 
@@ -153,8 +155,8 @@ These gaps become inputs to Phase 1 characterisation. They do not justify weaken
 | Exact source versions, fingerprints, and environment | Complete |
 | Syntax and B15 analytical/structural validation | Pass |
 | Genuine FreeCAD headless assertions | Pass |
-| Intended checkpoint contents reviewed | In progress |
-| Checkpoint committed and pushed | Pending user review and GitHub authentication |
+| Intended checkpoint contents reviewed | Complete |
+| Checkpoint committed and pushed | Complete — source checkpoint `989869c` on `origin/main` |
 | Representative GUI recipe and cold/warm reports | Pending user-assisted FreeCAD run |
 | B14/B15 behavioural acceptance | B14 baseline / B15 candidate; final acceptance pending |
 | Reference ZIP redistribution and project licence/provenance | Pending decision; ZIP remains local |
