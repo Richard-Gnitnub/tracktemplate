@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Fast contract checks for the development-only FreeCAD bridge recipe."""
 
+import ast
+import copy
 import json
 import pathlib
 import sys
@@ -45,6 +47,30 @@ def expect_value_error(action, text):
         assert text in str(error), str(error)
         return
     raise AssertionError("Expected ValueError containing {!r}".format(text))
+
+
+def load_acceptance_analysis_core(source):
+    tree = ast.parse(source)
+    driver_class = next(
+        node for node in tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "B15AcceptanceDriver"
+    )
+    method = copy.deepcopy(next(
+        node for node in driver_class.body
+        if isinstance(node, ast.FunctionDef) and node.name == "_analysis_core"
+    ))
+    probe_class = ast.ClassDef(
+        name="AnalysisCoreProbe",
+        bases=[],
+        keywords=[],
+        body=[method],
+        decorator_list=[],
+    )
+    module = ast.Module(body=[probe_class], type_ignores=[])
+    ast.fix_missing_locations(module)
+    namespace = {"copy": copy, "_sha256": lambda value: value}
+    exec(compile(module, "<acceptance-analysis-core>", "exec"), namespace)
+    return namespace["AnalysisCoreProbe"]()._analysis_core
 
 
 class FakeDocument:
@@ -237,29 +263,86 @@ def validate():
 
     cold_wrapper = bridge_root / "run-b14-cold"
     warm_wrapper = bridge_root / "run-b14-warm"
+    acceptance_wrapper = bridge_root / "run-b15-acceptance"
     warm_host = bridge_root / "run_b14_warm_reuse.py"
     warm_probe = bridge_root / "probes" / "b14_warm_reuse_driver.py"
+    acceptance_host = bridge_root / "run_b15_acceptance.py"
+    acceptance_probe = bridge_root / "probes" / "b15_acceptance_driver.py"
     for executable in (
         bridge_root / "setup-freecad-cli",
         bridge_root / "build-b14-base",
         cold_wrapper,
         warm_wrapper,
+        acceptance_wrapper,
     ):
         assert executable.is_file(), executable
         assert executable.stat().st_mode & 0o111, executable
 
     cold_wrapper_text = cold_wrapper.read_text(encoding="utf-8")
     warm_wrapper_text = warm_wrapper.read_text(encoding="utf-8")
+    isolated_wrapper_text = (bridge_root / "run-isolated").read_text(encoding="utf-8")
+    launcher_text = (bridge_root / "launch-freecad").read_text(encoding="utf-8")
     warm_host_text = warm_host.read_text(encoding="utf-8")
     warm_probe_text = warm_probe.read_text(encoding="utf-8")
     assert "run-isolated" in cold_wrapper_text
     assert "run-isolated" in warm_wrapper_text
+    assert 'isolated_temp_dir="$(mktemp -d' in isolated_wrapper_text
+    assert 'TRACKTEMPLATE_BRIDGE_TEMP_DIR="${isolated_temp_dir}"' in isolated_wrapper_text
+    assert '"${state_dir}"/isolated-temp.*)' in isolated_wrapper_text
+    assert 'temp_dir="${TRACKTEMPLATE_BRIDGE_TEMP_DIR:-${profile_dir}/temp}"' in launcher_text
     assert 'parser.add_argument("--base", type=pathlib.Path, required=True)' in warm_host_text
     assert "if args.iterations != 3:" in warm_host_text
     assert "shutil.copy2(base_path, document_path)" in warm_host_text
     assert "unchanged_result_reused" in warm_probe_text
     assert "Warm reuse changed stable document state" in warm_probe_text
     assert "toe_chainage_a_mm\"] != 746.298" in warm_probe_text
+
+    acceptance_wrapper_text = acceptance_wrapper.read_text(encoding="utf-8")
+    acceptance_host_text = acceptance_host.read_text(encoding="utf-8")
+    acceptance_probe_text = acceptance_probe.read_text(encoding="utf-8")
+    cold_host_text = (bridge_root / "run_b14_crossover.py").read_text(encoding="utf-8")
+    assert "run-isolated" in acceptance_wrapper_text
+    assert 'parser.add_argument("--base", type=pathlib.Path, required=True)' in acceptance_host_text
+    for required_action in (
+        '"run_analysis()"',
+        '"run_support()"',
+        '"run_layout(False)"',
+        '"run_layout(True)"',
+        '"remove_solids()"',
+        '"run_solids(False)"',
+        '"run_solids(True)"',
+        '"save_reopen()"',
+    ):
+        assert required_action in acceptance_host_text
+    assert "Current cold and unchanged-result" in acceptance_host_text
+    assert "EXPECTED_CHAINAGE_MM = 746.298" in acceptance_probe_text
+    assert "B15 changed non-chair leaf railway geometry" in acceptance_probe_text
+    assert 'analytical_keys = (' in acceptance_probe_text
+    assert '"model_timber_support_plan",' in acceptance_probe_text
+    assert 'if key in result' in acceptance_probe_text
+    analysis_core = load_acceptance_analysis_core(acceptance_probe_text)
+    core = analysis_core({
+        "entity_id": "XO-001",
+        "positions": [{"stable_identity": "chair-1"}],
+        "findings": [{"code": "ANALYSIS"}],
+        "geometry_signature": "geometry",
+        "model_timber_support_plan": [{"timber_identity": "timber-1"}],
+        "physical_chair_state": {"generated_count": 119},
+        "chair_2d_layout_state": {"display_generated": True},
+        "model_timber_support_state": {"changes_applied": True},
+    })
+    assert core["position_count"] == 1
+    assert core["finding_count"] == 1
+    assert core["semantic_sha256"] == {
+        "entity_id": "XO-001",
+        "findings": [{"code": "ANALYSIS"}],
+        "geometry_signature": "geometry",
+        "model_timber_support_plan": [{"timber_identity": "timber-1"}],
+        "positions": [{"stable_identity": "chair-1"}],
+    }
+    assert "Save/reopen changed the B15 chair representation" in acceptance_probe_text
+    assert 'module_name="tracktemplate_b14_session"' in cold_host_text
+    assert 'module_name="tracktemplate_b15_session"' in acceptance_host_text
 
     print("FreeCAD bridge recipe validation passed")
 

@@ -1,4 +1,4 @@
-"""Print structured state from B14's non-modal trackwork manager."""
+"""Print structured state from the isolated B14 or B15 trackwork manager."""
 
 import json
 import sys
@@ -11,10 +11,17 @@ except ImportError:
     except ImportError:
         from PySide import QtGui as QtWidgets
 
-module = sys.modules.get("tracktemplate_b14_session")
+module = next(
+    (
+        sys.modules.get(name)
+        for name in ("tracktemplate_b15_session", "tracktemplate_b14_session")
+        if sys.modules.get(name) is not None
+    ),
+    None,
+)
 manager = getattr(module, "_automation_trackwork_manager", None) if module else None
 if manager is None:
-    raise RuntimeError("The automated B14 trackwork manager is not open")
+    raise RuntimeError("The automated trackwork manager is not open")
 
 
 def _combo_state(combo):

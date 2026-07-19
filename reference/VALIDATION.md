@@ -11,12 +11,23 @@ change.
 
 ## Current version roles
 
-- `AdvancedTurnout.FCMacro` is the B14 baseline (`10.2A8A7B14`).
-- `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` is the B15 candidate (`10.2A8A7B15`).
-- `tests/validate_b15.py` validates B15 structure/analysis and compares selected functions against B14.
+- `AdvancedTurnout.FCMacro` is the immutable B14 legacy comparison oracle (`10.2A8A7B14`).
+- `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` is the accepted B15 behavioural reference entering Phase 1 (`10.2A8A7B15`).
+- `tests/validate_b15.py` validates B15 structure/analysis, compares selected
+  railway functions, and proves complete inherited-module AST parity with B14
+  after normalising only version, launch, docstring, and recompute-instrumentation
+  differences.
 - `tests/freecad_validate_b15.py` exercises the B15 chair display path in real headless FreeCAD.
 
-These roles are current project state, not a permanent versioning scheme. Update this document when the baseline/candidate relationship changes.
+B15 passed the bounded real-GUI, reuse, solid-equivalence, and save/reopen
+qualification recorded in
+[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+The project owner accepted that evidence and the formal version roles on
+2026-07-19. Acceptance is bounded to the declared B15 delta; B14 remains
+available as the immutable legacy oracle for every Phase 1 characterisation
+slice and later parity check.
+
+These roles are current project state, not a permanent versioning scheme. Update this document when the oracle/reference relationship changes.
 
 ## Validation layers
 
@@ -112,6 +123,21 @@ sibling `run.json`. It performs one warm-up and exactly three measured
 unchanged-result iterations, and fails if object, cache-signature, chair-count,
 or solid-shape identity changes. These long-running GUI benchmarks are
 checkpoint/performance evidence, not part of the fast edit loop.
+
+Run the bounded B14-to-B15 behavioural acceptance from a completed controlled
+B14 cold document with:
+
+```bash
+tools/freecad_bridge/run-b15-acceptance \
+  --base benchmark-output/freecad-bridge/runs/<cold-run-id>/b14-crossover.FCStd
+```
+
+This long-running GUI check verifies the exact inherited analysis/support and
+non-chair leaf geometry, the B15 layout representation and unchanged-result
+reuse, controlled removal of retained B14 solids, fresh B15 solid construction,
+solid reuse/equivalence, effective status, save/reopen persistence, rendered
+manager/view evidence, and non-mutation of the input document. Its timings are
+observations only and are not approved interactive budgets.
 
 The FreeCADCmd B15 command is successful only when it exits with status zero
 **and** prints `B15 FreeCAD 1.1 headless smoke test passed`. FreeCADCmd loads

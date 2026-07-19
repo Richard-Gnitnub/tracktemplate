@@ -9,9 +9,12 @@ TrackTemplateMacro runtime dependency.
 - The third-party `freecad-cli` checkout lives under ignored `.devtools/`.
 - FreeCAD uses ignored configuration and results under
   `benchmark-output/freecad-bridge/`.
-- Its FreeCAD user home/data/temp paths and XDG data, configuration and cache
+- Its FreeCAD user home/data paths and XDG data, configuration and cache
   directories are isolated there as well, so installed addons and cache locks
-  from everyday FreeCAD are not shared.
+  from everyday FreeCAD are not shared. Each automated isolated run receives a
+  fresh temporary/recovery directory which is removed after its exact FreeCAD
+  instance stops, preventing a failed run's recovery record from contaminating
+  the next run.
 - The addon is supplied only through this session's `--module-path`; it is not
   installed into the normal FreeCAD `Mod` directory.
 - The server binds to `127.0.0.1`, uses the dedicated port `19875`, and requires
@@ -168,3 +171,37 @@ integration because replaying constructive or invalidating stages would be a
 false cache-reuse test. Its result is stage-specific and must not be compared
 with the full cold-workflow total. The controlled Phase 0 result is recorded in
 [`reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md`](../../reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md).
+
+## Automated B14-to-B15 behavioural acceptance
+
+Use a completed document from a successful full B14 cold run as the immutable
+input:
+
+```bash
+tools/freecad_bridge/run-b15-acceptance \
+  --base benchmark-output/freecad-bridge/runs/<cold-run-id>/b14-crossover.FCStd
+```
+
+The runner verifies the cold run and source hashes, copies the document into a
+new ignored acceptance directory, then opens that copy in one fresh isolated
+FreeCAD process. It loads B15 without its startup dialog and drives the real
+crossover-manager actions for chair analysis, bounded model support, first B15
+2D layout, and unchanged-layout reuse. Through the real maintenance control it
+then removes the retained B14 solids, constructs fresh B15 solids, and repeats
+the unchanged solid action to prove reuse. Finally it saves, closes and reopens
+the document before checking effective statuses and capturing the real manager
+and top view.
+
+The acceptance oracle requires stable persisted host identities and Host A
+chainage `746.298 mm`, exact inherited chair-analysis semantics, unchanged
+bounded-support decisions, unchanged non-chair leaf `Part` geometry, 119
+equivalent supported-chair solids, B15 representation revision 2, no document
+or shape mutation on valid layout/solid reuse, fresh B15 reconstruction of the
+exact 119-solid B14 topology and bounds, and an exact save/reopen round trip. It
+also verifies that the completed B14 source document was not modified.
+
+This is a correctness qualification, not a performance benchmark. Action
+durations are recorded as observations, but the current cold and
+unchanged-result durations are explicitly not approved human-use budgets. The
+sanitised Phase 0 result is recorded in
+[`reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md`](../../reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).

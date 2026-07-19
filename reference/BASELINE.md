@@ -1,6 +1,11 @@
 # Phase 0 Baseline Record
 
-Status: automated checkpoint evidence, controlled three-run B14 cold-process and three-iteration unchanged-result warm-reuse series, and reproducible bridge/fixture bootstrap were captured on 2026-07-19. Phase 0 remains open for B14/B15 acceptance and licence/provenance decisions.
+Status: automated checkpoint evidence, controlled three-run B14 cold-process
+and three-iteration unchanged-result warm-reuse series, reproducible
+bridge/fixture bootstrap, and a passing B14-to-B15 real-GUI/persistence
+qualification were captured on 2026-07-19. The project owner accepted B15,
+licensing/provenance policy, and this closeout evidence on that date. Phase 0
+is closed and Phase 1 is current.
 
 ## Purpose
 
@@ -21,21 +26,32 @@ The B14 file has no working-tree diff from the starting commit. Phase 0 document
 
 The reviewed source checkpoint was committed as `989869c` (`Establish Phase 0 baseline checkpoint`) and pushed to `origin/main` on 2026-07-19.
 
+The benchmark/tooling and testing-policy checkpoint was committed as `7379eb4`
+(`Add reproducible FreeCAD benchmarks and testing policy`) and pushed to
+`origin/main` on 2026-07-19.
+
 ## Version roles and source fingerprints
 
 | Role | File | Version assignments | Lines | Bytes | SHA-256 |
 | --- | --- | --- | ---: | ---: | --- |
-| Behavioural baseline | `AdvancedTurnout.FCMacro` | two assignments of `10.2A8A7B14` | 47,436 | 2,242,840 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
-| Candidate | `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` | three assignments of `10.2A8A7B15` | 48,286 | 2,286,863 | `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848` |
+| Immutable legacy comparison oracle | `AdvancedTurnout.FCMacro` | two assignments of `10.2A8A7B14` | 47,436 | 2,242,840 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
+| Accepted behavioural reference entering Phase 1 | `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` | three assignments of `10.2A8A7B15` | 48,286 | 2,286,863 | `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848` |
 
-B14 remains the behavioural reference and B15 remains a candidate until representative GUI comparison and user acceptance say otherwise. File hashes must be recalculated if either source changes; a changed hash is a different baseline.
+B15 passed the bounded representative GUI, reuse, solid-equivalence and
+save/reopen qualification in
+[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+The project owner accepted that qualification on 2026-07-19. B15 is now the
+behavioural reference for Phase 1; B14 remains immutable as the legacy
+comparison oracle and is not retired. File hashes must be recalculated if
+either source changes; a changed hash is a different checkpoint.
 
 ## Validation assets
 
 | File | Purpose | Lines | Bytes | SHA-256 at capture |
 | --- | --- | ---: | ---: | --- |
-| `tests/validate_b15.py` | Fast B15 structural/analytical checks and selected B14 comparison | 357 | 13,822 | `c439ddad3f43bbf99bc2564f551b6e044ad49964573fbb0163ccbd10d0e180c1` |
+| `tests/validate_b15.py` | Fast B15 structural/analytical checks, selected-function comparison and complete inherited-module AST parity | 396 | 15,418 | `05f191e421d5cd0064c65decfc9b3d5272c7b0f2c017d6ed4f34bfe08716679e` |
 | `tests/freecad_validate_b15.py` | Real FreeCAD chair-display smoke test | 87 | 3,413 | `c513dae82e3ec7203fc2f9cdbcab7c6073f5b114938487b9dcae9b91315ab5da` |
+| `tests/validate_freecad_bridge.py` | Fast bridge and B14/B15 recipe contract checks | 351 | 12,723 | `85393593e1a49bef17a54f648399d7f5de3629d4c3ef0ca81623f20692cb3a02` |
 
 During Phase 0, the documented FreeCAD command was found to exit successfully without executing `validate()`: FreeCADCmd gives a command-line script its filename stem as `__name__`, not `__main__`. The test now supports that execution mode, converts assertion failures into a non-zero exit, and prints an explicit success sentinel. This was a test-runner correction only; macro source was not changed.
 
@@ -87,6 +103,46 @@ Result: **PASS** — exit status zero and `B15 FreeCAD 1.1 headless smoke test p
 
 These command durations are not performance benchmarks. They establish current source/test execution only.
 
+### Development-bridge contract validation
+
+```bash
+.venv/bin/python tests/validate_freecad_bridge.py
+```
+
+Result: **PASS** — `FreeCAD bridge recipe validation passed`. The check covers
+the reconstructable B14 fixture/recipe contracts, B14 warm-reuse contract, B15
+acceptance action sequence, independent analysis fingerprint boundary, generic
+B14/B15 screenshot helpers, executable wrappers, and fresh per-run recovery
+directory wiring.
+
+A subsequent bounded real lifecycle also passed through `run-isolated`: it
+started with no open document, used a unique ignored temporary/recovery
+directory, emitted no recovery/corruption warning, removed that directory, and
+stopped the exact Flatpak instance. This verifies the isolation hardening; it is
+not an additional performance observation.
+
+### B14-to-B15 real-GUI and persistence qualification
+
+```bash
+tools/freecad_bridge/run-b15-acceptance \
+  --base benchmark-output/freecad-bridge/runs/20260719T132252Z/b14-crossover.FCStd
+```
+
+Result: **PASS** — the isolated FreeCAD 1.1.1 run preserved the exact inherited
+chair analysis, bounded-support decisions, every non-chair leaf `Part` shape,
+119 supported-chair solids, stable document identities and all effective
+statuses. B15 representation revision 2 was created and reused without object,
+shape or recompute mutation. The real panel then removed the retained B14
+solids, fresh B15 construction reproduced their exact topology and bounds, and
+an unchanged repeat reused them without mutation. All accepted state survived
+save/close/reopen. The real manager, top view and FreeCAD window were captured,
+and the source B14 FCStd remained byte-for-byte unchanged.
+
+The sanitised evidence and raw-artifact hashes are recorded in
+[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+The observed B15 actions still took 116–159 seconds and save/reopen took 260
+seconds; these timings are explicitly rejected as human-use budgets.
+
 ## Repository exclusions
 
 The Phase 0 `.gitignore` deliberately excludes:
@@ -96,7 +152,8 @@ The Phase 0 `.gitignore` deliberately excludes:
 - credentials/environment files;
 - repository-local benchmark and production-output directories;
 - FreeCAD backup/recovery files, while leaving intentional `.FCStd` fixtures trackable;
-- `reference/t5_files_556b_06_feb_2025.zip` pending the decision below.
+- `reference/t5_files_556b_06_feb_2025.zip` by accepted policy: retain the
+  checksum and upstream SourceForge link without redistributing the ZIP here.
 
 No ignored file is deleted. If an ignored path later becomes intentional source or a fixture, change the narrow rule explicitly rather than forcing an unexplained add.
 
@@ -110,15 +167,25 @@ No ignored file is deleted. If an ignored path later becomes intentional source 
 | SHA-256 | `2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3` |
 | Archive contents | 156 entries; 13,862,960 uncompressed bytes |
 | Identification | `Templot5`, described in the included README as the open-source version of Templot by Martin Wynne |
-| Included licence texts | GNU General Public License version 3 |
+| Reviewed source notices | Copyright 2024 Martin Wynne and OpenTemplot contributors; GPL version 3 or later |
+| Exact acquisition source | [Templot5 SourceForge files](https://sourceforge.net/projects/opentemplot/files/), published 2025-02-06 |
+| Repository policy | Keep ignored and untracked; link to the upstream download |
 
-Open decisions before committing the archive or copying/adapting its source:
+The full evidence, conservative source-relationship classification,
+redistribution status, upstream links, and accepted decision are recorded in
+[PROVENANCE.md](PROVENANCE.md). The macro explicitly cites named Templot5 units,
+routines, rules, tables, and source-dimensional data, so it is not currently
+classified as a clean-room independent implementation.
 
-1. Confirm where this exact snapshot came from and whether the archive should be redistributed in this repository.
-2. Determine the TrackTemplateMacro project licence and required attribution/notices.
-3. Record whether current macro code is independently implemented, derived from, translated from, or incorporates any Templot5 source.
+The project owner selected **GPL-3.0-or-later**. The repository-root
+[`LICENSE`](../LICENSE) contains the complete GPLv3 text, and
+[`NOTICE.md`](../NOTICE.md) applies the licence, preserves
+the Templot5 source-basis attribution, and gives particular thanks to Martin
+Wynne and Steve Cornford. The ZIP remains ignored and untracked by choice, not
+because its source or upstream licence is now unknown.
 
-This record identifies the issue; it is not legal advice or a conclusion about derivative-work status.
+This record preserves the ideas/expression distinction; it is not legal advice
+or a conclusion about derivative-work status.
 
 ## Representative GUI and performance baseline
 
@@ -186,12 +253,16 @@ The initial like-for-like cold and unchanged-result warm series are complete. Pr
 
 ## Known validation gaps
 
-- Current automated tests concentrate on B15 chair representation, selected chair/timber calculations, cache reuse, recompute measurement, and selected B14/B15 function equality.
+- Current automated tests concentrate on B15 chair representation, selected
+  chair/timber calculations, cache reuse, recompute measurement, selected
+  B14/B15 function equality, and complete inherited-module structural parity.
 - They do not cover every curve/easement, station, multiple-track, turnout, crossover, timbering, persistence, GUI editing, undo/redo, or production-export workflow.
 - The FreeCAD smoke test checks a bounded chair batch and object-count behaviour; it is not a whole-document integration test.
 - The deterministic B14 fixture, stable centreline/chainage recipe and reviewed bridge patch are reconstructable from tracked inputs; a fresh machine still requires the documented FreeCAD Flatpak and ordinary local tool prerequisites.
 - Controlled three-run cold-process and unchanged-result warm-reuse crossover series exist, but whole-product pipeline instrumentation does not yet cover curve/easement, station, multiple-track, editing, Validate, and Export paths.
-- No save/reopen, legacy-document migration, or complete SVG/DXF/STL/STEP equivalence matrix has yet been run.
+- A bounded completed-B14-to-B15 crossover save/reopen qualification now
+  exists. There is still no general persistence/legacy-migration matrix or
+  complete SVG/DXF/STL/STEP equivalence matrix.
 
 These gaps become inputs to Phase 1 characterisation. They do not justify weakening the Phase 0 checkpoint gate.
 
@@ -205,9 +276,10 @@ These gaps become inputs to Phase 1 characterisation. They do not justify weaken
 | Genuine FreeCAD headless assertions | Pass |
 | Intended checkpoint contents reviewed | Complete |
 | Source checkpoint committed and pushed | Complete — source checkpoint `989869c` on `origin/main` |
-| Benchmark/tooling checkpoint | Committed locally; push pending |
+| Benchmark/tooling checkpoint | Complete — checkpoint `7379eb4` on `origin/main` |
 | Representative GUI recipe and cold/warm reports | Complete for the defined B14 `XO-001` scope — exact recipe, reproducible prerequisites, like-for-like three-run cold series and three-iteration unchanged-result warm series captured; whole-product extension belongs to Phase 1 |
-| B14/B15 behavioural acceptance | B14 baseline / B15 candidate; final acceptance pending |
-| Reference ZIP redistribution and project licence/provenance | Pending decision; ZIP remains local |
+| B14/B15 behavioural acceptance | Complete — B15 accepted as the Phase 1 behavioural reference; B14 retained as immutable legacy oracle |
+| Reference ZIP redistribution and project licence/provenance | Complete — exact SourceForge source recorded; GPL-3.0-or-later plus notice accepted; ZIP remains ignored and untracked |
+| Phase 0 owner acceptance | Complete — accepted 2026-07-19; checkpoint tag `phase-0-closeout` |
 
-Phase 0 remains open.
+Phase 0 is closed. Phase 1 is current.

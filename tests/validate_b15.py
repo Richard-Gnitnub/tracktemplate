@@ -15,6 +15,7 @@ import types
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 B14_PATH = ROOT / "AdvancedTurnout.FCMacro"
 B15_PATH = ROOT / "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro"
+B15_LAYER_MARKER = "# A8A7B15 chair performance and representation."
 
 
 class _EnumValue:
@@ -162,6 +163,40 @@ def _normalised_function_dump(node):
     clone = _NormaliseRecompute().visit(clone)
     ast.fix_missing_locations(clone)
     return ast.dump(clone, include_attributes=False)
+
+
+def _normalised_inherited_module_dump(source, stop_before_marker=None):
+    inherited_source = source
+    if stop_before_marker is not None:
+        marker_index = inherited_source.find(stop_before_marker)
+        assert marker_index >= 0, stop_before_marker
+        inherited_source = inherited_source[:marker_index]
+    tree = ast.parse(inherited_source)
+    retained = []
+    for index, node in enumerate(tree.body):
+        if (
+            index == 0
+            and isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
+        ):
+            continue
+        if isinstance(node, ast.Assign) and len(node.targets) == 1:
+            target = node.targets[0]
+            if isinstance(target, ast.Name) and target.id in {"MACRO_VERSION", "MACRO_VERSION_NUMBER"}:
+                continue
+        if (
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Name)
+            and node.value.func.id == "run_macro"
+        ):
+            continue
+        retained.append(node)
+    tree.body = retained
+    tree = _NormaliseRecompute().visit(tree)
+    ast.fix_missing_locations(tree)
+    return ast.dump(tree, include_attributes=False)
 
 
 def validate():
@@ -337,6 +372,10 @@ def validate():
     assert recompute_measurement["recompute_ms"] >= 0.0
 
     b14_source = B14_PATH.read_text(encoding="utf-8")
+    assert _normalised_inherited_module_dump(b14_source) == _normalised_inherited_module_dump(
+        source,
+        B15_LAYER_MARKER,
+    ), "B15 changed the inherited B14 implementation outside its declared compatibility layer"
     _b14_tree, b14_functions = _function_nodes(b14_source)
     preserved = (
         "rea_c10_timber_layout",

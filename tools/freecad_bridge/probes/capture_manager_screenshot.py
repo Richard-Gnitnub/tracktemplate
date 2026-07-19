@@ -1,14 +1,21 @@
-"""Save a screenshot of B14's manager into the ignored bridge output area."""
+"""Save the isolated B14 or B15 manager into the ignored bridge output area."""
 
 import json
 import os
 import pathlib
 import sys
 
-module = sys.modules.get("tracktemplate_b14_session")
+module = next(
+    (
+        sys.modules.get(name)
+        for name in ("tracktemplate_b15_session", "tracktemplate_b14_session")
+        if sys.modules.get(name) is not None
+    ),
+    None,
+)
 manager = getattr(module, "_automation_trackwork_manager", None) if module else None
 if manager is None:
-    raise RuntimeError("The automated B14 trackwork manager is not open")
+    raise RuntimeError("The automated trackwork manager is not open")
 
 output_dir = pathlib.Path(os.environ["TRACKTEMPLATE_REPO"]) / "benchmark-output" / "freecad-bridge" / "screenshots"
 output_dir.mkdir(parents=True, exist_ok=True)

@@ -17,8 +17,10 @@ if "${bridge_dir}/freecad-cli" ping >/dev/null 2>&1; then
 fi
 
 mkdir -p "${state_dir}"
+isolated_temp_dir="$(mktemp -d "${state_dir}/isolated-temp.XXXXXX")"
 : >"${instance_file}"
 TRACKTEMPLATE_BRIDGE_INSTANCE_FILE="${instance_file}" \
+TRACKTEMPLATE_BRIDGE_TEMP_DIR="${isolated_temp_dir}" \
     "${bridge_dir}/launch-freecad" >"${launcher_log}" 2>&1 &
 freecad_process=$!
 
@@ -42,6 +44,15 @@ cleanup() {
         kill "${freecad_process}" >/dev/null 2>&1 || true
         wait "${freecad_process}" >/dev/null 2>&1 || true
     fi
+    case "${isolated_temp_dir}" in
+        "${state_dir}"/isolated-temp.*)
+            rm -rf -- "${isolated_temp_dir}"
+            ;;
+        *)
+            echo "Refusing to remove unexpected isolated temp path: ${isolated_temp_dir}" >&2
+            cleanup_status=1
+            ;;
+    esac
     return "${cleanup_status}"
 }
 

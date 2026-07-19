@@ -23,7 +23,14 @@ if App.ActiveDocument is None or Gui.ActiveDocument is None:
 output_dir = pathlib.Path(os.environ["TRACKTEMPLATE_REPO"]) / "benchmark-output" / "freecad-bridge" / "screenshots"
 output_dir.mkdir(parents=True, exist_ok=True)
 output_path = output_dir / "active-document-top.png"
-module = sys.modules.get("tracktemplate_b14_session")
+module = next(
+    (
+        sys.modules.get(name)
+        for name in ("tracktemplate_b15_session", "tracktemplate_b14_session")
+        if sys.modules.get(name) is not None
+    ),
+    None,
+)
 manager = getattr(module, "_automation_trackwork_manager", None) if module else None
 manager_was_visible = bool(manager is not None and manager.isVisible())
 if manager_was_visible:

@@ -66,11 +66,25 @@ cold run:
 tools/freecad_bridge/run-b14-warm --base benchmark-output/freecad-bridge/runs/<cold-run-id>/b14-crossover.FCStd
 ```
 
+The bounded B14-to-B15 correctness qualification uses that same class of
+completed cold document:
+
+```bash
+tools/freecad_bridge/run-b15-acceptance \
+  --base benchmark-output/freecad-bridge/runs/<cold-run-id>/b14-crossover.FCStd
+```
+
+It records action durations so the operator-visible cost is not hidden, but it
+is not a repeated performance series. Do not turn its exceptionally slow cold
+or unchanged-result observations into pass thresholds or approved human-use
+budgets.
+
 The cold wrapper must:
 
 - refuse to start if its dedicated localhost bridge is already occupied;
 - launch one fresh FreeCAD process with repository-local user data,
-  configuration, cache, temporary data, token and port;
+  configuration, cache, a fresh per-run temporary/recovery directory, token
+  and port;
 - start with no open document, copy the unchanged fixture for the run, and
   preserve the fixture itself;
 - validate the fixture's semantic object/curve/centreline contract and record
@@ -88,9 +102,9 @@ The cold wrapper must:
   port is no longer live.
 
 Here, **cold** means a fresh FreeCAD process, empty document session and freshly
-copied fixture. The isolated preference profile persists between runs and the
-operating-system file cache is uncontrolled; state those qualifications on the
-report.
+copied fixture. The isolated preference profile persists between runs, the
+temporary/recovery directory does not, and the operating-system file cache is
+uncontrolled; state those qualifications on the report.
 
 The controlled warm wrapper requires the completed document's sibling
 `run.json`, exact macro and semantic-base hashes, all seven cold stages, and the

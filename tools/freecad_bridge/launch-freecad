@@ -6,6 +6,7 @@ project_root="$(cd "${bridge_dir}/../.." && pwd)"
 tool_root="${project_root}/.devtools/freecad-cli"
 state_dir="${project_root}/benchmark-output/freecad-bridge"
 profile_dir="${state_dir}/profile"
+temp_dir="${TRACKTEMPLATE_BRIDGE_TEMP_DIR:-${profile_dir}/temp}"
 token_file="${state_dir}/rpc-token"
 instance_file="${TRACKTEMPLATE_BRIDGE_INSTANCE_FILE:-${state_dir}/instance-id}"
 bridge_port="${TRACKTEMPLATE_BRIDGE_PORT:-19875}"
@@ -22,7 +23,7 @@ mkdir -p \
     "${profile_dir}/xdg-data" \
     "${profile_dir}/user-home" \
     "${profile_dir}/user-data" \
-    "${profile_dir}/temp"
+    "${temp_dir}"
 if [[ ! -s "${token_file}" ]]; then
     umask 077
     /usr/bin/openssl rand -hex -out "${token_file}" 32
@@ -39,7 +40,7 @@ exec flatpak run \
     --env="FREECAD_CLI_EXECUTION_TIMEOUT=${TRACKTEMPLATE_BRIDGE_EXECUTION_TIMEOUT:-21600}" \
     --env="FREECAD_USER_HOME=${profile_dir}/user-home" \
     --env="FREECAD_USER_DATA=${profile_dir}/user-data" \
-    --env="FREECAD_USER_TEMP=${profile_dir}/temp" \
+    --env="FREECAD_USER_TEMP=${temp_dir}" \
     --env="TRACKTEMPLATE_REPO=${project_root}" \
     --env="XDG_CACHE_HOME=${profile_dir}/xdg-cache" \
     --env="XDG_CONFIG_HOME=${profile_dir}/xdg-config" \

@@ -12,7 +12,7 @@ Modularisation supports the architecture in [ARCHITECTURE.md](ARCHITECTURE.md). 
 
 ## Current structural baseline
 
-The B14 baseline currently contains:
+The preserved Phase 0 B14 legacy oracle contains:
 
 | Signal | Observed value |
 | --- | ---: |
@@ -221,11 +221,13 @@ Only after parity is established may a second change simplify or optimise the ex
 
 ### Stage M0: preserve the checkpoint
 
-- Commit the agreed macro baselines, candidate, tests and architecture documents while excluding IDE/cache/generated files.
+- Commit the B14 legacy oracle, accepted B15 behavioural reference, tests and architecture documents while excluding IDE/cache/generated files.
 - Record representative inputs/documents and cold/warm benchmark reports.
 - Confirm the current validation commands and known coverage gaps.
 
 Exit gate: the pre-modular behaviour can be reproduced and recovered.
+
+Status: **Complete with the Phase 0 closeout.**
 
 ### Stage M1: dependency inventory
 

@@ -27,7 +27,7 @@ from tools.freecad_bridge.orchestration import (  # noqa: E402
 DRIVER_MODULE = "tracktemplate_b14_benchmark_driver"
 
 
-def capture_visual_evidence(client, run_dir):
+def capture_visual_evidence(client, run_dir, module_name="tracktemplate_b14_session"):
     view_path = run_dir / "final-top-view.png"
     window_path = run_dir / "final-freecad-window.png"
     manager_path = run_dir / "final-manager.png"
@@ -47,7 +47,10 @@ if App.ActiveDocument is None or Gui.ActiveDocument is None:
 view_path = pathlib.Path({view_path!r})
 window_path = pathlib.Path({window_path!r})
 manager_path = pathlib.Path({manager_path!r})
-manager = sys.modules['tracktemplate_b14_session']._automation_trackwork_manager
+module = sys.modules.get({module_name!r})
+manager = getattr(module, '_automation_trackwork_manager', None) if module else None
+if manager is None:
+    raise RuntimeError('The requested automated trackwork manager is not open')
 manager.hide()
 main_window = Gui.getMainWindow()
 main_window.showNormal()
@@ -97,6 +100,7 @@ print(json.dumps({{
         view_path=str(view_path),
         window_path=str(window_path),
         manager_path=str(manager_path),
+        module_name=str(module_name),
     )
     return parse_json_output(execute(client, code))
 

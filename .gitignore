@@ -24,7 +24,7 @@ htmlcov/
 # PyCharm starter file; this is not a product entry point
 /main.py
 
-# Local source evidence pending redistribution/provenance confirmation
+# Local source evidence; provenance is recorded and the owner chose not to redistribute it here
 /reference/t5_files_556b_06_feb_2025.zip
 
 # Repository-local generated output locations

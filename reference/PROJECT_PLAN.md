@@ -1,6 +1,6 @@
 # Project Plan: Baseline to Release Candidate
 
-Status: working delivery plan. **Phase 0 is current and its exit gate has not yet been met.**
+Status: working delivery plan. **Phase 0 closed on 2026-07-19; Phase 1 is current.**
 
 ## Purpose
 
@@ -15,6 +15,8 @@ The documents have distinct responsibilities:
 - [TESTING_POLICY.md](TESTING_POLICY.md) defines when tests are required and when an existing oracle may change.
 - [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md) defines comparable resource measurements.
 - [VALIDATION.md](VALIDATION.md) defines correctness and integration evidence.
+- [PROVENANCE.md](PROVENANCE.md) records reference-source identity, source
+  relationship, redistribution and licensing status.
 - This document owns delivery order, phase status, decision timing, and release-candidate gates.
 
 If a proposed shortcut conflicts with railway correctness, production safety, or an accepted architectural invariant, the invariant wins unless the user explicitly approves a changed requirement.
@@ -33,7 +35,7 @@ The release candidate will provide the agreed curve/easement, station and multip
 - reproducible installation or distribution artifacts, validation evidence, user documentation, and measured performance budgets;
 - no known release-blocking correctness, data-loss, migration, or production-export defect in the supported scope.
 
-Release-candidate scope is based on behaviour explicitly accepted from the preserved B14/B15 reference path. New feature requests are assessed and scheduled; they do not silently expand the release-candidate gate.
+Release-candidate scope is based on the accepted B15 behavioural reference, with B14 retained as the immutable legacy comparison oracle. New feature requests are assessed and scheduled; they do not silently expand the release-candidate gate.
 
 ## Phase control
 
@@ -49,8 +51,8 @@ Release-candidate scope is based on behaviour explicitly accepted from the prese
 
 | Phase | Outcome | State |
 | --- | --- | --- |
-| 0 | Recoverable baseline and benchmark checkpoint | Current |
-| 1 | Product, dependency, correctness, and performance inventory | Not started |
+| 0 | Recoverable baseline and benchmark checkpoint | Complete — accepted 2026-07-19 |
+| 1 | Product, dependency, correctness, and performance inventory | Current |
 | 2 | Minimal modular foundation and validation harness | Not started |
 | 3 | First parity-proven vertical slice | Not started |
 | 4 | Canonical state, signatures, and persistence | Not started |
@@ -64,6 +66,8 @@ Release-candidate scope is based on behaviour explicitly accepted from the prese
 
 ## Phase 0: recoverable baseline and benchmark checkpoint
 
+Status: **Complete — accepted and closed on 2026-07-19.**
+
 ### Goal
 
 Make the pre-migration state reproducible, reviewable, and recoverable before production code is moved.
@@ -71,7 +75,7 @@ Make the pre-migration state reproducible, reviewable, and recoverable before pr
 ### Deliverables
 
 - Add a conservative `.gitignore` for IDE state, virtual environments, bytecode, generated FreeCAD documents, exports, and temporary benchmark artifacts.
-- Preserve the B14 baseline, B15 candidate, tests, agent guidance, and reference documents in Git without committing generated or IDE-only files.
+- Preserve B14 as the immutable legacy comparison oracle, qualify B15 as the candidate behavioural reference, and preserve tests, agent guidance, and reference documents in Git without committing generated or IDE-only files.
 - Exclude the PyCharm starter `main.py` from the product checkpoint; remove it only with explicit approval.
 - Confirm whether `reference/t5_files_556b_06_feb_2025.zip` may be redistributed. If it cannot be committed, record its provenance, purpose, size, and checksum without its contents.
 - Record the project licence/attribution status and whether any implementation is derived or translated from the Templot5 source evidence before copying archive code or preparing a public release.
@@ -87,8 +91,15 @@ three-iteration unchanged-result warm-reuse series are preserved in
 `reference/benchmarks/`. A tracked reviewed patch reconstructs the pinned bridge
 checkout, and an automated isolated FreeCAD builder reconstructs and
 semantically validates the ignored nine-object base fixture. The Phase 0
-performance item is complete for this defined crossover scope; B14/B15
-behavioural acceptance and licence/provenance decisions remain.
+performance item is complete for this defined crossover scope. B15 has also
+passed the bounded source-parity, real-GUI, reuse, supported-solid and
+save/reopen qualification recorded in
+[`benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md`](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+The project owner accepted B15 as the behavioural reference entering Phase 1,
+retained B14 as the immutable comparison oracle, selected GPL-3.0-or-later with
+the attribution and acknowledgements in `NOTICE.md`, confirmed SourceForge as
+the exact ZIP source, and chose to keep the ZIP ignored and untracked. The
+decision record is in [PROVENANCE.md](PROVENANCE.md).
 
 ### Exit gate
 
@@ -97,9 +108,15 @@ behavioural acceptance and licence/provenance decisions remain.
 - Reference provenance and licensing status are explicit, with unresolved material kept out of the checkpoint.
 - Current automated checks pass, and any GUI-only baseline work is either recorded or explicitly listed as outstanding.
 - At least one cold/warm performance series and its exact input recipe are preserved.
-- B14 and B15 roles are unambiguous. B15 becomes a baseline only after its candidate behaviour is accepted.
+- B14 and B15 roles are unambiguous: B15 is accepted as the behavioural reference and B14 remains the immutable legacy comparison oracle.
+
+Result: **Pass.** Every exit item is complete, the user accepted the evidence
+and decisions on 2026-07-19, and the closeout checkpoint is tagged
+`phase-0-closeout`.
 
 ## Phase 1: product, dependency, correctness, and performance inventory
+
+Status: **Current.**
 
 ### Goal
 
@@ -388,8 +405,8 @@ Every migrated capability, including those inside the larger Phase 7–9 waves, 
 
 | Decision | Due no later than | Evidence required |
 | --- | --- | --- |
-| B14/B15 behavioural reference and checkpoint tag | Phase 0 exit | Validation plus representative GUI comparison |
-| Reference ZIP commit/provenance policy | Phase 0 exit | Ownership/redistribution decision and checksum |
+| B14/B15 behavioural reference and checkpoint tag | Resolved at Phase 0 exit — B15 accepted; B14 retained as immutable oracle; `phase-0-closeout` tag | Validation plus representative GUI comparison |
+| Reference ZIP commit/provenance policy | Resolved at Phase 0 exit — exact SourceForge origin recorded; ZIP ignored and untracked | Owner decision, upstream GPLv3 statement and checksum |
 | Representative fixtures and first extraction slice | Phase 1 exit | Coverage, coupling, side-effect, and profile inventory |
 | Supported FreeCAD/Python and legacy document window | Phase 1/4 | Environment evidence and migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |
@@ -412,13 +429,18 @@ Every migrated capability, including those inside the larger Phase 7–9 waves, 
 | Legacy and modular paths become permanent duplication | Give every comparison path a named retirement gate and review it at each phase close |
 | Distribution artifact drifts from modular source | Generate or assemble it reproducibly and compare it with the authoritative package |
 | Feature additions destabilise migration | Triage them against the RC scope; schedule separately unless required for correctness |
-| Reference material has unclear redistribution rights | Record provenance/checksum and keep it local until permission is confirmed |
+| Reference-source provenance or licence later becomes ambiguous | Preserve the exact SourceForge URL/checksum, GPL-3.0-or-later licence, notices, and local exclusion decision |
 
-## Immediate Phase 0 work order
+## Phase 0 closeout record
 
 1. Preserve and validate the fresh-checkout bridge patch and deterministic base-fixture builder. **Complete and committed.**
 2. Capture two more equivalent B14 cold-process runs and report the three-run median/range. **Complete and committed.**
 3. Define an unchanged-result warm/reuse recipe, then capture three comparable warm runs without replaying destructive construction as a false cache test. **Complete and committed.**
-4. Record B14/B15 behavioural acceptance status.
-5. Resolve the reference ZIP redistribution and project licence/provenance decisions.
-6. Review and commit are complete. Push the checkpoint when requested, then close Phase 0 only when every exit-gate item is accepted.
+4. Record B14/B15 behavioural acceptance status. **Complete — B15 accepted as
+   the behavioural reference; B14 retained as the immutable legacy oracle.**
+5. Resolve the reference ZIP redistribution and project licence/provenance
+   decisions. **Complete — exact SourceForge origin recorded,
+   GPL-3.0-or-later selected, `NOTICE.md` added, and the ZIP remains ignored.**
+6. Review, commit and push of checkpoint `7379eb4` are complete. **Final Phase 0
+   closeout commit, tag, and push authorised by the project owner on
+   2026-07-19.**
