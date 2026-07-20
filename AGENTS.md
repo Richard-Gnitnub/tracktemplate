@@ -11,6 +11,12 @@
 - `reference/PROJECT_PLAN.md` is the canonical delivery sequence from the current checkpoint to a release candidate. Read it before starting source work, report work against its current phase, and do not claim a phase transition without its exit evidence and user acceptance.
 - `reference/ARCHITECTURE.md` is the canonical strategic architecture. Read it before changing model boundaries, persistence, display construction, validation, export, or source organisation.
 - `reference/MODULARISATION_PLAN.md` defines source boundaries, dependency direction and extraction gates. Read it before moving code or creating modules.
+- `reference/contracts/phase1-compatibility.json` defines the current exact
+  qualified FreeCAD stack, standalone Python floor, intended Addon manifest
+  bounds and B14/B15 document-ingress policy. Read it before choosing record
+  types, changing persistence/version handling, adding a runtime dependency,
+  broadening platform support, implementing migration or creating Addon
+  metadata.
 - `reference/LICENSING_BOUNDARIES.md` defines source/data classifications,
   canonical admission, chair collaboration, package licensing, optional
   Templot compatibility and generated-output project status. Read it before adding
@@ -38,6 +44,13 @@
   Phase 10 owns exact manifest/loading/update/catalogue mechanics, not another
   choice of product form.
 - Follow `reference/PERFORMANCE_SOP.md` for measurement and `reference/VALIDATION.md` for the applicable validation matrix.
+- Runtime and document compatibility are separate fail-closed gates. Only the
+  exact qualified profile may currently write through the future Workbench.
+  B14/B15 are the outer future migration window, not blanket entity-family
+  coverage; migrate only to a copy/new target after the applicable Phase 4
+  fixture passes. Treat older/versionless/future/conflicting state as
+  inspection-only or blocked. Do not infer `.FCStd` support from a successful
+  external configuration migration.
 
 ## Railway terminology
 
@@ -157,6 +170,12 @@
   evidence closes; its provisional static labels are not final module
   ownership. It also records the 2026-07-20 read-only Templot chair
   data/component/output-path audit and the remaining S1 oracle/schema evidence.
+- `reference/contracts/phase1-compatibility.json`,
+  `tools/runtime_compatibility_probe.py` and
+  `tests/validate_phase1_compatibility.py` own the Phase 1 host/ingress
+  boundary. The probe records no user path; standalone Python is expected to
+  report `not-freecad-runtime`, while the current FreeCAD probe must report the
+  exact `linux-x86_64-flatpak-freecad-1.1.1` profile as `qualified`.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
@@ -385,6 +404,16 @@ Run the selected transition-pilot boundary and expanded parity contract:
 .venv/bin/python tests/validate_phase1_transition_pilot.py
 ```
 
+Run the Phase 1 runtime and legacy-ingress compatibility contract, then probe
+the standalone and current FreeCAD environments:
+
+```bash
+.venv/bin/python tests/validate_phase1_compatibility.py
+.venv/bin/python tools/runtime_compatibility_probe.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tools/runtime_compatibility_probe.py --pass --require-qualified
+```
+
 Run the licensing-control tests and validate the current S1 pilot record:
 
 ```bash
@@ -437,7 +466,9 @@ Run the fast Phase 1 standalone-turnout analytical and bridge-contract checks:
 .venv/bin/python tests/validate_phase1_turnout.py
 ```
 
-- These commands were verified with FreeCAD 1.1.1 in the current environment.
+- These commands were verified on the exact qualified profile recorded in the
+  compatibility contract: Linux x86_64 stable FreeCAD 1.1.1 Flatpak with
+  bundled CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8.
 - A successful FreeCAD smoke run must print `B15 FreeCAD 1.1 headless smoke test passed`; an exit code without that sentinel is not evidence that FreeCAD executed the assertions.
 - `tests/validate_b15.py` treats B14 as the immutable legacy oracle. If B14 is deliberately changed with explicit approval, do not automatically alter B15 or the comparison test merely to restore a pass; first determine the intended version scope and preserve the accepted checkpoint.
 - Headless checks do not replace a real GUI workflow run. For geometry, document integration, display, export, or performance changes, run the exact target macro in FreeCAD and exercise the affected guided stages.

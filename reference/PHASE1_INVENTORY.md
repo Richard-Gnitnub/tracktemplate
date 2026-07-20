@@ -2,7 +2,8 @@
 
 Status: **in progress; last updated 2026-07-20**. This document owns the Phase 1
 inventory and concise decision log. It records the accepted first extraction
-slice but does not start source movement or close Phase 1.
+slice and the initial runtime/legacy-ingress compatibility window, but does not
+start source movement, implement document migration or close Phase 1.
 
 ## Purpose
 
@@ -59,6 +60,11 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | First-slice scorecard | `reference/PHASE1_SLICE_SCORECARD.md`; records why the transition solver was selected as a first architecture pilot, not a performance optimisation |
 | Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher identity, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates while source movement remains unstarted |
 | Selected transition-pilot validator | `tests/validate_phase1_transition_pilot.py`; verifies exact B14/B15 source, signatures, constant, closure cut, generated parameter/error parity, evidence links and premature package/launcher absence |
+| Runtime/legacy compatibility contract | `reference/contracts/phase1-compatibility.json`, schema 1; defines one exact qualified FreeCAD profile, the intended Addon manifest bounds, B14/B15 document ingress, external-configuration migrations and fail-closed unsupported-state rules |
+| Qualified FreeCAD profile | Linux x86_64 stable `org.freecad.FreeCAD` Flatpak: FreeCAD 1.1.1, bundled CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8 |
+| Standalone development floor | CPython 3.12.0 minimum; observed repository environment 3.12.3. This qualifies tools/tests and future domain imports, not a FreeCAD host by itself |
+| Compatibility probe and validator | `tools/runtime_compatibility_probe.py` emits a non-sensitive machine-readable record and exact-profile result; `tests/validate_phase1_compatibility.py` verifies source/schema anchors, current migration behaviour and fail-closed mutations |
+| Legacy document ingress | B14-only, B15-only and the expected mixed B14/B15 version sets are the intended RC migration sources; implementation and entity-family fixtures remain Phase 4 work, so this is not a claim that a successor migrator exists today |
 | Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
 | Production-source changes in this tranche | None |
 
@@ -102,6 +108,16 @@ Validate the five candidate boundaries and selected transition-pilot contract:
 ```bash
 .venv/bin/python tests/validate_phase1_candidate_boundaries.py
 .venv/bin/python tests/validate_phase1_transition_pilot.py
+```
+
+Validate the Phase 1 runtime and legacy-ingress contract, then inspect the
+current standalone or FreeCAD runtime without exposing user paths:
+
+```bash
+.venv/bin/python tests/validate_phase1_compatibility.py
+.venv/bin/python tools/runtime_compatibility_probe.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tools/runtime_compatibility_probe.py --pass --require-qualified
 ```
 
 Run the fast contract checks for the deeper B14 plain-line document oracle:
@@ -1026,6 +1042,59 @@ uses it to prove the Workbench's modular domain/façade path safely, while the
 chair chain remains the high-payoff later performance target after accurate
 core attribution, signature and provenance gates.
 
+## Runtime and legacy-compatibility boundary
+
+[`contracts/phase1-compatibility.json`](contracts/phase1-compatibility.json)
+now separates three facts that must not be collapsed into a single claim:
+
+1. the minimum Python feature floor used by standalone development code;
+2. an exact FreeCAD host stack that has passed the current project evidence;
+3. the versions and schemas of persisted input that a future migrator may
+   accept.
+
+The initial qualified and release-candidate profile is the current Linux
+x86_64 stable `org.freecad.FreeCAD` Flatpak: FreeCAD 1.1.1 with its bundled
+CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8. The
+repository's standalone CPython 3.12.3 environment establishes a 3.12.0
+development floor for tools, tests and future domain imports. Users will not
+be asked to install a separate Python beside FreeCAD. Windows, macOS, other
+Linux packages/architectures and any other FreeCAD or bundled-library version
+remain qualification-pending rather than being assumed compatible.
+
+FreeCAD's official Addon schema defines `freecadmin`, optional `freecadmax`
+and `pythonmin`. The intended initial manifest bounds are therefore
+`1.1.1`, `1.1.1` and `3.12.0`, respectively. The real `package.xml` remains a
+Phase 10 artifact and those values must be revalidated against the then-current
+[official schema](https://github.com/FreeCAD/Addon-Manifest-Schema) and
+[Addon template](https://github.com/FreeCAD/Addon-Template); this Phase 1
+contract does not create a premature package.
+
+The bounded legacy `.FCStd` ingress window is B14 and B15. A B15 action can
+legitimately leave inherited B14 objects beside new or changed B15 objects, so
+the exact mixed set is recognised. Pre-B14, versionless, unknown/future,
+conflicting, corrupt or insufficiently parametric documents are
+inspection-only or blocked: the Workbench must report them before a
+transaction and must not mutate, migrate or export them. B14/B15 is the outer
+window, not blanket family coverage. Phase 4 must provide a copied-target,
+atomic migrator and a passing fixture for every entity family advertised for
+release; one unqualified family blocks the whole Track Template write.
+
+External configuration has a deliberately separate content-based window. The
+current code accepts configuration schema 1, migrates schema 0 and a recognised
+legacy saved-dialog shape, normalises last-input schemas 1/2/3, accepts preset
+library schema 1 plus a legacy root array, and recognises two bounded preset
+field aliases. Future, negative, malformed or otherwise unknown schemas fail
+closed. None of those configuration migrations proves that an older `.FCStd`
+is supported.
+
+`tools/runtime_compatibility_probe.py` records only versions, platform class
+and package identity. It qualifies the exact FreeCAD profile above and reports
+field-level mismatches for drift. The contract validator also executes the
+current B14 configuration, last-input and preset outer migrations from selected
+AST definitions, checks every persisted schema anchor in both B14 and B15, and
+mutates the contract to prove that unsupported broadening fails closed. No
+successor document detector or migrator exists yet, and neither macro changed.
+
 ## Decision log
 
 | Date | Decision | Status and reason |
@@ -1054,6 +1123,7 @@ core attribution, signature and provenance gates.
 | 2026-07-20 | Make an external FreeCAD Workbench distributed as an Addon the product target | Accepted by the project owner; the modular `tracktemplate` package is authoritative, Addon Manager installation is the intended release route, and the `.FCMacro` is limited to migration or explicit compatibility rather than a second implementation |
 | 2026-07-20 | Score the five first-slice candidates using bounded static closure cuts and measured workflow evidence | Recommendation completed; schema 2 exposed root-versus-closure caller differences and the scorecard recommended the transition solver as a low-risk architecture pilot rather than a speed optimisation |
 | 2026-07-20 | Select and freeze the transition-length architecture pilot | Accepted by the project owner; candidate-register schema 3 points to an exact fail-closed contract, `10.2A8A7B16` and `TrackTemplate.FCMacro` are reserved for the development composition path, B14/B15 remain unchanged and source movement has not started |
+| 2026-07-20 | Define the initial runtime and legacy-document ingress window | Implemented for Phase 1 evidence and owner review; only the exact Linux x86_64 FreeCAD 1.1.1 Flatpak stack is currently qualified, standalone Python has a 3.12.0 floor, B14/B15 are the bounded future migration sources, unsupported hosts/documents fail closed, and Phase 4 still owns the copied-target migrator and family fixtures |
 
 ## Remaining Phase 1 work
 
@@ -1092,8 +1162,11 @@ core attribution, signature and provenance gates.
 - Reconcile instrumentation and profile the proposed lightweight routine
   editing path and complete Validate/Export path without double-counting or
   treating the current exact-shape replacement measurement as its budget.
-- Decide the supported FreeCAD/Python baseline and proposed legacy-document
-  support window.
+- Review and accept the recorded runtime/legacy-ingress policy; qualify any
+  additional RC platform explicitly rather than broadening by assumption.
+  Phase 4 must implement and fixture the B14/B15 detector/migrator for every
+  advertised entity family, while Phase 10 must revalidate and emit the real
+  Addon manifest.
 - Before starting Phase 2 source work, review the remaining Phase 1 exit gates
   and obtain explicit phase-transition acceptance. When Phase 2 is started,
   implement only the frozen transition pilot package/façade and reserved small

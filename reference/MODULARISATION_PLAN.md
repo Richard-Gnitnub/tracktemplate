@@ -192,6 +192,13 @@ Owns only explicit legacy concerns:
 - legacy property aliases;
 - version-to-version document upgrade rules.
 
+The outer ingress policy is not open-ended: the Phase 1
+[`compatibility contract`](contracts/phase1-compatibility.json) recognises B14,
+B15 and their expected mixed set only. A compatibility adapter must preflight
+read-only, fail closed on unknown/future/conflicting state, and migrate into a
+copy/new canonical target. Each advertised entity family needs its own Phase 4
+fixture before the adapter may write it.
+
 Git history is the record of old implementations. Do not keep historical function bodies active merely to preserve a source changelog.
 
 ## Public contracts
@@ -246,7 +253,10 @@ If a generated macro is required, modular source remains authoritative. The gene
 Phase 10 still owns the exact Addon manifest, installation/update mechanics,
 catalogue submission and compatibility-launcher retirement evidence. Those
 implementation choices do not reopen the accepted Workbench/Addon product
-target.
+target. Phase 1 records the intended initial compatibility metadata
+(`freecadmin`/`freecadmax` 1.1.1 and `pythonmin` 3.12.0); Phase 10 must
+revalidate it against the then-current official schema and runtime matrix
+before generating `package.xml`.
 
 ## Extraction method
 
@@ -302,8 +312,12 @@ the transition solver as a first architecture pilot, not a performance
 optimisation. Its exact façade, caller, parity, rollback and performance scope
 is frozen in
 [contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json).
-Broader workflow boundaries, candidate-specific gaps and representative
-target-architecture profiles remain open; source movement has not started.
+The exact qualified runtime, standalone Python floor and B14/B15 ingress
+policy are separately frozen in
+[`contracts/phase1-compatibility.json`](contracts/phase1-compatibility.json).
+Broader workflow boundaries, candidate-specific gaps, additional platform
+qualification and representative target-architecture profiles remain open;
+source movement and document migration have not started.
 
 ### Stage M2: package skeleton and façade
 
@@ -313,6 +327,12 @@ target-architecture profiles remain open; source movement has not started.
 - Keep B14 and B15 byte-identical as legacy/reference evidence. Introduce the
   reserved `TrackTemplate.FCMacro` only as a small B16 development composition
   root; do not copy the monolith or make the launcher authoritative.
+- Keep the extracted domain/API compatible with the recorded CPython 3.12.0
+  floor and exercise it in both the standalone 3.12.3 environment and the
+  qualified FreeCAD-bundled 3.13.14 runtime.
+- Add only a development composition guard for the exact qualified host; the
+  production document detector/migrator remains a Phase 4 compatibility
+  adapter and the final Addon metadata remains Phase 10 work.
 
 Exit gate: the empty boundary and loading approach work in both standalone Python tests and FreeCAD.
 
@@ -421,7 +441,8 @@ Modularisation is complete when:
 
 - exact Workbench/Addon manifest, loading/update and Addon Manager catalogue
   submission mechanics, plus the compatibility launcher's supported lifetime;
-- supported legacy document/version window;
+- B14/B15 family-migration implementation/fixtures and qualification evidence
+  for any proposed runtime or legacy-window expansion;
 - record/type approach compatible with the supported FreeCAD Python runtime;
 - exact chair-definition package schema, source-value representation and
   canonical unit strategy;

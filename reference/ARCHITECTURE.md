@@ -103,6 +103,16 @@ The FreeCAD document should contain a small number of logical objects with typed
 
 Avoid one persistent document object per rail segment, timber, chair, marker, or export fragment. Object count should scale with logical assemblies and display layers rather than raw primitive count.
 
+The initial host and legacy-ingress boundary is fixed by
+[`contracts/phase1-compatibility.json`](contracts/phase1-compatibility.json).
+Only a qualified FreeCAD runtime may write through this adapter. B14 and B15
+are the bounded future migration sources, including their expected mixed
+version set, but migration always targets a user-approved copy/new document
+and remains family-gated. Unknown, future, versionless, corrupt or
+insufficiently parametric state is inspection-only or blocked; legacy exact
+shapes are evidence rather than authoritative state. The canonical successor
+schema and executable migrations remain Phase 4 work.
+
 ### 4. Lightweight presentation adapter
 
 The normal editing view is derived 2D geometry grouped into a few semantic/style layers, for example:
@@ -370,7 +380,9 @@ The following require prototypes or user decisions and are not settled by this d
 - exact Addon manifest, loading/update mechanics, catalogue-submission route
   and supported lifetime of the compatibility macro launcher;
 - numerical performance budgets and representative benchmark documents;
-- migration/version policy for existing FreeCAD documents;
+- canonical successor schema, B14/B15 family-migration implementations and
+  fixtures, plus evidence for any proposed expansion beyond the accepted
+  ingress/runtime matrix;
 - chair-definition package schema, exact source-value representation and
   internal canonical units, including machine-readable provenance and output
   dependency fields;

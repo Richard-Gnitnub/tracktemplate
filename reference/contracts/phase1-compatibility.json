@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:runtime-and-legacy-compatibility:1",
+  "recorded_on": "2026-07-20",
+  "status": "phase1-policy-defined-successor-enforcement-and-broader-qualification-not-started",
+  "phase": 1,
+  "scope": {
+    "release_candidate_intent": "Define the initial FreeCAD/Python support promise and the bounded B14/B15 ingress window before modular source or persistence migration starts.",
+    "current_effect": "Development evidence and future implementation gates only. This contract does not alter B14, B15, any existing FCStd, configuration, Addon package or current macro behaviour.",
+    "support_meaning": "A release-supported workflow must pass both a qualified-runtime gate and a supported-document/schema gate before the Workbench may mutate, migrate or export.",
+    "licensing_separation": "Compatibility support does not grant project-cleared output status and does not change any provenance, dependency-manifest or rights gate."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "version_token": "10.2A8A7B14",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "version_token": "10.2A8A7B15",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference"
+    }
+  },
+  "official_host_metadata": {
+    "observed_on": "2026-07-20",
+    "freecad_release_source": "https://github.com/FreeCAD/FreeCAD/releases",
+    "observed_current_stable_release": "1.1.1",
+    "addon_manifest_schema": {
+      "repository": "https://github.com/FreeCAD/Addon-Manifest-Schema",
+      "branch": "Stable",
+      "observed_tree_sha": "90c9b419cdb284130533d472dfdc0b8b03f9176c",
+      "example": "https://github.com/FreeCAD/Addon-Manifest-Schema/blob/Stable/Assets/Examples/Everything.xml",
+      "template": "https://github.com/FreeCAD/Addon-Template/blob/main/package.xml",
+      "fields": {
+        "freecadmin": "Required earliest FreeCAD release with which the Addon works.",
+        "freecadmax": "Optional latest FreeCAD release with which the Addon works.",
+        "pythonmin": "Required earliest Python version needed by the Addon."
+      }
+    },
+    "initial_package_manifest_intent": {
+      "freecadmin": "1.1.1",
+      "freecadmax": "1.1.1",
+      "pythonmin": "3.12.0",
+      "phase_10_rule": "Generate the real package.xml only in the Workbench packaging phase and revalidate these values against then-current official schema and qualification evidence."
+    }
+  },
+  "runtime_baseline": {
+    "runtime_policy": "The Workbench uses the Python, Qt, OpenCASCADE and Coin stack bundled by the supported FreeCAD distribution; users are not asked to install a separate runtime Python.",
+    "standalone_development_floor": {
+      "pythonmin": "3.12.0",
+      "observed_python": "3.12.3",
+      "implementation": "CPython",
+      "scope": "Repository tools, AST/analytical tests and domain-package import checks only; this does not by itself qualify a FreeCAD host."
+    },
+    "qualified_profiles": [
+      {
+        "profile_id": "linux-x86_64-flatpak-freecad-1.1.1",
+        "status": "qualified-reference-and-initial-rc-profile",
+        "host_distribution_evidence": "Linux Mint 22.3 x86_64 host running the stable org.freecad.FreeCAD Flatpak",
+        "exact_match": {
+          "freecad.coin_version": "SIM Coin 4.0.8",
+          "freecad.opencascade_version": "7.8.1",
+          "freecad.pyside_version": "6.10.3",
+          "freecad.qt_binding": "PySide6",
+          "freecad.qt_version": "6.10.3",
+          "freecad.version_info": [
+            1,
+            1,
+            1
+          ],
+          "platform.flatpak_id": "org.freecad.FreeCAD",
+          "platform.machine": "x86_64",
+          "platform.packaging": "flatpak",
+          "platform.system": "Linux",
+          "python.implementation": "CPython",
+          "python.version_info": [
+            3,
+            13,
+            14
+          ]
+        },
+        "observed_freecad_revision": "44874 (Git)",
+        "observed_freecad_commit": "0108fd4b4850cc46e625b60e53cea7a7bbe69f8d",
+        "qualification_basis": [
+          "Phase 0 macro syntax, B15 structural/analytical and FreeCADCmd smoke checks",
+          "B14 isolated real-GUI workflow and performance recipes",
+          "B14-to-B15 real-GUI, reuse and save/reopen acceptance",
+          "Phase 1 B14 copied-document plain-line, straight/station and turnout oracles"
+        ]
+      }
+    ],
+    "platform_matrix": [
+      {
+        "platform": "Linux x86_64 stable org.freecad.FreeCAD Flatpak",
+        "status": "qualified"
+      },
+      {
+        "platform": "Other Linux packages or architectures",
+        "status": "qualification-pending"
+      },
+      {
+        "platform": "Windows",
+        "status": "qualification-pending"
+      },
+      {
+        "platform": "macOS",
+        "status": "qualification-pending"
+      }
+    ],
+    "support_rule": "Only an exact qualified profile is initially release-supported. A newer FreeCAD patch, another bundled Python/Qt/OCC/Coin stack, another package channel, OS or architecture is unqualified until its required matrix passes and this contract is deliberately revised.",
+    "unqualified_runtime_rule": "Report every observed mismatch, preserve the document untouched and disable Track Template mutation, migration and production export; do not guess compatibility from a higher version number."
+  },
+  "legacy_document_window": {
+    "current_implementation_status": "contract-only-no-successor-document-detector-or-migrator-exists",
+    "generator_id": "ModelRailwayCurveTemplate.IndependentEasements",
+    "supported_ingress_versions": [
+      "10.2A8A7B14",
+      "10.2A8A7B15"
+    ],
+    "accepted_version_sets": [
+      [
+        "10.2A8A7B14"
+      ],
+      [
+        "10.2A8A7B15"
+      ],
+      [
+        "10.2A8A7B14",
+        "10.2A8A7B15"
+      ]
+    ],
+    "mixed_b14_b15_rule": "A B15 action may retain inherited B14 objects and add or retag only changed B15 objects. The exact mixed set is therefore an intended B15 ingress form, not automatically a conflict.",
+    "version_detection": {
+      "scope": "Read-only preflight over objects whose GeneratedBy equals the declared generator_id and over recognised JSON payloads on those objects.",
+      "generator_version_rule": "GeneratorVersion stores a descriptive string; its first whitespace-delimited token is the macro version token.",
+      "json_version_rule": "Recognised macro_version and source_macro_version fields carry version tokens and must not contradict object evidence.",
+      "schema_rule": "Every encountered required payload must have a recognised schema and internally consistent stable identities; derived payloads may be discarded only when canonical inputs are sufficient to regenerate them.",
+      "foreign_object_rule": "FreeCAD objects not owned by the declared generator_id do not classify the document and must remain untouched."
+    },
+    "classification": [
+      {
+        "condition": "All owned version evidence is one accepted version set, every required schema is recognised and the entity family has a passing migration fixture.",
+        "status": "supported-migration-source",
+        "write_policy": "Migrate only a user-approved copy/new document through the future versioned migrator; never rewrite the source in place."
+      },
+      {
+        "condition": "The document is pre-B14, versionless, contains an unknown/future token, lacks sufficient canonical inputs, or contains a family without an accepted migration fixture.",
+        "status": "inspection-only",
+        "write_policy": "Allow a compatibility report and ordinary FreeCAD inspection only; no Track Template mutation, migration or production export."
+      },
+      {
+        "condition": "Owned version/schema evidence conflicts, is malformed or is corrupt.",
+        "status": "blocked-corrupt-or-conflicting",
+        "write_policy": "Stop before a transaction, preserve the document and report exact objects/properties/findings."
+      }
+    ],
+    "migration_invariants": [
+      "Open and inspect the source read-only before starting any transaction.",
+      "Require an explicit user-selected copy/new target and retain the original byte-for-byte.",
+      "Validate the complete target model before one atomic commit; abort and remove the target on failure.",
+      "Preserve stable railway identities, ordering, units, coordinate frames, topology intent, production selections and user-authored metadata.",
+      "Treat legacy Part shapes as comparison/recovery evidence, not canonical model state; regenerate derived views and exact geometry only when sufficient canonical inputs exist.",
+      "Do not silently drop an unsupported entity, property, payload, finding or foreign FreeCAD object.",
+      "Save/reopen, undo/redo, failure recovery and legacy-versus-canonical semantic comparison must pass for each supported entity family before RC support is claimed."
+    ],
+    "family_evidence_rule": "B14/B15 identify the outer ingress window, not blanket migration coverage. Phase 4 must attach deterministic migration fixtures for every advertised entity family; a document containing any unqualified family remains inspection-only.",
+    "successor_target_status": "The canonical successor document schema and migration implementation belong to Phase 4; B16 is a development composition checkpoint, not another legacy source generation."
+  },
+  "external_configuration_window": {
+    "scope_rule": "Configuration, last-input and preset support is content/schema based and is deliberately separate from FCStd document support.",
+    "configuration_json": [
+      {
+        "input": "schema_version 1",
+        "disposition": "validate-and-normalise-current"
+      },
+      {
+        "input": "schema_version 0",
+        "disposition": "deterministically-migrate-to-1"
+      },
+      {
+        "input": "No configuration root but required transition/radius/angle/main_width fields",
+        "disposition": "recognised-legacy-saved-dialog-shape-migrate-to-1"
+      },
+      {
+        "input": "Future, negative, missing, non-integer, unsafe or malformed schema/data",
+        "disposition": "reject-fail-closed"
+      }
+    ],
+    "last_dialog_inputs": {
+      "accepted_schema_versions": [
+        1,
+        2,
+        3
+      ],
+      "disposition": "normalise-to-current-in-memory-shape",
+      "other_versions": "reject-and-use-no-payload"
+    },
+    "named_preset_library": [
+      {
+        "input": "Legacy root array",
+        "disposition": "migrate-in-memory-to-library-object"
+      },
+      {
+        "input": "library_schema_version 1",
+        "disposition": "validate-current"
+      },
+      {
+        "input": "Other, missing or malformed library schema/root",
+        "disposition": "reject-fail-closed"
+      }
+    ],
+    "named_preset_records": {
+      "current_schema": 1,
+      "recognised_legacy_aliases": [
+        "payload -> configuration",
+        "schema_version -> preset_schema_version"
+      ],
+      "other_versions": "reject-fail-closed"
+    }
+  },
+  "persisted_schema_anchors": {
+    "ASSEMBLY_LABEL_SCHEMA_VERSION": 1,
+    "CHAIR_ANALYSIS_SCHEMA_VERSION": 5,
+    "CHAIR_SOLID_SCHEMA_VERSION": 2,
+    "CONFIGURATION_SCHEMA_VERSION": 1,
+    "CROSSOVER_B3_SCHEMA_VERSION": 1,
+    "CROSSOVER_B4_SCHEMA_VERSION": 1,
+    "CROSSOVER_INTEGRATION_SCHEMA_VERSION": 1,
+    "CROSSOVER_SCHEMA_VERSION": 1,
+    "CROSSOVER_SHARED_TIMBER_SCHEMA_VERSION": 3,
+    "CROSSOVER_TIMBER_ANALYSIS_SCHEMA_VERSION": 1,
+    "LAST_INPUTS_SCHEMA_VERSION": 3,
+    "MATERIAL_REPORT_SCHEMA_VERSION": 1,
+    "PLATFORM_DEFAULTS_SCHEMA_VERSION": 3,
+    "PRESET_LIBRARY_SCHEMA_VERSION": 1,
+    "PRESET_RECORD_SCHEMA_VERSION": 1,
+    "PRODUCTION_PREFLIGHT_SCHEMA_VERSION": 1,
+    "PRODUCTION_RECORD_SCHEMA_VERSION": 2,
+    "PRODUCTION_SCHEDULE_SCHEMA_VERSION": 1,
+    "TURNOUT_INTEGRATION_SCHEMA_VERSION": 1,
+    "TURNOUT_SCHEMA_VERSION": 1
+  },
+  "enforcement_and_requalification": {
+    "phase_2": "Use this baseline for standalone record/type choices and a development-only runtime guard; do not broaden the matrix by assumption.",
+    "phase_4": "Implement the document detector, versioned canonical schema, B14/B15 family migrations, copied-target transaction and migration fixtures.",
+    "phase_10": "Generate and validate package.xml, requalify the supported platform matrix, publish upgrade/recovery guidance and bind unsupported-host diagnostics into the Workbench.",
+    "requalification_triggers": [
+      "Any FreeCAD version change, including a patch release",
+      "Any bundled Python, Qt/PySide, OpenCASCADE or Coin version change",
+      "Another OS, architecture, package channel or FreeCAD distribution",
+      "A new runtime dependency or a change to the minimum Python feature set",
+      "Any persisted schema, migration rule, entity family or compatibility-launcher change"
+    ],
+    "required_matrix": [
+      "Standalone domain/API import and analytical tests",
+      "FreeCADCmd structural, document and save/reopen tests",
+      "Real-GUI create/edit/undo/redo/save/reopen workflows",
+      "Validate/Export equivalence, transactional failure and cleanup",
+      "B14 and B15 copied-document migrations for every advertised entity family",
+      "Unsupported, future, conflicting, corrupt and exact change-back cases"
+    ]
+  },
+  "evidence": {
+    "probe_tool": "tools/runtime_compatibility_probe.py",
+    "probe_sentinel": "TRACKTEMPLATE_RUNTIME_PROBE=",
+    "standalone_probe_command": ".venv/bin/python tools/runtime_compatibility_probe.py",
+    "freecad_probe_command": "flatpak run --command=FreeCADCmd org.freecad.FreeCAD tools/runtime_compatibility_probe.py --pass --require-qualified",
+    "runtime_probe_observed_on": "2026-07-20",
+    "baseline": "reference/BASELINE.md",
+    "b15_acceptance": "reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md",
+    "plain_line_save_reopen": "reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md",
+    "straight_station_save_reopen": "reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md",
+    "turnout_save_reopen": "reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md",
+    "known_evidence_gaps": [
+      "No Windows, macOS, non-Flatpak Linux or other architecture is qualified yet.",
+      "No FreeCAD release other than 1.1.1 is qualified yet.",
+      "No pre-B14 or versionless FCStd is promised as a migration source.",
+      "The B14/B15 successor document detector and migrator do not exist yet.",
+      "B15 save/reopen evidence is bounded to the accepted crossover chair delta; family-by-family migration fixtures remain Phase 4 work."
+    ]
+  }
+}

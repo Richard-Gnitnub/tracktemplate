@@ -172,7 +172,13 @@ Choose migration order from evidence and establish oracles for behaviour that cu
 - Close or explicitly bound the observed instrumentation defects before using subprofiles to select an optimisation: the geometry external/internal boundary gap, the prematurely persisted chair timing payload, the late supported-solid reuse check, redundant post-reuse panel refresh, and repeated effective-status signature scans.
 - Characterise and align crossover preview/commit feasibility diagnostics so preview covers the same complete mapped-turnout and connector minimum-radius rule as transactional commit.
 - Add deterministic input recipes or non-sensitive fixtures for release-critical workflows, starting with the gaps listed in [VALIDATION.md](VALIDATION.md).
-- Decide the supported FreeCAD/Python baseline and the intended legacy-document support window for the release candidate.
+- Decide the supported FreeCAD/Python baseline and the intended legacy-document
+  support window for the release candidate. The initial policy is now recorded
+  in `contracts/phase1-compatibility.json`: one exact FreeCAD 1.1.1 Flatpak
+  profile is qualified, standalone Python has a 3.12.0 floor, and B14/B15 form
+  the outer future migration window. Phase 4 still owns the detector, copied-
+  target migrator and per-family fixtures; Phase 10 owns final package metadata
+  and broader platform qualification.
 - Score candidate first slices by clarity of input/output, current characterisation coverage, side effects, caller count, architectural value, and measurable resource cost.
 - Record durable choices in one concise decision log rather than scattering decisions through source comments.
 - Establish canonical railway terminology before naming modular interfaces;
@@ -232,6 +238,14 @@ as the first architecture pilot. The project owner accepted that selection on
 development checkpoint `10.2A8A7B16` and a small `TrackTemplate.FCMacro`
 compatibility launcher, while explicitly keeping source movement unstarted and
 the public Workbench/RC version undecided.
+
+The Phase 1 compatibility contract also freezes the initial host and ingress
+policy without pretending that migration exists. The exact Linux x86_64
+FreeCAD 1.1.1 Flatpak stack is the only qualified profile; other platforms or
+bundled stacks require the declared requalification matrix. B14-only, B15-only
+and expected mixed B14/B15 documents are the intended RC migration sources,
+but each entity family remains inspection-only until its Phase 4 copied-target
+migration fixture passes. Existing macros and documents are unchanged.
 
 Current Phase 1 evidence is maintained in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Its first static tranche is
@@ -445,6 +459,10 @@ Prove that modular source can load through both standalone Python and FreeCAD wi
 - Add boundary checks for dependency direction and circular imports using the standard library or already-approved tooling.
 - Provide a deterministic legacy/new comparison harness capable of structured values, ordering, stable identities, diagnostics, and output metadata.
 - Confirm the chosen record/type strategy works in the supported FreeCAD Python runtime.
+- Make the B16 development composition path consume the Phase 1 compatibility
+  contract and stop with a recoverable diagnostic before mutation when the
+  host is unqualified. Do not implement the document migrator or final Addon
+  manifest in this phase.
 - Document how the modular package is found when launched from the FreeCAD macro environment.
 
 ### Exit gate
@@ -795,7 +813,7 @@ package licence and field/component provenance pass
 | Scoped output lineage and first S1 package rights plan | Phase 1 exit | Complete first-S1/core-rail-timber classifications or an explicit S1 block; bounded other-S&C and legacy registers; validated manifest, B15 gap analysis, pilot evidence/licence, non-copyright review, intended commercial/publication use and comparison metrics |
 | First extraction slice | Resolved 2026-07-20 — transition-length solver selected as the architecture pilot; B16/launcher and exact acceptance contract reserved; source movement not started | Candidate contracts, bounded closure cuts, workflow profiles, scorecard and owner acceptance |
 | Remaining representative fixtures and Phase 1 profile coverage | Phase 1 exit | Coverage, workflow gaps and reconciled target-architecture profile inventory |
-| Supported FreeCAD/Python and legacy document window | Phase 1/4 | Environment evidence and migration fixtures |
+| Supported FreeCAD/Python and legacy document window | Initial policy defined 2026-07-20; owner review at Phase 1 exit and implementation/family fixtures due by Phase 4 | Exact runtime probe, official Addon metadata fields, B14/B15 source/schema anchors, existing save/reopen evidence, fail-closed contract validation and future migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |
 | Coin ViewProvider versus SVG/Qt editing view | Phase 5 exit | Selection, editing, persistence, and resource prototype |
 | Numerical performance budgets | Provisional after Phase 1; frozen by Phase 10 | Repeated cold/warm representative baselines |
@@ -820,7 +838,7 @@ package licence and field/component provenance pass
 | Lightweight editing loses expected FreeCAD behaviour | Prototype selection, handles, visibility, undo/redo, save/reopen, and GUI use before choosing a renderer |
 | Deferred geometry only moves cost to export | Measure both edit-only and edit-through-export workflows, including cleanup |
 | Cache signatures omit an input | Centralise signatures and test change/reuse/change-back for every input class |
-| New persistence makes old documents unreadable | Agree a support window, retain fixtures, version schemas, and test recoverable migrations |
+| New persistence makes old documents unreadable | Enforce the recorded B14/B15 ingress window, retain source documents byte-for-byte, migrate only into a copied/new target, version schemas, and test every supported family plus unsupported/corrupt recovery |
 | Legacy and modular paths become permanent duplication | Give every comparison path a named retirement gate and review it at each phase close |
 | Distribution artifact drifts from modular source | Generate or assemble it reproducibly and compare it with the authoritative package |
 | Feature additions destabilise migration | Triage them against the RC scope; schedule separately unless required for correctness |

@@ -21,6 +21,10 @@ change.
   after normalising only version, launch, docstring, and recompute-instrumentation
   differences.
 - `tests/freecad_validate_b15.py` exercises the B15 chair display path in real headless FreeCAD.
+- `reference/contracts/phase1-compatibility.json` defines the exact currently
+  qualified FreeCAD stack, standalone Python floor and bounded B14/B15 future
+  migration ingress. It is a Phase 1 control, not an implemented migrator or
+  final Addon manifest.
 
 B15 passed the bounded real-GUI, reuse, solid-equivalence, and save/reopen
 qualification recorded in
@@ -49,7 +53,9 @@ These roles are current project state, not a permanent versioning scheme. Update
 
 ### 3. FreeCAD document validation
 
-- Run against the supported FreeCAD version.
+- Run against a profile qualified by the Phase 1 compatibility contract. The
+  current exact profile is the Linux x86_64 stable FreeCAD 1.1.1 Flatpak with
+  bundled CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8.
 - Verify object types, properties, grouping, visibility, transactions, recomputes and cleanup.
 - Confirm save/reopen behaviour when persistence changes.
 - Ensure transient validation/export objects do not leak into the editable document.
@@ -196,6 +202,31 @@ diagnostics, reserved B16/launcher identity, rollback rules and all declared
 evidence paths. While its status is `source-movement-not-started`, it also
 fails if the package or reserved launcher appears prematurely. It executes
 selected function definitions only and does not import or launch either macro.
+
+Phase 1 runtime and legacy-ingress compatibility checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_compatibility.py
+.venv/bin/python tools/runtime_compatibility_probe.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tools/runtime_compatibility_probe.py --pass --require-qualified
+```
+
+The validator protects the exact B14/B15 fingerprints, active persisted-schema
+constants, initial official Addon metadata intent, standalone Python floor,
+qualified FreeCAD stack and B14/B15 ingress sets. It executes selected current
+configuration, last-input and preset migration boundaries without importing or
+launching the macro, then mutates every support class to prove unsupported
+broadening fails closed. The standalone probe should report
+`not-freecad-runtime`; the FreeCAD probe is successful evidence only when its
+`TRACKTEMPLATE_RUNTIME_PROBE=` record reports `qualified` for
+`linux-x86_64-flatpak-freecad-1.1.1`. It records no user path.
+
+This check does not claim that the successor document migrator exists. Phase 4
+must add copied-target migration fixtures for each advertised B14/B15 entity
+family, including supported, future, versionless, corrupt/conflicting, failure,
+undo/redo and save/reopen cases. A configuration JSON migration is not evidence
+that an older `.FCStd` is supported.
 
 Phase 1 licensing-control and manifest-gate checks:
 
