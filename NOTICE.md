@@ -27,6 +27,32 @@ claim that mathematical concepts, railway methods, functional ideas, or factual
 dimensions are themselves copyrightable, nor that every part of
 TrackTemplateMacro derives from Templot5.
 
+## Ordinary generated output
+
+GPL-3.0-or-later applies to the covered project software. Under GPLv3 section
+2, running the program does not by itself place ordinary generated output under
+the GPL unless the output, given its content, constitutes a covered work.
+
+TrackTemplateMacro contributors do not assert control over a user's ordinary
+track arrangement, drawing, production file, render, or physical result merely
+because TrackTemplateMacro generated it. This repository does not apply CC
+BY-NC-SA or another non-commercial restriction to ordinary output solely by
+execution of the program.
+
+This is a scope clarification, not a warranty of ownership or
+non-infringement, and it cannot grant rights held by someone else. Conditions
+may still follow user-supplied inputs, chair-definition packages, embedded
+assets, standards, scans/CAD/drawings, output boilerplate, or other protected
+material actually present. A chair-definition or evidence package may state a
+separate data/media licence; CC0-1.0 applies only to a package explicitly
+marked with that dedication after its rights review.
+
+Current B14/B15 output is not retroactively certified for unrestricted public
+or commercial reuse. The required source/data classifications, Templot-media
+separation, package rules, output-dependency records, and Phase 1 clearance
+audit are defined in
+[`reference/LICENSING_BOUNDARIES.md`](reference/LICENSING_BOUNDARIES.md).
+
 ## Particular thanks
 
 - **Martin Wynne** — with particular thanks for creating and developing

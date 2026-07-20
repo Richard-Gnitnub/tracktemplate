@@ -1,7 +1,9 @@
 # Reference Source Provenance and Licensing Decision Record
 
-Status: **COMPLETE — source, licence, attribution, and redistribution policy
-accepted by the project owner on 2026-07-19.**
+Status: **COMPLETE for the Phase 0 source snapshot, project licence,
+attribution, and ZIP redistribution decision accepted on 2026-07-19. The
+Phase 1 production-data and output-lineage audit is OPEN under the policy
+accepted on 2026-07-20.**
 
 This record captures what can be established from the repository and the local
 reference material. It is a project-control record, not legal advice or a legal
@@ -45,6 +47,46 @@ state:
 
 The archive also contains the corresponding GPL licence text. Preserve those
 notices when retaining, reviewing, adapting, or redistributing the source.
+
+## Templot media-output evidence and limits of the finding
+
+A read-only full-archive text search on 2026-07-20, followed by inspection of
+the matched output paths, found that the Templot5 556b print paths add a
+separate assertion to generated drawings:
+
+- `print_unit.pas` emits “This drawing contains design elements and data ©
+  Martin Wynne and OpenTemplot contributors.”; and
+- `pdf_laz_unit.pas` emits the same statement using `(c)`.
+
+This is evidence of an upstream copyright assertion about content in a
+Templot-generated drawing. It is not, by itself, a complete output licence or
+evidence that every formula, coordinate, factual dimension, user layout, or
+physical article in every output is copyrightable.
+
+The same archive-wide text search found no general **CC BY-NC-SA** designation
+and no general non-commercial licence for Templot5 output in this snapshot. The
+Creative Commons wording found in `map_loader_unit.pas` concerns imported
+National Library of Scotland historic maps and their required attribution; it
+must not be generalised to unrelated Templot output.
+
+Historical [Templot2 Terms of
+Use](https://web.archive.org/web/20171118195822/http://templot.com/companion/terms_of_use.html),
+last revised in 2015 and archived in 2017, asserted that printed templates,
+screen images, data files, and other Templot2-derived material contained
+Martin Wynne's design elements and data. Those terms predate the reviewed
+Templot5 open-source snapshot. They are retained as relevant historical
+evidence, but this project does not silently treat them as a CC licence, as
+the GPL text, or as conclusively applicable or inapplicable to Templot5.
+
+The personal/non-commercial notice displayed on the historical Templot Club
+archive concerns files submitted to that web site by their respective
+contributors. It is a separate forum-media rule and must not be conflated with
+the licence of Templot5 source or all program output.
+
+The operational classification, neutral-data, collaboration, package-licence,
+and generated-output rules adopted in response are maintained in
+[LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). The current B14/B15 output
+paths are not retroactively declared rights-cleared by this evidence record.
 
 ## Relationship to TrackTemplateMacro
 
@@ -127,6 +169,10 @@ named.
 - Templot5 source may be consulted or adapted only with its notices and the
   project provenance maintained; mathematical ideas and expressive source must
   not be conflated in future records.
+- [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) separates GPL source
+  compliance from engineering facts, data/database provenance, media-output
+  assertions, external evidence, package licensing, and ordinary generated
+  output. Its adoption does not grant rights the project does not hold.
 
 ## Phase 0 decision
 
@@ -142,4 +188,6 @@ On 2026-07-19 the project owner approved:
 
 This decision aligns the project licence with the notices found in the source
 material while leaving the mathematics/copyright distinction explicit. It is a
-project-control decision, not legal advice or a court finding.
+project-control decision, not legal advice or a court finding. The later Phase
+1 output-lineage policy refines future data admission and release evidence; it
+does not reopen or invalidate the accepted Phase 0 source/ZIP decision.

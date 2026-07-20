@@ -11,6 +11,11 @@
 - `reference/PROJECT_PLAN.md` is the canonical delivery sequence from the current checkpoint to a release candidate. Read it before starting source work, report work against its current phase, and do not claim a phase transition without its exit evidence and user acceptance.
 - `reference/ARCHITECTURE.md` is the canonical strategic architecture. Read it before changing model boundaries, persistence, display construction, validation, export, or source organisation.
 - `reference/MODULARISATION_PLAN.md` defines source boundaries, dependency direction and extraction gates. Read it before moving code or creating modules.
+- `reference/LICENSING_BOUNDARIES.md` defines source/data classifications,
+  canonical admission, chair collaboration, package licensing, optional
+  Templot compatibility and generated-output clearance. Read it before adding
+  or changing output-affecting constants, tables, profiles, chair evidence,
+  definition packages, fixtures, exporters or embedded media.
 - The authoritative state is the parametric railway model: configuration, stable identities, topology, analytical results and production intent.
 - SVG, Coin nodes and other viewport geometry are derived views, never an independent source of railway truth.
 - Normal editing should use lightweight aggregated 2D presentation. Build exact `Part` shapes and solids only at an explicit Validate/Export boundary or when the user explicitly requests retained production geometry.
@@ -120,9 +125,14 @@
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
-- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md` and `reference/PROVENANCE.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, licence/provenance status or version role changes.
+- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/PROVENANCE.md` and `reference/LICENSING_BOUNDARIES.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, licence/provenance/output status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `reference/PROVENANCE.md` owns source and external chair-evidence provenance.
+- `reference/LICENSING_BOUNDARIES.md` owns the operational distinction between
+  engineering methods/facts, project measurements/derivations, Templot source
+  expression/reference data/media, third-party evidence, user designs and
+  generated output. It also owns the `rights-cleared`, `restricted`,
+  `reference-only` and `unknown` project-control statuses.
 - `LICENSE` and `NOTICE.md` apply GPL-3.0-or-later to the project, preserve the Templot5 source-basis attribution, and record particular thanks to Martin Wynne and Steve Cornford. Preserve both files and all applicable upstream notices.
 - `main.py` is PyCharm starter boilerplate, not the product entry point.
 - Each macro launches through its final `run_macro()` call. Tests that load definitions deliberately remove only that final launch call.
@@ -136,6 +146,28 @@
 - Preserve UTF-8 encoding and compatibility with FreeCAD's bundled Python, `FreeCAD`, `Part`, `FreeCADGui`, and the existing PySide fallback.
 - Do not add third-party runtime dependencies without approval.
 - When consulting or adapting Templot5 material, preserve `reference/PROVENANCE.md`, the GPL-3.0-or-later project licence, and applicable upstream notices. Distinguish unprotected mathematical concepts, railway methods, functionality, and factual dimensions from potentially copyrightable code, comments, tables, selection, arrangement, or close translation; do not make unsupported clean-room or derivation claims.
+- Do not call a value “Templot data” merely because Templot calculates or uses
+  the same independently evidenced engineering fact. Conversely, do not
+  relabel a systematically copied Templot table, profile, selection or
+  arrangement as isolated engineering facts. Record provenance at field or
+  component level where package-level labelling would hide mixed origins.
+- Templot-generated PDFs, screenshots, drawings, DXF/STL/data files and
+  unresolved Templot-authored value collections are local comparison evidence,
+  not canonical production inputs. Keep them untracked unless their exact
+  redistribution permission is accepted; record hashes and derived comparison
+  results instead where sufficient.
+- The canonical chair interchange is the neutral TrackTemplateMacro
+  `ChairDefinition`. Any future Templot-format support is an optional one-way
+  outward adapter and must not feed Templot media, opaque geometry or
+  unreviewed values back into canonical state.
+- Do not mark a package or output `rights-cleared` while an output-affecting
+  dependency is `restricted`, `reference-only`, `unknown`, `NOASSERTION`, or
+  incompatible with the declared intended use. Current B14/B15 output remains
+  uncleared for that status until the Phase 1 lineage audit closes.
+- CC0-1.0 is the target for a project-authored factual chair-definition package
+  intended for unrestricted reuse only when that package is explicitly marked
+  after a complete rights review. Never apply CC0 by assumption to Templot,
+  third-party, mixed-rights or unresolved material.
 - Before chair-definition, chair-generator or assimilation source work, read
   the chair contract in `reference/ARCHITECTURE.md`, its scheduled gates in
   `reference/PROJECT_PLAN.md`, the source audit in
@@ -304,6 +336,10 @@ Run the fast Phase 1 straight/station analytical and bridge-contract checks:
 - Before reporting completion, inspect the diff for accidental broad changes and run every applicable check above.
 - State which macro/version changed, which invariants were preserved, which tests ran, and any GUI validation still required.
 - For project-plan work, state the current phase, which deliverables or gates changed, and whether the phase remains open or was accepted closed.
+- For source-data, chair-package, fixture, export or media changes, state the
+  provenance classifications affected, package/output licence impact, and any
+  remaining restricted/reference-only/unknown dependency. Do not claim
+  unrestricted output merely because the software is GPL-licensed.
 - For performance changes, include the before/after reports and identify any measurement noise or cache-state difference.
 - Keep `.idea/`, `.venv/`, `__pycache__/`, generated FreeCAD documents, exported production files, and temporary benchmark artifacts out of commits.
 - Do not commit or push unless the user asks.

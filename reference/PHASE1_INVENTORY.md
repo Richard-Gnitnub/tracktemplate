@@ -14,6 +14,8 @@ correctness, boundary-data and performance work explicit.
 
 The applicable gates are in [PROJECT_PLAN.md](PROJECT_PLAN.md), and source
 movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
+Source/data classification, package licensing and generated-output clearance
+are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 
 ## Evidence state
 
@@ -41,6 +43,8 @@ movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
 | B15 SHA-256 | `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848` |
 | Chair source evidence | ignored Templot5 revision 556b SourceForge archive recorded in [PROVENANCE.md](PROVENANCE.md) |
 | Chair source-audit date | 2026-07-20; read-only review of selected Pascal units |
+| Source/data/output policy | accepted 2026-07-20; [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) |
+| Current B14/B15 project-control output clearance | `unknown` pending the Phase 1 output-affecting lineage audit; this is not a new output restriction |
 | Production-source changes in this tranche | None |
 
 The `ordinary_track` filenames, imports, commands and recipe IDs in this
@@ -389,6 +393,41 @@ worn surfaces, nominal dimensions, component boundaries and rail fit. Fully
 automatic conversion of an arbitrary 3D source is consequently outside the RC
 scope and remains post-RC research.
 
+### Source/data/output licensing boundary
+
+The 2026-07-20 read-only evidence review now separates four matters that were
+previously too easy to conflate:
+
+- the Templot5 Pascal source and its GPL-3.0-or-later notices;
+- established engineering methods and independently evidenced factual values;
+- Templot-authored tables, profiles, value collections and generated media;
+  and
+- the rights dependencies of TrackTemplateMacro-generated output.
+
+The reviewed 556b print/PDF paths stamp a copyright assertion about design
+elements and data in Templot drawings. The snapshot contains no general CC
+BY-NC-SA or non-commercial output licence; its Creative Commons wording is
+specific to imported National Library of Scotland maps. Historical Templot2
+terms and forum-uploaded-media terms are recorded separately in
+[PROVENANCE.md](PROVENANCE.md) rather than treated as the current GPL source
+licence.
+
+The accepted successor boundary is a neutral `ChairDefinition`. Engineering
+facts, project measurements and project derivations require their own evidence
+chain; a Templot comparison can be an oracle but cannot silently become their
+claimed primary source. Templot reference data/media remains local and
+untracked unless its exact redistribution and output use is accepted. Any
+future Templot-format support is a one-way outward adapter and cannot feed
+opaque media or unreviewed values back into canonical state.
+
+This resolves policy, not current-output clearance. Phase 1 must still map
+every output-affecting table, profile, constant, rule, asset and boilerplate
+element, define the dependency-manifest schema, dispose every
+restricted/reference-only/unknown source, and agree the first S1 package's
+evidence, licence and commercial/publication use. Until that work closes,
+current B14/B15 output is `unknown` for project-control clearance and is not
+retroactively labelled unrestricted by this documentation change.
+
 ## Release-critical workflow coverage inventory
 
 This is the initial owner/coverage map. “Gap” means the behaviour must be
@@ -405,11 +444,11 @@ is known to be defective.
 | Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and plain-line timber decisions; focused failure/invalidation cases |
 | Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/plain-line coverage, input-class invalidation, late timing payload and redundant refresh defects |
 | Legacy approximate supported chair bodies | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage; five-box S1/S1J bodies are gap evidence, not the final procedural chair oracle |
-| Procedural chair definitions and exact components | Templot5 556b source audit plus the accepted architecture requirement | None yet | Reproducible Templot S1 component/assembly oracle, complete source-value/transform map, package schema, comparison metrics and tolerances |
-| Assisted chair assimilation | Accepted RC scope; no implementation oracle yet | One S1 pilot to be selected | Precise prototype designation, evidence provenance/rights, calibrated scan/CAD/measurement set, component landmarks, fit-residual policy and acceptance recipe |
+| Procedural chair definitions and exact components | Templot5 556b source audit plus the accepted architecture and licensing boundaries | None yet | Reproducible local Templot S1 comparison oracle, complete source-value/transform/classification map, neutral package schema, rights-compatible primary evidence, package licence, comparison metrics and tolerances |
+| Assisted chair assimilation | Accepted RC scope; no implementation oracle yet | One S1 pilot to be selected | Precise prototype designation, evidence provenance/rights, intended commercial/publication use, calibrated scan/CAD/measurement set, component landmarks, fit-residual policy, package licence and acceptance recipe |
 | Host integration | Controlled crossover acceptance | `XO-001` stage 6 | Standalone turnout, removal/reversal, rollback and legacy-document variants |
 | Save/reopen | B15 crossover acceptance and B14 plain-line edit-lifecycle oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Broader entity families and future schema migration |
-| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback and future deferred exact-shape reconstruction |
+| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback, future deferred exact-shape reconstruction, output-affecting lineage map and dependency/clearance manifest |
 | Failure recovery | Transactional source paths, strict bridge dialog policy, plain-line edit lifecycle and both export fault injections | Edit oracle proves zero-angle rejection/post-removal abort and bounds B14's three-entry incomplete Undo states; selected export proves byte restoration; create-time export freezes the current 13-file partial result and unchanged document | Make successor edit commands and create-time output atomic under accepted contracts; add equivalent fixtures for other release-critical workflows |
 
 Existing crossover evidence remains owned by
@@ -724,8 +763,9 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-19 | Use plain line/plain-line for track without S&C | Accepted; official UK railway usage replaces the project category “ordinary track”; B14/B15 and historical evidence identifiers remain unchanged, new APIs will use `plain_line`, and macro/component wording is separately gated in [TERMINOLOGY.md](TERMINOLOGY.md) |
 | 2026-07-19 | Extend the fixed plain-line edit oracle through undo/redo and exact change-back | Accepted for Phase 1 evidence; every intermediate B14 state is frozen, but its three-entry geometry/schedule/report stack is a bounded legacy defect and the successor must make one accepted command one atomic undo unit |
 | 2026-07-19 | Select the first extraction now | Deferred; transition solving leads on structural coupling, but workflow oracles, boundary contracts and representative profiles are not yet complete |
-| 2026-07-20 | Follow Templot's procedural constituent method for production chair geometry | Accepted; full-size definitions and named parts are canonical, while FreeCAD B-reps may replace DXF `3DFACE` mechanics only under geometric oracle evidence; B15's five-box body remains legacy gap evidence |
+| 2026-07-20 | Use a source-informed procedural constituent pattern through a neutral project definition | Accepted; full-size definitions and named parts are canonical, Templot source/media is not canonical data, and FreeCAD B-reps may replace DXF `3DFACE` mechanics only under geometric oracle evidence; B15's five-box body remains legacy gap evidence |
 | 2026-07-20 | Add reusable chair-definition packages and one assisted S1 assimilation pilot to RC scope | Accepted; scans/CAD/drawings/measurements fit the same definition used by native chairs, source evidence is not runtime truth, and arbitrary fully automatic conversion remains post-RC research |
+| 2026-07-20 | Adopt explicit source/data/output licensing boundaries | Accepted; GPL source compliance is separated from engineering facts, Templot reference data/media and generated-output dependencies; neutral chair data and a one-way optional Templot adapter are required, CC0-1.0 is only a reviewed per-package target, and ordinary output receives no project NC restriction merely by generation |
 | 2026-07-20 | Use B14's controlled connected pair as the first straight/station workflow oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes route/station direction, stable identities, exact inherited joins, length editing, full history recovery, raw persistence and production catalogue without changing either macro; independent-datum GUI, physical station/platform and target-file export remain separate gaps |
 
 ## Remaining Phase 1 work
@@ -741,14 +781,18 @@ create-time series covers fresh legacy exact-shape construction only.
   fixture.
 - Record candidate boundary schemas, units, frames, tolerances, identities,
   ordering, signatures and invalidation inputs.
+- Complete the output-affecting lineage audit for constants, tables, profiles,
+  rules, embedded assets and boilerplate; classify Templot-only and third-party
+  dependencies, and define the machine-readable package/output
+  dependency-clearance manifest.
 - Complete the Templot chair-generation data-flow/value/transform map; produce
   or define the reproducible recipe for a frozen S1 constituent/assembly oracle
   and record any unavailable evidence without substituting the B15 box body.
 - Specify the versioned chair-definition package and assisted-assimilation
   boundary, including provenance and corrupt/unsupported-package behaviour;
-  confirm the pilot's precise prototype designation, source evidence,
-  component landmarks, rail section, fit metrics and tolerances with the
-  project owner.
+  confirm the pilot's precise prototype designation, rights-compatible primary
+  evidence, package licence, commercial/publication use, component landmarks,
+  rail section, fit metrics and tolerances with the project owner.
 - Reconcile instrumentation and profile the proposed lightweight routine
   editing path and complete Validate/Export path without double-counting or
   treating the current exact-shape replacement measurement as its budget.

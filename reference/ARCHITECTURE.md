@@ -15,7 +15,7 @@ The next phase is architectural rather than another feature layer. It must reduc
 The system will separate the authoritative parametric model from its interactive display and its production geometry.
 
 ```text
-Parametric railway model + versioned chair definitions
+Parametric railway model + provenance-classified chair definitions
         |
         +--> analytical results and validation findings
         |
@@ -44,6 +44,11 @@ Exact geometry is permitted at an explicit **Validate** or **Export** boundary. 
    explicit constituent parts are authoritative. A scan, mesh, CAD body, or
    generated FreeCAD shape is reference evidence or derived output, never a
    substitute for an accepted parametric chair definition.
+10. **Rights provenance travels with data.** Software-source licensing,
+    engineering methods, factual dimensions, measured evidence, external
+    assets, Templot reference material, and generated output remain explicitly
+    classified under [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). A
+    validation oracle is not silently promoted into canonical production data.
 
 ## Target layers
 
@@ -56,7 +61,8 @@ The domain layer represents:
 - turnouts, crossover relationships and topology;
 - rails, timbers, chair assignments, supports and stable identities;
 - versioned chair-family definitions, constituent components, rail interfaces,
-  manufacturing variants and source provenance;
+  manufacturing variants, field/component provenance classifications, and
+  package/output rights metadata;
 - configuration, tolerances and production intent.
 
 It should use Python data and deterministic calculations without depending on a FreeCAD document or GUI. FreeCAD vectors may be adapted at the boundary rather than used as persistent domain state.
@@ -127,16 +133,20 @@ The export layer keeps the existing safety model:
 2. Confirm analysis and exact-validation signatures are current.
 3. Generate only target-specific transient geometry.
 4. Write into a hidden staging location.
-5. Validate bounds, scale, topology and manifest entries.
+5. Validate bounds, scale, topology, manifest entries, and recorded
+   output-affecting package/rights dependencies.
 6. Commit the complete output set atomically.
 7. Roll back failures and clean transient geometry.
 
 ## Chair-definition and procedural-geometry contract
 
-Production chair geometry will follow the procedural construction model found
-in the accepted Templot5 revision 556b source evidence. This is a method and
-output contract, not a requirement to reproduce Pascal control flow or emit
-Templot's low-level DXF `3DFACE` records internally.
+Production chair geometry will use a neutral TrackTemplateMacro definition and
+a procedural constituent construction pattern. That pattern is explicitly
+source-informed by the accepted Templot5 revision 556b evidence, but the
+canonical schema is not a Templot data format. Source-informed architecture
+does not authorise unrecorded copying of Templot tables, profiles, media output,
+or expressive Pascal control flow, and it does not require the exact adapter to
+emit Templot's low-level DXF `3DFACE` records internally.
 
 The canonical chair definition must:
 
@@ -151,17 +161,22 @@ The canonical chair definition must:
 - separate prototype geometry and rail-fit intent from model scale, printer or
   material compensation, clearances and other manufacturing variants;
 - carry a version, stable component identities, supported rail-interface data,
-  provenance, source-file hashes, assumptions, tolerances and validation state;
+  field/component classifications from
+  [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md), source-file hashes,
+  licence or `NOASSERTION` state, permitted output/redistribution use,
+  assumptions, tolerances and validation state;
   and
 - be serialisable and usable by domain tests without importing FreeCAD or Qt.
 
 The exact adapter consumes an accepted chair definition, constructs its named
 components, and assembles reusable prototypes by deterministic transforms at
 calculated rail/timber positions. FreeCAD/OpenCASCADE B-reps and solids are the
-preferred exact representation. They may improve on Templot's output mechanism,
-but not replace its parameterised component model with hand-drawn bodies,
-rectangular envelopes, or an imported mesh. Tessellation is an export concern
-for formats such as STL, not canonical chair state.
+preferred exact representation. They may differ from the upstream output
+mechanism, but not replace the accepted parameterised component model with
+hand-drawn bodies, rectangular envelopes, or an imported mesh. Tessellation is
+an export concern for formats such as STL, not canonical chair state. A local
+Templot comparison oracle may validate geometry; it does not become a runtime
+or distributable package dependency.
 
 The current B15 S1/S1J five-box body is retained only as accepted legacy
 behaviour and gap evidence. It is not the production chair-definition schema,
@@ -174,8 +189,8 @@ definition used by native definitions; it does not create a second geometry
 system. A source may be a calibrated scan mesh, a componentised CAD model,
 prototype drawings, direct measurements, or a combination. The boundary must:
 
-1. record provenance, licence/usage status, file hashes, units, scale and
-   coordinate frame before fitting;
+1. record provenance classification, licence/usage/output/redistribution
+   status, file hashes, units, scale and coordinate frame before fitting;
 2. align and calibrate the evidence using declared datums and measurements;
 3. identify or ask the operator to identify constituent parts and rail-fit
    landmarks;
@@ -191,6 +206,43 @@ component boundaries or manufacturing fits. The supported workflow is therefore
 assisted and evidence-led. Fully automatic conversion of an arbitrary 3D scan
 into a production-ready parametric chair remains research unless later evidence
 and a separately accepted scope promote it.
+
+### Templot compatibility and rights boundary
+
+The canonical interchange is the neutral `ChairDefinition`, not “Templot
+data”. If Templot compatibility is later implemented, it is an optional outward
+adapter:
+
+```text
+rights-cleared evidence
+          |
+          v
+neutral ChairDefinition ----> TrackTemplate exact/export adapters
+          |
+          `------------------> optional Templot-format adapter
+```
+
+The adapter may serialise an accepted neutral definition into a documented
+Templot format. It cannot make a Templot file the canonical project state,
+import Templot media or opaque generated geometry as an authoritative chair,
+or feed upstream values back into a definition without a new provenance and
+rights review. Templot comparison artifacts remain local reference evidence
+unless their exact licence permits redistribution.
+
+An outward conversion does not change the recorded origin or ownership of the
+neutral data. If the same rights-cleared package is contributed to Templot, a
+notice later added by Templot to Templot-generated media does not automatically
+become a notice on separate TrackTemplateMacro output generated directly from
+the original package.
+
+Generated-output rights follow the actual user inputs, definition packages,
+and protected material embedded in the output. The project does not assert
+control over ordinary output merely because its GPL program generated it, and
+it cannot grant rights held by others. Production manifests must expose package
+identities, licences, restricted/reference-only/unknown dependencies, and the
+project-control clearance status defined in
+[LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). Current B14/B15 output is
+not retroactively rights-cleared by adopting this architecture.
 
 ## Operating modes
 
@@ -217,6 +269,8 @@ and a separately accepted scope promote it.
 
 - Current validation is required for the requested production scope.
 - Target-specific geometry is built, staged, verified, committed, and disposed.
+- The manifest records the canonical/package identities and known
+  output-affecting rights dependencies used for the export.
 - Export does not silently change the editable model.
 
 ## Non-negotiable invariants
@@ -228,6 +282,14 @@ and a separately accepted scope promote it.
   the original scan/CAD file or a retained FreeCAD shape.
 - Chair constituent identities, rail-fit interfaces and prototype/manufacturing
   separation cannot be discarded during import, display or export.
+- Engineering facts and project measurements cannot be replaced by a Templot
+  comparison as their claimed primary source, and systematically copied
+  upstream tables cannot be relabelled as isolated facts.
+- Templot reference data/media and unresolved third-party evidence cannot enter
+  a rights-cleared production definition.
+- A package or output cannot be labelled `rights-cleared` while an
+  output-affecting dependency is `restricted`, `reference-only`, `unknown`, or
+  `NOASSERTION` for the intended use.
 - Cache reuse must be invalidated by every input that can affect its result.
 - A lightweight preview is never evidence that exact production validation passed.
 - One accepted application command is one atomic undo unit; its related
@@ -258,6 +320,8 @@ Every migrated slice requires:
 - exact geometry or export equivalence for its production scope;
 - cold- and warm-cache tests;
 - failure and rollback tests where document/export state changes;
+- provenance/dependency-manifest checks where source data or protected material
+  can affect production output;
 - a real FreeCAD GUI exercise for affected display and editing behaviour.
 
 See [VALIDATION.md](VALIDATION.md).
@@ -291,11 +355,13 @@ The following require prototypes or user decisions and are not settled by this d
 - temporary-document lifecycle for exact geometry;
 - single macro, generated macro bundle, or installable workbench distribution;
 - numerical performance budgets and representative benchmark documents;
-- migration/version policy for existing FreeCAD documents.
+- migration/version policy for existing FreeCAD documents;
 - chair-definition package schema, exact source-value representation and
-  internal canonical units;
+  internal canonical units, including machine-readable provenance and output
+  dependency fields;
 - accepted evidence, fit metrics and tolerances for the first S1 assimilation
-  pilot, including confirmation of its precise prototype designation; and
+  pilot, including confirmation of its precise prototype designation, rights
+  chain, intended package licence and commercial/publication use; and
 - optional scan/CAD readers and fitting tools, which must not become mandatory
   dependencies of the macro's normal runtime without approval.
 

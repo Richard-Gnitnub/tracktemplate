@@ -19,6 +19,10 @@ The documents have distinct responsibilities:
   compatibility policy for legacy identifiers.
 - [PROVENANCE.md](PROVENANCE.md) records reference-source identity, source
   relationship, redistribution and licensing status.
+- [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) defines the mandatory
+  source/data classifications, neutral chair-data boundary, collaboration
+  rules, package-licensing target, generated-output policy, and clearance
+  statuses.
 - [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md) owns the current workflow,
   dependency, side-effect, candidate and Phase 1 decision evidence.
 - This document owns delivery order, phase status, decision timing, and release-candidate gates.
@@ -33,12 +37,16 @@ The release candidate will provide the agreed curve/easement, station and multip
 - reusable domain calculations that import and run without FreeCAD or Qt;
 - a lightweight derived editing view with deterministic selection back to domain identities;
 - exact `Part` geometry generated only for explicit validation/export or requested retained production objects;
-- versioned, validated external chair-definition packages whose full-size
-  constituent geometry can be regenerated procedurally;
+- versioned, validated and provenance-classified external chair-definition
+  packages whose full-size constituent geometry can be regenerated
+  procedurally and whose intended output/redistribution use is explicit;
 - one evidence-led, operator-assisted S1 chair assimilation pilot using the
   same definition and geometry path as native chair definitions;
 - compact, versioned FreeCAD persistence with tested save/reopen and supported legacy migration;
 - deterministic, transactional exports and manifests;
+- machine-readable output dependency/clearance records that distinguish user
+  design, engineering facts, project measurements, package data, restricted
+  material, and local comparison oracles;
 - a small launcher/composition root and one authoritative modular implementation;
 - reproducible installation or distribution artifacts, validation evidence, user documentation, and measured performance budgets;
 - no known release-blocking correctness, data-loss, migration, or production-export defect in the supported scope.
@@ -47,10 +55,13 @@ Release-candidate scope is based on the accepted B15 behavioural reference,
 with B14 retained as the immutable legacy comparison oracle. On 2026-07-20 the
 project owner explicitly expanded that scope to include the chair-definition
 package, procedural chair generator and assisted S1 pilot above. The production
-generator must follow Templot's full-size, parameterised, constituent-part
-method; FreeCAD/OpenCASCADE solids may replace Templot's low-level DXF face
-implementation only when the agreed geometric oracle passes. The existing B15
-five-box S1/S1J body remains legacy gap evidence, not the final chair model.
+generator must use the accepted full-size, parameterised, constituent-part
+pattern through a neutral TrackTemplateMacro definition. That pattern is
+Templot-source-informed, but neither a Templot schema nor Templot media output
+is canonical project data. FreeCAD/OpenCASCADE solids may replace Templot's
+low-level DXF face implementation only when the agreed geometric oracle passes.
+The existing B15 five-box S1/S1J body remains legacy gap evidence, not the final
+chair model.
 
 Fully automatic conversion of an arbitrary scan or CAD body into an accepted
 procedural chair is outside this release candidate. It remains post-RC research
@@ -160,6 +171,21 @@ Choose migration order from evidence and establish oracles for behaviour that cu
 - Establish canonical railway terminology before naming modular interfaces;
   preserve historical evidence identifiers and separately gate any accepted
   macro wording correction.
+- Complete the output-affecting lineage audit defined in
+  [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md): inventory and classify
+  every table, profile, constant, rule, asset and boilerplate element that can
+  materially affect SVG, DXF, STL, STEP, retained FreeCAD objects, reports,
+  manifests or images. Keep GPL source-expression compliance separate from the
+  rights basis of generated data and media.
+- Identify every release-candidate value collection supported only by Templot
+  source, a Templot-authored table/profile, or Templot media output. Establish
+  an accepted engineering, measurement or separately licensed evidence chain,
+  or retain it as `restricted`, `reference-only` or `unknown`; do not launder a
+  copied table into nominally independent facts.
+- Define the neutral `ChairDefinition` as the only canonical interchange and
+  bound any later Templot compatibility work to an optional one-way outward
+  adapter. Define the machine-readable package/output dependency manifest and
+  its `rights-cleared`, `restricted`, `reference-only` and `unknown` statuses.
 - Audit the Templot5 revision 556b chair-generation route from full-size 2D/3D
   data through constituent component builders, reusable block placement and
   DXF/STL emission. Record relevant routines, units, transforms, manufacturing
@@ -175,9 +201,11 @@ Choose migration order from evidence and establish oracles for behaviour that cu
   and units, profiles/cross-sections, rail interfaces, prototype versus
   manufacturing parameters, provenance, tolerances, fit residuals and
   acceptance state.
-- Confirm the precise prototype designation, evidence ownership and minimum
+- Confirm the precise prototype designation, evidence ownership, rights chain,
+  intended package licence, commercial/publication use, and minimum
   scan/CAD/measurement inputs for the S1 pilot before naming or implementing
-  its reusable definition.
+  its reusable definition. CC0-1.0 is the default target only for a package
+  whose complete rights record permits the project to make that dedication.
 
 Chair analysis/presentation is a strong candidate because B15 already has focused checks. Curve/easement calculation is strategically foundational and may be purer. Neither is selected until this inventory exposes its real coupling.
 
@@ -242,6 +270,16 @@ plus one procedural generator, not refinement of the box approximation or
 retention of an imported scan as runtime geometry. The detailed audit and
 decision are recorded in [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md).
 
+The 2026-07-20 licensing-boundary review now records the Templot5 drawing
+notice, distinguishes historical Templot2 and forum-media terms from the
+reviewed GPL source snapshot, and finds no general CC BY-NC-SA output licence
+in revision 556b. The owner accepted the neutral data, one-way compatibility,
+package-licence and generated-output policy in
+[LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). This resolves the policy
+direction, not the field-by-field audit: current B14/B15 output remains
+`unknown` for project-control clearance until the lineage and dependency
+manifest deliverables above are completed.
+
 Canonical **plain line** terminology and the compatibility treatment of the
 legacy `ordinary-*` evidence identifiers are now recorded in
 [TERMINOLOGY.md](TERMINOLOGY.md). B14/B15 remain byte-identical; user-facing
@@ -256,6 +294,13 @@ macro wording is deferred to an approved successor version.
 - The Templot chair-generation map, B15 gap statement, proposed S1 oracle
   recipe and chair-definition/assimilation boundary requirements are reviewed;
   any missing source or measurement evidence has a named owner and gate.
+- The current output-affecting source/data map is classified at the smallest
+  practical field/component granularity; every Templot-only, restricted,
+  reference-only, unknown or `NOASSERTION` dependency has a named disposition
+  and cannot be mistaken for a rights-cleared production input.
+- The neutral chair-definition boundary, optional one-way Templot adapter,
+  package-licence rule, dependency-manifest schema and first S1 evidence/rights
+  plan are reviewed and accepted.
 - RC chair scope is bounded to validated definition packages and one assisted
   S1 pilot; arbitrary automatic scan conversion is not an implicit exit
   requirement.
@@ -325,7 +370,10 @@ Make parametric railway intent—not preview or exact shape data—the durable s
   production chair builder depends on it. It must cover constituent components,
   source values/units, rail interfaces, procedural profiles, prototype and
   manufacturing variants, provenance, tolerances, validation state and stable
-  package/component identities without embedding `Part` shapes or meshes.
+  package/component identities without embedding `Part` shapes or meshes. Its
+  schema must carry the field/component classifications, licence or
+  `NOASSERTION` state, intended output/redistribution use and acceptance record
+  required by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 - Define versioned serialisation and migration rules for persisted payloads and FreeCAD properties.
 - Centralise complete analysis, preview, validation, and export signatures and dirty-state propagation.
 - Implement FreeCAD transactions, undo/redo intent, save/reopen, failure recovery, and stale-result rejection at the adapter boundary.
@@ -377,6 +425,9 @@ Prove that exact geometry can be deferred without reducing production validation
 - Build only required exact geometry in a temporary/isolated scope and guarantee cleanup on success, cancellation, and failure.
 - Refuse export when the applicable exact validation is absent or stale.
 - Exercise transactional staging, scale/bounds/topology checks, manifests, overwrite handling, commit, and rollback.
+- Generate and validate the output-dependency record without describing an
+  export as `rights-cleared` when an output-affecting package or material is
+  restricted, reference-only, unknown, or `NOASSERTION` for the intended use.
 - Compare legacy/new exact bounds, lengths, profiles, topology, solids/meshes, identifiers, filenames, categories, and manifests as applicable.
 - Measure edit-only and edit-through-export workflows, including transient construction and cleanup costs.
 - Allow direct SVG/DXF generation from canonical 2D records only where equivalence and production checks are proven.
@@ -449,24 +500,34 @@ output family from canonical records.
 ### Deliverables
 
 - Complete chair/support analysis, assignment, representation, stable identities, and cache invalidation across migrated trackwork.
-- Implement one definition-driven procedural chair generator following the
-  Templot constituent-part method: full-size source dimensions and explicit
-  profiles/cross-sections produce named base/plinth, seat, jaw, rib, fillet,
-  key and applicable fastening/interface components; reusable prototypes are
-  then transformed into calculated track positions.
+- Implement one definition-driven procedural chair generator using the
+  accepted source-informed constituent pattern through the neutral project
+  schema: full-size source dimensions and explicit profiles/cross-sections
+  produce named base/plinth, seat, jaw, rib, fillet, key and applicable
+  fastening/interface components; reusable prototypes are then transformed
+  into calculated track positions.
 - Permit FreeCAD/OpenCASCADE B-rep construction in place of Templot's DXF
   `3DFACE` mechanics, while proving agreed dimensional, component, interface,
   topology and assembled-output equivalence against the frozen S1 oracle.
 - Load, validate and version external chair-definition packages without making
   their source scan/CAD files or any third-party fitting tool a normal runtime
   dependency.
+- Build the release-candidate S1 definition only from accepted engineering
+  facts, project measurements, project derivations, or separately licensed
+  evidence whose commercial/publication and redistribution use is explicit.
+  Keep Templot reference data and media outside the canonical package; use a
+  frozen Templot S1 artifact only as a local comparison oracle unless its exact
+  redistribution terms are separately accepted.
 - Deliver one operator-assisted S1 assimilation pilot. Record source
   calibration, component/landmark decisions, inferred and unresolved values,
-  regenerated-versus-source residuals, rail fit, provenance and explicit
+  regenerated-versus-source residuals, rail fit, field/component
+  classifications, licences, intended output use, provenance and explicit
   acceptance. Use the same generator and package schema as native definitions.
 - Keep full-size prototype geometry separate from model scale, rail-fit policy
   and printer/material compensation, and test their signatures independently.
-- Complete production-record planning and deterministic category/manifest generation.
+- Complete production-record planning and deterministic category/manifest
+  generation, including machine-readable package and output-affecting rights
+  dependencies.
 - Validate supported SVG, DXF, STL, STEP, and retained-FreeCAD-object paths, limited to the formats confirmed in Phase 1 scope.
 - Exercise scale, planarity, bounds, solid/mesh validity, filename collisions, overwrite policy, staging, rollback, cancellation, and cleanup.
 - Replace any remaining per-element persistent display or production objects with accepted layered presentation or transient construction.
@@ -489,6 +550,14 @@ If chair analysis/presentation was the Phase 3 proof slice, this phase completes
   regenerated-versus-reference tolerances pass in standalone and FreeCAD tests.
 - The assisted S1 pilot is documented and accepted; arbitrary automatic scan
   assimilation remains explicitly outside the RC qualification matrix.
+- The accepted S1 package has an explicit licence and no `NC`, `NOASSERTION`,
+  reference-only, unknown, or otherwise incompatible dependency in the
+  rights-cleared commercial/publication path. Any raw evidence that cannot be
+  redistributed remains separate and its permitted fitting/use basis is
+  recorded.
+- Representative output manifests reproduce the complete package/dependency
+  classification and cannot claim `rights-cleared` after any relevant input is
+  replaced by a restricted or unresolved source.
 - Export failure cannot partially replace an accepted output set or corrupt the editable model.
 - Editing and end-to-end performance meet the provisional budgets derived from measured baselines.
 
@@ -508,8 +577,9 @@ Turn the migrated capabilities into one maintainable, installable, feature-compl
 - Complete supported legacy-document migration, diagnostics, and recovery guidance.
 - Add installation, upgrade, workflow, Validate/Export, troubleshooting, and known-limitation documentation.
 - Document chair-definition package authoring/loading, the assisted S1
-  assimilation workflow, evidence/provenance requirements and the boundary
-  between the RC capability and post-RC automatic-conversion research.
+  assimilation workflow, evidence/provenance requirements, per-package licence,
+  output-dependency/clearance interpretation, and the boundary between the RC
+  capability and post-RC automatic-conversion research.
 - Freeze release-candidate feature scope and public schema/API surfaces at beta exit.
 
 ### Exit gate
@@ -536,6 +606,10 @@ Produce a reproducible RC1 artifact whose remaining risks are known and acceptab
 - Qualify the accepted external chair-definition package and S1 assimilation
   fixture from a clean installation without access to development-only source
   evidence or retained generated shapes.
+- Re-run the production-data/output-lineage audit against the frozen artifact;
+  verify package licences, dependency manifests, embedded notices, and the
+  absence of unresolved or non-commercial material from every path advertised
+  as rights-cleared for commercial/publication use.
 - Resolve all release-blocking defects and explicitly disposition lower-severity known limitations.
 - Finalise version assignments, change log, installation/upgrade notes, licences/notices, artifact contents, and checksums.
 - Build the artifact twice from the same source and verify reproducibility or document any unavoidable environment-specific difference.
@@ -566,14 +640,20 @@ Every migrated capability, including those inside the larger Phase 7–9 waves, 
 7. applicable headless FreeCAD, GUI, save/reopen, exact-output, and rollback evidence;
 8. cold/warm performance evidence for affected operator paths;
 9. a recorded owner and removal gate for every temporary compatibility path;
-10. user acceptance before behaviourally significant legacy code is retired.
+10. a recorded classification and output-dependency disposition for every new
+    or changed source value, package, fixture, or asset that can affect
+    production output; and
+11. user acceptance before behaviourally significant legacy code is retired.
 
 For a chair-definition or chair-generator slice, definition-package
 round-trip, constituent identity, prototype/manufacturing separation,
 procedural regeneration, rail-fit and reference/residual evidence are also
 mandatory. Legacy equality still applies to preserved chair assignment,
 analysis, editing, persistence and export behaviour; it does not require the
-accepted procedural geometry to reproduce B15's approximate box body.
+accepted procedural geometry to reproduce B15's approximate box body. A chair
+slice cannot be accepted for the rights-cleared production path until its
+package licence and field/component provenance pass
+[LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 
 ## Scheduled decision gates
 
@@ -581,8 +661,9 @@ accepted procedural geometry to reproduce B15's approximate box body.
 | --- | --- | --- |
 | B14/B15 behavioural reference and checkpoint tag | Resolved at Phase 0 exit — B15 accepted; B14 retained as immutable oracle; `phase-0-closeout` tag | Validation plus representative GUI comparison |
 | Reference ZIP commit/provenance policy | Resolved at Phase 0 exit — exact SourceForge origin recorded; ZIP ignored and untracked | Owner decision, upstream GPLv3 statement and checksum |
+| Source/data/output classification policy | Resolved 2026-07-20 — neutral canonical data, one-way optional Templot adapter, package-specific licensing and no automatic project claim over ordinary output | Archive/output-notice review, GPL/CC scope review, `LICENSING_BOUNDARIES.md`, and owner acceptance |
 | Chair geometry method and RC scope | Resolved 2026-07-20 — full-size procedural constituent generation, validated external packages and one assisted S1 pilot; arbitrary automatic conversion remains post-RC research | Templot source audit and project-owner acceptance |
-| Chair-definition boundary requirements and S1 oracle recipe | Phase 1 exit | Source/data-flow map, B15 gap analysis, provenance, pilot evidence and proposed comparison metrics |
+| Current output lineage, dependency manifest and first S1 package rights plan | Phase 1 exit | Field/component classification, Templot-only disposition, manifest schema, B15 gap analysis, pilot evidence/licence, intended commercial/publication use and comparison metrics |
 | Representative fixtures and first extraction slice | Phase 1 exit | Coverage, coupling, side-effect, and profile inventory |
 | Supported FreeCAD/Python and legacy document window | Phase 1/4 | Environment evidence and migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |
@@ -601,6 +682,9 @@ accepted procedural geometry to reproduce B15's approximate box body.
 | A scan cannot reveal nominal, hidden, worn or rail-fit geometry | Require measurements/drawings and operator landmarks, preserve unresolved findings, and reject unsupported confidence rather than inventing dimensions |
 | Chair assimilation introduces heavy or proprietary normal-runtime dependencies | Isolate optional readers/fitting tools at adapters, approve dependencies separately, and keep definition loading/generation usable without the original tool |
 | Imported chair evidence has unclear ownership or licence | Require per-package provenance, hashes and usage/redistribution status before inclusion or publication |
+| Templot source licensing is conflated with a blanket licence on all generated output | Keep GPL source compliance, data/database provenance, media notices and output dependencies separate under `LICENSING_BOUNDARIES.md`; do not infer CC BY-NC-SA from the reviewed snapshot |
+| A systematically copied table or profile is relabelled as isolated engineering facts | Require field/component provenance and an accepted independent engineering, measurement or separately licensed evidence chain before canonical admission |
+| A non-commercial, unknown or reference-only chair dependency reaches a path advertised for magazine/commercial use | Propagate dependency status into manifests and prohibit `rights-cleared` qualification until the dependency is replaced or separately permitted |
 | Duplicate definitions and runtime patches hide live callers | Inventory captured aliases and patch order; remove only after retained-reference audits |
 | Modularisation increases files without reducing runtime cost | Treat source boundaries and representation/performance changes as separate measured outcomes |
 | Lightweight editing loses expected FreeCAD behaviour | Prototype selection, handles, visibility, undo/redo, save/reopen, and GUI use before choosing a renderer |
