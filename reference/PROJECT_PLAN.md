@@ -226,10 +226,17 @@ module-side effects and mutable-state candidates for the exact B14/B15 source
 hashes. It shows that the bounded transition-length solver has the lowest
 structural coupling, while the better-tested chair core crosses substantial
 shadowing and alias chains. Direct B14/B15 transition and station
-characterisation now protects the leading calculation boundary. This is not
-yet a slice decision: end-to-end workflow oracles, boundary contracts,
-product-pipeline profiles and the remaining Phase 1 user decisions are still
-open. The fixed B14 plain-line curve/two-track fixture now also has a read-only
+characterisation now protects the leading calculation boundary. A
+machine-readable candidate-boundary register now freezes inputs, outputs,
+units, frames, tolerances, identities, ordering, schemas, effects and
+signature/invalidation rules for all five static candidates. Its fail-closed
+test derives the station and chair record schemas from the exact B14/B15 ASTs
+and keeps selection open. Transition solving remains only the structural
+leader; stationing still needs an explicit point-adapter seam, while chair
+analysis retains alias coupling and known cache-signature gaps. This is not
+yet a slice decision: broader workflow boundaries, product-pipeline profiles
+and the remaining Phase 1 user decisions are still open. The fixed B14
+plain-line curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,
 grouping, ordered production catalogue and exact-shape summaries. This closes
 the fixed create-result characterisation gap. A second isolated recipe now

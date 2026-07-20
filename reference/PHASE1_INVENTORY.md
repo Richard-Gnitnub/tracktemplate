@@ -54,6 +54,8 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | First-S1/core lineage contract | `tests/validate_phase1_s1_lineage.py`; verifies register semantics, B14/B15 source anchors, the optional local archive hashes and the unresolved S1 manifest link |
 | Other-S&C/legacy lineage register | `reference/lineage/phase1-other-snc-legacy-lineage.json`, schema 1; 24 bounded output-affecting groups, 14 `reference-only` and 10 `unknown`, with both scopes visibly `blocked` |
 | Other-S&C/legacy lineage contract | `tests/validate_phase1_other_snc_legacy_lineage.py`; verifies the two remaining scopes, exact B14/B15 anchors, optional local evidence hashes, all-four-scope coverage and absent current output manifests |
+| Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 1; exact current contracts for all five static first-slice candidates with selection still open |
+| Candidate boundary contract | `tests/validate_phase1_candidate_boundaries.py`; verifies source/AST anchors, structural facts, transition/station schemas, chair record schemas, cache-signature inputs and fail-closed non-selection |
 | Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
 | Production-source changes in this tranche | None |
 
@@ -917,33 +919,45 @@ standalone timber/chair stages, target-file export and deferred reconstruction
 remain open. Full evidence and limitations are in
 [benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md](benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
 
-## Boundary-data inventory still required
+## Candidate boundary-data contract
 
-The fixed plain-line, connected-straight and standalone-turnout oracles now
-record the first concrete subsets: length/angle units, global document,
-travel-order station and host-chainage frames, template-set/track/route/
-turnout/record identities, exact join tolerances, object and production-record
-ordering, persisted property/raw JSON schemas and volatile-field
-normalisation. Before selecting the slice, Phase 1 must still record the exact
-contract for every candidate rather than infer it from variable names:
+The five candidates emitted by the static inventory now have an exact,
+machine-readable current-state contract in
+[contracts/phase1-candidate-boundaries.json](contracts/phase1-candidate-boundaries.json).
+It records inputs, outputs, units, frames, tolerances, identity and ordering
+rules, side effects, errors, schemas, cache/signature behaviour, current
+oracles, structural facts and open extraction gates for:
 
-- model and output units, including every degrees/radians and model/real-scale
-  conversion;
-- global XY, local alignment, turnout-local and host-chainage coordinate frames;
-- geometric, station, topology, fit and export tolerances;
-- stable entity, path, rail, timber, chair, production-record and document
-  identities;
-- chair-definition/package versions, constituent identities, exact source
-  values and units, procedural profiles/cross-sections, local datums,
-  rail-interface contracts, prototype/manufacturing separation, provenance,
-  residual metrics and acceptance state;
-- deterministic ordering rules and JSON/property/manifest schemas;
-- complete analysis, support, layout, exact-solid and export signatures; and
-- every relevant input class, cache reuse rule and invalidation/change-back
-  case.
+- the comparison-only curve/easement/station aggregate;
+- the transition-length solver;
+- the cumulative alignment-station index;
+- alignment-station interpolation; and
+- the chair-analysis core and its surrounding application cache boundary.
 
-The static tool identifies where these values are used. It does not establish
-their semantic contract.
+The fail-closed validator ties those statements to both complete macro
+fingerprints, 30 literal/function anchors and the live AST inventory. It also
+derives the seven-field station schema and the current chair settings, rail,
+timber, position, finding, support-plan, summary, result and signature payload
+schemas directly from source. It records rather than hides the one anchored
+B14/B15 difference in the first chair application wrapper.
+
+The evidence makes the trade-off clearer. The transition-length solver remains
+the structural leader: one direct caller, a three-definition platform-free
+closure and a direct numerical oracle. This is not selection authority. The
+station index has high fan-out; interpolation still returns `App.Vector`; and
+the chair core has duplicate/alias coupling, non-deterministic timings,
+unvalidated mapping inputs and known signature omissions. In particular, its
+current cache signature excludes rail-face/source metadata and several timber
+support/source fields. Those omissions must be resolved or explicitly accepted
+before a migrated cache treats a matching signature as semantic equivalence.
+
+This closes the bounded **candidate boundary-recording** task. It does not
+complete the wider curve-to-export boundary inventory: production-file units,
+exact-solid/export signatures, chair-definition package and constituent
+schemas, and all workflow invalidation/change-back cases still belong to their
+own release-critical paths and gates. The static inventory remains a location
+map; the new register is the semantic current-state contract for only the five
+listed candidates.
 
 ## Performance inventory status
 
@@ -1004,6 +1018,7 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-20 | Define a fail-closed exact-556b S1 oracle capture contract | Implemented for Phase 1 evidence and owner review; the exact source/member route, isolated settings, local-only artifact policy and DXF/STL semantics are executable, while the installed 5.55a candidate is rejected and the oracle remains visibly blocked pending an exact 556b executable, frozen fixture, capture and review |
 | 2026-07-20 | Use B14's controlled connected pair as the first straight/station workflow oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes route/station direction, stable identities, exact inherited joins, length editing, full history recovery, raw persistence and production catalogue without changing either macro; independent-datum GUI, physical station/platform and target-file export remain separate gaps |
 | 2026-07-20 | Add a dedicated centreline-anchored standalone-turnout lifecycle oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes one left/facing REA C10 creation, handed edit, exact history/persistence, stable objects, ordered production records, occupied-chainage rejection and in-transaction abort without changing either macro; trailing/straight/alternate hosts, integration, downstream stages and export remain separate gaps |
+| 2026-07-20 | Record all five current candidate boundaries before selection | Implemented for Phase 1 evidence; the machine-readable register and fail-closed drift test freeze units, frames, tolerances, identities, ordering, schemas, effects and signature/invalidation behaviour without moving code, selecting a slice or clearing chair data |
 
 ## Remaining Phase 1 work
 
@@ -1017,8 +1032,11 @@ create-time series covers fresh legacy exact-shape construction only.
   an accepted atomic/UI contract, and extend the standalone-turnout fixture to
   trailing/straight/alternate-host inputs, removal/integration, downstream
   timber/chair stages and target-file export.
-- Record candidate boundary schemas, units, frames, tolerances, identities,
-  ordering, signatures and invalidation inputs.
+- Resolve or explicitly bound the candidate-specific gaps recorded in the new
+  boundary register, then obtain owner agreement before marking any first
+  slice selected. In particular, define the station point-adapter seam and
+  decide the chair signature omissions/hard-coded predicate tolerances if
+  either family remains under consideration.
 - Keep all four lineage scopes blocked until their named evidence and decision
   gates are resolved. The bounded other-S&C and legacy registers now exist;
   complete field-level lineage only for an exact advertised output before its
@@ -1026,7 +1044,7 @@ create-time series covers fresh legacy exact-shape construction only.
   machine-readable manifest, validator, non-copyright fields and contribution
   declaration now exist; wire their fail-closed `project-cleared` gate into
   the later package/export path.
-- Complete the remaining Templot chair-generation value/transform map and
+- Review the completed Templot 556b chair-generation value/transform map and
   execute the defined frozen-S1 capture recipe after an exact 556b executable
   and its build/acquisition evidence are available. Keep the exact fixture and
   DXF/STL artifacts local, record their hashes/settings, and do not substitute

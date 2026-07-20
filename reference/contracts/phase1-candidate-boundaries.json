@@ -1,0 +1,1132 @@
+{
+  "schema_version": 1,
+  "register_id": "tracktemplate:phase1:candidate-boundaries:1",
+  "recorded_on": "2026-07-20",
+  "status": "inventory-complete-selection-open",
+  "status_reason": "The five current first-slice candidates now have explicit legacy boundary contracts, but no extraction slice has been selected or authorised.",
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference"
+    }
+  },
+  "conventions": {
+    "scope": "Current B14/B15 calculation boundaries only; this register is not a successor API, geometry approval, licence clearance or phase-exit decision.",
+    "length_unit": "millimetres in the model coordinate system unless a field explicitly says otherwise",
+    "angle_unit": "radians unless a field name or entry explicitly says degrees",
+    "plan_frame": "FreeCAD document global XY with positive Z normal to the track-template plane",
+    "sequence_rule": "Arrays are ordered and order is semantic unless an entry states that it is sorted or set-like.",
+    "identity_rule": "Stable string identities are semantic; FreeCAD object names, object order and in-memory point identity are not substitutes.",
+    "status_rule": "Contract status describes inventory completeness only and must not use the project-control rights statuses defined in LICENSING_BOUNDARIES.md."
+  },
+  "source_anchors": [
+    {
+      "anchor_id": "function:clothoid-entry-displacement",
+      "kind": "function_ast",
+      "symbol": "clothoid_entry_displacement",
+      "occurrence": 1,
+      "b14_line": 7023,
+      "b15_line": 7023,
+      "ast_sha256": "4a65d8e73b51dbaca11073a2c32498bde220a1a0c519101d4de8309a7c897906"
+    },
+    {
+      "anchor_id": "function:transition-start-signed-offset",
+      "kind": "function_ast",
+      "symbol": "transition_start_signed_offset",
+      "occurrence": 1,
+      "b14_line": 7691,
+      "b15_line": 7691,
+      "ast_sha256": "3da5a18d36bd2be972798502c42a41eb7c445e284385ca6e27917fddfb319fed"
+    },
+    {
+      "anchor_id": "function:solve-transition-length",
+      "kind": "function_ast",
+      "symbol": "solve_transition_length",
+      "occurrence": 1,
+      "b14_line": 7700,
+      "b15_line": 7700,
+      "ast_sha256": "80e9bcf3f9d1a45e5736bb62b11d4d198e47e2d12113dfaa82c7b31036fd6068"
+    },
+    {
+      "anchor_id": "function:alignment-station-data",
+      "kind": "function_ast",
+      "symbol": "alignment_station_data",
+      "occurrence": 1,
+      "b14_line": 8473,
+      "b15_line": 8473,
+      "ast_sha256": "e4aa061f8129980b54398a453977f04a1ab0304b42ea50079a60de798e24fd9d"
+    },
+    {
+      "anchor_id": "function:interpolate-alignment-station",
+      "kind": "function_ast",
+      "symbol": "interpolate_alignment_station",
+      "occurrence": 1,
+      "b14_line": 8500,
+      "b15_line": 8500,
+      "ast_sha256": "fee1d3172bcf5f1439816f02d726c15149b96cc480a5bffe1bce994554f9bdc0"
+    },
+    {
+      "anchor_id": "function:vector-xy",
+      "kind": "function_ast",
+      "symbol": "vector_xy",
+      "occurrence": 1,
+      "b14_line": 6968,
+      "b15_line": 6968,
+      "ast_sha256": "1e705af015d1efac13f7c052edee0b07e67bebba17e8ce5e5a37fa44c52e0b1c"
+    },
+    {
+      "anchor_id": "function:chair-position-identity",
+      "kind": "function_ast",
+      "symbol": "_chair_position_identity",
+      "occurrence": 1,
+      "b14_line": 36404,
+      "b15_line": 36404,
+      "ast_sha256": "2338cb84b005b7074dde0f6e3b69f71a15134a8c71eed27599fcea63c0b40894"
+    },
+    {
+      "anchor_id": "function:chair-finding",
+      "kind": "function_ast",
+      "symbol": "_chair_finding",
+      "occurrence": 1,
+      "b14_line": 36512,
+      "b15_line": 36512,
+      "ast_sha256": "cc598ab1a7648b21ee95054d403dcdea2fa65e48c4eedad150f0139e60079ac4"
+    },
+    {
+      "anchor_id": "function:chair-geometry-signature",
+      "kind": "function_ast",
+      "symbol": "_chair_geometry_signature",
+      "occurrence": 1,
+      "b14_line": 36821,
+      "b15_line": 36821,
+      "ast_sha256": "a37340fe26e4c84f333ed578e05f0b2fe6b66893c4c9ecba908077e87b6009f5"
+    },
+    {
+      "anchor_id": "function:chair-invalidation-base",
+      "kind": "function_ast",
+      "symbol": "invalidate_chair_analysis",
+      "occurrence": 1,
+      "b14_line": 36984,
+      "b15_line": 36984,
+      "ast_sha256": "8a9e394707193c8db5ba2c5f5e9caa427027f2678e76f74ec3ea092c63b0125b"
+    },
+    {
+      "anchor_id": "function:chair-effective-status",
+      "kind": "function_ast",
+      "symbol": "chair_analysis_effective_status",
+      "occurrence": 1,
+      "b14_line": 37176,
+      "b15_line": 37176,
+      "ast_sha256": "082e10be1bdf817e3b335a7029730fda93639d3586ccbcd3cb7f015ba484e6d4"
+    },
+    {
+      "anchor_id": "function:chair-application-boundary",
+      "kind": "function_ast",
+      "symbol": "analyse_entity_chair_positions",
+      "occurrence": 1,
+      "b14_line": 37192,
+      "b15_line": 37192,
+      "ast_sha256": "9d920579e943c081f01bd5887183f375df926303d77030e7d1913999c2e1f55e",
+      "b15_ast_sha256": "81927f9eecf805f6eb11f0181277f5ab43173c25bbae08a98ac76e16900bfd46"
+    },
+    {
+      "anchor_id": "function:timber-record-from-layout",
+      "kind": "function_ast",
+      "symbol": "_timber_record_from_layout",
+      "occurrence": 1,
+      "b14_line": 30182,
+      "b15_line": 30182,
+      "ast_sha256": "dbd607858c4faaf4b18345511591da8f43954f979a55dbf215b314f59350dfd7"
+    },
+    {
+      "anchor_id": "function:chair-turnout-timber-records",
+      "kind": "function_ast",
+      "symbol": "_chair_turnout_timber_records",
+      "occurrence": 1,
+      "b14_line": 35801,
+      "b15_line": 35801,
+      "ast_sha256": "949e09b9638c4285403604d58c2b3354561fb6606e8f1d948a17680fdb15610f"
+    },
+    {
+      "anchor_id": "function:generate-chair-positions",
+      "kind": "function_ast",
+      "symbol": "generate_chair_positions",
+      "occurrence": 2,
+      "b14_line": 43458,
+      "b15_line": 43458,
+      "ast_sha256": "9cfcf37bfe0716b96ce89a3f43c4a3de88f7d64ffe3ef73af598917034ae7027"
+    },
+    {
+      "anchor_id": "function:chair-model-support-plan",
+      "kind": "function_ast",
+      "symbol": "_chair_model_support_plan",
+      "occurrence": 1,
+      "b14_line": 43593,
+      "b15_line": 43593,
+      "ast_sha256": "91c1b7b05e1bd52273978c379671cc9c6c78c1e22bc78fd2ea79762c7d0f91c5"
+    },
+    {
+      "anchor_id": "function:validate-chair-positions",
+      "kind": "function_ast",
+      "symbol": "validate_chair_positions",
+      "occurrence": 2,
+      "b14_line": 43640,
+      "b15_line": 43640,
+      "ast_sha256": "03d00671ddfc6f6c7651c97e11aceead9648e6e1dc20253c84f128619a72f8f6"
+    },
+    {
+      "anchor_id": "function:recount-chair-findings",
+      "kind": "function_ast",
+      "symbol": "_chair_recount_findings",
+      "occurrence": 1,
+      "b14_line": 43618,
+      "b15_line": 43618,
+      "ast_sha256": "133dfcaa757aa25c6e7d5d4eda435dfa0211e456350974b83fd5f0c35e630b8c"
+    },
+    {
+      "anchor_id": "function:analyse-chair-position-records",
+      "kind": "function_ast",
+      "symbol": "analyse_chair_position_records",
+      "occurrence": 2,
+      "b14_line": 43758,
+      "b15_line": 43758,
+      "ast_sha256": "34a57552898847145e11457ad6676cb3e6df474b7710ef9c58225d643aa77005"
+    },
+    {
+      "anchor_id": "function:default-chair-analysis-settings",
+      "kind": "function_ast",
+      "symbol": "default_chair_analysis_settings",
+      "occurrence": 3,
+      "b14_line": 44108,
+      "b15_line": 44108,
+      "ast_sha256": "eef3cd1a602656442ef74493bf60109e771ddd17cd2296832f259498955d26f0"
+    },
+    {
+      "anchor_id": "function:normalise-chair-analysis-settings",
+      "kind": "function_ast",
+      "symbol": "normalise_chair_analysis_settings",
+      "occurrence": 3,
+      "b14_line": 44136,
+      "b15_line": 44136,
+      "ast_sha256": "847994427b25028800173d7c61166aa966d98fe61df3cbbd1182775eb9588c35"
+    },
+    {
+      "anchor_id": "function:chair-turnout-rail-records",
+      "kind": "function_ast",
+      "symbol": "_chair_turnout_rail_records",
+      "occurrence": 2,
+      "b14_line": 44189,
+      "b15_line": 44189,
+      "ast_sha256": "0a7be9a432b31fa07181504339e94eb38f74ac11ebc65cd8ace7e3e16033692d"
+    },
+    {
+      "anchor_id": "function:chair-connector-rail-records",
+      "kind": "function_ast",
+      "symbol": "_chair_connector_rail_records",
+      "occurrence": 2,
+      "b14_line": 44256,
+      "b15_line": 44256,
+      "ast_sha256": "6b32e71b07901d63fc97d888456268e7cd7dc9be27c49a63abf57f238f42ac92"
+    },
+    {
+      "anchor_id": "function:chair-invalidation-wrapper",
+      "kind": "function_ast",
+      "symbol": "invalidate_chair_analysis",
+      "occurrence": 2,
+      "b14_line": 44369,
+      "b15_line": 44369,
+      "ast_sha256": "db26f06d59d0f08a16763503386c9931b1dd39f0ba20d5aa3d803521de3f6958"
+    },
+    {
+      "anchor_id": "literal:geometry-tolerance",
+      "kind": "literal_assignment",
+      "symbol": "GEOMETRY_TOLERANCE",
+      "occurrence": 1,
+      "b14_line": 596,
+      "b15_line": 596,
+      "expected_value": 1e-08
+    },
+    {
+      "anchor_id": "literal:chair-analysis-schema-version",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_ANALYSIS_SCHEMA_VERSION",
+      "occurrence": 3,
+      "b14_line": 44040,
+      "b15_line": 44040,
+      "expected_value": 5
+    },
+    {
+      "anchor_id": "literal:chair-settings-property",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_ANALYSIS_SETTINGS_PROPERTY",
+      "occurrence": 1,
+      "b14_line": 35469,
+      "b15_line": 35469,
+      "expected_value": "ChairAnalysisSettingsJSON"
+    },
+    {
+      "anchor_id": "literal:chair-result-property",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_ANALYSIS_RESULT_PROPERTY",
+      "occurrence": 1,
+      "b14_line": 35470,
+      "b15_line": 35470,
+      "expected_value": "ChairAnalysisResultJSON"
+    },
+    {
+      "anchor_id": "literal:chair-status-property",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_ANALYSIS_STATUS_PROPERTY",
+      "occurrence": 1,
+      "b14_line": 35471,
+      "b15_line": 35471,
+      "expected_value": "ChairAnalysisStatus"
+    },
+    {
+      "anchor_id": "literal:chair-signature-property",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_ANALYSIS_SIGNATURE_PROPERTY",
+      "occurrence": 1,
+      "b14_line": 35472,
+      "b15_line": 35472,
+      "expected_value": "ChairAnalysisSignature"
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "curve_easement_station",
+      "candidate_kind": "comparison_parent",
+      "contract_status": "composed-current-legacy-boundary",
+      "role": "Compare the combined curve transition solve and station mapping family against smaller extraction seams.",
+      "roots": [
+        "solve_transition_length",
+        "alignment_station_data",
+        "interpolate_alignment_station"
+      ],
+      "inputs": [
+        "Union of transition_length_solver, alignment_station_index and alignment_station_interpolation inputs."
+      ],
+      "outputs": [
+        "Union of the three component candidate outputs; no additional aggregate object exists."
+      ],
+      "units": [
+        "Millimetres for plan coordinates, offsets, radii, station and length; radians for headings and curve angle."
+      ],
+      "coordinate_frames": [
+        "Canonical local left-turn frame in the transition solver and global document XY/travel-order chainage in station mapping."
+      ],
+      "tolerances": [
+        "Composes the exact solver and station-interpolation tolerances below; it introduces no aggregate tolerance."
+      ],
+      "identities": [
+        "No aggregate stable identity; station data retains the input alignment mapping and its ordered point values."
+      ],
+      "ordering": [
+        "Composition order is transition solve, cumulative station index, then right-biased segment interpolation."
+      ],
+      "schemas": {
+        "composes_candidate_ids": [
+          "transition_length_solver",
+          "alignment_station_index",
+          "alignment_station_interpolation"
+        ]
+      },
+      "signature_and_invalidation": {
+        "cache": "none in these calculation roots",
+        "signature": "none",
+        "invalidation": "callers rebuild results from their current input values"
+      },
+      "side_effects": [
+        "The solver and station index are calculation-only; interpolation allocates one App.Vector through vector_xy."
+      ],
+      "errors": [
+        "Union of the explicit and incidental errors documented by the three component candidates."
+      ],
+      "existing_oracles": [
+        "tests/validate_phase1_alignment.py",
+        "tests/validate_phase1_straight_station.py",
+        "tests/validate_phase1_turnout.py"
+      ],
+      "structural_inventory": {
+        "b14": {
+          "root_lines": [7700, 8473, 8500],
+          "closure_definition_count": 6,
+          "closure_source_lines": 154,
+          "direct_caller_count": 35,
+          "caller_closure_definition_count": 114,
+          "platform_signals": ["freecad"],
+          "duplicate_definition_names": [],
+          "captured_alias_calls": []
+        },
+        "b15": {
+          "root_lines": [7700, 8473, 8500],
+          "closure_definition_count": 6,
+          "closure_source_lines": 154,
+          "direct_caller_count": 35,
+          "caller_closure_definition_count": 114,
+          "platform_signals": ["freecad"],
+          "duplicate_definition_names": [],
+          "captured_alias_calls": []
+        }
+      },
+      "extraction_disposition": "not-selected-too-broad",
+      "open_gaps": [
+        "The aggregate crosses a FreeCAD point-construction seam and has 35 direct callers.",
+        "No representative target-architecture editing/deferred-validation profile exists."
+      ]
+    },
+    {
+      "candidate_id": "transition_length_solver",
+      "candidate_kind": "calculation",
+      "contract_status": "recorded-current-legacy-boundary",
+      "role": "Solve the length of one same-direction Euler entry or exit transition from a requested signed tangent offset.",
+      "roots": [
+        "solve_transition_length"
+      ],
+      "inputs": [
+        "circle_centre_y: finite numeric Y coordinate in millimetres in canonical local left-turn space.",
+        "radius: positive numeric circular radius in millimetres.",
+        "target_signed_offset: numeric tangent offset in millimetres; sign is canonical local Y.",
+        "total_angle: numeric available turn angle in radians; callers currently provide a positive angle.",
+        "track_name: diagnostic text only.",
+        "end_name: diagnostic text identifying the entry or exit end."
+      ],
+      "outputs": [
+        "One float transition length in millimetres in the closed interval from zero to 2 * radius * total_angle - 0.000001 mm."
+      ],
+      "units": [
+        "circle_centre_y, radius, target_signed_offset and result are millimetres; total_angle and internal clothoid angle are radians."
+      ],
+      "coordinate_frames": [
+        "Canonical local left-turn frame: the tangent is measured by signed Y offset from a circle whose relevant centre coordinate is circle_centre_y."
+      ],
+      "tolerances": [
+        "Maximum-length guard: 0.000001 mm below 2 * radius * total_angle.",
+        "Achievable-range slack: 0.000001 mm.",
+        "Exact endpoint acceptance: 0.00000001 mm offset residual.",
+        "Bisection exit: 0.0000000001 mm offset residual or 0.0000001 mm interval width, with at most 72 iterations."
+      ],
+      "identities": [
+        "No entity identity enters the calculation; track_name and end_name affect diagnostics only."
+      ],
+      "ordering": [
+        "Deterministic bracketed bisection; solution selection is independent of caller or document order."
+      ],
+      "schemas": {
+        "input_parameter_order": [
+          "circle_centre_y",
+          "radius",
+          "target_signed_offset",
+          "total_angle",
+          "track_name",
+          "end_name"
+        ],
+        "output_type": "float"
+      },
+      "signature_and_invalidation": {
+        "cache": "none",
+        "signature": "none",
+        "invalidation": "recompute whenever any numeric input changes; diagnostic names need not invalidate a successful numeric value"
+      },
+      "side_effects": [
+        "No mutation, FreeCAD/Qt access, filesystem/process access, global write or clock read."
+      ],
+      "errors": [
+        "ValueError when radius is not greater than zero.",
+        "ValueError with requested and achievable ranges when the signed offset is outside the bracket.",
+        "ValueError if the two computed endpoint residuals do not bracket a solution.",
+        "Non-finite inputs and non-positive total_angle have no explicit boundary validation in the current function."
+      ],
+      "existing_oracles": [
+        "tests/validate_phase1_alignment.py freezes representative values, monotonicity, both endpoints, range diagnostics and B14/B15 AST/result parity.",
+        "The fixed plain-line and connected-straight workflow oracles exercise the function through current callers."
+      ],
+      "structural_inventory": {
+        "b14": {
+          "root_lines": [7700],
+          "closure_definition_count": 3,
+          "closure_source_lines": 107,
+          "direct_caller_count": 1,
+          "caller_closure_definition_count": 2,
+          "platform_signals": [],
+          "duplicate_definition_names": [],
+          "captured_alias_calls": []
+        },
+        "b15": {
+          "root_lines": [7700],
+          "closure_definition_count": 3,
+          "closure_source_lines": 107,
+          "direct_caller_count": 1,
+          "caller_closure_definition_count": 2,
+          "platform_signals": [],
+          "duplicate_definition_names": [],
+          "captured_alias_calls": []
+        }
+      },
+      "extraction_disposition": "structural-leader-not-selected",
+      "open_gaps": [
+        "Agree whether explicit finite/positive-angle validation belongs in the successor API or is retained as a caller precondition.",
+        "Freeze the proposed module/API seam and run legacy-versus-extracted parity before routing the sole direct caller.",
+        "Record a representative profile even though this function is not a measured dominant cost."
+      ]
+    },
+    {
+      "candidate_id": "alignment_station_index",
+      "candidate_kind": "calculation",
+      "contract_status": "recorded-current-legacy-boundary",
+      "role": "Build cumulative travel-order stationing and clamped core bounds for an already sampled alignment.",
+      "roots": [
+        "alignment_station_data"
+      ],
+      "inputs": [
+        "alignment: mapping with required ordered points and headings arrays and optional entry_extension and exit_extension values.",
+        "points: at least two point-like values exposing numeric x and y in global document millimetres.",
+        "headings: one numeric radian value per point in the same travel order.",
+        "entry_extension and exit_extension: optional numeric millimetres, default zero, each independently clamped to [0, total]."
+      ],
+      "outputs": [
+        "A seven-field station-data mapping containing the original alignment, shallow point and heading lists, cumulative stations, total, core_start and core_end."
+      ],
+      "units": [
+        "Point coordinates, stations, total and extensions are millimetres; headings are radians."
+      ],
+      "coordinate_frames": [
+        "Points use global document XY; stations increase strictly by input travel order, not global axis direction or object order."
+      ],
+      "tolerances": [
+        "No geometric tolerance is applied while accumulating XY Euclidean segment lengths; duplicate consecutive points create equal stations.",
+        "Extension clamping is exact numeric min/max; core_end is max(core_start, total - exit_extension)."
+      ],
+      "identities": [
+        "The output alignment is the identical input mapping object; point values retain input order but carry no station-level stable identity."
+      ],
+      "ordering": [
+        "points, headings and cumulative stations preserve input travel order exactly."
+      ],
+      "schemas": {
+        "required_alignment_fields": ["points", "headings"],
+        "optional_alignment_fields": ["entry_extension", "exit_extension"],
+        "station_data_fields": [
+          "alignment",
+          "points",
+          "headings",
+          "stations",
+          "total",
+          "core_start",
+          "core_end"
+        ]
+      },
+      "signature_and_invalidation": {
+        "cache": "none",
+        "signature": "none",
+        "invalidation": "rebuild after any ordered point, heading or extension change; callers must not reuse the shallow result after mutating its source"
+      },
+      "side_effects": [
+        "No mutation or platform access; it reads point x/y values, copies the two sequences shallowly and retains the original alignment mapping."
+      ],
+      "errors": [
+        "ValueError when fewer than two points are present or point and heading counts differ.",
+        "Malformed point values or non-numeric extensions raise their ordinary Python attribute/type errors."
+      ],
+      "existing_oracles": [
+        "tests/validate_phase1_alignment.py freezes cumulative values, extension clamping, incomplete-input errors and B14/B15 parity.",
+        "tests/validate_phase1_straight_station.py freezes travel direction and connected-route station semantics."
+      ],
+      "structural_inventory": {
+        "b14": {
+          "root_lines": [8473],
+          "closure_definition_count": 1,
+          "closure_source_lines": 25,
+          "direct_caller_count": 15,
+          "caller_closure_definition_count": 77,
+          "platform_signals": [],
+          "duplicate_definition_names": [],
+          "captured_alias_calls": []
+        },
+        "b15": {
+          "root_lines": [8473],
+          "closure_definition_count": 1,
+          "closure_source_lines": 25,
+          "direct_caller_count": 15,
+          "caller_closure_definition_count": 77,
+          "platform_signals": [],
+          "duplicate_definition_names": [],
+          "captured_alias_calls": []
+        }
+      },
+      "extraction_disposition": "not-selected-high-fanout",
+      "open_gaps": [
+        "Define an immutable domain point/alignment representation or an explicit point protocol before widening caller migration.",
+        "Decide whether duplicate consecutive points are accepted domain data or rejected earlier.",
+        "Add caller-group profiles before choosing this high-fanout seam."
+      ]
+    },
+    {
+      "candidate_id": "alignment_station_interpolation",
+      "candidate_kind": "calculation-with-platform-output",
+      "contract_status": "recorded-current-legacy-boundary",
+      "role": "Clamp one station to an indexed alignment and linearly interpolate its global XY point and heading.",
+      "roots": [
+        "interpolate_alignment_station"
+      ],
+      "inputs": [
+        "data: the seven-field mapping returned by alignment_station_data.",
+        "station: numeric millimetres; values below zero or above total are clamped to the nearest endpoint."
+      ],
+      "outputs": [
+        "A two-item tuple: newly allocated App.Vector(x, y, 0) in global document coordinates and a linearly interpolated heading in radians."
+      ],
+      "units": [
+        "Input station and point coordinates are millimetres; heading is radians."
+      ],
+      "coordinate_frames": [
+        "Global document XY at travel-order chainage; vector Z is fixed to zero by vector_xy."
+      ],
+      "tolerances": [
+        "A segment span at or below GEOMETRY_TOLERANCE = 0.00000001 mm uses fraction zero.",
+        "Station endpoint clamping and bisect selection are otherwise exact; heading interpolation is linear and not angle-wrap aware."
+      ],
+      "identities": [
+        "No stable point identity is returned; every call allocates a new App.Vector."
+      ],
+      "ordering": [
+        "bisect_right chooses the later segment at an equal station, so an initial duplicate point uses the second heading.",
+        "Input station and point order are semantic."
+      ],
+      "schemas": {
+        "required_station_data_fields": [
+          "points",
+          "headings",
+          "stations",
+          "total"
+        ],
+        "output_tuple": ["App.Vector", "heading_radians"]
+      },
+      "signature_and_invalidation": {
+        "cache": "none",
+        "signature": "none",
+        "invalidation": "recompute after any station-data content or requested station changes"
+      },
+      "side_effects": [
+        "No input mutation or document mutation; one FreeCAD App.Vector is allocated through vector_xy."
+      ],
+      "errors": [
+        "There is no explicit schema validation; missing fields, inconsistent arrays and non-numeric values raise ordinary Python errors.",
+        "The function relies on alignment_station_data or an equivalent validated producer."
+      ],
+      "existing_oracles": [
+        "tests/validate_phase1_alignment.py freezes clamping, interpolation, duplicate-station right bias and B14/B15 parity using a standalone point adapter.",
+        "The connected-straight and standalone-turnout workflow oracles exercise real FreeCAD vectors through callers."
+      ],
+      "structural_inventory": {
+        "b14": {
+          "root_lines": [8500],
+          "closure_definition_count": 2,
+          "closure_source_lines": 22,
+          "direct_caller_count": 30,
+          "caller_closure_definition_count": 107,
+          "platform_signals": ["freecad"],
+          "duplicate_definition_names": [],
+          "captured_alias_calls": []
+        },
+        "b15": {
+          "root_lines": [8500],
+          "closure_definition_count": 2,
+          "closure_source_lines": 22,
+          "direct_caller_count": 30,
+          "caller_closure_definition_count": 107,
+          "platform_signals": ["freecad"],
+          "duplicate_definition_names": [],
+          "captured_alias_calls": []
+        }
+      },
+      "extraction_disposition": "not-selected-adapter-seam-required",
+      "open_gaps": [
+        "Split domain XY/heading interpolation from the FreeCAD App.Vector adapter.",
+        "Decide and test heading wrap behaviour as an explicit successor requirement rather than silently changing it.",
+        "Profile representative caller groups before migrating the 30 direct callers."
+      ]
+    },
+    {
+      "candidate_id": "chair_analysis_core",
+      "candidate_kind": "analytical-core-with-application-cache",
+      "contract_status": "recorded-current-legacy-boundary-with-open-signature-and-provenance-gates",
+      "role": "Derive, classify and validate logical chair positions plus model-support recommendations from precomputed rail and timber records.",
+      "roots": [
+        "normalise_chair_analysis_settings",
+        "generate_chair_positions",
+        "validate_chair_positions",
+        "analyse_chair_position_records"
+      ],
+      "inputs": [
+        "entity_kind: current callers use turnout or crossover.",
+        "config: mapping containing a stable turnout_id or crossover_id and optional template_set_id/handing fields used by position metadata.",
+        "rail_records: ordered logical rail mappings matching one of the recorded turnout or connector rail schemas.",
+        "timber_records: ordered effective timber mappings matching the recorded timber schema.",
+        "settings: optional mapping normalised over 22 defaults, 13 numeric bounds and eight boolean controls; unknown fields are not carried into the result."
+      ],
+      "outputs": [
+        "analyse_chair_position_records returns the recorded 16-field schema with logical positions, findings, support plan, summary and non-deterministic performance_timings_ms.",
+        "generate_chair_positions also returns rail_supports, a mapping from each rail stable identity to references to its generated position records.",
+        "validate_chair_positions mutates each input position validation_status and returns ordered findings plus severity counts."
+      ],
+      "units": [
+        "Plan coordinates, rail station, timber dimensions, clearances, spans, footprint dimensions, support extensions, embed depth and boolean allowances are model millimetres.",
+        "Angles named *_radians are radians; *_degrees, maximum_advisory_skew_degrees and chair_skew_degrees are degrees.",
+        "physical_overlap_area_tolerance is square millimetres; performance timings are milliseconds."
+      ],
+      "coordinate_frames": [
+        "Rail points, timber outlines, chair centres and footprint polygons use global document XY.",
+        "rail_station is cumulative travel order along each rail polyline; host_chainage belongs to the host centreline travel frame.",
+        "local_rail_tangent, timber length_axis, width_axis, local_support_direction and longitudinal_reference_axis are global-XY unit vectors.",
+        "Turnout-local prototype coordinates survive only inside timber source_configuration fields and are mapped before entering the core."
+      ],
+      "tolerances": [
+        "Defaults: position 0.20 mm, footprint broad-phase clearance 0.15 mm, timber-end clearance 0.50 mm, advisory skew 5 degrees and unsupported span 15.0 mm.",
+        "Model-support defaults: edge margin 0.15 mm and preferred maximum extension per side 2.0 mm.",
+        "Future/physical defaults: embed depth 0.20 mm, boolean overlap 0.05 mm, boolean fuzzy tolerance 0.01 mm, rail-fit clearance 0.04 mm per side, overlap-area tolerance 0.0025 square mm and rail-interference clearance 0.02 mm.",
+        "All 13 numeric settings and exact accepted bounds are recorded in schemas.numeric_setting_bounds.",
+        "Internal predicate epsilons are hard-coded in the current closure; their complete classification remains an explicit pre-extraction gap."
+      ],
+      "identities": [
+        "Chair identity is <entity_id>:chair:<slug(timber_identity)>:<slug(rail suffix after :rail:)> and must be unique.",
+        "Parent template-set, turnout and crossover identities plus timber and rail stable identities are copied into each position.",
+        "Turnout rail identity is <turnout_id>:rail:<slug(base rail name)>; connector and timber producers retain their recorded stable-identity schemes.",
+        "FreeCAD object names and position list indices are not chair identities."
+      ],
+      "ordering": [
+        "Positions sort by timber_identity, rail_identity, stable_chair_position_identity.",
+        "Findings sort by descending severity rank, code, message; per-finding identity arrays retain producer order.",
+        "Support plans sort by timber_identity and deduplicate/sort chair_position_identities.",
+        "Turnout rail records follow sorted gauge-face names; connector records are left then right; turnout timber records sort by longitudinal_station then stable_identity.",
+        "Input rail and timber array order remains signature-sensitive."
+      ],
+      "schemas": {
+        "analysis_schema_version": 5,
+        "default_setting_fields": [
+          "schema_version",
+          "position_tolerance",
+          "footprint_clearance",
+          "timber_end_clearance",
+          "maximum_advisory_skew_degrees",
+          "maximum_unsupported_span",
+          "markers_visible",
+          "protected_markers_visible",
+          "footprints_visible",
+          "cache_enabled",
+          "model_support_recommendations_enabled",
+          "model_support_auto_apply_enabled",
+          "model_support_edge_margin",
+          "preferred_maximum_model_support_extension_per_side",
+          "future_chair_embed_depth",
+          "future_boolean_overlap_allowance",
+          "future_boolean_fuzzy_tolerance",
+          "rail_fit_clearance_per_side",
+          "physical_overlap_area_tolerance",
+          "physical_rail_interference_clearance",
+          "physical_solids_visible",
+          "unresolved_markers_visible"
+        ],
+        "normalised_setting_fields": [
+          "schema_version",
+          "position_tolerance",
+          "footprint_clearance",
+          "timber_end_clearance",
+          "maximum_advisory_skew_degrees",
+          "maximum_unsupported_span",
+          "markers_visible",
+          "protected_markers_visible",
+          "footprints_visible",
+          "cache_enabled",
+          "model_support_recommendations_enabled",
+          "model_support_auto_apply_enabled",
+          "model_support_edge_margin",
+          "preferred_maximum_model_support_extension_per_side",
+          "future_chair_embed_depth",
+          "future_boolean_overlap_allowance",
+          "future_boolean_fuzzy_tolerance",
+          "rail_fit_clearance_per_side",
+          "physical_overlap_area_tolerance",
+          "physical_rail_interference_clearance",
+          "physical_solids_visible",
+          "unresolved_markers_visible",
+          "rail_profile_id"
+        ],
+        "numeric_setting_defaults": {
+          "position_tolerance": 0.2,
+          "footprint_clearance": 0.15,
+          "timber_end_clearance": 0.5,
+          "maximum_advisory_skew_degrees": 5.0,
+          "maximum_unsupported_span": 15.0,
+          "model_support_edge_margin": 0.15,
+          "preferred_maximum_model_support_extension_per_side": 2.0,
+          "future_chair_embed_depth": 0.2,
+          "future_boolean_overlap_allowance": 0.05,
+          "future_boolean_fuzzy_tolerance": 0.01,
+          "rail_fit_clearance_per_side": 0.04,
+          "physical_overlap_area_tolerance": 0.0025,
+          "physical_rail_interference_clearance": 0.02
+        },
+        "boolean_setting_defaults": {
+          "markers_visible": true,
+          "protected_markers_visible": false,
+          "footprints_visible": false,
+          "cache_enabled": true,
+          "model_support_recommendations_enabled": true,
+          "model_support_auto_apply_enabled": true,
+          "physical_solids_visible": false,
+          "unresolved_markers_visible": false
+        },
+        "numeric_setting_bounds": {
+          "position_tolerance": [0.0, 5.0],
+          "footprint_clearance": [0.0, 5.0],
+          "timber_end_clearance": [0.0, 10.0],
+          "maximum_advisory_skew_degrees": [0.0, 30.0],
+          "maximum_unsupported_span": [1.0, 100.0],
+          "model_support_edge_margin": [0.0, 3.0],
+          "preferred_maximum_model_support_extension_per_side": [0.0, 10.0],
+          "future_chair_embed_depth": [0.0, 5.0],
+          "future_boolean_overlap_allowance": [0.0, 2.0],
+          "future_boolean_fuzzy_tolerance": [0.0, 1.0],
+          "rail_fit_clearance_per_side": [0.0, 0.5],
+          "physical_overlap_area_tolerance": [0.0, 1.0],
+          "physical_rail_interference_clearance": [0.0, 1.0]
+        },
+        "turnout_rail_fields": [
+          "stable_identity",
+          "parent_turnout_identity",
+          "parent_crossover_identity",
+          "turnout_side",
+          "name",
+          "rail_role",
+          "supported_feature",
+          "points",
+          "gauge_face_points",
+          "outer_face_points",
+          "source_configuration"
+        ],
+        "turnout_rail_source_fields": [
+          "gauge_face",
+          "outer_face",
+          "gauge_orientation_source",
+          "rail_geometry_revision"
+        ],
+        "connector_rail_fields": [
+          "stable_identity",
+          "parent_turnout_identity",
+          "parent_crossover_identity",
+          "turnout_side",
+          "name",
+          "rail_role",
+          "supported_feature",
+          "points",
+          "source_configuration"
+        ],
+        "connector_rail_source_fields": [
+          "source",
+          "connector_geometry_signature",
+          "gauge_normal_sign",
+          "gauge_orientation_source"
+        ],
+        "timber_fields": [
+          "stable_identity",
+          "parent_turnout_identity",
+          "crossover_identity",
+          "turnout_side",
+          "identifier",
+          "prototype_reference",
+          "sequence",
+          "section",
+          "centre",
+          "angle_radians",
+          "angle_degrees",
+          "width",
+          "length",
+          "outline_polygon",
+          "collision_polygon",
+          "bounding_box",
+          "near_end_segment",
+          "far_end_segment",
+          "side_segments",
+          "length_axis",
+          "width_axis",
+          "longitudinal_reference_axis",
+          "longitudinal_station",
+          "host_chainage",
+          "local_rail_heading_radians",
+          "local_rail_heading_degrees",
+          "source_configuration",
+          "protected_support_region",
+          "protected_features",
+          "supported_feature",
+          "support_zone_polygon"
+        ],
+        "timber_source_fields": [
+          "source_note",
+          "crossing_suffix",
+          "local_x",
+          "local_near_y",
+          "local_far_y",
+          "length_prototype_inches",
+          "turnout_geometry_revision",
+          "longitudinal_reference_axis"
+        ],
+        "position_fields": [
+          "stable_chair_position_identity",
+          "parent_template_set_identity",
+          "parent_turnout_identity",
+          "parent_crossover_identity",
+          "timber_identity",
+          "timber_identifier",
+          "prototype_timber_identifier",
+          "rail_identity",
+          "rail_name",
+          "rail_role",
+          "supported_feature",
+          "centre_point",
+          "rail_station",
+          "local_rail_tangent",
+          "timber_centre",
+          "timber_angle_radians",
+          "timber_angle_degrees",
+          "local_support_direction",
+          "chair_family",
+          "chair_subtype",
+          "chair_code",
+          "chair_code_label",
+          "assignment_status",
+          "assignment_complete_in_current_stage",
+          "special_assignment_deferred",
+          "handedness",
+          "handedness_classification",
+          "key_orientation",
+          "key_direction_sign",
+          "key_orientation_classification",
+          "rail_foot_orientation",
+          "rail_foot_orientation_classification",
+          "protected_support_classification",
+          "protected_features",
+          "protected_support_zone",
+          "source_configuration",
+          "chair_footprint_parameters",
+          "model_timber_support_adjustment",
+          "future_solid_generation_parameters",
+          "source_or_assumed_classification",
+          "validation_status",
+          "stale_signature_state",
+          "mandatory",
+          "deliberate_omission",
+          "chair_skew_degrees",
+          "distance_from_timber_centre"
+        ],
+        "generation_only_position_fields": ["_generation_timber"],
+        "position_source_fields": ["rail", "timber"],
+        "footprint_fields": [
+          "length",
+          "width",
+          "clearance",
+          "polygon",
+          "dimension_classification",
+          "dimension_note"
+        ],
+        "future_solid_parameter_fields": [
+          "embed_depth",
+          "boolean_overlap_allowance",
+          "boolean_fuzzy_tolerance",
+          "active_in_this_stage"
+        ],
+        "protected_support_zone_fields": [
+          "type",
+          "centre_station",
+          "minimum_station",
+          "maximum_station",
+          "position_tolerance",
+          "classification"
+        ],
+        "model_support_adjustment_fields": [
+          "required",
+          "eligible_in_current_stage",
+          "applied_to_production_geometry",
+          "approach_side_extension",
+          "exit_side_extension",
+          "total_width_increase",
+          "model_support_edge_margin",
+          "classification",
+          "reason"
+        ],
+        "finding_fields": [
+          "code",
+          "severity",
+          "message",
+          "chair_position_identities",
+          "timber_identities",
+          "rail_identities"
+        ],
+        "model_support_plan_fields": [
+          "timber_identity",
+          "timber_identifier",
+          "approach_side_extension",
+          "exit_side_extension",
+          "total_width_increase",
+          "chair_position_identities",
+          "applied_to_production_geometry"
+        ],
+        "summary_fields": [
+          "rail_count",
+          "timber_count",
+          "chair_position_count",
+          "family_counts",
+          "chair_code_counts",
+          "assignment_status_counts",
+          "severity_counts",
+          "deliberately_omitted_count",
+          "mandatory_position_count",
+          "confirmed_ordinary_turnout_assignment_count",
+          "special_assignment_deferred_count",
+          "model_support_timber_count",
+          "maximum_model_support_extension_per_side"
+        ],
+        "analysis_result_fields": [
+          "schema_version",
+          "macro_version",
+          "entity_kind",
+          "entity_id",
+          "status",
+          "settings",
+          "source_basis",
+          "positions",
+          "findings",
+          "model_timber_support_plan",
+          "summary",
+          "cache_reused",
+          "production_geometry_changed",
+          "model_timber_support_changes_applied",
+          "chair_solids_generated",
+          "performance_timings_ms"
+        ],
+        "persistent_property_names": {
+          "settings": "ChairAnalysisSettingsJSON",
+          "result": "ChairAnalysisResultJSON",
+          "status": "ChairAnalysisStatus",
+          "signature": "ChairAnalysisSignature"
+        }
+      },
+      "signature_and_invalidation": {
+        "application_cache": "When cache_enabled is true, analyse_entity_chair_positions reuses a stored result only when its geometry_signature equals the current signature; core results themselves report cache_reused false.",
+        "signature_algorithm": "SHA-256 of compact sort_keys JSON over schema_version, entity_kind, entity_id, normalised calculation settings, ordered rails and ordered timbers.",
+        "display_only_settings_excluded": [
+          "markers_visible",
+          "protected_markers_visible",
+          "footprints_visible",
+          "physical_solids_visible",
+          "unresolved_markers_visible",
+          "cache_enabled"
+        ],
+        "rail_signature_fields": ["id", "points", "role"],
+        "rail_point_rounding_decimal_places": 5,
+        "timber_signature_fields": ["id", "centre", "angle", "width", "length", "outline"],
+        "timber_linear_rounding_decimal_places": 5,
+        "timber_angle_rounding_decimal_places": 8,
+        "effective_status": "Re-extract rail/timber records and compare the current signature; extraction failure or mismatch reports stale.",
+        "explicit_invalidation": "Marks stored analysis stale, production_ready false, removes temporary display when requested and marks retained chair solids stale through the active wrapper.",
+        "known_signature_gaps": [
+          "Rail gauge_face_points, outer_face_points and source_configuration are omitted.",
+          "Timber collision/support polygons, axes, protected-feature metadata, host_chainage and source_configuration are omitted.",
+          "Configuration fields other than entity identity enter only indirectly through precomputed records/settings.",
+          "Rounding can intentionally coalesce changes below the recorded precision."
+        ]
+      },
+      "side_effects": [
+        "The four root functions do not create or mutate FreeCAD document objects.",
+        "generate_chair_positions creates new records and removes its temporary _generation_timber field before return.",
+        "validate_chair_positions mutates validation_status on position records.",
+        "analyse_chair_position_records reads time.perf_counter and emits non-deterministic performance timings.",
+        "The surrounding analyse_entity_chair_positions application boundary extracts document records, reads/writes persistent JSON, manages cache/display objects and uses a FreeCAD transaction; those effects are outside the four-root core."
+      ],
+      "errors": [
+        "ValueError for non-numeric or out-of-bounds settings.",
+        "ValueError when no stable turnout/crossover identity exists or duplicate chair identities are generated.",
+        "Rail/timber producer errors cover missing host objects, missing stable identities and unavailable rail pairs.",
+        "Most geometric conflicts are ordered finding records rather than raised exceptions.",
+        "Malformed record mappings can raise ordinary KeyError, TypeError or numeric-conversion errors; no standalone schema validator currently guards the core."
+      ],
+      "existing_oracles": [
+        "tests/validate_b15.py protects current structural/analytical chair behaviour and complete inherited B14/B15 AST parity.",
+        "tests/freecad_validate_b15.py exercises the real FreeCAD B15 display layer.",
+        "The B14 crossover cold/warm and B15 acceptance evidence exercise cache, persistence and display behaviour.",
+        "reference/lineage/phase1-s1-core-lineage.json and reference/manifests/s1-chair-pilot.dependency-manifest.json keep current S1/core data visibly unresolved."
+      ],
+      "structural_inventory": {
+        "b14": {
+          "root_lines": [44136, 43458, 43640, 43758],
+          "closure_definition_count": 39,
+          "closure_source_lines": 1396,
+          "direct_caller_count": 16,
+          "caller_closure_definition_count": 49,
+          "platform_signals": [],
+          "duplicate_definition_names": [
+            "_chair_assignment",
+            "_chair_footprint_fit_measurements",
+            "_chair_orientation_metadata",
+            "_chair_status_from_counts",
+            "analyse_chair_position_records",
+            "default_chair_analysis_settings",
+            "generate_chair_positions",
+            "normalise_chair_analysis_settings",
+            "validate_chair_positions"
+          ],
+          "captured_alias_calls": ["_A8A7A1_VALIDATE_CHAIR_POSITIONS"]
+        },
+        "b15": {
+          "root_lines": [44136, 43458, 43640, 43758],
+          "closure_definition_count": 39,
+          "closure_source_lines": 1396,
+          "direct_caller_count": 18,
+          "caller_closure_definition_count": 57,
+          "platform_signals": [],
+          "duplicate_definition_names": [
+            "_chair_assignment",
+            "_chair_footprint_fit_measurements",
+            "_chair_orientation_metadata",
+            "_chair_status_from_counts",
+            "analyse_chair_position_records",
+            "default_chair_analysis_settings",
+            "generate_chair_positions",
+            "normalise_chair_analysis_settings",
+            "validate_chair_positions"
+          ],
+          "captured_alias_calls": ["_A8A7A1_VALIDATE_CHAIR_POSITIONS"]
+        }
+      },
+      "extraction_disposition": "not-selected-coupling-signature-and-provenance-gates-open",
+      "open_gaps": [
+        "Classify and test every hard-coded geometric predicate epsilon in the 39-definition closure.",
+        "Resolve or explicitly accept the signature omissions before relying on cache equivalence across a new module boundary.",
+        "Define and validate standalone rail, timber and chair record schemas rather than depending on permissive mappings.",
+        "Remove process timings from deterministic domain output or normalise them at the comparison boundary.",
+        "Keep production S1/chair-definition values blocked until the separate evidence, manifest and owner-acceptance gates close.",
+        "Profile the candidate independently of FreeCAD record extraction, display and exact-solid preparation."
+      ]
+    }
+  ],
+  "selection_gate": {
+    "status": "open",
+    "selected_candidate_id": null,
+    "current_structural_leader": "transition_length_solver",
+    "leader_reason": "It has one direct caller, a three-definition platform-free closure, direct numerical characterisation and no duplicate-definition or captured-alias coupling.",
+    "not_a_selection": "The structural leader is a recommendation for owner review, not authority to create a package or route callers.",
+    "required_before_selection": [
+      "Project-owner agreement on the first slice, successor API and exact legacy/new acceptance evidence.",
+      "A representative profile sufficient to show that the slice advances architecture or risk reduction rather than source movement alone.",
+      "A documented adapter seam for any FreeCAD point/document boundary in the selected slice.",
+      "A rollback plan and temporary façade preserving the immutable B14 oracle and accepted B15 reference.",
+      "Closure of candidate-specific open gaps, or an explicit bounded exception accepted by the project owner."
+    ]
+  }
+}

@@ -281,8 +281,12 @@ Exit gate: the first extraction is selected from evidence rather than source pro
 
 Status: **In progress.** The reproducible static definition/caller/alias/patch
 inventory and initial candidate comparison are recorded in
-[PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Workflow, boundary-data and
-representative performance inventories remain open.
+[PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). The five current candidates now
+have a fail-closed machine-readable boundary contract covering units, frames,
+tolerances, identities, ordering, schemas, side effects and
+signature/invalidation inputs. Broader workflow boundaries, candidate-specific
+gaps, representative target-architecture profiles and owner selection remain
+open.
 
 ### Stage M2: package skeleton and façade
 

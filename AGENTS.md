@@ -76,6 +76,12 @@
 - `tests/validate_phase1_alignment.py` directly characterises the current
   transition-length and alignment-station boundary in B14 and B15 without
   importing FreeCAD; preserve its numerical, invalid-input and ordering oracles.
+- `reference/contracts/phase1-candidate-boundaries.json` and
+  `tests/validate_phase1_candidate_boundaries.py` own the fail-closed current
+  boundary contract for all five static first-slice candidates. Preserve its
+  source anchors, units, frames, tolerances, identities, ordering, schemas,
+  side effects, signature gaps and explicit open selection gate; updating a
+  current-source fact is not authority to select or extract a slice.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
   semantic oracle for the fixed B14 plain-line curve/two-track document. Their
@@ -346,6 +352,12 @@ Run the deterministic Phase 1 macro-inventory contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_inventory.py
+```
+
+Run the fail-closed Phase 1 candidate-boundary contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_candidate_boundaries.py
 ```
 
 Run the licensing-control tests and validate the current S1 pilot record:
