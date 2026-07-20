@@ -1,7 +1,7 @@
 # Modularisation Plan
 
-Status: accepted direction; Stage M1 dependency inventory is in progress and no
-source extraction has started.
+Status: accepted direction; Stage M1 selected the transition-length pilot and
+froze its acceptance contract, but no source extraction has started.
 
 The authoritative delivery phases from the current baseline to a release candidate are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md). The `M` stages below describe only the modularisation workstream and intentionally do not create a second project phase scheme.
 
@@ -289,24 +289,30 @@ Status: **Complete with the Phase 0 closeout.**
 
 Exit gate: the first extraction is selected from evidence rather than source proximity.
 
-Status: **In progress.** The reproducible static definition/caller/alias/patch
+Status: **Selection complete; remaining Phase 1 inventory gates stay open.**
+The reproducible static definition/caller/alias/patch
 inventory and initial candidate comparison are recorded in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). The five current candidates now
 have a fail-closed machine-readable boundary contract covering units, frames,
 tolerances, identities, ordering, schemas, side effects and
 signature/invalidation inputs. Inventory schema 2 now adds static closure-cut
 callers and dependencies leaving each bounded closure. The
-[first-slice scorecard](PHASE1_SLICE_SCORECARD.md) recommends the transition
-solver as a first architecture pilot, not a performance optimisation. Broader
-workflow boundaries, candidate-specific gaps, representative
-target-architecture profiles and owner selection remain open.
+[first-slice scorecard](PHASE1_SLICE_SCORECARD.md) led to owner acceptance of
+the transition solver as a first architecture pilot, not a performance
+optimisation. Its exact façade, caller, parity, rollback and performance scope
+is frozen in
+[contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json).
+Broader workflow boundaries, candidate-specific gaps and representative
+target-architecture profiles remain open; source movement has not started.
 
 ### Stage M2: package skeleton and façade
 
 - Add only the package locations needed by the selected slice.
 - Establish `tracktemplate.api` and the composition root.
 - Add an import test proving the extracted domain code loads without FreeCAD or Qt.
-- Keep `AdvancedTurnout.FCMacro` as the working launcher.
+- Keep B14 and B15 byte-identical as legacy/reference evidence. Introduce the
+  reserved `TrackTemplate.FCMacro` only as a small B16 development composition
+  root; do not copy the monolith or make the launcher authoritative.
 
 Exit gate: the empty boundary and loading approach work in both standalone Python tests and FreeCAD.
 
@@ -413,7 +419,6 @@ Modularisation is complete when:
 
 ## Open decisions
 
-- first extraction slice after dependency inventory;
 - exact Workbench/Addon manifest, loading/update and Addon Manager catalogue
   submission mechanics, plus the compatibility launcher's supported lifetime;
 - supported legacy document/version window;

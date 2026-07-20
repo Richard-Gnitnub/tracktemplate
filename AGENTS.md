@@ -89,14 +89,18 @@
   `tests/validate_phase1_candidate_boundaries.py` own the fail-closed current
   boundary contract for all five static first-slice candidates. Preserve its
   source anchors, units, frames, tolerances, identities, ordering, schemas,
-  side effects, signature gaps and explicit open selection gate; updating a
-  current-source fact is not authority to select or extract a slice.
+  side effects, signature gaps and schema-3 pointer to the accepted selection;
+  updating a current-source fact is not authority to extract a slice.
 - `reference/PHASE1_SLICE_SCORECARD.md` owns the current first-slice
-  recommendation. It recommends the transition solver as an architecture
-  pilot rather than a performance optimisation, but selection remains null
-  until the project owner accepts it and a successor launcher/version is
-  named. Do not edit immutable B14 or accepted-reference B15 to begin that
-  extraction.
+  evidence. The project owner accepted the transition solver as the first
+  architecture pilot, not a performance optimisation, on 2026-07-20.
+- `reference/contracts/phase1-transition-pilot.json` and
+  `tests/validate_phase1_transition_pilot.py` freeze the selected three-function
+  boundary, all three external caller routes, exact parity grid, rollback and
+  performance gates, development checkpoint `10.2A8A7B16`, and reserved small
+  `TrackTemplate.FCMacro` launcher. Source movement has not started: do not
+  create the package/launcher or edit immutable B14 or accepted-reference B15
+  until Phase 2 source work is explicitly started.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
   semantic oracle for the fixed B14 plain-line curve/two-track document. Their
@@ -373,6 +377,12 @@ Run the fail-closed Phase 1 candidate-boundary contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_candidate_boundaries.py
+```
+
+Run the selected transition-pilot boundary and expanded parity contract:
+
+```bash
+.venv/bin/python tests/validate_phase1_transition_pilot.py
 ```
 
 Run the licensing-control tests and validate the current S1 pilot record:

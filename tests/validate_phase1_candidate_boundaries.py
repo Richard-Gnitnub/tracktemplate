@@ -78,7 +78,7 @@ EXPECTED_CONTRACT_STATUS = {
 EXPECTED_DISPOSITIONS = {
     "curve_easement_station": "not-selected-too-broad",
     "transition_length_solver": (
-        "recommended-first-architecture-pilot-owner-decision-pending"
+        "selected-first-architecture-pilot-source-movement-not-started"
     ),
     "alignment_station_index": "not-selected-high-fanout",
     "alignment_station_interpolation": "not-selected-adapter-seam-required",
@@ -300,12 +300,14 @@ def validate_register(document):
         return ["register must be an object"]
     if set(document) != TOP_LEVEL_KEYS:
         errors.append("register top-level fields do not match the contract")
-    if document.get("schema_version") != 2:
-        errors.append("schema_version must be 2")
-    if document.get("register_id") != "tracktemplate:phase1:candidate-boundaries:2":
-        errors.append("register_id must identify candidate-boundary schema 2")
-    if document.get("status") != "inventory-and-recommendation-complete-selection-open":
-        errors.append("candidate inventory/recommendation must keep selection open")
+    if document.get("schema_version") != 3:
+        errors.append("schema_version must be 3")
+    if document.get("register_id") != "tracktemplate:phase1:candidate-boundaries:3":
+        errors.append("register_id must identify candidate-boundary schema 3")
+    if document.get("status") != (
+        "inventory-and-selection-complete-source-movement-not-started"
+    ):
+        errors.append("candidate inventory must record selection before movement")
     if not str(document.get("status_reason", "")).strip():
         errors.append("register status requires a reason")
 
@@ -456,37 +458,27 @@ def validate_register(document):
     expected_gate_keys = {
         "status",
         "selected_candidate_id",
-        "recommended_candidate_id",
-        "recommendation_class",
-        "scorecard_path",
-        "current_structural_leader",
-        "leader_reason",
-        "not_a_selection",
-        "required_before_selection",
+        "selected_on",
+        "selection_contract_path",
+        "recommendation_evidence_path",
     }
     if not isinstance(gate, dict) or set(gate) != expected_gate_keys:
         errors.append("selection_gate fields do not match the contract")
     else:
-        if (
-            gate.get("status") != "recommendation-ready-owner-decision-pending"
-            or gate.get("selected_candidate_id") is not None
+        if gate.get("status") != "selected-owner-accepted-contract-frozen":
+            errors.append("the owner-accepted selection status is invalid")
+        if gate.get("selected_candidate_id") != "transition_length_solver":
+            errors.append("the selected candidate must be transition_length_solver")
+        if gate.get("selected_on") != "2026-07-20":
+            errors.append("the selection date is invalid")
+        if gate.get("selection_contract_path") != (
+            "reference/contracts/phase1-transition-pilot.json"
         ):
-            errors.append("no extraction candidate may be selected by this register")
-        if gate.get("recommended_candidate_id") != "transition_length_solver":
-            errors.append("the scorecard recommendation must remain explicit")
-        if gate.get("recommendation_class") != (
-            "first-architecture-pilot-not-performance-optimisation"
+            errors.append("the pilot selection-contract path is invalid")
+        if gate.get("recommendation_evidence_path") != (
+            "reference/PHASE1_SLICE_SCORECARD.md"
         ):
-            errors.append("the recommendation class is invalid")
-        if gate.get("scorecard_path") != "reference/PHASE1_SLICE_SCORECARD.md":
-            errors.append("the scorecard path is invalid")
-        if gate.get("current_structural_leader") != "transition_length_solver":
-            errors.append("the current structural leader must remain explicit")
-        if not _non_empty_string_list(gate.get("required_before_selection")):
-            errors.append("selection prerequisites must be unique non-empty text")
-        for field in ("leader_reason", "not_a_selection"):
-            if not isinstance(gate.get(field), str) or not gate[field].strip():
-                errors.append("selection gate requires {}".format(field))
+            errors.append("the recommendation-evidence path is invalid")
     return errors
 
 
@@ -760,15 +752,17 @@ def validate_source_contract(document):
             ):
                 errors.append("{} chair property {} drifted".format(label, field))
 
-    scorecard_path = ROOT / document["selection_gate"]["scorecard_path"]
+    scorecard_path = (
+        ROOT / document["selection_gate"]["recommendation_evidence_path"]
+    )
     if scorecard_path != SCORECARD_PATH or not scorecard_path.is_file():
         errors.append("the declared first-slice scorecard is unavailable")
     else:
         scorecard = scorecard_path.read_text(encoding="utf-8")
         required_scorecard_text = (
-            "recommendation complete; project-owner decision pending",
+            "owner accepted; transition pilot selected; source movement not started",
             "Recommend `transition_length_solver`",
-            "Selected candidate: **none**",
+            "Selected candidate: `transition_length_solver`",
             "Recommendation class: first architecture pilot",
             "optimisation",
         )
@@ -781,15 +775,13 @@ def validate_source_contract(document):
 
 
 def validate_fail_closed(document):
-    selected = copy.deepcopy(document)
-    selected["selection_gate"]["selected_candidate_id"] = "transition_length_solver"
-    assert validate_register(selected), "selection mutation must fail closed"
+    deselected = copy.deepcopy(document)
+    deselected["selection_gate"]["selected_candidate_id"] = None
+    assert validate_register(deselected), "deselection mutation must fail closed"
 
     redirected = copy.deepcopy(document)
-    redirected["selection_gate"]["recommended_candidate_id"] = (
-        "chair_analysis_core"
-    )
-    assert validate_register(redirected), "recommendation mutation must fail closed"
+    redirected["selection_gate"]["selected_candidate_id"] = "chair_analysis_core"
+    assert validate_register(redirected), "selection mutation must fail closed"
 
     promoted = copy.deepcopy(document)
     promoted["candidates"][-1]["contract_status"] = "ready"

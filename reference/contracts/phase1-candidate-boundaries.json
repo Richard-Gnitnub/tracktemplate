@@ -1,9 +1,9 @@
 {
-  "schema_version": 2,
-  "register_id": "tracktemplate:phase1:candidate-boundaries:2",
+  "schema_version": 3,
+  "register_id": "tracktemplate:phase1:candidate-boundaries:3",
   "recorded_on": "2026-07-20",
-  "status": "inventory-and-recommendation-complete-selection-open",
-  "status_reason": "The five current first-slice candidates have explicit legacy boundary and closure-cut contracts, and the transition solver is recommended as the first architecture pilot; no extraction slice has been selected or authorised.",
+  "status": "inventory-and-selection-complete-source-movement-not-started",
+  "status_reason": "The five current first-slice candidates have explicit legacy boundary and closure-cut contracts. The project owner accepted the transition solver as the first architecture pilot on 2026-07-20; its exact pilot contract is frozen, but source movement has not started.",
   "source_state": {
     "b14": {
       "path": "AdvancedTurnout.FCMacro",
@@ -477,11 +477,11 @@
           "captured_alias_calls": []
         }
       },
-      "extraction_disposition": "recommended-first-architecture-pilot-owner-decision-pending",
+      "extraction_disposition": "selected-first-architecture-pilot-source-movement-not-started",
       "open_gaps": [
-        "Agree whether explicit finite/positive-angle validation belongs in the successor API or is retained as a caller precondition.",
-        "Freeze the proposed module/API seam and run legacy-versus-extracted parity before routing all three external closure callers.",
-        "Record a representative profile even though this function is not a measured dominant cost."
+        "Preserve positive total_angle as a caller precondition during mechanical extraction; any explicit finite/non-positive-angle validation is a later behaviour change.",
+        "Implement the frozen module/API seam and run legacy-versus-modular parity before routing all three external closure callers.",
+        "Record the contracted calculation and representative workflow profiles after implementation even though this function is not a measured dominant cost."
       ]
     },
     {
@@ -1136,20 +1136,10 @@
     }
   ],
   "selection_gate": {
-    "status": "recommendation-ready-owner-decision-pending",
-    "selected_candidate_id": null,
-    "recommended_candidate_id": "transition_length_solver",
-    "recommendation_class": "first-architecture-pilot-not-performance-optimisation",
-    "scorecard_path": "reference/PHASE1_SLICE_SCORECARD.md",
-    "current_structural_leader": "transition_length_solver",
-    "leader_reason": "It has one root caller, only three external callers across its bounded static three-definition closure, no outgoing project-definition dependency, direct numerical characterisation and no duplicate-definition or captured-alias coupling.",
-    "not_a_selection": "The structural leader is a recommendation for owner review, not authority to create a package or route callers.",
-    "required_before_selection": [
-      "Project-owner agreement on the first slice, successor API and exact legacy/new acceptance evidence.",
-      "A representative profile sufficient to show that the slice advances architecture or risk reduction rather than source movement alone.",
-      "A documented adapter seam for any FreeCAD point/document boundary in the selected slice.",
-      "A rollback plan and temporary façade preserving the immutable B14 oracle and accepted B15 reference.",
-      "Closure of candidate-specific open gaps, or an explicit bounded exception accepted by the project owner."
-    ]
+    "status": "selected-owner-accepted-contract-frozen",
+    "selected_candidate_id": "transition_length_solver",
+    "selected_on": "2026-07-20",
+    "selection_contract_path": "reference/contracts/phase1-transition-pilot.json",
+    "recommendation_evidence_path": "reference/PHASE1_SLICE_SCORECARD.md"
   }
 }

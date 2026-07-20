@@ -1,8 +1,8 @@
 # Phase 1 Product and Dependency Inventory
 
 Status: **in progress; last updated 2026-07-20**. This document owns the Phase 1
-inventory and concise decision log. It does not close Phase 1 or select the
-first extraction slice.
+inventory and concise decision log. It records the accepted first extraction
+slice but does not start source movement or close Phase 1.
 
 ## Purpose
 
@@ -54,9 +54,11 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | First-S1/core lineage contract | `tests/validate_phase1_s1_lineage.py`; verifies register semantics, B14/B15 source anchors, the optional local archive hashes and the unresolved S1 manifest link |
 | Other-S&C/legacy lineage register | `reference/lineage/phase1-other-snc-legacy-lineage.json`, schema 1; 24 bounded output-affecting groups, 14 `reference-only` and 10 `unknown`, with both scopes visibly `blocked` |
 | Other-S&C/legacy lineage contract | `tests/validate_phase1_other_snc_legacy_lineage.py`; verifies the two remaining scopes, exact B14/B15 anchors, optional local evidence hashes, all-four-scope coverage and absent current output manifests |
-| Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 2; exact current contracts and closure-cut facts for all five static first-slice candidates with selection still open |
-| Candidate boundary contract | `tests/validate_phase1_candidate_boundaries.py`; verifies source/AST anchors, structural facts, transition/station schemas, chair record schemas, cache-signature inputs and fail-closed non-selection |
-| First-slice scorecard | `reference/PHASE1_SLICE_SCORECARD.md`; recommends the transition solver as a first architecture pilot, not a performance optimisation; project-owner decision remains pending |
+| Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 3; exact current contracts and closure-cut facts for all five static candidates plus the owner-accepted selection pointer |
+| Candidate boundary contract | `tests/validate_phase1_candidate_boundaries.py`; verifies source/AST anchors, structural facts, transition/station schemas, chair record schemas, cache-signature inputs and fail-closed selected candidate |
+| First-slice scorecard | `reference/PHASE1_SLICE_SCORECARD.md`; records why the transition solver was selected as a first architecture pilot, not a performance optimisation |
+| Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher identity, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates while source movement remains unstarted |
+| Selected transition-pilot validator | `tests/validate_phase1_transition_pilot.py`; verifies exact B14/B15 source, signatures, constant, closure cut, generated parameter/error parity, evidence links and premature package/launcher absence |
 | Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
 | Production-source changes in this tranche | None |
 
@@ -93,6 +95,13 @@ Run the first direct B14/B15 transition and station characterisation oracle:
 
 ```bash
 .venv/bin/python tests/validate_phase1_alignment.py
+```
+
+Validate the five candidate boundaries and selected transition-pilot contract:
+
+```bash
+.venv/bin/python tests/validate_phase1_candidate_boundaries.py
+.venv/bin/python tests/validate_phase1_transition_pilot.py
 ```
 
 Run the fast contract checks for the deeper B14 plain-line document oracle:
@@ -310,7 +319,7 @@ static top-level definition occurrences, not runtime invocation frequency.
 | Candidate | Roots | Dependency definitions / lines | Root callers | External closure callers | Outgoing dependencies | Caller closure | Platform signal | Existing position |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
 | Curve/easement/station family | 3 | 6 / 154 | 35 | 65 | 0 | 114 | FreeCAD via station interpolation | Strategically broad; reject as one first move |
-| Transition-length solver | 1 | 3 / 107 | 1 | 3 | 0 | 2 | None | Lowest complete cut; recommended architecture pilot pending owner decision |
+| Transition-length solver | 1 | 3 / 107 | 1 | 3 | 0 | 2 | None | Selected architecture pilot; exact contract frozen, source movement not started |
 | Alignment station index | 1 | 1 / 25 | 15 | 15 | 0 | 77 | None directly | Foundational, but high fan-out and shallow FreeCAD-derived point inputs |
 | Alignment station interpolation | 1 | 2 / 22 | 30 | 60 | 0 | 107 | Direct `App.Vector` construction | Split the coordinate record from the shared vector adapter first |
 | Chair-analysis core | 4 | 39 / 1,396 | 18 B15 / 16 B14 | 39 B15 / 36 B14 | 11 | 57 B15 / 49 B14 | None in the bounded calculation closure | High-payoff later slice; not mechanically self-contained |
@@ -338,9 +347,12 @@ three external callers because `clothoid_entry_displacement` is also used by
 `main_circle_centre` and `build_concentric_core`. The direct characterisation
 locks the default two-track outside solution, an inside solution, monotonic
 targets, endpoint behaviour, invalid radius/range diagnostics and exact
-B14/B15 equality. This is the recommended first architecture pilot in
-[PHASE1_SLICE_SCORECARD.md](PHASE1_SLICE_SCORECARD.md), but it is not selected
-until the project owner accepts the scope and successor launcher/version.
+B14/B15 equality. The project owner accepted this as the first architecture
+pilot on 2026-07-20. The selected boundary reserves development checkpoint
+`10.2A8A7B16` and the small future `TrackTemplate.FCMacro` compatibility
+launcher in
+[contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json);
+package creation and source movement have not started.
 
 ### Station maps
 
@@ -952,12 +964,12 @@ timber, position, finding, support-plan, summary, result and signature payload
 schemas directly from source. It records rather than hides the one anchored
 B14/B15 difference in the first chair application wrapper.
 
-The evidence makes the trade-off clearer. The transition-length solver remains
-the structural leader: one root caller, three external closure callers, a
+The evidence makes the trade-off clearer. The transition-length solver is the
+selected structural leader: one root caller, three external closure callers, a
 three-definition platform-free/self-contained closure and a direct numerical
-oracle. The scorecard recommends it as a first architecture pilot, not a
-performance optimisation; this is still not selection authority. The
-station index has high fan-out; interpolation still returns `App.Vector`; and
+oracle. The scorecard and accepted contract make it a first architecture
+pilot, not a performance optimisation or authority to start source movement.
+The station index has high fan-out; interpolation still returns `App.Vector`; and
 the chair core has duplicate/alias coupling, non-deterministic timings,
 unvalidated mapping inputs and known signature omissions. In particular, its
 current cache signature excludes rail-face/source metadata and several timber
@@ -1040,7 +1052,8 @@ core attribution, signature and provenance gates.
 | 2026-07-20 | Add a dedicated centreline-anchored standalone-turnout lifecycle oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes one left/facing REA C10 creation, handed edit, exact history/persistence, stable objects, ordered production records, occupied-chainage rejection and in-transaction abort without changing either macro; trailing/straight/alternate hosts, integration, downstream stages and export remain separate gaps |
 | 2026-07-20 | Record all five current candidate boundaries before selection | Implemented for Phase 1 evidence; the machine-readable register and fail-closed drift test freeze units, frames, tolerances, identities, ordering, schemas, effects and signature/invalidation behaviour without moving code, selecting a slice or clearing chair data |
 | 2026-07-20 | Make an external FreeCAD Workbench distributed as an Addon the product target | Accepted by the project owner; the modular `tracktemplate` package is authoritative, Addon Manager installation is the intended release route, and the `.FCMacro` is limited to migration or explicit compatibility rather than a second implementation |
-| 2026-07-20 | Score the five first-slice candidates using bounded static closure cuts and measured workflow evidence | Recommendation complete; schema 2 exposes root-versus-closure caller differences, the scorecard recommends the transition solver as a low-risk architecture pilot rather than a speed optimisation, and selection remains pending owner acceptance plus a named successor launcher/version |
+| 2026-07-20 | Score the five first-slice candidates using bounded static closure cuts and measured workflow evidence | Recommendation completed; schema 2 exposed root-versus-closure caller differences and the scorecard recommended the transition solver as a low-risk architecture pilot rather than a speed optimisation |
+| 2026-07-20 | Select and freeze the transition-length architecture pilot | Accepted by the project owner; candidate-register schema 3 points to an exact fail-closed contract, `10.2A8A7B16` and `TrackTemplate.FCMacro` are reserved for the development composition path, B14/B15 remain unchanged and source movement has not started |
 
 ## Remaining Phase 1 work
 
@@ -1081,10 +1094,11 @@ core attribution, signature and provenance gates.
   treating the current exact-shape replacement measurement as its budget.
 - Decide the supported FreeCAD/Python baseline and proposed legacy-document
   support window.
-- Review the scorecard recommendation with the project owner. If accepted,
-  name the successor launcher/version and freeze the transition pilot's
-  three-caller façade, legacy comparison path, parameter grid and exact
-  acceptance evidence before Phase 2 creates package structure.
+- Before starting Phase 2 source work, review the remaining Phase 1 exit gates
+  and obtain explicit phase-transition acceptance. When Phase 2 is started,
+  implement only the frozen transition pilot package/façade and reserved small
+  B16 composition root; do not alter the contract, B14 or B15 merely to ease
+  extraction.
 
 Phase 1 remains open until all exit criteria in
 [PROJECT_PLAN.md](PROJECT_PLAN.md) are met and accepted.

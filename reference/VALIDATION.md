@@ -13,6 +13,9 @@ change.
 
 - `AdvancedTurnout.FCMacro` is the immutable B14 legacy comparison oracle (`10.2A8A7B14`).
 - `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` is the accepted B15 behavioural reference entering Phase 1 (`10.2A8A7B15`).
+- `10.2A8A7B16` is reserved for the first modular migration development
+  checkpoint and `TrackTemplate.FCMacro` for its future small compatibility
+  launcher. Neither exists yet; this is not the public Workbench/RC version.
 - `tests/validate_b15.py` validates B15 structure/analysis, compares selected
   railway functions, and proves complete inherited-module AST parity with B14
   after normalising only version, launch, docstring, and recompute-instrumentation
@@ -173,11 +176,26 @@ This validates the five current candidate contracts against both complete
 macro fingerprints, exact literal/function AST anchors and the live structural
 inventory. It also derives the transition parameter order, station-data fields
 and current chair settings/rail/timber/position/finding/support/result/signature
-schemas from source. Schema 2 freezes the bounded static closure-cut counts and the
-scorecard's transition-pilot recommendation while keeping the selected ID
-null. Mutation checks prove that source drift, a promoted chair status, a
-missing schema or an inferred slice selection fails closed. It does not import
-either macro, select an extraction slice or approve current chair data.
+schemas from source. Inventory schema 2 freezes the bounded static closure-cut
+counts; candidate-register schema 3 records the owner-accepted transition
+selection and points to its exact pilot contract. Mutation checks prove that
+source drift, a promoted chair status, a missing schema or a changed selection
+fails closed. It does not import either macro, start extraction or approve
+current chair data.
+
+Selected transition-pilot contract and expanded parity grid:
+
+```bash
+.venv/bin/python tests/validate_phase1_transition_pilot.py
+```
+
+This verifies the exact B14/B15 fingerprints, three function signatures,
+`GEOMETRY_TOLERANCE`, three external caller routes, zero outgoing project
+dependencies, generated displacement/offset/solver grids, current error
+diagnostics, reserved B16/launcher identity, rollback rules and all declared
+evidence paths. While its status is `source-movement-not-started`, it also
+fails if the package or reserved launcher appears prematurely. It executes
+selected function definitions only and does not import or launch either macro.
 
 Phase 1 licensing-control and manifest-gate checks:
 

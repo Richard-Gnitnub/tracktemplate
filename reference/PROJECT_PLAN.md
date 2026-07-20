@@ -225,9 +225,13 @@ Choose migration order from evidence and establish oracles for behaviour that cu
 
 Chair analysis/presentation remains a high-payoff later candidate because B15
 has focused checks and the controlled chair workflow is exceptionally slow.
-The completed cut-boundary scorecard recommends the purer transition solver as
-the first architecture pilot. No candidate is selected until the project owner
-accepts that recommendation and its exact successor-version/acceptance scope.
+The completed cut-boundary scorecard recommended the purer transition solver
+as the first architecture pilot. The project owner accepted that selection on
+2026-07-20. The fail-closed
+[transition-pilot contract](contracts/phase1-transition-pilot.json) reserves
+development checkpoint `10.2A8A7B16` and a small `TrackTemplate.FCMacro`
+compatibility launcher, while explicitly keeping source movement unstarted and
+the public Workbench/RC version undecided.
 
 Current Phase 1 evidence is maintained in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Its first static tranche is
@@ -242,19 +246,23 @@ machine-readable candidate-boundary register now freezes inputs, outputs,
 units, frames, tolerances, identities, ordering, schemas, effects and
 signature/invalidation rules for all five static candidates. Its fail-closed
 test derives the station and chair record schemas from the exact B14/B15 ASTs
-and keeps selection open. Within the analyser's bounded static top-level call
-model, inventory schema 2 now distinguishes root callers from callers crossing
-the proposed dependency closure and records dependencies leaving that closure.
-The resulting
-[first-slice scorecard](PHASE1_SLICE_SCORECARD.md) recommends the
-three-function transition solver as the first architecture pilot, not as a
-performance optimisation: it has three external closure callers and no
-outgoing project-definition dependency. Stationing still needs an explicit
-point-adapter seam, while chair analysis retains alias coupling, 11 outgoing
-closure dependencies and known cache-signature gaps. The recommendation still
-requires project-owner acceptance and a named successor launcher/version; no
-slice is selected. Broader workflow boundaries, product-pipeline profiles and
-the remaining Phase 1 user decisions are still open. The fixed B14
+and candidate-register schema 3 records the accepted selection. Within the
+analyser's bounded static top-level call model, inventory schema 2
+distinguishes root callers from callers crossing the proposed dependency
+closure and records dependencies leaving that closure. The resulting
+[first-slice scorecard](PHASE1_SLICE_SCORECARD.md) selected the three-function
+transition solver as the first architecture pilot, not as a performance
+optimisation: it has three external closure callers and no outgoing
+project-definition dependency. The exact signatures, constant, expanded
+parameter grid, diagnostics, façade/caller route, rollback and profiling gates
+are now frozen in
+[contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json)
+and enforced without importing either macro. Stationing still needs an
+explicit point-adapter seam, while chair analysis retains alias coupling, 11
+outgoing closure dependencies and known cache-signature gaps. Broader workflow
+boundaries, product-pipeline profiles and the remaining Phase 1 user decisions
+are still open; package creation and source movement have not started. The
+fixed B14
 plain-line curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,
 grouping, ordered production catalogue and exact-shape summaries. This closes
@@ -429,7 +437,10 @@ Prove that modular source can load through both standalone Python and FreeCAD wi
   legacy `ordinary_track` identifiers only at an explicit compatibility
   boundary.
 - Establish a narrow `tracktemplate.api` façade and an explicit FreeCAD composition root.
-- Keep the working macro as the launcher while removing no legacy behaviour.
+- Keep B14 and B15 byte-identical. Introduce the reserved
+  `TrackTemplate.FCMacro` only as a small `10.2A8A7B16` development composition
+  root while removing no legacy behaviour; it must not contain another
+  maintained copy of the monolith.
 - Add a domain import test that fails if FreeCAD, Part, Qt, pivy, or exporter dependencies enter the domain boundary.
 - Add boundary checks for dependency direction and circular imports using the standard library or already-approved tooling.
 - Provide a deterministic legacy/new comparison harness capable of structured values, ordering, stable identities, diagnostics, and output metadata.
@@ -782,7 +793,8 @@ package licence and field/component provenance pass
 | Source/data/output classification policy | Resolved 2026-07-20 — neutral canonical data, one-way optional Templot adapter, package-specific licensing and no automatic project claim over ordinary output | Archive/output-notice review, GPL/CC scope review, `LICENSING_BOUNDARIES.md`, and owner acceptance |
 | Chair geometry method and RC scope | Resolved 2026-07-20 — full-size procedural constituent generation, validated external packages and one assisted S1 pilot; arbitrary automatic conversion remains post-RC research | Templot source audit and project-owner acceptance |
 | Scoped output lineage and first S1 package rights plan | Phase 1 exit | Complete first-S1/core-rail-timber classifications or an explicit S1 block; bounded other-S&C and legacy registers; validated manifest, B15 gap analysis, pilot evidence/licence, non-copyright review, intended commercial/publication use and comparison metrics |
-| Representative fixtures and first extraction slice | Phase 1 exit | Coverage, coupling, side-effect, and profile inventory |
+| First extraction slice | Resolved 2026-07-20 — transition-length solver selected as the architecture pilot; B16/launcher and exact acceptance contract reserved; source movement not started | Candidate contracts, bounded closure cuts, workflow profiles, scorecard and owner acceptance |
+| Remaining representative fixtures and Phase 1 profile coverage | Phase 1 exit | Coverage, workflow gaps and reconciled target-architecture profile inventory |
 | Supported FreeCAD/Python and legacy document window | Phase 1/4 | Environment evidence and migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |
 | Coin ViewProvider versus SVG/Qt editing view | Phase 5 exit | Selection, editing, persistence, and resource prototype |

@@ -1,13 +1,14 @@
 # Phase 1 First-Slice Scorecard
 
-Status: **recommendation complete; project-owner decision pending**. This
-scorecard recommends a first architecture pilot. It does not select a slice,
-authorise source extraction, advance Phase 1 or promise an operator-visible
-performance improvement.
+Status: **owner accepted; transition pilot selected; source movement not started**.
+This scorecard records the evidence behind the first architecture
+pilot. Selection does not itself start extraction, advance Phase 1 or promise
+an operator-visible performance improvement. The exact accepted boundary is in
+[contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json).
 
-## Decision being made
+## Decision made
 
-The first extraction has two possible jobs which must not be confused:
+The first extraction had two possible jobs which must not be confused:
 
 1. prove the modular package, standalone-domain import, temporary façade,
    parity comparison and rollback method with the smallest safe change; or
@@ -17,7 +18,7 @@ The current evidence supports the first job. It does not yet support using the
 chair hotspot as the first mechanical extraction. The candidate boundary
 contract is
 [contracts/phase1-candidate-boundaries.json](contracts/phase1-candidate-boundaries.json),
-schema 2. Its selection gate remains open.
+schema 3. Its selection gate points to the frozen pilot contract.
 
 ## Evidence scale
 
@@ -37,7 +38,7 @@ extraction, not whether the current implementation is fast.
 
 | Candidate | Correctness boundary | Mechanical cut | Performance evidence | Architectural value | First-slice disposition |
 | --- | --- | --- | --- | --- | --- |
-| Transition-length solver | **Strong** — direct numerical, endpoint, error and B14/B15 parity oracle | **Strong** — 3 platform-free definitions, 3 external closure callers, 0 outgoing definition dependencies | **Weak for speed** — exercised by workflow baselines but not isolated and not a measured hotspot | **Strong** — proves the domain package/façade/parity path with limited risk | **Recommend as the first architecture pilot, pending owner acceptance** |
+| Transition-length solver | **Strong** — direct numerical, endpoint, error and B14/B15 parity oracle | **Strong** — 3 platform-free definitions, 3 external closure callers, 0 outgoing definition dependencies | **Weak for speed** — exercised by workflow baselines but not isolated and not a measured hotspot | **Strong** — proves the domain package/façade/parity path with limited risk | **Selected as the first architecture pilot; source movement not started** |
 | Alignment station index | **Strong** — cumulative station, clamping, errors and workflow direction are characterised | **Conditional** — 1 definition but 15 external callers and shallow mutable inputs | **Weak** — no isolated station-index timing | **Strong** — foundational domain record, but a broader migration surface | Defer until the point/alignment record contract and caller groups are planned |
 | Alignment station interpolation | **Strong** — clamping, interpolation and duplicate-station ordering are characterised | **Blocker as currently cut** — the 2-definition closure includes shared `vector_xy`, producing 60 external closure callers | **Weak** — no isolated interpolation or caller-group timing | **Strong after redesign** — natural domain/FreeCAD adapter seam | Defer until pure XY/heading output is separated from `App.Vector` construction |
 | Chair-analysis core | **Conditional** — substantial B15 parity/schema evidence, but permissive inputs and signature gaps remain | **Blocker for a first move** — 39 definitions, 36 B14/39 B15 external closure callers, 11 outgoing dependencies and duplicate/alias chains | **Strong family-level hotspot, weak core attribution** — chair-position analysis is 125.798 s median, but the boundary includes extraction, cache, metadata and display work | **High later value** — directly relevant to lightweight editing and reuse | Prioritise as a later measured performance slice after instrumentation, schema, signature and provenance gates |
@@ -97,14 +98,17 @@ method cheaply before touching a high-fan-out station seam or the
 resource-intensive chair chain. A successful extraction is allowed to produce
 no perceptible speed-up; it must produce no meaningful regression.
 
-## Required acceptance contract for the recommended pilot
+## Accepted pilot contract
 
-Before source movement, the project owner must accept the recommendation and
-the project must name a successor launcher/version. Neither immutable B14 nor
-accepted-reference B15 is to be silently repurposed as the new production
-version.
+The project owner accepted the recommendation on 2026-07-20. The next
+migration checkpoint is reserved as `10.2A8A7B16`, and the future small
+compatibility launcher is reserved as `TrackTemplate.FCMacro`. This checkpoint
+identifier is not the public Workbench/RC version. Neither immutable B14 nor
+accepted-reference B15 is repurposed.
 
-The extraction then requires:
+The fail-closed contract at
+[contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json)
+freezes the following requirements before and during extraction:
 
 1. a small standalone domain module with no FreeCAD, Qt or third-party import;
 2. exact units, frames, parameter order, error diagnostics and tolerances from
@@ -140,6 +144,9 @@ The extraction then requires:
 - Recommended candidate: `transition_length_solver`.
 - Recommendation class: first architecture pilot, not performance
   optimisation.
-- Selected candidate: **none**.
-- Owner decision required: **yes**.
+- Selected candidate: `transition_length_solver`.
+- Owner decision required: **no — accepted 2026-07-20**.
+- Successor development checkpoint: `10.2A8A7B16`.
+- Reserved compatibility launcher: `TrackTemplate.FCMacro`.
+- Source movement started: **no**.
 - Phase 1 status: **open**.

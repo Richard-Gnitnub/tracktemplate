@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:transition-pilot:1",
+  "recorded_on": "2026-07-20",
+  "status": "selected-contract-frozen-source-movement-not-started",
+  "phase": 1,
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference"
+    }
+  },
+  "selection": {
+    "candidate_id": "transition_length_solver",
+    "selection_class": "first-architecture-pilot-not-performance-optimisation",
+    "owner_accepted_on": "2026-07-20",
+    "owner_acceptance_basis": "The project owner instructed Codex to commit and push the completed recommendation tranche and then work on the next tranche after being told that the next decision was acceptance of the transition pilot and its successor-version contract.",
+    "scorecard_path": "reference/PHASE1_SLICE_SCORECARD.md",
+    "candidate_register_path": "reference/contracts/phase1-candidate-boundaries.json",
+    "scope": "Select and freeze the pilot boundary only. This contract does not start source movement, create package files, close Phase 1, approve a performance optimisation or change B14/B15."
+  },
+  "successor": {
+    "development_checkpoint_id": "10.2A8A7B16",
+    "checkpoint_scope": "First modular migration development checkpoint; not the public Workbench, beta or release-candidate version.",
+    "compatibility_launcher_path": "TrackTemplate.FCMacro",
+    "compatibility_launcher_status": "reserved-not-created",
+    "compatibility_launcher_rule": "The launcher must remain small and delegate to the authoritative tracktemplate package. It must not contain or become a second maintained copy of B15.",
+    "authoritative_package": "tracktemplate",
+    "public_workbench_version_status": "deferred-to-release-qualification",
+    "behavioural_reference": "b15",
+    "legacy_oracle": "b14"
+  },
+  "module_boundary": {
+    "domain_module_path": "tracktemplate/domain/alignment.py",
+    "temporary_facade_path": "tracktemplate/api.py",
+    "facade_stability": "migration-only-no-public-api-stability-promise",
+    "standard_library_imports": [
+      "math"
+    ],
+    "forbidden_import_roots": [
+      "FreeCAD",
+      "FreeCADGui",
+      "Part",
+      "PySide",
+      "PySide2",
+      "PySide6",
+      "pivy"
+    ],
+    "constants": {
+      "GEOMETRY_TOLERANCE": 1e-08
+    },
+    "functions": [
+      {
+        "name": "clothoid_entry_displacement",
+        "parameters": [
+          "length",
+          "radius",
+          "integration_steps"
+        ],
+        "defaults": {
+          "integration_steps": 240
+        },
+        "return_contract": "Three-float tuple (local X millimetres, local Y millimetres, heading radians)."
+      },
+      {
+        "name": "transition_start_signed_offset",
+        "parameters": [
+          "circle_centre_y",
+          "radius",
+          "transition_length"
+        ],
+        "defaults": {},
+        "return_contract": "One float signed tangent offset in canonical local-left-turn millimetres."
+      },
+      {
+        "name": "solve_transition_length",
+        "parameters": [
+          "circle_centre_y",
+          "radius",
+          "target_signed_offset",
+          "total_angle",
+          "track_name",
+          "end_name"
+        ],
+        "defaults": {},
+        "return_contract": "One float transition length in millimetres."
+      }
+    ],
+    "external_caller_routes": [
+      {
+        "caller": "main_circle_centre",
+        "targets": [
+          "clothoid_entry_displacement"
+        ]
+      },
+      {
+        "caller": "build_concentric_core",
+        "targets": [
+          "clothoid_entry_displacement"
+        ]
+      },
+      {
+        "caller": "prepare_track_alignment",
+        "targets": [
+          "transition_start_signed_offset",
+          "solve_transition_length"
+        ]
+      }
+    ],
+    "outgoing_project_definition_dependencies": [],
+    "migration_route": "At the Phase 3 routing step, bind all three legacy global names to the temporary façade in the B16 development composition path so every recorded external caller reaches the modular implementation without editing B14 or B15.",
+    "current_input_policy": "Mechanical parity only. Preserve existing supported finite inputs and exact diagnostics; retain positive total_angle as a caller precondition and do not add finite/non-positive-angle validation during extraction.",
+    "behaviour_change_policy": "Validation hardening, formula cleanup, tolerance changes and optimisation require later separate accepted changes."
+  },
+  "parity_contract": {
+    "comparison": "Exact Python value/type equality and exact exception type/text between B14, B15 and the modular implementation; no tolerance widening is permitted for the mechanical extraction.",
+    "fixed_oracle_path": "tests/validate_phase1_alignment.py",
+    "pilot_validator_path": "tests/validate_phase1_transition_pilot.py",
+    "displacement_grid": {
+      "lengths_mm": [
+        -1.0,
+        0.0,
+        1e-08,
+        1e-07,
+        150.0,
+        600.0,
+        1200.0
+      ],
+      "radii_mm": [
+        300.0,
+        600.0,
+        1200.0
+      ],
+      "integration_steps": [
+        39,
+        40,
+        41,
+        240,
+        241
+      ]
+    },
+    "offset_grid": {
+      "circle_centre_y_mm": [
+        0.0,
+        624.7779655573173,
+        1000.0
+      ],
+      "radii_mm": [
+        300.0,
+        545.0,
+        655.0,
+        1200.0
+      ],
+      "transition_lengths_mm": [
+        -1.0,
+        0.0,
+        1e-08,
+        150.0,
+        600.0,
+        1200.0
+      ]
+    },
+    "solver_scenarios": [
+      {
+        "circle_centre_y_mm": 624.7779655573173,
+        "radius_mm": 655.0,
+        "total_angle_rad": 1.5707963267948966,
+        "track_name": "Outside Track",
+        "end_name": "Entry"
+      },
+      {
+        "circle_centre_y_mm": 624.7779655573173,
+        "radius_mm": 545.0,
+        "total_angle_rad": 1.5707963267948966,
+        "track_name": "Inside Track",
+        "end_name": "Exit"
+      },
+      {
+        "circle_centre_y_mm": 700.0,
+        "radius_mm": 900.0,
+        "total_angle_rad": 0.7853981633974483,
+        "track_name": "Quarter-angle Track",
+        "end_name": "Entry"
+      }
+    ],
+    "solver_target_fractions": [
+      0.0,
+      0.1,
+      0.25,
+      0.5,
+      0.75,
+      0.9,
+      1.0
+    ],
+    "error_cases": [
+      {
+        "function": "clothoid_entry_displacement",
+        "arguments": [
+          100.0,
+          0.0
+        ],
+        "exception_type": "ValueError",
+        "required_text": "A clothoid radius must be greater than zero."
+      },
+      {
+        "function": "clothoid_entry_displacement",
+        "arguments": [
+          100.0,
+          -600.0
+        ],
+        "exception_type": "ValueError",
+        "required_text": "A clothoid radius must be greater than zero."
+      },
+      {
+        "function": "solve_transition_length",
+        "arguments": [
+          624.7779655573173,
+          0.0,
+          -50.0,
+          1.5707963267948966,
+          "Bad Radius",
+          "Entry"
+        ],
+        "exception_type": "ValueError",
+        "required_text": "The radius for 'Bad Radius' must be greater than zero."
+      },
+      {
+        "function": "solve_transition_length",
+        "arguments": [
+          624.7779655573173,
+          655.0,
+          100.0,
+          1.5707963267948966,
+          "Track 2",
+          "Entry"
+        ],
+        "exception_type": "ValueError",
+        "required_text": "Entry spacing for 'Track 2' cannot be produced"
+      }
+    ],
+    "workflow_oracles": [
+      "tests/validate_phase1_alignment.py",
+      "tests/validate_phase1_ordinary_track.py",
+      "tests/validate_phase1_ordinary_edit.py",
+      "tests/validate_phase1_straight_station.py"
+    ],
+    "real_freecad_scope": "Run the affected plain-line and connected-straight GUI workflows under the successor composition path after routing exists; B14/B15 evidence remains unchanged."
+  },
+  "performance_contract": {
+    "purpose": "Guard against regression; the pilot is not expected or required to make operator-visible work faster.",
+    "calculation_profile": "Record repeated legacy and modular execution of the complete parity grid in the same standalone process/environment, reporting individual runs, median and range without using the result as an interaction budget.",
+    "workflow_profiles": [
+      "Plain-line left/right replacement under the fixed Phase 1 fixture.",
+      "Connected-straight creation and edit under the fixed Phase 1 fixture."
+    ],
+    "comparison_rule": "Use PERFORMANCE_SOP.md with equivalent inputs, process/cache state and output scope. Report every delta; do not claim improvement from this architecture pilot.",
+    "acceptance_rule": "No material regression beyond measured run-to-run noise, with all correctness oracles passing. Numerical thresholds require separate baseline evidence and owner acceptance."
+  },
+  "rollback_contract": {
+    "legacy_reference_retention": "Keep B14 immutable and B15 byte-identical as comparison/recovery evidence.",
+    "pre_routing_rollback": "Before any production caller is routed, removing the new package and reserved launcher must restore the exact pre-pilot repository behaviour.",
+    "routed_rollback": "The B16 development composition path must retain an explicit switch capable of routing all three names back to the captured B15 implementations until parity, standalone import, FreeCAD workflow and performance gates are accepted.",
+    "retirement_gate": "Remove the legacy comparison switch only after Phase 3 parity evidence and explicit project-owner acceptance; do not retire B14/B15 artifacts as part of this pilot."
+  },
+  "implementation_gates": [
+    "Phase 1 remains open; this selection satisfies only the first-slice decision part of its exit gate.",
+    "Do not create tracktemplate package files or TrackTemplate.FCMacro until Phase 2 source work is explicitly started.",
+    "Create only the package locations required by this three-function slice.",
+    "Prove standalone import without FreeCAD, Part, Qt, pivy or third-party dependencies before caller routing.",
+    "Run legacy-versus-modular parity before routing any caller, then route all three external callers together through the temporary façade.",
+    "Keep mechanical extraction separate from validation-policy changes, cleanup and optimisation.",
+    "Do not change B14 or B15; any runtime integration belongs to the reserved B16 development composition path."
+  ]
+}
