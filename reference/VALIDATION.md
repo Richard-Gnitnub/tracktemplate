@@ -167,6 +167,7 @@ Phase 1 licensing-control and manifest-gate checks:
 .venv/bin/python tools/validate_dependency_manifest.py \
   reference/manifests/s1-chair-pilot.dependency-manifest.json
 .venv/bin/python tests/validate_phase1_s1_lineage.py
+.venv/bin/python tests/validate_phase1_other_snc_legacy_lineage.py
 .venv/bin/python tests/validate_templot_s1_oracle.py
 .venv/bin/python tests/validate_templot_s1_generation_map.py
 ```
@@ -178,11 +179,24 @@ record. The S1 record must validate truthfully as `unknown`; it is not expected
 to pass the strict release gate yet.
 
 The lineage test separately enforces the bounded first-S1/core register: both
-scopes must remain blocked, every current Templot-dependent entry must remain
-`reference-only`, unresolved evidence and owners must be present, and all
-source anchors must match the immutable B14 and accepted B15 files. When the
+scopes must remain blocked, every current entry containing unresolved Templot
+reference data/media must remain `reference-only` without conflating that
+status with GPL source-expression compliance. Unresolved evidence and owners
+must be present, and all source anchors must match the immutable B14 and
+accepted B15 files. When the
 ignored local Templot archive is present it also verifies the archive and five
 reviewed active member hashes; a clean checkout does not require that archive.
+
+The other-S&C/legacy lineage test enforces the two remaining bounded scopes in
+[`lineage/phase1-other-snc-legacy-lineage.json`](lineage/phase1-other-snc-legacy-lineage.json):
+24 grouped dependencies retain their exact current `reference-only` or
+`unknown` status, every anchor matches the immutable B14 and accepted B15
+sources, and the two lineage files together cover all four audit-scope IDs.
+When the ignored archive is present it verifies the five cited upstream member
+hashes, including the explicitly inactive `chairs_unit_x.pas` evidence. It also
+requires the current absence of other-S&C/legacy output dependency manifests;
+adding one must be accompanied by a truthful register and validation update,
+not an inferred positive status.
 
 The oracle-contract test validates the blocked exact-556b capture
 specification, local-only artifact rule, rejected-version guard and synthetic

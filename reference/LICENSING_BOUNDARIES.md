@@ -345,6 +345,24 @@ of what is unresolved, not a positive rights or production decision. Its
 status may change only with the evidence and acceptance required below, never
 merely by editing the JSON.
 
+The tracked implementation for the third and fourth scopes is
+[`lineage/phase1-other-snc-legacy-lineage.json`](lineage/phase1-other-snc-legacy-lineage.json).
+It establishes a deliberately bounded group-level inventory rather than an
+unbounded retrospective clearance exercise: 14 other-S&C groups and 10 legacy
+B14/B15 groups have exact current source anchors, classifications, owners,
+dispositions and later gates. Fourteen groups are `reference-only` because a
+current output-affecting path includes unresolved Templot reference data; some
+also contain Templot source expression whose GPL compliance is tracked
+separately. The other ten remain `unknown`. There is no `restricted` finding
+in the record because no reviewed evidence currently supports that stronger status,
+and no group is `project-cleared`. The exact `chairs_unit_x.pas` citation is
+recorded as an inactive alternate, not as evidence of the active 556b route.
+
+The two machine-readable files therefore house all four scoped Phase 1
+registers. Establishing the latter two registers satisfies the bounded-
+inventory deliverable only. It does not complete their field-level lineage,
+create an output dependency manifest, clear legacy output, or close Phase 1.
+
 For each applicable scope the project must:
 
 1. inventory every table, profile, constant, rule, asset, and generated

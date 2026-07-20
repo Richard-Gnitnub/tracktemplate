@@ -52,7 +52,9 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Lineage audit scopes | first S1; core rail/timber used by S1; other S&C output; legacy B14/B15 output |
 | First-S1/core lineage register | `reference/lineage/phase1-s1-core-lineage.json`, schema 1; 16 current output-affecting groups, all `reference-only` or `unknown`, with both scopes visibly `blocked` |
 | First-S1/core lineage contract | `tests/validate_phase1_s1_lineage.py`; verifies register semantics, B14/B15 source anchors, the optional local archive hashes and the unresolved S1 manifest link |
-| Current B14/B15 project-control output status | `unknown` pending its scoped output-affecting lineage audit; this is not a new output restriction |
+| Other-S&C/legacy lineage register | `reference/lineage/phase1-other-snc-legacy-lineage.json`, schema 1; 24 bounded output-affecting groups, 14 `reference-only` and 10 `unknown`, with both scopes visibly `blocked` |
+| Other-S&C/legacy lineage contract | `tests/validate_phase1_other_snc_legacy_lineage.py`; verifies the two remaining scopes, exact B14/B15 anchors, optional local evidence hashes, all-four-scope coverage and absent current output manifests |
+| Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
 | Production-source changes in this tranche | None |
 
 The `ordinary_track` filenames, imports, commands and recipe IDs in this
@@ -81,6 +83,7 @@ unresolved S1 pilot record:
 .venv/bin/python tools/validate_dependency_manifest.py \
   reference/manifests/s1-chair-pilot.dependency-manifest.json
 .venv/bin/python tests/validate_phase1_s1_lineage.py
+.venv/bin/python tests/validate_phase1_other_snc_legacy_lineage.py
 ```
 
 Run the first direct B14/B15 transition and station characterisation oracle:
@@ -401,9 +404,10 @@ scan/mesh is canonical production geometry.
 The bounded current-path map is now machine-readable in
 [`lineage/phase1-s1-core-lineage.json`](lineage/phase1-s1-core-lineage.json).
 It records 16 output-affecting groups across the S1 and shared rail/timber
-paths: nine are `reference-only` because their present basis includes Templot
-reference data or source expression, and seven are `unknown` pending an
-independent evidence source or an accepted engineering/manufacturing decision.
+paths: nine are `reference-only` because their present basis includes
+unresolved Templot reference data, while source-expression compliance remains
+a separate GPL question; seven are `unknown` pending an independent evidence
+source or an accepted engineering/manufacturing decision.
 The register freezes 27 literal/function source anchors in B14/B15 and hashes
 the five reviewed active upstream units when the ignored local archive is
 available.
@@ -419,6 +423,37 @@ records structure, values, disposition and owners; it does not approve the
 current values for a production package. No Templot code was copied into
 production, no macro was changed and both registered scopes remain visibly
 `blocked`.
+
+### Other-S&C and legacy B14/B15 bounded lineage
+
+The two remaining scopes are now machine-readable in
+[`lineage/phase1-other-snc-legacy-lineage.json`](lineage/phase1-other-snc-legacy-lineage.json).
+This is a group-level boundary and ownership map, not an assertion that every
+historic constant has been independently cleared. Its 14 other-S&C groups
+cover the current C10 rails and timbers, centreline-anchored lifecycle,
+crossover connector and topology gates, automatic timber-resolution stages,
+special-chair assignment, host integration and inherited export path. Its 10
+legacy groups cover persisted/user state, retained FreeCAD shapes, all current
+production formats and reports, B15 chair representations, output boilerplate,
+external assets/exporters and the version/release boundary.
+
+Fourteen groups are `reference-only` because their current output path includes
+unresolved Templot reference data. Some also contain Templot source expression,
+whose GPL compliance is tracked separately. Ten are `unknown` pending project
+evidence or decisions. There is no `restricted` finding
+because the reviewed record does not support that stronger classification, and
+there is no `project-cleared` group. `chairs_unit_x.pas` is retained only to
+explain the macro's historical citation; the register explicitly records that
+it is an inactive alternate in the exact 556b project.
+
+The contract test freezes 43 literal/function anchors across the exact B14 and
+B15 hashes, checks five upstream members when the ignored archive is present,
+and proves that the two lineage files together cover the four audit-scope IDs.
+It also confirms that no current other-S&C or legacy output dependency manifest
+exists. The later gates require an exact advertised workflow, field-level
+lineage, embedded-material review, validated output manifest, non-copyright
+reviews and owner acceptance. Completing an independently evidenced S1 package
+will not silently clear the legacy macro or current special-trackwork output.
 
 ### Frozen S1 comparison-oracle capture contract
 
@@ -603,7 +638,7 @@ is known to be defective.
 | Assisted chair assimilation | Accepted RC scope; no implementation oracle yet | One S1 pilot to be selected | Precise prototype designation, evidence provenance/rights, intended commercial/publication use, calibrated scan/CAD/measurement set, component landmarks, fit-residual policy, package licence and acceptance recipe |
 | Host integration | Controlled crossover acceptance | `XO-001` stage 6 | Standalone turnout, removal/reversal, rollback and legacy-document variants |
 | Save/reopen | B15 crossover acceptance and B14 plain-line edit-lifecycle oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Broader entity families and future schema migration |
-| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback, future deferred exact-shape reconstruction, other-S&C/legacy lineage maps and integration of the dependency/project-status manifest |
+| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback, future deferred exact-shape reconstruction, output-specific other-S&C/legacy lineage closure and integration of the dependency/project-status manifest |
 | Failure recovery | Transactional source paths, strict bridge dialog policy, plain-line edit lifecycle and both export fault injections | Edit oracle proves zero-angle rejection/post-removal abort and bounds B14's three-entry incomplete Undo states; selected export proves byte restoration; create-time export freezes the current 13-file partial result and unchanged document | Make successor edit commands and create-time output atomic under accepted contracts; add equivalent fixtures for other release-critical workflows |
 
 Existing crossover evidence remains owned by
@@ -965,6 +1000,7 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-20 | Adopt explicit source/data/output licensing boundaries | Accepted; GPL source compliance is separated from engineering facts, Templot reference data/media and generated-output dependencies; neutral chair data and a one-way optional Templot adapter are required, CC0-1.0 is only a reviewed per-package target, and ordinary output receives no project NC restriction merely by generation |
 | 2026-07-20 | Make the licensing boundary executable and scope the lineage audit | Implemented for owner review within the already accepted direction; rename the internal positive status to `project-cleared`, require a validated manifest before that status, record non-copyright reviews, add prospective DCO/data declarations, and split the audit into first-S1, core rail/timber, other S&C and legacy scopes so unresolved legacy breadth stays blocked without preventing independently evidenced S1 work |
 | 2026-07-20 | Create the bounded first-S1/core rail-and-timber lineage register | Implemented for Phase 1 evidence; 16 current output-affecting groups have exact B14/B15 anchors, classifications, dispositions, evidence needs and owners, while the S1 and core scopes intentionally remain blocked pending independent evidence and accepted decisions |
+| 2026-07-20 | Establish the bounded other-S&C and legacy B14/B15 lineage registers | Implemented for Phase 1 evidence; 24 grouped output dependencies have exact current anchors, statuses, owners and later gates, while 14 remain `reference-only`, 10 remain `unknown`, no output manifest exists and neither scope receives positive clearance |
 | 2026-07-20 | Define a fail-closed exact-556b S1 oracle capture contract | Implemented for Phase 1 evidence and owner review; the exact source/member route, isolated settings, local-only artifact policy and DXF/STL semantics are executable, while the installed 5.55a candidate is rejected and the oracle remains visibly blocked pending an exact 556b executable, frozen fixture, capture and review |
 | 2026-07-20 | Use B14's controlled connected pair as the first straight/station workflow oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes route/station direction, stable identities, exact inherited joins, length editing, full history recovery, raw persistence and production catalogue without changing either macro; independent-datum GUI, physical station/platform and target-file export remain separate gaps |
 | 2026-07-20 | Add a dedicated centreline-anchored standalone-turnout lifecycle oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes one left/facing REA C10 creation, handed edit, exact history/persistence, stable objects, ordered production records, occupied-chainage rejection and in-transaction abort without changing either macro; trailing/straight/alternate hosts, integration, downstream stages and export remain separate gaps |
@@ -983,12 +1019,13 @@ create-time series covers fresh legacy exact-shape construction only.
   timber/chair stages and target-file export.
 - Record candidate boundary schemas, units, frames, tolerances, identities,
   ordering, signatures and invalidation inputs.
-- Keep the first-S1/core register blocked until its named evidence and decision
-  gates are resolved; create bounded other-S&C and legacy B14/B15 registers
-  with current statuses, owners and later gates. The machine-readable
-  manifest, validator, non-copyright fields and contribution declaration now
-  exist; wire their fail-closed `project-cleared` gate into the later
-  package/export path.
+- Keep all four lineage scopes blocked until their named evidence and decision
+  gates are resolved. The bounded other-S&C and legacy registers now exist;
+  complete field-level lineage only for an exact advertised output before its
+  later gate, rather than asserting blanket historical clearance. The
+  machine-readable manifest, validator, non-copyright fields and contribution
+  declaration now exist; wire their fail-closed `project-cleared` gate into
+  the later package/export path.
 - Complete the remaining Templot chair-generation value/transform map and
   execute the defined frozen-S1 capture recipe after an exact 556b executable
   and its build/acquisition evidence are available. Keep the exact fixture and

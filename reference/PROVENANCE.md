@@ -159,6 +159,19 @@ field or package. The current values and exact source-unit links remain
 `reference-only` in
 [`lineage/phase1-s1-core-lineage.json`](lineage/phase1-s1-core-lineage.json).
 
+The remaining current output boundary is grouped in
+[`lineage/phase1-other-snc-legacy-lineage.json`](lineage/phase1-other-snc-legacy-lineage.json).
+It records 14 other-S&C and 10 legacy B14/B15 output-affecting groups with
+their exact current macro anchors, five cited upstream members,
+classifications, owners and later gates. This is a bounded provenance
+inventory, not a legal or release clearance: groups containing unresolved
+Templot reference data remain `reference-only`, source-expression compliance
+remains a separate GPL question, other unresolved groups remain `unknown`, and
+no current output-specific dependency manifest exists. The register also preserves
+`chairs_unit_x.pas` as inactive alternate evidence for a historical macro
+citation; it does not contradict the active-unit finding above or promote that
+file into the exact 556b generation route.
+
 This documentation change records the source/data-flow findings and intended
 boundary. It does not copy or translate Pascal implementation into production
 code and does not alter either macro.

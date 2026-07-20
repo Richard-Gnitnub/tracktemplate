@@ -1,0 +1,1220 @@
+{
+  "schema_version": 1,
+  "register_id": "tracktemplate:phase1:other-snc-and-legacy-lineage:1",
+  "recorded_on": "2026-07-20",
+  "status": "blocked",
+  "status_reason": "These bounded registers identify the current output-affecting groups and later gates, but they do not provide field-level independent evidence or output dependency manifests. Templot-dependent groups remain reference-only and the other unresolved groups remain unknown.",
+  "intended_uses": [
+    "public-redistribution",
+    "commercial-production",
+    "publication",
+    "physical-production"
+  ],
+  "owners": {
+    "project-provenance-review": "Classify current values and expressive source at field level, locate independent evidence, and record permissions and database-rights considerations.",
+    "project-geometry-review": "Define accepted turnout, crossover, timber and chair inputs, derivations, numerical tolerances and comparison evidence.",
+    "project-export-review": "Inventory embedded output material and boilerplate, generate output dependency manifests, and validate reproducible artifacts.",
+    "project-owner": "Accept each advertised output scope, evidence bundle, declared uses, non-copyright-rights record and release decision."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference"
+    },
+    "templot5_archive": {
+      "path": "reference/t5_files_556b_06_feb_2025.zip",
+      "sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3",
+      "role": "ignored read-only local comparison evidence",
+      "required_in_clean_checkout": false
+    }
+  },
+  "upstream_evidence": [
+    {
+      "evidence_id": "templot5-556b-math-unit",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+      "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65",
+      "symbols": [
+        "switchtimbers",
+        "make_crossover",
+        "drawtimber"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "permitted_role": "local special-trackwork comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-switch-select",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/switch_select.pas",
+      "sha256": "0412d14ee0b3a7dc223031438bdd93d21aa08d629d1e987089dd9241c10f4ffb",
+      "symbols": [
+        "init_switch_data",
+        "switch_info"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "permitted_role": "local switch/timber comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-shove-timber",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/shove_timber.pas",
+      "sha256": "57d0b10afad40dd92d85d5e0a5dcecbfa2ef31cf1d94691113de89846a98d1d7",
+      "symbols": [
+        "shoved timber handling",
+        "long crossover timber guidance"
+      ],
+      "classifications": [
+        "templot_source_expression"
+      ],
+      "permitted_role": "local timber-behaviour comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-chairs-unit",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+      "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b",
+      "symbols": [
+        "T_2d_data",
+        "init_2d_rea"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "permitted_role": "local chair-assignment comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-chairs-unit-x",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit_x.pas",
+      "sha256": "aff0e0079c4749c1132aac0ff15a742afef3f13080178c2ad66545be7235d92a",
+      "symbols": [
+        "draw_chairs_on_timber"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "permitted_role": "local cited inactive-alternate evidence",
+      "active_in_exact_556b_project": false
+    }
+  ],
+  "source_anchors": [
+    {
+      "anchor_id": "literal:turnout-source-note",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_SOURCE_NOTE",
+      "expected_value": "REA C switch and regular 1:10 common-crossing geometry cross-checked against the Templot5 math_unit.pas calculation model"
+    },
+    {
+      "anchor_id": "literal:turnout-timber-source-note",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_TIMBER_SOURCE_NOTE",
+      "expected_value": "REA C-switch and regular-crossing timber positions cross-checked against Templot5 switch_select.pas and math_unit.pas"
+    },
+    {
+      "anchor_id": "literal:turnout-timber-length-step",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_TIMBER_LENGTH_INCREMENT_INCHES",
+      "expected_value": 6.0
+    },
+    {
+      "anchor_id": "literal:turnout-rail-content",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_RAIL_GEOMETRY_CONTENT",
+      "value_sha256": "311a0b67a428c8be13a247fa7d3bfae79e9c70f6c9675fb9d117263e032f6fb6"
+    },
+    {
+      "anchor_id": "literal:turnout-default-gauge",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_DEFAULT_GAUGE",
+      "expected_value": 16.5
+    },
+    {
+      "anchor_id": "literal:turnout-default-flangeway",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_DEFAULT_FLANGEWAY",
+      "expected_value": 1.0
+    },
+    {
+      "anchor_id": "literal:turnout-rail-sample-spacing",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_RAIL_SAMPLE_SPACING",
+      "expected_value": 1.0
+    },
+    {
+      "anchor_id": "literal:turnout-overlap-tolerance",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_OVERLAP_TOLERANCE",
+      "expected_value": 0.1
+    },
+    {
+      "anchor_id": "literal:crossover-source-note",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_SOURCE_NOTE",
+      "expected_value": "Natural REA C10 turnout geometry reused from the A8A5 engine; ordinary-crossover pairing cross-checked against Templot5 revision 556b math_unit.pas make_crossover and TXP calculations"
+    },
+    {
+      "anchor_id": "literal:crossover-default-minimum-radius",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_DEFAULT_MINIMUM_RADIUS",
+      "expected_value": 600.0
+    },
+    {
+      "anchor_id": "literal:crossover-connector-sample-spacing",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_CONNECTOR_SAMPLE_SPACING",
+      "expected_value": 1.0
+    },
+    {
+      "anchor_id": "literal:crossover-position-tolerance",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_POSITION_TOLERANCE",
+      "expected_value": 1e-05
+    },
+    {
+      "anchor_id": "literal:crossover-timber-analysis-basis",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_TIMBER_ANALYSIS_SOURCE_BASIS",
+      "value_sha256": "5715c5ce332fb514199e3d3b631295b1452ba199113163d3088ae2ce285a9a4a"
+    },
+    {
+      "anchor_id": "literal:crossover-shared-timber-basis",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_SHARED_TIMBER_SOURCE_BASIS",
+      "value_sha256": "8985a1c4e357f4fa736114f7d7d51e2791868d9c62c5e396e36f02b7ac4fd6d2"
+    },
+    {
+      "anchor_id": "literal:crossover-b3-basis",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_B3_SOURCE_BASIS",
+      "value_sha256": "150975c43b0445b3f549b1f893ef701df31e1a780cca9386c96db086dfc63a12"
+    },
+    {
+      "anchor_id": "literal:crossover-b3-maximum-movement",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_B3_MAXIMUM_MOVEMENT",
+      "expected_value": 1.5
+    },
+    {
+      "anchor_id": "literal:crossover-b3-movement-increment",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_B3_MOVEMENT_INCREMENT",
+      "expected_value": 0.25
+    },
+    {
+      "anchor_id": "literal:crossover-b4-basis",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_B4_SOURCE_BASIS",
+      "value_sha256": "81c56bab65aafc5389392f82975ad1e8a2b631ff0c623ce16dc4163a605b74c0"
+    },
+    {
+      "anchor_id": "literal:crossover-integration-basis",
+      "kind": "literal_assignment",
+      "symbol": "CROSSOVER_INTEGRATION_SOURCE_BASIS",
+      "value_sha256": "b31b6415bad57a49942bf10c8d1d49714a0bbf286c44d26a46aa38690f0226ae"
+    },
+    {
+      "anchor_id": "literal:chair-analysis-basis",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_ANALYSIS_SOURCE_BASIS",
+      "value_sha256": "e6bb9f0addbd8b1d43beaeb3856c4accd13b6d29f1a45bae71a7bd1c788fb243"
+    },
+    {
+      "anchor_id": "literal:production-record-schema",
+      "kind": "literal_assignment",
+      "symbol": "PRODUCTION_RECORD_SCHEMA_VERSION",
+      "expected_value": 2
+    },
+    {
+      "anchor_id": "literal:export-manifest-fields",
+      "kind": "literal_assignment",
+      "symbol": "EXPORT_MANIFEST_FIELDS",
+      "value_sha256": "bd805463c150ddc457bb98e3a779622af41733401dbc20d6bd21899be40280a0"
+    },
+    {
+      "anchor_id": "literal:export-subtype-filenames",
+      "kind": "literal_assignment",
+      "symbol": "EXPORT_SUBTYPE_FILENAMES",
+      "value_sha256": "0dfeb924325e9bb841b98320a634da2d6c0cafe838eec9c48799cb84b12c4276"
+    },
+    {
+      "anchor_id": "literal:template-thickness",
+      "kind": "literal_assignment",
+      "symbol": "TEMPLATE_THICKNESS",
+      "expected_value": 1.0
+    },
+    {
+      "anchor_id": "function:turnout-rails",
+      "kind": "function_ast",
+      "symbol": "rea_c10_complete_rail_polylines",
+      "ast_sha256": "ab098a2fda93163b6778284bc085b622b775e8291bdef331e1ba06786f6d543a"
+    },
+    {
+      "anchor_id": "function:turnout-timbers",
+      "kind": "function_ast",
+      "symbol": "rea_c10_timber_layout",
+      "ast_sha256": "3e6f6f7d4aec79d158c9ad2a66baae7b50e6b9dcba2a319b56af8080bcda7eaa"
+    },
+    {
+      "anchor_id": "function:turnout-mapping-metrics",
+      "kind": "function_ast",
+      "symbol": "turnout_mapping_metrics",
+      "ast_sha256": "409087a71c993d90ea9f1ecce719e0313443d16d1b624dcb5328ba5d7f2674ee"
+    },
+    {
+      "anchor_id": "function:create-turnout",
+      "kind": "function_ast",
+      "symbol": "create_curve_inheriting_c10_turnout",
+      "ast_sha256": "a88799c21cf3659f0571530c03a50d4879c1e230b6667f4524894b784d17204b",
+      "b15_ast_sha256": [
+        "8a94f6c93568d30a627fca2d7caeb6755c6915a3f5ac4df804905593ba8b4b54"
+      ]
+    },
+    {
+      "anchor_id": "function:turnout-host-integration",
+      "kind": "function_ast",
+      "symbol": "build_turnout_host_integration",
+      "ast_sha256": "1c09183d5baba3bb2699b2b7624324635e78e3f78723e3218a1f95e99e01cf94"
+    },
+    {
+      "anchor_id": "function:solve-crossover",
+      "kind": "function_ast",
+      "symbol": "solve_rea_c10_crossover_geometry",
+      "ast_sha256": "2afb94127a6bbb593016aa98ffce2dcb12b5696466e5278f61db02f6d1303a17"
+    },
+    {
+      "anchor_id": "function:crossover-topology",
+      "kind": "function_ast",
+      "symbol": "_crossover_validate_topology",
+      "ast_sha256": "734ec5d0264d82348abe0a1ea731b001c341841f77c053d122acf7ecce5b679f"
+    },
+    {
+      "anchor_id": "function:create-crossover",
+      "kind": "function_ast",
+      "symbol": "create_rea_c10_crossover",
+      "ast_sha256": "50dffacd0cc0f45fd624ab6f77a83089ec195932b07fb34221f0b438459fb545",
+      "b15_ast_sha256": [
+        "1762d5ea1ef9c969d10ef29b720875562b5050ee9852f2dfd18e4d7376238f7e"
+      ]
+    },
+    {
+      "anchor_id": "function:analyse-crossover-timbers",
+      "kind": "function_ast",
+      "symbol": "analyse_crossover_timber_records",
+      "ast_sha256": "e753e24772210488c7d894100854a9f8d17096a592b2471effec5a8190af10cd"
+    },
+    {
+      "anchor_id": "function:shared-long-timbers",
+      "kind": "function_ast",
+      "symbol": "propose_crossover_shared_long_timbers",
+      "ast_sha256": "a93263b1c859db1919d17140a6fc6b1746f83e3fffbd6d9a6a1b7a19f877ca15"
+    },
+    {
+      "anchor_id": "function:controlled-shove",
+      "kind": "function_ast",
+      "symbol": "resolve_crossover_b3_timbering",
+      "ast_sha256": "cd8a58e7333bda5271a6198b2c4e9e6ac3eb4bfdd573e2d07757894b9b9bcc4f"
+    },
+    {
+      "anchor_id": "function:hybrid-timber-resolution",
+      "kind": "function_ast",
+      "symbol": "resolve_crossover_b4_timbering",
+      "ast_sha256": "85c4b17928c7c0a6d9cf95e1a33e097c4278d97d24328bf4b9eff9e66e95a3b4"
+    },
+    {
+      "anchor_id": "function:crossover-host-integration",
+      "kind": "function_ast",
+      "symbol": "build_crossover_host_integration",
+      "ast_sha256": "68f5f64758d9254a9a0c1bfc8833929ebdc98a0f18fa206bc1fd3e50f934f12c"
+    },
+    {
+      "anchor_id": "function:chair-assignment",
+      "kind": "function_ast",
+      "symbol": "_chair_assignment",
+      "ast_sha256": "9bf727da547f443aae039909ccd914a606f10868fd35121e6f00f3093ef1afd6"
+    },
+    {
+      "anchor_id": "function:template-shape",
+      "kind": "function_ast",
+      "symbol": "create_template_shape",
+      "ast_sha256": "b970abf7b7d02c70adb276515938f42b835fea221ef3728d3900d816eaf49a1c"
+    },
+    {
+      "anchor_id": "function:production-records",
+      "kind": "function_ast",
+      "symbol": "build_production_export_records",
+      "ast_sha256": "ae19c6670d8d3634623380fb25fde521d1327fa4c6e30d7640ac13196e2404c0"
+    },
+    {
+      "anchor_id": "function:dispatch-export",
+      "kind": "function_ast",
+      "symbol": "dispatch_freecad_export",
+      "ast_sha256": "fd9b2b7c21a3d11922ea996587facee8df1250788c0ccf7a3b044db7263b6ebc"
+    },
+    {
+      "anchor_id": "function:write-export-manifest",
+      "kind": "function_ast",
+      "symbol": "write_export_manifest",
+      "ast_sha256": "c68038b880a31446527e30aa1491557349c7952aefb64c72979b99026f0eeacb"
+    },
+    {
+      "anchor_id": "function:run-production-export",
+      "kind": "function_ast",
+      "symbol": "run_production_export",
+      "ast_sha256": "1c9fef11f669542a68a55805b92c4dfdd7871af77cb0f244e58df0f1603e6540"
+    }
+  ],
+  "scopes": [
+    {
+      "scope_id": "other-switches-crossings-output",
+      "status": "blocked",
+      "owner_roles": [
+        "project-provenance-review",
+        "project-geometry-review",
+        "project-export-review",
+        "project-owner"
+      ],
+      "included": [
+        "the current REA C10 turnout rail, timber and centreline-anchored lifecycle path",
+        "the current paired-turnout crossover connector, topology and feasibility path",
+        "crossover timber analysis, shared-long-timber, interlacing, controlled-shove and hybrid-resolution paths",
+        "turnout/crossover chair assignment, host integration and production-export inheritance"
+      ],
+      "excluded": [
+        "the first reusable S1 definition and its core rail/timber qualification path, which have their own register",
+        "plain-line, curve, station and platform output except where they act as a special-trackwork host",
+        "turnout sizes, switch families, crossings and track systems not implemented by B14/B15",
+        "raw Templot-generated media and future independently evidenced neutral definitions"
+      ],
+      "later_gate": "Before any named turnout or crossover output is advertised as project-cleared, its output-specific dependency manifest must trace every selected geometry, timber, chair, integration and embedded-output input; every Templot-backed collection must be independently re-evidenced or remain reference-only, numerical and manufacturing rules must be accepted, non-copyright reviews must pass, and the project owner must accept the declared uses.",
+      "entries": [
+        {
+          "entry_id": "snc.rea-c10-rail-family-and-defaults",
+          "subject": "Current REA C10 switch, closure, crossing, wing and check-rail geometry",
+          "output_effect": "Defines the rail family, fixed C-switch/1:10 crossing arrangement, gauge and flangeway used by every current turnout and inherited crossover road.",
+          "observed_values": {
+            "supported_size": "REA C10 natural",
+            "default_gauge_mm": 16.5,
+            "default_flangeway_mm": 1.0,
+            "rail_groups": 6,
+            "source_description": "cross-checked against the Templot5 math_unit calculation model"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:turnout-source-note",
+            "literal:turnout-rail-content",
+            "literal:turnout-default-gauge",
+            "literal:turnout-default-flangeway",
+            "function:turnout-rails"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Retain as the legacy C10 comparison path. Re-establish the complete switch and crossing definition from accepted railway evidence before a project-cleared C10 release.",
+          "evidence_needed": [
+            "Precise REA C-switch and 1:10 crossing specification with permitted primary evidence",
+            "Field-level dimensions, relationships, units and tolerances separated from implementation expression",
+            "Accepted geometry oracle across both hands and orientations"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "snc.host-anchoring-mapping-and-turnout-lifecycle",
+          "subject": "Centreline-anchored turnout placement, identity and transactional lifecycle",
+          "output_effect": "Projects a selected toe chainage onto a persisted host centreline, maps local geometry into the document, allocates stable identities and controls create/edit/integrate/remove transactions.",
+          "observed_values": {
+            "anchor": "persisted host centreline identity plus chainage",
+            "supported_hands": [
+              "Left-hand",
+              "Right-hand"
+            ],
+            "supported_orientations": [
+              "Facing in host travel direction",
+              "Trailing against host travel direction"
+            ],
+            "current_oracle": "bounded standalone-turnout lifecycle fixture"
+          },
+          "classifications": [
+            "engineering_method",
+            "project_derivation",
+            "user_design"
+          ],
+          "source_anchor_ids": [
+            "function:turnout-mapping-metrics",
+            "function:create-turnout",
+            "function:turnout-host-integration"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Keep the anchored placement architecture, but document and accept its coordinate-frame, identity, transaction and legacy-document contracts before positive output status.",
+          "evidence_needed": [
+            "Complete mapping frame, handedness and orientation contract",
+            "Accepted lifecycle behaviour for all supported hosts and failure paths",
+            "Output manifest link from user design inputs to produced artifacts"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "snc.turnout-feasibility-sampling-and-tolerances",
+          "subject": "Current mapped-turnout sampling, overlap and feasibility policy",
+          "output_effect": "Controls curve discretisation, minimum-radius observations, occupied-host rejection and whether mapped geometry is accepted before document commit.",
+          "observed_values": {
+            "rail_sample_spacing_mm": 1.0,
+            "overlap_tolerance_mm": 0.1,
+            "current_status": "behaviour-characterised, engineering rationale not yet accepted"
+          },
+          "classifications": [
+            "engineering_method",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:turnout-rail-sample-spacing",
+            "literal:turnout-overlap-tolerance",
+            "function:turnout-mapping-metrics"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Separate numerical approximation from railway acceptance limits and justify each tolerance without changing the frozen legacy oracle silently.",
+          "evidence_needed": [
+            "Named numerical and engineering tolerances with units and rationale",
+            "Boundary tests proving equivalent decisions at supported scales and host curvature",
+            "Accepted preview/commit diagnostic parity"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "snc.turnout-timber-stationing-and-length-rules",
+          "subject": "C10 timber regions, centres, end geometry, length steps and support identities",
+          "output_effect": "Determines every turnout timber station, orientation, prototype width/length, stepped manufactured length and protected support reference inherited by later chairing and crossover resolution.",
+          "observed_values": {
+            "regions": [
+              "switch",
+              "closure",
+              "crossing",
+              "exit"
+            ],
+            "length_step_prototype_in": 6.0,
+            "source_description": "Templot-cross-checked C-switch and regular-crossing timber positions"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:turnout-timber-source-note",
+            "literal:turnout-timber-length-step",
+            "function:turnout-timbers"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-shove-timber"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Preserve as legacy output and comparison evidence; build an independently sourced timbering definition before qualifying complete C10 output.",
+          "evidence_needed": [
+            "Independent timber centre, width, length and numbering evidence",
+            "Accepted rounding and manufacturing-length policy",
+            "Full output comparison including protected support identities"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "snc.crossover-pairing-and-connector-geometry",
+          "subject": "Current paired-C10 crossover arrangement and local connector solver",
+          "output_effect": "Selects the second turnout toe, hand/orientation and tangent-continuous connector family, thereby changing route length, radius, rail shapes and both constituent placements.",
+          "observed_values": {
+            "default_minimum_radius_mm": 600.0,
+            "connector_sample_spacing_mm": 1.0,
+            "families": [
+              "biarc",
+              "cubic Bezier fallback",
+              "bounded CSC"
+            ],
+            "source_description": "pairing cross-checked against Templot5 make_crossover and TXP calculations"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:crossover-source-note",
+            "literal:crossover-default-minimum-radius",
+            "literal:crossover-connector-sample-spacing",
+            "function:solve-crossover"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Keep the current solver as behavioural reference. Separate established connection geometry from project search policy and independently evidence the selected railway arrangement.",
+          "evidence_needed": [
+            "Accepted crossover arrangement and turnout-pairing rules",
+            "Derivation and tests for each connector family and selection merit",
+            "Comparison oracle for straight and curved hosts"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "snc.crossover-topology-and-numerical-gates",
+          "subject": "Crossover locality, direction, tangency, corridor and radius acceptance gates",
+          "output_effect": "Rejects connectors that backtrack, loop, enter switch regions, violate endpoint direction/tangency or fall below the configured minimum radius.",
+          "observed_values": {
+            "position_tolerance_mm": 1e-05,
+            "validation": "sampled local-route and directed endpoint topology",
+            "current_status": "regression-characterised, rationale and tolerance ownership unresolved"
+          },
+          "classifications": [
+            "engineering_method",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:crossover-position-tolerance",
+            "function:crossover-topology"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Retain the safety gate while its geometry predicates, tolerance classes and preview/commit contract are documented and accepted.",
+          "evidence_needed": [
+            "Predicate-by-predicate topology contract",
+            "Numerical tolerance and sampling justification",
+            "Failing and passing fixtures around every boundary"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "snc.crossover-timber-analysis",
+          "subject": "Inherited timber conflict, spacing and protected-support analysis",
+          "output_effect": "Classifies intersections, duplicate support, near-touching ends, clear spacing, skew and protected-feature support before any automatic timber resolution.",
+          "observed_values": {
+            "input": "two inherited C10 timber arrangements plus connector context",
+            "source_groups": 5,
+            "result": "cached findings, severity and support records"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:crossover-timber-analysis-basis",
+            "function:analyse-crossover-timbers"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-shove-timber",
+            "templot5-556b-chairs-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Use findings to characterise B14/B15 only until every source position, severity rule and numerical threshold is independently justified.",
+          "evidence_needed": [
+            "Independent prototype support and clearance rules",
+            "Separation of geometric tolerances from manufacturing limits",
+            "Complete fixture set for clear, conflict and critical outcomes"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "snc.shared-long-timber-envelope",
+          "subject": "Automatic shared-long-timber envelope and plain-line return",
+          "output_effect": "Replaces eligible inherited pairs with long shared supports, expands their envelope across roads and determines where further interlacing or shoving is required.",
+          "observed_values": {
+            "input_authority": "oriented inherited timber records and protected support zones",
+            "plain_return": "derived from inherited Main template width",
+            "current_status": "legacy automatic resolver"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:crossover-shared-timber-basis",
+            "function:shared-long-timbers"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-shove-timber"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Keep as a comparison result; replace inherited reference-only positions and independently justify envelope, return and eligibility policy before production clearance.",
+          "evidence_needed": [
+            "Prototype long-timber and adjacent-road support evidence",
+            "Accepted envelope, return and collision rules",
+            "Output oracle for all shared/partial/conflict statuses"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "snc.interlacing-and-controlled-shove",
+          "subject": "Crossover interlacing, omission and bounded longitudinal timber movement",
+          "output_effect": "Moves or omits eligible inherited timbers where long timbers alone cannot resolve conflicts and preserves protected support limits.",
+          "observed_values": {
+            "default_maximum_movement_mm": 1.5,
+            "default_search_increment_mm": 0.25,
+            "twisting": "excluded",
+            "source_description": "Templot shove workflow used as precedent"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:crossover-b3-basis",
+            "literal:crossover-b3-maximum-movement",
+            "literal:crossover-b3-movement-increment",
+            "function:controlled-shove"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-shove-timber"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Retain as bounded legacy behaviour. Treat the current movement/search limits as unresolved manufacturing policy until independently supported and accepted.",
+          "evidence_needed": [
+            "Independent interlacing, omission and timber-movement practice",
+            "Manufacturing and structural justification for movement limits",
+            "Deterministic minimal-change and protected-feature tests"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "snc.hybrid-automatic-timber-resolution",
+          "subject": "Combined shared-envelope and controlled-shove crossover timber result",
+          "output_effect": "Selects the final effective production timber set, carries unresolved positions forward and controls the geometry offered to host integration and later chair analysis.",
+          "observed_values": {
+            "strategy": "rebuild shared envelope, then apply bounded B3 only to unresolved eligible positions",
+            "unsafe_positions": "retained explicitly",
+            "current_status": "legacy resolver output"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation",
+            "generated_output"
+          ],
+          "source_anchor_ids": [
+            "literal:crossover-b4-basis",
+            "function:hybrid-timber-resolution"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-shove-timber"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Do not treat the combined result as an independently cleared timber design; it inherits every unresolved source and policy dependency from the preceding stages.",
+          "evidence_needed": [
+            "Cleared inputs for shared and moved timbers",
+            "Accepted combination and unresolved-position rules",
+            "Output-level dependency manifest and equivalence evidence"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "snc.host-integration-and-production-record-binding",
+          "subject": "Reversible turnout/crossover host integration and production-record replacement",
+          "output_effect": "Cuts and replaces host template sections, binds stable source/output identities, changes visibility and updates the ordered production catalogue used by export.",
+          "observed_values": {
+            "turnout_integration": "reversible",
+            "crossover_integration": "uses current resolved timber signature",
+            "production_record_schema": 2
+          },
+          "classifications": [
+            "project_derivation",
+            "generated_output"
+          ],
+          "source_anchor_ids": [
+            "literal:crossover-integration-basis",
+            "literal:production-record-schema",
+            "function:turnout-host-integration",
+            "function:crossover-host-integration"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Retain the reversible architecture, but document exact replacement semantics and bind it to cleared geometry/timber dependencies before clearing integrated output.",
+          "evidence_needed": [
+            "Canonical source-to-integrated identity and ordering contract",
+            "Transactional create/remove/change-back and persistence evidence",
+            "Output manifest that preserves every upstream geometry dependency"
+          ],
+          "owner_role": "project-export-review"
+        },
+        {
+          "entry_id": "snc.special-chair-assignment-and-current-geometry-gap",
+          "subject": "Switch, crossing, wing and check-rail chair assignment",
+          "output_effect": "Assigns ordinary, joint and special chair codes and records unsupported production-critical positions; current B14/B15 exact solids cover only S1/S1J approximations.",
+          "observed_values": {
+            "ordinary_supported_codes": [
+              1,
+              7
+            ],
+            "special_families": [
+              "switch",
+              "common-crossing",
+              "wing-rail",
+              "check-rail"
+            ],
+            "special_solids": "not implemented"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:chair-analysis-basis",
+            "function:chair-assignment"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-chairs-unit",
+            "templot5-556b-chairs-unit-x"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Keep assignments and unsupported positions as legacy analysis evidence. Do not infer cleared special-chair definitions from codes or the inactive chairs_unit_x citation.",
+          "evidence_needed": [
+            "Independent chairing practice and complete constituent definitions for every released family",
+            "Active-source versus historical-citation reconciliation",
+            "Position, orientation, keying and physical-fit oracles"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "snc.output-projection-and-export-path",
+          "subject": "Special-trackwork retained shapes, 2D projections and production exports",
+          "output_effect": "Turns the selected turnout/crossover geometry and integration records into FreeCAD objects and DXF, SVG, STL, STEP or CSV artifacts with format-specific projections.",
+          "observed_values": {
+            "formats": [
+              "DXF",
+              "SVG",
+              "STL",
+              "STEP",
+              "CSV"
+            ],
+            "dependency_rule": "generated output inherits the unresolved status of selected geometry, timber and chair inputs",
+            "output_manifest": "legacy descriptive manifest, not the dependency/project-status manifest"
+          },
+          "classifications": [
+            "generated_output",
+            "project_derivation",
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "function:create-crossover",
+            "function:production-records",
+            "function:dispatch-export",
+            "function:run-production-export"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-shove-timber",
+            "templot5-556b-chairs-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Continue private development and comparison under the project licence; do not advertise current special-trackwork artifacts as project-cleared until their exact dependency manifest passes.",
+          "evidence_needed": [
+            "Artifact-specific dependency manifest for every advertised format and scope",
+            "Embedded-material and exporter-boilerplate audit",
+            "Geometric, transactional and reproducibility validation"
+          ],
+          "owner_role": "project-export-review"
+        },
+        {
+          "entry_id": "snc.release-manifest-and-rights-gate",
+          "subject": "Other-S&C project status, package/output manifest and non-copyright review",
+          "output_effect": "Controls whether a named turnout/crossover configuration and any artifact made from it can receive the project's positive release status.",
+          "observed_values": {
+            "scope_dependency_manifest": "not present",
+            "non_copyright_reviews": "not performed",
+            "current_positive_status": false,
+            "register_role": "bounded blocker and ownership map only"
+          },
+          "classifications": [
+            "third_party_evidence",
+            "generated_output"
+          ],
+          "source_anchor_ids": [],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Create an output-specific manifest only after the selected geometry/data path is fully known; leave every current special-trackwork output blocked meanwhile.",
+          "evidence_needed": [
+            "Complete field-level lineage for the exact released configuration",
+            "Validated dependency manifest and compatible intended-use permissions",
+            "Registered/unregistered-design, patent and trade-mark reviews plus owner acceptance"
+          ],
+          "owner_role": "project-owner"
+        }
+      ]
+    },
+    {
+      "scope_id": "legacy-b14-b15-output",
+      "status": "blocked",
+      "owner_roles": [
+        "project-provenance-review",
+        "project-geometry-review",
+        "project-export-review",
+        "project-owner"
+      ],
+      "included": [
+        "current B14/B15 persisted configuration, generated FreeCAD objects and production records",
+        "current DXF, SVG, STL, STEP, CSV, report and legacy manifest paths",
+        "current B15 lightweight chair display and retained/export-preparation body path",
+        "current output naming, metadata, external exporter and third-party-input boundaries"
+      ],
+      "excluded": [
+        "GPL source-distribution compliance and attribution, which remain governed by LICENSE, NOTICE.md and PROVENANCE.md",
+        "raw Templot PDFs, screenshots, drawings, DXF/STL/data files and the local comparison oracle",
+        "future neutral ChairDefinition packages and successor output paths",
+        "an unbounded retrospective assertion about outputs or user inputs not represented by the current B14/B15 paths"
+      ],
+      "later_gate": "Legacy output remains unknown or reference-only, and cannot be project-cleared, unless the exact advertised B14/B15 workflow receives an output-specific dependency manifest covering canonical inputs, derived geometry, embedded material, exporter boilerplate and user assets; every dependency and intended use must pass the project gate, non-copyright reviews and explicit owner acceptance. Completion of an independent S1 package does not clear this legacy scope.",
+      "entries": [
+        {
+          "entry_id": "legacy.source-informed-geometry-and-data-basis",
+          "subject": "B14/B15 source-informed railway geometry, timbering and chair data",
+          "output_effect": "Supplies current special-trackwork coordinates, support arrangements and chair assignments that flow into retained objects and exported artifacts.",
+          "observed_values": {
+            "project_history": "source-informed, not clean-room",
+            "named_upstream_units": [
+              "math_unit.pas",
+              "switch_select.pas",
+              "shove_timber.pas",
+              "chairs_unit.pas",
+              "chairs_unit_x.pas"
+            ],
+            "positive_output_status": "not established"
+          },
+          "classifications": [
+            "templot_source_expression",
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:turnout-source-note",
+            "literal:turnout-timber-source-note",
+            "literal:crossover-source-note",
+            "literal:crossover-timber-analysis-basis",
+            "literal:chair-analysis-basis"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-shove-timber",
+            "templot5-556b-chairs-unit",
+            "templot5-556b-chairs-unit-x"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Keep the project-wide GPL source basis and comparison history explicit. Do not treat GPL compliance as proof that the underlying value collections or output rights are cleared.",
+          "evidence_needed": [
+            "Output-path-specific classification of every inherited value collection",
+            "Independent evidence or accepted permissions for each production input",
+            "Separation of GPL expression compliance from data and output status"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "legacy.user-input-and-persisted-parametric-state",
+          "subject": "User alignment choices, macro defaults and persisted document configuration",
+          "output_effect": "Controls alignment, scale, gauge, dimensions, template assembly, selected output scope and stable identities reconstructed after save/reopen.",
+          "observed_values": {
+            "user_design": "alignment, topology and selected parameters",
+            "project_defaults": "mixed with calculated and inherited values",
+            "persistence": "typed FreeCAD properties plus ordered JSON payloads",
+            "field_level_lineage": "not yet complete"
+          },
+          "classifications": [
+            "user_design",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:production-record-schema",
+            "literal:template-thickness",
+            "function:template-shape"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Preserve user design as a distinct classification, but do not let a user-authored alignment hide unresolved project defaults or inherited datasets in its output.",
+          "evidence_needed": [
+            "Field-level persisted-state schema with source and unit for every output-affecting property",
+            "Explicit distinction between user inputs, defaults, calculations and imported values",
+            "Legacy-document migration and invalidation contract"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "legacy.retained-freecad-shapes-and-document-objects",
+          "subject": "Editable and retained exact Part geometry in B14/B15 documents",
+          "output_effect": "Stores template, turnout, crossover, timber, rail, construction-mark and current chair geometry in FreeCAD objects that can be displayed, saved or selected for export.",
+          "observed_values": {
+            "representation": "current editable documents retain exact and production-source Part geometry",
+            "normal_editing_cost": "resource intensive",
+            "dependency_status": "inherits unresolved geometry and data inputs"
+          },
+          "classifications": [
+            "generated_output",
+            "project_derivation",
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "function:template-shape",
+            "function:create-turnout",
+            "function:create-crossover"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-shove-timber"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Treat retained shapes as legacy generated output, not as an independent rights basis or future canonical model. Defer successor exact shapes to Validate/Export.",
+          "evidence_needed": [
+            "Per-object dependency manifest or reproducible link to canonical state",
+            "Defined lightweight-versus-exact reconstruction boundary",
+            "Persistence and geometry equivalence tests"
+          ],
+          "owner_role": "project-export-review"
+        },
+        {
+          "entry_id": "legacy.dxf-svg-stl-step-export-artifacts",
+          "subject": "Current project-generated 2D and 3D production files",
+          "output_effect": "Serialises selected B14/B15 shapes and projections into DXF, SVG, STL or STEP artifacts whose geometry inherits every selected source dependency.",
+          "observed_values": {
+            "formats": [
+              "DXF",
+              "SVG",
+              "STL",
+              "STEP"
+            ],
+            "current_transaction_evidence": "bounded plain-line explicit and create-time workflows only",
+            "Templot_media": "not embedded merely because Templot is used as an oracle"
+          },
+          "classifications": [
+            "generated_output",
+            "project_derivation",
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "function:dispatch-export",
+            "function:run-production-export"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-shove-timber",
+            "templot5-556b-chairs-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Do not impose a blanket Templot-media label on project-generated files, but keep current artifacts reference-only because their actual production inputs are not independently cleared.",
+          "evidence_needed": [
+            "Format- and scope-specific output dependency manifest",
+            "Audit of exporter-added headers, names, metadata and third-party material",
+            "Complete geometry, scale, unit, transaction and reproducibility evidence"
+          ],
+          "owner_role": "project-export-review"
+        },
+        {
+          "entry_id": "legacy.csv-manifests-reports-and-production-records",
+          "subject": "Production catalogues, schedules, CSV reports and legacy export manifest",
+          "output_effect": "Publishes identities, labels, dimensions, format paths, status and material/production facts derived from the current document and geometry.",
+          "observed_values": {
+            "production_record_schema": 2,
+            "legacy_manifest_fields": 21,
+            "dependency_manifest": "not the same as the legacy export manifest",
+            "status_inheritance": "not implemented"
+          },
+          "classifications": [
+            "generated_output",
+            "project_derivation",
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "literal:production-record-schema",
+            "literal:export-manifest-fields",
+            "function:production-records",
+            "function:write-export-manifest"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-shove-timber",
+            "templot5-556b-chairs-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Retain the operational reports, but add machine-readable dependency status rather than treating a successful file-write manifest as rights clearance.",
+          "evidence_needed": [
+            "Field-level report provenance and status propagation",
+            "Stable relation between production records, canonical model and artifacts",
+            "Dependency-manifest integration with failure-closed export"
+          ],
+          "owner_role": "project-export-review"
+        },
+        {
+          "entry_id": "legacy.b15-chair-display-and-retained-body",
+          "subject": "B15 lightweight chair symbols and S1/S1J retained/export-preparation bodies",
+          "output_effect": "Displays low-detail plan symbols and can prepare five-box S1/S1J bodies while leaving all special-chair solids unsupported.",
+          "observed_values": {
+            "body": "five-box approximation",
+            "supported_codes": [
+              1,
+              7
+            ],
+            "special_chair_solids": "not implemented",
+            "owning_detailed_register": "reference/lineage/phase1-s1-core-lineage.json"
+          },
+          "classifications": [
+            "generated_output",
+            "project_derivation",
+            "templot_source_expression",
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "literal:chair-analysis-basis",
+            "function:chair-assignment"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-chairs-unit",
+            "templot5-556b-chairs-unit-x"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Retain solely as accepted B15 behavioural and performance reference. The independent S1 package gate is not inherited by, and does not clear, this legacy representation.",
+          "evidence_needed": [
+            "Resolution of every first-S1/core register gate for a new package",
+            "Explicit decision whether legacy symbols/bodies remain comparison-only",
+            "Output-specific manifest if any legacy representation is distributed as production geometry"
+          ],
+          "owner_role": "project-owner"
+        },
+        {
+          "entry_id": "legacy.output-names-labels-and-boilerplate",
+          "subject": "Project filenames, object labels, report headings and exporter-added boilerplate",
+          "output_effect": "Adds human-readable names, field headings, path metadata and format-specific material around or within generated artifacts.",
+          "observed_values": {
+            "subtype_filename_mappings": 30,
+            "legacy_manifest_fields": 21,
+            "embedded_material_audit": "not complete"
+          },
+          "classifications": [
+            "generated_output",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:export-subtype-filenames",
+            "literal:export-manifest-fields",
+            "function:write-export-manifest"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Inventory project-authored and exporter-added boilerplate separately from geometry; remove, replace, attribute or record any third-party embedded material before positive status.",
+          "evidence_needed": [
+            "Artifact inspection for headers, comments, metadata, logos, fonts and identifiers",
+            "Authorship/licence record for deliberate embedded content",
+            "Deterministic boilerplate tests by format"
+          ],
+          "owner_role": "project-export-review"
+        },
+        {
+          "entry_id": "legacy.user-assets-fonts-and-external-exporters",
+          "subject": "User-supplied assets and FreeCAD/exporter material that may enter an artifact",
+          "output_effect": "May introduce third-party geometry, text rendering, fonts, metadata or format boilerplate independently of the macro's railway calculations.",
+          "observed_values": {
+            "tracked_third_party_cad_or_scan_asset": "none identified in this bounded register",
+            "freecad_export_dispatch": "runtime adapter boundary",
+            "future_user_inputs": "must be declared per output rather than assumed clear"
+          },
+          "classifications": [
+            "third_party_evidence",
+            "user_design",
+            "generated_output"
+          ],
+          "source_anchor_ids": [
+            "function:dispatch-export"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Require the output manifest to identify retained user assets and deliberately embedded third-party material; do not infer authority from successful import or export.",
+          "evidence_needed": [
+            "Input and embedded-asset enumeration for the exact workflow",
+            "Applicable FreeCAD/exporter licence and output-boilerplate review",
+            "User declaration and permission status for retained third-party inputs"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "legacy.dependency-manifest-and-non-copyright-gate",
+          "subject": "Legacy B14/B15 output dependency status and non-copyright review",
+          "output_effect": "Controls whether any precisely named historical workflow can receive project-cleared status for redistribution, production or publication.",
+          "observed_values": {
+            "legacy_output_dependency_manifest": "not present",
+            "registered_design_review": "not performed",
+            "unregistered_design_review": "not performed",
+            "patent_review": "not performed",
+            "trade_mark_review": "not performed"
+          },
+          "classifications": [
+            "third_party_evidence",
+            "generated_output"
+          ],
+          "source_anchor_ids": [],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Leave legacy output uncleared unless a deliberately selected workflow is audited through the current manifest and non-copyright gates; do not attempt an unbounded retrospective declaration.",
+          "evidence_needed": [
+            "Exact advertised subject, version, artifacts and intended uses",
+            "Complete validated output dependency manifest",
+            "Territory-specific non-copyright reviews and explicit owner acceptance"
+          ],
+          "owner_role": "project-owner"
+        },
+        {
+          "entry_id": "legacy.b14-b15-version-and-release-boundary",
+          "subject": "Immutable B14 oracle and accepted B15 behavioural-reference boundary",
+          "output_effect": "Determines which historical implementation and chair-display variation an oracle, benchmark, document or artifact actually represents.",
+          "observed_values": {
+            "b14_role": "immutable legacy comparison oracle",
+            "b15_role": "accepted behavioural reference",
+            "macro_hashes": "frozen in source_state",
+            "release_status_inheritance": "none"
+          },
+          "classifications": [
+            "project_derivation",
+            "generated_output"
+          ],
+          "source_anchor_ids": [
+            "function:create-turnout",
+            "function:create-crossover",
+            "function:run-production-export"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Keep version roles and hashes explicit. Behavioural acceptance, benchmark reproducibility and GPL distribution do not confer project-cleared status on either version's output.",
+          "evidence_needed": [
+            "Version-specific output subject and complete dependency set",
+            "Recorded equivalence and intentional-difference evidence",
+            "Independent release decision for each advertised legacy path"
+          ],
+          "owner_role": "project-owner"
+        }
+      ]
+    }
+  ]
+}

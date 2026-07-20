@@ -308,18 +308,30 @@ permissions, package licence, non-copyright reviews and owner acceptance exist.
 The lineage work is now divided into the four owned scopes above rather than
 making a complete historical macro audit an implicit prerequisite for S1.
 
-The first two scopes now have a bounded machine-readable current-path register
+The first two scopes have a bounded machine-readable current-path register
 at [lineage/phase1-s1-core-lineage.json](lineage/phase1-s1-core-lineage.json).
 It records 16 output-affecting groups with exact B14/B15 source anchors,
 dispositions, evidence needs and owners. Nine groups remain `reference-only`
-because the present path includes Templot comparison data or source expression;
-seven remain `unknown` pending independent evidence or accepted project
-decisions. Its drift test verifies both macro fingerprints, literal/function
+because the present path includes unresolved Templot reference data; source-
+expression compliance remains a separate GPL question. Seven remain `unknown`
+pending independent evidence or accepted project decisions. Its drift test
+verifies both macro fingerprints, literal/function
 anchors, the S1 pilot manifest link and, when available, the ignored local
 archive and five reviewed active source members. Both scopes therefore take the exit
 gate's explicit blocked branch; this evidence neither clears the five-box body
-nor selects production S1 values. Other-S&C and legacy B14/B15 registers,
-primary S1 evidence and the frozen constituent/assembly oracle remain open.
+nor selects production S1 values.
+
+The remaining two bounded registers are now housed in
+[lineage/phase1-other-snc-legacy-lineage.json](lineage/phase1-other-snc-legacy-lineage.json).
+They inventory 14 other-S&C and 10 legacy B14/B15 output-affecting groups,
+freeze their current B14/B15 and optional local-upstream anchors, assign all
+four owner roles, and state each later output gate. Fourteen groups remain
+`reference-only` and ten remain `unknown`; no group is `restricted` or
+`project-cleared`, and no other-S&C or legacy output dependency manifest yet
+exists. This completes the Phase 1 bounded-register deliverable without
+pretending to complete the field-level historical audit. Primary S1 evidence,
+the frozen constituent/assembly oracle, output-specific lineage/manifest
+closure and the other Phase 1 gates remain open.
 
 The proposed frozen-S1 oracle now has a fail-closed machine-readable capture
 contract at

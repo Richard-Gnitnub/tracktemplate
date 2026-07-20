@@ -64,6 +64,10 @@ TEMPLOT_CLASSIFICATIONS = {
     "templot_reference_data",
     "templot_media_output",
 }
+REFERENCE_ONLY_TEMPLOT_CLASSIFICATIONS = {
+    "templot_reference_data",
+    "templot_media_output",
+}
 
 
 def _sha256_bytes(payload):
@@ -266,9 +270,22 @@ def validate_register(document):
                 errors.append("{} has an invalid project status".format(entry_id))
             if status == "project-cleared":
                 errors.append("{} cannot be project-cleared in this register".format(entry_id))
-            if TEMPLOT_CLASSIFICATIONS.intersection(classifications) and status != "reference-only":
+            reference_only_dependency = bool(
+                REFERENCE_ONLY_TEMPLOT_CLASSIFICATIONS.intersection(
+                    classifications
+                )
+            )
+            if reference_only_dependency and status != "reference-only":
                 errors.append(
-                    "{} uses Templot evidence and must be reference-only".format(entry_id)
+                    "{} uses Templot reference data/media and must be reference-only".format(
+                        entry_id
+                    )
+                )
+            if status == "reference-only" and not reference_only_dependency:
+                errors.append(
+                    "{} needs an output-blocking Templot classification for reference-only status".format(
+                        entry_id
+                    )
                 )
             source_ids = entry.get("source_anchor_ids")
             if not isinstance(source_ids, list) or len(set(source_ids)) != len(source_ids):

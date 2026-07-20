@@ -153,6 +153,12 @@
   `tests/validate_phase1_s1_lineage.py` protects its classifications, blocked
   status, B14/B15 source anchors, manifest link and optional local evidence
   hashes. It is an audit record, not an accepted production definition.
+- `reference/lineage/phase1-other-snc-legacy-lineage.json` houses the bounded
+  remaining other-S&C and legacy B14/B15 registers;
+  `tests/validate_phase1_other_snc_legacy_lineage.py` protects their 24 grouped
+  dependencies, current statuses, exact B14/B15 anchors, optional local
+  evidence hashes, four-scope coverage and absent current output manifests.
+  It establishes owners and later gates; it does not clear current output.
 - `reference/lineage/templot5-556b-s1-generation-map.json` records the bounded
   active 556b code-1 value/unit/frame/constituent/transform route;
   `tests/validate_templot_s1_generation_map.py` protects its exact source
@@ -199,8 +205,8 @@
   dependency is `restricted`, `reference-only`, `unknown`, `NOASSERTION`, or
   incompatible with the declared intended use. A machine-readable manifest
   must also pass `tools/validate_dependency_manifest.py --require-project-cleared`.
-  Current B14/B15 output remains uncleared for that status until its scoped
-  Phase 1 lineage audit closes.
+  Current B14/B15 output remains uncleared for that status until its applicable
+  field-level lineage, output-manifest and acceptance gates close.
 - Do not edit a lineage status, classification, expected source value or hash
   merely to make its validation pass. Reconcile the actual source/evidence,
   record the reason and preserve the blocked state until every named evidence
@@ -349,6 +355,7 @@ Run the licensing-control tests and validate the current S1 pilot record:
 .venv/bin/python tools/validate_dependency_manifest.py \
   reference/manifests/s1-chair-pilot.dependency-manifest.json
 .venv/bin/python tests/validate_phase1_s1_lineage.py
+.venv/bin/python tests/validate_phase1_other_snc_legacy_lineage.py
 .venv/bin/python tests/validate_templot_s1_oracle.py
 ```
 
