@@ -166,14 +166,24 @@ Phase 1 licensing-control and manifest-gate checks:
 .venv/bin/python tests/validate_licensing_controls.py
 .venv/bin/python tools/validate_dependency_manifest.py \
   reference/manifests/s1-chair-pilot.dependency-manifest.json
+.venv/bin/python tests/validate_phase1_s1_lineage.py
 ```
 
 The test checks the Draft 2020-12 schema vocabulary, package/output structural
 rules, fail-closed `project-cleared` semantics, non-copyright-rights reviews,
 contribution authority, duplicate identities and the current S1 control
 record. The S1 record must validate truthfully as `unknown`; it is not expected
-to pass the strict release gate yet. Any package or output proposed for the
-positive internal status must additionally pass:
+to pass the strict release gate yet.
+
+The lineage test separately enforces the bounded first-S1/core register: both
+scopes must remain blocked, every current Templot-dependent entry must remain
+`reference-only`, unresolved evidence and owners must be present, and all
+source anchors must match the immutable B14 and accepted B15 files. When the
+ignored local Templot archive is present it also verifies the archive and six
+reviewed member hashes; a clean checkout does not require that archive.
+
+Any package or output proposed for the positive internal status must
+additionally pass:
 
 ```bash
 .venv/bin/python tools/validate_dependency_manifest.py \

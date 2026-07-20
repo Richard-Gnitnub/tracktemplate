@@ -133,6 +133,16 @@ transcribing the upstream DXF face writer. Output and method equivalence must be
 supported by recorded geometric evidence; different implementation technology
 does not justify relabelling the work clean-room.
 
+The bounded first-S1 lineage audit found a bibliographic lead in the
+`chairs_unit.pas` S1 plan-data comments: **Standard Railway Equipment 1926** is
+cited for the S1 ordinary-chair values. This is a second-hand upstream comment,
+not project-held primary evidence. The project has not yet identified the
+precise document, obtained a copy, verified the cited dimensions or reviewed
+its reuse status. It may guide the evidence search, but it cannot clear a
+field or package. The current values and exact source-unit links remain
+`reference-only` in
+[`lineage/phase1-s1-core-lineage.json`](lineage/phase1-s1-core-lineage.json).
+
 This documentation change records the source/data-flow findings and intended
 boundary. It does not copy or translate Pascal implementation into production
 code and does not alter either macro.

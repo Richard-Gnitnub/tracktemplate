@@ -293,9 +293,9 @@ reviewed GPL source snapshot, and finds no general CC BY-NC-SA output licence
 in revision 556b. The owner accepted the neutral data, one-way compatibility,
 package-licence and generated-output policy in
 [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). This resolves the policy
-direction, not the field-by-field audit: current B14/B15 output remains
-`unknown` for project-control clearance until the lineage and dependency
-manifest deliverables above are completed.
+direction, not positive clearance: current B14/B15 output remains `unknown`
+for project-control clearance until its applicable lineage and dependency-
+manifest gates are completed.
 
 The licensing-control follow-up now renames the internal positive status to
 `project-cleared`, records the project owner's prior acceptance explicitly,
@@ -307,6 +307,19 @@ remains `unknown` and fails `--require-project-cleared` until primary evidence,
 permissions, package licence, non-copyright reviews and owner acceptance exist.
 The lineage work is now divided into the four owned scopes above rather than
 making a complete historical macro audit an implicit prerequisite for S1.
+
+The first two scopes now have a bounded machine-readable current-path register
+at [lineage/phase1-s1-core-lineage.json](lineage/phase1-s1-core-lineage.json).
+It records 16 output-affecting groups with exact B14/B15 source anchors,
+dispositions, evidence needs and owners. Nine groups remain `reference-only`
+because the present path includes Templot comparison data or source expression;
+seven remain `unknown` pending independent evidence or accepted project
+decisions. Its drift test verifies both macro fingerprints, literal/function
+anchors, the S1 pilot manifest link and, when available, the ignored local
+archive and six reviewed source members. Both scopes therefore take the exit
+gate's explicit blocked branch; this evidence neither clears the five-box body
+nor selects production S1 values. Other-S&C and legacy B14/B15 registers,
+primary S1 evidence and the frozen constituent/assembly oracle remain open.
 
 Canonical **plain line** terminology and the compatibility treatment of the
 legacy `ordinary-*` evidence identifiers are now recorded in

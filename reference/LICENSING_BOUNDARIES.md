@@ -335,6 +335,16 @@ that the complete legacy macro has already been cleared:
    S1 package can be accepted, but it must close before legacy output is
    advertised as project-cleared.
 
+The tracked implementation for the first two scopes is
+[`lineage/phase1-s1-core-lineage.json`](lineage/phase1-s1-core-lineage.json).
+It inventories the current B14/B15 S1 approximation and the rail/timber path
+that can affect it, links exact source anchors and local comparison-evidence
+hashes, and records a disposition, evidence need and owner for every group.
+Both scopes are intentionally `blocked`; the register is an auditable account
+of what is unresolved, not a positive rights or production decision. Its
+status may change only with the evidence and acceptance required below, never
+merely by editing the JSON.
+
 For each applicable scope the project must:
 
 1. inventory every table, profile, constant, rule, asset, and generated

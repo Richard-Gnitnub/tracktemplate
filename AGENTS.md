@@ -148,6 +148,11 @@
   `tools/validate_dependency_manifest.py` owns its fail-closed semantic gate,
   and `tests/validate_licensing_controls.py` protects both. The tracked S1
   pilot record is `reference/manifests/s1-chair-pilot.dependency-manifest.json`.
+- `reference/lineage/phase1-s1-core-lineage.json` is the bounded current-path
+  register for the first S1 and its shared rail/timber inputs;
+  `tests/validate_phase1_s1_lineage.py` protects its classifications, blocked
+  status, B14/B15 source anchors, manifest link and optional local evidence
+  hashes. It is an audit record, not an accepted production definition.
 - `CONTRIBUTING.md` owns the prospective DCO sign-off and the separate data and
   evidence declaration. Never invent a retrospective contributor attestation.
 - `LICENSE` and `NOTICE.md` apply GPL-3.0-or-later to the project, preserve the Templot5 source-basis attribution, and record particular thanks to Martin Wynne and Steve Cornford. Preserve both files and all applicable upstream notices.
@@ -183,6 +188,10 @@
   must also pass `tools/validate_dependency_manifest.py --require-project-cleared`.
   Current B14/B15 output remains uncleared for that status until its scoped
   Phase 1 lineage audit closes.
+- Do not edit a lineage status, classification, expected source value or hash
+  merely to make its validation pass. Reconcile the actual source/evidence,
+  record the reason and preserve the blocked state until every named evidence
+  and owner-acceptance gate has genuinely closed.
 - CC0-1.0 is the target for a project-authored factual chair-definition package
   intended for unrestricted reuse only when that package is explicitly marked
   after a complete rights review. Never apply CC0 by assumption to Templot,
@@ -326,6 +335,7 @@ Run the licensing-control tests and validate the current S1 pilot record:
 .venv/bin/python tests/validate_licensing_controls.py
 .venv/bin/python tools/validate_dependency_manifest.py \
   reference/manifests/s1-chair-pilot.dependency-manifest.json
+.venv/bin/python tests/validate_phase1_s1_lineage.py
 ```
 
 The current S1 pilot is deliberately `unknown`. Do not use

@@ -39,7 +39,8 @@
       },
       "conditions": [
         "Select and identify calibrated scan, CAD, drawing or measurement evidence before defining production geometry.",
-        "Record field/component provenance and the authority for the intended package licence."
+        "Record field/component provenance and the authority for the intended package licence.",
+        "Resolve the current field-level block recorded in reference/lineage/phase1-s1-core-lineage.json."
       ],
       "contribution_attestation": {
         "status": "missing",
@@ -224,9 +225,9 @@
   },
   "project_status": {
     "status": "unknown",
-    "reason": "The pilot is intentionally blocked: primary evidence, package data, licence authority, non-copyright-rights reviews and owner acceptance are incomplete.",
+    "reason": "The pilot is intentionally blocked by the current lineage register: primary evidence, package data, licence authority, non-copyright-rights reviews and owner acceptance are incomplete.",
     "reviewed_by": "Phase 1 inventory",
     "reviewed_on": "2026-07-20",
-    "decision_reference": "reference/LICENSING_BOUNDARIES.md#scoped-phase-1-lineage-audit"
+    "decision_reference": "reference/lineage/phase1-s1-core-lineage.json"
   }
 }

@@ -1,0 +1,840 @@
+{
+  "schema_version": 1,
+  "register_id": "tracktemplate:phase1:first-s1-and-core-lineage:1",
+  "recorded_on": "2026-07-20",
+  "status": "blocked",
+  "status_reason": "The current S1 body and its rail/timber fit path depend on Templot reference data and unaccepted project assumptions. No independently evidenced production ChairDefinition exists.",
+  "intended_uses": [
+    "public-redistribution",
+    "commercial-production",
+    "publication",
+    "physical-production"
+  ],
+  "owners": {
+    "project-provenance-review": "Select and verify independent evidence, permissions and field-level classifications.",
+    "project-geometry-review": "Specify the full-size ChairDefinition, rail/timber interfaces, derivations, tolerances and comparison oracle.",
+    "project-owner": "Accept the precise S1 prototype, evidence bundle, package licence, declared uses and non-copyright-rights review."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference"
+    },
+    "templot5_archive": {
+      "path": "reference/t5_files_556b_06_feb_2025.zip",
+      "sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3",
+      "role": "ignored read-only local comparison evidence",
+      "required_in_clean_checkout": false
+    }
+  },
+  "upstream_evidence": [
+    {
+      "evidence_id": "templot5-556b-chairs-unit",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+      "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b",
+      "symbols": [
+        "T_2d_data",
+        "T_3d_data",
+        "init_2d_rea",
+        "init_3d_rea"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "permitted_role": "local comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-chairs-unit-x",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit_x.pas",
+      "sha256": "aff0e0079c4749c1132aac0ff15a742afef3f13080178c2ad66545be7235d92a",
+      "symbols": [
+        "draw_chairs_on_timber"
+      ],
+      "classifications": [
+        "templot_source_expression"
+      ],
+      "permitted_role": "local procedural comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-dxf-unit",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+      "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d",
+      "symbols": [
+        "init_rail_section",
+        "create_s1_outer_jaw_block",
+        "create_S1_SC_L1_CC_inner_jaw_block",
+        "create_S1_S1J_L1_CC_seat_block"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "permitted_role": "local rail/component comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-math-unit",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+      "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65",
+      "symbols": [
+        "drawtimber"
+      ],
+      "classifications": [
+        "templot_source_expression"
+      ],
+      "permitted_role": "local assignment/timber comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-switch-select",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/switch_select.pas",
+      "sha256": "0412d14ee0b3a7dc223031438bdd93d21aa08d629d1e987089dd9241c10f4ffb",
+      "symbols": [
+        "init_switch_data"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "permitted_role": "local switch/timber comparison oracle"
+    },
+    {
+      "evidence_id": "templot5-556b-shove-timber",
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/shove_timber.pas",
+      "sha256": "57d0b10afad40dd92d85d5e0a5dcecbfa2ef31cf1d94691113de89846a98d1d7",
+      "symbols": [
+        "shoved timber handling"
+      ],
+      "classifications": [
+        "templot_source_expression"
+      ],
+      "permitted_role": "local timber-behaviour comparison oracle"
+    }
+  ],
+  "source_anchors": [
+    {
+      "anchor_id": "literal:chair-source-basis",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_SOLID_SOURCE_BASIS",
+      "expected_value": [
+        "Templot5 revision 556b dxf_unit.pas init_rail_section: C&L / EMGS / S4Soc Code 75 rev:A rail section",
+        "Templot5 revision 556b chairs_unit.pas init_2d_rea: REA S1 and S1J chair base dimensions",
+        "Templot5 revision 556b chairs_unit.pas init_3d_rea: chair edge, plinth, seat and jaw reference dimensions"
+      ]
+    },
+    {
+      "anchor_id": "literal:supported-chair-codes",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_SOLID_SUPPORTED_CODES",
+      "expected_value": [
+        1,
+        7
+      ]
+    },
+    {
+      "anchor_id": "literal:code75-rail-profile",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_CODE75_RAIL_PROFILE",
+      "expected_value": {
+        "profile_id": "Templot556b-CL-EMGS-S4Soc-Code75-revA",
+        "operator_label": "Templot C&L / EMGS / S4Soc Code 75 bullhead rev:A",
+        "source_revision": "Templot5 556b, dxf_unit.pas init_rail_section",
+        "scale_mm_per_foot": 4.0,
+        "vertical_rail": true,
+        "rail_depth_mm": 1.9,
+        "rail_head_width_mm": 0.9,
+        "rail_corner_radius_mm": 0.15,
+        "rail_foot_width_mm": 0.9,
+        "rail_fish_angle": 1.5,
+        "rail_web_top_from_top_mm": 0.8,
+        "rail_web_bottom_from_top_mm": 1.25,
+        "rail_web_thickness_mm": 0.35
+      }
+    },
+    {
+      "anchor_id": "literal:model-scale",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_DEFAULT_SCALE",
+      "expected_value": 76.2
+    },
+    {
+      "anchor_id": "literal:turnout-timber-width",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_TIMBER_WIDTH_INCHES",
+      "expected_value": 12.0
+    },
+    {
+      "anchor_id": "literal:plain-sleeper-width",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_SLEEPER_WIDTH_INCHES",
+      "expected_value": 10.0
+    },
+    {
+      "anchor_id": "literal:timber-length-increment",
+      "kind": "literal_assignment",
+      "symbol": "TURNOUT_TIMBER_LENGTH_INCREMENT_INCHES",
+      "expected_value": 6.0
+    },
+    {
+      "anchor_id": "literal:template-thickness",
+      "kind": "literal_assignment",
+      "symbol": "TEMPLATE_THICKNESS",
+      "expected_value": 1.0
+    },
+    {
+      "anchor_id": "literal:model-support-increment",
+      "kind": "literal_assignment",
+      "symbol": "CHAIR_MODEL_SUPPORT_INCREMENT_MM",
+      "expected_value": 0.05
+    },
+    {
+      "anchor_id": "function:chair-base-dimensions",
+      "kind": "function_ast",
+      "symbol": "_chair_base_dimensions",
+      "ast_sha256": "d8a41b9c3e142f23862278b60b0a854ff1e94892e45859611dc60753bbc47b5c"
+    },
+    {
+      "anchor_id": "function:chair-assignment",
+      "kind": "function_ast",
+      "symbol": "_chair_assignment",
+      "ast_sha256": "9bf727da547f443aae039909ccd914a606f10868fd35121e6f00f3093ef1afd6"
+    },
+    {
+      "anchor_id": "function:production-rail-profile",
+      "kind": "function_ast",
+      "symbol": "chair_production_rail_profile",
+      "ast_sha256": "3e3a331f272ed988930d23c3f16dc9698cfb8717e3d64638fed9f836de6b3eab"
+    },
+    {
+      "anchor_id": "function:chair-settings",
+      "kind": "function_ast",
+      "symbol": "default_chair_analysis_settings",
+      "ast_sha256": "eef3cd1a602656442ef74493bf60109e771ddd17cd2296832f259498955d26f0"
+    },
+    {
+      "anchor_id": "function:gauge-normal",
+      "kind": "function_ast",
+      "symbol": "_chair_gauge_normal_for_position",
+      "ast_sha256": "5d6a294d5a74bcbbc6663a1b171c0c788411899b8caeeca3e26c47bec6f7142e"
+    },
+    {
+      "anchor_id": "function:s1-body-dimensions",
+      "kind": "function_ast",
+      "symbol": "_chair_s1_body_dimensions",
+      "ast_sha256": "3a66b811e3243267eecf9a6aaadbfbc78a25614e6f7475b3ee9a05228db90bf4"
+    },
+    {
+      "anchor_id": "function:chair-physical-top-z",
+      "kind": "function_ast",
+      "symbol": "_chair_physical_top_z",
+      "ast_sha256": "a6fbfa6ba8e975fbb22bc5a3ff15e4ad5ba0ada6ed56278516f1509ea348c105"
+    },
+    {
+      "anchor_id": "function:supported-physical-position",
+      "kind": "function_ast",
+      "symbol": "_chair_supported_physical_position",
+      "ast_sha256": "4a448e4f8cf746e0e150c5ed0456641cf61f530a1995f3cb170d2d52ba406054"
+    },
+    {
+      "anchor_id": "function:chair-instance-transform",
+      "kind": "function_ast",
+      "symbol": "_chair_instance_from_position",
+      "ast_sha256": "63784649923a326e39c85eed0f9ce97c738a568d3ee87d73bf00285ca2ce6172"
+    },
+    {
+      "anchor_id": "function:model-support-analysis",
+      "kind": "function_ast",
+      "symbol": "_chair_physical_model_support_adjustments",
+      "ast_sha256": "4c036daaf1ebb033d2731c669f21403383757f28e13d77cc074c323e2764e7f4"
+    },
+    {
+      "anchor_id": "function:model-support-transform",
+      "kind": "function_ast",
+      "symbol": "_chair_transform_timber_for_model_support",
+      "ast_sha256": "0917105421f6e7afb44c68130c5c9005868cadcd1515640a22060f11af482280"
+    },
+    {
+      "anchor_id": "function:chair-solid-plan",
+      "kind": "function_ast",
+      "symbol": "_chair_build_solid_plan",
+      "ast_sha256": "b04f08ebcf8df287fffac11e5228fd075b2deb0840b90382929f969bcdf01d91"
+    },
+    {
+      "anchor_id": "function:chair-fit-validation",
+      "kind": "function_ast",
+      "symbol": "_chair_validate_solid_plan",
+      "ast_sha256": "c6eb0c072ad30ac6f4c1cd7eefa6f7d5c2c9cafed50658c1654c38bac565f9c3"
+    },
+    {
+      "anchor_id": "function:s1-box-prototype",
+      "kind": "function_ast",
+      "symbol": "_chair_make_s1_prototype_shape",
+      "ast_sha256": "873c2cd2127843b86bc1db19d1ec09664b0537c3c25b65b80d4445b25862f44d"
+    },
+    {
+      "anchor_id": "function:generate-supported-chair-solids",
+      "kind": "function_ast",
+      "symbol": "generate_supported_chair_solids",
+      "ast_sha256": "3d25f7d4876445f331d4fe7ae40519389703d400389ccdd6f00e60de192e2fd9",
+      "b15_ast_sha256": [
+        "a1e61a23a616f243ee25f611c76152b87e2f0c52163ff5f76be5e6a563f0c3c6",
+        "77b7942a744fa5e48973bd6c5816468ee6a94536b10717dcd504ee0496bfe2ce"
+      ]
+    },
+    {
+      "anchor_id": "function:turnout-timber-layout",
+      "kind": "function_ast",
+      "symbol": "rea_c10_timber_layout",
+      "ast_sha256": "3e6f6f7d4aec79d158c9ad2a66baae7b50e6b9dcba2a319b56af8080bcda7eaa"
+    },
+    {
+      "anchor_id": "function:turnout-timber-ends",
+      "kind": "function_ast",
+      "symbol": "_turnout_timber_end_data",
+      "ast_sha256": "d8412991ed49351d6dd5fda751a5e6bdbed61e201aa9f733e257ba702205178c"
+    },
+    {
+      "anchor_id": "function:turnout-timber-step",
+      "kind": "function_ast",
+      "symbol": "_turnout_stepped_timber_length",
+      "ast_sha256": "4b1a07bb3fc0a3dc00fecc67d809612ee4db14840a53f8b0013dde640e8db277"
+    }
+  ],
+  "scopes": [
+    {
+      "scope_id": "s1-chair-release-path",
+      "status": "blocked",
+      "owner_roles": [
+        "project-provenance-review",
+        "project-geometry-review",
+        "project-owner"
+      ],
+      "included": [
+        "S1 designation and constituent identity",
+        "full-size base, seat and jaw geometry",
+        "rail interface and local datums",
+        "prototype versus manufacturing parameters",
+        "package evidence, licence and release status"
+      ],
+      "excluded": [
+        "S1J and all special-chair definitions",
+        "turnout-specific chair assignment and stationing except as legacy interface evidence",
+        "automatic conversion of arbitrary scans or CAD",
+        "Templot media or source data as canonical production input"
+      ],
+      "later_gate": "A versioned full-size S1 ChairDefinition, independently evidenced field by field, must reproduce every accepted constituent and rail interface, pass the frozen comparison oracle and strict package manifest, and receive project-owner acceptance.",
+      "entries": [
+        {
+          "entry_id": "s1.designation-and-code",
+          "subject": "Current S1 identity and chair-code mapping",
+          "output_effect": "Selects chair code 1 as an ordinary REA S1 body and controls which analytical positions can generate the current physical approximation.",
+          "observed_values": {
+            "chair_code": 1,
+            "label": "S1",
+            "current_supported_code_set": [
+              1,
+              7
+            ]
+          },
+          "classifications": [
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "literal:supported-chair-codes",
+            "function:chair-assignment",
+            "function:supported-physical-position"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-chairs-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Retain this mapping only as legacy comparison evidence until an independent REA/LMS chair source establishes the precise prototype designation and constituent contract.",
+          "evidence_needed": [
+            "Precise S1 prototype designation and period/application",
+            "Independent engineering or measured evidence for the S1 identity and interfaces"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "s1.plan-footprint",
+          "subject": "Current base and seat plan envelope",
+          "output_effect": "Defines the current rectangular base footprint and seat width used for fit, support and display.",
+          "observed_values": {
+            "base_total_length_prototype_in": 14.5,
+            "base_total_width_prototype_in": 8.0,
+            "inward_length_from_gauge_face_prototype_in": 5.25,
+            "outward_length_from_gauge_face_prototype_in": 9.25,
+            "seat_total_width_prototype_in": 7.875,
+            "upstream_bibliographic_lead": "Templot comment cites Standard Railway Equipment 1926; the project has not independently obtained or accepted that source"
+          },
+          "classifications": [
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "literal:chair-source-basis",
+            "function:chair-base-dimensions",
+            "function:s1-body-dimensions"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-chairs-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Replace the provenance basis with independent full-size evidence; preserve the current values only as comparison expectations.",
+          "evidence_needed": [
+            "Calibrated base outline including corner radii and fixing features",
+            "Nominal full-size datum from the rail gauge face",
+            "Uncertainty and tolerance for every accepted dimension"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "s1.vertical-envelope",
+          "subject": "Current edge, plinth, seat and jaw heights",
+          "output_effect": "Controls the vertical envelope and rail seating height of the current five-box body.",
+          "observed_values": {
+            "edge_thickness_prototype_in": 0.375,
+            "plinth_top_prototype_in": 0.875,
+            "seat_top_prototype_in": 1.75,
+            "inner_jaw_top_prototype_in": 4.71875,
+            "outer_jaw_top": "derived from the current rail web-face height minus 1/32 prototype inch"
+          },
+          "classifications": [
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:chair-source-basis",
+            "literal:code75-rail-profile",
+            "function:production-rail-profile",
+            "function:s1-body-dimensions"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-chairs-unit",
+            "templot5-556b-dxf-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Re-establish the nominal vertical sections from independent chair and rail evidence, then derive interface heights transparently from those accepted inputs.",
+          "evidence_needed": [
+            "Full-size sectional measurements or drawing datums",
+            "Accepted rail-seat inclination and rail-section interface",
+            "Independent confirmation of jaw top and web engagement"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "s1.jaw-envelope",
+          "subject": "Current inner and outer jaw envelope",
+          "output_effect": "Defines rectangular jaw blocks and therefore the rail-foot gap and overall solid bounds.",
+          "observed_values": {
+            "inner_jaw_depth_prototype_in": 2.0,
+            "outer_jaw_face_from_gauge_face_prototype_in": 3.9375,
+            "outer_jaw_depth_prototype_in": 1.9375,
+            "jaw_width": "derived from Templot-guided rib-width expressions",
+            "key": "not generated",
+            "loose_jaw_or_plug": "not generated"
+          },
+          "classifications": [
+            "templot_reference_data",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:chair-source-basis",
+            "function:s1-body-dimensions",
+            "function:s1-box-prototype"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-chairs-unit",
+            "templot5-556b-dxf-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Do not refine the boxes into production geometry. Replace them with independently evidenced jaw profiles and named constituent builders.",
+          "evidence_needed": [
+            "Inner solid/loose-jaw form and rail-web engagement",
+            "Outer-jaw ribs, slopes, fillets and transitions",
+            "Key, plug and socket geometry where applicable"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "s1.current-representation-gap",
+          "subject": "Legacy five-box S1 body",
+          "output_effect": "Fuses edge, plinth, seat, inner-jaw and outer-jaw boxes into the current retained/export-preparation solid.",
+          "observed_values": {
+            "named_box_constituents": 5,
+            "base_corner_radii": "omitted",
+            "bolt_or_screw_features": "omitted",
+            "keys": "omitted",
+            "loose_jaws_or_plugs": "omitted",
+            "detailed_ribs_slopes_and_fillets": "omitted"
+          },
+          "classifications": [
+            "project_derivation",
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "function:s1-box-prototype",
+            "function:generate-supported-chair-solids"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-chairs-unit-x",
+            "templot5-556b-dxf-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Retain solely as B14/B15 behavioural and bounding-box evidence. It is not the production S1 ChairDefinition or exact geometry oracle.",
+          "evidence_needed": [
+            "Complete constituent inventory",
+            "Procedural cross-sections and transitions",
+            "Frozen independent S1 assembly oracle and tolerances"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "s1.full-size-scale-boundary",
+          "subject": "Current prototype-inch to model-millimetre conversion",
+          "output_effect": "Bakes the fixed OO-scale divisor into current body dimensions before shape generation.",
+          "observed_values": {
+            "prototype_inch_to_mm_formula": "25.4 / scale",
+            "current_fixed_scale_divisor": 76.2,
+            "current_nominal_scale_mm_per_foot": 4.0
+          },
+          "classifications": [
+            "engineering_method",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:model-scale",
+            "function:s1-body-dimensions"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Make the canonical ChairDefinition full-size and unit-explicit; move scale and manufacturing compensation to an export/manufacturing adapter.",
+          "evidence_needed": [
+            "Accepted canonical full-size units and datum convention",
+            "Explicit scale/manufacturing adapter contract and round-trip tests"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "s1.package-rights-and-acceptance",
+          "subject": "Independent S1 package evidence and rights record",
+          "output_effect": "Controls whether any future S1 definition or output can pass the project release gate.",
+          "observed_values": {
+            "primary_evidence": "not selected",
+            "package_license": "NOASSERTION",
+            "non_copyright_reviews": "not performed",
+            "dependency_manifest_status": "unknown"
+          },
+          "classifications": [
+            "third_party_evidence"
+          ],
+          "source_anchor_ids": [],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Select a rights-compatible independent evidence bundle, populate field-level provenance, complete the non-copyright review and obtain explicit project-owner acceptance.",
+          "evidence_needed": [
+            "Calibrated measurement, scan, CAD or engineering drawing evidence with authority and hashes",
+            "Commercial, publication, adaptation and redistribution permission",
+            "Package licence and strict dependency-manifest pass"
+          ],
+          "owner_role": "project-owner"
+        }
+      ]
+    },
+    {
+      "scope_id": "core-rail-timber-path",
+      "status": "blocked",
+      "owner_roles": [
+        "project-provenance-review",
+        "project-geometry-review",
+        "project-owner"
+      ],
+      "included": [
+        "rail section used to define and validate the S1 interface",
+        "timber surface and width used to support the S1",
+        "chair placement frame and rail/timber fit transforms",
+        "manufacturing allowances and validation tolerances that can change accepted output"
+      ],
+      "excluded": [
+        "complete C10 turnout geometry and topology",
+        "special-chair assignment and geometry",
+        "crossover shared-timber resolution",
+        "legacy output families not required to qualify a standalone S1 package"
+      ],
+      "later_gate": "Every rail/timber input used by the S1 definition or its qualification fixture must be independently evidenced or an explicitly accepted project derivation; turnout-specific placement stays blocked under the other-S&C/legacy scopes until separately audited.",
+      "entries": [
+        {
+          "entry_id": "core.rail-section",
+          "subject": "Current fixed C&L/EMGS/S4Soc Code 75 rev:A rail profile",
+          "output_effect": "Controls gauge-face datum, rail-foot gap, jaw heights and physical interference validation.",
+          "observed_values": {
+            "scale_mm_per_foot": 4.0,
+            "vertical_rail": true,
+            "rail_depth_mm": 1.9,
+            "rail_head_width_mm": 0.9,
+            "rail_corner_radius_mm": 0.15,
+            "rail_foot_width_mm": 0.9,
+            "rail_fish_angle": 1.5,
+            "rail_web_top_from_top_mm": 0.8,
+            "rail_web_bottom_from_top_mm": 1.25,
+            "rail_web_thickness_mm": 0.35
+          },
+          "classifications": [
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "literal:code75-rail-profile",
+            "function:production-rail-profile"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-dxf-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Use this exact profile only for the frozen Templot/B14 comparison. Select and independently evidence the rail section supported by the production S1 package.",
+          "evidence_needed": [
+            "Precise prototype or model rail-section designation",
+            "Independent cross-section dimensions and permitted source",
+            "Rail inclination and manufacturing tolerance"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "core.derived-rail-faces",
+          "subject": "Derived head, foot and web-face profile values",
+          "output_effect": "Derives jaw top and fit surfaces from the fixed rail dimensions and fish angle.",
+          "observed_values": {
+            "derivation": "head/foot depth and web-face heights derived from the fixed profile",
+            "input_status": "Templot reference-only"
+          },
+          "classifications": [
+            "project_derivation",
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "literal:code75-rail-profile",
+            "function:production-rail-profile"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-dxf-unit"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Retain the transparent derivation method but recompute only from an independently evidenced rail profile.",
+          "evidence_needed": [
+            "Accepted rail-profile inputs",
+            "Direct tests of every derived face and rail-seat interface"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "core.fit-and-validation-tolerances",
+          "subject": "Current chair/rail/timber fit tolerances",
+          "output_effect": "Changes jaw clearance, chair acceptance, timber support findings and incompatible-rail rejection.",
+          "observed_values": {
+            "position_tolerance_mm": 0.2,
+            "footprint_clearance_mm": 0.15,
+            "timber_end_clearance_mm": 0.5,
+            "maximum_advisory_skew_degrees": 5.0,
+            "rail_fit_clearance_per_side_mm": 0.04,
+            "physical_overlap_area_tolerance_mm2": 0.0025,
+            "physical_rail_interference_clearance_mm": 0.02
+          },
+          "classifications": [
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "function:chair-settings",
+            "function:chair-fit-validation"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Separate geometric truth, manufacturing allowance and numerical tolerance; justify and accept each value against measured fit and printer/process capability.",
+          "evidence_needed": [
+            "Rail/chair fit measurements",
+            "Manufacturing-process capability and shrinkage evidence",
+            "Numerical robustness tests independent of production allowance"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "core.timber-and-sleeper-widths",
+          "subject": "Current turnout timber, plain sleeper and length-step values",
+          "output_effect": "Controls support polygons, chair overhang findings and model-support widening.",
+          "observed_values": {
+            "turnout_timber_width_prototype_in": 12.0,
+            "plain_sleeper_width_prototype_in": 10.0,
+            "timber_length_increment_prototype_in": 6.0
+          },
+          "classifications": [
+            "templot_reference_data"
+          ],
+          "source_anchor_ids": [
+            "literal:turnout-timber-width",
+            "literal:plain-sleeper-width",
+            "literal:timber-length-increment"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-switch-select"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Independently evidence the timber/sleeper section used by the S1 qualification fixture; do not make turnout timbering a hidden chair-package constant.",
+          "evidence_needed": [
+            "Prototype timber or sleeper dimensions for the selected application",
+            "Model/manufacturing timber definition and permitted evidence source"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "core.turnout-timber-placement-boundary",
+          "subject": "Current C10 timber stationing, length and rounding rules",
+          "output_effect": "Determines the support position and available footprint beneath every turnout S1 instance.",
+          "observed_values": {
+            "scope": "legacy C10 placement rather than reusable S1 package geometry",
+            "source_description": "REA-labelled values and Templot-cross-checked stationing",
+            "production_status": "not independently evidenced"
+          },
+          "classifications": [
+            "templot_reference_data",
+            "templot_source_expression",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "function:turnout-timber-layout",
+            "function:turnout-timber-ends",
+            "function:turnout-timber-step"
+          ],
+          "upstream_evidence_ids": [
+            "templot5-556b-math-unit",
+            "templot5-556b-switch-select",
+            "templot5-556b-shove-timber"
+          ],
+          "current_project_status": "reference-only",
+          "release_disposition": "Exclude C10 stationing from the standalone S1 package. Retain it as a local placement oracle and move its complete lineage to the other-S&C/legacy audit before qualifying full turnout output.",
+          "evidence_needed": [
+            "Independent C10 timbering source before full turnout release",
+            "A minimal independently defined timber fixture for standalone S1 fit qualification"
+          ],
+          "owner_role": "project-provenance-review"
+        },
+        {
+          "entry_id": "core.model-support-policy",
+          "subject": "Current model-only timber widening policy",
+          "output_effect": "May widen the effective manufactured timber support beneath rotated chairs while leaving the recorded prototype width unchanged.",
+          "observed_values": {
+            "edge_margin_mm": 0.15,
+            "maximum_extension_per_side_mm": 2.0,
+            "rounding_increment_mm": 0.05,
+            "automatic_application_default": true
+          },
+          "classifications": [
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:model-support-increment",
+            "function:chair-settings",
+            "function:model-support-analysis",
+            "function:model-support-transform"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Keep this as a separately versioned manufacturing policy, never a mutation of prototype truth; justify its limits and make its application explicit in output manifests.",
+          "evidence_needed": [
+            "Manufacturing and structural rationale for the margin and limit",
+            "Operator acceptance of automatic versus explicit application",
+            "Export tests proving prototype and manufactured dimensions remain distinct"
+          ],
+          "owner_role": "project-owner"
+        },
+        {
+          "entry_id": "core.vertical-placement-and-embed",
+          "subject": "Current template-top and chair embed placement",
+          "output_effect": "Sets the generated chair base Z relative to a model template thickness and subtracts a fixed embed depth.",
+          "observed_values": {
+            "fallback_template_thickness_mm": 1.0,
+            "default_embed_depth_mm": 0.2,
+            "placement": "maximum configured/document template thickness minus embed depth"
+          },
+          "classifications": [
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "literal:template-thickness",
+            "function:chair-settings",
+            "function:chair-physical-top-z",
+            "function:chair-solid-plan"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Remove template-document Z from the full-size chair definition. Define timber-seat datum and manufacturing embed/socket treatment in the appropriate adapter.",
+          "evidence_needed": [
+            "Canonical chair/timber contact datum",
+            "Manufacturing socket/embed contract and supported process",
+            "Round-trip placement tests"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "core.local-placement-frame",
+          "subject": "Current rail-tangent and gauge-normal placement transform",
+          "output_effect": "Rotates and positions each chair from a rail support point, local tangent and named gauge side.",
+          "observed_values": {
+            "origin": "chair centre on assigned rail support point",
+            "local_x": "outward from gauge side",
+            "local_y": "perpendicular to local_x in the track plane",
+            "rotation": "atan2 of the outward axis",
+            "gauge_side_source": "named gauge/outer faces or connector offset sign"
+          },
+          "classifications": [
+            "engineering_method",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "function:gauge-normal",
+            "function:chair-instance-transform"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Retain the transparent transform method after the canonical chair datum and independently evidenced rail interface are accepted; test both hands, orientations and change-back.",
+          "evidence_needed": [
+            "Accepted chair-local coordinate frame",
+            "Rail gauge-face and seat datum",
+            "Mirroring/orientation and persistence oracle"
+          ],
+          "owner_role": "project-geometry-review"
+        },
+        {
+          "entry_id": "core.release-and-export-boundary",
+          "subject": "Current chair-solid preparation versus future package/export gate",
+          "output_effect": "The legacy path can build a retained compound, but it cannot establish the evidence, package licence or output dependency status required for release.",
+          "observed_values": {
+            "current_body_scope": "S1/S1J approximate body envelopes only",
+            "production_ready": false,
+            "package_manifest_integration": "not implemented",
+            "strict_project_cleared_gate": "not passed"
+          },
+          "classifications": [
+            "generated_output",
+            "project_derivation"
+          ],
+          "source_anchor_ids": [
+            "function:chair-solid-plan",
+            "function:chair-fit-validation",
+            "function:generate-supported-chair-solids"
+          ],
+          "upstream_evidence_ids": [],
+          "current_project_status": "unknown",
+          "release_disposition": "Keep B14/B15 solids as inspection/behavioural evidence. Wire the dependency manifest into the future package and transactional Validate/Export boundary before any positive release status.",
+          "evidence_needed": [
+            "Accepted full-size S1 package and exact generator",
+            "Package and output dependency manifests",
+            "Transactional export, equivalence and reproducibility evidence"
+          ],
+          "owner_role": "project-owner"
+        }
+      ]
+    }
+  ]
+}
