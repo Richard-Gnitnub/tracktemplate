@@ -153,6 +153,13 @@
   `tests/validate_phase1_s1_lineage.py` protects its classifications, blocked
   status, B14/B15 source anchors, manifest link and optional local evidence
   hashes. It is an audit record, not an accepted production definition.
+- `reference/oracles/templot5-556b-s1-oracle.json` is the blocked exact-source
+  capture contract; `tools/templot_s1_oracle.py` owns its local source,
+  executable and DXF/STL semantic checks, and
+  `tests/validate_templot_s1_oracle.py` protects them. Keep the executable,
+  fixture and raw Templot output local and ignored. The recorded installed
+  5.55a executable is rejected; never relax the 556b gate or automate an
+  everyday Templot profile to obtain a passing artifact.
 - `CONTRIBUTING.md` owns the prospective DCO sign-off and the separate data and
   evidence declaration. Never invent a retrospective contributor attestation.
 - `LICENSE` and `NOTICE.md` apply GPL-3.0-or-later to the project, preserve the Templot5 source-basis attribution, and record particular thanks to Martin Wynne and Steve Cornford. Preserve both files and all applicable upstream notices.
@@ -336,6 +343,7 @@ Run the licensing-control tests and validate the current S1 pilot record:
 .venv/bin/python tools/validate_dependency_manifest.py \
   reference/manifests/s1-chair-pilot.dependency-manifest.json
 .venv/bin/python tests/validate_phase1_s1_lineage.py
+.venv/bin/python tests/validate_templot_s1_oracle.py
 ```
 
 The current S1 pilot is deliberately `unknown`. Do not use

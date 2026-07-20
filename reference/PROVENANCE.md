@@ -147,6 +147,40 @@ This documentation change records the source/data-flow findings and intended
 boundary. It does not copy or translate Pascal implementation into production
 code and does not alter either macro.
 
+## Exact 556b oracle acquisition/build status
+
+The proposed S1 geometric comparison must come from the reviewed 556b state,
+not merely from a nearby Templot release. On 2026-07-20 the project recorded a
+fail-closed capture specification at
+[`oracles/templot5-556b-s1-oracle.json`](oracles/templot5-556b-s1-oracle.json).
+It fingerprints the source ZIP and seven source/build/export members, requires
+an isolated profile and keeps the fixture and generated media under ignored
+local output.
+
+The executable already present in the local Templot Bottles installation has
+SHA-256
+`3df2cb480f828876967e5f7b5172111f5a1f1a159529c52a16456ebb627731f5`
+and contains the current version marker `5.55.a`. It is explicitly rejected as
+the 556b oracle; the binary is not copied into this repository and the existing
+user profile was not launched or modified during the audit.
+
+A disposable native-source probe used Lazarus 3.0 and FPC 3.2.2 with an
+isolated configuration. It stopped because the Windows `ShellAPI` unit is not
+available to the native Linux target. The SourceForge ZIP is also not a
+self-contained build bundle: the upstream README calls for modified HtmlViewer
+files, the project references `FrameViewer09` and `synapse_units`, and those
+inputs are absent from the archive. This does not alter the source licence or
+prove that 556b cannot be built. It means the project currently lacks a
+reproducible exact build whose external inputs, versions, modifications, hashes
+and licences have all been recorded.
+
+The minimum provenance needed to unblock capture is an exact 556b executable
+with acquisition/build evidence and visible version confirmation, an isolated
+runtime profile, a hashed S1-only fixture, an effective-settings record and
+hashed local DXF/STL artifacts. Passing the semantic artifact inspector is a
+format/evidence check only; project geometry review must still set and apply
+the later equivalence metrics and tolerances.
+
 ## External chair-evidence provenance
 
 Each reusable chair-definition package derived from a scan, CAD model,

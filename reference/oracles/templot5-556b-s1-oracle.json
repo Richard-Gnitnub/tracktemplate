@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "oracle_id": "tracktemplate:templot5-556b:s1-constituent-assembly-oracle:1",
+  "recorded_on": "2026-07-20",
+  "status": "blocked",
+  "status_reason": "The exact 556b source route is fingerprinted, but no exact 556b executable, frozen S1-only fixture or captured DXF/STL pair is yet available.",
+  "permitted_role": "local comparison oracle only",
+  "source": {
+    "product": "Templot5",
+    "required_revision": "556b",
+    "accepted_executable_markers": [
+      "version  556b       February  2025",
+      "5.56.b"
+    ],
+    "archive": {
+      "path": "reference/t5_files_556b_06_feb_2025.zip",
+      "sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3",
+      "tracked": false,
+      "required_in_clean_checkout": false
+    },
+    "required_members": [
+      {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/README.md",
+        "sha256": "fe57740b1548651674895b96b7f50a633410ce4a6218d07fe2d6461e19aa8671",
+        "role": "upstream build instructions"
+      },
+      {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/OpenTemplot2024.lpi",
+        "sha256": "fbc24f99e79c79ae3a23ea4b4218b7f0186dada33457e11faf3edb964f98b80f",
+        "role": "Lazarus project and package paths"
+      },
+      {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/OpenTemplot2024.lpr",
+        "sha256": "ceefe944c2300f5dedea7eb64778d4048f0b1545daa4052cf023aa02d67d5766",
+        "role": "Windows program entry and unit dependencies"
+      },
+      {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/control_room.lfm",
+        "sha256": "27d1ec9d1ef4ae9a69494af39ffdf9d36ee31c775060d46470a46c2556a494cf",
+        "role": "visible revision 556b label"
+      },
+      {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/control_room.pas",
+        "sha256": "60f44096afdef770488debd3feaa70bede22066acc7f539f6ee7d159f7b9d19e",
+        "role": "program revision number"
+      },
+      {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+        "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d",
+        "role": "S1 block builders and DXF/STL emitter"
+      },
+      {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit_x.pas",
+        "sha256": "aff0e0079c4749c1132aac0ff15a742afef3f13080178c2ad66545be7235d92a",
+        "role": "S1 constituent assembly and transforms"
+      }
+    ],
+    "build_probe": {
+      "environment": "Linux x86_64, Lazarus 3.0, Free Pascal 3.2.2, isolated temporary Lazarus configuration",
+      "command": "lazbuild --pcp=<isolated-config> --no-write-project --skip-dependencies --build-mode=Release OpenTemplot2024.lpi",
+      "result": "blocked",
+      "first_fatal_error": "OpenTemplot2024.lpr cannot find the Windows ShellAPI unit in the native Linux target",
+      "archive_missing_inputs": [
+        "HTML_VIEWER_MODS",
+        "FrameViewer09",
+        "synapse_units"
+      ],
+      "disposition": "Obtain a provenance-recorded exact 556b Windows executable, or reproduce a Windows/cross build with the exact external package versions, modifications, hashes and licences; do not patch the source into a different revision merely to make an oracle."
+    },
+    "observed_candidate": {
+      "observed_on": "2026-07-20",
+      "location_description": "existing local Templot Bottles installation; absolute user path intentionally not recorded",
+      "sha256": "3df2cb480f828876967e5f7b5172111f5a1f1a159529c52a16456ebb627731f5",
+      "detected_version": "5.55.a",
+      "disposition": "rejected-version-mismatch"
+    }
+  },
+  "capture_recipe": {
+    "raw_output_root": "benchmark-output/templot-s1-oracle/",
+    "raw_artifacts_tracked": false,
+    "isolated_profile_required": true,
+    "existing_user_profile_allowed": false,
+    "fixture": {
+      "status": "missing",
+      "required_form": "one frozen short straight plain-line Templot box containing only ordinary S1 chair code 1 instances",
+      "required_record": "local fixture filename, SHA-256, creation steps, template count, timber count and S1 chair-instance count"
+    },
+    "settings": {
+      "track_scale_mm_per_foot": 4.0,
+      "model_scale_denominator": 76.2,
+      "track_gauge_mm": 16.5,
+      "rail_profile": "C&L / EMGS / S4Soc Code 75 bullhead rev:A",
+      "export_mode": "3-D CAD",
+      "output_units": "mm",
+      "print_scaled_output": false,
+      "formats": [
+        "DXF",
+        "STL"
+      ],
+      "jaw_policy": "all solid outer jaws",
+      "included": [
+        "chair bases and plinths",
+        "S1 outer jaws",
+        "S1 inner jaws",
+        "S1 seats",
+        "keys"
+      ],
+      "omitted": [
+        "rails",
+        "timbers",
+        "chair bolts and screws",
+        "supports",
+        "sprues",
+        "webs",
+        "rafts",
+        "clips",
+        "soleplates",
+        "switch drives"
+      ],
+      "manufacturing_compensation": "all FDM/resin rail-fit, jaw, edge, beefing, shrinkage and thin-timber corrections disabled or identity; record every effective numeric value",
+      "selection_scope": "only the frozen S1 fixture",
+      "custom_component_files": "optional corroboration only; named DXF blocks remain the required constituent evidence"
+    },
+    "required_artifacts": [
+      "3d-dxf",
+      "ascii-stl"
+    ],
+    "required_capture_record_fields": [
+      "oracle_id",
+      "captured_on",
+      "operator",
+      "source_archive_sha256",
+      "executable_sha256",
+      "visible_program_version",
+      "isolated_profile_identifier",
+      "fixture_sha256",
+      "effective_settings",
+      "dxf_sha256",
+      "stl_sha256",
+      "semantic_summary",
+      "limitations",
+      "review_status"
+    ]
+  },
+  "semantic_contract": {
+    "dxf": {
+      "required_block_names": [
+        "S1OUTJAW",
+        "S1INJAW",
+        "S1SEAT",
+        "KEY"
+      ],
+      "required_insert_names": [
+        "S1OUTJAW",
+        "S1INJAW",
+        "S1SEAT",
+        "KEY"
+      ],
+      "minimum_faces_per_required_block": 1,
+      "minimum_direct_entity_faces": 1,
+      "require_equal_nonzero_insert_counts": true,
+      "units": "mm"
+    },
+    "stl": {
+      "encoding": "ascii",
+      "minimum_facets": 1,
+      "units": "mm"
+    },
+    "comparison_limits": [
+      "Artifact hashes establish provenance and byte identity, not geometric equivalence.",
+      "DXF face order and STL tessellation order are not canonical.",
+      "A later ChairDefinition comparison must separately agree dimensional, section/profile, surface-distance, rail-interface, topology, transform and solid-validity metrics and tolerances.",
+      "The Templot capture remains reference-only and cannot supply canonical production values."
+    ]
+  },
+  "blockers": [
+    {
+      "blocker_id": "exact-556b-executable",
+      "status": "open",
+      "owner_role": "project-oracle-capture",
+      "minimum_evidence": [
+        "Exact 556b executable fingerprint and visible version evidence",
+        "Reproducible acquisition or build provenance including external dependencies"
+      ]
+    },
+    {
+      "blocker_id": "isolated-556b-environment",
+      "status": "open",
+      "owner_role": "project-oracle-capture",
+      "minimum_evidence": [
+        "Disposable Wine/Bottles or Windows profile identifier",
+        "Evidence that no everyday Templot profile or user file was used or modified"
+      ]
+    },
+    {
+      "blocker_id": "frozen-s1-fixture-and-settings",
+      "status": "open",
+      "owner_role": "project-geometry-review",
+      "minimum_evidence": [
+        "Deterministic S1-only fixture and hash",
+        "GUI-confirmed effective setting record with compensation disabled or identity"
+      ]
+    },
+    {
+      "blocker_id": "frozen-s1-artifacts",
+      "status": "open",
+      "owner_role": "project-geometry-review",
+      "minimum_evidence": [
+        "Local untracked DXF and STL hashes",
+        "Passing semantic summary for all four named components and the assembled chair faces",
+        "Reviewed comparison metrics and tolerances"
+      ]
+    }
+  ],
+  "acceptance_gate": {
+    "status": "blocked",
+    "required_review": "Project geometry review and project-owner acceptance of the exact source, fixture, settings, semantic summary, limitations and later comparison tolerances.",
+    "raw_hash_equality_is_geometry_oracle": false,
+    "canonical_production_input": false
+  }
+}

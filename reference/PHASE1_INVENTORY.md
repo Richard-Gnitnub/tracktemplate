@@ -411,11 +411,59 @@ The upstream S1 comments point to “Standard Railway Equipment 1926”; as
 recorded in [PROVENANCE.md](PROVENANCE.md), this is an unverified search lead,
 not selected primary evidence.
 
-Phase 1 still needs a reproducible S1 component/assembly oracle, accepted
-primary evidence and agreed comparison metrics/tolerances. This audit records
-structure, values, disposition and owners; it does not approve the current
-values for a production package. No Templot code was copied into production,
-no macro was changed and both registered scopes remain visibly `blocked`.
+Phase 1 still needs an executed and reviewed S1 component/assembly oracle,
+accepted primary evidence and agreed comparison metrics/tolerances. This audit
+records structure, values, disposition and owners; it does not approve the
+current values for a production package. No Templot code was copied into
+production, no macro was changed and both registered scopes remain visibly
+`blocked`.
+
+### Frozen S1 comparison-oracle capture contract
+
+The next source-audit tranche is now executable without making an upstream
+artifact canonical. The tracked
+[`oracles/templot5-556b-s1-oracle.json`](oracles/templot5-556b-s1-oracle.json)
+defines the exact-source fingerprints, proposed capture settings, named
+constituents, local-only artifact policy, blockers, owners and minimum evidence.
+[`../tools/templot_s1_oracle.py`](../tools/templot_s1_oracle.py) verifies that
+contract and the ignored source archive, rejects a non-556b executable, and
+summarises a future 3D DXF/ASCII STL pair using standard-library parsers.
+
+The exact 556b source evidence establishes the required capture semantics:
+
+- `dxf_unit.pas` defines `S1OUTJAW`, `S1INJAW`, `S1SEAT` and `KEY` reusable
+  blocks before emitting entities;
+- `chairs_unit_x.pas` inserts one of each named part for chair code 1, while
+  the chair base/plinth contributes direct 3D faces; and
+- the same constituent faces and placements are triangulated into the main
+  ASCII STL, so DXF block/insert semantics and assembled STL bounds/facets are
+  complementary evidence.
+
+The exact artifact is not yet available. A clean isolated native build probe
+with Lazarus 3.0/FPC 3.2.2 stops at the Windows `ShellAPI` unit, and the ZIP is
+not a self-contained build input: its README requires modified HtmlViewer
+sources, its project references `FrameViewer09` and `synapse_units`, and those
+inputs are absent from the archive. The existing local Bottles executable was
+fingerprinted as SHA-256
+`3df2cb480f828876967e5f7b5172111f5a1f1a159529c52a16456ebb627731f5`
+and exposes version `5.55.a`; the validator rejects it rather than silently
+substituting it for 556b. The everyday Templot bottle was not launched or
+modified.
+
+The finite unblock path is therefore: obtain or reproducibly build an exact
+556b executable with its external dependencies recorded; run it only in a
+disposable profile; create and hash one short S1-only plain-line fixture;
+record every effective geometry/manufacturing setting; capture DXF and STL
+locally under ignored `benchmark-output/`; and pass the semantic inspector plus
+geometry/owner review. The inspector requires non-empty faces for all four
+named blocks, equal non-zero assembly insert counts, direct base/assembly faces
+and a structurally complete ASCII STL. It deliberately reports
+`semantically-valid-unaccepted-capture`: hashes establish provenance, not
+geometric equivalence, and the capture remains comparison-only.
+
+This completes the Phase 1 **recipe-and-explicit-blocker** branch of the oracle
+deliverable. It does not claim that the frozen oracle itself exists, does not
+clear any S1 production value, and does not close Phase 1.
 
 ### Chair-definition assimilation scope
 
@@ -504,7 +552,7 @@ is known to be defective.
 | Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and plain-line timber decisions; focused failure/invalidation cases |
 | Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/plain-line coverage, input-class invalidation, late timing payload and redundant refresh defects |
 | Legacy approximate supported chair bodies | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage; five-box S1/S1J bodies are gap evidence, not the final procedural chair oracle |
-| Procedural chair definitions and exact components | Templot5 556b source audit, accepted architecture/licensing boundaries and the validated blocked first-S1/core lineage register | Current legacy inputs are reproducibly anchored; no exact constituent fixture yet | Frozen local Templot S1 comparison oracle, neutral package schema, rights-compatible primary evidence, accepted full-size values/transforms, package licence, comparison metrics and tolerances |
+| Procedural chair definitions and exact components | Templot5 556b source audit, accepted architecture/licensing boundaries, blocked first-S1/core lineage register and fail-closed S1 oracle contract | Exact source/member hashes and constituent route are reproducibly verified; capture settings and semantic DXF/STL checks are defined, but the exact 556b executable, S1-only fixture and artifacts remain blocked | Execute and review the frozen local Templot S1 capture; define the neutral package schema; obtain rights-compatible primary evidence, accepted full-size values/transforms, package licence, comparison metrics and tolerances |
 | Assisted chair assimilation | Accepted RC scope; no implementation oracle yet | One S1 pilot to be selected | Precise prototype designation, evidence provenance/rights, intended commercial/publication use, calibrated scan/CAD/measurement set, component landmarks, fit-residual policy, package licence and acceptance recipe |
 | Host integration | Controlled crossover acceptance | `XO-001` stage 6 | Standalone turnout, removal/reversal, rollback and legacy-document variants |
 | Save/reopen | B15 crossover acceptance and B14 plain-line edit-lifecycle oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Broader entity families and future schema migration |
@@ -870,6 +918,7 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-20 | Adopt explicit source/data/output licensing boundaries | Accepted; GPL source compliance is separated from engineering facts, Templot reference data/media and generated-output dependencies; neutral chair data and a one-way optional Templot adapter are required, CC0-1.0 is only a reviewed per-package target, and ordinary output receives no project NC restriction merely by generation |
 | 2026-07-20 | Make the licensing boundary executable and scope the lineage audit | Implemented for owner review within the already accepted direction; rename the internal positive status to `project-cleared`, require a validated manifest before that status, record non-copyright reviews, add prospective DCO/data declarations, and split the audit into first-S1, core rail/timber, other S&C and legacy scopes so unresolved legacy breadth stays blocked without preventing independently evidenced S1 work |
 | 2026-07-20 | Create the bounded first-S1/core rail-and-timber lineage register | Implemented for Phase 1 evidence; 16 current output-affecting groups have exact B14/B15 anchors, classifications, dispositions, evidence needs and owners, while the S1 and core scopes intentionally remain blocked pending independent evidence and accepted decisions |
+| 2026-07-20 | Define a fail-closed exact-556b S1 oracle capture contract | Implemented for Phase 1 evidence and owner review; the exact source/member route, isolated settings, local-only artifact policy and DXF/STL semantics are executable, while the installed 5.55a candidate is rejected and the oracle remains visibly blocked pending an exact 556b executable, frozen fixture, capture and review |
 | 2026-07-20 | Use B14's controlled connected pair as the first straight/station workflow oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes route/station direction, stable identities, exact inherited joins, length editing, full history recovery, raw persistence and production catalogue without changing either macro; independent-datum GUI, physical station/platform and target-file export remain separate gaps |
 | 2026-07-20 | Add a dedicated centreline-anchored standalone-turnout lifecycle oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes one left/facing REA C10 creation, handed edit, exact history/persistence, stable objects, ordered production records, occupied-chainage rejection and in-transaction abort without changing either macro; trailing/straight/alternate hosts, integration, downstream stages and export remain separate gaps |
 
@@ -893,9 +942,11 @@ create-time series covers fresh legacy exact-shape construction only.
   manifest, validator, non-copyright fields and contribution declaration now
   exist; wire their fail-closed `project-cleared` gate into the later
   package/export path.
-- Complete the Templot chair-generation data-flow/value/transform map; produce
-  or define the reproducible recipe for a frozen S1 constituent/assembly oracle
-  and record any unavailable evidence without substituting the B15 box body.
+- Complete the remaining Templot chair-generation value/transform map and
+  execute the defined frozen-S1 capture recipe after an exact 556b executable
+  and its build/acquisition evidence are available. Keep the exact fixture and
+  DXF/STL artifacts local, record their hashes/settings, and do not substitute
+  either the rejected 5.55a executable or the B15 box body.
 - Specify the versioned chair-definition package and assisted-assimilation
   boundary, including provenance and corrupt/unsupported-package behaviour;
   confirm the pilot's precise prototype designation, rights-compatible primary

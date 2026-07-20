@@ -167,6 +167,7 @@ Phase 1 licensing-control and manifest-gate checks:
 .venv/bin/python tools/validate_dependency_manifest.py \
   reference/manifests/s1-chair-pilot.dependency-manifest.json
 .venv/bin/python tests/validate_phase1_s1_lineage.py
+.venv/bin/python tests/validate_templot_s1_oracle.py
 ```
 
 The test checks the Draft 2020-12 schema vocabulary, package/output structural
@@ -181,6 +182,40 @@ scopes must remain blocked, every current Templot-dependent entry must remain
 source anchors must match the immutable B14 and accepted B15 files. When the
 ignored local Templot archive is present it also verifies the archive and six
 reviewed member hashes; a clean checkout does not require that archive.
+
+The oracle-contract test validates the blocked exact-556b capture
+specification, local-only artifact rule, rejected-version guard and synthetic
+DXF/STL semantics. When the ignored source ZIP is present it also verifies the
+archive plus seven required members, the visible 556b revision evidence and
+the four named S1 component routes. It does not require an executable or raw
+Templot media in a clean checkout and does not claim that the frozen oracle has
+been captured.
+
+Local source and candidate probes are:
+
+```bash
+.venv/bin/python tools/templot_s1_oracle.py validate-spec
+.venv/bin/python tools/templot_s1_oracle.py probe-source
+.venv/bin/python tools/templot_s1_oracle.py \
+  inspect-executable /path/to/templot_5.exe
+```
+
+`inspect-executable` returns exit status 2 for an MZ-signature executable
+candidate that lacks the required exact-556b marker or matches the recorded
+rejected 5.55a fingerprint.
+Do not run an accepted candidate in an everyday profile. After an isolated
+capture exists, validate its bounded format semantics with:
+
+```bash
+.venv/bin/python tools/templot_s1_oracle.py inspect-artifacts \
+  --dxf benchmark-output/templot-s1-oracle/<capture>.dxf \
+  --stl benchmark-output/templot-s1-oracle/<capture>.stl
+```
+
+This command reports a `semantically-valid-unaccepted-capture`; it verifies
+named component blocks/inserts, direct assembly/base faces, ASCII STL
+structure, hashes, counts and bounds. It cannot by itself prove source
+revision, effective GUI settings, solid equivalence or acceptance.
 
 Any package or output proposed for the positive internal status must
 additionally pass:
@@ -493,7 +528,9 @@ Before retiring a legacy path, add representative, non-sensitive fixtures or det
 - turnout creation and editing;
 - straight- and curved-host crossovers;
 - automatic timbering and chair analysis;
-- a frozen Templot S1 constituent/assembly oracle and its deterministic recipe;
+- an exact local capture produced under the tracked frozen-Templot-S1
+  constituent/assembly recipe (the recipe/validator exists; the exact 556b
+  executable, fixture and artifacts remain blocked);
 - a versioned native S1 chair-definition package with invalid/corrupt fixtures;
 - one non-sensitive, project-cleared calibrated scan/CAD/measurement fixture for
   the assisted S1 assimilation pilot;

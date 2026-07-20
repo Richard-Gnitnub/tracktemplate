@@ -321,6 +321,20 @@ gate's explicit blocked branch; this evidence neither clears the five-box body
 nor selects production S1 values. Other-S&C and legacy B14/B15 registers,
 primary S1 evidence and the frozen constituent/assembly oracle remain open.
 
+The proposed frozen-S1 oracle now has a fail-closed machine-readable capture
+contract at
+[oracles/templot5-556b-s1-oracle.json](oracles/templot5-556b-s1-oracle.json),
+with a standard-library source/executable/DXF/STL inspector and direct contract
+test. Seven exact 556b archive members and the four named S1 jaw/seat/key block
+routes are fingerprinted. The installed local Templot5 candidate is
+deterministically rejected as version 5.55a, while a clean native source-build
+probe is blocked by Windows units and external HtmlViewer/Synapse inputs not
+contained in the ZIP. The recipe therefore takes the deliverable's explicit
+blocker branch: an exact provenance-recorded 556b executable, disposable
+profile, frozen S1-only fixture, effective-settings record and local DXF/STL
+capture are the minimum remaining evidence. This defines the recipe without
+claiming that the exact oracle exists or relaxing its revision gate.
+
 Canonical **plain line** terminology and the compatibility treatment of the
 legacy `ordinary-*` evidence identifiers are now recorded in
 [TERMINOLOGY.md](TERMINOLOGY.md). B14/B15 remain byte-identical; user-facing
