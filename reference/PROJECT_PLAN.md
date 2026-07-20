@@ -204,8 +204,8 @@ separation, and records a comparable three-process edit series. It also
 exposes a bounded B14 defect: one replacement is split across geometry,
 production-schedule and material-report undo entries, whereas the accepted
 successor contract requires one atomic application-command unit. Wider input
-boundaries, straight/station workflows, explicit Validate/deferred
-reconstruction and the reconciled product-pipeline profile remain open. A
+boundaries, explicit Validate/deferred reconstruction and the reconciled
+product-pipeline profile remain open. A
 third isolated recipe now covers B14's
 real explicit selected-export dialog for the fixed plain-line fixture:
 deterministic DXF/SVG/STL/STEP and CSV,
@@ -220,7 +220,16 @@ non-atomic partial output plus contradictory final success wording after the
 last planned task fails. This closes the fixed create-time characterisation
 gap without accepting either defect as future behaviour. Deferred exact-shape
 reconstruction, cancellation, other entity families/scopes and the reconciled
-product-pipeline profile remain open.
+product-pipeline profile remain open. A fifth isolated recipe now covers the
+bounded connected-straight and travel-order stationing workflow. It invokes
+B14's real entrance/exit pair control, freezes deterministic manager and route
+identities, inherited two-track order, exact endpoint/tangent joins, raw
+persistence, 23 document objects and 12 production records; edits the two
+lengths while preserving curve geometry; and proves complete Undo/Redo and
+save/reopen recovery in three fresh processes. The independent-datum GUI,
+physical station/platform, straight target-file export, straight-specific
+negative paths and wider configurations remain open. This evidence does not
+close Phase 1 or select the first extraction slice.
 
 A read-only chair source audit now establishes that Templot5 556b holds
 full-size chair data separately from its procedural component-face builders,

@@ -32,6 +32,9 @@ movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
 | Plain-line export production-metric SHA-256 | `37dcbc20e8ecda9c1a80b3e73646b0c1127211e01488d56eeef49aa08d0789b4` for selected and create-time paths |
 | Plain-line create-time document SHA-256 | `a6aae6d70610ceec50a6223328db1454eca264effc12e7db5df07204707b3aa2` |
 | Diagnosed create-time partial-directory SHA-256 | `05d27a32b26435eda3b776498c2b28195a943bc2499ced404450f18ce349bf29` |
+| Connected straight/stationing oracle | `tools/freecad_bridge/straight_station_recipe.py`, schema 1 |
+| Created `600/600 mm` straight/station workflow SHA-256 | `f5bf185baf2c61fbdf79c483b96ccf53e3a6206320e50087568e457022958a6c` |
+| Edited `750/450 mm` straight/station workflow SHA-256 | `430d5f134e20789ee22c7f5549b64611a067646f1d24e038d4fbbc473d6b7666` |
 | B14 role | Immutable legacy comparison oracle |
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
@@ -92,6 +95,14 @@ Run the fast and real-GUI B14 plain-line selected-export oracles with:
 tools/freecad_bridge/run-b14-ordinary-export \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 tools/freecad_bridge/run-b14-ordinary-create-export \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+Run the fast and real-GUI connected-straight/stationing lifecycle oracles with:
+
+```bash
+.venv/bin/python tests/validate_phase1_straight_station.py
+tools/freecad_bridge/run-b14-straight-station \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 ```
 
@@ -387,7 +398,7 @@ is known to be defective.
 | Workflow family | Current oracle/evidence owner | Deterministic recipe or fixture | Principal Phase 1 gap |
 | --- | --- | --- | --- |
 | Curve/easement creation and editing | B15 reference; B14 oracle; direct transition/station characterisation; fixed create-result, edit-lifecycle, selected-export and create-time-export oracles | B14 default-base builder plus the four `run-b14-ordinary-*` characterisation wrappers | Fixed left/right replacement, undo/redo, exact change-back, persistence, negative paths and both export entry points for retained/fresh exact shapes are characterised; wider curve boundaries and future deferred Validate/reconstruction remain open; remaining curve functions lack direct oracles |
-| Straight/station workflow | B15/B14 source only | None dedicated | Inputs, station semantics, edit behaviour, persistence and production output are uncharacterised |
+| Straight/stationing workflow | B15/B14 source plus direct calculation parity and the connected-pair lifecycle oracle | `run-b14-straight-station` creates and edits a deterministic entrance/exit pair from the fixed two-track curve | Connected route inputs, identities, inherited track order, travel-order stationing, joins/tangents, length editing, complete history recovery, raw persistence, exact document shapes and ordered production catalogue are characterised; the independent-datum GUI, physical station/platform, straight file export, straight-specific failures and wider configurations remain open |
 | Multiple-track/spacing transition | Default B14 two-track base fixture plus deep create/edit/export document oracles | `build-b14-base` plus the four `run-b14-ordinary-*` characterisation wrappers | The fixed two-track configuration survives handedness replacement/reopen, selected export and create-time export; deferred Validate/reconstruction plus spacing/easement edit and invalid-input edge cases remain open |
 | Standalone turnout | B15/B14 source and inherited parity checks | None dedicated | Creation/editing, handedness/orientation, straight/curved host, rollback and performance recipes |
 | Crossover geometry | B14 cold series and B15 acceptance report | Controlled `XO-001` bridge recipe | Preview/commit feasibility mismatch and curved-host coverage |
@@ -414,6 +425,9 @@ The plain-line selected-production export evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
 The normal Generate-path production-export evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md).
+The connected-straight creation, stationing, edit, history, persistence and
+production-catalogue evidence is recorded in
+[benchmarks/2026-07-20-b14-straight-station-workflow-series.md](benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
 
 ## Fixed plain-line document contract
 
@@ -604,14 +618,46 @@ exporter-bound preflight is `1450.616 ms` median and the actual export is
 `2883.880 ms` median. These are bounded legacy measurements, not accepted
 human-use budgets. Full evidence and limitations are in the benchmark report.
 
+## Connected straight and stationing contract
+
+The isolated `run-b14-straight-station` recipe invokes B14's real controlled
+curve-entrance/curve-exit pair action on the fixed two-track curve. Three fresh
+FreeCAD 1.1.1 processes produced created `600/600 mm` workflow SHA-256
+`f5bf185baf2c61fbdf79c483b96ccf53e3a6206320e50087568e457022958a6c`
+and edited `750/450 mm` workflow SHA-256
+`430d5f134e20789ee22c7f5549b64611a067646f1d24e038d4fbbc473d6b7666`.
+
+The analytical boundary now establishes that each connected route inherits
+Main Track then Track 2 with the exact source endpoint, tangent, width and
+output choices. Entrance station zero is the remote end and station `L` is the
+curve join; exit station zero is the curve join and station `L` is the remote
+end. Every characterised join has zero normalised endpoint and heading error.
+The manager IDs persist exactly in raw Settings and Template JSON and produce
+stable `straight-<manager_id>` route IDs.
+
+The normal Generate action materialises a 23-object document and an ordered
+12-record catalogue. Full three-entry Undo/Redo cycles recover the exact base,
+created and edited states; save/reopen preserves the complete edited payload;
+and changing only straight lengths leaves the exact curve template and
+centrelines unchanged. The three-entry schedule/report/geometry stack is the
+same bounded B14 atomicity defect already recorded for curve editing, not a
+successor requirement.
+
+The fast oracle also covers one independent reverse/right-side two-track datum
+and exact B14/B15 calculation parity. The independent-datum GUI, physical
+station/platform, straight target-file export, formation/section options and
+straight-specific negative paths remain open. Full evidence and timings are in
+[benchmarks/2026-07-20-b14-straight-station-workflow-series.md](benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
+
 ## Boundary-data inventory still required
 
-The fixed plain-line oracle now records the first concrete subset: its
-length/angle property units, global document frame, template-set/track/record
-identities, object and production-record ordering, persisted property/JSON
-schema, and volatile-field normalisation. Before selecting the slice, Phase 1
-must still record the exact contract for every candidate rather than infer it
-from variable names:
+The fixed plain-line and connected-straight oracles now record the first
+concrete subsets: length/angle units, global document and travel-order station
+frames, template-set/track/route/record identities, exact join tolerances,
+object and production-record ordering, persisted property/raw JSON schemas and
+volatile-field normalisation. Before selecting the slice, Phase 1 must still
+record the exact contract for every candidate rather than infer it from
+variable names:
 
 - model and output units, including every degrees/radians and model/real-scale
   conversion;
@@ -680,16 +726,19 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-19 | Select the first extraction now | Deferred; transition solving leads on structural coupling, but workflow oracles, boundary contracts and representative profiles are not yet complete |
 | 2026-07-20 | Follow Templot's procedural constituent method for production chair geometry | Accepted; full-size definitions and named parts are canonical, while FreeCAD B-reps may replace DXF `3DFACE` mechanics only under geometric oracle evidence; B15's five-box body remains legacy gap evidence |
 | 2026-07-20 | Add reusable chair-definition packages and one assisted S1 assimilation pilot to RC scope | Accepted; scans/CAD/drawings/measurements fit the same definition used by native chairs, source evidence is not runtime truth, and arbitrary fully automatic conversion remains post-RC research |
+| 2026-07-20 | Use B14's controlled connected pair as the first straight/station workflow oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes route/station direction, stable identities, exact inherited joins, length editing, full history recovery, raw persistence and production catalogue without changing either macro; independent-datum GUI, physical station/platform and target-file export remain separate gaps |
 
 ## Remaining Phase 1 work
 
 - Complete operator workflow inputs, outputs, persisted properties, guided
   stages, failure and rollback maps for every row above.
 - Extend the fixed curve/multiple-track recipe through broader boundary cases
-  and explicit Validate/deferred reconstruction; cover
+  and explicit Validate/deferred reconstruction; extend straight coverage to
+  the independent-datum GUI, physical station/platform, target-file export and
+  straight-specific negative paths; cover
   cancellation and other export scopes, converge create-time output failure on
-  an accepted atomic/UI contract, and create dedicated fixtures for
-  station/straight and standalone turnout.
+  an accepted atomic/UI contract, and create a dedicated standalone-turnout
+  fixture.
 - Record candidate boundary schemas, units, frames, tolerances, identities,
   ordering, signatures and invalidation inputs.
 - Complete the Templot chair-generation data-flow/value/transform map; produce

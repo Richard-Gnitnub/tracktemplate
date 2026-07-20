@@ -249,6 +249,39 @@ Raw evidence remains ignored under
 series is recorded in
 [`reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md`](../../reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md).
 
+## Phase 1 connected-straight and stationing oracle
+
+Drive B14's real controlled curve-entrance/curve-exit straight workflow with:
+
+```bash
+tools/freecad_bridge/run-b14-straight-station \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The wrapper launches a fresh isolated process and operates only on a copied
+two-track curve fixture. It invokes the real **Replace with curve entrance +
+exit pair** control, assigns deterministic manager identities, creates two
+`600 mm` routes, and observes B14's actual analytical route result without
+substituting its builder. It validates the inherited Main Track/Track 2 order,
+exact endpoint/tangent joins and travel-order station direction: entrance
+station zero is remote and exit station zero is at the curve join.
+
+The recipe then applies all three B14 Undo/Redo entries, edits the two lengths
+to `750/450 mm` through the reopened real dialog, proves the curve geometry is
+unchanged, repeats full history recovery, and saves/closes/reopens the edited
+copy. Raw Settings/Template JSON must retain the exact route identities; the
+23-object document and ordered 12-record production catalogue must retain the
+frozen semantic SHA-256
+`430d5f134e20789ee22c7f5549b64611a067646f1d24e038d4fbbc473d6b7666`.
+
+Raw evidence remains ignored under
+`benchmark-output/freecad-bridge/straight-station-runs/`; the controlled series
+and its explicit boundary are recorded in
+[`reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md`](../../reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
+This oracle covers connected straight stationing and its production catalogue,
+not a physical station/platform, the independent-datum GUI path or target-file
+export.
+
 ## Automated B14 cold run
 
 After the local base fixture has been prepared, one command launches a fresh

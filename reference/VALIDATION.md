@@ -267,6 +267,36 @@ documents B14; it is not the accepted transaction contract for a migrated
 exporter. The controlled three-run evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md).
 
+Fast Phase 1 connected-straight and stationing workflow checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_straight_station.py
+```
+
+This extracts the exact B14/B15 straight construction, connection validation
+and station functions without importing either macro. It proves B14/B15 AST
+and result parity for the controlled pair, exact travel-order stationing and
+joins, one independent reverse/right-side two-track datum, negative contract
+checks, source-level pre-transaction ordering and the isolated runner
+structure. Exercise the real copied-document GUI path with:
+
+```bash
+tools/freecad_bridge/run-b14-straight-station \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The command must use B14's real pair control and normal Replace action; create
+the deterministic `600/600 mm` entrance/exit pair; recover the exact base and
+created states through all three Undo/Redo entries; edit to `750/450 mm` while
+preserving exact curve geometry and stable route identities; recover both edit
+states through Undo/Redo; and preserve raw Settings/Template JSON, 23 objects,
+12 ordered production records and the frozen workflow hash across save/reopen.
+It must restore isolated preferences and leave the source fixture byte-
+identical. The controlled series is recorded in
+[benchmarks/2026-07-20-b14-straight-station-workflow-series.md](benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
+This is alignment stationing evidence, not coverage of a physical
+station/platform or straight target-file export.
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash
