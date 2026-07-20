@@ -30,8 +30,10 @@ EXPECTED_MEMBER_SHA256 = {
     "T556B_ZIPPED_FOR_UPLOAD/OpenTemplot2024.lpr": "ceefe944c2300f5dedea7eb64778d4048f0b1545daa4052cf023aa02d67d5766",
     "T556B_ZIPPED_FOR_UPLOAD/control_room.lfm": "27d1ec9d1ef4ae9a69494af39ffdf9d36ee31c775060d46470a46c2556a494cf",
     "T556B_ZIPPED_FOR_UPLOAD/control_room.pas": "60f44096afdef770488debd3feaa70bede22066acc7f539f6ee7d159f7b9d19e",
+    "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b",
     "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d",
-    "T556B_ZIPPED_FOR_UPLOAD/chairs_unit_x.pas": "aff0e0079c4749c1132aac0ff15a742afef3f13080178c2ad66545be7235d92a",
+    "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65",
+    "T556B_ZIPPED_FOR_UPLOAD/pad_unit.pas": "c5c05b9406de434a81946fd68d8179f8f6b27fd004c8fae36977932194887fbb",
 }
 
 
@@ -145,6 +147,7 @@ def validate():
     assert settings["export_mode"] == "3-D CAD"
     assert settings["print_scaled_output"] is False
     assert settings["jaw_policy"] == "all solid outer jaws"
+    assert settings["key_placement"].startswith("central;")
     assert spec["source"]["archive"]["sha256"] == EXPECTED_ARCHIVE_SHA256
     assert spec["source"]["observed_candidate"]["sha256"] == (
         EXPECTED_REJECTED_EXECUTABLE_SHA256
@@ -164,13 +167,23 @@ def validate():
         source_result = oracle.probe_source_archive(archive_path, spec)
         assert source_result["status"] == "exact-source-verified-build-blocked"
         assert source_result["s1_component_route_confirmed"] is True
+        assert source_result["active_project_units"] == {
+            "math_unit": "math_unit in 'math_unit.pas'",
+            "pad_unit": "pad_unit in 'pad_unit.pas'",
+            "chairs_unit": "chairs_unit in 'chairs_unit.pas'",
+            "dxf_unit": "dxf_unit in 'dxf_unit.pas'",
+        }
+        assert source_result["inactive_alternates_excluded"] == [
+            "math_unit_x.pas",
+            "chairs_unit_x.pas",
+        ]
         assert source_result["self_contained_build_ready"] is False
         assert set(source_result["missing_declared_build_inputs"]) == {
             "HTML_VIEWER_MODS",
             "FrameViewer09",
             "synapse_units",
         }
-        assert len(source_result["required_members"]) == 7
+        assert len(source_result["required_members"]) == 9
 
     changed = copy.deepcopy(document)
     changed["status"] = "accepted"

@@ -153,6 +153,12 @@
   `tests/validate_phase1_s1_lineage.py` protects its classifications, blocked
   status, B14/B15 source anchors, manifest link and optional local evidence
   hashes. It is an audit record, not an accepted production definition.
+- `reference/lineage/templot5-556b-s1-generation-map.json` records the bounded
+  active 556b code-1 value/unit/frame/constituent/transform route;
+  `tests/validate_templot_s1_generation_map.py` protects its exact source
+  hashes, active project units, inactive `_x` alternatives, reference-only
+  status and blocked production gate. Do not cite an `_x` file as the active
+  executable route unless a later exact project entry selects it.
 - `reference/oracles/templot5-556b-s1-oracle.json` is the blocked exact-source
   capture contract; `tools/templot_s1_oracle.py` owns its local source,
   executable and DXF/STL semantic checks, and

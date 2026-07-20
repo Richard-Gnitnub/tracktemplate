@@ -168,6 +168,7 @@ Phase 1 licensing-control and manifest-gate checks:
   reference/manifests/s1-chair-pilot.dependency-manifest.json
 .venv/bin/python tests/validate_phase1_s1_lineage.py
 .venv/bin/python tests/validate_templot_s1_oracle.py
+.venv/bin/python tests/validate_templot_s1_generation_map.py
 ```
 
 The test checks the Draft 2020-12 schema vocabulary, package/output structural
@@ -180,16 +181,27 @@ The lineage test separately enforces the bounded first-S1/core register: both
 scopes must remain blocked, every current Templot-dependent entry must remain
 `reference-only`, unresolved evidence and owners must be present, and all
 source anchors must match the immutable B14 and accepted B15 files. When the
-ignored local Templot archive is present it also verifies the archive and six
-reviewed member hashes; a clean checkout does not require that archive.
+ignored local Templot archive is present it also verifies the archive and five
+reviewed active member hashes; a clean checkout does not require that archive.
 
 The oracle-contract test validates the blocked exact-556b capture
 specification, local-only artifact rule, rejected-version guard and synthetic
 DXF/STL semantics. When the ignored source ZIP is present it also verifies the
-archive plus seven required members, the visible 556b revision evidence and
-the four named S1 component routes. It does not require an executable or raw
-Templot media in a clean checkout and does not claim that the frozen oracle has
-been captured.
+archive plus nine required members, the visible 556b revision evidence and
+the four named S1 component routes through active `math_unit.pas`. It also
+proves that the exact Lazarus project selects the non-`_x` math, pad, chair and
+DXF units. It does not require an executable or raw Templot media in a clean
+checkout and does not claim that the frozen oracle has been captured.
+
+The generation-map test separately enforces the bounded code-1 source audit.
+It protects the active/inactive project-unit distinction, exact source hashes,
+unit conversions, coordinate frames, eight reference-only value groups, nine
+generation stages, five constituent/base routes, manufacturing branches and
+blocked acceptance gate. When the ignored ZIP is available it verifies every
+mapped field and routine in its owning active unit, the complete code-1
+constituent sequence and the DXF/STL emission functions. It does not approve
+the mapped values, copy source expressions into production, or replace the
+missing artifact and independent-evidence gates.
 
 Local source and candidate probes are:
 

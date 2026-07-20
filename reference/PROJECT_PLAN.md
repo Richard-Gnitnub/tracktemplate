@@ -316,7 +316,7 @@ because the present path includes Templot comparison data or source expression;
 seven remain `unknown` pending independent evidence or accepted project
 decisions. Its drift test verifies both macro fingerprints, literal/function
 anchors, the S1 pilot manifest link and, when available, the ignored local
-archive and six reviewed source members. Both scopes therefore take the exit
+archive and five reviewed active source members. Both scopes therefore take the exit
 gate's explicit blocked branch; this evidence neither clears the five-box body
 nor selects production S1 values. Other-S&C and legacy B14/B15 registers,
 primary S1 evidence and the frozen constituent/assembly oracle remain open.
@@ -325,7 +325,7 @@ The proposed frozen-S1 oracle now has a fail-closed machine-readable capture
 contract at
 [oracles/templot5-556b-s1-oracle.json](oracles/templot5-556b-s1-oracle.json),
 with a standard-library source/executable/DXF/STL inspector and direct contract
-test. Seven exact 556b archive members and the four named S1 jaw/seat/key block
+test. Nine exact 556b archive members and the four named S1 jaw/seat/key block
 routes are fingerprinted. The installed local Templot5 candidate is
 deterministically rejected as version 5.55a, while a clean native source-build
 probe is blocked by Windows units and external HtmlViewer/Synapse inputs not
@@ -334,6 +334,20 @@ blocker branch: an exact provenance-recorded 556b executable, disposable
 profile, frozen S1-only fixture, effective-settings record and local DXF/STL
 capture are the minimum remaining evidence. This defines the recipe without
 claiming that the exact oracle exists or relaxing its revision gate.
+
+The detailed 556b value/unit/frame/transform branch is now recorded in
+[lineage/templot5-556b-s1-generation-map.json](lineage/templot5-556b-s1-generation-map.json)
+and protected by a source-drift test. The exact Lazarus project establishes
+`math_unit.pas`, `pad_unit.pas`, `chairs_unit.pas`, `dxf_unit.pas` and
+`custom_3d_unit.pas` as the mapped active route; the similarly named `_x` files
+are fingerprinted inactive alternates, not executable-path evidence. The map
+separates eight value groups, four coordinate frames, nine generation stages,
+five S1 assembly constituents and seven manufacturing/output branch groups. It
+also records every current
+finding and keeps all mapped Templot material `reference-only`. This completes
+the source-generation-map branch subject to owner review; it does not provide
+the missing exact artifact oracle, independently evidenced S1 values or a
+production ChairDefinition, and it does not close Phase 1.
 
 Canonical **plain line** terminology and the compatibility treatment of the
 legacy `ordinary-*` evidence identifiers are now recorded in

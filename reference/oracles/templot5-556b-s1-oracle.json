@@ -45,14 +45,24 @@
         "role": "program revision number"
       },
       {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+        "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b",
+        "role": "active full-size S1 2D/3D data initialisation"
+      },
+      {
         "path": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
         "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d",
         "role": "S1 block builders and DXF/STL emitter"
       },
       {
-        "path": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit_x.pas",
-        "sha256": "aff0e0079c4749c1132aac0ff15a742afef3f13080178c2ad66545be7235d92a",
-        "role": "S1 constituent assembly and transforms"
+        "path": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+        "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65",
+        "role": "active drawtimber S1 assignment, constituent assembly and placement transforms"
+      },
+      {
+        "path": "T556B_ZIPPED_FOR_UPLOAD/pad_unit.pas",
+        "sha256": "c5c05b9406de434a81946fd68d8179f8f6b27fd004c8fae36977932194887fbb",
+        "role": "active scale state and normal/FDM key-offset controls"
       }
     ],
     "build_probe": {
@@ -98,6 +108,7 @@
         "STL"
       ],
       "jaw_policy": "all solid outer jaws",
+      "key_placement": "central; set both normal and FDM maximum off-centre values to 0 full-size inches so random direction is geometrically neutral",
       "included": [
         "chair bases and plinths",
         "S1 outer jaws",

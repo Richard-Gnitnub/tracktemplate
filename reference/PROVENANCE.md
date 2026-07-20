@@ -97,6 +97,12 @@ including `switch_select.pas`, `math_unit.pas`, `shove_timber.pas`,
 rules, tables, profiles, and chair geometry as Templot-derived,
 Templot-cross-checked, or source-dimensional.
 
+That list records what B14/B15 cite; it is not a statement that every cited
+file belongs to the compiled upstream route. The chair audit below establishes
+that `chairs_unit_x.pas` is an inactive alternate in the exact 556b Lazarus
+project and corrects the executable-path evidence without rewriting the macro
+history.
+
 The accepted project classification is therefore:
 
 > TrackTemplateMacro is source-informed and contains data, dimensions, rules,
@@ -114,14 +120,24 @@ Templot. Do not replace the source-informed classification with “clean-room”
 ## Chair procedural source-audit record
 
 On 2026-07-20 a read-only architecture audit examined the chair-related paths
-in the exact local Templot5 revision 556b archive, principally
-`chairs_unit.pas`, `chairs_unit_x.pas`, `dxf_unit.pas` and
-`custom_3d_unit.pas`. The audit records that the upstream program separates
+in the exact local Templot5 revision 556b archive, principally active
+`chairs_unit.pas`, `math_unit.pas`, `pad_unit.pas`, `dxf_unit.pas` and
+`custom_3d_unit.pas`. `OpenTemplot2024.lpr` proves those unit selections;
+`chairs_unit_x.pas` and `math_unit_x.pas` are present in the ZIP but are not
+compiled by that project and are retained only as fingerprinted inactive
+alternate evidence. The audit records that the upstream program separates
 full-size 2D/3D chair data from procedural constituent builders, reuses named
 jaw/seat/key blocks at calculated transforms, emits derived DXF 3D faces and
 triangulates them for STL. Its `.sk4` loading path covers rail, dimensional and
 manufacturing settings; this audit found no generic arbitrary-chair mesh to
 procedural-definition importer in the reviewed snapshot.
+
+The exact active source, value groups, unit boundaries, coordinate frames,
+constituent routes, manufacturing branches and open findings are recorded in
+[lineage/templot5-556b-s1-generation-map.json](lineage/templot5-556b-s1-generation-map.json).
+That map and its drift test are local comparison evidence only. They do not
+reclassify any upstream value as independent project data, authorise source
+translation, or admit Templot data to a production chair package.
 
 TrackTemplateMacro's B15 body already cites selected `init_2d_rea`,
 `init_3d_rea` and rail-section dimensions, but its supported S1/S1J exact body

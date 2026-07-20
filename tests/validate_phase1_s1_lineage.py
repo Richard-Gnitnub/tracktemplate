@@ -202,9 +202,8 @@ def validate_register(document):
             errors.append("upstream comparison evidence needs Templot classifications")
         if item.get("permitted_role") not in {
             "local comparison oracle",
-            "local procedural comparison oracle",
             "local rail/component comparison oracle",
-            "local assignment/timber comparison oracle",
+            "local active assembly/timber comparison oracle",
             "local switch/timber comparison oracle",
             "local timber-behaviour comparison oracle",
         }:

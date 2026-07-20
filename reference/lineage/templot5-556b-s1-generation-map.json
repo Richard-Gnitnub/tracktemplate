@@ -1,0 +1,877 @@
+{
+  "schema_version": 1,
+  "map_id": "tracktemplate:templot5-556b:s1-generation-map:1",
+  "recorded_on": "2026-07-20",
+  "status": "mapped-with-open-findings",
+  "status_reason": "The active 556b value, unit, frame, constituent, placement and export routes are mapped, but the values remain Templot reference evidence and the exact 556b artifact oracle and independent S1 evidence are still unavailable.",
+  "permitted_role": "local comparison evidence only",
+  "source_state": {
+    "archive": {
+      "path": "reference/t5_files_556b_06_feb_2025.zip",
+      "sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3",
+      "tracked": false,
+      "required_in_clean_checkout": false
+    },
+    "project_entry": {
+      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/OpenTemplot2024.lpr",
+      "sha256": "ceefe944c2300f5dedea7eb64778d4048f0b1545daa4052cf023aa02d67d5766"
+    },
+    "active_units": [
+      {
+        "unit": "chairs_unit",
+        "archive_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+        "sha256": "0a996ea4ad6fa7556dde43f6af0a1e41463112d3f69c4efce3dd3c29406dc21b",
+        "project_marker": "chairs_unit in 'chairs_unit.pas'",
+        "role": "full-size 2D and 3D chair data initialisation"
+      },
+      {
+        "unit": "math_unit",
+        "archive_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+        "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65",
+        "project_marker": "math_unit in 'math_unit.pas'",
+        "role": "active drawtimber assignment, direct base geometry and constituent placement"
+      },
+      {
+        "unit": "pad_unit",
+        "archive_member": "T556B_ZIPPED_FOR_UPLOAD/pad_unit.pas",
+        "sha256": "c5c05b9406de434a81946fd68d8179f8f6b27fd004c8fae36977932194887fbb",
+        "project_marker": "pad_unit in 'pad_unit.pas'",
+        "role": "active scale state and normal/FDM key-offset controls"
+      },
+      {
+        "unit": "dxf_unit",
+        "archive_member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+        "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d",
+        "project_marker": "dxf_unit in 'dxf_unit.pas'",
+        "role": "rail-section derivation, constituent builders and DXF/STL emission"
+      },
+      {
+        "unit": "custom_3d_unit",
+        "archive_member": "T556B_ZIPPED_FOR_UPLOAD/custom_3d_unit.pas",
+        "sha256": "04899d1060c8d2946def1d3f660cfea2571c3e41d7e3c4c1915b5c3039668934",
+        "project_marker": "custom_3d_unit in 'custom_3d_unit.pas'",
+        "role": "global .sk4 rail, dimensional and manufacturing setting persistence"
+      }
+    ],
+    "inactive_alternates": [
+      {
+        "archive_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit_x.pas",
+        "sha256": "aff0e0079c4749c1132aac0ff15a742afef3f13080178c2ad66545be7235d92a",
+        "present_in_project_entry": false,
+        "disposition": "inactive alternate source copy; never use as the executable 556b route"
+      },
+      {
+        "archive_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit_x.pas",
+        "sha256": "1baad39862ac11e2b10cdba8c8ed3eb3a4eb6909b3149abddb8f561d378a64ee",
+        "present_in_project_entry": false,
+        "disposition": "inactive alternate source copy; never use as the executable 556b route"
+      }
+    ]
+  },
+  "scope": {
+    "chair_code": 1,
+    "designation": "S1 plain-line chair",
+    "comparison_configuration": "solid outer jaw, Code 75 bullhead rail option A, 4 mm/ft, 3-D CAD output",
+    "included": [
+      "S1 base and plinth direct faces",
+      "S1OUTJAW reusable outer-jaw constituent",
+      "S1INJAW reusable inner-jaw constituent",
+      "S1SEAT reusable rail-seat constituent",
+      "KEY reusable solid-jaw key constituent",
+      "chair-to-track and export transforms"
+    ],
+    "excluded": [
+      "S1J and all special chair families",
+      "loose-jaw and loose-key variants",
+      "bolts, screws, plugs, sockets, supports, sprues, webs, rafts and timbers",
+      "COT integral-chair output",
+      "custom one-off jaw blocks",
+      "production use of any mapped value or expression"
+    ]
+  },
+  "unit_model": {
+    "prototype_parameters": "full-size inches in _2d_data and _3d_data unless a field is explicitly derived from rail_section_data_mm",
+    "model_scale": "scale is model millimetres per prototype foot; inscale = scale / 12 is model millimetres per prototype inch",
+    "selected_capture_scale": {
+      "scale_mm_per_foot": 4.0,
+      "inscale_mm_per_inch": 0.3333333333333333,
+      "denominator": 76.2
+    },
+    "rail_section": "rail_section_data_mm holds model-space millimetres after profile selection, chair-fit adjustment and optional FDM rail-fit correction",
+    "internal_angles": "radians",
+    "dxf_angles": "degrees",
+    "stl_angles": "radians passed to insert_stl_block",
+    "output_units": "DXF may be millimetres or inches; the frozen comparison recipe requires millimetres; ASCII STL numeric coordinates are treated as millimetres"
+  },
+  "coordinate_frames": [
+    {
+      "frame_id": "component-local-rail-top",
+      "owner": "dxf_unit constituent builders",
+      "origin": "rail gauge face at the constituent centre with rail top at z = 0",
+      "axes": {
+        "x": "along the rail and chair width",
+        "y": "normal to the rail; negative values lie on the keyed outer-jaw side in the unmirrored S1 builders",
+        "z": "up from rail top; chair geometry is normally at zero or negative z"
+      },
+      "units": "model millimetres"
+    },
+    {
+      "frame_id": "chair-on-timber",
+      "owner": "math_unit.drawtimber",
+      "origin": "current timber/rail calculation frame",
+      "axes": {
+        "x": "template longitudinal calculation axis",
+        "y": "template transverse calculation axis",
+        "z": "not stored in the constituent endpoint records"
+      },
+      "transform_in": "component insertion endpoints are skewed if required, rotated by chair angle, offset to the rail, equalised/curved, shifted for curving, transformed into the template/pad frame and handed",
+      "units": "model millimetres"
+    },
+    {
+      "frame_id": "template-export-placement",
+      "owner": "dxf_unit entity emission",
+      "origin": "midpoint of the two stored constituent endpoints",
+      "axes": {
+        "x": "orientation reconstructed from endpoint delta",
+        "y": "perpendicular to reconstructed x",
+        "z": "rail-top datum plus constituent-specific loose-part offset"
+      },
+      "transform_in": "right-hand templates and the opposite rail side may add 180 degrees before block insertion",
+      "units": "model millimetres before output compensation"
+    },
+    {
+      "frame_id": "output",
+      "owner": "dxf_unit.make_dim and make_stl_dim",
+      "origin": "configured axis shifts after the rail-top-to-timber-underside z datum adjustment",
+      "axes": {
+        "x": "configured x scale, shrinkage and shift",
+        "y": "configured y scale, shrinkage and shift",
+        "z": "configured z scale, shrinkage, conditional timber thinification and shift"
+      },
+      "transform_in": "local block rotation and translation precede STL global rotation and per-axis output conversion; DXF block definitions omit axis shift and DXF INSERT records carry placement",
+      "units": "millimetres for the frozen recipe"
+    }
+  ],
+  "value_groups": [
+    {
+      "group_id": "s1-plan-footprint-and-fasteners",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+      "source_symbols": [
+        "init_2d_rea",
+        "S1_chair_outlong",
+        "S1_chair_inlong",
+        "S1_chair_halfwide",
+        "S1_inbolt_1x",
+        "S1_inbolt_2x",
+        "S1_outbolt_1x",
+        "S1_outbolt_2x",
+        "S1_bolts_from_end",
+        "S1_chair_crad_inner",
+        "S1_chair_crad_outer"
+      ],
+      "source_units": "full-size inches",
+      "model_conversion": "each field is multiplied by inscale inside active math_unit.drawtimber",
+      "affects": [
+        "base outline",
+        "plinth extent",
+        "bolt marks",
+        "seat width"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "project_status": "reference-only"
+    },
+    {
+      "group_id": "selected-rail-section-and-derived-faces",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+      "source_symbols": [
+        "init_rail_section",
+        "rail_depth_mm",
+        "rail_head_width_mm",
+        "rail_corner_rad_mm",
+        "rail_foot_width_mm",
+        "rail_fish_angle",
+        "rail_web_top_mm",
+        "rail_web_bottom_mm",
+        "rail_web_thick_mm",
+        "rail_head_depth_mm",
+        "rail_foot_depth_mm",
+        "rail_web_face_top_from_rail_bot_mm",
+        "rail_web_face_bottom_from_rail_bot_mm"
+      ],
+      "source_units": "selected profiles mix full-size-inch inputs and measured model-rail dimensions before conversion to model millimetres",
+      "model_conversion": "profile selection and chair_web_adjustment run before derived fish-angle faces; optional FDM rail-fit correction then changes web/foot values",
+      "affects": [
+        "jaw heights",
+        "jaw-to-web faces",
+        "seat interface",
+        "key faces"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "project_status": "reference-only"
+    },
+    {
+      "group_id": "common-base-seat-and-key",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+      "source_symbols": [
+        "init_3d_rea",
+        "seat_thickness",
+        "chair_plinth_thick",
+        "chair_plinth_spacing_sides",
+        "chair_plinth_spacing_ends",
+        "chair_edge_thick",
+        "outer_jaw_face",
+        "key_length",
+        "key_deformation",
+        "key_pad_taper",
+        "sj_key_pad_length",
+        "S1_seat_top_halfwide"
+      ],
+      "source_units": "full-size inches, including explicitly non-prototype model-fit and STL-integrity values",
+      "model_conversion": "multiplied by inscale in active component/base builders",
+      "affects": [
+        "base and plinth levels",
+        "seat block",
+        "outer-jaw gauge-face position",
+        "solid-jaw key"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "project_status": "reference-only"
+    },
+    {
+      "group_id": "s1-outer-jaw-sections",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+      "source_symbols": [
+        "S1_outjaw_height_top",
+        "S1_outjaw_height_mid",
+        "S1_outjaw_half_width_top",
+        "S1_outjaw_half_width_mid",
+        "S1_outjaw_half_width_seat",
+        "S1_outjaw_half_width_plinth",
+        "S1_outjaw_half_rib_space_top",
+        "S1_outjaw_half_rib_space_mid",
+        "S1_outjaw_half_rib_space_seat",
+        "S1_outjaw_half_rib_space_plinth",
+        "S1_outjaw_rib_depth_top",
+        "S1_outjaw_rib_depth_mid",
+        "S1_outjaw_rib_depth_seat",
+        "S1_outjaw_rib_depth_plinth",
+        "S1_outjaw_rib_width_top",
+        "S1_outjaw_rib_width_mid",
+        "S1_outjaw_rib_width_seat",
+        "S1_outjaw_rib_width_plinth",
+        "S1_outjaw_rib_rad_top",
+        "S1_outjaw_rib_rad_mid",
+        "S1_outjaw_rib_rad_seat",
+        "S1_outjaw_rib_rad_plinth",
+        "S1_outjaw_fillet_rad_top",
+        "S1_outjaw_fillet_rad_mid",
+        "S1_outjaw_fillet_rad_seat",
+        "S1_outjaw_fillet_rad_plinth",
+        "S1_outjaw_depth_top",
+        "S1_outjaw_depth_mid",
+        "S1_outjaw_depth_seat",
+        "S1_outjaw_depth_plinth",
+        "S1_outjaw_slope_mid",
+        "S1_outjaw_slope_seat",
+        "S1_outjaw_slope_plinth"
+      ],
+      "source_units": "full-size inches except dimensionless slopes",
+      "model_conversion": "section dimensions are multiplied by inscale and combined with model-mm rail faces",
+      "affects": [
+        "S1OUTJAW section profiles",
+        "sampled ribs and fillets",
+        "jaw vertical envelope"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "project_status": "reference-only"
+    },
+    {
+      "group_id": "s1-inner-jaw-sections",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+      "source_symbols": [
+        "S1_injaw_height_insert_top",
+        "S1_injaw_height_insert_bot",
+        "S1_injaw_height_stand",
+        "S1_injaw_height_upmid",
+        "S1_injaw_height_lomid",
+        "S1_injaw_half_width_insert_top",
+        "S1_injaw_half_width_insert_bot",
+        "S1_injaw_half_width_stand",
+        "S1_injaw_half_width_upmid",
+        "S1_injaw_half_width_lomid",
+        "S1_injaw_half_width_seat",
+        "S1_injaw_half_width_plinth",
+        "S1_injaw_side_space_stand",
+        "S1_injaw_side_space_upmid",
+        "S1_injaw_side_space_lomid",
+        "S1_injaw_side_space_seat",
+        "S1_injaw_side_space_plinth",
+        "S1_injaw_depth_insert",
+        "S1_injaw_depth_stand",
+        "S1_injaw_depth_upmid",
+        "S1_injaw_depth_lomid",
+        "S1_injaw_depth_seat",
+        "S1_injaw_depth_plinth",
+        "S1_injaw_corner_rad_stand",
+        "S1_injaw_corner_rad_upmid",
+        "S1_injaw_corner_rad_lomid",
+        "S1_injaw_corner_rad_seat",
+        "S1_injaw_corner_rad_plinth",
+        "S1_injaw_fillet_rad_stand",
+        "S1_injaw_fillet_rad_upmid",
+        "S1_injaw_fillet_rad_lomid",
+        "S1_injaw_fillet_rad_seat",
+        "S1_injaw_fillet_rad_plinth",
+        "S1_injaw_slope_insert",
+        "S1_injaw_slope_stand",
+        "S1_injaw_slope_upmid",
+        "S1_injaw_slope_lomid",
+        "S1_injaw_slope_seat",
+        "S1_injaw_slope_plinth"
+      ],
+      "source_units": "full-size inches except dimensionless slopes; several heights and widths are derived from rail-section values",
+      "model_conversion": "section dimensions are multiplied by inscale and combined with model-mm rail faces",
+      "affects": [
+        "S1INJAW insert and stand",
+        "sampled rib and fillet profiles",
+        "rail-foot and wheel-flange interface"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "project_status": "reference-only"
+    },
+    {
+      "group_id": "assignment-and-instance-placement",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+      "source_symbols": [
+        "drawtimber",
+        "calc_fill_chair_outline",
+        "add_jaw",
+        "add_seat",
+        "add_key",
+        "current_jaws",
+        "current_seats",
+        "current_keys"
+      ],
+      "source_units": "model millimetres and radians",
+      "model_conversion": "S1 chairing dimensions are scaled before assignment; placement endpoints pass through the chair, timber, curving, template and handedness transforms",
+      "affects": [
+        "direct base/plinth faces",
+        "constituent identity",
+        "constituent insertion midpoint",
+        "constituent rotation",
+        "loose-part z offset"
+      ],
+      "classifications": [
+        "templot_source_expression"
+      ],
+      "project_status": "reference-only"
+    },
+    {
+      "group_id": "key-placement-policy",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/pad_unit.pas",
+      "source_symbols": [
+        "normal_chair_key_max_offset",
+        "fdm_chair_key_max_offset"
+      ],
+      "source_units": "full-size inches",
+      "model_conversion": "the active export setup copies the selected limit to chair_key_max_offset; add_key converts the resulting random or central longitudinal offset with inscale",
+      "affects": [
+        "KEY insertion offset",
+        "capture determinism"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "project_status": "reference-only"
+    },
+    {
+      "group_id": "manufacturing-and-output-compensation",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+      "source_symbols": [
+        "chair_web_adjustment",
+        "fdm_rail_foot_correction",
+        "fdm_rail_web_correction",
+        "fdm_inner_jaw_correction",
+        "fdm_edge_correction",
+        "fdm_outer_beefing",
+        "fdm_inner_beefing",
+        "resin_outer_beefing",
+        "resin_inner_beefing",
+        "chair_key_max_offset",
+        "x_shrinkage_factor",
+        "y_shrinkage_factor",
+        "z_shrinkage_factor",
+        "thinify_timbers_factor",
+        "x_scale",
+        "y_scale",
+        "z_scale",
+        "x_shift",
+        "y_shift",
+        "z_shift"
+      ],
+      "source_units": "mixed full-size inches, model millimetres, percentages/factors and output units",
+      "model_conversion": "applied at rail-fit, builder, base, placement or final output stages according to branch",
+      "affects": [
+        "rail fit",
+        "jaw mass and clearance",
+        "chair edge and timber depth",
+        "key placement",
+        "final dimensions and datum"
+      ],
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data"
+      ],
+      "project_status": "reference-only"
+    }
+  ],
+  "generation_stages": [
+    {
+      "stage_id": "resolve-active-project-units",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/OpenTemplot2024.lpr",
+      "symbols": [
+        "math_unit",
+        "chairs_unit",
+        "dxf_unit",
+        "custom_3d_unit"
+      ],
+      "consumes": [
+        "Lazarus project unit list"
+      ],
+      "produces": [
+        "active executable source route"
+      ],
+      "transform": "select exact non-_x units named by the program project"
+    },
+    {
+      "stage_id": "initialise-full-size-chair-data",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas",
+      "symbols": [
+        "init_2d_rea",
+        "init_3d_rea"
+      ],
+      "consumes": [
+        "built-in S1 plan, seat, jaw and key values",
+        "current rail-section derived values"
+      ],
+      "produces": [
+        "_2d_data",
+        "_3d_data"
+      ],
+      "transform": "store predominantly full-size-inch values; some 3D fields are derived against the current model-mm rail section"
+    },
+    {
+      "stage_id": "select-and-derive-rail-section",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+      "symbols": [
+        "init_rail_section",
+        "fish_calcs"
+      ],
+      "consumes": [
+        "selected rail option",
+        "scale and inscale",
+        "chair rail-fit adjustment",
+        "optional FDM rail-fit correction"
+      ],
+      "produces": [
+        "rail_section_data_mm",
+        "derived key and jaw interface levels"
+      ],
+      "transform": "convert the selected profile to model millimetres and derive head, foot and web-face values"
+    },
+    {
+      "stage_id": "scale-and-assign-s1",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+      "symbols": [
+        "drawtimber",
+        "S1_chairing_dims"
+      ],
+      "consumes": [
+        "s1-plan-footprint-and-fasteners",
+        "scale and inscale",
+        "rail/timber chair assignment"
+      ],
+      "produces": [
+        "model-mm S1 chairing dimensions",
+        "chair code 1 assignment"
+      ],
+      "transform": "multiply full-size plan dimensions by inscale and select code 1 for the current rail position"
+    },
+    {
+      "stage_id": "construct-direct-base-and-plinth",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+      "symbols": [
+        "calc_fill_chair_outline"
+      ],
+      "consumes": [
+        "scaled S1 plan outline",
+        "base/plinth/fit settings",
+        "chair and timber transforms"
+      ],
+      "produces": [
+        "chair outline and vertical face marks for direct entity emission"
+      ],
+      "transform": "construct the S1 base/plinth and optional plug/support marks directly in the placed track frame"
+    },
+    {
+      "stage_id": "record-named-constituent-placements",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+      "symbols": [
+        "add_jaw",
+        "add_seat",
+        "add_key",
+        "current_jaws",
+        "current_seats",
+        "current_keys"
+      ],
+      "consumes": [
+        "S1OUTJAW",
+        "S1INJAW",
+        "S1SEAT",
+        "KEY",
+        "component endpoint boxes",
+        "chair/timber/template transforms"
+      ],
+      "produces": [
+        "named endpoint pairs and placement metadata"
+      ],
+      "transform": "skew, rotate, offset, curve, transform, shift and hand two endpoints; defer midpoint/angle reconstruction to export"
+    },
+    {
+      "stage_id": "persist-template-chair-records",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+      "symbols": [
+        "copy_jaws_array",
+        "copy_seats_array",
+        "copy_keys_array",
+        "keep_jaws",
+        "keep_seats",
+        "keep_keys"
+      ],
+      "consumes": [
+        "current constituent placement arrays"
+      ],
+      "produces": [
+        "template keep arrays consumed by export"
+      ],
+      "transform": "copy placement records into or out of the template state"
+    },
+    {
+      "stage_id": "build-reusable-constituent-faces",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+      "symbols": [
+        "create_s1_outer_jaw_block",
+        "create_S1_SC_L1_CC_inner_jaw_block",
+        "create_S1_S1J_L1_CC_seat_block",
+        "create_3d_key_block",
+        "dxf_3dface",
+        "do_block_file_dxf"
+      ],
+      "consumes": [
+        "full-size chair groups scaled by inscale",
+        "rail_section_data_mm",
+        "active manufacturing settings"
+      ],
+      "produces": [
+        "S1OUTJAW",
+        "S1INJAW",
+        "S1SEAT",
+        "KEY",
+        "parallel in-memory STL block faces"
+      ],
+      "transform": "construct section/profile vertices, sampled arcs and connecting 3D faces in the component-local frame"
+    },
+    {
+      "stage_id": "emit-assembled-dxf-and-stl",
+      "source_member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
+      "symbols": [
+        "make_dim",
+        "make_stl_dim",
+        "insert_stl_block",
+        "stl_3dface"
+      ],
+      "consumes": [
+        "direct base/plinth marks",
+        "template keep arrays",
+        "reusable constituent blocks",
+        "output scale, shrinkage, thinification and shifts"
+      ],
+      "produces": [
+        "DXF direct 3DFACEs and INSERT entities",
+        "triangulated ASCII STL facets"
+      ],
+      "transform": "derive midpoint and orientation from each endpoint pair, insert the named block, expand and triangulate the same block for STL, then apply the configured output transform"
+    }
+  ],
+  "components": [
+    {
+      "component_id": "S1-BASE-PLINTH",
+      "representation": "direct placed faces rather than a named reusable block",
+      "builder": "math_unit.drawtimber.calc_fill_chair_outline",
+      "value_group_ids": [
+        "s1-plan-footprint-and-fasteners",
+        "common-base-seat-and-key",
+        "assignment-and-instance-placement",
+        "manufacturing-and-output-compensation"
+      ],
+      "construction": "rounded plan outline, plinth and vertical/depth marks assembled in the placed track frame",
+      "local_frame_id": "chair-on-timber",
+      "output_route": "direct DXF 3DFACEs and direct STL triangles",
+      "project_status": "reference-only"
+    },
+    {
+      "component_id": "S1OUTJAW",
+      "representation": "named reusable block",
+      "builder": "dxf_unit.create_s1_outer_jaw_block",
+      "value_group_ids": [
+        "selected-rail-section-and-derived-faces",
+        "common-base-seat-and-key",
+        "s1-outer-jaw-sections",
+        "manufacturing-and-output-compensation"
+      ],
+      "construction": "top, middle, seat and plinth cross-sections with sampled ribs/fillets and connected faces",
+      "local_frame_id": "component-local-rail-top",
+      "placement_builder": "math_unit.drawtimber.add_jaw",
+      "output_route": "DXF BLOCK/INSERT and insert_stl_block expansion",
+      "project_status": "reference-only"
+    },
+    {
+      "component_id": "S1INJAW",
+      "representation": "named reusable block",
+      "builder": "dxf_unit.create_S1_SC_L1_CC_inner_jaw_block",
+      "value_group_ids": [
+        "selected-rail-section-and-derived-faces",
+        "common-base-seat-and-key",
+        "s1-inner-jaw-sections",
+        "manufacturing-and-output-compensation"
+      ],
+      "construction": "insert, stand, upper/lower middle, seat and plinth sections with sampled rib/fillet faces and rail-interface geometry",
+      "local_frame_id": "component-local-rail-top",
+      "placement_builder": "math_unit.drawtimber.add_jaw",
+      "output_route": "DXF BLOCK/INSERT and insert_stl_block expansion",
+      "project_status": "reference-only"
+    },
+    {
+      "component_id": "S1SEAT",
+      "representation": "named reusable block",
+      "builder": "dxf_unit.create_S1_S1J_L1_CC_seat_block",
+      "value_group_ids": [
+        "s1-plan-footprint-and-fasteners",
+        "selected-rail-section-and-derived-faces",
+        "common-base-seat-and-key"
+      ],
+      "construction": "rail-foot seat, key-side support, base/plinth interface and optional filler faces",
+      "local_frame_id": "component-local-rail-top",
+      "placement_builder": "math_unit.drawtimber.add_seat",
+      "output_route": "DXF BLOCK/INSERT and insert_stl_block expansion",
+      "project_status": "reference-only"
+    },
+    {
+      "component_id": "KEY",
+      "representation": "named reusable solid-jaw block",
+      "builder": "dxf_unit.create_3d_key_block",
+      "value_group_ids": [
+        "selected-rail-section-and-derived-faces",
+        "common-base-seat-and-key",
+        "key-placement-policy",
+        "manufacturing-and-output-compensation"
+      ],
+      "construction": "tapered longitudinal key faces derived against rail head/web geometry, including model-fit pad and integrity deformation",
+      "local_frame_id": "component-local-rail-top",
+      "placement_builder": "math_unit.drawtimber.add_key",
+      "output_route": "DXF BLOCK/INSERT and insert_stl_block expansion",
+      "project_status": "reference-only"
+    }
+  ],
+  "manufacturing_branches": [
+    {
+      "branch_id": "rail-profile-and-fit",
+      "source_members": [
+        "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas"
+      ],
+      "controls": [
+        "rail profile radio selection",
+        "chair_web_adjustment",
+        "fdm_chair_rail_fit_checkbox",
+        "fdm_rail_foot_correction",
+        "fdm_rail_web_correction"
+      ],
+      "affects": "rail_section_data_mm before jaw, seat and key construction",
+      "frozen_oracle_policy": "Code 75 option A; zero chair-web adjustment; FDM rail-fit correction disabled",
+      "project_status": "reference-only"
+    },
+    {
+      "branch_id": "jaw-policy-and-mass",
+      "source_members": [
+        "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+        "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas"
+      ],
+      "controls": [
+        "solid versus loose outer jaw",
+        "export loose jaw only",
+        "FDM/resin jaw beefing",
+        "FDM inner-jaw clearance correction"
+      ],
+      "affects": "component identity, pin/slot geometry, jaw depth, vertical clearance and loose-part z offset",
+      "frozen_oracle_policy": "all solid jaws; all jaw beefing and FDM inner-jaw corrections disabled",
+      "project_status": "reference-only"
+    },
+    {
+      "branch_id": "key-placement",
+      "source_members": [
+        "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+        "T556B_ZIPPED_FOR_UPLOAD/pad_unit.pas"
+      ],
+      "controls": [
+        "key inclusion",
+        "key direction",
+        "joint direction override",
+        "chair_key_max_offset",
+        "FDM offset rule"
+      ],
+      "affects": "KEY versus KEYL identity and longitudinal insertion offset; Random is consulted when a non-central offset is permitted",
+      "frozen_oracle_policy": "KEY included, solid-jaw KEY selected and normal/FDM maximum off-centre values set to exactly 0 full-size inches so Random cannot change geometry",
+      "project_status": "reference-only"
+    },
+    {
+      "branch_id": "plug-support-and-cot",
+      "source_members": [
+        "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
+        "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas"
+      ],
+      "controls": [
+        "clip/snap/press plug fit",
+        "COT mode",
+        "plug clearances/depths",
+        "support pyramids",
+        "chair-edge correction",
+        "timber correction and thinification"
+      ],
+      "affects": "direct base, plug, socket, support and timber geometry and whether separate jaws are emitted",
+      "frozen_oracle_policy": "separate solid-jaw chair comparison; supports, COT and correction branches excluded; every effective fit value must still be recorded",
+      "project_status": "reference-only"
+    },
+    {
+      "branch_id": "material-shrinkage",
+      "source_members": [
+        "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas"
+      ],
+      "controls": [
+        "3-D FDM heated/cold bed",
+        "3-D resin",
+        "3-D CAD",
+        "per-axis shrinkage factors"
+      ],
+      "affects": "every final output coordinate",
+      "frozen_oracle_policy": "3-D CAD with identity shrinkage on every axis",
+      "project_status": "reference-only"
+    },
+    {
+      "branch_id": "output-axis-transform",
+      "source_members": [
+        "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas"
+      ],
+      "controls": [
+        "scaled_checkbox and out_factor",
+        "x/y/z scale",
+        "x/y/z shift",
+        "STL global rotation",
+        "DXF millimetres versus inches"
+      ],
+      "affects": "block definitions, insertion points, direct faces and final output datum",
+      "frozen_oracle_policy": "unscaled millimetres, identity axis scales, zero operator shifts, recorded automatic z datum shift and zero STL global rotation",
+      "project_status": "reference-only"
+    },
+    {
+      "branch_id": "custom-sk4-overrides",
+      "source_members": [
+        "T556B_ZIPPED_FOR_UPLOAD/custom_3d_unit.pas"
+      ],
+      "controls": [
+        "saved rail variables",
+        "saved dimensional variables",
+        "saved manufacturing variables"
+      ],
+      "affects": "global values consumed by later active builders and output branches",
+      "frozen_oracle_policy": "no unrecorded custom .sk4 override; capture the file hash if one is intentionally used",
+      "project_status": "reference-only"
+    }
+  ],
+  "open_findings": [
+    {
+      "finding_id": "exact-556b-artifact-oracle",
+      "status": "open",
+      "owner_role": "project-oracle-capture",
+      "minimum_evidence": "exact 556b executable/build provenance, isolated fixture/settings and reviewed local DXF/STL capture"
+    },
+    {
+      "finding_id": "field-level-independent-provenance",
+      "status": "open",
+      "owner_role": "project-provenance-review",
+      "minimum_evidence": "independent engineering, measurement or separately licensed evidence for every production S1 scalar and profile"
+    },
+    {
+      "finding_id": "prototype-versus-model-adjustment-split",
+      "status": "open",
+      "owner_role": "project-geometry-review",
+      "minimum_evidence": "accepted classification of nominal prototype dimensions, rail-product measurements, fit policy, printable clearances and integrity overlaps"
+    },
+    {
+      "finding_id": "direct-base-face-semantics",
+      "status": "open",
+      "owner_role": "project-geometry-review",
+      "minimum_evidence": "frozen capture proving which direct faces belong to the S1 base/plinth after excluded timber, plug and support layers are removed"
+    },
+    {
+      "finding_id": "placement-handedness-and-datum",
+      "status": "open",
+      "owner_role": "project-geometry-review",
+      "minimum_evidence": "left/right and opposite-rail fixture comparison confirming endpoint-derived orientation, gauge-face sign and final z datum"
+    },
+    {
+      "finding_id": "stochastic-export-controls",
+      "status": "open",
+      "owner_role": "project-oracle-capture",
+      "minimum_evidence": "recorded proof that all in-scope random choices are geometrically neutral, or a controlled seed/output normalisation rule"
+    },
+    {
+      "finding_id": "custom-data-is-not-chair-schema",
+      "status": "open",
+      "owner_role": "project-architecture-review",
+      "minimum_evidence": "neutral ChairDefinition schema defined independently; .sk4 remains a comparison-settings source rather than an import contract"
+    },
+    {
+      "finding_id": "non-s1-heaved-rail-options-nyi",
+      "status": "bounded-exclusion",
+      "owner_role": "project-geometry-review",
+      "minimum_evidence": "active source marks other rails in the heaved-chair jaw-option path as not yet implemented; this map must not be generalized beyond code 1"
+    }
+  ],
+  "acceptance_gate": {
+    "status": "blocked",
+    "canonical_production_input": false,
+    "code_translation_authorised": false,
+    "required_before_use": [
+      "project owner accepts independently evidenced S1 definition values and package rights",
+      "native ChairDefinition cleanly separates prototype, model-product and manufacturing inputs",
+      "frozen exact-556b comparison artifacts and agreed geometric metrics pass",
+      "every open finding that affects the declared output is closed or explicitly accepted as a bounded exclusion"
+    ]
+  }
+}

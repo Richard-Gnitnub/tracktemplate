@@ -383,15 +383,68 @@ def probe_source_archive(archive_path, spec):
                 {"path": name, "sha256": actual, "role": expected["role"]}
             )
 
+        project_source = archive.read(
+            "T556B_ZIPPED_FOR_UPLOAD/OpenTemplot2024.lpr"
+        ).decode("utf-8-sig", errors="replace")
+        data_source = archive.read(
+            "T556B_ZIPPED_FOR_UPLOAD/chairs_unit.pas"
+        ).decode("utf-8-sig", errors="replace")
+        pad_source = archive.read(
+            "T556B_ZIPPED_FOR_UPLOAD/pad_unit.pas"
+        ).decode("utf-8-sig", errors="replace")
         dxf_source = archive.read(
             "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas"
         ).decode("utf-8-sig", errors="replace")
         assembly_source = archive.read(
-            "T556B_ZIPPED_FOR_UPLOAD/chairs_unit_x.pas"
+            "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas"
         ).decode("utf-8-sig", errors="replace")
         version_form = archive.read(
             "T556B_ZIPPED_FOR_UPLOAD/control_room.lfm"
         ).decode("utf-8-sig", errors="replace")
+
+        active_unit_markers = {
+            "math_unit": "math_unit in 'math_unit.pas'",
+            "pad_unit": "pad_unit in 'pad_unit.pas'",
+            "chairs_unit": "chairs_unit in 'chairs_unit.pas'",
+            "dxf_unit": "dxf_unit in 'dxf_unit.pas'",
+        }
+        for unit_name, marker in active_unit_markers.items():
+            if marker not in project_source:
+                raise OracleValidationError(
+                    "active Lazarus project route is missing {}".format(unit_name)
+                )
+        for inactive_name in ("math_unit_x.pas", "chairs_unit_x.pas"):
+            if inactive_name in project_source:
+                raise OracleValidationError(
+                    "inactive alternate unexpectedly entered the Lazarus project: {}".format(
+                        inactive_name
+                    )
+                )
+
+        for symbol in ("init_2d_rea", "init_3d_rea", "T_2d_data", "T_3d_data"):
+            if symbol not in data_source:
+                raise OracleValidationError(
+                    "active chair data route is missing {}".format(symbol)
+                )
+        for symbol in (
+            "normal_chair_key_max_offset",
+            "fdm_chair_key_max_offset",
+        ):
+            if symbol not in pad_source:
+                raise OracleValidationError(
+                    "active key-placement setting route is missing {}".format(symbol)
+                )
+        for symbol in (
+            "procedure drawtimber",
+            "procedure add_jaw",
+            "procedure add_seat",
+            "procedure add_key",
+            "procedure calc_fill_chair_outline",
+        ):
+            if symbol not in assembly_source:
+                raise OracleValidationError(
+                    "active S1 assembly route is missing {}".format(symbol)
+                )
 
         required_names = spec["semantic_contract"]["dxf"]["required_block_names"]
         for name in required_names:
@@ -417,6 +470,8 @@ def probe_source_archive(archive_path, spec):
         },
         "required_revision": spec["source"]["required_revision"],
         "required_members": member_results,
+        "active_project_units": active_unit_markers,
+        "inactive_alternates_excluded": ["math_unit_x.pas", "chairs_unit_x.pas"],
         "s1_component_route_confirmed": True,
         "self_contained_build_ready": False,
         "missing_declared_build_inputs": missing_build_inputs,

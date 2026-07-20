@@ -51,18 +51,6 @@
       "permitted_role": "local comparison oracle"
     },
     {
-      "evidence_id": "templot5-556b-chairs-unit-x",
-      "archive_member": "T556B_ZIPPED_FOR_UPLOAD/chairs_unit_x.pas",
-      "sha256": "aff0e0079c4749c1132aac0ff15a742afef3f13080178c2ad66545be7235d92a",
-      "symbols": [
-        "draw_chairs_on_timber"
-      ],
-      "classifications": [
-        "templot_source_expression"
-      ],
-      "permitted_role": "local procedural comparison oracle"
-    },
-    {
       "evidence_id": "templot5-556b-dxf-unit",
       "archive_member": "T556B_ZIPPED_FOR_UPLOAD/dxf_unit.pas",
       "sha256": "f6bd9cbe8ef63397f4a632535f7160a7e6f82498a334bcde8580c9d0ed5b4f8d",
@@ -83,12 +71,16 @@
       "archive_member": "T556B_ZIPPED_FOR_UPLOAD/math_unit.pas",
       "sha256": "341c6aeeb4d3136d9f85688453dbd4e4163c8543efe6ce9362aba8c505b55a65",
       "symbols": [
-        "drawtimber"
+        "drawtimber",
+        "calc_fill_chair_outline",
+        "add_jaw",
+        "add_seat",
+        "add_key"
       ],
       "classifications": [
         "templot_source_expression"
       ],
-      "permitted_role": "local assignment/timber comparison oracle"
+      "permitted_role": "local active assembly/timber comparison oracle"
     },
     {
       "evidence_id": "templot5-556b-switch-select",
@@ -481,7 +473,7 @@
             "function:generate-supported-chair-solids"
           ],
           "upstream_evidence_ids": [
-            "templot5-556b-chairs-unit-x",
+            "templot5-556b-math-unit",
             "templot5-556b-dxf-unit"
           ],
           "current_project_status": "reference-only",

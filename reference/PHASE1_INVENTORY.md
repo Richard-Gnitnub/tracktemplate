@@ -374,13 +374,14 @@ S1 construction.
 The read-only review of the local Templot5 revision 556b evidence finds a
 different production model:
 
-- `chairs_unit.pas` and `chairs_unit_x.pas` define separate `T_2d_data` and
-  `T_3d_data` records. `init_2d_rea` and `init_3d_rea` populate full-size chair
+- Active `chairs_unit.pas` defines the `T_2d_data` and `T_3d_data` records.
+  `init_2d_rea` and `init_3d_rea` populate full-size chair
   bases, corner radii, bolt centres, seat/plinth thicknesses, jaw sections,
   ribs, fillets, slopes, key and rail-fit/manufacturing parameters.
-- `draw_chairs_on_timber` resolves chair families and placements, builds
-  constituent jaw, seat and key records, and refers to reusable component
-  blocks such as `S1OUTJAW`, `S1INJAW`, `S1SEAT` and `KEY`.
+- Active `math_unit.pas` `drawtimber` resolves chair families and placements.
+  Its nested `calc_fill_chair_outline`, `add_jaw`, `add_seat` and `add_key`
+  paths build direct base geometry and constituent placement records referring
+  to reusable blocks such as `S1OUTJAW`, `S1INJAW`, `S1SEAT` and `KEY`.
 - `dxf_unit.pas` contains procedural component generators. For example,
   `create_s1_outer_jaw_block` connects parameterised top, middle, seat and
   plinth cross-sections, including sampled rib and fillet curves, with 3D
@@ -404,7 +405,8 @@ paths: nine are `reference-only` because their present basis includes Templot
 reference data or source expression, and seven are `unknown` pending an
 independent evidence source or an accepted engineering/manufacturing decision.
 The register freezes 27 literal/function source anchors in B14/B15 and hashes
-the six reviewed upstream units when the ignored local archive is available.
+the five reviewed active upstream units when the ignored local archive is
+available.
 It also makes the C10 timber-stationing path an explicit legacy interface,
 not a hidden dependency of a reusable S1 definition.
 The upstream S1 comments point to “Standard Railway Equipment 1926”; as
@@ -433,11 +435,20 @@ The exact 556b source evidence establishes the required capture semantics:
 
 - `dxf_unit.pas` defines `S1OUTJAW`, `S1INJAW`, `S1SEAT` and `KEY` reusable
   blocks before emitting entities;
-- `chairs_unit_x.pas` inserts one of each named part for chair code 1, while
-  the chair base/plinth contributes direct 3D faces; and
+- active `math_unit.pas` `drawtimber` records one of each named part for chair
+  code 1, while the chair base/plinth contributes direct 3D faces; and
 - the same constituent faces and placements are triangulated into the main
   ASCII STL, so DXF block/insert semantics and assembled STL bounds/facets are
   complementary evidence.
+
+The project-file audit corrects an important earlier source-routing assumption.
+`OpenTemplot2024.lpr` selects the mapped `math_unit.pas`, `pad_unit.pas`,
+`chairs_unit.pas`, `dxf_unit.pas` and `custom_3d_unit.pas` paths; it does not
+compile `math_unit_x.pas` or `chairs_unit_x.pas`.
+Those `_x` files remain fingerprinted as inactive alternate copies only. They
+must not be used to describe the executable 556b route unless a later exact
+project file explicitly selects them. The oracle source probe and lineage test
+now enforce this distinction.
 
 The exact artifact is not yet available. A clean isolated native build probe
 with Lazarus 3.0/FPC 3.2.2 stops at the Windows `ShellAPI` unit, and the ZIP is
@@ -454,9 +465,11 @@ The finite unblock path is therefore: obtain or reproducibly build an exact
 556b executable with its external dependencies recorded; run it only in a
 disposable profile; create and hash one short S1-only plain-line fixture;
 record every effective geometry/manufacturing setting; capture DXF and STL
-locally under ignored `benchmark-output/`; and pass the semantic inspector plus
-geometry/owner review. The inspector requires non-empty faces for all four
-named blocks, equal non-zero assembly insert counts, direct base/assembly faces
+locally under ignored `benchmark-output/`; set both normal and FDM key
+off-centre limits to zero so Templot's random direction cannot move the key;
+and pass the semantic inspector plus geometry/owner review. The inspector
+requires non-empty faces for all four named blocks, equal non-zero assembly
+insert counts, direct base/assembly faces
 and a structurally complete ASCII STL. It deliberately reports
 `semantically-valid-unaccepted-capture`: hashes establish provenance, not
 geometric equivalence, and the capture remains comparison-only.
@@ -464,6 +477,40 @@ geometric equivalence, and the capture remains comparison-only.
 This completes the Phase 1 **recipe-and-explicit-blocker** branch of the oracle
 deliverable. It does not claim that the frozen oracle itself exists, does not
 clear any S1 production value, and does not close Phase 1.
+
+### Active 556b S1 value and transform map
+
+The remaining read-only chair-generation inventory is now machine-readable in
+[`lineage/templot5-556b-s1-generation-map.json`](lineage/templot5-556b-s1-generation-map.json).
+It is deliberately bounded to chair code 1 with solid jaws and records:
+
+- the five mapped active Lazarus units and the two inactive `_x` alternatives;
+- full-size-inch, model-millimetre, angle and output-unit boundaries;
+- component-local, chair-on-timber, template-placement and output frames;
+- eight field groups covering the S1 plan, selected rail section, common
+  base/seat/key inputs, outer- and inner-jaw sections, placement and output
+  compensation, including the otherwise stochastic key-offset policy;
+- nine active stages from project-unit resolution and data initialisation to
+  direct base faces, reusable constituent blocks, transformed placements and
+  DXF/STL emission;
+- the separate base/plinth, `S1OUTJAW`, `S1INJAW`, `S1SEAT` and `KEY`
+  constructions; and
+- seven manufacturing/output branch groups plus the evidence needed to close
+  every unresolved or deliberately bounded finding.
+
+[`../tests/validate_templot_s1_generation_map.py`](../tests/validate_templot_s1_generation_map.py)
+fails closed if an inactive source copy is promoted, a Templot-dependent group
+is marked project-cleared, the chair-code scope broadens, a component/frame
+link drifts, or the acceptance gate is weakened. When the ignored ZIP exists,
+it additionally verifies every mapped field/symbol against the exact member,
+the active project-unit declarations, the code-1 constituent sequence and the
+DXF/STL output route.
+
+This completes the Phase 1 **source value/unit/frame/transform map** branch,
+subject to project-owner review. All mapped fields and constituents remain
+`reference-only`; the map authorises neither Pascal translation nor production
+use. Independent S1 evidence, the neutral ChairDefinition, exact 556b
+artifacts and accepted comparison tolerances remain later gates.
 
 ### Chair-definition assimilation scope
 
