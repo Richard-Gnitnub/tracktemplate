@@ -69,6 +69,54 @@ underlying ideas are copyrightable or that every macro line derives from
 Templot. Do not replace the source-informed classification with “clean-room” or
 “independently implemented” unless a traceable authorship review supports it.
 
+## Chair procedural source-audit record
+
+On 2026-07-20 a read-only architecture audit examined the chair-related paths
+in the exact local Templot5 revision 556b archive, principally
+`chairs_unit.pas`, `chairs_unit_x.pas`, `dxf_unit.pas` and
+`custom_3d_unit.pas`. The audit records that the upstream program separates
+full-size 2D/3D chair data from procedural constituent builders, reuses named
+jaw/seat/key blocks at calculated transforms, emits derived DXF 3D faces and
+triangulates them for STL. Its `.sk4` loading path covers rail, dimensional and
+manufacturing settings; this audit found no generic arbitrary-chair mesh to
+procedural-definition importer in the reviewed snapshot.
+
+TrackTemplateMacro's B15 body already cites selected `init_2d_rea`,
+`init_3d_rea` and rail-section dimensions, but its supported S1/S1J exact body
+is a bounded five-box approximation and omits additional constituents. The
+accepted successor architecture will therefore remain explicitly
+Templot-source-informed: it will implement a full-size, parameterised,
+constituent chair definition and may use FreeCAD/OpenCASCADE B-reps rather than
+transcribing the upstream DXF face writer. Output and method equivalence must be
+supported by recorded geometric evidence; different implementation technology
+does not justify relabelling the work clean-room.
+
+This documentation change records the source/data-flow findings and intended
+boundary. It does not copy or translate Pascal implementation into production
+code and does not alter either macro.
+
+## External chair-evidence provenance
+
+Each reusable chair-definition package derived from a scan, CAD model,
+drawing, physical measurement or combination must record, as applicable:
+
+- creator/supplier and acquisition date;
+- prototype designation and the evidence supporting that designation;
+- original filename, format, byte hash, declared units, scale and coordinate
+  frame;
+- ownership, licence, permitted use and redistribution status;
+- calibration references and direct measurements;
+- which values are measured, source-derived, fitted, inferred or unresolved;
+  and
+- the definition version, fitting/validation result and explicit acceptance.
+
+Do not assume that an accessible forum attachment, downloadable model or scan
+may be redistributed. Source evidence may remain local and untracked while a
+rights-compatible derived definition records its hashes and provenance. The
+first pilot's working description is an S1 chair; its precise REA/company
+designation must be confirmed from evidence before the published package is
+named.
+
 ## Accepted repository licensing state
 
 - TrackTemplateMacro is licensed under **GPL-3.0-or-later**. The complete GPLv3

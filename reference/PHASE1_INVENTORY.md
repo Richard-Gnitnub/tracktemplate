@@ -1,7 +1,8 @@
 # Phase 1 Product and Dependency Inventory
 
-Status: **in progress**. This document owns the Phase 1 inventory and concise
-decision log. It does not close Phase 1 or select the first extraction slice.
+Status: **in progress; last updated 2026-07-20**. This document owns the Phase 1
+inventory and concise decision log. It does not close Phase 1 or select the
+first extraction slice.
 
 ## Purpose
 
@@ -35,6 +36,8 @@ movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
 | B15 SHA-256 | `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848` |
+| Chair source evidence | ignored Templot5 revision 556b SourceForge archive recorded in [PROVENANCE.md](PROVENANCE.md) |
+| Chair source-audit date | 2026-07-20; read-only review of selected Pascal units |
 | Production-source changes in this tranche | None |
 
 The `ordinary_track` filenames, imports, commands and recipe IDs in this
@@ -315,6 +318,66 @@ guided workflows and B15 cache wrappers. Characterisation must therefore lock
 down record schemas, ordering, findings, aliases, signatures and invalidation
 before movement.
 
+### Chair procedural-geometry source audit
+
+The accepted B14/B15 relationship does not make the B15 supported chair body a
+complete production-geometry oracle. B15 explicitly cites Templot5 556b
+`init_2d_rea`, `init_3d_rea` and rail-section data, and
+`_chair_s1_body_dimensions` preserves selected source dimensions. Its active
+`_chair_make_s1_prototype_shape`, however, fuses five rectangular `Part` boxes
+for the base edge, plinth, seat, inner jaw and outer jaw. Its readiness result
+explicitly excludes keys, loose jaws/plugs and dedicated special-chair solids.
+This is a bounded source-dimensional approximation, not a faithful procedural
+S1 construction.
+
+The read-only review of the local Templot5 revision 556b evidence finds a
+different production model:
+
+- `chairs_unit.pas` and `chairs_unit_x.pas` define separate `T_2d_data` and
+  `T_3d_data` records. `init_2d_rea` and `init_3d_rea` populate full-size chair
+  bases, corner radii, bolt centres, seat/plinth thicknesses, jaw sections,
+  ribs, fillets, slopes, key and rail-fit/manufacturing parameters.
+- `draw_chairs_on_timber` resolves chair families and placements, builds
+  constituent jaw, seat and key records, and refers to reusable component
+  blocks such as `S1OUTJAW`, `S1INJAW`, `S1SEAT` and `KEY`.
+- `dxf_unit.pas` contains procedural component generators. For example,
+  `create_s1_outer_jaw_block` connects parameterised top, middle, seat and
+  plinth cross-sections, including sampled rib and fillet curves, with 3D
+  faces. Related builders cover the other components and special chairs.
+- `dxf_3dface`, `stl_3dface` and `insert_stl_block` form and triangulate the
+  derived faces and place reusable component blocks at calculated transforms.
+- `custom_3d_unit.pas` `.sk4` loading covers dimensional, rail and manufacturing
+  settings; it is not evidence of a generic arbitrary-chair mesh importer.
+
+The successor requirement is therefore source-informed procedural equivalence:
+one versioned full-size chair definition feeds named constituent builders and
+reusable transformed instances. FreeCAD/OpenCASCADE B-reps may replace
+Templot's DXF-face implementation only when dimensional, component, interface,
+topology and assembly comparisons pass. Neither the B15 boxes nor an imported
+scan/mesh is canonical production geometry.
+
+Phase 1 still needs a reproducible S1 component/assembly oracle, a map of every
+source value and transform selected for the supported scope, and agreed
+comparison metrics/tolerances. This audit records structure and scope; no
+Templot code was copied into production and no macro was changed.
+
+### Chair-definition assimilation scope
+
+On 2026-07-20 the project owner accepted a release-candidate capability that
+loads versioned chair-definition packages and proves one operator-assisted S1
+assimilation pilot. All native and assimilated chairs must use the same domain
+definition and exact generator. Source scans, CAD files, drawings and
+measurements are provenance-bearing evidence used to fit a definition; they do
+not form a parallel runtime geometry system.
+
+The pilot must establish source calibration and frame, declared units and
+scale, constituent segmentation, rail-interface landmarks, explicit measured
+versus inferred values, residual comparison, unresolved findings, provenance
+and manual acceptance. A scan alone is insufficient evidence for hidden or
+worn surfaces, nominal dimensions, component boundaries and rail fit. Fully
+automatic conversion of an arbitrary 3D source is consequently outside the RC
+scope and remains post-RC research.
+
 ## Release-critical workflow coverage inventory
 
 This is the initial owner/coverage map. “Gap” means the behaviour must be
@@ -330,7 +393,9 @@ is known to be defective.
 | Crossover geometry | B14 cold series and B15 acceptance report | Controlled `XO-001` bridge recipe | Preview/commit feasibility mismatch and curved-host coverage |
 | Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and plain-line timber decisions; focused failure/invalidation cases |
 | Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/plain-line coverage, input-class invalidation, late timing payload and redundant refresh defects |
-| Optional supported chair solids | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage |
+| Legacy approximate supported chair bodies | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage; five-box S1/S1J bodies are gap evidence, not the final procedural chair oracle |
+| Procedural chair definitions and exact components | Templot5 556b source audit plus the accepted architecture requirement | None yet | Reproducible Templot S1 component/assembly oracle, complete source-value/transform map, package schema, comparison metrics and tolerances |
+| Assisted chair assimilation | Accepted RC scope; no implementation oracle yet | One S1 pilot to be selected | Precise prototype designation, evidence provenance/rights, calibrated scan/CAD/measurement set, component landmarks, fit-residual policy and acceptance recipe |
 | Host integration | Controlled crossover acceptance | `XO-001` stage 6 | Standalone turnout, removal/reversal, rollback and legacy-document variants |
 | Save/reopen | B15 crossover acceptance and B14 plain-line edit-lifecycle oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Broader entity families and future schema migration |
 | SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback and future deferred exact-shape reconstruction |
@@ -554,6 +619,10 @@ from variable names:
 - geometric, station, topology, fit and export tolerances;
 - stable entity, path, rail, timber, chair, production-record and document
   identities;
+- chair-definition/package versions, constituent identities, exact source
+  values and units, procedural profiles/cross-sections, local datums,
+  rail-interface contracts, prototype/manufacturing separation, provenance,
+  residual metrics and acceptance state;
 - deterministic ordering rules and JSON/property/manifest schemas;
 - complete analysis, support, layout, exact-solid and export signatures; and
 - every relevant input class, cache reuse rule and invalidation/change-back
@@ -609,6 +678,8 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-19 | Use plain line/plain-line for track without S&C | Accepted; official UK railway usage replaces the project category “ordinary track”; B14/B15 and historical evidence identifiers remain unchanged, new APIs will use `plain_line`, and macro/component wording is separately gated in [TERMINOLOGY.md](TERMINOLOGY.md) |
 | 2026-07-19 | Extend the fixed plain-line edit oracle through undo/redo and exact change-back | Accepted for Phase 1 evidence; every intermediate B14 state is frozen, but its three-entry geometry/schedule/report stack is a bounded legacy defect and the successor must make one accepted command one atomic undo unit |
 | 2026-07-19 | Select the first extraction now | Deferred; transition solving leads on structural coupling, but workflow oracles, boundary contracts and representative profiles are not yet complete |
+| 2026-07-20 | Follow Templot's procedural constituent method for production chair geometry | Accepted; full-size definitions and named parts are canonical, while FreeCAD B-reps may replace DXF `3DFACE` mechanics only under geometric oracle evidence; B15's five-box body remains legacy gap evidence |
+| 2026-07-20 | Add reusable chair-definition packages and one assisted S1 assimilation pilot to RC scope | Accepted; scans/CAD/drawings/measurements fit the same definition used by native chairs, source evidence is not runtime truth, and arbitrary fully automatic conversion remains post-RC research |
 
 ## Remaining Phase 1 work
 
@@ -621,6 +692,14 @@ create-time series covers fresh legacy exact-shape construction only.
   station/straight and standalone turnout.
 - Record candidate boundary schemas, units, frames, tolerances, identities,
   ordering, signatures and invalidation inputs.
+- Complete the Templot chair-generation data-flow/value/transform map; produce
+  or define the reproducible recipe for a frozen S1 constituent/assembly oracle
+  and record any unavailable evidence without substituting the B15 box body.
+- Specify the versioned chair-definition package and assisted-assimilation
+  boundary, including provenance and corrupt/unsupported-package behaviour;
+  confirm the pilot's precise prototype designation, source evidence,
+  component landmarks, rail section, fit metrics and tolerances with the
+  project owner.
 - Reconcile instrumentation and profile the proposed lightweight routine
   editing path and complete Validate/Export path without double-counting or
   treating the current exact-shape replacement measurement as its budget.

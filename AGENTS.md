@@ -14,6 +14,16 @@
 - The authoritative state is the parametric railway model: configuration, stable identities, topology, analytical results and production intent.
 - SVG, Coin nodes and other viewport geometry are derived views, never an independent source of railway truth.
 - Normal editing should use lightweight aggregated 2D presentation. Build exact `Part` shapes and solids only at an explicit Validate/Export boundary or when the user explicitly requests retained production geometry.
+- Production chair geometry must consume versioned full-size parametric chair
+  definitions and generate named constituents using the procedural method
+  documented in `reference/ARCHITECTURE.md`. FreeCAD/OpenCASCADE B-reps may
+  replace Templot's DXF-face mechanics only under the agreed geometric oracle;
+  do not substitute hand-built envelopes, opaque meshes or retained shapes.
+- Scans, CAD bodies, drawings and measurements are provenance-bearing evidence
+  for assisted fitting into the same chair-definition contract used by native
+  chairs. They are not canonical runtime geometry. The RC includes validated
+  external definitions and one assisted S1 pilot; arbitrary fully automatic
+  conversion remains post-RC research.
 - The specific lightweight renderer remains an open design decision until a measured prototype proves editing, selection, persistence and performance.
 - Migrate incrementally behind equivalence checks. Do not attempt a whole-macro rewrite or remove a legacy path before parity evidence and user acceptance.
 - Follow `reference/PERFORMANCE_SOP.md` for measurement and `reference/VALIDATION.md` for the applicable validation matrix.
@@ -51,6 +61,9 @@
   B14-module AST parity after normalising the declared version, launch and
   recompute-instrumentation differences.
 - `tests/freecad_validate_b15.py` is the real FreeCAD 1.1 headless smoke test for the B15 chair display layer.
+- B15's supported S1/S1J exact body is a bounded five-box legacy approximation.
+  Preserve it as accepted B15 evidence, but do not use it as the production
+  chair-definition schema or final S1 geometry oracle.
 - `tools/phase1_inventory.py` creates the deterministic read-only Phase 1 AST
   inventory without importing or executing either macro;
   `tests/validate_phase1_inventory.py` protects its alias, patch, caller and
@@ -93,12 +106,14 @@
 - `reference/PHASE1_INVENTORY.md` owns the in-progress workflow, dependency,
   side-effect, candidate-slice and decision inventory. Update it as Phase 1
   evidence closes; its provisional static labels are not final module
-  ownership.
+  ownership. It also records the 2026-07-20 read-only Templot chair
+  data/component/output-path audit and the remaining S1 oracle/schema evidence.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
 - `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md` and `reference/PROVENANCE.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, licence/provenance status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
+- `reference/PROVENANCE.md` owns source and external chair-evidence provenance.
 - `LICENSE` and `NOTICE.md` apply GPL-3.0-or-later to the project, preserve the Templot5 source-basis attribution, and record particular thanks to Martin Wynne and Steve Cornford. Preserve both files and all applicable upstream notices.
 - `main.py` is PyCharm starter boilerplate, not the product entry point.
 - Each macro launches through its final `run_macro()` call. Tests that load definitions deliberately remove only that final launch call.
@@ -112,6 +127,12 @@
 - Preserve UTF-8 encoding and compatibility with FreeCAD's bundled Python, `FreeCAD`, `Part`, `FreeCADGui`, and the existing PySide fallback.
 - Do not add third-party runtime dependencies without approval.
 - When consulting or adapting Templot5 material, preserve `reference/PROVENANCE.md`, the GPL-3.0-or-later project licence, and applicable upstream notices. Distinguish unprotected mathematical concepts, railway methods, functionality, and factual dimensions from potentially copyrightable code, comments, tables, selection, arrangement, or close translation; do not make unsupported clean-room or derivation claims.
+- Before chair-definition, chair-generator or assimilation source work, read
+  the chair contract in `reference/ARCHITECTURE.md`, its scheduled gates in
+  `reference/PROJECT_PLAN.md`, the source audit in
+  `reference/PHASE1_INVENTORY.md`, and the additional matrix in
+  `reference/VALIDATION.md`. Do not start production chair code before the
+  Phase 1 S1 oracle, schema boundary, evidence and tolerance gate is accepted.
 - Do not silently change geometry, sampling, tolerances, topology gates, timber decisions, chair assignments, stable identities, ordering, metadata schemas, persistent property names, visibility, transaction/rollback behaviour, or exporter results.
 - Do not weaken validation, remove required work, reduce geometric fidelity, or suppress diagnostics merely to improve a timing result.
 - Preserve transactional behaviour: validate replacement geometry before committing document changes, and keep failure paths recoverable.

@@ -55,6 +55,7 @@ launcher / composition root
           +--> concrete adapters
                     |
                     +--> FreeCAD persistence / exact geometry
+                    +--> optional external chair-evidence readers
                     +--> lightweight presentation
                     `--> production exporters
 
@@ -75,6 +76,7 @@ tracktemplate/
 ├── application/            # commands, workflows, signatures and cache policy
 ├── adapters/
 │   ├── freecad/            # persistence and transient exact geometry
+│   ├── evidence/           # optional scan/CAD evidence readers and calibration
 │   └── export/             # SVG, DXF, STL, STEP and manifests
 ├── presentation/           # lightweight 2D scene and selection mapping
 ├── ui/                     # dialogs, panels and user-facing orchestration
@@ -94,6 +96,9 @@ Owns reusable railway meaning and calculations:
 - alignments, stations, curves, easements and spacing;
 - track, turnout and crossover topology;
 - rail, timber, chair and support records;
+- versioned chair-family definitions with named constituent records,
+  procedural profiles/cross-sections, rail interfaces, source values/units,
+  prototype/manufacturing separation, provenance and acceptance state;
 - tolerances, findings, stable identities and deterministic ordering;
 - production intent independent of a particular output format.
 
@@ -108,7 +113,12 @@ Owns use cases rather than railway formulae:
 - dirty-state propagation;
 - complete signatures and cache policy;
 - transaction intent and error propagation;
-- view models for UI reporting.
+- view models for UI reporting;
+- chair-definition package validation and the operator-assisted assimilation
+  command, including explicit approval of fitted values and unresolved
+  findings; and
+- orchestration of definition/reference/residual comparisons using neutral
+  evidence and exact-geometry metrics supplied by adapters.
 
 The application layer may depend on domain records and abstract adapter contracts. It must not show dialogs or directly construct FreeCAD shapes.
 
@@ -120,9 +130,25 @@ Owns the boundary with FreeCAD:
 - transactions, recomputes, groups and visibility;
 - conversion between domain coordinates and FreeCAD types;
 - transient exact `Part` geometry;
+- procedural construction of named chair components from accepted domain
+  definitions, plus deterministic prototype reuse, assembly transforms and
+  neutral exact-geometry measurements;
 - cleanup and save/reopen integration.
 
 It translates domain decisions; it must not introduce new railway rules.
+
+### External chair-evidence adapter
+
+Optional evidence adapters read a calibrated scan mesh, componentised CAD file,
+drawing-derived measurements or another approved source into neutral evidence
+records. They may perform format-specific parsing, alignment and surface
+sampling, but they do not publish a chair definition or decide railway fit.
+
+No evidence-reader dependency belongs in the normal macro runtime merely
+because it is convenient for assimilation. A validated chair-definition
+package must remain loadable and procedurally regenerable without the original
+reader, source file, FreeCAD document or fitting tool. Third-party dependencies
+still require separate approval.
 
 ### Presentation
 
@@ -175,6 +201,12 @@ Git history is the record of old implementations. Do not keep historical functio
 - Keep signature construction central to the result it protects. Do not let each adapter invent a partial cache key.
 - Make units, coordinate frames, tolerances and ordering explicit at boundaries.
 - Keep output schemas versioned and deterministic.
+- Keep chair-definition packages serialisable and adapter-neutral: no
+  `Part.Shape`, mesh object, GUI object or opaque source-file body may cross the
+  domain boundary as canonical chair geometry.
+- Preserve exact source values/units, inferred-value markers, component
+  identities, definition/package versions, provenance and validation state in
+  the package contract; generated topology or tessellation remains derived.
 
 ## Anti-bloat rules
 
@@ -188,6 +220,11 @@ Git history is the record of old implementations. Do not keep historical functio
 - Reject circular imports. Resolve a cycle by moving the shared contract inward or injecting the dependency.
 - Review module cohesion and dependency direction rather than enforcing an arbitrary file-size limit.
 - Track structural metrics after each phase, but never trade clarity or correctness merely to reduce a count.
+- Do not create separate native, scanned and imported chair generators. All
+  accepted definitions use one constituent generator; assimilation ends by
+  producing the same definition contract.
+- Reuse procedural primitives and component strategies where railway meaning
+  is shared, but do not create one copied module or class per chair type.
 
 ## Distribution strategy
 
@@ -236,6 +273,9 @@ Status: **Complete with the Phase 0 closeout.**
 - Identify imports, global state, duplicate definitions, class patches and side effects at import time.
 - Build caller/callee information for candidate slices.
 - Mark data that crosses FreeCAD, UI, persistence and export boundaries.
+- Map Templot's chair data, procedural component construction, reusable block
+  placement and output path, and distinguish it from B15's bounded five-box
+  approximation before selecting or moving chair code.
 
 Exit gate: the first extraction is selected from evidence rather than source proximity.
 
@@ -288,7 +328,8 @@ Potential capability families include:
 - track and platform preparation;
 - turnout geometry and timbering;
 - crossover topology and timber resolution;
-- chair analysis and presentation;
+- chair analysis, versioned definitions, procedural component generation,
+  assisted assimilation and presentation;
 - production record planning and export.
 
 Exit gate: each migrated family has independent tests, explicit adapters and no reverse dependencies.
@@ -315,6 +356,12 @@ Follow [VALIDATION.md](VALIDATION.md). At minimum, each extraction must demonstr
 - headless FreeCAD integration for changed adapter paths;
 - real GUI checks for display or editing changes;
 - exact output/manifest comparison for export paths;
+- chair-definition round-trip, constituent identity, rail-interface,
+  prototype/manufacturing separation and procedural-regeneration evidence when
+  the slice touches chairs;
+- regenerated-versus-Templot and, for an assimilated chair, regenerated-versus-
+  source residual evidence using agreed metrics rather than raw tessellation
+  byte equality;
 - no unplanned performance or object-count regression.
 
 ## Structural progress measures
@@ -350,4 +397,8 @@ Modularisation is complete when:
 - distribution as package beside macro, workbench, or generated bundle;
 - supported legacy document/version window;
 - record/type approach compatible with the supported FreeCAD Python runtime;
+- exact chair-definition package schema, source-value representation and
+  canonical unit strategy;
+- optional scan/CAD evidence readers and fitting implementation for the S1
+  pilot, subject to the no-new-runtime-dependency rule;
 - tooling for dependency-cycle and structural-metric enforcement.

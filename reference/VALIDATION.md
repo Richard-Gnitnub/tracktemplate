@@ -65,8 +65,58 @@ These roles are current project state, not a permanent versioning scheme. Update
 - Verify valid solids/meshes for STEP/STL outputs.
 - Compare filenames, categories, record IDs and manifest rows deterministically.
 - Exercise staging, overwrite handling, failure rollback and transient-object cleanup.
+- For procedural chairs, compare named constituents, full-size dimensions,
+  profiles/cross-sections, datums, rail interfaces, topology and assembled
+  placement against the accepted reference. FreeCAD B-rep and Templot
+  DXF/STL tessellations need not be byte- or face-order-identical when the
+  agreed geometric oracle proves equivalence.
 
-### 6. Performance validation
+### 6. Chair-definition and assimilation validation
+
+Chair work has an additional validation boundary because the accepted
+production requirement deliberately exceeds the B15 five-box S1/S1J body.
+B15 remains the behavioural reference for its declared analysis,
+representation, persistence and cache delta; its rectangular body is gap
+evidence, not the future exact chair oracle.
+
+Before a chair definition or generator is accepted:
+
+- parse and validate the definition without FreeCAD/Qt, then prove a
+  deterministic serialise/load/serialise round-trip and stable definition and
+  component identities;
+- reject missing required units, frames, datums, components, provenance,
+  package versions or rail-interface data, and reject unsupported future
+  versions without partial geometry generation;
+- prove prototype source values and geometry are separate from model scale,
+  rail-fit policy and manufacturing compensation, with complete signatures and
+  invalidation for each input class;
+- generate every in-scope named constituent through the common procedural
+  builder, assemble reusable prototypes by deterministic transforms, and
+  regenerate without the source scan/CAD file or retained FreeCAD shapes;
+- compare the native S1 definition with the frozen Templot component/assembly
+  oracle using agreed dimensional, section/profile, surface-distance,
+  interface, bounds, topology and solid-validity metrics;
+- prove rail fit, clearances, keys or loose components and applicable
+  fastening/plug interfaces independently of visual plausibility;
+- verify lightweight 2D symbols remain derived from the same accepted
+  definition and do not construct production solids during routine editing;
+  and
+- compare deterministic STL/STEP and any retained-component outputs after
+  exact validation, including separate-part identities and assembly placement.
+
+For the assisted S1 assimilation pilot, also validate calibration, units,
+coordinate frame, operator-declared components/landmarks, measured versus
+inferred values, unresolved findings, provenance/file hashes and the reported
+regenerated-versus-source residuals. Acceptance requires recorded tolerances
+and explicit operator approval. A low residual does not by itself validate
+hidden, worn or nominal geometry.
+
+Raw tessellation hash equality is not a general geometric oracle: meshing
+settings and face ordering can change without changing the solid. Preserve
+source hashes for provenance, then compare the regenerated geometry with
+format-appropriate semantic metrics.
+
+### 7. Performance validation
 
 - Follow [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md).
 - Report both editing cost and deferred Validate/Export cost.
@@ -275,6 +325,9 @@ The existing automated coverage does not validate every B14/B15 workflow. Select
 | Development bridge or benchmark recipe | Fast bridge contract checks plus a bounded isolated GUI lifecycle run |
 | Railway geometry/topology/timber/chair rules | Representative analytical comparisons and real workflow validation |
 | Export or exact geometry | Target-format output, manifest, rollback and deterministic repeat checks |
+| Chair-definition schema or package loader | Standalone schema validation, deterministic round-trip, corrupt/unsupported rejection, stable component IDs and provenance checks |
+| Procedural chair generator | Templot/reference constituent and assembly comparison, rail-fit/interface checks, valid B-reps/exports, deterministic regeneration and no routine-edit solids |
+| Assisted chair assimilation | Calibrated source fixture, landmark/component decisions, measured/inferred audit, residual metrics, unresolved findings, provenance and explicit acceptance |
 | Architecture migration | Legacy/new parity, editing cost and complete Validate/Export cost |
 
 ## Manual GUI checklist
@@ -346,6 +399,10 @@ Before retiring a legacy path, add representative, non-sensitive fixtures or det
 - turnout creation and editing;
 - straight- and curved-host crossovers;
 - automatic timbering and chair analysis;
+- a frozen Templot S1 constituent/assembly oracle and its deterministic recipe;
+- a versioned native S1 chair-definition package with invalid/corrupt fixtures;
+- one non-sensitive, rights-cleared calibrated scan/CAD/measurement fixture for
+  the assisted S1 assimilation pilot;
 - lightweight preview selection/editing;
 - exact validation and each production export family;
 - failure rollback and document reopen.

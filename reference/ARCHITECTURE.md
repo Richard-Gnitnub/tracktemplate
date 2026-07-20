@@ -15,7 +15,7 @@ The next phase is architectural rather than another feature layer. It must reduc
 The system will separate the authoritative parametric model from its interactive display and its production geometry.
 
 ```text
-Parametric railway model
+Parametric railway model + versioned chair definitions
         |
         +--> analytical results and validation findings
         |
@@ -40,6 +40,10 @@ Exact geometry is permitted at an explicit **Validate** or **Export** boundary. 
 6. **Derived state is fingerprinted.** Preview, analysis, validation, and export caches must be tied to complete input signatures. Stale speed is a correctness failure.
 7. **Export remains deterministic and transactional.** Staging, preflight, manifest generation, overwrite handling, commit, and rollback remain production invariants.
 8. **Migration is incremental.** The existing implementation remains the comparison path until each replacement proves output equivalence and a measured resource improvement.
+9. **Production chairs remain procedural.** Full-size prototype parameters and
+   explicit constituent parts are authoritative. A scan, mesh, CAD body, or
+   generated FreeCAD shape is reference evidence or derived output, never a
+   substitute for an accepted parametric chair definition.
 
 ## Target layers
 
@@ -50,7 +54,9 @@ The domain layer represents:
 - routes, tracks, stations and alignments;
 - curves, easements, straights and spacing transitions;
 - turnouts, crossover relationships and topology;
-- rails, timbers, chairs, supports and stable identities;
+- rails, timbers, chair assignments, supports and stable identities;
+- versioned chair-family definitions, constituent components, rail interfaces,
+  manufacturing variants and source provenance;
 - configuration, tolerances and production intent.
 
 It should use Python data and deterministic calculations without depending on a FreeCAD document or GUI. FreeCAD vectors may be adapted at the boundary rather than used as persistent domain state.
@@ -125,6 +131,67 @@ The export layer keeps the existing safety model:
 6. Commit the complete output set atomically.
 7. Roll back failures and clean transient geometry.
 
+## Chair-definition and procedural-geometry contract
+
+Production chair geometry will follow the procedural construction model found
+in the accepted Templot5 revision 556b source evidence. This is a method and
+output contract, not a requirement to reproduce Pascal control flow or emit
+Templot's low-level DXF `3DFACE` records internally.
+
+The canonical chair definition must:
+
+- retain full-size prototype dimensions with explicit source units and
+  deterministic conversion; the internal storage unit and exact-value strategy
+  are schema decisions, not assumptions to hide in geometry code;
+- describe named constituent parts as applicable to the chair family, including
+  base/plinth, rail seat, inner and outer jaws, ribs, fillets, key, fastenings,
+  and loose-jaw or plug interfaces;
+- describe procedural profiles, cross-sections, radii, slopes, relationships,
+  symmetry and placement datums rather than one opaque final mesh;
+- separate prototype geometry and rail-fit intent from model scale, printer or
+  material compensation, clearances and other manufacturing variants;
+- carry a version, stable component identities, supported rail-interface data,
+  provenance, source-file hashes, assumptions, tolerances and validation state;
+  and
+- be serialisable and usable by domain tests without importing FreeCAD or Qt.
+
+The exact adapter consumes an accepted chair definition, constructs its named
+components, and assembles reusable prototypes by deterministic transforms at
+calculated rail/timber positions. FreeCAD/OpenCASCADE B-reps and solids are the
+preferred exact representation. They may improve on Templot's output mechanism,
+but not replace its parameterised component model with hand-drawn bodies,
+rectangular envelopes, or an imported mesh. Tessellation is an export concern
+for formats such as STL, not canonical chair state.
+
+The current B15 S1/S1J five-box body is retained only as accepted legacy
+behaviour and gap evidence. It is not the production chair-definition schema,
+the final S1 geometry oracle, or a precedent for new chair families.
+
+### Chair assimilation boundary
+
+Chair assimilation converts external evidence into the same canonical chair
+definition used by native definitions; it does not create a second geometry
+system. A source may be a calibrated scan mesh, a componentised CAD model,
+prototype drawings, direct measurements, or a combination. The boundary must:
+
+1. record provenance, licence/usage status, file hashes, units, scale and
+   coordinate frame before fitting;
+2. align and calibrate the evidence using declared datums and measurements;
+3. identify or ask the operator to identify constituent parts and rail-fit
+   landmarks;
+4. fit procedural parameters and preserve unresolved or inferred values as
+   explicit findings;
+5. regenerate the proposed chair through the normal exact adapter;
+6. report dimensional constraints and a residual comparison against the source
+   evidence; and
+7. require explicit acceptance before publishing a reusable definition.
+
+A scan alone cannot prove hidden surfaces, nominal unworn dimensions,
+component boundaries or manufacturing fits. The supported workflow is therefore
+assisted and evidence-led. Fully automatic conversion of an arbitrary 3D scan
+into a production-ready parametric chair remains research unless later evidence
+and a separately accepted scope promote it.
+
 ## Operating modes
 
 ### Edit/preview
@@ -157,6 +224,10 @@ The export layer keeps the existing safety model:
 - Accepted geometry, sampling, tolerances and topology rules remain unchanged unless a separately approved change says otherwise.
 - Stable identities, deterministic ordering, metadata schemas and production categories remain reproducible.
 - Timber and chair decisions cannot change as a side effect of rendering or performance work.
+- A production chair must be regenerable from its accepted definition without
+  the original scan/CAD file or a retained FreeCAD shape.
+- Chair constituent identities, rail-fit interfaces and prototype/manufacturing
+  separation cannot be discarded during import, display or export.
 - Cache reuse must be invalidated by every input that can affect its result.
 - A lightweight preview is never evidence that exact production validation passed.
 - One accepted application command is one atomic undo unit; its related
@@ -221,9 +292,17 @@ The following require prototypes or user decisions and are not settled by this d
 - single macro, generated macro bundle, or installable workbench distribution;
 - numerical performance budgets and representative benchmark documents;
 - migration/version policy for existing FreeCAD documents.
+- chair-definition package schema, exact source-value representation and
+  internal canonical units;
+- accepted evidence, fit metrics and tolerances for the first S1 assimilation
+  pilot, including confirmation of its precise prototype designation; and
+- optional scan/CAD readers and fitting tools, which must not become mandatory
+  dependencies of the macro's normal runtime without approval.
 
 ## Technical references
 
 - [FreeCAD scripted objects and ViewProviders](https://github.com/FreeCAD/FreeCAD-documentation/blob/main/wiki/Scripted_objects.md)
 - [FreeCAD scene-graph manipulation with Coin](https://github.com/FreeCAD/FreeCAD-documentation/blob/main/wiki/Code_snippets.md#manipulate-the-scenegraph-in-python)
 - [FreeCAD SVG importer/exporter API](https://freecad.github.io/SourceDoc/d1/d33/namespaceimportSVG.html)
+- [Templot5 open-source files on SourceForge](https://sourceforge.net/projects/opentemplot/files/)
+- [Templot chair-output development discussion](https://85a.uk/templot/archive/topics/topic_3307.php)
