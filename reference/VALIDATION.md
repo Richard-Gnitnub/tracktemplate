@@ -158,7 +158,10 @@ Deterministic Phase 1 macro-inventory contract checks:
 
 This validates the analyser against a synthetic shadowing/alias/patch fixture,
 then checks the exact immutable B14 and accepted B15 source fingerprints and
-their current structural/candidate facts. It does not execute either macro.
+their current structural/candidate facts. Within the analyser's bounded static
+top-level call model, schema 2 separately checks callers of nominated roots,
+callers crossing the proposed dependency closure and dependencies leaving that
+closure. It does not execute either macro.
 
 Fail-closed Phase 1 candidate-boundary checks:
 
@@ -170,10 +173,11 @@ This validates the five current candidate contracts against both complete
 macro fingerprints, exact literal/function AST anchors and the live structural
 inventory. It also derives the transition parameter order, station-data fields
 and current chair settings/rail/timber/position/finding/support/result/signature
-schemas from source. Mutation checks prove that source drift, a promoted chair
-status, a missing schema or an inferred slice selection fails closed. It does
-not import either macro, select an extraction slice or approve current chair
-data.
+schemas from source. Schema 2 freezes the bounded static closure-cut counts and the
+scorecard's transition-pilot recommendation while keeping the selected ID
+null. Mutation checks prove that source drift, a promoted chair status, a
+missing schema or an inferred slice selection fails closed. It does not import
+either macro, select an extraction slice or approve current chair data.
 
 Phase 1 licensing-control and manifest-gate checks:
 

@@ -49,6 +49,11 @@ Exact geometry is permitted at an explicit **Validate** or **Export** boundary. 
     assets, Templot reference material, and generated output remain explicitly
     classified under [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). A
     validation oracle is not silently promoted into canonical production data.
+11. **The product is a FreeCAD Workbench Addon.** The release product is an
+    external Track Template Workbench backed by the authoritative modular
+    package and distributed in an Addon Manager-compatible form. The current
+    `.FCMacro` remains a migration and optional compatibility launcher, not the
+    authoritative release implementation.
 
 ## Target layers
 
@@ -344,7 +349,14 @@ Do not attempt a whole-macro rewrite.
 
 ## Source organisation direction
 
-The development source should eventually separate domain, workflow, FreeCAD adapter, presentation and export code. The distributable form may remain a macro launcher or become an installable module/workbench; that packaging decision is deliberately deferred until loading and deployment requirements are agreed.
+The development source will separate domain, workflow, FreeCAD adapter,
+presentation and export code. The accepted release target is an external
+FreeCAD **Track Template Workbench**, packaged as a FreeCAD **Addon** and
+intended for installation through the Addon Manager. The modular
+`tracktemplate` package is authoritative. A small `.FCMacro` may remain during
+migration or as an explicitly supported compatibility entry point, but it
+must delegate to the same package and cannot become a second maintained
+implementation.
 
 The extraction boundaries, dependency rules, anti-bloat safeguards and phased source migration are defined in [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
 
@@ -355,7 +367,8 @@ The following require prototypes or user decisions and are not settled by this d
 - Coin ViewProvider versus an embedded SVG/Qt renderer for the editing view;
 - required granularity of viewport selection and direct manipulation handles;
 - temporary-document lifecycle for exact geometry;
-- single macro, generated macro bundle, or installable workbench distribution;
+- exact Addon manifest, loading/update mechanics, catalogue-submission route
+  and supported lifetime of the compatibility macro launcher;
 - numerical performance budgets and representative benchmark documents;
 - migration/version policy for existing FreeCAD documents;
 - chair-definition package schema, exact source-value representation and
@@ -372,5 +385,7 @@ The following require prototypes or user decisions and are not settled by this d
 - [FreeCAD scripted objects and ViewProviders](https://github.com/FreeCAD/FreeCAD-documentation/blob/main/wiki/Scripted_objects.md)
 - [FreeCAD scene-graph manipulation with Coin](https://github.com/FreeCAD/FreeCAD-documentation/blob/main/wiki/Code_snippets.md#manipulate-the-scenegraph-in-python)
 - [FreeCAD SVG importer/exporter API](https://freecad.github.io/SourceDoc/d1/d33/namespaceimportSVG.html)
+- [FreeCAD Addons and Addon Manager](https://www.freecad.org/addons.php?lang=eng_EN)
+- [FreeCAD addon ecosystem repositories](https://github.com/FreeCAD)
 - [Templot5 open-source files on SourceForge](https://sourceforge.net/projects/opentemplot/files/)
 - [Templot chair-output development discussion](https://85a.uk/templot/archive/topics/topic_3307.php)

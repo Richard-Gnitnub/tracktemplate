@@ -39,7 +39,7 @@ def calc(value):
 OLD_CALC = calc
 
 def helper(value):
-    return value * 2
+    return refresh(value) or value * 2
 
 def calc(value):
     return OLD_CALC(value) + 1
@@ -117,6 +117,32 @@ def validate_synthetic_contract():
         assert calculation["missing_roots"] == []
         assert calculation["closure_definition_count"] == 3
         assert calculation["captured_alias_calls"] == ["OLD_CALC"]
+        assert calculation["closure_external_caller_count"] == 1
+        assert calculation["closure_external_callers"] == [
+            {
+                "name": "use",
+                "line": _definition(first, "use")["line"],
+                "targets": [
+                    {
+                        "name": "calc",
+                        "line": _definition(first, "calc")["line"],
+                    }
+                ],
+            }
+        ]
+        assert calculation["closure_outgoing_dependency_count"] == 1
+        assert calculation["closure_outgoing_dependencies"] == [
+            {
+                "caller": {
+                    "name": "helper",
+                    "line": _definition(first, "helper")["line"],
+                },
+                "dependency": {
+                    "name": "refresh",
+                    "line": _definition(first, "refresh")["line"],
+                },
+            }
+        ]
         assert calculation["direct_callers"] == [
             {"name": "use", "line": _definition(first, "use")["line"]}
         ]
@@ -133,7 +159,8 @@ def validate_synthetic_contract():
                 ]
             )
         payload = json.loads(output.getvalue())
-        assert payload["schema_version"] == 1
+        assert payload["schema_version"] == 2
+        assert payload["macros"][0]["schema_version"] == 2
         assert payload["macros"][0]["label"] == "sample"
 
 
@@ -174,21 +201,37 @@ def validate_current_macro_inventory():
     transition = _candidate(b15, "transition_length_solver")
     assert transition["closure_definition_count"] == 3
     assert transition["platform_signals"] == []
+    assert transition["closure_external_caller_count"] == 3
+    assert [item["name"] for item in transition["closure_external_callers"]] == [
+        "main_circle_centre",
+        "build_concentric_core",
+        "prepare_track_alignment",
+    ]
+    assert transition["closure_outgoing_dependency_count"] == 0
     assert transition["direct_callers"] == [
         {"name": "prepare_track_alignment", "line": 7967}
     ]
     station_index = _candidate(b15, "alignment_station_index")
     assert station_index["closure_definition_count"] == 1
     assert station_index["platform_signals"] == []
+    assert station_index["closure_external_caller_count"] == 15
+    assert station_index["closure_outgoing_dependency_count"] == 0
     station_interpolation = _candidate(b15, "alignment_station_interpolation")
     assert station_interpolation["closure_definition_count"] == 2
     assert station_interpolation["platform_signals"] == ["freecad"]
+    assert station_interpolation["closure_external_caller_count"] == 60
+    assert station_interpolation["closure_outgoing_dependency_count"] == 0
 
     b15_chair = _candidate(b15, "chair_analysis_core")
+    b14_chair = _candidate(b14, "chair_analysis_core")
+    assert b14_chair["closure_external_caller_count"] == 36
+    assert b14_chair["closure_outgoing_dependency_count"] == 11
     assert b15_chair["missing_roots"] == []
     assert b15_chair["closure_definition_count"] == 39
     assert b15_chair["platform_signals"] == []
     assert "_A8A7A1_VALIDATE_CHAIR_POSITIONS" in b15_chair["captured_alias_calls"]
+    assert b15_chair["closure_external_caller_count"] == 39
+    assert b15_chair["closure_outgoing_dependency_count"] == 11
     assert set(b15_chair["duplicate_definition_names"]).issuperset(
         {
             "generate_chair_positions",

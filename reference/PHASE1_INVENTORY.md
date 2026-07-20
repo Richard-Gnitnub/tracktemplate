@@ -22,7 +22,7 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Item | Value |
 | --- | --- |
 | Inventory date | 2026-07-19 |
-| Inventory tool | `tools/phase1_inventory.py`, schema 1 |
+| Inventory tool | `tools/phase1_inventory.py`, schema 2; adds static closure-cut caller and outgoing-dependency evidence to the earlier root/caller view |
 | Plain-line oracle | `tools/freecad_bridge/ordinary_track_recipe.py`, schema 1 |
 | Plain-line semantic SHA-256 | `b5641d79ff1fd77956f3ade8372da2f5b0dd50b6d42945aa611207242278b656` |
 | Plain-line edit lifecycle/rollback oracle | `tools/freecad_bridge/ordinary_track_edit_recipe.py`, schema 2 |
@@ -54,8 +54,9 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | First-S1/core lineage contract | `tests/validate_phase1_s1_lineage.py`; verifies register semantics, B14/B15 source anchors, the optional local archive hashes and the unresolved S1 manifest link |
 | Other-S&C/legacy lineage register | `reference/lineage/phase1-other-snc-legacy-lineage.json`, schema 1; 24 bounded output-affecting groups, 14 `reference-only` and 10 `unknown`, with both scopes visibly `blocked` |
 | Other-S&C/legacy lineage contract | `tests/validate_phase1_other_snc_legacy_lineage.py`; verifies the two remaining scopes, exact B14/B15 anchors, optional local evidence hashes, all-four-scope coverage and absent current output manifests |
-| Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 1; exact current contracts for all five static first-slice candidates with selection still open |
+| Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 2; exact current contracts and closure-cut facts for all five static first-slice candidates with selection still open |
 | Candidate boundary contract | `tests/validate_phase1_candidate_boundaries.py`; verifies source/AST anchors, structural facts, transition/station schemas, chair record schemas, cache-signature inputs and fail-closed non-selection |
+| First-slice scorecard | `reference/PHASE1_SLICE_SCORECARD.md`; recommends the transition solver as a first architecture pilot, not a performance optimisation; project-owner decision remains pending |
 | Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
 | Production-source changes in this tranche | None |
 
@@ -301,16 +302,18 @@ first mechanical move based only on its final function bodies.
 ## Candidate-slice comparison
 
 The table uses a two-call-deep dependency neighbourhood and a four-call-deep
-reverse caller neighbourhood. Counts describe static top-level definition
-occurrences, not runtime invocation frequency.
+reverse caller neighbourhood. Schema 2 distinguishes direct callers of the
+nominated roots from external callers of **any** definition in that dependency
+closure. It also reports calls leaving the bounded closure. Counts describe
+static top-level definition occurrences, not runtime invocation frequency.
 
-| Candidate | Roots | Dependency definitions / lines | Direct callers | Caller closure | Platform signal | Duplicate names in closure | Existing position |
-| --- | ---: | ---: | ---: | ---: | --- | ---: | --- |
-| Curve/easement/station family | 3 | 6 / 154 | 35 | 114 | FreeCAD via station interpolation | 0 | Strategically broad, too aggregated for a first move |
-| Transition-length solver | 1 | 3 / 107 | 1 | 2 | None | 0 | Lowest structural coupling; initial representative/boundary oracle now present |
-| Alignment station index | 1 | 1 / 25 | 15 | 77 | None directly | 0 | Pure-looking and foundational, but high fan-out and FreeCAD-derived point inputs |
-| Alignment station interpolation | 1 | 2 / 22 | 30 | 107 | Direct `App.Vector` construction | 0 | Requires an explicit coordinate-record/adapter seam |
-| Chair-analysis core | 4 | 39 / 1,396 | 18 | 57 | None in the bounded calculation closure | 9 | Best current tests, but substantial alias/schema coupling |
+| Candidate | Roots | Dependency definitions / lines | Root callers | External closure callers | Outgoing dependencies | Caller closure | Platform signal | Existing position |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| Curve/easement/station family | 3 | 6 / 154 | 35 | 65 | 0 | 114 | FreeCAD via station interpolation | Strategically broad; reject as one first move |
+| Transition-length solver | 1 | 3 / 107 | 1 | 3 | 0 | 2 | None | Lowest complete cut; recommended architecture pilot pending owner decision |
+| Alignment station index | 1 | 1 / 25 | 15 | 15 | 0 | 77 | None directly | Foundational, but high fan-out and shallow FreeCAD-derived point inputs |
+| Alignment station interpolation | 1 | 2 / 22 | 30 | 60 | 0 | 107 | Direct `App.Vector` construction | Split the coordinate record from the shared vector adapter first |
+| Chair-analysis core | 4 | 39 / 1,396 | 18 B15 / 16 B14 | 39 B15 / 36 B14 | 11 | 57 B15 / 49 B14 | None in the bounded calculation closure | High-payoff later slice; not mechanically self-contained |
 
 ### Transition-length solver map
 
@@ -328,22 +331,27 @@ clothoid_entry_displacement
 ```
 
 The three-function closure has no direct FreeCAD, Qt, filesystem, process,
-mutable-global, duplicate-definition or captured-alias signal. Its one direct
-caller is `prepare_track_alignment`. The direct characterisation now locks the
-default two-track outside solution, an inside solution, monotonic targets,
-endpoint behaviour, invalid radius/range diagnostics and exact B14/B15 equality.
-This is the current lowest-risk candidate for proving extraction mechanics, but
-Phase 1 has not yet established its complete caller, editing and
-Validate/Export workflow evidence, so it is not selected.
+mutable-global, duplicate-definition or captured-alias signal, and it has no
+outgoing project-definition dependency. The root has one direct caller,
+`prepare_track_alignment`, but a mechanical move of the complete closure has
+three external callers because `clothoid_entry_displacement` is also used by
+`main_circle_centre` and `build_concentric_core`. The direct characterisation
+locks the default two-track outside solution, an inside solution, monotonic
+targets, endpoint behaviour, invalid radius/range diagnostics and exact
+B14/B15 equality. This is the recommended first architecture pilot in
+[PHASE1_SLICE_SCORECARD.md](PHASE1_SLICE_SCORECARD.md), but it is not selected
+until the project owner accepts the scope and successor launcher/version.
 
 ### Station maps
 
 `alignment_station_data` is a single 25-line function with fifteen immediate
-callers. It builds cumulative station data from point objects without directly
-importing FreeCAD. `interpolate_alignment_station` is only 20 lines, but calls
-`vector_xy`, which constructs `App.Vector`. This is a concrete boundary seam:
-station arithmetic can be domain logic only when its point representation,
-units, frame and adapter conversion are explicit.
+and closure-cut callers. It builds cumulative station data from point objects
+without directly importing FreeCAD. `interpolate_alignment_station` is only 20
+lines, but calls the widely shared `vector_xy`, which constructs `App.Vector`;
+including that adapter produces 60 external closure callers rather than the 30
+root callers. This is a concrete boundary seam: station arithmetic can be
+domain logic only when its point representation, units, frame and adapter
+conversion are explicit.
 
 The initial station oracle covers cumulative length, extension clamping,
 negative/overrun station clamping, exact joints, interpolation, duplicate-point
@@ -357,7 +365,9 @@ The current chair root set is `normalise_chair_analysis_settings`,
 `generate_chair_positions`, `validate_chair_positions`, and
 `analyse_chair_position_records`. Its two-deep closure contains 39 definitions
 and no direct FreeCAD/Qt reference, which supports eventual domain extraction.
-However, nine names in that closure are repeated, and the active validator
+However, nine names in that closure are repeated, the two-deep closure still
+has 11 outgoing definition dependencies, and 36 B14/39 B15 definitions call
+into some part of it. The active validator
 calls `_A8A7A1_VALIDATE_CHAIR_POSITIONS`. The four-deep caller map reaches
 analysis metadata, displays, physical support, exact chair solids, UI classes,
 guided workflows and B15 cache wrappers. Characterisation must therefore lock
@@ -935,15 +945,18 @@ oracles, structural facts and open extraction gates for:
 - the chair-analysis core and its surrounding application cache boundary.
 
 The fail-closed validator ties those statements to both complete macro
-fingerprints, 30 literal/function anchors and the live AST inventory. It also
+fingerprints, 30 literal/function anchors and the live schema-2 AST inventory,
+including closure-cut caller and outgoing-dependency counts. It also
 derives the seven-field station schema and the current chair settings, rail,
 timber, position, finding, support-plan, summary, result and signature payload
 schemas directly from source. It records rather than hides the one anchored
 B14/B15 difference in the first chair application wrapper.
 
 The evidence makes the trade-off clearer. The transition-length solver remains
-the structural leader: one direct caller, a three-definition platform-free
-closure and a direct numerical oracle. This is not selection authority. The
+the structural leader: one root caller, three external closure callers, a
+three-definition platform-free/self-contained closure and a direct numerical
+oracle. The scorecard recommends it as a first architecture pilot, not a
+performance optimisation; this is still not selection authority. The
 station index has high fan-out; interpolation still returns `App.Vector`; and
 the chair core has duplicate/alias coupling, non-deterministic timings,
 unvalidated mapping inputs and known signature omissions. In particular, its
@@ -994,6 +1007,13 @@ will continue to be measured separately under
 covers exact shapes already retained in the legacy fixture, while the
 create-time series covers fresh legacy exact-shape construction only.
 
+[PHASE1_SLICE_SCORECARD.md](PHASE1_SLICE_SCORECARD.md) now reconciles these
+measurements with correctness and cut-boundary evidence. It deliberately does
+not assign the transition calculation an invented saving: the recommendation
+uses it to prove the Workbench's modular domain/façade path safely, while the
+chair chain remains the high-payoff later performance target after accurate
+core attribution, signature and provenance gates.
+
 ## Decision log
 
 | Date | Decision | Status and reason |
@@ -1019,6 +1039,8 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-20 | Use B14's controlled connected pair as the first straight/station workflow oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes route/station direction, stable identities, exact inherited joins, length editing, full history recovery, raw persistence and production catalogue without changing either macro; independent-datum GUI, physical station/platform and target-file export remain separate gaps |
 | 2026-07-20 | Add a dedicated centreline-anchored standalone-turnout lifecycle oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes one left/facing REA C10 creation, handed edit, exact history/persistence, stable objects, ordered production records, occupied-chainage rejection and in-transaction abort without changing either macro; trailing/straight/alternate hosts, integration, downstream stages and export remain separate gaps |
 | 2026-07-20 | Record all five current candidate boundaries before selection | Implemented for Phase 1 evidence; the machine-readable register and fail-closed drift test freeze units, frames, tolerances, identities, ordering, schemas, effects and signature/invalidation behaviour without moving code, selecting a slice or clearing chair data |
+| 2026-07-20 | Make an external FreeCAD Workbench distributed as an Addon the product target | Accepted by the project owner; the modular `tracktemplate` package is authoritative, Addon Manager installation is the intended release route, and the `.FCMacro` is limited to migration or explicit compatibility rather than a second implementation |
+| 2026-07-20 | Score the five first-slice candidates using bounded static closure cuts and measured workflow evidence | Recommendation complete; schema 2 exposes root-versus-closure caller differences, the scorecard recommends the transition solver as a low-risk architecture pilot rather than a speed optimisation, and selection remains pending owner acceptance plus a named successor launcher/version |
 
 ## Remaining Phase 1 work
 
@@ -1059,10 +1081,10 @@ create-time series covers fresh legacy exact-shape construction only.
   treating the current exact-shape replacement measurement as its budget.
 - Decide the supported FreeCAD/Python baseline and proposed legacy-document
   support window.
-- Score the final candidate slices using correctness coverage and measured
-  resource cost as well as static coupling.
-- Agree the first slice, legacy comparison path and exact acceptance evidence
-  with the project owner.
+- Review the scorecard recommendation with the project owner. If accepted,
+  name the successor launcher/version and freeze the transition pilot's
+  three-caller façade, legacy comparison path, parameter grid and exact
+  acceptance evidence before Phase 2 creates package structure.
 
 Phase 1 remains open until all exit criteria in
 [PROJECT_PLAN.md](PROJECT_PLAN.md) are met and accepted.

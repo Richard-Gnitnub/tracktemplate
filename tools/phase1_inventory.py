@@ -452,6 +452,55 @@ def analyse_source(
                     next_frontier.append(caller_key)
             caller_frontier = next_frontier
         caller_closure = sorted(caller_depths, key=lambda key: definitions_by_key[key]["line"])
+        closure_key_set = set(closure)
+        closure_external_callers = []
+        for caller_key in sorted(live_keys, key=lambda key: definitions_by_key[key]["line"]):
+            if caller_key in closure_key_set:
+                continue
+            target_keys = sorted(
+                set(edges.get(caller_key, ())).intersection(closure_key_set),
+                key=lambda key: definitions_by_key[key]["line"],
+            )
+            if not target_keys:
+                continue
+            closure_external_callers.append(
+                {
+                    "name": definitions_by_key[caller_key]["name"],
+                    "line": definitions_by_key[caller_key]["line"],
+                    "targets": [
+                        {
+                            "name": definitions_by_key[target_key]["name"],
+                            "line": definitions_by_key[target_key]["line"],
+                        }
+                        for target_key in target_keys
+                    ],
+                }
+            )
+        outgoing_pairs = sorted(
+            {
+                (caller_key, target_key)
+                for caller_key in closure
+                for target_key in edges.get(caller_key, ())
+                if target_key not in closure_key_set
+            },
+            key=lambda pair: (
+                definitions_by_key[pair[0]]["line"],
+                definitions_by_key[pair[1]]["line"],
+            ),
+        )
+        closure_outgoing_dependencies = [
+            {
+                "caller": {
+                    "name": definitions_by_key[caller_key]["name"],
+                    "line": definitions_by_key[caller_key]["line"],
+                },
+                "dependency": {
+                    "name": definitions_by_key[target_key]["name"],
+                    "line": definitions_by_key[target_key]["line"],
+                },
+            }
+            for caller_key, target_key in outgoing_pairs
+        ]
         candidate_reports.append(
             {
                 "name": candidate_name,
@@ -492,6 +541,12 @@ def analyse_source(
                     for key in caller_closure
                 ],
                 "caller_closure_definition_count": len(caller_closure),
+                "closure_external_callers": closure_external_callers,
+                "closure_external_caller_count": len(closure_external_callers),
+                "closure_outgoing_dependencies": closure_outgoing_dependencies,
+                "closure_outgoing_dependency_count": len(
+                    closure_outgoing_dependencies
+                ),
                 "platform_signals": sorted(
                     {
                         signal
@@ -569,7 +624,7 @@ def analyse_source(
     ]
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "label": label,
         "source": {
             "path": _relative_path(path),
@@ -689,7 +744,7 @@ def main(argv=None):
         for name, payload in candidate_specs
     ]
     result = {
-        "schema_version": 1,
+        "schema_version": 2,
         "dependency_depth": args.dependency_depth,
         "caller_depth": args.caller_depth,
         "macros": [

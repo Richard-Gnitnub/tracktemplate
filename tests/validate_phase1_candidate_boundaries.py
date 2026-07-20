@@ -18,6 +18,7 @@ from tools import phase1_inventory  # noqa: E402
 REGISTER_PATH = (
     ROOT / "reference" / "contracts" / "phase1-candidate-boundaries.json"
 )
+SCORECARD_PATH = ROOT / "reference" / "PHASE1_SLICE_SCORECARD.md"
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",
     "b15": ROOT
@@ -76,7 +77,9 @@ EXPECTED_CONTRACT_STATUS = {
 }
 EXPECTED_DISPOSITIONS = {
     "curve_easement_station": "not-selected-too-broad",
-    "transition_length_solver": "structural-leader-not-selected",
+    "transition_length_solver": (
+        "recommended-first-architecture-pilot-owner-decision-pending"
+    ),
     "alignment_station_index": "not-selected-high-fanout",
     "alignment_station_interpolation": "not-selected-adapter-seam-required",
     "chair_analysis_core": (
@@ -297,10 +300,12 @@ def validate_register(document):
         return ["register must be an object"]
     if set(document) != TOP_LEVEL_KEYS:
         errors.append("register top-level fields do not match the contract")
-    if document.get("schema_version") != 1:
-        errors.append("schema_version must be 1")
-    if document.get("status") != "inventory-complete-selection-open":
-        errors.append("candidate inventory must remain complete with selection open")
+    if document.get("schema_version") != 2:
+        errors.append("schema_version must be 2")
+    if document.get("register_id") != "tracktemplate:phase1:candidate-boundaries:2":
+        errors.append("register_id must identify candidate-boundary schema 2")
+    if document.get("status") != "inventory-and-recommendation-complete-selection-open":
+        errors.append("candidate inventory/recommendation must keep selection open")
     if not str(document.get("status_reason", "")).strip():
         errors.append("register status requires a reason")
 
@@ -451,6 +456,9 @@ def validate_register(document):
     expected_gate_keys = {
         "status",
         "selected_candidate_id",
+        "recommended_candidate_id",
+        "recommendation_class",
+        "scorecard_path",
         "current_structural_leader",
         "leader_reason",
         "not_a_selection",
@@ -459,8 +467,19 @@ def validate_register(document):
     if not isinstance(gate, dict) or set(gate) != expected_gate_keys:
         errors.append("selection_gate fields do not match the contract")
     else:
-        if gate.get("status") != "open" or gate.get("selected_candidate_id") is not None:
+        if (
+            gate.get("status") != "recommendation-ready-owner-decision-pending"
+            or gate.get("selected_candidate_id") is not None
+        ):
             errors.append("no extraction candidate may be selected by this register")
+        if gate.get("recommended_candidate_id") != "transition_length_solver":
+            errors.append("the scorecard recommendation must remain explicit")
+        if gate.get("recommendation_class") != (
+            "first-architecture-pilot-not-performance-optimisation"
+        ):
+            errors.append("the recommendation class is invalid")
+        if gate.get("scorecard_path") != "reference/PHASE1_SLICE_SCORECARD.md":
+            errors.append("the scorecard path is invalid")
         if gate.get("current_structural_leader") != "transition_length_solver":
             errors.append("the current structural leader must remain explicit")
         if not _non_empty_string_list(gate.get("required_before_selection")):
@@ -482,6 +501,12 @@ def _structural_record(report, candidate_id):
         "direct_caller_count": len(source["direct_callers"]),
         "caller_closure_definition_count": source[
             "caller_closure_definition_count"
+        ],
+        "closure_external_caller_count": source[
+            "closure_external_caller_count"
+        ],
+        "closure_outgoing_dependency_count": source[
+            "closure_outgoing_dependency_count"
         ],
         "platform_signals": source["platform_signals"],
         "duplicate_definition_names": source["duplicate_definition_names"],
@@ -554,6 +579,9 @@ def validate_source_contract(document):
         label: phase1_inventory.analyse_source(path, label.upper())
         for label, path in SOURCE_PATHS.items()
     }
+    for label, report in reports.items():
+        if report.get("schema_version") != 2:
+            errors.append("{} inventory report must use schema 2".format(label))
     for candidate in document.get("candidates", []):
         candidate_id = candidate.get("candidate_id")
         for label, report in reports.items():
@@ -731,6 +759,24 @@ def validate_source_contract(document):
                 tree, symbol
             ):
                 errors.append("{} chair property {} drifted".format(label, field))
+
+    scorecard_path = ROOT / document["selection_gate"]["scorecard_path"]
+    if scorecard_path != SCORECARD_PATH or not scorecard_path.is_file():
+        errors.append("the declared first-slice scorecard is unavailable")
+    else:
+        scorecard = scorecard_path.read_text(encoding="utf-8")
+        required_scorecard_text = (
+            "recommendation complete; project-owner decision pending",
+            "Recommend `transition_length_solver`",
+            "Selected candidate: **none**",
+            "Recommendation class: first architecture pilot",
+            "optimisation",
+        )
+        for required in required_scorecard_text:
+            if required not in scorecard:
+                errors.append(
+                    "the first-slice scorecard is missing {!r}".format(required)
+                )
     return errors
 
 
@@ -738,6 +784,12 @@ def validate_fail_closed(document):
     selected = copy.deepcopy(document)
     selected["selection_gate"]["selected_candidate_id"] = "transition_length_solver"
     assert validate_register(selected), "selection mutation must fail closed"
+
+    redirected = copy.deepcopy(document)
+    redirected["selection_gate"]["recommended_candidate_id"] = (
+        "chair_analysis_core"
+    )
+    assert validate_register(redirected), "recommendation mutation must fail closed"
 
     promoted = copy.deepcopy(document)
     promoted["candidates"][-1]["contract_status"] = "ready"

@@ -31,6 +31,12 @@
   conversion remains post-RC research.
 - The specific lightweight renderer remains an open design decision until a measured prototype proves editing, selection, persistence and performance.
 - Migrate incrementally behind equivalence checks. Do not attempt a whole-macro rewrite or remove a legacy path before parity evidence and user acceptance.
+- The accepted release product is an external FreeCAD Track Template
+  Workbench, packaged as a FreeCAD Addon and intended for installation through
+  the Addon Manager. The modular `tracktemplate` package is authoritative; the
+  `.FCMacro` is only a migration or explicitly retained compatibility launcher.
+  Phase 10 owns exact manifest/loading/update/catalogue mechanics, not another
+  choice of product form.
 - Follow `reference/PERFORMANCE_SOP.md` for measurement and `reference/VALIDATION.md` for the applicable validation matrix.
 
 ## Railway terminology
@@ -70,8 +76,11 @@
   Preserve it as accepted B15 evidence, but do not use it as the production
   chair-definition schema or final S1 geometry oracle.
 - `tools/phase1_inventory.py` creates the deterministic read-only Phase 1 AST
-  inventory without importing or executing either macro;
-  `tests/validate_phase1_inventory.py` protects its alias, patch, caller and
+  inventory without importing or executing either macro. Within its bounded
+  static top-level call model, schema 2 distinguishes nominated-root callers,
+  callers crossing a proposed dependency closure and dependencies leaving
+  that closure;
+  `tests/validate_phase1_inventory.py` protects its alias, patch, caller/cut and
   current-source contracts.
 - `tests/validate_phase1_alignment.py` directly characterises the current
   transition-length and alignment-station boundary in B14 and B15 without
@@ -82,6 +91,12 @@
   source anchors, units, frames, tolerances, identities, ordering, schemas,
   side effects, signature gaps and explicit open selection gate; updating a
   current-source fact is not authority to select or extract a slice.
+- `reference/PHASE1_SLICE_SCORECARD.md` owns the current first-slice
+  recommendation. It recommends the transition solver as an architecture
+  pilot rather than a performance optimisation, but selection remains null
+  until the project owner accepts it and a successor launcher/version is
+  named. Do not edit immutable B14 or accepted-reference B15 to begin that
+  extraction.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
   semantic oracle for the fixed B14 plain-line curve/two-track document. Their

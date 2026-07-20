@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
-  "register_id": "tracktemplate:phase1:candidate-boundaries:1",
+  "schema_version": 2,
+  "register_id": "tracktemplate:phase1:candidate-boundaries:2",
   "recorded_on": "2026-07-20",
-  "status": "inventory-complete-selection-open",
-  "status_reason": "The five current first-slice candidates now have explicit legacy boundary contracts, but no extraction slice has been selected or authorised.",
+  "status": "inventory-and-recommendation-complete-selection-open",
+  "status_reason": "The five current first-slice candidates have explicit legacy boundary and closure-cut contracts, and the transition solver is recommended as the first architecture pilot; no extraction slice has been selected or authorised.",
   "source_state": {
     "b14": {
       "path": "AdvancedTurnout.FCMacro",
@@ -360,6 +360,8 @@
           "closure_source_lines": 154,
           "direct_caller_count": 35,
           "caller_closure_definition_count": 114,
+          "closure_external_caller_count": 65,
+          "closure_outgoing_dependency_count": 0,
           "platform_signals": ["freecad"],
           "duplicate_definition_names": [],
           "captured_alias_calls": []
@@ -370,6 +372,8 @@
           "closure_source_lines": 154,
           "direct_caller_count": 35,
           "caller_closure_definition_count": 114,
+          "closure_external_caller_count": 65,
+          "closure_outgoing_dependency_count": 0,
           "platform_signals": ["freecad"],
           "duplicate_definition_names": [],
           "captured_alias_calls": []
@@ -377,7 +381,7 @@
       },
       "extraction_disposition": "not-selected-too-broad",
       "open_gaps": [
-        "The aggregate crosses a FreeCAD point-construction seam and has 35 direct callers.",
+        "The aggregate crosses a FreeCAD point-construction seam, has 35 root callers and has 65 external callers across the bounded static closure.",
         "No representative target-architecture editing/deferred-validation profile exists."
       ]
     },
@@ -454,6 +458,8 @@
           "closure_source_lines": 107,
           "direct_caller_count": 1,
           "caller_closure_definition_count": 2,
+          "closure_external_caller_count": 3,
+          "closure_outgoing_dependency_count": 0,
           "platform_signals": [],
           "duplicate_definition_names": [],
           "captured_alias_calls": []
@@ -464,15 +470,17 @@
           "closure_source_lines": 107,
           "direct_caller_count": 1,
           "caller_closure_definition_count": 2,
+          "closure_external_caller_count": 3,
+          "closure_outgoing_dependency_count": 0,
           "platform_signals": [],
           "duplicate_definition_names": [],
           "captured_alias_calls": []
         }
       },
-      "extraction_disposition": "structural-leader-not-selected",
+      "extraction_disposition": "recommended-first-architecture-pilot-owner-decision-pending",
       "open_gaps": [
         "Agree whether explicit finite/positive-angle validation belongs in the successor API or is retained as a caller precondition.",
-        "Freeze the proposed module/API seam and run legacy-versus-extracted parity before routing the sole direct caller.",
+        "Freeze the proposed module/API seam and run legacy-versus-extracted parity before routing all three external closure callers.",
         "Record a representative profile even though this function is not a measured dominant cost."
       ]
     },
@@ -545,6 +553,8 @@
           "closure_source_lines": 25,
           "direct_caller_count": 15,
           "caller_closure_definition_count": 77,
+          "closure_external_caller_count": 15,
+          "closure_outgoing_dependency_count": 0,
           "platform_signals": [],
           "duplicate_definition_names": [],
           "captured_alias_calls": []
@@ -555,6 +565,8 @@
           "closure_source_lines": 25,
           "direct_caller_count": 15,
           "caller_closure_definition_count": 77,
+          "closure_external_caller_count": 15,
+          "closure_outgoing_dependency_count": 0,
           "platform_signals": [],
           "duplicate_definition_names": [],
           "captured_alias_calls": []
@@ -631,6 +643,8 @@
           "closure_source_lines": 22,
           "direct_caller_count": 30,
           "caller_closure_definition_count": 107,
+          "closure_external_caller_count": 60,
+          "closure_outgoing_dependency_count": 0,
           "platform_signals": ["freecad"],
           "duplicate_definition_names": [],
           "captured_alias_calls": []
@@ -641,6 +655,8 @@
           "closure_source_lines": 22,
           "direct_caller_count": 30,
           "caller_closure_definition_count": 107,
+          "closure_external_caller_count": 60,
+          "closure_outgoing_dependency_count": 0,
           "platform_signals": ["freecad"],
           "duplicate_definition_names": [],
           "captured_alias_calls": []
@@ -650,7 +666,7 @@
       "open_gaps": [
         "Split domain XY/heading interpolation from the FreeCAD App.Vector adapter.",
         "Decide and test heading wrap behaviour as an explicit successor requirement rather than silently changing it.",
-        "Profile representative caller groups before migrating the 30 direct callers."
+        "Profile representative caller groups before migrating the 30 root callers or disturbing the shared vector adapter's 60-caller closure cut."
       ]
     },
     {
@@ -1069,6 +1085,8 @@
           "closure_source_lines": 1396,
           "direct_caller_count": 16,
           "caller_closure_definition_count": 49,
+          "closure_external_caller_count": 36,
+          "closure_outgoing_dependency_count": 11,
           "platform_signals": [],
           "duplicate_definition_names": [
             "_chair_assignment",
@@ -1089,6 +1107,8 @@
           "closure_source_lines": 1396,
           "direct_caller_count": 18,
           "caller_closure_definition_count": 57,
+          "closure_external_caller_count": 39,
+          "closure_outgoing_dependency_count": 11,
           "platform_signals": [],
           "duplicate_definition_names": [
             "_chair_assignment",
@@ -1116,10 +1136,13 @@
     }
   ],
   "selection_gate": {
-    "status": "open",
+    "status": "recommendation-ready-owner-decision-pending",
     "selected_candidate_id": null,
+    "recommended_candidate_id": "transition_length_solver",
+    "recommendation_class": "first-architecture-pilot-not-performance-optimisation",
+    "scorecard_path": "reference/PHASE1_SLICE_SCORECARD.md",
     "current_structural_leader": "transition_length_solver",
-    "leader_reason": "It has one direct caller, a three-definition platform-free closure, direct numerical characterisation and no duplicate-definition or captured-alias coupling.",
+    "leader_reason": "It has one root caller, only three external callers across its bounded static three-definition closure, no outgoing project-definition dependency, direct numerical characterisation and no duplicate-definition or captured-alias coupling.",
     "not_a_selection": "The structural leader is a recommendation for owner review, not authority to create a package or route callers.",
     "required_before_selection": [
       "Project-owner agreement on the first slice, successor API and exact legacy/new acceptance evidence.",

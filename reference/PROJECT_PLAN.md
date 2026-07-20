@@ -48,7 +48,9 @@ The release candidate will provide the agreed curve/easement, station and multip
   design, engineering facts, project measurements, package data, restricted
   material, and local comparison oracles;
 - a small launcher/composition root and one authoritative modular implementation;
-- reproducible installation or distribution artifacts, validation evidence, user documentation, and measured performance budgets;
+- an external Track Template FreeCAD Workbench, packaged as an Addon and
+  intended for Addon Manager installation, with reproducible artifacts,
+  validation evidence, user documentation and measured performance budgets;
 - no known release-blocking correctness, data-loss, migration, or production-export defect in the supported scope.
 
 Release-candidate scope is based on the accepted B15 behavioural reference,
@@ -60,6 +62,11 @@ pattern through a neutral TrackTemplateMacro definition. That pattern is
 Templot-source-informed, but neither a Templot schema nor Templot media output
 is canonical project data. FreeCAD/OpenCASCADE solids may replace Templot's
 low-level DXF face implementation only when the agreed geometric oracle passes.
+On 2026-07-20 the project owner also fixed the product destination: an external
+Track Template FreeCAD Workbench, packaged as an Addon and intended for Addon
+Manager installation. The exact manifest, update and public-catalogue mechanics
+remain Phase 10 evidence; the product form no longer does.
+
 The existing B15 five-box S1/S1J body remains legacy gap evidence, not the final
 chair model.
 
@@ -93,7 +100,7 @@ release-candidate gate.
 | 7 | Core alignment, station, and multiple-track migration | Not started |
 | 8 | Turnout, crossover, and timbering migration | Not started |
 | 9 | Chair definitions, assisted assimilation, production records, and export completion | Not started |
-| 10 | Product integration, launcher reduction, and beta packaging | Not started |
+| 10 | Workbench integration, launcher reduction, and beta Addon packaging | Not started |
 | 11 | Stabilisation and release-candidate qualification | Not started |
 
 ## Phase 0: recoverable baseline and benchmark checkpoint
@@ -216,7 +223,11 @@ Choose migration order from evidence and establish oracles for behaviour that cu
   its reusable definition. CC0-1.0 is the default target only for a package
   whose complete rights record permits the project to make that dedication.
 
-Chair analysis/presentation is a strong candidate because B15 already has focused checks. Curve/easement calculation is strategically foundational and may be purer. Neither is selected until this inventory exposes its real coupling.
+Chair analysis/presentation remains a high-payoff later candidate because B15
+has focused checks and the controlled chair workflow is exceptionally slow.
+The completed cut-boundary scorecard recommends the purer transition solver as
+the first architecture pilot. No candidate is selected until the project owner
+accepts that recommendation and its exact successor-version/acceptance scope.
 
 Current Phase 1 evidence is maintained in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Its first static tranche is
@@ -231,11 +242,19 @@ machine-readable candidate-boundary register now freezes inputs, outputs,
 units, frames, tolerances, identities, ordering, schemas, effects and
 signature/invalidation rules for all five static candidates. Its fail-closed
 test derives the station and chair record schemas from the exact B14/B15 ASTs
-and keeps selection open. Transition solving remains only the structural
-leader; stationing still needs an explicit point-adapter seam, while chair
-analysis retains alias coupling and known cache-signature gaps. This is not
-yet a slice decision: broader workflow boundaries, product-pipeline profiles
-and the remaining Phase 1 user decisions are still open. The fixed B14
+and keeps selection open. Within the analyser's bounded static top-level call
+model, inventory schema 2 now distinguishes root callers from callers crossing
+the proposed dependency closure and records dependencies leaving that closure.
+The resulting
+[first-slice scorecard](PHASE1_SLICE_SCORECARD.md) recommends the
+three-function transition solver as the first architecture pilot, not as a
+performance optimisation: it has three external closure callers and no
+outgoing project-definition dependency. Stationing still needs an explicit
+point-adapter seam, while chair analysis retains alias coupling, 11 outgoing
+closure dependencies and known cache-signature gaps. The recommendation still
+requires project-owner acceptance and a named successor launcher/version; no
+slice is selected. Broader workflow boundaries, product-pipeline profiles and
+the remaining Phase 1 user decisions are still open. The fixed B14
 plain-line curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,
 grouping, ordered production catalogue and exact-shape summaries. This closes
@@ -652,19 +671,25 @@ If chair analysis/presentation was the Phase 3 proof slice, this phase completes
 - Export failure cannot partially replace an accepted output set or corrupt the editable model.
 - Editing and end-to-end performance meet the provisional budgets derived from measured baselines.
 
-## Phase 10: product integration, launcher reduction, and beta packaging
+## Phase 10: Workbench integration, launcher reduction, and beta Addon packaging
 
 ### Goal
 
-Turn the migrated capabilities into one maintainable, installable, feature-complete beta.
+Turn the migrated capabilities into one maintainable, installable,
+feature-complete Track Template Workbench beta.
 
 ### Deliverables
 
 - Move guided workflow and UI composition out of the monolithic `run_macro` body into explicit commands/view models.
 - Replace import-time class patch chains and shadowed active definitions with normal composition; retain only named compatibility migrations.
-- Reduce the `.FCMacro` to startup/composition or generate it reproducibly from authoritative modular source.
-- Decide and automate the release distribution: launcher plus package, installable module/workbench, or generated bundle.
-- Prove a clean installation and loading path in the supported FreeCAD environment.
+- Reduce the `.FCMacro` to an optional startup/compatibility entry point that
+  delegates to authoritative modular source, or retire it when the supported
+  migration window permits.
+- Assemble the accepted external FreeCAD Workbench as an Addon, including its
+  metadata/manifest, resources, loading entry points and reproducible package.
+- Prove clean direct and Addon Manager installation/loading/update paths in the
+  supported FreeCAD environment; treat public catalogue submission as a
+  separately authorised publication step.
 - Complete supported legacy-document migration, diagnostics, and recovery guidance.
 - Add installation, upgrade, workflow, Validate/Export, troubleshooting, and known-limitation documentation.
 - Document chair-definition package authoring/loading, the assisted S1
@@ -676,7 +701,8 @@ Turn the migrated capabilities into one maintainable, installable, feature-compl
 ### Exit gate
 
 - All agreed release-candidate capabilities run through modular source; no unowned production path depends on historical monkey patches.
-- The launcher contains composition/startup only, and the distribution artifact cannot drift from source.
+- The Workbench loads the authoritative package; any retained launcher contains
+  composition/startup only, and the Addon artifact cannot drift from source.
 - Clean install, first run, normal workflow, save/reopen, and upgrade paths pass.
 - Full automated, headless, GUI, export, and performance matrices have no untriaged failure.
 - The beta is feature-complete; subsequent changes are limited to release blockers, defects, evidence, and documentation.
@@ -689,7 +715,8 @@ Produce a reproducible RC1 artifact whose remaining risks are known and acceptab
 
 ### Deliverables
 
-- Freeze candidate source, schema, public API, workflow scope, supported environment, and distribution format.
+- Freeze candidate source, schema, public API, workflow scope, supported
+  environment, Addon artifact and distribution mechanics.
 - Run the full validation matrix from a clean checkout and clean FreeCAD profile/install where practical.
 - Complete real-GUI acceptance for all representative workflows and supported legacy-document upgrades.
 - Run repeated cold and warm performance series; publish medians/ranges and confirm the agreed editing and end-to-end budgets.
@@ -760,7 +787,7 @@ package licence and field/component provenance pass
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |
 | Coin ViewProvider versus SVG/Qt editing view | Phase 5 exit | Selection, editing, persistence, and resource prototype |
 | Numerical performance budgets | Provisional after Phase 1; frozen by Phase 10 | Repeated cold/warm representative baselines |
-| RC distribution format | Phase 10 start | Loading, maintainability, deployment, and reproducibility spike |
+| RC product/distribution target | Resolved 2026-07-20 — external Track Template FreeCAD Workbench packaged as an Addon and intended for Addon Manager installation; modular package authoritative; macro limited to migration/compatibility | Project-owner acceptance and FreeCAD's Workbench/Addon ecosystem model |
 | RC version identifier and publication | Phase 11 | Complete qualification evidence and user approval |
 
 ## Principal risks and controls

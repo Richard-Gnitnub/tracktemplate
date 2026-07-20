@@ -40,7 +40,8 @@ Some shadowing definitions are captured by compatibility aliases or class assign
 - Do not split code solely to meet a line-count target.
 - Do not create dozens of tiny modules with circular imports or shared mutable globals.
 - Do not convert every dictionary or function to a new abstraction in one pass.
-- Do not decide the renderer, packaging format or workbench migration without the prototypes required by `ARCHITECTURE.md`.
+- Do not invent the renderer or the Workbench/Addon loading, update and
+  catalogue mechanics without the prototypes required by `ARCHITECTURE.md`.
 - Do not remove compatibility behaviour until representative legacy files and workflows pass.
 
 ## Target dependency direction
@@ -228,15 +229,24 @@ Git history is the record of old implementations. Do not keep historical functio
 
 ## Distribution strategy
 
-Development source will be modular. Distribution may use one of three forms:
+Development source will be modular. The accepted primary release artifact is
+an external FreeCAD **Track Template Workbench**, packaged as an Addon and
+intended for installation through the FreeCAD Addon Manager. The
+`tracktemplate` package remains the only authoritative implementation.
+
+During migration the repository may also provide:
 
 1. a small `.FCMacro` launcher beside the `tracktemplate` package;
-2. an installable FreeCAD module/workbench;
-3. a generated single-file macro when a self-contained artifact remains essential.
+2. direct development loading of the Workbench/package; and
+3. a generated single-file macro only when an explicitly supported recovery
+   or compatibility artifact remains essential.
 
 If a generated macro is required, modular source remains authoritative. The generated artifact must be reproducible and must not be edited by hand. Its behaviour must be tested against the modular source from which it was built.
 
-The final distribution form is an open architecture decision.
+Phase 10 still owns the exact Addon manifest, installation/update mechanics,
+catalogue submission and compatibility-launcher retirement evidence. Those
+implementation choices do not reopen the accepted Workbench/Addon product
+target.
 
 ## Extraction method
 
@@ -284,9 +294,12 @@ inventory and initial candidate comparison are recorded in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). The five current candidates now
 have a fail-closed machine-readable boundary contract covering units, frames,
 tolerances, identities, ordering, schemas, side effects and
-signature/invalidation inputs. Broader workflow boundaries, candidate-specific
-gaps, representative target-architecture profiles and owner selection remain
-open.
+signature/invalidation inputs. Inventory schema 2 now adds static closure-cut
+callers and dependencies leaving each bounded closure. The
+[first-slice scorecard](PHASE1_SLICE_SCORECARD.md) recommends the transition
+solver as a first architecture pilot, not a performance optimisation. Broader
+workflow boundaries, candidate-specific gaps, representative
+target-architecture profiles and owner selection remain open.
 
 ### Stage M2: package skeleton and façade
 
@@ -344,9 +357,12 @@ Exit gate: each migrated family has independent tests, explicit adapters and no 
 - Replace import-time class patches with explicit constructed collaborators.
 - Remove shadowed legacy implementations only after retained-reference audits.
 - Keep compatibility migrations required by supported documents.
-- Decide and automate the distribution format.
+- Automate the accepted Workbench/Addon assembly and any explicitly retained
+  compatibility launcher from the same authoritative source.
 
-Exit gate: the macro is a small launcher/composition root and modular source is the only maintained implementation.
+Exit gate: the Workbench loads the modular source, any macro is only a small
+launcher/composition root, and modular source is the only maintained
+implementation.
 
 ## Validation gates
 
@@ -398,7 +414,8 @@ Modularisation is complete when:
 ## Open decisions
 
 - first extraction slice after dependency inventory;
-- distribution as package beside macro, workbench, or generated bundle;
+- exact Workbench/Addon manifest, loading/update and Addon Manager catalogue
+  submission mechanics, plus the compatibility launcher's supported lifetime;
 - supported legacy document/version window;
 - record/type approach compatible with the supported FreeCAD Python runtime;
 - exact chair-definition package schema, source-value representation and
