@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "manifest_id": "tracktemplate:s1-chair-pilot:dependency-manifest:1",
+  "manifest_kind": "package",
+  "audit_scope": "s1-chair-release-path",
+  "subject": {
+    "identifier": "tracktemplate:s1-chair-pilot",
+    "version": "0-unresolved",
+    "description": "Phase 1 control record for the proposed S1 chair pilot; no production definition has been accepted.",
+    "package_license": "NOASSERTION"
+  },
+  "intended_uses": [
+    "public-redistribution",
+    "commercial-production",
+    "publication",
+    "physical-production"
+  ],
+  "dependencies": [
+    {
+      "identifier": "s1-primary-evidence-unselected",
+      "name": "Primary S1 prototype evidence",
+      "role": "production-input",
+      "output_affecting": true,
+      "classifications": [
+        "third_party_evidence"
+      ],
+      "source": {
+        "creator_or_supplier": "not yet selected",
+        "locator": "unresolved Phase 1 evidence source"
+      },
+      "license_expression": "NOASSERTION",
+      "permissions": {
+        "access": "unknown",
+        "adaptation": "unknown",
+        "production_output": "unknown",
+        "redistribution": "unknown",
+        "commercial_use": "unknown",
+        "publication": "unknown"
+      },
+      "conditions": [
+        "Select and identify calibrated scan, CAD, drawing or measurement evidence before defining production geometry.",
+        "Record field/component provenance and the authority for the intended package licence."
+      ],
+      "contribution_attestation": {
+        "status": "missing",
+        "reference": "No contributor or supplier declaration exists because the evidence has not been selected."
+      },
+      "non_copyright_review": {
+        "registered_designs": {
+          "status": "not-performed",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-20",
+          "reviewed_by": "Phase 1 inventory",
+          "evidence": [],
+          "notes": "The precise prototype and production evidence have not been selected."
+        },
+        "unregistered_designs": {
+          "status": "not-performed",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-20",
+          "reviewed_by": "Phase 1 inventory",
+          "evidence": [],
+          "notes": "The design date, first marketing and evidence ownership have not been established."
+        },
+        "patents": {
+          "status": "not-performed",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-20",
+          "reviewed_by": "Phase 1 inventory",
+          "evidence": [],
+          "notes": "No patent relevance assessment has been performed for the selected evidence or intended manufacturing path."
+        },
+        "trade_marks": {
+          "status": "not-performed",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-20",
+          "reviewed_by": "Phase 1 inventory",
+          "evidence": [],
+          "notes": "The proposed package name and any embedded branding have not been reviewed."
+        }
+      },
+      "project_status": {
+        "status": "unknown",
+        "reason": "Primary evidence, permissions, contribution authority and non-copyright-rights review are unresolved.",
+        "reviewed_by": "Phase 1 inventory",
+        "reviewed_on": "2026-07-20",
+        "decision_reference": "reference/LICENSING_BOUNDARIES.md#scoped-phase-1-lineage-audit"
+      }
+    },
+    {
+      "identifier": "templot5-556b-local-comparison",
+      "name": "Templot5 revision 556b local comparison evidence",
+      "role": "comparison-only",
+      "output_affecting": false,
+      "classifications": [
+        "templot_source_expression",
+        "templot_reference_data",
+        "templot_media_output"
+      ],
+      "source": {
+        "creator_or_supplier": "Martin Wynne and OpenTemplot contributors",
+        "locator": "https://sourceforge.net/projects/opentemplot/files/t5_files_556b_06_feb_2025.zip/download",
+        "acquired_on": "2026-07-19",
+        "evidence_sha256": "2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3"
+      },
+      "license_expression": "NOASSERTION",
+      "permissions": {
+        "access": "permitted",
+        "adaptation": "reference-only",
+        "production_output": "not-applicable",
+        "redistribution": "reference-only",
+        "commercial_use": "not-applicable",
+        "publication": "not-applicable"
+      },
+      "conditions": [
+        "The reviewed source expression states GPL-3.0-or-later, but this mixed comparison record also includes reference data and media whose production and redistribution status is not established.",
+        "Keep the archive and any generated comparison artifact local and untracked.",
+        "Do not promote comparison values into the canonical package without a separately accepted evidence chain."
+      ],
+      "contribution_attestation": {
+        "status": "not-required",
+        "reference": "External local comparison evidence; no TrackTemplateMacro package contribution is being accepted."
+      },
+      "non_copyright_review": {
+        "registered_designs": {
+          "status": "not-performed",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-20",
+          "reviewed_by": "Phase 1 inventory",
+          "evidence": [],
+          "notes": "Not assessed because this record is excluded from the production definition; promotion would require a new review."
+        },
+        "unregistered_designs": {
+          "status": "not-performed",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-20",
+          "reviewed_by": "Phase 1 inventory",
+          "evidence": [],
+          "notes": "Not assessed because this record is excluded from the production definition; promotion would require a new review."
+        },
+        "patents": {
+          "status": "not-performed",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-20",
+          "reviewed_by": "Phase 1 inventory",
+          "evidence": [],
+          "notes": "Not assessed because this record is excluded from the production definition; promotion would require a new review."
+        },
+        "trade_marks": {
+          "status": "not-performed",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-20",
+          "reviewed_by": "Phase 1 inventory",
+          "evidence": [],
+          "notes": "No Templot name, logo or branding may be embedded in production output through this comparison record."
+        }
+      },
+      "project_status": {
+        "status": "reference-only",
+        "reason": "The archive is retained only as a local source-informed comparison oracle and is not a canonical or output dependency.",
+        "reviewed_by": "Phase 1 inventory",
+        "reviewed_on": "2026-07-20",
+        "decision_reference": "reference/PROVENANCE.md#chair-procedural-source-audit-record"
+      }
+    }
+  ],
+  "non_copyright_review": {
+    "registered_designs": {
+      "status": "not-performed",
+      "territories": [
+        "GB"
+      ],
+      "reviewed_on": "2026-07-20",
+      "reviewed_by": "Phase 1 inventory",
+      "evidence": [],
+      "notes": "No package geometry exists and the precise prototype has not been confirmed."
+    },
+    "unregistered_designs": {
+      "status": "not-performed",
+      "territories": [
+        "GB"
+      ],
+      "reviewed_on": "2026-07-20",
+      "reviewed_by": "Phase 1 inventory",
+      "evidence": [],
+      "notes": "No package geometry exists and the relevant design history has not been established."
+    },
+    "patents": {
+      "status": "not-performed",
+      "territories": [
+        "GB"
+      ],
+      "reviewed_on": "2026-07-20",
+      "reviewed_by": "Phase 1 inventory",
+      "evidence": [],
+      "notes": "No package or manufacturing claim set exists to assess."
+    },
+    "trade_marks": {
+      "status": "not-performed",
+      "territories": [
+        "GB"
+      ],
+      "reviewed_on": "2026-07-20",
+      "reviewed_by": "Phase 1 inventory",
+      "evidence": [],
+      "notes": "The final package name and embedded content are undecided."
+    }
+  },
+  "project_status": {
+    "status": "unknown",
+    "reason": "The pilot is intentionally blocked: primary evidence, package data, licence authority, non-copyright-rights reviews and owner acceptance are incomplete.",
+    "reviewed_by": "Phase 1 inventory",
+    "reviewed_on": "2026-07-20",
+    "decision_reference": "reference/LICENSING_BOUNDARIES.md#scoped-phase-1-lineage-audit"
+  }
+}

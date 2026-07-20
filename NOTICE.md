@@ -49,8 +49,8 @@ marked with that dedication after its rights review.
 
 Current B14/B15 output is not retroactively certified for unrestricted public
 or commercial reuse. The required source/data classifications, Templot-media
-separation, package rules, output-dependency records, and Phase 1 clearance
-audit are defined in
+separation, package rules, output-dependency records, and scoped Phase 1
+project-status audits are defined in
 [`reference/LICENSING_BOUNDARIES.md`](reference/LICENSING_BOUNDARIES.md).
 
 ## Particular thanks

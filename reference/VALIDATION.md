@@ -160,6 +160,26 @@ This validates the analyser against a synthetic shadowing/alias/patch fixture,
 then checks the exact immutable B14 and accepted B15 source fingerprints and
 their current structural/candidate facts. It does not execute either macro.
 
+Phase 1 licensing-control and manifest-gate checks:
+
+```bash
+.venv/bin/python tests/validate_licensing_controls.py
+.venv/bin/python tools/validate_dependency_manifest.py \
+  reference/manifests/s1-chair-pilot.dependency-manifest.json
+```
+
+The test checks the Draft 2020-12 schema vocabulary, package/output structural
+rules, fail-closed `project-cleared` semantics, non-copyright-rights reviews,
+contribution authority, duplicate identities and the current S1 control
+record. The S1 record must validate truthfully as `unknown`; it is not expected
+to pass the strict release gate yet. Any package or output proposed for the
+positive internal status must additionally pass:
+
+```bash
+.venv/bin/python tools/validate_dependency_manifest.py \
+  --require-project-cleared path/to/dependency-manifest.json
+```
+
 Direct Phase 1 transition/station characterisation:
 
 ```bash
@@ -297,6 +317,40 @@ identical. The controlled series is recorded in
 This is alignment stationing evidence, not coverage of a physical
 station/platform or straight target-file export.
 
+Fast Phase 1 standalone-turnout workflow checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_turnout.py
+```
+
+This extracts the exact B14/B15 REA C10 dimension, handing/orientation,
+valid-toe, occupied-interval and edit-summary functions without importing
+either macro. It proves AST/result parity for the fixed analytical contract,
+invalid-input diagnostics, persisted host-identity selection, source-level
+pre-transaction construction and commit/abort structure, frozen semantic
+hashes and the isolated runner/fault-injection contract. Exercise the real
+copied-document GUI path with:
+
+```bash
+tools/freecad_bridge/run-b14-turnout \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The command must use B14's real turnout manager, resolve Main Track by
+persisted identity, create left-hand/facing `TO-001` at chainage `746.298 mm`,
+and change only its hand to right. It must preserve stable object names and
+the exact inherited plain-line geometry; recover exact before/after semantics
+through the single-entry creation and edit Undo/Redo cycles; reject an
+occupied-chainage creation without mutation; abort an injected first-mutation
+edit failure; and preserve the frozen 17-object, 10-record right-hand state
+across save/reopen. It must leave the source fixture byte-identical and retain
+top-view, manager and full-window evidence. The controlled series is recorded
+in
+[benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md](benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
+This is one B14 legacy comparison oracle, not canonical turnout data or
+coverage of trailing/straight/alternate hosts, downstream timber/chair stages
+or target-file export.
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash
@@ -431,7 +485,7 @@ Before retiring a legacy path, add representative, non-sensitive fixtures or det
 - automatic timbering and chair analysis;
 - a frozen Templot S1 constituent/assembly oracle and its deterministic recipe;
 - a versioned native S1 chair-definition package with invalid/corrupt fixtures;
-- one non-sensitive, rights-cleared calibrated scan/CAD/measurement fixture for
+- one non-sensitive, project-cleared calibrated scan/CAD/measurement fixture for
   the assisted S1 assimilation pilot;
 - lightweight preview selection/editing;
 - exact validation and each production export family;

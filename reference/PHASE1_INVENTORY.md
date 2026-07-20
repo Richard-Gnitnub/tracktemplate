@@ -14,7 +14,7 @@ correctness, boundary-data and performance work explicit.
 
 The applicable gates are in [PROJECT_PLAN.md](PROJECT_PLAN.md), and source
 movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
-Source/data classification, package licensing and generated-output clearance
+Source/data classification, package licensing and generated-output project status
 are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 
 ## Evidence state
@@ -37,14 +37,20 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Connected straight/stationing oracle | `tools/freecad_bridge/straight_station_recipe.py`, schema 1 |
 | Created `600/600 mm` straight/station workflow SHA-256 | `f5bf185baf2c61fbdf79c483b96ccf53e3a6206320e50087568e457022958a6c` |
 | Edited `750/450 mm` straight/station workflow SHA-256 | `430d5f134e20789ee22c7f5549b64611a067646f1d24e038d4fbbc473d6b7666` |
+| Standalone-turnout lifecycle oracle | `tools/freecad_bridge/turnout_recipe.py`, schema 1 |
+| Created left-hand/facing turnout semantic SHA-256 | `0738c5a639618739c69fcd06553ea0584c5bf8c51253c330e3374f39e437c1cb` |
+| Edited right-hand/facing turnout semantic SHA-256 | `46225072b4b56f7f767570c8b438ee0942c239f73f121ce420aa76caed9779f0` |
 | B14 role | Immutable legacy comparison oracle |
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
 | B15 SHA-256 | `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848` |
 | Chair source evidence | ignored Templot5 revision 556b SourceForge archive recorded in [PROVENANCE.md](PROVENANCE.md) |
 | Chair source-audit date | 2026-07-20; read-only review of selected Pascal units |
-| Source/data/output policy | accepted 2026-07-20; [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) |
-| Current B14/B15 project-control output clearance | `unknown` pending the Phase 1 output-affecting lineage audit; this is not a new output restriction |
+| Source/data/output policy | explicitly accepted by the project owner on 2026-07-20; [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) |
+| Dependency/project-status manifest | `reference/schemas/dependency-manifest-v1.schema.json`, schema 1; enforced by `tools/validate_dependency_manifest.py` |
+| First S1 pilot control manifest | structurally valid `unknown`; deliberately fails `--require-project-cleared` pending evidence, permissions, licence, non-copyright reviews and owner acceptance |
+| Lineage audit scopes | first S1; core rail/timber used by S1; other S&C output; legacy B14/B15 output |
+| Current B14/B15 project-control output status | `unknown` pending its scoped output-affecting lineage audit; this is not a new output restriction |
 | Production-source changes in this tranche | None |
 
 The `ordinary_track` filenames, imports, commands and recipe IDs in this
@@ -63,6 +69,15 @@ macros:
 
 ```bash
 .venv/bin/python tests/validate_phase1_inventory.py
+```
+
+Validate the executable dependency-manifest controls and the deliberately
+unresolved S1 pilot record:
+
+```bash
+.venv/bin/python tests/validate_licensing_controls.py
+.venv/bin/python tools/validate_dependency_manifest.py \
+  reference/manifests/s1-chair-pilot.dependency-manifest.json
 ```
 
 Run the first direct B14/B15 transition and station characterisation oracle:
@@ -107,6 +122,14 @@ Run the fast and real-GUI connected-straight/stationing lifecycle oracles with:
 ```bash
 .venv/bin/python tests/validate_phase1_straight_station.py
 tools/freecad_bridge/run-b14-straight-station \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+Run the fast and real-GUI standalone-turnout lifecycle oracles with:
+
+```bash
+.venv/bin/python tests/validate_phase1_turnout.py
+tools/freecad_bridge/run-b14-turnout \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 ```
 
@@ -420,13 +443,30 @@ untracked unless its exact redistribution and output use is accepted. Any
 future Templot-format support is a one-way outward adapter and cannot feed
 opaque media or unreviewed values back into canonical state.
 
-This resolves policy, not current-output clearance. Phase 1 must still map
-every output-affecting table, profile, constant, rule, asset and boilerplate
-element, define the dependency-manifest schema, dispose every
-restricted/reference-only/unknown source, and agree the first S1 package's
-evidence, licence and commercial/publication use. Until that work closes,
-current B14/B15 output is `unknown` for project-control clearance and is not
-retroactively labelled unrestricted by this documentation change.
+The red-team follow-up converts that policy into executable controls. The
+positive internal status is now `project-cleared`, explicitly not a legal
+opinion. A Draft 2020-12 JSON Schema and standard-library validator fail closed
+when any output-affecting dependency is unresolved, `NOASSERTION`, lacks the
+declared adaptation, production, redistribution, commercial-use or publication
+permission, lacks authority evidence, or has an incomplete registered-design,
+unregistered-design, patent or trade-mark review.
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) adds prospective DCO 1.1
+sign-off and a separate data/evidence declaration.
+
+The first S1 manifest is intentionally useful before it is clear: it records
+the unselected primary evidence as `unknown`, Templot5 as non-output-affecting
+`reference-only`, and every unperformed non-copyright review. It validates as
+a truthful control record but fails the strict `--require-project-cleared`
+gate. No package or output can receive the positive status without that strict
+validation.
+
+The remaining lineage work is split into first-S1, core rail/timber used by
+S1, other S&C output, and legacy B14/B15 registers. Phase 1 must fully classify
+the first two or keep S1 blocked; it must bound the latter two with current
+statuses, owners and later gates rather than requiring an unbounded historical
+audit before independently evidenced S1 work can progress. Current B14/B15
+output remains `unknown` for project control and is not retroactively labelled
+unrestricted by this documentation change.
 
 ## Release-critical workflow coverage inventory
 
@@ -439,7 +479,7 @@ is known to be defective.
 | Curve/easement creation and editing | B15 reference; B14 oracle; direct transition/station characterisation; fixed create-result, edit-lifecycle, selected-export and create-time-export oracles | B14 default-base builder plus the four `run-b14-ordinary-*` characterisation wrappers | Fixed left/right replacement, undo/redo, exact change-back, persistence, negative paths and both export entry points for retained/fresh exact shapes are characterised; wider curve boundaries and future deferred Validate/reconstruction remain open; remaining curve functions lack direct oracles |
 | Straight/stationing workflow | B15/B14 source plus direct calculation parity and the connected-pair lifecycle oracle | `run-b14-straight-station` creates and edits a deterministic entrance/exit pair from the fixed two-track curve | Connected route inputs, identities, inherited track order, travel-order stationing, joins/tangents, length editing, complete history recovery, raw persistence, exact document shapes and ordered production catalogue are characterised; the independent-datum GUI, physical station/platform, straight file export, straight-specific failures and wider configurations remain open |
 | Multiple-track/spacing transition | Default B14 two-track base fixture plus deep create/edit/export document oracles | `build-b14-base` plus the four `run-b14-ordinary-*` characterisation wrappers | The fixed two-track configuration survives handedness replacement/reopen, selected export and create-time export; deferred Validate/reconstruction plus spacing/easement edit and invalid-input edge cases remain open |
-| Standalone turnout | B15/B14 source and inherited parity checks | None dedicated | Creation/editing, handedness/orientation, straight/curved host, rollback and performance recipes |
+| Standalone turnout | B15/B14 calculation parity plus B14's complete fixed-lifecycle semantic oracle | `run-b14-turnout` creates `TO-001` on persisted Main Track identity at chainage `746.298 mm`, edits its hand and exercises recovery | Curved-host left/facing creation, one handed edit, exact history/persistence, overlap rejection and injected transaction abort are characterised; trailing GUI orientation, straight/other hosts, wider inputs, removal/integration, downstream timber/chair stages and export remain open |
 | Crossover geometry | B14 cold series and B15 acceptance report | Controlled `XO-001` bridge recipe | Preview/commit feasibility mismatch and curved-host coverage |
 | Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and plain-line timber decisions; focused failure/invalidation cases |
 | Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/plain-line coverage, input-class invalidation, late timing payload and redundant refresh defects |
@@ -448,7 +488,7 @@ is known to be defective.
 | Assisted chair assimilation | Accepted RC scope; no implementation oracle yet | One S1 pilot to be selected | Precise prototype designation, evidence provenance/rights, intended commercial/publication use, calibrated scan/CAD/measurement set, component landmarks, fit-residual policy, package licence and acceptance recipe |
 | Host integration | Controlled crossover acceptance | `XO-001` stage 6 | Standalone turnout, removal/reversal, rollback and legacy-document variants |
 | Save/reopen | B15 crossover acceptance and B14 plain-line edit-lifecycle oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Broader entity families and future schema migration |
-| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback, future deferred exact-shape reconstruction, output-affecting lineage map and dependency/clearance manifest |
+| SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback, future deferred exact-shape reconstruction, scoped output-affecting lineage maps and integration of the dependency/project-status manifest |
 | Failure recovery | Transactional source paths, strict bridge dialog policy, plain-line edit lifecycle and both export fault injections | Edit oracle proves zero-angle rejection/post-removal abort and bounds B14's three-entry incomplete Undo states; selected export proves byte restoration; create-time export freezes the current 13-file partial result and unchanged document | Make successor edit commands and create-time output atomic under accepted contracts; add equivalent fixtures for other release-critical workflows |
 
 Existing crossover evidence remains owned by
@@ -467,6 +507,9 @@ The normal Generate-path production-export evidence is recorded in
 The connected-straight creation, stationing, edit, history, persistence and
 production-catalogue evidence is recorded in
 [benchmarks/2026-07-20-b14-straight-station-workflow-series.md](benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
+The standalone-turnout creation, handed edit, history, persistence, overlap-
+rejection and transaction-abort evidence is recorded in
+[benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md](benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
 
 ## Fixed plain-line document contract
 
@@ -688,15 +731,51 @@ station/platform, straight target-file export, formation/section options and
 straight-specific negative paths remain open. Full evidence and timings are in
 [benchmarks/2026-07-20-b14-straight-station-workflow-series.md](benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
 
+## Standalone turnout lifecycle contract
+
+The isolated `run-b14-turnout` recipe drives B14's real turnout manager on a
+copy of the fixed two-track curve. It resolves `SET-001` Main Track from its
+persisted identity, places `TO-001` at host chainage `746.298 mm`, and creates
+a left-hand REA C10 facing in host travel direction. Three fresh FreeCAD 1.1.1
+processes produced created semantic SHA-256
+`0738c5a639618739c69fcd06553ea0584c5bf8c51253c330e3374f39e437c1cb`
+and, after changing only the hand to right, semantic SHA-256
+`46225072b4b56f7f767570c8b438ee0942c239f73f121ce420aa76caed9779f0`.
+
+The document grows from 9 to 17 objects. Eight stable turnout roles share the
+same typed `TO-001` configuration, retain their names across the handed edit,
+and add six ordered production records after the four inherited curve records.
+The exact curve Template, Centrelines and ProductionSource geometry remains
+unchanged. Both the single-entry creation and edit transactions recover their
+complete before/after states through Undo/Redo, and save/reopen preserves the
+right-hand hash with cleared history.
+
+The recipe also proves that a second turnout at the occupied chainage is
+rejected before document/history mutation and that an injected first-mutation
+failure inside an edit restores the exact accepted state through
+`abortTransaction()`. The fast oracle freezes representative REA C10 values,
+valid toe/occupied intervals, handing/orientation mappings and exact B14/B15
+calculation parity. The captured values and shapes remain a B14 legacy
+comparison oracle, not project-cleared canonical production data.
+
+The three-run median creation wall time is `1743.967 ms` and handed-edit wall
+time is `1977.051 ms`, with median end-minus-start RSS changes of `+54.738 MB`
+and `+43.438 MB`, respectively. These are bounded legacy observations, not
+accepted human-use budgets. Trailing orientation through the GUI, straight or
+alternate hosts, wider gauge/flangeway/output choices, removal/integration,
+standalone timber/chair stages, target-file export and deferred reconstruction
+remain open. Full evidence and limitations are in
+[benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md](benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
+
 ## Boundary-data inventory still required
 
-The fixed plain-line and connected-straight oracles now record the first
-concrete subsets: length/angle units, global document and travel-order station
-frames, template-set/track/route/record identities, exact join tolerances,
-object and production-record ordering, persisted property/raw JSON schemas and
-volatile-field normalisation. Before selecting the slice, Phase 1 must still
-record the exact contract for every candidate rather than infer it from
-variable names:
+The fixed plain-line, connected-straight and standalone-turnout oracles now
+record the first concrete subsets: length/angle units, global document,
+travel-order station and host-chainage frames, template-set/track/route/
+turnout/record identities, exact join tolerances, object and production-record
+ordering, persisted property/raw JSON schemas and volatile-field
+normalisation. Before selecting the slice, Phase 1 must still record the exact
+contract for every candidate rather than infer it from variable names:
 
 - model and output units, including every degrees/radians and model/real-scale
   conversion;
@@ -729,9 +808,12 @@ roughly 1.2-second-per-state deep-oracle cost. The selected-export series adds a
 that into repeated probe preflights versus the staged transaction. The
 create-time series adds a `6907.971 ms` median fixed Generate-through-export
 boundary, including fresh legacy exact-shape construction, one complete
-preflight and non-staged export. None measures a proposed lightweight editor
-or deferred Validate/rebuild, so Phase 1 still lacks a reconciled
-curve-to-export target-architecture profile.
+preflight and non-staged export. The standalone-turnout series adds a
+`1743.967 ms` median fixed left/facing creation boundary and a `1977.051 ms`
+median handed-edit boundary, plus exact rejection/abort/history/persistence
+evidence. None measures a proposed lightweight editor or deferred
+Validate/rebuild, so Phase 1 still lacks a reconciled curve-to-export target-
+architecture profile.
 Before profiles select an optimisation, the defects already recorded in
 [VALIDATION.md](VALIDATION.md) must be closed or bounded:
 
@@ -766,7 +848,9 @@ create-time series covers fresh legacy exact-shape construction only.
 | 2026-07-20 | Use a source-informed procedural constituent pattern through a neutral project definition | Accepted; full-size definitions and named parts are canonical, Templot source/media is not canonical data, and FreeCAD B-reps may replace DXF `3DFACE` mechanics only under geometric oracle evidence; B15's five-box body remains legacy gap evidence |
 | 2026-07-20 | Add reusable chair-definition packages and one assisted S1 assimilation pilot to RC scope | Accepted; scans/CAD/drawings/measurements fit the same definition used by native chairs, source evidence is not runtime truth, and arbitrary fully automatic conversion remains post-RC research |
 | 2026-07-20 | Adopt explicit source/data/output licensing boundaries | Accepted; GPL source compliance is separated from engineering facts, Templot reference data/media and generated-output dependencies; neutral chair data and a one-way optional Templot adapter are required, CC0-1.0 is only a reviewed per-package target, and ordinary output receives no project NC restriction merely by generation |
+| 2026-07-20 | Make the licensing boundary executable and scope the lineage audit | Implemented for owner review within the already accepted direction; rename the internal positive status to `project-cleared`, require a validated manifest before that status, record non-copyright reviews, add prospective DCO/data declarations, and split the audit into first-S1, core rail/timber, other S&C and legacy scopes so unresolved legacy breadth stays blocked without preventing independently evidenced S1 work |
 | 2026-07-20 | Use B14's controlled connected pair as the first straight/station workflow oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes route/station direction, stable identities, exact inherited joins, length editing, full history recovery, raw persistence and production catalogue without changing either macro; independent-datum GUI, physical station/platform and target-file export remain separate gaps |
+| 2026-07-20 | Add a dedicated centreline-anchored standalone-turnout lifecycle oracle | Accepted for Phase 1 evidence; the copied-document recipe freezes one left/facing REA C10 creation, handed edit, exact history/persistence, stable objects, ordered production records, occupied-chainage rejection and in-transaction abort without changing either macro; trailing/straight/alternate hosts, integration, downstream stages and export remain separate gaps |
 
 ## Remaining Phase 1 work
 
@@ -777,14 +861,16 @@ create-time series covers fresh legacy exact-shape construction only.
   the independent-datum GUI, physical station/platform, target-file export and
   straight-specific negative paths; cover
   cancellation and other export scopes, converge create-time output failure on
-  an accepted atomic/UI contract, and create a dedicated standalone-turnout
-  fixture.
+  an accepted atomic/UI contract, and extend the standalone-turnout fixture to
+  trailing/straight/alternate-host inputs, removal/integration, downstream
+  timber/chair stages and target-file export.
 - Record candidate boundary schemas, units, frames, tolerances, identities,
   ordering, signatures and invalidation inputs.
-- Complete the output-affecting lineage audit for constants, tables, profiles,
-  rules, embedded assets and boilerplate; classify Templot-only and third-party
-  dependencies, and define the machine-readable package/output
-  dependency-clearance manifest.
+- Complete the first-S1 and core rail/timber lineage registers or leave the S1
+  pilot blocked; create bounded other-S&C and legacy B14/B15 registers with
+  current statuses, owners and later gates. The machine-readable manifest,
+  validator, non-copyright fields and contribution declaration now exist; wire
+  their fail-closed `project-cleared` gate into the later package/export path.
 - Complete the Templot chair-generation data-flow/value/transform map; produce
   or define the reproducible recipe for a frozen S1 constituent/assembly oracle
   and record any unavailable evidence without substituting the B15 box body.

@@ -13,7 +13,7 @@
 - `reference/MODULARISATION_PLAN.md` defines source boundaries, dependency direction and extraction gates. Read it before moving code or creating modules.
 - `reference/LICENSING_BOUNDARIES.md` defines source/data classifications,
   canonical admission, chair collaboration, package licensing, optional
-  Templot compatibility and generated-output clearance. Read it before adding
+  Templot compatibility and generated-output project status. Read it before adding
   or changing output-affecting constants, tables, profiles, chair evidence,
   definition packages, fixtures, exporters or embedded media.
 - The authoritative state is the parametric railway model: configuration, stable identities, topology, analytical results and production intent.
@@ -117,6 +117,16 @@
   23-object and 12-record production contracts, full undo/redo recovery,
   unchanged curve geometry and save/reopen hashes. It does not cover a
   physical station/platform or the independent-datum GUI path.
+- `tools/freecad_bridge/turnout_recipe.py`,
+  `tools/freecad_bridge/run-b14-turnout` and
+  `tests/validate_phase1_turnout.py` own the bounded B14 standalone-turnout
+  lifecycle oracle. Preserve its persisted Main Track plus chainage placement,
+  frozen left/right semantic hashes, stable eight-role/17-object and ordered
+  10-record contracts, single-entry create/edit history, unchanged plain-line
+  host geometry, overlap rejection, transaction-abort recovery and
+  save/reopen result. It is a legacy comparison oracle rather than canonical
+  turnout data, and does not cover trailing/straight/alternate hosts,
+  downstream timber/chair stages or export.
 - `reference/PHASE1_INVENTORY.md` owns the in-progress workflow, dependency,
   side-effect, candidate-slice and decision inventory. Update it as Phase 1
   evidence closes; its provisional static labels are not final module
@@ -125,14 +135,21 @@
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
-- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/PROVENANCE.md` and `reference/LICENSING_BOUNDARIES.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, licence/provenance/output status or version role changes.
+- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `reference/PROVENANCE.md` owns source and external chair-evidence provenance.
 - `reference/LICENSING_BOUNDARIES.md` owns the operational distinction between
   engineering methods/facts, project measurements/derivations, Templot source
   expression/reference data/media, third-party evidence, user designs and
-  generated output. It also owns the `rights-cleared`, `restricted`,
+  generated output. It also owns the `project-cleared`, `restricted`,
   `reference-only` and `unknown` project-control statuses.
+- `reference/schemas/dependency-manifest-v1.schema.json` is the portable
+  package/output dependency-manifest contract;
+  `tools/validate_dependency_manifest.py` owns its fail-closed semantic gate,
+  and `tests/validate_licensing_controls.py` protects both. The tracked S1
+  pilot record is `reference/manifests/s1-chair-pilot.dependency-manifest.json`.
+- `CONTRIBUTING.md` owns the prospective DCO sign-off and the separate data and
+  evidence declaration. Never invent a retrospective contributor attestation.
 - `LICENSE` and `NOTICE.md` apply GPL-3.0-or-later to the project, preserve the Templot5 source-basis attribution, and record particular thanks to Martin Wynne and Steve Cornford. Preserve both files and all applicable upstream notices.
 - `main.py` is PyCharm starter boilerplate, not the product entry point.
 - Each macro launches through its final `run_macro()` call. Tests that load definitions deliberately remove only that final launch call.
@@ -160,10 +177,12 @@
   `ChairDefinition`. Any future Templot-format support is an optional one-way
   outward adapter and must not feed Templot media, opaque geometry or
   unreviewed values back into canonical state.
-- Do not mark a package or output `rights-cleared` while an output-affecting
+- Do not mark a package or output `project-cleared` while an output-affecting
   dependency is `restricted`, `reference-only`, `unknown`, `NOASSERTION`, or
-  incompatible with the declared intended use. Current B14/B15 output remains
-  uncleared for that status until the Phase 1 lineage audit closes.
+  incompatible with the declared intended use. A machine-readable manifest
+  must also pass `tools/validate_dependency_manifest.py --require-project-cleared`.
+  Current B14/B15 output remains uncleared for that status until its scoped
+  Phase 1 lineage audit closes.
 - CC0-1.0 is the target for a project-authored factual chair-definition package
   intended for unrestricted reuse only when that package is explicitly marked
   after a complete rights review. Never apply CC0 by assumption to Templot,
@@ -263,6 +282,13 @@ tools/freecad_bridge/run-b14-straight-station \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
 ```
 
+Run the Phase 1 standalone-turnout lifecycle oracle on a copied fixture:
+
+```bash
+tools/freecad_bridge/run-b14-turnout \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
 Run the controlled B14 crossover recipe in a fresh isolated FreeCAD process:
 
 ```bash
@@ -294,6 +320,19 @@ Run the deterministic Phase 1 macro-inventory contract checks:
 .venv/bin/python tests/validate_phase1_inventory.py
 ```
 
+Run the licensing-control tests and validate the current S1 pilot record:
+
+```bash
+.venv/bin/python tests/validate_licensing_controls.py
+.venv/bin/python tools/validate_dependency_manifest.py \
+  reference/manifests/s1-chair-pilot.dependency-manifest.json
+```
+
+The current S1 pilot is deliberately `unknown`. Do not use
+`--require-project-cleared` as an ordinary passing check until its evidence,
+permissions, licence, contributor attestation and non-copyright reviews close;
+that strict mode is the release gate.
+
 Run the direct Phase 1 transition/station characterisation:
 
 ```bash
@@ -324,11 +363,17 @@ Run the fast Phase 1 straight/station analytical and bridge-contract checks:
 .venv/bin/python tests/validate_phase1_straight_station.py
 ```
 
+Run the fast Phase 1 standalone-turnout analytical and bridge-contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_turnout.py
+```
+
 - These commands were verified with FreeCAD 1.1.1 in the current environment.
 - A successful FreeCAD smoke run must print `B15 FreeCAD 1.1 headless smoke test passed`; an exit code without that sentinel is not evidence that FreeCAD executed the assertions.
 - `tests/validate_b15.py` treats B14 as the immutable legacy oracle. If B14 is deliberately changed with explicit approval, do not automatically alter B15 or the comparison test merely to restore a pass; first determine the intended version scope and preserve the accepted checkpoint.
 - Headless checks do not replace a real GUI workflow run. For geometry, document integration, display, export, or performance changes, run the exact target macro in FreeCAD and exercise the affected guided stages.
-- Bridge runs must use the repository-local isolated profile and a copied/disposable document. Never attach the controller to an everyday FreeCAD session or an irreplaceable document, never approve an unexpected dialog, and confirm the exact bridge instance stopped after a snapshot, edit, straight/station, selected/create-time export, cold, warm or acceptance run. Resolve recipe hosts by persisted centreline identity and place special trackwork by centreline chainage or a point projected to that centreline, not by UI ordering or an unanchored XYZ datum.
+- Bridge runs must use the repository-local isolated profile and a copied/disposable document. Never attach the controller to an everyday FreeCAD session or an irreplaceable document, never approve an unexpected dialog, and confirm the exact bridge instance stopped after a snapshot, edit, straight/station, standalone-turnout, selected/create-time export, cold, warm or acceptance run. Resolve recipe hosts by persisted centreline identity and place special trackwork by centreline chainage or a point projected to that centreline, not by UI ordering or an unanchored XYZ datum.
 - Treat `benchmark-output/freecad-bridge/` as ignored raw evidence. Commit only sanitised reports with the exact recipe, hashes, cache/process state, validation outcome, limitations, and raw-artifact provenance.
 
 ## Completion and review
@@ -339,7 +384,8 @@ Run the fast Phase 1 straight/station analytical and bridge-contract checks:
 - For source-data, chair-package, fixture, export or media changes, state the
   provenance classifications affected, package/output licence impact, and any
   remaining restricted/reference-only/unknown dependency. Do not claim
-  unrestricted output merely because the software is GPL-licensed.
+  `project-cleared` or unrestricted output merely because the software is
+  GPL-licensed; cite the successful strict manifest validation when applicable.
 - For performance changes, include the before/after reports and identify any measurement noise or cache-state difference.
 - Keep `.idea/`, `.venv/`, `__pycache__/`, generated FreeCAD documents, exported production files, and temporary benchmark artifacts out of commits.
 - Do not commit or push unless the user asks.

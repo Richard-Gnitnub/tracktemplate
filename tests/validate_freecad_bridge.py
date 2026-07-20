@@ -265,6 +265,7 @@ def validate():
     warm_wrapper = bridge_root / "run-b14-warm"
     acceptance_wrapper = bridge_root / "run-b15-acceptance"
     straight_station_wrapper = bridge_root / "run-b14-straight-station"
+    turnout_wrapper = bridge_root / "run-b14-turnout"
     warm_host = bridge_root / "run_b14_warm_reuse.py"
     warm_probe = bridge_root / "probes" / "b14_warm_reuse_driver.py"
     acceptance_host = bridge_root / "run_b15_acceptance.py"
@@ -273,6 +274,8 @@ def validate():
     straight_station_probe = (
         bridge_root / "probes" / "b14_straight_station_driver.py"
     )
+    turnout_host = bridge_root / "run_b14_turnout.py"
+    turnout_probe = bridge_root / "probes" / "b14_turnout_driver.py"
     for executable in (
         bridge_root / "setup-freecad-cli",
         bridge_root / "build-b14-base",
@@ -280,6 +283,7 @@ def validate():
         warm_wrapper,
         acceptance_wrapper,
         straight_station_wrapper,
+        turnout_wrapper,
     ):
         assert executable.is_file(), executable
         assert executable.stat().st_mode & 0o111, executable
@@ -366,6 +370,18 @@ def validate():
     assert "add_connected_pair_button.click()" in straight_station_probe_text
     assert "straight_station_document_snapshot" in straight_station_probe_text
     assert "curve_geometry_preserved" in straight_station_probe_text
+
+    turnout_wrapper_text = turnout_wrapper.read_text(encoding="utf-8")
+    turnout_host_text = turnout_host.read_text(encoding="utf-8")
+    turnout_probe_text = turnout_probe.read_text(encoding="utf-8")
+    assert "run-isolated" in turnout_wrapper_text
+    assert "shutil.copy2(base_path, document_path)" in turnout_host_text
+    assert "source_fixture_sha256_after" in turnout_host_text
+    assert "phase1-b14-standalone-turnout-lifecycle-v1" in turnout_host_text
+    assert "manager.create_turnout" in turnout_probe_text
+    assert "manager.apply_turnout_edit" in turnout_probe_text
+    assert "reject_overlapping_turnout" in turnout_probe_text
+    assert "abort_injected_turnout_edit" in turnout_probe_text
 
     print("FreeCAD bridge recipe validation passed")
 

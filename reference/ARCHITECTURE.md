@@ -214,7 +214,7 @@ data”. If Templot compatibility is later implemented, it is an optional outwar
 adapter:
 
 ```text
-rights-cleared evidence
+project-cleared evidence
           |
           v
 neutral ChairDefinition ----> TrackTemplate exact/export adapters
@@ -230,7 +230,7 @@ rights review. Templot comparison artifacts remain local reference evidence
 unless their exact licence permits redistribution.
 
 An outward conversion does not change the recorded origin or ownership of the
-neutral data. If the same rights-cleared package is contributed to Templot, a
+neutral data. If the same project-cleared package is contributed to Templot, a
 notice later added by Templot to Templot-generated media does not automatically
 become a notice on separate TrackTemplateMacro output generated directly from
 the original package.
@@ -240,9 +240,11 @@ and protected material embedded in the output. The project does not assert
 control over ordinary output merely because its GPL program generated it, and
 it cannot grant rights held by others. Production manifests must expose package
 identities, licences, restricted/reference-only/unknown dependencies, and the
-project-control clearance status defined in
+project status defined in
 [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). Current B14/B15 output is
-not retroactively rights-cleared by adopting this architecture.
+not retroactively project-cleared by adopting this architecture. No package or
+output can receive `project-cleared` status until its machine-readable
+dependency manifest passes the repository's fail-closed validator.
 
 ## Operating modes
 
@@ -286,8 +288,8 @@ not retroactively rights-cleared by adopting this architecture.
   comparison as their claimed primary source, and systematically copied
   upstream tables cannot be relabelled as isolated facts.
 - Templot reference data/media and unresolved third-party evidence cannot enter
-  a rights-cleared production definition.
-- A package or output cannot be labelled `rights-cleared` while an
+  a project-cleared production definition.
+- A package or output cannot be labelled `project-cleared` while an
   output-affecting dependency is `restricted`, `reference-only`, `unknown`, or
   `NOASSERTION` for the intended use.
 - Cache reuse must be invalidated by every input that can affect its result.

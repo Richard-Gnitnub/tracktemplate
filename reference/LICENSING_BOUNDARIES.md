@@ -1,13 +1,19 @@
 # Licensing, Data Provenance, and Output Boundaries
 
-Status: **Accepted project-control policy — 2026-07-20. Phase 1 lineage
-audit remains open.**
+Status: **Base policy accepted by the project owner on 2026-07-20. The
+red-team executable-control amendments are implemented for owner review, and
+the scoped Phase 1 lineage audit remains open.**
 
 This document defines how TrackTemplateMacro distinguishes software source,
 engineering knowledge, factual data, external evidence, Templot-specific
 material, canonical chair definitions, and generated output. It is a
 repository policy, not legal advice or a ruling on ownership, copyright,
 database right, design right, patent, contract, or derivative-work status.
+
+The acceptance status records the project owner's explicit approval of the
+policy direction and requested implementation on 2026-07-20. It is not an
+approval asserted by the authoring tool and does not turn this internal review
+into professional legal clearance.
 
 The policy is deliberately prospective. It does not retroactively certify all
 current B14/B15 output for unrestricted publication or commercial use. That
@@ -19,12 +25,18 @@ status requires the Phase 1 lineage audit defined below.
   actually found, including the exact Templot5 snapshot and historical output
   notices.
 - This document owns the operational classification, separation, collaboration,
-  package-licensing, and output-clearance rules.
+  package-licensing, and output project-status rules.
 - [ARCHITECTURE.md](ARCHITECTURE.md) owns the neutral canonical data model and
   adapter direction.
 - [PROJECT_PLAN.md](PROJECT_PLAN.md) owns the audit timing and release gates.
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md) owns the prospective DCO sign-off and
+  project data/evidence declaration.
 - [`NOTICE.md`](../NOTICE.md) states the project licence and the clarification
   applicable to ordinary generated output.
+- [`schemas/dependency-manifest-v1.schema.json`](schemas/dependency-manifest-v1.schema.json)
+  is the portable manifest structure;
+  [`tools/validate_dependency_manifest.py`](../tools/validate_dependency_manifest.py)
+  applies the fail-closed project-status rules.
 
 ## Evidence boundary already established
 
@@ -57,6 +69,18 @@ be produced through different code. That does not authorise copying expressive
 source or a protected database. See the
 [UK knowledge-assets guidance](https://www.gov.uk/government/publications/knowledge-asset-management-in-government/knowledge-assets-classes-and-types-annex-a).
 
+Copyright and data licensing do not exhaust the relevant rights. UK guidance
+recognises separate registered and automatic unregistered protection for a
+product's appearance, shape and configuration. Patent rights concern technical
+inventions, while trade marks concern branding. CC0 itself does not waive
+patent or trade-mark rights or clear rights held by other people. The manifest
+therefore records these reviews independently. See the UK guidance on
+[unregistered designs](https://www.gov.uk/unregistered-designs), the official
+[registered-design search](https://www.gov.uk/search-registered-design),
+[patent search](https://www.gov.uk/search-for-patent), and
+[trade-mark search](https://www.gov.uk/search-for-trademark), plus the
+[CC0 1.0 legal code](https://creativecommons.org/publicdomain/zero/1.0/legalcode.en).
+
 ## Mandatory provenance classifications
 
 Every value collection, geometry definition, fixture, comparison source, or
@@ -68,7 +92,7 @@ field- or component-level where package-level labelling would hide that fact.
 | --- | --- | --- |
 | `engineering_method` | Established mathematics, geometric relationship, railway method, functionality, or algorithmic idea | May be implemented in original project expression with an engineering citation; do not call it Templot data merely because Templot uses it |
 | `engineering_fact` | An independently evidenced prototype dimension, gauge, angle, relationship, or other individual fact | May enter canonical data with its primary source and units recorded |
-| `project_measurement` | A calibrated measurement made by or for this project from a physical object or rights-cleared evidence | May enter canonical data with method, calibration, uncertainty, operator, and evidence hash |
+| `project_measurement` | A calibrated measurement made by or for this project from a physical object or project-cleared evidence | May enter canonical data with method, calibration, uncertainty, operator, and evidence hash |
 | `project_derivation` | A value or procedural parameter fitted or calculated by project tooling from recorded inputs | May enter canonical data with its complete derivation and input identities |
 | `user_design` | Alignment, topology, parameter, layout, or other creative/engineering choice supplied by the user | May enter canonical state; retained third-party dependencies must still be recorded |
 | `templot_source_expression` | Templot code, comments, close translation, expressive structure, or other GPL-covered source material | May inform or be adapted into GPL-compatible project source with notices and attribution; it is not canonical chair data merely because it computes geometry |
@@ -98,7 +122,7 @@ and accepted. In particular:
    must identify their primary evidence rather than cite a Templot comparison
    as their origin.
 2. `templot_reference_data`, `templot_media_output`, and unresolved
-   `third_party_evidence` do not enter a rights-cleared production definition.
+   `third_party_evidence` do not enter a project-cleared production definition.
 3. A comparison against Templot may record hashes, settings, numeric summaries,
    residuals, and pass/fail findings. The upstream media or dataset remains
    local and untracked unless redistribution is expressly accepted.
@@ -128,32 +152,42 @@ level where applicable:
   unresolved, or used only for comparison;
 - uncertainty, tolerances, assumptions, and complete derivation inputs;
 - licence expression or `NOASSERTION`, permitted use, output use, adaptation,
-  and redistribution status;
-- reviewer, validation evidence, residual result, and explicit acceptance.
+  redistribution, commercial-use and publication status;
+- reviewer, validation evidence, residual result, and explicit acceptance;
+- registered-design, unregistered-design, patent and trade-mark review status,
+  territory, date, reviewer, evidence and unresolved findings; and
+- the contributor/DCO or external-authority record that permits the project to
+  accept the material under its stated package terms.
 
 Project-authored factual chair-definition packages intended for unrestricted
 reuse should use **CC0-1.0** as the default target where the project controls
 all rights necessary to make that dedication. CC0 is applied only when the
 individual package explicitly says so after review. It must never be applied
 to Templot-derived, third-party, unknown, or mixed-rights material by
-assumption. Raw scans, CAD files, drawings, and photographs retain their own
-separately recorded terms and need not be distributed with a definition.
+assumption. CC0 does not replace the separate design, patent and trade-mark
+review, and it cannot grant rights held by somebody else. Raw scans, CAD
+files, drawings, and photographs retain their own separately recorded terms
+and need not be distributed with a definition.
 
 Code contributed to TrackTemplateMacro remains GPL-3.0-or-later unless a file
-states an accepted compatible alternative. A data contributor must confirm
-that they have authority to contribute the material under the package's stated
-terms. An attribution condition is not automatically disqualifying when the
-production path records and satisfies it and the licence otherwise permits the
-declared commercial/publication use. A package containing `NC`, `NOASSERTION`,
-reference-only, unresolved, or otherwise incompatible dependencies cannot
-qualify that rights-cleared release-candidate path.
+states an accepted compatible alternative. Prospective contributions require
+the unmodified DCO 1.1 sign-off and the separate data/evidence declaration in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md). A data contributor must confirm that
+they created, lawfully measured, or have authority to contribute the material
+under the package's stated terms, and must disclose rather than conceal an
+upstream table, CAD model, drawing or other third-party source. An attribution
+condition is not automatically disqualifying when the production path records
+and satisfies it and the licence otherwise permits the declared commercial/
+publication use. A package containing `NC`, `NOASSERTION`, reference-only,
+unresolved, or otherwise incompatible dependencies cannot qualify for the
+project-cleared release-candidate path.
 
 ## Templot compatibility adapter
 
 Templot compatibility, if implemented, is an optional outward adapter:
 
 ```text
-rights-cleared evidence
+project-cleared evidence
           |
           v
 neutral ChairDefinition ----> TrackTemplate exact/export adapters
@@ -190,27 +224,72 @@ rights. Rights and conditions follow the user's inputs, definition packages,
 embedded assets, output boilerplate, and other protected material actually
 present. The project cannot grant rights it does not hold.
 
-Production manifests must eventually identify:
+No package or output may receive `project-cleared` status until its machine-
+readable dependency manifest has been generated and passes the repository
+validator with `--require-project-cleared`. This is an immediate fail-closed
+project gate, not a future documentation aspiration. The existing B14/B15 CSV
+production manifest is a legacy artifact inventory and does not by itself
+satisfy this dependency/project-status gate.
+
+Dependency manifests must identify:
 
 - generating program/version and canonical-model signature;
 - every chair-definition/package identifier, version, classification, and
   licence expression;
 - external or restricted material deliberately embedded in the output;
 - unresolved or reference-only dependencies; and
-- the resulting project-control clearance status.
+- the resulting project-control status.
 
-The permitted clearance statuses are:
+For every output-affecting dependency, `project-cleared` requires permitted
+access and production-output use, plus permitted or reasoned-not-applicable
+adaptation. The declared-use list additionally requires explicit permitted
+redistribution, commercial use and publication results when those uses are
+claimed; one permission cannot stand in for another.
+
+The permitted project statuses are:
 
 | Status | Project meaning |
 | --- | --- |
-| `rights-cleared` | Every known output-affecting dependency has accepted terms compatible with the declared intended use, and every required condition such as attribution is recorded and satisfied; this is still not legal advice or a non-infringement warranty |
+| `project-cleared` | All known dependencies have passed the project's documented provenance, licence, declared-use and non-copyright-rights checks for the stated use, with required conditions recorded; this is an internal release gate, not legal advice or a guarantee that no third-party rights exist |
 | `restricted` | A recorded licence or right prevents the declared intended use or imposes a relevant condition that the production/publication path has not satisfied |
 | `reference-only` | Material may be used to compare or validate locally but not as a production/publication dependency |
 | `unknown` | Ownership, source, licence, output effect, or redistribution status is unresolved |
 
-No current B14/B15 output receives `rights-cleared` merely because this policy
+No current B14/B15 output receives `project-cleared` merely because this policy
 was adopted. Until the Phase 1 audit closes, its project-control status is
 `unknown` unless a narrower output has its own completed record.
+
+The normative schema is
+[`schemas/dependency-manifest-v1.schema.json`](schemas/dependency-manifest-v1.schema.json).
+The standard-library validator is run with:
+
+```bash
+.venv/bin/python tools/validate_dependency_manifest.py \
+  --require-project-cleared path/to/dependency-manifest.json
+```
+
+A structurally valid manifest may remain `unknown`, `restricted` or
+`reference-only`; omitting `--require-project-cleared` validates the record
+without promoting its status. The current deliberately blocked S1 control
+record is
+[`manifests/s1-chair-pilot.dependency-manifest.json`](manifests/s1-chair-pilot.dependency-manifest.json).
+
+## Non-copyright-rights review
+
+Every dependency and the package/output as a whole record four separate review
+areas: `registered_designs`, `unregistered_designs`, `patents`, and
+`trade_marks`. Each entry records status, territories, review date, reviewer,
+evidence and notes. Permitted status vocabulary includes `not-performed`,
+`not-applicable`, `no-known-conflict`, `permission-confirmed`,
+`expired-or-lapsed-confirmed`, `potential-conflict`, `unresolved`, and
+`professional-review-required`.
+
+`project-cleared` requires a positive or reasoned-not-applicable status with
+recorded evidence in all four areas. `No-known-conflict` means only that the
+documented project search or assessment found no known conflict in its stated
+scope; it is not a non-infringement opinion. A potential conflict or a question
+outside the project's competence is recorded and escalated rather than
+silently treated as absent.
 
 ## Publication and physical-production target
 
@@ -219,12 +298,12 @@ print, photograph, publish, exhibit, or use a TrackTemplateMacro-generated
 turnout or chair commercially without seeking separate permission from Martin
 Wynne merely because this project was informed by Templot. That target is met
 only when the actual canonical inputs and embedded output materials qualify as
-`rights-cleared` for the declared use.
+`project-cleared` for the declared use.
 
 The target does not cover direct reproduction of a Templot PDF, screenshot,
 drawing, mesh, data file, logo, or other Templot media output. Such material
 retains its own recorded or unresolved status. A photograph or render of a
-functional article generated solely from a rights-cleared project path is a
+functional article generated solely from a project-cleared path is a
 different case from reproducing the upstream drawing used as a comparison
 oracle.
 
@@ -234,10 +313,29 @@ analysis; the project does not rely on that provision as a blanket clearance.
 See [Copyright, Designs and Patents Act 1988, section
 51](https://www.legislation.gov.uk/ukpga/1988/48/section/51).
 
-## Phase 1 lineage audit
+## Scoped Phase 1 lineage audit
 
 Before the project describes ordinary production output as unrestricted or
-rights-cleared, Phase 1 must:
+project-cleared, the relevant audit scope must pass. Work is divided into four
+explicit registers so the first reusable chair can progress without pretending
+that the complete legacy macro has already been cleared:
+
+1. **First S1 chair release path:** the definition, components, primary
+   evidence, derivations, package licence, intended commercial/publication use,
+   comparison oracles and non-copyright-rights review.
+2. **Core rail and timber path used by S1:** rail-interface facts, timber and
+   support inputs, shared profiles, transformations and export boilerplate that
+   can affect an S1 package or its outputs.
+3. **Other turnout and crossover output:** remaining special-trackwork tables,
+   profiles, rules, assets and output paths, each blocked from
+   `project-cleared` until its own record passes.
+4. **Legacy B14/B15 output:** a bounded historical lineage register retaining
+   `unknown`, `restricted` or `reference-only` where evidence is unresolved;
+   this legacy audit need not be completed before an independently evidenced
+   S1 package can be accepted, but it must close before legacy output is
+   advertised as project-cleared.
+
+For each applicable scope the project must:
 
 1. inventory every table, profile, constant, rule, asset, and generated
    boilerplate that can materially affect SVG, DXF, STL, STEP, retained
@@ -249,11 +347,29 @@ rights-cleared, Phase 1 must:
    dependency restricted/reference-only/unknown;
 5. keep GPL source-expression compliance separate from data and output-rights
    analysis;
-6. define and test the machine-readable dependency/clearance manifest; and
+6. maintain and test the machine-readable dependency/project-status manifest;
+   and
 7. obtain explicit owner acceptance of the first S1 package's evidence,
-   licence, and intended commercial/publication use before implementation.
+   licence, intended commercial/publication use and non-copyright-rights record
+   before implementation.
+
+Phase 1 must fully classify the first two scopes or leave the S1 pilot visibly
+blocked. For the third and fourth scopes it must establish the bounded register,
+current status, named owner and later release gate; unresolved legacy breadth
+does not become an implicit assertion of clearance. The release and output
+validators remain fail-closed for every individual package or output.
 
 The audit may preserve Templot as a local numerical and geometric oracle. It
 does not require disguising the project's source-informed history or removing
 lawfully used GPL source. Its purpose is to ensure that validation evidence is
 not mistaken for the rights basis of canonical production data.
+
+## Acceptance record
+
+The project owner explicitly accepted this source/data/output boundary and
+asked for its implementation on 2026-07-20. The later red-team review prompted
+the `project-cleared` terminology, immediate manifest gate, non-copyright-
+rights fields, contributor declaration and scoped audit added here. Those
+amendments are implemented for owner review within the accepted direction;
+they do not claim professional legal review or retroactively alter the status
+of B14/B15 output.

@@ -1,0 +1,479 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tracktemplate:dependency-manifest:1",
+  "title": "TrackTemplateMacro dependency and project-status manifest",
+  "description": "Machine-readable provenance, intended-use and non-copyright-rights control for a package or generated output.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "manifest_kind",
+    "audit_scope",
+    "subject",
+    "intended_uses",
+    "dependencies",
+    "non_copyright_review",
+    "project_status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "manifest_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "manifest_kind": {
+      "enum": [
+        "package",
+        "output"
+      ]
+    },
+    "audit_scope": {
+      "enum": [
+        "s1-chair-release-path",
+        "core-rail-timber-path",
+        "other-switches-crossings-output",
+        "legacy-b14-b15-output"
+      ]
+    },
+    "subject": {
+      "$ref": "#/$defs/subject"
+    },
+    "intended_uses": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "private-development",
+          "public-redistribution",
+          "commercial-production",
+          "publication",
+          "physical-production"
+        ]
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/dependency"
+      }
+    },
+    "non_copyright_review": {
+      "$ref": "#/$defs/nonCopyrightReview"
+    },
+    "project_status": {
+      "$ref": "#/$defs/projectDecision"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "manifest_kind": {
+            "const": "package"
+          }
+        },
+        "required": [
+          "manifest_kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "subject": {
+            "required": [
+              "package_license"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "manifest_kind": {
+            "const": "output"
+          }
+        },
+        "required": [
+          "manifest_kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "subject": {
+            "required": [
+              "generator",
+              "canonical_model_sha256",
+              "artifacts"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identifier",
+        "version",
+        "description"
+      ],
+      "properties": {
+        "identifier": {
+          "$ref": "#/$defs/identifier"
+        },
+        "version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "package_license": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "generator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "program",
+            "version"
+          ],
+          "properties": {
+            "program": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "version": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "source_sha256": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        "canonical_model_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "format",
+              "sha256"
+            ],
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "format": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        }
+      }
+    },
+    "sourceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "creator_or_supplier",
+        "locator"
+      ],
+      "properties": {
+        "creator_or_supplier": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "locator": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "acquired_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "evidence_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "access",
+        "adaptation",
+        "production_output",
+        "redistribution",
+        "commercial_use",
+        "publication"
+      ],
+      "properties": {
+        "access": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "adaptation": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "production_output": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "redistribution": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "commercial_use": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "publication": {
+          "$ref": "#/$defs/permissionStatus"
+        }
+      }
+    },
+    "permissionStatus": {
+      "enum": [
+        "permitted",
+        "restricted",
+        "reference-only",
+        "unknown",
+        "not-applicable"
+      ]
+    },
+    "projectDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "reviewed_by",
+        "reviewed_on",
+        "decision_reference"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/projectStatus"
+        },
+        "reason": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "reviewed_by": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "reviewed_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "decision_reference": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "projectStatus": {
+      "enum": [
+        "project-cleared",
+        "restricted",
+        "reference-only",
+        "unknown"
+      ]
+    },
+    "nonCopyrightReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registered_designs",
+        "unregistered_designs",
+        "patents",
+        "trade_marks"
+      ],
+      "properties": {
+        "registered_designs": {
+          "$ref": "#/$defs/nonCopyrightFinding"
+        },
+        "unregistered_designs": {
+          "$ref": "#/$defs/nonCopyrightFinding"
+        },
+        "patents": {
+          "$ref": "#/$defs/nonCopyrightFinding"
+        },
+        "trade_marks": {
+          "$ref": "#/$defs/nonCopyrightFinding"
+        }
+      }
+    },
+    "nonCopyrightFinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "territories",
+        "reviewed_on",
+        "reviewed_by",
+        "evidence",
+        "notes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not-performed",
+            "not-applicable",
+            "no-known-conflict",
+            "permission-confirmed",
+            "expired-or-lapsed-confirmed",
+            "potential-conflict",
+            "unresolved",
+            "professional-review-required"
+          ]
+        },
+        "territories": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "reviewed_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "reviewed_by": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "notes": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identifier",
+        "name",
+        "role",
+        "output_affecting",
+        "classifications",
+        "source",
+        "license_expression",
+        "permissions",
+        "conditions",
+        "contribution_attestation",
+        "non_copyright_review",
+        "project_status"
+      ],
+      "properties": {
+        "identifier": {
+          "$ref": "#/$defs/identifier"
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "role": {
+          "enum": [
+            "production-input",
+            "embedded-material",
+            "software-source",
+            "comparison-only",
+            "validation-only",
+            "user-input",
+            "build-tool"
+          ]
+        },
+        "output_affecting": {
+          "type": "boolean"
+        },
+        "classifications": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "engineering_method",
+              "engineering_fact",
+              "project_measurement",
+              "project_derivation",
+              "user_design",
+              "templot_source_expression",
+              "templot_reference_data",
+              "templot_media_output",
+              "third_party_evidence",
+              "generated_output"
+            ]
+          }
+        },
+        "source": {
+          "$ref": "#/$defs/sourceRecord"
+        },
+        "license_expression": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "permissions": {
+          "$ref": "#/$defs/permissions"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "contribution_attestation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reference"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "recorded",
+                "not-required",
+                "missing"
+              ]
+            },
+            "reference": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        },
+        "non_copyright_review": {
+          "$ref": "#/$defs/nonCopyrightReview"
+        },
+        "project_status": {
+          "$ref": "#/$defs/projectDecision"
+        }
+      }
+    }
+  }
+}

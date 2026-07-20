@@ -86,7 +86,7 @@ the licence of Templot5 source or all program output.
 The operational classification, neutral-data, collaboration, package-licence,
 and generated-output rules adopted in response are maintained in
 [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). The current B14/B15 output
-paths are not retroactively declared rights-cleared by this evidence record.
+paths are not retroactively declared project-cleared by this evidence record.
 
 ## Relationship to TrackTemplateMacro
 
@@ -172,7 +172,10 @@ named.
 - [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) separates GPL source
   compliance from engineering facts, data/database provenance, media-output
   assertions, external evidence, package licensing, and ordinary generated
-  output. Its adoption does not grant rights the project does not hold.
+  output. Its adoption does not grant rights the project does not hold. The
+  internal positive status is `project-cleared`, not a legal clearance opinion,
+  and now requires the machine-readable manifest and non-copyright-rights
+  reviews maintained there.
 
 ## Phase 0 decision
 

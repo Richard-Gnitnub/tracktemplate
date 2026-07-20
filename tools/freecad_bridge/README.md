@@ -282,6 +282,41 @@ This oracle covers connected straight stationing and its production catalogue,
 not a physical station/platform, the independent-datum GUI path or target-file
 export.
 
+## Phase 1 standalone-turnout lifecycle oracle
+
+Drive B14's real turnout manager through creation, handed editing, history,
+persistence and two failure paths with:
+
+```bash
+tools/freecad_bridge/run-b14-turnout \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The wrapper launches a fresh isolated process and operates only on a copied
+nine-object curve/two-track fixture. It resolves `SET-001` Main Track by
+persisted identity, not UI order, and creates left-hand/facing `TO-001` at
+centreline chainage `746.298 mm` through B14's real manager. It validates the
+complete 17-object document, eight stable turnout roles, ten ordered production
+records and frozen created semantic SHA-256
+`0738c5a639618739c69fcd06553ea0584c5bf8c51253c330e3374f39e437c1cb`.
+
+The recipe applies the single creation Undo/Redo, edits only the hand to right,
+applies the single edit Undo/Redo and requires stable object names and unchanged
+plain-line host geometry. It then rejects a second turnout at the occupied
+chainage and injects an exception at the first tagging call inside another
+edit; both paths must leave the exact accepted right-hand semantic SHA-256
+`46225072b4b56f7f767570c8b438ee0942c239f73f121ce420aa76caed9779f0`
+and history unchanged. Save/close/reopen must retain that hash and clear
+history. The source fixture must remain byte-identical.
+
+Raw JSON, copied FCStd, logs and final top-view/manager/window PNGs remain
+ignored under `benchmark-output/freecad-bridge/turnout-runs/`; the controlled
+series and coverage boundary are recorded in
+[`reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md`](../../reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
+This is a B14 legacy comparison oracle, not canonical turnout data. It does not
+cover trailing orientation through the GUI, straight/alternate hosts,
+removal/integration, downstream timber/chair stages or target-file export.
+
 ## Automated B14 cold run
 
 After the local base fixture has been prepared, one command launches a fresh

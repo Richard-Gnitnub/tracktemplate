@@ -44,7 +44,7 @@ The release candidate will provide the agreed curve/easement, station and multip
   same definition and geometry path as native chair definitions;
 - compact, versioned FreeCAD persistence with tested save/reopen and supported legacy migration;
 - deterministic, transactional exports and manifests;
-- machine-readable output dependency/clearance records that distinguish user
+- machine-readable output dependency/project-status records that distinguish user
   design, engineering facts, project measurements, package data, restricted
   material, and local comparison oracles;
 - a small launcher/composition root and one authoritative modular implementation;
@@ -171,12 +171,16 @@ Choose migration order from evidence and establish oracles for behaviour that cu
 - Establish canonical railway terminology before naming modular interfaces;
   preserve historical evidence identifiers and separately gate any accepted
   macro wording correction.
-- Complete the output-affecting lineage audit defined in
-  [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md): inventory and classify
-  every table, profile, constant, rule, asset and boilerplate element that can
-  materially affect SVG, DXF, STL, STEP, retained FreeCAD objects, reports,
-  manifests or images. Keep GPL source-expression compliance separate from the
-  rights basis of generated data and media.
+- Establish the four scoped output-affecting lineage registers defined in
+  [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md): first S1 chair path, its
+  core rail/timber path, other turnout/crossover output, and legacy B14/B15
+  output. Fully classify the first two or keep the S1 pilot blocked; give the
+  latter two bounded inventories, current statuses, owners and later closure
+  gates rather than making an unbounded historical audit a prerequisite for an
+  independently evidenced S1 package. Every affected scope must still close
+  before its own output is advertised as project-cleared. Keep GPL source-
+  expression compliance separate from the rights basis of generated data and
+  media.
 - Identify every release-candidate value collection supported only by Templot
   source, a Templot-authored table/profile, or Templot media output. Establish
   an accepted engineering, measurement or separately licensed evidence chain,
@@ -185,7 +189,12 @@ Choose migration order from evidence and establish oracles for behaviour that cu
 - Define the neutral `ChairDefinition` as the only canonical interchange and
   bound any later Templot compatibility work to an optional one-way outward
   adapter. Define the machine-readable package/output dependency manifest and
-  its `rights-cleared`, `restricted`, `reference-only` and `unknown` statuses.
+  its `project-cleared`, `restricted`, `reference-only` and `unknown` statuses.
+- Make manifest validation an immediate fail-closed project gate for any
+  `project-cleared` package/output. Record registered-design,
+  unregistered-design, patent and trade-mark reviews separately from copyright
+  and data licensing, and require the prospective DCO plus project data/
+  evidence declaration for contributions.
 - Audit the Templot5 revision 556b chair-generation route from full-size 2D/3D
   data through constituent component builders, reusable block placement and
   DXF/STL emission. Record relevant routines, units, transforms, manufacturing
@@ -256,8 +265,16 @@ persistence, 23 document objects and 12 production records; edits the two
 lengths while preserving curve geometry; and proves complete Undo/Redo and
 save/reopen recovery in three fresh processes. The independent-datum GUI,
 physical station/platform, straight target-file export, straight-specific
-negative paths and wider configurations remain open. This evidence does not
-close Phase 1 or select the first extraction slice.
+negative paths and wider configurations remain open. A sixth isolated recipe
+now covers one centreline-anchored standalone REA C10 turnout lifecycle. It
+uses B14's real manager to create `TO-001` left/facing on the persisted Main
+Track identity, edits only its hand, freezes the complete 17-object and
+10-record document semantics, and proves exact Undo/Redo, save/reopen,
+occupied-chainage rejection and in-transaction abort recovery in three fresh
+processes. Trailing orientation through the GUI, straight/alternate hosts,
+wider input choices, removal/integration, downstream timber/chair stages and
+target-file export remain open. This evidence does not close Phase 1 or select
+the first extraction slice.
 
 A read-only chair source audit now establishes that Templot5 556b holds
 full-size chair data separately from its procedural component-face builders,
@@ -280,6 +297,17 @@ direction, not the field-by-field audit: current B14/B15 output remains
 `unknown` for project-control clearance until the lineage and dependency
 manifest deliverables above are completed.
 
+The licensing-control follow-up now renames the internal positive status to
+`project-cleared`, records the project owner's prior acceptance explicitly,
+adds a Draft 2020-12 dependency-manifest schema and standard-library fail-
+closed validator, requires registered/unregistered-design, patent and trade-
+mark review fields, and adds a prospective DCO/data contribution declaration.
+The first S1 pilot control manifest validates structurally but deliberately
+remains `unknown` and fails `--require-project-cleared` until primary evidence,
+permissions, package licence, non-copyright reviews and owner acceptance exist.
+The lineage work is now divided into the four owned scopes above rather than
+making a complete historical macro audit an implicit prerequisite for S1.
+
 Canonical **plain line** terminology and the compatibility treatment of the
 legacy `ordinary-*` evidence identifiers are now recorded in
 [TERMINOLOGY.md](TERMINOLOGY.md). B14/B15 remain byte-identical; user-facing
@@ -294,13 +322,16 @@ macro wording is deferred to an approved successor version.
 - The Templot chair-generation map, B15 gap statement, proposed S1 oracle
   recipe and chair-definition/assimilation boundary requirements are reviewed;
   any missing source or measurement evidence has a named owner and gate.
-- The current output-affecting source/data map is classified at the smallest
-  practical field/component granularity; every Templot-only, restricted,
+- The first S1 and its core rail/timber source/data maps are classified at the
+  smallest practical field/component granularity or remain visibly blocked;
+  other S&C and legacy B14/B15 have bounded registers, current statuses, named
+  owners and later closure gates. Every Templot-only, restricted,
   reference-only, unknown or `NOASSERTION` dependency has a named disposition
-  and cannot be mistaken for a rights-cleared production input.
+  and cannot be mistaken for a project-cleared production input.
 - The neutral chair-definition boundary, optional one-way Templot adapter,
-  package-licence rule, dependency-manifest schema and first S1 evidence/rights
-  plan are reviewed and accepted.
+  package-licence rule, dependency-manifest schema/validator, non-copyright-
+  rights fields, contribution declaration and first S1 evidence/rights plan are
+  reviewed and accepted.
 - RC chair scope is bounded to validated definition packages and one assisted
   S1 pilot; arbitrary automatic scan conversion is not an implicit exit
   requirement.
@@ -426,7 +457,7 @@ Prove that exact geometry can be deferred without reducing production validation
 - Refuse export when the applicable exact validation is absent or stale.
 - Exercise transactional staging, scale/bounds/topology checks, manifests, overwrite handling, commit, and rollback.
 - Generate and validate the output-dependency record without describing an
-  export as `rights-cleared` when an output-affecting package or material is
+  export as `project-cleared` when an output-affecting package or material is
   restricted, reference-only, unknown, or `NOASSERTION` for the intended use.
 - Compare legacy/new exact bounds, lengths, profiles, topology, solids/meshes, identifiers, filenames, categories, and manifests as applicable.
 - Measure edit-only and edit-through-export workflows, including transient construction and cleanup costs.
@@ -552,11 +583,11 @@ If chair analysis/presentation was the Phase 3 proof slice, this phase completes
   assimilation remains explicitly outside the RC qualification matrix.
 - The accepted S1 package has an explicit licence and no `NC`, `NOASSERTION`,
   reference-only, unknown, or otherwise incompatible dependency in the
-  rights-cleared commercial/publication path. Any raw evidence that cannot be
+  project-cleared commercial/publication path. Any raw evidence that cannot be
   redistributed remains separate and its permitted fitting/use basis is
   recorded.
 - Representative output manifests reproduce the complete package/dependency
-  classification and cannot claim `rights-cleared` after any relevant input is
+  classification and cannot claim `project-cleared` after any relevant input is
   replaced by a restricted or unresolved source.
 - Export failure cannot partially replace an accepted output set or corrupt the editable model.
 - Editing and end-to-end performance meet the provisional budgets derived from measured baselines.
@@ -578,7 +609,7 @@ Turn the migrated capabilities into one maintainable, installable, feature-compl
 - Add installation, upgrade, workflow, Validate/Export, troubleshooting, and known-limitation documentation.
 - Document chair-definition package authoring/loading, the assisted S1
   assimilation workflow, evidence/provenance requirements, per-package licence,
-  output-dependency/clearance interpretation, and the boundary between the RC
+  output-dependency/project-status interpretation, and the boundary between the RC
   capability and post-RC automatic-conversion research.
 - Freeze release-candidate feature scope and public schema/API surfaces at beta exit.
 
@@ -609,7 +640,7 @@ Produce a reproducible RC1 artifact whose remaining risks are known and acceptab
 - Re-run the production-data/output-lineage audit against the frozen artifact;
   verify package licences, dependency manifests, embedded notices, and the
   absence of unresolved or non-commercial material from every path advertised
-  as rights-cleared for commercial/publication use.
+  as project-cleared for commercial/publication use.
 - Resolve all release-blocking defects and explicitly disposition lower-severity known limitations.
 - Finalise version assignments, change log, installation/upgrade notes, licences/notices, artifact contents, and checksums.
 - Build the artifact twice from the same source and verify reproducibility or document any unavoidable environment-specific difference.
@@ -651,7 +682,7 @@ procedural regeneration, rail-fit and reference/residual evidence are also
 mandatory. Legacy equality still applies to preserved chair assignment,
 analysis, editing, persistence and export behaviour; it does not require the
 accepted procedural geometry to reproduce B15's approximate box body. A chair
-slice cannot be accepted for the rights-cleared production path until its
+slice cannot be accepted for the project-cleared production path until its
 package licence and field/component provenance pass
 [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 
@@ -663,7 +694,7 @@ package licence and field/component provenance pass
 | Reference ZIP commit/provenance policy | Resolved at Phase 0 exit — exact SourceForge origin recorded; ZIP ignored and untracked | Owner decision, upstream GPLv3 statement and checksum |
 | Source/data/output classification policy | Resolved 2026-07-20 — neutral canonical data, one-way optional Templot adapter, package-specific licensing and no automatic project claim over ordinary output | Archive/output-notice review, GPL/CC scope review, `LICENSING_BOUNDARIES.md`, and owner acceptance |
 | Chair geometry method and RC scope | Resolved 2026-07-20 — full-size procedural constituent generation, validated external packages and one assisted S1 pilot; arbitrary automatic conversion remains post-RC research | Templot source audit and project-owner acceptance |
-| Current output lineage, dependency manifest and first S1 package rights plan | Phase 1 exit | Field/component classification, Templot-only disposition, manifest schema, B15 gap analysis, pilot evidence/licence, intended commercial/publication use and comparison metrics |
+| Scoped output lineage and first S1 package rights plan | Phase 1 exit | Complete first-S1/core-rail-timber classifications or an explicit S1 block; bounded other-S&C and legacy registers; validated manifest, B15 gap analysis, pilot evidence/licence, non-copyright review, intended commercial/publication use and comparison metrics |
 | Representative fixtures and first extraction slice | Phase 1 exit | Coverage, coupling, side-effect, and profile inventory |
 | Supported FreeCAD/Python and legacy document window | Phase 1/4 | Environment evidence and migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |
@@ -684,7 +715,7 @@ package licence and field/component provenance pass
 | Imported chair evidence has unclear ownership or licence | Require per-package provenance, hashes and usage/redistribution status before inclusion or publication |
 | Templot source licensing is conflated with a blanket licence on all generated output | Keep GPL source compliance, data/database provenance, media notices and output dependencies separate under `LICENSING_BOUNDARIES.md`; do not infer CC BY-NC-SA from the reviewed snapshot |
 | A systematically copied table or profile is relabelled as isolated engineering facts | Require field/component provenance and an accepted independent engineering, measurement or separately licensed evidence chain before canonical admission |
-| A non-commercial, unknown or reference-only chair dependency reaches a path advertised for magazine/commercial use | Propagate dependency status into manifests and prohibit `rights-cleared` qualification until the dependency is replaced or separately permitted |
+| A non-commercial, unknown or reference-only chair dependency reaches a path advertised for magazine/commercial use | Propagate dependency status into manifests and prohibit `project-cleared` qualification until the dependency is replaced or separately permitted |
 | Duplicate definitions and runtime patches hide live callers | Inventory captured aliases and patch order; remove only after retained-reference audits |
 | Modularisation increases files without reducing runtime cost | Treat source boundaries and representation/performance changes as separate measured outcomes |
 | Lightweight editing loses expected FreeCAD behaviour | Prototype selection, handles, visibility, undo/redo, save/reopen, and GUI use before choosing a renderer |
