@@ -1,0 +1,827 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:performance-boundaries:1",
+  "recorded_on": "2026-07-21",
+  "status": "phase1-legacy-boundaries-reconciled-target-pipeline-unmeasured",
+  "phase": 1,
+  "scope": {
+    "purpose": "Classify the existing Phase 0/1 timing evidence by its real measurement boundary, prevent nested or harness time from being double-counted, and reserve explicit target-architecture edit, Validate and Export slots without inventing measurements.",
+    "current_effect": "Evidence and future measurement control only. This contract changes neither macro, accepts no latency budget and authorises no optimisation or Phase 2 source movement.",
+    "bounded_claim": "Existing profiles identify legacy operator-action costs and the chair-chain dominant cost family. They do not yet provide a target-architecture lightweight-edit or deferred exact-geometry baseline.",
+    "terminology": "Profile IDs retain plain-line wording even when an owning command or historical report uses the frozen legacy ordinary-track identifier."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "version_token": "10.2A8A7B14",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "version_token": "10.2A8A7B15",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference"
+    }
+  },
+  "accounting_policy": {
+    "clock": "Use monotonic/performance wall time around the declared boundary; process CPU, RSS, object, recompute, cache and shape metrics are supporting dimensions rather than substitutes for wall time.",
+    "span_classes": [
+      "operator-action",
+      "nested-component",
+      "harness-enclosing",
+      "same-process-correctness",
+      "missing-target-boundary"
+    ],
+    "reconciliation_rule": "Reconcile parent, non-overlapping child and uncovered time within each individual run, then report the median and range of those per-run results. Never subtract or add independently selected medians to manufacture a run total.",
+    "nesting_rule": "A nested component is already contained in its parent and must have add_to_primary=false. A child nested inside another child must not also be added beside that ancestor.",
+    "harness_rule": "Process launch, macro load, fixture opening, polling, screenshots, artifact parsing, deep semantic walks and cleanup are harness time unless the declared operator action explicitly includes them.",
+    "cache_rule": "Cold, same-process later action, warm-up and measured unchanged-result reuse are separate states. A destructive replay is not a warm-cache measurement.",
+    "persistence_rule": "A persisted internal profile is usable only if it is written after all work it claims to cover. A complete enclosing stage timer remains usable when a nested persisted payload is rejected.",
+    "budget_rule": "No observed B14/B15 time is an accepted human-use budget. Numerical gates require later representative target-architecture baselines and owner acceptance."
+  },
+  "evidence_reports": {
+    "provisional-accumulated-crossover": {
+      "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001.md",
+      "sha256": "47591d38eac1636d7ab4d283291f0af3d10f912b025b3078bdae48fb66fe3382",
+      "status": "excluded-from-comparison",
+      "required_markers": [
+        "Status: provisional Phase 0 accumulated-document observation.",
+        "the report was not reset immediately before this sequence"
+      ]
+    },
+    "b14-crossover-cold-series": {
+      "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md",
+      "sha256": "84dfa419bd608b524027cd78199bf0d9384b8b7a81ba83d687a53d88069a867b",
+      "status": "controlled-three-run-legacy-profile",
+      "required_markers": [
+        "Complete controller interval",
+        "**700.818 s**",
+        "Controller time outside internal total",
+        "**20.555 s**"
+      ]
+    },
+    "b14-crossover-warm-series": {
+      "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md",
+      "sha256": "a9e2120a5544c2d5682f916286b430f6a7d8ffbc28a8bb1de831e2e598b9c28b",
+      "status": "controlled-three-iteration-warm-diagnostic-profile",
+      "required_markers": [
+        "Actual panel operator action",
+        "**143.581 s**",
+        "Direct reuse function",
+        "**29.670 s**"
+      ]
+    },
+    "b14-to-b15-chair-acceptance": {
+      "path": "reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md",
+      "sha256": "45f76007e4fdda1b4c91785f84d18605bcae3c2375766cc371b6a441c856f8a6",
+      "status": "single-run-behavioural-acceptance-with-diagnostic-timings",
+      "required_markers": [
+        "Unchanged supported-chair solid reuse",
+        "145.463 s",
+        "reconciling manager-session performance history is an instrumentation gap"
+      ]
+    },
+    "b14-plain-line-edit-series": {
+      "path": "reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md",
+      "sha256": "f62f78955f32acbf1ae637c1064fc83f0a1a874c6f0e6171974b499c512f0aba",
+      "status": "controlled-three-run-legacy-profile",
+      "required_markers": [
+        "Left-to-right replacement wall time",
+        "**2783.694 ms**",
+        "deep semantic oracle"
+      ]
+    },
+    "b14-plain-line-selected-export-series": {
+      "path": "reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md",
+      "sha256": "66818e6ceb9275ddd5f3bf4e5da4eda8cdda1f9011554d48b701bbde77037193",
+      "status": "controlled-three-run-legacy-profile",
+      "required_markers": [
+        "Complete action wall time",
+        "**7,885.730 ms**",
+        "combined median `4035.036 ms`",
+        "median `66.551 ms`"
+      ]
+    },
+    "b14-plain-line-create-export-series": {
+      "path": "reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md",
+      "sha256": "e7d8e058ed923c6aa53e1ffd7abd061c81e75bc473c169c85326cc2899acb1b6",
+      "status": "controlled-three-run-legacy-profile",
+      "required_markers": [
+        "Successful create-through-export metric",
+        "**6,907.971 ms**",
+        "median `1450.616 ms`",
+        "median `2883.880 ms`"
+      ]
+    },
+    "b14-straight-station-series": {
+      "path": "reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md",
+      "sha256": "fbc57dce2c0ae7eab08b0f8447c878eeed39870f700756b6b5c897926e61ccb1",
+      "status": "controlled-three-run-legacy-profile",
+      "required_markers": [
+        "Create `600/600 mm` pair wall",
+        "**2528.073 ms**",
+        "Edit to `750/450 mm` wall",
+        "**2078.244 ms**"
+      ]
+    },
+    "b14-standalone-turnout-series": {
+      "path": "reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md",
+      "sha256": "5c101cd96c0c55da4482fc270a2f1701fd6141c15479b197ac67526155f8d41d",
+      "status": "controlled-three-run-legacy-profile",
+      "required_markers": [
+        "Create left/facing wall",
+        "**1743.967 ms**",
+        "Edit hand wall",
+        "**1977.051 ms**"
+      ]
+    }
+  },
+  "profiles": [
+    {
+      "profile_id": "b14-crossover-cold-guided-sequence",
+      "workflow_families": [
+        "crossover",
+        "automatic-timbering",
+        "chair-analysis",
+        "chair-presentation",
+        "host-integration",
+        "legacy-supported-chair-solids"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-crossover-cold-series",
+      "measurement_state": "fresh-process-cold-os-file-cache-uncontrolled",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "complete-controller-interval",
+        "span_class": "harness-enclosing",
+        "median_ms": 700818.0,
+        "includes": [
+          "document open and B14 load",
+          "fixture validation and manager setup",
+          "seven external driver-stage calls",
+          "reporting, save, inventory and rendered evidence"
+        ],
+        "excludes": [
+          "process launch before controller start"
+        ]
+      },
+      "related_spans": [
+        {
+          "span_id": "sum-external-stage-calls",
+          "span_class": "nested-component",
+          "median_ms": 691487.0,
+          "relationship_to_primary": "non-overlapping child stage calls within each controller run",
+          "add_to_primary": false
+        },
+        {
+          "span_id": "non-stage-controller-work",
+          "span_class": "nested-component",
+          "median_ms": 9091.0,
+          "relationship_to_primary": "per-run controller remainder reported separately; its median is not arithmetically paired with the independently selected parent median",
+          "add_to_primary": false
+        },
+        {
+          "span_id": "controller-time-outside-internal-stage-total",
+          "span_class": "nested-component",
+          "median_ms": 20555.0,
+          "relationship_to_primary": "per-run gap between controller and B14 internal stage total; overlaps non-stage work and external-versus-internal stage gaps",
+          "add_to_primary": false
+        }
+      ],
+      "reconciliation": {
+        "status": "per-run-reconciled-with-known-internal-boundary-gaps",
+        "method": "The report derives controller remainder and controller-minus-internal values in each run before reporting medians.",
+        "uncovered_time_reported": true
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": false,
+        "dominant_cost_context": true,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "Chair analysis, bounded support, 2D layout, host integration and 3D chair preparation exceed 99.3 percent of B14 internal recorded wall time in every controlled run.",
+      "gaps": [
+        "The controller interval includes harness work and is not one operator button action.",
+        "Geometry and other external stage boundaries exceed the B14 internal wrappers by measured but not fully attributed work.",
+        "The internal report has the chair persistence and status/reuse defects listed below."
+      ]
+    },
+    {
+      "profile_id": "b14-crossover-warm-supported-solid-panel",
+      "workflow_families": [
+        "crossover",
+        "legacy-supported-chair-solids",
+        "cache-reuse"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-crossover-warm-series",
+      "measurement_state": "fresh-process-open-completed-document-one-warmup-three-same-process-reuse-iterations",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "actual-panel-operator-action",
+        "span_class": "operator-action",
+        "median_ms": 143581.0,
+        "includes": [
+          "real Generate supported chair solids panel method",
+          "direct generation/reuse function",
+          "post-function parent and panel refresh"
+        ],
+        "excludes": [
+          "separate six-status audit",
+          "pre/post deep fingerprints",
+          "selection setup and complete asynchronous job harness"
+        ]
+      },
+      "related_spans": [
+        {
+          "span_id": "direct-reuse-function",
+          "span_class": "nested-component",
+          "median_ms": 29670.0,
+          "relationship_to_primary": "nested inside the panel action",
+          "add_to_primary": false
+        },
+        {
+          "span_id": "panel-minus-direct-function",
+          "span_class": "nested-component",
+          "median_ms": 113954.0,
+          "relationship_to_primary": "per-run derived panel remainder dominated by parent/panel refresh; not independently additive",
+          "add_to_primary": false
+        },
+        {
+          "span_id": "separate-six-status-validation",
+          "span_class": "harness-enclosing",
+          "median_ms": 22905.0,
+          "relationship_to_primary": "sibling audit after the panel action within the complete job",
+          "add_to_primary": false
+        },
+        {
+          "span_id": "complete-asynchronous-job",
+          "span_class": "harness-enclosing",
+          "median_ms": 223323.0,
+          "relationship_to_primary": "ancestor including the panel action, separate audit and fingerprint/setup work",
+          "add_to_primary": false
+        }
+      ],
+      "reconciliation": {
+        "status": "nested-boundaries-labelled",
+        "method": "Direct-function and panel remainder are reconciled per iteration; complete job and separate audit remain diagnostic harness boundaries.",
+        "uncovered_time_reported": true
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": true,
+        "dominant_cost_context": true,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "The unchanged panel action retains 94.70 percent of the comparable cold stage cost; post-function refresh is about 79 percent of warm panel time.",
+      "gaps": [
+        "The solid reuse test occurs after rebuilding and validating its plan inputs.",
+        "Parent/panel refresh repeats status work after valid object reuse.",
+        "Status functions re-extract records and rebuild signatures without one shared snapshot."
+      ]
+    },
+    {
+      "profile_id": "b14-plain-line-cold-edit",
+      "workflow_families": [
+        "curve-easement",
+        "multiple-track",
+        "routine-editing"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-plain-line-edit-series",
+      "measurement_state": "fresh-process-cold-first-dialog-action-on-fixed-two-track-fixture",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "left-to-right-replacement",
+        "span_class": "operator-action",
+        "median_ms": 2783.694,
+        "includes": [
+          "dialog and replacement confirmation",
+          "calculation and legacy exact Part shape construction",
+          "document replacement, metadata, recomputes, reports and success dialog"
+        ],
+        "excludes": [
+          "process launch, B14 load and fixture open",
+          "pre/post deep semantic oracle",
+          "later history, save/reopen and negative actions"
+        ]
+      },
+      "related_spans": [],
+      "reconciliation": {
+        "status": "single-boundary-no-internal-decomposition",
+        "method": "The driver times the complete modal action; semantic validation is outside the timer.",
+        "uncovered_time_reported": false
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": true,
+        "dominant_cost_context": true,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "This is the fixed legacy exact-shape editing boundary, not a lightweight edit measurement.",
+      "gaps": [
+        "Calculation, persistence, display and exact-shape construction are not internally separated.",
+        "No target lightweight edit or deferred Validate boundary exists."
+      ]
+    },
+    {
+      "profile_id": "b14-plain-line-cold-selected-export",
+      "workflow_families": [
+        "curve-easement",
+        "multiple-track",
+        "selected-production-export"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-plain-line-selected-export-series",
+      "measurement_state": "fresh-process-cold-first-export-on-retained-legacy-exact-shapes",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "complete-selected-export-action",
+        "span_class": "operator-action",
+        "median_ms": 7885.73,
+        "includes": [
+          "dialog construction and configured preview",
+          "confirmation and late safety recheck",
+          "staged export, manifest commit, summary and post-success preview refresh"
+        ],
+        "excludes": [
+          "process launch, B14 load and fixture open",
+          "artifact parsing and later revision/overwrite/failure scenarios",
+          "construction of exact shapes already retained by the fixture"
+        ]
+      },
+      "related_spans": [
+        {
+          "span_id": "three-full-probe-preflights",
+          "span_class": "nested-component",
+          "median_ms": 4035.036,
+          "relationship_to_primary": "three sibling full probe preflights within the complete action",
+          "add_to_primary": false
+        },
+        {
+          "span_id": "selected-export-transaction",
+          "span_class": "nested-component",
+          "median_ms": 3084.831,
+          "relationship_to_primary": "nested staged write, commit and cleanup call within the complete action",
+          "add_to_primary": false
+        },
+        {
+          "span_id": "late-no-probe-safety-preflight",
+          "span_class": "nested-component",
+          "median_ms": 66.551,
+          "relationship_to_primary": "nested inside the selected-export transaction and therefore also inside the complete action",
+          "add_to_primary": false
+        }
+      ],
+      "reconciliation": {
+        "status": "nested-boundaries-labelled",
+        "method": "Full action remains the total; probe and transaction medians are reported as nested diagnostics and are not added to it or to each other across runs.",
+        "uncovered_time_reported": false
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": true,
+        "dominant_cost_context": true,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "Three full exporter-bound probe preflights consume about 51 percent of the complete legacy action.",
+      "gaps": [
+        "The path exports retained legacy exact shapes and does not measure deferred reconstruction.",
+        "Other selection scopes and entity families remain unprofiled."
+      ]
+    },
+    {
+      "profile_id": "b14-plain-line-cold-create-through-export",
+      "workflow_families": [
+        "curve-easement",
+        "multiple-track",
+        "create-time-production-export"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-plain-line-create-export-series",
+      "measurement_state": "fresh-process-cold-first-generate-through-export-action",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "complete-create-through-export-action",
+        "span_class": "operator-action",
+        "median_ms": 6907.971,
+        "includes": [
+          "dialog and confirmation",
+          "calculation, fresh legacy exact-shape construction and document replacement",
+          "one full preflight, export plus manifest, reports, recomputes and result UI"
+        ],
+        "excludes": [
+          "process launch, B14 load and fixture open",
+          "artifact parsing and save/reopen",
+          "later injected failure action"
+        ]
+      },
+      "related_spans": [
+        {
+          "span_id": "complete-exporter-bound-preflight",
+          "span_class": "nested-component",
+          "median_ms": 1450.616,
+          "relationship_to_primary": "nested preflight inside the complete action and outside the actual production-export call",
+          "add_to_primary": false
+        },
+        {
+          "span_id": "actual-export-plus-manifest",
+          "span_class": "nested-component",
+          "median_ms": 2883.88,
+          "relationship_to_primary": "nested production-export call inside the complete action",
+          "add_to_primary": false
+        }
+      ],
+      "reconciliation": {
+        "status": "nested-boundaries-labelled",
+        "method": "The complete action is authoritative; preflight and export are contained siblings and their independently reported medians are not subtracted from the parent median.",
+        "uncovered_time_reported": false
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": true,
+        "dominant_cost_context": true,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "The legacy action combines editing, exact construction and export; it proves total cost but cannot serve as separate target edit and Validate budgets.",
+      "gaps": [
+        "Current create-time output is non-atomic after a late failure and is not the successor acceptance contract.",
+        "No explicit Validate boundary or export-from-validated-state measurement exists."
+      ]
+    },
+    {
+      "profile_id": "b14-connected-straight-cold-create",
+      "workflow_families": [
+        "straight",
+        "stationing",
+        "multiple-track"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-straight-station-series",
+      "measurement_state": "fresh-process-cold-first-generate-action-on-fixed-two-track-fixture",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "create-connected-600-600-pair",
+        "span_class": "operator-action",
+        "median_ms": 2528.073,
+        "includes": [
+          "real modal Generate workflow through success return",
+          "connected straight calculation and retained exact document geometry"
+        ],
+        "excludes": [
+          "subsequent deep semantic walk",
+          "history cycle and persistence harness"
+        ]
+      },
+      "related_spans": [],
+      "reconciliation": {
+        "status": "single-boundary-no-internal-decomposition",
+        "method": "The real action is timed separately from deep validation.",
+        "uncovered_time_reported": false
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": true,
+        "dominant_cost_context": true,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "This bounds one connected straight/station creation with retained legacy exact geometry.",
+      "gaps": [
+        "No internal calculation/display/exact-shape split.",
+        "Independent datum, physical station/platform and target-file export remain open."
+      ]
+    },
+    {
+      "profile_id": "b14-connected-straight-same-process-edit",
+      "workflow_families": [
+        "straight",
+        "stationing",
+        "multiple-track",
+        "routine-editing"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-straight-station-series",
+      "measurement_state": "later-same-process-edit-after-characterised-create",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "edit-connected-pair-to-750-450",
+        "span_class": "operator-action",
+        "median_ms": 2078.244,
+        "includes": [
+          "real modal Generate replacement through success return",
+          "straight recalculation and retained exact document geometry"
+        ],
+        "excludes": [
+          "deep semantic validation",
+          "history cycle and persistence harness"
+        ]
+      },
+      "related_spans": [],
+      "reconciliation": {
+        "status": "single-boundary-no-internal-decomposition",
+        "method": "The edit is a later same-process action and is never labelled cold or warm reuse.",
+        "uncovered_time_reported": false
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": true,
+        "dominant_cost_context": false,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "The result is an edit boundary only; it does not attribute the cost internally.",
+      "gaps": [
+        "Not comparable with a fresh-process cold action without a matching state.",
+        "No lightweight straight edit or deferred Validate measurement exists."
+      ]
+    },
+    {
+      "profile_id": "b14-standalone-turnout-cold-create",
+      "workflow_families": [
+        "standalone-turnout"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-standalone-turnout-series",
+      "measurement_state": "fresh-process-cold-first-manager-create-action",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "create-left-facing-turnout",
+        "span_class": "operator-action",
+        "median_ms": 1743.967,
+        "includes": [
+          "real manager create action through expected result dialog",
+          "turnout exact document objects and production-record update"
+        ],
+        "excludes": [
+          "subsequent deep semantic walk",
+          "history, save/reopen and negative-path harness"
+        ]
+      },
+      "related_spans": [],
+      "reconciliation": {
+        "status": "single-boundary-no-internal-decomposition",
+        "method": "The action timer ends before the deep semantic oracle.",
+        "uncovered_time_reported": false
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": true,
+        "dominant_cost_context": true,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "This bounds one curved-host left/facing turnout creation; it does not include downstream chair stages.",
+      "gaps": [
+        "No internal calculation/display/exact-shape split.",
+        "Trailing, straight/alternate hosts, downstream stages and export remain open."
+      ]
+    },
+    {
+      "profile_id": "b14-standalone-turnout-same-process-edit",
+      "workflow_families": [
+        "standalone-turnout",
+        "routine-editing"
+      ],
+      "source": "b14",
+      "evidence_report": "b14-standalone-turnout-series",
+      "measurement_state": "later-same-process-handed-edit-after-characterised-create",
+      "sample_count": 3,
+      "primary_boundary": {
+        "span_id": "edit-turnout-hand",
+        "span_class": "operator-action",
+        "median_ms": 1977.051,
+        "includes": [
+          "real manager handed edit through expected result dialog",
+          "exact turnout replacement and production-record update"
+        ],
+        "excludes": [
+          "deep semantic validation",
+          "history, save/reopen and negative-path harness"
+        ]
+      },
+      "related_spans": [],
+      "reconciliation": {
+        "status": "single-boundary-no-internal-decomposition",
+        "method": "The edit is a later same-process action and is kept separate from cold creation.",
+        "uncovered_time_reported": false
+      },
+      "decision_use": {
+        "legacy_boundary_comparison": true,
+        "dominant_cost_context": false,
+        "optimization_selection": false,
+        "human_use_budget": false
+      },
+      "dominant_cost_finding": "This bounds one handed edit without attributing its calculation, document or display cost.",
+      "gaps": [
+        "Not a cold or unchanged-result measurement.",
+        "No lightweight turnout edit or deferred Validate/Export measurement exists."
+      ]
+    }
+  ],
+  "observed_instrumentation_defects": [
+    {
+      "defect_id": "geometry-external-internal-boundary-gap",
+      "status": "bounded-not-fixed",
+      "blocks_optimization_selection_from_inner_profile": true,
+      "safe_current_use": "Use the external driver-stage or declared complete action for operator cost. Use the internal preview/commit values only as labelled nested diagnostics, with the per-run gap retained.",
+      "evidence_reports": [
+        "b14-crossover-cold-series"
+      ],
+      "source_anchors": [
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "_workflow_recorded_method(CrossoverManagerPanel, \"preview_geometry\""
+        },
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "_workflow_recorded_method(CrossoverManagerPanel, \"create_crossover\""
+        },
+        {
+          "path": "tools/freecad_bridge/probes/b14_benchmark_driver.py",
+          "contains": "panel.refresh_hosts()"
+        }
+      ],
+      "required_fix_evidence": "Record a shared action/correlation identity and nested span tree around host refresh, preview, confirmation, commit and post-action refresh; reconcile each run and retain the separate preview/commit feasibility regression."
+    },
+    {
+      "defect_id": "premature-chair-timing-persistence",
+      "status": "bounded-not-fixed",
+      "blocks_optimization_selection_from_inner_profile": true,
+      "safe_current_use": "Reject persisted chair performance_timings_ms as a complete operation profile. The enclosing panel/stage wall boundary remains valid when its scope is declared.",
+      "evidence_reports": [
+        "b14-crossover-cold-series",
+        "b14-to-b15-chair-acceptance"
+      ],
+      "source_anchors": [
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "result[\"performance_timings_ms\"] = dict(timings)\n        updated = _chair_write_metadata"
+        },
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "timings[\"transaction_commit\"] = (time.perf_counter() - stage_start) * 1000.0"
+        }
+      ],
+      "required_fix_evidence": "Persist the final timing payload only after metadata, display/visibility, recompute and transaction-commit measurements exist; save/reopen it and reconcile its total with the enclosing action."
+    },
+    {
+      "defect_id": "late-supported-solid-reuse-check",
+      "status": "bounded-not-fixed",
+      "blocks_optimization_selection_from_inner_profile": true,
+      "safe_current_use": "Treat the direct reuse duration as the current cost of proving reuse, not as saved construction time or an acceptable cache-hit cost.",
+      "evidence_reports": [
+        "b14-crossover-warm-series",
+        "b14-to-b15-chair-acceptance"
+      ],
+      "source_anchors": [
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "plan = _chair_build_solid_plan(doc, kind, config, analysis, rails, timbers, settings)"
+        },
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "existing = _chair_solid_object(doc, kind, entity_id)"
+        }
+      ],
+      "required_fix_evidence": "On an unchanged valid signature, return the identical object/shape before plan and physical-fit input reconstruction; mutate every signature input class and prove full validation/construction resumes."
+    },
+    {
+      "defect_id": "redundant-post-reuse-panel-refresh",
+      "status": "bounded-not-fixed",
+      "blocks_optimization_selection_from_inner_profile": true,
+      "safe_current_use": "Use the complete panel action for operator latency and retain the direct-function span as a nested diagnostic; do not describe the direct return as the complete cache-hit cost.",
+      "evidence_reports": [
+        "b14-crossover-warm-series",
+        "b14-to-b15-chair-acceptance"
+      ],
+      "source_anchors": [
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "self._refresh_parent(self.entity_id(config))"
+        },
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "def _chair_panel_refresh_v13(self):"
+        }
+      ],
+      "required_fix_evidence": "Prove one unchanged panel action retains object/shape identity with no redundant parent/panel reconstruction or document recompute, while changed status remains correct and visible."
+    },
+    {
+      "defect_id": "repeated-effective-status-signature-scans",
+      "status": "bounded-not-fixed",
+      "blocks_optimization_selection_from_inner_profile": true,
+      "safe_current_use": "Status-validation and refresh durations are diagnostic aggregate costs. Do not attribute them to one status function or infer independent additive costs from nested status calls.",
+      "evidence_reports": [
+        "b14-crossover-cold-series",
+        "b14-crossover-warm-series",
+        "b14-to-b15-chair-acceptance"
+      ],
+      "source_anchors": [
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "analysis_status = chair_analysis_effective_status(self.doc, self.entity_kind, config)"
+        },
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "support_status = chair_model_support_effective_status(self.doc, self.entity_kind, config)"
+        },
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "layout_status = chair_2d_layout_effective_status(self.doc, self.entity_kind, config)"
+        },
+        {
+          "path": "AdvancedTurnout.FCMacro",
+          "contains": "solid_status = chair_solid_effective_status(self.doc, self.entity_kind, config)"
+        }
+      ],
+      "required_fix_evidence": "Use one immutable status/signature snapshot or demonstrably bounded reuse, prove equivalent unchanged statuses, then invalidate correctly for every relevant analysis/support/layout/solid input class."
+    }
+  ],
+  "target_pipeline_slots": [
+    {
+      "slot_id": "lightweight-routine-edit-without-export",
+      "status": "not-implemented-unmeasured",
+      "span_class": "missing-target-boundary",
+      "required_boundary": "One accepted parameter edit from stable canonical model state through lightweight 2D presentation becoming current, with no exact Part shape or solid construction.",
+      "required_metrics": [
+        "operator wall and process CPU",
+        "RSS and document-object delta",
+        "calculation, persistence, recompute and display spans",
+        "cache hit/miss and invalidation state",
+        "exact-shape construction count fixed at zero"
+      ],
+      "legacy_context_profiles": [
+        "b14-plain-line-cold-edit",
+        "b14-connected-straight-same-process-edit",
+        "b14-standalone-turnout-same-process-edit"
+      ],
+      "owner_gate": "Phase 5 must populate this slot with the measured renderer/edit prototype and its correctness oracle before a lightweight interaction budget or optimisation claim is accepted."
+    },
+    {
+      "slot_id": "explicit-validate-deferred-exact-geometry",
+      "status": "not-implemented-unmeasured",
+      "span_class": "missing-target-boundary",
+      "required_boundary": "Explicit Validate from current lightweight model through exact geometry construction, semantic/topology validation, transient or retained production state, recompute and truthful result UI.",
+      "required_metrics": [
+        "operator wall and process CPU",
+        "RSS, object and exact-shape/subshape deltas",
+        "calculation, construction, validation, persistence and recompute spans",
+        "cleanup and retained-state cost",
+        "cold and unchanged-valid-result reuse"
+      ],
+      "legacy_context_profiles": [
+        "b14-plain-line-cold-edit",
+        "b14-plain-line-cold-create-through-export",
+        "b14-crossover-cold-guided-sequence"
+      ],
+      "owner_gate": "No implementation exists before the modular architecture phases; Phase 1 freezes the recipe slot and Phase 6 evidence must populate it before the affected path is optimised or retired."
+    },
+    {
+      "slot_id": "production-export-from-validated-state",
+      "status": "not-implemented-unmeasured",
+      "span_class": "missing-target-boundary",
+      "required_boundary": "Explicit export from an already validated canonical model through final safety preflight, deterministic writes/manifest, atomic commit, cleanup and summary.",
+      "required_metrics": [
+        "operator wall and process CPU",
+        "preflight, serialisation/write, commit and cleanup spans",
+        "dispatch count and transient-object delta",
+        "success, overwrite and injected-failure results"
+      ],
+      "legacy_context_profiles": [
+        "b14-plain-line-cold-selected-export",
+        "b14-plain-line-cold-create-through-export"
+      ],
+      "owner_gate": "Phase 6 must populate this slot for the selected slice by measuring the accepted atomic exporter separately from deferred construction and preserving output/rollback equivalence; Phase 9 extends it to every RC output family."
+    },
+    {
+      "slot_id": "complete-edit-validate-export",
+      "status": "not-implemented-unmeasured",
+      "span_class": "missing-target-boundary",
+      "required_boundary": "One reconciled operator journey from an accepted edit through lightweight presentation, explicit Validate, export and cleanup, retaining the three child action spans without double-counting.",
+      "required_metrics": [
+        "end-to-end wall and process CPU",
+        "per-action and uncovered wall time reconciled in every run",
+        "peak-sampling plan plus end-minus-start RSS",
+        "final document/object state and deterministic output semantics"
+      ],
+      "legacy_context_profiles": [
+        "b14-plain-line-cold-create-through-export"
+      ],
+      "owner_gate": "Phase 6 must first populate this slot for the selected slice after the Phase 5 edit and Phase 6 Validate/export child boundaries exist; Phase 9 extends it to every RC output family and Phase 11 uses it for qualification."
+    }
+  ],
+  "phase1_gate": {
+    "result": "bounded-performance-inventory-tranche-complete-phase1-remains-open",
+    "closed_by_this_contract": [
+      "Every retained timing is classified as operator action, nested component, harness, same-process correctness or missing target boundary.",
+      "The existing controlled curve/multiple-track, straight/station, turnout/crossover, editing and export profiles have explicit scopes, states and forbidden comparison uses.",
+      "All five observed instrumentation defects have a safe current-use boundary and named fix evidence instead of being silently treated as valid subprofiles.",
+      "The target lightweight Edit, explicit Validate, export-from-validated and complete edit-through-export measurement slots are explicit and unmeasured."
+    ],
+    "still_open": [
+      "Implement and measure the four target-pipeline slots; no current profile is eligible to set their budgets or select a code optimisation.",
+      "Characterise crossover preview/commit feasibility under one accepted diagnostic rule; this correctness gap is related to but not closed by timing reconciliation.",
+      "Add sampled peak-memory evidence where a later optimisation needs ownership/peak claims; current RSS values are end-minus-start snapshots.",
+      "Obtain project-owner acceptance of the completed Phase 1 exit evidence before starting Phase 2."
+    ]
+  }
+}

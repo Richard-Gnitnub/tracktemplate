@@ -202,17 +202,40 @@ the raw artifacts needed to audit it.
 
 The B14 report labelled **Whole workflow performance benchmark** currently measures the guided turnout/crossover workflow. It is an operator-visible special-trackwork benchmark, not yet a reconciled benchmark of the complete curve/easement-to-export product pipeline. The separate Phase 1 plain-line wrappers (whose command names retain the legacy `ordinary` identifier) add external replacement, persistence, explicit selected-export and fixed create-through-export boundaries; they do not make the internal B14 report whole-product instrumentation or cover target-architecture deferred exact-shape reconstruction.
 
+The canonical Phase 1 index of those measurements is
+[`contracts/phase1-performance-boundaries.json`](contracts/phase1-performance-boundaries.json).
+Its validator freezes the source/report evidence, labels operator, nested,
+harness and same-process spans, bounds the five known instrumentation defects,
+and reserves the still-unmeasured lightweight Edit, explicit Validate,
+export-from-validated and complete edit-through-export slots. Consult it before
+comparing current profiles or designing a replacement measurement.
+
 Until Phase 1 reconciles the complete instrumentation:
 
 - identify the exact instrumented scope on every committed report;
 - record missing workflow stages rather than assigning them estimated timings;
 - do not compare a turnout/crossover total with a future whole-product total;
 - keep repeated actions separate unless their starting state, inputs and cache intent are equivalent;
-- require stage totals to reconcile and identify nested spans so time is not double-counted.
+- require stage totals to reconcile and identify nested spans so time is not double-counted;
+- reconcile parent, non-overlapping children and uncovered time inside each
+  individual run before calculating summary statistics; never add or subtract
+  independently selected medians as though they came from one run;
 - compare internal stage spans with the external method boundary and record
   uncovered setup, dialog, refresh, recompute, report, save and cleanup time;
 - reject persisted subprofiles that omit late metadata/display/recompute work,
   even when their enclosing stage timer is complete.
+
+Every recorded span must use one of the register's classes:
+
+- **operator action**: the declared user-visible action boundary;
+- **nested component**: contained work that is diagnostic and never added to
+  its parent;
+- **harness enclosing**: setup, polling, deep validation, capture or other
+  development work around an action;
+- **same-process correctness**: a later action useful for behaviour evidence
+  but not equivalent to the cold or warm comparison; or
+- **missing target boundary**: a required measurement with no implementation or
+  evidence yet. Missing values stay absent rather than being estimated.
 
 ## Metrics
 

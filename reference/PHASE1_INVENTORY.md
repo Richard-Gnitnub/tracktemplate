@@ -1,6 +1,6 @@
 # Phase 1 Product and Dependency Inventory
 
-Status: **in progress; last updated 2026-07-20**. This document owns the Phase 1
+Status: **in progress; last updated 2026-07-21**. This document owns the Phase 1
 inventory and concise decision log. It records the accepted first extraction
 slice and the initial runtime/legacy-ingress compatibility window, but does not
 start source movement, implement document migration or close Phase 1.
@@ -65,6 +65,8 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Standalone development floor | CPython 3.12.0 minimum; observed repository environment 3.12.3. This qualifies tools/tests and future domain imports, not a FreeCAD host by itself |
 | Compatibility probe and validator | `tools/runtime_compatibility_probe.py` emits a non-sensitive machine-readable record and exact-profile result; `tests/validate_phase1_compatibility.py` verifies source/schema anchors, current migration behaviour and fail-closed mutations |
 | Legacy document ingress | B14-only, B15-only and the expected mixed B14/B15 version sets are the intended RC migration sources; implementation and entity-family fixtures remain Phase 4 work, so this is not a claim that a successor migrator exists today |
+| Performance-boundary register | `reference/contracts/phase1-performance-boundaries.json`, schema 1; classifies nine controlled legacy profiles, all nested/harness spans, five bounded instrumentation defects and four unmeasured target-pipeline slots |
+| Performance-boundary validator | `tests/validate_phase1_performance_boundaries.py`; verifies immutable source/report fingerprints, declared medians, per-run-before-median accounting, non-additive nested spans, source anchors, blocked optimisation/budget use and fail-closed mutations |
 | Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
 | Production-source changes in this tranche | None |
 
@@ -1028,6 +1030,32 @@ Before profiles select an optimisation, the defects already recorded in
 4. redundant post-reuse panel refresh; and
 5. repeated effective-status signature scans.
 
+The machine-readable
+[performance-boundary register](contracts/phase1-performance-boundaries.json)
+now completes the explicit-boundary branch of that requirement. It protects
+the exact source and committed-report fingerprints, then classifies each
+measurement as an operator action, nested component, harness enclosure,
+same-process correctness observation or missing target boundary. Reconciliation
+is performed within each run before medians are selected; independently
+reported medians are never added or subtracted to manufacture a run total.
+
+All five defects remain **not fixed**. The register instead states the only
+safe current use and the evidence required by a later fix. In particular, the
+complete enclosing panel/stage boundary may be used when declared, but the
+prematurely persisted chair payload and unreconciled inner spans may not select
+an optimisation. The warm solid result remains useful evidence that the panel
+retains 94.70% of its comparable cold stage cost and that refresh/status work
+dominates reuse; it is not permission to skip invalidation or physical-fit
+validation.
+
+Four target-architecture slots are deliberately present with status
+`not-implemented-unmeasured`: lightweight routine edit without export,
+explicit Validate/deferred exact geometry, export from already validated state,
+and the reconciled complete edit-through-export journey. Phase 1 defines their
+boundaries and legacy context without inventing values. The owning architecture
+phases must populate them before the corresponding capability is optimised or
+its legacy path is retired.
+
 No current timing is accepted as a human-use budget. Routine editing,
 explicit Validate/deferred reconstruction and complete edit-through-export
 will continue to be measured separately under
@@ -1124,6 +1152,7 @@ successor document detector or migrator exists yet, and neither macro changed.
 | 2026-07-20 | Score the five first-slice candidates using bounded static closure cuts and measured workflow evidence | Recommendation completed; schema 2 exposed root-versus-closure caller differences and the scorecard recommended the transition solver as a low-risk architecture pilot rather than a speed optimisation |
 | 2026-07-20 | Select and freeze the transition-length architecture pilot | Accepted by the project owner; candidate-register schema 3 points to an exact fail-closed contract, `10.2A8A7B16` and `TrackTemplate.FCMacro` are reserved for the development composition path, B14/B15 remain unchanged and source movement has not started |
 | 2026-07-20 | Define the initial runtime and legacy-document ingress window | Implemented for Phase 1 evidence and owner review; only the exact Linux x86_64 FreeCAD 1.1.1 Flatpak stack is currently qualified, standalone Python has a 3.12.0 floor, B14/B15 are the bounded future migration sources, unsupported hosts/documents fail closed, and Phase 4 still owns the copied-target migrator and family fixtures |
+| 2026-07-21 | Reconcile the current performance evidence before using subprofiles | Implemented for Phase 1 evidence and owner review; nine controlled legacy profiles now have exact operator/nested/harness boundaries, all five instrumentation defects are explicitly bounded but not fixed, per-run reconciliation precedes medians, four target-pipeline slots remain visibly unmeasured and no observed timing is accepted as a budget or optimisation authority |
 
 ## Remaining Phase 1 work
 
@@ -1159,9 +1188,11 @@ successor document detector or migrator exists yet, and neither macro changed.
   confirm the pilot's precise prototype designation, rights-compatible primary
   evidence, package licence, commercial/publication use, component landmarks,
   rail section, fit metrics and tolerances with the project owner.
-- Reconcile instrumentation and profile the proposed lightweight routine
-  editing path and complete Validate/Export path without double-counting or
-  treating the current exact-shape replacement measurement as its budget.
+- Retain the now-validated per-run accounting and five explicit defect bounds.
+  Populate the four frozen target-pipeline slots when their owning lightweight
+  edit, explicit Validate and exporter implementations exist; do not use the
+  current exact-shape replacement or combined create-through-export measurement
+  as an interaction budget or add nested medians to obtain a total.
 - Review and accept the recorded runtime/legacy-ingress policy; qualify any
   additional RC platform explicitly rather than broadening by assumption.
   Phase 4 must implement and fixture the B14/B15 detector/migrator for every

@@ -409,6 +409,18 @@ the source-generation-map branch subject to owner review; it does not provide
 the missing exact artifact oracle, independently evidenced S1 values or a
 production ChairDefinition, and it does not close Phase 1.
 
+The existing performance evidence is now reconciled through the fail-closed
+[performance-boundary contract](contracts/phase1-performance-boundaries.json).
+It classifies nine controlled legacy profiles by their real operator, nested,
+harness and cache/process boundaries; enforces per-run reconciliation before
+medians; and explicitly bounds all five observed instrumentation defects
+without calling them fixed. Four target slots—lightweight Edit, explicit
+Validate, export from validated state and complete edit-through-export—remain
+`not-implemented-unmeasured`. The current evidence can identify the chair chain
+and repeated export probing as dominant legacy costs, but no current timing is
+an accepted budget or authority to select a target-code optimisation. Phase 1
+therefore remains open.
+
 Canonical **plain line** terminology and the compatibility treatment of the
 legacy `ordinary-*` evidence identifiers are now recorded in
 [TERMINOLOGY.md](TERMINOLOGY.md). B14/B15 remain byte-identical; user-facing

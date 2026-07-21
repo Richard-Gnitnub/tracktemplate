@@ -172,6 +172,21 @@ top-level call model, schema 2 separately checks callers of nominated roots,
 callers crossing the proposed dependency closure and dependencies leaving that
 closure. It does not execute either macro.
 
+Fail-closed Phase 1 performance-boundary checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_performance_boundaries.py
+```
+
+This verifies the exact B14/B15 and committed benchmark-report fingerprints,
+nine declared legacy action profiles, all nested/harness relationships, the
+per-run-before-median accounting rule, five `bounded-not-fixed`
+instrumentation defects and four `not-implemented-unmeasured` target-pipeline
+slots. It statically protects the current premature timing-write and late
+solid-reuse source ordering, rejects double-counted children, invented budgets,
+unsupported defect closure and fabricated target measurements, and does not
+execute either macro or set a latency threshold.
+
 Fail-closed Phase 1 candidate-boundary checks:
 
 ```bash
@@ -581,6 +596,12 @@ The controlled B14 runs and export source/transaction audits expose six
 behaviours that need focused tests with their eventual production fixes.
 Do not encode the current defect as the expected result merely to increase the
 test count.
+
+The first four performance items below, together with repeated status scans,
+are explicitly bounded in
+[`contracts/phase1-performance-boundaries.json`](contracts/phase1-performance-boundaries.json).
+That makes unsafe current measurements ineligible for optimisation selection;
+it does not mark any defect fixed or replace the regression obligations.
 
 1. Crossover preview/commit feasibility: use the same persisted host-centreline
    identities and Host A chainage for preview and transactional commit. Assert

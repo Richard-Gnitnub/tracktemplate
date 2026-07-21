@@ -44,6 +44,11 @@
   Phase 10 owns exact manifest/loading/update/catalogue mechanics, not another
   choice of product form.
 - Follow `reference/PERFORMANCE_SOP.md` for measurement and `reference/VALIDATION.md` for the applicable validation matrix.
+- `reference/contracts/phase1-performance-boundaries.json` is the canonical
+  index of current timing scope, nesting, harness exclusions, known
+  instrumentation defects and missing target-pipeline measurements. Read it
+  before comparing profiles, selecting a performance hypothesis or adding a
+  benchmark boundary.
 - Runtime and document compatibility are separate fail-closed gates. Only the
   exact qualified profile may currently write through the future Workbench.
   B14/B15 are the outer future migration window, not blanket entity-family
@@ -176,6 +181,12 @@
   boundary. The probe records no user path; standalone Python is expected to
   report `not-freecad-runtime`, while the current FreeCAD probe must report the
   exact `linux-x86_64-flatpak-freecad-1.1.1` profile as `qualified`.
+- `reference/contracts/phase1-performance-boundaries.json` and
+  `tests/validate_phase1_performance_boundaries.py` own the fail-closed timing
+  register. Preserve its exact report/source anchors, per-run-before-median
+  accounting, non-additive nested spans, five `bounded-not-fixed` defects and
+  four `not-implemented-unmeasured` target slots. It accepts no human-use
+  budget and does not authorise an optimisation.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
@@ -274,6 +285,9 @@
 ## Performance work
 
 - Follow `reference/PERFORMANCE_SOP.md`; do not invent a reduced benchmark procedure for an individual change.
+- Reconcile parent, non-overlapping child and uncovered time in each run before
+  reporting medians. Never add or subtract independently selected medians, and
+  never add a nested span to its parent.
 - Use the B14 turnout/crossover **Whole workflow** report as the current operator-visible special-trackwork baseline and compare equivalent starting state, settings, stage sequence and cache state. Do not describe it as whole-product coverage.
 - Measure both routine editing and deferred Validate/Export work so cost is not merely hidden at a later boundary.
 - Preserve cache signatures and invalidation rules. A faster stale result is a correctness failure. Test both initial calculation and unchanged-result reuse when touching caches.
@@ -390,6 +404,12 @@ Run the deterministic Phase 1 macro-inventory contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_inventory.py
+```
+
+Run the fail-closed Phase 1 performance-boundary contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_performance_boundaries.py
 ```
 
 Run the fail-closed Phase 1 candidate-boundary contract checks:
