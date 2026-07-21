@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:crossover-feasibility:1",
+  "recorded_on": "2026-07-21",
+  "phase": 1,
+  "status": "b14-mismatch-characterised-successor-alignment-not-started",
+  "scope": {
+    "closed_by_this_contract": "The fixed B14 curved-host preview/commit minimum-radius mismatch is reproducible, quantified and protected against silent reinterpretation.",
+    "still_open": "The successor shared analytical preflight, preview/commit alignment, pre-mutation rejection test and wider crossover matrix are not implemented.",
+    "product_effect": "Evidence and acceptance rules only. Neither B14 nor B15 product behaviour is changed or approved as successor behaviour.",
+    "legacy_defect_rule": "The current mismatch is an immutable-oracle observation, not an invariant to reproduce in the Workbench."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "version": "10.2A8A7B14",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "version": "10.2A8A7B15",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference with matching crossover functions"
+    }
+  },
+  "fixture": {
+    "path": "benchmark-output/freecad-bridge/fixtures/b14-default-base.FCStd",
+    "tracked": false,
+    "reproduction_command": "tools/freecad_bridge/build-b14-base",
+    "sha256": "59d06cf57d65d9560dd53915fce2bef19130c534d214f92c9699066060dc4357",
+    "semantic_sha256": "a3486db6f02370e61432a480bfb6c9261bc9357cc2af5111f93135e3372d0a4e",
+    "object_count": 9,
+    "host_a_identity": {
+      "template_set_id": "SET-001",
+      "track_number": 1,
+      "track_name": "Main Track"
+    },
+    "host_b_identity": {
+      "template_set_id": "SET-001",
+      "track_number": 2,
+      "track_name": "Track 2"
+    },
+    "safety_rule": "Open read-only in memory, perform no creation or save, close it, and require the source bytes and nine-object snapshot to remain unchanged."
+  },
+  "request": {
+    "arrangement": "Facing crossover",
+    "handing": "Automatic handing",
+    "track_gauge_mm": 16.5,
+    "flangeway_mm": 1.0,
+    "minimum_radius_mm": 600.0,
+    "comparison_tolerance_mm": 0.000001,
+    "complete_rule": "minimum(turnout_a_mapped_road, turnout_b_mapped_road, connector) >= requested minimum radius"
+  },
+  "witnesses": [
+    {
+      "id": "lower-preview-pass-complete-fail",
+      "host_a_chainage_mm": 500.0,
+      "host_b_chainage_mm": 1341.223827116722,
+      "current_b14_preview": "accepted",
+      "turnout_a_mapped_minimum_radius_mm": 606.5847427027568,
+      "turnout_b_mapped_minimum_radius_mm": 540.8483745410599,
+      "connector_minimum_radius_mm": 621.0833364794331,
+      "complete_minimum_radius_mm": 540.8483745410599,
+      "complete_rule_result": "reject",
+      "successor_preflight_result": "reject-before-part-construction-or-document-mutation"
+    },
+    {
+      "id": "documented-valid-placement",
+      "host_a_chainage_mm": 746.298,
+      "host_b_chainage_mm": 1590.0680836279196,
+      "current_b14_preview": "accepted",
+      "turnout_a_mapped_minimum_radius_mm": 696.9079203985757,
+      "turnout_b_mapped_minimum_radius_mm": 887.1993906921958,
+      "connector_minimum_radius_mm": 676.1786691890956,
+      "complete_minimum_radius_mm": 676.1786691890956,
+      "complete_rule_result": "accept",
+      "successor_preflight_result": "accept"
+    }
+  ],
+  "legacy_path_characterisation": {
+    "preview": "CrossoverManagerPanel.preview_geometry calls solve_rea_c10_crossover_geometry and caches its result. The solver validates the requested connector radius but does not calculate either mapped turnout-road minimum radius.",
+    "commit": "Crossover creation reuses the cached solver result. _build_rea_c10_crossover_geometry builds both exact turnout modules and connector shapes before taking the minimum of the two built turnout configuration radii and connector radius.",
+    "consequence": "A connector-feasible placement can pass preview, spend exact-shape construction time and only then fail the complete gate. The document remains transactionally recoverable, but the preview is not authoritative and avoidable work occurs.",
+    "available_pure_boundary": "turnout_mapping_metrics already returns the mapped turnout-road minimum radius from host station data without creating a document object or Part shape."
+  },
+  "successor_acceptance": {
+    "shared_result": [
+      "persisted Host A and Host B identities",
+      "all request values and a deterministic input signature",
+      "resolved Host B chainage, orientations and handing",
+      "mapped turnout A minimum radius",
+      "mapped turnout B minimum radius",
+      "connector minimum radius",
+      "complete minimum radius",
+      "accepted or rejected decision with a component-specific diagnostic"
+    ],
+    "rules": [
+      "Preview and create/edit/extend must call or reuse one shared analytical preflight implementing the declared complete rule.",
+      "A reused preflight must be rejected if either persisted host identity, geometry signature or any request input changed.",
+      "The 500.000 mm witness must be rejected before a Part shape, document object, transaction, history entry, recompute or persisted metadata change is created.",
+      "The 746.298 mm witness must remain accepted and later exact construction must agree with every preflight component radius within the declared tolerance.",
+      "Failure must name the limiting component, actual radius and configured minimum; diagnostics must be identical at preview and commit boundaries.",
+      "The future regression must exercise create, edit and turnout-extension entry points plus invalidation after every signature input class changes."
+    ],
+    "migration_gate": "Do not move or remove the B14 crossover path until the successor regression proves both witnesses, zero mutation on rejection, exact-build agreement on acceptance and user-approved GUI evidence."
+  },
+  "evidence": {
+    "report": "reference/benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md",
+    "fast_validator": "tests/validate_phase1_crossover_feasibility.py",
+    "freecad_validator": "tests/freecad_validate_phase1_crossover_feasibility.py",
+    "existing_valid_commit_series": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md"
+  }
+}

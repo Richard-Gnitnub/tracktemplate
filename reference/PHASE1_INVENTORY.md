@@ -41,6 +41,8 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Standalone-turnout lifecycle oracle | `tools/freecad_bridge/turnout_recipe.py`, schema 1 |
 | Created left-hand/facing turnout semantic SHA-256 | `0738c5a639618739c69fcd06553ea0584c5bf8c51253c330e3374f39e437c1cb` |
 | Edited right-hand/facing turnout semantic SHA-256 | `46225072b4b56f7f767570c8b438ee0942c239f73f121ce420aa76caed9779f0` |
+| Crossover feasibility oracle | `contracts/phase1-crossover-feasibility.json`, schema 1 |
+| Crossover witnesses | `500.000 mm` preview-pass/complete-fail; `746.298 mm` complete-pass on the fixed curved-host fixture |
 | B14 role | Immutable legacy comparison oracle |
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
@@ -672,7 +674,7 @@ is known to be defective.
 | Straight/stationing workflow | B15/B14 source plus direct calculation parity and the connected-pair lifecycle oracle | `run-b14-straight-station` creates and edits a deterministic entrance/exit pair from the fixed two-track curve | Connected route inputs, identities, inherited track order, travel-order stationing, joins/tangents, length editing, complete history recovery, raw persistence, exact document shapes and ordered production catalogue are characterised; the independent-datum GUI, physical station/platform, straight file export, straight-specific failures and wider configurations remain open |
 | Multiple-track/spacing transition | Default B14 two-track base fixture plus deep create/edit/export document oracles | `build-b14-base` plus the four `run-b14-ordinary-*` characterisation wrappers | The fixed two-track configuration survives handedness replacement/reopen, selected export and create-time export; deferred Validate/reconstruction plus spacing/easement edit and invalid-input edge cases remain open |
 | Standalone turnout | B15/B14 calculation parity plus B14's complete fixed-lifecycle semantic oracle | `run-b14-turnout` creates `TO-001` on persisted Main Track identity at chainage `746.298 mm`, edits its hand and exercises recovery | Curved-host left/facing creation, one handed edit, exact history/persistence, overlap rejection and injected transaction abort are characterised; trailing GUI orientation, straight/other hosts, wider inputs, removal/integration, downstream timber/chair stages and export remain open |
-| Crossover geometry | B14 cold series and B15 acceptance report | Controlled `XO-001` bridge recipe | Preview/commit feasibility mismatch and curved-host coverage |
+| Crossover geometry | B14 cold series, B15 acceptance report and the fail-closed crossover-feasibility contract | Controlled `XO-001` bridge recipe plus read-only `500.000/746.298 mm` analytical witnesses on the fixed curved-host fixture | The current preview/commit mismatch is quantified; shared successor preflight, zero-mutation early rejection, exact-build agreement, create/edit/extend GUI regression and wider arrangements/hosts remain open |
 | Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and plain-line timber decisions; focused failure/invalidation cases |
 | Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/plain-line coverage, input-class invalidation, late timing payload and redundant refresh defects |
 | Legacy approximate supported chair bodies | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage; five-box S1/S1J bodies are gap evidence, not the final procedural chair oracle |
@@ -688,6 +690,11 @@ Existing crossover evidence remains owned by
 [benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md),
 and
 [benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+The fixed preview/complete-rule mismatch and successor acceptance boundary are
+recorded in
+[contracts/phase1-crossover-feasibility.json](contracts/phase1-crossover-feasibility.json)
+and
+[benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md](benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md).
 The plain-line edit, persistence and rollback evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 Its undo/redo and explicit change-back extension is recorded in

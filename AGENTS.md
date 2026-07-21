@@ -90,6 +90,11 @@
   B14-module AST parity after normalising the declared version, launch and
   recompute-instrumentation differences.
 - `tests/freecad_validate_b15.py` is the real FreeCAD 1.1 headless smoke test for the B15 chair display layer.
+- `reference/contracts/phase1-crossover-feasibility.json` and its fast/headless
+  validators freeze B14's fixed curved-host preview/complete-radius mismatch.
+  Treat it as defect evidence and a successor acceptance gate, not behaviour to
+  preserve: a successor must reject the lower witness before Part construction
+  or document mutation and retain the documented valid placement.
 - B15's supported S1/S1J exact body is a bounded five-box legacy approximation.
   Preserve it as accepted B15 evidence, but do not use it as the production
   chair-definition schema or final S1 geometry oracle.

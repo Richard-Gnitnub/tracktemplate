@@ -247,6 +247,15 @@ and expected mixed B14/B15 documents are the intended RC migration sources,
 but each entity family remains inspection-only until its Phase 4 copied-target
 migration fixture passes. Existing macros and documents are unchanged.
 
+The fixed curved-host crossover mismatch is now characterised under
+[`contracts/phase1-crossover-feasibility.json`](contracts/phase1-crossover-feasibility.json).
+B14 preview accepts Host A chainage `500.000 mm` although the complete mapped
+minimum is `540.848 mm` against the `600.000 mm` request; the documented
+`746.298 mm` placement passes at `676.179 mm`. This closes the characterisation
+part of the deliverable only. Shared successor preflight, aligned diagnostics,
+pre-Part/zero-mutation rejection and broader create/edit/extend GUI evidence
+remain required before the deliverable or Phase 1 can close.
+
 Current Phase 1 evidence is maintained in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Its first static tranche is
 complete: a deterministic, non-executing AST tool records definition

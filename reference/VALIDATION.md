@@ -505,6 +505,31 @@ This is one B14 legacy comparison oracle, not canonical turnout data or
 coverage of trailing/straight/alternate hosts, downstream timber/chair stages
 or target-file export.
 
+Fast Phase 1 crossover preview/commit feasibility contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_crossover_feasibility.py
+```
+
+This verifies the exact B14/B15 fingerprints and crossover AST parity, freezes
+the current preview/late-complete-gate call ordering, validates both analytical
+witnesses and fails closed if the successor zero-mutation rule is weakened. It
+does not import FreeCAD or claim the mismatch is fixed. After reproducing the
+ignored base fixture, exercise the read-only FreeCAD oracle with:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase1_crossover_feasibility.py
+```
+
+The oracle resolves both hosts by persisted identity, verifies the nine-object
+semantic fixture, calculates both mapped turnout roads and the connector at
+Host A chainages `500.000` and `746.298 mm`, creates no document objects and
+requires the fixture bytes to remain unchanged. It must print
+`Phase 1 crossover feasibility FreeCAD oracle passed`. The exact evidence and
+remaining production/GUI gate are recorded in
+[benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md](benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md).
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash
@@ -603,11 +628,14 @@ are explicitly bounded in
 That makes unsafe current measurements ineligible for optimisation selection;
 it does not mark any defect fixed or replace the regression obligations.
 
-1. Crossover preview/commit feasibility: use the same persisted host-centreline
-   identities and Host A chainage for preview and transactional commit. Assert
-   that the complete minimum-radius rule covers both mapped turnout roads and
-   the connector, that a lower invalid chainage is rejected before document
-   mutation, and that the documented valid chainage is accepted.
+1. Crossover preview/commit feasibility: the fail-closed Phase 1 contract and
+   read-only FreeCAD oracle now freeze B14's `500.000 mm` preview-pass/complete-
+   fail witness and its valid `746.298 mm` control. The successor regression
+   must use the same persisted host identities and request for preview and
+   create/edit/extend; cover both mapped turnout roads and the connector; reject
+   the lower witness before Part construction or document/history mutation;
+   accept the documented witness; and prove later exact-build agreement. The
+   characterisation does not mark that implementation fixed.
 2. Chair timing persistence: run chair analysis, save, close and reopen the
    document, then assert persisted `performance_timings_ms` includes metadata
    updates, diagnostic display construction, document recompute, transaction
