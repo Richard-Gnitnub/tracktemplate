@@ -210,6 +210,17 @@ and reserves the still-unmeasured lightweight Edit, explicit Validate,
 export-from-validated and complete edit-through-export slots. Consult it before
 comparing current profiles or designing a replacement measurement.
 
+The focused
+[`phase1-chair-analysis-persistence.json`](contracts/phase1-chair-analysis-persistence.json)
+oracle now supplies executable defect evidence for the chair subprofile: a
+fixed direct call separates logical calculation from record extraction,
+metadata/display work and save/reopen persistence, while the accepted GUI
+report remains the operator-action owner. Its two disposable timing
+repetitions are diagnostic only, not a controlled performance profile or a
+budget. Do not subtract them from the independently recorded panel duration;
+use the source/lifecycle evidence to define the successor boundary and measure
+that boundary afresh.
+
 Until Phase 1 reconciles the complete instrumentation:
 
 - identify the exact instrumented scope on every committed report;

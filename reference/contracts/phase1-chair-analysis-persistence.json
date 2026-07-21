@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:chair-analysis-persistence:1",
+  "recorded_on": "2026-07-21",
+  "phase": 1,
+  "status": "fixed-xo001-characterised-successor-fixes-not-started",
+  "scope": {
+    "closed_by_this_contract": "The fixed post-B4 XO-001 logical chair-analysis result, diagnostic display, cold calculation, unchanged reuse, Undo/Redo of that reuse and save/reopen persistence are reproducible and bounded.",
+    "still_open": "Every calculation-input invalidation class, turnout/plain-line and wider crossover coverage, the B15 layout/support/solid chain, real-GUI presentation semantics and all successor fixes remain open.",
+    "product_effect": "Evidence and successor acceptance rules only; neither B14 nor B15 product source is changed.",
+    "provenance_boundary": "The positions, family labels and current chair-code assignments are immutable legacy comparison evidence, not project-cleared chair definitions, dimensions or production data. Existing lineage and output-manifest gates still apply."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "version": "10.2A8A7B14",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "version": "10.2A8A7B15",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference using the inherited analysis core plus workflow instrumentation"
+    }
+  },
+  "fixture": {
+    "path": "benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd",
+    "tracked": false,
+    "reproduction_command": "tools/freecad_bridge/build-b14-base --output benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd",
+    "sha256": "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c",
+    "semantic_sha256": "a3486db6f02370e61432a480bfb6c9261bc9357cc2af5111f93135e3372d0a4e",
+    "object_count": 9,
+    "safety_rule": "Copy the fixture to a temporary directory, mutate only the copy, close it and require the source fixture bytes to remain unchanged."
+  },
+  "scenario": {
+    "crossover_id": "XO-001",
+    "host_a_chainage_mm": 746.298,
+    "prerequisite_b4_resolution_signature": "9ae269b05624df83a3b789986b10c301f7423f3ff92f2adf9b11c65d9927f51d",
+    "starting_object_count_after_b4": 20,
+    "settings_source": "B14 default chair-analysis settings persisted with the crossover",
+    "execution_boundary": "Call analyse_entity_chair_positions directly so panel refresh and asynchronous bridge overhead remain separate."
+  },
+  "legacy_semantics": {
+    "status": "Ordinary and turnout assignments validated",
+    "geometry_signature": "9d7d978ecb0cbbf145e8e5288222efafc7cfa037d05a4f53a5b30c8e61665e3e",
+    "semantic_sha256": "7e1a5e1a0e5d225377752db2962d42f664266ff72fa4b865ab025964b5902470",
+    "position_identity_sha256": "4444903ad30ee1f971e93726deb17eb20b500a03d231c2395b3ccf8d85089d10",
+    "finding_sha256": "face3ec848d53c8cb049e78cd73731ffae5b596704af1be4e8aa0dde2aaefef5",
+    "summary_counts": {
+      "rail_count": 30,
+      "timber_count": 86,
+      "chair_position_count": 355,
+      "mandatory_position_count": 170,
+      "deliberately_omitted_count": 48,
+      "confirmed_ordinary_turnout_assignment_count": 183,
+      "special_assignment_deferred_count": 124,
+      "model_support_timber_count": 38
+    },
+    "severity_counts": {
+      "Advisory": 269,
+      "Informational": 0,
+      "Production conflict": 0,
+      "Production-critical conflict": 0
+    },
+    "family_counts": {
+      "bridge chair": 14,
+      "check-rail chair": 20,
+      "common-crossing chair": 40,
+      "crossing-nose support": 4,
+      "deliberately omitted chair position": 48,
+      "knuckle-region support": 4,
+      "ordinary running-rail chair": 123,
+      "rail-joint support": 12,
+      "slide chair": 28,
+      "splice-rail support": 15,
+      "switch-heel chair": 12,
+      "switch-support chair": 8,
+      "vee support": 15,
+      "wing-rail chair": 12
+    },
+    "display": {
+      "object_count": 2,
+      "group_name": "ChairAnalysis_XO_001",
+      "group_role": "ChairAnalysisDisplay",
+      "marker_name": "ChairPositionMarkers_XO_001",
+      "marker_role": "ChairPositionMarkers",
+      "marker_type_id": "Part::Feature",
+      "marker_shape": {
+        "edges": 710,
+        "faces": 0,
+        "solids": 0,
+        "vertices": 1420,
+        "bounds_mm": [
+          684.416909309,
+          164.416603848,
+          1.145,
+          981.804261567,
+          903.378679655,
+          1.145
+        ]
+      },
+      "architectural_role": "Legacy derived diagnostic presentation only; the logical positions are authoritative and a successor must not retain this Part edge compound as railway state."
+    },
+    "lifecycle_object_counts": {
+      "after_b4_before_analysis": 20,
+      "after_cold_analysis": 22,
+      "after_unchanged_reuse": 22,
+      "after_reuse_undo": 22,
+      "after_reuse_redo": 22,
+      "after_reopen": 22,
+      "after_reopened_reuse": 22
+    }
+  },
+  "persistence_boundary": {
+    "cold_returned_timing_keys": [
+      "chair_calculation",
+      "core_chair_position_generation",
+      "core_chair_position_validation",
+      "core_core_total",
+      "core_result_summary_assembly",
+      "core_settings_normalisation",
+      "diagnostic_display_construction",
+      "document_recompute",
+      "metadata_display_and_recompute",
+      "metadata_updates",
+      "record_extraction",
+      "signature_and_cache_lookup",
+      "total",
+      "transaction_commit",
+      "transaction_open",
+      "visibility_updates"
+    ],
+    "cold_persisted_timing_keys": [
+      "chair_calculation",
+      "core_chair_position_generation",
+      "core_chair_position_validation",
+      "core_core_total",
+      "core_result_summary_assembly",
+      "core_settings_normalisation",
+      "record_extraction",
+      "signature_and_cache_lookup",
+      "transaction_open"
+    ],
+    "reuse_returned_timing_keys": [
+      "chair_calculation",
+      "diagnostic_display_construction",
+      "document_recompute",
+      "metadata_display_and_recompute",
+      "metadata_updates",
+      "record_extraction",
+      "signature_and_cache_lookup",
+      "total",
+      "transaction_commit",
+      "transaction_open",
+      "visibility_updates"
+    ],
+    "reuse_persisted_timing_keys": [
+      "chair_calculation",
+      "record_extraction",
+      "signature_and_cache_lookup",
+      "transaction_open"
+    ],
+    "reopen_result": "The logical core, geometry signature, two display identities and shape survive save/close/reopen, and the next direct analysis reports calculation and display reuse.",
+    "reuse_history_witness": "Undo immediately after unchanged reuse restores the cold persisted payload; Redo restores the reuse payload. The cache hit therefore creates a document-history entry even though logical and display semantics are unchanged."
+  },
+  "legacy_defects": {
+    "premature_timing_persistence": "performance_timings_ms is written before metadata, display, recompute, commit and total are measured, so the returned and persisted payloads disagree and reopen retains the truncated form.",
+    "unchanged_reuse_still_mutates": "The cache lookup occurs only after rebuilding all rail and timber records; a hit still opens a transaction, serialises and rewrites the roughly 1.5 MB result and visibility, dirties the document and adds an Undo entry.",
+    "repeated_effective_status_scan": "Each chair_analysis_effective_status call independently rebuilds rail and timber records and recomputes the geometry signature; no command-scoped shared status snapshot exists.",
+    "redundant_panel_refresh": "The active panel run_analysis calls _refresh_parent, whose callback and own refresh run, and then calls self.refresh again. The accepted GUI action was 120.415 seconds despite reporting reuse."
+  },
+  "successor_acceptance": {
+    "rules": [
+      "Cold calculation, cache reuse, save/reopen and any presentation-only update must expose one canonical signature-bound logical result.",
+      "Persist the final complete timing payload only after metadata, presentation, recompute and commit have completed, and reconcile it with the enclosing operator-action boundary.",
+      "An unchanged current logical result and current presentation must return before rail/timber record extraction, metadata serialisation, document mutation, history creation or recompute.",
+      "Compute effective chair/support/layout/solid status from one command-scoped dependency snapshot or demonstrably bounded signature cache, with exact invalidation when a relevant input changes.",
+      "Refresh the manager and chair panel once from the accepted command result; do not recursively rescan the document or reconstruct equivalent state.",
+      "Keep calculation-signature inputs separate from presentation controls. Visibility-only changes must reuse the logical result and update only lightweight derived presentation.",
+      "Treat logical positions, assignments and stable identities as model output and diagnostic geometry as replaceable presentation; exact chair solids remain a Validate/Export concern.",
+      "Preserve the fixed semantic digests unless an engineering-rule change is explicitly reviewed, but do not infer project-cleared provenance from oracle parity."
+    ],
+    "remaining_matrix": [
+      "each rail, timber, tolerance, assignment and calculation-setting invalidation class",
+      "turnout, plain-line and wider crossover configurations",
+      "B15 bounded-support, 2D-layout, supported-solid and integration dependencies",
+      "real-GUI selection, visibility, one-refresh and one-command history evidence",
+      "lightweight presentation prototype and deferred exact-shape agreement",
+      "field-level lineage and dependency manifest for any advertised chair output"
+    ],
+    "migration_gate": "Do not move or remove the legacy chair-analysis path until the successor passes these rules, the full matrix required for its advertised entity scope and user-approved GUI evidence."
+  },
+  "evidence": {
+    "report": "reference/benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md",
+    "fast_validator": "tests/validate_phase1_chair_analysis_persistence.py",
+    "freecad_validator": "tests/freecad_validate_phase1_chair_analysis_persistence.py",
+    "existing_gui_acceptance": "reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md",
+    "performance_boundary_contract": "reference/contracts/phase1-performance-boundaries.json"
+  }
+}

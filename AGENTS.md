@@ -396,6 +396,15 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
   tests/freecad_validate_phase1_crossover_timbering.py
 ```
 
+Run the fixed Phase 1 post-B4 chair-analysis persistence/reuse contract and
+disposable FreeCAD lifecycle oracle:
+
+```bash
+.venv/bin/python tests/validate_phase1_chair_analysis_persistence.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase1_chair_analysis_persistence.py
+```
+
 Run the controlled B14 crossover recipe in a fresh isolated FreeCAD process:
 
 ```bash

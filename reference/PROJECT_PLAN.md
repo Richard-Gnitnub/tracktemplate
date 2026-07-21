@@ -267,6 +267,20 @@ other crossover configurations and standalone turnout/plain-line timbering
 remain open. Current timber values remain legacy comparison evidence subject
 to the other-S&C lineage gate; the contract is not production clearance.
 
+The fixed post-B4 logical chair-analysis boundary is now separately bounded by
+[`contracts/phase1-chair-analysis-persistence.json`](contracts/phase1-chair-analysis-persistence.json).
+Cold calculation, immediate reuse, reuse Undo/Redo and save/reopen preserve the
+accepted 355 positions, 269 findings, stable identities, semantic digest and
+two diagnostic-display identities. The contract also proves, without
+accepting, that a cache hit still repeats multi-second record extraction,
+rewrites roughly 1.5 MB of timing-bearing metadata in a new history entry,
+persists an incomplete timing payload, and enters redundant status/panel
+refresh paths. Successor fixes, the complete calculation-input invalidation
+matrix, lightweight-presentation semantics, B15 support/layout/solid coverage
+and turnout/plain-line/wider-crossover cases remain open. Current position and
+chair-code semantics remain legacy comparison evidence, not project-cleared
+chair data.
+
 Current Phase 1 evidence is maintained in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Its first static tranche is
 complete: a deterministic, non-executing AST tool records definition

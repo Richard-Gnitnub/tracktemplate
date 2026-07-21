@@ -555,6 +555,29 @@ rebuild and nested diagnostic drift are required defect witnesses, not future
 behaviour. Exact evidence and remaining scope are in
 [benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md](benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md).
 
+Fast Phase 1 chair-analysis persistence/reuse contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_chair_analysis_persistence.py
+```
+
+This freezes the inherited B14/B15 logical-analysis source boundary, fixed
+`XO-001` semantic/display digests, timing-persistence ordering, effective-
+status scan and active panel refresh route. Exercise cold calculation,
+unchanged reuse, reuse Undo/Redo and save/reopen in real FreeCAD with:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase1_chair_analysis_persistence.py
+```
+
+It must print `Phase 1 chair analysis persistence FreeCAD oracle passed` and
+leave the ignored fixture byte-identical. Truncated persisted timings, metadata
+and history mutation on a cache hit, repeated status scans and redundant panel
+refresh are required defect witnesses, not accepted successor behaviour. Exact
+evidence and remaining scope are in
+[benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md](benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md).
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash
@@ -661,14 +684,18 @@ it does not mark any defect fixed or replace the regression obligations.
    the lower witness before Part construction or document/history mutation;
    accept the documented witness; and prove later exact-build agreement. The
    characterisation does not mark that implementation fixed.
-2. Chair timing persistence: run chair analysis, save, close and reopen the
-   document, then assert persisted `performance_timings_ms` includes metadata
-   updates, diagnostic display construction, document recompute, transaction
-   commit and total duration, and reconciles with the enclosing stage boundary.
-3. Effective-status reuse: query chair/support/layout/solid status through one
-   shared snapshot or demonstrably bounded signature reuse, assert unchanged
-   results are equivalent, then mutate each relevant input class and verify
-   correct invalidation.
+2. Chair timing persistence: the focused fixed-`XO-001` contract now proves
+   that cold and reused persisted `performance_timings_ms` omit metadata,
+   diagnostic display, recompute, commit and total work, and that unchanged
+   reuse rewrites the result in a new Undo entry. Preserve that defect witness;
+   the successor must persist the final complete payload after all claimed
+   work, reconcile it with the enclosing stage and perform no document/history
+   mutation for a current unchanged result.
+3. Effective-status reuse: the same contract now freezes the independent rail,
+   timber and signature scan on every chair-status query. Query chair/support/
+   layout/solid status through one shared snapshot or demonstrably bounded
+   signature reuse, assert unchanged results are equivalent, then mutate each
+   relevant input class and verify correct invalidation.
 4. Supported-solid cache boundary and panel refresh: assert an unchanged valid
    solid returns before rebuilding its plan/fit inputs, retains exact object and
    shape identity, and does not trigger redundant parent/panel reconstruction or
@@ -703,8 +730,8 @@ Before retiring a legacy path, add representative, non-sensitive fixtures or det
 - curve/easement and multi-track generation;
 - turnout creation and editing;
 - straight- and curved-host crossovers;
-- wider automatic timbering and chair analysis (the fixed `XO-001` B4
-  lifecycle now has a dedicated oracle);
+- wider automatic timbering and chair analysis (the fixed `XO-001` B4 and
+  post-B4 logical-analysis lifecycles now have dedicated oracles);
 - an exact local capture produced under the tracked frozen-Templot-S1
   constituent/assembly recipe (the recipe/validator exists; the exact 556b
   executable, fixture and artifacts remain blocked);
