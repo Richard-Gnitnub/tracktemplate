@@ -281,6 +281,18 @@ and turnout/plain-line/wider-crossover cases remain open. Current position and
 chair-code semantics remain legacy comparison evidence, not project-cleared
 chair data.
 
+The same fixed witness now has a complete emitted-input classification and
+representative invalidation matrix in
+[`contracts/phase1-chair-analysis-invalidation.json`](contracts/phase1-chair-analysis-invalidation.json).
+It classifies all 23 normalised settings, 11 rail-record fields and 40 timber-
+record fields, and reproduces an actual stale cache hit after changing omitted
+timber axes. It also bounds five-decimal signature aliasing, record-order over-
+invalidation and the headless topology of presentation-only changes. These are
+defect witnesses, not requirements to preserve. Upstream configuration-to-
+record mutations, turnout/plain-line/wider-crossover cases, real-GUI
+visibility/selection/history, the lightweight successor and B15's downstream
+support/layout/solid chain remain open.
+
 Current Phase 1 evidence is maintained in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Its first static tranche is
 complete: a deterministic, non-executing AST tool records definition
@@ -306,10 +318,12 @@ parameter grid, diagnostics, façade/caller route, rollback and profiling gates
 are now frozen in
 [contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json)
 and enforced without importing either macro. Stationing still needs an
-explicit point-adapter seam, while chair analysis retains alias coupling, 11
-outgoing closure dependencies and known cache-signature gaps. Broader workflow
-boundaries, product-pipeline profiles and the remaining Phase 1 user decisions
-are still open; package creation and source movement have not started. The
+explicit point-adapter seam, while chair analysis retains alias coupling and
+11 outgoing closure dependencies; its fixed-XO signature gaps are now
+classified and fail-closed by the dedicated invalidation contract. Broader
+workflow boundaries, product-pipeline profiles and the remaining Phase 1 user
+decisions are still open; package creation and source movement have not
+started. The
 fixed B14
 plain-line curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,

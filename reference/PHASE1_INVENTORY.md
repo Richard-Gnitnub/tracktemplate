@@ -678,7 +678,7 @@ is known to be defective.
 | Standalone turnout | B15/B14 calculation parity plus B14's complete fixed-lifecycle semantic oracle | `run-b14-turnout` creates `TO-001` on persisted Main Track identity at chainage `746.298 mm`, edits its hand and exercises recovery | Curved-host left/facing creation, one handed edit, exact history/persistence, overlap rejection and injected transaction abort are characterised; trailing GUI orientation, straight/other hosts, wider inputs, removal/integration, downstream timber/chair stages and export remain open |
 | Crossover geometry | B14 cold series, B15 acceptance report and the fail-closed crossover-feasibility contract | Controlled `XO-001` bridge recipe plus read-only `500.000/746.298 mm` analytical witnesses on the fixed curved-host fixture | The current preview/commit mismatch is quantified; shared successor preflight, zero-mutation early rejection, exact-build agreement, create/edit/extend GUI regression and wider arrangements/hosts remain open |
 | Automatic timbering | Controlled `XO-001` workflow plus the fail-closed semantic/lifecycle contract | Crossover cold recipe and disposable `freecad_validate_phase1_crossover_timbering.py` copy | Fixed curved-host records, calculation invalidation, reuse, Undo/Redo, persistence, clear and injected failure are characterised; persisted-analysis drift, display-only over-invalidation and abort cleanup remain successor defects; standalone turnout/plain-line decisions, wider crossover inputs and the complete invalidation matrix remain open |
-| Chair analysis and 2D presentation | B15 analytical tests, B14-to-B15 acceptance and the fail-closed logical-analysis persistence/reuse contract | Disposable post-B4 `XO-001` built from the regenerated base fixture, plus the controlled completed GUI document | Fixed cold/reuse/history/reopen semantics and the timing/status/refresh defects are characterised; successor fixes, every input-class invalidation, turnout/plain-line/wider crossover coverage and lightweight-presentation GUI semantics remain open |
+| Chair analysis and 2D presentation | B15 analytical tests, B14-to-B15 acceptance and the fail-closed persistence plus invalidation contracts | Disposable post-B4 `XO-001` built from the regenerated base fixture, plus the controlled completed GUI document | Fixed cold/reuse/history/reopen semantics, all emitted input fields, representative mutations, an actual stale-cache hit and headless presentation topology are characterised; upstream config-to-record mutation, successor fixes, turnout/plain-line/wider crossover coverage and lightweight real-GUI semantics remain open |
 | Legacy approximate supported chair bodies | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage; five-box S1/S1J bodies are gap evidence, not the final procedural chair oracle |
 | Procedural chair definitions and exact components | Templot5 556b source audit, accepted architecture/licensing boundaries, blocked first-S1/core lineage register and fail-closed S1 oracle contract | Exact source/member hashes and constituent route are reproducibly verified; capture settings and semantic DXF/STL checks are defined, but the exact 556b executable, S1-only fixture and artifacts remain blocked | Execute and review the frozen local Templot S1 capture; define the neutral package schema; obtain rights-compatible primary evidence, accepted full-size values/transforms, package licence, comparison metrics and tolerances |
 | Assisted chair assimilation | Accepted RC scope; no implementation oracle yet | One S1 pilot to be selected | Precise prototype designation, evidence provenance/rights, intended commercial/publication use, calibrated scan/CAD/measurement set, component landmarks, fit-residual policy, package licence and acceptance recipe |
@@ -707,6 +707,12 @@ diagnostic-display identity and save/reopen boundary is recorded in
 [contracts/phase1-chair-analysis-persistence.json](contracts/phase1-chair-analysis-persistence.json)
 and
 [benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md](benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md).
+Its complete fixed-XO emitted-input classification, representative mutation
+matrix, stale-cache witness, signature precision/order behavior and headless
+presentation topology are recorded separately in
+[contracts/phase1-chair-analysis-invalidation.json](contracts/phase1-chair-analysis-invalidation.json)
+and
+[benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md](benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md).
 The plain-line edit, persistence and rollback evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 Its undo/redo and explicit change-back extension is recorded in
@@ -1007,11 +1013,11 @@ three-definition platform-free/self-contained closure and a direct numerical
 oracle. The scorecard and accepted contract make it a first architecture
 pilot, not a performance optimisation or authority to start source movement.
 The station index has high fan-out; interpolation still returns `App.Vector`; and
-the chair core has duplicate/alias coupling, non-deterministic timings,
-unvalidated mapping inputs and known signature omissions. In particular, its
-current cache signature excludes rail-face/source metadata and several timber
-support/source fields. Those omissions must be resolved or explicitly accepted
-before a migrated cache treats a matching signature as semantic equivalence.
+the chair core has duplicate/alias coupling, non-deterministic timings and
+unvalidated mapping inputs. Its fixed-XO signature omissions, precision alias
+and order over-invalidation are now classified by the dedicated invalidation
+contract. Those defects must be fixed before a migrated cache treats a
+matching signature as semantic equivalence.
 
 This closes the bounded **candidate boundary-recording** task. It does not
 complete the wider curve-to-export boundary inventory: production-file units,
@@ -1174,16 +1180,18 @@ successor document detector or migrator exists yet, and neither macro changed.
 | 2026-07-21 | Reconcile the current performance evidence before using subprofiles | Implemented for Phase 1 evidence and owner review; nine controlled legacy profiles now have exact operator/nested/harness boundaries, all five instrumentation defects are explicitly bounded but not fixed, per-run reconciliation precedes medians, four target-pipeline slots remain visibly unmeasured and no observed timing is accepted as a budget or optimisation authority |
 | 2026-07-21 | Add a focused automatic-crossover-timbering semantic and lifecycle oracle | Implemented for Phase 1 evidence and owner review; the copied fixture freezes the fixed `XO-001` records, calculation invalidation, reuse/history/persistence and clear path, while diagnostic persistence, display-only rebuild and incomplete abort cleanup are explicit defects rather than successor requirements and current timber data remains provenance-blocked |
 | 2026-07-21 | Add a focused post-B4 chair-analysis persistence and reuse oracle | Implemented for Phase 1 evidence and owner review; the disposable fixed `XO-001` witness preserves 355 positions, 269 findings, semantic/display identities, reuse Undo/Redo and reopen, while premature timing persistence, full record extraction/metadata mutation on hits, repeated status scans and redundant panel refresh are bounded defects rather than successor requirements; current chair semantics remain provenance-blocked |
+| 2026-07-21 | Classify fixed-XO chair-analysis invalidation and presentation controls | Implemented for Phase 1 evidence and owner review; all 23 settings, 11 emitted rail fields and 40 emitted timber fields are classified, representative mutations reproduce an actual stale result plus precision/order defects, and headless layer topology is bounded without treating visibility as GUI evidence or changing either macro |
 
 ## Remaining Phase 1 work
 
 - Complete operator workflow inputs, outputs, persisted properties, guided
   stages, failure and rollback maps for every row above.
-- Extend the fixed chair-analysis oracle through every calculation-signature
-  input class, presentation-only controls, turnout/plain-line and wider
-  crossover cases. Fix rather than reproduce its four bounded timing,
-  mutation, effective-status and panel-refresh defects; retain logical chair
-  positions as model output, use lightweight diagnostic presentation, and
+- Extend the now-classified fixed chair-analysis oracle through upstream
+  configuration/host-to-record mutations and turnout/plain-line/wider-
+  crossover cases. Fix rather than reproduce its bounded under-invalidation,
+  precision, ordering, timing, mutation, effective-status, Part-presentation
+  and panel-refresh defects; retain logical chair positions as model output,
+  use lightweight diagnostic presentation, obtain real-GUI evidence, and
   leave B15 support/layout/solid invalidation under its separate gates.
 - Extend the fixed curve/multiple-track recipe through broader boundary cases
   and explicit Validate/deferred reconstruction; extend straight coverage to

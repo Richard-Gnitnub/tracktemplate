@@ -1,14 +1,10 @@
 """FreeCAD oracle for fixed XO-001 chair-analysis persistence and reuse."""
 
-import ast
-import copy
-import hashlib
 import json
 import pathlib
 import shutil
 import sys
 import tempfile
-import types
 
 import FreeCAD as App
 
@@ -17,6 +13,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools.freecad_bridge import b14_recipe  # noqa: E402
+from tools.freecad_bridge import chair_analysis_recipe as chair_recipe  # noqa: E402
 from tools.freecad_bridge import crossover_timber_recipe  # noqa: E402
 
 
@@ -24,117 +21,27 @@ CONTRACT_PATH = (
     ROOT / "reference" / "contracts" /
     "phase1-chair-analysis-persistence.json"
 )
-CORE_KEYS = (
-    "entity_id",
-    "entity_kind",
-    "findings",
-    "geometry_signature",
-    "model_timber_support_plan",
-    "positions",
-    "production_geometry_changed",
-    "schema_version",
-    "settings",
-    "source_basis",
-    "status",
-    "summary",
-)
-
-
-def _sha256(path):
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for block in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
-
-
-def _load_macro(path):
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    launch = tree.body[-1] if tree.body else None
-    assert (
-        isinstance(launch, ast.Expr)
-        and isinstance(launch.value, ast.Call)
-        and isinstance(launch.value.func, ast.Name)
-        and launch.value.func.id == "run_macro"
-    ), "B14 launch boundary changed"
-    tree.body.pop()
-    ast.fix_missing_locations(tree)
-    module = types.ModuleType("phase1_chair_analysis_persistence_b14")
-    module.__file__ = str(path)
-    exec(compile(tree, str(path), "exec"), module.__dict__)
-    return module
-
-
-def _canonical(value):
-    if isinstance(value, dict):
-        return {
-            str(key): _canonical(item)
-            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
-        }
-    if isinstance(value, (list, tuple)):
-        return [_canonical(item) for item in value]
-    if isinstance(value, set):
-        return sorted(_canonical(item) for item in value)
-    if isinstance(value, float):
-        return round(value, 9)
-    if value is None or isinstance(value, (str, int, bool)):
-        return value
-    return str(value)
-
-
-def _digest(value):
-    encoded = json.dumps(
-        _canonical(value), sort_keys=True, separators=(",", ":")
-    ).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
-
-
-def _analysis_core(result):
-    return {
-        key: copy.deepcopy(result[key])
-        for key in CORE_KEYS
-        if key in result
-    }
-
-
 def _assert_result(result, contract):
     expected = contract["legacy_semantics"]
-    core = _analysis_core(result)
+    core = chair_recipe.analysis_core(result)
     assert str(result.get("status") or "") == expected["status"]
     assert str(result.get("geometry_signature") or "") == expected[
         "geometry_signature"
     ]
-    assert _digest(core) == expected["semantic_sha256"]
+    assert chair_recipe.digest(core) == expected["semantic_sha256"]
     positions = list(result.get("positions") or [])
     findings = list(result.get("findings") or [])
-    assert _digest([
+    assert chair_recipe.digest([
         str(item.get("stable_chair_position_identity") or "")
         for item in positions
     ]) == expected["position_identity_sha256"]
-    assert _digest(findings) == expected["finding_sha256"]
+    assert chair_recipe.digest(findings) == expected["finding_sha256"]
 
     summary = dict(result.get("summary") or {})
     for key, value in expected["summary_counts"].items():
         assert summary.get(key) == value
     assert summary.get("severity_counts") == expected["severity_counts"]
     assert summary.get("family_counts") == expected["family_counts"]
-
-
-def _shape_summary(shape):
-    box = shape.BoundBox
-    return {
-        "edges": len(shape.Edges),
-        "faces": len(shape.Faces),
-        "solids": len(shape.Solids),
-        "vertices": len(shape.Vertexes),
-        "bounds_mm": [
-            round(float(value), 9)
-            for value in (
-                box.XMin, box.YMin, box.ZMin,
-                box.XMax, box.YMax, box.ZMax,
-            )
-        ],
-    }
 
 
 def _display_snapshot(module, document, entity_id, expected):
@@ -154,7 +61,7 @@ def _display_snapshot(module, document, entity_id, expected):
     assert str(group.Name) == expected["group_name"]
     assert str(marker.Name) == expected["marker_name"]
     assert str(marker.TypeId) == expected["marker_type_id"]
-    assert _shape_summary(marker.Shape) == expected["marker_shape"]
+    assert chair_recipe.shape_summary(marker.Shape) == expected["marker_shape"]
     return {
         role: str(obj.Name)
         for role, obj in sorted(by_role.items())
@@ -185,8 +92,10 @@ def validate():
     contract = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
     source = contract["source_state"]["b14"]
     macro_path = ROOT / source["path"]
-    assert _sha256(macro_path) == source["sha256"]
-    module = _load_macro(macro_path)
+    assert chair_recipe.sha256_file(macro_path) == source["sha256"]
+    module = chair_recipe.load_macro_without_launch(
+        macro_path, "phase1_chair_analysis_persistence_b14"
+    )
     assert str(module.MACRO_VERSION_NUMBER) == source["version"]
 
     fixture = contract["fixture"]
@@ -195,7 +104,7 @@ def validate():
         "Reproduce the ignored fixture first with: {}"
         .format(fixture["reproduction_command"])
     )
-    fixture_hash = _sha256(fixture_path)
+    fixture_hash = chair_recipe.sha256_file(fixture_path)
     assert fixture_hash == fixture["sha256"]
 
     document = None
@@ -359,7 +268,7 @@ def validate():
             if document is not None and document.Name in App.listDocuments():
                 App.closeDocument(document.Name)
 
-    assert _sha256(fixture_path) == fixture_hash
+    assert chair_recipe.sha256_file(fixture_path) == fixture_hash
     print("Phase 1 chair analysis persistence FreeCAD oracle passed")
 
 

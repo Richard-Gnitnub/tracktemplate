@@ -315,6 +315,11 @@ is frozen in
 The exact qualified runtime, standalone Python floor and B14/B15 ingress
 policy are separately frozen in
 [`contracts/phase1-compatibility.json`](contracts/phase1-compatibility.json).
+The fixed-XO chair candidate's emitted-input omissions, precision/order
+behavior and presentation-control topology are further frozen in
+[`contracts/phase1-chair-analysis-invalidation.json`](contracts/phase1-chair-analysis-invalidation.json);
+that evidence blocks reuse of its partial signature rather than authorising
+chair extraction.
 Broader workflow boundaries, candidate-specific gaps, additional platform
 qualification and representative target-architecture profiles remain open;
 source movement and document migration have not started.

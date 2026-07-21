@@ -578,6 +578,31 @@ refresh are required defect witnesses, not accepted successor behaviour. Exact
 evidence and remaining scope are in
 [benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md](benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md).
 
+Fast Phase 1 chair-analysis invalidation/presentation contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_chair_analysis_invalidation.py
+```
+
+This classifies every normalised setting and every emitted rail/timber field
+for the fixed post-B4 `XO-001`, freezes representative logical-output
+mutations and guards the source precision/order boundary. Exercise the actual
+application cache and headless diagnostic-layer topology in real FreeCAD with:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase1_chair_analysis_invalidation.py
+```
+
+It must print `Phase 1 chair analysis invalidation FreeCAD oracle passed` and
+leave the ignored fixture byte-identical. The stale cache hit, five-decimal
+precision alias, record-order over-invalidation, downstream-setting
+over-invalidation and exact-Part presentation rebuild are required legacy
+defect witnesses, not successor behavior. FreeCADCmd visibility is explicitly
+non-authoritative; real-GUI visibility, selection, history and refresh remain
+open. Exact evidence and scope are in
+[benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md](benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md).
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash

@@ -102,6 +102,14 @@
   persistence evidence. Its diagnostic-payload drift, display-only rebuild and
   retained untagged object after abort are bounded B14 defects, not successor
   invariants; the current timber data also remains subject to lineage gates.
+- `reference/contracts/phase1-chair-analysis-persistence.json` and
+  `reference/contracts/phase1-chair-analysis-invalidation.json`, their shared
+  `chair_analysis_recipe.py` helpers and fast/headless validators own the
+  fixed post-B4 `XO-001` logical-analysis boundary. Preserve the 355-position
+  semantic oracle and every classified setting/rail/timber field. Its stale
+  cache hit, signature precision/order behavior, mutation/timing defects and
+  exact-Part presentation rebuild are defect evidence, not successor
+  invariants; FreeCADCmd visibility is not real-GUI acceptance evidence.
 - B15's supported S1/S1J exact body is a bounded five-box legacy approximation.
   Preserve it as accepted B15 evidence, but do not use it as the production
   chair-definition schema or final S1 geometry oracle.
@@ -403,6 +411,15 @@ disposable FreeCAD lifecycle oracle:
 .venv/bin/python tests/validate_phase1_chair_analysis_persistence.py
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
   tests/freecad_validate_phase1_chair_analysis_persistence.py
+```
+
+Run the fixed Phase 1 post-B4 chair-analysis input-invalidation and headless
+presentation-topology contract:
+
+```bash
+.venv/bin/python tests/validate_phase1_chair_analysis_invalidation.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase1_chair_analysis_invalidation.py
 ```
 
 Run the controlled B14 crossover recipe in a fresh isolated FreeCAD process:

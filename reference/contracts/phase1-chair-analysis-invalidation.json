@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:chair-analysis-invalidation:1",
+  "recorded_on": "2026-07-21",
+  "phase": 1,
+  "status": "fixed-xo001-input-matrix-characterised-successor-fixes-not-started",
+  "scope": {
+    "closed_by_this_contract": "For the fixed post-B4 XO-001 witness, every normalised chair setting and every emitted rail and timber record field is classified, representative direct-input mutations are frozen, the actual stale-cache path is reproduced, and headless presentation-layer topology is bounded.",
+    "still_open": "Turnout, plain-line and wider-crossover semantics, upstream configuration-to-record invalidation, real-GUI visibility/selection/history, lightweight successor presentation, B15 support/layout/solid dependencies and all production fixes remain open.",
+    "product_effect": "Evidence and successor acceptance rules only; B14 and B15 product source remain byte-identical.",
+    "provenance_boundary": "All observed positions, assignments, labels and chair codes remain legacy comparison evidence. Signature parity neither creates project-cleared chair data nor closes any lineage or output-manifest gate."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "version": "10.2A8A7B14",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "version": "10.2A8A7B15",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference using the inherited logical chair-analysis signature and core"
+    }
+  },
+  "fixture": {
+    "path": "benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd",
+    "tracked": false,
+    "reproduction_command": "tools/freecad_bridge/build-b14-base --output benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd",
+    "sha256": "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c",
+    "semantic_sha256": "a3486db6f02370e61432a480bfb6c9261bc9357cc2af5111f93135e3372d0a4e",
+    "object_count": 9,
+    "safety_rule": "Copy the fixture into a temporary directory, mutate only the copy, close it and require the source bytes to remain unchanged."
+  },
+  "scenario": {
+    "crossover_id": "XO-001",
+    "host_a_chainage_mm": 746.298,
+    "prerequisite_b4_resolution_signature": "9ae269b05624df83a3b789986b10c301f7423f3ff92f2adf9b11c65d9927f51d",
+    "rail_count": 30,
+    "timber_count": 86,
+    "execution_boundary": "Extract the fixed records once, exercise the pure logical calculation, then patch only the two record extractors to reproduce application-cache and presentation behavior in a disposable document."
+  },
+  "observed_inputs": {
+    "classification_rule": "Signature inclusion is observed from _chair_geometry_signature. Output use is derived from the exact source plus fixed mutations; current-core-unused means no output change in the present logical core and does not authorise omission from a future wider pipeline.",
+    "direct_config": {
+      "scope": "Direct config reads after rail/timber extraction; upstream config fields that produce records remain indirect dependencies and must be covered by those records or an explicit upstream signature.",
+      "signature_included": [
+        "turnout_id",
+        "crossover_id"
+      ],
+      "omitted_output_affecting": [
+        "template_set_id"
+      ],
+      "current_core_unused": [
+        "handing"
+      ]
+    },
+    "settings": {
+      "normalised_keys": [
+        "cache_enabled",
+        "footprint_clearance",
+        "footprints_visible",
+        "future_boolean_fuzzy_tolerance",
+        "future_boolean_overlap_allowance",
+        "future_chair_embed_depth",
+        "markers_visible",
+        "maximum_advisory_skew_degrees",
+        "maximum_unsupported_span",
+        "model_support_auto_apply_enabled",
+        "model_support_edge_margin",
+        "model_support_recommendations_enabled",
+        "physical_overlap_area_tolerance",
+        "physical_rail_interference_clearance",
+        "physical_solids_visible",
+        "position_tolerance",
+        "preferred_maximum_model_support_extension_per_side",
+        "protected_markers_visible",
+        "rail_fit_clearance_per_side",
+        "rail_profile_id",
+        "schema_version",
+        "timber_end_clearance",
+        "unresolved_markers_visible"
+      ],
+      "presentation_only_excluded": [
+        "markers_visible",
+        "protected_markers_visible",
+        "footprints_visible",
+        "physical_solids_visible",
+        "unresolved_markers_visible"
+      ],
+      "execution_policy_excluded": [
+        "cache_enabled"
+      ],
+      "logical_output_included": [
+        "position_tolerance",
+        "footprint_clearance",
+        "timber_end_clearance",
+        "maximum_advisory_skew_degrees",
+        "maximum_unsupported_span",
+        "model_support_recommendations_enabled",
+        "model_support_edge_margin",
+        "preferred_maximum_model_support_extension_per_side",
+        "future_chair_embed_depth",
+        "future_boolean_overlap_allowance",
+        "future_boolean_fuzzy_tolerance"
+      ],
+      "downstream_only_but_included": [
+        "model_support_auto_apply_enabled",
+        "rail_fit_clearance_per_side",
+        "physical_overlap_area_tolerance",
+        "physical_rail_interference_clearance"
+      ],
+      "forced_identity_included": [
+        "schema_version",
+        "rail_profile_id"
+      ]
+    },
+    "rail_records": {
+      "schema": [
+        "gauge_face_points",
+        "name",
+        "outer_face_points",
+        "parent_crossover_identity",
+        "parent_turnout_identity",
+        "points",
+        "rail_role",
+        "source_configuration",
+        "stable_identity",
+        "supported_feature",
+        "turnout_side"
+      ],
+      "signature_included": [
+        "stable_identity",
+        "points",
+        "rail_role"
+      ],
+      "omitted_output_affecting": [
+        "name",
+        "parent_crossover_identity",
+        "parent_turnout_identity",
+        "source_configuration",
+        "supported_feature",
+        "turnout_side"
+      ],
+      "omitted_current_core_unused": [
+        "gauge_face_points",
+        "outer_face_points"
+      ]
+    },
+    "timber_records": {
+      "schema": [
+        "angle_degrees",
+        "angle_radians",
+        "bounding_box",
+        "centre",
+        "collision_polygon",
+        "crossover_identity",
+        "envelope_kind",
+        "envelope_path_station",
+        "envelope_timber",
+        "extended_inherited_timber",
+        "extended_source_timber_identity",
+        "far_end_segment",
+        "host_chainage",
+        "identifier",
+        "length",
+        "length_axis",
+        "local_rail_heading_degrees",
+        "local_rail_heading_radians",
+        "longitudinal_reference_axis",
+        "longitudinal_station",
+        "near_end_segment",
+        "outline_polygon",
+        "parent_turnout_identity",
+        "plain_connector_timber",
+        "protected_features",
+        "protected_support_region",
+        "prototype_reference",
+        "section",
+        "sequence",
+        "shared_long_timber",
+        "side_segments",
+        "source_configuration",
+        "source_timber_identities",
+        "stable_identity",
+        "support_requirements",
+        "support_zone_polygon",
+        "supported_feature",
+        "turnout_side",
+        "width",
+        "width_axis"
+      ],
+      "signature_included": [
+        "stable_identity",
+        "centre",
+        "angle_radians",
+        "width",
+        "length",
+        "outline_polygon"
+      ],
+      "omitted_output_affecting": [
+        "angle_degrees",
+        "collision_polygon",
+        "identifier",
+        "length_axis",
+        "protected_features",
+        "prototype_reference",
+        "section",
+        "source_configuration",
+        "support_requirements",
+        "turnout_side",
+        "width_axis"
+      ],
+      "omitted_current_core_unused": [
+        "bounding_box",
+        "crossover_identity",
+        "envelope_kind",
+        "envelope_path_station",
+        "envelope_timber",
+        "extended_inherited_timber",
+        "extended_source_timber_identity",
+        "far_end_segment",
+        "host_chainage",
+        "local_rail_heading_degrees",
+        "local_rail_heading_radians",
+        "longitudinal_reference_axis",
+        "longitudinal_station",
+        "near_end_segment",
+        "parent_turnout_identity",
+        "plain_connector_timber",
+        "protected_support_region",
+        "sequence",
+        "shared_long_timber",
+        "side_segments",
+        "source_timber_identities",
+        "support_zone_polygon",
+        "supported_feature"
+      ]
+    }
+  },
+  "baseline": {
+    "status": "Ordinary and turnout assignments validated",
+    "geometry_signature": "9d7d978ecb0cbbf145e8e5288222efafc7cfa037d05a4f53a5b30c8e61665e3e",
+    "deterministic_result_sha256": "d370cfecae4b455aaaaf9b14ce67a492e9390e0885bbbe8873068ffc5e62dd2d",
+    "output_without_settings_sha256": "e5d2565e1241da19d0ff3c4fe5560a51187aaa91ea6c112868909891ce3655f4",
+    "position_count": 355,
+    "finding_count": 269
+  },
+  "mutation_matrix": {
+    "settings": {
+      "cache_enabled": {"signature_changed": false, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "footprint_clearance": {"signature_changed": true, "output_without_settings_changed": true, "position_count": 355, "finding_count": 265},
+      "footprints_visible": {"signature_changed": false, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "future_boolean_fuzzy_tolerance": {"signature_changed": true, "output_without_settings_changed": true, "position_count": 355, "finding_count": 269},
+      "future_boolean_overlap_allowance": {"signature_changed": true, "output_without_settings_changed": true, "position_count": 355, "finding_count": 269},
+      "future_chair_embed_depth": {"signature_changed": true, "output_without_settings_changed": true, "position_count": 355, "finding_count": 269},
+      "markers_visible": {"signature_changed": false, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "maximum_advisory_skew_degrees": {"signature_changed": true, "output_without_settings_changed": true, "position_count": 355, "finding_count": 206},
+      "maximum_unsupported_span": {"signature_changed": true, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "model_support_auto_apply_enabled": {"signature_changed": true, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "model_support_edge_margin": {"signature_changed": true, "output_without_settings_changed": true, "position_count": 355, "finding_count": 269},
+      "model_support_recommendations_enabled": {"signature_changed": true, "output_without_settings_changed": true, "position_count": 355, "finding_count": 269},
+      "physical_overlap_area_tolerance": {"signature_changed": true, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "physical_rail_interference_clearance": {"signature_changed": true, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "physical_solids_visible": {"signature_changed": false, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "position_tolerance": {"signature_changed": true, "output_without_settings_changed": true, "position_count": 355, "finding_count": 265},
+      "preferred_maximum_model_support_extension_per_side": {"signature_changed": true, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "protected_markers_visible": {"signature_changed": false, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "rail_fit_clearance_per_side": {"signature_changed": true, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "timber_end_clearance": {"signature_changed": true, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269},
+      "unresolved_markers_visible": {"signature_changed": false, "output_without_settings_changed": false, "position_count": 355, "finding_count": 269}
+    },
+    "records": {
+      "config_handing_current_core_unused": {"signature_changed": false, "output_changed": false, "output_sha256": "e5d2565e1241da19d0ff3c4fe5560a51187aaa91ea6c112868909891ce3655f4", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "config_template_set_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "3de53f62a2eadc91414d46a13a5715f373bb78a47f460dbb21a78c5f2f77da98", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "rail_gauge_face_current_core_unused": {"signature_changed": false, "output_changed": false, "output_sha256": "e5d2565e1241da19d0ff3c4fe5560a51187aaa91ea6c112868909891ce3655f4", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "rail_name_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "581dc1c9183f818202090adf1c3fb466240a0ba6d5d63b684916bd29d8e20661", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "rail_order_over_invalidates": {"signature_changed": true, "output_changed": false, "output_sha256": "e5d2565e1241da19d0ff3c4fe5560a51187aaa91ea6c112868909891ce3655f4", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "rail_parent_turnout_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "7c067c61e4e56150d9504990de586d3bfafa906b2bb0adf74ef959b474554d12", "position_count": 355, "finding_count": 274, "status": "Production-critical conflicts"},
+      "rail_point_below_signature_precision": {"signature_changed": false, "output_changed": true, "output_sha256": "ee909b5f70d3c32c2effb37547810bcef2d57476213cc16da5acc31bc5fdd4bd", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "rail_points_included": {"signature_changed": true, "output_changed": true, "output_sha256": "dd8d90233fdd328109399cbc710d70ca11b0815b94d9f8fb6859773088b6ac04", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "rail_source_configuration_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "49df102102726e6fe4e04ab6fb79c556eead9bd96a5554208904b80cb26d18dc", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "rail_supported_feature_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "464e5e7b9c13f0e7ec5b210d36f51dd4a73aa610f57896a40acc57288867c550", "position_count": 355, "finding_count": 271, "status": "Ordinary and turnout assignments validated"},
+      "timber_axes_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "957aa3cd438e82a6dd8c9aa109dc9dc9c608cb78e7aff6b7d1b34d5eb36cf91b", "position_count": 355, "finding_count": 275, "status": "Ordinary and turnout assignments validated"},
+      "timber_centre_included": {"signature_changed": true, "output_changed": true, "output_sha256": "4fdafd7ad0f563a0189796364eb92b85ed37c9040a81442cca81320bda7d7230", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "timber_crossing_suffix_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "f63cb69f9709a98982e7cfd3388ca103095bd73398c0cdec8c6b3b45bbaaf03a", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "timber_identifier_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "72975b69ef3d7348f0d6fabe02dd698e322e8db2e8a1fdf50cc932a7687f0a5b", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "timber_order_over_invalidates": {"signature_changed": true, "output_changed": false, "output_sha256": "e5d2565e1241da19d0ff3c4fe5560a51187aaa91ea6c112868909891ce3655f4", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "timber_protected_features_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "8b065559461f475eb9c70e8149a8cc4b170e233caa02089e64a3d7292bb34cf4", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "timber_source_configuration_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "ab8636b6cbc30d7ca08d9b50264aa34f1c3cd65b02af308297fcc945b7ee89bd", "position_count": 355, "finding_count": 269, "status": "Ordinary and turnout assignments validated"},
+      "timber_support_requirements_omitted": {"signature_changed": false, "output_changed": true, "output_sha256": "94b5cc1f03ac10b19ce4a6db6adf44d529f598e2d9be3d5b954d3fd1af67eb47", "position_count": 355, "finding_count": 267, "status": "Ordinary and turnout assignments validated"}
+    }
+  },
+  "application_cache": {
+    "witness": "After caching the baseline through analyse_entity_chair_positions, change both timber axes while returning the modified records from the normal extractor boundary.",
+    "cache_reused": true,
+    "geometry_signature": "9d7d978ecb0cbbf145e8e5288222efafc7cfa037d05a4f53a5b30c8e61665e3e",
+    "actual_stale_output_sha256": "e5d2565e1241da19d0ff3c4fe5560a51187aaa91ea6c112868909891ce3655f4",
+    "expected_recalculated_output_sha256": "957aa3cd438e82a6dd8c9aa109dc9dc9c608cb78e7aff6b7d1b34d5eb36cf91b",
+    "stale_result_returned": true
+  },
+  "presentation_boundary": {
+    "common_geometry_signature": "9d7d978ecb0cbbf145e8e5288222efafc7cfa037d05a4f53a5b30c8e61665e3e",
+    "common_output_without_settings_sha256": "e5d2565e1241da19d0ff3c4fe5560a51187aaa91ea6c112868909891ce3655f4",
+    "headless_visibility_authority": false,
+    "headless_visibility_note": "FreeCADCmd reported every ViewObject.Visibility value false, including layers requested visible. This contract therefore freezes object/role/topology and reuse behavior only; real-GUI visibility and selection remain mandatory open evidence.",
+    "steps": {
+      "baseline": {"cache_reused": false, "display_cache_reused": false, "object_count": 22, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 710}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}}},
+      "markers_hidden": {"cache_reused": true, "display_cache_reused": true, "object_count": 22, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 710}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}}},
+      "markers_restored": {"cache_reused": true, "display_cache_reused": true, "object_count": 22, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 710}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}}},
+      "protected_shown": {"cache_reused": true, "display_cache_reused": false, "object_count": 23, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 1418}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}, "ChairProtectedPositionMarkers": {"type_id": "Part::Feature", "edges": 708}}},
+      "protected_hidden": {"cache_reused": true, "display_cache_reused": true, "object_count": 23, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 1418}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}, "ChairProtectedPositionMarkers": {"type_id": "Part::Feature", "edges": 708}}},
+      "footprints_shown": {"cache_reused": true, "display_cache_reused": false, "object_count": 23, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 1938}, "ChairFootprintMarkers": {"type_id": "Part::Feature", "edges": 1228}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}}},
+      "footprints_hidden": {"cache_reused": true, "display_cache_reused": true, "object_count": 23, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 1938}, "ChairFootprintMarkers": {"type_id": "Part::Feature", "edges": 1228}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}}},
+      "physical_visibility_changed": {"cache_reused": true, "display_cache_reused": true, "object_count": 23, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 1938}, "ChairFootprintMarkers": {"type_id": "Part::Feature", "edges": 1228}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}}},
+      "unresolved_visibility_changed": {"cache_reused": true, "display_cache_reused": true, "object_count": 23, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 1938}, "ChairFootprintMarkers": {"type_id": "Part::Feature", "edges": 1228}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}}},
+      "cache_disabled": {"cache_reused": false, "display_cache_reused": false, "object_count": 22, "layers": {"ChairAnalysisDisplay": {"type_id": "App::DocumentObjectGroup", "edges": 710}, "ChairPositionMarkers": {"type_id": "Part::Feature", "edges": 710}}}
+    }
+  },
+  "legacy_defects": {
+    "under_invalidation": "The signature omits output-affecting template-set, rail and timber fields; the application witness returns a cached baseline after changed timber axes should produce a different result.",
+    "precision_alias": "Rail points are rounded to five decimal places in the signature but consumed at higher precision. A +0.000004 mm coordinate change leaves the signature unchanged and changes the returned logical payload.",
+    "order_over_invalidation": "Reversing the complete rail or timber record sequence changes the signature while the deterministically sorted fixed result is unchanged.",
+    "downstream_setting_over_invalidation": "Four settings used only by later support/physical stages are included in the logical-analysis signature and force calculation misses.",
+    "part_presentation_rebuild": "Requesting a missing protected or footprint layer clears and rebuilds exact Part diagnostic compounds; hiding an existing layer retains its object. This is legacy topology evidence, not the accepted lightweight presentation design."
+  },
+  "successor_acceptance": {
+    "rules": [
+      "Construct each cache signature centrally from the exact canonical inputs consumed by the result it protects, including output-affecting identity and assignment fields.",
+      "Separate logical-analysis, downstream support/solid, execution-policy and presentation signatures so a change invalidates only its true dependency cone.",
+      "Either calculate and return from the same declared quantised canonical values or hash the exact consumed values; never round only the cache key while returning a distinguishable result.",
+      "Make ordering semantic and explicit: preserve it when output depends on it, or canonicalise both signature and calculation when records are a set.",
+      "A changed calculation input must never return a stale cached logical result; include direct miss and unchanged-reuse tests for every advertised entity family.",
+      "A presentation-only change must not recalculate logical analysis, rewrite model metadata, create document history or trigger an exact-Part rebuild when a lightweight layer update is sufficient.",
+      "Keep logical positions, findings, assignments and stable identities as model output, while diagnostic geometry remains replaceable derived presentation and exact solids remain a Validate/Export concern.",
+      "Validate visibility, selection-to-domain identity, one-command history and refresh behavior in a real GUI; FreeCADCmd visibility is not acceptance evidence.",
+      "Preserve reviewed semantic parity unless an engineering rule changes explicitly, while keeping oracle parity separate from provenance and project-cleared output status."
+    ],
+    "remaining_matrix": [
+      "turnout, plain-line and wider-crossover logical-analysis cases",
+      "upstream configuration and host mutations through record extraction",
+      "real-GUI visibility, selection, history and refresh behavior",
+      "B15 support-plan, layout, supported-solid and export invalidation",
+      "lightweight renderer prototype and deferred exact-shape agreement",
+      "field-level lineage and dependency manifests for advertised chair output"
+    ],
+    "migration_gate": "Do not move or remove the legacy chair-analysis path until the successor closes these rules for its advertised entity scope and the user accepts the required GUI evidence."
+  },
+  "evidence": {
+    "report": "reference/benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md",
+    "fast_validator": "tests/validate_phase1_chair_analysis_invalidation.py",
+    "freecad_validator": "tests/freecad_validate_phase1_chair_analysis_invalidation.py",
+    "shared_recipe": "tools/freecad_bridge/chair_analysis_recipe.py",
+    "persistence_contract": "reference/contracts/phase1-chair-analysis-persistence.json"
+  }
+}
