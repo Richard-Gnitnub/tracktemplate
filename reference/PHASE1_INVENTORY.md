@@ -43,6 +43,8 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Edited right-hand/facing turnout semantic SHA-256 | `46225072b4b56f7f767570c8b438ee0942c239f73f121ce420aa76caed9779f0` |
 | Crossover feasibility oracle | `contracts/phase1-crossover-feasibility.json`, schema 1 |
 | Crossover witnesses | `500.000 mm` preview-pass/complete-fail; `746.298 mm` complete-pass on the fixed curved-host fixture |
+| Crossover automatic-timbering oracle | `contracts/phase1-crossover-timbering.json`, schema 1; reusable semantic helpers plus fast and disposable-FreeCAD validators |
+| Fixed `XO-001` timber semantics | 86 effective records, 16 shared-envelope records, no unresolved or production conflicts; exact reuse/history/persistence evidence plus three bounded legacy defects |
 | B14 role | Immutable legacy comparison oracle |
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
@@ -675,7 +677,7 @@ is known to be defective.
 | Multiple-track/spacing transition | Default B14 two-track base fixture plus deep create/edit/export document oracles | `build-b14-base` plus the four `run-b14-ordinary-*` characterisation wrappers | The fixed two-track configuration survives handedness replacement/reopen, selected export and create-time export; deferred Validate/reconstruction plus spacing/easement edit and invalid-input edge cases remain open |
 | Standalone turnout | B15/B14 calculation parity plus B14's complete fixed-lifecycle semantic oracle | `run-b14-turnout` creates `TO-001` on persisted Main Track identity at chainage `746.298 mm`, edits its hand and exercises recovery | Curved-host left/facing creation, one handed edit, exact history/persistence, overlap rejection and injected transaction abort are characterised; trailing GUI orientation, straight/other hosts, wider inputs, removal/integration, downstream timber/chair stages and export remain open |
 | Crossover geometry | B14 cold series, B15 acceptance report and the fail-closed crossover-feasibility contract | Controlled `XO-001` bridge recipe plus read-only `500.000/746.298 mm` analytical witnesses on the fixed curved-host fixture | The current preview/commit mismatch is quantified; shared successor preflight, zero-mutation early rejection, exact-build agreement, create/edit/extend GUI regression and wider arrangements/hosts remain open |
-| Automatic timbering | Controlled `XO-001` workflow | Crossover cold recipe | Standalone turnout and plain-line timber decisions; focused failure/invalidation cases |
+| Automatic timbering | Controlled `XO-001` workflow plus the fail-closed semantic/lifecycle contract | Crossover cold recipe and disposable `freecad_validate_phase1_crossover_timbering.py` copy | Fixed curved-host records, calculation invalidation, reuse, Undo/Redo, persistence, clear and injected failure are characterised; persisted-analysis drift, display-only over-invalidation and abort cleanup remain successor defects; standalone turnout/plain-line decisions, wider crossover inputs and the complete invalidation matrix remain open |
 | Chair analysis and 2D presentation | B15 analytical tests and B14-to-B15 acceptance | Controlled completed `XO-001` document | Turnout/plain-line coverage, input-class invalidation, late timing payload and redundant refresh defects |
 | Legacy approximate supported chair bodies | B15 smoke and acceptance | Completed `XO-001` acceptance path | Late reuse check, each solid-signature invalidation class and export-scope coverage; five-box S1/S1J bodies are gap evidence, not the final procedural chair oracle |
 | Procedural chair definitions and exact components | Templot5 556b source audit, accepted architecture/licensing boundaries, blocked first-S1/core lineage register and fail-closed S1 oracle contract | Exact source/member hashes and constituent route are reproducibly verified; capture settings and semantic DXF/STL checks are defined, but the exact 556b executable, S1-only fixture and artifacts remain blocked | Execute and review the frozen local Templot S1 capture; define the neutral package schema; obtain rights-compatible primary evidence, accepted full-size values/transforms, package licence, comparison metrics and tolerances |
@@ -695,6 +697,11 @@ recorded in
 [contracts/phase1-crossover-feasibility.json](contracts/phase1-crossover-feasibility.json)
 and
 [benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md](benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md).
+The fixed automatic-timbering calculation, reuse, history, persistence,
+display-only invalidation and injected-failure boundary is recorded in
+[contracts/phase1-crossover-timbering.json](contracts/phase1-crossover-timbering.json)
+and
+[benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md](benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md).
 The plain-line edit, persistence and rollback evidence is recorded in
 [benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 Its undo/redo and explicit change-back extension is recorded in
@@ -1160,6 +1167,7 @@ successor document detector or migrator exists yet, and neither macro changed.
 | 2026-07-20 | Select and freeze the transition-length architecture pilot | Accepted by the project owner; candidate-register schema 3 points to an exact fail-closed contract, `10.2A8A7B16` and `TrackTemplate.FCMacro` are reserved for the development composition path, B14/B15 remain unchanged and source movement has not started |
 | 2026-07-20 | Define the initial runtime and legacy-document ingress window | Implemented for Phase 1 evidence and owner review; only the exact Linux x86_64 FreeCAD 1.1.1 Flatpak stack is currently qualified, standalone Python has a 3.12.0 floor, B14/B15 are the bounded future migration sources, unsupported hosts/documents fail closed, and Phase 4 still owns the copied-target migrator and family fixtures |
 | 2026-07-21 | Reconcile the current performance evidence before using subprofiles | Implemented for Phase 1 evidence and owner review; nine controlled legacy profiles now have exact operator/nested/harness boundaries, all five instrumentation defects are explicitly bounded but not fixed, per-run reconciliation precedes medians, four target-pipeline slots remain visibly unmeasured and no observed timing is accepted as a budget or optimisation authority |
+| 2026-07-21 | Add a focused automatic-crossover-timbering semantic and lifecycle oracle | Implemented for Phase 1 evidence and owner review; the copied fixture freezes the fixed `XO-001` records, calculation invalidation, reuse/history/persistence and clear path, while diagnostic persistence, display-only rebuild and incomplete abort cleanup are explicit defects rather than successor requirements and current timber data remains provenance-blocked |
 
 ## Remaining Phase 1 work
 
@@ -1172,7 +1180,11 @@ successor document detector or migrator exists yet, and neither macro changed.
   cancellation and other export scopes, converge create-time output failure on
   an accepted atomic/UI contract, and extend the standalone-turnout fixture to
   trailing/straight/alternate-host inputs, removal/integration, downstream
-  timber/chair stages and target-file export.
+  timber/chair stages and target-file export. Extend automatic timbering beyond
+  the fixed `XO-001` witness to standalone turnout/plain-line decisions, wider
+  crossover inputs, every calculation-signature input class and accepted
+  real-GUI visibility/history; fix rather than reproduce its three bounded
+  lifecycle defects in the successor.
 - Resolve or explicitly bound the candidate-specific gaps recorded in the new
   boundary register, then obtain owner agreement before marking any first
   slice selected. In particular, define the station point-adapter seam and

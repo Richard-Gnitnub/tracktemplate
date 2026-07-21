@@ -95,6 +95,13 @@
   Treat it as defect evidence and a successor acceptance gate, not behaviour to
   preserve: a successor must reject the lower witness before Part construction
   or document mutation and retain the documented valid placement.
+- `reference/contracts/phase1-crossover-timbering.json`, the reusable
+  `crossover_timber_recipe.py` helpers and their fast/headless validators own
+  the fixed `XO-001` automatic-timbering semantic and lifecycle oracle. Preserve
+  its characterised records, identities, calculation invalidation, Undo/Redo and
+  persistence evidence. Its diagnostic-payload drift, display-only rebuild and
+  retained untagged object after abort are bounded B14 defects, not successor
+  invariants; the current timber data also remains subject to lineage gates.
 - B15's supported S1/S1J exact body is a bounded five-box legacy approximation.
   Preserve it as accepted B15 evidence, but do not use it as the production
   chair-definition schema or final S1 geometry oracle.
@@ -378,6 +385,15 @@ Run the Phase 1 standalone-turnout lifecycle oracle on a copied fixture:
 ```bash
 tools/freecad_bridge/run-b14-turnout \
   --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+Run the fixed Phase 1 automatic-crossover-timbering contract and disposable
+FreeCAD lifecycle oracle:
+
+```bash
+.venv/bin/python tests/validate_phase1_crossover_timbering.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase1_crossover_timbering.py
 ```
 
 Run the controlled B14 crossover recipe in a fresh isolated FreeCAD process:

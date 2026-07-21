@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:crossover-timbering:1",
+  "recorded_on": "2026-07-21",
+  "phase": 1,
+  "status": "b14-characterised-successor-fixes-not-started",
+  "scope": {
+    "closed_by_this_contract": "The fixed curved-host XO-001 automatic-timbering calculation, cache, history, persistence, clear and injected-failure paths are reproducible and bounded.",
+    "still_open": "The three diagnosed legacy defects, wider invalidation matrix, other hosts and standalone turnout/plain-line timbering are not fixed or characterised by this contract.",
+    "product_effect": "Evidence and successor acceptance rules only; neither B14 nor B15 product source is changed.",
+    "provenance_boundary": "These are legacy comparison semantics, not project-cleared production timber data. The other-S&C lineage and later output manifest gates still apply."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "version": "10.2A8A7B14",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "version": "10.2A8A7B15",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference with matching B4 implementation"
+    }
+  },
+  "fixture": {
+    "path": "benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd",
+    "tracked": false,
+    "reproduction_command": "tools/freecad_bridge/build-b14-base --output benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd",
+    "sha256": "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c",
+    "semantic_sha256": "a3486db6f02370e61432a480bfb6c9261bc9357cc2af5111f93135e3372d0a4e",
+    "object_count": 9,
+    "safety_rule": "Copy the fixture to a temporary directory, mutate only the copy, close it and require the source fixture bytes to remain unchanged."
+  },
+  "scenario": {
+    "crossover_id": "XO-001",
+    "host_a_identity": {
+      "template_set_id": "SET-001",
+      "track_number": 1,
+      "track_name": "Main Track"
+    },
+    "host_b_identity": {
+      "template_set_id": "SET-001",
+      "track_number": 2,
+      "track_name": "Track 2"
+    },
+    "host_a_chainage_mm": 746.298,
+    "b3_calculation_change": {
+      "maximum_timber_movement": 2.0
+    }
+  },
+  "legacy_semantics": {
+    "status": "Automatic timbering resolved — no production conflicts detected",
+    "counts": {
+      "effective_timber_count": 86,
+      "shared_timber_count": 16,
+      "plain_connector_timber_count": 0,
+      "interlaced_pair_count": 0,
+      "shoved_timber_count": 0,
+      "unresolved_count": 0,
+      "remaining_production_conflicts": 0,
+      "remaining_production_critical_conflicts": 0,
+      "timber_resolution_complete": true
+    },
+    "record_turnout_sides": {
+      "A": 36,
+      "B": 34,
+      "ENVELOPE": 16
+    },
+    "record_envelope_kinds": {
+      "": 70,
+      "extended inherited A towards Host B": 4,
+      "extended inherited B towards Host A": 6,
+      "shared CONNECTOR + HOST-A + HOST-B": 6
+    },
+    "record_identity_sha256": "8513166935365fd6b821dbcb181c3b79a221711cb43c7f4bf7c52d675bd87d95",
+    "stable_record_sha256": "aebb9e04bbf4816a130fc196c7c504cd9f45d787b57e5a85f41c855abdf1b326",
+    "default_resolution_signature": "9ae269b05624df83a3b789986b10c301f7423f3ff92f2adf9b11c65d9927f51d",
+    "display_hidden_resolution_signature": "1a60d1e4add7fd3d1881598ecd4cdd4e8cb3910eec6ca4157491bb322b33ba8f",
+    "calculation_change_resolution_signature": "2e5be4d3ec0d4b4f8a8e2c609b3397c356e916397d4ddd1a35d5e062579d25bf",
+    "display_shape": {
+      "edges": 1316,
+      "faces": 0,
+      "solids": 0,
+      "bounds_mm": [
+        679.024313949,
+        158.385300568,
+        1.045,
+        988.880131021,
+        904.243492081,
+        1.045
+      ]
+    },
+    "lifecycle_object_counts": {
+      "after_crossover_geometry": 18,
+      "after_first_apply": 20,
+      "after_unchanged_reuse": 20,
+      "after_undo": 18,
+      "after_redo": 20,
+      "after_reopen": 20,
+      "after_clear": 20,
+      "after_injected_failure": 21
+    }
+  },
+  "legacy_defects": {
+    "resolved_analysis_persistence_drift": {
+      "observation": "The first returned result is enriched with geometry_signature and the effective-arrangement analysis_basis after the earlier result payload has already been persisted; unchanged reuse and reopen return the older nested analysis payload.",
+      "witness": {
+        "first_has_geometry_signature": true,
+        "first_analysis_basis": "Effective automatically resolved timber arrangement",
+        "reused_has_geometry_signature": false,
+        "reused_analysis_basis": ""
+      }
+    },
+    "display_only_over_invalidation": {
+      "observation": "Changing only show_b4_geometry from true to false rebuilds the pipeline and changes the resolution signature even though the stable timber records and display shape are identical.",
+      "witness": {
+        "cache_reused": false,
+        "stable_records_unchanged": true,
+        "shape_unchanged": true
+      }
+    },
+    "incomplete_abort_cleanup": {
+      "observation": "Failing the first B4 tag call leaves configuration unchanged but abortTransaction retains one untagged Part::Feature.",
+      "fault_text": "injected B4 tag failure",
+      "retained_object": {
+        "name": "CrossoverB4Timbering_XO_001",
+        "type_id": "Part::Feature",
+        "generated_role": "",
+        "crossover_id": ""
+      }
+    }
+  },
+  "successor_acceptance": {
+    "rules": [
+      "Cold apply, unchanged reuse and save/reopen must expose one canonical signature-bound result payload, including identical resolved-analysis diagnostics.",
+      "Display-only controls must be excluded from calculation and resolution signatures; changing visibility must not rerun the solver, rebuild geometry, rewrite calculation metadata or add a history entry.",
+      "Changing a calculation input must invalidate reuse. The complete future matrix must cover inherited host/timber geometry, analysis settings, shared-envelope settings and B3 movement settings.",
+      "Any failure must restore the exact pre-command document, configuration and history with no tagged or untagged object retained.",
+      "One successful application command must remain one complete Undo/Redo unit and preserve stable timber identities and ordering across save/reopen.",
+      "Resolved timber records are authoritative model output; the current Part edge compound is legacy presentation evidence and must not become canonical state.",
+      "The fixed XO-001 semantic counts and stable-record digest require parity or an explicitly reviewed engineering-rule change; this contract does not project-clear their provenance."
+    ],
+    "remaining_matrix": [
+      "standalone turnout and plain-line timber decisions",
+      "straight hosts, alternate arrangements, wider chainages, gauges and flangeways",
+      "every calculation-signature input class and stale-result fallback",
+      "real-GUI visibility, selection and one-entry history evidence",
+      "host integration, chair analysis and production export interaction",
+      "field-level other-S&C lineage and output dependency manifest"
+    ],
+    "migration_gate": "Do not move or remove the legacy automatic-timbering path until the successor passes these rules, the wider matrix required for its advertised scope and user-approved GUI evidence."
+  },
+  "evidence": {
+    "report": "reference/benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md",
+    "fast_validator": "tests/validate_phase1_crossover_timbering.py",
+    "freecad_validator": "tests/freecad_validate_phase1_crossover_timbering.py",
+    "existing_gui_series": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md"
+  }
+}

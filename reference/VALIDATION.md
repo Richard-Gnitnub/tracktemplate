@@ -530,6 +530,31 @@ requires the fixture bytes to remain unchanged. It must print
 remaining production/GUI gate are recorded in
 [benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md](benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md).
 
+Fast Phase 1 automatic-crossover-timbering contract checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_crossover_timbering.py
+```
+
+This freezes the exact B14/B15 B4 source boundary after normalising B15's
+recompute instrumentation, the controlled result/signatures and the distinction
+between accepted semantics and three current defects. Exercise the copied-
+fixture lifecycle in real FreeCAD with:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase1_crossover_timbering.py
+```
+
+The oracle creates `XO-001` only in a temporary copy, applies and reuses B4,
+checks exact Undo/Redo and save/reopen, distinguishes display-only from
+calculation-input invalidation, clears B4 and injects the first tagging failure.
+It must print `Phase 1 crossover timbering FreeCAD oracle passed` and leave the
+source fixture byte-identical. The retained untagged object, display-only
+rebuild and nested diagnostic drift are required defect witnesses, not future
+behaviour. Exact evidence and remaining scope are in
+[benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md](benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md).
+
 Fresh-checkout development-bridge and deterministic B14 fixture setup:
 
 ```bash
@@ -617,7 +642,7 @@ For an affected workflow:
 
 ## Observed regression obligations
 
-The controlled B14 runs and export source/transaction audits expose six
+The controlled B14 runs and export source/transaction audits expose seven
 behaviours that need focused tests with their eventual production fixes.
 Do not encode the current defect as the expected result merely to increase the
 test count.
@@ -662,6 +687,14 @@ it does not mark any defect fixed or replace the regression obligations.
    states. Preserve the lifecycle evidence, but require one
    accepted application command to create one complete undo unit and test the
    exact document after one Undo and one Redo.
+7. Automatic crossover timbering lifecycle: the fixed Phase 1 oracle preserves
+   B14's characterised `XO-001` records, calculation-input invalidation, reuse,
+   history and persistence, but diagnoses three behaviours that must not be
+   migrated. Persist one canonical returned/reused analysis payload; exclude
+   display controls from resolution signatures and solver/geometry/history
+   work; and make every injected failure restore the exact document and history
+   without retaining an untagged partial object. Extend invalidation through
+   every engineering-input class before retiring the legacy path.
 
 ## Future validation assets
 
@@ -670,7 +703,8 @@ Before retiring a legacy path, add representative, non-sensitive fixtures or det
 - curve/easement and multi-track generation;
 - turnout creation and editing;
 - straight- and curved-host crossovers;
-- automatic timbering and chair analysis;
+- wider automatic timbering and chair analysis (the fixed `XO-001` B4
+  lifecycle now has a dedicated oracle);
 - an exact local capture produced under the tracked frozen-Templot-S1
   constituent/assembly recipe (the recipe/validator exists; the exact 556b
   executable, fixture and artifacts remain blocked);

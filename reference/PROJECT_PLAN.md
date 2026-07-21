@@ -256,6 +256,17 @@ part of the deliverable only. Shared successor preflight, aligned diagnostics,
 pre-Part/zero-mutation rejection and broader create/edit/extend GUI evidence
 remain required before the deliverable or Phase 1 can close.
 
+The next fixed `XO-001` stage is now bounded by
+[`contracts/phase1-crossover-timbering.json`](contracts/phase1-crossover-timbering.json).
+It freezes 86 resolved records, 16 shared-envelope records, calculation-input
+invalidation, exact Undo/Redo, save/reopen and unchanged reuse. It also
+diagnoses, without accepting, B14's persisted-analysis drift, display-only full
+rebuild and incomplete cleanup of an untagged object after an injected abort.
+Successor fixes, every calculation-input class, real-GUI visibility/history,
+other crossover configurations and standalone turnout/plain-line timbering
+remain open. Current timber values remain legacy comparison evidence subject
+to the other-S&C lineage gate; the contract is not production clearance.
+
 Current Phase 1 evidence is maintained in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). Its first static tranche is
 complete: a deterministic, non-executing AST tool records definition
