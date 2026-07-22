@@ -9,9 +9,9 @@
 ## Architecture
 
 - `reference/PROJECT_PLAN.md` is the canonical delivery sequence from the current checkpoint to a release candidate. Read it before starting source work, report work against its current phase, and do not claim a phase transition without its exit evidence and user acceptance.
-- `reference/PHASE1_CLOSEOUT.md` is the review-ready Phase 1 evidence/risk
-  reconciliation. Read it before proposing Phase 1 acceptance or starting
-  Phase 2. Its presence or passing validator is not owner acceptance.
+- `reference/PHASE1_CLOSEOUT.md` is the owner-accepted Phase 1 evidence/risk
+  reconciliation and exact boundary of Phase 2 authority. Read it before any
+  Phase 2 work; its accepted deferrals remain mandatory at their named gates.
 - `reference/ARCHITECTURE.md` is the canonical strategic architecture. Read it before changing model boundaries, persistence, display construction, validation, export, or source organisation.
 - `reference/MODULARISATION_PLAN.md` defines source boundaries, dependency direction and extraction gates. Read it before moving code or creating modules.
 - Reuse and maintainability are release invariants. Keep one authoritative
@@ -101,7 +101,9 @@
 
 ## Project phase discipline
 
-- The current delivery phase is recorded in `reference/PROJECT_PLAN.md`; Phase 0 closed on 2026-07-19 and Phase 1 is current until its inventory exit gate is explicitly accepted.
+- The current delivery phase is recorded in `reference/PROJECT_PLAN.md`; Phase
+  0 closed on 2026-07-19, Phase 1 closed on 2026-07-22 and Phase 2 is current
+  under the bounded foundation authority in `reference/PHASE1_CLOSEOUT.md`.
 - Progress bars in `reference/PROJECT_PLAN.md` count evidenced exit conditions,
   not elapsed time or estimated effort. Update a bar only with corresponding
   gate evidence, keep the active-phase register aligned, and allow progress to
@@ -166,9 +168,10 @@
   `tests/validate_phase1_transition_pilot.py` freeze the selected three-function
   boundary, all three external caller routes, exact parity grid, rollback and
   performance gates, development checkpoint `10.2A8A7B16`, and reserved small
-  `TrackTemplate.FCMacro` launcher. Source movement has not started: do not
-  create the package/launcher or edit immutable B14 or accepted-reference B15
-  until Phase 2 source work is explicitly started.
+  `TrackTemplate.FCMacro` launcher. The accepted Phase 2 foundation may create
+  only the minimum package/loading skeleton and small composition root; do not
+  move the three calculations, route callers, or edit immutable B14 or
+  accepted-reference B15 before the Phase 3 gate.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
   semantic oracle for the fixed B14 plain-line curve/two-track document. Their
@@ -255,11 +258,10 @@
   set, B14/B15 findings, open review owners and fail-closed successor scan; do
   not promote a term merely to silence the validator.
 - `reference/PHASE1_CLOSEOUT.md` and `tests/validate_phase1_closeout.py` own the
-  unaccepted Phase 1 closeout aggregation. Preserve its narrow runtime/ingress
+  accepted Phase 1 closeout aggregation. Preserve its narrow runtime/ingress
   policy, open GUI/performance/S1/terminology boundaries, P1-X10 control-bloat
-  disposition and Phase 2 scope.
-  Do not mark P1-10 accepted, move the progress bar or create Phase 2 source
-  until the project owner explicitly accepts the closeout.
+  disposition and bounded Phase 2 scope. Acceptance authorises the foundation
+  only; it does not waive or pull later work into Phase 2.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
@@ -580,7 +582,7 @@ Run the Phase 1 terminology-assurance contract:
 .venv/bin/python tests/validate_phase1_terminology.py
 ```
 
-Run the review-ready Phase 1 closeout aggregation:
+Run the accepted Phase 1 closeout aggregation:
 
 ```bash
 .venv/bin/python tests/validate_phase1_closeout.py

@@ -19,7 +19,7 @@ from tools import phase1_inventory  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-transition-pilot.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "6dc05681cff47aa594713dd73e0810095089ce88268d1230005ffbbec1740511"
+    "724f0d8812c355b2aacc2993353d5d56aea18ba57b241a5d3b30c7cd1e678ada"
 )
 CANDIDATE_REGISTER_PATH = (
     ROOT / "reference" / "contracts" / "phase1-candidate-boundaries.json"
@@ -132,9 +132,10 @@ def validate_contract(document):
     if document.get("contract_id") != "tracktemplate:phase1:transition-pilot:1":
         errors.append("pilot contract_id is invalid")
     if document.get("status") != (
-        "selected-contract-frozen-source-movement-not-started"
+        "selected-contract-frozen-phase2-foundation-authorised-"
+        "source-movement-not-started"
     ):
-        errors.append("pilot must remain selected with source movement not started")
+        errors.append("pilot Phase 2 foundation authority/status drifted")
     if document.get("phase") != 1:
         errors.append("pilot selection belongs to Phase 1")
 
@@ -501,9 +502,9 @@ def validate_source_and_parity(document):
     successor = document["successor"]
     if successor["compatibility_launcher_status"] == "reserved-not-created":
         if (ROOT / successor["compatibility_launcher_path"]).exists():
-            errors.append("reserved B16 compatibility launcher already exists")
+            errors.append("reserved-not-created B16 launcher already exists")
         if (ROOT / successor["authoritative_package"]).exists():
-            errors.append("pilot package exists before Phase 2 source movement")
+            errors.append("reserved-not-created pilot package already exists")
     return errors
 
 

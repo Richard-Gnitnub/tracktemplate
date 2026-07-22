@@ -1,18 +1,19 @@
-# Phase 1 Closeout Review
+# Phase 1 Closeout Record
 
-Status: **Review-ready; Phase 1 remains current and Phase 2 is not authorised.**
+Status: **Accepted and closed by the project owner on 2026-07-22. Phase 2 is
+current under the bounded foundation authority recorded here.**
 
 Prepared on 2026-07-22 from repository evidence checkpoint
 `6f49d6570072926f7e416893bb6d07cee0071733`.
 
 This record consolidates the Phase 1 product, dependency, correctness,
-performance, compatibility, provenance and terminology evidence for one owner
-decision. It does not implement the Workbench, repair a legacy defect, clear an
-output dependency or create an S1 chair.
+performance, compatibility, provenance and terminology evidence accepted by
+the project owner. It does not implement the Workbench, repair a legacy defect,
+clear an output dependency or create an S1 chair.
 
 ## Decision boundary
 
-Owner acceptance of this closeout would mean that:
+Owner acceptance of this closeout means that:
 
 1. the Phase 1 inventory is sufficient to begin only the selected Phase 2
    modular-foundation work;
@@ -25,9 +26,9 @@ Owner acceptance of this closeout would mean that:
 5. no numerical human-use performance budget is accepted from the legacy
    timings; and
 6. B14 and B15 remain immutable references while the reserved B16 composition
-   path starts only after explicit Phase 2 authorisation.
+   path may start only within the bounded Phase 2 foundation.
 
-Acceptance would not clear any S1 package, accept any currently blocked
+Acceptance does not clear any S1 package, accept any currently blocked
 lineage, qualify another operating system/FreeCAD distribution, choose the
 lightweight renderer, authorise optimisation or permit a whole-macro rewrite.
 
@@ -41,8 +42,8 @@ lightweight renderer, authorise optimisation or permit a whole-macro rewrite.
 | Standalone development probe | CPython 3.12.3; expected `not-freecad-runtime`; FreeCAD modules unavailable |
 | Qualified FreeCAD probe | `linux-x86_64-flatpak-freecad-1.1.1`; FreeCAD 1.1.1, bundled CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8; reverified 2026-07-22 |
 | Real FreeCAD smoke | `B15 FreeCAD 1.1 headless smoke test passed` sentinel reverified 2026-07-22 |
-| Fast validation | 27 repository validators including this closeout control; all must pass on the review tree |
-| Product-source change in Phase 1 closeout | None; B14/B15 hashes remain exact and no `tracktemplate` package or `TrackTemplate.FCMacro` exists |
+| Fast validation | 27 repository validators including this closeout control; all pass on the accepted transition tree |
+| Product-source change at Phase 1 acceptance | None; B14/B15 hashes remain exact and no `tracktemplate` package or `TrackTemplate.FCMacro` existed when the decision was recorded |
 
 The runtime probes record only non-sensitive platform/version fields. The
 FreeCAD probe was rerun in the isolated installed Flatpak; the closeout does
@@ -60,11 +61,11 @@ not copy the user-specific diagnostic path printed by FreeCAD.
 | First-S1/core and other-S&C/legacy lineage scopes are classified or visibly blocked | Evidenced | Four machine-readable scopes remain `blocked`; no project clearance is inferred |
 | Neutral chair boundary, manifest/licensing controls and first-S1 evidence/rights plan are accepted | Evidenced | Owner-accepted `S1_PILOT_PLAN.md`; manifest stays `unknown`/`NOASSERTION` and S1-07 through S1-15 remain blocked |
 | RC chair scope is bounded to validated packages and one assisted S1 pilot | Evidenced | Arbitrary automatic scan/CAD conversion remains post-RC research |
-| Open risks and required owner decisions are recorded | Review-ready; owner acceptance required | This closeout, the decision register and the explicit deferral register below |
+| Open risks and required owner decisions are recorded | Evidenced | This accepted closeout, its decision register, explicit deferral register and exact owner instruction below |
 
-The ninth condition remains active in `PROJECT_PLAN.md` until the project owner
-accepts or amends this record. Merely committing the record cannot close the
-phase or start Phase 2.
+The project owner accepted the ninth condition and this complete record on
+2026-07-22. The project plan therefore records Phase 1 as 9/9 complete and
+Phase 2 as current, without promoting any controlled deferral.
 
 ## Runtime and legacy-ingress policy for acceptance
 
@@ -198,7 +199,7 @@ owner accepts an evidence-backed bounded meaning.
 
 ## Phase 2 authorisation boundary
 
-If this closeout is accepted, Phase 2 may begin only the already selected
+Under the accepted closeout, Phase 2 may begin only the already selected
 foundation:
 
 - create only the minimum package skeleton reserved for the three-function
@@ -217,33 +218,31 @@ exact formula/error parity begin only at the Phase 3 vertical-slice gate.
 
 ## Closeout decision register
 
-| ID | Decision | State before owner closeout | Proposed disposition |
+| ID | Decision | Accepted state | Accepted disposition |
 | --- | --- | --- | --- |
-| P1-01 | Phase 1 evidence sufficiency | recommended-for-acceptance | The bounded inventory is sufficient to start the selected modular foundation; later gaps remain mandatory |
-| P1-02 | Qualified runtime boundary | recommended-for-acceptance | Accept only the exact FreeCAD 1.1.1 Flatpak profile; all others fail closed pending qualification |
-| P1-03 | Legacy document ingress | recommended-for-acceptance | Accept B14/B15 as the outer future window with per-family fixtures and copied-target migration still required |
-| P1-04 | Workflow and GUI limitations | recommended-for-acceptance | Accept coverage ownership and scheduled gaps without claiming whole-product or successor GUI acceptance |
-| P1-05 | Performance evidence | recommended-for-acceptance | Accept bounded legacy measurements, five instrumentation defects, four unmeasured target slots and no numerical budget |
-| P1-06 | Legacy-defect disposition | recommended-for-acceptance | Characterised defects are not successor requirements and cannot be silently fixed during Phase 2 extraction |
-| P1-07 | S1/provenance boundary | accepted-existing-boundary | Preserve the accepted blocked S1 plan, unknown manifest, blocked lineages and local-comparison-only Templot oracle |
-| P1-08 | Terminology assurance | recommended-for-acceptance | Preserve the four confidence states, six open reviews, human review boundary and frozen evidence identifiers |
-| P1-09 | Phase 2 implementation scope | accepted-existing-boundary | Preserve the selected transition pilot, B16/package boundaries, exact parity contract and no source movement yet |
-| P1-10 | Phase transition | owner-decision-required | Close Phase 1 and authorise only the bounded Phase 2 foundation after explicit owner acceptance of this record |
+| P1-01 | Phase 1 evidence sufficiency | accepted | The bounded inventory is sufficient to start the selected modular foundation; later gaps remain mandatory |
+| P1-02 | Qualified runtime boundary | accepted | Only the exact FreeCAD 1.1.1 Flatpak profile is qualified; all others fail closed pending qualification |
+| P1-03 | Legacy document ingress | accepted | B14/B15 are the outer future window; per-family fixtures and copied-target migration remain required |
+| P1-04 | Workflow and GUI limitations | accepted | Coverage ownership and scheduled gaps are accepted without claiming whole-product or successor GUI acceptance |
+| P1-05 | Performance evidence | accepted | Bounded legacy measurements, five instrumentation defects, four unmeasured target slots and no numerical budget are accepted |
+| P1-06 | Legacy-defect disposition | accepted | Characterised defects are not successor requirements and cannot be silently fixed during Phase 2 foundation work |
+| P1-07 | S1/provenance boundary | accepted | Preserve the blocked S1 plan, unknown manifest, blocked lineages and local-comparison-only Templot oracle |
+| P1-08 | Terminology assurance | accepted | Preserve the four confidence states, six open reviews, human review boundary and frozen evidence identifiers |
+| P1-09 | Phase 2 implementation scope | accepted | Preserve the selected transition pilot, B16/package boundaries, exact parity contract and no calculation movement in Phase 2 |
+| P1-10 | Phase transition | accepted | Phase 1 is closed and only the bounded Phase 2 foundation is authorised |
 
 ## Acceptance record
 
-No acceptance is recorded yet. Committing this review or passing its validator
-does not substitute for the project-owner decision.
-
-If the record is accurate, the intended acceptance wording is:
+Accepted explicitly by the project owner on 2026-07-22 with this instruction:
 
 > I accept PHASE1_CLOSEOUT.md, including P1-01 through P1-10. Close Phase 1
 > and authorise only the bounded Phase 2 foundation described here. All open
 > workflow, GUI, performance, migration, provenance, S1, rights and terminology
 > items remain mandatory at their named later gates.
 
-After that explicit acceptance—and only then—the project plan may show Phase 1
-as 9/9 complete, M2 as complete and Phase 2 as current.
+This instruction is the phase-transition authority. It advances the project
+plan to Phase 1 9/9 complete, M2 complete and Phase 2 current; it does not
+alter any later gate or blocked status listed in this record.
 
 ## Reproduction
 

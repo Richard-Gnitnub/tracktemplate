@@ -182,7 +182,9 @@ def validate_contract(
         errors.append("terminology contract schema version drifted")
     if document.get("contract_id") != "tracktemplate:phase1:terminology-assurance:1":
         errors.append("terminology contract identity drifted")
-    if document.get("status") != "implemented-for-phase1-closeout-review":
+    if document.get("status") != (
+        "accepted-at-phase1-closeout-open-reviews-scheduled"
+    ):
         errors.append("terminology contract status drifted")
     if document.get("phase") != 1:
         errors.append("terminology contract phase drifted")
@@ -390,7 +392,9 @@ def validate_contract(
         errors.append("terminology product exception register is stale")
 
     gate = document.get("phase1_gate")
-    if not isinstance(gate, dict) or gate.get("status") != "ready-for-closeout-review":
+    if not isinstance(gate, dict) or gate.get("status") != (
+        "accepted-at-phase1-closeout"
+    ):
         errors.append("terminology Phase 1 gate status drifted")
     else:
         for field in ("evidenced", "not_claimed"):

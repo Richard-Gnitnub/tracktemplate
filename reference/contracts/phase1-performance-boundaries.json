@@ -810,7 +810,7 @@
     }
   ],
   "phase1_gate": {
-    "result": "bounded-performance-inventory-tranche-complete-phase1-remains-open",
+    "result": "bounded-performance-inventory-accepted-target-pipeline-unmeasured",
     "closed_by_this_contract": [
       "Every retained timing is classified as operator action, nested component, harness, same-process correctness or missing target boundary.",
       "The existing controlled curve/multiple-track, straight/station, turnout/crossover, editing and export profiles have explicit scopes, states and forbidden comparison uses.",
@@ -821,7 +821,7 @@
       "Implement and measure the four target-pipeline slots; no current profile is eligible to set their budgets or select a code optimisation.",
       "Characterise crossover preview/commit feasibility under one accepted diagnostic rule; this correctness gap is related to but not closed by timing reconciliation.",
       "Add sampled peak-memory evidence where a later optimisation needs ownership/peak claims; current RSS values are end-minus-start snapshots.",
-      "Obtain project-owner acceptance of the completed Phase 1 exit evidence before starting Phase 2."
+      "Preserve all four unmeasured target slots and their named Phase 5, 6, 9, 10 and 11 gates after the accepted 2026-07-22 Phase 1 closeout."
     ]
   }
 }

@@ -772,8 +772,6 @@ def main():
     errors.extend(validate_runtime_evaluator(contract))
     errors.extend(validate_fail_closed_mutations(contract))
 
-    if (ROOT / "tracktemplate").exists() or (ROOT / "TrackTemplate.FCMacro").exists():
-        errors.append("successor package/launcher appeared before Phase 2")
     if errors:
         for error in errors:
             print("ERROR: {}".format(error), file=sys.stderr)

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "contract_id": "tracktemplate:phase1:terminology-assurance:1",
   "recorded_on": "2026-07-22",
-  "status": "implemented-for-phase1-closeout-review",
+  "status": "accepted-at-phase1-closeout-open-reviews-scheduled",
   "phase": 1,
   "scope": {
     "purpose": "Make railway-language confidence visible and prevent an uncertain or frozen legacy term from silently becoming a successor UI, schema or API convention.",
@@ -423,7 +423,7 @@
     }
   ],
   "phase1_gate": {
-    "status": "ready-for-closeout-review",
+    "status": "accepted-at-phase1-closeout",
     "evidenced": [
       "The four assurance states and their promotion rules are explicit.",
       "Known ordinary-track, timber and chair findings are bounded without changing B14/B15.",
@@ -435,7 +435,7 @@
       "No open terminology review is resolved by this contract.",
       "No B14/B15 wording is corrected.",
       "No term is accepted outside its bounded context.",
-      "Phase 1 is not closed without the complete closeout review and project-owner acceptance."
+      "Phase 1 acceptance does not resolve or waive any of the six named later reviews."
     ]
   }
 }

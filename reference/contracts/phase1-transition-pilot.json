@@ -2,7 +2,7 @@
   "schema_version": 1,
   "contract_id": "tracktemplate:phase1:transition-pilot:1",
   "recorded_on": "2026-07-20",
-  "status": "selected-contract-frozen-source-movement-not-started",
+  "status": "selected-contract-frozen-phase2-foundation-authorised-source-movement-not-started",
   "phase": 1,
   "source_state": {
     "b14": {
@@ -269,8 +269,8 @@
     "retirement_gate": "Remove the legacy comparison switch only after Phase 3 parity evidence and explicit project-owner acceptance; do not retire B14/B15 artifacts as part of this pilot."
   },
   "implementation_gates": [
-    "Phase 1 remains open; this selection satisfies only the first-slice decision part of its exit gate.",
-    "Do not create tracktemplate package files or TrackTemplate.FCMacro until Phase 2 source work is explicitly started.",
+    "Phase 1 was accepted and closed on 2026-07-22; only the bounded Phase 2 package/loading foundation is authorised.",
+    "Phase 2 may create the minimum tracktemplate package skeleton and small TrackTemplate.FCMacro B16 composition root, but calculation movement and caller routing remain Phase 3 work.",
     "Create only the package locations required by this three-function slice.",
     "Prove standalone import without FreeCAD, Part, Qt, pivy or third-party dependencies before caller routing.",
     "Run legacy-versus-modular parity before routing any caller, then route all three external callers together through the temporary façade.",

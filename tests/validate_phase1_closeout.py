@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the review-ready, deliberately unaccepted Phase 1 closeout."""
+"""Validate the accepted Phase 1 closeout and bounded Phase 2 authority."""
 
 import collections
 import copy
@@ -34,16 +34,16 @@ SOURCE_EXPECTATIONS = {
     ),
 }
 DECISION_STATES = {
-    "P1-01": "recommended-for-acceptance",
-    "P1-02": "recommended-for-acceptance",
-    "P1-03": "recommended-for-acceptance",
-    "P1-04": "recommended-for-acceptance",
-    "P1-05": "recommended-for-acceptance",
-    "P1-06": "recommended-for-acceptance",
-    "P1-07": "accepted-existing-boundary",
-    "P1-08": "recommended-for-acceptance",
-    "P1-09": "accepted-existing-boundary",
-    "P1-10": "owner-decision-required",
+    "P1-01": "accepted",
+    "P1-02": "accepted",
+    "P1-03": "accepted",
+    "P1-04": "accepted",
+    "P1-05": "accepted",
+    "P1-06": "accepted",
+    "P1-07": "accepted",
+    "P1-08": "accepted",
+    "P1-09": "accepted",
+    "P1-10": "accepted",
 }
 PERFORMANCE_DEFECTS = (
     "geometry-external-internal-boundary-gap",
@@ -60,7 +60,8 @@ TARGET_SLOTS = (
 )
 DEFERRAL_IDS = tuple("P1-X{:02d}".format(number) for number in range(1, 11))
 REQUIRED_MARKERS = (
-    "Status: **Review-ready; Phase 1 remains current and Phase 2 is not authorised.**",
+    "Status: **Accepted and closed by the project owner on 2026-07-22.",
+    "Phase 2 is\ncurrent under the bounded foundation authority recorded here.**",
     "6f49d6570072926f7e416893bb6d07cee0071733",
     "B15 FreeCAD 1.1 headless smoke test passed",
     "14 workflows, 12 bounded-executed, two defined-blocked and 14 scheduled open gaps",
@@ -73,15 +74,20 @@ REQUIRED_MARKERS = (
     "S1-07 through S1-15 remain blocked",
     "six open reviews have Phase 8 or Phase",
     "Phase 2 is not authorised to move the selected calculation implementation",
-    "No acceptance is recorded yet.",
+    "Accepted explicitly by the project owner on 2026-07-22",
     "> I accept PHASE1_CLOSEOUT.md, including P1-01 through P1-10.",
-    "After that explicit acceptance—and only then—the project plan may show Phase 1",
+    "This instruction is the phase-transition authority.",
 )
 REQUIRED_PROJECT_PLAN_MARKERS = (
-    "Progress: `████████▒` — 8/9 exit conditions evidenced; 1 remains active.",
-    "| 1 | Product, dependency, correctness, and performance inventory | `████████▒` — 8/9 evidenced; 1 active | Current |",
+    "Progress: `█████████` — 9/9 exit conditions evidenced and accepted.",
+    "| 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |",
+    "| 2 | Minimal modular foundation and validation harness | `░░░░░` — 0/5 | Current |",
+    "| M2 — Migration blueprint locked",
+    "| 1 | Complete — accepted 2026-07-22 |",
+    "| M3 — First reusable modular capability",
+    "| 2–3 | Active |",
     "PHASE1_CLOSEOUT.md",
-    "review-ready",
+    "Phase 2 is current",
 )
 
 
@@ -148,8 +154,8 @@ def validate_closeout(data, check_repository=True):
     for marker in REQUIRED_MARKERS:
         if marker not in closeout_text:
             errors.append("closeout marker is missing: {}".format(marker))
-    if "Status: **Accepted" in closeout_text:
-        errors.append("Phase 1 closeout was promoted without owner acceptance")
+    if "No acceptance is recorded yet." in closeout_text:
+        errors.append("accepted closeout still claims that acceptance is absent")
 
     rows = _decision_rows(closeout_text, errors)
     row_ids = [row[0] for row in rows]
@@ -176,13 +182,8 @@ def validate_closeout(data, check_repository=True):
     for marker in REQUIRED_PROJECT_PLAN_MARKERS:
         if marker not in project_plan_text:
             errors.append("project-plan closeout marker is missing: {}".format(marker))
-    if "Phase 1 closed" in project_plan_text or (
-        "| 2 | Minimal modular foundation and validation harness" in project_plan_text
-        and "| Current |" in project_plan_text.split(
-            "| 2 | Minimal modular foundation and validation harness", 1
-        )[1].splitlines()[0]
-    ):
-        errors.append("project plan prematurely closed Phase 1 or started Phase 2")
+    if "Phase 1 closed\non 2026-07-22; Phase 2 is current." not in project_plan_text:
+        errors.append("project plan lost the accepted Phase 1/Phase 2 transition")
 
     workflow = data["workflow"]
     gate = workflow.get("phase1_gate") or {}
@@ -231,9 +232,15 @@ def validate_closeout(data, check_repository=True):
         errors.append("a target performance slot was populated without evidence")
     performance_gate = performance.get("phase1_gate") or {}
     if performance_gate.get("result") != (
-        "bounded-performance-inventory-tranche-complete-phase1-remains-open"
+        "bounded-performance-inventory-accepted-target-pipeline-unmeasured"
     ):
         errors.append("performance Phase 1 gate drifted")
+    if not any(
+        "Preserve all four unmeasured target slots" in item
+        and "after the accepted 2026-07-22 Phase 1 closeout" in item
+        for item in performance_gate.get("still_open") or []
+    ):
+        errors.append("accepted performance later-gate obligation is missing")
 
     compatibility = data["compatibility"]
     runtime = compatibility.get("runtime_baseline") or {}
@@ -278,7 +285,10 @@ def validate_closeout(data, check_repository=True):
     successor = transition.get("successor") or {}
     if (
         transition.get("status")
-        != "selected-contract-frozen-source-movement-not-started"
+        != (
+            "selected-contract-frozen-phase2-foundation-authorised-"
+            "source-movement-not-started"
+        )
         or selection.get("candidate_id") != "transition_length_solver"
         or selection.get("owner_accepted_on") != "2026-07-20"
         or successor.get("development_checkpoint_id") != "10.2A8A7B16"
@@ -287,6 +297,16 @@ def validate_closeout(data, check_repository=True):
         or successor.get("authoritative_package") != "tracktemplate"
     ):
         errors.append("selected transition-pilot boundary drifted")
+    implementation_gates = transition.get("implementation_gates") or []
+    if not any(
+        "only the bounded Phase 2 package/loading foundation is authorised"
+        in item
+        for item in implementation_gates
+    ) or not any(
+        "calculation movement and caller routing remain Phase 3 work" in item
+        for item in implementation_gates
+    ):
+        errors.append("bounded Phase 2 implementation authority drifted")
 
     manifest = data["manifest"]
     manifest_errors = manifest_validator.validate_document(manifest)
@@ -332,7 +352,8 @@ def validate_closeout(data, check_repository=True):
         item.get("state") for item in terminology.get("terms") or []
     )
     if (
-        terminology.get("status") != "implemented-for-phase1-closeout-review"
+        terminology.get("status")
+        != "accepted-at-phase1-closeout-open-reviews-scheduled"
         or term_states
         != {
             "accepted": 6,
@@ -346,9 +367,14 @@ def validate_closeout(data, check_repository=True):
             for item in terminology.get("open_reviews") or []
         )
         or (terminology.get("phase1_gate") or {}).get("status")
-        != "ready-for-closeout-review"
+        != "accepted-at-phase1-closeout"
     ):
         errors.append("terminology closeout boundary drifted")
+    if not any(
+        "does not resolve or waive any of the six named later reviews" in item
+        for item in (terminology.get("phase1_gate") or {}).get("not_claimed") or []
+    ):
+        errors.append("terminology later-review obligation is missing")
 
     if check_repository:
         for source_key, (relative_path, version, digest) in SOURCE_EXPECTATIONS.items():
@@ -357,9 +383,6 @@ def validate_closeout(data, check_repository=True):
                 errors.append("{} source fingerprint changed".format(source_key))
             if version not in path.read_text(encoding="utf-8"):
                 errors.append("{} version token is missing".format(source_key))
-        if (ROOT / "tracktemplate").exists() or (ROOT / "TrackTemplate.FCMacro").exists():
-            errors.append("Phase 2 source appeared before closeout acceptance")
-
     return errors
 
 
@@ -401,15 +424,15 @@ def main():
     if errors:
         raise AssertionError("\n".join(errors))
 
-    accepted_without_owner = copy.deepcopy(data)
-    accepted_without_owner["closeout_text"] = accepted_without_owner[
+    downgraded_decision = copy.deepcopy(data)
+    downgraded_decision["closeout_text"] = downgraded_decision[
         "closeout_text"
     ].replace(
-        "| P1-10 | Phase transition | owner-decision-required |",
         "| P1-10 | Phase transition | accepted |",
+        "| P1-10 | Phase transition | owner-decision-required |",
         1,
     )
-    _expect_invalid(accepted_without_owner, "premature phase acceptance")
+    _expect_invalid(downgraded_decision, "lost phase acceptance")
 
     broadened_host = copy.deepcopy(data)
     broadened_host["compatibility"]["runtime_baseline"]["platform_matrix"][2][
@@ -441,15 +464,15 @@ def main():
     )
     _expect_invalid(missing_bloat_control, "missing control-bloat deferral")
 
-    premature_plan = copy.deepcopy(data)
-    premature_plan["project_plan_text"] = premature_plan["project_plan_text"].replace(
+    reopened_plan = copy.deepcopy(data)
+    reopened_plan["project_plan_text"] = reopened_plan["project_plan_text"].replace(
+        "Progress: `█████████` — 9/9 exit conditions evidenced and accepted.",
         "Progress: `████████▒` — 8/9 exit conditions evidenced; 1 remains active.",
-        "Progress: `█████████` — 9/9 exit conditions evidenced; 0 remain active.",
         1,
     )
-    _expect_invalid(premature_plan, "premature project-plan closeout")
+    _expect_invalid(reopened_plan, "unrecorded project-plan reopening")
 
-    print("Phase 1 closeout review validation passed")
+    print("Accepted Phase 1 closeout validation passed")
 
 
 if __name__ == "__main__":

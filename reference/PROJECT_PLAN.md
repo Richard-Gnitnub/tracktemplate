@@ -1,6 +1,7 @@
 # Project Plan: Baseline to Release Candidate
 
-Status: working delivery plan. **Phase 0 closed on 2026-07-19; Phase 1 is current.**
+Status: working delivery plan. **Phase 0 closed on 2026-07-19; Phase 1 closed
+on 2026-07-22; Phase 2 is current.**
 
 ## Purpose
 
@@ -27,9 +28,8 @@ The documents have distinct responsibilities:
   statuses.
 - [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md) owns the current workflow,
   dependency, side-effect, candidate and Phase 1 decision evidence.
-- [PHASE1_CLOSEOUT.md](PHASE1_CLOSEOUT.md) reconciles the Phase 1 evidence,
-  risks, deferrals and owner decisions; it is review-ready but cannot close the
-  phase or start Phase 2 without explicit project-owner acceptance.
+- [PHASE1_CLOSEOUT.md](PHASE1_CLOSEOUT.md) records the accepted Phase 1
+  evidence, risks, deferrals, owner decisions and bounded Phase 2 authority.
 - This document owns delivery order, phase status, decision timing, and release-candidate gates.
 
 If a proposed shortcut conflicts with railway correctness, production safety, or an accepted architectural invariant, the invariant wins unless the user explicitly approves a changed requirement.
@@ -112,14 +112,14 @@ but does not decide whether the cited evidence is sufficient.
 
 ## Key project milestones
 
-Milestone progress: `█▒░░░░░░░` — one complete, one active and seven not
+Milestone progress: `██▒░░░░░░` — two complete, one active and six not
 started. This is an outcome count, not an overall percentage of effort.
 
 | Milestone | Outcome | Owning phases | State |
 | --- | --- | --- | --- |
 | M1 — Recoverable behavioural baseline | B14/B15 roles, source state, validation, provenance and representative performance can be reproduced | 0 | Complete — accepted 2026-07-19 |
-| M2 — Migration blueprint locked | Release-critical workflows, dependency/performance boundaries, compatibility, terminology, rights/provenance controls, chair direction and the first extraction slice are sufficiently bounded to begin modular source work | 1 | Active |
-| M3 — First reusable modular capability | The minimal package loads in standalone Python and FreeCAD, and the transition-length pilot passes end-to-end legacy/new parity | 2–3 | Not started |
+| M2 — Migration blueprint locked | Release-critical workflows, dependency/performance boundaries, compatibility, terminology, rights/provenance controls, chair direction and the first extraction slice are sufficiently bounded to begin modular source work | 1 | Complete — accepted 2026-07-22 |
+| M3 — First reusable modular capability | The minimal package loads in standalone Python and FreeCAD, and the transition-length pilot passes end-to-end legacy/new parity | 2–3 | Active |
 | M4 — Canonical responsive editing foundation | Versioned canonical state, exact invalidation, save/reopen and an accepted lightweight renderer support normal editing without dense exact geometry | 4–5 | Not started |
 | M5 — Deferred production seam proven | Explicit Validate/Export regenerates equivalent exact geometry transactionally without leaking production objects into routine editing | 6 | Not started |
 | M6 — Core trackwork migrated | Plain-line alignment/station/multiple-track plus turnout/crossover/timbering workflows run through the modular architecture | 7–8 | Not started |
@@ -132,8 +132,8 @@ started. This is an outcome count, not an overall percentage of effort.
 | Phase | Outcome | Exit-gate progress | State |
 | --- | --- | --- | --- |
 | 0 | Recoverable baseline and benchmark checkpoint | `██████` — 6/6 evidenced | Complete — accepted 2026-07-19 |
-| 1 | Product, dependency, correctness, and performance inventory | `████████▒` — 8/9 evidenced; 1 active | Current |
-| 2 | Minimal modular foundation and validation harness | `░░░░░` — 0/5 | Not started |
+| 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |
+| 2 | Minimal modular foundation and validation harness | `░░░░░` — 0/5 | Current |
 | 3 | First parity-proven vertical slice | `░░░░░` — 0/5 | Not started |
 | 4 | Canonical state, signatures, and persistence | `░░░░░░` — 0/6 | Not started |
 | 5 | Lightweight editing prototype and renderer decision | `░░░░` — 0/4 | Not started |
@@ -198,11 +198,11 @@ and decisions on 2026-07-19, and the closeout checkpoint is tagged
 
 ## Phase 1: product, dependency, correctness, and performance inventory
 
-Status: **Current.**
+Status: **Complete — accepted and closed on 2026-07-22.**
 
-Progress: `████████▒` — 8/9 exit conditions evidenced; 1 remains active.
+Progress: `█████████` — 9/9 exit conditions evidenced and accepted.
 
-### Current gate register
+### Final gate register
 
 | Exit condition | State | Evidence or remaining work |
 | --- | --- | --- |
@@ -214,7 +214,7 @@ Progress: `████████▒` — 8/9 exit conditions evidenced; 1 rem
 | First-S1/core and other-S&C/legacy lineage scopes are classified or visibly blocked | Evidenced | Both bounded machine-readable lineage registers have statuses, owners and later output gates; no positive clearance is inferred |
 | Neutral chair definition, manifest/licensing controls and first-S1 evidence/rights plan are accepted | Evidenced | The owner accepted `S1_PILOT_PLAN.md` on 2026-07-22, including S1-04 through S1-06, intended uses and the conditional CC0 target; S1-07 through S1-15 and the actual package remain blocked |
 | RC chair scope is bounded to validated packages and one assisted S1 pilot | Evidenced | Arbitrary automatic scan/CAD conversion remains explicitly post-RC research |
-| Open risks and required owner decisions are recorded | Active until closeout | `PHASE1_CLOSEOUT.md` is review-ready and reconciles GUI limitations, S1/lineage blocks, target-profile gaps, compatibility boundaries, legacy defects and terminology reviews; explicit owner acceptance is still required |
+| Open risks and required owner decisions are recorded | Evidenced | The project owner accepted `PHASE1_CLOSEOUT.md`, P1-01 through P1-10 and every recorded mandatory later gate on 2026-07-22 |
 
 The canonical workflow control is
 [`contracts/phase1-workflow-coverage.json`](contracts/phase1-workflow-coverage.json).
@@ -524,7 +524,7 @@ also records every current
 finding and keeps all mapped Templot material `reference-only`. This completes
 the source-generation-map branch subject to owner review; it does not provide
 the missing exact artifact oracle, independently evidenced S1 values or a
-production ChairDefinition, and it does not close Phase 1.
+production ChairDefinition, and it did not by itself close Phase 1.
 
 The existing performance evidence is now reconciled through the fail-closed
 [performance-boundary contract](contracts/phase1-performance-boundaries.json).
@@ -536,7 +536,7 @@ Validate, export from validated state and complete edit-through-export—remain
 `not-implemented-unmeasured`. The current evidence can identify the chair chain
 and repeated export probing as dominant legacy costs, but no current timing is
 an accepted budget or authority to select a target-code optimisation. Phase 1
-therefore remains open.
+acceptance preserves those target measurements and budgets as later gates.
 
 Canonical **plain line** terminology and the compatibility treatment of the
 legacy `ordinary-*` evidence identifiers are now recorded in
@@ -567,7 +567,28 @@ macro wording is deferred to an approved successor version.
   requirement.
 - Open risks and required user decisions are recorded.
 
+Result: **Pass.** Every exit condition is evidenced. On 2026-07-22 the project
+owner explicitly accepted `PHASE1_CLOSEOUT.md`, including P1-01 through P1-10,
+closed Phase 1 and authorised only the bounded Phase 2 foundation. All named
+workflow, GUI, performance, migration, provenance, S1, rights and terminology
+obligations remain mandatory at their later gates.
+
 ## Phase 2: minimal modular foundation and validation harness
+
+Status: **Current — bounded foundation authorised on 2026-07-22; implementation
+not yet started.**
+
+Progress: `░░░░░` — 0/5 exit conditions evidenced.
+
+### Current gate register
+
+| Exit condition | State | Evidence or remaining work |
+| --- | --- | --- |
+| Standalone Python imports the domain/API boundary without FreeCAD or Qt | Pending | Create only the minimum selected-slice package and enforce forbidden imports |
+| The launcher loads the package in the qualified FreeCAD environment | Pending | Add the small B16 composition root and prove the documented loading route |
+| Existing B14/B15 workflows and validation remain unchanged | Pending | Preserve both exact source hashes and rerun the applicable fast and FreeCAD checks after foundation work |
+| No speculative tree, cycle, runtime dependency or hidden global service is introduced | Pending | Add dependency/cycle checks and a deterministic modular-structure report |
+| The first package has a recorded maintainability/reuse review | Pending | Record authority, shared invariant, narrow interface, tests and any temporary retirement gate |
 
 ### Goal
 
@@ -946,9 +967,9 @@ package licence and field/component provenance pass
 | Source/data/output classification policy | Resolved 2026-07-20 — neutral canonical data, one-way optional Templot adapter, package-specific licensing and no automatic project claim over ordinary output | Archive/output-notice review, GPL/CC scope review, `LICENSING_BOUNDARIES.md`, and owner acceptance |
 | Chair geometry method and RC scope | Resolved 2026-07-20 — full-size procedural constituent generation, validated external packages and one assisted S1 pilot; arbitrary automatic conversion remains post-RC research | Templot source audit and project-owner acceptance |
 | Scoped output lineage and first S1 package rights plan | Resolved for Phase 1 planning on 2026-07-22; package remains blocked | Owner-accepted `S1_PILOT_PLAN.md` plus the blocked first-S1/core classifications, validated unknown manifest, B15 gap analysis, intended uses, evidence/licence/right-review decision owners, comparison metric families and explicit later gates |
-| First extraction slice | Resolved 2026-07-20 — transition-length solver selected as the architecture pilot; B16/launcher and exact acceptance contract reserved; source movement not started | Candidate contracts, bounded closure cuts, workflow profiles, scorecard and owner acceptance |
-| Remaining representative fixtures and Phase 1 profile coverage | Review-ready at Phase 1 closeout | Fourteen owned workflow families with scheduled gaps, reconciled legacy profiles, five bounded instrumentation defects and four explicit unmeasured target slots |
-| Supported FreeCAD/Python and legacy document window | Initial policy defined 2026-07-20; included in the review-ready Phase 1 closeout and implementation/family fixtures due by Phase 4 | Exact runtime probe, official Addon metadata fields, B14/B15 source/schema anchors, existing save/reopen evidence, fail-closed contract validation and future migration fixtures |
+| First extraction slice | Resolved 2026-07-20; Phase 2 foundation authorised 2026-07-22 — transition-length solver selected, B16/launcher and exact contract reserved; calculation movement/caller routing remain Phase 3 | Candidate contracts, bounded closure cuts, workflow profiles, scorecard and owner acceptance |
+| Remaining representative fixtures and Phase 1 profile coverage | Accepted as controlled deferrals at Phase 1 closeout on 2026-07-22 | Fourteen owned workflow families with scheduled gaps, reconciled legacy profiles, five bounded instrumentation defects and four explicit unmeasured target slots |
+| Supported FreeCAD/Python and legacy document window | Initial policy accepted at Phase 1 closeout on 2026-07-22; implementation/family fixtures remain due by Phase 4 | Exact runtime probe, official Addon metadata fields, B14/B15 source/schema anchors, existing save/reopen evidence, fail-closed contract validation and future migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |
 | Coin ViewProvider versus SVG/Qt editing view | Phase 5 exit | Selection, editing, persistence, and resource prototype |
 | Numerical performance budgets | Provisional after Phase 1; frozen by Phase 10 | Repeated cold/warm representative baselines |

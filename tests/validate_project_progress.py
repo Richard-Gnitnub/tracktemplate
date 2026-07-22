@@ -96,10 +96,10 @@ def _validate_phase_bars(text):
     return rows
 
 
-def _validate_current_phase_register(text, phase_row):
-    start = text.index("### Current gate register")
-    finish = text.index("### Goal", start)
-    register = text[start:finish]
+def _validate_gate_register(section, phase, phase_row, heading):
+    start = section.index(heading)
+    finish = section.index("### Goal", start)
+    register = section[start:finish]
     states = []
     for line in register.splitlines():
         cells = _table_cells(line) if line.startswith("|") else []
@@ -110,17 +110,27 @@ def _validate_current_phase_register(text, phase_row):
         states.append(cells[1])
     evidenced = sum(state == "Evidenced" for state in states)
     active = sum(state.startswith("Active") for state in states)
+    pending = sum(state.startswith("Pending") for state in states)
     assert len(states) == phase_row["total"], (
-        "Phase 1 register row count does not match its exit-gate total"
+        "Phase {} register row count does not match its exit-gate total".format(
+            phase
+        )
     )
     assert evidenced == phase_row["evidenced"], (
-        "Phase 1 evidenced register count does not match its roadmap bar"
+        "Phase {} evidenced register count does not match its roadmap bar".format(
+            phase
+        )
     )
     assert active == phase_row["bar"].count("▒"), (
-        "Phase 1 active register count does not match its roadmap bar"
+        "Phase {} active register count does not match its roadmap bar".format(phase)
     )
-    assert evidenced + active == len(states), (
-        "Phase 1 register contains an unsupported state"
+    assert pending == phase_row["bar"].count("░"), (
+        "Phase {} pending register count does not match its roadmap bar".format(
+            phase
+        )
+    )
+    assert evidenced + active + pending == len(states), (
+        "Phase {} register contains an unsupported state".format(phase)
     )
 
 
@@ -155,8 +165,19 @@ def _validate_milestones(text):
 
 def main():
     text = PLAN_PATH.read_text(encoding="utf-8")
+    sections = _phase_sections(text)
     rows = _validate_phase_bars(text)
-    _validate_current_phase_register(text, rows[1])
+    current = [phase for phase, row in rows.items() if row["state"] == "Current"]
+    assert current == [2], "Phase 2 must be the sole current phase"
+    _validate_gate_register(
+        sections[1], 1, rows[1], "### Final gate register"
+    )
+    _validate_gate_register(
+        sections[current[0]],
+        current[0],
+        rows[current[0]],
+        "### Current gate register",
+    )
     _validate_milestones(text)
     print("Project plan progress validation passed")
 

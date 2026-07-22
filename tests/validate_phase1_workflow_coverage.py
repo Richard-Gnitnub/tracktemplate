@@ -392,6 +392,12 @@ def validate_contract(document, inventory_text, check_paths=True):
         "oracle, and stated coverage gap."
     ):
         errors.append("workflow Phase 1 exit-condition wording drifted")
+    if gate.get("phase_effect") != (
+        "This supplied evidence for the first Phase 1 exit condition. The "
+        "project owner accepted the complete Phase 1 closeout on 2026-07-22; "
+        "all 14 open workflow gaps remain mandatory at their named later gates."
+    ):
+        errors.append("workflow Phase 1 acceptance/later-gate boundary drifted")
 
     return errors
 

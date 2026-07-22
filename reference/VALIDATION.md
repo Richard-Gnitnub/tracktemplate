@@ -209,7 +209,7 @@ ownership and future successor-product scan. It detects known terminology
 drift and missing review control; it cannot determine contextual railway
 correctness without the named human review.
 
-Review-ready Phase 1 closeout aggregation:
+Accepted Phase 1 closeout aggregation:
 
 ```bash
 .venv/bin/python tests/validate_phase1_closeout.py
@@ -218,10 +218,10 @@ Review-ready Phase 1 closeout aggregation:
 This reconciles the source fingerprints, workflow counts/gaps, selected pilot,
 runtime and ingress policy, bounded performance defects, unmeasured target
 slots, S1 manifest/lineage/oracle blocks, terminology reviews and the 10 owner
-decisions in `PHASE1_CLOSEOUT.md`. It also rejects premature phase closure,
-broadened host support, invented performance evidence and S1 clearance.
-Passing makes the record review-ready; only explicit owner acceptance can
-close Phase 1 or start Phase 2.
+decisions in `PHASE1_CLOSEOUT.md`. It rejects loss of the accepted phase state,
+broadened host support, invented performance evidence, waived later gates and
+S1 clearance. Passing protects the 2026-07-22 acceptance; it does not broaden
+the bounded Phase 2 authority.
 
 Owner-accepted first-S1 package/evidence plan checks:
 

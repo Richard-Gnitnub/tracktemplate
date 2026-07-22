@@ -12,7 +12,7 @@ CONTRACT_PATH = (
     ROOT / "reference" / "contracts" / "phase1-performance-boundaries.json"
 )
 EXPECTED_CONTRACT_SHA256 = (
-    "ee04f2c13064f9895326ded2cf22d03e977e2eb816cd188b725a62813831e37f"
+    "7aa377fdc7e7e1174f5a4ad8da75ee612e9efa8b46f2dd7fb9f3b37976f6ae43"
 )
 SOURCE_EXPECTATIONS = {
     "b14": {
@@ -452,9 +452,9 @@ def validate_contract(document):
         errors.append("performance Phase 1 gate fields are invalid")
     else:
         if gate.get("result") != (
-            "bounded-performance-inventory-tranche-complete-phase1-remains-open"
+            "bounded-performance-inventory-accepted-target-pipeline-unmeasured"
         ):
-            errors.append("performance gate overstates Phase 1 completion")
+            errors.append("accepted performance gate status drifted")
         for field in ("closed_by_this_contract", "still_open"):
             if not isinstance(gate.get(field), list) or not gate.get(field):
                 errors.append("performance gate {} is empty".format(field))

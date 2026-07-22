@@ -1,7 +1,8 @@
 # Modularisation Plan
 
-Status: accepted direction; Stage M1 selected the transition-length pilot and
-froze its acceptance contract, but no source extraction has started.
+Status: accepted direction; Stage M1 and the Phase 1 closeout are complete.
+Stage M2 is current under the bounded foundation authority accepted on
+2026-07-22; no calculation extraction has started.
 
 The authoritative delivery phases from the current baseline to a release candidate are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md). The `M` stages below describe only the modularisation workstream and intentionally do not create a second project phase scheme.
 
@@ -334,8 +335,7 @@ Status: **Complete with the Phase 0 closeout.**
 
 Exit gate: the first extraction is selected from evidence rather than source proximity.
 
-Status: **Selection complete; the Phase 1 closeout is review-ready but not
-accepted.**
+Status: **Complete — selection and Phase 1 closeout accepted on 2026-07-22.**
 The reproducible static definition/caller/alias/patch
 inventory and initial candidate comparison are recorded in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). The five current candidates now
@@ -359,10 +359,13 @@ chair extraction.
 Broader workflow boundaries, candidate-specific gaps, additional platform
 qualification and representative target-architecture profiles remain open;
 source movement and document migration have not started. The consolidated
-[Phase 1 closeout review](PHASE1_CLOSEOUT.md) preserves those later gates and
-the empty Stage M2 boundary pending explicit project-owner acceptance.
+[Phase 1 closeout record](PHASE1_CLOSEOUT.md) preserves those later gates and
+authorises only the empty Stage M2 package/loading foundation.
 
 ### Stage M2: package skeleton and façade
+
+Status: **Current — authorised on 2026-07-22; implementation not yet
+started.**
 
 - Add only the package locations needed by the selected slice.
 - Establish `tracktemplate.api` and the composition root.

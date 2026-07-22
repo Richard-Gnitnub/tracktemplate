@@ -1,7 +1,8 @@
 # Railway Terminology
 
 Status: accepted plain-line terminology decision, 2026-07-19; Phase 1
-assurance control implemented for closeout review, 2026-07-22.
+assurance control accepted at closeout on 2026-07-22, with six later reviews
+still open.
 
 ## Assurance control
 
