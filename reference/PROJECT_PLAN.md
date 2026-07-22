@@ -1,7 +1,7 @@
 # Project Plan: Baseline to Release Candidate
 
 Status: working delivery plan. **Phase 0 closed on 2026-07-19; Phases 1–3
-closed on 2026-07-22; Phase 4 is next and has not started.**
+closed on 2026-07-22; Phase 4 is current and opened on 2026-07-22.**
 
 ## Purpose
 
@@ -34,6 +34,9 @@ The documents have distinct responsibilities:
   dependency and comparison foundation.
 - [PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md) records the accepted
   transition-length extraction, parity, performance and closeout evidence.
+- [PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md) is the one live Phase
+  4 evidence record for canonical state, signatures, persistence, migration
+  and the chair-definition contract.
 - [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) owns destructive-action,
   checkpoint, ignored-data backup and restore controls. It does not mark an
   unconfigured backup as complete.
@@ -136,7 +139,8 @@ but does not decide whether the cited evidence is sufficient.
 
 ## Key project milestones
 
-Milestone progress: `███░░░░░░` — three complete and six not started. This is
+Milestone progress: `███▒░░░░░` — three complete, one active and five not
+started. This is
 an outcome count, not an overall percentage of effort.
 
 | Milestone | Outcome | Owning phases | State |
@@ -144,7 +148,7 @@ an outcome count, not an overall percentage of effort.
 | M1 — Recoverable behavioural baseline | B14/B15 roles, source state, validation, provenance and representative performance can be reproduced | 0 | Complete — accepted 2026-07-19 |
 | M2 — Migration blueprint locked | Release-critical workflows, dependency/performance boundaries, compatibility, terminology, rights/provenance controls, chair direction and the first extraction slice are sufficiently bounded to begin modular source work | 1 | Complete — accepted 2026-07-22 |
 | M3 — First reusable modular capability | The minimal package loads in standalone Python and FreeCAD, and the transition-length pilot passes end-to-end legacy/new parity | 2–3 | Complete — accepted 2026-07-22 |
-| M4 — Canonical responsive editing foundation | Versioned canonical state, exact invalidation, save/reopen and an accepted lightweight renderer support normal editing without dense exact geometry | 4–5 | Not started |
+| M4 — Canonical responsive editing foundation | Versioned canonical state, exact invalidation, save/reopen and an accepted lightweight renderer support normal editing without dense exact geometry | 4–5 | Active |
 | M5 — Deferred production seam proven | Explicit Validate/Export regenerates equivalent exact geometry transactionally without leaking production objects into routine editing | 6 | Not started |
 | M6 — Core trackwork migrated | Plain-line alignment/station/multiple-track plus turnout/crossover/timbering workflows run through the modular architecture | 7–8 | Not started |
 | M7 — Production chair system completed | Validated external definitions, one evidence-led S1 assimilation pilot, procedural constituents, production records, manifests and supported exports pass | 9 | Not started |
@@ -159,7 +163,7 @@ an outcome count, not an overall percentage of effort.
 | 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |
 | 2 | Minimal modular foundation and validation harness | `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 3 | First parity-proven vertical slice | `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |
-| 4 | Canonical state, signatures, and persistence | `░░░░░░` — 0/6 | Not started |
+| 4 | Canonical state, signatures, and persistence | `▒▒░░░▒` — 0/6 | Current |
 | 5 | Lightweight editing prototype and renderer decision | `░░░░` — 0/4 | Not started |
 | 6 | Explicit exact-validation and export seam | `░░░░░` — 0/5 | Not started |
 | 7 | Core alignment, station, and multiple-track migration | `░░░░` — 0/4 | Not started |
@@ -702,11 +706,28 @@ Prove the extraction method on one bounded capability before generalising the ar
 
 Result: **Pass.** On 2026-07-22 the project owner explicitly instructed the
 project to close Phase 3 with their acceptance and to commit and push the
-closeout. The acceptance closes the phase but neither removes the temporary
-comparison route nor starts Phase 4. Phase 4 remains not started pending an
-explicit project-owner instruction.
+closeout. That acceptance closed the phase but did not itself remove the
+temporary comparison route or start Phase 4. The project owner subsequently
+started Phase 4 explicitly on 2026-07-22; the retained comparison route remains
+separately gated.
 
 ## Phase 4: canonical state, signatures, and persistence
+
+Status: **Current — opened by explicit project-owner instruction on
+2026-07-22.**
+
+Progress: `▒▒░░░▒` — 0/6 exit conditions evidenced; three are active.
+
+### Current gate register
+
+| Exit condition | State | Evidence or remaining work |
+| --- | --- | --- |
+| The selected slice round-trips through save/reopen without result or identity drift | Active — foundation only | Deterministic transition JSON round-trip is implemented in the application boundary; qualified FreeCAD property, FCStd save/reopen and identity mapping remain due in [PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md) |
+| Parameter edits invalidate exactly the affected derived results, including cold/reuse/change-back cases | Active — transition analysis | All four numerical inputs, label-only reuse and A-B-A analysis cases are covered; downstream preview, validation and export dirty propagation remain due |
+| Undo/redo and failed updates leave a valid document | Pending | Requires the bounded FreeCAD persistence adapter and one-command transaction fixture |
+| Preview and exact geometry can be deleted and regenerated solely from canonical state | Pending | Requires later derived presentation/exact seams; neither is persisted by the opening tranche |
+| A chair-definition package round-trips deterministically and rejects missing, corrupt, unsupported or ambiguous required data | Pending | Cross-cutting neutral schema, provenance/licensing fields and fail-closed package tests remain due before production chair construction |
+| The supported schema/version window is agreed and tested | Active — provisional transition v1 | Exact transition schema v1 reader/writer is tested; owner agreement plus chair and legacy-migration windows remain due |
 
 ### Goal
 

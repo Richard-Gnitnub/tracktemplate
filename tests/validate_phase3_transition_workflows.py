@@ -287,7 +287,8 @@ def _validate_bridge_contract():
     assert "Progress: `█████` — 5/5 exit conditions evidenced and accepted" in (
         project_plan_text
     )
-    assert "Phase 4 remains not started" in project_plan_text
+    assert "Phase 3: first parity-proven vertical slice" in project_plan_text
+    assert "Complete — all five technical exit conditions" in project_plan_text
 
 
 def validate():

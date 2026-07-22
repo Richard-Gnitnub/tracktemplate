@@ -239,7 +239,8 @@ def validate_evidence_links():
     plan = (ROOT / "reference/PROJECT_PLAN.md").read_text(encoding="utf-8")
     assert "`█████` — 5/5 exit conditions evidenced and accepted" in plan
     assert "| `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |" in plan
-    assert "Phase 4 is next and has not started" in plan
+    assert "Phase 3: first parity-proven vertical slice" in plan
+    assert "Complete — all five technical exit conditions" in plan
 
     validation = (ROOT / "reference/VALIDATION.md").read_text(encoding="utf-8")
     assert "tests/validate_phase3_transition_performance.py" in validation

@@ -232,6 +232,22 @@ document mutation. It must print
 current-phase test when accepted routing state changes; do not rewrite the
 Phase 2 loading smoke.
 
+Phase 4 transition canonical-state foundation:
+
+```bash
+.venv/bin/python tests/validate_phase4_transition_state.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase4_transition_state.py
+```
+
+The standard-library validator owns the provisional schema-v1 deterministic
+round-trip, complete transition-analysis signatures, cold/reuse/change-back,
+label-only reuse, numerical invalidation, stable identity, stale/corrupt
+derived-result recovery, fail-closed input cases and application dependency
+boundary. The qualified-FreeCAD smoke proves only runtime/type compatibility,
+the same exact JSON round-trip and zero document mutation. It is not FreeCAD
+property, transaction, Undo/Redo or FCStd save/reopen evidence.
+
 Current Phase 3 real-GUI workflow parity:
 
 ```bash
