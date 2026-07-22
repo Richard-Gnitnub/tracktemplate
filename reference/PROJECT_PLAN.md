@@ -727,7 +727,7 @@ Progress: `█▒█░░▒` — 2/6 exit conditions evidenced; two are active
 | Undo/redo and failed updates leave a valid document | Evidenced | Qualified-host create and update are one transaction each; create/update Undo/Redo, no-op history, preflight rejection, injected post-write create/update abort and unchanged valid-document assertions pass |
 | Preview and exact geometry can be deleted and regenerated solely from canonical state | Pending | Requires later derived presentation/exact seams; neither is persisted by the opening tranche |
 | A chair-definition package round-trips deterministically and rejects missing, corrupt, unsupported or ambiguous required data | Pending | Cross-cutting neutral schema, provenance/licensing fields and fail-closed package tests remain due before production chair construction |
-| The supported schema/version window is agreed and tested | Active — provisional transition v1 | Exact transition schema v1 reader/writer is tested; owner agreement plus chair and legacy-migration windows remain due |
+| The supported schema/version window is agreed and tested | Active — provisional transition and ingress readers | Exact transition schema v1 plus read-only B14, B15 and accepted mixed outer-window detection are tested; no legacy family is write-qualified, and owner agreement plus chair/family migration windows remain due |
 
 ### Goal
 

@@ -162,6 +162,60 @@ The disposable qualified-FreeCAD fixture proves:
   modes and operator label; and
 - foreign and other-record-type objects survive unchanged.
 
+## Legacy-document detection tranche
+
+`tracktemplate.compatibility.legacy_document` now implements the contracted
+outer B14/B15 ingress inspection without importing FreeCAD or exposing a write
+path. It reads the accepted Phase 1 compatibility contract, rejects a malformed
+or broadened contract, and deterministically reports only:
+
+- objects whose `GeneratedBy` exactly matches
+  `ModelRailwayCurveTemplate.IndependentEasements`;
+- the first token of descriptive `GeneratorVersion` values;
+- `macro_version` and `source_macro_version` evidence inside the exact 48 JSON
+  property names present in both immutable B14 and B15 sources, including
+  nested records; and
+- owned object names, generated roles, template-set sufficiency, parsed JSON
+  property paths and foreign-object count.
+
+JSON inspection rejects duplicate keys, non-standard numbers, malformed text,
+invalid version fields and invalid schema-version types. B14-only, B15-only and
+the exact mixed B14/B15 set match the accepted outer window. Versionless,
+unknown or future evidence remains inspection-only. Contradictory object/JSON
+versions or malformed/corrupt payload evidence returns
+`blocked-corrupt-or-conflicting`. Foreign objects do not classify the document
+and their version or JSON content is not interpreted.
+
+This detector cannot return write authority. `SUPPORTED_MIGRATION_FAMILIES` is
+deliberately empty, so even an exact outer-window match remains
+`inspection-only` with `migration-family-not-qualified`. Family-specific
+schema recognition, stable-identity sufficiency, canonical conversion and a
+copied-target transaction must each gain an accepted fixture before a later
+migrator can advertise that family. The closed Phase 1 contract remains the
+historical accepted policy record; implementing this Phase 4 reader does not
+rewrite its earlier status text.
+
+Maintainability is bounded: this compatibility module is the sole outer
+legacy-version reader, imports only `dataclasses` and `json`, is not re-exported
+through the product API, and contains no FreeCAD or mutation call. Its 48-name
+property tuple is compatibility data rather than a second implementation and
+is mechanically checked against both immutable macros. Later family readers
+must consume this report and add their own schema fixture instead of copying
+its version scan.
+
+The disposable real-FreeCAD fixture proves B14, B15 and mixed classification,
+foreign-object exclusion, versionless/future handling, conflicting/malformed
+blocking, zero object/property/history mutation and an identical report after
+FCStd save/close/reopen. A separate read-only probe of a copied nine-object B14
+base fixture (semantic SHA-256
+`a3486db6f02370e61432a480bfb6c9261bc9357cc2af5111f93135e3372d0a4e`)
+observed only `10.2A8A7B14`, all eight expected generated roles and 29
+non-empty JSON properties. It returned an accepted outer version window but
+inspection-only family status. Object count, Undo/Redo counts and the copied
+FCStd SHA-256
+`0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`
+were unchanged.
+
 ## Validation evidence
 
 The tranche validator directly covers immutable records, exact numerical
@@ -177,7 +231,7 @@ Observed on 2026-07-22 from the repository root:
 | Check | Result |
 | --- | --- |
 | Parse B14, B15, B16 launcher and all new/changed Python | Passed |
-| Every `tests/validate_*.py` standalone validator | 34/34 passed |
+| Every `tests/validate_*.py` standalone validator | 35/35 passed |
 | Dedicated Phase 4 canonical-state validator | Passed |
 | Deterministic modular structure | Passed; declared application boundary, permitted inward edges, no cycle, forbidden domain dependency or warning |
 | Isolated API/domain/application import with FreeCAD, Part, Qt and pivy blocked | Passed; no host import attempted |
@@ -186,6 +240,8 @@ Observed on 2026-07-22 from the repository root:
 | Retained Phase 3 FreeCAD routing smoke | Passed |
 | Phase 4 FreeCAD 1.1 canonical-state smoke | Passed; exact round-trip and zero document mutation |
 | Phase 4 qualified FreeCAD persistence lifecycle | Passed; disposable create/update, Undo/Redo, abort, stale/corrupt rejection and FCStd save/reopen |
+| Phase 4 standalone B14/B15 detector matrix | Passed; B14, B15, mixed, foreign, unsupported, versionless, malformed and conflicting cases |
+| Phase 4 FreeCAD legacy detector lifecycle | Passed; zero-mutation inspection and identical mixed report after FCStd save/reopen |
 
 The dedicated qualified-FreeCAD smoke is intentionally limited to type/runtime
 compatibility, exact JSON round-trip and zero document mutation; it is not
@@ -202,19 +258,24 @@ alter an operator route, document, renderer, exact geometry or export path.
 | Undo/redo and failed updates leave a valid document | Evidenced: atomic create/update, no-op, Undo/Redo, preflight rejection and injected post-write abort all pass |
 | Preview/exact geometry can be deleted and regenerated from canonical state | Pending: no Phase 5/6 renderer or exact adapter is being invented here |
 | Deterministic, fail-closed chair-definition package | Pending: the cross-cutting schema must be defined before a production builder, with S1 evidence still blocked |
-| Supported schema/version window agreed and tested | Active: exact transition v1 development reader/writer is tested; owner agreement and chair/legacy windows remain due |
+| Supported schema/version window agreed and tested | Active: exact transition v1 and read-only B14/B15/mixed outer detection are tested; owner agreement, chair packages and family migration schemas remain due |
 
 ## Remaining risks and next bounded tranche
 
 - Stable identity mapping to one logical transition object is implemented, but
   identity generation remains the responsibility of the later owning entity
   workflow; adapters must not invent IDs from object order or labels.
-- The B14/B15 detector and family-gated copied-target migration remain due. A
-  transition-only adapter must not imply that a whole legacy document is
-  migratable.
+- The outer B14/B15 detector exists, but no legacy entity family is qualified
+  for migration. Family schema/identity validation and copied-target migration
+  fixtures remain mandatory; an accepted version set must not imply that a
+  whole legacy document is migratable.
 - Preview, exact-validation and export signatures cannot be completed until
   those derived-result contracts exist; adapters must not invent partial keys.
 - The chair-definition schema and its rights/provenance fields remain a
   separate mandatory Phase 4 tranche before any production chair builder.
 - The provisional v1 window requires explicit project-owner acceptance before
   it can satisfy the Phase 4 schema/version exit condition.
+
+The next self-contained Phase 4 tranche is the neutral chair-definition
+package contract and fail-closed round-trip. It can advance its named exit gate
+without guessing which broader legacy entity family should be migrated first.

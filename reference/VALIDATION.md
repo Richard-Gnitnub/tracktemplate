@@ -266,6 +266,25 @@ post-write rollback, stale/corrupt derived-result handling, foreign-object
 preservation and rejection of unqualified runtime evidence. Its success
 sentinel is `Phase 4 transition FreeCAD persistence validation passed`.
 
+Phase 4 B14/B15 legacy-document detection:
+
+```bash
+.venv/bin/python tests/validate_phase4_legacy_document_detection.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase4_legacy_document_detection.py
+```
+
+The standalone matrix proves deterministic B14-only, B15-only and accepted
+mixed-window reporting; foreign-object exclusion; versionless/future
+inspection-only results; malformed/conflicting fail-closed results; exact
+contract gating; isolated import; and zero migration-family write authority.
+The FreeCAD test uses only newly created disposable documents and a temporary
+FCStd. It proves zero mutation during inspection and an identical mixed report
+after save/close/reopen. Its success sentinel is
+`Phase 4 legacy document FreeCAD detection validation passed`. This is outer
+ingress evidence only: no entity family is migration-qualified and no copied-
+target migrator exists yet.
+
 Current Phase 3 real-GUI workflow parity:
 
 ```bash
