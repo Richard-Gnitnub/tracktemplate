@@ -338,9 +338,10 @@ This verifies the exact B14/B15 fingerprints, three function signatures,
 dependencies, generated displacement/offset/solver grids, current error
 diagnostics, B16/launcher identity, rollback rules and all declared evidence
 paths. In its current state it requires the bounded Phase 2 package and
-launcher, then fails if any selected pilot calculation appears in the
-successor package, façade or launcher before Phase 3. It executes selected
-legacy function definitions only and does not import or launch either macro.
+launcher, then fails if any selected pilot calculation appears while the live
+contract still records Phase 3 calculation movement as unstarted. It executes
+selected legacy function definitions only and does not import or launch either
+macro.
 
 Phase 1 runtime and legacy-ingress compatibility checks:
 

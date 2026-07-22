@@ -78,8 +78,8 @@ EXPECTED_CONTRACT_STATUS = {
 EXPECTED_DISPOSITIONS = {
     "curve_easement_station": "not-selected-too-broad",
     "transition_length_solver": (
-        "selected-first-architecture-pilot-phase2-foundation-created-"
-        "calculation-movement-not-started"
+        "selected-first-architecture-pilot-phase2-foundation-accepted-"
+        "phase3-calculation-movement-not-started"
     ),
     "alignment_station_index": "not-selected-high-fanout",
     "alignment_station_interpolation": "not-selected-adapter-seam-required",
@@ -306,8 +306,8 @@ def validate_register(document):
     if document.get("register_id") != "tracktemplate:phase1:candidate-boundaries:3":
         errors.append("register_id must identify candidate-boundary schema 3")
     if document.get("status") != (
-        "inventory-and-selection-complete-phase2-foundation-created-"
-        "calculation-movement-not-started"
+        "inventory-and-selection-complete-phase2-foundation-accepted-"
+        "phase3-calculation-movement-not-started"
     ):
         errors.append("candidate inventory must record foundation before movement")
     if not str(document.get("status_reason", "")).strip():

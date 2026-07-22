@@ -168,7 +168,7 @@ def main():
     sections = _phase_sections(text)
     rows = _validate_phase_bars(text)
     current = [phase for phase, row in rows.items() if row["state"] == "Current"]
-    assert current == [2], "Phase 2 must be the sole current phase"
+    assert current == [3], "Phase 3 must be the sole current phase"
     _validate_gate_register(
         sections[1], 1, rows[1], "### Final gate register"
     )

@@ -1,8 +1,8 @@
 # Modularisation Plan
 
-Status: accepted direction; Stage M1 and the Phase 1 closeout are complete.
-Stage M2 exit evidence is complete and awaits project-owner closeout
-acceptance; no calculation extraction or caller routing has started.
+Status: accepted direction; Stages M1 and M2 are complete. The project owner
+accepted the Stage M2/Phase 2 exit evidence on 2026-07-22. Stage M3 is current;
+no calculation extraction or caller routing has started.
 
 The authoritative delivery phases from the current baseline to a release candidate are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md). The `M` stages below describe only the modularisation workstream and intentionally do not create a second project phase scheme.
 
@@ -367,8 +367,8 @@ implementation and validation are recorded in
 
 ### Stage M2: package skeleton and façade
 
-Status: **Current — exit evidence complete; project-owner closeout acceptance
-required.**
+Status: **Complete — exit evidence accepted by the project owner on
+2026-07-22.**
 
 - Add only the package locations needed by the selected slice.
 - Establish `tracktemplate.api` and the composition root.
@@ -385,11 +385,14 @@ required.**
 
 Exit gate: **evidenced.** The minimal boundary and loading approach work in
 both isolated standalone Python and the qualified FreeCAD runtime, with no
-document mutation. See [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md). Stage M2
-does not close and Stage M3 does not begin until the project owner accepts the
-Phase 2 closeout.
+document mutation. See [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md). The
+project owner accepted that evidence on 2026-07-22, closing Stage M2 and making
+Stage M3 current without moving any calculation or caller.
 
 ### Stage M3: first vertical slice
+
+Status: **Current — the accepted transition-length slice is authorised under
+its frozen parity contract; implementation has not started.**
 
 Select a slice that has:
 

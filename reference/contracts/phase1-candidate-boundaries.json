@@ -2,8 +2,8 @@
   "schema_version": 3,
   "register_id": "tracktemplate:phase1:candidate-boundaries:3",
   "recorded_on": "2026-07-20",
-  "status": "inventory-and-selection-complete-phase2-foundation-created-calculation-movement-not-started",
-  "status_reason": "The five current first-slice candidates have explicit legacy boundary and closure-cut contracts. The project owner accepted the transition solver as the first architecture pilot on 2026-07-20; its exact pilot contract is frozen and the bounded Phase 2 package/loading foundation now exists, but calculation movement and caller routing have not started.",
+  "status": "inventory-and-selection-complete-phase2-foundation-accepted-phase3-calculation-movement-not-started",
+  "status_reason": "The five current first-slice candidates have explicit legacy boundary and closure-cut contracts. The project owner accepted the transition solver as the first architecture pilot on 2026-07-20, accepted the bounded Phase 2 package/loading foundation on 2026-07-22 and thereby made Phase 3 current. The exact pilot contract remains frozen; calculation movement and caller routing have not started.",
   "source_state": {
     "b14": {
       "path": "AdvancedTurnout.FCMacro",
@@ -477,7 +477,7 @@
           "captured_alias_calls": []
         }
       },
-      "extraction_disposition": "selected-first-architecture-pilot-phase2-foundation-created-calculation-movement-not-started",
+      "extraction_disposition": "selected-first-architecture-pilot-phase2-foundation-accepted-phase3-calculation-movement-not-started",
       "open_gaps": [
         "Preserve positive total_angle as a caller precondition during mechanical extraction; any explicit finite/non-positive-angle validation is a later behaviour change.",
         "Implement the frozen module/API seam and run legacy-versus-modular parity before routing all three external closure callers.",

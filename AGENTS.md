@@ -133,8 +133,9 @@
 ## Project phase discipline
 
 - The current delivery phase is recorded in `reference/PROJECT_PLAN.md`; Phase
-  0 closed on 2026-07-19, Phase 1 closed on 2026-07-22 and Phase 2 is current
-  under the bounded foundation authority in `reference/PHASE1_CLOSEOUT.md`.
+  0 closed on 2026-07-19, Phases 1 and 2 closed on 2026-07-22, and Phase 3 is
+  current under the accepted transition-pilot contract. Phase 2 acceptance did
+  not itself move a calculation or caller.
 - Progress bars in `reference/PROJECT_PLAN.md` count evidenced exit conditions,
   not elapsed time or estimated effort. Update a bar only with corresponding
   gate evidence, keep the active-phase register aligned, and allow progress to
@@ -200,9 +201,10 @@
   boundary, all three external caller routes, exact parity grid, rollback and
   performance gates and development checkpoint `10.2A8A7B16`. The accepted
   Phase 2 foundation has created only the minimum package/loading skeleton and
-  small `TrackTemplate.FCMacro` composition root; do not move the three
-  calculations, route callers, or edit immutable B14 or accepted-reference
-  B15 before the Phase 3 gate.
+  small `TrackTemplate.FCMacro` composition root. The three calculations and
+  all three caller routes may move only through the current Phase 3 mechanical
+  extraction, parity, rollback and acceptance gates; do not edit immutable B14
+  or accepted-reference B15.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
   semantic oracle for the fixed B14 plain-line curve/two-track document. Their
@@ -300,8 +302,9 @@
   `tools/modular_structure.py` and `tools/semantic_compare.py` own the bounded
   Phase 2 loading, dependency, cycle, runtime-guard, comparison and
   maintainability evidence. The package and B16 launcher are loading-only;
-  Phase 2 remains current until owner acceptance and no selected calculation
-  or caller may move before Phase 3.
+  the project owner accepted and closed Phase 2 on 2026-07-22. Phase 3 is
+  current, but its selected calculation movement and caller routing remain
+  unstarted and must follow the frozen transition contract.
 - `reference/RECOVERY_AND_BACKUP.md`,
   `tools/repository_safety_audit.py` and
   `tests/validate_recovery_controls.py` own the destructive-action,

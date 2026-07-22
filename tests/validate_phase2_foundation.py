@@ -358,12 +358,12 @@ def validate():
 
     transition = json.loads(TRANSITION_PATH.read_text(encoding="utf-8"))
     if transition.get("status") != (
-        "selected-contract-frozen-phase2-foundation-implemented-"
-        "calculation-movement-not-started"
+        "selected-contract-frozen-phase2-foundation-accepted-"
+        "phase3-calculation-movement-not-started"
     ) or (transition.get("successor") or {}).get(
         "compatibility_launcher_status"
-    ) != "phase2-foundation-created-not-routed":
-        errors.append("transition contract does not record the Phase 2 foundation")
+    ) != "phase2-foundation-accepted-not-routed":
+        errors.append("transition contract does not record accepted Phase 2 state")
 
     foundation_text = " ".join(
         FOUNDATION_PATH.read_text(encoding="utf-8").split()
@@ -378,6 +378,10 @@ def validate():
         "29/29 passed",
         "foundation-loaded-not-routed",
         "No real-GUI workflow run is claimed",
+        "complete and accepted by the project owner on 2026-07-22",
+        "> ok, accepted",
+        "Phase 3 is current",
+        "does not itself move a calculation or caller",
     ):
         if marker not in foundation_text:
             errors.append("Phase 2 foundation evidence marker is missing: {}".format(marker))

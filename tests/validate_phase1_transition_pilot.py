@@ -19,7 +19,7 @@ from tools import phase1_inventory  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-transition-pilot.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "854eed1d89246057bbda55178061667f271c7b66414506f607d604c45134fecd"
+    "329dfd6d56c28f72f0a93f4c563614e075952bca3a0c01c502e2b00e5e2b4912"
 )
 CANDIDATE_REGISTER_PATH = (
     ROOT / "reference" / "contracts" / "phase1-candidate-boundaries.json"
@@ -132,8 +132,8 @@ def validate_contract(document):
     if document.get("contract_id") != "tracktemplate:phase1:transition-pilot:1":
         errors.append("pilot contract_id is invalid")
     if document.get("status") != (
-        "selected-contract-frozen-phase2-foundation-implemented-"
-        "calculation-movement-not-started"
+        "selected-contract-frozen-phase2-foundation-accepted-"
+        "phase3-calculation-movement-not-started"
     ):
         errors.append("pilot Phase 2 foundation authority/status drifted")
     if document.get("phase") != 1:
@@ -210,7 +210,7 @@ def validate_contract(document):
         exact_successor = {
             "development_checkpoint_id": "10.2A8A7B16",
             "compatibility_launcher_path": "TrackTemplate.FCMacro",
-            "compatibility_launcher_status": "phase2-foundation-created-not-routed",
+            "compatibility_launcher_status": "phase2-foundation-accepted-not-routed",
             "authoritative_package": "tracktemplate",
             "public_workbench_version_status": "deferred-to-release-qualification",
             "behavioural_reference": "b15",
@@ -501,7 +501,7 @@ def validate_source_and_parity(document):
 
     successor = document["successor"]
     if successor["compatibility_launcher_status"] == (
-        "phase2-foundation-created-not-routed"
+        "phase2-foundation-accepted-not-routed"
     ):
         launcher_path = ROOT / successor["compatibility_launcher_path"]
         package_path = ROOT / successor["authoritative_package"]
@@ -544,8 +544,8 @@ def validate_register_link(document):
     if register.get("schema_version") != 3:
         errors.append("candidate register must use schema 3 after selection")
     if register.get("status") != (
-        "inventory-and-selection-complete-phase2-foundation-created-"
-        "calculation-movement-not-started"
+        "inventory-and-selection-complete-phase2-foundation-accepted-"
+        "phase3-calculation-movement-not-started"
     ):
         errors.append("candidate register selection status is invalid")
     if gate != expected_gate:

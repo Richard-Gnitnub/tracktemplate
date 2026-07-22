@@ -1,7 +1,7 @@
 # Project Plan: Baseline to Release Candidate
 
-Status: working delivery plan. **Phase 0 closed on 2026-07-19; Phase 1 closed
-on 2026-07-22; Phase 2 is current.**
+Status: working delivery plan. **Phase 0 closed on 2026-07-19; Phase 1 and
+Phase 2 closed on 2026-07-22; Phase 3 is current.**
 
 ## Purpose
 
@@ -136,8 +136,8 @@ started. This is an outcome count, not an overall percentage of effort.
 | --- | --- | --- | --- |
 | 0 | Recoverable baseline and benchmark checkpoint | `██████` — 6/6 evidenced | Complete — accepted 2026-07-19 |
 | 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |
-| 2 | Minimal modular foundation and validation harness | `█████` — 5/5 evidenced | Current |
-| 3 | First parity-proven vertical slice | `░░░░░` — 0/5 | Not started |
+| 2 | Minimal modular foundation and validation harness | `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |
+| 3 | First parity-proven vertical slice | `░░░░░` — 0/5 | Current |
 | 4 | Canonical state, signatures, and persistence | `░░░░░░` — 0/6 | Not started |
 | 5 | Lightweight editing prototype and renderer decision | `░░░░` — 0/4 | Not started |
 | 6 | Explicit exact-validation and export seam | `░░░░░` — 0/5 | Not started |
@@ -580,12 +580,12 @@ obligations remain mandatory at their later gates.
 
 ## Phase 2: minimal modular foundation and validation harness
 
-Status: **Current — bounded foundation implemented and exit evidence complete;
-project-owner closeout acceptance required.**
+Status: **Complete — bounded foundation and exit evidence accepted by the
+project owner on 2026-07-22.**
 
-Progress: `█████` — 5/5 exit conditions evidenced.
+Progress: `█████` — 5/5 exit conditions evidenced and accepted.
 
-### Current gate register
+### Final gate register
 
 | Exit condition | State | Evidence or remaining work |
 | --- | --- | --- |
@@ -633,11 +633,28 @@ Prove that modular source can load through both standalone Python and FreeCAD wi
   authoritative implementation, shared invariant, narrow interface,
   dependency direction, tests and every temporary exception/retirement gate.
 
-Implementation result: **exit evidence complete; Phase 2 remains current until
-the project owner explicitly accepts its closeout.** No Phase 3 calculation
-movement or caller routing is authorised by this result.
+Implementation result: **Pass.** The project owner explicitly accepted
+[PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md) on 2026-07-22, closing Phase 2 and
+making Phase 3 current. The acceptance authorises only the bounded,
+parity-controlled transition-length vertical slice. No calculation or caller
+was moved by the phase transition itself.
 
 ## Phase 3: first parity-proven vertical slice
+
+Status: **Current — authorised by Phase 2 acceptance on 2026-07-22;
+implementation has not started.**
+
+Progress: `░░░░░` — 0/5 exit conditions evidenced.
+
+### Current gate register
+
+| Exit condition | State | Evidence or remaining work |
+| --- | --- | --- |
+| The selected capability follows target dependency direction and its domain portion imports without FreeCAD/Qt | Pending | Mechanically extract the frozen three-function transition-length calculation boundary into `tracktemplate.domain.alignment`, preserving the accepted source contract |
+| Legacy/new analytical records, findings, identities, ordering and relevant metadata are equivalent | Pending | Run the frozen generated parity grid and affected workflow oracles through the temporary comparison route |
+| Cache miss, valid reuse and every relevant invalidation case pass | Pending | Confirm whether the pure slice has any cache participation, then evidence each applicable case without inventing a cache |
+| Applicable FreeCAD/headless and GUI checks pass | Pending | Exercise the B16 composition path after caller routing; retain every existing B14/B15 oracle and record any real-GUI work still required |
+| Every temporary dual path has an owner and named retirement gate | Pending | Implement the contract's all-three-callers rollback switch and retain it until Phase 3 parity evidence and explicit owner acceptance |
 
 ### Goal
 
@@ -976,7 +993,7 @@ package licence and field/component provenance pass
 | Source/data/output classification policy | Resolved 2026-07-20 — neutral canonical data, one-way optional Templot adapter, package-specific licensing and no automatic project claim over ordinary output | Archive/output-notice review, GPL/CC scope review, `LICENSING_BOUNDARIES.md`, and owner acceptance |
 | Chair geometry method and RC scope | Resolved 2026-07-20 — full-size procedural constituent generation, validated external packages and one assisted S1 pilot; arbitrary automatic conversion remains post-RC research | Templot source audit and project-owner acceptance |
 | Scoped output lineage and first S1 package rights plan | Resolved for Phase 1 planning on 2026-07-22; package remains blocked | Owner-accepted `S1_PILOT_PLAN.md` plus the blocked first-S1/core classifications, validated unknown manifest, B15 gap analysis, intended uses, evidence/licence/right-review decision owners, comparison metric families and explicit later gates |
-| First extraction slice | Resolved 2026-07-20; Phase 2 foundation authorised 2026-07-22 — transition-length solver selected, B16/launcher and exact contract reserved; calculation movement/caller routing remain Phase 3 | Candidate contracts, bounded closure cuts, workflow profiles, scorecard and owner acceptance |
+| First extraction slice | Resolved 2026-07-20; Phase 2 foundation accepted and Phase 3 opened 2026-07-22 — transition-length solver selected, B16/launcher and exact contract reserved; calculation movement/caller routing are current Phase 3 work but remain unstarted | Candidate contracts, bounded closure cuts, workflow profiles, scorecard and owner acceptance |
 | Remaining representative fixtures and Phase 1 profile coverage | Accepted as controlled deferrals at Phase 1 closeout on 2026-07-22 | Fourteen owned workflow families with scheduled gaps, reconciled legacy profiles, five bounded instrumentation defects and four explicit unmeasured target slots |
 | Supported FreeCAD/Python and legacy document window | Initial policy accepted at Phase 1 closeout on 2026-07-22; implementation/family fixtures remain due by Phase 4 | Exact runtime probe, official Addon metadata fields, B14/B15 source/schema anchors, existing save/reopen evidence, fail-closed contract validation and future migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |

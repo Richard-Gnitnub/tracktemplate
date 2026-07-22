@@ -65,7 +65,7 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 3; exact current contracts and closure-cut facts for all five static candidates plus the owner-accepted selection pointer |
 | Candidate boundary contract | `tests/validate_phase1_candidate_boundaries.py`; verifies source/AST anchors, structural facts, transition/station schemas, chair record schemas, cache-signature inputs and fail-closed selected candidate |
 | First-slice scorecard | `reference/PHASE1_SLICE_SCORECARD.md`; records why the transition solver was selected as a first architecture pilot, not a performance optimisation |
-| Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher identity, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates; the authorised Phase 2 foundation now exists while calculation movement remains unstarted |
+| Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher identity, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates; the accepted Phase 2 foundation now exists, Phase 3 is current and calculation movement remains unstarted |
 | Selected transition-pilot validator | `tests/validate_phase1_transition_pilot.py`; verifies exact B14/B15 source, signatures, constant, closure cut, generated parameter/error parity, evidence links and the loading-only Phase 2 package/launcher boundary while rejecting premature calculation movement |
 | Runtime/legacy compatibility contract | `reference/contracts/phase1-compatibility.json`, schema 1; defines one exact qualified FreeCAD profile, the intended Addon manifest bounds, B14/B15 document ingress, external-configuration migrations and fail-closed unsupported-state rules |
 | Qualified FreeCAD profile | Linux x86_64 stable `org.freecad.FreeCAD` Flatpak: FreeCAD 1.1.1, bundled CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8 |
@@ -1262,10 +1262,11 @@ successor document detector or migrator exists yet, and neither macro changed.
 - Preserve the accepted terminology-assurance control; its six open semantic
   reviews remain owned Phase 8/9 work rather than waived Phase 1 findings or
   silently normalised terminology.
-- Preserve the exact `PHASE1_CLOSEOUT.md` acceptance boundary. Phase 2 may
-  implement only the frozen transition-pilot package/façade/loading foundation
-  and small B16 composition root, which now exist; calculation movement and
-  caller routing begin only at Phase 3.
+- Preserve the exact `PHASE1_CLOSEOUT.md` acceptance boundary. It authorised
+  only the frozen transition-pilot package/façade/loading foundation and small
+  B16 composition root, which now exist and were accepted at Phase 2 closeout.
+  Phase 3 is current, but calculation movement and caller routing remain
+  unstarted and subject to its parity gates.
 - Do not alter B14, B15, the selected contract or a later gate merely to ease
   foundation work.
 

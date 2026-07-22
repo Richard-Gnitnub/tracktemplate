@@ -1,7 +1,7 @@
 # Phase 2 Modular Foundation Evidence
 
-Status: **implementation evidence complete; Phase 2 remains current pending
-project-owner closeout acceptance.**
+Status: **complete and accepted by the project owner on 2026-07-22. Phase 3 is
+current; no Phase 3 calculation movement has started.**
 
 ## Bounded result
 
@@ -108,5 +108,18 @@ named later gates.
   owners and retirement gates. None is treated as permanent merely because it
   passes today.
 
-This satisfies the Phase 2 P1-X10 maintainability/reuse review. It does not
-waive any Phase 1 deferral or authorise Phase 3 calculation extraction.
+This satisfies the Phase 2 P1-X10 maintainability/reuse review.
+
+## Owner acceptance
+
+The project owner explicitly accepted this bounded Phase 2 foundation and its
+recorded exit evidence on 2026-07-22:
+
+> ok, accepted
+
+That acceptance closes Phase 2 and makes Phase 3 current. It authorises only
+the parity-controlled transition-length vertical slice described by the
+accepted transition contract. It does not itself move a calculation or caller,
+retire a legacy path, configure an independent backup, or waive any migration,
+GUI, performance, provenance, chair, rights, terminology, persistence, export
+or later release gate.

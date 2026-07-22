@@ -281,25 +281,27 @@ def validate_closeout(data, check_repository=True):
     if (
         transition.get("status")
         != (
-            "selected-contract-frozen-phase2-foundation-implemented-"
-            "calculation-movement-not-started"
+            "selected-contract-frozen-phase2-foundation-accepted-"
+            "phase3-calculation-movement-not-started"
         )
         or selection.get("candidate_id") != "transition_length_solver"
         or selection.get("owner_accepted_on") != "2026-07-20"
         or successor.get("development_checkpoint_id") != "10.2A8A7B16"
         or successor.get("compatibility_launcher_path") != "TrackTemplate.FCMacro"
         or successor.get("compatibility_launcher_status")
-        != "phase2-foundation-created-not-routed"
+        != "phase2-foundation-accepted-not-routed"
         or successor.get("authoritative_package") != "tracktemplate"
     ):
         errors.append("selected transition-pilot boundary drifted")
     implementation_gates = transition.get("implementation_gates") or []
     if not any(
-        "bounded Phase 2 package/loading foundation is implemented"
+        "bounded Phase 2 package/loading foundation was subsequently accepted"
         in item
         for item in implementation_gates
     ) or not any(
-        "calculation movement and caller routing remain Phase 3 work" in item
+        "calculation movement and caller routing are authorised only through "
+        "this contract and have not started"
+        in item
         for item in implementation_gates
     ):
         errors.append("bounded Phase 2 implementation authority drifted")
