@@ -2,7 +2,8 @@
 
 Status: accepted direction; Stages M1 and M2 are complete. The project owner
 accepted the Stage M2/Phase 2 exit evidence on 2026-07-22. Stage M3 is current;
-no calculation extraction or caller routing has started.
+the transition-length domain calculation is mechanically extracted with direct
+parity, while caller routing has not started.
 
 The authoritative delivery phases from the current baseline to a release candidate are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md). The `M` stages below describe only the modularisation workstream and intentionally do not create a second project phase scheme.
 
@@ -358,7 +359,8 @@ that evidence blocks reuse of its partial signature rather than authorising
 chair extraction.
 Broader workflow boundaries, candidate-specific gaps, additional platform
 qualification and representative target-architecture profiles remain open;
-calculation movement, caller routing and document migration have not started.
+the selected domain calculation has moved under exact parity, while caller
+routing and document migration have not started.
 The consolidated
 [Phase 1 closeout record](PHASE1_CLOSEOUT.md) preserves those later gates and
 authorised only the minimal Stage M2 package/loading foundation. Its
@@ -392,7 +394,8 @@ Stage M3 current without moving any calculation or caller.
 ### Stage M3: first vertical slice
 
 Status: **Current — the accepted transition-length slice is authorised under
-its frozen parity contract; implementation has not started.**
+its frozen parity contract. Domain extraction, direct parity and no-cache
+recomputation evidence pass; caller routing and routed rollback remain open.**
 
 Select a slice that has:
 
@@ -404,7 +407,10 @@ Select a slice that has:
 
 Chair analysis is a candidate because current tests cover important chair behaviour, but it is not chosen until the dependency inventory confirms that its hidden coupling is manageable.
 
-Extract the pure calculation first, then its application command, FreeCAD adapter and presentation path as separate parity-proven steps.
+The pure calculation is now extracted as the first independently evidenced
+step. Add its application/routing boundary, FreeCAD adapter and presentation
+path only as separate parity-proven steps. See
+[PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md).
 
 Exit gate: one complete capability follows the target dependency direction without changing accepted results.
 

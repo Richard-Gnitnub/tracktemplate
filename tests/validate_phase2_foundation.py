@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the bounded Phase 2 package, loading and comparison foundation."""
+"""Validate the accepted Phase 2 foundation through its Phase 3 extension."""
 
 import ast
 import copy
@@ -39,7 +39,15 @@ PILOT_FUNCTIONS = {
 }
 EXPECTED_MODULES = {
     "tracktemplate": ("package", ["DEVELOPMENT_CHECKPOINT"]),
-    "tracktemplate.api": ("api", ["DEVELOPMENT_CHECKPOINT"]),
+    "tracktemplate.api": (
+        "api",
+        [
+            "DEVELOPMENT_CHECKPOINT",
+            "clothoid_entry_displacement",
+            "transition_start_signed_offset",
+            "solve_transition_length",
+        ],
+    ),
     "tracktemplate.bootstrap": (
         "bootstrap",
         [
@@ -51,7 +59,14 @@ EXPECTED_MODULES = {
         ],
     ),
     "tracktemplate.domain": ("domain", []),
-    "tracktemplate.domain.alignment": ("domain", []),
+    "tracktemplate.domain.alignment": (
+        "domain",
+        [
+            "clothoid_entry_displacement",
+            "transition_start_signed_offset",
+            "solve_transition_length",
+        ],
+    ),
 }
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
 TRANSITION_PATH = ROOT / "reference" / "contracts" / "phase1-transition-pilot.json"
@@ -133,8 +148,17 @@ def _validate_clean_import(errors):
         return
     payload = json.loads(result.stdout)
     if payload != {
-        "alignment": [],
-        "api": ["DEVELOPMENT_CHECKPOINT"],
+        "alignment": [
+            "clothoid_entry_displacement",
+            "transition_start_signed_offset",
+            "solve_transition_length",
+        ],
+        "api": [
+            "DEVELOPMENT_CHECKPOINT",
+            "clothoid_entry_displacement",
+            "transition_start_signed_offset",
+            "solve_transition_length",
+        ],
         "attempted": [],
         "checkpoint": "10.2A8A7B16",
         "domain": [],
@@ -155,6 +179,10 @@ def _validate_structure(errors):
             errors.append("{} layer/public boundary drifted".format(module))
     if report.get("import_edges") != [
         {"from": "tracktemplate.api", "to": "tracktemplate"},
+        {
+            "from": "tracktemplate.api",
+            "to": "tracktemplate.domain.alignment",
+        },
         {"from": "tracktemplate.bootstrap", "to": "tracktemplate"},
     ]:
         errors.append("Phase 2 internal import edge set drifted")
@@ -338,32 +366,33 @@ def validate():
     alignment_tree = _tree(ROOT / "tracktemplate" / "domain" / "alignment.py")
     api_tree = _tree(ROOT / "tracktemplate" / "api.py")
     launcher_tree = _tree(ROOT / "TrackTemplate.FCMacro")
-    for label, tree in (
-        ("alignment", alignment_tree),
-        ("api", api_tree),
-        ("launcher", launcher_tree),
-    ):
-        moved = _top_level_functions(tree) & PILOT_FUNCTIONS
-        if moved:
-            errors.append("{} prematurely implements {}".format(label, sorted(moved)))
-    if any(
-        isinstance(node, (ast.Assign, ast.AnnAssign))
-        and any(
+    if _top_level_functions(alignment_tree) != PILOT_FUNCTIONS:
+        errors.append("Phase 3 alignment function boundary drifted")
+    for label, tree in (("api", api_tree), ("launcher", launcher_tree)):
+        duplicated = _top_level_functions(tree) & PILOT_FUNCTIONS
+        if duplicated:
+            errors.append("{} duplicates {}".format(label, sorted(duplicated)))
+    geometry_tolerances = []
+    for node in alignment_tree.body:
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        if any(
             isinstance(target, ast.Name) and target.id == "GEOMETRY_TOLERANCE"
-            for target in (node.targets if isinstance(node, ast.Assign) else [node.target])
-        )
-        for node in alignment_tree.body
-    ):
-        errors.append("Phase 3 geometry constant moved during Phase 2")
+            for target in targets
+        ):
+            geometry_tolerances.append(ast.literal_eval(node.value))
+    if geometry_tolerances != [1.0e-8]:
+        errors.append("Phase 3 geometry constant drifted")
 
     transition = json.loads(TRANSITION_PATH.read_text(encoding="utf-8"))
     if transition.get("status") != (
-        "selected-contract-frozen-phase2-foundation-accepted-"
-        "phase3-calculation-movement-not-started"
+        "selected-contract-frozen-phase3-domain-extracted-parity-proven-"
+        "caller-routing-not-started"
     ) or (transition.get("successor") or {}).get(
         "compatibility_launcher_status"
-    ) != "phase2-foundation-accepted-not-routed":
-        errors.append("transition contract does not record accepted Phase 2 state")
+    ) != "phase3-domain-extracted-parity-proven-not-routed":
+        errors.append("transition contract does not record the Phase 3 extension")
 
     foundation_text = " ".join(
         FOUNDATION_PATH.read_text(encoding="utf-8").split()

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "contract_id": "tracktemplate:phase1:transition-pilot:1",
   "recorded_on": "2026-07-20",
-  "status": "selected-contract-frozen-phase2-foundation-accepted-phase3-calculation-movement-not-started",
+  "status": "selected-contract-frozen-phase3-domain-extracted-parity-proven-caller-routing-not-started",
   "phase": 1,
   "source_state": {
     "b14": {
@@ -29,7 +29,7 @@
     "development_checkpoint_id": "10.2A8A7B16",
     "checkpoint_scope": "First modular migration development checkpoint; not the public Workbench, beta or release-candidate version.",
     "compatibility_launcher_path": "TrackTemplate.FCMacro",
-    "compatibility_launcher_status": "phase2-foundation-accepted-not-routed",
+    "compatibility_launcher_status": "phase3-domain-extracted-parity-proven-not-routed",
     "compatibility_launcher_rule": "The launcher must remain small and delegate to the authoritative tracktemplate package. It must not contain or become a second maintained copy of B15.",
     "authoritative_package": "tracktemplate",
     "public_workbench_version_status": "deferred-to-release-qualification",
@@ -270,10 +270,10 @@
   },
   "implementation_gates": [
     "Phase 1 was accepted and closed on 2026-07-22; the bounded Phase 2 package/loading foundation was subsequently accepted and Phase 2 closed on 2026-07-22 without broadening that authority.",
-    "Phase 3 is current. The minimum tracktemplate skeleton and small TrackTemplate.FCMacro B16 composition root exist; calculation movement and caller routing are authorised only through this contract and have not started.",
-    "Create only the package locations required by this three-function slice.",
-    "Prove standalone import without FreeCAD, Part, Qt, pivy or third-party dependencies before caller routing.",
-    "Run legacy-versus-modular parity before routing any caller, then route all three external callers together through the temporary façade.",
+    "Phase 3 is current. The three selected functions and exact geometry tolerance are mechanically extracted into tracktemplate.domain.alignment and re-exported by tracktemplate.api with exact B14/B15 value, type, diagnostic and AST parity; no legacy workflow caller is routed.",
+    "Only the package locations required by this three-function slice exist; no speculative application, adapter, presentation or UI tree was added.",
+    "Standalone import without FreeCAD, Part, Qt, pivy or third-party dependencies passes before caller routing.",
+    "The complete frozen calculation parity grid and changed/change-back no-cache cases pass before routing; route all three external callers together through the temporary façade only with the contracted rollback switch.",
     "Keep mechanical extraction separate from validation-policy changes, cleanup and optimisation.",
     "Do not change B14 or B15; any runtime integration belongs to the reserved B16 development composition path."
   ]

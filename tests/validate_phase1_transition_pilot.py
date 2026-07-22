@@ -15,15 +15,20 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import phase1_inventory  # noqa: E402
+from tracktemplate import api as modular_api  # noqa: E402
+from tracktemplate.domain import alignment as modular_alignment  # noqa: E402
 
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-transition-pilot.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "329dfd6d56c28f72f0a93f4c563614e075952bca3a0c01c502e2b00e5e2b4912"
+    "98b760d5c9b261466fe5f4f237f7e181b8b441982d6fcfe185f4be96a8564866"
 )
 CANDIDATE_REGISTER_PATH = (
     ROOT / "reference" / "contracts" / "phase1-candidate-boundaries.json"
 )
+MODULAR_PATH = ROOT / "tracktemplate" / "domain" / "alignment.py"
+MODULAR_API_PATH = ROOT / "tracktemplate" / "api.py"
+PHASE3_EVIDENCE_PATH = ROOT / "reference" / "PHASE3_TRANSITION_SLICE.md"
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",
     "b15": ROOT
@@ -132,8 +137,8 @@ def validate_contract(document):
     if document.get("contract_id") != "tracktemplate:phase1:transition-pilot:1":
         errors.append("pilot contract_id is invalid")
     if document.get("status") != (
-        "selected-contract-frozen-phase2-foundation-accepted-"
-        "phase3-calculation-movement-not-started"
+        "selected-contract-frozen-phase3-domain-extracted-parity-proven-"
+        "caller-routing-not-started"
     ):
         errors.append("pilot Phase 2 foundation authority/status drifted")
     if document.get("phase") != 1:
@@ -210,7 +215,9 @@ def validate_contract(document):
         exact_successor = {
             "development_checkpoint_id": "10.2A8A7B16",
             "compatibility_launcher_path": "TrackTemplate.FCMacro",
-            "compatibility_launcher_status": "phase2-foundation-accepted-not-routed",
+            "compatibility_launcher_status": (
+                "phase3-domain-extracted-parity-proven-not-routed"
+            ),
             "authoritative_package": "tracktemplate",
             "public_workbench_version_status": "deferred-to-release-qualification",
             "behavioural_reference": "b15",
@@ -372,11 +379,17 @@ def _capture_error(action):
     return None
 
 
+def _same_value_and_type(values):
+    first = values[0]
+    return all(type(value) is type(first) and value == first for value in values[1:])
+
+
 def validate_source_and_parity(document):
     errors = []
     boundary = document["module_boundary"]
     tolerance = boundary["constants"]["GEOMETRY_TOLERANCE"]
     namespaces = {}
+    trees = {}
     for label, path in SOURCE_PATHS.items():
         declared_hash = document["source_state"][label]["sha256"]
         if _sha256(path) != declared_hash:
@@ -384,12 +397,51 @@ def validate_source_and_parity(document):
             continue
         try:
             tree, namespace = _load_namespace(path, tolerance)
+            trees[label] = tree
             namespaces[label] = namespace
             _validate_function_contract(errors, tree, boundary["functions"], label)
         except Exception as error:
             errors.append("{} pilot source loading failed: {}".format(label, error))
     if len(namespaces) != len(SOURCE_PATHS):
         return errors
+
+    try:
+        modular_tree, _compiled_namespace = _load_namespace(MODULAR_PATH, tolerance)
+        modular_namespace = {
+            name: getattr(modular_alignment, name)
+            for name in FUNCTION_NAMES
+        }
+        trees["modular"] = modular_tree
+        namespaces["modular"] = modular_namespace
+        _validate_function_contract(
+            errors,
+            modular_tree,
+            boundary["functions"],
+            "modular",
+        )
+    except Exception as error:
+        errors.append("modular pilot loading failed: {}".format(error))
+        return errors
+
+    for name in FUNCTION_NAMES:
+        legacy_function = _function(trees["b15"], name)
+        modular_function = _function(trees["modular"], name)
+        if ast.dump(legacy_function, include_attributes=False) != ast.dump(
+            modular_function,
+            include_attributes=False,
+        ):
+            errors.append("{} was not mechanically extracted".format(name))
+
+    if modular_alignment.GEOMETRY_TOLERANCE != tolerance:
+        errors.append("modular geometry tolerance drifted")
+    if tuple(modular_alignment.__all__) != FUNCTION_NAMES:
+        errors.append("modular alignment exports drifted")
+    expected_api_exports = ("DEVELOPMENT_CHECKPOINT",) + FUNCTION_NAMES
+    if tuple(modular_api.__all__) != expected_api_exports:
+        errors.append("temporary façade exports drifted")
+    for name in FUNCTION_NAMES:
+        if getattr(modular_api, name, None) is not getattr(modular_alignment, name):
+            errors.append("temporary façade {} is not the domain function".format(name))
 
     expected_routes = boundary["external_caller_routes"]
     for label, path in SOURCE_PATHS.items():
@@ -416,17 +468,20 @@ def validate_source_and_parity(document):
             errors.append("{} pilot dependency closure/order drifted".format(label))
 
     parity = document["parity_contract"]
-    first = namespaces["b14"]
-    second = namespaces["b15"]
+    implementations = tuple(
+        namespaces[label] for label in ("b14", "b15", "modular")
+    )
     displacement_grid = parity["displacement_grid"]
     for arguments in itertools.product(
         displacement_grid["lengths_mm"],
         displacement_grid["radii_mm"],
         displacement_grid["integration_steps"],
     ):
-        b14_value = first["clothoid_entry_displacement"](*arguments)
-        b15_value = second["clothoid_entry_displacement"](*arguments)
-        if type(b14_value) is not type(b15_value) or b14_value != b15_value:
+        observed = [
+            namespace["clothoid_entry_displacement"](*arguments)
+            for namespace in implementations
+        ]
+        if not _same_value_and_type(observed):
             errors.append("displacement grid parity failed for {!r}".format(arguments))
 
     offset_grid = parity["offset_grid"]
@@ -435,9 +490,11 @@ def validate_source_and_parity(document):
         offset_grid["radii_mm"],
         offset_grid["transition_lengths_mm"],
     ):
-        b14_value = first["transition_start_signed_offset"](*arguments)
-        b15_value = second["transition_start_signed_offset"](*arguments)
-        if type(b14_value) is not type(b15_value) or b14_value != b15_value:
+        observed = [
+            namespace["transition_start_signed_offset"](*arguments)
+            for namespace in implementations
+        ]
+        if not _same_value_and_type(observed):
             errors.append("offset grid parity failed for {!r}".format(arguments))
 
     for scenario in parity["solver_scenarios"]:
@@ -448,7 +505,7 @@ def validate_source_and_parity(document):
         angle = scenario["total_angle_rad"]
         maximum_length = (2.0 * scenario["radius_mm"] * angle) - 1.0e-6
         endpoints = []
-        for namespace in (first, second):
+        for namespace in implementations:
             signed_offset = namespace["transition_start_signed_offset"]
             endpoints.append(
                 (
@@ -456,7 +513,7 @@ def validate_source_and_parity(document):
                     signed_offset(*base_arguments, maximum_length),
                 )
             )
-        if endpoints[0] != endpoints[1]:
+        if not _same_value_and_type(endpoints):
             errors.append("solver endpoint generation drifted for {!r}".format(scenario))
             continue
         start, finish = endpoints[0]
@@ -470,9 +527,11 @@ def validate_source_and_parity(document):
                 scenario["track_name"],
                 scenario["end_name"],
             )
-            b14_value = first["solve_transition_length"](*arguments)
-            b15_value = second["solve_transition_length"](*arguments)
-            if type(b14_value) is not type(b15_value) or b14_value != b15_value:
+            observed = [
+                namespace["solve_transition_length"](*arguments)
+                for namespace in implementations
+            ]
+            if not _same_value_and_type(observed):
                 errors.append("solver grid parity failed for {!r}".format(arguments))
 
     for case in parity["error_cases"]:
@@ -480,9 +539,9 @@ def validate_source_and_parity(document):
         arguments = case["arguments"]
         observed = [
             _capture_error(lambda ns=namespace: ns[function_name](*arguments))
-            for namespace in (first, second)
+            for namespace in implementations
         ]
-        if observed[0] != observed[1]:
+        if any(item != observed[0] for item in observed[1:]):
             errors.append("error parity drifted for {}".format(function_name))
         if (
             observed[0] is None
@@ -490,6 +549,56 @@ def validate_source_and_parity(document):
             or case["required_text"] not in observed[0][1]
         ):
             errors.append("error contract drifted for {}".format(function_name))
+
+    scenario = parity["solver_scenarios"][0]
+    base_arguments = (
+        scenario["circle_centre_y_mm"],
+        scenario["radius_mm"],
+    )
+    maximum_length = (
+        2.0 * scenario["radius_mm"] * scenario["total_angle_rad"]
+    ) - 1.0e-6
+    offset = modular_alignment.transition_start_signed_offset
+    start = offset(*base_arguments, 0.0)
+    finish = offset(*base_arguments, maximum_length)
+    solver_arguments = []
+    for fraction in (0.25, 0.75):
+        solver_arguments.append(
+            (
+                scenario["circle_centre_y_mm"],
+                scenario["radius_mm"],
+                start + (fraction * (finish - start)),
+                scenario["total_angle_rad"],
+                scenario["track_name"],
+                scenario["end_name"],
+            )
+        )
+    change_back_cases = (
+        (
+            "clothoid_entry_displacement",
+            (150.0, 600.0, 240),
+            (600.0, 600.0, 240),
+        ),
+        (
+            "transition_start_signed_offset",
+            (624.7779655573173, 655.0, 150.0),
+            (624.7779655573173, 655.0, 600.0),
+        ),
+        (
+            "solve_transition_length",
+            solver_arguments[0],
+            solver_arguments[1],
+        ),
+    )
+    for function_name, first_arguments, changed_arguments in change_back_cases:
+        function = getattr(modular_alignment, function_name)
+        initial = function(*first_arguments)
+        changed = function(*changed_arguments)
+        changed_back = function(*first_arguments)
+        if not _same_value_and_type((initial, changed_back)):
+            errors.append("{} change-back result drifted".format(function_name))
+        if _same_value_and_type((initial, changed)):
+            errors.append("{} change case did not exercise a new value".format(function_name))
 
     declared_paths = [
         parity["fixed_oracle_path"],
@@ -499,33 +608,59 @@ def validate_source_and_parity(document):
         if not (ROOT / relative).is_file():
             errors.append("declared pilot evidence is missing: {}".format(relative))
 
+    if not PHASE3_EVIDENCE_PATH.is_file():
+        errors.append("Phase 3 transition evidence record is missing")
+    else:
+        evidence = " ".join(
+            PHASE3_EVIDENCE_PATH.read_text(encoding="utf-8").split()
+        )
+        for marker in (
+            "first calculation tranche evidenced",
+            "105 argument combinations",
+            "72 argument combinations",
+            "21 argument combinations",
+            "A-B-A changed/change-back sequence",
+            "calculation_routing: not-started",
+            "No real-GUI workflow run is claimed",
+            "contracted performance profiles remain open",
+        ):
+            if marker not in evidence:
+                errors.append(
+                    "Phase 3 transition evidence marker is missing: {}".format(
+                        marker
+                    )
+                )
+
     successor = document["successor"]
     if successor["compatibility_launcher_status"] == (
-        "phase2-foundation-accepted-not-routed"
+        "phase3-domain-extracted-parity-proven-not-routed"
     ):
         launcher_path = ROOT / successor["compatibility_launcher_path"]
         package_path = ROOT / successor["authoritative_package"]
         if not launcher_path.is_file() or not package_path.is_dir():
-            errors.append("declared Phase 2 package/launcher foundation is missing")
+            errors.append("declared Phase 3 package/launcher boundary is missing")
         else:
-            for path in (
-                launcher_path,
-                ROOT / document["module_boundary"]["domain_module_path"],
-                ROOT / document["module_boundary"]["temporary_facade_path"],
-            ):
+            domain_functions = {
+                node.name
+                for node in trees["modular"].body
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            }
+            if domain_functions != set(FUNCTION_NAMES):
+                errors.append("Phase 3 domain function set drifted")
+            for path in (launcher_path, MODULAR_API_PATH):
                 if not path.is_file():
-                    errors.append("declared Phase 2 boundary is missing: {}".format(path))
+                    errors.append("declared Phase 3 boundary is missing: {}".format(path))
                     continue
                 tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-                moved = {
+                duplicated = {
                     node.name
                     for node in tree.body
                     if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
                     and node.name in FUNCTION_NAMES
                 }
-                if moved:
+                if duplicated:
                     errors.append(
-                        "Phase 3 pilot functions moved prematurely into {}".format(path)
+                        "Phase 3 pilot functions are duplicated in {}".format(path)
                     )
     return errors
 
@@ -544,8 +679,8 @@ def validate_register_link(document):
     if register.get("schema_version") != 3:
         errors.append("candidate register must use schema 3 after selection")
     if register.get("status") != (
-        "inventory-and-selection-complete-phase2-foundation-accepted-"
-        "phase3-calculation-movement-not-started"
+        "inventory-and-selection-complete-phase3-domain-extracted-parity-"
+        "proven-caller-routing-not-started"
     ):
         errors.append("candidate register selection status is invalid")
     if gate != expected_gate:

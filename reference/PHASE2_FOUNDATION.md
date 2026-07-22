@@ -1,14 +1,17 @@
 # Phase 2 Modular Foundation Evidence
 
 Status: **complete and accepted by the project owner on 2026-07-22. Phase 3 is
-current; no Phase 3 calculation movement has started.**
+current; its subsequent domain extraction is recorded separately in
+[PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md).**
 
 ## Bounded result
 
 The accepted Phase 2 package/loading foundation now exists. No transition
-calculation has moved, no B14/B15 caller is routed, and neither immutable macro
-changed. `tracktemplate/domain/alignment.py` is only the selected Phase 3
-destination; its public export set is empty.
+calculation has moved within this Phase 2 result, no B14/B15 caller is routed,
+and neither immutable macro changed. At closeout,
+`tracktemplate/domain/alignment.py` was only the selected Phase 3 destination
+and its public export set was empty. Its later mechanical population does not
+alter the accepted Phase 2 evidence.
 
 The small `TrackTemplate.FCMacro` composition root locates the adjacent
 authoritative package from its own file path, verifies that exact package was

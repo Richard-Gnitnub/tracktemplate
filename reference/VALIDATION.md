@@ -167,7 +167,7 @@ Real FreeCAD 1.1 headless B15 smoke test:
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD tests/freecad_validate_b15.py
 ```
 
-Phase 2 standalone package, structure, runtime-guard and comparison checks:
+Accepted Phase 2 foundation plus current Phase 3 domain/API checks:
 
 ```bash
 .venv/bin/python tools/modular_structure.py
@@ -183,8 +183,10 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
 
 The standalone validator also launches an isolated interpreter with FreeCAD,
 Part, Qt and pivy imports blocked. The FreeCAD smoke must print
-`Phase 2 FreeCAD foundation smoke test passed`; its structured B16 result must
-remain `foundation-loaded-not-routed` with `document_mutation` false.
+`Phase 2 FreeCAD foundation smoke test passed` and
+`Phase 3 transition domain smoke test passed`; its structured B16 result must
+remain `foundation-loaded-not-routed` with `calculation_routing`
+`not-started` and `document_mutation` false.
 
 Repository recovery and ignored-data safety controls:
 
@@ -337,11 +339,11 @@ This verifies the exact B14/B15 fingerprints, three function signatures,
 `GEOMETRY_TOLERANCE`, three external caller routes, zero outgoing project
 dependencies, generated displacement/offset/solver grids, current error
 diagnostics, B16/launcher identity, rollback rules and all declared evidence
-paths. In its current state it requires the bounded Phase 2 package and
-launcher, then fails if any selected pilot calculation appears while the live
-contract still records Phase 3 calculation movement as unstarted. It executes
-selected legacy function definitions only and does not import or launch either
-macro.
+paths. In its current state it requires the three mechanically identical
+domain functions, exact B14/B15/modular value/type/error parity, the no-cache
+A-B-A change-back cases, façade identity and a non-routing B16 launcher. It
+executes only the selected legacy function definitions for comparison; it does
+not import or launch either legacy macro.
 
 Phase 1 runtime and legacy-ingress compatibility checks:
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Load the B16 Phase 2 foundation in the qualified FreeCAD runtime."""
+"""Load the B16 foundation and non-routing Phase 3 domain extension."""
 
 import ast
 import json
@@ -32,7 +32,12 @@ assert result == {
     "development_checkpoint": "10.2A8A7B16",
     "status": "foundation-loaded-not-routed",
     "matched_profile_id": "linux-x86_64-flatpak-freecad-1.1.1",
-    "public_api": ["DEVELOPMENT_CHECKPOINT"],
+    "public_api": [
+        "DEVELOPMENT_CHECKPOINT",
+        "clothoid_entry_displacement",
+        "transition_start_signed_offset",
+        "solve_transition_length",
+    ],
     "calculation_routing": "not-started",
     "document_mutation": False,
 }, "B16 foundation result drifted"
@@ -47,9 +52,23 @@ alignment_tree = ast.parse(
     pathlib.Path(alignment.__file__).read_text(encoding="utf-8"),
     filename=alignment.__file__,
 )
-assert not any(
-    isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+assert {
+    node.name
     for node in alignment_tree.body
-), "Phase 2 alignment boundary contains premature calculation code"
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+} == {
+    "clothoid_entry_displacement",
+    "transition_start_signed_offset",
+    "solve_transition_length",
+}, "Phase 3 alignment function boundary drifted"
+for name in (
+    "clothoid_entry_displacement",
+    "transition_start_signed_offset",
+    "solve_transition_length",
+):
+    assert getattr(api, name) is getattr(alignment, name), (
+        "Phase 3 façade does not expose the domain function: " + name
+    )
 
 print("Phase 2 FreeCAD foundation smoke test passed")
+print("Phase 3 transition domain smoke test passed")

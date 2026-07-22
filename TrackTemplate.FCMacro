@@ -1,4 +1,4 @@
-"""Small B16 development composition root for the Phase 2 foundation."""
+"""Small B16 composition root for the bounded modular migration."""
 
 import importlib
 import json
@@ -39,7 +39,7 @@ def _load_foundation(repository_root):
 
 
 def run_macro():
-    """Qualify the host and load the Phase 2 package without document mutation."""
+    """Qualify and load the package without routing or document mutation."""
     repository_root = _launcher_root()
     api, bootstrap = _load_foundation(repository_root)
     contract_path = (

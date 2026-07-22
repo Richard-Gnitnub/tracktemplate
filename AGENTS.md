@@ -201,10 +201,12 @@
   boundary, all three external caller routes, exact parity grid, rollback and
   performance gates and development checkpoint `10.2A8A7B16`. The accepted
   Phase 2 foundation has created only the minimum package/loading skeleton and
-  small `TrackTemplate.FCMacro` composition root. The three calculations and
-  all three caller routes may move only through the current Phase 3 mechanical
-  extraction, parity, rollback and acceptance gates; do not edit immutable B14
-  or accepted-reference B15.
+  small `TrackTemplate.FCMacro` composition root. Phase 3 has mechanically
+  extracted the three calculations into `tracktemplate.domain.alignment` and
+  re-exported them through `tracktemplate.api` with exact direct parity. No
+  legacy caller is routed; route all three only through the contracted B16
+  rollback/comparison boundary. Do not edit immutable B14 or
+  accepted-reference B15.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
   semantic oracle for the fixed B14 plain-line curve/two-track document. Their
@@ -302,9 +304,12 @@
   `tools/modular_structure.py` and `tools/semantic_compare.py` own the bounded
   Phase 2 loading, dependency, cycle, runtime-guard, comparison and
   maintainability evidence. The package and B16 launcher are loading-only;
-  the project owner accepted and closed Phase 2 on 2026-07-22. Phase 3 is
-  current, but its selected calculation movement and caller routing remain
-  unstarted and must follow the frozen transition contract.
+  the project owner accepted and closed Phase 2 on 2026-07-22.
+- `reference/PHASE3_TRANSITION_SLICE.md` owns the current mechanical
+  extraction, exact B14/B15/modular parity, no-cache disposition and remaining
+  routing evidence. The B16 launcher still reports calculation routing as
+  unstarted; do not claim workflow, GUI or performance parity from the
+  loading-only headless smoke.
 - `reference/RECOVERY_AND_BACKUP.md`,
   `tools/repository_safety_audit.py` and
   `tests/validate_recovery_controls.py` own the destructive-action,
@@ -314,7 +319,16 @@
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
-- `reference/PROJECT_PLAN.md`, `reference/PHASE1_CLOSEOUT.md`, `reference/PHASE2_FOUNDATION.md`, `reference/RECOVERY_AND_BACKUP.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
+- `reference/PROJECT_PLAN.md`, `reference/PHASE1_CLOSEOUT.md`,
+  `reference/PHASE2_FOUNDATION.md`, `reference/PHASE3_TRANSITION_SLICE.md`,
+  `reference/RECOVERY_AND_BACKUP.md`, `reference/ARCHITECTURE.md`,
+  `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`,
+  `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`,
+  `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`,
+  `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and
+  `CONTRIBUTING.md` are maintained project guidance. Update the owning
+  document when an accepted phase, decision, procedure, terminology,
+  contribution rule, licence/provenance/output status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `reference/PROVENANCE.md` owns source and external chair-evidence provenance.
 - `reference/LICENSING_BOUNDARIES.md` owns the operational distinction between
