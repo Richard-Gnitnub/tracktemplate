@@ -54,6 +54,12 @@ Exact geometry is permitted at an explicit **Validate** or **Export** boundary. 
     package and distributed in an Addon Manager-compatible form. The current
     `.FCMacro` remains a migration and optional compatibility launcher, not the
     authoritative release implementation.
+12. **Reuse and maintainability are release invariants.** A shared railway
+    concept has one authoritative implementation behind a cohesive, narrow and
+    tested interface. Dependencies remain explicit and follow the accepted
+    layer direction. Exploratory code is removed or deliberately promoted to
+    these standards before it becomes retained project code; any necessary
+    temporary duplication has a named owner and retirement gate.
 
 ## Target layers
 
@@ -333,6 +339,9 @@ The acceptance comparison must include both cold-cache and unchanged-result reus
 Every migrated slice requires:
 
 - legacy-versus-new analytical result comparison;
+- a maintainability/reuse review naming the authoritative implementation,
+  shared invariant, public boundary, dependency direction and any temporary
+  duplication plus its owner and retirement gate;
 - stable identity and ordering comparison;
 - exact geometry or export equivalence for its production scope;
 - cold- and warm-cache tests;

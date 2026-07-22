@@ -47,7 +47,9 @@ The release candidate will provide the agreed curve/easement, station and multip
 - machine-readable output dependency/project-status records that distinguish user
   design, engineering facts, project measurements, package data, restricted
   material, and local comparison oracles;
-- a small launcher/composition root and one authoritative modular implementation;
+- a small launcher/composition root and one authoritative, maintainable modular
+  implementation whose genuinely shared railway concepts are reused through
+  narrow tested interfaces;
 - an external Track Template FreeCAD Workbench, packaged as an Addon and
   intended for Addon Manager installation, with reproducible artifacts,
   validation evidence, user documentation and measured performance budgets;
@@ -517,6 +519,9 @@ Prove that modular source can load through both standalone Python and FreeCAD wi
   maintained copy of the monolith.
 - Add a domain import test that fails if FreeCAD, Part, Qt, pivy, or exporter dependencies enter the domain boundary.
 - Add boundary checks for dependency direction and circular imports using the standard library or already-approved tooling.
+- Add a deterministic modular-structure report covering package modules,
+  supported façade exports, import edges and structural warning signals. Treat
+  it as review evidence rather than a substitute for railway-semantic review.
 - Provide a deterministic legacy/new comparison harness capable of structured values, ordering, stable identities, diagnostics, and output metadata.
 - Confirm the chosen record/type strategy works in the supported FreeCAD Python runtime.
 - Make the B16 development composition path consume the Phase 1 compatibility
@@ -531,6 +536,9 @@ Prove that modular source can load through both standalone Python and FreeCAD wi
 - The launcher loads the package in the supported FreeCAD environment.
 - Existing B14/B15 workflows remain unchanged and current validation still passes.
 - No empty speculative package tree, circular dependency, new runtime dependency, or hidden global service has been introduced.
+- The first package has a recorded maintainability/reuse review naming its
+  authoritative implementation, shared invariant, narrow interface,
+  dependency direction, tests and every temporary exception/retirement gate.
 
 ## Phase 3: first parity-proven vertical slice
 

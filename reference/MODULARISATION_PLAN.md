@@ -234,6 +234,41 @@ Git history is the record of old implementations. Do not keep historical functio
 - Reuse procedural primitives and component strategies where railway meaning
   is shared, but do not create one copied module or class per chair type.
 
+## Maintainability and reuse gate
+
+This gate applies to retained product code, package/build tooling and shared
+test or validation helpers. A bounded exploratory probe may optimise for rapid
+learning, but before commit it must either be removed or deliberately promoted:
+placed with the concept it serves, given a narrow contract, covered at the
+appropriate stable boundary and made subject to the normal dependency rules.
+
+For each retained source-organisation change, review and record:
+
+1. the railway or application concept that owns the code;
+2. the invariant genuinely shared by its callers, rather than superficial
+   textual similarity;
+3. the one authoritative implementation and its narrow supported interface;
+4. the allowed dependency direction and any adapter boundary;
+5. the direct, integration and parity evidence appropriate to its risk; and
+6. every temporary duplicate, compatibility façade or comparison path, with a
+   named owner and retirement gate.
+
+The controls are deliberately layered:
+
+| Risk | Current control | Later executable gate |
+| --- | --- | --- |
+| Hidden duplicates, captured aliases, import-time patches and mutable globals in B14/B15 | `tools/phase1_inventory.py` plus `tests/validate_phase1_inventory.py` fingerprint the present legacy structure and selected dependency closures | Re-run structural metrics after each applicable phase; modular source must trend towards one live definition and no import-time patch chain |
+| Behaviour lost while code is reused or moved | Existing characterisation contracts, B14/B15 parity, stable-identity/ordering checks and applicable FreeCAD lifecycle tests | Every migrated slice must pass legacy/new parity before cleanup or optimisation |
+| Domain code becoming coupled to FreeCAD, Qt or exporters | Architectural review today; the Phase 1 inventory reports platform signals but does not prove a future package boundary | Phase 2 standalone-import and forbidden-import tests must fail on a boundary violation |
+| Circular or reverse dependencies | Manual dependency-direction review today | Phase 2 import-graph checks must fail on a cycle or prohibited layer edge |
+| A second maintained implementation or an indefinitely retained comparison path | Staged-diff review and an explicit exception/retirement record | Phase 2/3 façade and composition checks, followed by removal at the named migration gate |
+| Premature or misleading abstraction | Cohesion and railway-semantics review; similar code may remain separate until its invariant is understood | Direct tests of the shared contract and review of every new cross-module public API |
+
+Static tools can find structural warning signs; they cannot decide whether two
+algorithms express the same railway rule or whether an abstraction is clearer.
+That semantic judgement remains a required review, backed by the behavioural
+oracles rather than by line count or coverage percentage alone.
+
 ## Distribution strategy
 
 Development source will be modular. The accepted primary release artifact is

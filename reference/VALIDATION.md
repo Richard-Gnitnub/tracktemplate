@@ -44,6 +44,18 @@ These roles are current project state, not a permanent versioning scheme. Update
 - Check version assignments and launch boundaries.
 - Prevent accidental whole-file rewrites or unrelated changes.
 - Verify required function, schema and workflow structure.
+- For the legacy macros, run the Phase 1 structural inventory/validator to
+  detect drift in duplicate definitions, captured aliases, import-time method
+  patches, mutable-state signals and selected caller/dependency closures.
+- For retained source-organisation changes, review the named authoritative
+  implementation, genuinely shared invariant, narrow interface, dependency
+  direction and any temporary duplicate/retirement gate.
+- Beginning with the Phase 2 package, fail automated checks on a forbidden
+  domain/platform import, prohibited layer edge or circular dependency. These
+  package guards are scheduled controls and do not exist yet.
+- Treat structural metrics as risk signals, not proof of maintainability;
+  railway-semantic cohesion and abstraction quality still require review plus
+  behavioural evidence.
 
 ### 2. Analytical validation
 

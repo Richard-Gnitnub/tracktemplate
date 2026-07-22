@@ -11,6 +11,11 @@
 - `reference/PROJECT_PLAN.md` is the canonical delivery sequence from the current checkpoint to a release candidate. Read it before starting source work, report work against its current phase, and do not claim a phase transition without its exit evidence and user acceptance.
 - `reference/ARCHITECTURE.md` is the canonical strategic architecture. Read it before changing model boundaries, persistence, display construction, validation, export, or source organisation.
 - `reference/MODULARISATION_PLAN.md` defines source boundaries, dependency direction and extraction gates. Read it before moving code or creating modules.
+- Reuse and maintainability are release invariants. Keep one authoritative
+  implementation for each genuinely shared railway/application concept behind
+  a cohesive, narrow, tested interface; follow the accepted dependency
+  direction and give every temporary duplicate a named owner and retirement
+  gate.
 - `reference/contracts/phase1-compatibility.json` defines the current exact
   qualified FreeCAD stack, standalone Python floor, intended Addon manifest
   bounds and B14/B15 document-ingress policy. Read it before choosing record
@@ -258,6 +263,10 @@
 
 - Treat an explicitly mentioned macro as the target. If the target is ambiguous, confirm whether work belongs in the accepted B15 reference, the immutable B14 oracle, or both before editing. Never edit B14 merely to keep it aligned with B15.
 - Make small, reviewable patches. Do not reformat or mechanically rewrite the complete multi-megabyte macro.
+- A disposable exploratory probe may be deliberately narrow, but remove it
+  before commit or deliberately promote it to the retained-code standards in
+  `reference/MODULARISATION_PLAN.md`. Do not allow exploratory duplication to
+  become an undocumented second implementation.
 - Keep mechanical extraction separate from cleanup, optimisation and behaviour changes. Establish parity before improving moved code.
 - Preserve UTF-8 encoding and compatibility with FreeCAD's bundled Python, `FreeCAD`, `Part`, `FreeCADGui`, and the existing PySide fallback.
 - Do not add third-party runtime dependencies without approval.
@@ -547,6 +556,10 @@ Run the fast Phase 1 standalone-turnout analytical and bridge-contract checks:
 - Before reporting completion, inspect the diff for accidental broad changes and run every applicable check above.
 - State which macro/version changed, which invariants were preserved, which tests ran, and any GUI validation still required.
 - For project-plan work, state the current phase, which deliverables or gates changed, and whether the phase remains open or was accepted closed.
+- For source-organisation work, state the authoritative implementation and
+  shared invariant, the supported interface and dependency direction, the
+  applicable structural/behaviour checks, and any temporary exception plus its
+  owner and retirement gate.
 - For source-data, chair-package, fixture, export or media changes, state the
   provenance classifications affected, package/output licence impact, and any
   remaining restricted/reference-only/unknown dependency. Do not claim

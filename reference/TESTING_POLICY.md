@@ -122,3 +122,14 @@ Before a change is complete:
 - If a prior test changed, is the old oracle demonstrably wrong or the changed
   requirement explicitly accepted?
 - Are all remaining coverage gaps visible and owned?
+- Does retained code introduce another implementation of an existing railway
+  or application concept? If temporarily necessary, is its owner and
+  retirement gate explicit?
+- Is each new shared abstraction supported by a stated invariant and direct
+  tests at its narrow public boundary, rather than only by similar source text?
+- Where domain or layer boundaries changed, did the applicable standalone-
+  import, forbidden-dependency and circular-import guards run, or is their
+  not-yet-implemented risk recorded?
+- Was every disposable exploratory probe removed or deliberately promoted to
+  the retained-code standards in
+  [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md)?
