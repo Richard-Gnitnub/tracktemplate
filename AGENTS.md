@@ -62,10 +62,12 @@
   instrumentation defects and missing target-pipeline measurements. Read it
   before comparing profiles, selecting a performance hypothesis or adding a
   benchmark boundary.
-- `reference/contracts/phase1-workflow-coverage.json` is the canonical
-  machine-readable link registry for release-critical workflow ownership,
-  oracle state and later gap closure. Update it with the human-readable table
-  in `reference/PHASE1_INVENTORY.md`; registry coverage never waives a partial
+- `reference/contracts/phase1-workflow-coverage.json` and the corresponding
+  human-readable table in `reference/PHASE1_INVENTORY.md` are the frozen,
+  owner-accepted Phase 1 workflow-ownership baseline. Record later gap-closure
+  evidence only in the owning open-phase record and `reference/PROJECT_PLAN.md`;
+  change the frozen pair only to correct a demonstrated factual error or an
+  explicitly accepted scope change. Registry coverage never waives a partial
   or blocked workflow's owning migration, GUI, production or release gate.
 - Runtime and document compatibility are separate fail-closed gates. Only the
   exact qualified profile may currently write through the future Workbench.
@@ -144,6 +146,17 @@
 - Keep phase work gate-based rather than inventing calendar promises before dependency and performance evidence exists.
 - Bounded read-only investigation or disposable prototypes may reduce later risk, but they do not advance the phase or authorise production dependencies on an unaccepted decision.
 - Record exact source state, validation, GUI evidence, performance evidence where applicable, decisions, exceptions and open risks at every phase close.
+- Classify every live risk with exactly one treatment: **Tolerate**,
+  **Remove**, or **Mitigate**. Toleration must be time-bounded and name the
+  later remove/mitigate target; every entry must name an accountable owner,
+  phase deadline, required work and objective closure evidence. An overdue
+  open risk blocks its named gate unless the project owner explicitly changes
+  the treatment and records why.
+- Classify principal control measures as preventive, detective and
+  recovery/corrective, then assess effectiveness only as **Effective (current
+  scope)**, **Partial**, **Not yet effective**, or **Ineffective**. A policy or
+  planned test alone is not an effective control; link executed evidence,
+  state the missing assurance and name its next proof gate.
 - Triage new features against the agreed release-candidate scope. Do not silently expand a migration change or its acceptance gate.
 
 ## Documentation lifecycle and minimisation
@@ -151,6 +164,14 @@
 - `reference/PROJECT_PLAN.md` is the sole project-wide live status record.
   The one evidence document owned by the open phase records accumulating
   tranche evidence and remaining gates.
+- `reference/QUALITY_ASSURANCE.md` is the canonical dated QA audit and
+  immediate-action record. Its detailed findings link to evidence; the live
+  treatment, state, accountable owner, deadline and closure evidence of every
+  principal or residual QA risk—and principal-control effectiveness—belong
+  only in the corresponding register in `reference/PROJECT_PLAN.md`.
+- `reference/LEARNING_FROM_EXPERIENCE.md` is the append-only historical lesson
+  ledger. It records why a durable process adaptation was made but owns no
+  current phase status, requirement, risk state or acceptance decision.
 - After explicit owner acceptance, a phase closeout, inventory, baseline or
   foundation record is frozen historical evidence. Change it only to correct a
   demonstrated factual error; record the correction without rewriting what was

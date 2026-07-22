@@ -342,6 +342,24 @@ location with `--backup-target ... --require-backup-target`; backup completion
 and restore evidence remain separate gates under
 [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md).
 
+Repository QA, documentation-link and residual-risk controls:
+
+```bash
+.venv/bin/python tests/validate_quality_assurance.py
+```
+
+This standard-library check protects the canonical QA and learning-document
+roles, requires every audit finding to be corrected or mapped to the live
+`PROJECT_PLAN.md` QA risk log, verifies every repository-internal Markdown
+file target, preserves the immutable B14/B15 fingerprints, and prevents the
+corrected frozen-history instruction from regressing. Every live risk row must
+use exactly `Tolerate`, `Remove`, or `Mitigate` and include an accountable
+owner, phase deadline, required work and objective closure evidence. Passing
+the check also requires every principal risk to have preventive, detective and
+recovery/corrective controls, one permitted effectiveness state, linked
+evidence and a mandatory next proof. It proves control consistency only; it
+does not close an open risk or accept a phase gate.
+
 Fast development-bridge recipe contract checks:
 
 ```bash
