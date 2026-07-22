@@ -9,6 +9,9 @@
 ## Architecture
 
 - `reference/PROJECT_PLAN.md` is the canonical delivery sequence from the current checkpoint to a release candidate. Read it before starting source work, report work against its current phase, and do not claim a phase transition without its exit evidence and user acceptance.
+- `reference/PHASE1_CLOSEOUT.md` is the review-ready Phase 1 evidence/risk
+  reconciliation. Read it before proposing Phase 1 acceptance or starting
+  Phase 2. Its presence or passing validator is not owner acceptance.
 - `reference/ARCHITECTURE.md` is the canonical strategic architecture. Read it before changing model boundaries, persistence, display construction, validation, export, or source organisation.
 - `reference/MODULARISATION_PLAN.md` defines source boundaries, dependency direction and extraction gates. Read it before moving code or creating modules.
 - Reuse and maintainability are release invariants. Keep one authoritative
@@ -251,10 +254,16 @@
   terminology boundary. Preserve the four assurance states, exact frozen path
   set, B14/B15 findings, open review owners and fail-closed successor scan; do
   not promote a term merely to silence the validator.
+- `reference/PHASE1_CLOSEOUT.md` and `tests/validate_phase1_closeout.py` own the
+  unaccepted Phase 1 closeout aggregation. Preserve its narrow runtime/ingress
+  policy, open GUI/performance/S1/terminology boundaries, P1-X10 control-bloat
+  disposition and Phase 2 scope.
+  Do not mark P1-10 accepted, move the progress bar or create Phase 2 source
+  until the project owner explicitly accepts the closeout.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
-- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
+- `reference/PROJECT_PLAN.md`, `reference/PHASE1_CLOSEOUT.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `reference/PROVENANCE.md` owns source and external chair-evidence provenance.
 - `reference/LICENSING_BOUNDARIES.md` owns the operational distinction between
@@ -569,6 +578,12 @@ Run the Phase 1 terminology-assurance contract:
 
 ```bash
 .venv/bin/python tests/validate_phase1_terminology.py
+```
+
+Run the review-ready Phase 1 closeout aggregation:
+
+```bash
+.venv/bin/python tests/validate_phase1_closeout.py
 ```
 
 Run the fast Phase 1 plain-line oracle checks:

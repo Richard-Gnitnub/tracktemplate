@@ -334,7 +334,8 @@ Status: **Complete with the Phase 0 closeout.**
 
 Exit gate: the first extraction is selected from evidence rather than source proximity.
 
-Status: **Selection complete; remaining Phase 1 inventory gates stay open.**
+Status: **Selection complete; the Phase 1 closeout is review-ready but not
+accepted.**
 The reproducible static definition/caller/alias/patch
 inventory and initial candidate comparison are recorded in
 [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). The five current candidates now
@@ -357,7 +358,9 @@ that evidence blocks reuse of its partial signature rather than authorising
 chair extraction.
 Broader workflow boundaries, candidate-specific gaps, additional platform
 qualification and representative target-architecture profiles remain open;
-source movement and document migration have not started.
+source movement and document migration have not started. The consolidated
+[Phase 1 closeout review](PHASE1_CLOSEOUT.md) preserves those later gates and
+the empty Stage M2 boundary pending explicit project-owner acceptance.
 
 ### Stage M2: package skeleton and façade
 

@@ -27,6 +27,9 @@ The documents have distinct responsibilities:
   statuses.
 - [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md) owns the current workflow,
   dependency, side-effect, candidate and Phase 1 decision evidence.
+- [PHASE1_CLOSEOUT.md](PHASE1_CLOSEOUT.md) reconciles the Phase 1 evidence,
+  risks, deferrals and owner decisions; it is review-ready but cannot close the
+  phase or start Phase 2 without explicit project-owner acceptance.
 - This document owns delivery order, phase status, decision timing, and release-candidate gates.
 
 If a proposed shortcut conflicts with railway correctness, production safety, or an accepted architectural invariant, the invariant wins unless the user explicitly approves a changed requirement.
@@ -211,7 +214,7 @@ Progress: `████████▒` — 8/9 exit conditions evidenced; 1 rem
 | First-S1/core and other-S&C/legacy lineage scopes are classified or visibly blocked | Evidenced | Both bounded machine-readable lineage registers have statuses, owners and later output gates; no positive clearance is inferred |
 | Neutral chair definition, manifest/licensing controls and first-S1 evidence/rights plan are accepted | Evidenced | The owner accepted `S1_PILOT_PLAN.md` on 2026-07-22, including S1-04 through S1-06, intended uses and the conditional CC0 target; S1-07 through S1-15 and the actual package remain blocked |
 | RC chair scope is bounded to validated packages and one assisted S1 pilot | Evidenced | Arbitrary automatic scan/CAD conversion remains explicitly post-RC research |
-| Open risks and required owner decisions are recorded | Active until closeout | The terminology-assurance register now gives every uncertain family an owner/later gate; remaining GUI limitations, S1 blockers, target-profile decisions and accepted exceptions still require one reconciled Phase 1 closeout record |
+| Open risks and required owner decisions are recorded | Active until closeout | `PHASE1_CLOSEOUT.md` is review-ready and reconciles GUI limitations, S1/lineage blocks, target-profile gaps, compatibility boundaries, legacy defects and terminology reviews; explicit owner acceptance is still required |
 
 The canonical workflow control is
 [`contracts/phase1-workflow-coverage.json`](contracts/phase1-workflow-coverage.json).
@@ -944,8 +947,8 @@ package licence and field/component provenance pass
 | Chair geometry method and RC scope | Resolved 2026-07-20 — full-size procedural constituent generation, validated external packages and one assisted S1 pilot; arbitrary automatic conversion remains post-RC research | Templot source audit and project-owner acceptance |
 | Scoped output lineage and first S1 package rights plan | Resolved for Phase 1 planning on 2026-07-22; package remains blocked | Owner-accepted `S1_PILOT_PLAN.md` plus the blocked first-S1/core classifications, validated unknown manifest, B15 gap analysis, intended uses, evidence/licence/right-review decision owners, comparison metric families and explicit later gates |
 | First extraction slice | Resolved 2026-07-20 — transition-length solver selected as the architecture pilot; B16/launcher and exact acceptance contract reserved; source movement not started | Candidate contracts, bounded closure cuts, workflow profiles, scorecard and owner acceptance |
-| Remaining representative fixtures and Phase 1 profile coverage | Phase 1 exit | Coverage, workflow gaps and reconciled target-architecture profile inventory |
-| Supported FreeCAD/Python and legacy document window | Initial policy defined 2026-07-20; owner review at Phase 1 exit and implementation/family fixtures due by Phase 4 | Exact runtime probe, official Addon metadata fields, B14/B15 source/schema anchors, existing save/reopen evidence, fail-closed contract validation and future migration fixtures |
+| Remaining representative fixtures and Phase 1 profile coverage | Review-ready at Phase 1 closeout | Fourteen owned workflow families with scheduled gaps, reconciled legacy profiles, five bounded instrumentation defects and four explicit unmeasured target slots |
+| Supported FreeCAD/Python and legacy document window | Initial policy defined 2026-07-20; included in the review-ready Phase 1 closeout and implementation/family fixtures due by Phase 4 | Exact runtime probe, official Addon metadata fields, B14/B15 source/schema anchors, existing save/reopen evidence, fail-closed contract validation and future migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |
 | Coin ViewProvider versus SVG/Qt editing view | Phase 5 exit | Selection, editing, persistence, and resource prototype |
 | Numerical performance budgets | Provisional after Phase 1; frozen by Phase 10 | Repeated cold/warm representative baselines |
@@ -967,6 +970,7 @@ package licence and field/component provenance pass
 | A non-commercial, unknown or reference-only chair dependency reaches a path advertised for magazine/commercial use | Propagate dependency status into manifests and prohibit `project-cleared` qualification until the dependency is replaced or separately permitted |
 | Duplicate definitions and runtime patches hide live callers | Inventory captured aliases and patch order; remove only after retained-reference audits |
 | Modularisation increases files without reducing runtime cost | Treat source boundaries and representation/performance changes as separate measured outcomes |
+| Project controls duplicate facts or become stale documentation bloat | Keep one authoritative owner per fact, link to detailed payloads instead of copying them, require an enforceable purpose for each control and retire/archive superseded controls through the Phase 2 maintainability review and later closeouts |
 | Lightweight editing loses expected FreeCAD behaviour | Prototype selection, handles, visibility, undo/redo, save/reopen, and GUI use before choosing a renderer |
 | Deferred geometry only moves cost to export | Measure both edit-only and edit-through-export workflows, including cleanup |
 | Cache signatures omit an input | Centralise signatures and test change/reuse/change-back for every input class |
