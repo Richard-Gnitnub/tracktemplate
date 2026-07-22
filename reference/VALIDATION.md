@@ -167,14 +167,14 @@ Real FreeCAD 1.1 headless B15 smoke test:
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD tests/freecad_validate_b15.py
 ```
 
-Accepted Phase 2 foundation plus current Phase 3 domain/API checks:
+Durable modular package, domain/API and foundation checks:
 
 ```bash
 .venv/bin/python tools/modular_structure.py
 .venv/bin/python tests/validate_phase2_foundation.py
 ```
 
-Qualified FreeCAD loading and zero-document-mutation smoke:
+Accepted Phase 2 FreeCAD loading and zero-document-mutation smoke:
 
 ```bash
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
@@ -182,11 +182,24 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
 ```
 
 The standalone validator also launches an isolated interpreter with FreeCAD,
-Part, Qt and pivy imports blocked. The FreeCAD smoke must print
-`Phase 2 FreeCAD foundation smoke test passed` and
-`Phase 3 transition domain smoke test passed`; its structured B16 result must
-remain `foundation-loaded-not-routed` with `calculation_routing`
-`not-started` and `document_mutation` false.
+Part, Qt and pivy imports blocked. The Phase 2 FreeCAD smoke must print
+`Phase 2 FreeCAD foundation smoke test passed`. It loads the launcher
+definitions without executing the current orchestration entry point, then
+checks package/API/domain resolution, exact runtime qualification and zero
+document mutation. This keeps the accepted loading check independent of later
+calculation and caller-routing status.
+
+Current Phase 3 transition orchestration smoke:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase3_transition_slice.py
+```
+
+This directly executes the current B16 entry point and owns its current
+routing/result assertions. It must print
+`Phase 3 transition domain smoke test passed`. Update this current-phase test
+when accepted routing state changes; do not rewrite the Phase 2 loading smoke.
 
 Repository recovery and ignored-data safety controls:
 
@@ -341,7 +354,8 @@ dependencies, generated displacement/offset/solver grids, current error
 diagnostics, B16/launcher identity, rollback rules and all declared evidence
 paths. In its current state it requires the three mechanically identical
 domain functions, exact B14/B15/modular value/type/error parity, the no-cache
-A-B-A change-back cases, façade identity and a non-routing B16 launcher. It
+A-B-A change-back cases, façade identity and no copied calculation body in the
+B16 launcher. It
 executes only the selected legacy function definitions for comparison; it does
 not import or launch either legacy macro.
 

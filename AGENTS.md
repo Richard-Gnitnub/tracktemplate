@@ -10,8 +10,9 @@
 
 - `reference/PROJECT_PLAN.md` is the canonical delivery sequence from the current checkpoint to a release candidate. Read it before starting source work, report work against its current phase, and do not claim a phase transition without its exit evidence and user acceptance.
 - `reference/PHASE1_CLOSEOUT.md` is the owner-accepted Phase 1 evidence/risk
-  reconciliation and exact boundary of Phase 2 authority. Read it before any
-  Phase 2 work; its accepted deferrals remain mandatory at their named gates.
+  reconciliation and exact historical boundary of Phase 2 authority. Its
+  accepted deferrals remain mandatory at their named gates, but live delivery
+  status belongs only in `reference/PROJECT_PLAN.md`.
 - `reference/ARCHITECTURE.md` is the canonical strategic architecture. Read it before changing model boundaries, persistence, display construction, validation, export, or source organisation.
 - `reference/MODULARISATION_PLAN.md` defines source boundaries, dependency direction and extraction gates. Read it before moving code or creating modules.
 - Reuse and maintainability are release invariants. Keep one authoritative
@@ -132,10 +133,10 @@
 
 ## Project phase discipline
 
-- The current delivery phase is recorded in `reference/PROJECT_PLAN.md`; Phase
-  0 closed on 2026-07-19, Phases 1 and 2 closed on 2026-07-22, and Phase 3 is
-  current under the accepted transition-pilot contract. Phase 2 acceptance did
-  not itself move a calculation or caller.
+- The current delivery phase, progress bars, active gate register and phase
+  acceptance state are recorded only in `reference/PROJECT_PLAN.md`. Read
+  them there at the start of phase work; do not copy them into this file,
+  closed phase evidence or accepted contracts.
 - Progress bars in `reference/PROJECT_PLAN.md` count evidenced exit conditions,
   not elapsed time or estimated effort. Update a bar only with corresponding
   gate evidence, keep the active-phase register aligned, and allow progress to
@@ -144,6 +145,32 @@
 - Bounded read-only investigation or disposable prototypes may reduce later risk, but they do not advance the phase or authorise production dependencies on an unaccepted decision.
 - Record exact source state, validation, GUI evidence, performance evidence where applicable, decisions, exceptions and open risks at every phase close.
 - Triage new features against the agreed release-candidate scope. Do not silently expand a migration change or its acceptance gate.
+
+## Documentation lifecycle and minimisation
+
+- `reference/PROJECT_PLAN.md` is the sole project-wide live status record.
+  The one evidence document owned by the open phase records accumulating
+  tranche evidence and remaining gates.
+- After explicit owner acceptance, a phase closeout, inventory, baseline or
+  foundation record is frozen historical evidence. Change it only to correct a
+  demonstrated factual error; record the correction without rewriting what was
+  known or accepted at the time.
+- Accepted JSON contracts describe durable requirements, source anchors and
+  gates. Do not encode later implementation progress in their status,
+  disposition or role fields.
+- `AGENTS.md`, `ARCHITECTURE.md`, `MODULARISATION_PLAN.md`, testing,
+  validation, performance, provenance and licensing documents change only when
+  their owned instruction, architecture, procedure or policy changes—not to
+  mirror ordinary tranche progress.
+- Historical validators protect durable historical invariants. Current
+  implementation tests protect current code. Do not make a Phase 0, 1 or 2
+  validator assert the wording or progress state of a later phase.
+- A normal implementation tranche should usually update only product code,
+  directly relevant tests, the open-phase evidence record and
+  `reference/PROJECT_PLAN.md`. Any additional document must have a distinct
+  owning responsibility that changed; link to facts instead of copying them.
+- At phase close, add the acceptance to the open-phase evidence and project
+  plan once. Do not propagate the new phase number through historical files.
 
 ## Repository map
 
@@ -188,25 +215,21 @@
   transition-length and alignment-station boundary in B14 and B15 without
   importing FreeCAD; preserve its numerical, invalid-input and ordering oracles.
 - `reference/contracts/phase1-candidate-boundaries.json` and
-  `tests/validate_phase1_candidate_boundaries.py` own the fail-closed current
-  boundary contract for all five static first-slice candidates. Preserve its
+  `tests/validate_phase1_candidate_boundaries.py` own the fail-closed frozen
+  Phase 1 boundary contract for all five static first-slice candidates. Preserve its
   source anchors, units, frames, tolerances, identities, ordering, schemas,
   side effects, signature gaps and schema-3 pointer to the accepted selection;
   updating a current-source fact is not authority to extract a slice.
-- `reference/PHASE1_SLICE_SCORECARD.md` owns the current first-slice
+- `reference/PHASE1_SLICE_SCORECARD.md` owns the accepted first-slice
   evidence. The project owner accepted the transition solver as the first
   architecture pilot, not a performance optimisation, on 2026-07-20.
 - `reference/contracts/phase1-transition-pilot.json` and
   `tests/validate_phase1_transition_pilot.py` freeze the selected three-function
   boundary, all three external caller routes, exact parity grid, rollback and
-  performance gates and development checkpoint `10.2A8A7B16`. The accepted
-  Phase 2 foundation has created only the minimum package/loading skeleton and
-  small `TrackTemplate.FCMacro` composition root. Phase 3 has mechanically
-  extracted the three calculations into `tracktemplate.domain.alignment` and
-  re-exported them through `tracktemplate.api` with exact direct parity. No
-  legacy caller is routed; route all three only through the contracted B16
-  rollback/comparison boundary. Do not edit immutable B14 or
-  accepted-reference B15.
+  performance gates and development checkpoint `10.2A8A7B16`. Treat the
+  contract as frozen requirements rather than a live implementation-status
+  record. Implementation evidence belongs in the owning open-phase record and
+  project plan. Do not edit immutable B14 or accepted-reference B15.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
   semantic oracle for the fixed B14 plain-line curve/two-track document. Their
@@ -303,13 +326,15 @@
   `tests/freecad_validate_phase2_foundation.py`,
   `tools/modular_structure.py` and `tools/semantic_compare.py` own the bounded
   Phase 2 loading, dependency, cycle, runtime-guard, comparison and
-  maintainability evidence. The package and B16 launcher are loading-only;
-  the project owner accepted and closed Phase 2 on 2026-07-22.
-- `reference/PHASE3_TRANSITION_SLICE.md` owns the current mechanical
-  extraction, exact B14/B15/modular parity, no-cache disposition and remaining
-  routing evidence. The B16 launcher still reports calculation routing as
-  unstarted; do not claim workflow, GUI or performance parity from the
-  loading-only headless smoke.
+  maintainability evidence accepted at Phase 2 closeout. Later package
+  additions must preserve those durable boundaries without rewriting the
+  accepted record.
+- `reference/PHASE3_TRANSITION_SLICE.md` and
+  `tests/freecad_validate_phase3_transition_slice.py` own the
+  transition-slice implementation evidence, current B16 orchestration check and
+  declared limitations. Consult
+  `reference/PROJECT_PLAN.md` rather than this repository map for whether
+  that phase or tranche is current.
 - `reference/RECOVERY_AND_BACKUP.md`,
   `tools/repository_safety_audit.py` and
   `tests/validate_recovery_controls.py` own the destructive-action,

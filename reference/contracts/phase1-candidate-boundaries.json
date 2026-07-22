@@ -2,8 +2,8 @@
   "schema_version": 3,
   "register_id": "tracktemplate:phase1:candidate-boundaries:3",
   "recorded_on": "2026-07-20",
-  "status": "inventory-and-selection-complete-phase3-domain-extracted-parity-proven-caller-routing-not-started",
-  "status_reason": "The five current first-slice candidates have explicit legacy boundary and closure-cut contracts. The project owner accepted the transition solver as the first architecture pilot on 2026-07-20 and opened Phase 3 by accepting the bounded Phase 2 foundation on 2026-07-22. The three-function domain calculation is now mechanically extracted with exact direct parity, while all legacy workflow caller routing remains unstarted.",
+  "status": "phase1-inventory-complete-selection-owner-accepted",
+  "status_reason": "This is the frozen Phase 1 candidate/source snapshot. All five candidates have explicit legacy boundary and closure-cut contracts, and the project owner selected the transition solver as the first architecture pilot on 2026-07-20. Later implementation progress belongs in PROJECT_PLAN.md and the owning open-phase evidence.",
   "source_state": {
     "b14": {
       "path": "AdvancedTurnout.FCMacro",
@@ -477,7 +477,7 @@
           "captured_alias_calls": []
         }
       },
-      "extraction_disposition": "selected-first-architecture-pilot-phase3-domain-extracted-parity-proven-caller-routing-not-started",
+      "extraction_disposition": "selected-first-architecture-pilot",
       "open_gaps": [
         "Preserve positive total_angle as a caller precondition during mechanical extraction; any explicit finite/non-positive-angle validation is a later behaviour change.",
         "Keep all three legacy caller routes unmodified until the B16 all-callers routing/rollback switch and routed workflow evidence exist.",

@@ -1,8 +1,12 @@
 # Phase 2 Modular Foundation Evidence
 
-Status: **complete and accepted by the project owner on 2026-07-22. Phase 3 is
-current; its subsequent domain extraction is recorded separately in
-[PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md).**
+Status: **complete and accepted by the project owner on 2026-07-22; frozen
+historical evidence.** Later implementation status belongs in
+[PROJECT_PLAN.md](PROJECT_PLAN.md) and the owning open-phase evidence.
+
+Lifecycle note — 2026-07-22: the documentation-minimisation cleanup separated
+later implementation status from this record. It changed no accepted Phase 2
+evidence, gate, limitation or owner decision.
 
 ## Bounded result
 
@@ -120,7 +124,7 @@ recorded exit evidence on 2026-07-22:
 
 > ok, accepted
 
-That acceptance closes Phase 2 and makes Phase 3 current. It authorises only
+That acceptance closed Phase 2 and authorised Phase 3 to begin. It authorised only
 the parity-controlled transition-length vertical slice described by the
 accepted transition contract. It does not itself move a calculation or caller,
 retire a legacy path, configure an independent backup, or waive any migration,

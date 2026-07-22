@@ -77,10 +77,7 @@ EXPECTED_CONTRACT_STATUS = {
 }
 EXPECTED_DISPOSITIONS = {
     "curve_easement_station": "not-selected-too-broad",
-    "transition_length_solver": (
-        "selected-first-architecture-pilot-phase3-domain-extracted-parity-"
-        "proven-caller-routing-not-started"
-    ),
+    "transition_length_solver": "selected-first-architecture-pilot",
     "alignment_station_index": "not-selected-high-fanout",
     "alignment_station_interpolation": "not-selected-adapter-seam-required",
     "chair_analysis_core": (
@@ -306,10 +303,9 @@ def validate_register(document):
     if document.get("register_id") != "tracktemplate:phase1:candidate-boundaries:3":
         errors.append("register_id must identify candidate-boundary schema 3")
     if document.get("status") != (
-        "inventory-and-selection-complete-phase3-domain-extracted-parity-"
-        "proven-caller-routing-not-started"
+        "phase1-inventory-complete-selection-owner-accepted"
     ):
-        errors.append("candidate inventory must record foundation before movement")
+        errors.append("candidate inventory acceptance status drifted")
     if not str(document.get("status_reason", "")).strip():
         errors.append("register status requires a reason")
 

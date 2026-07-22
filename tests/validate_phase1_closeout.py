@@ -279,33 +279,26 @@ def validate_closeout(data, check_repository=True):
     selection = transition.get("selection") or {}
     successor = transition.get("successor") or {}
     if (
-        transition.get("status")
-        != (
-            "selected-contract-frozen-phase3-domain-extracted-parity-proven-"
-            "caller-routing-not-started"
-        )
+        transition.get("status") != "selected-owner-accepted-contract-frozen"
         or selection.get("candidate_id") != "transition_length_solver"
         or selection.get("owner_accepted_on") != "2026-07-20"
         or successor.get("development_checkpoint_id") != "10.2A8A7B16"
         or successor.get("compatibility_launcher_path") != "TrackTemplate.FCMacro"
         or successor.get("compatibility_launcher_status")
-        != "phase3-domain-extracted-parity-proven-not-routed"
+        != "reserved-b16-migration-composition-root"
         or successor.get("authoritative_package") != "tracktemplate"
     ):
         errors.append("selected transition-pilot boundary drifted")
     implementation_gates = transition.get("implementation_gates") or []
     if not any(
-        "bounded Phase 2 package/loading foundation was subsequently accepted"
-        in item
+        "Route all three external callers together" in item
+        and "contracted rollback switch" in item
         for item in implementation_gates
     ) or not any(
-        "three selected functions and exact geometry tolerance are "
-        "mechanically extracted"
-        in item
-        and "no legacy workflow caller is routed" in item
+        "Do not change B14 or B15" in item
         for item in implementation_gates
     ):
-        errors.append("bounded Phase 2 implementation authority drifted")
+        errors.append("selected transition-pilot implementation gates drifted")
 
     manifest = data["manifest"]
     manifest_errors = manifest_validator.validate_document(manifest)

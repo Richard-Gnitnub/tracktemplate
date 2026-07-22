@@ -26,8 +26,8 @@ The documents have distinct responsibilities:
   source/data classifications, neutral chair-data boundary, collaboration
   rules, package-licensing target, generated-output policy, and clearance
   statuses.
-- [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md) owns the current workflow,
-  dependency, side-effect, candidate and Phase 1 decision evidence.
+- [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md) records the accepted Phase 1
+  workflow, dependency, side-effect, candidate and decision evidence.
 - [PHASE1_CLOSEOUT.md](PHASE1_CLOSEOUT.md) records the accepted Phase 1
   evidence, risks, deferrals, owner decisions and bounded Phase 2 authority.
 - [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md) records the accepted loading,
@@ -99,6 +99,23 @@ release-candidate gate.
 - Update the status in this document when a phase starts or closes. Do not infer completion from commits alone.
 - Mechanical extraction, cleanup, optimisation, behaviour changes, and legacy removal remain separate reviewable changes.
 - Apply [TESTING_POLICY.md](TESTING_POLICY.md) to every production change; test exceptions require an explicit risk and closure condition.
+
+### Documentation lifecycle
+
+- This plan is the sole project-wide live phase, progress, milestone and
+  decision-status record.
+- The open phase has one owning evidence record. It accumulates tranche
+  evidence, limitations and remaining gates until closeout.
+- Accepted baselines, inventories, contracts, foundation/closeout records and
+  benchmark reports are historical evidence. Freeze them after acceptance
+  except for an explicit factual correction; do not make them follow later
+  phase progress.
+- Architecture, modularisation, testing, validation, performance, provenance,
+  licensing and agent-guidance documents change only when their owned policy
+  or procedure changes.
+- A normal tranche updates product code, directly relevant tests, the current
+  phase evidence and this plan. Link to an owning fact rather than duplicating
+  it across past-phase documents and validators.
 
 ### Progress convention
 

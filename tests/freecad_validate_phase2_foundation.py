@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Load the B16 foundation and non-routing Phase 3 domain extension."""
+"""Load durable B16 foundation boundaries in the qualified FreeCAD host."""
 
 import ast
-import json
 import pathlib
-import runpy
 import sys
 
 import FreeCAD as App
@@ -21,54 +19,44 @@ def _document_state():
     }
 
 
+launcher_path = ROOT / "TrackTemplate.FCMacro"
+launcher_tree = ast.parse(
+    launcher_path.read_text(encoding="utf-8"),
+    filename=str(launcher_path),
+)
+launcher_tree.body = [
+    node
+    for node in launcher_tree.body
+    if not (
+        isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == "FOUNDATION_RESULT"
+            for target in node.targets
+        )
+    )
+]
+namespace = {
+    "__file__": str(launcher_path),
+    "__name__": "tracktemplate_freecad_loading_smoke",
+}
+
 before = _document_state()
-namespace = runpy.run_path(str(ROOT / "TrackTemplate.FCMacro"))
+exec(compile(launcher_tree, str(launcher_path), "exec"), namespace)
+assert namespace["_launcher_root"]() == ROOT
+api, bootstrap = namespace["_load_foundation"](ROOT)
+qualification = bootstrap.require_qualified_runtime(
+    ROOT / "reference" / "contracts" / "phase1-compatibility.json"
+)
 after = _document_state()
-result = namespace.get("FOUNDATION_RESULT")
-
 assert before == after, "B16 foundation loading changed FreeCAD document state"
-assert result == {
-    "schema_version": 1,
-    "development_checkpoint": "10.2A8A7B16",
-    "status": "foundation-loaded-not-routed",
-    "matched_profile_id": "linux-x86_64-flatpak-freecad-1.1.1",
-    "public_api": [
-        "DEVELOPMENT_CHECKPOINT",
-        "clothoid_entry_displacement",
-        "transition_start_signed_offset",
-        "solve_transition_length",
-    ],
-    "calculation_routing": "not-started",
-    "document_mutation": False,
-}, "B16 foundation result drifted"
-json.dumps(result, sort_keys=True)
+assert api.DEVELOPMENT_CHECKPOINT == "10.2A8A7B16"
+assert qualification["compatibility_evaluation"]["matched_profile_id"] == (
+    "linux-x86_64-flatpak-freecad-1.1.1"
+)
 
-import tracktemplate.api as api  # noqa: E402
-import tracktemplate.domain.alignment as alignment  # noqa: E402
+import tracktemplate.domain as domain  # noqa: E402
 
 assert pathlib.Path(api.__file__).resolve().is_relative_to(ROOT)
-assert pathlib.Path(alignment.__file__).resolve().is_relative_to(ROOT)
-alignment_tree = ast.parse(
-    pathlib.Path(alignment.__file__).read_text(encoding="utf-8"),
-    filename=alignment.__file__,
-)
-assert {
-    node.name
-    for node in alignment_tree.body
-    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-} == {
-    "clothoid_entry_displacement",
-    "transition_start_signed_offset",
-    "solve_transition_length",
-}, "Phase 3 alignment function boundary drifted"
-for name in (
-    "clothoid_entry_displacement",
-    "transition_start_signed_offset",
-    "solve_transition_length",
-):
-    assert getattr(api, name) is getattr(alignment, name), (
-        "Phase 3 façade does not expose the domain function: " + name
-    )
+assert pathlib.Path(domain.__file__).resolve().is_relative_to(ROOT)
 
 print("Phase 2 FreeCAD foundation smoke test passed")
-print("Phase 3 transition domain smoke test passed")

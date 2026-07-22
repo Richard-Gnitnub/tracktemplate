@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""Validate the accepted Phase 2 foundation through its Phase 3 extension."""
+"""Validate durable invariants from the accepted Phase 2 foundation."""
 
-import ast
 import copy
 import hashlib
 import importlib.abc
@@ -32,61 +31,30 @@ SOURCE_HASHES = {
         "chair_performance_and_representation.FCMacro"
     ): "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
 }
-PILOT_FUNCTIONS = {
-    "clothoid_entry_displacement",
-    "transition_start_signed_offset",
-    "solve_transition_length",
-}
-EXPECTED_MODULES = {
-    "tracktemplate": ("package", ["DEVELOPMENT_CHECKPOINT"]),
+REQUIRED_MODULES = {
+    "tracktemplate": ("package", {"DEVELOPMENT_CHECKPOINT"}),
     "tracktemplate.api": (
         "api",
-        [
-            "DEVELOPMENT_CHECKPOINT",
-            "clothoid_entry_displacement",
-            "transition_start_signed_offset",
-            "solve_transition_length",
-        ],
+        {"DEVELOPMENT_CHECKPOINT"},
     ),
     "tracktemplate.bootstrap": (
         "bootstrap",
-        [
+        {
             "RuntimeQualificationError",
             "evaluate_runtime",
             "load_contract",
             "require_qualified_runtime",
             "runtime_record",
-        ],
+        },
     ),
-    "tracktemplate.domain": ("domain", []),
-    "tracktemplate.domain.alignment": (
-        "domain",
-        [
-            "clothoid_entry_displacement",
-            "transition_start_signed_offset",
-            "solve_transition_length",
-        ],
-    ),
+    "tracktemplate.domain": ("domain", set()),
 }
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
-TRANSITION_PATH = ROOT / "reference" / "contracts" / "phase1-transition-pilot.json"
 FOUNDATION_PATH = ROOT / "reference" / "PHASE2_FOUNDATION.md"
 
 
 def _sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def _tree(path):
-    return ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-
-
-def _top_level_functions(tree):
-    return {
-        node.name
-        for node in tree.body
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-    }
 
 
 def _qualified_record(contract):
@@ -125,13 +93,11 @@ def _validate_clean_import(errors):
         import tracktemplate
         import tracktemplate.api
         import tracktemplate.domain
-        import tracktemplate.domain.alignment
         print(json.dumps({{
             "attempted": attempted,
             "checkpoint": tracktemplate.DEVELOPMENT_CHECKPOINT,
             "api": list(tracktemplate.api.__all__),
             "domain": list(tracktemplate.domain.__all__),
-            "alignment": list(tracktemplate.domain.alignment.__all__),
             "python": list(sys.version_info[:3]),
         }}, sort_keys=True))
         """
@@ -147,23 +113,23 @@ def _validate_clean_import(errors):
         errors.append("isolated package import failed: {}".format(result.stderr))
         return
     payload = json.loads(result.stdout)
-    if payload != {
-        "alignment": [
-            "clothoid_entry_displacement",
-            "transition_start_signed_offset",
-            "solve_transition_length",
-        ],
-        "api": [
-            "DEVELOPMENT_CHECKPOINT",
-            "clothoid_entry_displacement",
-            "transition_start_signed_offset",
-            "solve_transition_length",
-        ],
-        "attempted": [],
-        "checkpoint": "10.2A8A7B16",
-        "domain": [],
-        "python": list(sys.version_info[:3]),
-    }:
+    if (
+        set(payload) != {
+            "api",
+            "attempted",
+            "checkpoint",
+            "domain",
+            "python",
+        }
+        or payload["attempted"] != []
+        or payload["checkpoint"] != "10.2A8A7B16"
+        or payload["python"] != list(sys.version_info[:3])
+        or "DEVELOPMENT_CHECKPOINT" not in payload["api"]
+        or not all(
+            isinstance(payload[field], list)
+            for field in ("api", "domain")
+        )
+    ):
         errors.append("isolated package import result drifted")
 
 
@@ -171,26 +137,30 @@ def _validate_structure(errors):
     report = modular_structure.structure_report(ROOT)
     errors.extend(modular_structure.validate_report(report))
     modules = {item["module"]: item for item in report["modules"]}
-    if set(modules) != set(EXPECTED_MODULES):
-        errors.append("Phase 2 package module set is not minimal")
-    for module, (layer, exports) in EXPECTED_MODULES.items():
+    missing = set(REQUIRED_MODULES) - set(modules)
+    if missing:
+        errors.append("required Phase 2 modules are missing: {}".format(sorted(missing)))
+    for module, (layer, required_exports) in REQUIRED_MODULES.items():
         record = modules.get(module, {})
-        if record.get("layer") != layer or record.get("public_exports") != exports:
+        observed_exports = record.get("public_exports")
+        if (
+            record.get("layer") != layer
+            or not isinstance(observed_exports, list)
+            or not required_exports <= set(observed_exports)
+        ):
             errors.append("{} layer/public boundary drifted".format(module))
-    if report.get("import_edges") != [
+    required_edges = [
         {"from": "tracktemplate.api", "to": "tracktemplate"},
-        {
-            "from": "tracktemplate.api",
-            "to": "tracktemplate.domain.alignment",
-        },
         {"from": "tracktemplate.bootstrap", "to": "tracktemplate"},
-    ]:
-        errors.append("Phase 2 internal import edge set drifted")
-    if (report.get("launcher") or {}).get("definitions") != [
+    ]
+    if not all(edge in report.get("import_edges", []) for edge in required_edges):
+        errors.append("required Phase 2 internal import edge is missing")
+    launcher = report.get("launcher") or {}
+    if not {
         "_launcher_root",
         "_load_foundation",
         "run_macro",
-    ] or (report.get("launcher") or {}).get("launch_calls") != 1:
+    } <= set(launcher.get("definitions", [])) or launcher.get("launch_calls") != 1:
         errors.append("B16 composition-root structure drifted")
 
     mutated = copy.deepcopy(report)
@@ -199,7 +169,7 @@ def _validate_structure(errors):
         errors.append("cycle mutation did not fail closed")
     mutated = copy.deepcopy(report)
     mutated["domain_forbidden_imports"].append(
-        {"module": "tracktemplate.domain.alignment", "import_root": "FreeCAD"}
+        {"module": "tracktemplate.domain", "import_root": "FreeCAD"}
     )
     if not modular_structure.validate_report(mutated):
         errors.append("forbidden-domain-import mutation did not fail closed")
@@ -363,37 +333,6 @@ def validate():
         if _sha256(ROOT / relative) != digest:
             errors.append("{} immutable source fingerprint drifted".format(relative))
 
-    alignment_tree = _tree(ROOT / "tracktemplate" / "domain" / "alignment.py")
-    api_tree = _tree(ROOT / "tracktemplate" / "api.py")
-    launcher_tree = _tree(ROOT / "TrackTemplate.FCMacro")
-    if _top_level_functions(alignment_tree) != PILOT_FUNCTIONS:
-        errors.append("Phase 3 alignment function boundary drifted")
-    for label, tree in (("api", api_tree), ("launcher", launcher_tree)):
-        duplicated = _top_level_functions(tree) & PILOT_FUNCTIONS
-        if duplicated:
-            errors.append("{} duplicates {}".format(label, sorted(duplicated)))
-    geometry_tolerances = []
-    for node in alignment_tree.body:
-        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
-            continue
-        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
-        if any(
-            isinstance(target, ast.Name) and target.id == "GEOMETRY_TOLERANCE"
-            for target in targets
-        ):
-            geometry_tolerances.append(ast.literal_eval(node.value))
-    if geometry_tolerances != [1.0e-8]:
-        errors.append("Phase 3 geometry constant drifted")
-
-    transition = json.loads(TRANSITION_PATH.read_text(encoding="utf-8"))
-    if transition.get("status") != (
-        "selected-contract-frozen-phase3-domain-extracted-parity-proven-"
-        "caller-routing-not-started"
-    ) or (transition.get("successor") or {}).get(
-        "compatibility_launcher_status"
-    ) != "phase3-domain-extracted-parity-proven-not-routed":
-        errors.append("transition contract does not record the Phase 3 extension")
-
     foundation_text = " ".join(
         FOUNDATION_PATH.read_text(encoding="utf-8").split()
     )
@@ -403,13 +342,11 @@ def validate():
         "tests/validate_phase2_foundation.py",
         "tests/freecad_validate_phase2_foundation.py",
         "P1-X10",
-        "Phase 3",
         "29/29 passed",
         "foundation-loaded-not-routed",
         "No real-GUI workflow run is claimed",
         "complete and accepted by the project owner on 2026-07-22",
         "> ok, accepted",
-        "Phase 3 is current",
         "does not itself move a calculation or caller",
     ):
         if marker not in foundation_text:

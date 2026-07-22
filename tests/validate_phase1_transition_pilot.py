@@ -21,14 +21,13 @@ from tracktemplate.domain import alignment as modular_alignment  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-transition-pilot.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "98b760d5c9b261466fe5f4f237f7e181b8b441982d6fcfe185f4be96a8564866"
+    "1f4c50f6edb327c5bfbd947c4953ee51cf606c9a676bec1c8ee7c224d5f5b139"
 )
 CANDIDATE_REGISTER_PATH = (
     ROOT / "reference" / "contracts" / "phase1-candidate-boundaries.json"
 )
 MODULAR_PATH = ROOT / "tracktemplate" / "domain" / "alignment.py"
 MODULAR_API_PATH = ROOT / "tracktemplate" / "api.py"
-PHASE3_EVIDENCE_PATH = ROOT / "reference" / "PHASE3_TRANSITION_SLICE.md"
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",
     "b15": ROOT
@@ -136,11 +135,8 @@ def validate_contract(document):
         errors.append("pilot contract schema_version must be 1")
     if document.get("contract_id") != "tracktemplate:phase1:transition-pilot:1":
         errors.append("pilot contract_id is invalid")
-    if document.get("status") != (
-        "selected-contract-frozen-phase3-domain-extracted-parity-proven-"
-        "caller-routing-not-started"
-    ):
-        errors.append("pilot Phase 2 foundation authority/status drifted")
+    if document.get("status") != "selected-owner-accepted-contract-frozen":
+        errors.append("accepted pilot contract status drifted")
     if document.get("phase") != 1:
         errors.append("pilot selection belongs to Phase 1")
 
@@ -216,7 +212,7 @@ def validate_contract(document):
             "development_checkpoint_id": "10.2A8A7B16",
             "compatibility_launcher_path": "TrackTemplate.FCMacro",
             "compatibility_launcher_status": (
-                "phase3-domain-extracted-parity-proven-not-routed"
+                "reserved-b16-migration-composition-root"
             ),
             "authoritative_package": "tracktemplate",
             "public_workbench_version_status": "deferred-to-release-qualification",
@@ -434,10 +430,17 @@ def validate_source_and_parity(document):
 
     if modular_alignment.GEOMETRY_TOLERANCE != tolerance:
         errors.append("modular geometry tolerance drifted")
-    if tuple(modular_alignment.__all__) != FUNCTION_NAMES:
+    alignment_exports = tuple(modular_alignment.__all__)
+    if tuple(
+        name for name in alignment_exports if name in FUNCTION_NAMES
+    ) != FUNCTION_NAMES:
         errors.append("modular alignment exports drifted")
-    expected_api_exports = ("DEVELOPMENT_CHECKPOINT",) + FUNCTION_NAMES
-    if tuple(modular_api.__all__) != expected_api_exports:
+    api_exports = tuple(modular_api.__all__)
+    if (
+        "DEVELOPMENT_CHECKPOINT" not in api_exports
+        or tuple(name for name in api_exports if name in FUNCTION_NAMES)
+        != FUNCTION_NAMES
+    ):
         errors.append("temporary façade exports drifted")
     for name in FUNCTION_NAMES:
         if getattr(modular_api, name, None) is not getattr(modular_alignment, name):
@@ -608,32 +611,9 @@ def validate_source_and_parity(document):
         if not (ROOT / relative).is_file():
             errors.append("declared pilot evidence is missing: {}".format(relative))
 
-    if not PHASE3_EVIDENCE_PATH.is_file():
-        errors.append("Phase 3 transition evidence record is missing")
-    else:
-        evidence = " ".join(
-            PHASE3_EVIDENCE_PATH.read_text(encoding="utf-8").split()
-        )
-        for marker in (
-            "first calculation tranche evidenced",
-            "105 argument combinations",
-            "72 argument combinations",
-            "21 argument combinations",
-            "A-B-A changed/change-back sequence",
-            "calculation_routing: not-started",
-            "No real-GUI workflow run is claimed",
-            "contracted performance profiles remain open",
-        ):
-            if marker not in evidence:
-                errors.append(
-                    "Phase 3 transition evidence marker is missing: {}".format(
-                        marker
-                    )
-                )
-
     successor = document["successor"]
     if successor["compatibility_launcher_status"] == (
-        "phase3-domain-extracted-parity-proven-not-routed"
+        "reserved-b16-migration-composition-root"
     ):
         launcher_path = ROOT / successor["compatibility_launcher_path"]
         package_path = ROOT / successor["authoritative_package"]
@@ -645,7 +625,7 @@ def validate_source_and_parity(document):
                 for node in trees["modular"].body
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
             }
-            if domain_functions != set(FUNCTION_NAMES):
+            if not set(FUNCTION_NAMES) <= domain_functions:
                 errors.append("Phase 3 domain function set drifted")
             for path in (launcher_path, MODULAR_API_PATH):
                 if not path.is_file():
@@ -679,8 +659,7 @@ def validate_register_link(document):
     if register.get("schema_version") != 3:
         errors.append("candidate register must use schema 3 after selection")
     if register.get("status") != (
-        "inventory-and-selection-complete-phase3-domain-extracted-parity-"
-        "proven-caller-routing-not-started"
+        "phase1-inventory-complete-selection-owner-accepted"
     ):
         errors.append("candidate register selection status is invalid")
     if gate != expected_gate:

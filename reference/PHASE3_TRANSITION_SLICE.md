@@ -26,7 +26,7 @@ The tranche started from accepted Phase 2 closeout commit
   `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088`.
 - B15 remains
   `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848`.
-- The exact implementation/status contract is
+- The exact accepted selection, boundary and implementation-gate contract is
   [contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json).
 
 ## Retained implementation boundary
@@ -83,7 +83,9 @@ Observed on 2026-07-22:
   FreeCAD, Part, Qt and pivy imports;
 - the modular structure guard found the permitted façade-to-domain edge, no
   cycle, no forbidden domain import and no duplicated pilot body;
-- the qualified FreeCAD 1.1.1 headless smoke emitted
+- the current-phase orchestration check in
+  `tests/freecad_validate_phase3_transition_slice.py` ran in qualified FreeCAD
+  1.1.1 headless and emitted
   `Phase 3 transition domain smoke test passed`;
 - its structured B16 result retained `foundation-loaded-not-routed`,
   `calculation_routing: not-started` and `document_mutation: false`.
@@ -117,3 +119,16 @@ No real-GUI workflow run is claimed because no workflow caller is routed.
 No independent backup is inferred from this evidence; the accepted temporary
 backup risk and [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) controls remain
 unchanged.
+
+## Documentation lifecycle housekeeping
+
+On 2026-07-22 the project owner accepted a smaller documentation update
+surface. `PROJECT_PLAN.md` became the sole project-wide live status record;
+this file remains the one open-phase evidence record. Closed Phase 1/2 records
+were marked historical, strategy/policy documents stopped mirroring tranche
+progress, and the accepted candidate/transition contract status fields were
+normalised to frozen selection/requirement states.
+
+This was an editorial and validation-ownership change only. It did not alter
+the transition calculations, public façade, caller routing, B14/B15 sources,
+phase progress, railway requirements or any deferred validation gate.

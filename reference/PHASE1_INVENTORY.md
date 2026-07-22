@@ -1,12 +1,15 @@
 # Phase 1 Product and Dependency Inventory
 
-Status: **complete and accepted at Phase 1 closeout on 2026-07-22**. This
-document owns the Phase 1 inventory and concise decision log. It records the
-accepted first extraction slice and initial runtime/legacy-ingress window. The
-closeout authorises only the Phase 2 foundation; calculation movement, document
-migration and every named later gate remain outside this inventory. Subsequent
-Phase 3 extraction evidence is owned by
-[PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md).
+Status: **complete and accepted at Phase 1 closeout on 2026-07-22; frozen
+historical evidence.** This document owns the Phase 1 inventory and concise
+decision log as accepted at closeout. It records the selected first extraction
+slice and initial runtime/legacy-ingress window, not later implementation
+progress. Live delivery state belongs in [PROJECT_PLAN.md](PROJECT_PLAN.md) and
+the owning open-phase evidence.
+
+Lifecycle note — 2026-07-22: the documentation-minimisation cleanup removed
+later-phase progress wording from this record. It changed no accepted Phase 1
+evidence, decision, risk or deferral.
 
 ## Purpose
 
@@ -67,8 +70,8 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 3; exact current contracts and closure-cut facts for all five static candidates plus the owner-accepted selection pointer |
 | Candidate boundary contract | `tests/validate_phase1_candidate_boundaries.py`; verifies source/AST anchors, structural facts, transition/station schemas, chair record schemas, cache-signature inputs and fail-closed selected candidate |
 | First-slice scorecard | `reference/PHASE1_SLICE_SCORECARD.md`; records why the transition solver was selected as a first architecture pilot, not a performance optimisation |
-| Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher identity, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates; Phase 3 domain extraction/direct parity now pass while caller routing remains unstarted |
-| Selected transition-pilot validator | `tests/validate_phase1_transition_pilot.py`; verifies exact B14/B15 source, signatures, constant, closure cut, generated parameter/error parity, mechanical modular AST parity, no-cache change-back, façade identity and the non-routing B16 boundary |
+| Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher role, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates without carrying later implementation status |
+| Selected transition-pilot validator | `tests/validate_phase1_transition_pilot.py`; verifies the frozen selection/source boundary and the pure calculation's exact B14/B15/modular parity at its durable public seam |
 | Runtime/legacy compatibility contract | `reference/contracts/phase1-compatibility.json`, schema 1; defines one exact qualified FreeCAD profile, the intended Addon manifest bounds, B14/B15 document ingress, external-configuration migrations and fail-closed unsupported-state rules |
 | Qualified FreeCAD profile | Linux x86_64 stable `org.freecad.FreeCAD` Flatpak: FreeCAD 1.1.1, bundled CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8 |
 | Standalone development floor | CPython 3.12.0 minimum; observed repository environment 3.12.3. This qualifies tools/tests and future domain imports, not a FreeCAD host by itself |
@@ -1266,10 +1269,8 @@ successor document detector or migrator exists yet, and neither macro changed.
   silently normalised terminology.
 - Preserve the exact `PHASE1_CLOSEOUT.md` acceptance boundary. It authorised
   only the frozen transition-pilot package/façade/loading foundation and small
-  B16 composition root, which now exist and were accepted at Phase 2 closeout.
-  Separate Phase 3 authority has now moved the calculation under exact direct
-  parity, but caller routing remains unstarted and subject to its rollback and
-  workflow gates.
+  B16 composition root. Later implementation evidence and status belong to
+  their owning phase; they do not revise this Phase 1 inventory.
 - Do not alter B14, B15, the selected contract or a later gate merely to ease
   foundation work.
 
