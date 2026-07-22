@@ -184,6 +184,19 @@ top-level call model, schema 2 separately checks callers of nominated roots,
 callers crossing the proposed dependency closure and dependencies leaving that
 closure. It does not execute either macro.
 
+Fail-closed release-critical workflow coverage checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_workflow_coverage.py
+```
+
+This cross-checks the 14 canonical Markdown inventory rows against their
+machine-readable owners, oracle states, evidence/recipe/validator paths, gap
+owners and future closure phases. It protects the exact B14/B15 source state
+and requires successor-only blocked oracles to remain visible. Passing proves
+coverage control, not that a partial or blocked workflow has passed its later
+GUI, migration, production, provenance or release gate.
+
 Project-plan progress bookkeeping:
 
 ```bash

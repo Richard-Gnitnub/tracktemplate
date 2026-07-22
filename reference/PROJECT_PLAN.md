@@ -127,7 +127,7 @@ started. This is an outcome count, not an overall percentage of effort.
 | Phase | Outcome | Exit-gate progress | State |
 | --- | --- | --- | --- |
 | 0 | Recoverable baseline and benchmark checkpoint | `██████` — 6/6 evidenced | Complete — accepted 2026-07-19 |
-| 1 | Product, dependency, correctness, and performance inventory | `██████▒▒▒` — 6/9 evidenced; 3 active | Current |
+| 1 | Product, dependency, correctness, and performance inventory | `███████▒▒` — 7/9 evidenced; 2 active | Current |
 | 2 | Minimal modular foundation and validation harness | `░░░░░` — 0/5 | Not started |
 | 3 | First parity-proven vertical slice | `░░░░░` — 0/5 | Not started |
 | 4 | Canonical state, signatures, and persistence | `░░░░░░` — 0/6 | Not started |
@@ -195,13 +195,13 @@ and decisions on 2026-07-19, and the closeout checkpoint is tagged
 
 Status: **Current.**
 
-Progress: `██████▒▒▒` — 6/9 exit conditions evidenced; 3 remain active.
+Progress: `███████▒▒` — 7/9 exit conditions evidenced; 2 remain active.
 
 ### Current gate register
 
 | Exit condition | State | Evidence or remaining work |
 | --- | --- | --- |
-| Every release-critical workflow has an owner, oracle and visible coverage gap | Active | Major fixed workflows have contracts and owners; the wider inputs, GUI paths, downstream chair chain and remaining workflow rows listed in `PHASE1_INVENTORY.md` are still open |
+| Every release-critical workflow has an owner, oracle and visible coverage gap | Evidenced | The fail-closed workflow registry covers all 14 canonical families: 12 have bounded executed oracles and the two successor-only chair workflows have defined blocked oracles, decision owners and later gates; their open gaps are not waived |
 | Dependency/side-effect map predicts the first extraction boundary | Evidenced | Deterministic AST inventory, candidate-boundary register, closure cuts and the transition-pilot contract |
 | Representative profiles identify dominant costs without source-size guesswork | Evidenced | Reconciled performance-boundary contract and controlled legacy profiles; target-architecture slots remain deliberately unmeasured until their implementations exist |
 | First slice, comparison path and acceptance evidence are agreed | Evidenced | Transition-length solver selected; B16/façade/caller/parity/rollback/performance contract frozen |
@@ -209,7 +209,16 @@ Progress: `██████▒▒▒` — 6/9 exit conditions evidenced; 3 rem
 | First-S1/core and other-S&C/legacy lineage scopes are classified or visibly blocked | Evidenced | Both bounded machine-readable lineage registers have statuses, owners and later output gates; no positive clearance is inferred |
 | Neutral chair definition, manifest/licensing controls and first-S1 evidence/rights plan are accepted | Active | Neutral schema direction, manifest validator, contribution and rights fields are accepted; exact pilot evidence, package values/licence and non-copyright reviews remain open |
 | RC chair scope is bounded to validated packages and one assisted S1 pilot | Evidenced | Arbitrary automatic scan/CAD conversion remains explicitly post-RC research |
-| Open risks and required owner decisions are recorded | Active until closeout | Registers exist, but remaining workflow, GUI, S1 evidence, terminology-assurance and target-profile decisions must be reconciled in the Phase 1 closeout record |
+| Open risks and required owner decisions are recorded | Active until closeout | Registers exist, but remaining GUI, S1 evidence, terminology-assurance and target-profile decisions must be reconciled in the Phase 1 closeout record |
+
+The canonical workflow control is
+[`contracts/phase1-workflow-coverage.json`](contracts/phase1-workflow-coverage.json).
+It cross-checks all 14 rows in the Phase 1 inventory, points to the specialist
+evidence owners instead of duplicating their semantic payloads, and assigns
+every visible gap to a later phase gate. Its 12 `bounded-executed` and two
+`defined-blocked` states satisfy workflow ownership only; they do not turn a
+partial legacy witness into whole-product coverage or clear either future
+chair workflow for implementation.
 
 ### Goal
 
@@ -308,7 +317,8 @@ minimum is `540.848 mm` against the `600.000 mm` request; the documented
 `746.298 mm` placement passes at `676.179 mm`. This closes the characterisation
 part of the deliverable only. Shared successor preflight, aligned diagnostics,
 pre-Part/zero-mutation rejection and broader create/edit/extend GUI evidence
-remain required before the deliverable or Phase 1 can close.
+remain mandatory Phase 8 migration evidence before the crossover legacy path
+can move or retire; the workflow registry does not waive them.
 
 The next fixed `XO-001` stage is now bounded by
 [`contracts/phase1-crossover-timbering.json`](contracts/phase1-crossover-timbering.json).

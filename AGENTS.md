@@ -54,6 +54,11 @@
   instrumentation defects and missing target-pipeline measurements. Read it
   before comparing profiles, selecting a performance hypothesis or adding a
   benchmark boundary.
+- `reference/contracts/phase1-workflow-coverage.json` is the canonical
+  machine-readable link registry for release-critical workflow ownership,
+  oracle state and later gap closure. Update it with the human-readable table
+  in `reference/PHASE1_INVENTORY.md`; registry coverage never waives a partial
+  or blocked workflow's owning migration, GUI, production or release gate.
 - Runtime and document compatibility are separate fail-closed gates. Only the
   exact qualified profile may currently write through the future Workbench.
   B14/B15 are the outer future migration window, not blanket entity-family
@@ -204,6 +209,12 @@
   evidence closes; its provisional static labels are not final module
   ownership. It also records the 2026-07-20 read-only Templot chair
   data/component/output-path audit and the remaining S1 oracle/schema evidence.
+- `reference/contracts/phase1-workflow-coverage.json` and
+  `tests/validate_phase1_workflow_coverage.py` own the fail-closed 14-family
+  workflow link registry. Preserve its exact inventory correspondence, 12
+  bounded-executed and two defined-blocked oracle states, source anchors,
+  repository paths, gap owners and later closure phases. It is coverage
+  control, not whole-product behavioural acceptance.
 - `reference/contracts/phase1-compatibility.json`,
   `tools/runtime_compatibility_probe.py` and
   `tests/validate_phase1_compatibility.py` own the Phase 1 host/ingress
@@ -464,6 +475,12 @@ Run the deterministic Phase 1 macro-inventory contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_inventory.py
+```
+
+Run the fail-closed release-critical workflow coverage checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_workflow_coverage.py
 ```
 
 Run the project-plan progress bookkeeping check after changing a phase gate,

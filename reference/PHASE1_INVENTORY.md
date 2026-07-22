@@ -1,6 +1,6 @@
 # Phase 1 Product and Dependency Inventory
 
-Status: **in progress; last updated 2026-07-21**. This document owns the Phase 1
+Status: **in progress; last updated 2026-07-22**. This document owns the Phase 1
 inventory and concise decision log. It records the accepted first extraction
 slice and the initial runtime/legacy-ingress compatibility window, but does not
 start source movement, implement document migration or close Phase 1.
@@ -71,6 +71,8 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Legacy document ingress | B14-only, B15-only and the expected mixed B14/B15 version sets are the intended RC migration sources; implementation and entity-family fixtures remain Phase 4 work, so this is not a claim that a successor migrator exists today |
 | Performance-boundary register | `reference/contracts/phase1-performance-boundaries.json`, schema 1; classifies nine controlled legacy profiles, all nested/harness spans, five bounded instrumentation defects and four unmeasured target-pipeline slots |
 | Performance-boundary validator | `tests/validate_phase1_performance_boundaries.py`; verifies immutable source/report fingerprints, declared medians, per-run-before-median accounting, non-additive nested spans, source anchors, blocked optimisation/budget use and fail-closed mutations |
+| Workflow-coverage register | `reference/contracts/phase1-workflow-coverage.json`, schema 1; all 14 canonical families have an accountable owner, known oracle state, repository evidence/control paths, visible gap owner and later closure phases |
+| Workflow-coverage validator | `tests/validate_phase1_workflow_coverage.py`; cross-checks the Markdown table, exact B14/B15 fingerprints, 12 bounded-executed and two defined-blocked oracles, every referenced path and fail-closed mutations |
 | Project progress control | `PROJECT_PLAN.md` counts evidenced exit conditions and outcome milestones; `tests/validate_project_progress.py` reconciles bars, denominators, Phase 1 register states and milestone states without judging evidence sufficiency |
 | Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
 | Production-source changes in this tranche | None |
@@ -91,6 +93,13 @@ macros:
 
 ```bash
 .venv/bin/python tests/validate_phase1_inventory.py
+```
+
+Validate ownership, oracle state and later gap closure for every canonical
+release-critical workflow:
+
+```bash
+.venv/bin/python tests/validate_phase1_workflow_coverage.py
 ```
 
 Validate the executable dependency-manifest controls and the deliberately
@@ -667,9 +676,11 @@ retroactively labelled unrestricted by this documentation change.
 
 ## Release-critical workflow coverage inventory
 
-This is the initial owner/coverage map. “Gap” means the behaviour must be
-characterised before its legacy path is moved; it does not imply the workflow
-is known to be defective.
+This is the canonical human-readable owner/coverage map. “Gap” means the
+behaviour must be characterised before its legacy path is moved or the future
+capability is advertised; it does not imply the workflow is known to be
+defective. The fail-closed machine-readable control is
+[`contracts/phase1-workflow-coverage.json`](contracts/phase1-workflow-coverage.json).
 
 | Workflow family | Current oracle/evidence owner | Deterministic recipe or fixture | Principal Phase 1 gap |
 | --- | --- | --- | --- |
@@ -687,6 +698,14 @@ is known to be defective.
 | Save/reopen | B15 crossover acceptance and B14 plain-line edit-lifecycle oracle | Accepted B15 FCStd copy/reopen sequence plus `run-b14-ordinary-edit` | Broader entity families and future schema migration |
 | SVG/DXF/STL/STEP and manifests | B14 source paths plus fixed plain-line selected- and create-time-export oracles | `run-b14-ordinary-export` covers revision/overwrite/atomic rollback; `run-b14-ordinary-create-export` covers the normal Generate entry point, all four formats, manifest, persistence and final-task failure | Cancellation, other scopes/entity families, accepted create-time all-files rollback, future deferred exact-shape reconstruction, output-specific other-S&C/legacy lineage closure and integration of the dependency/project-status manifest |
 | Failure recovery | Transactional source paths, strict bridge dialog policy, plain-line edit lifecycle and both export fault injections | Edit oracle proves zero-angle rejection/post-removal abort and bounds B14's three-entry incomplete Undo states; selected export proves byte restoration; create-time export freezes the current 13-file partial result and unchanged document | Make successor edit commands and create-time output atomic under accepted contracts; add equivalent fixtures for other release-critical workflows |
+
+The register contains the same 14 workflow identities. Twelve current or
+cross-cutting families point to bounded executed evidence; procedural chair
+definitions and assisted chair assimilation are `defined-blocked` because
+their acceptance oracles are specified but their S1 evidence and owner
+decisions are not yet available. Every row retains a gap owner and later
+closure phase. This evidences the Phase 1 ownership/oracle/gap condition; it
+does not execute or waive those later gates.
 
 Existing crossover evidence remains owned by
 [benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md),
@@ -1183,68 +1202,63 @@ successor document detector or migrator exists yet, and neither macro changed.
 | 2026-07-21 | Add a focused post-B4 chair-analysis persistence and reuse oracle | Implemented for Phase 1 evidence and owner review; the disposable fixed `XO-001` witness preserves 355 positions, 269 findings, semantic/display identities, reuse Undo/Redo and reopen, while premature timing persistence, full record extraction/metadata mutation on hits, repeated status scans and redundant panel refresh are bounded defects rather than successor requirements; current chair semantics remain provenance-blocked |
 | 2026-07-21 | Classify fixed-XO chair-analysis invalidation and presentation controls | Implemented for Phase 1 evidence and owner review; all 23 settings, 11 emitted rail fields and 40 emitted timber fields are classified, representative mutations reproduce an actual stale result plus precision/order defects, and headless layer topology is bounded without treating visibility as GUI evidence or changing either macro |
 | 2026-07-22 | Make reuse and maintainability explicit release invariants | Accepted by the project owner; each genuinely shared concept has one authoritative implementation behind a cohesive narrow tested interface, exploratory code is removed or promoted before retention, temporary duplication requires an owner/retirement gate, current structural/parity checks remain active and Phase 2 must add executable package import/dependency/cycle guards |
-| 2026-07-22 | Track progress by evidenced exit conditions and outcome milestones | Accepted and implemented in `PROJECT_PLAN.md`; bars do not estimate time or effort, the active Phase 1 register supports its current 6/9 evidenced count, nine value-based milestones connect the baseline to RC1 without weakening any phase gate, and `tests/validate_project_progress.py` prevents numerical drift without substituting for owner judgement |
+| 2026-07-22 | Track progress by evidenced exit conditions and outcome milestones | Accepted and implemented in `PROJECT_PLAN.md`; bars do not estimate time or effort, the initial Phase 1 register supported 6/9 evidenced conditions, nine value-based milestones connect the baseline to RC1 without weakening any phase gate, and `tests/validate_project_progress.py` prevents numerical drift without substituting for owner judgement |
+| 2026-07-22 | Make release-critical workflow ownership finite and fail closed | Implemented for Phase 1 evidence and owner review; the canonical 14-row inventory is mirrored by one compact link registry with 12 bounded-executed and two defined-blocked oracle states, exact evidence/control paths, gap owners and future closure phases; this advances the Phase 1 dashboard to 7/9 without claiming that any open gap has passed |
 
 ## Remaining Phase 1 work
 
-- Complete operator workflow inputs, outputs, persisted properties, guided
-  stages, failure and rollback maps for every row above.
-- Extend the now-classified fixed chair-analysis oracle through upstream
-  configuration/host-to-record mutations and turnout/plain-line/wider-
-  crossover cases. Fix rather than reproduce its bounded under-invalidation,
-  precision, ordering, timing, mutation, effective-status, Part-presentation
-  and panel-refresh defects; retain logical chair positions as model output,
-  use lightweight diagnostic presentation, obtain real-GUI evidence, and
-  leave B15 support/layout/solid invalidation under its separate gates.
-- Extend the fixed curve/multiple-track recipe through broader boundary cases
-  and explicit Validate/deferred reconstruction; extend straight coverage to
-  the independent-datum GUI, physical station/platform, target-file export and
-  straight-specific negative paths; cover
-  cancellation and other export scopes, converge create-time output failure on
-  an accepted atomic/UI contract, and extend the standalone-turnout fixture to
-  trailing/straight/alternate-host inputs, removal/integration, downstream
-  timber/chair stages and target-file export. Extend automatic timbering beyond
-  the fixed `XO-001` witness to standalone turnout/plain-line decisions, wider
-  crossover inputs, every calculation-signature input class and accepted
-  real-GUI visibility/history; fix rather than reproduce its three bounded
-  lifecycle defects in the successor.
-- Resolve or explicitly bound the candidate-specific gaps recorded in the new
-  boundary register, then obtain owner agreement before marking any first
-  slice selected. In particular, define the station point-adapter seam and
-  decide the chair signature omissions/hard-coded predicate tolerances if
-  either family remains under consideration.
-- Keep all four lineage scopes blocked until their named evidence and decision
-  gates are resolved. The bounded other-S&C and legacy registers now exist;
-  complete field-level lineage only for an exact advertised output before its
-  later gate, rather than asserting blanket historical clearance. The
-  machine-readable manifest, validator, non-copyright fields and contribution
-  declaration now exist; wire their fail-closed `project-cleared` gate into
-  the later package/export path.
-- Review the completed Templot 556b chair-generation value/transform map and
-  execute the defined frozen-S1 capture recipe after an exact 556b executable
-  and its build/acquisition evidence are available. Keep the exact fixture and
-  DXF/STL artifacts local, record their hashes/settings, and do not substitute
-  either the rejected 5.55a executable or the B15 box body.
-- Specify the versioned chair-definition package and assisted-assimilation
-  boundary, including provenance and corrupt/unsupported-package behaviour;
-  confirm the pilot's precise prototype designation, rights-compatible primary
-  evidence, package licence, commercial/publication use, component landmarks,
-  rail section, fit metrics and tolerances with the project owner.
-- Retain the now-validated per-run accounting and five explicit defect bounds.
-  Populate the four frozen target-pipeline slots when their owning lightweight
-  edit, explicit Validate and exporter implementations exist; do not use the
-  current exact-shape replacement or combined create-through-export measurement
-  as an interaction budget or add nested medians to obtain a total.
-- Review and accept the recorded runtime/legacy-ingress policy; qualify any
-  additional RC platform explicitly rather than broadening by assumption.
-  Phase 4 must implement and fixture the B14/B15 detector/migrator for every
-  advertised entity family, while Phase 10 must revalidate and emit the real
-  Addon manifest.
+- Keep the 14-workflow coverage registry aligned with the canonical inventory;
+  reopen its Phase 1 condition if a release-critical family lacks an owner,
+  known oracle state or explicit gap.
+- Complete the reviewable first-S1 evidence/rights plan: specify the neutral
+  package and corrupt/future-version behaviour, then obtain project-owner
+  decisions on the precise prototype designation, intended evidence, package
+  licence, commercial/publication use, rail section, component landmarks,
+  residual metrics and tolerances. Missing exact evidence may remain blocked
+  only with its named owner and later gate.
+- Establish the terminology-assurance control for accepted, provisional,
+  review-required and frozen legacy terms so unresolved railway usage is
+  visible rather than silently normalised.
+- Assemble the Phase 1 closeout record and reconcile its remaining owner
+  decisions: recorded GUI limitations, the exact host/legacy-ingress policy,
+  deliberately unmeasured target-pipeline slots, S1 blockers and every accepted
+  exception. Do not invent a performance budget or broaden platform support to
+  make the record appear complete.
 - Before starting Phase 2 source work, review the remaining Phase 1 exit gates
   and obtain explicit phase-transition acceptance. When Phase 2 is started,
   implement only the frozen transition pilot package/façade and reserved small
   B16 composition root; do not alter the contract, B14 or B15 merely to ease
   extraction.
+
+### Scheduled later workflow gates
+
+The workflow register makes these obligations finite and assigns them to the
+phase that can actually implement and test them. They are not waived, but they
+are not reasons to mutate immutable B14/B15 or hold Phase 1 open after its
+inventory and decision gates pass:
+
+- Phases 5 and 9 own corrected chair signature cones, upstream record
+  extraction, turnout/plain-line/wider-crossover cases, lightweight real-GUI
+  selection/history, B15 support/layout/solid invalidation and removal of the
+  bounded timing, mutation and exact-Part presentation defects.
+- Phases 6 to 8 own deferred Validate reconstruction; broader curve,
+  spacing/easement, straight, turnout and crossover inputs; cancellation and
+  export scopes; crossover preflight agreement; wider automatic timbering;
+  real-GUI lifecycle evidence; and atomic successor recovery.
+- Phase 7 must define the point-record/vector adapter before migrating the
+  station family. Phase 9 must resolve the chair predicate/signature rules
+  before moving that family. Neither changes the already selected Phase 2
+  transition pilot.
+- Each advertised output keeps its lineage and dependency manifest blocked
+  until its field-level evidence, non-copyright reviews and strict
+  `project-cleared` gate pass. The exact local Templot 556b capture remains a
+  Phase 9 comparison-oracle input when the required executable and acquisition
+  evidence become available; 5.55a and the B15 box body remain invalid
+  substitutes.
+- The four target-architecture performance slots are populated only when their
+  lightweight edit, explicit Validate and exporter implementations exist.
+  Phase 4 owns copied-target B14/B15 migration fixtures, and Phase 10 owns final
+  Addon metadata and broader platform qualification.
 
 Phase 1 remains open until all exit criteria in
 [PROJECT_PLAN.md](PROJECT_PLAN.md) are met and accepted.

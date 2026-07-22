@@ -1,0 +1,463 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:workflow-coverage:1",
+  "recorded_on": "2026-07-22",
+  "status": "all-release-critical-workflows-owned-oracle-defined-gaps-scheduled",
+  "phase": 1,
+  "scope": {
+    "purpose": "Give every release-critical workflow one stable inventory identity, an accountable evidence owner, an executed or explicitly blocked oracle, and a named later closure gate.",
+    "bounded_claim": "The registry proves coverage ownership and makes every known gap schedulable. It does not claim that partial or blocked workflows already pass their later migration, GUI, production, performance, provenance or release gates.",
+    "product_effect": "Control evidence only. Neither B14 nor B15 product source changes, no successor source movement begins and no legacy defect becomes accepted successor behaviour.",
+    "duplication_rule": "Specialist contracts and reports remain authoritative for hashes and detailed semantics. This registry links to those owners instead of copying their complete payloads.",
+    "terminology": "Living workflow names use plain line. Paths containing ordinary_track are frozen legacy evidence identifiers governed by reference/TERMINOLOGY.md."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "version_token": "10.2A8A7B14",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "version_token": "10.2A8A7B15",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference"
+    }
+  },
+  "policy": {
+    "inventory_owner": "reference/PHASE1_INVENTORY.md",
+    "inventory_heading": "## Release-critical workflow coverage inventory",
+    "coverage_rule": "Every row in the canonical Markdown inventory appears exactly once here, and every contract workflow appears in that table.",
+    "oracle_rule": "A current legacy workflow needs bounded-executed evidence. A successor-only workflow may be defined-blocked only when its acceptance oracle, blocker and decision owner are explicit.",
+    "gap_rule": "Every workflow retains a non-empty gap statement, accountable role, owning future phase and named closure gate until its advertised scope passes.",
+    "evidence_rule": "Referenced evidence, recipes and validators must be repository files. Their specialist validators own semantic and hash integrity.",
+    "phase_rule": "Coverage ownership may satisfy the Phase 1 inventory condition while the actual gaps remain mandatory work in their named phases."
+  },
+  "workflows": [
+    {
+      "workflow_id": "curve-easement-create-edit",
+      "inventory_title": "Curve/easement creation and editing",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 7 alignment migration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "B14/B15 analytical parity plus the fixed two-track create, handed edit, recovery, persistence and retained/fresh exact-shape export witnesses.",
+        "evidence_paths": [
+          "reference/contracts/phase1-candidate-boundaries.json",
+          "reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md",
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md",
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/ordinary_track_recipe.py",
+          "tools/freecad_bridge/ordinary_track_edit_recipe.py",
+          "tools/freecad_bridge/ordinary_track_export_recipe.py"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_alignment.py",
+          "tests/validate_phase1_ordinary_track.py",
+          "tests/validate_phase1_ordinary_edit.py",
+          "tests/validate_phase1_ordinary_export.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Wider curve/easement boundaries, remaining calculation functions and future lightweight-edit plus deferred exact reconstruction parity remain open.",
+        "owner_role": "Phase 7 alignment migration owner",
+        "closure_phases": [5, 6, 7],
+        "closure_gate": "Accepted renderer and exact-geometry seams followed by the Phase 7 alignment migration gate."
+      }
+    },
+    {
+      "workflow_id": "straight-stationing",
+      "inventory_title": "Straight/stationing workflow",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 7 stationing migration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "A deterministic connected entrance/exit pair fixes travel-order stations, joins, track order, length edits, history, persistence and production records.",
+        "evidence_paths": [
+          "reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/straight_station_recipe.py",
+          "tools/freecad_bridge/run-b14-straight-station"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_alignment.py",
+          "tests/validate_phase1_straight_station.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Independent-datum interaction, physical station/platform meaning, file export, straight-specific failures and wider configurations remain open.",
+        "owner_role": "Phase 7 stationing migration owner",
+        "closure_phases": [7],
+        "closure_gate": "Phase 7 straight/station migration acceptance across every advertised input mode."
+      }
+    },
+    {
+      "workflow_id": "multiple-track-spacing",
+      "inventory_title": "Multiple-track/spacing transition",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 7 multiple-track migration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "The fixed B14 two-track configuration is preserved across creation, handed replacement, reopen and both production-export entry points.",
+        "evidence_paths": [
+          "reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md",
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md",
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/ordinary_track_recipe.py",
+          "tools/freecad_bridge/ordinary_track_edit_recipe.py"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_ordinary_track.py",
+          "tests/validate_phase1_ordinary_edit.py",
+          "tests/validate_phase1_ordinary_export.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Spacing/easement editing, invalid inputs, wider track counts and deferred exact reconstruction remain open.",
+        "owner_role": "Phase 7 multiple-track migration owner",
+        "closure_phases": [6, 7],
+        "closure_gate": "Phase 7 multiple-track migration after the Phase 6 exact reconstruction seam passes."
+      }
+    },
+    {
+      "workflow_id": "standalone-turnout",
+      "inventory_title": "Standalone turnout",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 8 switches-and-crossings migration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "The fixed centreline-anchored REA C10 fixture covers curved-host left/facing creation, handed edit, recovery, persistence, overlap rejection and injected abort.",
+        "evidence_paths": [
+          "reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/turnout_recipe.py",
+          "tools/freecad_bridge/run-b14-turnout"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_turnout.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Trailing orientation, straight and alternate hosts, removal/integration, wider inputs, downstream timber/chair stages and export remain open.",
+        "owner_role": "Phase 8 switches-and-crossings migration owner",
+        "closure_phases": [8],
+        "closure_gate": "Phase 8 turnout lifecycle, timbering and export acceptance for the advertised scope."
+      }
+    },
+    {
+      "workflow_id": "crossover-geometry",
+      "inventory_title": "Crossover geometry",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 8 switches-and-crossings migration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "The controlled XO-001 series and analytical witnesses bound accepted creation plus the current preview/commit minimum-radius mismatch.",
+        "evidence_paths": [
+          "reference/contracts/phase1-crossover-feasibility.json",
+          "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md",
+          "reference/benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/run-b14-cold",
+          "tools/freecad_bridge/run_b14_crossover.py"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_crossover_feasibility.py",
+          "tests/freecad_validate_phase1_crossover_feasibility.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "One shared successor preflight, zero-mutation rejection, exact-build agreement, create/edit/extend GUI regression and wider hosts/arrangements remain open.",
+        "owner_role": "Phase 8 switches-and-crossings migration owner",
+        "closure_phases": [8],
+        "closure_gate": "Phase 8 crossover geometry and lifecycle migration acceptance."
+      }
+    },
+    {
+      "workflow_id": "automatic-timbering",
+      "inventory_title": "Automatic timbering",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 8 timbering migration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "The fixed XO-001 automatic-timbering contract preserves semantic records, invalidation, reuse, history, persistence, clear and injected failure while classifying three defects.",
+        "evidence_paths": [
+          "reference/contracts/phase1-crossover-timbering.json",
+          "reference/benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/crossover_timber_recipe.py"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_crossover_timbering.py",
+          "tests/freecad_validate_phase1_crossover_timbering.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Standalone-turnout/plain-line choices, wider crossovers, the complete input matrix and successor fixes for lifecycle defects remain open.",
+        "owner_role": "Phase 8 timbering migration owner",
+        "closure_phases": [8],
+        "closure_gate": "Phase 8 timbering parity, invalidation, lifecycle and GUI acceptance."
+      }
+    },
+    {
+      "workflow_id": "chair-analysis-presentation",
+      "inventory_title": "Chair analysis and 2D presentation",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 9 chair application and presentation owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "The fixed post-B4 XO-001 contracts preserve logical result, persistence, reuse and every emitted input class while exposing stale-cache, precision, ordering and Part-presentation defects.",
+        "evidence_paths": [
+          "reference/contracts/phase1-chair-analysis-persistence.json",
+          "reference/contracts/phase1-chair-analysis-invalidation.json",
+          "reference/benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md",
+          "reference/benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/chair_analysis_recipe.py"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_chair_analysis_persistence.py",
+          "tests/validate_phase1_chair_analysis_invalidation.py",
+          "tests/freecad_validate_phase1_chair_analysis_persistence.py",
+          "tests/freecad_validate_phase1_chair_analysis_invalidation.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Upstream record extraction, wider entity families, corrected signature cones, lightweight real-GUI selection/history and B15 support/layout/solid dependencies remain open.",
+        "owner_role": "Phase 9 chair application owner with Phase 5 presentation owner",
+        "closure_phases": [5, 9],
+        "closure_gate": "Phase 5 renderer decision and Phase 9 chair analysis/application acceptance for advertised entities."
+      }
+    },
+    {
+      "workflow_id": "legacy-supported-chair-bodies",
+      "inventory_title": "Legacy approximate supported chair bodies",
+      "classification": "legacy-reference-only",
+      "owner_role": "Phase 9 exact-chair migration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "B15 acceptance and headless smoke preserve the bounded five-box S1/S1J approximation, supported-solid equivalence, reuse and reopen solely as legacy gap evidence.",
+        "evidence_paths": [
+          "reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/run-b15-acceptance"
+        ],
+        "validation_paths": [
+          "tests/validate_b15.py",
+          "tests/freecad_validate_b15.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "All supported-solid invalidation classes and export scopes remain open; the five-box bodies must not become production chair definitions.",
+        "owner_role": "Phase 9 exact-chair migration owner",
+        "closure_phases": [6, 9],
+        "closure_gate": "Phase 6 deferred exact seam and Phase 9 procedural chair replacement acceptance."
+      }
+    },
+    {
+      "workflow_id": "procedural-chair-definitions",
+      "inventory_title": "Procedural chair definitions and exact components",
+      "classification": "successor-only",
+      "owner_role": "Phase 9 chair-definition owner",
+      "oracle": {
+        "state": "defined-blocked",
+        "definition": "A neutral versioned full-size constituent package must regenerate exact geometry and pass dimensional, interface, topology, assembly, provenance and output-manifest checks against accepted primary evidence; Templot is comparison evidence only.",
+        "evidence_paths": [
+          "reference/oracles/templot5-556b-s1-oracle.json",
+          "reference/lineage/templot5-556b-s1-generation-map.json",
+          "reference/lineage/phase1-s1-core-lineage.json",
+          "reference/manifests/s1-chair-pilot.dependency-manifest.json"
+        ],
+        "recipe_paths": [
+          "reference/ARCHITECTURE.md",
+          "reference/PROJECT_PLAN.md"
+        ],
+        "validation_paths": [
+          "tests/validate_templot_s1_oracle.py",
+          "tests/validate_templot_s1_generation_map.py",
+          "tests/validate_phase1_s1_lineage.py",
+          "tools/validate_dependency_manifest.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Exact 556b local capture, precise S1 designation, independent primary evidence, accepted values/transforms, neutral package schema, package licence, rights reviews and tolerances remain blocked.",
+        "owner_role": "Project owner for evidence/rights decisions and Phase 9 chair-definition owner for implementation",
+        "closure_phases": [9],
+        "closure_gate": "Phase 9 first-S1 definition, exact constituent and project-cleared output acceptance."
+      }
+    },
+    {
+      "workflow_id": "assisted-chair-assimilation",
+      "inventory_title": "Assisted chair assimilation",
+      "classification": "successor-only",
+      "owner_role": "Phase 9 assimilation owner",
+      "oracle": {
+        "state": "defined-blocked",
+        "definition": "One selected S1 pilot must preserve source hashes, calibration, units, frame, operator-declared constituents/landmarks, measured/inferred status, residuals, findings and explicit approval before producing the normal neutral definition.",
+        "evidence_paths": [
+          "reference/ARCHITECTURE.md",
+          "reference/LICENSING_BOUNDARIES.md",
+          "reference/manifests/s1-chair-pilot.dependency-manifest.json"
+        ],
+        "recipe_paths": [
+          "reference/PROJECT_PLAN.md"
+        ],
+        "validation_paths": [
+          "tests/validate_licensing_controls.py",
+          "tools/validate_dependency_manifest.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "The precise S1 prototype, lawful evidence set, usage intent, component landmarks, rail section, residual policy, licence and acceptance tolerances require project-owner decisions.",
+        "owner_role": "Project owner for pilot/evidence decisions and Phase 9 assimilation owner for implementation",
+        "closure_phases": [9],
+        "closure_gate": "Phase 9 assisted S1 assimilation pilot and package acceptance."
+      }
+    },
+    {
+      "workflow_id": "host-integration",
+      "inventory_title": "Host integration",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 8 trackwork integration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "The controlled crossover path and accepted B15 qualification preserve the fixed XO-001 host integration result and non-chair leaf geometry.",
+        "evidence_paths": [
+          "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md",
+          "reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/run-b14-cold",
+          "tools/freecad_bridge/run-b15-acceptance"
+        ],
+        "validation_paths": [
+          "tests/validate_freecad_bridge.py",
+          "tests/validate_b15.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Standalone-turnout integration, removal/reversal, rollback and legacy-document variants remain open.",
+        "owner_role": "Phase 8 trackwork integration owner",
+        "closure_phases": [8],
+        "closure_gate": "Phase 8 reversible turnout/crossover host-integration acceptance."
+      }
+    },
+    {
+      "workflow_id": "save-reopen",
+      "inventory_title": "Save/reopen",
+      "classification": "cross-cutting",
+      "owner_role": "Phase 4 persistence and migration owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "Accepted B15 crossover plus B14 plain-line, straight, turnout, timbering and chair-analysis copied-document fixtures preserve their bounded save/close/reopen semantics.",
+        "evidence_paths": [
+          "reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md",
+          "reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md",
+          "reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md",
+          "reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md",
+          "reference/contracts/phase1-crossover-timbering.json",
+          "reference/contracts/phase1-chair-analysis-persistence.json"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/ordinary_track_edit_recipe.py",
+          "tools/freecad_bridge/straight_station_recipe.py",
+          "tools/freecad_bridge/turnout_recipe.py"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_ordinary_edit.py",
+          "tests/validate_phase1_straight_station.py",
+          "tests/validate_phase1_turnout.py",
+          "tests/validate_phase1_crossover_timbering.py",
+          "tests/validate_phase1_chair_analysis_persistence.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Broader entity combinations, canonical successor schema, B14/B15 family migration fixtures and unsupported/corrupt version handling remain open.",
+        "owner_role": "Phase 4 persistence and migration owner",
+        "closure_phases": [4, 10],
+        "closure_gate": "Phase 4 canonical persistence/migration gate and Phase 10 Addon migration qualification."
+      }
+    },
+    {
+      "workflow_id": "production-export-manifests",
+      "inventory_title": "SVG/DXF/STL/STEP and manifests",
+      "classification": "current-and-successor",
+      "owner_role": "Phase 6 export owner",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "Fixed plain-line selected and Generate-path recipes preserve filenames, format semantics, manifests, revision/overwrite behaviour and selected-path rollback while exposing create-time partial output.",
+        "evidence_paths": [
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md",
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md",
+          "reference/schemas/dependency-manifest-v1.schema.json"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/ordinary_track_export_recipe.py",
+          "tools/freecad_bridge/run-b14-ordinary-export",
+          "tools/freecad_bridge/run-b14-ordinary-create-export"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_ordinary_export.py",
+          "tests/validate_licensing_controls.py",
+          "tools/validate_dependency_manifest.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Cancellation, other scopes/entity families, atomic Generate-path failure, deferred exact reconstruction and output-specific project-cleared dependency manifests remain open.",
+        "owner_role": "Phase 6 export owner with Phase 9 chair-output owner",
+        "closure_phases": [6, 9, 10],
+        "closure_gate": "Phase 6 transactional exporter gate plus Phase 9 output lineage and Phase 10 packaged integration gates."
+      }
+    },
+    {
+      "workflow_id": "failure-recovery",
+      "inventory_title": "Failure recovery",
+      "classification": "cross-cutting",
+      "owner_role": "Owning application-command and export adapter maintainers",
+      "oracle": {
+        "state": "bounded-executed",
+        "definition": "Plain-line edit and export fault injections preserve rejection, transaction abort and byte-restoring rollback while freezing B14's incomplete edit history and Generate-path partial-output defects.",
+        "evidence_paths": [
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md",
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md",
+          "reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md"
+        ],
+        "recipe_paths": [
+          "tools/freecad_bridge/ordinary_track_edit_recipe.py",
+          "tools/freecad_bridge/ordinary_track_export_recipe.py"
+        ],
+        "validation_paths": [
+          "tests/validate_phase1_ordinary_edit.py",
+          "tests/validate_phase1_ordinary_export.py"
+        ]
+      },
+      "gap_control": {
+        "summary": "Every successor application command and output path needs one atomic undo/rollback boundary and equivalent failure fixtures for its advertised scope.",
+        "owner_role": "Owning Phase 3-10 application-command or adapter maintainer",
+        "closure_phases": [3, 4, 6, 7, 8, 9, 10],
+        "closure_gate": "Each owning phase must pass its transaction, cancellation and recovery matrix before retiring the corresponding legacy path."
+      }
+    }
+  ],
+  "phase1_gate": {
+    "exit_condition": "Every release-critical workflow has an owner document/recipe, known oracle, and stated coverage gap.",
+    "assessment": "evidenced",
+    "workflow_count": 14,
+    "bounded_executed_count": 12,
+    "defined_blocked_count": 2,
+    "open_gap_count": 14,
+    "claim": "All 14 canonical workflow families now have an owner, an executed bounded oracle or explicitly blocked successor oracle, repository evidence/control paths, a visible gap owner and named later closure phases.",
+    "non_claim": "No open gap is waived, no partial oracle is promoted to whole-product coverage, and the two successor-only chair workflows remain blocked pending their recorded owner decisions and evidence.",
+    "phase_effect": "This supplies evidence for the first Phase 1 exit condition. Phase 1 remains open on the neutral-chair evidence/rights decision condition and final risk/owner-decision reconciliation."
+  }
+}
