@@ -81,6 +81,10 @@
 ## Project phase discipline
 
 - The current delivery phase is recorded in `reference/PROJECT_PLAN.md`; Phase 0 closed on 2026-07-19 and Phase 1 is current until its inventory exit gate is explicitly accepted.
+- Progress bars in `reference/PROJECT_PLAN.md` count evidenced exit conditions,
+  not elapsed time or estimated effort. Update a bar only with corresponding
+  gate evidence, keep the active-phase register aligned, and allow progress to
+  move backwards when discovery legitimately adds or reopens a condition.
 - Keep phase work gate-based rather than inventing calendar promises before dependency and performance evidence exists.
 - Bounded read-only investigation or disposable prototypes may reduce later risk, but they do not advance the phase or authorise production dependencies on an unaccepted decision.
 - Record exact source state, validation, GUI evidence, performance evidence where applicable, decisions, exceptions and open risks at every phase close.
@@ -460,6 +464,13 @@ Run the deterministic Phase 1 macro-inventory contract checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_inventory.py
+```
+
+Run the project-plan progress bookkeeping check after changing a phase gate,
+active gate register, roadmap progress row or milestone state:
+
+```bash
+.venv/bin/python tests/validate_project_progress.py
 ```
 
 Run the fail-closed Phase 1 performance-boundary contract checks:

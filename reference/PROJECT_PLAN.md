@@ -88,26 +88,62 @@ release-candidate gate.
 - Mechanical extraction, cleanup, optimisation, behaviour changes, and legacy removal remain separate reviewable changes.
 - Apply [TESTING_POLICY.md](TESTING_POLICY.md) to every production change; test exceptions require an explicit risk and closure condition.
 
+### Progress convention
+
+Progress bars count the explicit exit conditions in each phase; they do not
+estimate elapsed time, remaining effort or calendar completion:
+
+- `█` — exit condition has recorded evidence;
+- `▒` — exit condition is actively being closed; and
+- `░` — no accepted completion evidence yet.
+
+Bars may have different lengths because phases have different numbers of exit
+conditions. A phase closes only when every condition is evidenced and the
+project owner accepts the phase closeout. Discovery may add or refine an exit
+condition, so the bar can move backwards without implying that completed work
+was lost. Run `../tests/validate_project_progress.py` after changing a phase
+gate, register, roadmap row or milestone state; it checks numerical consistency
+but does not decide whether the cited evidence is sufficient.
+
+## Key project milestones
+
+Milestone progress: `█▒░░░░░░░` — one complete, one active and seven not
+started. This is an outcome count, not an overall percentage of effort.
+
+| Milestone | Outcome | Owning phases | State |
+| --- | --- | --- | --- |
+| M1 — Recoverable behavioural baseline | B14/B15 roles, source state, validation, provenance and representative performance can be reproduced | 0 | Complete — accepted 2026-07-19 |
+| M2 — Migration blueprint locked | Release-critical workflows, dependency/performance boundaries, compatibility, terminology, rights/provenance controls, chair direction and the first extraction slice are sufficiently bounded to begin modular source work | 1 | Active |
+| M3 — First reusable modular capability | The minimal package loads in standalone Python and FreeCAD, and the transition-length pilot passes end-to-end legacy/new parity | 2–3 | Not started |
+| M4 — Canonical responsive editing foundation | Versioned canonical state, exact invalidation, save/reopen and an accepted lightweight renderer support normal editing without dense exact geometry | 4–5 | Not started |
+| M5 — Deferred production seam proven | Explicit Validate/Export regenerates equivalent exact geometry transactionally without leaking production objects into routine editing | 6 | Not started |
+| M6 — Core trackwork migrated | Plain-line alignment/station/multiple-track plus turnout/crossover/timbering workflows run through the modular architecture | 7–8 | Not started |
+| M7 — Production chair system completed | Validated external definitions, one evidence-led S1 assimilation pilot, procedural constituents, production records, manifests and supported exports pass | 9 | Not started |
+| M8 — Installable Workbench beta | The authoritative package ships as an installable FreeCAD Addon with migration, documentation and no unowned monolithic production path | 10 | Not started |
+| M9 — Release Candidate 1 qualified | Reproducible artifact, complete validation/performance/rights evidence, known-risk disposition and explicit owner acceptance | 11 | Not started |
+
 ## Roadmap summary
 
-| Phase | Outcome | State |
-| --- | --- | --- |
-| 0 | Recoverable baseline and benchmark checkpoint | Complete — accepted 2026-07-19 |
-| 1 | Product, dependency, correctness, and performance inventory | Current |
-| 2 | Minimal modular foundation and validation harness | Not started |
-| 3 | First parity-proven vertical slice | Not started |
-| 4 | Canonical state, signatures, and persistence | Not started |
-| 5 | Lightweight editing prototype and renderer decision | Not started |
-| 6 | Explicit exact-validation and export seam | Not started |
-| 7 | Core alignment, station, and multiple-track migration | Not started |
-| 8 | Turnout, crossover, and timbering migration | Not started |
-| 9 | Chair definitions, assisted assimilation, production records, and export completion | Not started |
-| 10 | Workbench integration, launcher reduction, and beta Addon packaging | Not started |
-| 11 | Stabilisation and release-candidate qualification | Not started |
+| Phase | Outcome | Exit-gate progress | State |
+| --- | --- | --- | --- |
+| 0 | Recoverable baseline and benchmark checkpoint | `██████` — 6/6 evidenced | Complete — accepted 2026-07-19 |
+| 1 | Product, dependency, correctness, and performance inventory | `██████▒▒▒` — 6/9 evidenced; 3 active | Current |
+| 2 | Minimal modular foundation and validation harness | `░░░░░` — 0/5 | Not started |
+| 3 | First parity-proven vertical slice | `░░░░░` — 0/5 | Not started |
+| 4 | Canonical state, signatures, and persistence | `░░░░░░` — 0/6 | Not started |
+| 5 | Lightweight editing prototype and renderer decision | `░░░░` — 0/4 | Not started |
+| 6 | Explicit exact-validation and export seam | `░░░░░` — 0/5 | Not started |
+| 7 | Core alignment, station, and multiple-track migration | `░░░░` — 0/4 | Not started |
+| 8 | Turnout, crossover, and timbering migration | `░░░░` — 0/4 | Not started |
+| 9 | Chair definitions, assisted assimilation, production records, and export completion | `░░░░░░░░░` — 0/9 | Not started |
+| 10 | Workbench integration, launcher reduction, and beta Addon packaging | `░░░░░` — 0/5 | Not started |
+| 11 | Stabilisation and release-candidate qualification | `░░░░░░░` — 0/7 | Not started |
 
 ## Phase 0: recoverable baseline and benchmark checkpoint
 
 Status: **Complete — accepted and closed on 2026-07-19.**
+
+Progress: `██████` — 6/6 exit conditions evidenced and accepted.
 
 ### Goal
 
@@ -158,6 +194,22 @@ and decisions on 2026-07-19, and the closeout checkpoint is tagged
 ## Phase 1: product, dependency, correctness, and performance inventory
 
 Status: **Current.**
+
+Progress: `██████▒▒▒` — 6/9 exit conditions evidenced; 3 remain active.
+
+### Current gate register
+
+| Exit condition | State | Evidence or remaining work |
+| --- | --- | --- |
+| Every release-critical workflow has an owner, oracle and visible coverage gap | Active | Major fixed workflows have contracts and owners; the wider inputs, GUI paths, downstream chair chain and remaining workflow rows listed in `PHASE1_INVENTORY.md` are still open |
+| Dependency/side-effect map predicts the first extraction boundary | Evidenced | Deterministic AST inventory, candidate-boundary register, closure cuts and the transition-pilot contract |
+| Representative profiles identify dominant costs without source-size guesswork | Evidenced | Reconciled performance-boundary contract and controlled legacy profiles; target-architecture slots remain deliberately unmeasured until their implementations exist |
+| First slice, comparison path and acceptance evidence are agreed | Evidenced | Transition-length solver selected; B16/façade/caller/parity/rollback/performance contract frozen |
+| Templot chair map, B15 gap, S1 oracle recipe and assimilation boundary are reviewed | Evidenced | Exact 556b source route and blocker branch recorded; missing exact executable/artifacts remain named local evidence gates rather than silently weakened requirements |
+| First-S1/core and other-S&C/legacy lineage scopes are classified or visibly blocked | Evidenced | Both bounded machine-readable lineage registers have statuses, owners and later output gates; no positive clearance is inferred |
+| Neutral chair definition, manifest/licensing controls and first-S1 evidence/rights plan are accepted | Active | Neutral schema direction, manifest validator, contribution and rights fields are accepted; exact pilot evidence, package values/licence and non-copyright reviews remain open |
+| RC chair scope is bounded to validated packages and one assisted S1 pilot | Evidenced | Arbitrary automatic scan/CAD conversion remains explicitly post-RC research |
+| Open risks and required owner decisions are recorded | Active until closeout | Registers exist, but remaining workflow, GUI, S1 evidence, terminology-assurance and target-profile decisions must be reconciled in the Phase 1 closeout record |
 
 ### Goal
 

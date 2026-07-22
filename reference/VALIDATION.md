@@ -184,6 +184,17 @@ top-level call model, schema 2 separately checks callers of nominated roots,
 callers crossing the proposed dependency closure and dependencies leaving that
 closure. It does not execute either macro.
 
+Project-plan progress bookkeeping:
+
+```bash
+.venv/bin/python tests/validate_project_progress.py
+```
+
+This checks each roadmap bar and denominator against the number of explicit
+phase exit conditions, reconciles the active Phase 1 gate register, and checks
+the milestone bar against the milestone states. It does not assess the quality
+of gate evidence or replace project-owner phase acceptance.
+
 Fail-closed Phase 1 performance-boundary checks:
 
 ```bash
