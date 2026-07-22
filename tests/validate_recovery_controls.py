@@ -215,7 +215,14 @@ def _validate_static_controls(errors):
     policy_flat = " ".join(policy.split())
     policy_markers = (
         "Independent project-data backup",
-        "Not configured — owner action required",
+        "Operational for the complete declared project-data scope",
+        "Passed and owner-accepted for the complete declared scope on 2026-07-22",
+        "Active and verified 2026-07-22",
+        "QA-R01 is closed",
+        "retain the initial accepted snapshot plus at least four recent successful",
+        "never delete snapshots automatically",
+        "restore drill at least monthly",
+        "2026-07-22-initial-repository-backup-restore.md",
         "git clean",
         "different storage device",
         "restore into a new empty directory",
@@ -223,9 +230,9 @@ def _validate_static_controls(errors):
         "--require-backup-target",
         "Active and verified 2026-07-22",
         "force pushes and branch deletion are blocked",
-        "intends to purchase one",
-        "accepted temporary operational risk",
-        "before Phase 4 document migration work",
+        "positive recovery evidence for the complete valuable project-data scope",
+        "review backup currency and declared scope at every phase closeout",
+        "Missing the cadence, changing the valuable-data scope or failing a later run",
     )
     for marker in policy_markers:
         if marker not in policy_flat:

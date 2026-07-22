@@ -263,8 +263,17 @@ def validate_plan(
                 errors.append("{} source fingerprint changed".format(relative_path))
             if version not in path.read_text(encoding="utf-8"):
                 errors.append("{} version token is missing".format(relative_path))
-        if (ROOT / "reference" / "schemas" / "chair-definition-v1.schema.json").exists():
-            errors.append("production chair-definition schema appeared during Phase 1")
+        chair_schema = (
+            ROOT / "reference" / "schemas" / "chair-definition-v1.schema.json"
+        )
+        if chair_schema.exists():
+            phase4_evidence = (
+                ROOT / "reference" / "PHASE4_CANONICAL_STATE.md"
+            ).read_text(encoding="utf-8")
+            if "Phase 4 chair-definition package contract" not in phase4_evidence:
+                errors.append(
+                    "chair-definition schema is not attributed to its later Phase 4 gate"
+                )
 
     return errors
 

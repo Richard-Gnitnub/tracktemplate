@@ -2,10 +2,23 @@
 
 Phase 3 exposes the mechanically extracted transition calculations through
 the temporary all-three-name B15 comparison and rollback boundary. Phase 4
-adds the bounded canonical transition-state application contract.
+adds bounded canonical transition-state and neutral chair-package contracts.
 """
 
 from tracktemplate import DEVELOPMENT_CHECKPOINT
+from tracktemplate.application.chair_definition import (
+    CHAIR_DEFINITION_FRAME_ID,
+    CHAIR_DEFINITION_LENGTH_UNIT,
+    CHAIR_DEFINITION_PRODUCTION_ADMISSION_ENABLED,
+    CHAIR_DEFINITION_SCHEMA_VERSION,
+    ChairDefinitionError,
+    ChairDefinitionPackage,
+    chair_definition_manifest_signature,
+    chair_definition_package_from_json,
+    chair_definition_package_status,
+    chair_definition_package_to_json,
+    verify_chair_definition_manifest,
+)
 from tracktemplate.application.transition_state import (
     TRANSITION_STATE_SCHEMA_VERSION,
     TransitionAnalysis,
@@ -28,6 +41,17 @@ from tracktemplate.domain.transition import TransitionIntent
 
 __all__ = (
     "DEVELOPMENT_CHECKPOINT",
+    "CHAIR_DEFINITION_SCHEMA_VERSION",
+    "CHAIR_DEFINITION_FRAME_ID",
+    "CHAIR_DEFINITION_LENGTH_UNIT",
+    "CHAIR_DEFINITION_PRODUCTION_ADMISSION_ENABLED",
+    "ChairDefinitionError",
+    "ChairDefinitionPackage",
+    "chair_definition_manifest_signature",
+    "chair_definition_package_from_json",
+    "chair_definition_package_status",
+    "chair_definition_package_to_json",
+    "verify_chair_definition_manifest",
     "TRANSITION_STATE_SCHEMA_VERSION",
     "TransitionIntent",
     "TransitionAnalysis",

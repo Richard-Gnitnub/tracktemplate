@@ -76,7 +76,17 @@ def subsection(text: str, heading: str) -> str:
     marker = f"### {heading}"
     require(marker in text, f"missing section: {marker}")
     tail = text.split(marker, 1)[1]
-    return re.split(r"\n#{2,3} ", tail, maxsplit=1)[0]
+    lines: list[str] = []
+    in_fence = False
+    for line in tail.splitlines():
+        if line.startswith("```"):
+            in_fence = not in_fence
+            lines.append(line)
+            continue
+        if not in_fence and re.match(r"^#{2,3} ", line):
+            break
+        lines.append(line)
+    return "\n".join(lines)
 
 
 def markdown_documents() -> list[Path]:
@@ -110,10 +120,23 @@ def local_link_target(document: Path, raw_target: str) -> Path | None:
     return resolved
 
 
+def prose_outside_fenced_blocks(text: str) -> str:
+    lines: list[str] = []
+    in_fence = False
+    for line in text.splitlines():
+        if line.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if not in_fence:
+            lines.append(line)
+    return "\n".join(lines)
+
+
 def validate_links() -> None:
     broken: list[str] = []
     for document in markdown_documents():
-        for raw_target in LINK_RE.findall(document.read_text(encoding="utf-8")):
+        prose = prose_outside_fenced_blocks(document.read_text(encoding="utf-8"))
+        for raw_target in LINK_RE.findall(prose):
             target = local_link_target(document, raw_target)
             if target is not None and not target.exists():
                 broken.append(
@@ -271,6 +294,31 @@ def main() -> None:
     require("reference/QUALITY_ASSURANCE.md" in agents and
             "reference/LEARNING_FROM_EXPERIENCE.md" in agents,
             "AGENTS.md must route maintainers to both QA controls")
+    require("mandatory safety/risk panel" in agents,
+            "AGENTS.md must enforce the prospective gate-closeout panel")
+
+    panel_control = subsection(plan, "Mandatory safety/risk panel before gate closeout")
+    require("From Phase 4 onward" in panel_control,
+            "safety/risk panel must apply prospectively from Phase 4")
+    for role in ("**project owner**", "**phase/slice owner**", "**QA/risk reviewer**"):
+        require(role in panel_control, f"safety/risk panel lacks required role {role}")
+    for outcome in ("**Proceed**", "**Proceed with bounded conditions**", "**Do not proceed**"):
+        require(outcome in panel_control,
+                f"safety/risk panel lacks fail-closed outcome {outcome}")
+    for record_field in (
+        "Gate and exact source:",
+        "Participants and roles (including independence):",
+        "Evidence reviewed (links):",
+        "Due principal/QA risks and control-effectiveness changes:",
+        "Unresolved dissent, unknowns or exceptions:",
+        "Recommendation: Proceed | Proceed with bounded conditions | Do not proceed",
+        "Conditions, owners and deadlines:",
+        "Project-owner decision and date:",
+        "Safety/risk panel: [panel record](relative-path)",
+        "Project-owner gate decision: `Accepted YYYY-MM-DD`",
+    ):
+        require(record_field in panel_control,
+                f"safety/risk panel control lacks record field {record_field!r}")
 
     assurance_rules = subsection(plan, "Risk treatment and control-assurance rules")
     principal_register = subsection(plan, "Principal risk treatment register")
@@ -307,8 +355,8 @@ def main() -> None:
     findings = FINDING_ROW_RE.findall(quality)
     require(findings, "QA audit must contain classified findings")
     for finding_id, row in findings:
-        require(re.search(r"QA-(?:A|R)\d{2}", row) is not None,
-                f"{finding_id} is neither corrected nor mapped to a residual risk")
+        require(re.search(r"(?:QA-(?:A|R)|PR-)\d{2}", row) is not None,
+                f"{finding_id} is neither corrected nor mapped to a controlled risk")
 
     actions = ACTION_ROW_RE.findall(quality)
     require(actions, "QA audit must contain immediate correction actions")
@@ -318,9 +366,9 @@ def main() -> None:
     for action_id, row in actions:
         require("| Completed |" in f"|{row}", f"{action_id} is not completed")
 
-    valid_dispositions = set(plan_risks) | set(action_ids)
+    valid_dispositions = set(plan_risks) | set(action_ids) | set(principal_risks)
     for finding_id, row in findings:
-        references = set(re.findall(r"QA-(?:A|R)\d{2}", row))
+        references = set(re.findall(r"(?:QA-(?:A|R)|PR-)\d{2}", row))
         require(references <= valid_dispositions,
                 f"{finding_id} references an unknown disposition: "
                 f"{sorted(references - valid_dispositions)}")

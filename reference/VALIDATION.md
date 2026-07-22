@@ -285,6 +285,28 @@ after save/close/reopen. Its success sentinel is
 ingress evidence only: no entity family is migration-qualified and no copied-
 target migrator exists yet.
 
+Phase 4 neutral chair-definition package:
+
+```bash
+.venv/bin/python tests/validate_phase4_chair_definition.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase4_chair_definition.py
+```
+
+The standalone validator owns chair-package schema v1, the explicitly
+non-prototype synthetic fixture, deterministic signed round-trip, exact source
+and canonical decimal quantities, unit conversion, fixed chair-local frame,
+datum/component/procedure/rail-interface references, manufacturing separation,
+lineage coverage, acceptance, external dependency-manifest linkage and the
+missing/corrupt/unsupported/ambiguous failure matrix. It also requires the
+synthetic manifest to pass the existing strict project-clearance validator,
+then proves Phase 9 production admission still blocks geometry, document and
+filesystem mutation. The qualified-FreeCAD test proves only bundled-Python
+compatibility, the same exact package round-trip and zero document mutation;
+its sentinel is
+`Phase 4 chair-definition FreeCAD compatibility validation passed`. Neither
+test supplies an S1 definition, runs a chair builder or qualifies output.
+
 Current Phase 3 real-GUI workflow parity:
 
 ```bash
@@ -337,10 +359,13 @@ then require a clean pushed checkpoint:
 .venv/bin/python tools/repository_safety_audit.py --require-checkpoint
 ```
 
-After the owner selects and mounts an external destination, assess only its
-location with `--backup-target ... --require-backup-target`; backup completion
-and restore evidence remain separate gates under
-[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md).
+Assess a selected or replacement external destination only with
+`--backup-target ... --require-backup-target`; backup completion and restore
+evidence remain separate gates under
+[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The first repository-scope
+copy, restore and incremental-repeat result is recorded in the linked
+2026-07-22 evidence there for the owner-confirmed complete project-data scope;
+the audit command by itself still does not prove those executed results.
 
 Repository QA, documentation-link and residual-risk controls:
 
@@ -357,8 +382,10 @@ use exactly `Tolerate`, `Remove`, or `Mitigate` and include an accountable
 owner, phase deadline, required work and objective closure evidence. Passing
 the check also requires every principal risk to have preventive, detective and
 recovery/corrective controls, one permitted effectiveness state, linked
-evidence and a mandatory next proof. It proves control consistency only; it
-does not close an open risk or accept a phase gate.
+evidence and a mandatory next proof. It also protects the prospective
+safety/risk-panel roles, inputs, outcomes and fail-closed rule. It proves
+control consistency only; it does not close an open risk or accept a phase
+gate.
 
 Fast development-bridge recipe contract checks:
 
@@ -426,8 +453,10 @@ Owner-accepted first-S1 package/evidence plan checks:
 
 This protects all 15 S1 decision states and the recorded 2026-07-22 owner
 acceptance, the exact B14/B15 source, the
-structurally valid but `unknown` package manifest, blocked lineage scopes,
-comparison-only Templot oracle and absence of a premature production schema.
+structurally valid but `unknown` package manifest, blocked lineage scopes and
+comparison-only Templot oracle. If a later chair schema exists, the validator
+requires it to be attributed to the Phase 4 gate rather than retroactively to
+Phase 1.
 It fails closed if a designation, licence, dependency, rights status or
 Templot artifact is promoted without evidence. Passing means the accepted
 control is internally consistent, not that the package is project-cleared.
@@ -440,8 +469,10 @@ Project-plan progress bookkeeping:
 
 This checks each roadmap bar and denominator against the number of explicit
 phase exit conditions, reconciles the current-phase gate register, and checks
-the milestone bar against the milestone states. It does not assess the quality
-of gate evidence or replace project-owner phase acceptance.
+the milestone bar against the milestone states. For any phase completed from
+Phase 4 onward, it also requires the standard linked safety/risk-panel outcome
+and separate dated project-owner gate decision. It does not assess the quality
+of panel/gate evidence or replace project-owner phase acceptance.
 
 Fail-closed Phase 1 performance-boundary checks:
 

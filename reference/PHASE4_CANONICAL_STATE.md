@@ -1,7 +1,7 @@
 # Phase 4 Canonical State, Signatures, and Persistence Evidence
 
 Status: **Active.** The project owner explicitly instructed the project to
-start Phase 4 on 2026-07-22. Two of six Phase 4 exit conditions now have
+start Phase 4 on 2026-07-22. Three of six Phase 4 exit conditions now have
 recorded technical evidence; phase closeout and owner acceptance remain open.
 
 ## Bounded opening tranche
@@ -216,6 +216,57 @@ FCStd SHA-256
 `0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`
 were unchanged.
 
+## Phase 4 chair-definition package contract
+
+The neutral v1 contract is now implemented by
+`tracktemplate.application.chair_definition`, exposed only through the narrow
+`tracktemplate.api` façade, and published portably as
+[`chair-definition-v1.schema.json`](schemas/chair-definition-v1.schema.json).
+It is a TrackTemplate schema, not a Templot format, FreeCAD document schema,
+mesh container or production chair.
+
+The contract records the logical boundaries accepted in
+[S1_PILOT_PLAN.md](S1_PILOT_PLAN.md): package and definition identity/version,
+full-size exact source and canonical quantities, the fixed right-handed
+chair-local frame and mandatory datums, rail interfaces, present or explicitly
+absent constituents, ordered versioned procedural steps, manufacturing
+profiles kept outside prototype definition, field/component lineage,
+validation, acceptance, permissions and a signed dependency-manifest link.
+Only exact decimal strings are accepted as output-affecting source values. V1
+converts `mm`, `cm`, `m`, `in` and `ft` lengths exactly to full-size
+millimetres; angles preserve an exact `deg` or `rad` value and dimensionless
+values use unit `1`. Unknown fields, duplicate identities, ambiguous order,
+bad references, missing datum/component/interface records, inconsistent units,
+unsupported versions and content-signature damage fail with recoverable,
+zero-mutation diagnostics.
+
+Review parsing deliberately preserves an explicit `unresolved`, `inferred`,
+`comparison-only`, `NOASSERTION`, blocked or unaccepted state so the problem
+can be inspected rather than hidden. Such state is never admission. Exact
+manifest identity, subject/version, content signature, package licence,
+intended uses, project status and referenced dependency identities are checked
+when the external manifest is supplied; the existing dependency-manifest
+validator remains the separate semantic clearance gate. Phase 9 production
+admission remains disabled even when a package and manifest are otherwise
+valid, so the current API authorises no production geometry, FreeCAD document
+mutation or filesystem output.
+
+V1 uses one directed integrity edge: the signed package links the canonical
+manifest digest. The linked manifest therefore omits its optional
+`subject.content_sha256`; accepting a reciprocal whole-package digest would
+create an ambiguous circular hash. A future content-addressing change requires
+a new accepted schema rule rather than silently redefining either digest.
+
+The committed fixture pair under `tests/fixtures/` is explicitly labelled
+`TEST-ONLY-NON-PROTOTYPE-CONTRACT-FIXTURE`. It contains artificial dimensions
+and one artificial component solely to exercise schema mechanics; it is not an
+S1 definition, railway evidence, a family-completeness precedent or a visual
+artifact. Its separate synthetic dependency manifest passes the existing
+strict project-clearance validator, which proves that the independent Phase 9
+hard stop cannot be bypassed merely by presenting apparently complete rights
+records. No B14/B15 source, production chair value, Templot value collection,
+Part shape, mesh, GUI object or source evidence body was added.
+
 ## Validation evidence
 
 The tranche validator directly covers immutable records, exact numerical
@@ -231,7 +282,7 @@ Observed on 2026-07-22 from the repository root:
 | Check | Result |
 | --- | --- |
 | Parse B14, B15, B16 launcher and all new/changed Python | Passed |
-| Every `tests/validate_*.py` standalone validator | 35/35 passed |
+| Every `tests/validate_*.py` standalone validator | 37/37 passed |
 | Dedicated Phase 4 canonical-state validator | Passed |
 | Deterministic modular structure | Passed; declared application boundary, permitted inward edges, no cycle, forbidden domain dependency or warning |
 | Isolated API/domain/application import with FreeCAD, Part, Qt and pivy blocked | Passed; no host import attempted |
@@ -242,6 +293,8 @@ Observed on 2026-07-22 from the repository root:
 | Phase 4 qualified FreeCAD persistence lifecycle | Passed; disposable create/update, Undo/Redo, abort, stale/corrupt rejection and FCStd save/reopen |
 | Phase 4 standalone B14/B15 detector matrix | Passed; B14, B15, mixed, foreign, unsupported, versionless, malformed and conflicting cases |
 | Phase 4 FreeCAD legacy detector lifecycle | Passed; zero-mutation inspection and identical mixed report after FCStd save/reopen |
+| Phase 4 chair-definition package validator | Passed; exact deterministic round-trip, signed manifest linkage, unit/reference/lineage failure matrix and hard production-admission block |
+| Phase 4 chair-definition qualified-FreeCAD compatibility | Passed; exact package round-trip with zero document mutation and production admission disabled |
 
 The dedicated qualified-FreeCAD smoke is intentionally limited to type/runtime
 compatibility, exact JSON round-trip and zero document mutation; it is not
@@ -257,8 +310,8 @@ alter an operator route, document, renderer, exact geometry or export path.
 | Exact parameter invalidation including cold/reuse/change-back | Active: transition analysis cases are directly tested; downstream preview, exact-validation and export propagation remain due |
 | Undo/redo and failed updates leave a valid document | Evidenced: atomic create/update, no-op, Undo/Redo, preflight rejection and injected post-write abort all pass |
 | Preview/exact geometry can be deleted and regenerated from canonical state | Pending: no Phase 5/6 renderer or exact adapter is being invented here |
-| Deterministic, fail-closed chair-definition package | Pending: the cross-cutting schema must be defined before a production builder, with S1 evidence still blocked |
-| Supported schema/version window agreed and tested | Active: exact transition v1 and read-only B14/B15/mixed outer detection are tested; owner agreement, chair packages and family migration schemas remain due |
+| Deterministic, fail-closed chair-definition package | Evidenced: neutral schema v1, immutable review record, exact decimals/units, constituent/procedure/interface/manufacturing separation, lineage, signed manifest linkage and failure matrix pass without enabling production; S1 evidence remains blocked |
+| Supported schema/version window agreed and tested | Active: exact transition v1, chair-package v1 and read-only B14/B15/mixed outer detection are tested; owner agreement and family migration schemas remain due |
 
 ## Remaining risks and next bounded tranche
 
@@ -271,11 +324,16 @@ alter an operator route, document, renderer, exact geometry or export path.
   whole legacy document is migratable.
 - Preview, exact-validation and export signatures cannot be completed until
   those derived-result contracts exist; adapters must not invent partial keys.
-- The chair-definition schema and its rights/provenance fields remain a
-  separate mandatory Phase 4 tranche before any production chair builder.
+- Chair-package v1 is technically evidenced but remains provisional until the
+  project owner accepts the Phase 4 schema window. Family completeness,
+  numerical S1 data, exact generation and production admission remain Phase 9
+  work, not implicit consequences of this contract fixture.
 - The provisional v1 window requires explicit project-owner acceptance before
   it can satisfy the Phase 4 schema/version exit condition.
 
-The next self-contained Phase 4 tranche is the neutral chair-definition
-package contract and fail-closed round-trip. It can advance its named exit gate
-without guessing which broader legacy entity family should be migrated first.
+The next Phase 4 decision is project-owner review of the tested transition and
+chair-package v1 read window. The independent backup/restore prerequisite in
+[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) is satisfied for the owner-
+confirmed complete scope under its active cadence. Copied-target legacy-family
+migration remains blocked by its family-specific schema/identity fixture; no
+migrator is authorised by backup readiness alone.

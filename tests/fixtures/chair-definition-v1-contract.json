@@ -1,0 +1,259 @@
+{
+  "schema": "tracktemplate.chair-definition-package",
+  "schema_version": 1,
+  "content_signature": "sha256:b44209a3525375cdb04d3a3cc9670d9a4c24e30bedd0cea629311aa374828326",
+  "package": {
+    "package_id": "tracktemplate:test:chair-contract",
+    "package_version": "1.0.0-test",
+    "license_expression": "CC0-1.0",
+    "intended_uses": [
+      "private-development"
+    ],
+    "permissions": {
+      "access": "permitted",
+      "adaptation": "permitted",
+      "production_output": "permitted",
+      "redistribution": "permitted",
+      "commercial_use": "permitted",
+      "publication": "permitted"
+    },
+    "project_status": "project-cleared"
+  },
+  "definition": {
+    "definition_id": "tracktemplate:test:chair-contract:definition",
+    "definition_version": "1.0.0-test",
+    "prototype_designation": "TEST-ONLY-NON-PROTOTYPE-CONTRACT-FIXTURE",
+    "description": "Artificial records for schema validation only; these values do not define an S1 chair or any railway product.",
+    "lineage_id": "lineage:test:synthetic",
+    "canonical_length_unit": "mm",
+    "frame": {
+      "frame_id": "chair-local-right-handed-v1",
+      "handedness": "right",
+      "x_axis": "nominal-rail-direction",
+      "y_axis": "gauge-to-field",
+      "z_axis": "up-from-base-mounting-plane",
+      "origin": "longitudinal-chair-centre-plane/rail-section-centre-plane/base-mounting-plane"
+    },
+    "quantities": [
+      {
+        "quantity_id": "quantity:test:clearance",
+        "purpose": "rail-interface-clearance",
+        "quantity_kind": "length",
+        "source_value": "0.100",
+        "source_unit": "mm",
+        "canonical_value": "0.100",
+        "canonical_unit": "mm",
+        "uncertainty": null,
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "quantity_id": "quantity:test:length-x",
+        "purpose": "synthetic-profile-length-x",
+        "quantity_kind": "length",
+        "source_value": "1.000",
+        "source_unit": "mm",
+        "canonical_value": "1.000",
+        "canonical_unit": "mm",
+        "uncertainty": null,
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "quantity_id": "quantity:test:length-y",
+        "purpose": "synthetic-profile-length-y",
+        "quantity_kind": "length",
+        "source_value": "1.000",
+        "source_unit": "mm",
+        "canonical_value": "1.000",
+        "canonical_unit": "mm",
+        "uncertainty": null,
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "quantity_id": "quantity:test:tolerance",
+        "purpose": "contract-validation-tolerance",
+        "quantity_kind": "length",
+        "source_value": "0.001",
+        "source_unit": "mm",
+        "canonical_value": "0.001",
+        "canonical_unit": "mm",
+        "uncertainty": null,
+        "lineage_id": "lineage:test:synthetic"
+      }
+    ],
+    "datums": [
+      {
+        "datum_id": "datum:test:base",
+        "role": "base-mounting-plane",
+        "datum_kind": "plane",
+        "derivation_procedure_id": null,
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "datum_id": "datum:test:gauge-face",
+        "role": "gauge-face-datum",
+        "datum_kind": "plane",
+        "derivation_procedure_id": null,
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "datum_id": "datum:test:longitudinal-centre",
+        "role": "longitudinal-chair-centre-plane",
+        "datum_kind": "plane",
+        "derivation_procedure_id": null,
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "datum_id": "datum:test:rail-centre",
+        "role": "rail-section-centre-plane",
+        "datum_kind": "plane",
+        "derivation_procedure_id": null,
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "datum_id": "datum:test:rail-seat",
+        "role": "rail-seat-plane",
+        "datum_kind": "plane",
+        "derivation_procedure_id": null,
+        "lineage_id": "lineage:test:synthetic"
+      }
+    ],
+    "rail_interfaces": [
+      {
+        "interface_id": "interface:test:rail",
+        "rail_section_id": "rail:test:synthetic",
+        "seat_datum_id": "datum:test:rail-seat",
+        "gauge_face_datum_id": "datum:test:gauge-face",
+        "orientation": "gauge-to-field",
+        "procedure_ids": [
+          "procedure:test:seat"
+        ],
+        "clearance_quantity_ids": [
+          "quantity:test:clearance"
+        ],
+        "lineage_id": "lineage:test:synthetic"
+      }
+    ],
+    "components": [
+      {
+        "component_id": "component:test:base",
+        "role": "base-plinth",
+        "presence": "present",
+        "placement_datum_id": "datum:test:base",
+        "procedure_ids": [
+          "procedure:test:profile"
+        ],
+        "absence_reason": null,
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "component_id": "component:test:key",
+        "role": "key",
+        "presence": "absent",
+        "placement_datum_id": "datum:test:rail-seat",
+        "procedure_ids": [],
+        "absence_reason": "Not applicable to this artificial contract fixture.",
+        "lineage_id": "lineage:test:synthetic"
+      }
+    ],
+    "procedures": [
+      {
+        "procedure_id": "procedure:test:profile",
+        "kind": "profile",
+        "rule_id": "tracktemplate.test.rectangle-profile.v1",
+        "input_ids": [
+          "datum:test:base"
+        ],
+        "parameter_quantity_ids": [
+          "quantity:test:length-x",
+          "quantity:test:length-y"
+        ],
+        "output_ids": [
+          "result:test:base-profile"
+        ],
+        "lineage_id": "lineage:test:synthetic"
+      },
+      {
+        "procedure_id": "procedure:test:seat",
+        "kind": "relationship",
+        "rule_id": "tracktemplate.test.rail-seat-relationship.v1",
+        "input_ids": [
+          "datum:test:gauge-face",
+          "datum:test:rail-seat"
+        ],
+        "parameter_quantity_ids": [
+          "quantity:test:clearance"
+        ],
+        "output_ids": [
+          "result:test:rail-seat-relationship"
+        ],
+        "lineage_id": "lineage:test:synthetic"
+      }
+    ]
+  },
+  "manufacturing_profiles": [
+    {
+      "profile_id": "manufacturing:test:unscaled",
+      "description": "Synthetic separation record; no production process is represented.",
+      "model_scale": "1",
+      "quantities": [
+        {
+          "quantity_id": "quantity:test:printer-offset",
+          "purpose": "printer-compensation",
+          "quantity_kind": "length",
+          "source_value": "0",
+          "source_unit": "mm",
+          "canonical_value": "0",
+          "canonical_unit": "mm",
+          "uncertainty": null,
+          "lineage_id": "lineage:test:synthetic"
+        }
+      ],
+      "lineage_id": "lineage:test:synthetic"
+    }
+  ],
+  "lineage": [
+    {
+      "lineage_id": "lineage:test:synthetic",
+      "classifications": [
+        "user_design"
+      ],
+      "evidence_state": "derived",
+      "dependency_ids": [
+        "tracktemplate:test:synthetic-chair-data"
+      ],
+      "source_file_sha256s": [],
+      "derivation": {
+        "rule_id": "tracktemplate.test.synthetic-contract.v1",
+        "input_ids": []
+      },
+      "assumptions": [
+        "All dimensions and relationships are artificial and have no prototype meaning."
+      ],
+      "project_status": "project-cleared",
+      "validation_state": "accepted"
+    }
+  ],
+  "validation": {
+    "status": "passed",
+    "tolerance_profile_id": "tracktemplate.test.contract-tolerances.v1",
+    "tolerance_quantity_ids": [
+      "quantity:test:tolerance"
+    ],
+    "finding_ids": [],
+    "evidence_ids": [
+      "tests.validate-phase4-chair-definition"
+    ]
+  },
+  "acceptance": {
+    "status": "accepted",
+    "accepted_by": "Phase 4 automated contract fixture",
+    "accepted_on": "2026-07-22",
+    "decision_reference": "tests/validate_phase4_chair_definition.py"
+  },
+  "dependency_manifest": {
+    "manifest_id": "tracktemplate:test:chair-contract:manifest:1",
+    "subject_id": "tracktemplate:test:chair-contract",
+    "subject_version": "1.0.0-test",
+    "content_signature": "sha256:16d078997a8712f503f8942e9f538adc1c746b09f69e080d2e020e2b5057cd66"
+  }
+}

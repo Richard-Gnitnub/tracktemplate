@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "manifest_id": "tracktemplate:test:chair-contract:manifest:1",
+  "manifest_kind": "package",
+  "audit_scope": "core-rail-timber-path",
+  "subject": {
+    "identifier": "tracktemplate:test:chair-contract",
+    "version": "1.0.0-test",
+    "description": "Synthetic schema-contract fixture only; not a prototype chair or production definition.",
+    "package_license": "CC0-1.0"
+  },
+  "intended_uses": [
+    "private-development"
+  ],
+  "dependencies": [
+    {
+      "identifier": "tracktemplate:test:synthetic-chair-data",
+      "name": "Synthetic chair-contract test data",
+      "role": "production-input",
+      "output_affecting": true,
+      "classifications": [
+        "user_design"
+      ],
+      "source": {
+        "creator_or_supplier": "TrackTemplate test suite",
+        "locator": "tests/fixtures/chair-definition-v1-contract.json",
+        "acquired_on": "2026-07-22"
+      },
+      "license_expression": "CC0-1.0",
+      "permissions": {
+        "access": "permitted",
+        "adaptation": "permitted",
+        "production_output": "permitted",
+        "redistribution": "permitted",
+        "commercial_use": "permitted",
+        "publication": "permitted"
+      },
+      "conditions": [
+        "Test-only synthetic contract data must never be represented as prototype railway evidence."
+      ],
+      "contribution_attestation": {
+        "status": "recorded",
+        "reference": "Repository-authored synthetic fixture; tests/validate_phase4_chair_definition.py"
+      },
+      "non_copyright_review": {
+        "registered_designs": {
+          "status": "not-applicable",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-22",
+          "reviewed_by": "Phase 4 contract test",
+          "evidence": [
+            "tests/validate_phase4_chair_definition.py"
+          ],
+          "notes": "The synthetic values do not describe a product or prototype design."
+        },
+        "unregistered_designs": {
+          "status": "not-applicable",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-22",
+          "reviewed_by": "Phase 4 contract test",
+          "evidence": [
+            "tests/validate_phase4_chair_definition.py"
+          ],
+          "notes": "The synthetic values do not describe a product or prototype design."
+        },
+        "patents": {
+          "status": "not-applicable",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-22",
+          "reviewed_by": "Phase 4 contract test",
+          "evidence": [
+            "tests/validate_phase4_chair_definition.py"
+          ],
+          "notes": "The fixture exercises a data schema and makes no functional invention claim."
+        },
+        "trade_marks": {
+          "status": "not-applicable",
+          "territories": [
+            "GB"
+          ],
+          "reviewed_on": "2026-07-22",
+          "reviewed_by": "Phase 4 contract test",
+          "evidence": [
+            "tests/validate_phase4_chair_definition.py"
+          ],
+          "notes": "The fixture uses only descriptive TrackTemplate test identifiers."
+        }
+      },
+      "project_status": {
+        "status": "project-cleared",
+        "reason": "Synthetic repository-authored values are admitted only to exercise the v1 contract.",
+        "reviewed_by": "Phase 4 contract test",
+        "reviewed_on": "2026-07-22",
+        "decision_reference": "tests/validate_phase4_chair_definition.py"
+      }
+    }
+  ],
+  "non_copyright_review": {
+    "registered_designs": {
+      "status": "not-applicable",
+      "territories": [
+        "GB"
+      ],
+      "reviewed_on": "2026-07-22",
+      "reviewed_by": "Phase 4 contract test",
+      "evidence": [
+        "tests/validate_phase4_chair_definition.py"
+      ],
+      "notes": "The package is an artificial schema fixture, not prototype chair geometry."
+    },
+    "unregistered_designs": {
+      "status": "not-applicable",
+      "territories": [
+        "GB"
+      ],
+      "reviewed_on": "2026-07-22",
+      "reviewed_by": "Phase 4 contract test",
+      "evidence": [
+        "tests/validate_phase4_chair_definition.py"
+      ],
+      "notes": "The package is an artificial schema fixture, not prototype chair geometry."
+    },
+    "patents": {
+      "status": "not-applicable",
+      "territories": [
+        "GB"
+      ],
+      "reviewed_on": "2026-07-22",
+      "reviewed_by": "Phase 4 contract test",
+      "evidence": [
+        "tests/validate_phase4_chair_definition.py"
+      ],
+      "notes": "The fixture exercises serialisation and validation only."
+    },
+    "trade_marks": {
+      "status": "not-applicable",
+      "territories": [
+        "GB"
+      ],
+      "reviewed_on": "2026-07-22",
+      "reviewed_by": "Phase 4 contract test",
+      "evidence": [
+        "tests/validate_phase4_chair_definition.py"
+      ],
+      "notes": "No third-party branding is present."
+    }
+  },
+  "project_status": {
+    "status": "project-cleared",
+    "reason": "This status applies only to the synthetic test fixture and confers no status on any railway chair.",
+    "reviewed_by": "Phase 4 contract test",
+    "reviewed_on": "2026-07-22",
+    "decision_reference": "tests/validate_phase4_chair_definition.py"
+  }
+}

@@ -97,8 +97,9 @@
 - Do not run the IDE, FreeCAD automation or project tools as root. Treat every
   `sudo` or system-file change as a new authority boundary, not a normal
   development step.
-- Git protects committed files only. The repository is not positively backed
-  up until a different-device/off-site data backup and restore drill pass;
+- Git protects committed files only. The initial different-device backup and
+  restore drill for the owner-confirmed complete project-data scope passed on
+  2026-07-22, and the accepted incremental repeat/retention routine is active.
   Timeshift system snapshots do not cover the current `/home/richard`
   project data.
 - Before risky or bulk work, run `tools/repository_safety_audit.py`, establish
@@ -157,6 +158,12 @@
   scope)**, **Partial**, **Not yet effective**, or **Ineffective**. A policy or
   planned test alone is not an effective control; link executed evidence,
   state the missing assurance and name its next proof gate.
+- From Phase 4 onward, run the mandatory safety/risk panel defined in
+  `reference/PROJECT_PLAN.md` before any phase/milestone/RC closeout or named
+  authority-changing sub-gate. Record its evidence and challenge review once
+  in the open-phase evidence document. Missing evidence, an unmet due control
+  or `Do not proceed` recommendation leaves the gate open; only the project
+  owner may record the separate acceptance decision.
 - Triage new features against the agreed release-candidate scope. Do not silently expand a migration change or its acceptance gate.
 
 ## Documentation lifecycle and minimisation

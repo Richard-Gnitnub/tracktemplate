@@ -62,6 +62,7 @@ the live QA risk log. A passing audit does not silently accept an open item.
 | QA-F06 | `AGENTS.md` instructed maintainers to update a Phase 1 registry/inventory pair that the documentation lifecycle correctly freezes. That could have rewritten accepted historical evidence. | Corrected by QA-A01. |
 | QA-F07 | QA conclusions, accumulated process lessons and residual-risk linkage had no dedicated canonical controls before this tranche. | Corrected by QA-A02, QA-A03, QA-A04 and QA-A05. |
 | QA-F08 | The principal-risk catalogue named useful controls but did not assign treatments, accountable owners, deadlines or evidence-based effectiveness, so a planned policy could be mistaken for an effective control. | Corrected by QA-A07. |
+| QA-F09 | Gate closeout had no mandatory structured safety/risk challenge between completion evidence and project-owner acceptance. | Policy corrected by QA-A08; first-use effectiveness remains open as PR-22. |
 
 ## Action Matrix
 
@@ -78,6 +79,7 @@ delivery gate.
 | QA-A05 | Completed | Added [validate_quality_assurance.py](../tests/validate_quality_assurance.py) and its command to [VALIDATION.md](VALIDATION.md); it fails on broken internal file links, missing finding disposition, risk-log drift, document-role drift, the corrected instruction regressing, or immutable B14/B15 hash drift. |
 | QA-A06 | Completed | Re-ran the complete standalone and headless FreeCAD sets after the corrections and reviewed the final diff and repository hygiene. |
 | QA-A07 | Completed | Converted every principal risk in [PROJECT_PLAN.md](PROJECT_PLAN.md) into an ID-controlled treatment register and a linked preventive/detective/recovery assurance matrix with accountable owners, mandatory targets, current effectiveness and next evidence. |
+| QA-A08 | Completed | Added the mandatory Phase 4 onward safety/risk panel to [PROJECT_PLAN.md](PROJECT_PLAN.md), with minimum roles/inputs, fail-closed outcomes, one linked evidence record and a separate project-owner gate decision; operational effectiveness remains explicitly unproven under PR-22. |
 
 ## Residual risk disposition
 

@@ -8,6 +8,16 @@ import re
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PLAN_PATH = ROOT / "reference" / "PROJECT_PLAN.md"
 BAR_CHARACTERS = {"█", "▒", "░"}
+PANEL_REQUIRED_FROM_PHASE = 4
+PANEL_CLOSEOUT_RE = re.compile(
+    r"^Safety/risk panel: \[[^\]]+\]\([^)]+\) — "
+    r"`(?:Proceed|Proceed with bounded conditions)`$",
+    re.MULTILINE,
+)
+OWNER_GATE_DECISION_RE = re.compile(
+    r"^Project-owner gate decision: `Accepted \d{4}-\d{2}-\d{2}`$",
+    re.MULTILINE,
+)
 
 
 def _table_cells(line):
@@ -163,6 +173,26 @@ def _validate_milestones(text):
     )
 
 
+def _validate_closeout_panels(sections, rows):
+    for phase in range(PANEL_REQUIRED_FROM_PHASE, 12):
+        panel = PANEL_CLOSEOUT_RE.search(sections[phase])
+        owner_decision = OWNER_GATE_DECISION_RE.search(sections[phase])
+        if rows[phase]["state"].startswith("Complete"):
+            assert panel is not None, (
+                "Completed Phase {} lacks its linked safety/risk-panel outcome"
+                .format(phase)
+            )
+            assert owner_decision is not None, (
+                "Completed Phase {} lacks a separate dated project-owner decision"
+                .format(phase)
+            )
+        else:
+            assert owner_decision is None, (
+                "Open Phase {} records gate acceptance before closeout"
+                .format(phase)
+            )
+
+
 def main():
     text = PLAN_PATH.read_text(encoding="utf-8")
     sections = _phase_sections(text)
@@ -186,6 +216,7 @@ def main():
         rows[4],
         "### Current gate register",
     )
+    _validate_closeout_panels(sections, rows)
     _validate_milestones(text)
     print("Project plan progress validation passed")
 

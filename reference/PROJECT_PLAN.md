@@ -38,8 +38,9 @@ The documents have distinct responsibilities:
   4 evidence record for canonical state, signatures, persistence, migration
   and the chair-definition contract.
 - [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) owns destructive-action,
-  checkpoint, ignored-data backup and restore controls. It does not mark an
-  unconfigured backup as complete.
+  checkpoint, ignored-data backup and restore controls. Its first repository-
+  scope drill and the owner's complete project-data scope declaration are
+  recorded; repeat retention remains separately gated.
 - This document owns delivery order, phase status, decision timing, and release-candidate gates.
 
 If a proposed shortcut conflicts with railway correctness, production safety, or an accepted architectural invariant, the invariant wins unless the user explicitly approves a changed requirement.
@@ -103,6 +104,98 @@ release-candidate gate.
 - Mechanical extraction, cleanup, optimisation, behaviour changes, and legacy removal remain separate reviewable changes.
 - Apply [TESTING_POLICY.md](TESTING_POLICY.md) to every production change; test exceptions require an explicit risk and closure condition.
 
+### Mandatory safety/risk panel before gate closeout
+
+From Phase 4 onward, no phase, milestone or release-candidate gate may close
+until a safety/risk panel has reviewed the assembled evidence and issued a
+recorded recommendation. The same bounded panel is required before a sub-gate
+that would authorise copied-target family migration, behaviourally significant
+legacy retirement, project-cleared/commercial output, an irreversible external
+action, or an exception to an accepted gate. Ordinary tranche reviews do not
+need a separate panel unless they trigger one of those authority changes. One
+panel may cover coincident phase, milestone and sub-gates when its record names
+and assesses each gate; do not duplicate the same review.
+
+The panel may meet synchronously or by recorded review, but silence is not
+concurrence. Its minimum roles are:
+
+- the **project owner**, who chairs the decision and alone accepts or rejects
+  the gate;
+- the **phase/slice owner**, who presents the change, evidence, limitations and
+  proposed risk dispositions; and
+- a **QA/risk reviewer**, who performs a deliberate challenge review against
+  the implementation evidence and risk/control registers.
+
+Add railway-domain, FreeCAD/runtime, performance, provenance/licensing or
+recovery expertise when the gate affects that subject. Record any role overlap
+or lack of independence. If a due Critical risk, irreversible action or
+project-cleared rights decision is in scope, the QA/risk challenge must be
+independent of the implementation work; otherwise the recommendation is `Do
+not proceed` until an independent reviewer is appointed.
+
+The panel reviews links rather than reproducing their payloads. Its minimum
+inputs are:
+
+1. the exact source commit/diff and the owning open-phase evidence record;
+2. every exit condition and applicable item in the slice definition of done;
+3. all relevant principal and QA risks, their treatments, deadlines, control
+   effectiveness and changes since the previous review;
+4. the selected automated, FreeCAD headless, real-GUI, persistence,
+   exact-output, rollback and performance evidence under
+   [VALIDATION.md](VALIDATION.md);
+5. repository/document safety, backup prerequisites and recovery/rollback
+   evidence under [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md);
+6. applicable railway terminology, production-data provenance, licensing and
+   output-dependency evidence; and
+7. unresolved defects, unknowns, dissent, exceptions and proposed conditions.
+
+The recommendation must be exactly one of:
+
+- **Proceed** — all evidence due at this gate passes, no due risk/control is
+  ineffective or overdue, and no unaccepted gate blocker remains.
+- **Proceed with bounded conditions** — the gate evidence passes and every
+  remaining non-blocking exposure has an accepted treatment, owner and later
+  deadline. This outcome cannot waive a failed required test, a due Critical
+  risk, a data/document-corruption hazard, an unresolved rights restriction,
+  or another explicit fail-closed condition.
+- **Do not proceed** — required evidence is missing/failed, a due control is
+  ineffective, a deadline or safety prerequisite is unmet, material dissent
+  is unresolved, or the panel cannot demonstrate one of the two outcomes
+  above. Missing information defaults to this outcome.
+
+The recommendation does not itself close the gate. The project owner records a
+separate decision after reviewing the panel. An exception requires the live
+risk treatment, owner, deadline and rationale to be updated before acceptance;
+it cannot silently rewrite historical evidence or a non-waivable control.
+
+Keep one concise panel record in the owning open-phase evidence document using
+this minimum form:
+
+```text
+### Safety/risk panel — YYYY-MM-DD
+Gate and exact source:
+Participants and roles (including independence):
+Evidence reviewed (links):
+Due principal/QA risks and control-effectiveness changes:
+Safety, recovery, correctness, rights and performance conclusions:
+Unresolved dissent, unknowns or exceptions:
+Recommendation: Proceed | Proceed with bounded conditions | Do not proceed
+Conditions, owners and deadlines:
+Project-owner decision and date:
+```
+
+At phase close, link that record once from the phase section using:
+
+```text
+Safety/risk panel: [panel record](relative-path) — `Proceed`
+Project-owner gate decision: `Accepted YYYY-MM-DD`
+```
+
+Use `Proceed with bounded conditions` in the first line when applicable and
+identify the condition risk IDs in the panel record. A `Do not proceed` panel
+or absent record leaves the phase open. This requirement is prospective from
+Phase 4; it does not retroactively reopen accepted Phases 0–3.
+
 ### Documentation lifecycle
 
 - This plan is the sole project-wide live phase, progress, milestone and
@@ -163,7 +256,7 @@ an outcome count, not an overall percentage of effort.
 | 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |
 | 2 | Minimal modular foundation and validation harness | `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 3 | First parity-proven vertical slice | `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |
-| 4 | Canonical state, signatures, and persistence | `█▒█░░▒` — 2/6 | Current |
+| 4 | Canonical state, signatures, and persistence | `█▒█░█▒` — 3/6 | Current |
 | 5 | Lightweight editing prototype and renderer decision | `░░░░` — 0/4 | Not started |
 | 6 | Explicit exact-validation and export seam | `░░░░░` — 0/5 | Not started |
 | 7 | Core alignment, station, and multiple-track migration | `░░░░` — 0/4 | Not started |
@@ -716,7 +809,7 @@ separately gated.
 Status: **Current — opened by explicit project-owner instruction on
 2026-07-22.**
 
-Progress: `█▒█░░▒` — 2/6 exit conditions evidenced; two are active.
+Progress: `█▒█░█▒` — 3/6 exit conditions evidenced; two are active.
 
 ### Current gate register
 
@@ -726,8 +819,8 @@ Progress: `█▒█░░▒` — 2/6 exit conditions evidenced; two are active
 | Parameter edits invalidate exactly the affected derived results, including cold/reuse/change-back cases | Active — transition analysis | All four numerical inputs, label-only reuse and A-B-A analysis cases are covered; downstream preview, validation and export dirty propagation remain due |
 | Undo/redo and failed updates leave a valid document | Evidenced | Qualified-host create and update are one transaction each; create/update Undo/Redo, no-op history, preflight rejection, injected post-write create/update abort and unchanged valid-document assertions pass |
 | Preview and exact geometry can be deleted and regenerated solely from canonical state | Pending | Requires later derived presentation/exact seams; neither is persisted by the opening tranche |
-| A chair-definition package round-trips deterministically and rejects missing, corrupt, unsupported or ambiguous required data | Pending | Cross-cutting neutral schema, provenance/licensing fields and fail-closed package tests remain due before production chair construction |
-| The supported schema/version window is agreed and tested | Active — provisional transition and ingress readers | Exact transition schema v1 plus read-only B14, B15 and accepted mixed outer-window detection are tested; no legacy family is write-qualified, and owner agreement plus chair/family migration windows remain due |
+| A chair-definition package round-trips deterministically and rejects missing, corrupt, unsupported or ambiguous required data | Evidenced | Neutral chair-package v1 and its non-prototype fixture prove deterministic exact-decimal round-trip, fixed frame/datums, component/procedure/interface/manufacturing separation, lineage, signed manifest linkage and recoverable failure cases; Phase 9 production admission remains disabled and S1 evidence/values remain blocked; see [PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md) |
+| The supported schema/version window is agreed and tested | Active — provisional transition, chair-package and ingress readers | Exact transition v1, neutral chair-package v1 plus read-only B14, B15 and accepted mixed outer-window detection are tested; no legacy family is write-qualified, and explicit project-owner agreement plus family migration schemas remain due |
 
 ### Goal
 
@@ -1115,6 +1208,7 @@ owner remains accountable for ensuring its gate is not crossed.
 | PR-19 | High | Open | Remove | The distributed Addon artifact could drift from authoritative modular source. | Phase 10 packaging/build owner; Phase 11 release owner. | Remove drift by reproducible assembly and comparison before Phase 10 beta exit and reproduce the frozen artifact twice at Phase 11. |
 | PR-20 | Medium | Open | Mitigate | Feature additions could destabilise or silently expand the migration. | Project owner owns RC scope; current phase owner performs tranche triage. | Mitigate at every tranche/phase close, freeze feature scope at Phase 10 beta exit, and allow only release blockers/defects through Phase 11. |
 | PR-21 | High | Open | Mitigate | Reference-source provenance or licence could later become ambiguous. | Licensing/provenance owner; project owner accepts source and publication evidence. | Mitigate on every source/dependency change, re-audit production lineage at Phase 9, and verify the frozen artifact at Phase 11. |
+| PR-22 | High | Open | Remove | A gate could close without a structured safety/risk challenge, allowing incomplete evidence or an ineffective control to escape scrutiny. | Current phase/slice owner presents; QA/risk reviewer challenges; project owner chairs and decides. | Remove the exposure at Phase 4 closeout and every later phase/milestone/RC gate, and before each authority-changing sub-gate named in the panel policy. |
 
 ### Principal control assurance matrix
 
@@ -1132,7 +1226,7 @@ owner remains accountable for ensuring its gate is not crossed.
 | PR-10 | **P:** inventory active definitions/callers before extraction. **D:** AST inventory, caller-closure and structural validators. **R:** retain an explicit captured legacy rollback until parity/removal. | Partial | [PHASE1_INVENTORY.md](PHASE1_INVENTORY.md) and [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md) make current duplication visible, but legacy patches remain. **Next proof:** each retirement record and the Phase 10 no-unowned-patch result. |
 | PR-11 | **P:** require a cohesive boundary and forbid speculative modules. **D:** dependency/cycle/warning metrics plus separate performance evidence. **R:** remove speculative modules or roll back an extraction. | Effective (current scope) | The current modular structure is clean and [QUALITY_ASSURANCE.md](QUALITY_ASSURANCE.md) records the audit; this is not a runtime-speed claim. **Next proof:** per-slice structural/performance review and Phase 10 legacy consolidation. |
 | PR-12 | **P:** one fact owner, link-first updates and frozen accepted history. **D:** QA link/risk validator and phase-progress validation. **R:** dated factual correction or archive/retire superseded controls. | Effective (current scope) | [AGENTS.md](../AGENTS.md) owns the lifecycle and [QUALITY_ASSURANCE.md](QUALITY_ASSURANCE.md) records zero broken file targets plus the corrected contradiction. **Next proof:** review at every phase close and the Phase 10/11 documentation audits. |
-| PR-13 | **P:** destructive-action prohibitions, sandboxing, pushed checkpoints and copied documents. **D:** safety audit, hashes and Git/remote checks. **R:** GitHub recovery plus independent backup/restore. | Partial | Local/Git controls pass, but [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) records no independent backup or restore drill. **Next proof:** QA-R01 backup/restore evidence before Phase 4 migration writes and the Phase 11 recovery rehearsal. |
+| PR-13 | **P:** destructive-action prohibitions, sandboxing, pushed checkpoints and copied documents. **D:** safety audit, hashes and Git/remote checks. **R:** GitHub recovery plus independent backup/restore. | Effective (current scope) | Local/Git controls pass; the owner declared the repository to contain all valuable project files; and the [backup, restore and incremental-repeat record](backup-records/2026-07-22-initial-repository-backup-restore.md) passed on a separate USB device under the accepted cadence, closing QA-R01. **Next proof:** maintain the weekly/triggered snapshots and monthly drill, review currency at each gate, and repeat the frozen recovery rehearsal at Phase 11. |
 | PR-14 | **P:** renderer-neutral prototype and no production choice without evidence. **D:** real-GUI selection/edit/undo/persistence/resource tests. **R:** reject the candidate and retain the accepted legacy path. | Not yet effective | [ARCHITECTURE.md](ARCHITECTURE.md) and the Phase 5 gate define the controls, but no renderer prototype has exercised them. **Next proof:** the complete Phase 5 decision record and project-owner acceptance. |
 | PR-15 | **P:** require both edit-only and edit-through-export measurement. **D:** controlled cold/warm timing, memory, object/recompute and parity evidence. **R:** reject/optimise a seam that only defers cost. | Partial | [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md) and the Phase 1 boundary contract control method, but the full modular target pipeline is unmeasured. **Next proof:** Phase 6–9 end-to-end reports, Phase 10 budgets and Phase 11 repeated passes. |
 | PR-16 | **P:** central complete signatures. **D:** miss/reuse/input-change/change-back and stale-result tests. **R:** discard stale results and recompute from canonical state. | Partial | The transition slice passes these cases in [PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md), but later input families are not migrated. **Next proof:** equivalent evidence for every signed Phase 4–9 slice and the Phase 11 matrix. |
@@ -1141,6 +1235,7 @@ owner remains accountable for ensuring its gate is not crossed.
 | PR-19 | **P:** reproducible Addon assembly from authoritative source. **D:** source/artifact comparison, hashes, clean install/update and double-build checks. **R:** reject and rebuild a drifting artifact. | Not yet effective | The product form is fixed in [ARCHITECTURE.md](ARCHITECTURE.md), but Phase 10 packaging has not begun. **Next proof:** Phase 10 clean Addon/package parity and Phase 11 two-build reproducibility. |
 | PR-20 | **P:** explicit RC scope and gate-based feature triage. **D:** plan/diff/phase-close review. **R:** defer or back out work that is not required for correctness. | Effective (current scope) | [PROJECT_PLAN.md](PROJECT_PLAN.md) and [AGENTS.md](../AGENTS.md) own scope and acceptance; the QA audit found no silent phase advance. **Next proof:** continued tranche reviews, Phase 10 feature freeze and Phase 11 blocker-only discipline. |
 | PR-21 | **P:** preserve exact source URL, checksum, archive decision, licence and notices. **D:** provenance/licensing validators and output-lineage audit. **R:** quarantine/block ambiguous source or dependency status. | Effective (current scope) | [PROVENANCE.md](PROVENANCE.md), [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md), and the retained archive checksum currently agree. **Next proof:** review every source change, then Phase 9 and Phase 11 frozen-lineage audits. |
+| PR-22 | **P:** mandatory timing, roles, evidence inputs and exact panel outcomes before closeout. **D:** QA-policy and prospective progress validation plus recorded challenge review. **R:** default to `Do not proceed`, leave/reopen the gate and update due risks before reconsideration. | Not yet effective | The panel policy and guards now exist in [PROJECT_PLAN.md](PROJECT_PLAN.md) and [VALIDATION.md](VALIDATION.md), but no prospective panel has yet executed. **Next proof:** the linked Phase 4 panel record, recommendation and separate project-owner decision; repeat at every later applicable gate. |
 
 ### QA audit risk log
 
@@ -1154,7 +1249,7 @@ other automatically and the stricter deadline controls.
 
 | ID | Severity | State | Treatment | Residual finding and present boundary | Accountable owner | Target end-state and deadline | Required resolution and objective closure evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| QA-R01 | High | Open | Mitigate | No independent different-device/off-site project backup or tested restore protects ignored evidence, working FCStd files and production output. Until closure, work remains limited to pushed checkpoints and copied/disposable documents. | Project owner selects and maintains the destination; Phase 4 implementation/QA owner configures verification and the restore drill. | Mitigated before Phase 4 enables any copied-target entity-family migrator or any operation that could affect the sole operator copy; absolute deadline Phase 4 exit. | Select and mount an independent destination; complete a versioned backup covering `.git`, ignored evidence, valuable FCStd/output and the source archive; run the location audit; restore into a new empty directory; verify expected HEAD, archive checksum, one raw-evidence item and one representative FCStd in the qualified runtime. **Closure evidence:** a non-sensitive dated backup/restore record accepted by the project owner under [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). |
+| QA-R01 | High | Closed | Mitigate | Closed 2026-07-22: a different-device snapshot and restore of the owner-confirmed complete project-data scope passed and was owner-accepted; the accepted repeat/retention routine then passed a second non-overwriting incremental snapshot. | Project owner maintains the declared complete data scope and retention authority; current implementation/QA owner verifies cadence and later drills. | Mitigated before Phase 4 copied-target entity-family migration; maintain through every later phase and prove the frozen route again at Phase 11. | **Closure evidence:** Closed 2026-07-22 — the [backup, restore and repeat record](backup-records/2026-07-22-initial-repository-backup-restore.md) records the complete scope declaration, separate-device location, two dated sets, empty-directory restore, exact HEAD/archive/raw-evidence/FreeCAD checks, efficient hard-linked repeat, owner acceptance and adopted cadence. A missed cadence, failed run or scope change reopens this risk or creates a successor entry. |
 | QA-R02 | Medium | Open | Remove | The validator estate is locally invoked; GitHub `main` has no required pull-request/status-check gate and the repository has no CI workflow. Existing force-push/deletion protection remains only a partial control. | Phase 10 integration owner delivers CI; project owner enables and accepts the GitHub branch rule. | Removed before Phase 10 beta exit; the frozen release matrix is rerun at Phase 11. | Add a tracked clean-checkout CI workflow for the complete standalone matrix and any host checks supportable by the runner; require its successful status and pull-request path for `main`; retain separately controlled FreeCAD GUI/performance gates where CI cannot execute them. **Closure evidence:** two successful clean runs, one deliberate failing-change demonstration on a disposable branch/PR, branch-protection evidence, and the Phase 10 matrix result. |
 | QA-R03 | High | Open | Remove | Release-critical GUI, migration-family, exact-output, chair and end-to-end workflows remain partial, blocked or manually evidenced despite strong accepted-slice coverage. Headless success does not close a real-GUI gate. | The named family owner in [phase1-workflow-coverage.json](contracts/phase1-workflow-coverage.json) owns each gap; each phase owner owns its exit; the Phase 10/11 QA owner owns final completeness. | Remove each gap at its applicable Phase 4–9 exit, complete the aggregated matrix by Phase 10 beta exit, and leave no release-critical workflow represented only by an unperformed test at Phase 11. | Convert every owned gap into the proportionate standalone, headless, real-GUI, persistence, rollback, exact-output and performance evidence required by [VALIDATION.md](VALIDATION.md) and the slice definition of done; record results once in the owning open-phase evidence. **Closure evidence:** every gap in the frozen ownership baseline has accepted evidence linked from its owning phase record, the Phase 10 matrix has no untriaged failure, and the Phase 11 clean qualification has no unperformed release-critical workflow. |
 | QA-R04 | High | Open | Mitigate | Complete modular edit-through-export performance is not yet measured and numerical interaction/end-to-end budgets are not frozen. Deferred geometry could otherwise hide rather than remove operator cost. | The performance owner for each slice captures evidence; the Phase 10 integration owner freezes budgets; the project owner accepts the budgets and Phase 11 result. | Mitigated with decision evidence at each applicable Phase 5–9 exit; numerical budgets frozen by Phase 10 beta exit; final repeated budget pass required at Phase 11. | Run equivalent cold/warm edit-only and edit-through-export recipes with fixed source, environment and cache state; report medians/ranges, CPU, memory, object/recompute counts and output parity; optimise only behind correctness evidence. **Closure evidence:** linked Phase 5–9 reports, accepted numerical budgets in Phase 10, and repeated Phase 11 runs within budget without hidden deferred cost. |

@@ -3,8 +3,12 @@
 Status: **active project-control policy adopted on 2026-07-22. Timeshift is
 configured for scheduled system snapshots but a recent snapshot/restore has
 not been verified; tracked-source recovery and repository safety checks are
-active; an independent project-data backup remains blocked until an external
-destination is selected.**
+active; an ext4 removable USB destination on a separate physical device has a
+passed initial repository snapshot and restore drill, accepted by the project
+owner on 2026-07-22. The owner confirmed that all valuable project files are
+inside the repository and no external project files require backup, and
+accepted the repeat/retention routine. Its incremental second-snapshot proof
+passed, closing QA-R01 on 2026-07-22. The ongoing cadence remains mandatory.**
 
 ## Purpose
 
@@ -26,27 +30,64 @@ versioned backup and a tested restore.
 | Local Git history | Active | Protects committed content; it does not protect untracked or ignored files |
 | GitHub `main` | Active and verified 2026-07-22 | Normal fast-forward pushes remain allowed; administrator enforcement is active; force pushes and branch deletion are blocked; pull requests and status checks are not yet required |
 | GitHub remote history | Active | Off-machine copy of pushed Git objects; not a complete backup of ignored assets and not independent of account/repository administration |
-| Independent project-data backup | **Not configured — owner action required** | No separate external disk or other destination is currently mounted or accepted |
-| Restore drill | **Not yet performed** | Must follow configuration of the independent data backup |
+| Independent project-data backup | **Operational for the complete declared project-data scope** | A dated, non-overwriting snapshot on a separate ext4 USB covers `.git`, ignored evidence, repository FCStd fixtures and the source archive; the owner confirmed no valuable external project files require backup |
+| Restore drill | **Passed and owner-accepted for the complete declared scope on 2026-07-22** | See the [backup, restore and repeat record](backup-records/2026-07-22-initial-repository-backup-restore.md) |
+| Repeat and retention | **Active and verified 2026-07-22** | The accepted cadence and hard-linked incremental retention were proved by a second complete snapshot; QA-R01 is closed |
 
-## Owner decision and temporary risk
+## Initial implementation and remaining risk
 
-On 2026-07-22 the project owner confirmed that no separate storage device is
-currently available, intends to purchase one, and authorised development to
-continue meanwhile. This is an accepted temporary operational risk, not a
-positive backup or restore result. The audit must continue to report the
-independent target, completed backup and restore drill as open.
+On 2026-07-22 the project owner first authorised bounded development while the
+removable device was prepared, then reported that the reformatted device was
+ready. The destination audit passed, a new dated repository snapshot completed
+without deleting existing destination content, and a complete restore into an
+empty temporary directory passed the checks recorded in the
+[dated evidence](backup-records/2026-07-22-initial-repository-backup-restore.md).
 
-Until the risk closes:
+That is positive recovery evidence for the complete valuable project-data
+scope declared by the owner on 2026-07-22. The project owner accepted the
+successful repository-scope backup and restore drill and confirmed that no
+valuable project files outside the repository require backup. Retention is
+now represented by two complete dated sets. The owner accepted the repeat/
+retention routine below on 2026-07-22, and its incremental second-snapshot
+proof passed exact comparison while adding only changed payload storage. The
+audit may therefore report QA-R01 closed for the current declared scope; a
+missed cadence, failed run or scope change must reopen the exposure rather than
+rely on this historical result.
+
+The backup gate is closed for the current declared scope, but these operating
+controls remain mandatory:
 
 - establish and push a clean Git checkpoint before each risky tranche;
 - do not perform an exceptional destructive action against project or operator
   data;
 - keep automation on copied/disposable FCStd inputs;
 - avoid accumulating a sole irreplaceable result under an ignored path; and
-- review this gap at every phase closeout and close it before Phase 4 document
-  migration work or any earlier operation that could affect the sole copy of
-  an operator document.
+- review backup currency and declared scope at every phase closeout.
+
+## Backup cadence and retention
+
+The project owner accepted this routine on 2026-07-22:
+
+- create a new dated, non-overwriting snapshot before risky migration work and
+  after an accepted tranche that adds valuable local evidence;
+- while development is active, complete at least one successful snapshot per
+  week even when neither trigger occurs;
+- retain the initial accepted snapshot plus at least four recent successful
+  snapshots;
+- never delete snapshots automatically; removing an older exact set requires
+  project-owner authority after a newer set and its evidence are verified;
+- perform an empty-directory restore drill at least monthly and again at the
+  Phase 11 gate; and
+- flush, safely unmount and store the USB separately from the computer between
+  backup runs.
+
+Incremental snapshots may hard-link unchanged files on the USB, but each dated
+directory must present a complete repository tree and must never overwrite or
+mutate an accepted earlier set. The verified repeat is recorded in the
+[2026-07-22 backup and restore record](backup-records/2026-07-22-initial-repository-backup-restore.md).
+Missing the cadence, changing the valuable-data scope or failing a later run
+reopens QA-R01 or creates a successor risk; historical evidence must not be
+rewritten.
 
 Authoritative background: Linux Mint documents that Timeshift does not include
 personal data; GitHub documents branch protection against force push and
@@ -158,6 +199,12 @@ checkout. The drill must verify:
 
 After the first successful drill, record only non-sensitive evidence in this
 document or a linked dated report. A failed drill keeps backup readiness open.
+
+The first repository-scope drill is recorded in
+[2026-07-22-initial-repository-backup-restore.md](backup-records/2026-07-22-initial-repository-backup-restore.md).
+Its remaining scope and acceptance conditions are controlling; the report does
+not extend protection beyond the complete project-data scope declared by the
+owner.
 
 ## Incident response
 

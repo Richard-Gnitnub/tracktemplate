@@ -1,0 +1,901 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:tracktemplate:chair-definition-package:1",
+  "title": "TrackTemplate neutral chair-definition package v1",
+  "description": "Adapter-neutral declarative chair package. The JSON Schema supplies the portable structural contract; tracktemplate.application.chair_definition applies exact-unit, reference, ordering, signature, lineage and fail-closed admission rules.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "content_signature",
+    "package",
+    "definition",
+    "manufacturing_profiles",
+    "lineage",
+    "validation",
+    "acceptance",
+    "dependency_manifest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "tracktemplate.chair-definition-package"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "content_signature": {
+      "$ref": "#/$defs/signature"
+    },
+    "package": {
+      "$ref": "#/$defs/package"
+    },
+    "definition": {
+      "$ref": "#/$defs/definition"
+    },
+    "manufacturing_profiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/manufacturingProfile"
+      }
+    },
+    "lineage": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/lineage"
+      }
+    },
+    "validation": {
+      "$ref": "#/$defs/validation"
+    },
+    "acceptance": {
+      "$ref": "#/$defs/acceptance"
+    },
+    "dependency_manifest": {
+      "$ref": "#/$defs/manifestLink"
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": ".*\\S.*"
+    },
+    "decimal": {
+      "type": "string",
+      "pattern": "^-?(?:0|[1-9][0-9]*)(?:\\.[0-9]+)?$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "identifierArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/identifier"
+      }
+    },
+    "stringArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "access",
+        "adaptation",
+        "production_output",
+        "redistribution",
+        "commercial_use",
+        "publication"
+      ],
+      "properties": {
+        "access": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "adaptation": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "production_output": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "redistribution": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "commercial_use": {
+          "$ref": "#/$defs/permissionStatus"
+        },
+        "publication": {
+          "$ref": "#/$defs/permissionStatus"
+        }
+      }
+    },
+    "permissionStatus": {
+      "enum": [
+        "permitted",
+        "restricted",
+        "reference-only",
+        "unknown",
+        "not-applicable"
+      ]
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package_id",
+        "package_version",
+        "license_expression",
+        "intended_uses",
+        "permissions",
+        "project_status"
+      ],
+      "properties": {
+        "package_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "package_version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "license_expression": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "intended_uses": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "private-development",
+              "public-redistribution",
+              "commercial-production",
+              "publication",
+              "physical-production"
+            ]
+          }
+        },
+        "permissions": {
+          "$ref": "#/$defs/permissions"
+        },
+        "project_status": {
+          "$ref": "#/$defs/projectStatus"
+        }
+      }
+    },
+    "projectStatus": {
+      "enum": [
+        "project-cleared",
+        "restricted",
+        "reference-only",
+        "unknown"
+      ]
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frame_id",
+        "handedness",
+        "x_axis",
+        "y_axis",
+        "z_axis",
+        "origin"
+      ],
+      "properties": {
+        "frame_id": {
+          "const": "chair-local-right-handed-v1"
+        },
+        "handedness": {
+          "const": "right"
+        },
+        "x_axis": {
+          "const": "nominal-rail-direction"
+        },
+        "y_axis": {
+          "const": "gauge-to-field"
+        },
+        "z_axis": {
+          "const": "up-from-base-mounting-plane"
+        },
+        "origin": {
+          "const": "longitudinal-chair-centre-plane/rail-section-centre-plane/base-mounting-plane"
+        }
+      }
+    },
+    "uncertainty": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/decimal"
+        },
+        "unit": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "quantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quantity_id",
+        "purpose",
+        "quantity_kind",
+        "source_value",
+        "source_unit",
+        "canonical_value",
+        "canonical_unit",
+        "uncertainty",
+        "lineage_id"
+      ],
+      "properties": {
+        "quantity_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "purpose": {
+          "$ref": "#/$defs/identifier"
+        },
+        "quantity_kind": {
+          "enum": [
+            "length",
+            "angle",
+            "dimensionless"
+          ]
+        },
+        "source_value": {
+          "$ref": "#/$defs/decimal"
+        },
+        "source_unit": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "canonical_value": {
+          "$ref": "#/$defs/decimal"
+        },
+        "canonical_unit": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "uncertainty": {
+          "$ref": "#/$defs/uncertainty"
+        },
+        "lineage_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "datum": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "datum_id",
+        "role",
+        "datum_kind",
+        "derivation_procedure_id",
+        "lineage_id"
+      ],
+      "properties": {
+        "datum_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "role": {
+          "enum": [
+            "base-mounting-plane",
+            "longitudinal-chair-centre-plane",
+            "rail-section-centre-plane",
+            "rail-seat-plane",
+            "gauge-face-datum",
+            "key-direction",
+            "loose-component-direction",
+            "component-local-frame",
+            "other"
+          ]
+        },
+        "datum_kind": {
+          "enum": [
+            "point",
+            "axis",
+            "plane",
+            "direction",
+            "frame"
+          ]
+        },
+        "derivation_procedure_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/identifier"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lineage_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "procedure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "procedure_id",
+        "kind",
+        "rule_id",
+        "input_ids",
+        "parameter_quantity_ids",
+        "output_ids",
+        "lineage_id"
+      ],
+      "properties": {
+        "procedure_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": [
+            "profile",
+            "cross-section",
+            "radius",
+            "slope",
+            "relationship",
+            "symmetry",
+            "placement",
+            "assembly-constraint"
+          ]
+        },
+        "rule_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "input_ids": {
+          "$ref": "#/$defs/identifierArray"
+        },
+        "parameter_quantity_ids": {
+          "$ref": "#/$defs/identifierArray"
+        },
+        "output_ids": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/identifierArray"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "lineage_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component_id",
+        "role",
+        "presence",
+        "placement_datum_id",
+        "procedure_ids",
+        "absence_reason",
+        "lineage_id"
+      ],
+      "properties": {
+        "component_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "role": {
+          "$ref": "#/$defs/identifier"
+        },
+        "presence": {
+          "enum": [
+            "present",
+            "absent"
+          ]
+        },
+        "placement_datum_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "procedure_ids": {
+          "$ref": "#/$defs/identifierArray"
+        },
+        "absence_reason": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lineage_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "presence": {
+                "const": "present"
+              }
+            },
+            "required": [
+              "presence"
+            ]
+          },
+          "then": {
+            "properties": {
+              "procedure_ids": {
+                "minItems": 1
+              },
+              "absence_reason": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "procedure_ids": {
+                "maxItems": 0
+              },
+              "absence_reason": {
+                "$ref": "#/$defs/nonEmptyString"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "railInterface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interface_id",
+        "rail_section_id",
+        "seat_datum_id",
+        "gauge_face_datum_id",
+        "orientation",
+        "procedure_ids",
+        "clearance_quantity_ids",
+        "lineage_id"
+      ],
+      "properties": {
+        "interface_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "rail_section_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "seat_datum_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "gauge_face_datum_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "orientation": {
+          "const": "gauge-to-field"
+        },
+        "procedure_ids": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/identifierArray"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "clearance_quantity_ids": {
+          "$ref": "#/$defs/identifierArray"
+        },
+        "lineage_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "definition_id",
+        "definition_version",
+        "prototype_designation",
+        "description",
+        "lineage_id",
+        "canonical_length_unit",
+        "frame",
+        "quantities",
+        "datums",
+        "rail_interfaces",
+        "components",
+        "procedures"
+      ],
+      "properties": {
+        "definition_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "definition_version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "prototype_designation": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "lineage_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "canonical_length_unit": {
+          "const": "mm"
+        },
+        "frame": {
+          "$ref": "#/$defs/frame"
+        },
+        "quantities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/quantity"
+          }
+        },
+        "datums": {
+          "type": "array",
+          "minItems": 5,
+          "items": {
+            "$ref": "#/$defs/datum"
+          }
+        },
+        "rail_interfaces": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/railInterface"
+          }
+        },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/component"
+          }
+        },
+        "procedures": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/procedure"
+          }
+        }
+      }
+    },
+    "manufacturingProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id",
+        "description",
+        "model_scale",
+        "quantities",
+        "lineage_id"
+      ],
+      "properties": {
+        "profile_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "model_scale": {
+          "$ref": "#/$defs/decimal"
+        },
+        "quantities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/quantity"
+          }
+        },
+        "lineage_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lineage_id",
+        "classifications",
+        "evidence_state",
+        "dependency_ids",
+        "source_file_sha256s",
+        "derivation",
+        "assumptions",
+        "project_status",
+        "validation_state"
+      ],
+      "properties": {
+        "lineage_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "classifications": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "engineering_method",
+              "engineering_fact",
+              "project_measurement",
+              "project_derivation",
+              "user_design",
+              "templot_source_expression",
+              "templot_reference_data",
+              "templot_media_output",
+              "third_party_evidence",
+              "generated_output"
+            ]
+          }
+        },
+        "evidence_state": {
+          "enum": [
+            "measured",
+            "factual",
+            "fitted",
+            "derived",
+            "inferred",
+            "unresolved",
+            "comparison-only"
+          ]
+        },
+        "dependency_ids": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/identifierArray"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "source_file_sha256s": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sha256"
+          }
+        },
+        "derivation": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/derivation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assumptions": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "project_status": {
+          "$ref": "#/$defs/projectStatus"
+        },
+        "validation_state": {
+          "enum": [
+            "accepted",
+            "blocked",
+            "rejected",
+            "unreviewed"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "evidence_state": {
+                "const": "derived"
+              }
+            },
+            "required": [
+              "evidence_state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "derivation": {
+                "$ref": "#/$defs/derivation"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "input_ids"
+      ],
+      "properties": {
+        "rule_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "input_ids": {
+          "$ref": "#/$defs/identifierArray"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "tolerance_profile_id",
+        "tolerance_quantity_ids",
+        "finding_ids",
+        "evidence_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "blocked",
+            "not-run"
+          ]
+        },
+        "tolerance_profile_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "tolerance_quantity_ids": {
+          "$ref": "#/$defs/identifierArray"
+        },
+        "finding_ids": {
+          "$ref": "#/$defs/identifierArray"
+        },
+        "evidence_ids": {
+          "$ref": "#/$defs/identifierArray"
+        }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "accepted_by",
+        "accepted_on",
+        "decision_reference"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "accepted",
+            "not-accepted"
+          ]
+        },
+        "accepted_by": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accepted_on": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision_reference": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "accepted"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "accepted_by": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "accepted_on": {
+                "type": "string",
+                "format": "date"
+              },
+              "decision_reference": {
+                "$ref": "#/$defs/nonEmptyString"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "accepted_by": {
+                "type": "null"
+              },
+              "accepted_on": {
+                "type": "null"
+              },
+              "decision_reference": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "manifestLink": {
+      "type": "object",
+      "description": "Directed package-to-manifest integrity link. A v1 linked manifest omits optional subject.content_sha256 to avoid a reciprocal whole-package hash cycle.",
+      "additionalProperties": false,
+      "required": [
+        "manifest_id",
+        "subject_id",
+        "subject_version",
+        "content_signature"
+      ],
+      "properties": {
+        "manifest_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "subject_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "subject_version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "content_signature": {
+          "$ref": "#/$defs/signature"
+        }
+      }
+    }
+  }
+}
