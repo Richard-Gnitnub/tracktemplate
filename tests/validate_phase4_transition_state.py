@@ -404,9 +404,9 @@ def _validate_source_and_phase_controls():
         encoding="utf-8"
     )
     assert "Phase 4 is current" in plan
-    assert "0/6" in plan
+    assert "PHASE4_CANONICAL_STATE.md" in plan
     assert "Provisional transition schema v1" in evidence
-    assert "No Phase 4 exit condition is claimed complete" in evidence
+    assert "Current Phase 4 gate disposition" in evidence
 
 
 def validate():

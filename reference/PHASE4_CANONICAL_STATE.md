@@ -1,7 +1,8 @@
 # Phase 4 Canonical State, Signatures, and Persistence Evidence
 
 Status: **Active.** The project owner explicitly instructed the project to
-start Phase 4 on 2026-07-22. No Phase 4 exit condition is claimed complete.
+start Phase 4 on 2026-07-22. Two of six Phase 4 exit conditions now have
+recorded technical evidence; phase closeout and owner acceptance remain open.
 
 ## Bounded opening tranche
 
@@ -107,8 +108,59 @@ The new package locations are the minimum justified by this tranche:
 
 The application layer depends inward on the two transition domain modules.
 Neither domain nor application imports FreeCAD, Part, Qt, pivy or a third-party
-package. The structural analyser now recognises this one real application
-boundary; no adapter, presentation, UI or chair package tree has been created.
+package. The opening tranche created no adapter, presentation, UI or chair
+package tree. The persistence tranche below adds only its now-proven concrete
+FreeCAD boundary.
+
+## FreeCAD persistence tranche
+
+`tracktemplate.adapters.freecad.transition_state` now provides the smallest
+qualified-host adapter required by the selected slice. It creates one logical
+`App::FeaturePython` with no `Shape` and exactly two project properties:
+
+| Property | Purpose |
+| --- | --- |
+| `TrackTemplateRecordType` | Read-only discovery index equal to `tracktemplate.transition-state` |
+| `TrackTemplateStateJSON` | Read-only deterministic schema-v1 canonical intent and accepted analysis |
+
+The schema/version remains inside the payload. The index does not contain or
+replace stable identity. Identity resolution parses the canonical payload and
+uses `transition_id`; FreeCAD object name, label and document order are never
+identity inputs. Names are only deterministic adapter hints and labels remain
+operator-editable metadata. Foreign objects and other Track Template record
+types are ignored and preserved.
+
+Read-only inspection does not require write authority. Construction of
+`FreeCADTransitionStore`, and therefore every create/update, requires the
+qualification record returned by the existing authoritative bootstrap. The
+adapter rejects unqualified evidence, evidence for a different live FreeCAD
+version and documents with Undo disabled before mutation.
+
+Create and changed update each open and commit exactly one FreeCAD transaction.
+An exact no-op creates no history entry. Inputs, ownership, stable identity,
+duplicate identity and serialisability are preflighted before the transaction.
+Any exception after object or property mutation aborts the transaction; an
+abort failure is separately reported as potentially mutating and non-
+recoverable. No document recompute, `Part` import, shape, renderer or exact
+geometry is introduced.
+
+The disposable qualified-FreeCAD fixture proves:
+
+- create and update each add exactly one Undo unit;
+- update Undo/Redo restores the exact prior/new canonical payload while an
+  operator-modified label remains independent;
+- create Undo removes the logical object and Redo restores its properties and
+  canonical state, while the undone stale object handle is rejected;
+- injected failures after a property write abort both create and update with
+  unchanged object count, payload and history;
+- invalid identity, duplicate identity, missing state, unsupported future
+  schema and disabled Undo fail before an authorised write;
+- stale or corrupt derived analysis is discarded on read without rewriting the
+  payload and can be explicitly reanalysed and committed;
+- one current transition survives real FCStd save/close/reopen with exact JSON,
+  analysis, stable identity, `App::FeaturePython` type/name, read-only property
+  modes and operator label; and
+- foreign and other-record-type objects survive unchanged.
 
 ## Validation evidence
 
@@ -125,7 +177,7 @@ Observed on 2026-07-22 from the repository root:
 | Check | Result |
 | --- | --- |
 | Parse B14, B15, B16 launcher and all new/changed Python | Passed |
-| Every `tests/validate_*.py` standalone validator | 33/33 passed |
+| Every `tests/validate_*.py` standalone validator | 34/34 passed |
 | Dedicated Phase 4 canonical-state validator | Passed |
 | Deterministic modular structure | Passed; declared application boundary, permitted inward edges, no cycle, forbidden domain dependency or warning |
 | Isolated API/domain/application import with FreeCAD, Part, Qt and pivy blocked | Passed; no host import attempted |
@@ -133,6 +185,7 @@ Observed on 2026-07-22 from the repository root:
 | Accepted Phase 2 FreeCAD loading smoke | Passed |
 | Retained Phase 3 FreeCAD routing smoke | Passed |
 | Phase 4 FreeCAD 1.1 canonical-state smoke | Passed; exact round-trip and zero document mutation |
+| Phase 4 qualified FreeCAD persistence lifecycle | Passed; disposable create/update, Undo/Redo, abort, stale/corrupt rejection and FCStd save/reopen |
 
 The dedicated qualified-FreeCAD smoke is intentionally limited to type/runtime
 compatibility, exact JSON round-trip and zero document mutation; it is not
@@ -144,21 +197,18 @@ alter an operator route, document, renderer, exact geometry or export path.
 
 | Exit condition | Current disposition |
 | --- | --- |
-| Selected-slice save/reopen without result or identity drift | Active: deterministic adapter-neutral round-trip exists; FreeCAD properties and FCStd save/reopen remain due |
+| Selected-slice save/reopen without result or identity drift | Evidenced: exact canonical payload, result and identity pass disposable qualified-FreeCAD save/close/reopen |
 | Exact parameter invalidation including cold/reuse/change-back | Active: transition analysis cases are directly tested; downstream preview, exact-validation and export propagation remain due |
-| Undo/redo and failed updates leave a valid document | Pending: requires the FreeCAD adapter and one-command transaction boundary |
+| Undo/redo and failed updates leave a valid document | Evidenced: atomic create/update, no-op, Undo/Redo, preflight rejection and injected post-write abort all pass |
 | Preview/exact geometry can be deleted and regenerated from canonical state | Pending: no Phase 5/6 renderer or exact adapter is being invented here |
 | Deterministic, fail-closed chair-definition package | Pending: the cross-cutting schema must be defined before a production builder, with S1 evidence still blocked |
 | Supported schema/version window agreed and tested | Active: exact transition v1 development reader/writer is tested; owner agreement and chair/legacy windows remain due |
 
 ## Remaining risks and next bounded tranche
 
-- A JSON round-trip is not a FreeCAD save/reopen result. The next persistence
-  tranche should add the smallest qualified-host adapter for this record,
-  storing one compact property on a copied/disposable document and proving
-  transaction, Undo/Redo, save/reopen and stale-result recovery.
-- Stable identity generation and mapping to a logical FreeCAD object are not
-  yet implemented. The adapter must not use object order or labels as identity.
+- Stable identity mapping to one logical transition object is implemented, but
+  identity generation remains the responsibility of the later owning entity
+  workflow; adapters must not invent IDs from object order or labels.
 - The B14/B15 detector and family-gated copied-target migration remain due. A
   transition-only adapter must not imply that a whole legacy document is
   migratable.

@@ -248,6 +248,24 @@ boundary. The qualified-FreeCAD smoke proves only runtime/type compatibility,
 the same exact JSON round-trip and zero document mutation. It is not FreeCAD
 property, transaction, Undo/Redo or FCStd save/reopen evidence.
 
+Phase 4 qualified FreeCAD transition persistence:
+
+```bash
+.venv/bin/python tests/validate_phase4_transition_persistence.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase4_transition_persistence.py
+```
+
+The standalone check protects the concrete-adapter dependency direction,
+property/type contract, qualified-write boundary and disposable fixture scope
+without importing FreeCAD. The FreeCAD test uses only newly created disposable
+documents and a temporary FCStd. It proves exact canonical save/reopen, stable
+identity independent of name/label/order, one-command create/update history,
+create/update Undo/Redo, no-op history, preflight rejection, injected
+post-write rollback, stale/corrupt derived-result handling, foreign-object
+preservation and rejection of unqualified runtime evidence. Its success
+sentinel is `Phase 4 transition FreeCAD persistence validation passed`.
+
 Current Phase 3 real-GUI workflow parity:
 
 ```bash

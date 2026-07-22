@@ -36,6 +36,8 @@ def _layer(module):
         return "api"
     if module == PACKAGE_NAME + ".bootstrap":
         return "bootstrap"
+    if module.startswith(PACKAGE_NAME + ".adapters"):
+        return "adapter"
     if module.startswith(PACKAGE_NAME + ".application"):
         return "application"
     if module.startswith(PACKAGE_NAME + ".compatibility"):
@@ -176,6 +178,7 @@ def _edge_allowed(source_layer, target_layer):
         "package": {"package"},
         "domain": {"domain"},
         "application": {"application", "domain"},
+        "adapter": {"adapter", "application", "domain"},
         "api": {"package", "application", "domain"},
         "bootstrap": {"package", "api"},
         "compatibility": {

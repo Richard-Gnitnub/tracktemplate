@@ -163,7 +163,7 @@ an outcome count, not an overall percentage of effort.
 | 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |
 | 2 | Minimal modular foundation and validation harness | `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 3 | First parity-proven vertical slice | `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |
-| 4 | Canonical state, signatures, and persistence | `▒▒░░░▒` — 0/6 | Current |
+| 4 | Canonical state, signatures, and persistence | `█▒█░░▒` — 2/6 | Current |
 | 5 | Lightweight editing prototype and renderer decision | `░░░░` — 0/4 | Not started |
 | 6 | Explicit exact-validation and export seam | `░░░░░` — 0/5 | Not started |
 | 7 | Core alignment, station, and multiple-track migration | `░░░░` — 0/4 | Not started |
@@ -716,15 +716,15 @@ separately gated.
 Status: **Current — opened by explicit project-owner instruction on
 2026-07-22.**
 
-Progress: `▒▒░░░▒` — 0/6 exit conditions evidenced; three are active.
+Progress: `█▒█░░▒` — 2/6 exit conditions evidenced; two are active.
 
 ### Current gate register
 
 | Exit condition | State | Evidence or remaining work |
 | --- | --- | --- |
-| The selected slice round-trips through save/reopen without result or identity drift | Active — foundation only | Deterministic transition JSON round-trip is implemented in the application boundary; qualified FreeCAD property, FCStd save/reopen and identity mapping remain due in [PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md) |
+| The selected slice round-trips through save/reopen without result or identity drift | Evidenced | One compact `App::FeaturePython` round-trips through an actual disposable FCStd with exact canonical JSON, result, stable identity, object type/name, operator label and foreign-object preservation; see [PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md) |
 | Parameter edits invalidate exactly the affected derived results, including cold/reuse/change-back cases | Active — transition analysis | All four numerical inputs, label-only reuse and A-B-A analysis cases are covered; downstream preview, validation and export dirty propagation remain due |
-| Undo/redo and failed updates leave a valid document | Pending | Requires the bounded FreeCAD persistence adapter and one-command transaction fixture |
+| Undo/redo and failed updates leave a valid document | Evidenced | Qualified-host create and update are one transaction each; create/update Undo/Redo, no-op history, preflight rejection, injected post-write create/update abort and unchanged valid-document assertions pass |
 | Preview and exact geometry can be deleted and regenerated solely from canonical state | Pending | Requires later derived presentation/exact seams; neither is persisted by the opening tranche |
 | A chair-definition package round-trips deterministically and rejects missing, corrupt, unsupported or ambiguous required data | Pending | Cross-cutting neutral schema, provenance/licensing fields and fail-closed package tests remain due before production chair construction |
 | The supported schema/version window is agreed and tested | Active — provisional transition v1 | Exact transition schema v1 reader/writer is tested; owner agreement plus chair and legacy-migration windows remain due |
