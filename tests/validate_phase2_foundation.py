@@ -375,7 +375,7 @@ def validate():
         "tests/freecad_validate_phase2_foundation.py",
         "P1-X10",
         "Phase 3",
-        "28/28 passed",
+        "29/29 passed",
         "foundation-loaded-not-routed",
         "No real-GUI workflow run is claimed",
     ):

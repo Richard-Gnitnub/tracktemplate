@@ -30,6 +30,9 @@ The documents have distinct responsibilities:
   dependency, side-effect, candidate and Phase 1 decision evidence.
 - [PHASE1_CLOSEOUT.md](PHASE1_CLOSEOUT.md) records the accepted Phase 1
   evidence, risks, deferrals, owner decisions and bounded Phase 2 authority.
+- [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) owns destructive-action,
+  checkpoint, ignored-data backup and restore controls. It does not mark an
+  unconfigured backup as complete.
 - This document owns delivery order, phase status, decision timing, and release-candidate gates.
 
 If a proposed shortcut conflicts with railway correctness, production safety, or an accepted architectural invariant, the invariant wins unless the user explicitly approves a changed requirement.
@@ -998,6 +1001,7 @@ package licence and field/component provenance pass
 | Duplicate definitions and runtime patches hide live callers | Inventory captured aliases and patch order; remove only after retained-reference audits |
 | Modularisation increases files without reducing runtime cost | Treat source boundaries and representation/performance changes as separate measured outcomes |
 | Project controls duplicate facts or become stale documentation bloat | Keep one authoritative owner per fact, link to detailed payloads instead of copying them, require an enforceable purpose for each control and retire/archive superseded controls through the Phase 2 maintainability review and later closeouts |
+| An accidental command, history rewrite or disk failure destroys system state, project history, ignored evidence or working FCStd files | Follow `RECOVERY_AND_BACKUP.md`: prohibit routine destructive Git/filesystem actions, keep exact pushed checkpoints, protect GitHub `main`, use copied documents and require an independent different-device/off-site backup plus tested restore before claiming data-backup readiness |
 | Lightweight editing loses expected FreeCAD behaviour | Prototype selection, handles, visibility, undo/redo, save/reopen, and GUI use before choosing a renderer |
 | Deferred geometry only moves cost to export | Measure both edit-only and edit-through-export workflows, including cleanup |
 | Cache signatures omit an input | Centralise signatures and test change/reuse/change-back for every input class |

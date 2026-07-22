@@ -24,6 +24,9 @@ htmlcov/
 # PyCharm starter file; this is not a product entry point
 /main.py
 
+# SAFETY: ignored paths can contain the only local copy of evidence or working
+# data. Never run `git clean` in this repository; Git is not their backup.
+
 # Local source evidence; provenance is recorded and the owner chose not to redistribute it here
 /reference/t5_files_556b_06_feb_2025.zip
 

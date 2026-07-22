@@ -186,6 +186,32 @@ Part, Qt and pivy imports blocked. The FreeCAD smoke must print
 `Phase 2 FreeCAD foundation smoke test passed`; its structured B16 result must
 remain `foundation-loaded-not-routed` with `document_mutation` false.
 
+Repository recovery and ignored-data safety controls:
+
+```bash
+.venv/bin/python tools/repository_safety_audit.py
+.venv/bin/python tests/validate_recovery_controls.py
+```
+
+The audit is read-only and performs no network operation. It reports clean and
+pushed checkpoint state from local remote-tracking refs, verifies the ignored
+Templot source archive, inventories local generated-data roots and fails closed
+when a requested backup target is absent, inside the repository or on the same
+mounted filesystem. Passing the validator proves the control behaves as
+declared; it does not claim that an independent backup or restore exists.
+
+Before a risky tranche, fetch explicitly when remote state might have changed,
+then require a clean pushed checkpoint:
+
+```bash
+.venv/bin/python tools/repository_safety_audit.py --require-checkpoint
+```
+
+After the owner selects and mounts an external destination, assess only its
+location with `--backup-target ... --require-backup-target`; backup completion
+and restore evidence remain separate gates under
+[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md).
+
 Fast development-bridge recipe contract checks:
 
 ```bash

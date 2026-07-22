@@ -74,6 +74,37 @@
   inspection-only or blocked. Do not infer `.FCStd` support from a successful
   external configuration migration.
 
+## Repository and system safety
+
+- `reference/RECOVERY_AND_BACKUP.md` is the authoritative destructive-action,
+  checkpoint, backup-scope and restore policy. Read it before any deletion,
+  bulk rewrite, history operation, system change, backup work or use of an
+  operator-owned FreeCAD document.
+- Never run `git clean` in this repository. Ignored paths include the local
+  Templot source archive, raw benchmark evidence, copied FCStd files, exports
+  and recovery files that Git/GitHub do not protect.
+- Do not use `git reset --hard`, destructive `git checkout`/`git restore`,
+  force push, branch/tag deletion or broad recursive deletion during routine
+  work. An exceptional destructive action requires explicit authority for the
+  exact target, a read-only target check and the recoverable checkpoint defined
+  in the recovery policy.
+- Never target `/`, `$HOME`, `~`, the workspace root, an unresolved variable,
+  wildcard or command substitution for deletion, overwrite or recursive move.
+  Prefer quarantine/trash or an exact copied target.
+- Do not run the IDE, FreeCAD automation or project tools as root. Treat every
+  `sudo` or system-file change as a new authority boundary, not a normal
+  development step.
+- Git protects committed files only. The repository is not positively backed
+  up until a different-device/off-site data backup and restore drill pass;
+  Timeshift system snapshots do not cover the current `/home/richard`
+  project data.
+- Before risky or bulk work, run `tools/repository_safety_audit.py`, establish
+  the named clean/pushed checkpoint when required, and use a dedicated branch
+  or disposable worktree. The audit is read-only and does not replace a real
+  backup.
+- Continue to use copied/disposable FCStd inputs for automation. Never open,
+  mutate or save over the only copy of an operator document.
+
 ## Railway terminology
 
 - `reference/TERMINOLOGY.md` is the canonical project glossary and migration
@@ -271,10 +302,16 @@
   maintainability evidence. The package and B16 launcher are loading-only;
   Phase 2 remains current until owner acceptance and no selected calculation
   or caller may move before Phase 3.
+- `reference/RECOVERY_AND_BACKUP.md`,
+  `tools/repository_safety_audit.py` and
+  `tests/validate_recovery_controls.py` own the destructive-action,
+  clean/pushed checkpoint, ignored-asset, backup-target and restore boundary.
+  A passing repository audit is not evidence that an independent backup or
+  restore exists.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
-- `reference/PROJECT_PLAN.md`, `reference/PHASE1_CLOSEOUT.md`, `reference/PHASE2_FOUNDATION.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
+- `reference/PROJECT_PLAN.md`, `reference/PHASE1_CLOSEOUT.md`, `reference/PHASE2_FOUNDATION.md`, `reference/RECOVERY_AND_BACKUP.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `reference/PROVENANCE.md` owns source and external chair-evidence provenance.
 - `reference/LICENSING_BOUNDARIES.md` owns the operational distinction between
@@ -413,6 +450,13 @@ Run the bounded Phase 2 package/structure and FreeCAD loading checks:
 .venv/bin/python tests/validate_phase2_foundation.py
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
   tests/freecad_validate_phase2_foundation.py
+```
+
+Run the read-only repository safety audit and recovery-control validation:
+
+```bash
+.venv/bin/python tools/repository_safety_audit.py
+.venv/bin/python tests/validate_recovery_controls.py
 ```
 
 Prepare the development-only FreeCAD bridge and its deterministic ignored B14

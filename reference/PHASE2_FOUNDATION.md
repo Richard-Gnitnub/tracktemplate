@@ -75,7 +75,7 @@ Observed on 2026-07-22 from the repository root:
 | Check | Result |
 | --- | --- |
 | Parse B14, B15 and `TrackTemplate.FCMacro` | Passed |
-| Every `tests/validate_*.py` check | 28/28 passed |
+| Every `tests/validate_*.py` check | 29/29 passed |
 | Isolated standalone domain/API import with FreeCAD, Part, Qt and pivy blocked | Passed; no forbidden import attempted |
 | Standalone B16 launch | Expected fail-closed result: `blocked-before-composition`, `not-freecad-runtime`, no document mutation |
 | Deterministic modular-structure report | Five justified modules, two permitted internal edges, no cycle, prohibited edge, forbidden domain import or warning |
