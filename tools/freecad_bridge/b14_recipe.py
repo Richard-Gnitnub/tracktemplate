@@ -128,7 +128,11 @@ def select_crossover_hosts(hosts, read_string, read_integer):
     }
 
 
-def freecad_base_snapshot(module, document):
+def freecad_base_snapshot(
+    module,
+    document,
+    expected_macro_version=EXPECTED_BASE_MACRO_VERSION,
+):
     """Validate and fingerprint the generated nine-object B14 starting state."""
     objects = list(document.Objects)
     role_counts = collections.Counter()
@@ -222,11 +226,12 @@ def freecad_base_snapshot(module, document):
         "track_configs": track_configs,
     }
     macro_version = str(module.MACRO_VERSION_NUMBER)
-    if macro_version != EXPECTED_BASE_MACRO_VERSION:
+    expected_macro_version = str(expected_macro_version)
+    if macro_version != expected_macro_version:
         raise ValueError(
             "Unexpected base macro version: {} (expected {})".format(
                 macro_version,
-                EXPECTED_BASE_MACRO_VERSION,
+                expected_macro_version,
             )
         )
     if curve != EXPECTED_BASE_CURVE:

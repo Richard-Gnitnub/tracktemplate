@@ -407,3 +407,35 @@ durations are recorded as observations, but the current cold and
 unchanged-result durations are explicitly not approved human-use budgets. The
 sanitised Phase 0 result is recorded in
 [`reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md`](../../reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+
+## Phase 3 routed transition workflow parity
+
+Run the B16 transition pilot through both complete calculation routes for the
+plain-line edit and connected-straight lifecycle oracles:
+
+```bash
+tools/freecad_bridge/run-phase3-transition-workflows \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+The controller launches four fresh isolated FreeCAD GUI processes: legacy and
+modular routes for each workflow. It loads the B16 composition definitions
+without their automatic final call, qualifies the runtime, applies one complete
+route to the exact B15 source, and exposes that routed module to the existing
+Phase 1 drivers. It fails if the selected bindings change during a workflow.
+
+The fixed input is a B14 document, so the Phase 3 adapter explicitly permits
+only the expected B14-to-B15 generator-version labels while preserving the
+strict B14 defaults of the original commands. Route comparison removes only
+declared path/timing/RSS/undo-memory observations and requires exact equality
+for every remaining dialog, semantic snapshot, identity, order, history,
+persistence, object-count and failure result. Each child copies the fixture,
+restores isolated preferences and closes its document; the source is never
+modified.
+
+Raw evidence remains ignored under
+`benchmark-output/freecad-bridge/phase3-transition-workflow-runs/`. The
+controlled result and its normalisation boundary are recorded in
+[`reference/benchmarks/2026-07-22-b16-transition-routed-workflow-parity.md`](../../reference/benchmarks/2026-07-22-b16-transition-routed-workflow-parity.md).
+The recorded timings are correctness observations, not the contracted Phase 3
+performance profile.

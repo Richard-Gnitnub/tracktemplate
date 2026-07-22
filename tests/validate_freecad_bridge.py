@@ -237,6 +237,18 @@ def validate():
         FakeDocument(reversed(document.Objects)),
     )
     assert reversed_snapshot["semantic_sha256"] == snapshot["semantic_sha256"]
+    module.MACRO_VERSION_NUMBER = "10.2A8A7B15"
+    expect_value_error(
+        lambda: b14_recipe.freecad_base_snapshot(module, document),
+        "expected 10.2A8A7B14",
+    )
+    b15_reader_snapshot = b14_recipe.freecad_base_snapshot(
+        module,
+        document,
+        expected_macro_version="10.2A8A7B15",
+    )
+    assert b15_reader_snapshot["semantic"]["macro_version"] == "10.2A8A7B15"
+    module.MACRO_VERSION_NUMBER = "10.2A8A7B14"
 
     document_with_turnout = base_document()
     document_with_turnout.Objects[4].properties["TurnoutID"] = "TO-001"

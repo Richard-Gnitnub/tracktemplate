@@ -36,7 +36,18 @@ from tools.freecad_bridge.straight_station_recipe import (
 )
 
 
-MODULE_NAME = "tracktemplate_b14_session"
+MODULE_NAME = globals().get(
+    "TRACKTEMPLATE_WORKFLOW_MODULE_NAME",
+    "tracktemplate_b14_session",
+)
+BASE_MACRO_VERSION = globals().get(
+    "TRACKTEMPLATE_BASE_MACRO_VERSION",
+    "10.2A8A7B14",
+)
+ENFORCE_FROZEN_WORKFLOW_HASHES = globals().get(
+    "TRACKTEMPLATE_ENFORCE_FROZEN_WORKFLOW_HASHES",
+    True,
+)
 SUCCESS_TEXT = "Curve and straight-track outputs created successfully"
 
 module = sys.modules.get(MODULE_NAME)
@@ -52,6 +63,23 @@ if not str(document.FileName or ""):
 def _current_rss_mb():
     reader = getattr(module, "_workflow_current_rss_mb", None)
     return float(reader()) if callable(reader) else 0.0
+
+
+def _initial_base_snapshot(active_document):
+    return ordinary_track_snapshot(
+        module,
+        active_document,
+        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+        expected_macro_version=BASE_MACRO_VERSION,
+    )
+
+
+def _expected_workflow_hash(target_lengths):
+    if not ENFORCE_FROZEN_WORKFLOW_HASHES:
+        return None
+    if tuple(target_lengths) == tuple(CREATED_LENGTHS_MM):
+        return EXPECTED_CREATED_SEMANTIC_SHA256
+    return EXPECTED_EDITED_SEMANTIC_SHA256
 
 
 def _history_state(active_document):
@@ -299,15 +327,10 @@ def _run_generation(name, target_lengths, initial_lengths, use_pair_control):
     snapshot = straight_station_document_snapshot(
         module, App.ActiveDocument, analysis
     )
-    expected_hash = (
-        EXPECTED_CREATED_SEMANTIC_SHA256
-        if tuple(target_lengths) == tuple(CREATED_LENGTHS_MM)
-        else EXPECTED_EDITED_SEMANTIC_SHA256
-    )
     validate_straight_station_snapshot(
         snapshot,
         target_lengths,
-        expected_hash=expected_hash or None,
+        expected_hash=_expected_workflow_hash(target_lengths),
     )
     remembered = remembered_straight_contract(
         module.read_last_dialog_inputs(App.ActiveDocument)
@@ -408,7 +431,7 @@ preferences_before = {
 result = {
     "schema_version": 1,
     "source_document": str(document.FileName),
-    "initial_base": ordinary_track_snapshot(module, document),
+    "initial_base": _initial_base_snapshot(document),
     "initial_document": ordinary_track_document_snapshot(module, document),
     "scenarios": [],
     "history_cycles": [],
@@ -501,7 +524,7 @@ try:
     validate_straight_station_snapshot(
         reopened,
         EDITED_LENGTHS_MM,
-        expected_hash=EXPECTED_EDITED_SEMANTIC_SHA256 or None,
+        expected_hash=_expected_workflow_hash(EDITED_LENGTHS_MM),
     )
     if (
         reopened["semantic_sha256"] != edited_snapshot["semantic_sha256"]
@@ -528,4 +551,7 @@ finally:
 
 if not result["preference_store_restored"]:
     raise RuntimeError("The straight/station recipe did not restore bridge preferences")
-print(json.dumps(result, sort_keys=True))
+if globals().get("TRACKTEMPLATE_CAPTURE_WORKFLOW_RESULT", False):
+    TRACKTEMPLATE_WORKFLOW_RESULT = result
+else:
+    print(json.dumps(result, sort_keys=True))

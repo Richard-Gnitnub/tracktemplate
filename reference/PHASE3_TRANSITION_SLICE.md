@@ -1,8 +1,8 @@
 # Phase 3 Transition-Length Slice Evidence
 
-Status: **domain parity and the all-three-callers B16 routing/rollback
-boundary are evidenced; Phase 3 remains current. Routed full-workflow,
-failure-recovery, real-GUI and contracted performance evidence remain open.**
+Status: **domain, all-three-callers and routed real-GUI workflow parity are
+evidenced; Phase 3 remains current. Contracted calculation/workflow performance
+evidence and project-owner closeout acceptance remain open.**
 
 ## Bounded result
 
@@ -18,11 +18,13 @@ The normal B16 development route is `modular`; `legacy` is the explicit
 rollback route. Automated loading deliberately uses `launch_workflow: false`,
 reports `transition-routing-ready`, and performs no document mutation. The
 B16-hosted B15 workflow can be launched only through an explicit routed call;
-that full workflow is not claimed as accepted by this tranche.
+the bounded routed full-workflow evidence is recorded below. Phase 3 closeout
+is not yet accepted.
 
 No B14 or B15 source changed. No calculation implementation was copied into
-the launcher, façade or compatibility adapter, and no cleanup, validation
-hardening, tolerance change or optimisation is included.
+the launcher, façade or compatibility adapter, and no production calculation,
+tolerance or optimisation change is included. The development oracle gained
+only the reusable route/reader and comparison seams needed for this evidence.
 
 ## Exact source state
 
@@ -30,6 +32,8 @@ The tranche started from accepted Phase 2 closeout commit
 `55af5cf26ac82ba081bc3f3bc9ce40cce107c461`.
 The routing/rollback tranche started from pushed documentation-lifecycle
 checkpoint `cbee8260b5e0ea7852c6e16b5195861d6501a617`.
+The routed full-workflow tranche started from pushed routing checkpoint
+`3ab42b138e2f3a84cf413c2b434fb74f2565a597`.
 
 - B14 remains
   `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088`.
@@ -115,8 +119,46 @@ not change. This is calculation-level routed evidence, not a completed dialog,
 editing, persistence or production workflow run.
 
 The compatibility owner is Phase 3. Its legacy route cannot retire until the
-remaining full-workflow, GUI, failure-recovery and performance evidence passes
-and the project owner explicitly accepts the Phase 3 closeout.
+remaining performance evidence passes and the project owner explicitly
+accepts the Phase 3 closeout.
+
+## Routed full-workflow and real-GUI evidence
+
+The development bridge now reuses the complete Phase 1 plain-line edit and
+connected-straight lifecycle drivers against either B16 transition route. One
+controller starts four fresh isolated FreeCAD GUI processes so no route shares
+a module, document, process cache or undo stack with its comparison run. The
+B16 composition definitions qualify the runtime and route the exact B15 source
+before the established driver opens and operates on a copied fixture.
+
+The controlled 2026-07-22 series passed with exact route-independent workflow
+contracts:
+
+| Workflow | Legacy/modular contract SHA-256 | Difference count | Final semantic SHA-256 |
+| --- | --- | ---: | --- |
+| Plain-line edit lifecycle | `85976aa1a154ab5afce8d51a89f7674e655b7b5d91f61795580e67f3980fc7f0` | 0 | `13f707976ab749b92b768b766db58ec080e6aa7e81c9607a83849a24b644a370` |
+| Connected-straight lifecycle | `2eec8269c52b8491ac546650cad1c0c6975bc620ab3a4a845f4778d8a1379517` | 0 | `8ef264901e67c8bcd8dc3305352c2efbd365fe5b04f31f2a30042cf0aa79659c` |
+
+The comparison retains all semantic snapshots, identities, list ordering,
+dialog outcomes, history counts/names, object counts, persistence, save/reopen
+and failure results. It removes only measurement, undo-memory, path,
+source-document and wall-time fields. The fixed input is a B14 fixture read by
+the B15 workflow, so the Phase 3 adapter permits only the declared B14-to-B15
+`GeneratorVersion` and production-index version labels; the raw legacy/modular
+comparison retains both unnormalised results. The original strict B14 commands
+were rerun and retained their accepted final hashes.
+
+The plain-line run proves zero-angle rejection before transaction and an
+injected failure after generated-output removal both leave the saved right-hand
+document unchanged. Both workflows also pass their complete Undo/Redo and
+save/reopen contracts, restore isolated preferences, preserve the source
+fixture and leave no isolated FreeCAD process running. The full recipe,
+normalisation boundary, raw-artifact hashes and limitations are recorded in
+[the routed-workflow report](benchmarks/2026-07-22-b16-transition-routed-workflow-parity.md).
+
+The single-run durations in that report are correctness observations enclosing
+GUI automation and deep validation. They are not the contracted Phase 3
+calculation/workflow profiles and make no optimisation claim.
 
 ## Standalone and FreeCAD loading evidence
 
@@ -135,8 +177,9 @@ Observed on 2026-07-22:
   calculation routing, explicit legacy rollback, no mixed route,
   `workflow_launched: false` and `document_mutation: false`.
 
-No real-GUI workflow run is claimed; only the calculation callers have been
-exercised without launching the operator workflow.
+The calculation-level headless route and the bounded real-GUI operator
+workflows are now both evidenced. No exporter, renderer or wider
+turnout/crossover workflow is claimed by this transition slice.
 
 ## Current Phase 3 gate disposition
 
@@ -145,16 +188,14 @@ exercised without launching the operator workflow.
 | Dependency direction and FreeCAD/Qt-free domain import | Evidenced | Mechanical domain extraction, isolated import and structure guards |
 | Exact legacy/new analytical equivalence | Evidenced | AST, value/type, solver and diagnostic parity above |
 | Cache miss/reuse/invalidation as applicable | Evidenced | Contracted no-cache disposition and A-B-A recomputation checks |
-| Applicable FreeCAD/headless, GUI and performance evidence | Active | Calculation-level all-caller FreeCAD parity passes; routed plain-line and connected-straight full-workflow, failure-recovery, real-GUI and contracted calculation/workflow profiles remain required |
+| Applicable FreeCAD/headless, GUI and performance evidence | Active — performance remains | Calculation-level all-caller FreeCAD parity and routed plain-line/connected-straight real-GUI, persistence and failure-recovery parity pass; contracted calculation and comparable workflow profiles remain required |
 | Temporary dual-path owner and retirement gate | Evidenced | One compatibility session owns complete modular/legacy routes, the B16 default and explicit rollback are tested, and retirement remains gated by Phase 3 evidence plus owner acceptance |
 
 ## Remaining tranche gates
 
-1. Run the affected plain-line and connected-straight headless/real-GUI
-   oracles, including failure recovery and no document corruption.
-2. Record the calculation and comparable workflow performance profiles without
+1. Record the calculation and comparable workflow performance profiles without
    presenting this architecture extraction as an optimisation.
-3. Request explicit project-owner acceptance before retiring any temporary
+2. Request explicit project-owner acceptance before retiring any temporary
    comparison path or closing Phase 3.
 
 No independent backup is inferred from this evidence; the accepted temporary

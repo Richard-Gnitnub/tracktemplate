@@ -662,9 +662,9 @@ was moved by the phase transition itself.
 
 ## Phase 3: first parity-proven vertical slice
 
-Status: **Current — domain parity and the all-three-callers B16 routing/
-rollback boundary are evidenced. Routed full-workflow, real-GUI and
-performance evidence remains open.**
+Status: **Current — domain, all-three-callers and routed real-GUI workflow
+parity are evidenced. Contracted calculation/workflow performance evidence
+remains open.**
 
 Progress: `████▒` — 4/5 exit conditions evidenced and one remains active.
 
@@ -675,7 +675,7 @@ Progress: `████▒` — 4/5 exit conditions evidenced and one remains ac
 | The selected capability follows target dependency direction and its domain portion imports without FreeCAD/Qt | Evidenced | Exact three-function extraction in `tracktemplate.domain.alignment`; isolated import and structure guards recorded in [PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md) |
 | Legacy/new analytical records, findings, identities, ordering and relevant metadata are equivalent | Evidenced | Exact B14/B15/modular AST, value/type and diagnostic parity over the frozen grids; this slice emits only tuples/scalars/errors and has no record/identity/metadata output |
 | Cache miss, valid reuse and every relevant invalidation case pass | Evidenced | Candidate contract records no cache/signature; A-B-A recomputation for all three functions proves changed and exact change-back results without inventing reuse state |
-| Applicable FreeCAD/headless, GUI and contracted performance checks pass | Active — calculation callers routed | Qualified FreeCAD headless legacy/modular/legacy caller parity and zero-document-mutation pass; routed plain-line/connected-straight full-workflow, failure-recovery, real-GUI and calculation/workflow performance evidence remains required |
+| Applicable FreeCAD/headless, GUI and contracted performance checks pass | Active — performance remains | Qualified FreeCAD headless legacy/modular/legacy caller parity and zero-document-mutation pass. Routed plain-line/connected-straight real-GUI, persistence and failure-recovery parity also pass with exact workflow contracts; contracted calculation and comparable workflow profiles remain required |
 | Every temporary dual path has an owner and named retirement gate | Evidenced | `tracktemplate.compatibility.transition_pilot` applies one complete modular or captured-B15 route, defaults B16 to modular, retains explicit legacy rollback and remains owned by Phase 3 until parity evidence and owner acceptance permit retirement |
 
 ### Goal

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+exec /usr/bin/python3 \
+    "${bridge_dir}/run_phase3_transition_workflow_series.py" "$@"

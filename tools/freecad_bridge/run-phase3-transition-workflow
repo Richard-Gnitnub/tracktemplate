@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$(cd "${bridge_dir}/../.." && pwd)"
+
+exec "${bridge_dir}/run-isolated" \
+    /usr/bin/env PYTHONPATH="${project_root}/.devtools/freecad-cli/src" \
+    /usr/bin/python3 "${bridge_dir}/run_phase3_transition_workflow.py" "$@"

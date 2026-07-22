@@ -1,5 +1,9 @@
 """Contracts for Phase 1 B14 plain-line regeneration, history and rollback."""
 
+import copy
+
+from tools.semantic_compare import compare_structures, semantic_digest
+
 from tools.freecad_bridge.ordinary_track_recipe import (
     EXPECTED_GROUP_MEMBERS,
     EXPECTED_OBJECT_CONTRACT,
@@ -24,6 +28,60 @@ EXPECTED_RIGHT_HAND_SEMANTIC_SHA256 = (
 EXPECTED_DIALOG_TRACK_CONFIGURATION = [dict(EXPECTED_TRACK_CONFIGURATION[0])]
 EXPECTED_DIALOG_TRACK_CONFIGURATION[0]["entry_transition_length"] = 559.41
 EXPECTED_DIALOG_TRACK_CONFIGURATION[0]["exit_transition_length"] = 559.41
+
+
+def normalise_version_migration_snapshot(snapshot, allowed_version_prefixes):
+    """Normalise only declared generator-version fields for host migration.
+
+    The Phase 1 B14 oracle does not use this seam. Phase 3 uses it only when
+    the exact B15 workflow reads the fixed B14 fixture, so change-back can be
+    judged independently of the expected B14-to-B15 generator label update.
+    """
+    prefixes = tuple(str(value) for value in allowed_version_prefixes)
+    if not prefixes:
+        return copy.deepcopy(snapshot)
+
+    def normalise(value):
+        if isinstance(value, dict):
+            result = {}
+            for key, item in value.items():
+                if (
+                    key in ("GeneratorVersion", "macro_version")
+                    and isinstance(item, str)
+                    and item.startswith(prefixes)
+                ):
+                    result[key] = "<accepted-generator-version-migration>"
+                else:
+                    result[key] = normalise(item)
+            return result
+        if isinstance(value, list):
+            return [normalise(item) for item in value]
+        return copy.deepcopy(value)
+
+    result = normalise(snapshot)
+    if (
+        isinstance(result, dict)
+        and isinstance(result.get("semantic"), dict)
+        and "semantic_sha256" in result
+    ):
+        result["semantic_sha256"] = semantic_digest(result["semantic"])
+    return result
+
+
+def version_migration_comparison(left_snapshot, right_snapshot, prefixes):
+    """Return exact evidence for a bounded generator-version-only change."""
+    left = normalise_version_migration_snapshot(left_snapshot, prefixes)
+    right = normalise_version_migration_snapshot(right_snapshot, prefixes)
+    comparison = compare_structures(left, right)
+    return {
+        "equivalent": comparison["equal"],
+        "left_digest": comparison["legacy_digest"],
+        "right_digest": comparison["successor_digest"],
+        "difference_count": comparison["difference_count"],
+        "difference_paths": [
+            item["path"] for item in comparison["differences"][:20]
+        ],
+    }
 
 
 def remembered_input_contract(payload):
@@ -141,8 +199,15 @@ def validate_right_hand_snapshot(snapshot, enforce_expected_hash=True):
     return digest
 
 
-def validate_handing_mirror(left_snapshot, right_snapshot):
+def validate_handing_mirror(
+    left_snapshot,
+    right_snapshot,
+    allowed_identity_changes=(),
+    allowed_persisted_changes=(),
+):
     """Prove right-hand state is the XY mirror of the accepted left-hand state."""
+    allowed_identity_changes = set(allowed_identity_changes)
+    allowed_persisted_changes = set(allowed_persisted_changes)
     left = left_snapshot.get("semantic", {})
     right = right_snapshot.get("semantic", {})
     if left.get("groups") != right.get("groups"):
@@ -162,6 +227,13 @@ def validate_handing_mirror(left_snapshot, right_snapshot):
         right_static = {
             key: value for key, value in right_record.items() if key != "shape"
         }
+        if allowed_identity_changes:
+            left_identity = dict(left_static.get("identity", {}))
+            right_identity = dict(right_static.get("identity", {}))
+            for key in allowed_identity_changes:
+                if key in left_identity or key in right_identity:
+                    left_identity[key] = right_identity.get(key)
+            left_static["identity"] = left_identity
         if left_static != right_static:
             raise ValueError("Left/right stable object metadata differs for {}".format(name))
         left_shape = left_record.get("shape")
@@ -212,7 +284,10 @@ def validate_handing_mirror(left_snapshot, right_snapshot):
             name for name in set(left_values) | set(right_values)
             if left_values.get(name) != right_values.get(name)
         }
-        if changed != expected_changes:
+        if (
+            not expected_changes <= changed
+            or changed - expected_changes - allowed_persisted_changes
+        ):
             raise ValueError(
                 "Unexpected left/right persisted differences on {}: {}".format(
                     owner, sorted(changed)

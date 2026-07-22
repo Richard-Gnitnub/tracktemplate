@@ -136,6 +136,83 @@ def validate():
         ),
         "not the reflection",
     )
+    migrated_left = copy.deepcopy(left_snapshot)
+    migrated_right = copy.deepcopy(right_snapshot)
+    migrated_left["semantic"]["objects"][0]["identity"][
+        "GeneratorVersion"
+    ] = "10.2A8A7B14"
+    migrated_right["semantic"]["objects"][0]["identity"][
+        "GeneratorVersion"
+    ] = "10.2A8A7B15"
+    expect_value_error(
+        lambda: ordinary_track_edit_recipe.validate_handing_mirror(
+            migrated_left,
+            migrated_right,
+        ),
+        "stable object metadata differs",
+    )
+    migrated_mirror = ordinary_track_edit_recipe.validate_handing_mirror(
+        migrated_left,
+        migrated_right,
+        allowed_identity_changes=("GeneratorVersion",),
+    )
+    assert migrated_mirror == mirror
+    migrated_persistence = copy.deepcopy(migrated_right)
+    for owner in ("settings", "template"):
+        migrated_persistence["semantic"]["persistence"][owner]["values"][
+            "ProductionRecordIndexJSON"
+        ] = {"generator_version": "10.2A8A7B15"}
+    expect_value_error(
+        lambda: ordinary_track_edit_recipe.validate_handing_mirror(
+            migrated_left,
+            migrated_persistence,
+            allowed_identity_changes=("GeneratorVersion",),
+        ),
+        "persisted differences",
+    )
+    allowed_migration = ordinary_track_edit_recipe.validate_handing_mirror(
+        migrated_left,
+        migrated_persistence,
+        allowed_identity_changes=("GeneratorVersion",),
+        allowed_persisted_changes=("ProductionRecordIndexJSON",),
+    )
+    assert allowed_migration["mirrored_shape_objects"] == ["Track"]
+    version_left = {
+        "identity": {
+            "GeneratorVersion": "10.2A8A7B14 WHOLE WORKFLOW",
+        },
+        "index": {
+            "macro_version": "10.2A8A7B14 WHOLE WORKFLOW",
+            "records": [{"record_id": "one"}],
+        },
+    }
+    version_right = copy.deepcopy(version_left)
+    version_right["identity"]["GeneratorVersion"] = (
+        "10.2A8A7B15 WHOLE WORKFLOW"
+    )
+    version_right["index"]["macro_version"] = (
+        "10.2A8A7B15 WHOLE WORKFLOW"
+    )
+    version_comparison = ordinary_track_edit_recipe.version_migration_comparison(
+        version_left,
+        version_right,
+        ("10.2A8A7B14", "10.2A8A7B15"),
+    )
+    assert version_comparison["equivalent"] is True
+    assert version_comparison["left_digest"] == version_comparison["right_digest"]
+    assert version_comparison["difference_count"] == 0
+    assert version_comparison["difference_paths"] == []
+    changed_version = copy.deepcopy(version_right)
+    changed_version["index"]["records"][0]["record_id"] = "two"
+    changed_comparison = ordinary_track_edit_recipe.version_migration_comparison(
+        version_left,
+        changed_version,
+        ("10.2A8A7B14", "10.2A8A7B15"),
+    )
+    assert changed_comparison["equivalent"] is False
+    assert changed_comparison["difference_paths"] == [
+        '$["index"]["records"][0]["record_id"]'
+    ]
     assert ordinary_track_edit_recipe.RIGHT_HAND_ANGLE_DEGREES == -90.0
     assert ordinary_track_edit_recipe.EDIT_RECIPE_SCHEMA_VERSION == 2
     assert ordinary_track_edit_recipe.INVALID_ANGLE_DEGREES == 0.0

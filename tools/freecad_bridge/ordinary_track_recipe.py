@@ -9,7 +9,10 @@ hash contract.
 import hashlib
 import json
 
-from tools.freecad_bridge.b14_recipe import freecad_base_snapshot
+from tools.freecad_bridge.b14_recipe import (
+    EXPECTED_BASE_MACRO_VERSION,
+    freecad_base_snapshot,
+)
 
 
 ORDINARY_TRACK_SCHEMA_VERSION = 1
@@ -525,9 +528,18 @@ def ordinary_track_document_snapshot(module, document):
     }
 
 
-def ordinary_track_snapshot(module, document, enforce_expected_hash=True):
+def ordinary_track_snapshot(
+    module,
+    document,
+    enforce_expected_hash=True,
+    expected_macro_version=EXPECTED_BASE_MACRO_VERSION,
+):
     """Validate and fingerprint B14's fixed plain-line curve/two-track document."""
-    base = freecad_base_snapshot(module, document)
+    base = freecad_base_snapshot(
+        module,
+        document,
+        expected_macro_version=expected_macro_version,
+    )
     semantic = {
         "schema_version": ORDINARY_TRACK_SCHEMA_VERSION,
         "boundary_data": BOUNDARY_DATA,

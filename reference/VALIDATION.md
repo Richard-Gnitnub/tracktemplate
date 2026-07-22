@@ -13,10 +13,11 @@ change.
 
 - `AdvancedTurnout.FCMacro` is the immutable B14 legacy comparison oracle (`10.2A8A7B14`).
 - `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` is the accepted B15 behavioural reference entering Phase 1 (`10.2A8A7B15`).
-- `10.2A8A7B16` identifies the loading-only Phase 2 modular development
-  checkpoint. Its small `TrackTemplate.FCMacro` composition root and minimal
-  `tracktemplate` package exist, but no railway calculation or legacy caller
-  is routed through them; this is not the public Workbench/RC version.
+- `10.2A8A7B16` identifies the current modular development checkpoint. Its
+  small `TrackTemplate.FCMacro` composition root routes the bounded three-
+  function transition calculation through the modular domain by default and
+  retains the exact B15 calculation as a temporary explicit rollback route.
+  This is not the public Workbench/RC version.
 - `tests/validate_b15.py` validates B15 structure/analysis, compares selected
   railway functions, and proves complete inherited-module AST parity with B14
   after normalising only version, launch, docstring, and recompute-instrumentation
@@ -185,6 +186,17 @@ legacy change-back routes and fail-closed source, contract, API and launch
 boundary cases. It also requires the compatibility adapter to remain in the
 declared dependency layer without structural warnings.
 
+Phase 3 routed full-workflow harness contracts:
+
+```bash
+.venv/bin/python tests/validate_phase3_transition_workflows.py
+```
+
+This protects the reusable driver seam, exact B14/B15 fingerprints, B16 route
+loader, four-process controller, five-field volatility boundary, scenario
+order, preference restoration, bounded B14-to-B15 generator-version handling
+and exact semantic comparison. It does not start FreeCAD.
+
 Accepted Phase 2 FreeCAD loading and zero-document-mutation smoke:
 
 ```bash
@@ -215,6 +227,21 @@ document mutation. It must print
 `Phase 3 transition routing FreeCAD smoke test passed`. Update this
 current-phase test when accepted routing state changes; do not rewrite the
 Phase 2 loading smoke.
+
+Current Phase 3 real-GUI workflow parity:
+
+```bash
+tools/freecad_bridge/run-phase3-transition-workflows \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+This runs plain-line editing and connected-straight lifecycle automation under
+the complete legacy and modular routes in four fresh isolated GUI processes.
+It requires exact route-independent workflow contracts, preserved route
+bindings, undo/redo, save/reopen, isolated preference restoration, source
+non-mutation and the plain-line invalid-input/transaction-abort recovery paths.
+It records raw timing observations but is not the contracted calculation or
+workflow performance profile.
 
 Repository recovery and ignored-data safety controls:
 

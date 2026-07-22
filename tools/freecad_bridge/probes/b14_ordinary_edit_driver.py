@@ -27,6 +27,7 @@ from tools.freecad_bridge.ordinary_track_edit_recipe import (
     remembered_input_contract,
     validate_handing_mirror,
     validate_right_hand_snapshot,
+    version_migration_comparison,
 )
 from tools.freecad_bridge.ordinary_track_recipe import (
     ordinary_track_document_snapshot,
@@ -35,7 +36,30 @@ from tools.freecad_bridge.ordinary_track_recipe import (
 )
 
 
-MODULE_NAME = "tracktemplate_b14_session"
+MODULE_NAME = globals().get(
+    "TRACKTEMPLATE_WORKFLOW_MODULE_NAME",
+    "tracktemplate_b14_session",
+)
+BASE_MACRO_VERSION = globals().get(
+    "TRACKTEMPLATE_BASE_MACRO_VERSION",
+    "10.2A8A7B14",
+)
+ENFORCE_FROZEN_WORKFLOW_HASHES = globals().get(
+    "TRACKTEMPLATE_ENFORCE_FROZEN_WORKFLOW_HASHES",
+    True,
+)
+ALLOWED_HANDING_IDENTITY_CHANGES = globals().get(
+    "TRACKTEMPLATE_ALLOWED_HANDING_IDENTITY_CHANGES",
+    (),
+)
+ALLOWED_HANDING_PERSISTED_CHANGES = globals().get(
+    "TRACKTEMPLATE_ALLOWED_HANDING_PERSISTED_CHANGES",
+    (),
+)
+VERSION_MIGRATION_PREFIXES = globals().get(
+    "TRACKTEMPLATE_VERSION_MIGRATION_PREFIXES",
+    (),
+)
 SUCCESS_TEXT = "Curve and straight-track outputs created successfully"
 ZERO_ANGLE_ERROR = "The total turn angle cannot be zero."
 
@@ -52,6 +76,22 @@ if not str(document.FileName or ""):
 def _current_rss_mb():
     reader = getattr(module, "_workflow_current_rss_mb", None)
     return float(reader()) if callable(reader) else 0.0
+
+
+def _initial_base_snapshot(active_document):
+    return ordinary_track_snapshot(
+        module,
+        active_document,
+        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+        expected_macro_version=BASE_MACRO_VERSION,
+    )
+
+
+def _validate_right_hand(snapshot):
+    return validate_right_hand_snapshot(
+        snapshot,
+        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+    )
 
 
 def _history_state(active_document):
@@ -430,7 +470,7 @@ preferences_before = {
 result = {
     "schema_version": EDIT_RECIPE_SCHEMA_VERSION,
     "source_document": str(document.FileName),
-    "initial_base": ordinary_track_snapshot(module, document),
+    "initial_base": _initial_base_snapshot(document),
     "initial_document": ordinary_track_document_snapshot(module, document),
     "history_actions": [],
     "scenarios": [],
@@ -445,11 +485,14 @@ try:
         RIGHT_HAND_ANGLE_DEGREES,
         90.0,
     )
-    validate_right_hand_snapshot(right_hand)
+    _validate_right_hand(right_hand)
     result["scenarios"].append(success)
     result["right_hand_snapshot"] = right_hand
     result["handing_mirror"] = validate_handing_mirror(
-        result["initial_base"], right_hand
+        result["initial_base"],
+        right_hand,
+        allowed_identity_changes=ALLOWED_HANDING_IDENTITY_CHANGES,
+        allowed_persisted_changes=ALLOWED_HANDING_PERSISTED_CHANGES,
     )
 
     generation_transaction_name = (
@@ -551,19 +594,36 @@ try:
             missing_objects=missing_objects,
         )
         result["history_actions"].append(history_record)
-    validate_right_hand_snapshot(restored_right)
+    _validate_right_hand(restored_right)
 
     change_back, changed_back_left = _run_scenario(
         "change_right_back_to_left",
         90.0,
         RIGHT_HAND_ANGLE_DEGREES,
     )
-    if (
+    if VERSION_MIGRATION_PREFIXES:
+        change_back_equivalence = version_migration_comparison(
+            result["initial_document"],
+            changed_back_left,
+            VERSION_MIGRATION_PREFIXES,
+        )
+        if not change_back_equivalence["equivalent"]:
+            raise RuntimeError(
+                "Explicit change-back did not restore the initial left-hand "
+                "state after the bounded version normalisation: {}".format(
+                    change_back_equivalence["difference_paths"]
+                )
+            )
+        result["change_back_equivalence"] = change_back_equivalence
+    elif (
         changed_back_left["semantic_sha256"]
         != result["initial_document"]["semantic_sha256"]
-        or changed_back_left["semantic"] != result["initial_document"]["semantic"]
+        or changed_back_left["semantic"]
+        != result["initial_document"]["semantic"]
     ):
-        raise RuntimeError("Explicit change-back did not restore the initial left-hand state")
+        raise RuntimeError(
+            "Explicit change-back did not restore the initial left-hand state"
+        )
     result["scenarios"].append(change_back)
     result["change_back_semantic_sha256"] = changed_back_left["semantic_sha256"]
     post_change_back_history = _history_state(App.ActiveDocument)
@@ -617,7 +677,7 @@ try:
             missing_objects=missing_objects,
         )
         result["history_actions"].append(history_record)
-    validate_right_hand_snapshot(restored_right_after_change_back)
+    _validate_right_hand(restored_right_after_change_back)
 
     document = App.ActiveDocument
     persistence_wall_started = time.perf_counter()
@@ -649,7 +709,7 @@ try:
         persistence_measurement["rss_after_mb"] - persistence_rss_before
     )
     reopened = ordinary_track_document_snapshot(module, document)
-    validate_right_hand_snapshot(reopened)
+    _validate_right_hand(reopened)
     if reopened["semantic_sha256"] != right_hand["semantic_sha256"]:
         raise RuntimeError("Save/reopen changed the right-hand plain-line state")
     result["right_hand_save_reopen"] = {
@@ -672,7 +732,7 @@ try:
         RIGHT_HAND_ANGLE_DEGREES,
         expected_error=ZERO_ANGLE_ERROR,
     )
-    validate_right_hand_snapshot(invalid_after)
+    _validate_right_hand(invalid_after)
     result["scenarios"].append(invalid)
 
     rollback, rollback_after = _run_scenario(
@@ -682,7 +742,7 @@ try:
         expected_error=INJECTED_TRANSACTION_ERROR,
         inject=True,
     )
-    validate_right_hand_snapshot(rollback_after)
+    _validate_right_hand(rollback_after)
     result["scenarios"].append(rollback)
 
     document = App.ActiveDocument
@@ -691,7 +751,7 @@ try:
     App.closeDocument(final_name)
     document = App.openDocument(final_path)
     final_reopen = ordinary_track_document_snapshot(module, document)
-    validate_right_hand_snapshot(final_reopen)
+    _validate_right_hand(final_reopen)
     if final_reopen["semantic_sha256"] != right_hand["semantic_sha256"]:
         raise RuntimeError("Failure handling changed the saved right-hand document")
     result["final_reopen_semantic_sha256"] = final_reopen["semantic_sha256"]
@@ -705,4 +765,7 @@ finally:
 
 if not result["preference_store_restored"]:
     raise RuntimeError("The plain-line edit recipe did not restore bridge preferences")
-print(json.dumps(result, sort_keys=True))
+if globals().get("TRACKTEMPLATE_CAPTURE_WORKFLOW_RESULT", False):
+    TRACKTEMPLATE_WORKFLOW_RESULT = result
+else:
+    print(json.dumps(result, sort_keys=True))
