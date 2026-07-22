@@ -203,6 +203,15 @@ The current B15 S1/S1J five-box body is retained only as accepted legacy
 behaviour and gap evidence. It is not the production chair-definition schema,
 the final S1 geometry oracle, or a precedent for new chair families.
 
+The owner-accepted Phase 1 package/evidence decisions are in
+[S1_PILOT_PLAN.md](S1_PILOT_PLAN.md). Its exact decimal source-quantity,
+full-size millimetre, chair-local frame and validate-before-mutation rules are
+accepted architectural direction, not an implemented schema.
+It deliberately leaves the prototype designation, primary evidence, rail
+section, final package licence, rights reviews and numerical tolerances
+blocked; neither the working S1 name nor the conditional CC0 target is
+canonical data.
+
 ### Chair assimilation boundary
 
 Chair assimilation converts external evidence into the same canonical chair
@@ -392,9 +401,10 @@ The following require prototypes or user decisions and are not settled by this d
 - canonical successor schema, B14/B15 family-migration implementations and
   fixtures, plus evidence for any proposed expansion beyond the accepted
   ingress/runtime matrix;
-- chair-definition package schema, exact source-value representation and
-  internal canonical units, including machine-readable provenance and output
-  dependency fields;
+- implementation of the chair-definition package schema and accepted
+  schema-version window; the Phase 1 S1 plan recommends exact source-value
+  representation, full-size millimetres, an explicit chair-local frame and
+  fail-closed loading, accepted as direction and subject to Phase 4 tests;
 - accepted evidence, fit metrics and tolerances for the first S1 assimilation
   pilot, including confirmation of its precise prototype designation, rights
   chain, intended package licence and commercial/publication use; and

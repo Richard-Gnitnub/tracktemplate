@@ -197,6 +197,20 @@ and requires successor-only blocked oracles to remain visible. Passing proves
 coverage control, not that a partial or blocked workflow has passed its later
 GUI, migration, production, provenance or release gate.
 
+Review-ready first-S1 package/evidence plan checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_s1_pilot_plan.py
+```
+
+This protects all 15 S1 decision states and the recorded 2026-07-22 owner
+acceptance, the exact B14/B15 source, the
+structurally valid but `unknown` package manifest, blocked lineage scopes,
+comparison-only Templot oracle and absence of a premature production schema.
+It fails closed if a designation, licence, dependency, rights status or
+Templot artifact is promoted without evidence. Passing means the accepted
+control is internally consistent, not that the package is project-cleared.
+
 Project-plan progress bookkeeping:
 
 ```bash

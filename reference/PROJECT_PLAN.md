@@ -127,7 +127,7 @@ started. This is an outcome count, not an overall percentage of effort.
 | Phase | Outcome | Exit-gate progress | State |
 | --- | --- | --- | --- |
 | 0 | Recoverable baseline and benchmark checkpoint | `██████` — 6/6 evidenced | Complete — accepted 2026-07-19 |
-| 1 | Product, dependency, correctness, and performance inventory | `███████▒▒` — 7/9 evidenced; 2 active | Current |
+| 1 | Product, dependency, correctness, and performance inventory | `████████▒` — 8/9 evidenced; 1 active | Current |
 | 2 | Minimal modular foundation and validation harness | `░░░░░` — 0/5 | Not started |
 | 3 | First parity-proven vertical slice | `░░░░░` — 0/5 | Not started |
 | 4 | Canonical state, signatures, and persistence | `░░░░░░` — 0/6 | Not started |
@@ -195,7 +195,7 @@ and decisions on 2026-07-19, and the closeout checkpoint is tagged
 
 Status: **Current.**
 
-Progress: `███████▒▒` — 7/9 exit conditions evidenced; 2 remain active.
+Progress: `████████▒` — 8/9 exit conditions evidenced; 1 remains active.
 
 ### Current gate register
 
@@ -207,7 +207,7 @@ Progress: `███████▒▒` — 7/9 exit conditions evidenced; 2 rem
 | First slice, comparison path and acceptance evidence are agreed | Evidenced | Transition-length solver selected; B16/façade/caller/parity/rollback/performance contract frozen |
 | Templot chair map, B15 gap, S1 oracle recipe and assimilation boundary are reviewed | Evidenced | Exact 556b source route and blocker branch recorded; missing exact executable/artifacts remain named local evidence gates rather than silently weakened requirements |
 | First-S1/core and other-S&C/legacy lineage scopes are classified or visibly blocked | Evidenced | Both bounded machine-readable lineage registers have statuses, owners and later output gates; no positive clearance is inferred |
-| Neutral chair definition, manifest/licensing controls and first-S1 evidence/rights plan are accepted | Active | Neutral schema direction, manifest validator, contribution and rights fields are accepted; exact pilot evidence, package values/licence and non-copyright reviews remain open |
+| Neutral chair definition, manifest/licensing controls and first-S1 evidence/rights plan are accepted | Evidenced | The owner accepted `S1_PILOT_PLAN.md` on 2026-07-22, including S1-04 through S1-06, intended uses and the conditional CC0 target; S1-07 through S1-15 and the actual package remain blocked |
 | RC chair scope is bounded to validated packages and one assisted S1 pilot | Evidenced | Arbitrary automatic scan/CAD conversion remains explicitly post-RC research |
 | Open risks and required owner decisions are recorded | Active until closeout | Registers exist, but remaining GUI, S1 evidence, terminology-assurance and target-profile decisions must be reconciled in the Phase 1 closeout record |
 
@@ -940,7 +940,7 @@ package licence and field/component provenance pass
 | Reference ZIP commit/provenance policy | Resolved at Phase 0 exit — exact SourceForge origin recorded; ZIP ignored and untracked | Owner decision, upstream GPLv3 statement and checksum |
 | Source/data/output classification policy | Resolved 2026-07-20 — neutral canonical data, one-way optional Templot adapter, package-specific licensing and no automatic project claim over ordinary output | Archive/output-notice review, GPL/CC scope review, `LICENSING_BOUNDARIES.md`, and owner acceptance |
 | Chair geometry method and RC scope | Resolved 2026-07-20 — full-size procedural constituent generation, validated external packages and one assisted S1 pilot; arbitrary automatic conversion remains post-RC research | Templot source audit and project-owner acceptance |
-| Scoped output lineage and first S1 package rights plan | Phase 1 exit | Complete first-S1/core-rail-timber classifications or an explicit S1 block; bounded other-S&C and legacy registers; validated manifest, B15 gap analysis, pilot evidence/licence, non-copyright review, intended commercial/publication use and comparison metrics |
+| Scoped output lineage and first S1 package rights plan | Resolved for Phase 1 planning on 2026-07-22; package remains blocked | Owner-accepted `S1_PILOT_PLAN.md` plus the blocked first-S1/core classifications, validated unknown manifest, B15 gap analysis, intended uses, evidence/licence/right-review decision owners, comparison metric families and explicit later gates |
 | First extraction slice | Resolved 2026-07-20 — transition-length solver selected as the architecture pilot; B16/launcher and exact acceptance contract reserved; source movement not started | Candidate contracts, bounded closure cuts, workflow profiles, scorecard and owner acceptance |
 | Remaining representative fixtures and Phase 1 profile coverage | Phase 1 exit | Coverage, workflow gaps and reconciled target-architecture profile inventory |
 | Supported FreeCAD/Python and legacy document window | Initial policy defined 2026-07-20; owner review at Phase 1 exit and implementation/family fixtures due by Phase 4 | Exact runtime probe, official Addon metadata fields, B14/B15 source/schema anchors, existing save/reopen evidence, fail-closed contract validation and future migration fixtures |

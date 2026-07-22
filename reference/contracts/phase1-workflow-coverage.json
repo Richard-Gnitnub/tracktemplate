@@ -280,12 +280,14 @@
         ],
         "recipe_paths": [
           "reference/ARCHITECTURE.md",
-          "reference/PROJECT_PLAN.md"
+          "reference/PROJECT_PLAN.md",
+          "reference/S1_PILOT_PLAN.md"
         ],
         "validation_paths": [
           "tests/validate_templot_s1_oracle.py",
           "tests/validate_templot_s1_generation_map.py",
           "tests/validate_phase1_s1_lineage.py",
+          "tests/validate_phase1_s1_pilot_plan.py",
           "tools/validate_dependency_manifest.py"
         ]
       },
@@ -307,6 +309,7 @@
         "evidence_paths": [
           "reference/ARCHITECTURE.md",
           "reference/LICENSING_BOUNDARIES.md",
+          "reference/S1_PILOT_PLAN.md",
           "reference/manifests/s1-chair-pilot.dependency-manifest.json"
         ],
         "recipe_paths": [
@@ -314,6 +317,7 @@
         ],
         "validation_paths": [
           "tests/validate_licensing_controls.py",
+          "tests/validate_phase1_s1_pilot_plan.py",
           "tools/validate_dependency_manifest.py"
         ]
       },

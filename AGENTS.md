@@ -27,6 +27,10 @@
   Templot compatibility and generated-output project status. Read it before adding
   or changing output-affecting constants, tables, profiles, chair evidence,
   definition packages, fixtures, exporters or embedded media.
+- `reference/S1_PILOT_PLAN.md` is the owner-accepted, deliberately blocked
+  first S1 package/evidence control. Read it before S1 schema, evidence,
+  rail-interface, constituent, tolerance, licence or assimilation work. Its
+  accepted direction is not production data or project clearance.
 - The authoritative state is the parametric railway model: configuration, stable identities, topology, analytical results and production intent.
 - SVG, Coin nodes and other viewport geometry are derived views, never an independent source of railway truth.
 - Normal editing should use lightweight aggregated 2D presentation. Build exact `Part` shapes and solids only at an explicit Validate/Export boundary or when the user explicitly requests retained production geometry.
@@ -209,6 +213,12 @@
   evidence closes; its provisional static labels are not final module
   ownership. It also records the 2026-07-20 read-only Templot chair
   data/component/output-path audit and the remaining S1 oracle/schema evidence.
+- `reference/S1_PILOT_PLAN.md` and
+  `tests/validate_phase1_s1_pilot_plan.py` own the accepted 15-decision S1
+  plan. Preserve its unknown manifest, blocked lineage/oracle, exact source
+  anchors, conditional CC0 rule and owner/evidence gates. Do not publish an
+  LMS/REA designation, production value, rail section, licence or tolerance by
+  converting a recommendation into an asserted acceptance.
 - `reference/contracts/phase1-workflow-coverage.json` and
   `tests/validate_phase1_workflow_coverage.py` own the fail-closed 14-family
   workflow link registry. Preserve its exact inventory correspondence, 12
@@ -230,7 +240,7 @@
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
-- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
+- `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `reference/PROVENANCE.md` owns source and external chair-evidence provenance.
 - `reference/LICENSING_BOUNDARIES.md` owns the operational distinction between
@@ -525,6 +535,7 @@ Run the licensing-control tests and validate the current S1 pilot record:
 .venv/bin/python tools/validate_dependency_manifest.py \
   reference/manifests/s1-chair-pilot.dependency-manifest.json
 .venv/bin/python tests/validate_phase1_s1_lineage.py
+.venv/bin/python tests/validate_phase1_s1_pilot_plan.py
 .venv/bin/python tests/validate_phase1_other_snc_legacy_lineage.py
 .venv/bin/python tests/validate_templot_s1_oracle.py
 ```

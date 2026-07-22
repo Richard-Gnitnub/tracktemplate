@@ -225,9 +225,9 @@
   },
   "project_status": {
     "status": "unknown",
-    "reason": "The pilot is intentionally blocked by the current lineage register: primary evidence, package data, licence authority, non-copyright-rights reviews and owner acceptance are incomplete.",
-    "reviewed_by": "Phase 1 inventory",
-    "reviewed_on": "2026-07-20",
+    "reason": "The Phase 1 control plan is accepted, but the pilot remains intentionally blocked by the current lineage register: primary evidence, package data, licence authority, non-copyright-rights reviews and final package acceptance are incomplete.",
+    "reviewed_by": "Project owner and Phase 1 inventory",
+    "reviewed_on": "2026-07-22",
     "decision_reference": "reference/lineage/phase1-s1-core-lineage.json"
   }
 }

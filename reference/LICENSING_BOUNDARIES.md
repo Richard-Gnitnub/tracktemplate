@@ -37,6 +37,9 @@ status requires the Phase 1 lineage audit defined below.
   is the portable manifest structure;
   [`tools/validate_dependency_manifest.py`](../tools/validate_dependency_manifest.py)
   applies the fail-closed project-status rules.
+- [S1_PILOT_PLAN.md](S1_PILOT_PLAN.md) owns the accepted first-package
+  evidence/rights decision plan. It does not replace the manifest, perform a
+  rights review or promote a blocked dependency.
 
 ## Evidence boundary already established
 
@@ -344,6 +347,13 @@ Both scopes are intentionally `blocked`; the register is an auditable account
 of what is unresolved, not a positive rights or production decision. Its
 status may change only with the evidence and acceptance required below, never
 merely by editing the JSON.
+
+The owner-accepted [first S1 pilot plan](S1_PILOT_PLAN.md) fixes the intended uses,
+minimum evidence, conditional package-licence rule, decision owners and later
+metric/review gates without supplying missing evidence. Its 2026-07-22 owner
+acceptance closes the Phase 1 planning condition; it cannot change the manifest
+from `unknown`, change either lineage scope from `blocked`, or authorise
+implementation of production values.
 
 The tracked implementation for the third and fourth scopes is
 [`lineage/phase1-other-snc-legacy-lineage.json`](lineage/phase1-other-snc-legacy-lineage.json).

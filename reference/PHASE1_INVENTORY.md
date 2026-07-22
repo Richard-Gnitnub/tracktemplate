@@ -53,7 +53,9 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Chair source-audit date | 2026-07-20; read-only review of selected Pascal units |
 | Source/data/output policy | explicitly accepted by the project owner on 2026-07-20; [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) |
 | Dependency/project-status manifest | `reference/schemas/dependency-manifest-v1.schema.json`, schema 1; enforced by `tools/validate_dependency_manifest.py` |
-| First S1 pilot control manifest | structurally valid `unknown`; deliberately fails `--require-project-cleared` pending evidence, permissions, licence, non-copyright reviews and owner acceptance |
+| First S1 pilot control manifest | structurally valid `unknown`; deliberately fails `--require-project-cleared` pending evidence, permissions, licence, non-copyright reviews and final package acceptance; the accepted Phase 1 control does not alter that status |
+| First S1 pilot decision plan | `reference/S1_PILOT_PLAN.md`; owner accepted on 2026-07-22 as the blocked neutral package, quantity/frame, version/failure, evidence, intended-use and metric-family control, with all unsupported production decisions still blocked |
+| First S1 pilot plan validator | `tests/validate_phase1_s1_pilot_plan.py`; protects the acceptance record, 15-decision register, exact B14/B15 source, unknown manifest, blocked lineage/oracle and absence of a premature production schema |
 | Lineage audit scopes | first S1; core rail/timber used by S1; other S&C output; legacy B14/B15 output |
 | First-S1/core lineage register | `reference/lineage/phase1-s1-core-lineage.json`, schema 1; 16 current output-affecting groups, all `reference-only` or `unknown`, with both scopes visibly `blocked` |
 | First-S1/core lineage contract | `tests/validate_phase1_s1_lineage.py`; verifies register semantics, B14/B15 source anchors, the optional local archive hashes and the unresolved S1 manifest link |
@@ -111,6 +113,7 @@ unresolved S1 pilot record:
   reference/manifests/s1-chair-pilot.dependency-manifest.json
 .venv/bin/python tests/validate_phase1_s1_lineage.py
 .venv/bin/python tests/validate_phase1_other_snc_legacy_lineage.py
+.venv/bin/python tests/validate_phase1_s1_pilot_plan.py
 ```
 
 Run the first direct B14/B15 transition and station characterisation oracle:
@@ -619,6 +622,16 @@ and manual acceptance. A scan alone is insufficient evidence for hidden or
 worn surfaces, nominal dimensions, component boundaries and rail fit. Fully
 automatic conversion of an arbitrary 3D source is consequently outside the RC
 scope and remains post-RC research.
+
+The owner-accepted [first S1 pilot plan](S1_PILOT_PLAN.md) now turns that
+direction into 15 explicit decisions. It requires exact source-quantity
+serialization, full-size millimetres, a right-handed gauge-to-field chair
+frame and validate-before-mutation failure behaviour. It fixes the minimum
+evidence bundle and comparison metric families without inventing dimensions or
+tolerances. The precise designation, primary evidence, rail section,
+constituents/landmarks, final package licence, rights reviews, numeric
+tolerances and assimilation residual policy remain owner/evidence gates. The
+plan was accepted on 2026-07-22; the actual package is not project-cleared.
 
 ### Source/data/output licensing boundary
 
@@ -1204,18 +1217,17 @@ successor document detector or migrator exists yet, and neither macro changed.
 | 2026-07-22 | Make reuse and maintainability explicit release invariants | Accepted by the project owner; each genuinely shared concept has one authoritative implementation behind a cohesive narrow tested interface, exploratory code is removed or promoted before retention, temporary duplication requires an owner/retirement gate, current structural/parity checks remain active and Phase 2 must add executable package import/dependency/cycle guards |
 | 2026-07-22 | Track progress by evidenced exit conditions and outcome milestones | Accepted and implemented in `PROJECT_PLAN.md`; bars do not estimate time or effort, the initial Phase 1 register supported 6/9 evidenced conditions, nine value-based milestones connect the baseline to RC1 without weakening any phase gate, and `tests/validate_project_progress.py` prevents numerical drift without substituting for owner judgement |
 | 2026-07-22 | Make release-critical workflow ownership finite and fail closed | Implemented for Phase 1 evidence and owner review; the canonical 14-row inventory is mirrored by one compact link registry with 12 bounded-executed and two defined-blocked oracle states, exact evidence/control paths, gap owners and future closure phases; this advances the Phase 1 dashboard to 7/9 without claiming that any open gap has passed |
+| 2026-07-22 | Make the blocked first-S1 package/evidence plan reviewable | Implemented for Phase 1 evidence and owner review; `S1_PILOT_PLAN.md` records 15 accepted, recommended, owner-required and evidence-blocked decisions, recommends exact quantities/full-size millimetres/a declared chair frame/strict load failure, fixes intended uses and metric families, and explicitly prevents a working S1 name, conditional CC0 target or Templot comparison from becoming clearance |
+| 2026-07-22 | Accept the blocked first-S1 package/evidence control | Accepted explicitly by the project owner; S1-04 through S1-06, the intended uses and conditional CC0 target are accepted as direction, while S1-07 through S1-15, the manifest, lineage, comparison oracle and production package remain blocked; this advances the Phase 1 dashboard to 8/9 without asserting chair geometry or clearance |
 
 ## Remaining Phase 1 work
 
 - Keep the 14-workflow coverage registry aligned with the canonical inventory;
   reopen its Phase 1 condition if a release-critical family lacks an owner,
   known oracle state or explicit gap.
-- Complete the reviewable first-S1 evidence/rights plan: specify the neutral
-  package and corrupt/future-version behaviour, then obtain project-owner
-  decisions on the precise prototype designation, intended evidence, package
-  licence, commercial/publication use, rail section, component landmarks,
-  residual metrics and tolerances. Missing exact evidence may remain blocked
-  only with its named owner and later gate.
+- Preserve the accepted `S1_PILOT_PLAN.md` boundary: S1-07 through S1-15 and
+  the actual package remain blocked under their named Phase 9 gates until
+  evidence and the outstanding decisions exist.
 - Establish the terminology-assurance control for accepted, provisional,
   review-required and frozen legacy terms so unresolved railway usage is
   visible rather than silently normalised.
