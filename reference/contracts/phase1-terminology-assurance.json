@@ -1,0 +1,441 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase1:terminology-assurance:1",
+  "recorded_on": "2026-07-22",
+  "status": "implemented-for-phase1-closeout-review",
+  "phase": 1,
+  "scope": {
+    "purpose": "Make railway-language confidence visible and prevent an uncertain or frozen legacy term from silently becoming a successor UI, schema or API convention.",
+    "bounded_claim": "This contract records accepted project usage, provisional descriptions, review-required semantic families and frozen legacy identifiers. It does not claim that lexical scanning can prove railway correctness or that an accepted term is universally correct outside its declared context.",
+    "product_effect": "Control evidence only. B14 and B15 remain byte-identical, no successor source or UI is created and no unresolved railway term is renamed.",
+    "human_factor_rule": "When a contributor is unsure, preserve the observed wording, record its context and mark it for review instead of guessing or performing a mechanical replacement."
+  },
+  "source_state": {
+    "b14": {
+      "path": "AdvancedTurnout.FCMacro",
+      "version_token": "10.2A8A7B14",
+      "sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+      "role": "immutable legacy comparison oracle"
+    },
+    "b15": {
+      "path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+      "version_token": "10.2A8A7B15",
+      "sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+      "role": "accepted behavioural reference"
+    }
+  },
+  "state_definitions": [
+    {
+      "state": "accepted",
+      "meaning": "Approved for the bounded project context and preferred forms recorded here; this is not a claim about every railway, era or jurisdiction.",
+      "new_use": "Allowed only in the declared context. A changed meaning or broader public claim reopens review."
+    },
+    {
+      "state": "provisional",
+      "meaning": "A visible working description whose precise prototype or railway meaning is not yet evidenced.",
+      "new_use": "May be used only with its provisional status visible; it cannot become a production identifier or public factual claim."
+    },
+    {
+      "state": "review-required",
+      "meaning": "The wording is ambiguous, source-specific or plausibly wrong in the proposed context.",
+      "new_use": "Blocked in successor public UI, schema and API surfaces until the named railway-domain review closes."
+    },
+    {
+      "state": "frozen-legacy",
+      "meaning": "An exact existing token is retained solely for immutable source, evidence reproducibility or compatibility.",
+      "new_use": "Blocked outside the enumerated legacy boundary; a compatibility translation must expose the canonical successor term."
+    }
+  ],
+  "policy": {
+    "canonical_owner": "reference/TERMINOLOGY.md",
+    "register_owner": "reference/contracts/phase1-terminology-assurance.json",
+    "validation_owner": "tests/validate_phase1_terminology.py",
+    "new_term_rule": "A new railway term or a materially new context must be added as accepted, provisional or review-required before it enters a successor public UI, persisted schema, production manifest or public API.",
+    "uncertain_use_marker": "TERM-REVIEW[<term_id>]",
+    "marker_rule": "Development code or prose may use a TERM-REVIEW marker only for a registered provisional or review-required term and must add a matching open-review record with an owner and closure gate.",
+    "promotion_rule": "Only the project owner may accept a terminology decision, using recorded railway/source evidence and the exact bounded context. Tests or implementation convenience cannot promote a term.",
+    "legacy_rule": "Do not rename immutable macros or frozen evidence identifiers. New modular surfaces use canonical wording and translate legacy identifiers only in an explicit compatibility adapter.",
+    "review_output_rule": "A review records accepted wording, rejected alternatives, semantic context, evidence, reviewer, decision date and affected locations; unresolved findings remain visible.",
+    "automation_limit": "The validator detects registered-state drift, known prohibited tokens, unregistered frozen paths and missing review ownership. Human railway-domain review decides contextual correctness.",
+    "successor_scan_roots": [
+      "tracktemplate",
+      "TrackTemplate.FCMacro",
+      "Init.py",
+      "InitGui.py",
+      "package.xml",
+      "metadata.txt"
+    ],
+    "successor_text_suffixes": [
+      ".py",
+      ".json",
+      ".md",
+      ".xml",
+      ".txt",
+      ".FCMacro"
+    ],
+    "prohibited_unreviewed_tokens": [
+      "ordinary_track",
+      "ordinary track",
+      "ordinary-track",
+      "CHAIR_FAMILY_ORDINARY",
+      "frog"
+    ],
+    "product_exceptions": []
+  },
+  "terms": [
+    {
+      "term_id": "plain-line",
+      "display": "plain line / plain-line / plain line track",
+      "state": "accepted",
+      "bounded_meaning": "Track without switches and crossings; plain describes the infrastructure class, not whether the alignment is straight.",
+      "preferred_forms": [
+        "plain line",
+        "plain line track",
+        "plain-line"
+      ],
+      "context_rule": "Use plain line as a noun and plain-line as a compound modifier. Curved, transitioned and multiple-track layouts may still be plain line.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#canonical-track-terms",
+        "https://www.orr.gov.uk/glossary",
+        "https://www.orr.gov.uk/media/28096/download"
+      ],
+      "owner_role": "Project owner",
+      "later_gate": "Reopen only if the bounded meaning or cited railway authority changes."
+    },
+    {
+      "term_id": "switches-and-crossings",
+      "display": "switches and crossings (S&C)",
+      "state": "accepted",
+      "bounded_meaning": "The infrastructure class contrasted with plain line in this project; turnouts and crossovers are within the project's S&C or special-trackwork scope.",
+      "preferred_forms": [
+        "switches and crossings",
+        "S&C",
+        "special trackwork"
+      ],
+      "context_rule": "Do not use the class label to erase the more specific turnout, crossover, switch or crossing component meaning.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#canonical-track-terms",
+        "https://www.orr.gov.uk/glossary"
+      ],
+      "owner_role": "Project owner",
+      "later_gate": "Phase 8 component-language review retains the class/component distinction."
+    },
+    {
+      "term_id": "straight-and-curve",
+      "display": "straight / curve",
+      "state": "accepted",
+      "bounded_meaning": "Alignment descriptors independent of the plain-line versus S&C classification.",
+      "preferred_forms": [
+        "straight",
+        "curve"
+      ],
+      "context_rule": "Never use straight as a synonym for plain line.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#canonical-track-terms",
+        "Project-owner terminology decision 2026-07-19"
+      ],
+      "owner_role": "Project owner",
+      "later_gate": "Phase 7 alignment UI review."
+    },
+    {
+      "term_id": "easement-and-transition",
+      "display": "easement / transition",
+      "state": "accepted",
+      "bounded_meaning": "Project alignment descriptors for gradual geometric change, with the exact mathematical subtype stated where behaviour depends on it.",
+      "preferred_forms": [
+        "easement",
+        "transition",
+        "Euler easement"
+      ],
+      "context_rule": "Do not imply that every transition is an Euler easement; name the implemented curve family when it matters.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#canonical-track-terms",
+        "Project-owner terminology decision 2026-07-19"
+      ],
+      "owner_role": "Phase 7 alignment migration owner",
+      "later_gate": "Phase 7 alignment terminology and behaviour review."
+    },
+    {
+      "term_id": "chainage-and-station",
+      "display": "chainage / station",
+      "state": "accepted",
+      "bounded_meaning": "A longitudinal position on a declared centreline or route within the current geometry model.",
+      "preferred_forms": [
+        "chainage",
+        "station"
+      ],
+      "context_rule": "State the owning centreline, origin and direction. Do not use station without context where it could mean a passenger station or structure.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#canonical-track-terms",
+        "Project-owner terminology decision 2026-07-19"
+      ],
+      "owner_role": "Phase 7 stationing migration owner",
+      "later_gate": "Phase 7 public-label and independent-datum review."
+    },
+    {
+      "term_id": "multiple-track",
+      "display": "multiple-track",
+      "state": "accepted",
+      "bounded_meaning": "A layout containing more than one track alignment; it does not determine whether any alignment is plain line or S&C.",
+      "preferred_forms": [
+        "multiple-track"
+      ],
+      "context_rule": "Keep track count separate from alignment shape and S&C classification.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#canonical-track-terms",
+        "Project-owner terminology decision 2026-07-19"
+      ],
+      "owner_role": "Phase 7 multiple-track migration owner",
+      "later_gate": "Phase 7 multiple-track UI and schema review."
+    },
+    {
+      "term_id": "ordinary-track",
+      "display": "ordinary track / ordinary_track",
+      "state": "frozen-legacy",
+      "bounded_meaning": "A historical project identifier for plain-line evidence and compatibility paths, not the canonical railway category.",
+      "preferred_forms": [
+        "plain line",
+        "plain-line",
+        "plain_line"
+      ],
+      "context_rule": "Retain only in the enumerated legacy paths, immutable source quotations and explicit compatibility references.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#compatibility-and-evidence",
+        "Project-owner terminology decision 2026-07-19"
+      ],
+      "owner_role": "Compatibility and evidence owner",
+      "later_gate": "Retire only after every evidence link and compatibility caller has an accepted migration."
+    },
+    {
+      "term_id": "ordinary-single-road-timbers",
+      "display": "ordinary single-road timbers",
+      "state": "review-required",
+      "bounded_meaning": "Unresolved legacy phrase that may mean plain-line, independent single-road, non-shared or another support class.",
+      "preferred_forms": [],
+      "context_rule": "Do not choose a replacement until timber semantics and source usage are reviewed.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#deferred-source-correction",
+        "B14/B15 line containing maximum_advisory_skew_degrees"
+      ],
+      "owner_role": "Phase 8 timbering railway-domain reviewer",
+      "later_gate": "Phase 8 timber classification and public-label review."
+    },
+    {
+      "term_id": "ordinary-chair",
+      "display": "ordinary chair / CHAIR_FAMILY_ORDINARY",
+      "state": "review-required",
+      "bounded_meaning": "A legacy REA/Templot-derived chair-family expression whose exact prototype and source meaning is not established by the plain-line decision.",
+      "preferred_forms": [],
+      "context_rule": "Do not mechanically replace it with plain-line chair or treat it as a cleared prototype classification.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#deferred-source-correction",
+        "reference/lineage/phase1-s1-core-lineage.json"
+      ],
+      "owner_role": "Phase 9 chair evidence and railway-domain reviewer",
+      "later_gate": "S1-07, S1-08 and S1-10 evidence decisions in Phase 9."
+    },
+    {
+      "term_id": "sleeper-and-timber",
+      "display": "sleeper / timber",
+      "state": "review-required",
+      "bounded_meaning": "Support terms whose correct use may depend on plain line, S&C, prototype practice, component length and the source convention.",
+      "preferred_forms": [],
+      "context_rule": "Do not treat sleeper and timber as universal synonyms; review public labels and schema meanings against the represented prototype.",
+      "evidence": [
+        "reference/TERMINOLOGY.md#deferred-source-correction",
+        "Current B14/B15 mixed support terminology"
+      ],
+      "owner_role": "Phase 8 timbering railway-domain reviewer",
+      "later_gate": "Phase 8 support taxonomy, UI and migration review."
+    },
+    {
+      "term_id": "switch-points-and-turnout",
+      "display": "switch / points / turnout",
+      "state": "review-required",
+      "bounded_meaning": "Related but context-sensitive S&C terms that must not be assumed to be interchangeable; points is also heavily used for generic geometry vertices in current code.",
+      "preferred_forms": [],
+      "context_rule": "A public railway label must identify whether it means a complete turnout, a switch assembly, movable rails or generic geometric points.",
+      "evidence": [
+        "Current B14/B15 source usage",
+        "reference/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory"
+      ],
+      "owner_role": "Phase 8 S&C railway-domain reviewer",
+      "later_gate": "Phase 8 S&C component taxonomy and UI review."
+    },
+    {
+      "term_id": "crossing-vee-and-frog",
+      "display": "crossing / common crossing / vee / frog",
+      "state": "review-required",
+      "bounded_meaning": "Crossing-component terminology varies by source and audience; frog is not an established project term and is prohibited from silently becoming the default label.",
+      "preferred_forms": [],
+      "context_rule": "Use the current specific component term only when its geometry is known; any proposed frog label requires explicit railway-domain review.",
+      "evidence": [
+        "Current B14/B15 common-crossing and vee terminology",
+        "reference/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory"
+      ],
+      "owner_role": "Phase 8 S&C railway-domain reviewer",
+      "later_gate": "Phase 8 S&C component taxonomy and UI review."
+    },
+    {
+      "term_id": "s1-chair-designation",
+      "display": "S1 chair",
+      "state": "provisional",
+      "bounded_meaning": "Working project description for the first assisted chair pilot; no precise company, standard, LMS or REA attribution is asserted.",
+      "preferred_forms": [
+        "working S1 chair description"
+      ],
+      "context_rule": "Keep the provisional status visible and do not publish it as a precise prototype package designation.",
+      "evidence": [
+        "reference/S1_PILOT_PLAN.md",
+        "reference/manifests/s1-chair-pilot.dependency-manifest.json"
+      ],
+      "owner_role": "Phase 9 chair evidence owner",
+      "later_gate": "S1-07 precise prototype designation decision."
+    }
+  ],
+  "frozen_legacy_paths": [
+    "reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md",
+    "reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md",
+    "reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md",
+    "tests/validate_phase1_ordinary_edit.py",
+    "tests/validate_phase1_ordinary_export.py",
+    "tests/validate_phase1_ordinary_track.py",
+    "tools/freecad_bridge/ordinary_track_edit_recipe.py",
+    "tools/freecad_bridge/ordinary_track_export_recipe.py",
+    "tools/freecad_bridge/ordinary_track_recipe.py",
+    "tools/freecad_bridge/probes/b14_ordinary_create_export_driver.py",
+    "tools/freecad_bridge/probes/b14_ordinary_edit_driver.py",
+    "tools/freecad_bridge/probes/b14_ordinary_export_driver.py",
+    "tools/freecad_bridge/probes/snapshot_b14_ordinary_track.py",
+    "tools/freecad_bridge/run-b14-ordinary-create-export",
+    "tools/freecad_bridge/run-b14-ordinary-edit",
+    "tools/freecad_bridge/run-b14-ordinary-export",
+    "tools/freecad_bridge/run-b14-ordinary-snapshot",
+    "tools/freecad_bridge/run_b14_ordinary_create_export.py",
+    "tools/freecad_bridge/run_b14_ordinary_edit.py",
+    "tools/freecad_bridge/run_b14_ordinary_export.py",
+    "tools/freecad_bridge/run_b14_ordinary_snapshot.py"
+  ],
+  "macro_findings": [
+    {
+      "finding_id": "TERM-F01",
+      "term_id": "ordinary-track",
+      "literal": "ordinary parallel tracks",
+      "state": "frozen-legacy",
+      "expected_occurrences_per_source": 1,
+      "disposition": "Replace with plain-line wording only in an approved successor UI while preserving B14/B15 evidence."
+    },
+    {
+      "finding_id": "TERM-F02",
+      "term_id": "ordinary-single-road-timbers",
+      "literal": "ordinary single-road timbers",
+      "state": "review-required",
+      "expected_occurrences_per_source": 1,
+      "disposition": "Determine the represented support class before selecting successor wording."
+    },
+    {
+      "finding_id": "TERM-F03",
+      "term_id": "ordinary-chair",
+      "literal": "ordinary chair",
+      "state": "review-required",
+      "expected_occurrences_per_source": 5,
+      "disposition": "Resolve through the chair evidence and constituent review; do not inherit the phrase as canonical data."
+    }
+  ],
+  "open_reviews": [
+    {
+      "review_id": "TERM-R01",
+      "term_id": "ordinary-single-road-timbers",
+      "state": "open",
+      "locations": [
+        "AdvancedTurnout.FCMacro:38934",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:38934"
+      ],
+      "question": "Does the phrase mean plain-line, independent single-road, non-shared or another support classification?",
+      "owner_role": "Phase 8 timbering railway-domain reviewer",
+      "closure_gate": "Recorded source evidence, accepted replacement or retained bounded term, and successor UI/schema review."
+    },
+    {
+      "review_id": "TERM-R02",
+      "term_id": "ordinary-chair",
+      "state": "open",
+      "locations": [
+        "AdvancedTurnout.FCMacro:42998",
+        "AdvancedTurnout.FCMacro:43155",
+        "AdvancedTurnout.FCMacro:43164",
+        "AdvancedTurnout.FCMacro:43216",
+        "AdvancedTurnout.FCMacro:44495",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:42998",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:43155",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:43164",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:43216",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro:44495"
+      ],
+      "question": "What exact source classification does ordinary carry for the S1 family, and what independently evidenced successor term is appropriate?",
+      "owner_role": "Phase 9 chair evidence and railway-domain reviewer",
+      "closure_gate": "S1-07, S1-08 and S1-10 close with field/component provenance and accepted package terminology."
+    },
+    {
+      "review_id": "TERM-R03",
+      "term_id": "sleeper-and-timber",
+      "state": "open",
+      "locations": [
+        "AdvancedTurnout.FCMacro",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro"
+      ],
+      "question": "Which support categories and public labels apply across plain line, turnout and crossover workflows?",
+      "owner_role": "Phase 8 timbering railway-domain reviewer",
+      "closure_gate": "Phase 8 support taxonomy maps every successor label and persisted field to an evidenced meaning."
+    },
+    {
+      "review_id": "TERM-R04",
+      "term_id": "switch-points-and-turnout",
+      "state": "open",
+      "locations": [
+        "AdvancedTurnout.FCMacro",
+        "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro"
+      ],
+      "question": "Which current public labels refer to a complete turnout, a switch assembly, movable rails or generic geometry points?",
+      "owner_role": "Phase 8 S&C railway-domain reviewer",
+      "closure_gate": "Phase 8 component taxonomy and UI review records each public meaning without renaming generic point variables mechanically."
+    },
+    {
+      "review_id": "TERM-R05",
+      "term_id": "crossing-vee-and-frog",
+      "state": "open",
+      "locations": [
+        "Future successor S&C UI/schema/API"
+      ],
+      "question": "Which crossing-component terms are correct for the represented UK prototype and intended audience?",
+      "owner_role": "Phase 8 S&C railway-domain reviewer",
+      "closure_gate": "Phase 8 accepts the component glossary and rejects or bounds alternatives before public use."
+    },
+    {
+      "review_id": "TERM-R06",
+      "term_id": "s1-chair-designation",
+      "state": "open",
+      "locations": [
+        "reference/S1_PILOT_PLAN.md"
+      ],
+      "question": "What exact prototype/company/standard designation is supported by the selected primary evidence?",
+      "owner_role": "Phase 9 chair evidence owner",
+      "closure_gate": "S1-07 closes with rights-compatible primary evidence and explicit owner confirmation."
+    }
+  ],
+  "phase1_gate": {
+    "status": "ready-for-closeout-review",
+    "evidenced": [
+      "The four assurance states and their promotion rules are explicit.",
+      "Known ordinary-track, timber and chair findings are bounded without changing B14/B15.",
+      "Every unresolved semantic family has an accountable owner and later gate.",
+      "Successor product surfaces fail on known prohibited legacy tokens unless a reviewed exception is registered.",
+      "The human review workflow states what automation cannot decide."
+    ],
+    "not_claimed": [
+      "No open terminology review is resolved by this contract.",
+      "No B14/B15 wording is corrected.",
+      "No term is accepted outside its bounded context.",
+      "Phase 1 is not closed without the complete closeout review and project-owner acceptance."
+    ]
+  }
+}

@@ -77,6 +77,11 @@
   policy. Use **plain line** or **plain line track** for track without switches
   and crossings; plain line may be straight, curved, transitioned or part of a
   multiple-track layout.
+- `reference/contracts/phase1-terminology-assurance.json` and
+  `tests/validate_phase1_terminology.py` own the accepted, provisional,
+  review-required and frozen-legacy states, known source findings, open review
+  owners and successor terminology scan. Automated passing does not establish
+  contextual railway correctness.
 - Do not introduce **ordinary track** in new prose, UI, schema or API names.
   Use **routine editing** and **standalone Python** for the unrelated generic
   meanings.
@@ -86,6 +91,10 @@
   compatibility and evidence migration.
 - Do not mechanically relabel `ordinary chair`, timber or component terms;
   review their railway/source meaning separately.
+- If a railway term or its context is uncertain, do not guess. Add or update
+  the terminology register and use `TERM-REVIEW[<term_id>]` in development-only
+  code/prose with a matching open review, named owner and closure gate. Only
+  the project owner may accept the resulting project terminology decision.
 
 ## Project phase discipline
 
@@ -237,6 +246,11 @@
   accounting, non-additive nested spans, five `bounded-not-fixed` defects and
   four `not-implemented-unmeasured` target slots. It accepts no human-use
   budget and does not authorise an optimisation.
+- `reference/contracts/phase1-terminology-assurance.json` and
+  `tests/validate_phase1_terminology.py` own the Phase 1 human/automated
+  terminology boundary. Preserve the four assurance states, exact frozen path
+  set, B14/B15 findings, open review owners and fail-closed successor scan; do
+  not promote a term merely to silence the validator.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
@@ -549,6 +563,12 @@ Run the direct Phase 1 transition/station characterisation:
 
 ```bash
 .venv/bin/python tests/validate_phase1_alignment.py
+```
+
+Run the Phase 1 terminology-assurance contract:
+
+```bash
+.venv/bin/python tests/validate_phase1_terminology.py
 ```
 
 Run the fast Phase 1 plain-line oracle checks:

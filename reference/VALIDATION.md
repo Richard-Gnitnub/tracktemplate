@@ -197,7 +197,19 @@ and requires successor-only blocked oracles to remain visible. Passing proves
 coverage control, not that a partial or blocked workflow has passed its later
 GUI, migration, production, provenance or release gate.
 
-Review-ready first-S1 package/evidence plan checks:
+Fail-closed railway terminology-assurance checks:
+
+```bash
+.venv/bin/python tests/validate_phase1_terminology.py
+```
+
+This validates the four assurance states, exact B14/B15 fingerprints and
+known phrase counts, frozen ordinary-named evidence paths, open-review
+ownership and future successor-product scan. It detects known terminology
+drift and missing review control; it cannot determine contextual railway
+correctness without the named human review.
+
+Owner-accepted first-S1 package/evidence plan checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_s1_pilot_plan.py

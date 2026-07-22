@@ -16,7 +16,9 @@ The documents have distinct responsibilities:
 - [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md) defines comparable resource measurements.
 - [VALIDATION.md](VALIDATION.md) defines correctness and integration evidence.
 - [TERMINOLOGY.md](TERMINOLOGY.md) defines canonical railway language and the
-  compatibility policy for legacy identifiers.
+  compatibility policy for legacy identifiers;
+  [contracts/phase1-terminology-assurance.json](contracts/phase1-terminology-assurance.json)
+  records confidence states, open reviews and the automated successor boundary.
 - [PROVENANCE.md](PROVENANCE.md) records reference-source identity, source
   relationship, redistribution and licensing status.
 - [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) defines the mandatory
@@ -209,7 +211,7 @@ Progress: `████████▒` — 8/9 exit conditions evidenced; 1 rem
 | First-S1/core and other-S&C/legacy lineage scopes are classified or visibly blocked | Evidenced | Both bounded machine-readable lineage registers have statuses, owners and later output gates; no positive clearance is inferred |
 | Neutral chair definition, manifest/licensing controls and first-S1 evidence/rights plan are accepted | Evidenced | The owner accepted `S1_PILOT_PLAN.md` on 2026-07-22, including S1-04 through S1-06, intended uses and the conditional CC0 target; S1-07 through S1-15 and the actual package remain blocked |
 | RC chair scope is bounded to validated packages and one assisted S1 pilot | Evidenced | Arbitrary automatic scan/CAD conversion remains explicitly post-RC research |
-| Open risks and required owner decisions are recorded | Active until closeout | Registers exist, but remaining GUI, S1 evidence, terminology-assurance and target-profile decisions must be reconciled in the Phase 1 closeout record |
+| Open risks and required owner decisions are recorded | Active until closeout | The terminology-assurance register now gives every uncertain family an owner/later gate; remaining GUI limitations, S1 blockers, target-profile decisions and accepted exceptions still require one reconciled Phase 1 closeout record |
 
 The canonical workflow control is
 [`contracts/phase1-workflow-coverage.json`](contracts/phase1-workflow-coverage.json).

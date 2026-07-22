@@ -75,6 +75,8 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Performance-boundary validator | `tests/validate_phase1_performance_boundaries.py`; verifies immutable source/report fingerprints, declared medians, per-run-before-median accounting, non-additive nested spans, source anchors, blocked optimisation/budget use and fail-closed mutations |
 | Workflow-coverage register | `reference/contracts/phase1-workflow-coverage.json`, schema 1; all 14 canonical families have an accountable owner, known oracle state, repository evidence/control paths, visible gap owner and later closure phases |
 | Workflow-coverage validator | `tests/validate_phase1_workflow_coverage.py`; cross-checks the Markdown table, exact B14/B15 fingerprints, 12 bounded-executed and two defined-blocked oracles, every referenced path and fail-closed mutations |
+| Terminology-assurance register | `reference/contracts/phase1-terminology-assurance.json`, schema 1; 13 bounded term families across accepted, provisional, review-required and frozen-legacy states, six open reviews, three exact macro findings and 21 frozen evidence paths |
+| Terminology-assurance validator | `tests/validate_phase1_terminology.py`; protects B14/B15 hashes and finding counts, the exact frozen path set, unresolved-review ownership and prohibited successor-product tokens while explicitly leaving semantic correctness to human review |
 | Project progress control | `PROJECT_PLAN.md` counts evidenced exit conditions and outcome milestones; `tests/validate_project_progress.py` reconciles bars, denominators, Phase 1 register states and milestone states without judging evidence sufficiency |
 | Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
 | Production-source changes in this tranche | None |
@@ -82,6 +84,15 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 The `ordinary_track` filenames, imports, commands and recipe IDs in this
 inventory are frozen legacy evidence identifiers. Living prose follows
 [TERMINOLOGY.md](TERMINOLOGY.md) and describes the subject as plain line.
+
+The companion
+[terminology-assurance register](contracts/phase1-terminology-assurance.json)
+now makes human uncertainty explicit. It distinguishes six accepted bounded
+term families, one provisional S1 description, five review-required semantic
+families and the frozen ordinary-track identifier. Six open reviews have Phase
+8 or Phase 9 owners and closure gates. Its scanner prevents known legacy terms
+from silently entering future Workbench surfaces, but does not pretend that
+word matching can decide railway semantics.
 
 Reproduce the complete JSON inventory without importing or executing either
 macro:
@@ -102,6 +113,13 @@ release-critical workflow:
 
 ```bash
 .venv/bin/python tests/validate_phase1_workflow_coverage.py
+```
+
+Validate the railway terminology-assurance states, source findings, frozen
+identifiers, review ownership and successor scan:
+
+```bash
+.venv/bin/python tests/validate_phase1_terminology.py
 ```
 
 Validate the executable dependency-manifest controls and the deliberately
@@ -1219,6 +1237,7 @@ successor document detector or migrator exists yet, and neither macro changed.
 | 2026-07-22 | Make release-critical workflow ownership finite and fail closed | Implemented for Phase 1 evidence and owner review; the canonical 14-row inventory is mirrored by one compact link registry with 12 bounded-executed and two defined-blocked oracle states, exact evidence/control paths, gap owners and future closure phases; this advances the Phase 1 dashboard to 7/9 without claiming that any open gap has passed |
 | 2026-07-22 | Make the blocked first-S1 package/evidence plan reviewable | Implemented for Phase 1 evidence and owner review; `S1_PILOT_PLAN.md` records 15 accepted, recommended, owner-required and evidence-blocked decisions, recommends exact quantities/full-size millimetres/a declared chair frame/strict load failure, fixes intended uses and metric families, and explicitly prevents a working S1 name, conditional CC0 target or Templot comparison from becoming clearance |
 | 2026-07-22 | Accept the blocked first-S1 package/evidence control | Accepted explicitly by the project owner; S1-04 through S1-06, the intended uses and conditional CC0 target are accepted as direction, while S1-07 through S1-15, the manifest, lineage, comparison oracle and production package remain blocked; this advances the Phase 1 dashboard to 8/9 without asserting chair geometry or clearance |
+| 2026-07-22 | Make railway terminology uncertainty visible and fail closed | Implemented for Phase 1 closeout review; 13 bounded term families now use accepted, provisional, review-required or frozen-legacy states, six unresolved reviews have Phase 8/9 owners, exact B14/B15 phrases and 21 ordinary-named evidence paths are protected, and successor product surfaces reject known legacy tokens without claiming that lexical scanning proves semantic correctness |
 
 ## Remaining Phase 1 work
 
@@ -1228,9 +1247,9 @@ successor document detector or migrator exists yet, and neither macro changed.
 - Preserve the accepted `S1_PILOT_PLAN.md` boundary: S1-07 through S1-15 and
   the actual package remain blocked under their named Phase 9 gates until
   evidence and the outstanding decisions exist.
-- Establish the terminology-assurance control for accepted, provisional,
-  review-required and frozen legacy terms so unresolved railway usage is
-  visible rather than silently normalised.
+- Preserve and review the terminology-assurance control at Phase 1 closeout;
+  its six open semantic reviews remain owned Phase 8/9 work rather than hidden
+  Phase 1 blockers or silently normalised terminology.
 - Assemble the Phase 1 closeout record and reconcile its remaining owner
   decisions: recorded GUI limitations, the exact host/legacy-ingress policy,
   deliberately unmeasured target-pipeline slots, S1 blockers and every accepted
