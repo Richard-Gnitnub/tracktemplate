@@ -240,7 +240,7 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
   tests/freecad_validate_phase4_transition_state.py
 ```
 
-The standard-library validator owns the provisional schema-v1 deterministic
+The standard-library validator owns the accepted bounded-read schema-v1 deterministic
 round-trip, complete transition-analysis signatures, cold/reuse/change-back,
 label-only reuse, numerical invalidation, stable identity, stale/corrupt
 derived-result recovery, fail-closed input cases and application dependency
@@ -284,6 +284,27 @@ after save/close/reopen. Its success sentinel is
 `Phase 4 legacy document FreeCAD detection validation passed`. This is outer
 ingress evidence only: no entity family is migration-qualified and no copied-
 target migrator exists yet.
+
+Phase 4 read-only plain-line transition family assessment:
+
+```bash
+.venv/bin/python tests/validate_phase4_plain_line_transition_assessment.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase4_plain_line_transition_assessment.py
+```
+
+The standalone matrix consumes the accepted outer detector and proves exact
+B14, B15 and expected-mixed handling for the spacing-matched secondary
+plain-line transition slice. It requires complete typed settings, derives
+stable identities from template-set identity plus persisted semantic track
+ordinal and end, replays the canonical solver exactly, rejects partial,
+unsupported, corrupt or ambiguous input, and retains zero write, migration or
+production authority. The FreeCAD check opens the reproducible ignored B14
+base fixture read-only, obtains the two exact canonical candidates, compares
+document/property/history snapshots and requires the source FCStd hash to stay
+unchanged. Its sentinel is
+`Phase 4 plain-line transition FreeCAD assessment passed`. This is an
+assessment, not a copied-target migration or entity-family support claim.
 
 Phase 4 neutral chair-definition package:
 

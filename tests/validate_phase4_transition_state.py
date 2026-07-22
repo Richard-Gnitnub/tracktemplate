@@ -405,7 +405,8 @@ def _validate_source_and_phase_controls():
     )
     assert "Phase 4 is current" in plan
     assert "PHASE4_CANONICAL_STATE.md" in plan
-    assert "Provisional transition schema v1" in evidence
+    assert "## Transition schema v1" in evidence
+    assert "owner accepted this as part of the bounded Phase 4 read window" in evidence
     assert "Current Phase 4 gate disposition" in evidence
 
 

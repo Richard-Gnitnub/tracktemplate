@@ -37,13 +37,13 @@ The record normalises accepted integer or float inputs to finite Python
 to the new canonical-state boundary; the three mechanically extracted Phase 3
 functions remain byte-for-byte AST-equivalent to B15.
 
-## Provisional transition schema v1
+## Transition schema v1
 
-`tracktemplate.application.transition_state` owns the provisional development
-schema. The writer emits version 1 and the reader currently accepts exactly
-version 1. This is not yet the owner-agreed complete Phase 4 schema/version
-window: the chair-definition version window, legacy family migrations and
-FreeCAD property envelope remain open.
+`tracktemplate.application.transition_state` owns the development schema. The
+writer emits version 1 and the reader accepts exactly version 1. The project
+owner accepted this as part of the bounded Phase 4 read window on 2026-07-22;
+that decision does not qualify a legacy entity-family writer or broaden the
+FreeCAD property envelope.
 
 The deterministic JSON object contains exactly:
 
@@ -216,6 +216,42 @@ FCStd SHA-256
 `0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`
 were unchanged.
 
+## Bounded read-window acceptance and family assessment
+
+On 2026-07-22 the project owner accepted exactly transition-state v1,
+chair-definition package v1, and B14-only, B15-only or expected mixed B14/B15
+read-only legacy ingress, with the fail-closed limits above. The same decision
+explicitly withheld authority for entity-family migration and production
+chair/output. `SUPPORTED_MIGRATION_FAMILIES` therefore remains empty and the
+production-admission hard stop remains unchanged.
+
+`tracktemplate.compatibility.plain_line_transition` is the first bounded
+read-only family assessment. It consumes the outer detector rather than
+reimplementing version discovery and examines only spacing-matched secondary
+plain-line entry/exit transitions. For each complete settings set it requires
+the exact persisted property types and ordered B14/B15 track record, then
+replays the accepted transition solver. Stable candidate identity uses
+`TemplateSetID`, the persisted semantic track ordinal and transition end; it
+does not use FreeCAD object order or the operator-facing track name.
+
+The assessment reports `canonical-inputs-sufficient` only when every selected
+record is recognised and its replayed transition length exactly equals the
+stored value. Missing inputs or an unsupported alignment mode remain
+inspection-only; malformed types/data, duplicate settings identities or a
+stored/replayed contradiction block the result. Any non-sufficient report
+exposes no candidate states. Every report states that write, migration and
+production output are unauthorised, and the module is not exported through the
+product API.
+
+The reproduced nine-object B14 base supplies the real-document fixture. Its
+two secondary-track states replay exactly at `559.4102547270278 mm`, retain
+stable entry/exit identities and leave object/property/history snapshots and
+the source FCStd SHA-256 unchanged. Synthetic B14, B15 and mixed cases cover
+direction normalisation, label independence, deterministic multi-set ordering,
+missing/unsupported state and the corrupt/ambiguous failure matrix. This is
+canonical-input sufficiency evidence only, not a migration fixture or document
+conversion.
+
 ## Phase 4 chair-definition package contract
 
 The neutral v1 contract is now implemented by
@@ -282,7 +318,7 @@ Observed on 2026-07-22 from the repository root:
 | Check | Result |
 | --- | --- |
 | Parse B14, B15, B16 launcher and all new/changed Python | Passed |
-| Every `tests/validate_*.py` standalone validator | 37/37 passed |
+| Every `tests/validate_*.py` standalone validator | 38/38 passed |
 | Dedicated Phase 4 canonical-state validator | Passed |
 | Deterministic modular structure | Passed; declared application boundary, permitted inward edges, no cycle, forbidden domain dependency or warning |
 | Isolated API/domain/application import with FreeCAD, Part, Qt and pivy blocked | Passed; no host import attempted |
@@ -293,6 +329,8 @@ Observed on 2026-07-22 from the repository root:
 | Phase 4 qualified FreeCAD persistence lifecycle | Passed; disposable create/update, Undo/Redo, abort, stale/corrupt rejection and FCStd save/reopen |
 | Phase 4 standalone B14/B15 detector matrix | Passed; B14, B15, mixed, foreign, unsupported, versionless, malformed and conflicting cases |
 | Phase 4 FreeCAD legacy detector lifecycle | Passed; zero-mutation inspection and identical mixed report after FCStd save/reopen |
+| Phase 4 plain-line transition family assessment | Passed; exact B14/B15/mixed read-only matrix, stable semantic identities, exact replay and fail-closed ambiguity handling |
+| Phase 4 reproduced-B14 FreeCAD family assessment | Passed; two exact canonical candidates with zero document/history or source-FCStd mutation |
 | Phase 4 chair-definition package validator | Passed; exact deterministic round-trip, signed manifest linkage, unit/reference/lineage failure matrix and hard production-admission block |
 | Phase 4 chair-definition qualified-FreeCAD compatibility | Passed; exact package round-trip with zero document mutation and production admission disabled |
 
@@ -311,29 +349,29 @@ alter an operator route, document, renderer, exact geometry or export path.
 | Undo/redo and failed updates leave a valid document | Evidenced: atomic create/update, no-op, Undo/Redo, preflight rejection and injected post-write abort all pass |
 | Preview/exact geometry can be deleted and regenerated from canonical state | Pending: no Phase 5/6 renderer or exact adapter is being invented here |
 | Deterministic, fail-closed chair-definition package | Evidenced: neutral schema v1, immutable review record, exact decimals/units, constituent/procedure/interface/manufacturing separation, lineage, signed manifest linkage and failure matrix pass without enabling production; S1 evidence remains blocked |
-| Supported schema/version window agreed and tested | Active: exact transition v1, chair-package v1 and read-only B14/B15/mixed outer detection are tested; owner agreement and family migration schemas remain due |
+| Supported schema/version window agreed and tested | Active: the owner accepted exact transition v1, chair-package v1 and read-only B14/B15/mixed ingress on 2026-07-22; first-family canonical-input sufficiency is tested, but no entity-family migration is authorised or write-qualified |
 
 ## Remaining risks and next bounded tranche
 
-- Stable identity mapping to one logical transition object is implemented, but
-  identity generation remains the responsibility of the later owning entity
-  workflow; adapters must not invent IDs from object order or labels.
+- Stable identity mapping for the assessed legacy spacing-matched transition
+  uses template-set identity, persisted semantic track ordinal and end. Other
+  entity workflows still own their identity rules; adapters must not invent IDs
+  from FreeCAD object order or labels.
 - The outer B14/B15 detector exists, but no legacy entity family is qualified
-  for migration. Family schema/identity validation and copied-target migration
-  fixtures remain mandatory; an accepted version set must not imply that a
-  whole legacy document is migratable.
+  for migration. The first read-only assessment proves only canonical-input
+  sufficiency. Separate owner authority, complete family schema/identity
+  validation and a copied-target atomic migration fixture remain mandatory; an
+  accepted version set must not imply that a whole document is migratable.
 - Preview, exact-validation and export signatures cannot be completed until
   those derived-result contracts exist; adapters must not invent partial keys.
-- Chair-package v1 is technically evidenced but remains provisional until the
-  project owner accepts the Phase 4 schema window. Family completeness,
-  numerical S1 data, exact generation and production admission remain Phase 9
-  work, not implicit consequences of this contract fixture.
-- The provisional v1 window requires explicit project-owner acceptance before
-  it can satisfy the Phase 4 schema/version exit condition.
+- Chair-package v1 is accepted only inside the bounded read window. Family
+  completeness, numerical S1 data, exact generation and production admission
+  remain Phase 9 work, not implicit consequences of that acceptance.
 
-The next Phase 4 decision is project-owner review of the tested transition and
-chair-package v1 read window. The independent backup/restore prerequisite in
+The next authority-changing Phase 4 decision is whether to authorise a bounded
+copied-target migration fixture for the assessed transition family. Until that
+separate decision, implementation stops at read-only assessment. The
+independent backup/restore prerequisite in
 [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) is satisfied for the owner-
-confirmed complete scope under its active cadence. Copied-target legacy-family
-migration remains blocked by its family-specific schema/identity fixture; no
-migrator is authorised by backup readiness alone.
+confirmed complete scope under its active cadence, but backup readiness alone
+does not authorise a migrator.
