@@ -158,7 +158,7 @@ started. This is an outcome count, not an overall percentage of effort.
 | 0 | Recoverable baseline and benchmark checkpoint | `██████` — 6/6 evidenced | Complete — accepted 2026-07-19 |
 | 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |
 | 2 | Minimal modular foundation and validation harness | `█████` — 5/5 evidenced | Complete — accepted 2026-07-22 |
-| 3 | First parity-proven vertical slice | `███▒░` — 3/5 evidenced | Current |
+| 3 | First parity-proven vertical slice | `████▒` — 4/5 evidenced | Current |
 | 4 | Canonical state, signatures, and persistence | `░░░░░░` — 0/6 | Not started |
 | 5 | Lightweight editing prototype and renderer decision | `░░░░` — 0/4 | Not started |
 | 6 | Explicit exact-validation and export seam | `░░░░░` — 0/5 | Not started |
@@ -328,10 +328,9 @@ as the first architecture pilot. The project owner accepted that selection on
 2026-07-20. The fail-closed
 [transition-pilot contract](contracts/phase1-transition-pilot.json) reserves
 development checkpoint `10.2A8A7B16` and a small `TrackTemplate.FCMacro`
-compatibility launcher. The bounded Phase 2 foundation now occupies those
-reserved identities. Phase 3 has mechanically extracted the three calculation
-functions with direct parity while explicitly keeping every legacy caller
-unrouted; the public Workbench/RC version remains undecided.
+compatibility launcher. Subsequent implementation evidence belongs in the
+owning current-phase section rather than this accepted Phase 1 record; the
+public Workbench/RC version remains undecided.
 
 The Phase 1 compatibility contract also freezes the initial host and ingress
 policy without pretending that migration exists. The exact Linux x86_64
@@ -418,9 +417,8 @@ explicit point-adapter seam, while chair analysis retains alias coupling and
 classified and fail-closed by the dedicated invalidation contract. Broader
 workflow boundaries and product-pipeline profiles remain controlled
 later-phase gaps after the accepted Phase 1 closeout. The bounded Phase 2
-package/loading foundation now exists; the Phase 3 domain calculation is
-mechanically extracted with direct parity, while caller routing has not
-started. The
+package, calculation and routing status is recorded by the owning later phase
+rather than this accepted Phase 1 record. The
 fixed B14
 plain-line curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,
@@ -664,11 +662,11 @@ was moved by the phase transition itself.
 
 ## Phase 3: first parity-proven vertical slice
 
-Status: **Current — the first domain/parity tranche is evidenced; workflow
-caller routing has not started.**
+Status: **Current — domain parity and the all-three-callers B16 routing/
+rollback boundary are evidenced. Routed full-workflow, real-GUI and
+performance evidence remains open.**
 
-Progress: `███▒░` — 3/5 exit conditions evidenced, one active and one
-pending.
+Progress: `████▒` — 4/5 exit conditions evidenced and one remains active.
 
 ### Current gate register
 
@@ -677,8 +675,8 @@ pending.
 | The selected capability follows target dependency direction and its domain portion imports without FreeCAD/Qt | Evidenced | Exact three-function extraction in `tracktemplate.domain.alignment`; isolated import and structure guards recorded in [PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md) |
 | Legacy/new analytical records, findings, identities, ordering and relevant metadata are equivalent | Evidenced | Exact B14/B15/modular AST, value/type and diagnostic parity over the frozen grids; this slice emits only tuples/scalars/errors and has no record/identity/metadata output |
 | Cache miss, valid reuse and every relevant invalidation case pass | Evidenced | Candidate contract records no cache/signature; A-B-A recomputation for all three functions proves changed and exact change-back results without inventing reuse state |
-| Applicable FreeCAD/headless and GUI checks pass | Active — loading only | Qualified FreeCAD headless loading and zero-document-mutation pass; routed plain-line/connected-straight headless and real-GUI workflow evidence remains required |
-| Every temporary dual path has an owner and named retirement gate | Pending | Implement the contract's all-three-callers rollback switch and retain it until Phase 3 parity evidence and explicit owner acceptance |
+| Applicable FreeCAD/headless, GUI and contracted performance checks pass | Active — calculation callers routed | Qualified FreeCAD headless legacy/modular/legacy caller parity and zero-document-mutation pass; routed plain-line/connected-straight full-workflow, failure-recovery, real-GUI and calculation/workflow performance evidence remains required |
+| Every temporary dual path has an owner and named retirement gate | Evidenced | `tracktemplate.compatibility.transition_pilot` applies one complete modular or captured-B15 route, defaults B16 to modular, retains explicit legacy rollback and remains owned by Phase 3 until parity evidence and owner acceptance permit retirement |
 
 ### Goal
 
@@ -699,7 +697,8 @@ Prove the extraction method on one bounded capability before generalising the ar
 - The capability follows the target dependency direction and its domain portion imports without FreeCAD/Qt.
 - Legacy/new analytical records, findings, stable identities, ordering, and relevant metadata are equivalent.
 - Cache miss, valid reuse, and all relevant invalidation cases pass.
-- FreeCAD/headless and GUI checks pass where the selected path touches them.
+- FreeCAD/headless, GUI and contracted calculation/workflow performance checks
+  pass where the selected path touches them.
 - Any temporary dual path has an owner and a named retirement gate.
 
 ## Phase 4: canonical state, signatures, and persistence
@@ -1017,7 +1016,7 @@ package licence and field/component provenance pass
 | Source/data/output classification policy | Resolved 2026-07-20 — neutral canonical data, one-way optional Templot adapter, package-specific licensing and no automatic project claim over ordinary output | Archive/output-notice review, GPL/CC scope review, `LICENSING_BOUNDARIES.md`, and owner acceptance |
 | Chair geometry method and RC scope | Resolved 2026-07-20 — full-size procedural constituent generation, validated external packages and one assisted S1 pilot; arbitrary automatic conversion remains post-RC research | Templot source audit and project-owner acceptance |
 | Scoped output lineage and first S1 package rights plan | Resolved for Phase 1 planning on 2026-07-22; package remains blocked | Owner-accepted `S1_PILOT_PLAN.md` plus the blocked first-S1/core classifications, validated unknown manifest, B15 gap analysis, intended uses, evidence/licence/right-review decision owners, comparison metric families and explicit later gates |
-| First extraction slice | Resolved 2026-07-20; Phase 2 foundation accepted and Phase 3 opened 2026-07-22 — the transition-length domain/API calculation is mechanically extracted with direct parity and no cache; all legacy caller routing, rollback-switch workflow evidence and performance profiles remain open | Candidate contracts, bounded closure cuts, workflow profiles, scorecard, [PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md) and owner acceptance |
+| First extraction slice | Resolved 2026-07-20; Phase 2 foundation accepted and Phase 3 opened 2026-07-22 — the transition-length domain/API calculation has direct parity and no cache, and the all-three-callers B16 modular/legacy switch passes calculation-only FreeCAD change-back; routed full-workflow/GUI, failure-recovery and performance evidence remain open | Candidate contracts, bounded closure cuts, workflow profiles, scorecard, [PHASE3_TRANSITION_SLICE.md](PHASE3_TRANSITION_SLICE.md) and owner acceptance |
 | Remaining representative fixtures and Phase 1 profile coverage | Accepted as controlled deferrals at Phase 1 closeout on 2026-07-22 | Fourteen owned workflow families with scheduled gaps, reconciled legacy profiles, five bounded instrumentation defects and four explicit unmeasured target slots |
 | Supported FreeCAD/Python and legacy document window | Initial policy accepted at Phase 1 closeout on 2026-07-22; implementation/family fixtures remain due by Phase 4 | Exact runtime probe, official Addon metadata fields, B14/B15 source/schema anchors, existing save/reopen evidence, fail-closed contract validation and future migration fixtures |
 | Domain record and persistence schema strategy | Phase 4 exit | Runtime compatibility and round-trip tests |

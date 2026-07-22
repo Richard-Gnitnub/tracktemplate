@@ -1,7 +1,7 @@
 """Narrow migration façade for Track Template.
 
-Phase 3 exposes the mechanically extracted transition calculations while the
-legacy workflow callers remain unrouted.
+Phase 3 exposes the mechanically extracted transition calculations through
+the temporary all-three-name B15 comparison and rollback boundary.
 """
 
 from tracktemplate import DEVELOPMENT_CHECKPOINT

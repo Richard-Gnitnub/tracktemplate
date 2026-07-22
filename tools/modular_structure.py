@@ -36,6 +36,8 @@ def _layer(module):
         return "api"
     if module == PACKAGE_NAME + ".bootstrap":
         return "bootstrap"
+    if module.startswith(PACKAGE_NAME + ".compatibility"):
+        return "compatibility"
     if module.startswith(PACKAGE_NAME + ".domain"):
         return "domain"
     return "undeclared"
@@ -173,6 +175,7 @@ def _edge_allowed(source_layer, target_layer):
         "domain": {"domain"},
         "api": {"package", "domain"},
         "bootstrap": {"package", "api"},
+        "compatibility": {"package", "api", "domain", "compatibility"},
     }
     return target_layer in allowed.get(source_layer, set())
 

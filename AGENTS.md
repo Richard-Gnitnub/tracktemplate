@@ -329,7 +329,9 @@
   maintainability evidence accepted at Phase 2 closeout. Later package
   additions must preserve those durable boundaries without rewriting the
   accepted record.
-- `reference/PHASE3_TRANSITION_SLICE.md` and
+- `tracktemplate/compatibility/transition_pilot.py`,
+  `reference/PHASE3_TRANSITION_SLICE.md` and
+  `tests/validate_phase3_transition_routing.py` plus
   `tests/freecad_validate_phase3_transition_slice.py` own the
   transition-slice implementation evidence, current B16 orchestration check and
   declared limitations. Consult

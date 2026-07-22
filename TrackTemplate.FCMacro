@@ -1,4 +1,4 @@
-"""Small B16 composition root for the bounded modular migration."""
+"""Small B16 composition root for the bounded transition migration."""
 
 import importlib
 import json
@@ -38,8 +38,37 @@ def _load_foundation(repository_root):
     return api, bootstrap
 
 
-def run_macro():
-    """Qualify and load the package without routing or document mutation."""
+def _load_transition_pilot(
+    repository_root,
+    api,
+    bootstrap,
+    calculation_route,
+):
+    compatibility = importlib.import_module("tracktemplate.compatibility")
+    if calculation_route not in compatibility.CALCULATION_ROUTES:
+        raise compatibility.TransitionPilotError(
+            "Unknown transition calculation route {!r}; expected one of {}."
+            .format(
+                calculation_route,
+                ", ".join(compatibility.CALCULATION_ROUTES),
+            )
+        )
+    transition_contract = bootstrap.load_contract(
+        repository_root
+        / "reference"
+        / "contracts"
+        / "phase1-transition-pilot.json"
+    )
+    session = compatibility.load_transition_pilot_session(
+        repository_root,
+        api,
+        transition_contract,
+    )
+    return session, session.apply_route(calculation_route)
+
+
+def run_macro(calculation_route="modular", launch_workflow=False):
+    """Qualify B16 and select one complete transition calculation route."""
     repository_root = _launcher_root()
     api, bootstrap = _load_foundation(repository_root)
     contract_path = (
@@ -65,16 +94,54 @@ def run_macro():
         )
         raise RuntimeError(str(error)) from error
 
+    try:
+        if not isinstance(launch_workflow, bool):
+            raise ValueError("launch_workflow must be a boolean value.")
+        session, routing = _load_transition_pilot(
+            repository_root,
+            api,
+            bootstrap,
+            calculation_route,
+        )
+    except (OSError, RuntimeError, ValueError) as error:
+        blocked = {
+            "schema_version": 1,
+            "development_checkpoint": api.DEVELOPMENT_CHECKPOINT,
+            "status": "blocked-before-routing",
+            "requested_calculation_routing": str(calculation_route),
+            "diagnostic": str(error),
+            "document_mutation": False,
+        }
+        print(
+            LAUNCH_SENTINEL
+            + json.dumps(blocked, sort_keys=True, separators=(",", ":")),
+            flush=True,
+        )
+        raise RuntimeError(str(error)) from error
+
+    if launch_workflow:
+        session.launch_workflow()
+
     result = {
         "schema_version": 1,
         "development_checkpoint": api.DEVELOPMENT_CHECKPOINT,
-        "status": "foundation-loaded-not-routed",
+        "status": (
+            "transition-workflow-launched"
+            if launch_workflow
+            else "transition-routing-ready"
+        ),
         "matched_profile_id": qualification["compatibility_evaluation"][
             "matched_profile_id"
         ],
         "public_api": list(api.__all__),
-        "calculation_routing": "not-started",
-        "document_mutation": False,
+        "calculation_routing": routing["route"],
+        "rollback_calculation_routing": routing["rollback_route"],
+        "routed_function_names": routing["function_names"],
+        "routed_caller_names": routing["caller_names"],
+        "legacy_source_sha256": routing["legacy_source_sha256"],
+        "mixed_calculation_routing": routing["mixed_route"],
+        "workflow_launched": bool(launch_workflow),
+        "document_mutation": False if not launch_workflow else None,
     }
     print(
         LAUNCH_SENTINEL

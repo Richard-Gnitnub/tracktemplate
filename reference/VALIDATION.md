@@ -174,6 +174,17 @@ Durable modular package, domain/API and foundation checks:
 .venv/bin/python tests/validate_phase2_foundation.py
 ```
 
+Current Phase 3 transition routing and rollback boundary:
+
+```bash
+.venv/bin/python tests/validate_phase3_transition_routing.py
+```
+
+This standard-library check exercises complete synthetic legacy, modular and
+legacy change-back routes and fail-closed source, contract, API and launch
+boundary cases. It also requires the compatibility adapter to remain in the
+declared dependency layer without structural warnings.
+
 Accepted Phase 2 FreeCAD loading and zero-document-mutation smoke:
 
 ```bash
@@ -197,9 +208,13 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
 ```
 
 This directly executes the current B16 entry point and owns its current
-routing/result assertions. It must print
-`Phase 3 transition domain smoke test passed`. Update this current-phase test
-when accepted routing state changes; do not rewrite the Phase 2 loading smoke.
+routing/result assertions. It loads the exact B15 definitions without the
+operator dialog, verifies the modular default and legacy rollback, and compares
+all three frozen callers under legacy → modular → legacy routing with no
+document mutation. It must print
+`Phase 3 transition routing FreeCAD smoke test passed`. Update this
+current-phase test when accepted routing state changes; do not rewrite the
+Phase 2 loading smoke.
 
 Repository recovery and ignored-data safety controls:
 
