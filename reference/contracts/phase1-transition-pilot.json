@@ -2,7 +2,7 @@
   "schema_version": 1,
   "contract_id": "tracktemplate:phase1:transition-pilot:1",
   "recorded_on": "2026-07-20",
-  "status": "selected-contract-frozen-phase2-foundation-authorised-source-movement-not-started",
+  "status": "selected-contract-frozen-phase2-foundation-implemented-calculation-movement-not-started",
   "phase": 1,
   "source_state": {
     "b14": {
@@ -23,13 +23,13 @@
     "owner_acceptance_basis": "The project owner instructed Codex to commit and push the completed recommendation tranche and then work on the next tranche after being told that the next decision was acceptance of the transition pilot and its successor-version contract.",
     "scorecard_path": "reference/PHASE1_SLICE_SCORECARD.md",
     "candidate_register_path": "reference/contracts/phase1-candidate-boundaries.json",
-    "scope": "Select and freeze the pilot boundary only. This contract does not start source movement, create package files, close Phase 1, approve a performance optimisation or change B14/B15."
+    "scope": "The selection decision froze the pilot without starting source movement or changing B14/B15. The accepted Phase 1 closeout later authorised the Phase 2 package/loading foundation only; calculation movement, caller routing and performance optimisation remain outside this scope."
   },
   "successor": {
     "development_checkpoint_id": "10.2A8A7B16",
     "checkpoint_scope": "First modular migration development checkpoint; not the public Workbench, beta or release-candidate version.",
     "compatibility_launcher_path": "TrackTemplate.FCMacro",
-    "compatibility_launcher_status": "reserved-not-created",
+    "compatibility_launcher_status": "phase2-foundation-created-not-routed",
     "compatibility_launcher_rule": "The launcher must remain small and delegate to the authoritative tracktemplate package. It must not contain or become a second maintained copy of B15.",
     "authoritative_package": "tracktemplate",
     "public_workbench_version_status": "deferred-to-release-qualification",
@@ -269,8 +269,8 @@
     "retirement_gate": "Remove the legacy comparison switch only after Phase 3 parity evidence and explicit project-owner acceptance; do not retire B14/B15 artifacts as part of this pilot."
   },
   "implementation_gates": [
-    "Phase 1 was accepted and closed on 2026-07-22; only the bounded Phase 2 package/loading foundation is authorised.",
-    "Phase 2 may create the minimum tracktemplate package skeleton and small TrackTemplate.FCMacro B16 composition root, but calculation movement and caller routing remain Phase 3 work.",
+    "Phase 1 was accepted and closed on 2026-07-22; the bounded Phase 2 package/loading foundation is implemented without broadening that authority.",
+    "The minimum tracktemplate skeleton and small TrackTemplate.FCMacro B16 composition root exist; calculation movement and caller routing remain Phase 3 work.",
     "Create only the package locations required by this three-function slice.",
     "Prove standalone import without FreeCAD, Part, Qt, pivy or third-party dependencies before caller routing.",
     "Run legacy-versus-modular parity before routing any caller, then route all three external callers together through the temporary façade.",

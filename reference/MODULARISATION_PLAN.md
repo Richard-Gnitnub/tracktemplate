@@ -1,8 +1,8 @@
 # Modularisation Plan
 
 Status: accepted direction; Stage M1 and the Phase 1 closeout are complete.
-Stage M2 is current under the bounded foundation authority accepted on
-2026-07-22; no calculation extraction has started.
+Stage M2 exit evidence is complete and awaits project-owner closeout
+acceptance; no calculation extraction or caller routing has started.
 
 The authoritative delivery phases from the current baseline to a release candidate are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md). The `M` stages below describe only the modularisation workstream and intentionally do not create a second project phase scheme.
 
@@ -260,8 +260,8 @@ The controls are deliberately layered:
 | --- | --- | --- |
 | Hidden duplicates, captured aliases, import-time patches and mutable globals in B14/B15 | `tools/phase1_inventory.py` plus `tests/validate_phase1_inventory.py` fingerprint the present legacy structure and selected dependency closures | Re-run structural metrics after each applicable phase; modular source must trend towards one live definition and no import-time patch chain |
 | Behaviour lost while code is reused or moved | Existing characterisation contracts, B14/B15 parity, stable-identity/ordering checks and applicable FreeCAD lifecycle tests | Every migrated slice must pass legacy/new parity before cleanup or optimisation |
-| Domain code becoming coupled to FreeCAD, Qt or exporters | Architectural review today; the Phase 1 inventory reports platform signals but does not prove a future package boundary | Phase 2 standalone-import and forbidden-import tests must fail on a boundary violation |
-| Circular or reverse dependencies | Manual dependency-direction review today | Phase 2 import-graph checks must fail on a cycle or prohibited layer edge |
+| Domain code becoming coupled to FreeCAD, Qt or exporters | `tests/validate_phase2_foundation.py` proves isolated domain/API import and fails on forbidden domain dependencies | Retain and extend the same boundary as domain modules are populated from Phase 3 onward |
+| Circular or reverse dependencies | `tools/modular_structure.py` and the Phase 2 validator fail on cycles and prohibited layer edges | Re-run and extend the declared layering with every applicable package change |
 | A second maintained implementation or an indefinitely retained comparison path | Staged-diff review and an explicit exception/retirement record | Phase 2/3 façade and composition checks, followed by removal at the named migration gate |
 | Premature or misleading abstraction | Cohesion and railway-semantics review; similar code may remain separate until its invariant is understood | Direct tests of the shared contract and review of every new cross-module public API |
 
@@ -358,14 +358,17 @@ that evidence blocks reuse of its partial signature rather than authorising
 chair extraction.
 Broader workflow boundaries, candidate-specific gaps, additional platform
 qualification and representative target-architecture profiles remain open;
-source movement and document migration have not started. The consolidated
+calculation movement, caller routing and document migration have not started.
+The consolidated
 [Phase 1 closeout record](PHASE1_CLOSEOUT.md) preserves those later gates and
-authorises only the empty Stage M2 package/loading foundation.
+authorised only the minimal Stage M2 package/loading foundation. Its
+implementation and validation are recorded in
+[PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md).
 
 ### Stage M2: package skeleton and façade
 
-Status: **Current — authorised on 2026-07-22; implementation not yet
-started.**
+Status: **Current — exit evidence complete; project-owner closeout acceptance
+required.**
 
 - Add only the package locations needed by the selected slice.
 - Establish `tracktemplate.api` and the composition root.
@@ -380,7 +383,11 @@ started.**
   production document detector/migrator remains a Phase 4 compatibility
   adapter and the final Addon metadata remains Phase 10 work.
 
-Exit gate: the empty boundary and loading approach work in both standalone Python tests and FreeCAD.
+Exit gate: **evidenced.** The minimal boundary and loading approach work in
+both isolated standalone Python and the qualified FreeCAD runtime, with no
+document mutation. See [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md). Stage M2
+does not close and Stage M3 does not begin until the project owner accepts the
+Phase 2 closeout.
 
 ### Stage M3: first vertical slice
 

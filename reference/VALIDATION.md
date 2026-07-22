@@ -13,9 +13,10 @@ change.
 
 - `AdvancedTurnout.FCMacro` is the immutable B14 legacy comparison oracle (`10.2A8A7B14`).
 - `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` is the accepted B15 behavioural reference entering Phase 1 (`10.2A8A7B15`).
-- `10.2A8A7B16` is reserved for the first modular migration development
-  checkpoint and `TrackTemplate.FCMacro` for its future small compatibility
-  launcher. Neither exists yet; this is not the public Workbench/RC version.
+- `10.2A8A7B16` identifies the loading-only Phase 2 modular development
+  checkpoint. Its small `TrackTemplate.FCMacro` composition root and minimal
+  `tracktemplate` package exist, but no railway calculation or legacy caller
+  is routed through them; this is not the public Workbench/RC version.
 - `tests/validate_b15.py` validates B15 structure/analysis, compares selected
   railway functions, and proves complete inherited-module AST parity with B14
   after normalising only version, launch, docstring, and recompute-instrumentation
@@ -50,9 +51,10 @@ These roles are current project state, not a permanent versioning scheme. Update
 - For retained source-organisation changes, review the named authoritative
   implementation, genuinely shared invariant, narrow interface, dependency
   direction and any temporary duplicate/retirement gate.
-- Beginning with the Phase 2 package, fail automated checks on a forbidden
-  domain/platform import, prohibited layer edge or circular dependency. These
-  package guards are scheduled controls and do not exist yet.
+- `tests/validate_phase2_foundation.py` and `tools/modular_structure.py` fail
+  on a forbidden domain/platform import, undeclared or prohibited layer edge,
+  circular dependency, speculative module or import-time structural warning.
+  Retain and extend these guards with every applicable package change.
 - Treat structural metrics as risk signals, not proof of maintainability;
   railway-semantic cohesion and abstraction quality still require review plus
   behavioural evidence.
@@ -147,10 +149,10 @@ format-appropriate semantic metrics.
 
 Run from the repository root.
 
-Syntax-check both current macros:
+Syntax-check the two legacy/reference macros and the B16 composition root:
 
 ```bash
-.venv/bin/python -c "import ast, pathlib; files=['AdvancedTurnout.FCMacro','model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro']; [ast.parse(pathlib.Path(f).read_text(encoding='utf-8'), filename=f) for f in files]; print('Macro syntax checks passed')"
+.venv/bin/python -c "import ast, pathlib; files=['AdvancedTurnout.FCMacro','model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro','TrackTemplate.FCMacro']; [ast.parse(pathlib.Path(f).read_text(encoding='utf-8'), filename=f) for f in files]; print('Macro syntax checks passed')"
 ```
 
 Fast B15 structural and analytical validation:
@@ -164,6 +166,25 @@ Real FreeCAD 1.1 headless B15 smoke test:
 ```bash
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD tests/freecad_validate_b15.py
 ```
+
+Phase 2 standalone package, structure, runtime-guard and comparison checks:
+
+```bash
+.venv/bin/python tools/modular_structure.py
+.venv/bin/python tests/validate_phase2_foundation.py
+```
+
+Qualified FreeCAD loading and zero-document-mutation smoke:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase2_foundation.py
+```
+
+The standalone validator also launches an isolated interpreter with FreeCAD,
+Part, Qt and pivy imports blocked. The FreeCAD smoke must print
+`Phase 2 FreeCAD foundation smoke test passed`; its structured B16 result must
+remain `foundation-loaded-not-routed` with `document_mutation` false.
 
 Fast development-bridge recipe contract checks:
 
@@ -244,7 +265,7 @@ Project-plan progress bookkeeping:
 ```
 
 This checks each roadmap bar and denominator against the number of explicit
-phase exit conditions, reconciles the active Phase 1 gate register, and checks
+phase exit conditions, reconciles the current-phase gate register, and checks
 the milestone bar against the milestone states. It does not assess the quality
 of gate evidence or replace project-owner phase acceptance.
 
@@ -289,10 +310,11 @@ Selected transition-pilot contract and expanded parity grid:
 This verifies the exact B14/B15 fingerprints, three function signatures,
 `GEOMETRY_TOLERANCE`, three external caller routes, zero outgoing project
 dependencies, generated displacement/offset/solver grids, current error
-diagnostics, reserved B16/launcher identity, rollback rules and all declared
-evidence paths. While its status is `source-movement-not-started`, it also
-fails if the package or reserved launcher appears prematurely. It executes
-selected function definitions only and does not import or launch either macro.
+diagnostics, B16/launcher identity, rollback rules and all declared evidence
+paths. In its current state it requires the bounded Phase 2 package and
+launcher, then fails if any selected pilot calculation appears in the
+successor package, façade or launcher before Phase 3. It executes selected
+legacy function definitions only and does not import or launch either macro.
 
 Phase 1 runtime and legacy-ingress compatibility checks:
 
@@ -313,7 +335,9 @@ broadening fails closed. The standalone probe should report
 `TRACKTEMPLATE_RUNTIME_PROBE=` record reports `qualified` for
 `linux-x86_64-flatpak-freecad-1.1.1`. It records no user path.
 
-This check does not claim that the successor document migrator exists. Phase 4
+The Phase 2 launcher now consumes the same authoritative evaluator through
+`tracktemplate.bootstrap`; this does not claim that the successor document
+migrator exists. Phase 4
 must add copied-target migration fixtures for each advertised B14/B15 entity
 family, including supported, future, versionless, corrupt/conflicting, failure,
 undo/redo and save/reopen cases. A configuration JSON migration is not evidence

@@ -107,7 +107,8 @@ This ownership is not whole-product GUI acceptance:
   retains at least one scheduled gap;
 - FreeCADCmd/headless layer topology is not evidence for real-GUI visibility,
   selection, interaction, refresh or one-command history behaviour;
-- the successor Workbench, B16 launcher and lightweight renderer do not exist;
+- at closeout the successor Workbench, B16 launcher and lightweight renderer
+  did not exist; the later loading-only B16 foundation is not GUI evidence;
 - independent-datum stationing, wider alignment/turnout/crossover/timber/chair
   matrices and remaining export/failure paths stay with Phases 4 through 10;
   and

@@ -1,0 +1,87 @@
+"""Small B16 development composition root for the Phase 2 foundation."""
+
+import importlib
+import json
+import pathlib
+import sys
+
+
+LAUNCH_SENTINEL = "TRACKTEMPLATE_B16_FOUNDATION="
+
+
+def _launcher_root():
+    source_path = globals().get("__file__")
+    if not source_path:
+        raise RuntimeError(
+            "Track Template cannot locate its package because __file__ is unavailable."
+        )
+    return pathlib.Path(str(source_path)).resolve().parent
+
+
+def _load_foundation(repository_root):
+    root_text = str(repository_root)
+    if not sys.path or sys.path[0] != root_text:
+        sys.path.insert(0, root_text)
+
+    package = importlib.import_module("tracktemplate")
+    expected_package = (repository_root / "tracktemplate").resolve()
+    observed_package = pathlib.Path(str(package.__file__)).resolve().parent
+    if observed_package != expected_package:
+        raise RuntimeError(
+            "Track Template resolved package {!s}, expected {!s}.".format(
+                observed_package,
+                expected_package,
+            )
+        )
+    api = importlib.import_module("tracktemplate.api")
+    bootstrap = importlib.import_module("tracktemplate.bootstrap")
+    return api, bootstrap
+
+
+def run_macro():
+    """Qualify the host and load the Phase 2 package without document mutation."""
+    repository_root = _launcher_root()
+    api, bootstrap = _load_foundation(repository_root)
+    contract_path = (
+        repository_root
+        / "reference"
+        / "contracts"
+        / "phase1-compatibility.json"
+    )
+    try:
+        qualification = bootstrap.require_qualified_runtime(contract_path)
+    except bootstrap.RuntimeQualificationError as error:
+        blocked = {
+            "schema_version": 1,
+            "development_checkpoint": api.DEVELOPMENT_CHECKPOINT,
+            "status": "blocked-before-composition",
+            "compatibility_evaluation": error.evaluation,
+            "document_mutation": False,
+        }
+        print(
+            LAUNCH_SENTINEL
+            + json.dumps(blocked, sort_keys=True, separators=(",", ":")),
+            flush=True,
+        )
+        raise RuntimeError(str(error)) from error
+
+    result = {
+        "schema_version": 1,
+        "development_checkpoint": api.DEVELOPMENT_CHECKPOINT,
+        "status": "foundation-loaded-not-routed",
+        "matched_profile_id": qualification["compatibility_evaluation"][
+            "matched_profile_id"
+        ],
+        "public_api": list(api.__all__),
+        "calculation_routing": "not-started",
+        "document_mutation": False,
+    }
+    print(
+        LAUNCH_SENTINEL
+        + json.dumps(result, sort_keys=True, separators=(",", ":")),
+        flush=True,
+    )
+    return result
+
+
+FOUNDATION_RESULT = run_macro()

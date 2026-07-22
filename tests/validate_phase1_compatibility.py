@@ -19,7 +19,7 @@ from tools import runtime_compatibility_probe  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "45ea432956d9ad4b64c74fbc575506ae0553c5a3bbedacca4f77fe96fd9eb9eb"
+    "f6e9617370f0dc19ffc10cf4593258659d54aabf5d470bb4194a2b51a3fd9cc2"
 )
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",
@@ -168,8 +168,8 @@ def validate_contract(document):
         "contract_id": "tracktemplate:phase1:runtime-and-legacy-compatibility:1",
         "recorded_on": "2026-07-20",
         "status": (
-            "phase1-policy-defined-successor-enforcement-and-broader-"
-            "qualification-not-started"
+            "phase1-policy-accepted-phase2-development-guard-implemented-"
+            "broader-qualification-not-started"
         ),
         "phase": 1,
     }
@@ -415,6 +415,8 @@ def validate_contract(document):
             "plain_line_save_reopen",
             "straight_station_save_reopen",
             "turnout_save_reopen",
+            "phase2_foundation",
+            "phase2_freecad_smoke",
         ):
             relative = evidence.get(field)
             if not _non_empty_text(relative) or not (ROOT / relative).is_file():

@@ -65,8 +65,8 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 3; exact current contracts and closure-cut facts for all five static candidates plus the owner-accepted selection pointer |
 | Candidate boundary contract | `tests/validate_phase1_candidate_boundaries.py`; verifies source/AST anchors, structural facts, transition/station schemas, chair record schemas, cache-signature inputs and fail-closed selected candidate |
 | First-slice scorecard | `reference/PHASE1_SLICE_SCORECARD.md`; records why the transition solver was selected as a first architecture pilot, not a performance optimisation |
-| Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher identity, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates; Phase 2 foundation is authorised while calculation movement remains unstarted |
-| Selected transition-pilot validator | `tests/validate_phase1_transition_pilot.py`; verifies exact B14/B15 source, signatures, constant, closure cut, generated parameter/error parity, evidence links and the current reserved-not-created package/launcher state |
+| Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher identity, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates; the authorised Phase 2 foundation now exists while calculation movement remains unstarted |
+| Selected transition-pilot validator | `tests/validate_phase1_transition_pilot.py`; verifies exact B14/B15 source, signatures, constant, closure cut, generated parameter/error parity, evidence links and the loading-only Phase 2 package/launcher boundary while rejecting premature calculation movement |
 | Runtime/legacy compatibility contract | `reference/contracts/phase1-compatibility.json`, schema 1; defines one exact qualified FreeCAD profile, the intended Addon manifest bounds, B14/B15 document ingress, external-configuration migrations and fail-closed unsupported-state rules |
 | Qualified FreeCAD profile | Linux x86_64 stable `org.freecad.FreeCAD` Flatpak: FreeCAD 1.1.1, bundled CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8 |
 | Standalone development floor | CPython 3.12.0 minimum; observed repository environment 3.12.3. This qualifies tools/tests and future domain imports, not a FreeCAD host by itself |
@@ -410,11 +410,11 @@ three external callers because `clothoid_entry_displacement` is also used by
 locks the default two-track outside solution, an inside solution, monotonic
 targets, endpoint behaviour, invalid radius/range diagnostics and exact
 B14/B15 equality. The project owner accepted this as the first architecture
-pilot on 2026-07-20. The selected boundary reserves development checkpoint
-`10.2A8A7B16` and the small future `TrackTemplate.FCMacro` compatibility
-launcher in
+pilot on 2026-07-20. The selected boundary reserved development checkpoint
+`10.2A8A7B16` and the small `TrackTemplate.FCMacro` composition root in
 [contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json);
-package creation and source movement have not started.
+the bounded Phase 2 package/loading foundation now exists, but none of the
+three calculations has moved and no caller is routed through it.
 
 ### Station maps
 
@@ -1180,7 +1180,8 @@ and `pythonmin`. The intended initial manifest bounds are therefore
 Phase 10 artifact and those values must be revalidated against the then-current
 [official schema](https://github.com/FreeCAD/Addon-Manifest-Schema) and
 [Addon template](https://github.com/FreeCAD/Addon-Template); this Phase 1
-contract does not create a premature package.
+contract did not create a premature package. The later bounded Phase 2
+development package is not the Phase 10 Addon manifest or distribution.
 
 The bounded legacy `.FCStd` ingress window is B14 and B15. A B15 action can
 legitimately leave inherited B14 objects beside new or changed B15 objects, so
@@ -1263,8 +1264,8 @@ successor document detector or migrator exists yet, and neither macro changed.
   silently normalised terminology.
 - Preserve the exact `PHASE1_CLOSEOUT.md` acceptance boundary. Phase 2 may
   implement only the frozen transition-pilot package/façade/loading foundation
-  and reserved small B16 composition root; calculation movement and caller
-  routing begin only at Phase 3.
+  and small B16 composition root, which now exist; calculation movement and
+  caller routing begin only at Phase 3.
 - Do not alter B14, B15, the selected contract or a later gate merely to ease
   foundation work.
 

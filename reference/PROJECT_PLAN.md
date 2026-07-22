@@ -133,7 +133,7 @@ started. This is an outcome count, not an overall percentage of effort.
 | --- | --- | --- | --- |
 | 0 | Recoverable baseline and benchmark checkpoint | `██████` — 6/6 evidenced | Complete — accepted 2026-07-19 |
 | 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |
-| 2 | Minimal modular foundation and validation harness | `░░░░░` — 0/5 | Current |
+| 2 | Minimal modular foundation and validation harness | `█████` — 5/5 evidenced | Current |
 | 3 | First parity-proven vertical slice | `░░░░░` — 0/5 | Not started |
 | 4 | Canonical state, signatures, and persistence | `░░░░░░` — 0/6 | Not started |
 | 5 | Lightweight editing prototype and renderer decision | `░░░░` — 0/4 | Not started |
@@ -304,8 +304,9 @@ as the first architecture pilot. The project owner accepted that selection on
 2026-07-20. The fail-closed
 [transition-pilot contract](contracts/phase1-transition-pilot.json) reserves
 development checkpoint `10.2A8A7B16` and a small `TrackTemplate.FCMacro`
-compatibility launcher, while explicitly keeping source movement unstarted and
-the public Workbench/RC version undecided.
+compatibility launcher. The bounded Phase 2 foundation now occupies those
+reserved identities while explicitly keeping calculation movement and caller
+routing unstarted; the public Workbench/RC version remains undecided.
 
 The Phase 1 compatibility contract also freezes the initial host and ingress
 policy without pretending that migration exists. The exact Linux x86_64
@@ -390,9 +391,10 @@ and enforced without importing either macro. Stationing still needs an
 explicit point-adapter seam, while chair analysis retains alias coupling and
 11 outgoing closure dependencies; its fixed-XO signature gaps are now
 classified and fail-closed by the dedicated invalidation contract. Broader
-workflow boundaries, product-pipeline profiles and the remaining Phase 1 user
-decisions are still open; package creation and source movement have not
-started. The
+workflow boundaries and product-pipeline profiles remain controlled
+later-phase gaps after the accepted Phase 1 closeout. The bounded Phase 2
+package/loading foundation now exists; calculation movement and caller routing
+have not started. The
 fixed B14
 plain-line curve/two-track fixture now also has a read-only
 FreeCAD document oracle covering its persisted parameter schema, identities,
@@ -575,20 +577,20 @@ obligations remain mandatory at their later gates.
 
 ## Phase 2: minimal modular foundation and validation harness
 
-Status: **Current — bounded foundation authorised on 2026-07-22; implementation
-not yet started.**
+Status: **Current — bounded foundation implemented and exit evidence complete;
+project-owner closeout acceptance required.**
 
-Progress: `░░░░░` — 0/5 exit conditions evidenced.
+Progress: `█████` — 5/5 exit conditions evidenced.
 
 ### Current gate register
 
 | Exit condition | State | Evidence or remaining work |
 | --- | --- | --- |
-| Standalone Python imports the domain/API boundary without FreeCAD or Qt | Pending | Create only the minimum selected-slice package and enforce forbidden imports |
-| The launcher loads the package in the qualified FreeCAD environment | Pending | Add the small B16 composition root and prove the documented loading route |
-| Existing B14/B15 workflows and validation remain unchanged | Pending | Preserve both exact source hashes and rerun the applicable fast and FreeCAD checks after foundation work |
-| No speculative tree, cycle, runtime dependency or hidden global service is introduced | Pending | Add dependency/cycle checks and a deterministic modular-structure report |
-| The first package has a recorded maintainability/reuse review | Pending | Record authority, shared invariant, narrow interface, tests and any temporary retirement gate |
+| Standalone Python imports the domain/API boundary without FreeCAD or Qt | Evidenced | Isolated import and forbidden-import checks in `tests/validate_phase2_foundation.py`; result recorded in [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md) |
+| The launcher loads the package in the qualified FreeCAD environment | Evidenced | Zero-document-mutation FreeCAD smoke in `tests/freecad_validate_phase2_foundation.py`; loading route recorded in [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md) |
+| Existing B14/B15 workflows and validation remain unchanged | Evidenced | Exact B14/B15 hashes and the applicable fast and FreeCAD regression results are recorded in [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md) |
+| No speculative tree, cycle, runtime dependency or hidden global service is introduced | Evidenced | Deterministic `tools/modular_structure.py` report and fail-closed assertions in `tests/validate_phase2_foundation.py` |
+| The first package has a recorded maintainability/reuse review | Evidenced | Authority, interfaces, dependency direction and retirement gates are recorded in [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md) |
 
 ### Goal
 
@@ -627,6 +629,10 @@ Prove that modular source can load through both standalone Python and FreeCAD wi
 - The first package has a recorded maintainability/reuse review naming its
   authoritative implementation, shared invariant, narrow interface,
   dependency direction, tests and every temporary exception/retirement gate.
+
+Implementation result: **exit evidence complete; Phase 2 remains current until
+the project owner explicitly accepts its closeout.** No Phase 3 calculation
+movement or caller routing is authorised by this result.
 
 ## Phase 3: first parity-proven vertical slice
 

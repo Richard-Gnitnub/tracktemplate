@@ -2,11 +2,11 @@
   "schema_version": 1,
   "contract_id": "tracktemplate:phase1:runtime-and-legacy-compatibility:1",
   "recorded_on": "2026-07-20",
-  "status": "phase1-policy-defined-successor-enforcement-and-broader-qualification-not-started",
+  "status": "phase1-policy-accepted-phase2-development-guard-implemented-broader-qualification-not-started",
   "phase": 1,
   "scope": {
     "release_candidate_intent": "Define the initial FreeCAD/Python support promise and the bounded B14/B15 ingress window before modular source or persistence migration starts.",
-    "current_effect": "Development evidence and future implementation gates only. This contract does not alter B14, B15, any existing FCStd, configuration, Addon package or current macro behaviour.",
+    "current_effect": "Accepted compatibility policy and implemented Phase 2 development loading guard. The guard does not alter B14, B15, any existing FCStd, configuration, Addon package or legacy macro behaviour, and it is not the successor document detector or migrator.",
     "support_meaning": "A release-supported workflow must pass both a qualified-runtime gate and a supported-document/schema gate before the Workbench may mutate, migrate or export.",
     "licensing_separation": "Compatibility support does not grant project-cleared output status and does not change any provenance, dependency-manifest or rights gate."
   },
@@ -244,7 +244,7 @@
     "TURNOUT_SCHEMA_VERSION": 1
   },
   "enforcement_and_requalification": {
-    "phase_2": "Use this baseline for standalone record/type choices and a development-only runtime guard; do not broaden the matrix by assumption.",
+    "phase_2": "Implemented for the bounded foundation: standalone record/type choices and the development-only runtime guard use this exact baseline without broadening the matrix.",
     "phase_4": "Implement the document detector, versioned canonical schema, B14/B15 family migrations, copied-target transaction and migration fixtures.",
     "phase_10": "Generate and validate package.xml, requalify the supported platform matrix, publish upgrade/recovery guidance and bind unsupported-host diagnostics into the Workbench.",
     "requalification_triggers": [
@@ -274,6 +274,8 @@
     "plain_line_save_reopen": "reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md",
     "straight_station_save_reopen": "reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md",
     "turnout_save_reopen": "reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md",
+    "phase2_foundation": "reference/PHASE2_FOUNDATION.md",
+    "phase2_freecad_smoke": "tests/freecad_validate_phase2_foundation.py",
     "known_evidence_gaps": [
       "No Windows, macOS, non-Flatpak Linux or other architecture is qualified yet.",
       "No FreeCAD release other than 1.1.1 is qualified yet.",

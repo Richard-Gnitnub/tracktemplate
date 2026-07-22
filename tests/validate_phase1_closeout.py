@@ -81,13 +81,9 @@ REQUIRED_MARKERS = (
 REQUIRED_PROJECT_PLAN_MARKERS = (
     "Progress: `█████████` — 9/9 exit conditions evidenced and accepted.",
     "| 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |",
-    "| 2 | Minimal modular foundation and validation harness | `░░░░░` — 0/5 | Current |",
     "| M2 — Migration blueprint locked",
     "| 1 | Complete — accepted 2026-07-22 |",
-    "| M3 — First reusable modular capability",
-    "| 2–3 | Active |",
     "PHASE1_CLOSEOUT.md",
-    "Phase 2 is current",
 )
 
 
@@ -182,8 +178,6 @@ def validate_closeout(data, check_repository=True):
     for marker in REQUIRED_PROJECT_PLAN_MARKERS:
         if marker not in project_plan_text:
             errors.append("project-plan closeout marker is missing: {}".format(marker))
-    if "Phase 1 closed\non 2026-07-22; Phase 2 is current." not in project_plan_text:
-        errors.append("project plan lost the accepted Phase 1/Phase 2 transition")
 
     workflow = data["workflow"]
     gate = workflow.get("phase1_gate") or {}
@@ -246,7 +240,8 @@ def validate_closeout(data, check_repository=True):
     runtime = compatibility.get("runtime_baseline") or {}
     profiles = runtime.get("qualified_profiles") or []
     if compatibility.get("status") != (
-        "phase1-policy-defined-successor-enforcement-and-broader-qualification-not-started"
+        "phase1-policy-accepted-phase2-development-guard-implemented-"
+        "broader-qualification-not-started"
     ):
         errors.append("compatibility contract status drifted")
     if len(profiles) != 1 or profiles[0].get("profile_id") != (
@@ -286,20 +281,21 @@ def validate_closeout(data, check_repository=True):
     if (
         transition.get("status")
         != (
-            "selected-contract-frozen-phase2-foundation-authorised-"
-            "source-movement-not-started"
+            "selected-contract-frozen-phase2-foundation-implemented-"
+            "calculation-movement-not-started"
         )
         or selection.get("candidate_id") != "transition_length_solver"
         or selection.get("owner_accepted_on") != "2026-07-20"
         or successor.get("development_checkpoint_id") != "10.2A8A7B16"
         or successor.get("compatibility_launcher_path") != "TrackTemplate.FCMacro"
-        or successor.get("compatibility_launcher_status") != "reserved-not-created"
+        or successor.get("compatibility_launcher_status")
+        != "phase2-foundation-created-not-routed"
         or successor.get("authoritative_package") != "tracktemplate"
     ):
         errors.append("selected transition-pilot boundary drifted")
     implementation_gates = transition.get("implementation_gates") or []
     if not any(
-        "only the bounded Phase 2 package/loading foundation is authorised"
+        "bounded Phase 2 package/loading foundation is implemented"
         in item
         for item in implementation_gates
     ) or not any(

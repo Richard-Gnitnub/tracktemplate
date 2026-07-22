@@ -167,11 +167,11 @@
 - `reference/contracts/phase1-transition-pilot.json` and
   `tests/validate_phase1_transition_pilot.py` freeze the selected three-function
   boundary, all three external caller routes, exact parity grid, rollback and
-  performance gates, development checkpoint `10.2A8A7B16`, and reserved small
-  `TrackTemplate.FCMacro` launcher. The accepted Phase 2 foundation may create
-  only the minimum package/loading skeleton and small composition root; do not
-  move the three calculations, route callers, or edit immutable B14 or
-  accepted-reference B15 before the Phase 3 gate.
+  performance gates and development checkpoint `10.2A8A7B16`. The accepted
+  Phase 2 foundation has created only the minimum package/loading skeleton and
+  small `TrackTemplate.FCMacro` composition root; do not move the three
+  calculations, route callers, or edit immutable B14 or accepted-reference
+  B15 before the Phase 3 gate.
 - `tools/freecad_bridge/ordinary_track_recipe.py` and
   `tests/validate_phase1_ordinary_track.py` own the separate Phase 1 deep
   semantic oracle for the fixed B14 plain-line curve/two-track document. Their
@@ -223,10 +223,10 @@
   save/reopen result. It is a legacy comparison oracle rather than canonical
   turnout data, and does not cover trailing/straight/alternate hosts,
   downstream timber/chair stages or export.
-- `reference/PHASE1_INVENTORY.md` owns the in-progress workflow, dependency,
-  side-effect, candidate-slice and decision inventory. Update it as Phase 1
-  evidence closes; its provisional static labels are not final module
-  ownership. It also records the 2026-07-20 read-only Templot chair
+- `reference/PHASE1_INVENTORY.md` owns the accepted Phase 1 workflow,
+  dependency, side-effect, candidate-slice and decision inventory. Its static
+  legacy labels are evidence, not final module ownership. It also records the
+  2026-07-20 read-only Templot chair
   data/component/output-path audit and the remaining S1 oracle/schema evidence.
 - `reference/S1_PILOT_PLAN.md` and
   `tests/validate_phase1_s1_pilot_plan.py` own the accepted 15-decision S1
@@ -241,11 +241,13 @@
   repository paths, gap owners and later closure phases. It is coverage
   control, not whole-product behavioural acceptance.
 - `reference/contracts/phase1-compatibility.json`,
-  `tools/runtime_compatibility_probe.py` and
+  `tracktemplate/bootstrap.py`, `tools/runtime_compatibility_probe.py` and
   `tests/validate_phase1_compatibility.py` own the Phase 1 host/ingress
-  boundary. The probe records no user path; standalone Python is expected to
-  report `not-freecad-runtime`, while the current FreeCAD probe must report the
-  exact `linux-x86_64-flatpak-freecad-1.1.1` profile as `qualified`.
+  boundary and Phase 2 development guard. Bootstrap is the one authoritative
+  runtime evaluator and the probe is its thin CLI; neither records a user
+  path. Standalone Python is expected to report `not-freecad-runtime`, while
+  the current FreeCAD probe must report the exact
+  `linux-x86_64-flatpak-freecad-1.1.1` profile as `qualified`.
 - `reference/contracts/phase1-performance-boundaries.json` and
   `tests/validate_phase1_performance_boundaries.py` own the fail-closed timing
   register. Preserve its exact report/source anchors, per-run-before-median
@@ -262,10 +264,17 @@
   policy, open GUI/performance/S1/terminology boundaries, P1-X10 control-bloat
   disposition and bounded Phase 2 scope. Acceptance authorises the foundation
   only; it does not waive or pull later work into Phase 2.
+- `reference/PHASE2_FOUNDATION.md`, `tests/validate_phase2_foundation.py`,
+  `tests/freecad_validate_phase2_foundation.py`,
+  `tools/modular_structure.py` and `tools/semantic_compare.py` own the bounded
+  Phase 2 loading, dependency, cycle, runtime-guard, comparison and
+  maintainability evidence. The package and B16 launcher are loading-only;
+  Phase 2 remains current until owner acceptance and no selected calculation
+  or caller may move before Phase 3.
 - `reference/BASELINE.md` records the closed Phase 0 source fingerprints, environment, validation evidence, exclusions, decisions and gate evidence.
 - `reference/benchmarks/` stores committed, non-sensitive raw benchmark reports plus clearly separated derived analysis. Preserve supplied readouts verbatim and state missing recipe/cache information.
 - `tools/freecad_bridge/` is an optional development-only controller for isolated FreeCAD GUI observation and benchmarks. It is not a macro runtime dependency; read its README and verify its ignored local prerequisites before use.
-- `reference/PROJECT_PLAN.md`, `reference/PHASE1_CLOSEOUT.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
+- `reference/PROJECT_PLAN.md`, `reference/PHASE1_CLOSEOUT.md`, `reference/PHASE2_FOUNDATION.md`, `reference/ARCHITECTURE.md`, `reference/MODULARISATION_PLAN.md`, `reference/TESTING_POLICY.md`, `reference/PERFORMANCE_SOP.md`, `reference/VALIDATION.md`, `reference/TERMINOLOGY.md`, `reference/S1_PILOT_PLAN.md`, `reference/PROVENANCE.md`, `reference/LICENSING_BOUNDARIES.md` and `CONTRIBUTING.md` are maintained project guidance. Update the owning document when an accepted phase, decision, procedure, terminology, contribution rule, licence/provenance/output status or version role changes.
 - `reference/t5_files_556b_06_feb_2025.zip` is source evidence. Treat it as read-only unless the user explicitly requests a change.
 - `reference/PROVENANCE.md` owns source and external chair-evidence provenance.
 - `reference/LICENSING_BOUNDARIES.md` owns the operational distinction between
@@ -379,10 +388,10 @@
 
 Run from the repository root. Use `reference/VALIDATION.md` to select additional checks for the changed scope.
 
-Syntax-check both macros:
+Syntax-check the two legacy/reference macros and the B16 composition root:
 
 ```bash
-.venv/bin/python -c "import ast, pathlib; files=['AdvancedTurnout.FCMacro','model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro']; [ast.parse(pathlib.Path(f).read_text(encoding='utf-8'), filename=f) for f in files]; print('Macro syntax checks passed')"
+.venv/bin/python -c "import ast, pathlib; files=['AdvancedTurnout.FCMacro','model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro','TrackTemplate.FCMacro']; [ast.parse(pathlib.Path(f).read_text(encoding='utf-8'), filename=f) for f in files]; print('Macro syntax checks passed')"
 ```
 
 Run the fast B15 structural and analytical validation:
@@ -395,6 +404,15 @@ Run the real FreeCAD 1.1 headless B15 smoke test:
 
 ```bash
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD tests/freecad_validate_b15.py
+```
+
+Run the bounded Phase 2 package/structure and FreeCAD loading checks:
+
+```bash
+.venv/bin/python tools/modular_structure.py
+.venv/bin/python tests/validate_phase2_foundation.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase2_foundation.py
 ```
 
 Prepare the development-only FreeCAD bridge and its deterministic ignored B14

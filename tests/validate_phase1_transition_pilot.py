@@ -19,7 +19,7 @@ from tools import phase1_inventory  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-transition-pilot.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "724f0d8812c355b2aacc2993353d5d56aea18ba57b241a5d3b30c7cd1e678ada"
+    "854eed1d89246057bbda55178061667f271c7b66414506f607d604c45134fecd"
 )
 CANDIDATE_REGISTER_PATH = (
     ROOT / "reference" / "contracts" / "phase1-candidate-boundaries.json"
@@ -132,8 +132,8 @@ def validate_contract(document):
     if document.get("contract_id") != "tracktemplate:phase1:transition-pilot:1":
         errors.append("pilot contract_id is invalid")
     if document.get("status") != (
-        "selected-contract-frozen-phase2-foundation-authorised-"
-        "source-movement-not-started"
+        "selected-contract-frozen-phase2-foundation-implemented-"
+        "calculation-movement-not-started"
     ):
         errors.append("pilot Phase 2 foundation authority/status drifted")
     if document.get("phase") != 1:
@@ -210,7 +210,7 @@ def validate_contract(document):
         exact_successor = {
             "development_checkpoint_id": "10.2A8A7B16",
             "compatibility_launcher_path": "TrackTemplate.FCMacro",
-            "compatibility_launcher_status": "reserved-not-created",
+            "compatibility_launcher_status": "phase2-foundation-created-not-routed",
             "authoritative_package": "tracktemplate",
             "public_workbench_version_status": "deferred-to-release-qualification",
             "behavioural_reference": "b15",
@@ -500,11 +500,33 @@ def validate_source_and_parity(document):
             errors.append("declared pilot evidence is missing: {}".format(relative))
 
     successor = document["successor"]
-    if successor["compatibility_launcher_status"] == "reserved-not-created":
-        if (ROOT / successor["compatibility_launcher_path"]).exists():
-            errors.append("reserved-not-created B16 launcher already exists")
-        if (ROOT / successor["authoritative_package"]).exists():
-            errors.append("reserved-not-created pilot package already exists")
+    if successor["compatibility_launcher_status"] == (
+        "phase2-foundation-created-not-routed"
+    ):
+        launcher_path = ROOT / successor["compatibility_launcher_path"]
+        package_path = ROOT / successor["authoritative_package"]
+        if not launcher_path.is_file() or not package_path.is_dir():
+            errors.append("declared Phase 2 package/launcher foundation is missing")
+        else:
+            for path in (
+                launcher_path,
+                ROOT / document["module_boundary"]["domain_module_path"],
+                ROOT / document["module_boundary"]["temporary_facade_path"],
+            ):
+                if not path.is_file():
+                    errors.append("declared Phase 2 boundary is missing: {}".format(path))
+                    continue
+                tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+                moved = {
+                    node.name
+                    for node in tree.body
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    and node.name in FUNCTION_NAMES
+                }
+                if moved:
+                    errors.append(
+                        "Phase 3 pilot functions moved prematurely into {}".format(path)
+                    )
     return errors
 
 
@@ -522,7 +544,8 @@ def validate_register_link(document):
     if register.get("schema_version") != 3:
         errors.append("candidate register must use schema 3 after selection")
     if register.get("status") != (
-        "inventory-and-selection-complete-source-movement-not-started"
+        "inventory-and-selection-complete-phase2-foundation-created-"
+        "calculation-movement-not-started"
     ):
         errors.append("candidate register selection status is invalid")
     if gate != expected_gate:
