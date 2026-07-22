@@ -1,8 +1,7 @@
 # Phase 3 Transition-Length Slice Evidence
 
-Status: **domain, all-three-callers and routed real-GUI workflow parity are
-evidenced; Phase 3 remains current. Contracted calculation/workflow performance
-evidence and project-owner closeout acceptance remain open.**
+Status: **Complete — all five technical exit conditions and project-owner
+closeout acceptance recorded on 2026-07-22.**
 
 ## Bounded result
 
@@ -19,7 +18,7 @@ rollback route. Automated loading deliberately uses `launch_workflow: false`,
 reports `transition-routing-ready`, and performs no document mutation. The
 B16-hosted B15 workflow can be launched only through an explicit routed call;
 the bounded routed full-workflow evidence is recorded below. Phase 3 closeout
-is not yet accepted.
+is now accepted; neither route was removed by the closeout.
 
 No B14 or B15 source changed. No calculation implementation was copied into
 the launcher, façade or compatibility adapter, and no production calculation,
@@ -34,6 +33,8 @@ The routing/rollback tranche started from pushed documentation-lifecycle
 checkpoint `cbee8260b5e0ea7852c6e16b5195861d6501a617`.
 The routed full-workflow tranche started from pushed routing checkpoint
 `3ab42b138e2f3a84cf413c2b434fb74f2565a597`.
+The contracted performance tranche started from pushed routed-workflow
+checkpoint `dc0623fa024cf1ba86891f713e7f160f52b0b38d`.
 
 - B14 remains
   `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088`.
@@ -118,9 +119,9 @@ legacy → modular → legacy routing, and FreeCAD document names/object counts 
 not change. This is calculation-level routed evidence, not a completed dialog,
 editing, persistence or production workflow run.
 
-The compatibility owner is Phase 3. Its legacy route cannot retire until the
-remaining performance evidence passes and the project owner explicitly
-accepts the Phase 3 closeout.
+The performance and owner-acceptance retirement prerequisites now pass. The
+legacy route remains intentionally present because retirement is a separate
+source change, not an administrative closeout edit.
 
 ## Routed full-workflow and real-GUI evidence
 
@@ -160,6 +161,43 @@ The single-run durations in that report are correctness observations enclosing
 GUI automation and deep validation. They are not the contracted Phase 3
 calculation/workflow profiles and make no optimisation claim.
 
+## Contracted calculation and workflow performance evidence
+
+`tools/phase3_transition_performance.py` now owns the reproducible regression
+profile required by the frozen pilot contract. In one standalone CPython
+process it performs one untimed warm-up and nine measured repetitions per
+route of the complete 202-case parity grid, alternating route order. It then
+runs three fresh isolated FreeCAD GUI processes per workflow and route—12
+processes in total—again alternating route order. Every measurement retains
+the established workflow parity, route-binding, fixture, history, persistence,
+failure-recovery and preference-restoration checks.
+
+The controlled 2026-07-22 profile found:
+
+- one exact calculation result digest across all legacy/modular warm-ups and
+  measured runs;
+- all three paired GUI repetitions retained zero workflow-contract
+  differences and the same accepted contract digests;
+- every modular GUI wall-time median was no higher than legacy and all
+  legacy/modular wall-time ranges overlapped;
+- the sole higher modular CPU median was `+2.1 ms` (`+0.10%`) for the
+  same-process plain-line change-back, inside overlapping observed ranges; and
+- every paired document-object delta was exactly equal.
+
+The standalone modular calculation observations were lower, but no speed-up is
+claimed: the extracted AST is identical and the two implementations have
+different loading contexts. Three GUI repetitions meet the SOP minimum but do
+not set a permanent budget. Synchronous action timing excludes later viewport
+repaint, RSS is an end-minus-start snapshot, the OS file cache is uncontrolled,
+and this slice does not touch Validate/Export or wider trackwork paths.
+
+The complete recipe, medians/ranges, CPU/RSS/object observations, raw-artifact
+hash and limitations are recorded in
+[the performance report](benchmarks/2026-07-22-b16-transition-performance-profile.md).
+This closes the contracted regression evidence without introducing an
+optimisation, threshold, cache, calculation change or reduced validation
+scope.
+
 ## Standalone and FreeCAD loading evidence
 
 Observed on 2026-07-22:
@@ -177,26 +215,45 @@ Observed on 2026-07-22:
   calculation routing, explicit legacy rollback, no mixed route,
   `workflow_launched: false` and `document_mutation: false`.
 
-The calculation-level headless route and the bounded real-GUI operator
-workflows are now both evidenced. No exporter, renderer or wider
-turnout/crossover workflow is claimed by this transition slice.
+The calculation-level headless route, bounded real-GUI operator workflows and
+their contracted performance profiles are now evidenced. No exporter,
+renderer or wider turnout/crossover workflow is claimed by this transition
+slice.
 
-## Current Phase 3 gate disposition
+## Final Phase 3 gate disposition
 
 | Exit condition | State | Evidence or remaining work |
 | --- | --- | --- |
 | Dependency direction and FreeCAD/Qt-free domain import | Evidenced | Mechanical domain extraction, isolated import and structure guards |
 | Exact legacy/new analytical equivalence | Evidenced | AST, value/type, solver and diagnostic parity above |
 | Cache miss/reuse/invalidation as applicable | Evidenced | Contracted no-cache disposition and A-B-A recomputation checks |
-| Applicable FreeCAD/headless, GUI and performance evidence | Active — performance remains | Calculation-level all-caller FreeCAD parity and routed plain-line/connected-straight real-GUI, persistence and failure-recovery parity pass; contracted calculation and comparable workflow profiles remain required |
-| Temporary dual-path owner and retirement gate | Evidenced | One compatibility session owns complete modular/legacy routes, the B16 default and explicit rollback are tested, and retirement remains gated by Phase 3 evidence plus owner acceptance |
+| Applicable FreeCAD/headless, GUI and performance evidence | Evidenced | Calculation-level all-caller FreeCAD parity, routed real-GUI/persistence/failure-recovery parity, nine-repeat complete-grid calculation profile and three-repeat fresh-process workflow profiles pass without a material modular regression |
+| Temporary dual-path owner and retirement gate | Evidenced | `tracktemplate.compatibility.transition_pilot` owns the complete modular/legacy routes; the evidence and acceptance prerequisites pass, while actual removal transfers to the bounded Phase 4 entry compatibility-maintenance tranche |
 
-## Remaining tranche gates
+## Closeout acceptance and carried controls
 
-1. Record the calculation and comparable workflow performance profiles without
-   presenting this architecture extraction as an optimisation.
-2. Request explicit project-owner acceptance before retiring any temporary
-   comparison path or closing Phase 3.
+On 2026-07-22 the project owner explicitly instructed the project to close
+Phase 3 with their acceptance, commit all intended changes and push them to the
+GitHub repository. This satisfies the final administrative gate and closes the
+phase.
+
+The acceptance does not combine route retirement with closeout and does not
+start Phase 4:
+
+- the modular route remains the B16 default and the captured-B15 route remains
+  the explicit rollback/comparison path;
+- removing that temporary route is now eligible, but remains a separate,
+  reviewable Phase 4 entry compatibility-maintenance change with the same
+  parity and rollback validation applicable until removal;
+- B14 and B15 remain immutable behavioural/recovery oracles and are not
+  retirement candidates merely because the temporary B16 switch can later be
+  removed; and
+- the three-run GUI sample, uncontrolled OS file cache, synchronous repaint
+  exclusion and slice-only performance scope remain recorded limitations, not
+  silently converted into numerical product budgets.
+
+Phase 4 is next in the delivery order but remains not started pending explicit
+project-owner instruction.
 
 No independent backup is inferred from this evidence; the accepted temporary
 backup risk and [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) controls remain
@@ -206,10 +263,12 @@ unchanged.
 
 On 2026-07-22 the project owner accepted a smaller documentation update
 surface. `PROJECT_PLAN.md` became the sole project-wide live status record;
-this file remains the one open-phase evidence record. Closed Phase 1/2 records
-were marked historical, strategy/policy documents stopped mirroring tranche
-progress, and the accepted candidate/transition contract status fields were
-normalised to frozen selection/requirement states.
+this file served as the one open-phase evidence record and becomes accepted
+historical evidence at this closeout. Closed Phase 1/2 records were marked
+historical, strategy/policy documents stopped mirroring tranche progress, and
+the accepted candidate/transition contract status fields were normalised to
+frozen selection/requirement states. Freeze this record after the closeout
+commit except for an explicit factual correction.
 
 This was an editorial and validation-ownership change only. It did not alter
 the transition calculations, public façade, caller routing, B14/B15 sources,

@@ -190,12 +190,16 @@ Phase 3 routed full-workflow harness contracts:
 
 ```bash
 .venv/bin/python tests/validate_phase3_transition_workflows.py
+.venv/bin/python tests/validate_phase3_transition_performance.py
 ```
 
-This protects the reusable driver seam, exact B14/B15 fingerprints, B16 route
-loader, four-process controller, five-field volatility boundary, scenario
-order, preference restoration, bounded B14-to-B15 generator-version handling
-and exact semantic comparison. It does not start FreeCAD.
+The first command protects the reusable driver seam, exact B14/B15
+fingerprints, B16 route loader, four-process controller, five-field volatility
+boundary, scenario order, preference restoration, bounded B14-to-B15
+generator-version handling and exact semantic comparison. The second protects
+the 202-case calculation boundary, profiled action selection, repetition/order
+rules, descriptive comparisons and committed evidence links. Neither starts
+FreeCAD.
 
 Accepted Phase 2 FreeCAD loading and zero-document-mutation smoke:
 
@@ -242,6 +246,22 @@ bindings, undo/redo, save/reopen, isolated preference restoration, source
 non-mutation and the plain-line invalid-input/transaction-abort recovery paths.
 It records raw timing observations but is not the contracted calculation or
 workflow performance profile.
+
+Current Phase 3 contracted performance profile:
+
+```bash
+.venv/bin/python tools/phase3_transition_performance.py \
+  --base benchmark-output/freecad-bridge/fixtures/b14-default-base-regenerated.FCStd
+```
+
+This performs nine same-process repetitions per route of the complete frozen
+202-case calculation grid, then three fresh isolated FreeCAD GUI repetitions
+per workflow and route. It alternates route order, retains exact workflow
+parity and records medians, ranges, CPU, end-minus-start RSS and object deltas.
+The 12-process GUI profile is checkpoint evidence rather than a fast test. Its
+timings do not establish an interaction budget or an optimisation claim; raw
+paths, FCStd files and JSON remain ignored, with a sanitised committed report
+under `reference/benchmarks/`.
 
 Repository recovery and ignored-data safety controls:
 

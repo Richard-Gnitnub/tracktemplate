@@ -279,11 +279,15 @@ def _validate_bridge_contract():
         encoding="utf-8"
     )
     assert "Routed full-workflow and real-GUI evidence" in phase3_text
-    assert "Active — performance remains" in phase3_text
-    assert "Progress: `████▒` — 4/5" in project_plan_text
-    assert "Contracted calculation/workflow performance evidence" in (
+    assert "Applicable FreeCAD/headless, GUI and performance evidence | Evidenced" in (
+        phase3_text
+    )
+    assert "Closeout acceptance and carried controls" in phase3_text
+    assert "neither route was removed by the closeout" in phase3_text
+    assert "Progress: `█████` — 5/5 exit conditions evidenced and accepted" in (
         project_plan_text
     )
+    assert "Phase 4 remains not started" in project_plan_text
 
 
 def validate():

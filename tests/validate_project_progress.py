@@ -168,15 +168,17 @@ def main():
     sections = _phase_sections(text)
     rows = _validate_phase_bars(text)
     current = [phase for phase, row in rows.items() if row["state"] == "Current"]
-    assert current == [3], "Phase 3 must be the sole current phase"
+    assert current == [], "No successor phase starts implicitly at closeout"
+    assert rows[3]["state"] == "Complete — accepted 2026-07-22"
+    assert rows[4]["state"] == "Not started"
     _validate_gate_register(
         sections[1], 1, rows[1], "### Final gate register"
     )
     _validate_gate_register(
-        sections[current[0]],
-        current[0],
-        rows[current[0]],
-        "### Current gate register",
+        sections[3],
+        3,
+        rows[3],
+        "### Final gate register",
     )
     _validate_milestones(text)
     print("Project plan progress validation passed")
