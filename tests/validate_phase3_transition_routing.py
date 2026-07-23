@@ -12,7 +12,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import modular_structure  # noqa: E402
-from tracktemplate.compatibility import transition_pilot  # noqa: E402
+from tools import phase3_transition_pilot as transition_pilot  # noqa: E402
 
 
 LEGACY_SOURCE = '''
@@ -218,10 +218,16 @@ def _validate_structure():
     report = modular_structure.structure_report(ROOT)
     assert modular_structure.validate_report(report) == []
     modules = {item["module"]: item for item in report["modules"]}
-    assert modules["tracktemplate.compatibility"]["layer"] == "compatibility"
-    pilot = modules["tracktemplate.compatibility.transition_pilot"]
-    assert pilot["layer"] == "compatibility"
-    assert pilot["warning_signals"] == []
+    assert "tracktemplate.compatibility.transition_pilot" not in modules
+    assert (
+        modules["tracktemplate.compatibility.b15_workflow_host"]["layer"]
+        == "compatibility"
+    )
+    assert (
+        modules["tracktemplate.compatibility.transition_workflow"]["layer"]
+        == "compatibility"
+    )
+    assert (ROOT / "tools" / "phase3_transition_pilot.py").is_file()
 
 
 def validate():

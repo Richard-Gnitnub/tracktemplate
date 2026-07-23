@@ -31,6 +31,7 @@ knowledge; append a correction or successor lesson.
 | LFE-010 / Phase 3–4 | Persisted derived geometry and cache results can become stale or compete with parametric intent. | [PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md) makes canonical intent authoritative and treats derived results as signed, discardable state. | Persist the smallest authoritative state; regenerate views and exact geometry at explicit boundaries. |
 | LFE-011 / Phase 2–4 | Git, GitHub and system snapshots protect different failure modes and none alone protects ignored project data. | [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) separates checkpoint, system recovery, independent backup and restore proof. | Never call a protection layer a backup beyond the data and failure modes it actually covers. |
 | LFE-012 / QA audit 2026-07-22 | Strong controls can still conflict, remain prose-only or lack a downstream owner. | [QUALITY_ASSURANCE.md](QUALITY_ASSURANCE.md) introduced explicit correction-or-gate disposition and an executable linkage check. | Every audit finding is corrected now or remains visibly open at a named phase gate. |
+| LFE-013 / Phase 4 | A temporary parity switch remained useful as an oracle after it ceased to belong in product composition. | [PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md) separates the modular-only lazy product host from the development-only dual-route tool. | Retire comparison choices from product runtime once accepted, but retain reproducible oracles under explicit tooling ownership. |
 
 ## Using the ledger
 

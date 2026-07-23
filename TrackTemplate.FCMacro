@@ -1,4 +1,4 @@
-"""Small B16 composition root for the bounded transition migration."""
+"""Small modular-only B16 composition root for Track Template development."""
 
 import importlib
 import json
@@ -38,37 +38,28 @@ def _load_foundation(repository_root):
     return api, bootstrap
 
 
-def _load_transition_pilot(
+def _load_modular_transition_workflow(
     repository_root,
     api,
     bootstrap,
-    calculation_route,
 ):
     compatibility = importlib.import_module("tracktemplate.compatibility")
-    if calculation_route not in compatibility.CALCULATION_ROUTES:
-        raise compatibility.TransitionPilotError(
-            "Unknown transition calculation route {!r}; expected one of {}."
-            .format(
-                calculation_route,
-                ", ".join(compatibility.CALCULATION_ROUTES),
-            )
-        )
     transition_contract = bootstrap.load_contract(
         repository_root
         / "reference"
         / "contracts"
         / "phase1-transition-pilot.json"
     )
-    session = compatibility.load_transition_pilot_session(
+    session = compatibility.load_modular_transition_workflow_session(
         repository_root,
         api,
         transition_contract,
     )
-    return session, session.apply_route(calculation_route)
+    return session, session.routing_record()
 
 
-def run_macro(calculation_route="modular", launch_workflow=False):
-    """Qualify B16 and select one complete transition calculation route."""
+def run_macro(launch_workflow=False):
+    """Qualify the modular foundation and optionally load its inherited GUI."""
     repository_root = _launcher_root()
     api, bootstrap = _load_foundation(repository_root)
     contract_path = (
@@ -97,18 +88,19 @@ def run_macro(calculation_route="modular", launch_workflow=False):
     try:
         if not isinstance(launch_workflow, bool):
             raise ValueError("launch_workflow must be a boolean value.")
-        session, routing = _load_transition_pilot(
-            repository_root,
-            api,
-            bootstrap,
-            calculation_route,
-        )
+        session = None
+        routing = None
+        if launch_workflow:
+            session, routing = _load_modular_transition_workflow(
+                repository_root,
+                api,
+                bootstrap,
+            )
     except (OSError, RuntimeError, ValueError) as error:
         blocked = {
             "schema_version": 1,
             "development_checkpoint": api.DEVELOPMENT_CHECKPOINT,
-            "status": "blocked-before-routing",
-            "requested_calculation_routing": str(calculation_route),
+            "status": "blocked-before-workflow-composition",
             "diagnostic": str(error),
             "document_mutation": False,
         }
@@ -128,21 +120,30 @@ def run_macro(calculation_route="modular", launch_workflow=False):
         "status": (
             "transition-workflow-launched"
             if launch_workflow
-            else "transition-routing-ready"
+            else "modular-foundation-ready"
         ),
         "matched_profile_id": qualification["compatibility_evaluation"][
             "matched_profile_id"
         ],
         "public_api": list(api.__all__),
-        "calculation_routing": routing["route"],
-        "rollback_calculation_routing": routing["rollback_route"],
-        "routed_function_names": routing["function_names"],
-        "routed_caller_names": routing["caller_names"],
-        "legacy_source_sha256": routing["legacy_source_sha256"],
-        "mixed_calculation_routing": routing["mixed_route"],
+        "calculation_routing": "modular",
+        "legacy_comparison_route_available": False,
+        "workflow_host_loaded": bool(routing),
         "workflow_launched": bool(launch_workflow),
         "document_mutation": False if not launch_workflow else None,
     }
+    if routing is not None:
+        result.update(
+            {
+                "routed_function_names": routing["function_names"],
+                "routed_caller_names": routing["caller_names"],
+                "workflow_source_sha256": routing[
+                    "workflow_source_sha256"
+                ],
+                "workflow_version": routing["workflow_version"],
+                "mixed_calculation_routing": routing["mixed_route"],
+            }
+        )
     print(
         LAUNCH_SENTINEL
         + json.dumps(result, sort_keys=True, separators=(",", ":")),

@@ -162,6 +162,65 @@ The disposable qualified-FreeCAD fixture proves:
   modes and operator label; and
 - foreign and other-record-type objects survive unchanged.
 
+## Active comparison-route retirement
+
+On 2026-07-23 the project owner authorised the bounded Phase 4 retirement of
+the active Phase 3 B15 comparison switch. The accepted invariant makes B16
+product composition modular-only, retains any inherited B15 GUI host as a lazy
+compatibility dependency, moves dual-route comparison to development-only
+oracle tooling, and keeps B14/B15 byte-identical. It does not authorise a
+migration-support claim, operator migration, another entity family or
+production output.
+
+`tracktemplate.compatibility.b15_workflow_host` is the single internal owner of
+the frozen source/contract checks, no-launch AST loading, caller-boundary
+validation and atomic complete-function binding. Product composition uses
+`tracktemplate.compatibility.transition_workflow`, which exposes only one
+modular session and has no route switch or rollback field.
+`tools.phase3_transition_pilot` retains legacy → modular → legacy selection
+solely so the accepted Phase 3 oracle and benchmark tooling remain
+reproducible; it is neither imported nor exported by the product package.
+
+`TrackTemplate.FCMacro` now accepts only the boolean `launch_workflow` option.
+Its default qualification path reports `modular-foundation-ready` without
+loading the 2.3 MB B15 module. An explicit inherited-workflow launch lazily
+loads the host and binds all three transition functions to `tracktemplate.api`
+before the GUI entry point can run. Supplying the retired `"legacy"` positional
+argument fails before host loading with no document mutation.
+
+The qualified FreeCAD fixture proves the lazy default, rejected legacy
+argument, exact historical all-caller parity through the development oracle,
+and a separate product host whose three live bindings are all the modular API.
+B14 and B15 retain their accepted hashes. This is implementation evidence
+awaiting separate project-owner acceptance; no numerical startup-performance
+improvement is claimed from the structural lazy-load proof.
+
+The isolated real-GUI product-composition correctness run
+`20260723T104629754109Z-plain-line-edit-modular` completed the full inherited
+plain-line edit, rejection and rollback recipe in 35.22 seconds. Its routing
+record states `comparison_route_available: false`; the modular binding identity
+remained intact, the disposable run document was closed, the isolated process
+stopped, and the source fixture remained SHA-256
+`0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.
+The ignored raw run is development evidence; its single uncontrolled-cache
+duration is not a performance qualification or human-use budget.
+
+The matching development-oracle run
+`20260723T104739153208Z-plain-line-edit-legacy` completed in 34.77 seconds
+with the same source and cleanup controls. The existing route-independent
+comparator reported zero differences and exact shared semantic digest
+`85976aa1a154ab5afce8d51a89f7674e655b7b5d91f61795580e67f3980fc7f0`.
+This preserves reproducible comparison evidence without restoring a legacy
+choice to product composition.
+
+The inherited B15 GUI host remains a temporary development compatibility path,
+not a release implementation. The Phase 10 integration owner must remove it no
+later than the beta gate after equivalent modular Workbench workflows have
+their named Phase 7–9 evidence. Until then it is lazy, modular-bound and
+covered by the same frozen B15 fingerprint. The development oracle may remain
+under `tools` for historical reproduction but must never be imported by
+product composition.
+
 ## Legacy-document detection tranche
 
 `tracktemplate.compatibility.legacy_document` now implements the contracted
@@ -252,6 +311,45 @@ missing/unsupported state and the corrupt/ambiguous failure matrix. This is
 canonical-input sufficiency evidence only, not a migration fixture or document
 conversion.
 
+## Accepted copied-target migration fixture
+
+On 2026-07-23 the project owner authorised one fixture-only migration exercise
+for the already assessed spacing-matched secondary plain-line transition
+family. The authority covers disposable B14, B15 and expected mixed copies or
+new targets only. It does not permit source-document writes, another entity
+family, advertised migration support, production chair/output, or a product
+API.
+
+`tracktemplate.compatibility.plain_line_transition_migration` now performs only
+the host-independent preflight: source and target must be different document
+objects, both assessments must be complete, and their deterministic family
+reports must match exactly. It returns an immutable fixture plan and remains
+outside `tracktemplate.api`. The physical-copy and full-document preservation
+proof belongs to the qualified fixture, not to this family-level preflight.
+
+`FreeCADTransitionStore.create_many()` is the one retained adapter addition. It
+pre-serialises and checks every state and stable identity before opening one
+transaction, creates the complete batch, reads every payload back before
+commit, and aborts the whole transaction on failure. It creates no shape and
+does not recompute. The existing one-record create/update paths are unchanged.
+
+The isolated FreeCAD 1.1.1 fixture exercised the reproduced B14 FCStd plus
+synthetic B15-only and expected mixed sources. Each target began as a byte copy,
+received exactly the two assessed canonical transition records in one Undo
+entry, returned exactly to its legacy state on Undo, restored both records on
+Redo, rejected a duplicate batch without history, and preserved legacy object
+properties, group relationships, shape topology/bounds and canonical state
+through target save/reopen. Source files and the original B14 fixture remained
+byte-identical. An injected failure after the second payload produced a
+recoverable transaction error and restored target objects, history and bytes
+exactly. `SUPPORTED_MIGRATION_FAMILIES` remains empty and both migration-
+support and production-output flags remain false.
+
+On 2026-07-23 the project owner accepted this bounded fixture evidence for
+B14, B15 and expected mixed ingress. The acceptance explicitly does not
+advertise migration support, authorise Workbench/operator wiring, migrate
+another family, or enable production chair/output.
+
 ## Phase 4 chair-definition package contract
 
 The neutral v1 contract is now implemented by
@@ -313,32 +411,37 @@ result recovery, duplicate/missing/extra fields, unsupported schema versions,
 non-finite inputs, structured diagnostics, isolated imports and dependency
 direction.
 
-Observed on 2026-07-22 from the repository root:
+Observed through 2026-07-23 from the repository root:
 
 | Check | Result |
 | --- | --- |
 | Parse B14, B15, B16 launcher and all new/changed Python | Passed |
-| Every `tests/validate_*.py` standalone validator | 38/38 passed |
+| Every `tests/validate_*.py` standalone validator | 39/39 passed |
 | Dedicated Phase 4 canonical-state validator | Passed |
 | Deterministic modular structure | Passed; declared application boundary, permitted inward edges, no cycle, forbidden domain dependency or warning |
 | Isolated API/domain/application import with FreeCAD, Part, Qt and pivy blocked | Passed; no host import attempted |
 | B15 FreeCAD 1.1 headless smoke | Passed |
 | Accepted Phase 2 FreeCAD loading smoke | Passed |
-| Retained Phase 3 FreeCAD routing smoke | Passed |
+| Retained Phase 3/Phase 4 FreeCAD routing smoke | Passed; lazy modular-only product default, rejected legacy argument, development-oracle parity and forced modular product host |
+| Phase 4 comparison-route retirement validator | Passed; no product switch/export, shared loader, development-only oracle and immutable B14/B15 hashes |
+| Phase 4 isolated modular GUI workflow | Passed; complete plain-line edit/rejection/rollback recipe, binding identity, source-fixture preservation and cleanup |
 | Phase 4 FreeCAD 1.1 canonical-state smoke | Passed; exact round-trip and zero document mutation |
 | Phase 4 qualified FreeCAD persistence lifecycle | Passed; disposable create/update, Undo/Redo, abort, stale/corrupt rejection and FCStd save/reopen |
 | Phase 4 standalone B14/B15 detector matrix | Passed; B14, B15, mixed, foreign, unsupported, versionless, malformed and conflicting cases |
 | Phase 4 FreeCAD legacy detector lifecycle | Passed; zero-mutation inspection and identical mixed report after FCStd save/reopen |
 | Phase 4 plain-line transition family assessment | Passed; exact B14/B15/mixed read-only matrix, stable semantic identities, exact replay and fail-closed ambiguity handling |
 | Phase 4 reproduced-B14 FreeCAD family assessment | Passed; two exact canonical candidates with zero document/history or source-FCStd mutation |
+| Phase 4 copied-target migration fixture | Passed; B14/B15/mixed atomic two-record batch, Undo/Redo, save/reopen, duplicate preflight and injected second-write rollback; sources unchanged and support unadvertised |
 | Phase 4 chair-definition package validator | Passed; exact deterministic round-trip, signed manifest linkage, unit/reference/lineage failure matrix and hard production-admission block |
 | Phase 4 chair-definition qualified-FreeCAD compatibility | Passed; exact package round-trip with zero document mutation and production admission disabled |
 
-The dedicated qualified-FreeCAD smoke is intentionally limited to type/runtime
-compatibility, exact JSON round-trip and zero document mutation; it is not
-FreeCAD property, transaction, Undo/Redo or FCStd save/reopen evidence. No
-real-GUI workflow or performance run is claimed because this tranche does not
-alter an operator route, document, renderer, exact geometry or export path.
+The dedicated canonical-state qualified-FreeCAD smoke is intentionally limited
+to type/runtime compatibility, exact JSON round-trip and zero document
+mutation; it is not FreeCAD property, transaction, Undo/Redo or FCStd
+save/reopen evidence. The route-retirement tranche separately reran one
+isolated real-GUI development workflow because it changed that loader. It did
+not alter an advertised operator route, renderer, exact geometry or export path,
+and it makes no numerical performance claim.
 
 ## Current Phase 4 gate disposition
 
@@ -349,7 +452,7 @@ alter an operator route, document, renderer, exact geometry or export path.
 | Undo/redo and failed updates leave a valid document | Evidenced: atomic create/update, no-op, Undo/Redo, preflight rejection and injected post-write abort all pass |
 | Preview/exact geometry can be deleted and regenerated from canonical state | Pending: no Phase 5/6 renderer or exact adapter is being invented here |
 | Deterministic, fail-closed chair-definition package | Evidenced: neutral schema v1, immutable review record, exact decimals/units, constituent/procedure/interface/manufacturing separation, lineage, signed manifest linkage and failure matrix pass without enabling production; S1 evidence remains blocked |
-| Supported schema/version window agreed and tested | Active: the owner accepted exact transition v1, chair-package v1 and read-only B14/B15/mixed ingress on 2026-07-22; first-family canonical-input sufficiency is tested, but no entity-family migration is authorised or write-qualified |
+| Supported schema/version window agreed and tested | Active: the read window and bounded B14/B15/mixed copied-target fixture evidence are accepted; later support-advertising authority remains a separate owner decision, so no entity family is advertised or product-write-qualified |
 
 ## Remaining risks and next bounded tranche
 
@@ -358,20 +461,19 @@ alter an operator route, document, renderer, exact geometry or export path.
   entity workflows still own their identity rules; adapters must not invent IDs
   from FreeCAD object order or labels.
 - The outer B14/B15 detector exists, but no legacy entity family is qualified
-  for migration. The first read-only assessment proves only canonical-input
-  sufficiency. Separate owner authority, complete family schema/identity
-  validation and a copied-target atomic migration fixture remain mandatory; an
-  accepted version set must not imply that a whole document is migratable.
+  for supported migration. The first read-only assessment and copied-target
+  atomic fixture are accepted, but a later explicit support-advertising
+  decision remains mandatory. An accepted version set or fixture must not imply
+  that a whole document is migratable.
 - Preview, exact-validation and export signatures cannot be completed until
   those derived-result contracts exist; adapters must not invent partial keys.
 - Chair-package v1 is accepted only inside the bounded read window. Family
   completeness, numerical S1 data, exact generation and production admission
   remain Phase 9 work, not implicit consequences of that acceptance.
 
-The next authority-changing Phase 4 decision is whether to authorise a bounded
-copied-target migration fixture for the assessed transition family. Until that
-separate decision, implementation stops at read-only assessment. The
-independent backup/restore prerequisite in
+The copied-target fixture evidence is accepted without advertising a supported
+family or wiring an operator path. Either later action requires its own
+explicit authority. The independent backup/restore prerequisite in
 [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) is satisfied for the owner-
 confirmed complete scope under its active cadence, but backup readiness alone
 does not authorise a migrator.

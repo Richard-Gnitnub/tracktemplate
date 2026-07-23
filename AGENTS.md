@@ -357,12 +357,18 @@
   maintainability evidence accepted at Phase 2 closeout. Later package
   additions must preserve those durable boundaries without rewriting the
   accepted record.
-- `tracktemplate/compatibility/transition_pilot.py`,
-  `reference/PHASE3_TRANSITION_SLICE.md` and
-  `tests/validate_phase3_transition_routing.py` plus
-  `tests/freecad_validate_phase3_transition_slice.py` own the
-  transition-slice implementation evidence, current B16 orchestration check and
-  declared limitations. Consult
+- `tracktemplate/compatibility/b15_workflow_host.py` and
+  `tracktemplate/compatibility/transition_workflow.py` own the temporary,
+  modular-only inherited B15 GUI host. The B16 default must not eagerly load
+  that host and the product compatibility surface must not expose a legacy
+  route. `tools/phase3_transition_pilot.py` retains the old dual-route session
+  solely as development-oracle tooling. Together with
+  `reference/PHASE3_TRANSITION_SLICE.md`,
+  `tests/validate_phase3_transition_routing.py`,
+  `tests/validate_phase4_transition_route_retirement.py` and
+  `tests/freecad_validate_phase3_transition_slice.py`, these own the
+  transition-slice historical evidence and current B16 retirement check.
+  Consult
   `reference/PROJECT_PLAN.md` rather than this repository map for whether
   that phase or tranche is current.
 - `reference/RECOVERY_AND_BACKUP.md`,
@@ -675,6 +681,12 @@ Run the selected transition-pilot boundary and expanded parity contract:
 
 ```bash
 .venv/bin/python tests/validate_phase1_transition_pilot.py
+```
+
+Run the Phase 4 comparison-route retirement boundary:
+
+```bash
+.venv/bin/python tests/validate_phase4_transition_route_retirement.py
 ```
 
 Run the Phase 1 runtime and legacy-ingress compatibility contract, then probe

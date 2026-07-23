@@ -216,21 +216,32 @@ checks package/API/domain resolution, exact runtime qualification and zero
 document mutation. This keeps the accepted loading check independent of later
 calculation and caller-routing status.
 
-Current Phase 3 transition orchestration smoke:
+Phase 3 oracle and authorised Phase 4 comparison-route retirement:
+
+```bash
+.venv/bin/python tests/validate_phase3_transition_routing.py
+.venv/bin/python tests/validate_phase4_transition_route_retirement.py
+```
 
 ```bash
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
   tests/freecad_validate_phase3_transition_slice.py
 ```
 
-This directly executes the current B16 entry point and owns its current
-routing/result assertions. It loads the exact B15 definitions without the
-operator dialog, verifies the modular default and legacy rollback, and compares
-all three frozen callers under legacy → modular → legacy routing with no
-document mutation. It must print
-`Phase 3 transition routing FreeCAD smoke test passed`. Update this
-current-phase test when accepted routing state changes; do not rewrite the
-Phase 2 loading smoke.
+The Phase 3 standalone test retains legacy → modular → legacy comparison only
+through `tools.phase3_transition_pilot`. The Phase 4 retirement validator
+requires that oracle to remain outside the product package, removes the route
+argument and legacy exports from current composition, and proves that the
+modular-only host loader is a clean, lazy compatibility dependency.
+
+The FreeCAD test executes the current B16 default and requires that it neither
+loads the 2.3 MB B15 host nor mutates a document. It rejects the retired legacy
+argument before host loading, reproduces the accepted all-caller parity through
+the development-only oracle, then loads a separate product session and proves
+that all three bindings are the modular API with no comparison route. It must
+print `Phase 3 transition routing FreeCAD smoke test passed`. No operator dialog
+is launched by this smoke, and the immutable B14/B15 workflow evidence remains
+the accepted GUI oracle. Do not rewrite the independent Phase 2 loading smoke.
 
 Phase 4 transition canonical-state foundation:
 
@@ -305,6 +316,26 @@ document/property/history snapshots and requires the source FCStd hash to stay
 unchanged. Its sentinel is
 `Phase 4 plain-line transition FreeCAD assessment passed`. This is an
 assessment, not a copied-target migration or entity-family support claim.
+
+Authorised Phase 4 copied-target transition migration fixture:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase4_plain_line_transition_migration.py
+```
+
+This isolated fixture starts B14, B15-only and expected mixed targets as
+physical copies of disposable source FCStd files. The host-independent
+preflight requires exact family-level source/target assessments; the qualified
+FreeCAD adapter then creates both canonical transition records in one batch
+transaction. The fixture requires one-step Undo/Redo, duplicate preflight with
+no history, exact canonical and legacy persistence through target save/reopen,
+source-byte preservation, and complete abort after an injected failure on the
+second payload. It also requires the original reproduced B14 fixture hash to
+remain unchanged, `SUPPORTED_MIGRATION_FAMILIES` to remain empty, and migration-
+support/production-output flags to remain false. Its sentinel is
+`Phase 4 copied-target transition migration fixture passed`. Passing this test
+does not advertise support or authorise a Workbench/operator migration path.
 
 Phase 4 neutral chair-definition package:
 

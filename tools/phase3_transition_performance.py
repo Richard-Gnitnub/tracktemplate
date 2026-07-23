@@ -635,7 +635,15 @@ def _source_record():
         CONTRACT_PATH,
         DOMAIN_PATH,
         PROJECT_ROOT / "tracktemplate" / "api.py",
-        PROJECT_ROOT / "tracktemplate" / "compatibility" / "transition_pilot.py",
+        PROJECT_ROOT
+        / "tracktemplate"
+        / "compatibility"
+        / "b15_workflow_host.py",
+        PROJECT_ROOT
+        / "tracktemplate"
+        / "compatibility"
+        / "transition_workflow.py",
+        PROJECT_ROOT / "tools" / "phase3_transition_pilot.py",
         PROJECT_ROOT / "tools" / "freecad_bridge" / "phase3_transition_workflow_recipe.py",
         PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "b14_ordinary_edit_driver.py",
         PROJECT_ROOT / "tools" / "freecad_bridge" / "probes" / "b14_straight_station_driver.py",

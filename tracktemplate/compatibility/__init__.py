@@ -1,18 +1,12 @@
-"""Temporary, explicit compatibility boundaries used during migration."""
+"""Explicit product compatibility boundaries used during migration."""
 
-from .transition_pilot import (
-    CALCULATION_ROUTES,
-    LEGACY_ROUTE,
-    MODULAR_ROUTE,
-    TransitionPilotError,
-    load_transition_pilot_session,
+from .transition_workflow import (
+    TransitionWorkflowError,
+    load_modular_transition_workflow_session,
 )
 
 
 __all__ = (
-    "CALCULATION_ROUTES",
-    "LEGACY_ROUTE",
-    "MODULAR_ROUTE",
-    "TransitionPilotError",
-    "load_transition_pilot_session",
+    "TransitionWorkflowError",
+    "load_modular_transition_workflow_session",
 )

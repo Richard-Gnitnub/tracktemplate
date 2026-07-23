@@ -18,12 +18,22 @@ from tools import modular_structure  # noqa: E402
 from tracktemplate.application import transition_state  # noqa: E402
 from tracktemplate.compatibility import legacy_document  # noqa: E402
 from tracktemplate.compatibility import plain_line_transition  # noqa: E402
+from tracktemplate.compatibility import plain_line_transition_migration  # noqa: E402
 
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
 MODULE_PATH = ROOT / "tracktemplate" / "compatibility" / "plain_line_transition.py"
+MIGRATION_MODULE_PATH = (
+    ROOT / "tracktemplate" / "compatibility" / "plain_line_transition_migration.py"
+)
+TRANSITION_ADAPTER_PATH = (
+    ROOT / "tracktemplate" / "adapters" / "freecad" / "transition_state.py"
+)
 FREECAD_TEST_PATH = (
     ROOT / "tests" / "freecad_validate_phase4_plain_line_transition_assessment.py"
+)
+MIGRATION_FREECAD_TEST_PATH = (
+    ROOT / "tests" / "freecad_validate_phase4_plain_line_transition_migration.py"
 )
 GENERATOR_ID = "ModelRailwayCurveTemplate.IndependentEasements"
 B14 = "10.2A8A7B14"
@@ -162,6 +172,22 @@ def _snapshot(document):
 
 def _codes(report):
     return {item.code for item in report.findings}
+
+
+def _expect_migration_error(action, code):
+    try:
+        action()
+    except plain_line_transition_migration.CopiedTargetMigrationError as error:
+        assert error.code == code, error
+        assert error.diagnostic() == {
+            "code": code,
+            "message": error.detail,
+            "recoverable": True,
+            "source_document_mutation": False,
+            "target_document_mutation": False,
+        }
+        return
+    raise AssertionError("Expected CopiedTargetMigrationError {!r}".format(code))
 
 
 def _candidate_summary(report):
@@ -435,6 +461,116 @@ def _validate_blocked_cases():
     }
 
 
+def _validate_copied_target_plan():
+    contract = _contract()
+    source = FakeDocument([_foreign(), _settings()])
+    target = copy.deepcopy(source)
+    source_before = _snapshot(source)
+    target_before = _snapshot(target)
+    plan = (
+        plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            source,
+            target,
+            contract,
+        )
+    )
+    assert _snapshot(source) == source_before
+    assert _snapshot(target) == target_before
+    assert plan.source_versions == (B14,)
+    assert plan.transition_ids == (
+        "SET-001/curve-track/2/transition/entry",
+        "SET-001/curve-track/2/transition/exit",
+    )
+    assert len(plan.states) == 2
+    assert plan.migration_support_advertised is False
+    assert plan.production_output_authorized is False
+    assert len(plan.assessment_sha256) == 64
+    assert set(plan.assessment_sha256) <= set("0123456789abcdef")
+    assert plan.to_record() == {
+        "assessment_sha256": plan.assessment_sha256,
+        "fixture_only": True,
+        "migration_support_advertised": False,
+        "production_output_authorized": False,
+        "schema_id": (
+            "tracktemplate.plain-line-transition-copied-target-fixture"
+        ),
+        "schema_version": 1,
+        "source_document_mutation": False,
+        "source_versions": [B14],
+        "transition_ids": list(plan.transition_ids),
+    }
+
+    b15_source = FakeDocument([_settings(version=B15)])
+    b15_plan = (
+        plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            b15_source,
+            copy.deepcopy(b15_source),
+            contract,
+        )
+    )
+    assert b15_plan.source_versions == (B15,)
+
+    mixed_source = FakeDocument(
+        [_owned("B15Chair", B15), _settings(version=B14)]
+    )
+    mixed_plan = (
+        plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            mixed_source,
+            copy.deepcopy(mixed_source),
+            contract,
+        )
+    )
+    assert mixed_plan.source_versions == (B14, B15)
+    assert mixed_plan.transition_ids == plan.transition_ids
+
+    _expect_migration_error(
+        lambda: plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            source,
+            source,
+            contract,
+        ),
+        "source-target-alias",
+    )
+    _expect_migration_error(
+        lambda: plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            object(),
+            target,
+            contract,
+        ),
+        "invalid-document",
+    )
+    insufficient_source = FakeDocument([_settings(tracks=[])])
+    _expect_migration_error(
+        lambda: plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            insufficient_source,
+            copy.deepcopy(insufficient_source),
+            contract,
+        ),
+        "source-assessment-not-sufficient",
+    )
+    insufficient_target = FakeDocument([_settings(tracks=[])])
+    _expect_migration_error(
+        lambda: plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            source,
+            insufficient_target,
+            contract,
+        ),
+        "target-assessment-not-sufficient",
+    )
+    changed_target = FakeDocument(
+        [_foreign(), _settings(tracks=[_track(name="Changed diagnostic label")])]
+    )
+    _expect_migration_error(
+        lambda: plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            source,
+            changed_target,
+            contract,
+        ),
+        "target-not-family-copy",
+    )
+    assert _snapshot(source) == source_before
+
+
 def _validate_structure_and_controls():
     source = MODULE_PATH.read_text(encoding="utf-8")
     tree = ast.parse(source, filename=str(MODULE_PATH))
@@ -461,6 +597,40 @@ def _validate_structure_and_controls():
         assert forbidden not in source
     assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
 
+    migration_source = MIGRATION_MODULE_PATH.read_text(encoding="utf-8")
+    migration_tree = ast.parse(
+        migration_source,
+        filename=str(MIGRATION_MODULE_PATH),
+    )
+    migration_imported_roots = set()
+    for node in ast.walk(migration_tree):
+        if isinstance(node, ast.Import):
+            migration_imported_roots.update(
+                alias.name.split(".", 1)[0] for alias in node.names
+            )
+        elif isinstance(node, ast.ImportFrom):
+            migration_imported_roots.add((node.module or "").split(".", 1)[0])
+    assert migration_imported_roots == {"dataclasses", "hashlib", "tracktemplate"}
+    for forbidden in (
+        "import FreeCAD",
+        "import Part",
+        "openTransaction(",
+        "commitTransaction(",
+        "abortTransaction(",
+        "addObject(",
+        "addProperty(",
+        "setattr(",
+        "recompute(",
+        "saveAs(",
+        "removeObject(",
+    ):
+        assert forbidden not in migration_source
+
+    adapter_source = TRANSITION_ADAPTER_PATH.read_text(encoding="utf-8")
+    assert "def create_many(self, document, states):" in adapter_source
+    assert "Create Track Template transition batch" in adapter_source
+    assert "document.abortTransaction()" in adapter_source
+
     report = modular_structure.structure_report(ROOT)
     assert modular_structure.validate_report(report) == []
     modules = {item["module"]: item for item in report["modules"]}
@@ -470,6 +640,16 @@ def _validate_structure_and_controls():
     assert "tracktemplate.compatibility" in family["imports"]
     assert "tracktemplate.application.transition_state" in family["imports"]
     assert "tracktemplate.domain.transition" in family["imports"]
+    migration = modules[
+        "tracktemplate.compatibility.plain_line_transition_migration"
+    ]
+    assert migration["layer"] == "compatibility"
+    assert migration["warning_signals"] == []
+    assert migration["imports"] == [
+        "dataclasses",
+        "hashlib",
+        "tracktemplate.compatibility.plain_line_transition",
+    ]
     assert not any(
         item.startswith("tracktemplate.compatibility.plain_line_transition")
         for item in modules["tracktemplate.api"]["imports"]
@@ -491,10 +671,16 @@ class Blocked(importlib.abc.MetaPathFinder):
 
 sys.meta_path.insert(0, Blocked())
 sys.path.insert(0, {root!r})
-from tracktemplate.compatibility import legacy_document, plain_line_transition
+from tracktemplate.compatibility import (
+    legacy_document,
+    plain_line_transition,
+    plain_line_transition_migration,
+)
 assert attempted == []
 assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
 assert plain_line_transition.FAMILY_ID == "plain-line-spacing-matched-transition-intent"
+assert plain_line_transition_migration.MIGRATION_SUPPORT_ADVERTISED is False
+assert plain_line_transition_migration.PRODUCTION_OUTPUT_AUTHORIZED is False
 """.format(root=str(ROOT))
     result = subprocess.run(
         [sys.executable, "-I", "-c", script],
@@ -508,13 +694,26 @@ assert plain_line_transition.FAMILY_ID == "plain-line-spacing-matched-transition
     for relative, expected_hash in SOURCE_HASHES.items():
         assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == expected_hash
     assert FREECAD_TEST_PATH.exists()
+    assert MIGRATION_FREECAD_TEST_PATH.exists()
     evidence = (ROOT / "reference" / "PHASE4_CANONICAL_STATE.md").read_text(
+        encoding="utf-8"
+    )
+    project_plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"
     )
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(encoding="utf-8")
     assert "Bounded read-window acceptance" in evidence
     assert "plain-line transition family assessment" in evidence.lower()
+    assert "Accepted copied-target migration fixture" in evidence
+    assert (
+        "On 2026-07-23 the project owner accepted this bounded fixture evidence"
+        in evidence
+    )
+    assert "`SUPPORTED_MIGRATION_FAMILIES` remains empty" in evidence
+    assert "copied-target fixture accepted; support withheld" in project_plan
+    assert "Support advertising remains a separate authority gate" in project_plan
     assert FREECAD_TEST_PATH.name in validation
+    assert MIGRATION_FREECAD_TEST_PATH.name in validation
 
 
 def validate():
@@ -522,6 +721,7 @@ def validate():
     _validate_window_identity_and_direction()
     _validate_inspection_only_cases()
     _validate_blocked_cases()
+    _validate_copied_target_plan()
     _validate_structure_and_controls()
     print("Phase 4 plain-line transition assessment validation passed")
 

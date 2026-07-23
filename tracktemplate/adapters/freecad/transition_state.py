@@ -401,6 +401,79 @@ class FreeCADTransitionStore:
                 _abort_transaction(document, error)
             _raise_transaction_error(error, failed_object_name)
 
+    def create_many(self, document, states):
+        """Create a non-empty transition set as one atomic FreeCAD command."""
+        document = _require_open_document(document)
+        _require_undo(document)
+        try:
+            states = tuple(states)
+        except TypeError as error:
+            raise TypeError("states must be an iterable of TransitionState values") from error
+        if not states:
+            raise TransitionDocumentError(
+                "empty-create-batch",
+                "an atomic transition batch must contain at least one state",
+            )
+
+        prepared = []
+        identities = set()
+        for state in states:
+            if not isinstance(state, TransitionState):
+                raise TypeError("every batch item must be a TransitionState")
+            try:
+                payload = transition_state_to_json(state)
+            except TransitionStateError as error:
+                raise TransitionDocumentError(
+                    "invalid-write-state",
+                    str(error),
+                    source_code=error.code,
+                ) from error
+            identity = state.intent.transition_id
+            if identity in identities:
+                raise TransitionDocumentError(
+                    "duplicate-batch-stable-identity",
+                    "transition identity {!r} occurs more than once in the batch".format(
+                        identity
+                    ),
+                )
+            identities.add(identity)
+            prepared.append((identity, payload))
+
+        for identity, _payload in prepared:
+            if find_transition_object(document, identity) is not None:
+                raise TransitionDocumentError(
+                    "duplicate-stable-identity",
+                    "transition identity {!r} already exists".format(identity),
+                )
+
+        transaction_open = False
+        objects = []
+        try:
+            document.openTransaction("Create Track Template transition batch")
+            transaction_open = True
+            for identity, payload in prepared:
+                obj = document.addObject(
+                    FREECAD_TRANSITION_OBJECT_TYPE,
+                    _transition_object_name(identity),
+                )
+                objects.append(obj)
+                _initialise_transition_object(obj, payload)
+            for obj, (_identity, payload) in zip(objects, prepared):
+                if transition_state_to_json(read_transition_object(obj)) != payload:
+                    raise TransitionDocumentError(
+                        "write-verification-failed",
+                        "a batch object did not retain its requested canonical state",
+                        _object_name(obj),
+                    )
+            document.commitTransaction()
+            transaction_open = False
+            return tuple(objects)
+        except Exception as error:
+            failed_object_name = _object_name(objects[-1]) if objects else ""
+            if transaction_open:
+                _abort_transaction(document, error)
+            _raise_transaction_error(error, failed_object_name)
+
     def update(self, document, obj, state):
         """Replace canonical state atomically, or make no history for a no-op."""
         document = _require_open_document(document)

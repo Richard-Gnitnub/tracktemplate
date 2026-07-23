@@ -2,6 +2,7 @@
 
 import ast
 import hashlib
+import importlib
 import os
 import pathlib
 import sys
@@ -69,14 +70,29 @@ _PHASE3_QUALIFICATION = _PHASE3_BOOTSTRAP.require_qualified_runtime(
     / "contracts"
     / "phase1-compatibility.json"
 )
-_PHASE3_SESSION, _PHASE3_ROUTING = (
-    _PHASE3_COMPOSITION._load_transition_pilot(
+_PHASE3_PRODUCT_COMPOSITION = _PHASE3_ROUTE == "modular"
+if _PHASE3_PRODUCT_COMPOSITION:
+    _PHASE3_SESSION, _PHASE3_ROUTING = (
+        _PHASE3_COMPOSITION._load_modular_transition_workflow(
+            _PHASE3_REPOSITORY_ROOT,
+            _PHASE3_API,
+            _PHASE3_BOOTSTRAP,
+        )
+    )
+else:
+    _PHASE3_ORACLE = importlib.import_module("tools.phase3_transition_pilot")
+    _PHASE3_TRANSITION_CONTRACT = _PHASE3_BOOTSTRAP.load_contract(
+        _PHASE3_REPOSITORY_ROOT
+        / "reference"
+        / "contracts"
+        / "phase1-transition-pilot.json"
+    )
+    _PHASE3_SESSION = _PHASE3_ORACLE.load_transition_pilot_session(
         _PHASE3_REPOSITORY_ROOT,
         _PHASE3_API,
-        _PHASE3_BOOTSTRAP,
-        _PHASE3_ROUTE,
+        _PHASE3_TRANSITION_CONTRACT,
     )
-)
+    _PHASE3_ROUTING = _PHASE3_SESSION.apply_route(_PHASE3_ROUTE)
 
 _PHASE3_WORKFLOW_MODULE_NAME = "tracktemplate_b16_transition_workflow_session"
 if _PHASE3_WORKFLOW_MODULE_NAME in sys.modules:

@@ -1,8 +1,9 @@
 """Narrow migration façade for Track Template.
 
-Phase 3 exposes the mechanically extracted transition calculations through
-the temporary all-three-name B15 comparison and rollback boundary. Phase 4
-adds bounded canonical transition-state and neutral chair-package contracts.
+Phase 3 exposed the mechanically extracted transition calculations and proved
+them through a temporary B15 comparison route. Phase 4 retains only the
+modular façade and adds bounded canonical transition-state and neutral
+chair-package contracts.
 """
 
 from tracktemplate import DEVELOPMENT_CHECKPOINT

@@ -225,7 +225,11 @@ def _validate_bridge_contract():
     wrapper_text = wrapper.read_text(encoding="utf-8")
     assert "_load_foundation" in loader_text
     assert "require_qualified_runtime" in loader_text
-    assert "_load_transition_pilot" in loader_text
+    assert "_load_modular_transition_workflow" in loader_text
+    assert "_PHASE3_PRODUCT_COMPOSITION" in loader_text
+    assert "tools.phase3_transition_pilot" in loader_text
+    assert "load_transition_pilot_session" in loader_text
+    assert "_PHASE3_SESSION.apply_route(_PHASE3_ROUTE)" in loader_text
     assert "FOUNDATION_RESULT" in loader_text
     assert "sys.modules[_PHASE3_WORKFLOW_MODULE_NAME]" in loader_text
     assert "_PHASE3_BINDINGS_BEFORE" in loader_text
@@ -236,6 +240,7 @@ def _validate_bridge_contract():
     assert '"10.2A8A7B14"' in loader_text
     assert '"10.2A8A7B15"' in loader_text
     assert "binding_identity_preserved" in finisher_text
+    assert "_PHASE3_SESSION.routing_record()" in finisher_text
     assert "_PHASE3_SESSION.apply_route(_PHASE3_ROUTE)" in finisher_text
     assert "run-isolated" in wrapper_text
     assert "shutil.copy2(base_path, document_path)" in host_text
