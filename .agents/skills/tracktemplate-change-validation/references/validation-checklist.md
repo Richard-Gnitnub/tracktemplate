@@ -45,14 +45,6 @@ Require the corresponding evidence when a change affects:
 
 ## Evidence integrity
 
-- The proof uses the highest reliable boundary that can observe the changed
-  behaviour; substitutes, fixtures or mocks begin only beyond that boundary.
-- Tests assert railway outcomes, document state, persisted state, exported
-  content or visible failure contracts rather than internal call sequences.
-- Where practical, the focused regression proof was observed failing against
-  the pre-change behaviour and passing after the change.
-- Pre-existing failures are distinguished from failures introduced by the
-  present change.
 - Focused tests prove observable behaviour rather than only implementation shape.
 - Existing regression and oracle changes have evidence and authority.
 - Required success sentinels were observed.

@@ -43,15 +43,6 @@ Do not shorten text when doing so would remove:
 - compatibility requirements;
 - validator-required wording.
 
-## Post-edit survival check
-
-- Load-bearing names, paths, commands, identifiers, classifications and
-  controlled railway terms still appear where required.
-- Incoming and outgoing links remain valid after headings, sections or files
-  are moved.
-- Material removed from one document was either unnecessary or relocated to
-  its canonical owner.
-
 ## Removal review
 
 Report proposed deletions separately when they could change historical, legal, safety, licensing or evidential meaning. Do not remove that material through automatic cleanup.

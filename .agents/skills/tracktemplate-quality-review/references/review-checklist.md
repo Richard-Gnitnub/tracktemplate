@@ -2,16 +2,6 @@
 
 Apply only the sections relevant to the complete change.
 
-## Requirement compliance
-
-- Every requested or accepted outcome is present.
-- No unrequested behaviour, refactor, configuration or compatibility change is
-  included.
-- Requirements that the available diff cannot settle are reported as
-  CANNOT_VERIFY with the exact evidence required.
-- The review relies on the complete diff and evidence rather than the
-  implementer's completion summary.
-
 ## Scope and authority
 
 - The requested scope, affected files and complete relevant diff have been inspected.

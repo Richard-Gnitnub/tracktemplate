@@ -83,9 +83,6 @@
 - Confirm the exact target and authority before editing. Do not assume a change
   belongs in B14, B15, B16 or every layer.
 - Make the smallest coherent, reviewable change that satisfies the request.
-- Implement non-trivial work in small, independently checkable slices and run
-  the nearest useful check after each slice. For large mechanical or bulk
-  changes, prove a representative pilot before scaling.
 - Keep mechanical extraction, clean-up, behaviour change and performance work in
   separately reviewable steps with their own evidence.
 - Keep one authoritative implementation for each genuinely shared railway or
