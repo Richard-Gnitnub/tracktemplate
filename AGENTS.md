@@ -15,19 +15,19 @@
   conflicts with this file or a canonical reference document, follow the
   canonical project rule and report the conflict.
 
-## Purpose and priorities
+## Purpose and Priorities
 
 - TrackTemplate develops a FreeCAD system for parametric model-railway track
   templates, including plain line, turnouts, crossovers, timbering, chairs,
-  persistence, display and production export.
-- Railway correctness, recoverability and production integrity take priority
+  persistence, display, and production export.
+- Railway correctness, recoverability, and production integrity take priority
   over speed or aesthetic clean-up.
 - Treat performance work as behaviour-preserving unless the project owner
   explicitly accepts a behaviour change.
 - Inspect the implementation that actually runs and capture a repeatable
   baseline before refactoring. Do not redesign from intuition alone.
 
-## Canonical document ownership
+## Canonical Document Ownership
 
 - `reference/PROJECT_PLAN.md` is the sole project-wide live status record. It
   owns the current phase, progress, gates, live risks and acceptance state.
@@ -54,7 +54,7 @@
   contracts are frozen historical or contractual evidence. Change them only to
   correct a demonstrated factual error or an explicitly accepted scope change.
 
-## Version and architecture boundaries
+## Version and Architecture Boundaries
 
 - `AdvancedTurnout.FCMacro` is the immutable B14 legacy comparison oracle.
 - `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro`
@@ -75,7 +75,7 @@
   rewrite or remove a legacy path before parity evidence and project-owner
   acceptance.
 
-## Scope and change discipline
+## Scope and Change Discipline
 
 - Confirm the exact target and authority before editing. Do not assume a change
   belongs in B14, B15, B16 or every layer.
@@ -103,7 +103,7 @@
 - Do not change a test merely to make an implementation pass. Explain and prove
   any accepted oracle change.
 
-## Repository and system safety
+## Repository and System Safety
 
 - Read `reference/RECOVERY_AND_BACKUP.md` before deletion, bulk rewriting,
   history operations, system changes, backup work or use of operator-owned
