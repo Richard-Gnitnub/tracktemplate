@@ -111,7 +111,19 @@ def main() -> None:
         text = read(skill_file)
         fields = parse_frontmatter(skill_file, text)
         name = fields["name"]
+        description = fields["description"]
 
+        require(
+            1 <= len(name) <= 64,
+            f"skill name must contain between 1 and 64 characters: {name!r}",
+        )
+        require(
+            1 <= len(description) <= 1024,
+            (
+                f"{skill_file.relative_to(ROOT)} description must contain "
+                "between 1 and 1024 characters"
+            ),
+        )
         require(VALID_NAME_RE.fullmatch(name) is not None, f"invalid skill name: {name}")
         require(
             name == directory.name,

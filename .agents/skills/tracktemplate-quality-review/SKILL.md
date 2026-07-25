@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-quality-review
-description: Review TrackTemplate source changes for unnecessary complexity, duplicated logic, misleading comments, hidden failures, behavioural drift, performance regressions and unsupported validation claims.
+description: Review complete TrackTemplate source or documentation changes for unnecessary complexity, duplicated authority, misleading comments, hidden failures, behavioural drift, performance regressions and unsupported validation claims. Use before reporting completion of a non-trivial change.
 ---
 
 # TrackTemplate quality review

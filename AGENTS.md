@@ -195,6 +195,11 @@
   starting states and report cache/process differences and measurement noise.
 - Never invent a result that is visible only in FreeCAD. Use the approved
   isolated bridge or state that GUI validation remains outstanding.
+- The validator checks skill frontmatter, directory/name agreement, local links, the skill register and root routing. It does not judge whether a skill's
+instructions are substantively correct or whether project validation passed.
+- After adding, renaming or moving a skill, start a fresh Codex session and use
+`/skills` to confirm that every repository skill appears with the expected name
+and description.
 
 ## Completion and review
 
