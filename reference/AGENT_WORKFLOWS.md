@@ -129,7 +129,15 @@ Prefer explicit invocation for:
 - changes involving canonical ownership, frozen evidence, provenance or
   validator-controlled wording.
 
+For geometry, topology, persistence, migration, export, performance, provenance
+or authority-changing work, `$tracktemplate-change-validation` may also be used
+before implementation to define the required proof boundary. This does not
+replace post-implementation validation.
+
 ## Normal workflow order
+
+Validation determines what the evidence proves. Quality review determines
+whether the implementation and scope are acceptable given that evidence.
 
 For a source change:
 
