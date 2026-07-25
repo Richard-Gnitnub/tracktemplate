@@ -8,7 +8,7 @@ Apply only the sections relevant to the complete change.
 - The current phase, open gates and owning evidence document have been
   identified.
 - The affected architectural, railway and FreeCAD/host boundaries are explicit.
-- The change is separated from unrelated cleanup, optimisation or behaviour
+- The change is separated from unrelated clean-up, optimisation or behaviour
   changes.
 
 ## Evidence-layer selection
@@ -19,11 +19,11 @@ Consider each layer and record why it applies or does not apply:
 - pure or analytical railway behaviour;
 - dependency direction and standalone import;
 - qualified FreeCAD document behaviour;
-- real-GUI presentation, selection and operator workflow;
+- real-GUI presentation, selection, and operator workflow;
 - persistence, migration, save/reopen, Undo/Redo and stable identity;
-- transaction, rollback, cleanup and recovery;
+- transaction, rollback, clean-up and recovery;
 - exact geometry and production output;
-- exporter naming, ordering, manifests and overwrite handling;
+- exporter naming, ordering, manifests, and overwrite handling;
 - performance and resource measurement;
 - provenance, licensing, package admission and output status;
 - documentation links, canonical ownership and validator-controlled wording.
@@ -32,7 +32,7 @@ Consider each layer and record why it applies or does not apply:
 
 Require the corresponding evidence when a change affects:
 
-- units, coordinate frames, geometry, sampling or tolerances;
+- units, coordinate frames, geometry, sampling, or tolerances;
 - topology, timbering, chairs, stable identities or deterministic ordering;
 - public APIs, schemas, stored properties or migration behaviour;
 - FreeCAD objects, transactions, recompute, visibility or selection;

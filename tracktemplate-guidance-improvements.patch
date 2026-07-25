@@ -1,0 +1,145 @@
+--- a/.agents/skills/tracktemplate-change-validation/SKILL.md
++++ b/.agents/skills/tracktemplate-change-validation/SKILL.md
+@@ -25,6 +25,10 @@
+ 6. Read `reference/TESTING_POLICY.md` for testing obligations and oracle-change
+    rules.
+ 7. Read only the additional canonical documents required by the change.
++8. For a proposed non-trivial behaviour change, define the regression contract
++   before implementation: the observable outcome, preserved invariants,
++   intended behaviour change, important rejection or failure cases, and the
++   evidence that could disprove success.
+ 
+ ## Conditional canonical reading
+ 
+@@ -66,6 +70,9 @@
+   correctness assertions when assessing performance.
+ - Do not weaken tests, widen tolerances, change accepted oracles or remove
+   failure cases merely to obtain a pass.
++- When repeated focused fixes fail against the same proof, stop applying local
++  patches and reassess the premise, affected boundary, baseline and proposed
++  approach. Record the unresolved cause rather than suppressing the failure.
+ - Do not describe a copied-target fixture, local comparison path, prototype,
+   headless smoke or partial workflow as supported production behaviour.
+ - Do not claim a phase, milestone, release, migration family, package or output
+--- a/.agents/skills/tracktemplate-change-validation/references/validation-checklist.md
++++ b/.agents/skills/tracktemplate-change-validation/references/validation-checklist.md
+@@ -45,6 +45,14 @@
+ 
+ ## Evidence integrity
+ 
++- The proof uses the highest reliable boundary that can observe the changed
++  behaviour; substitutes, fixtures or mocks begin only beyond that boundary.
++- Tests assert railway outcomes, document state, persisted state, exported
++  content or visible failure contracts rather than internal call sequences.
++- Where practical, the focused regression proof was observed failing against
++  the pre-change behaviour and passing after the change.
++- Pre-existing failures are distinguished from failures introduced by the
++  present change.
+ - Focused tests prove observable behaviour rather than only implementation shape.
+ - Existing regression and oracle changes have evidence and authority.
+ - Required success sentinels were observed.
+--- a/.agents/skills/tracktemplate-documentation-review/references/writing-checklist.md
++++ b/.agents/skills/tracktemplate-documentation-review/references/writing-checklist.md
+@@ -43,6 +43,15 @@
+ - compatibility requirements;
+ - validator-required wording.
+ 
++## Post-edit survival check
++
++- Load-bearing names, paths, commands, identifiers, classifications and
++  controlled railway terms still appear where required.
++- Incoming and outgoing links remain valid after headings, sections or files
++  are moved.
++- Material removed from one document was either unnecessary or relocated to
++  its canonical owner.
++
+ ## Removal review
+ 
+ Report proposed deletions separately when they could change historical, legal, safety, licensing or evidential meaning. Do not remove that material through automatic cleanup.
+--- a/.agents/skills/tracktemplate-quality-review/SKILL.md
++++ b/.agents/skills/tracktemplate-quality-review/SKILL.md
+@@ -16,6 +16,19 @@
+ 3. Identify the affected architectural boundary and railway boundary before assessing implementation quality.
+ 4. Read only the canonical project documents relevant to the change. Do not copy their policy into this skill or treat this skill as a second authority.
+ 
++## Review order
++
++Review requirement compliance before implementation quality:
++
++- **MISSING:** a requested or accepted requirement is demonstrably absent.
++- **EXTRA:** an unrequested behaviour change, refactor or expansion is present.
++- **CANNOT_VERIFY:** the available diff or evidence cannot settle a requirement;
++  name the exact check or authority required.
++
++Report MISSING and EXTRA findings before code-quality findings. CANNOT_VERIFY
++does not imply failure, but it must remain visible and must not be treated as
++acceptance.
++
+ ## Review principles
+ 
+ - Preserve necessary FreeCAD compatibility code, diagnostics, transaction handling, geometry tolerances, stable identities and legacy evidence unless the change has specific evidence and authority to alter them.
+@@ -43,11 +56,13 @@
+ Report:
+ 
+ 1. **Decision:** pass, pass with findings, or blocked.
+-2. **Confirmed defects:** ordered by impact, with exact paths or symbols and the evidence supporting each finding.
+-3. **Unnecessary complexity:** only where its lack of purpose has been established.
+-4. **Behavioural risks:** including the affected architectural and railway boundaries.
+-5. **Checks completed:** commands, inspections and evidence actually reviewed.
+-6. **Checks still required:** especially real-GUI FreeCAD, export, performance, provenance, licensing or compatibility evidence that was not available.
+-7. **Scope:** whether unrelated files and behaviour remained unchanged.
++2. **Specification findings:** MISSING, EXTRA and CANNOT_VERIFY findings.
++3. **Confirmed defects:** ordered by impact, with exact paths or symbols and the
++   evidence supporting each finding.
++4. **Unnecessary complexity:** only where its lack of purpose has been established.
++5. **Behavioural risks:** including the affected architectural and railway boundaries.
++6. **Checks completed:** commands, inspections and evidence actually reviewed.
++7. **Checks still required:** especially real-GUI FreeCAD, export, performance, provenance, licensing or compatibility evidence that was not available.
++8. **Scope:** whether unrelated files and behaviour remained unchanged.
+ 
+ Do not present preferences as defects, and do not imply that an unperformed check passed.
+--- a/.agents/skills/tracktemplate-quality-review/references/review-checklist.md
++++ b/.agents/skills/tracktemplate-quality-review/references/review-checklist.md
+@@ -2,6 +2,16 @@
+ 
+ Apply only the sections relevant to the complete change.
+ 
++## Requirement compliance
++
++- Every requested or accepted outcome is present.
++- No unrequested behaviour, refactor, configuration or compatibility change is
++  included.
++- Requirements that the available diff cannot settle are reported as
++  CANNOT_VERIFY with the exact evidence required.
++- The review relies on the complete diff and evidence rather than the
++  implementer's completion summary.
++
+ ## Scope and authority
+ 
+ - The requested scope, affected files and complete relevant diff have been inspected.
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -83,6 +83,9 @@
+ - Confirm the exact target and authority before editing. Do not assume a change
+   belongs in B14, B15, B16 or every layer.
+ - Make the smallest coherent, reviewable change that satisfies the request.
++- Implement non-trivial work in small, independently checkable slices and run
++  the nearest useful check after each slice. For large mechanical or bulk
++  changes, prove a representative pilot before scaling.
+ - Keep mechanical extraction, clean-up, behaviour change and performance work in
+   separately reviewable steps with their own evidence.
+ - Keep one authoritative implementation for each genuinely shared railway or
+--- a/reference/AGENT_WORKFLOWS.md
++++ b/reference/AGENT_WORKFLOWS.md
+@@ -129,6 +129,11 @@
+ - changes involving canonical ownership, frozen evidence, provenance or
+   validator-controlled wording.
+ 
++For geometry, topology, persistence, migration, export, performance, provenance
++or authority-changing work, `$tracktemplate-change-validation` may also be used
++before implementation to define the required proof boundary. This does not
++replace post-implementation validation.
++
+ ## Normal workflow order
+ 
+ For a source change:

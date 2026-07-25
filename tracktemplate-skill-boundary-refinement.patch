@@ -1,0 +1,63 @@
+diff --git a/.agents/skills/tracktemplate-change-validation/SKILL.md b/.agents/skills/tracktemplate-change-validation/SKILL.md
+index 2c323f0..a4e6927 100644
+--- a/.agents/skills/tracktemplate-change-validation/SKILL.md
++++ b/.agents/skills/tracktemplate-change-validation/SKILL.md
+@@ -7,9 +7,10 @@ description: Select, run and report the proportionate TrackTemplate validation r
+ 
+ ## Purpose
+ 
+-Select and report the evidence required by the actual TrackTemplate change
+-without running an indiscriminate whole-repository suite or claiming acceptance
+-that the evidence does not support.
++This skill owns evidence selection and interpretation. Determine what the actual
++TrackTemplate change requires, report what completed checks prove and keep
++unavailable evidence visible. Do not decide whether the implementation or scope
++is acceptable overall; that belongs to `$tracktemplate-quality-review`.
+ 
+ ## Required preparation
+ 
+diff --git a/.agents/skills/tracktemplate-quality-review/SKILL.md b/.agents/skills/tracktemplate-quality-review/SKILL.md
+index 46a2971..0b707b5 100644
+--- a/.agents/skills/tracktemplate-quality-review/SKILL.md
++++ b/.agents/skills/tracktemplate-quality-review/SKILL.md
+@@ -7,7 +7,12 @@ description: Review complete TrackTemplate source or documentation changes for u
+ 
+ ## Purpose
+ 
+-Review a proposed or completed TrackTemplate source change without expanding its accepted scope or substituting personal preference for evidence.
++This skill owns implementation and scope judgement. Decide whether a proposed or
++completed TrackTemplate change is acceptable against requirements and available
++evidence, without expanding its accepted scope or substituting preference for
++evidence. Do not duplicate validation selection or execution; identify exact
++evidence gaps and leave their interpretation to
++`$tracktemplate-change-validation`.
+ 
+ ## Required preparation
+ 
+diff --git a/AGENTS.md b/AGENTS.md
+index 33ad839..92b0b84 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -198,8 +198,6 @@
+   starting states and report cache/process differences and measurement noise.
+ - Never invent a result that is visible only in FreeCAD. Use the approved
+   isolated bridge or state that GUI validation remains outstanding.
+-- The validator checks skill frontmatter, directory/name agreement, local links, the skill register and root routing. It does not judge whether a skill's
+-  instructions are substantively correct or whether project validation passed.
+ - After adding, renaming or moving a skill, start a fresh Codex session and use
+   `/skills` to confirm that every repository skill appears with the expected name
+   and description.
+diff --git a/reference/AGENT_WORKFLOWS.md b/reference/AGENT_WORKFLOWS.md
+index e7553ea..7ecdc0a 100644
+--- a/reference/AGENT_WORKFLOWS.md
++++ b/reference/AGENT_WORKFLOWS.md
+@@ -136,6 +136,9 @@ replace post-implementation validation.
+ 
+ ## Normal workflow order
+ 
++Validation determines what the evidence proves. Quality review determines
++whether the implementation and scope are acceptable given that evidence.
++
+ For a source change:
+ 
+ ```text
