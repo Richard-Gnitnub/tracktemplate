@@ -25,6 +25,10 @@ that the evidence does not support.
 6. Read `reference/TESTING_POLICY.md` for testing obligations and oracle-change
    rules.
 7. Read only the additional canonical documents required by the change.
+8. For a proposed non-trivial behaviour change, define the regression contract
+   before implementation: the observable outcome, preserved invariants,
+   intended behaviour change, important rejection or failure cases, and the
+   evidence that could disprove success.
 
 ## Conditional canonical reading
 
@@ -66,6 +70,9 @@ that the evidence does not support.
   correctness assertions when assessing performance.
 - Do not weaken tests, widen tolerances, change accepted oracles or remove
   failure cases merely to obtain a pass.
+- When repeated focused fixes fail against the same proof, stop applying local
+  patches and reassess the premise, affected boundary, baseline and proposed
+  approach. Record the unresolved cause rather than suppressing the failure.
 - Do not describe a copied-target fixture, local comparison path, prototype,
   headless smoke or partial workflow as supported production behaviour.
 - Do not claim a phase, milestone, release, migration family, package or output

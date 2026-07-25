@@ -83,6 +83,9 @@
 - Confirm the exact target and authority before editing. Do not assume a change
   belongs in B14, B15, B16 or every layer.
 - Make the smallest coherent, reviewable change that satisfies the request.
+- Implement non-trivial work in small, independently checkable slices and run
+  the nearest useful check after each slice. For large mechanical or bulk
+  changes, prove a representative pilot before scaling.
 - Keep mechanical extraction, clean-up, behaviour change and performance work in
   separately reviewable steps with their own evidence.
 - Keep one authoritative implementation for each genuinely shared railway or
@@ -129,7 +132,7 @@
 - Use copied or disposable FCStd inputs for automation. Never open, mutate or
   save over the only copy of an operator document.
 - Do not commit, push, merge or open a pull request unless the user asks.
-- Keep `.idea/`, `.venv/`, `__pycache__/`, generated FreeCAD documents, exports
+- Keep `.idea/`, `.venv/`, `__pycache__/`, generated FreeCAD documents, exports,
   and temporary benchmark artefacts out of commits.
 
 ## Licensing and provenance
@@ -138,7 +141,7 @@
   applicable lineage or manifest before changing output-affecting constants,
   tables, profiles, chair definitions, fixtures, exporters or embedded media.
 - Distinguish engineering methods and facts from potentially copyrightable
-  source expression, comments, tables, selection, arrangement and close
+  source expression, comments, tables, selection, arrangement, and close
   translation. Do not make unsupported clean-room or independent-derivation
   claims.
 - Templot-generated media and unresolved Templot-authored value collections are
@@ -190,7 +193,7 @@
   code without the required success sentinel is not evidence that assertions
   ran.
 - Headless checks do not replace a real GUI workflow for geometry, display,
-  selection, document integration, export or operator-visible performance.
+  selection, document integration, export, or operator-visible performance.
 - For performance work, follow `reference/PERFORMANCE_SOP.md`, compare equivalent
   starting states and report cache/process differences and measurement noise.
 - Never invent a result that is visible only in FreeCAD. Use the approved
@@ -213,7 +216,7 @@ and description.
 - State what changed, which version or authority boundary changed, which
   invariants were preserved, which checks actually ran and what remains
   unverified.
-- For geometry, persistence, display, export or performance changes, identify any
+- For geometry, persistence, display, export, or performance changes, identify any
   GUI evidence still required.
 - For licensing, provenance, data, chair-package or output changes, state the
   affected classifications and every remaining non-cleared dependency.
