@@ -9,8 +9,11 @@
 - Read the canonical document that owns the affected subject before editing.
   The document ownership map below is authoritative.
 - `reference/AGENT_WORKFLOWS.md` defines the repository's agent-skill strategy.
-  Use `$tracktemplate-quality-review` before reporting completion of a
-  non-trivial code or documentation change.
+  Use `$tracktemplate-documentation-review` when creating or materially editing
+  Markdown documentation. Use `$tracktemplate-change-validation` to select, run
+  and report the applicable evidence for a non-trivial change. Use
+  `$tracktemplate-quality-review` before reporting completion of a non-trivial
+  source or documentation change.
 - A skill is a reusable workflow, not a source of project authority. If a skill
   conflicts with this file or a canonical reference document, follow the
   canonical project rule and report the conflict.
@@ -197,6 +200,9 @@
 
 - Review the complete diff for accidental broad rewrites, duplicated policy,
   speculative abstractions, misleading comments and unrelated changes.
+- Run `$tracktemplate-change-validation` for a non-trivial change when the
+  applicable evidence layers or remaining checks need to be selected and
+  reported.
 - Run `$tracktemplate-quality-review` for non-trivial code or documentation
   changes before reporting completion.
 - State what changed, which version or authority boundary changed, which
