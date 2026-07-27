@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-quality-review
-description: Review complete TrackTemplate source or documentation changes for unnecessary complexity, duplicated authority, misleading comments, hidden failures, behavioural drift, performance regressions and unsupported validation claims. Use before reporting completion of a non-trivial change.
+description: Perform a staff-level review of new or changed TrackTemplate source, tests and documentation, including classified failed-test repairs. Use before reporting completion or when a read-only independent review is requested.
 ---
 
 # TrackTemplate quality review
@@ -14,12 +14,42 @@ evidence. Do not duplicate validation selection or execution; identify exact
 evidence gaps and leave their interpretation to
 `$tracktemplate-change-validation`.
 
+## Staff-review boundary
+
+Make the first review pass read-only. Inspect the raw diff, source, tests and
+validation artifacts before relying on the implementing agent's explanation.
+Do not repair findings during that pass.
+
+Prefer a fresh reviewer or session for non-trivial changes when available.
+Provide only the request, canonical requirements, complete diff, raw validation
+evidence and known unperformed checks. Do not provide the intended verdict or
+the implementing agent's diagnosis as fact. When the same agent performs the
+review, disclose that the review was not independent.
+
+If the user authorised fixes, finish and report the first verdict, then make a
+separate remediation pass. Rerun affected evidence and review the resulting
+complete diff again.
+
+Use one of two modes:
+
+- **Post-implementation review:** assess new or changed production code, tests,
+  documentation and evidence before completion.
+- **Failed-test repair review:** assess the preserved raw failure, the primary
+  classification from `reference/TESTING_POLICY.md`, the chosen repair boundary
+  and the source, test, fixture or environment changes made in response.
+
 ## Required preparation
 
 1. Read [`references/review-checklist.md`](references/review-checklist.md).
-2. Inspect the complete relevant diff before reaching conclusions. Include connected changes, tests, documentation and generated interfaces that affect the same behaviour.
-3. Identify the affected architectural boundary and railway boundary before assessing implementation quality.
-4. Read only the canonical project documents relevant to the change. Do not copy their policy into this skill or treat this skill as a second authority.
+2. Inspect the complete relevant diff before reaching conclusions. Include
+   connected changes, tests, documentation and generated interfaces that affect
+   the same behaviour.
+3. Inspect raw validation output and failed-test evidence before reading a
+   completion summary or proposed diagnosis.
+4. Identify the affected architectural boundary and railway boundary before
+   assessing implementation quality.
+5. Read only the canonical project documents relevant to the change. Do not
+   copy their policy into this skill or treat this skill as a second authority.
 
 ## Review order
 
@@ -53,6 +83,11 @@ Assess the relevant change for:
 - behavioural drift in geometry, topology, tolerances, ordering, persistence, transactions or exporters;
 - unnecessary metadata, repeated calculations and likely performance regressions;
 - accidental public API, stored-state or compatibility changes;
+- tests that assert implementation shape, miss the accepted regression or omit
+  important failure, invalidation, rollback or persistence cases;
+- failed-test repairs applied to the wrong classified boundary;
+- test, fixture or oracle changes that do not satisfy
+  `reference/TESTING_POLICY.md`;
 - weakened validation, changed evidence boundaries or unsupported completion claims;
 - unrelated formatting, refactoring or scope expansion.
 
@@ -68,6 +103,12 @@ Report:
 5. **Behavioural risks:** including the affected architectural and railway boundaries.
 6. **Checks completed:** commands, inspections and evidence actually reviewed.
 7. **Checks still required:** especially real-GUI FreeCAD, export, performance, provenance, licensing or compatibility evidence that was not available.
-8. **Scope:** whether unrelated files and behaviour remained unchanged.
+8. **Failed-test integrity:** classification, repair boundary, original proof
+   rerun and any test/oracle authority used.
+9. **Reviewer independence:** fresh reviewer/session or disclosed same-agent
+   review.
+10. **Scope:** whether unrelated files and behaviour remained unchanged.
 
-Do not present preferences as defects, and do not imply that an unperformed check passed.
+Omit failed-test integrity when no failed test or repair is in scope. Do not
+present preferences as defects, and do not imply that an unperformed check
+passed.

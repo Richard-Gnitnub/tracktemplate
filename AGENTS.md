@@ -6,9 +6,15 @@
   turn it into a repository history, command catalogue or duplicate project plan.
 - Read `reference/PROJECT_PLAN.md` before source work to identify the current
   phase, open gates and accepted scope.
+- When resuming work after a new session, compaction or interrupted handoff, use
+  `$tracktemplate-context-recovery` to reload the controlling documents. Treat
+  commits and diffs as implementation evidence, not as requirement or decision
+  authority.
 - Read the canonical document that owns the affected subject before editing.
   The document ownership map below is authoritative.
 - `reference/AGENT_WORKFLOWS.md` defines the repository's agent-skill strategy.
+  Use `$tracktemplate-python-writing` when creating or materially editing Python
+  or FCMacro source.
   Use `$tracktemplate-documentation-review` when creating or materially editing
   Markdown documentation. Use `$tracktemplate-change-validation` to select, run
   and report the applicable evidence for a non-trivial change. Use
@@ -108,6 +114,9 @@
   orchestration require the applicable integration boundary.
 - Do not change a test merely to make an implementation pass. Explain and prove
   any accepted oracle change.
+- When a test fails, preserve the raw failure and classify it under
+  `reference/TESTING_POLICY.md` before editing retained source, tests or
+  fixtures. Rerun the original proof after the classified repair.
 
 ## Repository and System Safety
 
@@ -211,6 +220,9 @@ and description.
   reported.
 - Run `$tracktemplate-quality-review` for non-trivial code or documentation
   changes before reporting completion.
+- Treat the first staff-review pass as read-only. Prefer a fresh reviewer when
+  available, provide raw diffs and validation evidence, and disclose when the
+  review was not independent.
 - State what changed, which version or authority boundary changed, which
   invariants were preserved, which checks actually ran and what remains
   unverified.

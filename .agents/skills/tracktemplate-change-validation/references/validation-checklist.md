@@ -61,6 +61,22 @@ Require the corresponding evidence when a change affects:
 - Operator-owned documents were not used as the only mutable fixture.
 - Unavailable checks and residual risk are stated.
 
+## Failed-test adjudication
+
+For every failed check:
+
+- the exact command, environment/profile, source state, sentinel, raw output and
+  first relevant traceback or assertion have been preserved;
+- the observable contract and its canonical authority are identified;
+- introduced, pre-existing and unresolved status is distinguished;
+- one supported primary classification from
+  `reference/TESTING_POLICY.md` is recorded;
+- diagnostic probes have not mutated retained source or test authority;
+- the proposed repair targets the classified boundary;
+- a test or oracle change satisfies the separate canonical change gate; and
+- the original exact proof and affected regression layers are rerun after the
+  repair.
+
 ## Reporting
 
 - Every executed command and environment is recorded.

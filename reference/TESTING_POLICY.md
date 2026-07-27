@@ -76,6 +76,39 @@ The following are not acceptable reasons:
   suite green; or
 - a slow test is silently skipped instead of being classified and scheduled.
 
+## Failed-test adjudication
+
+A failed test is evidence that the attempted proof did not pass. It is not, by
+itself, evidence that either the implementation or the test is wrong.
+
+Before editing retained source, tests, fixtures or expected results:
+
+1. preserve the exact command, environment/profile, source state, required
+   sentinel, raw output and first relevant traceback or assertion;
+2. identify the observable contract and its canonical authority;
+3. determine whether the failure is introduced by the current change or was
+   already present; and
+4. assign one supported primary classification from this table.
+
+Read-only inspection, repeat runs and disposable diagnostic probes may be used
+to establish the classification. An unresolved failure remains open and blocks
+completion; do not guess a convenient category.
+
+| Classification | Meaning | Required response |
+| --- | --- | --- |
+| `implementation-defect` | The accepted test and environment expose incorrect production behaviour | Change the smallest responsible production path; preserve the test |
+| `test-or-oracle-defect` | The assertion, expected result or accepted oracle is demonstrably wrong or superseded | Apply the existing test/oracle-change gate above; keep the former regression where it remains valid |
+| `fixture-or-harness-defect` | Test setup, fixture construction, isolation or the runner fails to exercise its stated contract | Repair the harness without weakening the observable assertion |
+| `environment-or-profile-defect` | The wrong, incomplete or unavailable runtime, dependency, profile or external service prevents the proof | Correct or obtain the required environment; do not translate the result into a product pass or fail |
+| `flaky-or-nondeterministic-defect` | Repeated equivalent runs do not produce a stable result | Diagnose and repair the instability; quarantine only with an owner, risk and objective removal condition |
+| `pre-existing-unrelated-failure` | The failure predates and is outside the current dependency path | Record the evidence and avoid unrelated repair unless scope is explicitly expanded |
+| `requirement-ambiguity` | Available authority cannot determine the intended observable result | Stop retained changes and obtain the required project-owner or canonical decision |
+
+Record contributing causes separately when more than one applies, but do not
+use multiple labels to avoid choosing the primary repair boundary. After the
+repair, rerun the original exact command and then every additional regression
+layer affected by the changed dependency path.
+
 ## Test design and maintenance
 
 - Keep tests deterministic and independent. Do not depend on UI row order,
@@ -108,8 +141,10 @@ Before a change is complete:
 4. run applicable FreeCAD headless, GUI, persistence, export, rollback, and
    performance checks from [VALIDATION.md](VALIDATION.md);
 5. confirm tests were not weakened solely to obtain a pass;
-6. record any unrun or unavailable check and the risk it leaves; and
-7. keep test code, fixtures, and validation documentation in the same commit as
+6. classify every observed failure under the failed-test adjudication gate and
+   rerun the original proof after repair;
+7. record any unrun or unavailable check and the risk it leaves; and
+8. keep test code, fixtures, and validation documentation in the same commit as
    the behaviour they protect unless an earlier test-only commit is clearer.
 
 ## Review questions
@@ -121,6 +156,8 @@ Before a change is complete:
 - Is the assertion tied to a stable contract rather than private structure?
 - If a prior test changed, is the old oracle demonstrably wrong or the changed
   requirement explicitly accepted?
+- Is every observed failure supported by one primary classification, repaired
+  at that boundary and followed by the original exact proof?
 - Are all remaining coverage gaps visible and owned?
 - Does retained code introduce another implementation of an existing railway
   or application concept? If temporarily necessary, is its owner and

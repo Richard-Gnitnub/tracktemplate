@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-change-validation
-description: Select, run and report the proportionate TrackTemplate validation required for a proposed or completed change, distinguishing standalone, qualified FreeCAD, real-GUI, persistence, export, performance, provenance and licensing evidence.
+description: Select, run and report proportionate TrackTemplate validation and classify failed tests before retained fixes, distinguishing standalone, qualified FreeCAD, real-GUI, persistence, export, performance, provenance and licensing evidence.
 ---
 
 # TrackTemplate change validation
@@ -82,6 +82,30 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
 - Do not change files unless the user requested implementation or validation
   fixes.
 
+## Failed-test adjudication
+
+When any selected check fails, begin with a read-only evidence pass:
+
+1. preserve the exact command, environment/profile, source state, required
+   sentinel, raw output and first relevant traceback or assertion;
+2. identify the observable contract and its canonical authority;
+3. compare with the known baseline and determine whether the failure is
+   introduced, pre-existing or unresolved;
+4. assign the supported primary classification defined by
+   `reference/TESTING_POLICY.md`; and
+5. state the correct repair boundary before editing retained source, tests,
+   fixtures, expected values or environment configuration.
+
+Repeat runs and disposable probes may gather diagnostic evidence. Do not mutate
+retained code or tests while the primary classification remains unsupported.
+If the user authorised fixes, make the smallest repair at the classified
+boundary, rerun the original exact command, then run every additionally affected
+layer.
+
+Changing a test or oracle still requires the canonical gate in
+`reference/TESTING_POLICY.md`. A test failure, an implementation preference or
+the desire for a green suite is not that evidence.
+
 ## Output
 
 Report:
@@ -90,12 +114,15 @@ Report:
    integration.
 2. **Selected validation:** each applicable layer and why it is required.
 3. **Checks completed:** exact commands, environments, sentinels and results.
-4. **Checks not run:** the reason, remaining risk and required environment or
+4. **Failed-test adjudication:** for each failure, the preserved evidence,
+   primary classification, canonical contract and correct repair boundary.
+5. **Checks not run:** the reason, remaining risk and required environment or
    evidence.
-5. **Evidence interpretation:** what the completed checks prove and what they do
+6. **Evidence interpretation:** what the completed checks prove and what they do
    not prove.
-6. **Evidence status:** complete for the selected scope, incomplete, or failed.
-7. **Next review boundary:** whether the complete change is ready for
+7. **Evidence status:** complete for the selected scope, incomplete, or failed.
+8. **Next review boundary:** whether the complete change is ready for
    `$tracktemplate-quality-review`.
 
-Do not imply that an unavailable, unperformed or narrower check passed.
+Omit failed-test adjudication when no check failed. Do not imply that an
+unavailable, unperformed or narrower check passed.

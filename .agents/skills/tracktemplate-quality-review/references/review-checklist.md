@@ -19,6 +19,17 @@ Apply only the sections relevant to the complete change.
 - Only canonical project documents relevant to the change have been read.
 - Unrelated formatting, refactoring, renaming or cleanup has not been included.
 
+## Staff-review integrity
+
+- The first review pass was read-only.
+- Raw diff, source, tests and validation artifacts were inspected before the
+  implementing agent's summary or diagnosis was relied upon.
+- A fresh reviewer/session was used when available and proportionate.
+- Same-agent review or another independence limitation is disclosed.
+- Findings were reported before any authorised remediation pass.
+- Remediation was followed by affected validation and review of the new complete
+  diff.
+
 ## Complexity and duplication
 
 - No unnecessary abstraction has been introduced.
@@ -58,6 +69,21 @@ Apply only the sections relevant to the complete change.
 - Claims that FreeCAD, GUI, export or performance testing succeeded are supported by recorded evidence.
 - Headless validation is not described as real-GUI acceptance.
 - Remaining checks and evidence gaps are stated explicitly.
+
+## Failed-test repair
+
+When a failed test or its repair is in scope:
+
+- the preserved raw command, environment/profile, source state, output and first
+  relevant failure were reviewed;
+- the primary classification is supported under
+  `reference/TESTING_POLICY.md`;
+- the retained repair targets the classified source, test, fixture, harness or
+  environment boundary;
+- changed tests and oracles satisfy their separate authority gate;
+- the original exact failing proof passed after repair;
+- affected regression layers were rerun; and
+- pre-existing or unresolved failures remain visible.
 
 ## Diff hygiene
 
