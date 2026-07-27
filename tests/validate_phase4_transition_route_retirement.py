@@ -283,8 +283,17 @@ def _validate_evidence_controls():
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(
         encoding="utf-8"
     )
-    assert "Active comparison-route retirement" in evidence
-    assert "comparison route retired; acceptance pending" in plan
+    assert "Accepted comparison-route retirement" in evidence
+    assert "Safety/risk panel — 2026-07-27" in evidence
+    assert (
+        "**Recommendation:** **Proceed with bounded conditions.**"
+        in evidence
+    )
+    assert (
+        "**Project-owner decision and date:** **Accepted 2026-07-27**"
+        in evidence
+    )
+    assert "comparison-route retirement was accepted on 2026-07-27" in plan
     assert "validate_phase4_transition_route_retirement.py" in validation
 
 

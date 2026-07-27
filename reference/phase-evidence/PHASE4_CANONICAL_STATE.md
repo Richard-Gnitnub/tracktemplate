@@ -162,7 +162,7 @@ The disposable qualified-FreeCAD fixture proves:
   modes and operator label; and
 - foreign and other-record-type objects survive unchanged.
 
-## Active comparison-route retirement
+## Accepted comparison-route retirement
 
 On 2026-07-23 the project owner authorised the bounded Phase 4 retirement of
 the active Phase 3 B15 comparison switch. The accepted invariant makes B16
@@ -191,9 +191,10 @@ argument fails before host loading with no document mutation.
 The qualified FreeCAD fixture proves the lazy default, rejected legacy
 argument, exact historical all-caller parity through the development oracle,
 and a separate product host whose three live bindings are all the modular API.
-B14 and B15 retain their accepted hashes. This is implementation evidence
-awaiting separate project-owner acceptance; no numerical startup-performance
-improvement is claimed from the structural lazy-load proof.
+B14 and B15 retain their accepted hashes. The project owner accepted this
+bounded retirement on 2026-07-27 under the panel conditions below. No numerical
+startup-performance improvement is claimed from the structural lazy-load
+proof.
 
 The isolated real-GUI product-composition correctness run
 `20260723T104629754109Z-plain-line-edit-modular` completed the full inherited
@@ -220,6 +221,66 @@ their named Phase 7–9 evidence. Until then it is lazy, modular-bound and
 covered by the same frozen B15 fingerprint. The development oracle may remain
 under `tools` for historical reproduction but must never be imported by
 product composition.
+
+### Safety/risk panel — 2026-07-27
+
+**Gate and exact source:** Phase 4 comparison-route retirement sub-gate at
+`466324ddeffa80daa950389868eb0d92f2b8421d`; implementation range
+`8a57c24..40059fa`. The affected product source is unchanged after
+`40059fa`.
+
+**Participants and roles (including independence):** Richard, project owner,
+chaired and accepted the recorded review on 2026-07-27. Codex acted as both
+phase/slice owner and QA/risk reviewer; those roles overlapped and the challenge
+was not independent. Independent challenge was not mandatory because no due
+Critical risk, irreversible external action or project-cleared rights decision
+was in this sub-gate.
+
+**Evidence reviewed (links):** the [current Phase 4 gate
+disposition](#current-phase-4-gate-disposition), the
+[validation evidence](#validation-evidence), the accepted
+[Phase 3 slice](PHASE3_TRANSITION_SLICE.md), the selected commands and evidence
+boundaries in [VALIDATION.md](../VALIDATION.md), the live principal and QA risk
+registers in [PROJECT_PLAN.md](../PROJECT_PLAN.md), and the copied-document and
+recovery controls in
+[RECOVERY_AND_BACKUP.md](../RECOVERY_AND_BACKUP.md). Review covered the complete
+retirement diff, current source, standalone and qualified-FreeCAD raw results,
+and the two retained real-GUI run records.
+
+**Due principal/QA risks and control-effectiveness changes:** PR-10 remains
+Partial because later legacy patches still have their own retirement gates.
+PR-18 becomes Effective (current scope) because product composition is
+modular-only and the reproducible dual route is development-only. PR-20 remains
+Effective (current scope). PR-22 becomes Effective (current scope) through this
+first prospective recorded panel. QA-R03 remains Open for the wider
+release-critical workflow matrix; the affected plain-line edit workflow has
+bounded headless and real-GUI evidence.
+
+**Safety, recovery, correctness, rights and performance conclusions:** B14 and
+B15 remain byte-identical; the default B16 path is lazy, modular-only and
+non-mutating; rejected legacy selection fails before host loading; and the
+recorded modular GUI workflow matches the development oracle with source-copy
+preservation and clean shutdown. The sub-gate changes no persistence,
+migration, exact output, provenance or licensing authority. Its single
+uncontrolled-cache GUI timings are observations only, not a performance
+qualification.
+
+**Unresolved dissent, unknowns or exceptions:** No dissent or failed required
+check. The temporary inherited B15 GUI host and development oracle remain
+bounded obligations rather than release implementations.
+
+**Recommendation:** **Proceed with bounded conditions.**
+
+**Conditions, owners and deadlines:** The Phase 10 integration owner must
+remove the inherited B15 GUI host after the equivalent modular Workbench
+workflows obtain their Phase 7–9 evidence and no later than the Phase 10 beta
+gate. Current and later slice owners must keep the dual-route oracle under
+`tools`, outside product imports, immediately and for as long as it is retained.
+They must not claim migration support or performance improvement from this
+retirement.
+
+**Project-owner decision and date:** **Accepted 2026-07-27** through explicit
+recorded instruction.
 
 ## Legacy-document detection tranche
 
