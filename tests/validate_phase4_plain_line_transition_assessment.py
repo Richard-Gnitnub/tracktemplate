@@ -77,6 +77,17 @@ class FakeDocument:
         self.Objects = list(objects)
 
 
+class RecordingAtomicWriter:
+    def __init__(self, error=None):
+        self.calls = []
+        self.error = error
+
+    def create_many(self, document, states):
+        self.calls.append((document, tuple(states)))
+        if self.error is not None:
+            raise self.error
+
+
 def _contract():
     return json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
 
@@ -482,14 +493,14 @@ def _validate_copied_target_plan():
         "SET-001/curve-track/2/transition/exit",
     )
     assert len(plan.states) == 2
-    assert plan.migration_support_advertised is False
+    assert plan.migration_support_advertised is True
     assert plan.production_output_authorized is False
     assert len(plan.assessment_sha256) == 64
     assert set(plan.assessment_sha256) <= set("0123456789abcdef")
     assert plan.to_record() == {
         "assessment_sha256": plan.assessment_sha256,
         "fixture_only": True,
-        "migration_support_advertised": False,
+        "migration_support_advertised": True,
         "production_output_authorized": False,
         "schema_id": (
             "tracktemplate.plain-line-transition-copied-target-fixture"
@@ -571,6 +582,77 @@ def _validate_copied_target_plan():
     assert _snapshot(source) == source_before
 
 
+def _validate_copied_target_execution():
+    contract = _contract()
+    source = FakeDocument([_foreign(), _settings()])
+    target = copy.deepcopy(source)
+    source_before = _snapshot(source)
+    target_before = _snapshot(target)
+    writer = RecordingAtomicWriter()
+    plan = (
+        plain_line_transition_migration.execute_copied_plain_line_transition_migration_fixture(
+            source,
+            target,
+            contract,
+            writer,
+        )
+    )
+    assert len(writer.calls) == 1
+    written_target, written_states = writer.calls[0]
+    assert written_target is target
+    assert written_states == plan.states
+    assert plan.transition_ids == (
+        "SET-001/curve-track/2/transition/entry",
+        "SET-001/curve-track/2/transition/exit",
+    )
+    assert _snapshot(source) == source_before
+    assert _snapshot(target) == target_before
+
+    blocked_writer = RecordingAtomicWriter()
+    changed_target = FakeDocument(
+        [_foreign(), _settings(tracks=[_track(name="Changed label")])]
+    )
+    _expect_migration_error(
+        lambda: plain_line_transition_migration.execute_copied_plain_line_transition_migration_fixture(
+            source,
+            changed_target,
+            contract,
+            blocked_writer,
+        ),
+        "target-not-family-copy",
+    )
+    assert blocked_writer.calls == []
+
+    marker_error = RuntimeError("atomic writer marker")
+    failing_writer = RecordingAtomicWriter(marker_error)
+    try:
+        plain_line_transition_migration.execute_copied_plain_line_transition_migration_fixture(
+            source,
+            copy.deepcopy(source),
+            contract,
+            failing_writer,
+        )
+    except RuntimeError as error:
+        assert error is marker_error
+    else:
+        raise AssertionError("Expected the atomic writer failure to propagate")
+    assert len(failing_writer.calls) == 1
+
+    try:
+        plain_line_transition_migration.execute_copied_plain_line_transition_migration_fixture(
+            source,
+            copy.deepcopy(source),
+            contract,
+            object(),
+        )
+    except TypeError as error:
+        assert str(error) == (
+            "atomic_writer must expose callable create_many(document, states)"
+        )
+    else:
+        raise AssertionError("Expected an atomic-writer contract TypeError")
+
+
 def _validate_structure_and_controls():
     source = MODULE_PATH.read_text(encoding="utf-8")
     tree = ast.parse(source, filename=str(MODULE_PATH))
@@ -595,7 +677,10 @@ def _validate_structure_and_controls():
         "removeObject(",
     ):
         assert forbidden not in source
-    assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
+    assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == (
+        plain_line_transition.FAMILY_ID,
+    )
+    assert len(legacy_document.SUPPORTED_MIGRATION_FAMILIES) == 1
 
     migration_source = MIGRATION_MODULE_PATH.read_text(encoding="utf-8")
     migration_tree = ast.parse(
@@ -648,12 +733,33 @@ def _validate_structure_and_controls():
     assert migration["imports"] == [
         "dataclasses",
         "hashlib",
+        "tracktemplate.compatibility.legacy_document",
         "tracktemplate.compatibility.plain_line_transition",
     ]
     assert not any(
         item.startswith("tracktemplate.compatibility.plain_line_transition")
         for item in modules["tracktemplate.api"]["imports"]
     )
+    assert not any(
+        edge["to"]
+        == "tracktemplate.compatibility.plain_line_transition_migration"
+        and edge["from"]
+        != "tracktemplate.compatibility.plain_line_transition_migration"
+        for edge in report["import_edges"]
+    )
+    for product_surface in (
+        ROOT / "TrackTemplate.FCMacro",
+        ROOT / "tracktemplate" / "__init__.py",
+        ROOT / "tracktemplate" / "api.py",
+        ROOT / "tracktemplate" / "bootstrap.py",
+        ROOT / "tracktemplate" / "compatibility" / "__init__.py",
+    ):
+        surface_source = product_surface.read_text(encoding="utf-8")
+        assert "plain_line_transition_migration" not in surface_source
+        assert (
+            "execute_copied_plain_line_transition_migration_fixture"
+            not in surface_source
+        )
 
     script = """
 import importlib.abc
@@ -677,9 +783,11 @@ from tracktemplate.compatibility import (
     plain_line_transition_migration,
 )
 assert attempted == []
-assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
+assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == (
+    plain_line_transition.FAMILY_ID,
+)
 assert plain_line_transition.FAMILY_ID == "plain-line-spacing-matched-transition-intent"
-assert plain_line_transition_migration.MIGRATION_SUPPORT_ADVERTISED is False
+assert plain_line_transition_migration.MIGRATION_SUPPORT_ADVERTISED is True
 assert plain_line_transition_migration.PRODUCTION_OUTPUT_AUTHORIZED is False
 """.format(root=str(ROOT))
     result = subprocess.run(
@@ -698,8 +806,8 @@ assert plain_line_transition_migration.PRODUCTION_OUTPUT_AUTHORIZED is False
     evidence = (
         ROOT
         / "reference"
-        / "phase-evidence"
-        / "PHASE4_CANONICAL_STATE.md"
+        / "current"
+        / "PHASE_EVIDENCE.md"
     ).read_text(encoding="utf-8")
     project_plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"
@@ -712,9 +820,20 @@ assert plain_line_transition_migration.PRODUCTION_OUTPUT_AUTHORIZED is False
         "On 2026-07-23 the project owner accepted this bounded fixture evidence"
         in evidence
     )
-    assert "`SUPPORTED_MIGRATION_FAMILIES` remains empty" in evidence
-    assert "copied-target fixture accepted; support withheld" in project_plan
-    assert "Support advertising remains a separate authority gate" in project_plan
+    assert "## Exact-family support enablement" in evidence
+    assert "`plain-line-spacing-matched-transition-intent` the sole entry" in evidence
+    assert (
+        "| D-P4-005 | 2026-07-27 | Accepted |"
+        in project_plan
+    )
+    assert (
+        "**Final bounded-window project-owner decision:** **Accepted 2026-07-27.**"
+        in evidence
+    )
+    assert (
+        "Exact-family Phase 4 copied-target transition migration fixture"
+        in validation
+    )
     assert FREECAD_TEST_PATH.name in validation
     assert MIGRATION_FREECAD_TEST_PATH.name in validation
 
@@ -725,6 +844,7 @@ def validate():
     _validate_inspection_only_cases()
     _validate_blocked_cases()
     _validate_copied_target_plan()
+    _validate_copied_target_execution()
     _validate_structure_and_controls()
     print("Phase 4 plain-line transition assessment validation passed")
 

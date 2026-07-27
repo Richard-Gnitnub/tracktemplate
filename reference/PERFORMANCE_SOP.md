@@ -289,7 +289,7 @@ When replacing a legacy persistent-shape path with a lightweight preview path, c
 
 This prevents an apparently fast editor from hiding an unacceptable export penalty.
 
-## Acceptance gates
+## Acceptance conditions
 
 A performance change is acceptable only when:
 

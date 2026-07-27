@@ -169,14 +169,30 @@ def main() -> None:
         "reference/AGENT_WORKFLOWS.md" in agents,
         "AGENTS.md does not route to reference/AGENT_WORKFLOWS.md",
     )
+    require(
+        "reference/ENGINEERING_POLICY.md" in agents,
+        "AGENTS.md does not route to reference/ENGINEERING_POLICY.md",
+    )
+    require(
+        "reference/current/PHASE_EVIDENCE.md" in agents,
+        "AGENTS.md does not route to the fixed current phase record",
+    )
+    require(
+        100 <= len(agents.splitlines()) <= 140,
+        "AGENTS.md must remain within its 100-140 line always-on budget",
+    )
+    require(
+        len(agents.encode("utf-8")) < 12 * 1024,
+        "AGENTS.md exceeded its 12 KiB always-on budget",
+    )
     for name in names:
         require(
             f"${name}" in workflows,
             f"reference/AGENT_WORKFLOWS.md lacks invocation for ${name}",
         )
         require(
-            f"${name}" in agents,
-            f"AGENTS.md lacks routing for ${name}",
+            f"${name}" not in agents,
+            f"AGENTS.md duplicates specialist routing for ${name}",
         )
 
     validate_links(sorted(set(markdown_documents)))

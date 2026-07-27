@@ -5,8 +5,8 @@ Apply only the sections relevant to the complete change.
 ## Scope and authority
 
 - The complete relevant diff has been inspected.
-- The current phase, open gates and owning evidence document have been
-  identified.
+- The current phase/exit status, applicable authority decisions and owning
+  evidence have been identified.
 - The affected architectural, railway and FreeCAD/host boundaries are explicit.
 - The change is separated from unrelated clean-up, optimisation or behaviour
   changes.
@@ -73,7 +73,7 @@ For every failed check:
   `reference/TESTING_POLICY.md` is recorded;
 - diagnostic probes have not mutated retained source or test authority;
 - the proposed repair targets the classified boundary;
-- a test or oracle change satisfies the separate canonical change gate; and
+- a test or oracle change satisfies its canonical authority control; and
 - the original exact proof and affected regression layers are rerun after the
   repair.
 

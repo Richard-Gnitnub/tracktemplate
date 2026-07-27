@@ -272,12 +272,13 @@ def validate_plan(
             phase4_evidence = (
                 ROOT
                 / "reference"
-                / "phase-evidence"
-                / "PHASE4_CANONICAL_STATE.md"
+                / "current"
+                / "PHASE_EVIDENCE.md"
             ).read_text(encoding="utf-8")
             if "Phase 4 chair-definition package contract" not in phase4_evidence:
                 errors.append(
-                    "chair-definition schema is not attributed to its later Phase 4 gate"
+                    "chair-definition schema is not attributed to its later "
+                    "Phase 4 evidence and owner decision"
                 )
 
     return errors

@@ -184,11 +184,11 @@ def _validate_controls():
     evidence = (
         ROOT
         / "reference"
-        / "phase-evidence"
-        / "PHASE4_CANONICAL_STATE.md"
+        / "current"
+        / "PHASE_EVIDENCE.md"
     ).read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(encoding="utf-8")
-    assert "PHASE4_CANONICAL_STATE.md" in plan
+    assert "current/PHASE_EVIDENCE.md" in plan
     assert "FreeCAD persistence tranche" in evidence
     assert "freecad_validate_phase4_transition_persistence.py" in validation
 

@@ -9,7 +9,7 @@ This document separates five different kinds of project control:
 | Layer | Owns | Must not own |
 | --- | --- | --- |
 | `AGENTS.md` | Short, always-on, repository-wide invariants and routing | Detailed repository history, long command catalogues, live progress or task-specific procedure |
-| Canonical `reference/` documents | Project requirements, architecture, policy, evidence interpretation and live status in their named domains | Agent-product implementation details that do not change project policy |
+| Canonical `reference/` documents | Project requirements, architecture, policy and evidence interpretation in their named domains | Agent-product implementation details that do not change project policy |
 | `.agents/skills/*/SKILL.md` | Repeatable, task-specific workflows and review methods | Project authority, accepted requirements, phase status or automatic acceptance |
 | Tests and scripts | Deterministic checks and safe automation | Subjective project decisions or unreviewed file rewriting |
 | Git history and diffs | Source-state and change evidence | Requirements, rationale, acceptance or current project status |
@@ -24,8 +24,8 @@ At the start of resumed work, reconstruct authority in this order:
 
 1. repository and scoped `AGENTS.md`;
 2. `reference/PROJECT_PLAN.md`;
-3. the canonical owner of the affected subject;
-4. the named open-phase evidence record where relevant; and
+3. `reference/current/PHASE_EVIDENCE.md` and the current JSON registers;
+4. the canonical owner of the affected subject; and
 5. source, tests, Git history and diffs as implementation evidence.
 
 Use `$tracktemplate-context-recovery` when a new session, compaction,
@@ -35,7 +35,7 @@ message, branch name, test expectation or implementation comment.
 
 Before ending work, put each accepted durable fact in its existing canonical
 owner. Do not create generic per-task plans or chronicles that duplicate
-`PROJECT_PLAN.md`, the open-phase evidence record or another canonical
+`PROJECT_PLAN.md`, the fixed current-phase records or another canonical
 document. A task that remains incomplete is reported as incomplete, with its
 working-tree state, evidence already run, unresolved decisions and next safe
 check made explicit.
@@ -48,8 +48,7 @@ instructions still have room.
 
 Project target:
 
-- aim for no more than **16 KiB** for the root `AGENTS.md`;
-- treat **24 KiB** as a review threshold requiring deliberate justification;
+- keep the root `AGENTS.md` at roughly **100–140 lines** and below **12 KiB**;
 - move repeatable procedures to skills and detailed facts to their canonical
   reference documents;
 - do not raise the Codex instruction limit merely to avoid removing duplication.
@@ -226,7 +225,7 @@ Markdown documentation, particularly where the change involves:
 - duplicated status or technical explanation;
 - verbose or repetitive prose;
 - unclear document ownership;
-- live status recorded outside `reference/PROJECT_PLAN.md`;
+- live evidence, risks or decisions recorded outside `reference/current/`;
 - material copied from another canonical owner;
 - conclusions or operative requirements buried beneath background;
 - frozen evidence, licensing, provenance or controlled wording;
@@ -427,13 +426,19 @@ $tracktemplate-explain-change
 Codex may also select a skill implicitly when the request clearly matches its
 description.
 
+Classify the task under
+[ENGINEERING_POLICY.md](ENGINEERING_POLICY.md) before selecting workflows.
+Level 2 requires the relevant specialist skill; Level 3 adds the applicable
+evidence-review and panel workflow without making a skill an acceptance
+authority.
+
 Use `$tracktemplate-freecad-addon-research` before the source or documentation
 sequence when work depends on current FreeCAD Addon guidance. Its output is
 research evidence, not implementation, validation or project acceptance.
 
 Prefer explicit invocation for:
 
-- release, phase-gate or authority-changing reviews;
+- release, phase-closure or true authority-transfer reviews;
 - large refactors or architectural changes;
 - persistence, migration, export, licensing or performance work;
 - substantial documentation restructuring;

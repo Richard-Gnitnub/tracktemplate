@@ -11,7 +11,7 @@ Replace proven repetitive work with a narrow, reviewable automation that is
 safe on a dirty working tree, produces verifiable evidence and remains
 recoverable when interrupted or rerun.
 
-## Admission gate
+## Admission conditions
 
 Automate only when all of these are known:
 
@@ -68,7 +68,7 @@ Those are separate external-state and maintenance decisions.
 ## Token- and context-efficiency rules
 
 - Automate deterministic retrieval, validation and formatting; leave
-  requirement, railway, legal and gate decisions visible to the agent or
+  requirement, railway, legal and authority decisions visible to the agent or
   project owner.
 - Prefer machine-readable focused output with stable identifiers so later
   agents can retrieve only the relevant section.

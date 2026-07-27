@@ -15,9 +15,10 @@ change.
 - `model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro` is the accepted B15 behavioural reference entering Phase 1 (`10.2A8A7B15`).
 - `10.2A8A7B16` identifies the current modular development checkpoint. Its
   small `TrackTemplate.FCMacro` composition root routes the bounded three-
-  function transition calculation through the modular domain by default and
-  retains the exact B15 calculation as a temporary explicit rollback route.
-  This is not the public Workbench/RC version.
+  function transition calculation exclusively through the modular domain.
+  The inherited B15 GUI host remains a lazy compatibility dependency, while
+  dual-route comparison is development-only oracle tooling. This is not the
+  public Workbench/RC version.
 - `tests/validate_b15.py` validates B15 structure/analysis, compares selected
   railway functions, and proves complete inherited-module AST parity with B14
   after normalising only version, launch, docstring, and recompute-instrumentation
@@ -51,7 +52,7 @@ These roles are current project state, not a permanent versioning scheme. Update
   patches, mutable-state signals and selected caller/dependency closures.
 - For retained source-organisation changes, review the named authoritative
   implementation, genuinely shared invariant, narrow interface, dependency
-  direction and any temporary duplicate/retirement gate.
+  direction and any temporary duplicate/retirement condition.
 - `tests/validate_phase2_foundation.py` and `tools/modular_structure.py` fail
   on a forbidden domain/platform import, undeclared or prohibited layer edge,
   circular dependency, speculative module or import-time structural warning.
@@ -146,14 +147,19 @@ format-appropriate semantic metrics.
 - Report both editing cost and deferred Validate/Export cost.
 - Prove that an optimisation did not achieve speed by changing results or validation scope.
 
-## Verified commands
+## Verified commands and CI
 
 Run from the repository root.
 
-Syntax-check the two legacy/reference macros and the B16 composition root:
+The tracked [standalone CI workflow](../.github/workflows/ci.yml) runs on pushes
+to `main` and pull requests. It parses every tracked Python/macro source and
+runs every `tests/validate_*.py` check, which includes contracts, dependency
+direction, frozen hashes, Markdown links and current-project consistency.
+
+Run the same source parser locally when diagnosing a syntax failure:
 
 ```bash
-.venv/bin/python -c "import ast, pathlib; files=['AdvancedTurnout.FCMacro','model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro','TrackTemplate.FCMacro']; [ast.parse(pathlib.Path(f).read_text(encoding='utf-8'), filename=f) for f in files]; print('Macro syntax checks passed')"
+.venv/bin/python tools/validate_python_syntax.py
 ```
 
 Fast B15 structural and analytical validation:
@@ -185,7 +191,7 @@ human/formal coverage:
 This standalone standard-library validator checks the supporting JSON-LD/OWL
 projection and its Markdown reference. It does not replace the canonical
 architecture, schema validators, railway tests, FreeCAD integration evidence
-or live phase gates.
+or current phase and authority records.
 
 Current Phase 3 transition routing and rollback boundary:
 
@@ -300,13 +306,14 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
 The standalone matrix proves deterministic B14-only, B15-only and accepted
 mixed-window reporting; foreign-object exclusion; versionless/future
 inspection-only results; malformed/conflicting fail-closed results; exact
-contract gating; isolated import; and zero migration-family write authority.
-The FreeCAD test uses only newly created disposable documents and a temporary
+contract gating; isolated import; and zero outer-detector write authority. The
+FreeCAD test uses only newly created disposable documents and a temporary
 FCStd. It proves zero mutation during inspection and an identical mixed report
 after save/close/reopen. Its success sentinel is
 `Phase 4 legacy document FreeCAD detection validation passed`. This is outer
-ingress evidence only: no entity family is migration-qualified and no copied-
-target migrator exists yet.
+ingress evidence only: even when one exact family is separately qualified, the
+detector remains inspection-only and cannot advertise a whole document as a
+supported migration source.
 
 Phase 4 read-only plain-line transition family assessment:
 
@@ -326,10 +333,11 @@ production authority. The FreeCAD check opens the reproducible ignored B14
 base fixture read-only, obtains the two exact canonical candidates, compares
 document/property/history snapshots and requires the source FCStd hash to stay
 unchanged. Its sentinel is
-`Phase 4 plain-line transition FreeCAD assessment passed`. This is an
-assessment, not a copied-target migration or entity-family support claim.
+`Phase 4 plain-line transition FreeCAD assessment passed`. This read-only
+assessment does not itself authorise a copied-target write or advertise family
+support; the registry and fixture below own those separate controls.
 
-Authorised Phase 4 copied-target transition migration fixture:
+Exact-family Phase 4 copied-target transition migration fixture:
 
 ```bash
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
@@ -338,16 +346,36 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
 
 This isolated fixture starts B14, B15-only and expected mixed targets as
 physical copies of disposable source FCStd files. The host-independent
-preflight requires exact family-level source/target assessments; the qualified
-FreeCAD adapter then creates both canonical transition records in one batch
-transaction. The fixture requires one-step Undo/Redo, duplicate preflight with
-no history, exact canonical and legacy persistence through target save/reopen,
-source-byte preservation, and complete abort after an injected failure on the
-second payload. It also requires the original reproduced B14 fixture hash to
-remain unchanged, `SUPPORTED_MIGRATION_FAMILIES` to remain empty, and migration-
-support/production-output flags to remain false. Its sentinel is
+operation requires exact family-level source/target assessments before it calls
+the injected qualified FreeCAD writer once to create both canonical transition
+records in one batch transaction. The fixture requires one-step Undo/Redo,
+duplicate preflight with no history, exact canonical and legacy persistence
+through target save/reopen, source-byte preservation, and complete abort after
+an injected failure on the second payload. It also requires the original
+reproduced B14 fixture hash to remain unchanged; requires
+`SUPPORTED_MIGRATION_FAMILIES` to contain exactly
+`plain-line-spacing-matched-transition-intent`; requires migration support to
+be true only for that family; and requires production-output authority to
+remain false. Its sentinel is
 `Phase 4 copied-target transition migration fixture passed`. Passing this test
-does not advertise support or authorise a Workbench/operator migration path.
+proves the exact fixture-only family boundary; it does not qualify a complete
+document or authorise a Workbench/operator migration path.
+
+Exercise the same persistence and rollback fixture inside an isolated real-GUI
+process, with the GUI-host boundary asserted, using:
+
+```bash
+tools/freecad_bridge/run-isolated \
+  tools/freecad_bridge/freecad-cli execute-code \
+  'assert __import__("FreeCAD").GuiUp; import runpy; runpy.run_path("tests/freecad_validate_phase4_plain_line_transition_migration.py", run_name="__main__")'
+```
+
+Use `runpy.run_path` rather than `execute-code --file` for this validator
+because the latter bridge mode does not define `__file__`. A successful JSON
+bridge response must contain the same fixture sentinel. This is real-GUI host,
+document-lifecycle, persistence and rollback evidence for the exact supported
+fixture-only family; it is not evidence of an operator-visible command,
+target-path control or production output.
 
 Phase 4 neutral chair-definition package:
 
@@ -425,7 +453,7 @@ then require a clean pushed checkpoint:
 
 Assess a selected or replacement external destination only with
 `--backup-target ... --require-backup-target`; backup completion and restore
-evidence remain separate gates under
+evidence remain separate recovery conditions under
 [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The first repository-scope
 copy, restore and incremental-repeat result is recorded in the linked
 2026-07-22 evidence there for the owner-confirmed complete project-data scope;
@@ -438,18 +466,14 @@ Repository QA, documentation-link and residual-risk controls:
 ```
 
 This standard-library check protects the canonical QA and learning-document
-roles, requires every audit finding to be corrected or mapped to the live
-`PROJECT_PLAN.md` QA risk log, verifies every repository-internal Markdown
-file target, preserves the immutable B14/B15 fingerprints, and prevents the
-corrected frozen-history instruction from regressing. Every live risk row must
-use exactly `Tolerate`, `Remove`, or `Mitigate` and include an accountable
-owner, phase deadline, required work and objective closure evidence. Passing
-the check also requires every principal risk to have preventive, detective and
-recovery/corrective controls, one permitted effectiveness state, linked
-evidence and a mandatory next proof. It also protects the prospective
-safety/risk-panel roles, inputs, outcomes and fail-closed rule. It proves
-control consistency only; it does not close an open risk or accept a phase
-gate.
+roles, verifies the accepted hash manifest for frozen phase/audit/benchmark
+records, reconciles the frozen audit's open QA dispositions with
+`current/risks.json`, verifies every repository-internal Markdown file target
+and preserves the immutable B14/B15 fingerprints. It also enforces the
+`AGENTS.md` size/routing boundary, three-level task model, governance budget,
+Level 3 true-gate panel triggers and compact completion report in
+[ENGINEERING_POLICY.md](ENGINEERING_POLICY.md). It proves control consistency
+only; it does not close an open risk or accept a phase closure.
 
 Fast development-bridge recipe contract checks:
 
@@ -480,8 +504,8 @@ This cross-checks the 14 canonical Markdown inventory rows against their
 machine-readable owners, oracle states, evidence/recipe/validator paths, gap
 owners and future closure phases. It protects the exact B14/B15 source state
 and requires successor-only blocked oracles to remain visible. Passing proves
-coverage control, not that a partial or blocked workflow has passed its later
-GUI, migration, production, provenance or release gate.
+coverage control, not that a partial or blocked workflow has received its later
+GUI, migration, production, provenance or release authority.
 
 Fail-closed railway terminology-assurance checks:
 
@@ -505,7 +529,7 @@ This reconciles the source fingerprints, workflow counts/gaps, selected pilot,
 runtime and ingress policy, bounded performance defects, unmeasured target
 slots, S1 manifest/lineage/oracle blocks, terminology reviews and the 10 owner
 decisions in `PHASE1_CLOSEOUT.md`. It rejects loss of the accepted phase state,
-broadened host support, invented performance evidence, waived later gates and
+broadened host support, invented performance evidence, waived later controls and
 S1 clearance. Passing protects the 2026-07-22 acceptance; it does not broaden
 the bounded Phase 2 authority.
 
@@ -519,24 +543,24 @@ This protects all 15 S1 decision states and the recorded 2026-07-22 owner
 acceptance, the exact B14/B15 source, the
 structurally valid but `unknown` package manifest, blocked lineage scopes and
 comparison-only Templot oracle. If a later chair schema exists, the validator
-requires it to be attributed to the Phase 4 gate rather than retroactively to
-Phase 1.
+requires it to be attributed to the Phase 4 evidence and owner decision rather
+than retroactively to Phase 1.
 It fails closed if a designation, licence, dependency, rights status or
 Templot artifact is promoted without evidence. Passing means the accepted
 control is internally consistent, not that the package is project-cleared.
 
-Project-plan progress bookkeeping:
+Project dashboard and current-record consistency:
 
 ```bash
 .venv/bin/python tests/validate_project_progress.py
 ```
 
-This checks each roadmap bar and denominator against the number of explicit
-phase exit conditions, reconciles the current-phase gate register, and checks
-the milestone bar against the milestone states. For any phase completed from
-Phase 4 onward, it also requires the standard linked safety/risk-panel outcome
-and separate dated project-owner gate decision. It does not assess the quality
-of panel/gate evidence or replace project-owner phase acceptance.
+This enforces the compact project-plan sections and line budget, reconciles the
+Phase 4 dashboard with `current/PHASE_EVIDENCE.md`, validates the detailed
+current risk and decision JSON registers, protects the retired descriptive-path
+redirect and checks the least-privilege, SHA-pinned standalone CI workflow. It
+does not assess the quality of a decision's evidence or replace project-owner
+acceptance.
 
 Fail-closed Phase 1 performance-boundary checks:
 
@@ -614,7 +638,7 @@ family, including supported, future, versionless, corrupt/conflicting, failure,
 undo/redo and save/reopen cases. A configuration JSON migration is not evidence
 that an older `.FCStd` is supported.
 
-Phase 1 licensing-control and manifest-gate checks:
+Phase 1 licensing and manifest-control checks:
 
 ```bash
 .venv/bin/python tests/validate_licensing_controls.py
@@ -669,7 +693,7 @@ blocked acceptance gate. When the ignored ZIP is available it verifies every
 mapped field and routine in its owning active unit, the complete code-1
 constituent sequence and the DXF/STL emission functions. It does not approve
 the mapped values, copy source expressions into production, or replace the
-missing artifact and independent-evidence gates.
+missing artifact and independent-evidence requirements.
 
 Local source and candidate probes are:
 
@@ -898,7 +922,7 @@ semantic fixture, calculates both mapped turnout roads and the connector at
 Host A chainages `500.000` and `746.298 mm`, creates no document objects and
 requires the fixture bytes to remain unchanged. It must print
 `Phase 1 crossover feasibility FreeCAD oracle passed`. The exact evidence and
-remaining production/GUI gate are recorded in
+remaining production/GUI acceptance decision is recorded in
 [benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md](benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md).
 
 Fast Phase 1 automatic-crossover-timbering contract checks:

@@ -403,14 +403,14 @@ def _validate_source_and_phase_controls():
     evidence = (
         ROOT
         / "reference"
-        / "phase-evidence"
-        / "PHASE4_CANONICAL_STATE.md"
+        / "current"
+        / "PHASE_EVIDENCE.md"
     ).read_text(encoding="utf-8")
-    assert "Phase 4 is current" in plan
-    assert "PHASE4_CANONICAL_STATE.md" in plan
+    assert "| 4 | Canonical state, signatures and persistence | 4/6 evidenced" in plan
+    assert "current/PHASE_EVIDENCE.md" in plan
     assert "## Transition schema v1" in evidence
     assert "owner accepted this as part of the bounded Phase 4 read window" in evidence
-    assert "Current Phase 4 gate disposition" in evidence
+    assert "Current Phase 4 exit-condition disposition" in evidence
 
 
 def validate():

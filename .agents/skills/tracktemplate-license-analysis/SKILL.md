@@ -20,7 +20,11 @@ before analysis.
 - The first document owns project classifications, admission rules, manifest
   statuses, intended-use checks and non-copyright-rights review.
 - The second records source identity and licence evidence actually found.
-- `reference/PROJECT_PLAN.md` owns timing, live risks and acceptance gates.
+- `reference/PROJECT_PLAN.md` owns phase timing and linked risk/decision
+  summaries; `reference/current/risks.json` and `gate-decisions.json` own the
+  detailed live records.
+- `reference/ENGINEERING_POLICY.md` owns the panel requirement for licensing
+  or provenance authority changes.
 - `LICENSE`, `NOTICE.md`, contributor declarations, package manifests and
   upstream terms are evidence; none silently overrides the project owners.
 

@@ -14,7 +14,7 @@ authority.
 | Dependencies and vendoring | `AGENTS.md`; `reference/MODULARISATION_PLAN.md`; licensing where applicable | Adapter/runtime dependency, never implicit canonical data |
 | Code and asset licensing | `reference/LICENSING_BOUNDARIES.md`; `reference/PROVENANCE.md` | `tt:DependencyManifest`, `tt:ProvenanceRecord`, `tt:ProjectStatus` |
 | Local development and testing | `reference/VALIDATION.md`; `reference/TESTING_POLICY.md` | Evidence for the affected adapter/workflow boundary |
-| FreeCAD compatibility | `reference/ARCHITECTURE.md`; qualified profile contract; live gate in `reference/PROJECT_PLAN.md` | `tt:CompatibilityAdapter`, `tt:PersistentRecord` |
+| FreeCAD compatibility | `reference/ARCHITECTURE.md`; qualified profile contract; current decisions in `reference/current/gate-decisions.json` | `tt:CompatibilityAdapter`, `tt:PersistentRecord` |
 | Data/schema migration | `reference/ARCHITECTURE.md`; `reference/TESTING_POLICY.md` | `tt:VersionedRecord`, `tt:CompatibilityAdapter` |
 | Addon Index qualities and publication | `reference/PROJECT_PLAN.md`; licensing/provenance owners | Release evidence, not ontology maturity status |
 | Recovery or destructive installation steps | `reference/RECOVERY_AND_BACKUP.md` | Repository/system safety boundary |
@@ -34,4 +34,4 @@ authority.
 - Addon Index acceptance criteria do not close a TrackTemplate phase or release
   gate.
 - Use `reference/ONTOLOGY.md` to name stable product concepts, and
-  `reference/PROJECT_PLAN.md` only for live status.
+  `reference/PROJECT_PLAN.md` only for phase/exit status and linked summaries.

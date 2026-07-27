@@ -19,7 +19,10 @@ description: Create, review, shorten or reorganise TrackTemplate Markdown docume
 
 Read only the documents relevant to the present change:
 
-- Read `reference/PROJECT_PLAN.md` for current status, phases, gates and risks.
+- Read `reference/PROJECT_PLAN.md` for phase and exit-condition status plus
+  linked risk/decision summaries.
+- Read `reference/current/PHASE_EVIDENCE.md` and the JSON registers beside it
+  when current evidence, detailed risks or decisions are in scope.
 - Read `reference/ARCHITECTURE.md` for architecture or canonical-state decisions.
 - Read `reference/MODULARISATION_PLAN.md` for source organisation or dependency
   direction.
@@ -50,8 +53,9 @@ Read only the documents relevant to the present change:
 - Check for exact wording required by validators before changing prose.
 - Avoid arbitrary word-count targets, automatic whole-repository rewrites and
   broad mechanical cleanup.
-- Keep current phase status in `reference/PROJECT_PLAN.md` and current phase
-  evidence in the one open-phase evidence document it names.
+- Keep phase and exit-condition status in `reference/PROJECT_PLAN.md`, current
+  evidence in `reference/current/PHASE_EVIDENCE.md`, and detailed risks and
+  decisions in the JSON registers beside it.
 - Report material proposed for removal when deletion could change historical,
   legal, safety, licensing or evidential meaning.
 

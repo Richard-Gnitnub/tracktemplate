@@ -80,7 +80,8 @@ Select only the rows relevant to the audit.
 
 | Claim surface | Compare against |
 | --- | --- |
-| Current phase, progress, gates or live risks | `reference/PROJECT_PLAN.md` and the named open-phase evidence |
+| Phase and exit-condition status | `reference/PROJECT_PLAN.md` |
+| Current evidence, detailed risks or decisions | `reference/current/PHASE_EVIDENCE.md` and the JSON registers beside it |
 | Architecture or product boundaries | The owning canonical document, current composition and focused tests |
 | Paths, modules, commands or interfaces | `rg --files`, source, configuration, manifests and executable validation |
 | Tests or validation status | `reference/VALIDATION.md`, `reference/TESTING_POLICY.md` and raw results |

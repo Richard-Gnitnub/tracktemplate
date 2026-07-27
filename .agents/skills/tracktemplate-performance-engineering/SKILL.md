@@ -28,8 +28,8 @@ faster partial workflow into end-to-end evidence.
 
 ## Baseline
 
-1. Read the current phase gate, owning evidence record and relevant performance
-   risks in `reference/PROJECT_PLAN.md`.
+1. Read the current phase/exit status in `reference/PROJECT_PLAN.md`, the
+   applicable current evidence and relevant performance risks.
 2. Define the operator-visible workflow, exact source state, runtime/profile,
    input document or fixture, cold/warm state, cache state, process boundary
    and output scope.

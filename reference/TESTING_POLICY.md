@@ -141,7 +141,7 @@ Before a change is complete:
 4. run applicable FreeCAD headless, GUI, persistence, export, rollback, and
    performance checks from [VALIDATION.md](VALIDATION.md);
 5. confirm tests were not weakened solely to obtain a pass;
-6. classify every observed failure under the failed-test adjudication gate and
+6. classify every observed failure under the failed-test adjudication process and
    rerun the original proof after repair;
 7. record any unrun or unavailable check and the risk it leaves; and
 8. keep test code, fixtures, and validation documentation in the same commit as
@@ -161,7 +161,7 @@ Before a change is complete:
 - Are all remaining coverage gaps visible and owned?
 - Does retained code introduce another implementation of an existing railway
   or application concept? If temporarily necessary, is its owner and
-  retirement gate explicit?
+  retirement condition explicit?
 - Is each new shared abstraction supported by a stated invariant and direct
   tests at its narrow public boundary, rather than only by similar source text?
 - Where domain or layer boundaries changed, did the applicable standalone-

@@ -36,7 +36,7 @@ Apply only the sections relevant to the complete change.
 - No authoritative logic has been duplicated.
 - No speculative helper, option, configuration or extension point has been added.
 - No wrapper is used once without improving clarity, isolation or a defined invariant.
-- Temporary compatibility code has an owner, purpose and retirement gate.
+- Temporary compatibility code has an owner, purpose and retirement condition.
 - Apparent repetition has not been removed until its FreeCAD, compatibility, recovery, evidence or performance purpose has been checked.
 
 ## Comments and failure handling
@@ -80,7 +80,7 @@ When a failed test or its repair is in scope:
   `reference/TESTING_POLICY.md`;
 - the retained repair targets the classified source, test, fixture, harness or
   environment boundary;
-- changed tests and oracles satisfy their separate authority gate;
+- changed tests and oracles satisfy their separate authority control;
 - the original exact failing proof passed after repair;
 - affected regression layers were rerun; and
 - pre-existing or unresolved failures remain visible.

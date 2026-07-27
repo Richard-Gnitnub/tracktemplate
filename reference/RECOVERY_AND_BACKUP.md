@@ -8,7 +8,9 @@ passed initial repository snapshot and restore drill, accepted by the project
 owner on 2026-07-22. The owner confirmed that all valuable project files are
 inside the repository and no external project files require backup, and
 accepted the repeat/retention routine. Its incremental second-snapshot proof
-passed, closing QA-R01 on 2026-07-22. The ongoing cadence remains mandatory.**
+passed, closing QA-R01 on 2026-07-22. The ongoing cadence remains mandatory.
+Triggered Phase 4 snapshots passed before both the copied-target orchestration
+and exact-family support tranches on 2026-07-27.**
 
 ## Purpose
 
@@ -32,7 +34,7 @@ versioned backup and a tested restore.
 | GitHub remote history | Active | Off-machine copy of pushed Git objects; not a complete backup of ignored assets and not independent of account/repository administration |
 | Independent project-data backup | **Operational for the complete declared project-data scope** | A dated, non-overwriting snapshot on a separate ext4 USB covers `.git`, ignored evidence, repository FCStd fixtures and the source archive; the owner confirmed no valuable external project files require backup |
 | Restore drill | **Passed and owner-accepted for the complete declared scope on 2026-07-22** | See the [backup, restore and repeat record](backup-records/2026-07-22-initial-repository-backup-restore.md) |
-| Repeat and retention | **Active and verified 2026-07-22** | The accepted cadence and hard-linked incremental retention were proved by a second complete snapshot; QA-R01 is closed |
+| Repeat and retention | **Active and verified again 2026-07-27** | The accepted cadence and hard-linked incremental retention were proved again by the [pre-orchestration](backup-records/2026-07-27-pre-phase4-migration-snapshot.md) and [pre-support](backup-records/2026-07-27-pre-phase4-family-support-snapshot.md) snapshots; QA-R01 remains closed |
 
 ## Initial implementation and remaining risk
 
@@ -46,13 +48,14 @@ empty temporary directory passed the checks recorded in the
 That is positive recovery evidence for the complete valuable project-data
 scope declared by the owner on 2026-07-22. The project owner accepted the
 successful repository-scope backup and restore drill and confirmed that no
-valuable project files outside the repository require backup. Retention is
-now represented by two complete dated sets. The owner accepted the repeat/
-retention routine below on 2026-07-22, and its incremental second-snapshot
-proof passed exact comparison while adding only changed payload storage. The
-audit may therefore report QA-R01 closed for the current declared scope; a
-missed cadence, failed run or scope change must reopen the exposure rather than
-rely on this historical result.
+valuable project files outside the repository require backup. Retention is now
+represented by multiple complete dated sets, most recently the triggered
+2026-07-27 pre-support repeat linked below. The owner accepted the repeat/
+retention routine on 2026-07-22, and incremental snapshot proofs passed exact
+comparison while adding only changed payload storage. The audit may therefore
+report QA-R01 closed for the current declared scope; a missed cadence, failed
+run or scope change must reopen the exposure rather than rely on this
+historical result.
 
 The backup gate is closed for the current declared scope, but these operating
 controls remain mandatory:
@@ -85,6 +88,10 @@ Incremental snapshots may hard-link unchanged files on the USB, but each dated
 directory must present a complete repository tree and must never overwrite or
 mutate an accepted earlier set. The verified repeat is recorded in the
 [2026-07-22 backup and restore record](backup-records/2026-07-22-initial-repository-backup-restore.md).
+The triggered `2026-07-27-pre-phase4-migration-01` repeat is recorded in its
+[dated snapshot record](backup-records/2026-07-27-pre-phase4-migration-snapshot.md).
+The later `2026-07-27-pre-phase4-family-support-01` repeat is recorded in its
+[dated pre-support record](backup-records/2026-07-27-pre-phase4-family-support-snapshot.md).
 Missing the cadence, changing the valuable-data scope or failing a later run
 reopens QA-R01 or creates a successor risk; historical evidence must not be
 rewritten.

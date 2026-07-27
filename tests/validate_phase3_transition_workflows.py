@@ -292,11 +292,10 @@ def _validate_bridge_contract():
     )
     assert "Closeout acceptance and carried controls" in phase3_text
     assert "neither route was removed by the closeout" in phase3_text
-    assert "Progress: `█████` — 5/5 exit conditions evidenced and accepted" in (
-        project_plan_text
-    )
-    assert "Phase 3: first parity-proven vertical slice" in project_plan_text
-    assert "Complete — all five technical exit conditions" in project_plan_text
+    assert (
+        "| 3 | First parity-proven vertical slice | 5/5 evidenced | "
+        "Complete — accepted 2026-07-22 |"
+    ) in project_plan_text
 
 
 def validate():

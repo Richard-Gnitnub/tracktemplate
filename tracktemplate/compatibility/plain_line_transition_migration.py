@@ -1,14 +1,20 @@
 """Fixture-only copied-target orchestration for assessed legacy transitions.
 
-This module does not advertise a supported migration family.  It verifies that
-the source and target expose the same complete read-only family assessment and
-returns immutable states for the fixture to pass to a qualified atomic adapter.
+The exact assessed family is support-advertised through the central registry.
+This module verifies that source and target expose the same complete read-only
+family assessment, then lets the authorised fixture pass those immutable
+states to a qualified atomic writer as one synchronous operation.  No product
+or operator path imports it.
 """
 
 from dataclasses import dataclass
 import hashlib
 
+from tracktemplate.compatibility.legacy_document import (
+    SUPPORTED_MIGRATION_FAMILIES,
+)
 from tracktemplate.compatibility.plain_line_transition import (
+    FAMILY_ID,
     STATUS_CANONICAL_INPUTS_SUFFICIENT,
     assess_plain_line_transitions,
     plain_line_transition_assessment_to_json,
@@ -19,7 +25,7 @@ MIGRATION_FIXTURE_SCHEMA_ID = (
     "tracktemplate.plain-line-transition-copied-target-fixture"
 )
 MIGRATION_FIXTURE_SCHEMA_VERSION = 1
-MIGRATION_SUPPORT_ADVERTISED = False
+MIGRATION_SUPPORT_ADVERTISED = FAMILY_ID in SUPPORTED_MIGRATION_FAMILIES
 PRODUCTION_OUTPUT_AUTHORIZED = False
 
 __all__ = (
@@ -29,6 +35,7 @@ __all__ = (
     "PRODUCTION_OUTPUT_AUTHORIZED",
     "CopiedTargetMigrationError",
     "CopiedTargetMigrationPlan",
+    "execute_copied_plain_line_transition_migration_fixture",
     "prepare_copied_plain_line_transition_migration",
 )
 
@@ -61,7 +68,7 @@ class CopiedTargetMigrationPlan:
 
     @property
     def migration_support_advertised(self):
-        return False
+        return MIGRATION_SUPPORT_ADVERTISED
 
     @property
     def production_output_authorized(self):
@@ -75,7 +82,7 @@ class CopiedTargetMigrationPlan:
         return {
             "assessment_sha256": self.assessment_sha256,
             "fixture_only": True,
-            "migration_support_advertised": False,
+            "migration_support_advertised": MIGRATION_SUPPORT_ADVERTISED,
             "production_output_authorized": False,
             "schema_id": MIGRATION_FIXTURE_SCHEMA_ID,
             "schema_version": MIGRATION_FIXTURE_SCHEMA_VERSION,
@@ -145,3 +152,30 @@ def prepare_copied_plain_line_transition_migration(
         states=tuple(item.state for item in source_assessment.candidates),
         assessment_sha256=_assessment_digest(source_json),
     )
+
+
+def execute_copied_plain_line_transition_migration_fixture(
+    source_document,
+    target_document,
+    compatibility_contract,
+    atomic_writer,
+):
+    """Preflight and execute the authorised fixture synchronously.
+
+    ``atomic_writer.create_many(target_document, states)`` must validate and
+    commit the complete state set as one rollback-safe command.  Its structured
+    failures propagate unchanged.  Family-level support does not provide a
+    product/operator entry point or authorise production output.
+    """
+    create_many = getattr(atomic_writer, "create_many", None)
+    if not callable(create_many):
+        raise TypeError(
+            "atomic_writer must expose callable create_many(document, states)"
+        )
+    plan = prepare_copied_plain_line_transition_migration(
+        source_document,
+        target_document,
+        compatibility_contract,
+    )
+    create_many(target_document, plan.states)
+    return plan

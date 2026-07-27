@@ -81,11 +81,8 @@ REQUIRED_MARKERS = (
     "This instruction is the phase-transition authority.",
 )
 REQUIRED_PROJECT_PLAN_MARKERS = (
-    "Progress: `█████████` — 9/9 exit conditions evidenced and accepted.",
-    "| 1 | Product, dependency, correctness, and performance inventory | `█████████` — 9/9 evidenced | Complete — accepted 2026-07-22 |",
-    "| M2 — Migration blueprint locked",
-    "| 1 | Complete — accepted 2026-07-22 |",
-    "PHASE1_CLOSEOUT.md",
+    "| 1 | Product, dependency, correctness and performance inventory | "
+    "9/9 evidenced | Complete — accepted 2026-07-22 |",
 )
 
 
@@ -460,8 +457,10 @@ def main():
 
     reopened_plan = copy.deepcopy(data)
     reopened_plan["project_plan_text"] = reopened_plan["project_plan_text"].replace(
-        "Progress: `█████████` — 9/9 exit conditions evidenced and accepted.",
-        "Progress: `████████▒` — 8/9 exit conditions evidenced; 1 remains active.",
+        "| 1 | Product, dependency, correctness and performance inventory | "
+        "9/9 evidenced | Complete — accepted 2026-07-22 |",
+        "| 1 | Product, dependency, correctness and performance inventory | "
+        "8/9 evidenced | Active |",
         1,
     )
     _expect_invalid(reopened_plan, "unrecorded project-plan reopening")

@@ -19,8 +19,9 @@ Hot context:
 
 Warm context:
 - canonical source and section — reason loaded
-- open-phase evidence and section — reason loaded
+- reference/current/PHASE_EVIDENCE.md section — reason loaded
 - applicable live risk IDs — required treatment or proof
+- applicable current decision IDs — authority and exclusions
 
 Cold or excluded context:
 - source — exclusion reason — trigger for retrieval
@@ -50,13 +51,15 @@ Packet prepared or verified:
 From `reference/PROJECT_PLAN.md`, retrieve:
 
 1. the document status and roadmap entry for the current phase;
-2. the current phase gate register and named evidence record;
-3. principal or QA risk rows relevant to the task; and
+2. the applicable current exit-condition status and evidence link;
+3. risk and decision summary IDs relevant to the task; and
 4. a closed-phase decision only when the task depends on that decision,
    accepted oracle or historical evidence.
 
-Record other phase sections as excluded cold context. Do not create a second
-live-status summary in another repository file.
+Then retrieve detailed evidence from `reference/current/PHASE_EVIDENCE.md` and
+the selected entries from `reference/current/risks.json` or
+`gate-decisions.json`. Record other material as excluded cold context. Do not
+create a second live-status summary in another repository file.
 
 ## Loss-check questions
 

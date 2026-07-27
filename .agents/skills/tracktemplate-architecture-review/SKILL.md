@@ -30,7 +30,8 @@ scope or create a parallel ADR catalogue.
 
 ## Preparation
 
-1. Read `reference/PROJECT_PLAN.md` for the current gate and authorised scope.
+1. Read `reference/PROJECT_PLAN.md` for current phase/exit status, then read
+   the applicable current decision record for authorised scope.
 2. Read `reference/ARCHITECTURE.md` and
    `reference/MODULARISATION_PLAN.md`.
 3. Read the canonical owner of each affected persistence, display, validation,
@@ -52,18 +53,18 @@ scope or create a parallel ADR catalogue.
    obligations.
 4. **Challenge duplication.** Identify the one authoritative implementation
    and give every necessary temporary duplicate an owner and objective
-   retirement gate.
+   retirement condition.
 5. **Check sequencing.** Prefer an independently verifiable vertical slice.
    Separate mechanical extraction, behavioural change, cleanup and performance
    work.
 6. **Recommend narrowly.** State why the preferred option satisfies the current
-   gate with less irreversible commitment than the alternatives. Mark any
+   requirements with less irreversible commitment than the alternatives. Mark any
    requirement, evidence or owner decision still missing.
 7. **Route the record.** Put an accepted strategic decision in
    `reference/ARCHITECTURE.md`, an accepted source-boundary decision in
-   `reference/MODULARISATION_PLAN.md`, live gate status in
-   `reference/PROJECT_PLAN.md`, and tranche evidence only in the named
-   open-phase record.
+   `reference/MODULARISATION_PLAN.md`, phase/exit status in
+   `reference/PROJECT_PLAN.md`, current decisions in the structured register
+   and tranche evidence only in `reference/current/PHASE_EVIDENCE.md`.
 
 ## Invalid shortcuts
 
@@ -79,6 +80,6 @@ Do not:
 ## Report
 
 Report the decision boundary, preserved invariants, options compared,
-recommendation, rejected trade-offs, required migration and retirement gates,
-evidence needed before implementation, and the canonical owner for any accepted
-record.
+recommendation, rejected trade-offs, required migration decisions and
+retirement conditions, evidence needed before implementation, and the
+canonical owner for any accepted record.

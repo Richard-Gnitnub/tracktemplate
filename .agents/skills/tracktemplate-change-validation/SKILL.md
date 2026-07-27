@@ -19,8 +19,9 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
    documentation, schemas, fixtures and generated interfaces.
 3. Identify the affected architectural boundary, railway boundary and
    FreeCAD/host-integration boundary.
-4. Read `reference/PROJECT_PLAN.md` to identify the current phase, open gates and
-   owning evidence document.
+4. Read `reference/PROJECT_PLAN.md` for the current phase and applicable
+   exit-condition status. Read `reference/current/PHASE_EVIDENCE.md` and the
+   current JSON registers when detailed evidence, risks or decisions matter.
 5. Read `reference/VALIDATION.md` for the applicable validation layers and
    verified commands.
 6. Read `reference/TESTING_POLICY.md` for testing obligations and oracle-change
@@ -77,8 +78,8 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
 - Do not describe a copied-target fixture, local comparison path, prototype,
   headless smoke or partial workflow as supported production behaviour.
 - Do not claim a phase, milestone, release, migration family, package or output
-  is accepted or project-cleared. Those decisions remain with their canonical
-  gates and the project owner.
+  is accepted or project-cleared. Those decisions remain with the structured
+  current records and the project owner.
 - Do not change files unless the user requested implementation or validation
   fixes.
 
@@ -102,7 +103,7 @@ If the user authorised fixes, make the smallest repair at the classified
 boundary, rerun the original exact command, then run every additionally affected
 layer.
 
-Changing a test or oracle still requires the canonical gate in
+Changing a test or oracle still requires the canonical change control in
 `reference/TESTING_POLICY.md`. A test failure, an implementation preference or
 the desire for a green suite is not that evidence.
 

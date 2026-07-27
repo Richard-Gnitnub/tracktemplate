@@ -2,7 +2,9 @@
 
 Status: accepted strategic direction; implementation is intentionally phased.
 
-The authoritative phase sequence and release-candidate gates are maintained in [PROJECT_PLAN.md](PROJECT_PLAN.md).
+The authoritative phase sequence and status are maintained in
+[PROJECT_PLAN.md](PROJECT_PLAN.md); true-gate policy is maintained in
+[ENGINEERING_POLICY.md](ENGINEERING_POLICY.md).
 The supporting [product-system ontology](ONTOLOGY.md) projects the stable
 concepts and relationships in this architecture for human and machine use; it
 does not replace this document or record delivery status.
@@ -62,7 +64,7 @@ Exact geometry is permitted at an explicit **Validate** or **Export** boundary. 
     tested interface. Dependencies remain explicit and follow the accepted
     layer direction. Exploratory code is removed or deliberately promoted to
     these standards before it becomes retained project code; any necessary
-    temporary duplication has a named owner and retirement gate.
+    temporary duplication has a named owner and retirement condition.
 
 ## Target layers
 
@@ -117,7 +119,7 @@ The initial host and legacy-ingress boundary is fixed by
 Only a qualified FreeCAD runtime may write through this adapter. B14 and B15
 are the bounded future migration sources, including their expected mixed
 version set, but migration always targets a user-approved copy/new document
-and remains family-gated. Unknown, future, versionless, corrupt or
+and remains controlled by entity family. Unknown, future, versionless, corrupt or
 insufficiently parametric state is inspection-only or blocked; legacy exact
 shapes are evidence rather than authoritative state. The canonical successor
 schema and executable migrations remain Phase 4 work.
@@ -353,7 +355,7 @@ Every migrated slice requires:
 - legacy-versus-new analytical result comparison;
 - a maintainability/reuse review naming the authoritative implementation,
   shared invariant, public boundary, dependency direction and any temporary
-  duplication plus its owner and retirement gate;
+  duplication plus its owner and retirement condition;
 - stable identity and ordering comparison;
 - exact geometry or export equivalence for its production scope;
 - cold- and warm-cache tests;
@@ -366,14 +368,16 @@ See [VALIDATION.md](VALIDATION.md).
 
 ## Migration sequence
 
-This is the architectural sequence. The numbered delivery phases, current status, and exit evidence are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md).
+This is the architectural sequence. Numbered phase status is in
+[PROJECT_PLAN.md](PROJECT_PLAN.md), while detailed current exit evidence is in
+[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md).
 
 1. **Baseline:** preserve representative documents and benchmark reports for current workflows.
 2. **Create seams:** isolate domain calculations, FreeCAD document writes, view construction, and export calls without changing results.
 3. **Prototype one measured hotspot:** replace one bounded, high-cost display/object-construction path with a lightweight adapter behind a comparison switch.
 4. **Prove editing semantics:** demonstrate selection, parameter edits, undo/redo, visibility, save/load, and signature invalidation.
 5. **Move exact construction to Validate/Export:** generate target-specific transient geometry and compare it with the legacy path.
-6. **Migrate by entity family:** expand only after correctness and performance gates pass for the previous slice.
+6. **Migrate by entity family:** expand only after correctness and performance checks pass for the previous slice.
 7. **Retire legacy paths:** remove a legacy path only after representative parity evidence and user acceptance.
 
 Do not attempt a whole-macro rewrite.

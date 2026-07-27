@@ -1,8 +1,9 @@
 # Modularisation Plan
 
-Status: accepted modularisation strategy and extraction method. Live stage and
-phase progress belongs only in [PROJECT_PLAN.md](PROJECT_PLAN.md) and the
-owning open-phase evidence; it is not mirrored here.
+Status: accepted modularisation strategy and extraction method. Phase status
+belongs in [PROJECT_PLAN.md](PROJECT_PLAN.md) and detailed live evidence in
+[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md); neither is mirrored
+here.
 
 The authoritative delivery phases from the current baseline to a release candidate are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md). The `M` stages below describe only the modularisation workstream and intentionally do not create a second project phase scheme.
 
@@ -235,9 +236,9 @@ Git history is the record of old implementations. Do not keep historical functio
 - Reuse procedural primitives and component strategies where railway meaning
   is shared, but do not create one copied module or class per chair type.
 
-## Maintainability and reuse gate
+## Maintainability and reuse control
 
-This gate applies to retained product code, package/build tooling and shared
+This control applies to retained product code, package/build tooling and shared
 test or validation helpers. A bounded exploratory probe may optimise for rapid
 learning, but before commit it must either be removed or deliberately promoted:
 placed with the concept it serves, given a narrow contract, covered at the
@@ -252,17 +253,17 @@ For each retained source-organisation change, review and record:
 4. the allowed dependency direction and any adapter boundary;
 5. the direct, integration and parity evidence appropriate to its risk; and
 6. every temporary duplicate, compatibility façade or comparison path, with a
-   named owner and retirement gate.
+   named owner and retirement condition.
 
 The controls are deliberately layered:
 
-| Risk | Current control | Later executable gate |
+| Risk | Current control | Later executable control |
 | --- | --- | --- |
 | Hidden duplicates, captured aliases, import-time patches and mutable globals in B14/B15 | `tools/phase1_inventory.py` plus `tests/validate_phase1_inventory.py` fingerprint the present legacy structure and selected dependency closures | Re-run structural metrics after each applicable phase; modular source must trend towards one live definition and no import-time patch chain |
 | Behaviour lost while code is reused or moved | Existing characterisation contracts, B14/B15 parity, stable-identity/ordering checks and applicable FreeCAD lifecycle tests | Every migrated slice must pass legacy/new parity before cleanup or optimisation |
 | Domain code becoming coupled to FreeCAD, Qt or exporters | `tests/validate_phase2_foundation.py` proves isolated domain/API import and fails on forbidden domain dependencies | Retain and extend the same boundary as domain modules are populated from Phase 3 onward |
 | Circular or reverse dependencies | `tools/modular_structure.py` and the Phase 2 validator fail on cycles and prohibited layer edges | Re-run and extend the declared layering with every applicable package change |
-| A second maintained implementation or an indefinitely retained comparison path | Staged-diff review and an explicit exception/retirement record | Phase 2/3 façade and composition checks, followed by removal at the named migration gate |
+| A second maintained implementation or an indefinitely retained comparison path | Staged-diff review and an explicit exception/retirement record | Phase 2/3 façade and composition checks, followed by removal at the named retirement condition |
 | Premature or misleading abstraction | Cohesion and railway-semantics review; similar code may remain separate until its invariant is understood | Direct tests of the shared contract and review of every new cross-module public API |
 
 Static tools can find structural warning signs; they cannot decide whether two
@@ -319,7 +320,7 @@ Only after parity is established may a second change simplify or optimise the ex
 - Record representative inputs/documents and cold/warm benchmark reports.
 - Confirm the current validation commands and known coverage gaps.
 
-Exit gate: the pre-modular behaviour can be reproduced and recovered.
+Exit condition: the pre-modular behaviour can be reproduced and recovered.
 
 Status: **Complete with the Phase 0 closeout.**
 
@@ -333,7 +334,7 @@ Status: **Complete with the Phase 0 closeout.**
   placement and output path, and distinguish it from B15's bounded five-box
   approximation before selecting or moving chair code.
 
-Exit gate: the first extraction is selected from evidence rather than source proximity.
+Exit condition: the first extraction is selected from evidence rather than source proximity.
 
 Status: **Complete — selection and Phase 1 closeout accepted on 2026-07-22.**
 The reproducible static definition/caller/alias/patch
@@ -361,7 +362,7 @@ qualification and representative target-architecture profiles remain open;
 their implementation status is recorded by the owning delivery phase rather
 than this strategy document.
 The consolidated
-[Phase 1 closeout record](phase-evidence/PHASE1_CLOSEOUT.md) preserves those later gates and
+[Phase 1 closeout record](phase-evidence/PHASE1_CLOSEOUT.md) preserves those later obligations and
 authorised only the minimal Stage M2 package/loading foundation. Its
 implementation and validation are recorded in
 [PHASE2_FOUNDATION.md](phase-evidence/PHASE2_FOUNDATION.md).
@@ -384,7 +385,7 @@ Status: **Complete — exit evidence accepted by the project owner on
   production document detector/migrator remains a Phase 4 compatibility
   adapter and the final Addon metadata remains Phase 10 work.
 
-Exit gate: **evidenced.** The minimal boundary and loading approach work in
+Exit condition: **evidenced.** The minimal boundary and loading approach work in
 both isolated standalone Python and the qualified FreeCAD runtime, with no
 document mutation. See [PHASE2_FOUNDATION.md](phase-evidence/PHASE2_FOUNDATION.md). The
 project owner accepted that evidence on 2026-07-22, closing Stage M2 and making
@@ -393,8 +394,8 @@ as part of the acceptance itself.
 
 ### Stage M3: first vertical slice
 
-Delivery status: see [PROJECT_PLAN.md](PROJECT_PLAN.md) and the owning
-open-phase evidence.
+Delivery status: see [PROJECT_PLAN.md](PROJECT_PLAN.md) and
+[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md).
 
 Select a slice that has:
 
@@ -410,7 +411,7 @@ Extract the pure calculation as the first independently evidenced step. Add
 its application/routing boundary, FreeCAD adapter and presentation path only
 as separate parity-proven steps.
 
-Exit gate: one complete capability follows the target dependency direction without changing accepted results.
+Exit condition: one complete capability follows the target dependency direction without changing accepted results.
 
 ### Stage M4: deferred geometry seam
 
@@ -419,11 +420,11 @@ Exit gate: one complete capability follows the target dependency direction witho
 - Compare editing and end-to-end export cost using [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md).
 - Keep a temporary legacy comparison path until parity and user acceptance.
 
-Exit gate: the architecture produces a measured resource improvement without hiding cost or reducing validation.
+Exit condition: the architecture produces a measured resource improvement without hiding cost or reducing validation.
 
 ### Stage M5: repeat by capability
 
-Migrate the next bounded capability using the same gates. Reassess ordering after every slice; do not assume source order is migration order.
+Migrate the next bounded capability using the same controls. Reassess ordering after every slice; do not assume source order is migration order.
 
 Potential capability families include:
 
@@ -435,7 +436,7 @@ Potential capability families include:
   assisted assimilation and presentation;
 - production record planning and export.
 
-Exit gate: each migrated family has independent tests, explicit adapters and no reverse dependencies.
+Exit condition: each migrated family has independent tests, explicit adapters and no reverse dependencies.
 
 ### Stage M6: reduce the launcher and retire legacy layers
 
@@ -446,11 +447,11 @@ Exit gate: each migrated family has independent tests, explicit adapters and no 
 - Automate the accepted Workbench/Addon assembly and any explicitly retained
   compatibility launcher from the same authoritative source.
 
-Exit gate: the Workbench loads the modular source, any macro is only a small
+Exit condition: the Workbench loads the modular source, any macro is only a small
 launcher/composition root, and modular source is the only maintained
 implementation.
 
-## Validation gates
+## Validation checks
 
 Follow [VALIDATION.md](VALIDATION.md). At minimum, each extraction must demonstrate:
 
@@ -481,7 +482,7 @@ Recalculate the current baseline indicators after each applicable project phase:
 - domain test coverage without FreeCAD;
 - number of persistent document objects for representative workflows.
 
-The desired trend is fewer active duplicates/patches, a smaller launcher, stronger independent tests and lower document cost. Total repository line count may temporarily rise while parity tests and compatibility façades coexist; that is acceptable when the temporary code has an explicit retirement gate.
+The desired trend is fewer active duplicates/patches, a smaller launcher, stronger independent tests and lower document cost. Total repository line count may temporarily rise while parity tests and compatibility façades coexist; that is acceptable when the temporary code has an explicit retirement condition.
 
 ## Completion criteria
 
@@ -495,7 +496,7 @@ Modularisation is complete when:
 - legacy documents use explicit migrations rather than historical live implementations;
 - no import-time monkey-patch chain chooses the active production behaviour;
 - the modular source and distribution artifact cannot drift;
-- validation and performance gates pass for representative workflows.
+- validation and performance checks pass for representative workflows.
 
 ## Open decisions
 

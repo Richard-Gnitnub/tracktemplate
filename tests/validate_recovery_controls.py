@@ -217,12 +217,13 @@ def _validate_static_controls(errors):
         "Independent project-data backup",
         "Operational for the complete declared project-data scope",
         "Passed and owner-accepted for the complete declared scope on 2026-07-22",
-        "Active and verified 2026-07-22",
-        "QA-R01 is closed",
+        "Active and verified again 2026-07-27",
+        "QA-R01 remains closed",
         "retain the initial accepted snapshot plus at least four recent successful",
         "never delete snapshots automatically",
         "restore drill at least monthly",
         "2026-07-22-initial-repository-backup-restore.md",
+        "2026-07-27-pre-phase4-family-support-snapshot.md",
         "git clean",
         "different storage device",
         "restore into a new empty directory",
@@ -238,7 +239,7 @@ def _validate_static_controls(errors):
         if marker not in policy_flat:
             errors.append("recovery policy marker is missing: " + marker)
     for marker in (
-        "## Repository and system safety",
+        "## Repository and System Safety",
         "Never run `git clean`",
         "tools/repository_safety_audit.py",
         "Timeshift system snapshots do not cover",

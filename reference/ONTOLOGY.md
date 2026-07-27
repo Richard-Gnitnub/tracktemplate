@@ -17,8 +17,8 @@ canonical owner whenever it supplies a tighter requirement:
 - [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) owns classifications,
   permissions, package admission and output-status rules.
 - [PROVENANCE.md](PROVENANCE.md) owns source and evidence findings.
-- [PROJECT_PLAN.md](PROJECT_PLAN.md) is the sole live phase, gate, risk and
-  acceptance record.
+- [PROJECT_PLAN.md](PROJECT_PLAN.md) is the live phase dashboard;
+  [current/](current/) owns detailed current evidence, risks and decisions.
 - The versioned [chair-definition](schemas/chair-definition-v1.schema.json) and
   [dependency-manifest](schemas/dependency-manifest-v1.schema.json) schemas own
   their wire structures.

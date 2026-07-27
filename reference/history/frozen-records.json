@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "accepted-frozen-records",
+  "updated_on": "2026-07-27",
+  "records": [
+    {"category": "phase-closeout", "path": "reference/phase-evidence/BASELINE.md", "sha256": "ebbf117a0459ad85501544a0ebf993edbe528af69c9f6fb4d358f1042c871e1b"},
+    {"category": "phase-closeout", "path": "reference/phase-evidence/PHASE1_CLOSEOUT.md", "sha256": "b2be49068364853691ccf9e4e0ce611e7081b1c8b1a0a8b361a263da1da03a73"},
+    {"category": "phase-inventory", "path": "reference/phase-evidence/PHASE1_INVENTORY.md", "sha256": "59a1019ba752df476edb5b0e9fdf80c8b6dbcc567e467a893eafeac4f25e1493"},
+    {"category": "phase-foundation", "path": "reference/phase-evidence/PHASE1_SLICE_SCORECARD.md", "sha256": "f6086f862ddbbeafe6546a993b1233ca4d3b2d3178675932e71a147b0d5c2e9b"},
+    {"category": "phase-foundation", "path": "reference/phase-evidence/PHASE2_FOUNDATION.md", "sha256": "bf9740e4cc928c583ff6b5925ec02df95696e3cf34c495a59965d350bb93afff"},
+    {"category": "phase-closeout", "path": "reference/phase-evidence/PHASE3_TRANSITION_SLICE.md", "sha256": "56b7cc47c67f6001ffaab6e306556f082b0894545fe06fc011fdbe42f9cbdbe8"},
+    {"category": "phase-foundation", "path": "reference/phase-evidence/S1_PILOT_PLAN.md", "sha256": "2fc949e060a57e2369448ccf2f771b5216fbd617a343e7635a35b5658069a057"},
+    {"category": "audit", "path": "reference/QUALITY_ASSURANCE.md", "sha256": "c6a67b15704ce4bc9eb072615043524748e8922dbff724a9f3488011820139f6"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-01.md", "sha256": "099901d286ee7791618fee48a4390090537293e57c15f9d0972bc6750ffdf99c"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md", "sha256": "84dfa419bd608b524027cd78199bf0d9384b8b7a81ba83d687a53d88069a867b"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md", "sha256": "a9e2120a5544c2d5682f916286b430f6a7d8ffbc28a8bb1de831e2e598b9c28b"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001.md", "sha256": "7b631562dd331ee661e002843fa192cca290b549b862be13a17db1447f05c30c"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md", "sha256": "e7d8e058ed923c6aa53e1ffd7abd061c81e75bc473c169c85326cc2899acb1b6"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md", "sha256": "2474aa85ccb278b4ef445802cc124d153d0aab904772fc096f43eb7fe0545e47"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md", "sha256": "66818e6ceb9275ddd5f3bf4e5da4eda8cdda1f9011554d48b701bbde77037193"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md", "sha256": "f62f78955f32acbf1ae637c1064fc83f0a1a874c6f0e6171974b499c512f0aba"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md", "sha256": "45f76007e4fdda1b4c91785f84d18605bcae3c2375766cc371b6a441c856f8a6"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md", "sha256": "5c101cd96c0c55da4482fc270a2f1701fd6141c15479b197ac67526155f8d41d"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-20-b14-straight-station-workflow-series.md", "sha256": "fbc57dce2c0ae7eab08b0f8447c878eeed39870f700756b6b5c897926e61ccb1"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md", "sha256": "b352066a6fdb1b536a662cc862a06aae3f1b3e4f28d48ecb7c4f7b0f245b52de"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md", "sha256": "abc7123da77ecc7bf0a69f219e1b3f99de1970e0c933e0204a90e4dc378c5ede"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md", "sha256": "0c9a2fcb16d83765deec603cf7ad4104175d45dc63050e9915a722db982df288"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md", "sha256": "b4b85e99aa9358c5b64dd5323a1ab3642de8da1192b085bc8658a74b6718f8aa"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-22-b16-transition-performance-profile.md", "sha256": "f9b82a0875d0851bfea4b18b09bd3d939ef445c94dc78a4ad7638c3f4880d7ce"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-22-b16-transition-routed-workflow-parity.md", "sha256": "43326843fc4bf103794e1b260159f5cf7bef6edb9d6a9a908f7be557d5bb8530"}
+  ]
+}

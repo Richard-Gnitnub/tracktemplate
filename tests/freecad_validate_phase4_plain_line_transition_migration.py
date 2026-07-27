@@ -257,25 +257,27 @@ def _exercise_success(
             persistent=True,
         )
         plan = (
-            plain_line_transition_migration.prepare_copied_plain_line_transition_migration(
+            plain_line_transition_migration.execute_copied_plain_line_transition_migration_fixture(
                 source,
                 target,
                 contract,
+                store,
             )
         )
         assert (_history(source), _object_snapshot(source)) == source_before
-        assert _history(target) == target_history_before
         assert _object_snapshot(target, include_canonical=False) == target_legacy_before
         assert plan.source_versions == expected_versions
         assert plan.transition_ids == (
             "SET-001/curve-track/2/transition/entry",
             "SET-001/curve-track/2/transition/exit",
         )
-        assert plan.migration_support_advertised is False
+        assert plan.migration_support_advertised is True
         assert plan.production_output_authorized is False
-        assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
+        assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == (
+            "plain-line-spacing-matched-transition-intent",
+        )
 
-        created = store.create_many(target, plan.states)
+        created = tuple(obj for obj in target.Objects if _is_canonical(obj))
         created_names = tuple(str(obj.Name) for obj in created)
         assert len(created_names) == 2 and len(set(created_names)) == 2
         assert _history(target) == (target_history_before[0] + 1, 0)
@@ -386,7 +388,12 @@ def _exercise_atomic_failure(store, contract, source_path, target_path):
         adapter._write_transition_payload = fail_on_second_payload
         try:
             error = _expect_store_error(
-                lambda: store.create_many(target, plan.states),
+                lambda: plain_line_transition_migration.execute_copied_plain_line_transition_migration_fixture(
+                    source,
+                    target,
+                    contract,
+                    store,
+                ),
                 "transaction-failed",
             )
             assert error.document_mutation is False
@@ -458,8 +465,10 @@ def _validate():
         _close_all_documents()
 
     assert _sha256(B14_FIXTURE_PATH) == B14_FIXTURE_SHA256
-    assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
-    assert plain_line_transition_migration.MIGRATION_SUPPORT_ADVERTISED is False
+    assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == (
+        "plain-line-spacing-matched-transition-intent",
+    )
+    assert plain_line_transition_migration.MIGRATION_SUPPORT_ADVERTISED is True
     assert plain_line_transition_migration.PRODUCTION_OUTPUT_AUTHORIZED is False
 
 

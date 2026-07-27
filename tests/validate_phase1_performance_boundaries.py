@@ -12,7 +12,7 @@ CONTRACT_PATH = (
     ROOT / "reference" / "contracts" / "phase1-performance-boundaries.json"
 )
 EXPECTED_CONTRACT_SHA256 = (
-    "7aa377fdc7e7e1174f5a4ad8da75ee612e9efa8b46f2dd7fb9f3b37976f6ae43"
+    "c71d55141abc1ecb6eb86d9e4daac42c235b04840770dd11fb01ff91b1146ad7"
 )
 SOURCE_EXPECTATIONS = {
     "b14": {
@@ -34,7 +34,7 @@ SOURCE_EXPECTATIONS = {
 EVIDENCE_EXPECTATIONS = {
     "provisional-accumulated-crossover": (
         "reference/benchmarks/2026-07-19-b14-crossover-xo-001.md",
-        "47591d38eac1636d7ab4d283291f0af3d10f912b025b3078bdae48fb66fe3382",
+        "7b631562dd331ee661e002843fa192cca290b549b862be13a17db1447f05c30c",
         "excluded-from-comparison",
     ),
     "b14-crossover-cold-series": (

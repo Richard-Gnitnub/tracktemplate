@@ -43,7 +43,7 @@
   "evidence_reports": {
     "provisional-accumulated-crossover": {
       "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001.md",
-      "sha256": "47591d38eac1636d7ab4d283291f0af3d10f912b025b3078bdae48fb66fe3382",
+      "sha256": "7b631562dd331ee661e002843fa192cca290b549b862be13a17db1447f05c30c",
       "status": "excluded-from-comparison",
       "required_markers": [
         "Status: provisional Phase 0 accumulated-document observation.",

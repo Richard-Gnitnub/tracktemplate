@@ -28,7 +28,10 @@ status requires the Phase 1 lineage audit defined below.
   package-licensing, and output project-status rules.
 - [ARCHITECTURE.md](ARCHITECTURE.md) owns the neutral canonical data model and
   adapter direction.
-- [PROJECT_PLAN.md](PROJECT_PLAN.md) owns the audit timing and release gates.
+- [PROJECT_PLAN.md](PROJECT_PLAN.md) owns phase timing and linked decision
+  summaries; [ENGINEERING_POLICY.md](ENGINEERING_POLICY.md) owns true-gate
+  procedure, and [current/gate-decisions.json](current/gate-decisions.json)
+  owns detailed current decisions.
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) owns the prospective DCO sign-off and
   project data/evidence declaration.
 - [`NOTICE.md`](../NOTICE.md) states the project licence and the clarification

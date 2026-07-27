@@ -76,7 +76,7 @@ Resolve these before choosing syntax or framework.
 - Return structured results and failures; adapters translate them into FreeCAD
   state or operator messages.
 - Keep one authoritative operation behind a cohesive interface. Record every
-  temporary façade or duplicate with an owner and retirement gate.
+  temporary façade or duplicate with an owner and retirement condition.
 - Preserve atomic command, transaction, Undo/Redo, rollback and
   validate-before-mutation behaviour.
 - Version stored and interchange schemas. Reject unknown, future, corrupt or

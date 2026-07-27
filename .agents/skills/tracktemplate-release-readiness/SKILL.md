@@ -13,7 +13,9 @@ separate authority boundaries.
 
 ## Responsibility boundary
 
-- `reference/PROJECT_PLAN.md` owns phase, beta and release-candidate gates.
+- `reference/PROJECT_PLAN.md` owns the phase and exit-status dashboard;
+  `reference/ENGINEERING_POLICY.md` owns true-gate procedure, and the current
+  records own detailed evidence, risks and decisions.
 - `$tracktemplate-freecad-addon-research` supplies current first-party Addon and
   Addon Index guidance when required.
 - `$tracktemplate-changelog` owns user-facing release notes.
@@ -40,8 +42,8 @@ Record:
 
 ## Readiness workflow
 
-1. **Read the gates.** Load only the applicable Phase 10, Phase 11, milestone,
-   risk and current-phase evidence sections.
+1. **Read the authority.** Load only the applicable Phase 10/11 dashboard
+   status, current evidence, risk/decision records and true-gate policy.
 2. **Freeze the candidate boundary.** Reject a moving source tree, unrecorded
    generated payload or artifact assembled from a different state.
 3. **Audit the artifact.** Verify package metadata, version consistency,
@@ -51,14 +53,14 @@ Record:
    first run, representative creation/editing, persistence, migration,
    Validate/Export, GUI interaction, uninstall or rollback, and reinstall or
    upgrade as required by the accepted matrix.
-5. **Check non-functional gates.** Include repeated performance budgets,
+5. **Check non-functional conditions.** Include repeated performance budgets,
    recovery, security-sensitive packaging, documentation usability and
    compatibility evidence where required.
 6. **Prepare communication.** Derive release notes from accepted validated
    changes and retain known limitations, unsupported paths and rights
    boundaries.
-7. **Classify every gate.** Use `PASS`, `BLOCKED` or `CANNOT_VERIFY`; never
-   upgrade a partial, headless or unavailable check.
+7. **Classify every readiness condition.** Use `PASS`, `BLOCKED` or
+   `CANNOT_VERIFY`; never upgrade a partial, headless or unavailable check.
 8. **Require explicit decisions.** Separate technical readiness, version
    acceptance, gate closeout and publication approval.
 
@@ -75,7 +77,7 @@ Record:
 
 ## Report
 
-Report the exact candidate, artifact identity, gate matrix, completed evidence,
-blocked and unverified items, compatibility and rights boundaries, rollback
-readiness, proposed release communication and the explicit owner decisions
-still required.
+Report the exact candidate, artifact identity, readiness matrix, completed
+evidence, blocked and unverified items, compatibility and rights boundaries,
+rollback readiness, proposed release communication and the explicit owner
+decisions still required.

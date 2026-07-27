@@ -132,7 +132,7 @@ def _validate_accepted_windows():
     assert report.foreign_object_count == 1
     assert "B14Settings.OperatorNotesJSON" not in report.json_payload_paths
     assert report.write_authorized is False
-    assert _codes(report) == {"migration-family-not-qualified"}
+    assert _codes(report) == {"whole-document-migration-not-qualified"}
     record = report.to_record()
     assert set(record) == {
         "schema_id",
@@ -237,7 +237,7 @@ def _validate_inspection_only_cases():
     assert _codes(incomplete_report) == {
         "missing-family-role",
         "missing-template-set-identity",
-        "migration-family-not-qualified",
+        "whole-document-migration-not-qualified",
     }
 
 
@@ -361,7 +361,10 @@ def _validate_structure_and_controls():
         "saveAs(",
     ):
         assert forbidden not in source
-    assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
+    assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == (
+        "plain-line-spacing-matched-transition-intent",
+    )
+    assert len(legacy_document.SUPPORTED_MIGRATION_FAMILIES) == 1
     expected_json_properties = None
     for relative in SOURCE_HASHES:
         macro_tree = ast.parse((ROOT / relative).read_text(encoding="utf-8"))
@@ -411,7 +414,9 @@ sys.meta_path.insert(0, Blocked())
 sys.path.insert(0, {root!r})
 from tracktemplate.compatibility import legacy_document
 assert attempted == []
-assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
+assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == (
+    "plain-line-spacing-matched-transition-intent",
+)
 """.format(root=str(ROOT))
     result = subprocess.run(
         [sys.executable, "-I", "-c", script],
@@ -437,8 +442,8 @@ assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
     evidence = (
         ROOT
         / "reference"
-        / "phase-evidence"
-        / "PHASE4_CANONICAL_STATE.md"
+        / "current"
+        / "PHASE_EVIDENCE.md"
     ).read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(encoding="utf-8")
     assert "Legacy-document detection tranche" in evidence

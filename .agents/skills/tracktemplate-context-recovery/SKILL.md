@@ -16,8 +16,9 @@ uncommitted boundary, while excluding unrelated history and duplicated policy.
 - **Hot:** preserve the current request, exact user decisions, dirty paths,
   active failures, validation results and next safe action with minimal
   paraphrase.
-- **Warm:** load the current phase, affected canonical owner, relevant live
-  risks and named open-phase evidence.
+- **Warm:** load the current phase, affected canonical owner,
+  `reference/current/PHASE_EVIDENCE.md` and relevant entries in the current
+  risk/decision registers.
 - **Cold:** leave accepted history, old benchmarks, full inventories, legacy
   source and unrelated phase material unloaded until the task requires them.
 
@@ -26,14 +27,15 @@ uncommitted boundary, while excluding unrelated history and duplicated policy.
 1. State the exact task, affected boundary and facts that must survive
    compression.
 2. Read the root and applicable scoped `AGENTS.md` files.
-3. Read only the relevant parts of `reference/PROJECT_PLAN.md`: its status and
-   roadmap, the current phase gate register, applicable live risks and the link
-   to the open-phase evidence record. Load a closed-phase section only when the
-   task depends on its accepted decision, oracle or historical evidence.
+3. Read only the relevant parts of `reference/PROJECT_PLAN.md`: current phase
+   status, applicable exit-condition status, risk summary, owner decisions and
+   evidence links. Load closed-phase evidence only when the task depends on its
+   accepted decision or oracle.
 4. Read the canonical owner of the affected subject from the `AGENTS.md`
    ownership map.
-5. Read only the task-relevant sections of the named open-phase evidence
-   record.
+5. Read only the task-relevant sections of
+   `reference/current/PHASE_EVIDENCE.md` and the applicable records from
+   `reference/current/risks.json` or `gate-decisions.json`.
 6. Retrieve implementation evidence deterministically. Prefer exact paths,
    identifiers and headings with `rg --files` and `rg`; use ontology concepts
    to expand stable product terms, not to infer live status. Inspect relevant
@@ -95,9 +97,10 @@ Before relying on a compressed or recovered packet:
 
 Record an accepted durable fact in its single canonical owner:
 
-- project-wide phase, gate, risk or acceptance state in
+- phase and exit-condition status plus linked risk/decision summaries in
   `reference/PROJECT_PLAN.md`;
-- current-phase evidence in the one open-phase evidence record;
+- current-phase evidence in `reference/current/PHASE_EVIDENCE.md`;
+- detailed live risks and decisions in the JSON registers beside that file;
 - architecture, policy or procedure in its named canonical document;
 - repeatable agent method in a skill; and
 - an evidenced historical lesson in

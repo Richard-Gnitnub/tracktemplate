@@ -276,8 +276,8 @@ def _validate_evidence_controls():
     evidence = (
         ROOT
         / "reference"
-        / "phase-evidence"
-        / "PHASE4_CANONICAL_STATE.md"
+        / "current"
+        / "PHASE_EVIDENCE.md"
     ).read_text(encoding="utf-8")
     plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(
@@ -293,7 +293,7 @@ def _validate_evidence_controls():
         "**Project-owner decision and date:** **Accepted 2026-07-27**"
         in evidence
     )
-    assert "comparison-route retirement was accepted on 2026-07-27" in plan
+    assert "| D-P4-003 | 2026-07-27 | Accepted |" in plan
     assert "validate_phase4_transition_route_retirement.py" in validation
 
 

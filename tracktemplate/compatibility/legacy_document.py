@@ -1,8 +1,8 @@
 """Read-only B14/B15 legacy-document ingress inspection.
 
-This module implements only the outer compatibility preflight.  It never
-authorises or performs migration: every entity-family migration remains
-blocked until that family has its own accepted Phase 4 fixture.
+This module implements only the outer compatibility preflight.  The exact
+families in ``SUPPORTED_MIGRATION_FAMILIES`` have separate accepted fixtures;
+their presence never qualifies a complete document or authorises a write.
 """
 
 from dataclasses import dataclass
@@ -14,7 +14,9 @@ LEGACY_INSPECTION_SCHEMA_VERSION = 1
 COMPATIBILITY_CONTRACT_ID = (
     "tracktemplate:phase1:runtime-and-legacy-compatibility:1"
 )
-SUPPORTED_MIGRATION_FAMILIES = ()
+SUPPORTED_MIGRATION_FAMILIES = (
+    "plain-line-spacing-matched-transition-intent",
+)
 
 STATUS_SUPPORTED = "supported-migration-source"
 STATUS_INSPECTION_ONLY = "inspection-only"
@@ -612,7 +614,24 @@ def inspect_legacy_document(document, compatibility_contract):
         version_window_status = "accepted"
         status = STATUS_INSPECTION_ONLY
 
-    if owned_names and status != STATUS_BLOCKED:
+    if (
+        owned_names
+        and status != STATUS_BLOCKED
+        and version_window_status == "accepted"
+        and SUPPORTED_MIGRATION_FAMILIES
+    ):
+        findings.append(
+            _finding(
+                "inspection",
+                "whole-document-migration-not-qualified",
+                message=(
+                    "bounded support for {} does not qualify the complete "
+                    "document; every additional entity family and schema still "
+                    "requires accepted Phase 4 evidence"
+                ).format(", ".join(SUPPORTED_MIGRATION_FAMILIES)),
+            )
+        )
+    elif owned_names and status != STATUS_BLOCKED:
         findings.append(
             _finding(
                 "inspection",

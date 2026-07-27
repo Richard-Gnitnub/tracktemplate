@@ -135,7 +135,7 @@ def _validate_accepted_and_reopen(contract, directory):
     assert report.owned_roles == ("ChairAnalysisDisplay", "Settings")
     assert report.foreign_object_count == 1
     assert "B14Settings.OperatorNotesJSON" not in report.json_payload_paths
-    assert _codes(report) == {"migration-family-not-qualified"}
+    assert _codes(report) == {"whole-document-migration-not-qualified"}
 
     path = pathlib.Path(directory) / "legacy-detection-mixed.FCStd"
     document.saveAs(str(path))

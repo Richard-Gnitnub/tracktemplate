@@ -5,9 +5,10 @@ shortening or deleting documentation.
 
 | Information | Canonical owner |
 | --- | --- |
-| Current phase, progress, gates and live risks | `reference/PROJECT_PLAN.md` |
+| Phase and exit-condition status plus risk/decision summaries | `reference/PROJECT_PLAN.md` |
 | Strategic architecture and canonical state | `reference/ARCHITECTURE.md` |
 | Source organisation and dependency direction | `reference/MODULARISATION_PLAN.md` |
+| Proportional change, true gates and documentation lifecycle | `reference/ENGINEERING_POLICY.md` |
 | Validation procedures and evidence interpretation | `reference/VALIDATION.md` |
 | Testing obligations and oracle-change policy | `reference/TESTING_POLICY.md` |
 | Performance measurement | `reference/PERFORMANCE_SOP.md` |
@@ -18,10 +19,11 @@ shortening or deleting documentation.
 | Dated QA audit findings | `reference/QUALITY_ASSURANCE.md` |
 | Historical process lessons | `reference/LEARNING_FROM_EXPERIENCE.md` |
 | Agent skills, invocation and maintenance | `reference/AGENT_WORKFLOWS.md` |
-| Current phase evidence | The one open-phase evidence document named by `reference/PROJECT_PLAN.md` |
+| Current phase evidence | `reference/current/PHASE_EVIDENCE.md` |
+| Detailed live risks and decisions | `reference/current/risks.json` and `reference/current/gate-decisions.json` |
 
-Phase records are grouped under `reference/phase-evidence/`. Accepted
-closeouts, inventories, baselines, contracts and foundation records are
-historical evidence rather than live project-status documents. Preserve their
-dated meaning, and link to the live canonical owner instead of updating them as
-though they owned current status.
+Existing accepted closeouts, inventories, baselines and foundations remain
+frozen at their recorded paths, including `reference/phase-evidence/`.
+`reference/history/` owns the archive policy and receives new closeouts.
+Preserve historical meaning and link to the live canonical owner instead of
+updating frozen records as though they owned current status.

@@ -15,9 +15,12 @@ acceptance or release status.
 
 - `CHANGELOG.md` is user-facing release history. It must not duplicate live
   phase status, tranche evidence, decision rationale or validation detail.
-- `reference/PROJECT_PLAN.md` owns current phases, gates, live risks, release
-  scope and the Phase 11 version/publication decision.
-- The open-phase evidence record owns current tranche evidence.
+- `reference/PROJECT_PLAN.md` owns the phase and exit-status dashboard plus
+  linked risk/decision summaries.
+- `reference/current/PHASE_EVIDENCE.md` owns current tranche evidence; the JSON
+  registers beside it own detailed current risks and decisions.
+- `reference/ENGINEERING_POLICY.md` owns true-gate and release-authority
+  procedure.
 - Canonical reference documents own architecture, compatibility, validation,
   licensing, provenance and other project requirements.
 
@@ -71,7 +74,8 @@ Skip routine internal work unless it changes a supported outcome:
 - tests, fixtures or evidence that only confirm unchanged behaviour;
 - internal refactors, formatting, comments and typo-only documentation;
 - prototypes, unaccepted diffs and reverted unshipped work; and
-- phase progress or risk detail owned by `reference/PROJECT_PLAN.md`.
+- phase progress or current risk detail owned by the current governance
+  records.
 
 Use short, specific descriptions in the project's terminology. Aggregate one
 user-visible outcome across its implementation commits. Keep the standard
