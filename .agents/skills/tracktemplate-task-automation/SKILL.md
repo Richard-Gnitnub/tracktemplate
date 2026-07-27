@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-task-automation
-description: Design or implement safe, deterministic automation for repeated TrackTemplate development, validation, evidence or packaging workflows. Use when recurring manual steps, repeated command construction or repeated repository discovery consume agent time or tokens and a stable workflow can be automated without expanding authority.
+description: Design or implement safe, deterministic automation for repeated TrackTemplate development, CI, validation, evidence or packaging workflows. Use when pipeline orchestration, repeated commands or repeated repository discovery consume agent time or tokens and a stable workflow can be automated without expanding authority. Do not use for a one-off product failure whose cause is not established.
 ---
 
 # TrackTemplate task automation
@@ -40,6 +40,10 @@ requires judgement at each step or would cost more to maintain than it saves.
 4. Define the exact runtime/profile, inputs, outputs, side effects, external
    systems, credentials, concurrency and failure modes.
 5. Capture the current manual result and cost as a repeatable baseline.
+
+Read the [CI validation workflow](references/ci-validation.md) when automation
+runs in a clean checkout, composes the standalone matrix or crosses between
+tracked CI evidence and workstation-only evidence.
 
 ## Design rules
 
@@ -96,6 +100,14 @@ Those are separate external-state and maintenance decisions.
 7. **Validate and review.** Run the applicable standalone, FreeCAD, GUI,
    persistence, export, performance, provenance and recovery checks, then the
    normal quality review.
+
+## Evaluation
+
+When this skill, its description or its resource routing changes, exercise the
+[routing and workflow cases](references/evaluation-cases.md). Check intended
+activation, non-activation and composition using fresh task prompts where the
+environment permits it; static frontmatter validation alone is not evidence
+that routing or task execution works.
 
 ## Report
 

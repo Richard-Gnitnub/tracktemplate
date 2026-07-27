@@ -740,6 +740,35 @@ standalone matrix passed 41/41, and the final read-only diff review found no
 blocking issue. Remote CI remains separately open under QA-R02 until the pushed
 workflow runs.
 
+## CI clean-checkout and skill workflow automation
+
+This Level 2 workflow repair starts from failed GitHub Actions run
+[`30310864619`](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/30310864619)
+at commit `67d8c028c4f663d1029d1c7ceee0cce5194d602c`. Parsing passed, then
+`tests/validate_recovery_controls.py` failed because the generic matrix required
+an ignored workstation-only source archive that a clean checkout cannot
+contain. The failure is classified `fixture-or-harness-defect`, with the
+clean-checkout environment as a contributing cause; no product or safety
+requirement changed.
+
+The retained runner executes every standalone validator and reports all
+failures with a structured sentinel. Its explicit `ci` profile proves tracked
+clean-checkout contracts and expected fail-closed missing-asset behaviour; its
+`local` profile additionally requires the real archive/hash and
+branch/upstream evidence. The task-automation skill now conditionally routes to
+the CI procedure and real routing/evaluation cases, while agent-guidance
+validation enforces the 500-line body budget and direct one-level reference
+links. No duplicate CI skill was added.
+
+Pre-publication evidence: 135 tracked Python/FCMacro files parsed; the focused
+runner, recovery, skill-guidance, progress and QA checks passed; both complete
+profiles passed 42/42; and the `ci` profile also passed 42/42 in the disposable
+clean clone that reproduced the original failure, without the ignored archive.
+No product, FreeCAD, GUI, migration, output or authority boundary changed, and
+the owner pause remains. QA-R02 stays open pending an authorised push, remote
+clean-run evidence, the required deliberate-failure proof and branch
+protection.
+
 ## Current Phase 4 exit-condition disposition
 
 | Exit condition | Current disposition |

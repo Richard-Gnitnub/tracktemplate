@@ -20,6 +20,15 @@ REGISTER_PATH_RE = re.compile(
     re.MULTILINE,
 )
 VALID_NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+ALLOWED_SKILL_ENTRIES = {
+    "SKILL.md",
+    "agents",
+    "assets",
+    "references",
+    "scripts",
+}
+MAX_SKILL_LINES = 500
+RESOURCE_DIRECTORY_NAMES = ("assets", "references", "scripts")
 
 
 def require(condition: bool, message: str) -> None:
@@ -56,7 +65,11 @@ def parse_frontmatter(path: Path, text: str) -> dict[str, str]:
     return fields
 
 
-def markdown_target(document: Path, raw_target: str) -> Path | None:
+def markdown_target(
+    document: Path,
+    raw_target: str,
+    repository_root: Path = ROOT,
+) -> Path | None:
     target = raw_target.strip()
     if target.startswith("<") and ">" in target:
         target = target[1:target.index(">")]
@@ -71,17 +84,103 @@ def markdown_target(document: Path, raw_target: str) -> Path | None:
     target = unquote(target.split("#", 1)[0].split("?", 1)[0])
     require(
         not target.startswith("/"),
-        f"non-portable absolute Markdown target in {document.relative_to(ROOT)}: {target}",
+        (
+            "non-portable absolute Markdown target in "
+            f"{document.relative_to(repository_root)}: {target}"
+        ),
     )
 
     resolved = (document.parent / target).resolve()
     try:
-        resolved.relative_to(ROOT)
+        resolved.relative_to(repository_root)
     except ValueError as error:
         raise AssertionError(
-            f"repository-external Markdown target in {document.relative_to(ROOT)}: {target}"
+            "repository-external Markdown target in "
+            f"{document.relative_to(repository_root)}: {target}"
         ) from error
     return resolved
+
+
+def direct_markdown_targets(
+    document: Path,
+    text: str,
+    repository_root: Path = ROOT,
+) -> set[Path]:
+    """Return repository-local targets linked directly from one document."""
+    targets = set()
+    for raw_target in LINK_RE.findall(text):
+        target = markdown_target(document, raw_target, repository_root)
+        if target is not None:
+            targets.add(target)
+    return targets
+
+
+def validate_skill_line_budget(
+    skill_file: Path,
+    text: str,
+    repository_root: Path = ROOT,
+) -> None:
+    """Require one skill file to remain within its loading budget."""
+    require(
+        len(text.splitlines()) < MAX_SKILL_LINES,
+        (
+            f"{skill_file.relative_to(repository_root)} must remain below "
+            f"{MAX_SKILL_LINES} lines for progressive disclosure"
+        ),
+    )
+
+
+def validate_skill_resource_routing(
+    directory: Path,
+    text: str,
+    repository_root: Path = ROOT,
+) -> None:
+    """Require every bundled resource to be linked directly from SKILL.md."""
+    skill_file = directory / "SKILL.md"
+    linked_targets = direct_markdown_targets(
+        skill_file,
+        text,
+        repository_root,
+    )
+
+    resource_files = []
+    for resource_directory_name in RESOURCE_DIRECTORY_NAMES:
+        resource_root = directory / resource_directory_name
+        if resource_root.is_dir():
+            resource_files.extend(
+                path
+                for path in resource_root.rglob("*")
+                if path.is_file()
+            )
+
+    references_root = directory / "references"
+    nested_references = [
+        path
+        for path in resource_files
+        if references_root in path.parents and path.parent != references_root
+    ]
+    require(
+        not nested_references,
+        "skill references must remain one filesystem level from SKILL.md:\n"
+        + "\n".join(
+            path.relative_to(repository_root).as_posix()
+            for path in sorted(nested_references)
+        ),
+    )
+
+    unlinked_resources = [
+        path
+        for path in resource_files
+        if path.resolve() not in linked_targets
+    ]
+    require(
+        not unlinked_resources,
+        "skill resource is not linked directly from SKILL.md:\n"
+        + "\n".join(
+            path.relative_to(repository_root).as_posix()
+            for path in sorted(unlinked_resources)
+        ),
+    )
 
 
 def validate_links(documents: list[Path]) -> None:
@@ -129,6 +228,20 @@ def main() -> None:
             name == directory.name,
             f"skill name {name!r} does not match directory {directory.name!r}",
         )
+        validate_skill_line_budget(skill_file, text)
+        unexpected_entries = sorted(
+            path.name
+            for path in directory.iterdir()
+            if path.name not in ALLOWED_SKILL_ENTRIES
+        )
+        require(
+            not unexpected_entries,
+            (
+                f"{directory.relative_to(ROOT)} has unsupported skill entries: "
+                + ", ".join(unexpected_entries)
+            ),
+        )
+        validate_skill_resource_routing(directory, text)
         names.append(name)
         markdown_documents.extend(sorted(directory.rglob("*.md")))
 

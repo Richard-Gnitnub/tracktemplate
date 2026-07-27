@@ -33,9 +33,4 @@ jobs:
         run: python tools/validate_python_syntax.py
 
       - name: Run standalone tests and repository contracts
-        shell: bash
-        run: |
-          set -euo pipefail
-          for test_file in tests/validate_*.py; do
-            python "$test_file"
-          done
+        run: python tools/run_standalone_validators.py --profile ci

@@ -383,7 +383,10 @@ def _validate_ci_workflow() -> None:
     _require("permissions:\n  contents: read" in workflow, "CI lacks least permissions")
     _require("persist-credentials: false" in workflow, "checkout credentials persist")
     _require("tools/validate_python_syntax.py" in workflow, "CI omits syntax parsing")
-    _require("tests/validate_*.py" in workflow, "CI omits the standalone matrix")
+    _require(
+        "tools/run_standalone_validators.py --profile ci" in workflow,
+        "CI omits the explicit clean-checkout standalone matrix",
+    )
     pins = re.findall(r"uses: actions/[a-z-]+@([0-9a-f]{40})", workflow)
     _require(len(pins) == 2, "official CI actions must be pinned to two full SHAs")
     _require("timeout-minutes:" in workflow, "CI job lacks a timeout")

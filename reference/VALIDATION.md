@@ -152,9 +152,24 @@ format-appropriate semantic metrics.
 Run from the repository root.
 
 The tracked [standalone CI workflow](../.github/workflows/ci.yml) runs on pushes
-to `main` and pull requests. It parses every tracked Python/macro source and
-runs every `tests/validate_*.py` check, which includes contracts, dependency
-direction, frozen hashes, Markdown links and current-project consistency.
+to `main` and pull requests. It parses every tracked Python/macro source, then
+runs every `tests/validate_*.py` check through the complete-run standalone
+runner. The runner continues after a failed validator and emits a structured
+summary so one run exposes all observed failures.
+
+Use the same explicit profiles locally:
+
+```bash
+.venv/bin/python tools/run_standalone_validators.py --profile ci
+.venv/bin/python tools/run_standalone_validators.py --profile local
+```
+
+The `ci` profile proves deterministic tracked contracts in a clean checkout.
+It tests that a missing ignored critical asset fails closed, but does not
+pretend the asset is available. The `local` profile additionally requires the
+workstation-only archive, hash, branch and upstream evidence. Neither profile
+substitutes for selected FreeCAD, GUI, backup/restore, output or owner-decision
+evidence.
 
 Run the same source parser locally when diagnosing a syntax failure:
 
@@ -435,14 +450,18 @@ Repository recovery and ignored-data safety controls:
 ```bash
 .venv/bin/python tools/repository_safety_audit.py
 .venv/bin/python tests/validate_recovery_controls.py
+.venv/bin/python tests/validate_recovery_controls.py --live-workstation
 ```
 
 The audit is read-only and performs no network operation. It reports clean and
 pushed checkpoint state from local remote-tracking refs, verifies the ignored
 Templot source archive, inventories local generated-data roots and fails closed
 when a requested backup target is absent, inside the repository or on the same
-mounted filesystem. Passing the validator proves the control behaves as
-declared; it does not claim that an independent backup or restore exists.
+mounted filesystem. The default validator proves deterministic control
+behaviour, including rejection of a clean fixture without the archive. The
+`--live-workstation` profile additionally proves the current checkout's ignored
+archive/hash and branch/upstream boundary. Neither result claims that an
+independent backup or restore exists.
 
 Before a risky tranche, fetch explicitly when remote state might have changed,
 then require a clean pushed checkpoint:

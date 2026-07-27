@@ -59,6 +59,32 @@ Measure with:
 wc -c AGENTS.md
 ```
 
+## Progressive disclosure and composition
+
+TrackTemplate uses the three skill-loading layers deliberately:
+
+1. **Discovery metadata:** `name` and `description` state what the skill does
+   and when it should activate. Include concrete project/task concepts; add a
+   negative boundary only where a real routing overlap exists.
+2. **Triggered procedure:** `SKILL.md` contains the cohesive workflow,
+   load-bearing gotchas and resource-selection rules needed on every activation.
+   Keep it below 500 lines and avoid generic knowledge the agent already has.
+3. **Conditional resources:** focused references, deterministic scripts and
+   output assets load only when their named condition applies. Link every file
+   directly from `SKILL.md`; a directory link or another resource is not a
+   substitute. Keep references one filesystem level deep.
+
+The project uses the portable `name`/`description` frontmatter core supported by
+the current Codex validator. Optional fields from the wider Agent Skills
+specification are not added unless the active client and a project need justify
+them.
+
+A skill packages a repeatable procedure, not one tool call. Compose several
+skills when a task crosses coherent responsibilities; do not mirror each CLI,
+MCP endpoint or script as a separate skill. Put deterministic operations in
+tested scripts and leave scope, evidence interpretation and authority decisions
+visible to the agent and project owner.
+
 ## Current skill register
 
 ### `tracktemplate-architecture-review`
@@ -194,6 +220,8 @@ workflow creates measurable operator or agent toil. It prefers existing tools,
 keeps judgement and approvals explicit, and requires deterministic,
 idempotent, recoverable evidence. It does not authorise unattended schedulers,
 watchers, hooks, external services, destructive mutation or new dependencies.
+Its conditional CI reference separates clean-checkout contracts from
+workstation-only evidence and defines the failed-run repair loop.
 
 ### `tracktemplate-performance-engineering`
 
@@ -728,6 +756,8 @@ script or runtime package was copied or installed by this review.
 | [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Adapt its documentation-drift audit, changelog curation and bounded simplification ideas through the corresponding local skills, while preserving TrackTemplate's canonical owners, frozen evidence and release gates. Adapt explain-diff's visual idea into a separate read-only explanation skill whose sanitised HTML exists only in temporary storage and is never production evidence. Do not install its router, auto-formatter, mutation hooks, `docs/plans/` or `docs/chronicles/` model, and do not grant changelog, simplification or explanation work automatic commit, tag, bulk-rewrite or release authority. |
 | [`seb1n/awesome-ai-agent-skills`](https://github.com/seb1n/awesome-ai-agent-skills/tree/a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd), `a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd`, MIT | Broad catalogue of generic instruction skills | Use only as a discovery source and admit each idea after project-specific review. Adapt stable-workflow automation without generic schedulers, watchers, destructive moves or new dependencies; adapt licence analysis through the existing fail-closed source/data/media/output controls without categorical legal conclusions; and adapt the complete API/integration group into one local contract skill. Its conditional network reference covers client resilience, OAuth, webhooks and GraphQL without assuming REST, installing an SDK or service, or loading network guidance for ordinary Python/FreeCAD boundaries. From the code-and-development group, admit only systematic debugging as a separate causal-investigation skill. Code documentation, review, refactoring and testing duplicate stronger local skills; generic version-control guidance conflicts with repository recovery and Git-authority controls. Embedding/vector retrieval infrastructure remains unjustified. |
 | [`pydantic/pydantic-ai`](https://github.com/pydantic/pydantic-ai/tree/ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5), `ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5`, MIT | Python agent framework repository with root/scoped instructions and project-specific skills | Adapt its context-first, responsibility-to-project and patch-as-evidence patterns. TrackTemplate already supplies the corresponding authority map and local skills; add scoped `AGENTS.md` only where a directory has genuinely different rules. Do not add the Pydantic AI package as a TrackTemplate or FreeCAD runtime dependency without a separately approved in-product agent capability and compatibility, security, data, cost and validation evidence. |
+| A B Vijay Kumar, [Deep Dive SKILL.md Part 1](https://abvijaykumar.medium.com/deep-dive-skill-md-part-1-2-09fc9a536996) (published 2026-03-17) and [Part 2](https://abvijaykumar.medium.com/getting-deep-agents-to-work-with-skill-md-part-2-2-a65707eb5131) (published 2026-03-21), mutable web pages retrieved 2026-07-27, no reusable-content licence relied upon | Expository architecture and worked skill-building example, not project or platform authority | Adapt progressive disclosure, precise routing descriptions, conditional references, deterministic scripts, actionable diagnostics, validation loops and real-task iteration. No prose, sample code, dependencies, optional frontmatter or external package was copied. The unpinned pages remain research inputs only. |
+| [Agent Skills specification](https://agentskills.io/specification) and [creator best practices](https://agentskills.io/skill-creation/best-practices), live open-standard pages retrieved 2026-07-27 | Primary format and design guidance; client support still varies | Enforce the below-500-line `SKILL.md` budget, direct one-level resource routing and real-task evaluation. Retain the current Codex-compatible two-field frontmatter subset, prefer project-specific gotchas over generic teaching, and do not create one skill per tool. |
 
 ## Agent-guidance validation
 
@@ -746,13 +776,20 @@ run:
 .venv/bin/python tests/validate_agent_guidance.py
 ```
 
-The validator checks skill frontmatter, directory/name agreement, local links,
-the skill register and root routing. It does not judge whether a skill's
-instructions are substantively correct or whether project validation passed.
+The validator checks skill frontmatter, directory/name agreement, the
+below-500-line `SKILL.md` budget, direct routing for every reference, script and
+asset file, one-level reference layout, local links, the skill register and root
+routing. It does not judge whether a skill's instructions are substantively
+correct, route correctly under a model or prove project validation.
 
 ## Skill maintenance rules
 
 - Give each skill one repeatable job and a concise trigger description.
+- Ground new or revised skills in a real TrackTemplate task, correction,
+  failure, contract or review pattern rather than generic advice.
+- Put what the skill does and when it activates in the description. Add
+  non-activation wording only for evidenced overlap; metadata consumes shared
+  discovery context.
 - Default to instruction-only. Add scripts only when the task is deterministic,
   reviewable, safe on a dirty working tree and materially better than existing
   project tools.
@@ -761,11 +798,18 @@ instructions are substantively correct or whether project validation passed.
 - Do not add MCP merely because a skill exists. MCP is appropriate only when the
   workflow needs controlled access to an external system or live data source.
 - Link to the canonical project document rather than copying its detailed rules.
+- Link every conditional resource file directly from `SKILL.md`, state when to
+  load or execute it, and keep references one filesystem level deep. A link to
+  a directory or from another resource does not establish direct reachability.
 - Treat new skill behaviour as repository guidance: review it like code, keep the
   diff narrow and run the documentation, link and agent-guidance controls.
 - Keep the skill register aligned with the directories under `.agents/skills/`.
 - Do not allow two skills to claim the same primary responsibility without
   clearly defining their order and boundary.
+- For a new skill or material trigger/workflow change, exercise natural prompts
+  that should activate, should not activate and should compose. Inspect the
+  execution path as well as the final answer; static validation is necessary
+  but not a routing or output-quality evaluation.
 - When a skill uncovers a durable project lesson, append it to
   `reference/LEARNING_FROM_EXPERIENCE.md` only after the lesson has evidence and
   leads to an accepted reusable adaptation.

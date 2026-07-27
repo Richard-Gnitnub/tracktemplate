@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Validate the recovery policy and read-only repository safety audit."""
+"""Validate deterministic recovery controls and optional workstation evidence."""
 
+import argparse
 import ast
 import json
 import pathlib
@@ -206,6 +207,52 @@ def _validate_live_audit(errors):
         errors.append("missing independent backup target did not fail closed")
 
 
+def _validate_missing_critical_asset(errors):
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-missing-critical-asset-"
+    ) as temporary:
+        repository = _git_fixture(pathlib.Path(temporary))
+        report = safety.audit_repository(repository.resolve())
+        source = next(
+            item
+            for item in report["local_assets"]
+            if item["path"] == safety.SOURCE_ARCHIVE_PATH.as_posix()
+        )
+        expected_finding = (
+            "required-local-asset-missing:"
+            + safety.SOURCE_ARCHIVE_PATH.as_posix()
+        )
+        if (
+            source["present"]
+            or report["readiness"]["critical_assets_ready"]
+            or expected_finding not in report["findings"]
+        ):
+            errors.append("missing critical asset did not fail closed")
+
+        result = _run(
+            [
+                sys.executable,
+                str(TOOL_PATH),
+                "--root",
+                str(repository),
+                "--require-critical-assets",
+            ],
+            cwd=ROOT,
+            check=False,
+        )
+        records = [
+            line[len(safety.SENTINEL):]
+            for line in result.stdout.splitlines()
+            if line.startswith(safety.SENTINEL)
+        ]
+        if result.returncode != 1 or len(records) != 1:
+            errors.append("critical-asset CLI did not reject a clean fixture")
+        elif json.loads(records[0])["requested_requirements"][
+            "critical_assets"
+        ]:
+            errors.append("critical-asset CLI overstated fixture readiness")
+
+
 def _validate_static_controls(errors):
     policy = POLICY_PATH.read_text(encoding="utf-8")
     agents = AGENTS_PATH.read_text(encoding="utf-8")
@@ -281,11 +328,13 @@ def _validate_static_controls(errors):
         )
 
 
-def validate():
+def validate(include_live_workstation=False):
     errors = []
     _validate_repository_state(errors)
     _validate_backup_assessment(errors)
-    _validate_live_audit(errors)
+    _validate_missing_critical_asset(errors)
+    if include_live_workstation:
+        _validate_live_audit(errors)
     _validate_static_controls(errors)
     try:
         safety.audit_repository(pathlib.Path.home())
@@ -298,5 +347,19 @@ def validate():
     print("Repository recovery and backup controls validation passed")
 
 
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--live-workstation",
+        action="store_true",
+        help=(
+            "also require this checkout's ignored source archive, main branch "
+            "and origin/main workstation evidence"
+        ),
+    )
+    arguments = parser.parse_args(argv)
+    validate(include_live_workstation=arguments.live_workstation)
+
+
 if __name__ == "__main__":
-    validate()
+    main()
