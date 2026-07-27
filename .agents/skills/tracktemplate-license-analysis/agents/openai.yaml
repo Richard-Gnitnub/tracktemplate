@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Licence Analysis"
+  short_description: "Analyse licence evidence and compliance boundaries"
+  default_prompt: "Use $tracktemplate-license-analysis to assess the licence and provenance implications of this TrackTemplate dependency."

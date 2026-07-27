@@ -83,6 +83,17 @@ distinguishes guidance from runtime fact, and maps the result to the owning
 TrackTemplate document and ontology boundary without turning upstream advice
 into a project decision.
 
+### `tracktemplate-license-analysis`
+
+Path: `.agents/skills/tracktemplate-license-analysis/SKILL.md`
+
+Use it to analyse exact licence, provenance and rights evidence for source,
+dependencies, data, media, packages and generated output. It separates
+copyright licensing from data, design, patent, trade-mark, contract and
+contributor-authority questions, preserves unknowns and routes legal
+interpretation to professional review. It cannot itself confer
+`project-cleared` status or legal clearance.
+
 ### `tracktemplate-python-writing`
 
 Path: `.agents/skills/tracktemplate-python-writing/SKILL.md`
@@ -91,6 +102,37 @@ Use it whenever creating or materially editing Python or FCMacro source. It
 applies PEP 8 and PEP 257 as the writing baseline while preserving railway
 behaviour, qualified FreeCAD compatibility, frozen B14/B15 evidence, public and
 persisted identifiers, diagnostics and narrow diffs.
+
+### `tracktemplate-api-design`
+
+Path: `.agents/skills/tracktemplate-api-design/SKILL.md`
+
+Use it before adding or changing a supported Python API, application command,
+FreeCAD boundary, persistence/package schema, exporter contract or accepted
+HTTP interface. It defines consumers, units, identities, errors, side effects,
+compatibility, migration and evidence before implementation, without turning
+internal helpers into public APIs or assuming a REST service exists.
+
+### `tracktemplate-task-automation`
+
+Path: `.agents/skills/tracktemplate-task-automation/SKILL.md`
+
+Use it when a stable repeated development, validation, evidence or packaging
+workflow creates measurable operator or agent toil. It prefers existing tools,
+keeps judgement and approvals explicit, and requires deterministic,
+idempotent, recoverable evidence. It does not authorise unattended schedulers,
+watchers, hooks, external services, destructive mutation or new dependencies.
+
+### `tracktemplate-simplify`
+
+Path: `.agents/skills/tracktemplate-simplify/SKILL.md`
+
+Use it to run a bounded simplification pass over source, tests, documentation or
+agent guidance after establishing the preserved behaviour and evidence
+boundary. It removes only proven accidental complexity and routes material
+edits through the applicable writing, validation and quality skills. It does
+not authorise changed railway behaviour, weaker validation, frozen-identifier
+migration or broad cleanup.
 
 ### `tracktemplate-documentation-review`
 
@@ -120,6 +162,16 @@ or agent-guidance changes. It classifies verified, stale, contradictory,
 duplicated, orphaned and unverified claims before making narrow corrections.
 It does not rewrite accepted requirements to match code, update frozen history
 to current state or perform automatic corpus cleanup.
+
+### `tracktemplate-changelog`
+
+Path: `.agents/skills/tracktemplate-changelog/SKILL.md`
+
+Use it to add or derive concise user-facing unreleased notes and to prepare a
+version section only after the project-owner release gate and version decision.
+It verifies Git-discovered candidates against canonical authority and completed
+evidence; it does not duplicate live phase status, infer acceptance, edit
+version files, commit, tag, push or publish.
 
 ### `tracktemplate-change-validation`
 
@@ -163,7 +215,7 @@ completion of a non-trivial source or documentation change, and after a
 classified failed-test repair. It judges the change using the available
 evidence; it does not replace the validation skill.
 
-All seven skills are deliberately instruction-only. They do not perform
+All twelve skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
@@ -181,7 +233,23 @@ $tracktemplate-freecad-addon-research
 ```
 
 ```text
+$tracktemplate-license-analysis
+```
+
+```text
 $tracktemplate-python-writing
+```
+
+```text
+$tracktemplate-api-design
+```
+
+```text
+$tracktemplate-task-automation
+```
+
+```text
+$tracktemplate-simplify
 ```
 
 ```text
@@ -190,6 +258,10 @@ $tracktemplate-documentation-review
 
 ```text
 $tracktemplate-documentation-alignment
+```
+
+```text
+$tracktemplate-changelog
 ```
 
 ```text
@@ -236,6 +308,32 @@ $tracktemplate-change-validation
 $tracktemplate-quality-review
 ```
 
+For an API or schema change:
+
+```text
+$tracktemplate-api-design
+    ↓
+$tracktemplate-freecad-addon-research when the boundary is FreeCAD-specific
+    ↓
+$tracktemplate-python-writing during implementation
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For retained task automation:
+
+```text
+$tracktemplate-task-automation
+    ↓
+$tracktemplate-python-writing
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
 For a material documentation change:
 
 ```text
@@ -252,6 +350,42 @@ For a documentation-alignment task:
 $tracktemplate-documentation-alignment
     ↓
 $tracktemplate-documentation-review during material corrections
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For a bounded simplification:
+
+```text
+$tracktemplate-simplify
+    ↓
+$tracktemplate-python-writing or $tracktemplate-documentation-review
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For a material changelog update:
+
+```text
+$tracktemplate-changelog
+    ↓
+$tracktemplate-documentation-review
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For a licence, provenance or output-use assessment:
+
+```text
+$tracktemplate-license-analysis
+    ↓
+$tracktemplate-documentation-review when canonical records change
     ↓
 $tracktemplate-change-validation
     ↓
@@ -320,8 +454,8 @@ script or runtime package was copied or installed by this review.
 
 | Source and reviewed revision | Classification | TrackTemplate decision |
 | --- | --- | --- |
-| [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Adapt its documentation-drift audit through the local alignment skill, while preserving TrackTemplate's canonical owners and frozen evidence. Do not install its router, auto-formatter, `docs/plans/` or `docs/chronicles/` model: those introduce executable mutation and overlapping document owners and approval semantics. |
-| [`seb1n/awesome-ai-agent-skills`](https://github.com/seb1n/awesome-ai-agent-skills/tree/a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd), `a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd`, MIT | Broad catalogue of generic instruction skills | Use only as a discovery source. Admit a skill individually after project-specific review; do not bulk-copy the catalogue. Generic code review overlaps the local quality skill, while its context-retrieval workflow assumes embedding and vector-database infrastructure that this repository does not require. |
+| [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Adapt its documentation-drift audit, changelog curation and bounded simplification ideas through the corresponding local skills, while preserving TrackTemplate's canonical owners, frozen evidence and release gates. Do not install its router, auto-formatter, mutation hooks, `docs/plans/` or `docs/chronicles/` model, and do not grant changelog or simplification work automatic commit, tag, bulk-rewrite or release authority. |
+| [`seb1n/awesome-ai-agent-skills`](https://github.com/seb1n/awesome-ai-agent-skills/tree/a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd), `a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd`, MIT | Broad catalogue of generic instruction skills | Use only as a discovery source and admit each idea after project-specific review. Adapt stable-workflow automation without generic schedulers, watchers, destructive moves or new dependencies; adapt licence analysis through the existing fail-closed source/data/media/output controls without categorical legal conclusions; and adapt API contract design to Python, FreeCAD, persistence, package and exporter boundaries without assuming REST. Generic code review overlaps the local quality skill, while embedding/vector retrieval infrastructure remains unjustified. |
 | [`pydantic/pydantic-ai`](https://github.com/pydantic/pydantic-ai/tree/ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5), `ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5`, MIT | Python agent framework repository with root/scoped instructions and project-specific skills | Adapt its context-first, responsibility-to-project and patch-as-evidence patterns. TrackTemplate already supplies the corresponding authority map and local skills; add scoped `AGENTS.md` only where a directory has genuinely different rules. Do not add the Pydantic AI package as a TrackTemplate or FreeCAD runtime dependency without a separately approved in-product agent capability and compatibility, security, data, cost and validation evidence. |
 
 ## Agent-guidance validation

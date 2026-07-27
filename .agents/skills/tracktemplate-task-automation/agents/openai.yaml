@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Task Automation"
+  short_description: "Automate stable workflows with fail-safe controls"
+  default_prompt: "Use $tracktemplate-task-automation to assess and automate this repeated TrackTemplate workflow safely."

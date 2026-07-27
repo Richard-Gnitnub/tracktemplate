@@ -15,10 +15,19 @@
 - `reference/AGENT_WORKFLOWS.md` defines the repository's agent-skill strategy.
   Use `$tracktemplate-python-writing` when creating or materially editing Python
   or FCMacro source.
+  Use `$tracktemplate-api-design` before adding or changing a supported API,
+  schema, command or compatibility contract.
+  Use `$tracktemplate-task-automation` when a stable repeated workflow can be
+  automated safely.
+  Use `$tracktemplate-simplify` for a bounded, behaviour-preserving complexity
+  reduction.
   Use `$tracktemplate-documentation-review` when creating or materially editing
   Markdown documentation. Use `$tracktemplate-documentation-alignment` when
   repository documentation may have drifted from authority or implementation
-  evidence. Use `$tracktemplate-freecad-addon-research` when
+  evidence. Use `$tracktemplate-changelog` when curating user-facing release
+  notes. Use `$tracktemplate-license-analysis` before admitting third-party
+  material or changing licence, provenance or output-use claims. Use
+  `$tracktemplate-freecad-addon-research` when
   extracting current first-party FreeCAD Addon guidance before planning or
   implementation. Use `$tracktemplate-change-validation` to select, run and
   report the applicable evidence for a non-trivial change. Use

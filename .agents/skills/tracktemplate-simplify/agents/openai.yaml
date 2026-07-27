@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Simplification"
+  short_description: "Reduce complexity without behavioural drift"
+  default_prompt: "Use $tracktemplate-simplify to simplify this bounded TrackTemplate target while preserving its verified behaviour."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Changelog"
+  short_description: "Curate evidence-backed user-facing release notes"
+  default_prompt: "Use $tracktemplate-changelog to prepare concise, evidence-backed release notes for TrackTemplate."
