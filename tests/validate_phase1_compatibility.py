@@ -19,7 +19,7 @@ from tools import runtime_compatibility_probe  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "f6e9617370f0dc19ffc10cf4593258659d54aabf5d470bb4194a2b51a3fd9cc2"
+    "76e2b6ddba3c3194a2e284770edb8366a6aa4ea98226d80662dacecf8f106bec"
 )
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",

@@ -9,7 +9,7 @@ is closed and Phase 1 is current.
 
 ## Purpose
 
-This record identifies the exact pre-modular source, environment, validations, exclusions, and known gaps. It is evidence for Phase 0 of [PROJECT_PLAN.md](PROJECT_PLAN.md), not a claim that every operator workflow is already covered.
+This record identifies the exact pre-modular source, environment, validations, exclusions, and known gaps. It is evidence for Phase 0 of [PROJECT_PLAN.md](../PROJECT_PLAN.md), not a claim that every operator workflow is already covered.
 
 ## Repository starting point
 
@@ -39,7 +39,7 @@ The benchmark/tooling and testing-policy checkpoint was committed as `7379eb4`
 
 B15 passed the bounded representative GUI, reuse, solid-equivalence and
 save/reopen qualification in
-[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](../benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
 The project owner accepted that qualification on 2026-07-19. B15 is now the
 behavioural reference for Phase 1; B14 remains immutable as the legacy
 comparison oracle and is not retired. File hashes must be recalculated if
@@ -71,7 +71,7 @@ During Phase 0, the documented FreeCAD command was found to exit successfully wi
 | FreeCAD Flatpak commit | `2d9baee388a50345bd8eaf47f9e74885267951c0cf0dab7e261d499fa428153f` |
 | Flatpak runtime | `org.kde.Platform/x86_64/6.10` |
 
-Available memory and process state vary between runs. Performance reports must still capture the fresh process/document/cache state required by [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md).
+Available memory and process state vary between runs. Performance reports must still capture the fresh process/document/cache state required by [PERFORMANCE_SOP.md](../PERFORMANCE_SOP.md).
 
 ## Automated validation results
 
@@ -139,7 +139,7 @@ save/close/reopen. The real manager, top view and FreeCAD window were captured,
 and the source B14 FCStd remained byte-for-byte unchanged.
 
 The sanitised evidence and raw-artifact hashes are recorded in
-[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](../benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
 The observed B15 actions still took 116–159 seconds and save/reopen took 260
 seconds; these timings are explicitly rejected as human-use budgets.
 
@@ -173,13 +173,13 @@ No ignored file is deleted. If an ignored path later becomes intentional source 
 
 The full evidence, conservative source-relationship classification,
 redistribution status, upstream links, and accepted decision are recorded in
-[PROVENANCE.md](PROVENANCE.md). The macro explicitly cites named Templot5 units,
+[PROVENANCE.md](../PROVENANCE.md). The macro explicitly cites named Templot5 units,
 routines, rules, tables, and source-dimensional data, so it is not currently
 classified as a clean-room independent implementation.
 
 The project owner selected **GPL-3.0-or-later**. The repository-root
-[`LICENSE`](../LICENSE) contains the complete GPLv3 text, and
-[`NOTICE.md`](../NOTICE.md) applies the licence, preserves
+[`LICENSE`](../../LICENSE) contains the complete GPLv3 text, and
+[`NOTICE.md`](../../NOTICE.md) applies the licence, preserves
 the Templot5 source-basis attribution, and gives particular thanks to Martin
 Wynne and Steve Cornford. The ZIP remains ignored and untracked by choice, not
 because its source or upstream licence is now unknown.
@@ -191,12 +191,12 @@ or a conclusion about derivative-work status.
 
 Status: **COMPLETE FOR THE DEFINED B14 `XO-001` PERFORMANCE SCOPE — like-for-like three-run cold-process and three-iteration unchanged-result warm-reuse series are preserved, along with one earlier accumulated-document observation. The local bridge and fixture are reconstructable from tracked inputs. This is not whole-product pipeline coverage.**
 
-The supplied Crossover `XO-001` report and derived arithmetic are recorded in [benchmarks/2026-07-19-b14-crossover-xo-001.md](benchmarks/2026-07-19-b14-crossover-xo-001.md). It reports 1,980.77 seconds across nine entries from a long-lived document without a fresh process or timing reset. It includes repeated 3D preparation and bounded-support actions, with no intervening parameter changes reported. Treat it as evidence of accumulated-document behaviour, not a controlled cold/warm benchmark or a benchmark of the complete curve-to-export product pipeline.
+The supplied Crossover `XO-001` report and derived arithmetic are recorded in [benchmarks/2026-07-19-b14-crossover-xo-001.md](../benchmarks/2026-07-19-b14-crossover-xo-001.md). It reports 1,980.77 seconds across nine entries from a long-lived document without a fresh process or timing reset. It includes repeated 3D preparation and bounded-support actions, with no intervening parameter changes reported. Treat it as evidence of accumulated-document behaviour, not a controlled cold/warm benchmark or a benchmark of the complete curve-to-export product pipeline.
 
-The first controlled run is recorded in [benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-01.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-01.md). A fresh isolated FreeCAD 1.1.1 process opened a nine-object copy of the fixed B14 default two-track curve, placed `XO-001` between Main Track and Track 2 at Host A chainage 746.298 mm, and completed geometry, timbering, chair analysis, bounded support, 2D fit, integration and 3D chair preparation. All post-stage domain assertions passed. B14 recorded 695.262 seconds and +445.7 MB RSS; the external controller recorded 714.987 seconds from pre-open snapshot through reporting, save and final inventory, with process RSS increasing from 488.234 MB to 1083.188 MB.
+The first controlled run is recorded in [benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-01.md](../benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-01.md). A fresh isolated FreeCAD 1.1.1 process opened a nine-object copy of the fixed B14 default two-track curve, placed `XO-001` between Main Track and Track 2 at Host A chainage 746.298 mm, and completed geometry, timbering, chair analysis, bounded support, 2D fit, integration and 3D chair preparation. All post-stage domain assertions passed. B14 recorded 695.262 seconds and +445.7 MB RSS; the external controller recorded 714.987 seconds from pre-open snapshot through reporting, save and final inventory, with process RSS increasing from 488.234 MB to 1083.188 MB.
 
 The like-for-like current-controller cold series is recorded in
-[benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md).
+[benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md](../benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md).
 Its three internal B14 totals were 686.691, 680.027 and 679.098 seconds, with a
 median of 680.027 seconds and range of 7.593 seconds. Complete controller
 intervals were 707.246, 700.818 and 698.573 seconds, with a median of 700.818
@@ -207,7 +207,7 @@ is excluded from those series statistics because its outer evidence-capture
 boundary predates the current controller.
 
 The unchanged-result series is recorded in
-[benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md).
+[benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md](../benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md).
 A fresh isolated process opened the completed cold-run document, validated its
 27-object and 119-solid state, performed one excluded warm-up, then measured
 the real **Generate supported chair solids** panel action three times. Every
@@ -226,7 +226,7 @@ tools/freecad_bridge/run-b14-cold
 tools/freecad_bridge/run-b14-warm --base benchmark-output/freecad-bridge/runs/<cold-run-id>/b14-crossover.FCStd
 ```
 
-The bridge and exact recipe are documented in [`tools/freecad_bridge/README.md`](../tools/freecad_bridge/README.md). The third-party checkout and FCStd remain ignored local artifacts, but tracked tooling now recreates them: `setup-freecad-cli` pins and verifies the reviewed six-file patch with 22 focused tests, and `build-b14-base` constructs the default two-centreline document in an empty isolated FreeCAD session without operator clicks. The builder records binary and semantic manifests and refuses overwrites.
+The bridge and exact recipe are documented in [`tools/freecad_bridge/README.md`](../../tools/freecad_bridge/README.md). The third-party checkout and FCStd remain ignored local artifacts, but tracked tooling now recreates them: `setup-freecad-cli` pins and verifies the reviewed six-file patch with 22 focused tests, and `build-b14-base` constructs the default two-centreline document in an empty isolated FreeCAD session without operator clicks. The builder records binary and semantic manifests and refuses overwrites.
 
 An independent regeneration produced a 636,344-byte FCStd with binary SHA-256
 `0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.

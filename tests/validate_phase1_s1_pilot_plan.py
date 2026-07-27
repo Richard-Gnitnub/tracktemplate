@@ -15,7 +15,9 @@ sys.path.insert(0, str(ROOT))
 from tools import validate_dependency_manifest as manifest_validator  # noqa: E402
 
 
-PLAN_PATH = ROOT / "reference" / "S1_PILOT_PLAN.md"
+PLAN_PATH = (
+    ROOT / "reference" / "phase-evidence" / "S1_PILOT_PLAN.md"
+)
 MANIFEST_PATH = (
     ROOT / "reference" / "manifests" / "s1-chair-pilot.dependency-manifest.json"
 )
@@ -268,7 +270,10 @@ def validate_plan(
         )
         if chair_schema.exists():
             phase4_evidence = (
-                ROOT / "reference" / "PHASE4_CANONICAL_STATE.md"
+                ROOT
+                / "reference"
+                / "phase-evidence"
+                / "PHASE4_CANONICAL_STATE.md"
             ).read_text(encoding="utf-8")
             if "Phase 4 chair-definition package contract" not in phase4_evidence:
                 errors.append(

@@ -338,12 +338,12 @@ Exit gate: the first extraction is selected from evidence rather than source pro
 Status: **Complete — selection and Phase 1 closeout accepted on 2026-07-22.**
 The reproducible static definition/caller/alias/patch
 inventory and initial candidate comparison are recorded in
-[PHASE1_INVENTORY.md](PHASE1_INVENTORY.md). The five current candidates now
+[PHASE1_INVENTORY.md](phase-evidence/PHASE1_INVENTORY.md). The five current candidates now
 have a fail-closed machine-readable boundary contract covering units, frames,
 tolerances, identities, ordering, schemas, side effects and
 signature/invalidation inputs. Inventory schema 2 now adds static closure-cut
 callers and dependencies leaving each bounded closure. The
-[first-slice scorecard](PHASE1_SLICE_SCORECARD.md) led to owner acceptance of
+[first-slice scorecard](phase-evidence/PHASE1_SLICE_SCORECARD.md) led to owner acceptance of
 the transition solver as a first architecture pilot, not a performance
 optimisation. Its exact façade, caller, parity, rollback and performance scope
 is frozen in
@@ -361,10 +361,10 @@ qualification and representative target-architecture profiles remain open;
 their implementation status is recorded by the owning delivery phase rather
 than this strategy document.
 The consolidated
-[Phase 1 closeout record](PHASE1_CLOSEOUT.md) preserves those later gates and
+[Phase 1 closeout record](phase-evidence/PHASE1_CLOSEOUT.md) preserves those later gates and
 authorised only the minimal Stage M2 package/loading foundation. Its
 implementation and validation are recorded in
-[PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md).
+[PHASE2_FOUNDATION.md](phase-evidence/PHASE2_FOUNDATION.md).
 
 ### Stage M2: package skeleton and façade
 
@@ -386,7 +386,7 @@ Status: **Complete — exit evidence accepted by the project owner on
 
 Exit gate: **evidenced.** The minimal boundary and loading approach work in
 both isolated standalone Python and the qualified FreeCAD runtime, with no
-document mutation. See [PHASE2_FOUNDATION.md](PHASE2_FOUNDATION.md). The
+document mutation. See [PHASE2_FOUNDATION.md](phase-evidence/PHASE2_FOUNDATION.md). The
 project owner accepted that evidence on 2026-07-22, closing Stage M2 and making
 the first Stage M3 slice permissible without moving any calculation or caller
 as part of the acceptance itself.

@@ -400,9 +400,12 @@ def _validate_source_and_phase_controls():
     for relative, expected in SOURCE_HASHES.items():
         assert _sha256(ROOT / relative) == expected
     plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(encoding="utf-8")
-    evidence = (ROOT / "reference" / "PHASE4_CANONICAL_STATE.md").read_text(
-        encoding="utf-8"
-    )
+    evidence = (
+        ROOT
+        / "reference"
+        / "phase-evidence"
+        / "PHASE4_CANONICAL_STATE.md"
+    ).read_text(encoding="utf-8")
     assert "Phase 4 is current" in plan
     assert "PHASE4_CANONICAL_STATE.md" in plan
     assert "## Transition schema v1" in evidence

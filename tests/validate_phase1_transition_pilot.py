@@ -21,7 +21,7 @@ from tracktemplate.domain import alignment as modular_alignment  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-transition-pilot.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "1f4c50f6edb327c5bfbd947c4953ee51cf606c9a676bec1c8ee7c224d5f5b139"
+    "7202990bc7b35480703431ce5aab8150c34e16508b9136b71b66a772116bec02"
 )
 CANDIDATE_REGISTER_PATH = (
     ROOT / "reference" / "contracts" / "phase1-candidate-boundaries.json"
@@ -182,7 +182,7 @@ def validate_contract(document):
         if selection.get("owner_accepted_on") != "2026-07-20":
             errors.append("pilot owner-acceptance date is invalid")
         if selection.get("scorecard_path") != (
-            "reference/PHASE1_SLICE_SCORECARD.md"
+            "reference/phase-evidence/PHASE1_SLICE_SCORECARD.md"
         ):
             errors.append("pilot scorecard path is invalid")
         if selection.get("candidate_register_path") != (

@@ -355,7 +355,7 @@ another family, or enable production chair/output.
 The neutral v1 contract is now implemented by
 `tracktemplate.application.chair_definition`, exposed only through the narrow
 `tracktemplate.api` façade, and published portably as
-[`chair-definition-v1.schema.json`](schemas/chair-definition-v1.schema.json).
+[`chair-definition-v1.schema.json`](../schemas/chair-definition-v1.schema.json).
 It is a TrackTemplate schema, not a Templot format, FreeCAD document schema,
 mesh container or production chair.
 
@@ -474,6 +474,6 @@ and it makes no numerical performance claim.
 The copied-target fixture evidence is accepted without advertising a supported
 family or wiring an operator path. Either later action requires its own
 explicit authority. The independent backup/restore prerequisite in
-[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) is satisfied for the owner-
+[RECOVERY_AND_BACKUP.md](../RECOVERY_AND_BACKUP.md) is satisfied for the owner-
 confirmed complete scope under its active cadence, but backup readiness alone
 does not authorise a migrator.

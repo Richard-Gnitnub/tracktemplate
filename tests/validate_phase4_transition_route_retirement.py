@@ -273,9 +273,12 @@ def _validate_evidence_controls():
     ):
         assert marker in freecad_source
 
-    evidence = (ROOT / "reference" / "PHASE4_CANONICAL_STATE.md").read_text(
-        encoding="utf-8"
-    )
+    evidence = (
+        ROOT
+        / "reference"
+        / "phase-evidence"
+        / "PHASE4_CANONICAL_STATE.md"
+    ).read_text(encoding="utf-8")
     plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(
         encoding="utf-8"

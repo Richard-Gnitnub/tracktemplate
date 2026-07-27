@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Architecture Review"
+  short_description: "Review architecture choices before implementation"
+  default_prompt: "Use $tracktemplate-architecture-review to assess this TrackTemplate architecture decision before implementation."

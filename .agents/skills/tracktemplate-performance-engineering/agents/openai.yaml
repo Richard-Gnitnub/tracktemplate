@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Performance Engineering"
+  short_description: "Profile and improve performance without behaviour drift"
+  default_prompt: "Use $tracktemplate-performance-engineering to baseline, profile and improve this TrackTemplate performance boundary."

@@ -101,7 +101,7 @@ REFERENCE_ONLY_TEMPLOT_CLASSIFICATIONS = {
 DOCUMENTATION_PATHS = (
     ROOT / "AGENTS.md",
     ROOT / "reference" / "LICENSING_BOUNDARIES.md",
-    ROOT / "reference" / "PHASE1_INVENTORY.md",
+    ROOT / "reference" / "phase-evidence" / "PHASE1_INVENTORY.md",
     ROOT / "reference" / "PROJECT_PLAN.md",
     ROOT / "reference" / "PROVENANCE.md",
     ROOT / "reference" / "VALIDATION.md",

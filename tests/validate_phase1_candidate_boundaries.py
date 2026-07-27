@@ -18,7 +18,9 @@ from tools import phase1_inventory  # noqa: E402
 REGISTER_PATH = (
     ROOT / "reference" / "contracts" / "phase1-candidate-boundaries.json"
 )
-SCORECARD_PATH = ROOT / "reference" / "PHASE1_SLICE_SCORECARD.md"
+SCORECARD_PATH = (
+    ROOT / "reference" / "phase-evidence" / "PHASE1_SLICE_SCORECARD.md"
+)
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",
     "b15": ROOT
@@ -474,7 +476,7 @@ def validate_register(document):
         ):
             errors.append("the pilot selection-contract path is invalid")
         if gate.get("recommendation_evidence_path") != (
-            "reference/PHASE1_SLICE_SCORECARD.md"
+            "reference/phase-evidence/PHASE1_SLICE_SCORECARD.md"
         ):
             errors.append("the recommendation-evidence path is invalid")
     return errors

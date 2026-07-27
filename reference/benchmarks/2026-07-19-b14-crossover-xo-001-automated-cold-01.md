@@ -15,7 +15,7 @@ optimisation comparison.
 | Macro | `AdvancedTurnout.FCMacro` |
 | Version | `10.2A8A7B14` |
 | Macro SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
-| FreeCAD | 1.1.1 Flatpak, using the Phase 0 environment in [../BASELINE.md](../BASELINE.md) |
+| FreeCAD | 1.1.1 Flatpak, using the Phase 0 environment in [../phase-evidence/BASELINE.md](../phase-evidence/BASELINE.md) |
 | Process state | Fresh dedicated FreeCAD process; empty session before opening the fixture |
 | Profile state | Dedicated persistent benchmark profile; normal FreeCAD user data/addons excluded |
 | Operating-system file cache | Uncontrolled; this is not a hardware/disk-cache cold claim |

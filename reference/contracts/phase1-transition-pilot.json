@@ -21,7 +21,7 @@
     "selection_class": "first-architecture-pilot-not-performance-optimisation",
     "owner_accepted_on": "2026-07-20",
     "owner_acceptance_basis": "The project owner instructed Codex to commit and push the completed recommendation tranche and then work on the next tranche after being told that the next decision was acceptance of the transition pilot and its successor-version contract.",
-    "scorecard_path": "reference/PHASE1_SLICE_SCORECARD.md",
+    "scorecard_path": "reference/phase-evidence/PHASE1_SLICE_SCORECARD.md",
     "candidate_register_path": "reference/contracts/phase1-candidate-boundaries.json",
     "scope": "The selection decision froze the pilot without starting source movement or changing B14/B15. The accepted Phase 1 closeout later authorised the Phase 2 package/loading foundation only; calculation movement, caller routing and performance optimisation remain outside this scope."
   },

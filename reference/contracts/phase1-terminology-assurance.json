@@ -257,7 +257,7 @@
       "context_rule": "A public railway label must identify whether it means a complete turnout, a switch assembly, movable rails or generic geometric points.",
       "evidence": [
         "Current B14/B15 source usage",
-        "reference/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory"
+        "reference/phase-evidence/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory"
       ],
       "owner_role": "Phase 8 S&C railway-domain reviewer",
       "later_gate": "Phase 8 S&C component taxonomy and UI review."
@@ -271,7 +271,7 @@
       "context_rule": "Use the current specific component term only when its geometry is known; any proposed frog label requires explicit railway-domain review.",
       "evidence": [
         "Current B14/B15 common-crossing and vee terminology",
-        "reference/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory"
+        "reference/phase-evidence/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory"
       ],
       "owner_role": "Phase 8 S&C railway-domain reviewer",
       "later_gate": "Phase 8 S&C component taxonomy and UI review."
@@ -286,7 +286,7 @@
       ],
       "context_rule": "Keep the provisional status visible and do not publish it as a precise prototype package designation.",
       "evidence": [
-        "reference/S1_PILOT_PLAN.md",
+        "reference/phase-evidence/S1_PILOT_PLAN.md",
         "reference/manifests/s1-chair-pilot.dependency-manifest.json"
       ],
       "owner_role": "Phase 9 chair evidence owner",
@@ -415,7 +415,7 @@
       "term_id": "s1-chair-designation",
       "state": "open",
       "locations": [
-        "reference/S1_PILOT_PLAN.md"
+        "reference/phase-evidence/S1_PILOT_PLAN.md"
       ],
       "question": "What exact prototype/company/standard designation is supported by the selected primary evidence?",
       "owner_role": "Phase 9 chair evidence owner",

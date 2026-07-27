@@ -207,7 +207,7 @@ behaviour and gap evidence. It is not the production chair-definition schema,
 the final S1 geometry oracle, or a precedent for new chair families.
 
 The owner-accepted Phase 1 package/evidence decisions are in
-[S1_PILOT_PLAN.md](S1_PILOT_PLAN.md). Its exact decimal source-quantity,
+[S1_PILOT_PLAN.md](phase-evidence/S1_PILOT_PLAN.md). Its exact decimal source-quantity,
 full-size millimetre, chair-local frame and validate-before-mutation rules are
 accepted architectural direction, not an implemented schema.
 It deliberately leaves the prototype designation, primary evidence, rail

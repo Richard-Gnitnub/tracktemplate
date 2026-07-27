@@ -11,7 +11,7 @@ test health, the qualified FreeCAD runtime, local recovery readiness, Git and
 GitHub safeguards, and the evidence supporting the current Phase 4 boundary.
 The governing delivery status and live risk state remain in
 [PROJECT_PLAN.md](PROJECT_PLAN.md); current implementation evidence remains in
-[PHASE4_CANONICAL_STATE.md](PHASE4_CANONICAL_STATE.md).
+[PHASE4_CANONICAL_STATE.md](phase-evidence/PHASE4_CANONICAL_STATE.md).
 
 Verdict: **operationally healthy for bounded Phase 4 foundation work, subject
 to the existing fail-closed controls; not release-ready.** In particular, no

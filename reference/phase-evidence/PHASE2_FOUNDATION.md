@@ -2,7 +2,7 @@
 
 Status: **complete and accepted by the project owner on 2026-07-22; frozen
 historical evidence.** Later implementation status belongs in
-[PROJECT_PLAN.md](PROJECT_PLAN.md) and the owning open-phase evidence.
+[PROJECT_PLAN.md](../PROJECT_PLAN.md) and the owning open-phase evidence.
 
 Lifecycle note — 2026-07-22: the documentation-minimisation cleanup separated
 later implementation status from this record. It changed no accepted Phase 2

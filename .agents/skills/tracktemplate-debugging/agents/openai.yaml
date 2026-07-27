@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Debugging"
+  short_description: "Diagnose TrackTemplate failures systematically"
+  default_prompt: "Use $tracktemplate-debugging to reproduce, isolate and diagnose this TrackTemplate failure."

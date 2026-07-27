@@ -181,9 +181,12 @@ def _validate_controls():
     for relative, expected in SOURCE_HASHES.items():
         assert _sha256(ROOT / relative) == expected
     plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(encoding="utf-8")
-    evidence = (ROOT / "reference" / "PHASE4_CANONICAL_STATE.md").read_text(
-        encoding="utf-8"
-    )
+    evidence = (
+        ROOT
+        / "reference"
+        / "phase-evidence"
+        / "PHASE4_CANONICAL_STATE.md"
+    ).read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(encoding="utf-8")
     assert "PHASE4_CANONICAL_STATE.md" in plan
     assert "FreeCAD persistence tranche" in evidence

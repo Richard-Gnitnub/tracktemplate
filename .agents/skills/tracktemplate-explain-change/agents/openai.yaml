@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Explain Change"
+  short_description: "Explain verified changes and visualise flows"
+  default_prompt: "Use $tracktemplate-explain-change to explain this TrackTemplate change and its evidence."

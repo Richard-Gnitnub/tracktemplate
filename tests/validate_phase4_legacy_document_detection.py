@@ -434,9 +434,12 @@ assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == ()
         "Phase 4 legacy document FreeCAD detection validation passed",
     ):
         assert marker in freecad_source
-    evidence = (ROOT / "reference" / "PHASE4_CANONICAL_STATE.md").read_text(
-        encoding="utf-8"
-    )
+    evidence = (
+        ROOT
+        / "reference"
+        / "phase-evidence"
+        / "PHASE4_CANONICAL_STATE.md"
+    ).read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(encoding="utf-8")
     assert "Legacy-document detection tranche" in evidence
     assert "freecad_validate_phase4_legacy_document_detection.py" in validation

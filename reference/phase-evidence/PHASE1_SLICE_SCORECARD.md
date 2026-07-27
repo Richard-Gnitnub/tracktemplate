@@ -4,7 +4,7 @@ Status: **owner accepted; transition pilot selected; source movement not started
 This scorecard records the evidence behind the first architecture
 pilot. Selection does not itself start extraction, advance Phase 1 or promise
 an operator-visible performance improvement. The exact accepted boundary is in
-[contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json).
+[contracts/phase1-transition-pilot.json](../contracts/phase1-transition-pilot.json).
 
 ## Decision made
 
@@ -17,7 +17,7 @@ The first extraction had two possible jobs which must not be confused:
 The current evidence supports the first job. It does not yet support using the
 chair hotspot as the first mechanical extraction. The candidate boundary
 contract is
-[contracts/phase1-candidate-boundaries.json](contracts/phase1-candidate-boundaries.json),
+[contracts/phase1-candidate-boundaries.json](../contracts/phase1-candidate-boundaries.json),
 schema 3. Its selection gate points to the frozen pilot contract.
 
 ## Evidence scale
@@ -69,7 +69,7 @@ pure-function microbenchmarks:
 | Plain-line selected export | 7,885.730 ms | Baseline for the later transactional export/deferred-exact boundary |
 | Plain-line create-through-export | 6,907.971 ms | Baseline for the legacy non-atomic Generate/export path |
 
-The source reports are in [benchmarks](benchmarks/). None measures the proposed
+The source reports are in [benchmarks](../benchmarks/). None measures the proposed
 lightweight editor or a modular transition/station function. That absence is
 recorded rather than filled with an estimated saving.
 
@@ -107,7 +107,7 @@ identifier is not the public Workbench/RC version. Neither immutable B14 nor
 accepted-reference B15 is repurposed.
 
 The fail-closed contract at
-[contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json)
+[contracts/phase1-transition-pilot.json](../contracts/phase1-transition-pilot.json)
 freezes the following requirements before and during extraction:
 
 1. a small standalone domain module with no FreeCAD, Qt or third-party import;

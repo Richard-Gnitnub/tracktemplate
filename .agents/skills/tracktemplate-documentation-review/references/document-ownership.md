@@ -20,7 +20,8 @@ shortening or deleting documentation.
 | Agent skills, invocation and maintenance | `reference/AGENT_WORKFLOWS.md` |
 | Current phase evidence | The one open-phase evidence document named by `reference/PROJECT_PLAN.md` |
 
-Accepted closeouts, inventories, baselines, contracts and foundation records are
+Phase records are grouped under `reference/phase-evidence/`. Accepted
+closeouts, inventories, baselines, contracts and foundation records are
 historical evidence rather than live project-status documents. Preserve their
 dated meaning, and link to the live canonical owner instead of updating them as
 though they owned current status.

@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-api-design
-description: Design or review narrow, versioned TrackTemplate contracts across Python APIs, application commands, FreeCAD integration, persistence, chair packages, exporters and optional HTTP interfaces. Use before adding or changing a public boundary, schema, command, stored property, adapter interface or compatibility contract.
+description: Design, integrate or review narrow, versioned TrackTemplate contracts across Python APIs, application commands, FreeCAD integration, persistence, chair packages, exporters and optional network interfaces. Use before adding or changing a public boundary, schema, command, stored property, adapter or compatibility contract, or an accepted third-party API, OAuth, webhook or GraphQL integration.
 ---
 
 # TrackTemplate API design
@@ -20,8 +20,8 @@ Apply this workflow to:
 - FreeCAD commands, document objects, properties and ViewProvider boundaries;
 - persistence, migration and chair-definition schemas;
 - exact-geometry and exporter requests, results and manifests;
-- optional adapters or external HTTP APIs only when accepted scope requires
-  them.
+- optional third-party clients, HTTP or GraphQL APIs, OAuth flows and webhook
+  boundaries only when accepted scope requires them.
 
 Do not turn every internal function into a supported API or add a network
 service merely to follow generic API guidance.
@@ -37,6 +37,10 @@ service merely to follow generic API guidance.
 4. Inspect qualified Python, FreeCAD, Qt/PySide and package constraints.
 5. Use `$tracktemplate-freecad-addon-research` before relying on current
    FreeCAD command, document-object, property or ViewProvider practice.
+6. If a network API, authentication flow or event integration is in accepted
+   scope, read
+   [`references/network-integrations.md`](references/network-integrations.md)
+   before designing or implementing it.
 
 ## Contract definition
 
@@ -101,6 +105,9 @@ toolchain:
   improves interoperability.
 - Do not require REST, CRUD, HATEOAS, pagination, rate-limit headers or
   version-in-URL patterns when the actual contract does not need them.
+- For accepted OAuth, webhook or GraphQL work, use the standards and
+  provider-specific verification rules selected in the network-integration
+  reference. Do not infer provider behaviour from a generic example.
 
 Verify current standards from primary sources when designing the concrete
 surface; do not assume the examples embedded in this skill remain current.

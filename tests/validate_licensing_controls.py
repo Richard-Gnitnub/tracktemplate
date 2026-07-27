@@ -248,7 +248,10 @@ def validate():
         PROJECT_ROOT / "NOTICE.md",
         PROJECT_ROOT / "reference" / "ARCHITECTURE.md",
         PROJECT_ROOT / "reference" / "LICENSING_BOUNDARIES.md",
-        PROJECT_ROOT / "reference" / "PHASE1_INVENTORY.md",
+        PROJECT_ROOT
+        / "reference"
+        / "phase-evidence"
+        / "PHASE1_INVENTORY.md",
         PROJECT_ROOT / "reference" / "PROJECT_PLAN.md",
         PROJECT_ROOT / "reference" / "PROVENANCE.md",
         PROJECT_ROOT / "reference" / "VALIDATION.md",

@@ -62,6 +62,16 @@ wc -c AGENTS.md
 
 ## Current skill register
 
+### `tracktemplate-architecture-review`
+
+Path: `.agents/skills/tracktemplate-architecture-review/SKILL.md`
+
+Use it before a material system-structure, responsibility,
+dependency-direction, canonical-state or staged-migration decision. It compares
+the status quo and reversible alternatives against the accepted architecture,
+routes detailed contracts to the API skill and records an accepted durable
+decision only in its existing canonical owner.
+
 ### `tracktemplate-context-recovery`
 
 Path: `.agents/skills/tracktemplate-context-recovery/SKILL.md`
@@ -94,6 +104,17 @@ contributor-authority questions, preserves unknowns and routes legal
 interpretation to professional review. It cannot itself confer
 `project-cleared` status or legal clearance.
 
+### `tracktemplate-security-review`
+
+Path: `.agents/skills/tracktemplate-security-review/SKILL.md`
+
+Use it to inspect actual trust boundaries for untrusted files and archives,
+stored FreeCAD data, filesystem and subprocess handling, dependencies,
+credentials, accepted network integrations, exports and packaging. It
+distinguishes reachable weaknesses from pattern matches and routes rights
+questions to licence analysis; it is not publication authority or a security
+certification.
+
 ### `tracktemplate-python-writing`
 
 Path: `.agents/skills/tracktemplate-python-writing/SKILL.md`
@@ -103,15 +124,28 @@ applies PEP 8 and PEP 257 as the writing baseline while preserving railway
 behaviour, qualified FreeCAD compatibility, frozen B14/B15 evidence, public and
 persisted identifiers, diagnostics and narrow diffs.
 
+### `tracktemplate-debugging`
+
+Path: `.agents/skills/tracktemplate-debugging/SKILL.md`
+
+Use it to reproduce, isolate and diagnose unexpected behaviour, tracebacks,
+hangs, crashes, nondeterminism and resource regressions across standalone,
+FreeCAD, GUI, persistence, export and performance boundaries. It separates
+symptoms from confirmed causes, uses disposable probes and owns no authority to
+edit source unless the user also requests a fix. Formal evidence selection and
+failed-test classification remain with the validation skill.
+
 ### `tracktemplate-api-design`
 
 Path: `.agents/skills/tracktemplate-api-design/SKILL.md`
 
 Use it before adding or changing a supported Python API, application command,
 FreeCAD boundary, persistence/package schema, exporter contract or accepted
-HTTP interface. It defines consumers, units, identities, errors, side effects,
-compatibility, migration and evidence before implementation, without turning
-internal helpers into public APIs or assuming a REST service exists.
+network integration. It defines consumers, units, identities, errors, side
+effects, compatibility, migration and evidence before implementation. A
+conditional reference adds third-party client, OAuth, webhook and GraphQL
+controls without loading them for normal in-process API work or assuming a
+network service exists.
 
 ### `tracktemplate-task-automation`
 
@@ -122,6 +156,15 @@ workflow creates measurable operator or agent toil. It prefers existing tools,
 keeps judgement and approvals explicit, and requires deterministic,
 idempotent, recoverable evidence. It does not authorise unattended schedulers,
 watchers, hooks, external services, destructive mutation or new dependencies.
+
+### `tracktemplate-performance-engineering`
+
+Path: `.agents/skills/tracktemplate-performance-engineering/SKILL.md`
+
+Use it to baseline, profile and improve runtime, memory, recompute or
+interaction performance under `PERFORMANCE_SOP.md`. It requires equivalent
+inputs, process/cache conditions and correctness scope, checks displaced
+Validate/Export cost and cannot invent budgets or accept changed behaviour.
 
 ### `tracktemplate-simplify`
 
@@ -173,6 +216,16 @@ It verifies Git-discovered candidates against canonical authority and completed
 evidence; it does not duplicate live phase status, infer acceptance, edit
 version files, commit, tag, push or publish.
 
+### `tracktemplate-release-readiness`
+
+Path: `.agents/skills/tracktemplate-release-readiness/SKILL.md`
+
+Use it to audit one exact beta or release candidate and distributable artifact
+against accepted gates, clean-build reproducibility, Addon installation and
+upgrade, compatibility, notices, provenance, documentation and qualification
+evidence. It keeps technical readiness, version acceptance, gate closeout and
+publication as separate project-owner decisions.
+
 ### `tracktemplate-change-validation`
 
 Path: `.agents/skills/tracktemplate-change-validation/SKILL.md`
@@ -215,14 +268,37 @@ completion of a non-trivial source or documentation change, and after a
 classified failed-test repair. It judges the change using the available
 evidence; it does not replace the validation skill.
 
-All twelve skills are deliberately instruction-only. They do not perform
+### `tracktemplate-explain-change`
+
+Path: `.agents/skills/tracktemplate-explain-change/SKILL.md`
+
+Use it to teach a bounded working-tree diff, commit range, PR, patch, validated
+tranche or review packet in concept order with explicit evidence limits. Its
+optional visual mode creates only sanitised, self-contained temporary HTML and
+does not execute production code or become validation evidence. Explanation
+does not replace validation, quality review or project-owner acceptance.
+
+All eighteen skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
 
+### Lifecycle coverage review
+
+The 2026-07-27 repository-wide review added only the four previously uncovered
+decision surfaces: architecture review, performance engineering, security
+review and release readiness. Testing, project management, persistence,
+geometry evidence, documentation, dependency rights and change explanation
+remain with their existing skills and canonical owners; adding parallel skills
+for those subjects would duplicate authority and increase context load.
+
 ## Invocation
 
 In Codex CLI or the IDE extension, invoke the relevant skill explicitly:
+
+```text
+$tracktemplate-architecture-review
+```
 
 ```text
 $tracktemplate-context-recovery
@@ -237,7 +313,15 @@ $tracktemplate-license-analysis
 ```
 
 ```text
+$tracktemplate-security-review
+```
+
+```text
 $tracktemplate-python-writing
+```
+
+```text
+$tracktemplate-debugging
 ```
 
 ```text
@@ -246,6 +330,10 @@ $tracktemplate-api-design
 
 ```text
 $tracktemplate-task-automation
+```
+
+```text
+$tracktemplate-performance-engineering
 ```
 
 ```text
@@ -265,11 +353,19 @@ $tracktemplate-changelog
 ```
 
 ```text
+$tracktemplate-release-readiness
+```
+
+```text
 $tracktemplate-change-validation
 ```
 
 ```text
 $tracktemplate-quality-review
+```
+
+```text
+$tracktemplate-explain-change
 ```
 
 Codex may also select a skill implicitly when the request clearly matches its
@@ -297,6 +393,20 @@ replace post-implementation validation.
 
 Validation determines what the evidence proves. Quality review determines
 whether the implementation and scope are acceptable given that evidence.
+
+For an architecture decision:
+
+```text
+$tracktemplate-architecture-review
+    ↓
+$tracktemplate-api-design when a public or stored contract changes
+    ↓
+$tracktemplate-documentation-review for an accepted canonical update
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
 
 For a source change:
 
@@ -326,6 +436,34 @@ For retained task automation:
 
 ```text
 $tracktemplate-task-automation
+    ↓
+$tracktemplate-python-writing
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For measured performance work:
+
+```text
+$tracktemplate-performance-engineering
+    ↓
+$tracktemplate-debugging when the cause is not established
+    ↓
+$tracktemplate-python-writing or $tracktemplate-simplify
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For a security-sensitive change:
+
+```text
+$tracktemplate-security-review
+    ↓
+$tracktemplate-api-design or $tracktemplate-license-analysis when applicable
     ↓
 $tracktemplate-python-writing
     ↓
@@ -392,6 +530,20 @@ $tracktemplate-change-validation
 $tracktemplate-quality-review
 ```
 
+For a beta or release-candidate audit:
+
+```text
+$tracktemplate-release-readiness
+    ↓
+$tracktemplate-freecad-addon-research when current packaging guidance is needed
+    ↓
+$tracktemplate-changelog and $tracktemplate-license-analysis
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
 For a review-only request, use `$tracktemplate-quality-review`. Add
 `$tracktemplate-change-validation` when the review must determine whether the
 available evidence supports the change or which checks remain outstanding.
@@ -417,6 +569,28 @@ $tracktemplate-change-validation — classify under TESTING_POLICY.md
 repair only the classified boundary and rerun the original proof
     ↓
 $tracktemplate-quality-review — review source, tests and evidence
+```
+
+For an unexpected failure whose cause is not established:
+
+```text
+$tracktemplate-debugging — reproduce and isolate read-only
+    ↓
+$tracktemplate-change-validation — classify failed evidence
+    ↓
+$tracktemplate-python-writing — only when a fix is authorised
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For a maintainer explanation after evidence is bounded:
+
+```text
+$tracktemplate-change-validation and $tracktemplate-quality-review evidence
+    ↓
+$tracktemplate-explain-change
 ```
 
 Do not treat a failed test as automatic authority to change production code or
@@ -454,11 +628,19 @@ script or runtime package was copied or installed by this review.
 
 | Source and reviewed revision | Classification | TrackTemplate decision |
 | --- | --- | --- |
-| [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Adapt its documentation-drift audit, changelog curation and bounded simplification ideas through the corresponding local skills, while preserving TrackTemplate's canonical owners, frozen evidence and release gates. Do not install its router, auto-formatter, mutation hooks, `docs/plans/` or `docs/chronicles/` model, and do not grant changelog or simplification work automatic commit, tag, bulk-rewrite or release authority. |
-| [`seb1n/awesome-ai-agent-skills`](https://github.com/seb1n/awesome-ai-agent-skills/tree/a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd), `a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd`, MIT | Broad catalogue of generic instruction skills | Use only as a discovery source and admit each idea after project-specific review. Adapt stable-workflow automation without generic schedulers, watchers, destructive moves or new dependencies; adapt licence analysis through the existing fail-closed source/data/media/output controls without categorical legal conclusions; and adapt API contract design to Python, FreeCAD, persistence, package and exporter boundaries without assuming REST. Generic code review overlaps the local quality skill, while embedding/vector retrieval infrastructure remains unjustified. |
+| [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Adapt its documentation-drift audit, changelog curation and bounded simplification ideas through the corresponding local skills, while preserving TrackTemplate's canonical owners, frozen evidence and release gates. Adapt explain-diff's visual idea into a separate read-only explanation skill whose sanitised HTML exists only in temporary storage and is never production evidence. Do not install its router, auto-formatter, mutation hooks, `docs/plans/` or `docs/chronicles/` model, and do not grant changelog, simplification or explanation work automatic commit, tag, bulk-rewrite or release authority. |
+| [`seb1n/awesome-ai-agent-skills`](https://github.com/seb1n/awesome-ai-agent-skills/tree/a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd), `a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd`, MIT | Broad catalogue of generic instruction skills | Use only as a discovery source and admit each idea after project-specific review. Adapt stable-workflow automation without generic schedulers, watchers, destructive moves or new dependencies; adapt licence analysis through the existing fail-closed source/data/media/output controls without categorical legal conclusions; and adapt the complete API/integration group into one local contract skill. Its conditional network reference covers client resilience, OAuth, webhooks and GraphQL without assuming REST, installing an SDK or service, or loading network guidance for ordinary Python/FreeCAD boundaries. From the code-and-development group, admit only systematic debugging as a separate causal-investigation skill. Code documentation, review, refactoring and testing duplicate stronger local skills; generic version-control guidance conflicts with repository recovery and Git-authority controls. Embedding/vector retrieval infrastructure remains unjustified. |
 | [`pydantic/pydantic-ai`](https://github.com/pydantic/pydantic-ai/tree/ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5), `ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5`, MIT | Python agent framework repository with root/scoped instructions and project-specific skills | Adapt its context-first, responsibility-to-project and patch-as-evidence patterns. TrackTemplate already supplies the corresponding authority map and local skills; add scoped `AGENTS.md` only where a directory has genuinely different rules. Do not add the Pydantic AI package as a TrackTemplate or FreeCAD runtime dependency without a separately approved in-product agent capability and compatibility, security, data, cost and validation evidence. |
 
 ## Agent-guidance validation
+
+Optional agent-skill tooling is pinned in `requirements-dev.txt`. It is not
+imported by TrackTemplate, required by FreeCAD or included in the Addon
+artifact. Install it into the project virtual environment with:
+
+```bash
+.venv/bin/python -m pip install -r requirements-dev.txt
+```
 
 After changing `AGENTS.md`, `reference/AGENT_WORKFLOWS.md` or a repository skill,
 run:

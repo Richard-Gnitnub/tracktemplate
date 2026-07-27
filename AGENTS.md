@@ -13,26 +13,38 @@
 - Read the canonical document that owns the affected subject before editing.
   The document ownership map below is authoritative.
 - `reference/AGENT_WORKFLOWS.md` defines the repository's agent-skill strategy.
+  Use `$tracktemplate-architecture-review` before a material system,
+  responsibility or dependency-direction decision.
   Use `$tracktemplate-python-writing` when creating or materially editing Python
   or FCMacro source.
   Use `$tracktemplate-api-design` before adding or changing a supported API,
-  schema, command or compatibility contract.
+  schema, command, compatibility contract or accepted external integration.
+  Use `$tracktemplate-debugging` to reproduce, isolate and diagnose an
+  unexpected failure before applying a speculative fix.
   Use `$tracktemplate-task-automation` when a stable repeated workflow can be
   automated safely.
+  Use `$tracktemplate-performance-engineering` for measured profiling or
+  behaviour-preserving optimisation. Use `$tracktemplate-security-review` for
+  untrusted input, filesystem, subprocess, dependency, credential, network or
+  packaging trust boundaries.
   Use `$tracktemplate-simplify` for a bounded, behaviour-preserving complexity
   reduction.
   Use `$tracktemplate-documentation-review` when creating or materially editing
   Markdown documentation. Use `$tracktemplate-documentation-alignment` when
   repository documentation may have drifted from authority or implementation
   evidence. Use `$tracktemplate-changelog` when curating user-facing release
-  notes. Use `$tracktemplate-license-analysis` before admitting third-party
-  material or changing licence, provenance or output-use claims. Use
+  notes. Use `$tracktemplate-release-readiness` for beta or release-candidate
+  gate and artifact audits. Use `$tracktemplate-license-analysis` before
+  admitting third-party material or changing licence, provenance or output-use
+  claims. Use
   `$tracktemplate-freecad-addon-research` when
   extracting current first-party FreeCAD Addon guidance before planning or
   implementation. Use `$tracktemplate-change-validation` to select, run and
   report the applicable evidence for a non-trivial change. Use
   `$tracktemplate-quality-review` before reporting completion of a non-trivial
-  source or documentation change.
+  source or documentation change. Use `$tracktemplate-explain-change` for a
+  maintainer walkthrough or optional temporary visual after the change and its
+  evidence have been bounded.
 - A skill is a reusable workflow, not a source of project authority. If a skill
   conflicts with this file or a canonical reference document, follow the
   canonical project rule and report the conflict.
@@ -72,9 +84,10 @@
   ledger and owns no live phase status, requirement, risk or acceptance state.
 - `reference/AGENT_WORKFLOWS.md` owns agent-skill scope, invocation and
   maintenance. It owns no product requirement or delivery status.
-- Accepted phase closeouts, inventories, baselines, foundations and JSON
-  contracts are frozen historical or contractual evidence. Change them only to
-  correct a demonstrated factual error or an explicitly accepted scope change.
+- `reference/phase-evidence/` contains the active phase record and frozen phase
+  baselines, inventories, foundations and closeouts. JSON contracts remain
+  under their typed subdirectories. Change frozen evidence only to correct a
+  demonstrated factual error or an explicitly accepted scope change.
 
 ## Version and Architecture Boundaries
 

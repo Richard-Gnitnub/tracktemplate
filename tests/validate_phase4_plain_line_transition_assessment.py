@@ -695,9 +695,12 @@ assert plain_line_transition_migration.PRODUCTION_OUTPUT_AUTHORIZED is False
         assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == expected_hash
     assert FREECAD_TEST_PATH.exists()
     assert MIGRATION_FREECAD_TEST_PATH.exists()
-    evidence = (ROOT / "reference" / "PHASE4_CANONICAL_STATE.md").read_text(
-        encoding="utf-8"
-    )
+    evidence = (
+        ROOT
+        / "reference"
+        / "phase-evidence"
+        / "PHASE4_CANONICAL_STATE.md"
+    ).read_text(encoding="utf-8")
     project_plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"
     )

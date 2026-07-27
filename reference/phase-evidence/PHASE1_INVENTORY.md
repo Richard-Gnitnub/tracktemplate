@@ -4,7 +4,7 @@ Status: **complete and accepted at Phase 1 closeout on 2026-07-22; frozen
 historical evidence.** This document owns the Phase 1 inventory and concise
 decision log as accepted at closeout. It records the selected first extraction
 slice and initial runtime/legacy-ingress window, not later implementation
-progress. Live delivery state belongs in [PROJECT_PLAN.md](PROJECT_PLAN.md) and
+progress. Live delivery state belongs in [PROJECT_PLAN.md](../PROJECT_PLAN.md) and
 the owning open-phase evidence.
 
 Lifecycle note — 2026-07-22: the documentation-minimisation cleanup removed
@@ -19,10 +19,10 @@ legacy oracle, identifies order-sensitive implementation mechanisms, compares
 the leading calculation candidates, and makes the remaining workflow,
 correctness, boundary-data and performance work explicit.
 
-The applicable gates are in [PROJECT_PLAN.md](PROJECT_PLAN.md), and source
-movement remains governed by [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md).
+The applicable gates are in [PROJECT_PLAN.md](../PROJECT_PLAN.md), and source
+movement remains governed by [MODULARISATION_PLAN.md](../MODULARISATION_PLAN.md).
 Source/data classification, package licensing and generated-output project status
-are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
+are governed by [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md).
 
 ## Evidence state
 
@@ -55,12 +55,12 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | B14 SHA-256 | `51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088` |
 | B15 role | Accepted behavioural reference |
 | B15 SHA-256 | `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848` |
-| Chair source evidence | ignored Templot5 revision 556b SourceForge archive recorded in [PROVENANCE.md](PROVENANCE.md) |
+| Chair source evidence | ignored Templot5 revision 556b SourceForge archive recorded in [PROVENANCE.md](../PROVENANCE.md) |
 | Chair source-audit date | 2026-07-20; read-only review of selected Pascal units |
-| Source/data/output policy | explicitly accepted by the project owner on 2026-07-20; [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) |
+| Source/data/output policy | explicitly accepted by the project owner on 2026-07-20; [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md) |
 | Dependency/project-status manifest | `reference/schemas/dependency-manifest-v1.schema.json`, schema 1; enforced by `tools/validate_dependency_manifest.py` |
 | First S1 pilot control manifest | structurally valid `unknown`; deliberately fails `--require-project-cleared` pending evidence, permissions, licence, non-copyright reviews and final package acceptance; the accepted Phase 1 control does not alter that status |
-| First S1 pilot decision plan | `reference/S1_PILOT_PLAN.md`; owner accepted on 2026-07-22 as the blocked neutral package, quantity/frame, version/failure, evidence, intended-use and metric-family control, with all unsupported production decisions still blocked |
+| First S1 pilot decision plan | `reference/phase-evidence/S1_PILOT_PLAN.md`; owner accepted on 2026-07-22 as the blocked neutral package, quantity/frame, version/failure, evidence, intended-use and metric-family control, with all unsupported production decisions still blocked |
 | First S1 pilot plan validator | `tests/validate_phase1_s1_pilot_plan.py`; protects the acceptance record, 15-decision register, exact B14/B15 source, unknown manifest, blocked lineage/oracle and absence of a premature production schema |
 | Lineage audit scopes | first S1; core rail/timber used by S1; other S&C output; legacy B14/B15 output |
 | First-S1/core lineage register | `reference/lineage/phase1-s1-core-lineage.json`, schema 1; 16 current output-affecting groups, all `reference-only` or `unknown`, with both scopes visibly `blocked` |
@@ -69,7 +69,7 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Other-S&C/legacy lineage contract | `tests/validate_phase1_other_snc_legacy_lineage.py`; verifies the two remaining scopes, exact B14/B15 anchors, optional local evidence hashes, all-four-scope coverage and absent current output manifests |
 | Candidate boundary register | `reference/contracts/phase1-candidate-boundaries.json`, schema 3; exact current contracts and closure-cut facts for all five static candidates plus the owner-accepted selection pointer |
 | Candidate boundary contract | `tests/validate_phase1_candidate_boundaries.py`; verifies source/AST anchors, structural facts, transition/station schemas, chair record schemas, cache-signature inputs and fail-closed selected candidate |
-| First-slice scorecard | `reference/PHASE1_SLICE_SCORECARD.md`; records why the transition solver was selected as a first architecture pilot, not a performance optimisation |
+| First-slice scorecard | `reference/phase-evidence/PHASE1_SLICE_SCORECARD.md`; records why the transition solver was selected as a first architecture pilot, not a performance optimisation |
 | Selected transition-pilot contract | `reference/contracts/phase1-transition-pilot.json`, schema 1; freezes B16/launcher role, exact module/façade/caller boundary, expanded parity grid, rollback and profiling gates without carrying later implementation status |
 | Selected transition-pilot validator | `tests/validate_phase1_transition_pilot.py`; verifies the frozen selection/source boundary and the pure calculation's exact B14/B15/modular parity at its durable public seam |
 | Runtime/legacy compatibility contract | `reference/contracts/phase1-compatibility.json`, schema 1; defines one exact qualified FreeCAD profile, the intended Addon manifest bounds, B14/B15 document ingress, external-configuration migrations and fail-closed unsupported-state rules |
@@ -83,7 +83,7 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 | Workflow-coverage validator | `tests/validate_phase1_workflow_coverage.py`; cross-checks the Markdown table, exact B14/B15 fingerprints, 12 bounded-executed and two defined-blocked oracles, every referenced path and fail-closed mutations |
 | Terminology-assurance register | `reference/contracts/phase1-terminology-assurance.json`, schema 1; 13 bounded term families across accepted, provisional, review-required and frozen-legacy states, six open reviews, three exact macro findings and 21 frozen evidence paths |
 | Terminology-assurance validator | `tests/validate_phase1_terminology.py`; protects B14/B15 hashes and finding counts, the exact frozen path set, unresolved-review ownership and prohibited successor-product tokens while explicitly leaving semantic correctness to human review |
-| Phase 1 closeout record | `reference/PHASE1_CLOSEOUT.md`; owner-accepted reconciliation of all nine exit conditions, runtime/ingress policy, GUI limitations, performance gaps, legacy defects, S1/provenance blocks, terminology reviews and bounded Phase 2 authority |
+| Phase 1 closeout record | `reference/phase-evidence/PHASE1_CLOSEOUT.md`; owner-accepted reconciliation of all nine exit conditions, runtime/ingress policy, GUI limitations, performance gaps, legacy defects, S1/provenance blocks, terminology reviews and bounded Phase 2 authority |
 | Phase 1 closeout validator | `tests/validate_phase1_closeout.py`; protects the owning contracts, exact source hashes, accepted 10-decision register, mandatory later gates and bounded transition state |
 | Project progress control | `PROJECT_PLAN.md` counts evidenced exit conditions and outcome milestones; `tests/validate_project_progress.py` reconciles bars, denominators, Phase 1 register states and milestone states without judging evidence sufficiency |
 | Current B14/B15 project-control output status | group-level `reference-only` or `unknown`; no current other-S&C/legacy workflow has an output dependency manifest or positive status, and this is not a new output restriction |
@@ -91,10 +91,10 @@ are governed by [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md).
 
 The `ordinary_track` filenames, imports, commands and recipe IDs in this
 inventory are frozen legacy evidence identifiers. Living prose follows
-[TERMINOLOGY.md](TERMINOLOGY.md) and describes the subject as plain line.
+[TERMINOLOGY.md](../TERMINOLOGY.md) and describes the subject as plain line.
 
 The companion
-[terminology-assurance register](contracts/phase1-terminology-assurance.json)
+[terminology-assurance register](../contracts/phase1-terminology-assurance.json)
 now makes human uncertainty explicit. It distinguishes six accepted bounded
 term families, one provisional S1 description, five review-required semantic
 families and the frozen ordinary-track identifier. Six open reviews have Phase
@@ -417,7 +417,7 @@ targets, endpoint behaviour, invalid radius/range diagnostics and exact
 B14/B15 equality. The project owner accepted this as the first architecture
 pilot on 2026-07-20. The selected boundary reserved development checkpoint
 `10.2A8A7B16` and the small `TrackTemplate.FCMacro` composition root in
-[contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json);
+[contracts/phase1-transition-pilot.json](../contracts/phase1-transition-pilot.json);
 the bounded Phase 2 package/loading foundation now exists, but none of the
 three calculations has moved and no caller is routed through it.
 
@@ -493,7 +493,7 @@ topology and assembly comparisons pass. Neither the B15 boxes nor an imported
 scan/mesh is canonical production geometry.
 
 The bounded current-path map is now machine-readable in
-[`lineage/phase1-s1-core-lineage.json`](lineage/phase1-s1-core-lineage.json).
+[`lineage/phase1-s1-core-lineage.json`](../lineage/phase1-s1-core-lineage.json).
 It records 16 output-affecting groups across the S1 and shared rail/timber
 paths: nine are `reference-only` because their present basis includes
 unresolved Templot reference data, while source-expression compliance remains
@@ -505,7 +505,7 @@ available.
 It also makes the C10 timber-stationing path an explicit legacy interface,
 not a hidden dependency of a reusable S1 definition.
 The upstream S1 comments point to “Standard Railway Equipment 1926”; as
-recorded in [PROVENANCE.md](PROVENANCE.md), this is an unverified search lead,
+recorded in [PROVENANCE.md](../PROVENANCE.md), this is an unverified search lead,
 not selected primary evidence.
 
 Phase 1 still needs an executed and reviewed S1 component/assembly oracle,
@@ -518,7 +518,7 @@ production, no macro was changed and both registered scopes remain visibly
 ### Other-S&C and legacy B14/B15 bounded lineage
 
 The two remaining scopes are now machine-readable in
-[`lineage/phase1-other-snc-legacy-lineage.json`](lineage/phase1-other-snc-legacy-lineage.json).
+[`lineage/phase1-other-snc-legacy-lineage.json`](../lineage/phase1-other-snc-legacy-lineage.json).
 This is a group-level boundary and ownership map, not an assertion that every
 historic constant has been independently cleared. Its 14 other-S&C groups
 cover the current C10 rails and timbers, centreline-anchored lifecycle,
@@ -550,10 +550,10 @@ will not silently clear the legacy macro or current special-trackwork output.
 
 The next source-audit tranche is now executable without making an upstream
 artifact canonical. The tracked
-[`oracles/templot5-556b-s1-oracle.json`](oracles/templot5-556b-s1-oracle.json)
+[`oracles/templot5-556b-s1-oracle.json`](../oracles/templot5-556b-s1-oracle.json)
 defines the exact-source fingerprints, proposed capture settings, named
 constituents, local-only artifact policy, blockers, owners and minimum evidence.
-[`../tools/templot_s1_oracle.py`](../tools/templot_s1_oracle.py) verifies that
+[`../tools/templot_s1_oracle.py`](../../tools/templot_s1_oracle.py) verifies that
 contract and the ignored source archive, rejects a non-556b executable, and
 summarises a future 3D DXF/ASCII STL pair using standard-library parsers.
 
@@ -607,7 +607,7 @@ clear any S1 production value, and does not close Phase 1.
 ### Active 556b S1 value and transform map
 
 The remaining read-only chair-generation inventory is now machine-readable in
-[`lineage/templot5-556b-s1-generation-map.json`](lineage/templot5-556b-s1-generation-map.json).
+[`lineage/templot5-556b-s1-generation-map.json`](../lineage/templot5-556b-s1-generation-map.json).
 It is deliberately bounded to chair code 1 with solid jaws and records:
 
 - the five mapped active Lazarus units and the two inactive `_x` alternatives;
@@ -624,7 +624,7 @@ It is deliberately bounded to chair code 1 with solid jaws and records:
 - seven manufacturing/output branch groups plus the evidence needed to close
   every unresolved or deliberately bounded finding.
 
-[`../tests/validate_templot_s1_generation_map.py`](../tests/validate_templot_s1_generation_map.py)
+[`../tests/validate_templot_s1_generation_map.py`](../../tests/validate_templot_s1_generation_map.py)
 fails closed if an inactive source copy is promoted, a Templot-dependent group
 is marked project-cleared, the chair-code scope broadens, a component/frame
 link drifts, or the acceptance gate is weakened. When the ignored ZIP exists,
@@ -681,7 +681,7 @@ elements and data in Templot drawings. The snapshot contains no general CC
 BY-NC-SA or non-commercial output licence; its Creative Commons wording is
 specific to imported National Library of Scotland maps. Historical Templot2
 terms and forum-uploaded-media terms are recorded separately in
-[PROVENANCE.md](PROVENANCE.md) rather than treated as the current GPL source
+[PROVENANCE.md](../PROVENANCE.md) rather than treated as the current GPL source
 licence.
 
 The accepted successor boundary is a neutral `ChairDefinition`. Engineering
@@ -699,7 +699,7 @@ when any output-affecting dependency is unresolved, `NOASSERTION`, lacks the
 declared adaptation, production, redistribution, commercial-use or publication
 permission, lacks authority evidence, or has an incomplete registered-design,
 unregistered-design, patent or trade-mark review.
-[`CONTRIBUTING.md`](../CONTRIBUTING.md) adds prospective DCO 1.1
+[`CONTRIBUTING.md`](../../CONTRIBUTING.md) adds prospective DCO 1.1
 sign-off and a separate data/evidence declaration.
 
 The first S1 manifest is intentionally useful before it is clear: it records
@@ -725,7 +725,7 @@ This is the canonical human-readable owner/coverage map. “Gap” means the
 behaviour must be characterised before its legacy path is moved or the future
 capability is advertised; it does not imply the workflow is known to be
 defective. The fail-closed machine-readable control is
-[`contracts/phase1-workflow-coverage.json`](contracts/phase1-workflow-coverage.json).
+[`contracts/phase1-workflow-coverage.json`](../contracts/phase1-workflow-coverage.json).
 
 | Workflow family | Current oracle/evidence owner | Deterministic recipe or fixture | Principal Phase 1 gap |
 | --- | --- | --- | --- |
@@ -753,45 +753,45 @@ closure phase. This evidences the Phase 1 ownership/oracle/gap condition; it
 does not execute or waive those later gates.
 
 Existing crossover evidence remains owned by
-[benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md),
-[benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md](benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md),
+[benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md](../benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md),
+[benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md](../benchmarks/2026-07-19-b14-crossover-xo-001-automated-warm-reuse-series.md),
 and
-[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
+[benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md](../benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md).
 The fixed preview/complete-rule mismatch and successor acceptance boundary are
 recorded in
-[contracts/phase1-crossover-feasibility.json](contracts/phase1-crossover-feasibility.json)
+[contracts/phase1-crossover-feasibility.json](../contracts/phase1-crossover-feasibility.json)
 and
-[benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md](benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md).
+[benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md](../benchmarks/2026-07-21-b14-crossover-feasibility-characterisation.md).
 The fixed automatic-timbering calculation, reuse, history, persistence,
 display-only invalidation and injected-failure boundary is recorded in
-[contracts/phase1-crossover-timbering.json](contracts/phase1-crossover-timbering.json)
+[contracts/phase1-crossover-timbering.json](../contracts/phase1-crossover-timbering.json)
 and
-[benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md](benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md).
+[benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md](../benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md).
 The fixed post-B4 chair-analysis result, persistence, unchanged-reuse history,
 diagnostic-display identity and save/reopen boundary is recorded in
-[contracts/phase1-chair-analysis-persistence.json](contracts/phase1-chair-analysis-persistence.json)
+[contracts/phase1-chair-analysis-persistence.json](../contracts/phase1-chair-analysis-persistence.json)
 and
-[benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md](benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md).
+[benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md](../benchmarks/2026-07-21-b14-chair-analysis-persistence-characterisation.md).
 Its complete fixed-XO emitted-input classification, representative mutation
 matrix, stale-cache witness, signature precision/order behavior and headless
 presentation topology are recorded separately in
-[contracts/phase1-chair-analysis-invalidation.json](contracts/phase1-chair-analysis-invalidation.json)
+[contracts/phase1-chair-analysis-invalidation.json](../contracts/phase1-chair-analysis-invalidation.json)
 and
-[benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md](benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md).
+[benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md](../benchmarks/2026-07-21-b14-chair-analysis-invalidation-characterisation.md).
 The plain-line edit, persistence and rollback evidence is recorded in
-[benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
+[benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md](../benchmarks/2026-07-19-b14-ordinary-track-edit-rollback-series.md).
 Its undo/redo and explicit change-back extension is recorded in
-[benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md](benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md).
+[benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md](../benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md).
 The plain-line selected-production export evidence is recorded in
-[benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
+[benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md](../benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md).
 The normal Generate-path production-export evidence is recorded in
-[benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md).
+[benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md](../benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md).
 The connected-straight creation, stationing, edit, history, persistence and
 production-catalogue evidence is recorded in
-[benchmarks/2026-07-20-b14-straight-station-workflow-series.md](benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
+[benchmarks/2026-07-20-b14-straight-station-workflow-series.md](../benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
 The standalone-turnout creation, handed edit, history, persistence, overlap-
 rejection and transaction-abort evidence is recorded in
-[benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md](benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
+[benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md](../benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
 
 ## Fixed plain-line document contract
 
@@ -1011,7 +1011,7 @@ The fast oracle also covers one independent reverse/right-side two-track datum
 and exact B14/B15 calculation parity. The independent-datum GUI, physical
 station/platform, straight target-file export, formation/section options and
 straight-specific negative paths remain open. Full evidence and timings are in
-[benchmarks/2026-07-20-b14-straight-station-workflow-series.md](benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
+[benchmarks/2026-07-20-b14-straight-station-workflow-series.md](../benchmarks/2026-07-20-b14-straight-station-workflow-series.md).
 
 ## Standalone turnout lifecycle contract
 
@@ -1047,13 +1047,13 @@ accepted human-use budgets. Trailing orientation through the GUI, straight or
 alternate hosts, wider gauge/flangeway/output choices, removal/integration,
 standalone timber/chair stages, target-file export and deferred reconstruction
 remain open. Full evidence and limitations are in
-[benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md](benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
+[benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md](../benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md).
 
 ## Candidate boundary-data contract
 
 The five candidates emitted by the static inventory now have an exact,
 machine-readable current-state contract in
-[contracts/phase1-candidate-boundaries.json](contracts/phase1-candidate-boundaries.json).
+[contracts/phase1-candidate-boundaries.json](../contracts/phase1-candidate-boundaries.json).
 It records inputs, outputs, units, frames, tolerances, identity and ordering
 rules, side effects, errors, schemas, cache/signature behaviour, current
 oracles, structural facts and open extraction gates for:
@@ -1112,7 +1112,7 @@ evidence. None measures a proposed lightweight editor or deferred
 Validate/rebuild, so Phase 1 still lacks a reconciled curve-to-export target-
 architecture profile.
 Before profiles select an optimisation, the defects already recorded in
-[VALIDATION.md](VALIDATION.md) must be closed or bounded:
+[VALIDATION.md](../VALIDATION.md) must be closed or bounded:
 
 1. geometry external/internal timing boundary gap;
 2. prematurely persisted chair timing payload;
@@ -1121,7 +1121,7 @@ Before profiles select an optimisation, the defects already recorded in
 5. repeated effective-status signature scans.
 
 The machine-readable
-[performance-boundary register](contracts/phase1-performance-boundaries.json)
+[performance-boundary register](../contracts/phase1-performance-boundaries.json)
 now completes the explicit-boundary branch of that requirement. It protects
 the exact source and committed-report fingerprints, then classifies each
 measurement as an operator action, nested component, harness enclosure,
@@ -1149,7 +1149,7 @@ its legacy path is retired.
 No current timing is accepted as a human-use budget. Routine editing,
 explicit Validate/deferred reconstruction and complete edit-through-export
 will continue to be measured separately under
-[PERFORMANCE_SOP.md](PERFORMANCE_SOP.md); the current selected-export series
+[PERFORMANCE_SOP.md](../PERFORMANCE_SOP.md); the current selected-export series
 covers exact shapes already retained in the legacy fixture, while the
 create-time series covers fresh legacy exact-shape construction only.
 
@@ -1162,7 +1162,7 @@ core attribution, signature and provenance gates.
 
 ## Runtime and legacy-compatibility boundary
 
-[`contracts/phase1-compatibility.json`](contracts/phase1-compatibility.json)
+[`contracts/phase1-compatibility.json`](../contracts/phase1-compatibility.json)
 now separates three facts that must not be collapsed into a single claim:
 
 1. the minimum Python feature floor used by standalone development code;
@@ -1226,7 +1226,7 @@ successor document detector or migrator exists yet, and neither macro changed.
 | 2026-07-19 | Extend the plain-line oracle through one real handedness edit and two negative paths | Accepted; the copied-document recipe freezes mirrored semantics, save/reopen, zero-angle rejection, post-removal transaction abort and the separate last-used-input side effect without changing either macro |
 | 2026-07-19 | Characterise the real explicit selected-export transaction before changing export architecture | Accepted; the copied-document recipe freezes all current formats/manifest, revision and overwrite semantics, parsed artifacts, atomic rollback and cleanup, and exposes repeated probe cost without changing either macro |
 | 2026-07-19 | Characterise create-time production export independently from selected export | Accepted; the normal Generate recipe freezes successful production measures and persistence, measures the fixed end-to-end boundary, and deterministically bounds B14's partial-output/final-success-dialog defects without changing either macro or accepting them as future behaviour |
-| 2026-07-19 | Use plain line/plain-line for track without S&C | Accepted; official UK railway usage replaces the project category “ordinary track”; B14/B15 and historical evidence identifiers remain unchanged, new APIs will use `plain_line`, and macro/component wording is separately gated in [TERMINOLOGY.md](TERMINOLOGY.md) |
+| 2026-07-19 | Use plain line/plain-line for track without S&C | Accepted; official UK railway usage replaces the project category “ordinary track”; B14/B15 and historical evidence identifiers remain unchanged, new APIs will use `plain_line`, and macro/component wording is separately gated in [TERMINOLOGY.md](../TERMINOLOGY.md) |
 | 2026-07-19 | Extend the fixed plain-line edit oracle through undo/redo and exact change-back | Accepted for Phase 1 evidence; every intermediate B14 state is frozen, but its three-entry geometry/schedule/report stack is a bounded legacy defect and the successor must make one accepted command one atomic undo unit |
 | 2026-07-19 | Select the first extraction now | Deferred; transition solving leads on structural coupling, but workflow oracles, boundary contracts and representative profiles are not yet complete |
 | 2026-07-20 | Use a source-informed procedural constituent pattern through a neutral project definition | Accepted; full-size definitions and named parts are canonical, Templot source/media is not canonical data, and FreeCAD B-reps may replace DXF `3DFACE` mechanics only under geometric oracle evidence; B15's five-box body remains legacy gap evidence |
@@ -1305,4 +1305,4 @@ inventory and decision gates pass:
   Addon metadata and broader platform qualification.
 
 Phase 1 closed on 2026-07-22 after all nine exit criteria in
-[PROJECT_PLAN.md](PROJECT_PLAN.md) were evidenced and explicitly accepted.
+[PROJECT_PLAN.md](../PROJECT_PLAN.md) were evidenced and explicitly accepted.

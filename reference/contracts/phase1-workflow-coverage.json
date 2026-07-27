@@ -26,7 +26,7 @@
     }
   },
   "policy": {
-    "inventory_owner": "reference/PHASE1_INVENTORY.md",
+    "inventory_owner": "reference/phase-evidence/PHASE1_INVENTORY.md",
     "inventory_heading": "## Release-critical workflow coverage inventory",
     "coverage_rule": "Every row in the canonical Markdown inventory appears exactly once here, and every contract workflow appears in that table.",
     "oracle_rule": "A current legacy workflow needs bounded-executed evidence. A successor-only workflow may be defined-blocked only when its acceptance oracle, blocker and decision owner are explicit.",
@@ -281,7 +281,7 @@
         "recipe_paths": [
           "reference/ARCHITECTURE.md",
           "reference/PROJECT_PLAN.md",
-          "reference/S1_PILOT_PLAN.md"
+          "reference/phase-evidence/S1_PILOT_PLAN.md"
         ],
         "validation_paths": [
           "tests/validate_templot_s1_oracle.py",
@@ -309,7 +309,7 @@
         "evidence_paths": [
           "reference/ARCHITECTURE.md",
           "reference/LICENSING_BOUNDARIES.md",
-          "reference/S1_PILOT_PLAN.md",
+          "reference/phase-evidence/S1_PILOT_PLAN.md",
           "reference/manifests/s1-chair-pilot.dependency-manifest.json"
         ],
         "recipe_paths": [

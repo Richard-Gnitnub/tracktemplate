@@ -16,7 +16,9 @@ sys.path.insert(0, str(ROOT))
 from tools import validate_dependency_manifest as manifest_validator  # noqa: E402
 
 
-CLOSEOUT_PATH = ROOT / "reference" / "PHASE1_CLOSEOUT.md"
+CLOSEOUT_PATH = (
+    ROOT / "reference" / "phase-evidence" / "PHASE1_CLOSEOUT.md"
+)
 PROJECT_PLAN_PATH = ROOT / "reference" / "PROJECT_PLAN.md"
 SOURCE_EXPECTATIONS = {
     "b14": (
@@ -391,9 +393,9 @@ def _load_data():
         "manifest": _read_json(
             "reference/manifests/s1-chair-pilot.dependency-manifest.json"
         ),
-        "s1_plan_text": (ROOT / "reference" / "S1_PILOT_PLAN.md").read_text(
-            encoding="utf-8"
-        ),
+        "s1_plan_text": (
+            ROOT / "reference" / "phase-evidence" / "S1_PILOT_PLAN.md"
+        ).read_text(encoding="utf-8"),
         "s1_lineage": _read_json("reference/lineage/phase1-s1-core-lineage.json"),
         "other_lineage": _read_json(
             "reference/lineage/phase1-other-snc-legacy-lineage.json"

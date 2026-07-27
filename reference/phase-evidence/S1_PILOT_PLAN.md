@@ -8,16 +8,16 @@ acceptance plan for the first S1 chair. It is a project-control plan, not a
 chair definition, an assertion that the working description “S1” is a precise
 prototype designation, or legal clearance.
 
-The governing boundaries are [ARCHITECTURE.md](ARCHITECTURE.md) and
-[LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md). The local Templot
+The governing boundaries are [ARCHITECTURE.md](../ARCHITECTURE.md) and
+[LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md). The local Templot
 comparison remains controlled by the
-[frozen 556b oracle](oracles/templot5-556b-s1-oracle.json).
+[frozen 556b oracle](../oracles/templot5-556b-s1-oracle.json).
 
 The plan deliberately contains no production dimensions, copied Templot value
 collection, generated chair body or positive rights decision. The current
-[dependency manifest](manifests/s1-chair-pilot.dependency-manifest.json)
+[dependency manifest](../manifests/s1-chair-pilot.dependency-manifest.json)
 therefore remains `unknown` with package licence `NOASSERTION`, and the
-[first-S1/core lineage register](lineage/phase1-s1-core-lineage.json) remains
+[first-S1/core lineage register](../lineage/phase1-s1-core-lineage.json) remains
 blocked.
 
 ## Accepted direction

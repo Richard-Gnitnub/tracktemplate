@@ -229,9 +229,9 @@ def validate_evidence_links():
     assert "no optimisation" in report.lower()
     assert "explicit project-owner acceptance" in report
 
-    phase3 = (ROOT / "reference/PHASE3_TRANSITION_SLICE.md").read_text(
-        encoding="utf-8"
-    )
+    phase3 = (
+        ROOT / "reference/phase-evidence/PHASE3_TRANSITION_SLICE.md"
+    ).read_text(encoding="utf-8")
     assert "all five technical exit conditions and project-owner" in phase3
     assert "2026-07-22-b16-transition-performance-profile.md" in phase3
     assert "Closeout acceptance and carried controls" in phase3

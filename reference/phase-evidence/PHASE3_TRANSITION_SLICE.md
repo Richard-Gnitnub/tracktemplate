@@ -41,7 +41,7 @@ checkpoint `dc0623fa024cf1ba86891f713e7f160f52b0b38d`.
 - B15 remains
   `3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848`.
 - The exact accepted selection, boundary and implementation-gate contract is
-  [contracts/phase1-transition-pilot.json](contracts/phase1-transition-pilot.json).
+  [contracts/phase1-transition-pilot.json](../contracts/phase1-transition-pilot.json).
 
 ## Retained implementation boundary
 
@@ -155,7 +155,7 @@ document unchanged. Both workflows also pass their complete Undo/Redo and
 save/reopen contracts, restore isolated preferences, preserve the source
 fixture and leave no isolated FreeCAD process running. The full recipe,
 normalisation boundary, raw-artifact hashes and limitations are recorded in
-[the routed-workflow report](benchmarks/2026-07-22-b16-transition-routed-workflow-parity.md).
+[the routed-workflow report](../benchmarks/2026-07-22-b16-transition-routed-workflow-parity.md).
 
 The single-run durations in that report are correctness observations enclosing
 GUI automation and deep validation. They are not the contracted Phase 3
@@ -193,7 +193,7 @@ and this slice does not touch Validate/Export or wider trackwork paths.
 
 The complete recipe, medians/ranges, CPU/RSS/object observations, raw-artifact
 hash and limitations are recorded in
-[the performance report](benchmarks/2026-07-22-b16-transition-performance-profile.md).
+[the performance report](../benchmarks/2026-07-22-b16-transition-performance-profile.md).
 This closes the contracted regression evidence without introducing an
 optimisation, threshold, cache, calculation change or reduced validation
 scope.
@@ -256,7 +256,7 @@ Phase 4 is next in the delivery order but remains not started pending explicit
 project-owner instruction.
 
 No independent backup is inferred from this evidence; the accepted temporary
-backup risk and [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) controls remain
+backup risk and [RECOVERY_AND_BACKUP.md](../RECOVERY_AND_BACKUP.md) controls remain
 unchanged.
 
 ## Documentation lifecycle housekeeping

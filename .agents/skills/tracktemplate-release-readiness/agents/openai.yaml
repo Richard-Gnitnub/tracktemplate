@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Release Readiness"
+  short_description: "Audit release gates and distributable artifacts"
+  default_prompt: "Use $tracktemplate-release-readiness to audit this TrackTemplate release candidate without publishing it."

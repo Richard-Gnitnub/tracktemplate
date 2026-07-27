@@ -1140,6 +1140,6 @@
     "selected_candidate_id": "transition_length_solver",
     "selected_on": "2026-07-20",
     "selection_contract_path": "reference/contracts/phase1-transition-pilot.json",
-    "recommendation_evidence_path": "reference/PHASE1_SLICE_SCORECARD.md"
+    "recommendation_evidence_path": "reference/phase-evidence/PHASE1_SLICE_SCORECARD.md"
   }
 }

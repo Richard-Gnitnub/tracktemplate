@@ -12,7 +12,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 CONTRACT_PATH = (
     ROOT / "reference" / "contracts" / "phase1-workflow-coverage.json"
 )
-INVENTORY_PATH = ROOT / "reference" / "PHASE1_INVENTORY.md"
+INVENTORY_PATH = (
+    ROOT / "reference" / "phase-evidence" / "PHASE1_INVENTORY.md"
+)
 TOP_LEVEL_KEYS = {
     "schema_version",
     "contract_id",
@@ -230,7 +232,10 @@ def validate_contract(document, inventory_text, check_paths=True):
         policy = {}
     elif not all(_non_empty_text(value) for value in policy.values()):
         errors.append("workflow coverage policy contains empty text")
-    if policy.get("inventory_owner") != "reference/PHASE1_INVENTORY.md":
+    if (
+        policy.get("inventory_owner")
+        != "reference/phase-evidence/PHASE1_INVENTORY.md"
+    ):
         errors.append("workflow inventory owner is invalid")
     heading = policy.get("inventory_heading")
     if heading != "## Release-critical workflow coverage inventory":

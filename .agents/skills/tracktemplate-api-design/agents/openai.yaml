@@ -1,4 +1,4 @@
 interface:
   display_name: "TrackTemplate API Design"
-  short_description: "Design narrow versioned TrackTemplate contracts"
-  default_prompt: "Use $tracktemplate-api-design to design or review this TrackTemplate API contract."
+  short_description: "Design and integrate narrow API contracts"
+  default_prompt: "Use $tracktemplate-api-design to design, integrate or review this TrackTemplate API contract."

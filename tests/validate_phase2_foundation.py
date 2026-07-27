@@ -50,7 +50,9 @@ REQUIRED_MODULES = {
     "tracktemplate.domain": ("domain", set()),
 }
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
-FOUNDATION_PATH = ROOT / "reference" / "PHASE2_FOUNDATION.md"
+FOUNDATION_PATH = (
+    ROOT / "reference" / "phase-evidence" / "PHASE2_FOUNDATION.md"
+)
 
 
 def _sha256(path):

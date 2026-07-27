@@ -277,9 +277,12 @@ def _validate_bridge_contract():
     ):
         assert required_evidence in report_text
 
-    phase3_text = (ROOT / "reference" / "PHASE3_TRANSITION_SLICE.md").read_text(
-        encoding="utf-8"
-    )
+    phase3_text = (
+        ROOT
+        / "reference"
+        / "phase-evidence"
+        / "PHASE3_TRANSITION_SLICE.md"
+    ).read_text(encoding="utf-8")
     project_plan_text = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"
     )

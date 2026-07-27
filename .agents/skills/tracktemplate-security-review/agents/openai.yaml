@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Security Review"
+  short_description: "Review trust boundaries and security-sensitive changes"
+  default_prompt: "Use $tracktemplate-security-review to assess the security and trust boundaries of this TrackTemplate change."

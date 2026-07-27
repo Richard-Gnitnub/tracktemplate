@@ -1,0 +1,2 @@
+# Optional repository and agent-skill validation tools; not Addon dependencies.
+PyYAML==6.0.3
