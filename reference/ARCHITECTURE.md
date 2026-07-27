@@ -3,6 +3,9 @@
 Status: accepted strategic direction; implementation is intentionally phased.
 
 The authoritative phase sequence and release-candidate gates are maintained in [PROJECT_PLAN.md](PROJECT_PLAN.md).
+The supporting [product-system ontology](ONTOLOGY.md) projects the stable
+concepts and relationships in this architecture for human and machine use; it
+does not replace this document or record delivery status.
 
 ## Why the architecture is changing
 

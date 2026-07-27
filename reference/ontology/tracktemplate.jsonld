@@ -1,0 +1,1418 @@
+{
+  "@context": {
+    "dcterms": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "tt": "https://github.com/Richard-Gnitnub/tracktemplate/ontology#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@graph": [
+    {
+      "@id": "https://github.com/Richard-Gnitnub/tracktemplate/ontology",
+      "@type": "owl:Ontology",
+      "dcterms:description": "A stable semantic projection of the TrackTemplate product system. Canonical project documents and versioned schemas remain authoritative.",
+      "dcterms:license": {
+        "@id": "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/LICENSE"
+      },
+      "dcterms:relation": {
+        "@id": "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/reference/PROJECT_PLAN.md"
+      },
+      "dcterms:title": "TrackTemplate product-system ontology",
+      "owl:versionIRI": {
+        "@id": "https://github.com/Richard-Gnitnub/tracktemplate/ontology/0.1.0"
+      },
+      "owl:versionInfo": "0.1.0",
+      "rdfs:isDefinedBy": [
+        {
+          "@id": "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/reference/ARCHITECTURE.md"
+        },
+        {
+          "@id": "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/reference/TERMINOLOGY.md"
+        },
+        {
+          "@id": "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/reference/LICENSING_BOUNDARIES.md"
+        },
+        {
+          "@id": "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/reference/PROVENANCE.md"
+        }
+      ]
+    },
+    {
+      "@id": "tt:CanonicalState",
+      "@type": "owl:Class",
+      "owl:disjointWith": {
+        "@id": "tt:DerivedArtifact"
+      },
+      "rdfs:comment": "Durable, versioned product state that records railway intent rather than generated views or geometry.",
+      "rdfs:label": "Canonical state"
+    },
+    {
+      "@id": "tt:RailwayModel",
+      "@type": "owl:Class",
+      "rdfs:comment": "The authoritative aggregate of configuration, railway entities, topology and production intent.",
+      "rdfs:label": "Railway model",
+      "rdfs:subClassOf": [
+        {
+          "@id": "tt:CanonicalState"
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:containsEntity"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:RailwayEntity"
+          }
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:hasConfiguration"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:Configuration"
+          }
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:hasProductionIntent"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:ProductionIntent"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "tt:RailwayEntity",
+      "@type": "owl:Class",
+      "rdfs:comment": "A stable, identifiable railway concept contained by the canonical model.",
+      "rdfs:label": "Railway entity"
+    },
+    {
+      "@id": "tt:Route",
+      "@type": "owl:Class",
+      "rdfs:comment": "An ordered path through the railway topology.",
+      "rdfs:label": "Route",
+      "rdfs:subClassOf": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:Track",
+      "@type": "owl:Class",
+      "rdfs:comment": "A railway track with an alignment, rails and supporting infrastructure.",
+      "rdfs:label": "Track",
+      "rdfs:subClassOf": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:PlainLineTrack",
+      "@type": "owl:Class",
+      "rdfs:comment": "Track without switches and crossings; it may be straight, curved, transitioned, single-track or multiple-track.",
+      "rdfs:label": "Plain line track",
+      "rdfs:subClassOf": {
+        "@id": "tt:Track"
+      }
+    },
+    {
+      "@id": "tt:Alignment",
+      "@type": "owl:Class",
+      "rdfs:comment": "The ordered geometric definition of a track centreline.",
+      "rdfs:label": "Alignment",
+      "rdfs:subClassOf": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:AlignmentElement",
+      "@type": "owl:Class",
+      "rdfs:comment": "One ordered straight, circular or transition element of an alignment.",
+      "rdfs:label": "Alignment element",
+      "rdfs:subClassOf": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:StraightAlignmentElement",
+      "@type": "owl:Class",
+      "rdfs:comment": "An alignment element with zero curvature.",
+      "rdfs:label": "Straight alignment element",
+      "rdfs:subClassOf": {
+        "@id": "tt:AlignmentElement"
+      }
+    },
+    {
+      "@id": "tt:CircularAlignmentElement",
+      "@type": "owl:Class",
+      "rdfs:comment": "An alignment element with constant non-zero curvature.",
+      "rdfs:label": "Circular alignment element",
+      "rdfs:subClassOf": {
+        "@id": "tt:AlignmentElement"
+      }
+    },
+    {
+      "@id": "tt:TransitionAlignmentElement",
+      "@type": "owl:Class",
+      "rdfs:comment": "An alignment element in which curvature or track spacing changes according to a declared mathematical rule.",
+      "rdfs:label": "Transition alignment element",
+      "rdfs:subClassOf": {
+        "@id": "tt:AlignmentElement"
+      }
+    },
+    {
+      "@id": "tt:SpecialTrackwork",
+      "@type": "owl:Class",
+      "rdfs:comment": "Switches and crossings infrastructure represented by explicit railway topology.",
+      "rdfs:label": "Special trackwork",
+      "rdfs:subClassOf": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:Turnout",
+      "@type": "owl:Class",
+      "rdfs:comment": "A special-trackwork entity providing a divergence between routes; component terminology remains governed by the terminology register.",
+      "rdfs:label": "Turnout",
+      "rdfs:subClassOf": {
+        "@id": "tt:SpecialTrackwork"
+      },
+      "skos:scopeNote": "The label denotes the complete special-trackwork entity here; switch, points and crossing component terms require their own accepted contexts."
+    },
+    {
+      "@id": "tt:Crossover",
+      "@type": "owl:Class",
+      "rdfs:comment": "A relationship of special-trackwork entities connecting adjacent tracks.",
+      "rdfs:label": "Crossover",
+      "rdfs:subClassOf": {
+        "@id": "tt:SpecialTrackwork"
+      }
+    },
+    {
+      "@id": "tt:Rail",
+      "@type": "owl:Class",
+      "rdfs:comment": "A running rail whose section, position and interfaces are defined by railway intent.",
+      "rdfs:label": "Rail",
+      "rdfs:subClassOf": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:TrackSupport",
+      "@type": "owl:Class",
+      "rdfs:comment": "A support beneath or associated with rails; specific support taxonomy remains explicit rather than assuming universal synonymy.",
+      "rdfs:label": "Track support",
+      "rdfs:subClassOf": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:Timber",
+      "@type": "owl:Class",
+      "rdfs:comment": "A timber represented as a track support without asserting equivalence to every sleeper class.",
+      "rdfs:label": "Timber",
+      "rdfs:subClassOf": {
+        "@id": "tt:TrackSupport"
+      },
+      "skos:scopeNote": "This class does not assert that timber and sleeper are universally interchangeable."
+    },
+    {
+      "@id": "tt:ChairAssignment",
+      "@type": "owl:Class",
+      "rdfs:comment": "The stable assignment of a chair definition and variant to a rail/support location.",
+      "rdfs:label": "Chair assignment",
+      "rdfs:subClassOf": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:Configuration",
+      "@type": "owl:Class",
+      "rdfs:comment": "Versioned user and project parameters used to build the railway model.",
+      "rdfs:label": "Configuration"
+    },
+    {
+      "@id": "tt:TopologyRelation",
+      "@type": "owl:Class",
+      "rdfs:comment": "An explicit connection or ordering relation among railway entities.",
+      "rdfs:label": "Topology relation"
+    },
+    {
+      "@id": "tt:ProductionIntent",
+      "@type": "owl:Class",
+      "rdfs:comment": "Canonical choices that affect validation, manufacture or export.",
+      "rdfs:label": "Production intent"
+    },
+    {
+      "@id": "tt:StableIdentity",
+      "@type": "owl:Class",
+      "rdfs:comment": "A durable identity independent of labels, document order and generated object names.",
+      "rdfs:label": "Stable identity"
+    },
+    {
+      "@id": "tt:CoordinateFrame",
+      "@type": "owl:Class",
+      "rdfs:comment": "An explicit coordinate origin, axes and handedness used at a semantic boundary.",
+      "rdfs:label": "Coordinate frame"
+    },
+    {
+      "@id": "tt:Unit",
+      "@type": "owl:Class",
+      "rdfs:comment": "An explicit unit attached to a quantity or interface.",
+      "rdfs:label": "Unit"
+    },
+    {
+      "@id": "tt:ToleranceProfile",
+      "@type": "owl:Class",
+      "rdfs:comment": "A versioned set of numerical tolerances that participates in result signatures.",
+      "rdfs:label": "Tolerance profile"
+    },
+    {
+      "@id": "tt:VersionedRecord",
+      "@type": "owl:Class",
+      "rdfs:comment": "A semantic or persistent record governed by an explicit schema identity and version.",
+      "rdfs:label": "Versioned record"
+    },
+    {
+      "@id": "tt:PermissionBearingRecord",
+      "@type": "owl:Class",
+      "rdfs:comment": "A package or provenance record that carries explicit field-level permissions.",
+      "rdfs:label": "Permission-bearing record"
+    },
+    {
+      "@id": "tt:ProjectStatusBearingRecord",
+      "@type": "owl:Class",
+      "rdfs:comment": "A package or dependency record that carries a fail-closed project status.",
+      "rdfs:label": "Project-status-bearing record"
+    },
+    {
+      "@id": "tt:ChairDefinitionPackage",
+      "@type": "owl:Class",
+      "rdfs:comment": "A neutral, versioned and manifest-linked package containing one validated chair definition.",
+      "rdfs:label": "Chair-definition package",
+      "rdfs:subClassOf": [
+        {
+          "@id": "tt:CanonicalState"
+        },
+        {
+          "@id": "tt:ManifestBearingRecord"
+        },
+        {
+          "@id": "tt:VersionedRecord"
+        },
+        {
+          "@id": "tt:PermissionBearingRecord"
+        },
+        {
+          "@id": "tt:ProjectStatusBearingRecord"
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onClass": {
+            "@id": "tt:ChairDefinition"
+          },
+          "owl:onProperty": {
+            "@id": "tt:packagesChairDefinition"
+          },
+          "owl:qualifiedCardinality": {
+            "@type": "xsd:nonNegativeInteger",
+            "@value": "1"
+          }
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onClass": {
+            "@id": "tt:DependencyManifest"
+          },
+          "owl:onProperty": {
+            "@id": "tt:hasDependencyManifest"
+          },
+          "owl:qualifiedCardinality": {
+            "@type": "xsd:nonNegativeInteger",
+            "@value": "1"
+          }
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:hasProvenance"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:ProvenanceRecord"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "tt:ChairDefinition",
+      "@type": "owl:Class",
+      "rdfs:comment": "An adapter-neutral procedural definition of prototype geometry, components, interfaces and manufacturing separation.",
+      "rdfs:label": "Chair definition",
+      "rdfs:subClassOf": [
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:hasComponent"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:ChairComponent"
+          }
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:hasDatum"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:Datum"
+          }
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:hasRailInterface"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:RailInterface"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "tt:ChairComponent",
+      "@type": "owl:Class",
+      "rdfs:comment": "A stable named constituent of a procedural chair definition.",
+      "rdfs:label": "Chair component"
+    },
+    {
+      "@id": "tt:ProceduralRule",
+      "@type": "owl:Class",
+      "rdfs:comment": "A declarative profile, section, radius, slope, relationship, symmetry, placement or assembly rule.",
+      "rdfs:label": "Procedural rule"
+    },
+    {
+      "@id": "tt:Quantity",
+      "@type": "owl:Class",
+      "rdfs:comment": "A value retaining its source quantity, canonical conversion, unit, uncertainty and lineage.",
+      "rdfs:label": "Quantity"
+    },
+    {
+      "@id": "tt:Datum",
+      "@type": "owl:Class",
+      "rdfs:comment": "A named point, axis, plane, direction or frame used to define or assemble geometry.",
+      "rdfs:label": "Datum"
+    },
+    {
+      "@id": "tt:RailInterface",
+      "@type": "owl:Class",
+      "rdfs:comment": "The declared relationship between a chair definition and a supported rail section.",
+      "rdfs:label": "Rail interface"
+    },
+    {
+      "@id": "tt:ManufacturingProfile",
+      "@type": "owl:Class",
+      "rdfs:comment": "Scale, material, process and compensation parameters kept separate from prototype geometry.",
+      "rdfs:label": "Manufacturing profile"
+    },
+    {
+      "@id": "tt:ProvenanceRecord",
+      "@type": "owl:Class",
+      "rdfs:comment": "A field-, component- or package-level record of origin, classification, evidence and permissions.",
+      "rdfs:label": "Provenance record",
+      "rdfs:subClassOf": {
+        "@id": "tt:PermissionBearingRecord"
+      }
+    },
+    {
+      "@id": "tt:Evidence",
+      "@type": "owl:Class",
+      "rdfs:comment": "A source, measurement, drawing, scan, CAD model, comparison artifact or derivation supporting a claim.",
+      "rdfs:label": "Evidence"
+    },
+    {
+      "@id": "tt:Dependency",
+      "@type": "owl:Class",
+      "rdfs:comment": "An input or protected-material dependency that may affect a package or generated output.",
+      "rdfs:label": "Dependency"
+    },
+    {
+      "@id": "tt:DependencyManifest",
+      "@type": "owl:Class",
+      "rdfs:comment": "A fail-closed machine-readable record of output-affecting dependencies and project status.",
+      "rdfs:label": "Dependency manifest",
+      "rdfs:subClassOf": {
+        "@id": "tt:ProjectStatusBearingRecord"
+      }
+    },
+    {
+      "@id": "tt:PermissionSet",
+      "@type": "owl:Class",
+      "rdfs:comment": "Recorded permissions for access, adaptation, output, redistribution, commercial use and publication.",
+      "rdfs:label": "Permission set"
+    },
+    {
+      "@id": "tt:ManifestBearingRecord",
+      "@type": "owl:Class",
+      "rdfs:comment": "A canonical package or derived output record that carries a dependency manifest.",
+      "rdfs:label": "Manifest-bearing record"
+    },
+    {
+      "@id": "tt:ProvenanceClassification",
+      "@type": "owl:Class",
+      "rdfs:comment": "A controlled classification from the licensing and provenance policy.",
+      "rdfs:label": "Provenance classification"
+    },
+    {
+      "@id": "tt:PermissionStatus",
+      "@type": "owl:Class",
+      "rdfs:comment": "A controlled status applied to one permission field.",
+      "rdfs:label": "Permission status",
+      "rdfs:subClassOf": {
+        "@id": "tt:ControlledStatus"
+      }
+    },
+    {
+      "@id": "tt:ProjectStatus",
+      "@type": "owl:Class",
+      "rdfs:comment": "The fail-closed project status of a package or output dependency.",
+      "rdfs:label": "Project status",
+      "rdfs:subClassOf": {
+        "@id": "tt:ControlledStatus"
+      }
+    },
+    {
+      "@id": "tt:ControlledStatus",
+      "@type": "owl:Class",
+      "rdfs:comment": "A stable machine status code controlled by an authoritative project policy or schema.",
+      "rdfs:label": "Controlled status"
+    },
+    {
+      "@id": "tt:DerivedArtifact",
+      "@type": "owl:Class",
+      "rdfs:comment": "A reproducible result, view or output derived from canonical state.",
+      "rdfs:label": "Derived artifact",
+      "rdfs:subClassOf": [
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:derivedFrom"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:CanonicalState"
+          }
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:protectedBySignature"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:InputSignature"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "tt:AnalysisResult",
+      "@type": "owl:Class",
+      "rdfs:comment": "A derived analytical result tied to complete inputs and result integrity.",
+      "rdfs:label": "Analysis result",
+      "rdfs:subClassOf": [
+        {
+          "@id": "tt:DerivedArtifact"
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:hasResultIntegritySignature"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:ResultIntegritySignature"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "tt:PreviewScene",
+      "@type": "owl:Class",
+      "owl:disjointWith": {
+        "@id": "tt:ValidationResult"
+      },
+      "rdfs:comment": "A lightweight derived editing view that is not exact-validation evidence.",
+      "rdfs:label": "Preview scene",
+      "rdfs:subClassOf": {
+        "@id": "tt:DerivedArtifact"
+      }
+    },
+    {
+      "@id": "tt:ExactGeometry",
+      "@type": "owl:Class",
+      "rdfs:comment": "Demand-driven transient geometry constructed for exact validation or target-specific export.",
+      "rdfs:label": "Exact geometry",
+      "rdfs:subClassOf": {
+        "@id": "tt:DerivedArtifact"
+      }
+    },
+    {
+      "@id": "tt:ValidationResult",
+      "@type": "owl:Class",
+      "rdfs:comment": "A production-grade validation result tied to current canonical inputs and required exact geometry.",
+      "rdfs:label": "Validation result",
+      "rdfs:subClassOf": {
+        "@id": "tt:DerivedArtifact"
+      }
+    },
+    {
+      "@id": "tt:ExportArtifact",
+      "@type": "owl:Class",
+      "rdfs:comment": "A generated SVG, DXF, STL, STEP, FreeCAD object or other requested output.",
+      "rdfs:label": "Export artifact",
+      "rdfs:subClassOf": [
+        {
+          "@id": "tt:DerivedArtifact"
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:validatedBy"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:ValidationResult"
+          }
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:describedByManifest"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:ExportManifest"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "tt:ExportManifest",
+      "@type": "owl:Class",
+      "rdfs:comment": "A deterministic record of exported artifacts, identities, categories and rights dependencies.",
+      "rdfs:label": "Export manifest",
+      "rdfs:subClassOf": [
+        {
+          "@id": "tt:DerivedArtifact"
+        },
+        {
+          "@id": "tt:ManifestBearingRecord"
+        }
+      ]
+    },
+    {
+      "@id": "tt:Signature",
+      "@type": "owl:Class",
+      "rdfs:comment": "A deterministic fingerprint of semantic inputs or a result and its inputs.",
+      "rdfs:label": "Signature"
+    },
+    {
+      "@id": "tt:InputSignature",
+      "@type": "owl:Class",
+      "rdfs:comment": "A fingerprint covering every input that can affect a derived result.",
+      "rdfs:label": "Input signature",
+      "rdfs:subClassOf": {
+        "@id": "tt:Signature"
+      }
+    },
+    {
+      "@id": "tt:ResultIntegritySignature",
+      "@type": "owl:Class",
+      "rdfs:comment": "A fingerprint covering a complete input signature and the resulting value or artifact.",
+      "rdfs:label": "Result-integrity signature",
+      "rdfs:subClassOf": {
+        "@id": "tt:Signature"
+      }
+    },
+    {
+      "@id": "tt:WorkflowOperation",
+      "@type": "owl:Class",
+      "rdfs:comment": "An application-layer command or state transition.",
+      "rdfs:label": "Workflow operation"
+    },
+    {
+      "@id": "tt:EditOperation",
+      "@type": "owl:Class",
+      "rdfs:comment": "An atomic change to canonical intent with corresponding invalidation of affected derived state.",
+      "rdfs:label": "Edit operation",
+      "rdfs:subClassOf": {
+        "@id": "tt:WorkflowOperation"
+      }
+    },
+    {
+      "@id": "tt:AnalyseOperation",
+      "@type": "owl:Class",
+      "rdfs:comment": "A calculation of analytical results from canonical state.",
+      "rdfs:label": "Analyse operation",
+      "rdfs:subClassOf": {
+        "@id": "tt:WorkflowOperation"
+      }
+    },
+    {
+      "@id": "tt:ValidateOperation",
+      "@type": "owl:Class",
+      "rdfs:comment": "An explicit production-grade validation request.",
+      "rdfs:label": "Validate operation",
+      "rdfs:subClassOf": {
+        "@id": "tt:WorkflowOperation"
+      }
+    },
+    {
+      "@id": "tt:ExportOperation",
+      "@type": "owl:Class",
+      "rdfs:comment": "A staged, validated, deterministic and transactional output request.",
+      "rdfs:label": "Export operation",
+      "rdfs:subClassOf": [
+        {
+          "@id": "tt:WorkflowOperation"
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:requiresCurrentValidation"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:ValidationResult"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "tt:Adapter",
+      "@type": "owl:Class",
+      "rdfs:comment": "A boundary translating domain or application records without owning railway rules.",
+      "rdfs:label": "Adapter"
+    },
+    {
+      "@id": "tt:PersistenceAdapter",
+      "@type": "owl:Class",
+      "rdfs:comment": "An adapter between canonical records and a versioned persistent host representation.",
+      "rdfs:label": "Persistence adapter",
+      "rdfs:subClassOf": {
+        "@id": "tt:Adapter"
+      }
+    },
+    {
+      "@id": "tt:PresentationAdapter",
+      "@type": "owl:Class",
+      "rdfs:comment": "An adapter producing lightweight semantic display layers and selection mappings.",
+      "rdfs:label": "Presentation adapter",
+      "rdfs:subClassOf": {
+        "@id": "tt:Adapter"
+      }
+    },
+    {
+      "@id": "tt:ExactGeometryAdapter",
+      "@type": "owl:Class",
+      "rdfs:comment": "An adapter constructing the minimum exact geometry needed for validation or export.",
+      "rdfs:label": "Exact-geometry adapter",
+      "rdfs:subClassOf": {
+        "@id": "tt:Adapter"
+      }
+    },
+    {
+      "@id": "tt:ExportAdapter",
+      "@type": "owl:Class",
+      "rdfs:comment": "An adapter preparing, staging, verifying, committing and rolling back target output.",
+      "rdfs:label": "Export adapter",
+      "rdfs:subClassOf": {
+        "@id": "tt:Adapter"
+      }
+    },
+    {
+      "@id": "tt:CompatibilityAdapter",
+      "@type": "owl:Class",
+      "rdfs:comment": "A fail-closed adapter for explicit legacy inspection, aliases or versioned migrations.",
+      "rdfs:label": "Compatibility adapter",
+      "rdfs:subClassOf": {
+        "@id": "tt:Adapter"
+      }
+    },
+    {
+      "@id": "tt:PersistentRecord",
+      "@type": "owl:Class",
+      "rdfs:comment": "A compact versioned record that persists canonical state rather than redundant derived geometry.",
+      "rdfs:label": "Persistent record",
+      "rdfs:subClassOf": [
+        {
+          "@id": "tt:VersionedRecord"
+        },
+        {
+          "@type": "owl:Restriction",
+          "owl:onProperty": {
+            "@id": "tt:persistsCanonicalState"
+          },
+          "owl:someValuesFrom": {
+            "@id": "tt:CanonicalState"
+          }
+        }
+      ]
+    },
+    {
+      "@id": "tt:containsEntity",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Relates a railway model to one of its stable railway entities.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayModel"
+      },
+      "rdfs:label": "contains entity",
+      "rdfs:range": {
+        "@id": "tt:RailwayEntity"
+      }
+    },
+    {
+      "@id": "tt:containsTrack",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Relates a railway model to a contained track.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayModel"
+      },
+      "rdfs:label": "contains track",
+      "rdfs:range": {
+        "@id": "tt:Track"
+      },
+      "rdfs:subPropertyOf": {
+        "@id": "tt:containsEntity"
+      }
+    },
+    {
+      "@id": "tt:hasAlignment",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a track with its alignment.",
+      "rdfs:domain": {
+        "@id": "tt:Track"
+      },
+      "rdfs:label": "has alignment",
+      "rdfs:range": {
+        "@id": "tt:Alignment"
+      }
+    },
+    {
+      "@id": "tt:hasAlignmentElement",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates an alignment with an ordered geometric element.",
+      "rdfs:domain": {
+        "@id": "tt:Alignment"
+      },
+      "rdfs:label": "has alignment element",
+      "rdfs:range": {
+        "@id": "tt:AlignmentElement"
+      }
+    },
+    {
+      "@id": "tt:hasTopologyRelation",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates canonical railway state with an explicit topology relation.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayModel"
+      },
+      "rdfs:label": "has topology relation",
+      "rdfs:range": {
+        "@id": "tt:TopologyRelation"
+      }
+    },
+    {
+      "@id": "tt:usesRail",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates track or special trackwork with a rail.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayEntity"
+      },
+      "rdfs:label": "uses rail",
+      "rdfs:range": {
+        "@id": "tt:Rail"
+      }
+    },
+    {
+      "@id": "tt:supportedBy",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a rail or track entity with a track support.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayEntity"
+      },
+      "rdfs:label": "supported by",
+      "rdfs:range": {
+        "@id": "tt:TrackSupport"
+      }
+    },
+    {
+      "@id": "tt:hasChairAssignment",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates canonical railway state with a chair assignment.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayModel"
+      },
+      "rdfs:label": "has chair assignment",
+      "rdfs:range": {
+        "@id": "tt:ChairAssignment"
+      }
+    },
+    {
+      "@id": "tt:usesChairDefinition",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a chair assignment with its neutral chair definition.",
+      "rdfs:domain": {
+        "@id": "tt:ChairAssignment"
+      },
+      "rdfs:label": "uses chair definition",
+      "rdfs:range": {
+        "@id": "tt:ChairDefinition"
+      }
+    },
+    {
+      "@id": "tt:hasConfiguration",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates canonical railway state with its configuration.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayModel"
+      },
+      "rdfs:label": "has configuration",
+      "rdfs:range": {
+        "@id": "tt:Configuration"
+      }
+    },
+    {
+      "@id": "tt:hasProductionIntent",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates canonical railway state with production intent.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayModel"
+      },
+      "rdfs:label": "has production intent",
+      "rdfs:range": {
+        "@id": "tt:ProductionIntent"
+      }
+    },
+    {
+      "@id": "tt:hasStableIdentity",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a railway entity with its durable identity.",
+      "rdfs:domain": {
+        "@id": "tt:RailwayEntity"
+      },
+      "rdfs:label": "has stable identity",
+      "rdfs:range": {
+        "@id": "tt:StableIdentity"
+      }
+    },
+    {
+      "@id": "tt:packagesChairDefinition",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a package with the chair definition it carries.",
+      "rdfs:domain": {
+        "@id": "tt:ChairDefinitionPackage"
+      },
+      "rdfs:label": "packages chair definition",
+      "rdfs:range": {
+        "@id": "tt:ChairDefinition"
+      }
+    },
+    {
+      "@id": "tt:hasComponent",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a chair definition with a named component.",
+      "rdfs:domain": {
+        "@id": "tt:ChairDefinition"
+      },
+      "rdfs:label": "has component",
+      "rdfs:range": {
+        "@id": "tt:ChairComponent"
+      }
+    },
+    {
+      "@id": "tt:hasProceduralRule",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a definition or component with a procedural rule.",
+      "rdfs:domain": {
+        "@id": "tt:ChairDefinition"
+      },
+      "rdfs:label": "has procedural rule",
+      "rdfs:range": {
+        "@id": "tt:ProceduralRule"
+      }
+    },
+    {
+      "@id": "tt:hasQuantity",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a chair definition with a sourced quantity.",
+      "rdfs:domain": {
+        "@id": "tt:ChairDefinition"
+      },
+      "rdfs:label": "has quantity",
+      "rdfs:range": {
+        "@id": "tt:Quantity"
+      }
+    },
+    {
+      "@id": "tt:hasDatum",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a chair definition with a construction or placement datum.",
+      "rdfs:domain": {
+        "@id": "tt:ChairDefinition"
+      },
+      "rdfs:label": "has datum",
+      "rdfs:range": {
+        "@id": "tt:Datum"
+      }
+    },
+    {
+      "@id": "tt:hasRailInterface",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a chair definition with a rail-fit interface.",
+      "rdfs:domain": {
+        "@id": "tt:ChairDefinition"
+      },
+      "rdfs:label": "has rail interface",
+      "rdfs:range": {
+        "@id": "tt:RailInterface"
+      }
+    },
+    {
+      "@id": "tt:hasManufacturingProfile",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a package with a manufacturing-specific profile.",
+      "rdfs:domain": {
+        "@id": "tt:ChairDefinitionPackage"
+      },
+      "rdfs:label": "has manufacturing profile",
+      "rdfs:range": {
+        "@id": "tt:ManufacturingProfile"
+      }
+    },
+    {
+      "@id": "tt:hasProvenance",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates canonical state with a provenance record.",
+      "rdfs:domain": {
+        "@id": "tt:CanonicalState"
+      },
+      "rdfs:label": "has provenance",
+      "rdfs:range": {
+        "@id": "tt:ProvenanceRecord"
+      }
+    },
+    {
+      "@id": "tt:supportedByEvidence",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a provenance record with its evidence.",
+      "rdfs:domain": {
+        "@id": "tt:ProvenanceRecord"
+      },
+      "rdfs:label": "supported by evidence",
+      "rdfs:range": {
+        "@id": "tt:Evidence"
+      }
+    },
+    {
+      "@id": "tt:hasDependencyManifest",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a package or output manifest with its dependency manifest.",
+      "rdfs:domain": {
+        "@id": "tt:ManifestBearingRecord"
+      },
+      "rdfs:label": "has dependency manifest",
+      "rdfs:range": {
+        "@id": "tt:DependencyManifest"
+      }
+    },
+    {
+      "@id": "tt:recordsDependency",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a dependency manifest with an output-affecting dependency.",
+      "rdfs:domain": {
+        "@id": "tt:DependencyManifest"
+      },
+      "rdfs:label": "records dependency",
+      "rdfs:range": {
+        "@id": "tt:Dependency"
+      }
+    },
+    {
+      "@id": "tt:classifiedAs",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates provenance with one controlled classification.",
+      "rdfs:domain": {
+        "@id": "tt:ProvenanceRecord"
+      },
+      "rdfs:label": "classified as",
+      "rdfs:range": {
+        "@id": "tt:ProvenanceClassification"
+      }
+    },
+    {
+      "@id": "tt:hasPermissionSet",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a package or provenance record with recorded permissions.",
+      "rdfs:domain": {
+        "@id": "tt:PermissionBearingRecord"
+      },
+      "rdfs:label": "has permission set",
+      "rdfs:range": {
+        "@id": "tt:PermissionSet"
+      }
+    },
+    {
+      "@id": "tt:hasPermissionStatus",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a permission set with a controlled field status.",
+      "rdfs:domain": {
+        "@id": "tt:PermissionSet"
+      },
+      "rdfs:label": "has permission status",
+      "rdfs:range": {
+        "@id": "tt:PermissionStatus"
+      }
+    },
+    {
+      "@id": "tt:hasProjectStatus",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a package or dependency record with its fail-closed project status.",
+      "rdfs:domain": {
+        "@id": "tt:ProjectStatusBearingRecord"
+      },
+      "rdfs:label": "has project status",
+      "rdfs:range": {
+        "@id": "tt:ProjectStatus"
+      }
+    },
+    {
+      "@id": "tt:derivedFrom",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a derived artifact with the canonical state that produced it.",
+      "rdfs:domain": {
+        "@id": "tt:DerivedArtifact"
+      },
+      "rdfs:label": "derived from",
+      "rdfs:range": {
+        "@id": "tt:CanonicalState"
+      }
+    },
+    {
+      "@id": "tt:protectedBySignature",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates derived state with its complete input signature.",
+      "rdfs:domain": {
+        "@id": "tt:DerivedArtifact"
+      },
+      "rdfs:label": "protected by signature",
+      "rdfs:range": {
+        "@id": "tt:InputSignature"
+      }
+    },
+    {
+      "@id": "tt:hasResultIntegritySignature",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates an analytical result with the signature covering its input signature and result value.",
+      "rdfs:domain": {
+        "@id": "tt:AnalysisResult"
+      },
+      "rdfs:label": "has result-integrity signature",
+      "rdfs:range": {
+        "@id": "tt:ResultIntegritySignature"
+      }
+    },
+    {
+      "@id": "tt:invalidatedBy",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates derived state with an edit that invalidates its complete signature.",
+      "rdfs:domain": {
+        "@id": "tt:DerivedArtifact"
+      },
+      "rdfs:label": "invalidated by",
+      "rdfs:range": {
+        "@id": "tt:EditOperation"
+      }
+    },
+    {
+      "@id": "tt:validatedBy",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates an export artifact with the current validation result authorising it.",
+      "rdfs:domain": {
+        "@id": "tt:ExportArtifact"
+      },
+      "rdfs:label": "validated by",
+      "rdfs:range": {
+        "@id": "tt:ValidationResult"
+      }
+    },
+    {
+      "@id": "tt:describedByManifest",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates an export artifact with its deterministic export manifest.",
+      "rdfs:domain": {
+        "@id": "tt:ExportArtifact"
+      },
+      "rdfs:label": "described by manifest",
+      "rdfs:range": {
+        "@id": "tt:ExportManifest"
+      }
+    },
+    {
+      "@id": "tt:requiresCurrentValidation",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates an export operation with the current validation result it requires.",
+      "rdfs:domain": {
+        "@id": "tt:ExportOperation"
+      },
+      "rdfs:label": "requires current validation",
+      "rdfs:range": {
+        "@id": "tt:ValidationResult"
+      }
+    },
+    {
+      "@id": "tt:persistsCanonicalState",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a compact persistent record with canonical state.",
+      "rdfs:domain": {
+        "@id": "tt:PersistentRecord"
+      },
+      "rdfs:label": "persists canonical state",
+      "rdfs:range": {
+        "@id": "tt:CanonicalState"
+      }
+    },
+    {
+      "@id": "tt:consumes",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a workflow operation with input canonical state.",
+      "rdfs:domain": {
+        "@id": "tt:WorkflowOperation"
+      },
+      "rdfs:label": "consumes",
+      "rdfs:range": {
+        "@id": "tt:CanonicalState"
+      }
+    },
+    {
+      "@id": "tt:produces",
+      "@type": "owl:ObjectProperty",
+      "rdfs:comment": "Associates a workflow operation with a derived artifact it produces.",
+      "rdfs:domain": {
+        "@id": "tt:WorkflowOperation"
+      },
+      "rdfs:label": "produces",
+      "rdfs:range": {
+        "@id": "tt:DerivedArtifact"
+      }
+    },
+    {
+      "@id": "tt:identifierValue",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:comment": "The lexical value of a stable identity.",
+      "rdfs:domain": {
+        "@id": "tt:StableIdentity"
+      },
+      "rdfs:label": "identifier value",
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "tt:schemaIdentifier",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:comment": "The stable identifier of a versioned persistent or package schema.",
+      "rdfs:domain": {
+        "@id": "tt:VersionedRecord"
+      },
+      "rdfs:label": "schema identifier",
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "tt:schemaVersion",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:comment": "The explicit version of a persistent or package schema.",
+      "rdfs:domain": {
+        "@id": "tt:VersionedRecord"
+      },
+      "rdfs:label": "schema version",
+      "rdfs:range": {
+        "@id": "xsd:nonNegativeInteger"
+      }
+    },
+    {
+      "@id": "tt:unitSymbol",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:comment": "The stable symbol or identifier of a unit.",
+      "rdfs:domain": {
+        "@id": "tt:Unit"
+      },
+      "rdfs:label": "unit symbol",
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "tt:frameIdentifier",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:comment": "The stable identifier of a coordinate frame.",
+      "rdfs:domain": {
+        "@id": "tt:CoordinateFrame"
+      },
+      "rdfs:label": "frame identifier",
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "tt:signatureValue",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:comment": "The deterministic lexical value of an input or result-integrity signature.",
+      "rdfs:domain": {
+        "@id": "tt:Signature"
+      },
+      "rdfs:label": "signature value",
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "tt:classificationCode",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:comment": "The controlled machine code of a provenance classification.",
+      "rdfs:domain": {
+        "@id": "tt:ProvenanceClassification"
+      },
+      "rdfs:label": "classification code",
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "tt:statusCode",
+      "@type": "owl:DatatypeProperty",
+      "rdfs:comment": "The controlled machine code of a permission or project status.",
+      "rdfs:domain": {
+        "@id": "tt:ControlledStatus"
+      },
+      "rdfs:label": "status code",
+      "rdfs:range": {
+        "@id": "xsd:string"
+      }
+    },
+    {
+      "@id": "tt:classification-engineering-method",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "engineering method",
+      "tt:classificationCode": "engineering_method"
+    },
+    {
+      "@id": "tt:classification-engineering-fact",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "engineering fact",
+      "tt:classificationCode": "engineering_fact"
+    },
+    {
+      "@id": "tt:classification-project-measurement",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "project measurement",
+      "tt:classificationCode": "project_measurement"
+    },
+    {
+      "@id": "tt:classification-project-derivation",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "project derivation",
+      "tt:classificationCode": "project_derivation"
+    },
+    {
+      "@id": "tt:classification-user-design",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "user design",
+      "tt:classificationCode": "user_design"
+    },
+    {
+      "@id": "tt:classification-templot-source-expression",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "Templot source expression",
+      "tt:classificationCode": "templot_source_expression"
+    },
+    {
+      "@id": "tt:classification-templot-reference-data",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "Templot reference data",
+      "tt:classificationCode": "templot_reference_data"
+    },
+    {
+      "@id": "tt:classification-templot-media-output",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "Templot media output",
+      "tt:classificationCode": "templot_media_output"
+    },
+    {
+      "@id": "tt:classification-third-party-evidence",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "third-party evidence",
+      "tt:classificationCode": "third_party_evidence"
+    },
+    {
+      "@id": "tt:classification-generated-output",
+      "@type": "tt:ProvenanceClassification",
+      "rdfs:label": "generated output",
+      "tt:classificationCode": "generated_output"
+    },
+    {
+      "@id": "tt:permission-permitted",
+      "@type": "tt:PermissionStatus",
+      "rdfs:label": "permitted",
+      "tt:statusCode": "permitted"
+    },
+    {
+      "@id": "tt:permission-restricted",
+      "@type": "tt:PermissionStatus",
+      "rdfs:label": "restricted permission",
+      "tt:statusCode": "restricted"
+    },
+    {
+      "@id": "tt:permission-reference-only",
+      "@type": "tt:PermissionStatus",
+      "rdfs:label": "reference-only permission",
+      "tt:statusCode": "reference-only"
+    },
+    {
+      "@id": "tt:permission-unknown",
+      "@type": "tt:PermissionStatus",
+      "rdfs:label": "unknown permission",
+      "tt:statusCode": "unknown"
+    },
+    {
+      "@id": "tt:permission-not-applicable",
+      "@type": "tt:PermissionStatus",
+      "rdfs:label": "not-applicable permission",
+      "tt:statusCode": "not-applicable"
+    },
+    {
+      "@id": "tt:project-status-project-cleared",
+      "@type": "tt:ProjectStatus",
+      "rdfs:label": "project-cleared",
+      "tt:statusCode": "project-cleared"
+    },
+    {
+      "@id": "tt:project-status-restricted",
+      "@type": "tt:ProjectStatus",
+      "rdfs:label": "restricted project status",
+      "tt:statusCode": "restricted"
+    },
+    {
+      "@id": "tt:project-status-reference-only",
+      "@type": "tt:ProjectStatus",
+      "rdfs:label": "reference-only project status",
+      "tt:statusCode": "reference-only"
+    },
+    {
+      "@id": "tt:project-status-unknown",
+      "@type": "tt:ProjectStatus",
+      "rdfs:label": "unknown project status",
+      "tt:statusCode": "unknown"
+    }
+  ]
+}

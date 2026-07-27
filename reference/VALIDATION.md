@@ -175,6 +175,18 @@ Durable modular package, domain/API and foundation checks:
 .venv/bin/python tests/validate_phase2_foundation.py
 ```
 
+Product-system ontology structure, controlled codes, semantic invariants and
+human/formal coverage:
+
+```bash
+.venv/bin/python tests/validate_ontology.py
+```
+
+This standalone standard-library validator checks the supporting JSON-LD/OWL
+projection and its Markdown reference. It does not replace the canonical
+architecture, schema validators, railway tests, FreeCAD integration evidence
+or live phase gates.
+
 Current Phase 3 transition routing and rollback boundary:
 
 ```bash
