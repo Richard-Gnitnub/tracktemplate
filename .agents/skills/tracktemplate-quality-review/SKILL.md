@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-quality-review
-description: Perform a staff-level review of new or changed TrackTemplate source, tests and documentation, including classified failed-test repairs. Use before reporting completion or when a read-only independent review is requested.
+description: Perform a staff-level review of new or changed TrackTemplate source, tests and documentation, including classified failed-test repairs and an optional light-hearted code roast. Use before reporting completion, when a read-only independent review is requested, or when the user asks to review and gently roast the code.
 ---
 
 # TrackTemplate quality review
@@ -64,6 +64,21 @@ Report MISSING and EXTRA findings before code-quality findings. CANNOT_VERIFY
 does not imply failure, but it must remain visible and must not be treated as
 acceptance.
 
+## Optional operator-morale roast
+
+When the user explicitly requests a roast:
+
+- Complete the factual review and verdict first; do not let humour alter,
+  soften or replace a finding.
+- End with one or two concise, good-natured lines grounded in the reviewed code
+  or diff.
+- Roast the code, abstraction or naming—not the operator, contributor or their
+  ability.
+- Do not joke about safety, data loss, security, licensing, provenance or an
+  unresolved blocking defect.
+- Keep it suitable for a friendly engineering room: no cruelty, profanity or
+  invented defects.
+
 ## Review principles
 
 - Preserve necessary FreeCAD compatibility code, diagnostics, transaction handling, geometry tolerances, stable identities and legacy evidence unless the change has specific evidence and authority to alter them.
@@ -108,6 +123,7 @@ Report:
 9. **Reviewer independence:** fresh reviewer/session or disclosed same-agent
    review.
 10. **Scope:** whether unrelated files and behaviour remained unchanged.
+11. **Morale roast:** only when explicitly requested, after the factual review.
 
 Omit failed-test integrity when no failed test or repair is in scope. Do not
 present preferences as defects, and do not imply that an unperformed check

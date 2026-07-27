@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Documentation Alignment"
+  short_description: "Reconcile documentation claims with project evidence"
+  default_prompt: "Use $tracktemplate-documentation-alignment to identify and safely correct stale documentation claims."

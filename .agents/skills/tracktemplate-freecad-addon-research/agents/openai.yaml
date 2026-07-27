@@ -1,0 +1,4 @@
+interface:
+  display_name: "FreeCAD Addon Research"
+  short_description: "Extract current, source-cited FreeCAD Addon guidance"
+  default_prompt: "Use $tracktemplate-freecad-addon-research to research current FreeCAD Addon guidance for this TrackTemplate task."

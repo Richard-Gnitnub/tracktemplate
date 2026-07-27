@@ -16,8 +16,12 @@
   Use `$tracktemplate-python-writing` when creating or materially editing Python
   or FCMacro source.
   Use `$tracktemplate-documentation-review` when creating or materially editing
-  Markdown documentation. Use `$tracktemplate-change-validation` to select, run
-  and report the applicable evidence for a non-trivial change. Use
+  Markdown documentation. Use `$tracktemplate-documentation-alignment` when
+  repository documentation may have drifted from authority or implementation
+  evidence. Use `$tracktemplate-freecad-addon-research` when
+  extracting current first-party FreeCAD Addon guidance before planning or
+  implementation. Use `$tracktemplate-change-validation` to select, run and
+  report the applicable evidence for a non-trivial change. Use
   `$tracktemplate-quality-review` before reporting completion of a non-trivial
   source or documentation change.
 - A skill is a reusable workflow, not a source of project authority. If a skill

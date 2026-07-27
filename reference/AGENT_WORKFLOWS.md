@@ -67,9 +67,21 @@ wc -c AGENTS.md
 Path: `.agents/skills/tracktemplate-context-recovery/SKILL.md`
 
 Use it to resume TrackTemplate work after context may have been lost. It reloads
-the current phase, subject authority and relevant evidence before inspecting
-the working tree as implementation state. It does not turn Git history, diffs,
-tests or conversation summaries into project authority.
+only the task-relevant current phase, subject authority and evidence before
+inspecting the working tree as implementation state. It uses hot, warm and cold
+context, an authority-ranked loss check and a transient context packet; it does
+not turn Git history, diffs, tests or conversation summaries into project
+authority.
+
+### `tracktemplate-freecad-addon-research`
+
+Path: `.agents/skills/tracktemplate-freecad-addon-research/SKILL.md`
+
+Use it to answer a bounded FreeCAD Addon question from the current official
+Addon Academy and related first-party sources. It records source freshness,
+distinguishes guidance from runtime fact, and maps the result to the owning
+TrackTemplate document and ontology boundary without turning upstream advice
+into a project decision.
 
 ### `tracktemplate-python-writing`
 
@@ -97,6 +109,17 @@ Markdown documentation, particularly where the change involves:
 - documentation that needs restructuring without changing its meaning.
 
 Use this skill while making a material documentation change.
+
+### `tracktemplate-documentation-alignment`
+
+Path: `.agents/skills/tracktemplate-documentation-alignment/SKILL.md`
+
+Use it to audit documentation claims against current repository authority,
+implementation and validation evidence after source, structure, phase, workflow
+or agent-guidance changes. It classifies verified, stale, contradictory,
+duplicated, orphaned and unverified claims before making narrow corrections.
+It does not rewrite accepted requirements to match code, update frozen history
+to current state or perform automatic corpus cleanup.
 
 ### `tracktemplate-change-validation`
 
@@ -140,7 +163,7 @@ completion of a non-trivial source or documentation change, and after a
 classified failed-test repair. It judges the change using the available
 evidence; it does not replace the validation skill.
 
-All five skills are deliberately instruction-only. They do not perform
+All seven skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
@@ -154,11 +177,19 @@ $tracktemplate-context-recovery
 ```
 
 ```text
+$tracktemplate-freecad-addon-research
+```
+
+```text
 $tracktemplate-python-writing
 ```
 
 ```text
 $tracktemplate-documentation-review
+```
+
+```text
+$tracktemplate-documentation-alignment
 ```
 
 ```text
@@ -171,6 +202,10 @@ $tracktemplate-quality-review
 
 Codex may also select a skill implicitly when the request clearly matches its
 description.
+
+Use `$tracktemplate-freecad-addon-research` before the source or documentation
+sequence when work depends on current FreeCAD Addon guidance. Its output is
+research evidence, not implementation, validation or project acceptance.
 
 Prefer explicit invocation for:
 
@@ -205,6 +240,18 @@ For a material documentation change:
 
 ```text
 $tracktemplate-documentation-review
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For a documentation-alignment task:
+
+```text
+$tracktemplate-documentation-alignment
+    ↓
+$tracktemplate-documentation-review during material corrections
     ↓
 $tracktemplate-change-validation
     ↓
@@ -273,7 +320,7 @@ script or runtime package was copied or installed by this review.
 
 | Source and reviewed revision | Classification | TrackTemplate decision |
 | --- | --- | --- |
-| [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Do not install its router, auto-formatter, `docs/plans/` or `docs/chronicles/` model: those introduce executable mutation and overlapping document owners and approval semantics. |
+| [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Adapt its documentation-drift audit through the local alignment skill, while preserving TrackTemplate's canonical owners and frozen evidence. Do not install its router, auto-formatter, `docs/plans/` or `docs/chronicles/` model: those introduce executable mutation and overlapping document owners and approval semantics. |
 | [`seb1n/awesome-ai-agent-skills`](https://github.com/seb1n/awesome-ai-agent-skills/tree/a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd), `a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd`, MIT | Broad catalogue of generic instruction skills | Use only as a discovery source. Admit a skill individually after project-specific review; do not bulk-copy the catalogue. Generic code review overlaps the local quality skill, while its context-retrieval workflow assumes embedding and vector-database infrastructure that this repository does not require. |
 | [`pydantic/pydantic-ai`](https://github.com/pydantic/pydantic-ai/tree/ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5), `ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5`, MIT | Python agent framework repository with root/scoped instructions and project-specific skills | Adapt its context-first, responsibility-to-project and patch-as-evidence patterns. TrackTemplate already supplies the corresponding authority map and local skills; add scoped `AGENTS.md` only where a directory has genuinely different rules. Do not add the Pydantic AI package as a TrackTemplate or FreeCAD runtime dependency without a separately approved in-product agent capability and compatibility, security, data, cost and validation evidence. |
 
