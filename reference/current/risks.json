@@ -273,10 +273,10 @@
       "state": "Open",
       "treatment": "Remove",
       "control_effectiveness": "Partial",
-      "summary": "CI is tracked locally but is not yet remotely proven or required on main.",
+      "summary": "Remote clean-run CI is proven; deliberate-failure evidence and required status remain open.",
       "owner": "Phase 10 integration owner delivers CI; project owner controls the branch rule.",
       "deadline": "Prove and require CI before Phase 10 beta exit; rerun the frozen matrix at Phase 11.",
-      "required_work": "Run the tracked workflow twice, demonstrate a deliberate failure and require its status for main.",
+      "required_work": "Retain repeat clean-run evidence, demonstrate a deliberate failure and require its status for main.",
       "closure_evidence": "Clean runs, disposable failing PR evidence and branch-protection status."
     },
     {

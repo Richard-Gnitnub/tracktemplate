@@ -72,7 +72,7 @@ dashboard only.
 | PR-20 | Medium | Mitigate | Feature work could silently expand migration scope. |
 | PR-21 | High | Mitigate | Source provenance or licence could become ambiguous. |
 | PR-22 | High | Remove | A true authority transfer could occur without structured challenge. |
-| QA-R02 | Medium | Remove | CI is tracked locally but is not yet remotely proven or required. |
+| QA-R02 | Medium | Remove | Remote clean-run CI is proven; deliberate-failure evidence and required status remain open. |
 | QA-R03 | High | Remove | Release-critical GUI and end-to-end evidence remains incomplete. |
 | QA-R04 | High | Mitigate | Modular end-to-end performance budgets remain unfrozen. |
 | QA-R05 | Low | Tolerate | Root navigation exists; install and operator guidance remains future work. |

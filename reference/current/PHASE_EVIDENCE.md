@@ -737,8 +737,9 @@ passing the complete standalone matrix and final diff review. The project owner
 accepted these boundaries on 2026-07-27. The publication condition was then
 satisfied locally: all 133 Python/FCMacro sources parsed, the complete
 standalone matrix passed 41/41, and the final read-only diff review found no
-blocking issue. Remote CI remains separately open under QA-R02 until the pushed
-workflow runs.
+blocking issue. Remote CI is now proven by the successful clean-checkout run
+recorded below; QA-R02 remains open for deliberate-failure evidence and branch
+protection.
 
 ## CI clean-checkout and skill workflow automation
 
@@ -765,9 +766,14 @@ runner, recovery, skill-guidance, progress and QA checks passed; both complete
 profiles passed 42/42; and the `ci` profile also passed 42/42 in the disposable
 clean clone that reproduced the original failure, without the ignored archive.
 No product, FreeCAD, GUI, migration, output or authority boundary changed, and
-the owner pause remains. QA-R02 stays open pending an authorised push, remote
-clean-run evidence, the required deliberate-failure proof and branch
-protection.
+the owner pause remains.
+
+Post-publication evidence: commit
+`bfcfab0c194b95a60a65fb1e8cda83a2e1d5a337` is on `main`, and
+[Standalone CI run 30313014929](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/30313014929)
+completed successfully for that exact SHA. Both remote parsing and the complete
+43-validator matrix passed. QA-R02 remains open for deliberate-failure evidence
+and branch protection.
 
 ## Current Phase 4 exit-condition disposition
 
