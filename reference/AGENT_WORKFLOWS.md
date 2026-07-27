@@ -93,6 +93,15 @@ distinguishes guidance from runtime fact, and maps the result to the owning
 TrackTemplate document and ontology boundary without turning upstream advice
 into a project decision.
 
+### `tracktemplate-freecad-object-model`
+
+Path: `.agents/skills/tracktemplate-freecad-object-model/SKILL.md`
+
+Use it to map canonical railway records and stable identities onto a small
+number of versioned FreeCAD document objects, properties and FeaturePython
+proxies. It governs recompute, transactions, save/reopen, migration, Undo/Redo
+and App/Gui separation while keeping ViewProvider and Coin state derived.
+
 ### `tracktemplate-license-analysis`
 
 Path: `.agents/skills/tracktemplate-license-analysis/SKILL.md`
@@ -103,6 +112,36 @@ copyright licensing from data, design, patent, trade-mark, contract and
 contributor-authority questions, preserves unknowns and routes legal
 interpretation to professional review. It cannot itself confer
 `project-cleared` status or legal clearance.
+
+### `tracktemplate-occt-geometry`
+
+Path: `.agents/skills/tracktemplate-occt-geometry/SKILL.md`
+
+Use it for exact FreeCAD `Part` and Open CASCADE B-rep construction, topology,
+booleans, offsets, fillets, healing, meshing and production-output geometry. It
+requires an explicit topology and tolerance contract, validates railway
+semantics beyond kernel validity and keeps exact shapes derived and
+demand-driven.
+
+### `tracktemplate-railway-mathematics`
+
+Path: `.agents/skills/tracktemplate-railway-mathematics/SKILL.md`
+
+Use it to formulate, implement or review alignment, transition, station,
+offset, multiple-track, turnout, crossover, intersection, sampling and solver
+mathematics. It requires explicit units, frames, domains, invariants,
+degenerate cases, numerical tolerances and independent evidence in a
+FreeCAD-independent domain boundary.
+
+### `tracktemplate-railway-standards`
+
+Path: `.agents/skills/tracktemplate-railway-standards/SKILL.md`
+
+Use it before a gauge, wheel-and-track, clearance, rail, switch-and-crossing,
+timbering or related standards-derived value becomes a requirement, default or
+production input. It records exact applicability, revision, original units,
+tolerance, provenance and rights without copying standards tables or making
+the skill a source of railway authority.
 
 ### `tracktemplate-security-review`
 
@@ -278,19 +317,20 @@ optional visual mode creates only sanitised, self-contained temporary HTML and
 does not execute production code or become validation evidence. Explanation
 does not replace validation, quality review or project-owner acceptance.
 
-All eighteen skills are deliberately instruction-only. They do not perform
+All twenty-two skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
 
 ### Lifecycle coverage review
 
-The 2026-07-27 repository-wide review added only the four previously uncovered
-decision surfaces: architecture review, performance engineering, security
-review and release readiness. Testing, project management, persistence,
-geometry evidence, documentation, dependency rights and change explanation
-remain with their existing skills and canonical owners; adding parallel skills
-for those subjects would duplicate authority and increase context load.
+The 2026-07-27 repository-wide review added four general decision surfaces:
+architecture review, performance engineering, security review and release
+readiness. A subsequent railway/FreeCAD review added the four specialist proof
+surfaces that general workflows could not safely absorb: standards admission,
+railway mathematics, FreeCAD document-object lifecycle and exact OCCT geometry.
+Testing, project management, documentation, dependency rights and change
+explanation remain with their existing skills and canonical owners.
 
 ## Invocation
 
@@ -309,7 +349,23 @@ $tracktemplate-freecad-addon-research
 ```
 
 ```text
+$tracktemplate-freecad-object-model
+```
+
+```text
 $tracktemplate-license-analysis
+```
+
+```text
+$tracktemplate-occt-geometry
+```
+
+```text
+$tracktemplate-railway-mathematics
+```
+
+```text
+$tracktemplate-railway-standards
 ```
 
 ```text
@@ -426,6 +482,42 @@ $tracktemplate-api-design
 $tracktemplate-freecad-addon-research when the boundary is FreeCAD-specific
     ↓
 $tracktemplate-python-writing during implementation
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For a standards-derived railway change:
+
+```text
+$tracktemplate-railway-standards
+    ↓
+$tracktemplate-license-analysis when retained evidence or distribution is involved
+    ↓
+$tracktemplate-railway-mathematics
+    ↓
+$tracktemplate-api-design when a public or stored contract changes
+    ↓
+$tracktemplate-python-writing
+    ↓
+$tracktemplate-change-validation
+    ↓
+$tracktemplate-quality-review
+```
+
+For FreeCAD document-object or exact-geometry work:
+
+```text
+$tracktemplate-freecad-addon-research
+    ↓
+$tracktemplate-freecad-object-model
+    ↓
+$tracktemplate-railway-mathematics for analytical geometry
+    ↓
+$tracktemplate-occt-geometry for an explicit Validate/Export boundary
+    ↓
+$tracktemplate-api-design and $tracktemplate-python-writing
     ↓
 $tracktemplate-change-validation
     ↓

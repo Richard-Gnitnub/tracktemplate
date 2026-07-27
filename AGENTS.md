@@ -19,6 +19,12 @@
   or FCMacro source.
   Use `$tracktemplate-api-design` before adding or changing a supported API,
   schema, command, compatibility contract or accepted external integration.
+  Use `$tracktemplate-railway-standards` before admitting or changing a
+  standards-derived railway value, tolerance or rule. Use
+  `$tracktemplate-railway-mathematics` for railway geometry or numerical
+  calculations. Use `$tracktemplate-freecad-object-model` for document-object,
+  persistence, recompute or ViewProvider mapping, and
+  `$tracktemplate-occt-geometry` for exact `Part`/OpenCASCADE construction.
   Use `$tracktemplate-debugging` to reproduce, isolate and diagnose an
   unexpected failure before applying a speculative fix.
   Use `$tracktemplate-task-automation` when a stable repeated workflow can be

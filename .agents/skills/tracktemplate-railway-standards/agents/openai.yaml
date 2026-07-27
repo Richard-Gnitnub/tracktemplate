@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Railway Standards"
+  short_description: "Admit railway standards with traceable scope"
+  default_prompt: "Use $tracktemplate-railway-standards to research and admit the applicable railway standard for this change."

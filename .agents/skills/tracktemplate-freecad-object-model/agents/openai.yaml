@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate FreeCAD Object Model"
+  short_description: "Map canonical state to FreeCAD objects safely"
+  default_prompt: "Use $tracktemplate-freecad-object-model to design or review this FreeCAD document-object mapping."

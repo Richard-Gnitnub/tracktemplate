@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate OCCT Geometry"
+  short_description: "Build and validate exact OCCT geometry"
+  default_prompt: "Use $tracktemplate-occt-geometry to design or review this exact Part and OCCT geometry operation."

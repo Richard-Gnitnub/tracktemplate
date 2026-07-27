@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Railway Mathematics"
+  short_description: "Engineer verified railway geometry mathematics"
+  default_prompt: "Use $tracktemplate-railway-mathematics to define and verify the mathematics for this railway geometry change."
