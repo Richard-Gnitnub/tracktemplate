@@ -403,11 +403,12 @@ def _validate_source_and_phase_controls():
     evidence = (
         ROOT
         / "reference"
-        / "current"
-        / "PHASE_EVIDENCE.md"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE4_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
-    assert "| 4 | Canonical state, signatures and persistence | 4/6 evidenced" in plan
-    assert "current/PHASE_EVIDENCE.md" in plan
+    assert "| 4 | Canonical state, signatures and persistence | 6/6 evidenced" in plan
+    assert "history/phase-closeouts/PHASE4_CLOSEOUT.md" in plan
     assert "## Transition schema v1" in evidence
     assert "owner accepted this as part of the bounded Phase 4 read window" in evidence
     assert "Current Phase 4 exit-condition disposition" in evidence

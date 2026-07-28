@@ -470,13 +470,14 @@ def _validate_source_and_phase_controls():
     evidence = (
         ROOT
         / "reference"
-        / "current"
-        / "PHASE_EVIDENCE.md"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE4_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(encoding="utf-8")
     assert "chair-definition-v1.schema.json" in evidence
     assert "validate_phase4_chair_definition.py" in validation
-    assert "4/6 evidenced" in plan
+    assert "6/6 evidenced" in plan
     assert "Phase 9 production admission remains disabled" in " ".join(
         evidence.split()
     )

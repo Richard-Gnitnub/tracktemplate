@@ -442,8 +442,9 @@ assert legacy_document.SUPPORTED_MIGRATION_FAMILIES == (
     evidence = (
         ROOT
         / "reference"
-        / "current"
-        / "PHASE_EVIDENCE.md"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE4_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(encoding="utf-8")
     assert "Legacy-document detection tranche" in evidence

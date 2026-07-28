@@ -806,8 +806,9 @@ assert plain_line_transition_migration.PRODUCTION_OUTPUT_AUTHORIZED is False
     evidence = (
         ROOT
         / "reference"
-        / "current"
-        / "PHASE_EVIDENCE.md"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE4_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     project_plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"
