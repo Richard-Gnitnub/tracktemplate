@@ -61,7 +61,7 @@ EXPECTED_RISK_IDS = {
     "QA-R04",
     "QA-R05",
 }
-EXPECTED_DECISION_IDS = {
+EXPECTED_PHASE4_DECISION_IDS = {
     "D-P4-001",
     "D-P4-002",
     "D-P4-003",
@@ -75,6 +75,7 @@ EXPECTED_DECISION_IDS = {
     "D-P4-008",
     "D-P4-009",
 }
+EXPECTED_CURRENT_DECISION_IDS = {"D-P5-001"}
 ALLOWED_TREATMENTS = {"Tolerate", "Remove", "Mitigate"}
 ALLOWED_SEVERITIES = {"Low", "Medium", "High", "Critical"}
 ALLOWED_EFFECTIVENESS = {
@@ -114,7 +115,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         == [
             "# Project Plan",
             "## Phase status",
-            "## Closed Phase 4 exit conditions",
+            "## Open Phase 5 exit conditions",
             "## Live risks",
             "## Owner decisions",
             "## Authority and evidence links",
@@ -174,8 +175,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
     )
     _require(
         rows[5]["evidenced"] == 0
-        and str(rows[5]["state"]).startswith("Not started"),
-        "Phase 5 must remain unopened at zero evidenced exits",
+        and rows[5]["state"] == "Current — opened 2026-07-28",
+        "Phase 5 must be current at zero evidenced exits",
     )
     _require(
         rows[6]["evidenced"] == 0
@@ -184,13 +185,15 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
     )
     _require(
         all(
-            not str(row["state"]).startswith("Current") for row in rows.values()
+            not str(row["state"]).startswith("Current")
+            for phase, row in rows.items()
+            if phase != 5
         ),
-        "a later phase became current without an opening decision",
+        "another phase became current alongside Phase 5",
     )
     _require(
-        "Phase 5 is not started" in plan,
-        "the unopened Phase 5 boundary is missing",
+        "Phase 5 current" in plan,
+        "the open Phase 5 boundary is missing",
     )
     return rows
 
@@ -201,7 +204,7 @@ def _validate_exit_conditions(
     current_evidence: str,
 ) -> None:
     plan_states: list[str] = []
-    for line in _section(plan, "Closed Phase 4 exit conditions").splitlines():
+    for line in _section(plan, "Open Phase 5 exit conditions").splitlines():
         cells = _cells(line) if line.startswith("|") else []
         if len(cells) == 3 and cells[0] not in {"Exit condition", "---"}:
             plan_states.append(cells[1])
@@ -220,7 +223,8 @@ def _validate_exit_conditions(
             continue
         evidence_states.append(cells[1].split(":", 1)[0])
 
-    expected = [
+    expected_plan = ["Pending", "Pending", "Pending", "Pending"]
+    expected_phase4 = [
         "Evidenced",
         "Evidenced",
         "Evidenced",
@@ -228,9 +232,12 @@ def _validate_exit_conditions(
         "Evidenced",
         "Evidenced",
     ]
-    _require(plan_states == expected, "project-plan Phase 4 exit states drifted")
     _require(
-        evidence_states == expected,
+        plan_states == expected_plan,
+        "project-plan Phase 5 exit states drifted",
+    )
+    _require(
+        evidence_states == expected_phase4,
         "frozen Phase 4 exit states drifted",
     )
     closeout_flat = " ".join(closeout.split())
@@ -251,21 +258,61 @@ def _validate_exit_conditions(
     )
     current_flat = " ".join(current_evidence.split())
     _require(
-        "Not started — awaiting an explicit project-owner opening decision"
-        in current_flat,
-        "current Phase 5 record does not remain unopened",
+        "Open — project owner accepted Phase 5 opening on 2026-07-28; "
+        "0/4 exits evidenced" in current_flat,
+        "current Phase 5 record does not show the accepted opening",
     )
     _require(
-        "The starting exit state is 0/4" in current_evidence,
-        "current Phase 5 record has an invalid starting count",
+        "The current exit state is 0/4" in current_evidence,
+        "current Phase 5 record has an invalid current count",
     )
+    current_section = _section(
+        current_evidence,
+        "Current Phase 5 exit-condition disposition",
+    )
+    current_states: list[str] = []
+    for line in current_section.splitlines():
+        cells = _cells(line) if line.startswith("|") else []
+        if len(cells) == 2 and cells[0] not in {"Exit condition", "---"}:
+            current_states.append(cells[1])
     _require(
-        current_evidence.count("Pending — phase not opened") == 4,
-        "current Phase 5 exit conditions must all remain pending",
+        current_states
+        == [
+            (
+                "Pending — the Coin candidate has bounded GUI evidence; "
+                "editing, resource and acceptance evidence remain"
+            ),
+            (
+                "Pending — one disposable object/layer and programmatic "
+                "selection mapping are proved; pointer selection and scale "
+                "remain"
+            ),
+            (
+                "Pending — the fixture creates no `Part` shape, but no edit "
+                "workflow is proved"
+            ),
+            (
+                "Pending — editing behaviour has not yet been presented for "
+                "owner acceptance"
+            ),
+        ],
+        "current Phase 5 exit evidence drifted",
     )
     _require(
         "../history/phase-closeouts/PHASE4_CLOSEOUT.md" in current_evidence,
         "current Phase 5 record does not link the frozen predecessor",
+    )
+    _require(
+        'id="phase-5-opening-panel"' in current_evidence,
+        "current Phase 5 opening panel is missing",
+    )
+    _require(
+        "| Accountable owner | Deadline | Condition |" in current_evidence,
+        "Phase 5 opening conditions lack owners and deadlines",
+    )
+    _require(
+        "**Governance-budget exception:**" in current_evidence,
+        "Phase 5 opening lacks its governance-budget exception",
     )
 
 
@@ -299,10 +346,6 @@ def _validate_risks(plan: str) -> None:
     _require(
         phase4_document["current_phase"] == 4,
         "frozen risk snapshot is not for Phase 4",
-    )
-    _require(
-        phase4_document["risks"] == document["risks"],
-        "live risks changed during Phase 4 archival",
     )
     records = document["risks"]
     _require(isinstance(records, list), "risks must be a list")
@@ -354,6 +397,21 @@ def _validate_risks(plan: str) -> None:
         "Level 3" in str(by_id["PR-22"]["required_work"]),
         "PR-22 does not enforce Level 3 panel scope",
     )
+    _require(
+        by_id["PR-14"]["control_effectiveness"] == "Partial",
+        "PR-14 does not reflect the bounded GUI fixture evidence",
+    )
+    for risk_id in ("PR-16", "PR-17", "QA-R03", "QA-R04"):
+        _require(
+            by_id[risk_id]["control_effectiveness"] == "Partial",
+            "{} changed without Phase 5 evidence".format(risk_id),
+        )
+    for risk_id in ("PR-20", "PR-22"):
+        _require(
+            by_id[risk_id]["control_effectiveness"]
+            == "Effective (current scope)",
+            "{} lost the bounded opening control".format(risk_id),
+        )
     plan_ids = set(
         re.findall(
             r"^\| (PR-\d{2}|QA-R\d{2}) \|",
@@ -389,10 +447,6 @@ def _validate_decisions(plan: str) -> None:
         "current decision register is not prepared for Phase 5",
     )
     _require(
-        current_document["decisions"] == [],
-        "unopened Phase 5 must have a clean decision register",
-    )
-    _require(
         set(document) == expected_document_fields,
         "frozen Phase 4 decision-register fields changed",
     )
@@ -401,8 +455,6 @@ def _validate_decisions(plan: str) -> None:
         document["current_phase"] == 4,
         "frozen decision register is not for Phase 4",
     )
-    records = document["decisions"]
-    _require(isinstance(records, list), "decisions must be a list")
     expected_fields = {
         "id",
         "decided_on",
@@ -414,6 +466,70 @@ def _validate_decisions(plan: str) -> None:
         "panel_required_under_current_policy",
         "panel_record",
     }
+    current_records = current_document["decisions"]
+    _require(
+        isinstance(current_records, list),
+        "current decisions must be a list",
+    )
+    _require(
+        len(current_records) == 1
+        and isinstance(current_records[0], dict),
+        "Phase 5 opening must have one structured decision",
+    )
+    current_record = current_records[0]
+    _require(
+        set(current_record) == expected_fields,
+        "current decision fields changed",
+    )
+    _require(
+        current_record["id"] in EXPECTED_CURRENT_DECISION_IDS
+        and current_record["status"] == "Accepted",
+        "Phase 5 opening decision is missing or unaccepted",
+    )
+    _require(
+        re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}",
+            str(current_record["decided_on"]),
+        )
+        is not None,
+        "Phase 5 opening date is not ISO formatted",
+    )
+    _require(
+        current_record["panel_required_under_current_policy"] is True,
+        "Phase 5 opening lost its panel requirement",
+    )
+    _require(
+        "Phase 5 is open at 0/4" in str(current_record["authority"])
+        and "No renderer or exit is accepted"
+        in str(current_record["exclusions"]),
+        "Phase 5 opening authority or exclusions drifted",
+    )
+    for field in ("decision", "authority", "exclusions", "evidence"):
+        _require(
+            isinstance(current_record[field], str)
+            and bool(current_record[field].strip()),
+            "D-P5-001 lacks {}".format(field),
+        )
+    current_evidence_path = (
+        ROOT / str(current_record["evidence"]).split("#", 1)[0]
+    )
+    _require(
+        current_evidence_path.is_file(),
+        "Phase 5 decision evidence path is missing",
+    )
+    panel_path_text, separator, panel_anchor = str(
+        current_record["panel_record"]
+    ).partition("#")
+    panel_path = ROOT / panel_path_text
+    _require(panel_path.is_file(), "Phase 5 panel record path is missing")
+    _require(
+        separator
+        and 'id="{}"'.format(panel_anchor) in _read(panel_path),
+        "Phase 5 panel record anchor is missing",
+    )
+
+    records = document["decisions"]
+    _require(isinstance(records, list), "decisions must be a list")
     by_id: dict[str, dict[str, object]] = {}
     for record in records:
         _require(isinstance(record, dict), "each decision must be an object")
@@ -458,7 +574,10 @@ def _validate_decisions(plan: str) -> None:
                 )
         by_id[decision_id] = record
 
-    _require(set(by_id) == EXPECTED_DECISION_IDS, "Phase 4 decision IDs drifted")
+    _require(
+        set(by_id) == EXPECTED_PHASE4_DECISION_IDS,
+        "Phase 4 decision IDs drifted",
+    )
     _require(
         by_id["D-P4-005"]["panel_required_under_current_policy"] is True,
         "supported-migration decision lost its panel requirement",
@@ -505,9 +624,9 @@ def _validate_decisions(plan: str) -> None:
         "Phase 4 decision summary does not route to the frozen register",
     )
     _require(
-        "clean for unopened Phase 5"
+        "owns Phase 5 decisions"
         in " ".join(decision_section.split()),
-        "the current Phase 5 decision-register boundary is missing",
+        "the current Phase 5 decision-register ownership is missing",
     )
     plan_ids = set(
         re.findall(
@@ -517,8 +636,8 @@ def _validate_decisions(plan: str) -> None:
         )
     )
     _require(
-        plan_ids == set(by_id),
-        "project-plan decisions differ from decisions.json",
+        plan_ids == set(by_id) | EXPECTED_CURRENT_DECISION_IDS,
+        "project-plan decisions differ from current and frozen registers",
     )
 
 

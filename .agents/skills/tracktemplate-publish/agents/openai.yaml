@@ -1,0 +1,6 @@
+interface:
+  display_name: "TrackTemplate Publish"
+  short_description: "Validate and publish a bounded change safely"
+  default_prompt: "Use $tracktemplate-publish to validate and publish the current TrackTemplate change as a draft pull request."
+policy:
+  allow_implicit_invocation: false
