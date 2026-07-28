@@ -30,7 +30,7 @@ versioned backup and a tested restore.
 | Codex filesystem sandbox | Active | Routine writes are restricted to the project, temporary storage and the agent workspace; an explicit elevation is a separate user decision |
 | Timeshift system snapshots | Configured: daily, five retained; recent snapshot/restore not verified | Current configuration excludes `/home/richard/**`; it protects system state, not this project or personal FreeCAD documents |
 | Local Git history | Active | Protects committed content; it does not protect untracked or ignored files |
-| GitHub `main` | Active and verified 2026-07-22 | Normal fast-forward pushes remain allowed; administrator enforcement is active; force pushes and branch deletion are blocked; pull requests and status checks are not yet required |
+| GitHub `main` | Active and verified 2026-07-28 | Strict, up-to-date `validation` from GitHub Actions app `15368` is required; administrator enforcement is active; force pushes and branch deletion remain blocked; no pull-request review count is required |
 | GitHub remote history | Active | Off-machine copy of pushed Git objects; not a complete backup of ignored assets and not independent of account/repository administration |
 | Independent project-data backup | **Operational for the complete declared project-data scope** | A dated, non-overwriting snapshot on a separate ext4 USB covers `.git`, ignored evidence, repository FCStd fixtures and the source archive; the owner confirmed no valuable external project files require backup |
 | Restore drill | **Passed and owner-accepted for the complete declared scope on 2026-07-22** | See the [backup, restore and repeat record](backup-records/2026-07-22-initial-repository-backup-restore.md) |

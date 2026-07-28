@@ -250,8 +250,8 @@ def validate_current_qa_risks(quality: str) -> None:
         if isinstance(record, dict) and str(record.get("id", "")).startswith("QA-R")
     }
     require(
-        live_qa == audit_ids - {"QA-R01"},
-        "current QA risks differ from the frozen audit and closed QA-R01",
+        live_qa == audit_ids - {"QA-R01", "QA-R02"},
+        "current QA risks differ from the frozen audit and closed QA-R01/QA-R02",
     )
     require(
         "QA-R01 remains closed" in read(RECOVERY),

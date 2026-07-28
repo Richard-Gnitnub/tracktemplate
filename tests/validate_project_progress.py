@@ -34,7 +34,6 @@ PHASE_TOTALS = {
 }
 EXPECTED_RISK_IDS = {
     *{"PR-{:02d}".format(value) for value in range(1, 23)},
-    "QA-R02",
     "QA-R03",
     "QA-R04",
     "QA-R05",
@@ -48,6 +47,7 @@ EXPECTED_DECISION_IDS = {
     "D-P4-006",
     "D-GOV-001",
     "D-GOV-002",
+    "D-GOV-003",
 }
 ALLOWED_TREATMENTS = {"Tolerate", "Remove", "Mitigate"}
 ALLOWED_SEVERITIES = {"Low", "Medium", "High", "Critical"}
@@ -347,6 +347,10 @@ def _validate_decisions(plan: str) -> None:
     _require(
         by_id["D-GOV-002"]["panel_required_under_current_policy"] is True,
         "three-level governance decision lost its panel requirement",
+    )
+    _require(
+        by_id["D-GOV-003"]["panel_required_under_current_policy"] is True,
+        "CI enforcement decision lost its panel requirement",
     )
     _require(
         by_id["D-P4-003"]["panel_required_under_current_policy"] is False,
