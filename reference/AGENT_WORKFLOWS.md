@@ -223,6 +223,17 @@ watchers, hooks, external services, destructive mutation or new dependencies.
 Its conditional CI reference separates clean-checkout contracts from
 workstation-only evidence and defines the failed-run repair loop.
 
+### `tracktemplate-publish`
+
+Path: `.agents/skills/tracktemplate-publish/SKILL.md`
+
+Invoke `$tracktemplate-publish` explicitly to validate and publish the current
+bounded change through intentional commits, an `agent/` branch, one draft pull
+request and exact-commit CI monitoring. That invocation supplies commit, push,
+draft-PR and bounded CI-repair authority for the current scope only. It never
+authorises merge, ready-for-review conversion, tagging, release, destructive
+history operations, gate acceptance or scope expansion.
+
 ### `tracktemplate-performance-engineering`
 
 Path: `.agents/skills/tracktemplate-performance-engineering/SKILL.md`
@@ -344,7 +355,7 @@ optional visual mode creates only sanitised, self-contained temporary HTML and
 does not execute production code or become validation evidence. Explanation
 does not replace validation, quality review or project-owner acceptance.
 
-All twenty-two skills are deliberately instruction-only. They do not perform
+All twenty-three skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
