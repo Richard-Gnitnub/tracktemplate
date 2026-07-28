@@ -738,8 +738,8 @@ accepted these boundaries on 2026-07-27. The publication condition was then
 satisfied locally: all 133 Python/FCMacro sources parsed, the complete
 standalone matrix passed 41/41, and the final read-only diff review found no
 blocking issue. Remote CI is now proven by the successful clean-checkout run
-recorded below; QA-R02 remains open for deliberate-failure evidence and branch
-protection.
+recorded below; at that point, QA-R02 remained open for deliberate-failure
+evidence and branch protection.
 
 ## CI clean-checkout and skill workflow automation
 
@@ -772,8 +772,57 @@ Post-publication evidence: commit
 `bfcfab0c194b95a60a65fb1e8cda83a2e1d5a337` is on `main`, and
 [Standalone CI run 30313014929](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/30313014929)
 completed successfully for that exact SHA. Both remote parsing and the complete
-43-validator matrix passed. QA-R02 remains open for deliberate-failure evidence
-and branch protection.
+43-validator matrix passed. At that point, QA-R02 remained open for
+deliberate-failure evidence and branch protection.
+
+<a id="qa-r02-ci-enforcement-closeout"></a>
+
+## QA-R02 CI enforcement closeout
+
+**Decision and source state:** This Level 3 governance change starts from clean
+`main` at `5088c9bb050d6c2268f6fa487a53510be04e6978`. It transfers only
+authority over updates to protected `main`: the GitHub Actions job
+`validation`, bound to app ID `15368`, must pass against the latest base state.
+Richard chaired the decision and accepted **Proceed with bounded conditions**
+on 2026-07-28.
+
+**Panel and evidence review:** Codex is change owner, presenter and same-agent
+QA/risk reviewer; the review is not independent. The risk is Medium,
+non-destructive and unrelated to rights clearance, so the policy does not
+require an independent reviewer. The panel reviewed successful clean runs
+[`30313014929`](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/30313014929)
+and
+[`30313143402`](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/30313143402),
+the app identity of their `validation` checks, the official
+[protected-branch contract](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches),
+and disposable
+[PR #1](https://github.com/Richard-Gnitnub/tracktemplate/pull/1) with deliberate
+failure run
+[`30380370420`](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/30380370420).
+That run parsed successfully, executed the complete matrix, reported 43 passes
+and the one intentional assertion failure, and emitted its failed summary
+sentinel.
+
+**Finding, conditions and risks:** Before enforcement, the failed draft PR was
+mergeable with an unstable status. After enforcement, GitHub reported it
+`BLOCKED` by the failed required check. QA-R02 therefore changes from Partial
+to Effective and is closed; PR-22 remains Effective for the current scope.
+There was no dissent. A workflow/job rename, app-source change or GitHub
+Actions outage can block `main`; the integration owner must preserve the exact
+check identity and reopen QA-R02 before weakening or replacing it.
+
+**Result, rollback and exclusions:** Live protection now reports
+`strict: true`, context `validation`, app ID `15368`, administrator enforcement
+enabled, and force pushes and deletion disabled. The first request combined
+legacy `contexts` with app-bound `checks`; GitHub rejected it with HTTP 422 and
+made no change. The corrected app-bound request succeeded. PR #1 was then
+closed without merge and its evidence branch retained. The focused recovery
+control initially failed on two superseded pre-enforcement text markers; this
+was classified `test-or-oracle-defect`, the validator was strengthened for the
+new app-bound rule, and the exact check then passed. Rollback removes only the
+required-status-check rule and reopens QA-R02. No pull-request review count,
+conversation-resolution rule, linear-history rule, product work, migration
+support, operator wiring, production output or release authority is added.
 
 ## Current Phase 4 exit-condition disposition
 

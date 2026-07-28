@@ -72,7 +72,6 @@ dashboard only.
 | PR-20 | Medium | Mitigate | Feature work could silently expand migration scope. |
 | PR-21 | High | Mitigate | Source provenance or licence could become ambiguous. |
 | PR-22 | High | Remove | A true authority transfer could occur without structured challenge. |
-| QA-R02 | Medium | Remove | Remote clean-run CI is proven; deliberate-failure evidence and required status remain open. |
 | QA-R03 | High | Remove | Release-critical GUI and end-to-end evidence remains incomplete. |
 | QA-R04 | High | Mitigate | Modular end-to-end performance budgets remain unfrozen. |
 | QA-R05 | Low | Tolerate | Root navigation exists; install and operator guidance remains future work. |
@@ -92,6 +91,7 @@ record. Detailed review evidence stays in the current phase file.
 | D-P4-006 | 2026-07-27 | Accepted | Product implementation paused until the owner resumes it. |
 | D-GOV-001 | 2026-07-27 | Accepted | Governance simplification, fixed current paths, narrowed panels, governance budget and CI adopted. |
 | D-GOV-002 | 2026-07-27 | Accepted | Three task levels adopted: routine, behavioural, and authority or release. |
+| D-GOV-003 | 2026-07-28 | Accepted | Strict app-bound validation required on protected `main`; QA-R02 closed. |
 
 ## Authority and evidence links
 
