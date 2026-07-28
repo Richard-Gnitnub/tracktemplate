@@ -1,5 +1,6 @@
 """Exercise the Phase 5 Coin ViewProvider fixture in the real FreeCAD GUI."""
 
+from dataclasses import replace
 import datetime
 import json
 import math
@@ -33,17 +34,18 @@ except ImportError:
 ROOT = pathlib.Path(os.environ["TRACKTEMPLATE_REPO"])
 sys.path.insert(0, str(ROOT))
 
-from tracktemplate import api  # noqa: E402
+from tracktemplate import api, bootstrap  # noqa: E402
+from tracktemplate.adapters.freecad import transition_state as adapter  # noqa: E402
+from tracktemplate.application import transition_edit as command  # noqa: E402
 from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
 from tracktemplate.presentation import (  # noqa: E402
     transition_coin_viewprovider as viewprovider,
 )
 
 
-def _artifact():
+def _state(transition_length_mm):
     circle_centre_y_mm = 624.7779655573173
     radius_mm = 655.0
-    transition_length_mm = 300.0
     intent = api.TransitionIntent(
         transition_id="transition:phase5:viewprovider-gui",
         circle_centre_y_mm=circle_centre_y_mm,
@@ -57,7 +59,10 @@ def _artifact():
         track_name="Phase 5 GUI transition",
         end_name="Entry",
     )
-    state = api.analyse_transition_state(api.TransitionState(intent))
+    return api.analyse_transition_state(api.TransitionState(intent))
+
+
+def _artifact(state):
     return api.regenerate_transition_preview(
         api.TransitionDerivedCache(),
         state,
@@ -71,11 +76,11 @@ def _process_gui():
         QtWidgets.QApplication.processEvents()
 
 
-def _red_pixel_count(path):
+def _red_pixel_positions(path):
     image = QtGui.QImage(str(path))
     if image.isNull():
         raise RuntimeError("FreeCAD created an unreadable GUI screenshot")
-    count = 0
+    positions = set()
     for y_pos in range(image.height()):
         for x_pos in range(image.width()):
             colour = image.pixelColor(x_pos, y_pos)
@@ -83,8 +88,12 @@ def _red_pixel_count(path):
             green = colour.green()
             blue = colour.blue()
             if red >= 160 and red >= green * 2 and red >= blue * 2:
-                count += 1
-    return count
+                positions.add((x_pos, y_pos))
+    return frozenset(positions)
+
+
+def _red_pixel_count(path):
+    return len(_red_pixel_positions(path))
 
 
 def _red_pixel_columns(image):
@@ -190,6 +199,15 @@ class _ObservedTransitionCoinViewProviderFixture(
         return super().getElementPicked(picked_point)
 
 
+def _expect_adapter_error(action, code):
+    try:
+        action()
+    except adapter.TransitionDocumentError as error:
+        assert error.code == code, error
+        return error
+    raise AssertionError("Expected TransitionDocumentError {!r}".format(code))
+
+
 def validate():
     if App.listDocuments():
         raise RuntimeError(
@@ -209,23 +227,49 @@ def validate():
     run_directory.mkdir(parents=True)
     visible_path = run_directory / "visible.png"
     hidden_path = run_directory / "hidden.png"
+    edited_path = run_directory / "edited.png"
+    undo_path = run_directory / "undo.png"
+    redo_path = run_directory / "redo.png"
+    recovered_path = run_directory / "recovered.png"
 
     document = App.newDocument("Phase5TransitionViewProvider")
+    document.UndoMode = 1
     observer = _SelectionObserver()
     Gui.Selection.addObserver(observer)
     proxy = None
     try:
-        obj = document.addObject(
-            "App::FeaturePython",
-            "Phase5TransitionPreview",
+        qualification = bootstrap.require_qualified_runtime(
+            ROOT
+            / "reference"
+            / "contracts"
+            / "phase1-compatibility.json"
         )
+        store = adapter.FreeCADTransitionStore(qualification)
+        initial_state = _state(300.0)
+        obj = store.create(document, initial_state)
         view_object = obj.ViewObject
         object_properties = tuple(obj.PropertiesList)
         view_properties = tuple(view_object.PropertiesList)
         root_count_before = int(view_object.RootNode.getNumChildren())
         mode_count_before = int(view_object.SwitchNode.getNumChildren())
 
-        artifact = _artifact()
+        failure_control = {
+            "state": None,
+            "remaining": 0,
+        }
+
+        def artifact_for_state(state):
+            if (
+                failure_control["remaining"]
+                and state == failure_control["state"]
+            ):
+                failure_control["remaining"] -= 1
+                raise RuntimeError(
+                    "injected GUI preview refresh failure"
+                )
+            return _artifact(state)
+
+        artifact = artifact_for_state(initial_state)
         proxy = _ObservedTransitionCoinViewProviderFixture(
             view_object,
             artifact,
@@ -234,6 +278,9 @@ def validate():
                 line_width=6.0,
             ),
             coin,
+            state_reader=adapter.read_transition_object,
+            artifact_for_state=artifact_for_state,
+            source_property_name=adapter.FREECAD_STATE_JSON_PROPERTY,
         )
         document.recompute()
         assert tuple(obj.PropertiesList) == object_properties
@@ -265,7 +312,8 @@ def validate():
         view.redraw()
         _process_gui()
         view.saveImage(str(visible_path), 1000, 700, "Current")
-        visible_red_pixels = _red_pixel_count(visible_path)
+        visible_red_positions = _red_pixel_positions(visible_path)
+        visible_red_pixels = len(visible_red_positions)
         assert visible_red_pixels >= 100
 
         view_object.Visibility = False
@@ -324,6 +372,131 @@ def validate():
         )
 
         Gui.Selection.clearSelection()
+        view.redraw()
+        _process_gui()
+        document.clearUndos()
+        assert int(document.UndoCount) == 0
+        assert int(document.RedoCount) == 0
+        initial_source_signature = proxy.source_signature
+        edit_port = adapter.FreeCADTransitionEditPort(
+            store,
+            document,
+            obj,
+            proxy,
+        )
+        edited_intent = replace(
+            initial_state.intent,
+            target_signed_offset_mm=_state(
+                340.0
+            ).intent.target_signed_offset_mm,
+        )
+        edit_result = command.edit_transition_intent(
+            initial_state,
+            edited_intent,
+            edit_port,
+        )
+        assert edit_result.changed is True
+        assert adapter.read_transition_object(obj) == edit_result.state
+        assert proxy.source_signature != initial_source_signature
+        edited_source_signature = proxy.source_signature
+        edited_mapping = proxy.selection_for_element(proxy.element_name)
+        assert edited_mapping.domain_id == mapped.domain_id
+        assert edited_mapping.visual_id == mapped.visual_id
+        assert int(document.UndoCount) == 1
+        assert int(document.RedoCount) == 0
+        assert tuple(obj.PropertiesList) == object_properties
+        assert tuple(view_object.PropertiesList) == view_properties
+        assert len(document.Objects) == 1
+        assert not hasattr(obj, "Shape")
+        view.redraw()
+        _process_gui()
+        view.saveImage(str(edited_path), 1000, 700, "Current")
+        edited_red_positions = _red_pixel_positions(edited_path)
+        assert len(edited_red_positions) >= 100
+        assert edited_red_positions != visible_red_positions
+
+        document.undo()
+        view.redraw()
+        _process_gui()
+        assert adapter.read_transition_object(obj) == initial_state
+        assert proxy.source_signature == initial_source_signature
+        assert int(document.UndoCount) == 0
+        assert int(document.RedoCount) == 1
+        view.saveImage(str(undo_path), 1000, 700, "Current")
+        undo_red_positions = _red_pixel_positions(undo_path)
+        assert undo_red_positions == visible_red_positions
+
+        document.redo()
+        view.redraw()
+        _process_gui()
+        assert adapter.read_transition_object(obj) == edit_result.state
+        assert proxy.source_signature == edited_source_signature
+        assert int(document.UndoCount) == 1
+        assert int(document.RedoCount) == 0
+        view.saveImage(str(redo_path), 1000, 700, "Current")
+        redo_red_positions = _red_pixel_positions(redo_path)
+        assert redo_red_positions == edited_red_positions
+
+        before_noop = (
+            int(document.UndoCount),
+            int(document.RedoCount),
+            str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
+            proxy.source_signature,
+        )
+        noop_result = command.edit_transition_intent(
+            edit_result.state,
+            edit_result.state.intent,
+            edit_port,
+        )
+        assert noop_result.changed is False
+        assert (
+            int(document.UndoCount),
+            int(document.RedoCount),
+            str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
+            proxy.source_signature,
+        ) == before_noop
+
+        failure_state = _state(380.0)
+        failure_control["state"] = failure_state
+        failure_control["remaining"] = 1
+        before_failure = (
+            adapter.read_transition_object(obj),
+            int(document.UndoCount),
+            int(document.RedoCount),
+            len(document.Objects),
+            tuple(obj.PropertiesList),
+            tuple(view_object.PropertiesList),
+            proxy.source_signature,
+        )
+        failure_error = _expect_adapter_error(
+            lambda: command.edit_transition_intent(
+                edit_result.state,
+                failure_state.intent,
+                edit_port,
+            ),
+            "transaction-failed",
+        )
+        assert failure_error.recoverable is True
+        assert failure_error.document_mutation is False
+        assert failure_control["remaining"] == 0
+        assert (
+            adapter.read_transition_object(obj),
+            int(document.UndoCount),
+            int(document.RedoCount),
+            len(document.Objects),
+            tuple(obj.PropertiesList),
+            tuple(view_object.PropertiesList),
+            proxy.source_signature,
+        ) == before_failure
+        assert proxy.selection_for_element(
+            proxy.element_name
+        ).domain_id == mapped.domain_id
+        view.redraw()
+        _process_gui()
+        view.saveImage(str(recovered_path), 1000, 700, "Current")
+        recovered_red_positions = _red_pixel_positions(recovered_path)
+        assert recovered_red_positions == edited_red_positions
+
         selection_root = proxy.selection_root
         assert proxy.dispose() is True
         assert proxy.attached is False
@@ -335,18 +508,28 @@ def validate():
         payload = {
             "document_object_count": 1,
             "document_object_type": "App::FeaturePython",
+            "edit_command_route": "internal-application-command",
+            "edit_failure_recovered": True,
+            "edit_noop_history_delta": 0,
+            "edit_undo_units": 1,
             "freecad_version": ".".join(App.Version()[:3]),
             "hidden_red_pixels": hidden_red_pixels,
             "mapped_domain_id": mapped.domain_id,
             "mapped_visual_id": mapped.visual_id,
             "part_shape_created": False,
+            "persisted_schema_changed": False,
+            "save_route_exercised": False,
             "display_modes_added": 1,
             "root_children_added": 0,
             "selection_input": "qt-mouse-click",
             "pick_callback_count": proxy.pick_callback_count,
             "pointer_target": pointer_target,
             "screenshots": {
+                "edited": str(edited_path),
                 "hidden": str(hidden_path),
+                "recovered": str(recovered_path),
+                "redo": str(redo_path),
+                "undo": str(undo_path),
                 "visible": str(visible_path),
             },
             "selection_event": {
@@ -354,6 +537,19 @@ def validate():
                 "object": event[1],
                 "subelement": event[2],
             },
+            "preview_signatures": {
+                "edited": edited_source_signature,
+                "initial": initial_source_signature,
+            },
+            "red_pixel_counts": {
+                "edited": len(edited_red_positions),
+                "recovered": len(recovered_red_positions),
+                "redo": len(redo_red_positions),
+                "undo": len(undo_red_positions),
+                "visible": visible_red_pixels,
+            },
+            "redo_restored_edit": True,
+            "undo_restored_initial": True,
             "visible_red_pixels": visible_red_pixels,
         }
         print(

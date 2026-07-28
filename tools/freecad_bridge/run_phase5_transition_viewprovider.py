@@ -142,6 +142,15 @@ def main():
             != "TransitionPreviewCentreline"
             or payload.get("pointer_target", {}).get("class_name")
             != "QOpenGLWidget"
+            or payload.get("edit_command_route")
+            != "internal-application-command"
+            or payload.get("edit_undo_units") != 1
+            or payload.get("edit_noop_history_delta") != 0
+            or payload.get("undo_restored_initial") is not True
+            or payload.get("redo_restored_edit") is not True
+            or payload.get("edit_failure_recovered") is not True
+            or payload.get("persisted_schema_changed") is not False
+            or payload.get("save_route_exercised") is not False
         ):
             raise RuntimeError(
                 "Phase 5 GUI proof returned an invalid result"

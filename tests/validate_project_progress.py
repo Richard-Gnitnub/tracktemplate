@@ -279,16 +279,17 @@ def _validate_exit_conditions(
         current_states
         == [
             (
-                "Pending — the Coin candidate has bounded GUI evidence; "
-                "editing, resource and acceptance evidence remain"
+                "Pending — the Coin candidate has bounded selection, edit and "
+                "Undo/Redo evidence; save/reopen, resource, maintainability "
+                "and acceptance evidence remain"
             ),
             (
                 "Pending — one disposable object/layer and mouse-driven "
                 "selection mapping are proved; representative scale remains"
             ),
             (
-                "Pending — the fixture creates no `Part` shape, but no edit "
-                "workflow is proved"
+                "Pending — one bounded intent edit keeps one object and no "
+                "`Part` shape; representative editing remains"
             ),
             (
                 "Pending — editing behaviour has not yet been presented for "
