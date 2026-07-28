@@ -1,7 +1,7 @@
 # Project Plan
 
-Status: **Phase 4 current; bounded product implementation resumed by owner
-decision.**
+Status: **Phase 4 current; bounded product implementation resumed; revised
+scope 6/6 evidenced; separate owner closeout decision pending.**
 
 This file is the project dashboard. It owns only phase status, exit-condition
 status, the live-risk summary, owner-decision summary and links to evidence.
@@ -17,7 +17,7 @@ and decisions belong in the JSON registers beside it.
 | 1 | Product, dependency, correctness and performance inventory | 9/9 evidenced | Complete — accepted 2026-07-22 |
 | 2 | Minimal modular foundation and validation harness | 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 3 | First parity-proven vertical slice | 5/5 evidenced | Complete — accepted 2026-07-22 |
-| 4 | Canonical state, signatures and persistence | 4/6 evidenced | Current — bounded implementation active |
+| 4 | Canonical state, signatures and persistence | 6/6 evidenced | Current — awaiting separate closeout decision |
 | 5 | Lightweight editing prototype and renderer decision | 0/4 evidenced | Not started |
 | 6 | Explicit exact-validation and export seam | 0/5 evidenced | Not started |
 | 7 | Core alignment, station and multiple-track migration | 0/4 evidenced | Not started |
@@ -31,15 +31,19 @@ and decisions belong in the JSON registers beside it.
 | Exit condition | Status | Evidence |
 | --- | --- | --- |
 | Selected-slice save/reopen without result or identity drift | Evidenced | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-4-exit-condition-disposition) |
-| Exact parameter invalidation, including cold/reuse/change-back | Active | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-4-exit-condition-disposition) |
+| Canonical analysis and Phase 4 derived-preview invalidation, including cold/reuse/change-back | Evidenced | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-4-exit-condition-disposition) |
 | Undo/Redo and failed updates leave a valid document | Evidenced | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-4-exit-condition-disposition) |
-| Preview/exact geometry can be deleted and regenerated | Pending | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-4-exit-condition-disposition) |
+| Renderer-neutral preview artifacts can be deleted and regenerated from canonical state | Evidenced | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-4-exit-condition-disposition) |
 | Deterministic, fail-closed chair-definition package | Evidenced | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-4-exit-condition-disposition) |
 | Supported schema/version window agreed and tested | Evidenced | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-4-exit-condition-disposition) |
 
-Phase 4 remains open at 4/6. Exact-family support is limited to the accepted
-fixture-only family; operator wiring, whole-document migration and production
-output remain excluded.
+After D-P4-008, Phase 5 retains visible renderer/style, selection, GUI-editing
+and resource evidence. Phase 6 retains complete stage-specific
+exact-validation/export signatures and invalidation, transient exact-geometry
+regeneration/cleanup, output equivalence, rollback and end-to-end performance.
+Phase 4 remains open pending separate owner closeout acceptance. Exact-family
+support is still fixture-only; operator wiring, whole-document migration and
+production output remain excluded.
 
 ## Live risks
 
@@ -94,6 +98,7 @@ record. Detailed review evidence stays in the current phase file.
 | D-GOV-002 | 2026-07-27 | Accepted | Three task levels adopted: routine, behavioural, and authority or release. |
 | D-GOV-003 | 2026-07-28 | Accepted | Strict app-bound validation required on protected `main`; QA-R02 closed. |
 | D-P4-007 | 2026-07-28 | Accepted | Product implementation resumed for the bounded derived-state lifecycle tranche only. |
+| D-P4-008 | 2026-07-28 | Accepted | Cross-phase renderer and exact/export duties assigned to Phases 5 and 6; revised Phase 4 scope is 6/6 evidenced but not closed. |
 
 ## Authority and evidence links
 

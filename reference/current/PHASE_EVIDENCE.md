@@ -1,8 +1,9 @@
 # Phase 4 Canonical State, Signatures, and Persistence Evidence
 
-Status: **Active.** The project owner explicitly instructed the project to
-start Phase 4 on 2026-07-22. Four of six Phase 4 exit conditions now have
-recorded and accepted evidence; phase closeout remains open.
+Status: **Active — revised scope 6/6 evidenced.** The project owner explicitly
+instructed the project to start Phase 4 on 2026-07-22. All six revised Phase 4
+exit conditions now have recorded evidence; a separate owner closeout decision
+remains required.
 
 ## Bounded opening tranche
 
@@ -935,14 +936,66 @@ is a renderer-neutral preview geometry contract, not visible GUI evidence, a
 renderer decision, exact `Part` geometry, validation, export, production output
 or a performance claim. It closes neither remaining Phase 4 exit condition.
 
+<a id="phase-4-exit-ownership-reassignment"></a>
+
+## Phase 4 exit-ownership reassignment
+
+**Decision and source state:** This Level 3 responsibility transfer starts from
+clean protected `main` at
+`69db0df47c7aa992910c92e906576bb500c4ebdd`. Required pull-request and
+post-merge `main` CI passed. On 2026-07-28 Richard directed the project to
+“formally move those later-phase obligations to their owning phases and revise
+the Phase 4 exits.”
+
+**Panel and evidence review:** Richard is project owner and decision chair.
+Codex is change owner and presenter. The existing PR-17 post-change reviewer
+performed a fresh read-only challenge independent of both merged implementation
+tranches and this wording change. The panel reviewed the current dashboard and
+evidence, accepted architecture and modularisation boundaries, merged
+implementation and tests, the original detailed Phase 4–6 gate allocation as
+supporting history, and PR-14, PR-15, PR-16, PR-17, PR-20 and PR-22.
+
+**Challenge, recommendation and conditions:** The reviewer found no Critical or
+High issue and two Moderate record conditions: describe this as an explicit
+transfer rather than evidence under the old combined wording, and change the
+status-control tests only under the accepted requirement change. The
+recommendation is **Proceed with bounded conditions**. Phase 5 must retain the
+visible renderer, styles, selection mapping, GUI editing and resource evidence.
+Phase 6 must retain complete stage-specific exact-validation/export signatures,
+all output-affecting invalidation inputs, transient exact-geometry
+regeneration/cleanup, output equivalence, rollback and end-to-end performance.
+Phase 4 may become 6/6 evidenced, but this decision must not close it or start a
+later phase. There was no unresolved dissent.
+
+**Risk disposition and owner decision:** PR-14 remains
+Open/Remove/Not-yet-effective; PR-15, PR-16 and PR-17 remain Open/Mitigate/Partial;
+PR-20 remains effective for the bounded current scope. PR-22 is satisfied for
+this transfer by the prospective panel, independent challenge and Richard's
+explicit decision. No treatment or control-effectiveness value changes. Richard
+accepted the transfer and revised Phase 4 boundary on 2026-07-28.
+
+**Resulting authority and exclusions:** Phase 4 now owns invalidation proof for
+its canonical analysis, derived lifecycle and actual renderer-neutral preview,
+plus deletion and identical regeneration of that preview from canonical state.
+Those revised exits are evidenced. Phase 4 remains current and awaits a
+separate owner closeout decision; Phase 5 and Phase 6 remain not started. No
+renderer choice, GUI or operator wiring, `Part`/exact geometry, validation,
+export, production output, additional migration family or phase closeout is
+authorised.
+
+| Transferred obligation | Owning phase | Current status |
+| --- | ---: | --- |
+| Visible renderer, styles, selection mapping, GUI editing and resource evidence | 5 | Not started |
+| Exact-validation/export signatures and invalidation; transient exact geometry, cleanup, equivalence, rollback and end-to-end cost | 6 | Not started |
+
 ## Current Phase 4 exit-condition disposition
 
 | Exit condition | Current disposition |
 | --- | --- |
 | Selected-slice save/reopen without result or identity drift | Evidenced: exact canonical payload, result and identity pass disposable qualified-FreeCAD save/close/reopen |
-| Exact parameter invalidation including cold/reuse/change-back | Active: analysis, lifecycle and the actual renderer-neutral preview scene pass; exact-validation and export contracts/adapters remain due |
+| Canonical analysis and Phase 4 derived-preview invalidation including cold/reuse/change-back | Evidenced: analysis, the generic derived lifecycle and the actual renderer-neutral preview pass their applicable miss/reuse/change/change-back cases |
 | Undo/redo and failed updates leave a valid document | Evidenced: atomic create/update, no-op, Undo/Redo, preflight rejection and injected post-write abort all pass |
-| Preview/exact geometry can be deleted and regenerated from canonical state | Pending: the renderer-neutral preview scene passes deletion/regeneration, but no visible Phase 5 renderer or Phase 6 exact geometry exists yet |
+| Renderer-neutral preview artifacts can be deleted and regenerated from canonical state | Evidenced: explicit discard and identical regeneration pass standalone and after qualified-FreeCAD save/reopen without persisting the scene |
 | Deterministic, fail-closed chair-definition package | Evidenced: neutral schema v1, immutable review record, exact decimals/units, constituent/procedure/interface/manufacturing separation, lineage, signed manifest linkage and failure matrix pass without enabling production; S1 evidence remains blocked |
 | Supported schema/version window agreed and tested | Evidenced: the read window, bounded B14/B15/mixed copied-target fixture and exact first-family support are accepted after independent challenge; operator wiring, whole-document migration, other families and production output remain excluded |
 
@@ -957,9 +1010,10 @@ or a performance claim. It closes neither remaining Phase 4 exit condition.
   fixture-only copied-target boundary; no other family or complete document is
   qualified, and the current support flag must not be treated as an operator
   command.
-- The preview scene now has a complete sampling signature and stable selection
-  identity, but Phase 5/6 owners must still define renderer/style,
-  exact-validation and export inputs; adapters must not supply partial keys.
+- Phase 5 retains the visible renderer/style, selection, GUI-editing and
+  resource evidence. Phase 6 retains complete exact-validation/export
+  signatures and invalidation, transient exact geometry, cleanup, equivalence,
+  rollback and end-to-end cost; adapters must not supply partial keys.
 - Chair-package v1 is accepted only inside the bounded read window. Family
   completeness, numerical S1 data, exact generation and production admission
   remain Phase 9 work, not implicit consequences of that acceptance.

@@ -112,6 +112,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#bounded-phase-4-resumption",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#bounded-phase-4-resumption"
+    },
+    {
+      "id": "D-P4-008",
+      "decided_on": "2026-07-28",
+      "status": "Accepted",
+      "decision": "Reassign cross-phase Phase 4 exit obligations to their owning phases.",
+      "authority": "Phase 4 exit scope ends at canonical analysis, its derived lifecycle and actual renderer-neutral preview regeneration; the revised scope is 6/6 evidenced and ready for a separate closeout decision.",
+      "exclusions": "Phase 4 is not closed and Phases 5 and 6 are not started; no renderer, GUI/operator, Part/exact-geometry, validation, export, production-output or additional migration authority is added.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-4-exit-ownership-reassignment",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-4-exit-ownership-reassignment"
     }
   ]
 }

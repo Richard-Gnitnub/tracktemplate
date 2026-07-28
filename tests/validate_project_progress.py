@@ -49,6 +49,7 @@ EXPECTED_DECISION_IDS = {
     "D-GOV-002",
     "D-GOV-003",
     "D-P4-007",
+    "D-P4-008",
 }
 ALLOWED_TREATMENTS = {"Tolerate", "Remove", "Mitigate"}
 ALLOWED_SEVERITIES = {"Low", "Medium", "High", "Critical"}
@@ -138,10 +139,18 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
     _require(set(rows) == set(PHASE_TOTALS), "project phase rows must be 0 through 11")
     for phase, total in PHASE_TOTALS.items():
         _require(rows[phase]["total"] == total, "phase total drifted: {}".format(phase))
-    _require(rows[4]["evidenced"] == 4, "Phase 4 must show four evidenced exits")
+    _require(rows[4]["evidenced"] == 6, "Phase 4 must show six evidenced exits")
     _require(
         str(rows[4]["state"]).startswith("Current"),
         "Phase 4 must be the sole current phase",
+    )
+    _require(
+        "awaiting separate closeout decision" in str(rows[4]["state"]),
+        "Phase 4 must remain open for a separate closeout decision",
+    )
+    _require(
+        rows[5]["evidenced"] == 0 and rows[6]["evidenced"] == 0,
+        "exit reassignment must not start Phase 5 or Phase 6",
     )
     _require(
         all(
@@ -180,9 +189,9 @@ def _validate_exit_conditions(plan: str, evidence: str) -> None:
 
     expected = [
         "Evidenced",
-        "Active",
         "Evidenced",
-        "Pending",
+        "Evidenced",
+        "Evidenced",
         "Evidenced",
         "Evidenced",
     ]
@@ -191,9 +200,21 @@ def _validate_exit_conditions(plan: str, evidence: str) -> None:
         evidence_states == expected,
         "current-evidence Phase 4 exit states drifted",
     )
+    evidence_flat = " ".join(evidence.split())
     _require(
-        "Four of six Phase 4 exit conditions" in evidence,
+        "All six revised Phase 4 exit conditions" in evidence_flat,
         "current evidence summary count drifted",
+    )
+    plan_flat = " ".join(plan.split())
+    _require(
+        "Phase 5 retains visible renderer/style, selection, GUI-editing "
+        "and resource evidence" in plan_flat,
+        "Phase 5 receiving obligations are missing",
+    )
+    _require(
+        "Phase 6 retains complete stage-specific exact-validation/export "
+        "signatures and invalidation" in plan_flat,
+        "Phase 6 receiving obligations are missing",
     )
 
 
@@ -356,6 +377,15 @@ def _validate_decisions(plan: str) -> None:
     _require(
         by_id["D-P4-007"]["panel_required_under_current_policy"] is True,
         "bounded Phase 4 resumption lost its panel requirement",
+    )
+    _require(
+        by_id["D-P4-008"]["panel_required_under_current_policy"] is True,
+        "Phase 4 exit-ownership transfer lost its panel requirement",
+    )
+    _require(
+        "6/6 evidenced" in str(by_id["D-P4-008"]["authority"])
+        and "not closed" in str(by_id["D-P4-008"]["exclusions"]),
+        "Phase 4 exit transfer lost its closeout boundary",
     )
     _require(
         by_id["D-P4-003"]["panel_required_under_current_policy"] is False,
