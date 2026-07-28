@@ -272,8 +272,9 @@ def validate_plan(
             phase4_evidence = (
                 ROOT
                 / "reference"
-                / "current"
-                / "PHASE_EVIDENCE.md"
+                / "history"
+                / "phase-closeouts"
+                / "PHASE4_CLOSEOUT.md"
             ).read_text(encoding="utf-8")
             if "Phase 4 chair-definition package contract" not in phase4_evidence:
                 errors.append(

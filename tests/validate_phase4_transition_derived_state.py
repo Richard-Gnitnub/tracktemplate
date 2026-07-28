@@ -435,10 +435,11 @@ def _validate_controls():
     evidence = (
         ROOT
         / "reference"
-        / "current"
-        / "PHASE_EVIDENCE.md"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE4_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
-    assert "bounded product implementation resumed" in plan
+    assert "Complete — accepted 2026-07-28" in plan
     assert "| 4 | Canonical state, signatures and persistence | 6/6 evidenced" in plan
     assert "## Bounded Phase 4 resumption" in evidence
     assert "## Derived-state lifecycle contract" in evidence

@@ -470,8 +470,9 @@ def _validate_source_and_phase_controls():
     evidence = (
         ROOT
         / "reference"
-        / "current"
-        / "PHASE_EVIDENCE.md"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE4_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(encoding="utf-8")
     assert "chair-definition-v1.schema.json" in evidence

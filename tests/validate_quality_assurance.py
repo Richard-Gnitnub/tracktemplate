@@ -231,9 +231,21 @@ def validate_frozen_records() -> None:
         path.relative_to(ROOT).as_posix()
         for path in (ROOT / "reference" / "benchmarks").glob("*.md")
     }
-    expected = expected_phase_records | expected_benchmarks | {
-        "reference/QUALITY_ASSURANCE.md"
+    expected_new_closeouts = {
+        path.relative_to(ROOT).as_posix()
+        for path in (
+            ROOT / "reference" / "history" / "phase-closeouts"
+        ).iterdir()
+        if path.is_file()
     }
+    expected = (
+        expected_phase_records
+        | expected_benchmarks
+        | expected_new_closeouts
+        | {
+            "reference/QUALITY_ASSURANCE.md"
+        }
+    )
     require(set(by_path) == expected, "frozen-record manifest coverage drifted")
 
 

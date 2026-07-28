@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "accepted-frozen-records",
-  "updated_on": "2026-07-27",
+  "updated_on": "2026-07-28",
   "records": [
     {"category": "phase-closeout", "path": "reference/phase-evidence/BASELINE.md", "sha256": "ebbf117a0459ad85501544a0ebf993edbe528af69c9f6fb4d358f1042c871e1b"},
     {"category": "phase-closeout", "path": "reference/phase-evidence/PHASE1_CLOSEOUT.md", "sha256": "b2be49068364853691ccf9e4e0ce611e7081b1c8b1a0a8b361a263da1da03a73"},
@@ -9,6 +9,9 @@
     {"category": "phase-foundation", "path": "reference/phase-evidence/PHASE1_SLICE_SCORECARD.md", "sha256": "f6086f862ddbbeafe6546a993b1233ca4d3b2d3178675932e71a147b0d5c2e9b"},
     {"category": "phase-foundation", "path": "reference/phase-evidence/PHASE2_FOUNDATION.md", "sha256": "bf9740e4cc928c583ff6b5925ec02df95696e3cf34c495a59965d350bb93afff"},
     {"category": "phase-closeout", "path": "reference/phase-evidence/PHASE3_TRANSITION_SLICE.md", "sha256": "56b7cc47c67f6001ffaab6e306556f082b0894545fe06fc011fdbe42f9cbdbe8"},
+    {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE4_CLOSEOUT.md", "sha256": "52552ff35615c5b4e6102d079915f057904fe28213b06f84111cb766149128e2"},
+    {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE4_GATE_DECISIONS.json", "sha256": "b75ccceea3c51f945fe060be0b2f8c691198f5c9d4d13951ea7e26984cd5aacb"},
+    {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE4_RISKS.json", "sha256": "55e618c5be4c521c9a4fc028f763a3f4ee957710dcd7d46f1d640cda89648257"},
     {"category": "phase-foundation", "path": "reference/phase-evidence/S1_PILOT_PLAN.md", "sha256": "2fc949e060a57e2369448ccf2f771b5216fbd617a343e7635a35b5658069a057"},
     {"category": "audit", "path": "reference/QUALITY_ASSURANCE.md", "sha256": "c6a67b15704ce4bc9eb072615043524748e8922dbff724a9f3488011820139f6"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-01.md", "sha256": "099901d286ee7791618fee48a4390090537293e57c15f9d0972bc6750ffdf99c"},
