@@ -44,6 +44,34 @@ def _analysed(transition_id="transition:phase4:persistence"):
     return api.analyse_transition_state(api.TransitionState(_intent(transition_id)))
 
 
+def _derived_requests():
+    exact_result_signature = api.transition_derived_contract_signature(
+        "test-only.freecad-exact-result.v1",
+        {"fixture": "phase4-persistence"},
+    )
+    return tuple(
+        api.TransitionDerivedRequest(
+            stage=stage,
+            contract_signature=api.transition_derived_contract_signature(
+                "test-only.freecad-{}.v1".format(stage),
+                {"fixture": "phase4-persistence"},
+            ),
+            exact_validation_result_signature=(
+                exact_result_signature if stage == "export" else None
+            ),
+        )
+        for stage in api.TRANSITION_DERIVED_STAGES
+    )
+
+
+def _derived_payload(state, request):
+    return {
+        "analysis_result_signature": state.analysis.result_signature,
+        "stage": request.stage,
+        "transition_id": state.intent.transition_id,
+    }
+
+
 def _new_document(suffix):
     document = App.newDocument(DOCUMENT_PREFIX + suffix)
     document.UndoMode = 1
@@ -198,6 +226,34 @@ def _validate_lifecycle(store, directory):
     )
     assert (int(document.UndoCount), _custom_payload(created)) == before_mismatch
 
+    requests = _derived_requests()
+    cache = api.TransitionDerivedCache()
+    before_derived = (
+        _custom_payload(created),
+        int(document.UndoCount),
+        int(document.RedoCount),
+        len(document.Objects),
+        tuple(created.PropertiesList),
+    )
+    derived_source_signatures = {}
+    derived_payloads = {}
+    for request in requests:
+        assert cache.status(updated, request) == "missing"
+        artifact = cache.regenerate(updated, request, _derived_payload)
+        assert cache.status(updated, request) == "current"
+        assert cache.regenerate(updated, request, _derived_payload) is artifact
+        derived_source_signatures[request.stage] = artifact.source_signature
+        derived_payloads[request.stage] = artifact.payload
+    assert (
+        _custom_payload(created),
+        int(document.UndoCount),
+        int(document.RedoCount),
+        len(document.Objects),
+        tuple(created.PropertiesList),
+    ) == before_derived
+    assert cache.discard() == api.TRANSITION_DERIVED_STAGES
+    assert all(cache.artifact(request.stage) is None for request in requests)
+
     path = pathlib.Path(directory) / "transition-persistence.FCStd"
     persisted_payload = _custom_payload(created)
     document.saveAs(str(path))
@@ -224,6 +280,34 @@ def _validate_lifecycle(store, directory):
     assert str(reopened.getObject(other_record_name).TrackTemplateRecordType) == (
         "tracktemplate.other-state"
     )
+
+    reopened_state = adapter.read_transition_object(reopened_object)
+    reopened_cache = api.TransitionDerivedCache()
+    before_regeneration = (
+        _custom_payload(reopened_object),
+        int(reopened.UndoCount),
+        int(reopened.RedoCount),
+        len(reopened.Objects),
+        tuple(reopened_object.PropertiesList),
+    )
+    for request in requests:
+        assert reopened_cache.status(reopened_state, request) == "missing"
+        artifact = reopened_cache.regenerate(
+            reopened_state,
+            request,
+            _derived_payload,
+        )
+        assert artifact.source_signature == (
+            derived_source_signatures[request.stage]
+        )
+        assert artifact.payload == derived_payloads[request.stage]
+    assert (
+        _custom_payload(reopened_object),
+        int(reopened.UndoCount),
+        int(reopened.RedoCount),
+        len(reopened.Objects),
+        tuple(reopened_object.PropertiesList),
+    ) == before_regeneration
     App.closeDocument(reopened.Name)
 
 

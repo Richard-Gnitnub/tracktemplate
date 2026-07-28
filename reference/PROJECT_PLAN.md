@@ -1,6 +1,7 @@
 # Project Plan
 
-Status: **Phase 4 current; product implementation paused by owner decision.**
+Status: **Phase 4 current; bounded product implementation resumed by owner
+decision.**
 
 This file is the project dashboard. It owns only phase status, exit-condition
 status, the live-risk summary, owner-decision summary and links to evidence.
@@ -16,7 +17,7 @@ and decisions belong in the JSON registers beside it.
 | 1 | Product, dependency, correctness and performance inventory | 9/9 evidenced | Complete — accepted 2026-07-22 |
 | 2 | Minimal modular foundation and validation harness | 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 3 | First parity-proven vertical slice | 5/5 evidenced | Complete — accepted 2026-07-22 |
-| 4 | Canonical state, signatures and persistence | 4/6 evidenced | Current — implementation paused |
+| 4 | Canonical state, signatures and persistence | 4/6 evidenced | Current — bounded implementation active |
 | 5 | Lightweight editing prototype and renderer decision | 0/4 evidenced | Not started |
 | 6 | Explicit exact-validation and export seam | 0/5 evidenced | Not started |
 | 7 | Core alignment, station and multiple-track migration | 0/4 evidenced | Not started |
@@ -92,6 +93,7 @@ record. Detailed review evidence stays in the current phase file.
 | D-GOV-001 | 2026-07-27 | Accepted | Governance simplification, fixed current paths, narrowed panels, governance budget and CI adopted. |
 | D-GOV-002 | 2026-07-27 | Accepted | Three task levels adopted: routine, behavioural, and authority or release. |
 | D-GOV-003 | 2026-07-28 | Accepted | Strict app-bound validation required on protected `main`; QA-R02 closed. |
+| D-P4-007 | 2026-07-28 | Accepted | Product implementation resumed for the bounded derived-state lifecycle tranche only. |
 
 ## Authority and evidence links
 
