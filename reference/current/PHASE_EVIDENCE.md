@@ -824,14 +824,84 @@ required-status-check rule and reopens QA-R02. No pull-request review count,
 conversation-resolution rule, linear-history rule, product work, migration
 support, operator wiring, production output or release authority is added.
 
+<a id="bounded-phase-4-resumption"></a>
+
+## Bounded Phase 4 resumption
+
+**Decision and source state:** This Level 3 governance decision starts from
+clean `main` at `76041d1a378d90a0f0c5924f3cafeef9831a8639`. It supersedes
+only the implementation pause in D-P4-006. On 2026-07-28 Richard explicitly
+directed: “Resume Phase 4 product implementation for the bounded derived-state
+lifecycle tranche under those exclusions.”
+
+**Panel and evidence review:** Richard is project owner and decision chair.
+Codex is change owner, presenter and same-agent QA/risk reviewer; the review is
+not independent. The change is non-destructive and does not clear rights,
+migration or output authority, so an independent reviewer is not required.
+The review covered the clean protected-main checkpoint, successful required
+CI, the four evidenced Phase 4 exits, the two remaining exit conditions and the
+accepted architecture/dependency direction.
+
+**Risks, recommendation and conditions:** PR-16 controls signature completeness
+and stale reuse; PR-20 controls scope. PR-17 remains unchanged because no
+migration family or operator path is added. The sequencing uncertainty is that
+Phase 4 requires disposable regeneration while Phase 5 and Phase 6 own the
+renderer and exact-production seams. Recommendation: **Proceed with bounded
+conditions**—complete architecture review first, keep the contract
+adapter-neutral, and do not claim either remaining exit condition without its
+direct proof. There was no dissent.
+
+**Resulting authority and exclusions:** The project owner accepted those
+conditions. Phase 4 product work may resume only for an application-owned
+derived-state signature, exact invalidation and disposable-regeneration
+contract for the selected transition slice. Renderer choice, GUI or operator
+wiring, `Part` production geometry, export, production output, additional
+migration families and phase closeout remain excluded.
+
+## Derived-state lifecycle contract
+
+This Level 2 tranche starts from
+`76041d1a378d90a0f0c5924f3cafeef9831a8639` and adds one
+application-owned, ephemeral lifecycle for the selected transition slice.
+Architecture review rejected persistence of derived artifacts and rejected
+premature renderer, `Part` or exporter schemas. The retained contract combines
+current canonical/analysis identity with a deterministic stage-owned contract
+signature; export additionally requires an exact-validation result signature.
+
+`TransitionDerivedCache` supports missing/current/stale status, current-result
+reuse, atomic rebuild and explicit discard for `preview`, `exact-validation`
+and `export`. Numerical changes invalidate all three stages. Diagnostic-label
+changes invalidate preview/export while retaining exact validation. A builder
+failure or invalid payload leaves the prior artifact intact. The cache and its
+opaque adapter payloads are never serialized, added to a FreeCAD property or
+made authoritative.
+
+The focused validator was first observed failing because the accepted module
+did not yet exist; this was classified `implementation-defect` against the new
+owner-approved contract. A later exact-import assertion omitted the newly
+required standard-library `math` dependency; this was classified
+`fixture-or-harness-defect`, corrected without weakening the assertion, and the
+original focused command passed. After implementation, 138 repository
+Python/FCMacro files parsed, the derived-state, canonical-state,
+persistence-structure and project-progress validators passed, and the complete
+`ci` profile passed 44/44. Qualified FreeCAD 1.1.1 then printed `Phase 4
+transition FreeCAD persistence validation passed`: disposable artifacts were
+discarded and regenerated with identical source signatures after FCStd reopen,
+without changing canonical JSON, properties, object count or Undo/Redo
+history.
+
+This is not preview or exact geometry, a renderer decision, an operator
+workflow, export evidence or a performance claim. It does not close either
+remaining Phase 4 exit condition.
+
 ## Current Phase 4 exit-condition disposition
 
 | Exit condition | Current disposition |
 | --- | --- |
 | Selected-slice save/reopen without result or identity drift | Evidenced: exact canonical payload, result and identity pass disposable qualified-FreeCAD save/close/reopen |
-| Exact parameter invalidation including cold/reuse/change-back | Active: transition analysis cases are directly tested; downstream preview, exact-validation and export propagation remain due |
+| Exact parameter invalidation including cold/reuse/change-back | Active: analysis and adapter-neutral derived lifecycle cases pass; stage-specific preview, exact-validation and export contracts/adapters remain due |
 | Undo/redo and failed updates leave a valid document | Evidenced: atomic create/update, no-op, Undo/Redo, preflight rejection and injected post-write abort all pass |
-| Preview/exact geometry can be deleted and regenerated from canonical state | Pending: no Phase 5/6 renderer or exact adapter is being invented here |
+| Preview/exact geometry can be deleted and regenerated from canonical state | Pending: disposable artifact mechanics pass, but no Phase 5 renderer or Phase 6 exact geometry exists yet |
 | Deterministic, fail-closed chair-definition package | Evidenced: neutral schema v1, immutable review record, exact decimals/units, constituent/procedure/interface/manufacturing separation, lineage, signed manifest linkage and failure matrix pass without enabling production; S1 evidence remains blocked |
 | Supported schema/version window agreed and tested | Evidenced: the read window, bounded B14/B15/mixed copied-target fixture and exact first-family support are accepted after independent challenge; operator wiring, whole-document migration, other families and production output remain excluded |
 
@@ -846,8 +916,9 @@ support, operator wiring, production output or release authority is added.
   fixture-only copied-target boundary; no other family or complete document is
   qualified, and the current support flag must not be treated as an operator
   command.
-- Preview, exact-validation and export signatures cannot be completed until
-  those derived-result contracts exist; adapters must not invent partial keys.
+- The lifecycle now requires deterministic stage-owned contract signatures,
+  but Phase 5/6 owners must still define every renderer, exact-validation and
+  export input; adapters must not supply partial keys.
 - Chair-package v1 is accepted only inside the bounded read window. Family
   completeness, numerical S1 data, exact generation and production admission
   remain Phase 9 work, not implicit consequences of that acceptance.

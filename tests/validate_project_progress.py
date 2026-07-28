@@ -48,6 +48,7 @@ EXPECTED_DECISION_IDS = {
     "D-GOV-001",
     "D-GOV-002",
     "D-GOV-003",
+    "D-P4-007",
 }
 ALLOWED_TREATMENTS = {"Tolerate", "Remove", "Mitigate"}
 ALLOWED_SEVERITIES = {"Low", "Medium", "High", "Critical"}
@@ -150,8 +151,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "more than one phase is current",
     )
     _require(
-        "product implementation paused" in plan.lower(),
-        "the current owner pause decision is missing",
+        "bounded product implementation resumed" in plan.lower(),
+        "the bounded owner resumption decision is missing",
     )
     return rows
 
@@ -351,6 +352,10 @@ def _validate_decisions(plan: str) -> None:
     _require(
         by_id["D-GOV-003"]["panel_required_under_current_policy"] is True,
         "CI enforcement decision lost its panel requirement",
+    )
+    _require(
+        by_id["D-P4-007"]["panel_required_under_current_policy"] is True,
+        "bounded Phase 4 resumption lost its panel requirement",
     )
     _require(
         by_id["D-P4-003"]["panel_required_under_current_policy"] is False,

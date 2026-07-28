@@ -172,6 +172,9 @@ def _validate_freecad_fixture_contract():
         "stale-analysis-discarded",
         "transaction-failed",
         "duplicate-stable-identity",
+        "TransitionDerivedCache",
+        "transition_derived_contract_signature",
+        "cache.discard()",
         "Phase 4 transition FreeCAD persistence validation passed",
     ):
         assert marker in source
