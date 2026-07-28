@@ -92,9 +92,9 @@ The current exit state is 0/4:
 
 | Exit condition | Current disposition |
 | --- | --- |
-| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded GUI evidence; editing, resource and acceptance evidence remain |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded selection, edit and Undo/Redo evidence; save/reopen, resource, maintainability and acceptance evidence remain |
 | Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one disposable object/layer and mouse-driven selection mapping are proved; representative scale remains |
-| Normal edits avoid dense exact `Part` geometry | Pending — the fixture creates no `Part` shape, but no edit workflow is proved |
+| Normal edits avoid dense exact `Part` geometry | Pending — one bounded intent edit keeps one object and no `Part` shape; representative editing remains |
 | Project owner accepts editing behaviour and documented limitations | Pending — editing behaviour has not yet been presented for owner acceptance |
 
 Phase 6 retains complete exact-validation/export signatures and invalidation,
@@ -219,12 +219,63 @@ scale, application-command editing, atomic Undo/Redo, failure recovery,
 save/reopen, cache invalidation and resource measurements remain unproved.
 No renderer or Phase 5 exit is accepted.
 
+## Application-command edit and atomic Undo/Redo tranche
+
+This Level 2 tranche adds an internal application command that replaces one
+complete transition intent, preserves stable identity, refreshes its accepted
+analysis and delegates the write through an injected edit port. The qualified
+FreeCAD port uses the existing Phase 4 canonical properties and transaction;
+it defers automatic ViewProvider callbacks while the write is open, swaps the
+disposable Coin scene before commit and restores the prior canonical state and
+preview after failure. `updateData` then handles valid Undo/Redo property
+changes. An exact no-op creates no transaction. The command is absent from
+`tracktemplate.api`, the product macro and operator UI.
+
+The focused test first failed because the command module did not exist,
+classified `implementation-defect`. Its first retained run then omitted the
+standard-library import from a structural expectation, classified
+`test-or-oracle-defect` and corrected without weakening the boundary. The
+qualified headless proof likewise exposed the intentionally absent FreeCAD
+edit port; FreeCADCmd returned zero but emitted an exception instead of the
+required success sentinel, so the run remained failed and was classified
+`implementation-defect`. Updating the exit wording later exposed a stale
+exact-string progress expectation, classified `test-or-oracle-defect`; the
+accepted 0/4 wording was updated and the original validator passed.
+
+After implementation, the command, ViewProvider refresh and adjacent Phase 4
+state/derived/preview regressions passed. Qualified FreeCAD 1.1.1 headless
+proofs printed their required edit, persistence and Coin sentinels. The
+complete standalone CI profile passed 48/48 validators. Three clean isolated
+real-GUI runs passed through
+`tools/freecad_bridge/run-phase5-transition-viewprovider`. Each retained one
+`App::FeaturePython` object and one display mode, created no `Part` shape,
+changed the preview signature and visible centreline from 4,188 to 4,740 red
+pixels, recorded exactly one Undo unit and zero units for a no-op, restored
+the 4,188-pixel image exactly on Undo and the 4,740-pixel image exactly on
+Redo, and restored canonical state, history, identities and the 4,740-pixel
+image after an injected preview-refresh failure. The captured initial, edited,
+Undo and recovered states were visually inspected.
+
+The implementation follows the first-party ViewProvider `updateData` lifecycle
+and document transaction semantics reviewed on 2026-07-28 from the
+[FreeCAD Addon Academy](https://freecad.github.io/Addon-Academy/Guides/Code/Document-Objects/)
+at `833bb4852af825e1826b83d6b75872d18b433486` and the
+[FreeCAD document API](https://freecad.github.io/SourceDoc/d8/d3e/classApp_1_1Document.html).
+No save/reopen route, persisted-schema or custom-property change, product
+command, cache-invalidation claim, exact geometry/export, renderer acceptance
+or Phase 5 exit is included.
+
+PR-14 remains Open/Remove with **Partial** control: one bounded
+application-command edit, atomic Undo/Redo and transactional failure recovery
+are now proved. Representative editing and selection scale, save/reopen,
+cache invalidation, resource measurement and renderer acceptance remain open.
+
 ## Next bounded tranche
 
-Add the smallest application-command edit seam with one atomic Undo/Redo unit
-and transactional failure recovery. Keep the fixture development-only and
-continue to exclude a product command, persisted schema and save route until
-those separate proofs are complete.
+Retain one development-only preview cache and prove edit, Undo, Redo and
+change-back invalidation without adding a save/reopen route or product wiring.
+Keep persistence lifecycle and representative resource evidence as later
+separate tranches.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).

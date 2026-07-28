@@ -30,6 +30,7 @@ __all__ = (
     "FREECAD_STATE_JSON_PROPERTY",
     "FREECAD_TRANSITION_RECORD_TYPE",
     "FREECAD_CUSTOM_PROPERTIES",
+    "FreeCADTransitionEditPort",
     "FreeCADTransitionStore",
     "TransitionDocumentError",
     "find_transition_object",
@@ -474,13 +475,14 @@ class FreeCADTransitionStore:
                 _abort_transaction(document, error)
             _raise_transaction_error(error, failed_object_name)
 
-    def update(self, document, obj, state):
-        """Replace canonical state atomically, or make no history for a no-op."""
+    def _update(self, document, obj, state, before_commit=None):
         document = _require_open_document(document)
         _require_undo(document)
         _require_object_document(document, obj)
         if not isinstance(state, TransitionState):
             raise TypeError("state must be a TransitionState")
+        if before_commit is not None and not callable(before_commit):
+            raise TypeError("before_commit must be callable or None")
         current = read_transition_object(obj)
         identity = current.intent.transition_id
         if state.intent.transition_id != identity:
@@ -523,6 +525,8 @@ class FreeCADTransitionStore:
                     "the object did not retain the requested canonical state",
                     _object_name(obj),
                 )
+            if before_commit is not None:
+                before_commit(obj, state)
             document.commitTransaction()
             transaction_open = False
             return obj
@@ -531,3 +535,80 @@ class FreeCADTransitionStore:
             if transaction_open:
                 _abort_transaction(document, error)
             _raise_transaction_error(error, failed_object_name)
+
+    def update(self, document, obj, state):
+        """Replace canonical state atomically, or make no history for a no-op."""
+        return self._update(document, obj, state)
+
+
+class FreeCADTransitionEditPort:
+    """Coordinate one canonical write with its development-only preview."""
+
+    def __init__(self, store, document, obj, preview):
+        if not isinstance(store, FreeCADTransitionStore):
+            raise TypeError("store must be a FreeCADTransitionStore")
+        document = _require_open_document(document)
+        _require_object_document(document, obj)
+        defer_updates = getattr(preview, "defer_document_updates", None)
+        refresh_state = getattr(preview, "refresh_for_state", None)
+        if not callable(defer_updates) or not callable(refresh_state):
+            raise TypeError(
+                "preview must provide defer_document_updates() and "
+                "refresh_for_state(state)"
+            )
+        self._store = store
+        self._document = document
+        self._obj = obj
+        self._preview = preview
+
+    def _restore_preview(self, previous_state, original_error):
+        try:
+            restored_state = read_transition_object(self._obj)
+            self._preview.refresh_for_state(restored_state)
+        except Exception as recovery_error:
+            raise TransitionDocumentError(
+                "edit-view-recovery-failed",
+                "canonical rollback completed but preview recovery failed: {}".format(
+                    recovery_error
+                ),
+                _object_name(self._obj),
+                recoverable=False,
+                document_mutation=True,
+            ) from original_error
+        if restored_state != previous_state:
+            raise TransitionDocumentError(
+                "edit-state-recovery-mismatch",
+                "the failed edit did not restore its exact canonical base",
+                _object_name(self._obj),
+                recoverable=False,
+                document_mutation=True,
+            ) from original_error
+
+    def apply_transition_edit(self, previous_state, replacement_state):
+        """Apply one validated edit as one FreeCAD Undo/Redo transaction."""
+        if not isinstance(previous_state, TransitionState):
+            raise TypeError("previous_state must be a TransitionState")
+        if not isinstance(replacement_state, TransitionState):
+            raise TypeError("replacement_state must be a TransitionState")
+        current_state = read_transition_object(self._obj)
+        if current_state != previous_state:
+            raise TransitionDocumentError(
+                "stale-edit-base",
+                "the command base no longer matches the canonical document state",
+                _object_name(self._obj),
+            )
+
+        def refresh_before_commit(_obj, state):
+            self._preview.refresh_for_state(state)
+
+        with self._preview.defer_document_updates():
+            try:
+                return self._store._update(
+                    self._document,
+                    self._obj,
+                    replacement_state,
+                    before_commit=refresh_before_commit,
+                )
+            except Exception as error:
+                self._restore_preview(previous_state, error)
+                raise

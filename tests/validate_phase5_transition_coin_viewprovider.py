@@ -67,6 +67,9 @@ class _Group:
     def removeAllChildren(self):
         self.children.clear()
 
+    def replaceChild(self, old_child, new_child):
+        self.children[self.children.index(old_child)] = new_child
+
     def getChild(self, index):
         return self.children[index]
 
@@ -172,10 +175,9 @@ def _sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _artifact():
+def _state(transition_length_mm=300.0):
     circle_centre_y_mm = 624.7779655573173
     radius_mm = 655.0
-    transition_length_mm = 300.0
     intent = api.TransitionIntent(
         transition_id="transition:phase5:viewprovider",
         circle_centre_y_mm=circle_centre_y_mm,
@@ -189,7 +191,12 @@ def _artifact():
         track_name="Phase 5 ViewProvider transition",
         end_name="Entry",
     )
-    state = api.analyse_transition_state(api.TransitionState(intent))
+    return api.analyse_transition_state(api.TransitionState(intent))
+
+
+def _artifact(state=None):
+    if state is None:
+        state = _state()
     return api.regenerate_transition_preview(
         api.TransitionDerivedCache(),
         state,
@@ -350,6 +357,129 @@ def _validate_partial_disposal():
     assert proxy.dispose() is False
 
 
+def _validate_state_refresh():
+    initial = _state()
+    changed = _state(340.0)
+
+    class Source:
+        state = initial
+
+    source = Source()
+    built_states = []
+
+    def state_reader(obj):
+        assert obj is source
+        return obj.state
+
+    def artifact_for_state(state):
+        built_states.append(state)
+        return _artifact(state)
+
+    view_object = _ViewObject()
+    proxy = viewprovider.TransitionCoinViewProviderFixture(
+        view_object,
+        _artifact(initial),
+        _style(),
+        _FakeCoin,
+        state_reader=state_reader,
+        artifact_for_state=artifact_for_state,
+        source_property_name="CanonicalState",
+    )
+    selection_root = proxy.selection_root
+    initial_root = selection_root.children[0]
+    initial_source_signature = proxy.source_signature
+    initial_selection = proxy.selection_for_element(proxy.element_name)
+
+    assert proxy.refresh_for_state(initial) is False
+    assert built_states == [initial]
+    assert selection_root.children == [initial_root]
+
+    assert proxy.refresh_for_state(changed) is True
+    changed_root = selection_root.children[0]
+    assert changed_root is not initial_root
+    assert initial_root.children == []
+    assert proxy.source_signature != initial_source_signature
+    assert proxy.selection_for_element(proxy.element_name).domain_id == (
+        initial_selection.domain_id
+    )
+    changed_source_signature = proxy.source_signature
+
+    source.state = initial
+    assert proxy.updateData(source, "Unrelated") is None
+    assert proxy.source_signature == changed_source_signature
+    assert proxy.updateData(source, "CanonicalState") is True
+    assert proxy.source_signature == initial_source_signature
+
+    source.state = changed
+    with proxy.defer_document_updates():
+        assert proxy.updateData(source, "CanonicalState") is None
+        assert proxy.source_signature == initial_source_signature
+        assert proxy.refresh_for_state(changed) is True
+    assert proxy.source_signature == changed_source_signature
+
+    failure = RuntimeError("injected preview artifact failure")
+
+    def failing_artifact_for_state(state):
+        raise failure
+
+    proxy._artifact_for_state = failing_artifact_for_state
+    before_failure = (
+        proxy.source_signature,
+        proxy.selection_root.children[0],
+        proxy.selection_for_element(proxy.element_name),
+    )
+    error = _expect_state_error(
+        lambda: proxy.refresh_for_state(initial),
+        "coin-viewprovider-refresh-failed",
+    )
+    assert "injected preview artifact failure" in error.detail
+    assert (
+        proxy.source_signature,
+        proxy.selection_root.children[0],
+        proxy.selection_for_element(proxy.element_name),
+    ) == before_failure
+
+    proxy._artifact_for_state = artifact_for_state
+    assert proxy.refresh_for_state(initial) is True
+    assert proxy.source_signature == initial_source_signature
+
+    retired = proxy._binding
+    original_discard = retired.discard
+    discard_calls = []
+
+    def discard_then_fail_once():
+        result = original_discard()
+        discard_calls.append(True)
+        if len(discard_calls) == 1:
+            raise RuntimeError("injected retired-binding cleanup failure")
+        return result
+
+    retired.discard = discard_then_fail_once
+    error = _expect_state_error(
+        lambda: proxy.refresh_for_state(changed),
+        "coin-viewprovider-refresh-failed",
+    )
+    assert "injected retired-binding cleanup failure" in error.detail
+    assert proxy.source_signature == changed_source_signature
+    assert proxy._retired_bindings == [retired]
+    assert proxy.refresh_for_state(initial) is True
+    assert proxy.source_signature == initial_source_signature
+    assert proxy._retired_bindings == []
+    assert len(discard_calls) == 2
+    assert proxy.dispose() is True
+
+    _expect_state_error(
+        lambda: viewprovider.TransitionCoinViewProviderFixture(
+            _ViewObject(),
+            _artifact(initial),
+            _style(),
+            _FakeCoin,
+            state_reader=state_reader,
+        ),
+        "invalid-coin-viewprovider-refresh",
+    )
+
+
 def _validate_structure_and_controls():
     report = modular_structure.structure_report(ROOT)
     assert modular_structure.validate_report(report) == []
@@ -360,6 +490,7 @@ def _validate_structure_and_controls():
     assert module["layer"] == "presentation"
     assert module["warning_signals"] == []
     assert module["imports"] == [
+        "contextlib",
         "tracktemplate.application.transition_state",
         "tracktemplate.presentation.transition_coin",
     ]
@@ -400,6 +531,13 @@ def _validate_structure_and_controls():
     assert 'payload.get("selection_input") != "qt-mouse-click"' in (
         runner_text
     )
+    assert 'payload.get("edit_undo_units") != 1' in runner_text
+    assert 'payload.get("edit_failure_recovered") is not True' in (
+        runner_text
+    )
+    assert 'payload.get("save_route_exercised") is not False' in (
+        runner_text
+    )
     assert 'payload.get("pointer_target", {}).get("class_name")' in (
         runner_text
     )
@@ -408,6 +546,12 @@ def _validate_structure_and_controls():
     assert "QtTest.QTest.mouseClick(" in gui_proof_text
     assert "proxy.pick_callback_count = 0" in gui_proof_text
     assert "Gui.Selection.addSelection(" not in gui_proof_text
+    assert "command.edit_transition_intent(" in gui_proof_text
+    assert "document.undo()" in gui_proof_text
+    assert "document.redo()" in gui_proof_text
+    assert "injected GUI preview refresh failure" in gui_proof_text
+    assert ".saveAs(" not in gui_proof_text
+    assert ".save(" not in gui_proof_text
 
     plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"
@@ -420,6 +564,10 @@ def _validate_structure_and_controls():
         "| 0/4 evidenced | Current"
     ) in plan
     assert "## Development-only ViewProvider fixture tranche" in evidence
+    assert (
+        "## Application-command edit and atomic Undo/Redo tranche"
+        in evidence
+    )
     assert "No renderer or Phase 5 exit is accepted" in evidence
 
 
@@ -427,6 +575,7 @@ def validate():
     _validate_lifecycle_and_selection()
     _validate_attach_failure_cleanup()
     _validate_partial_disposal()
+    _validate_state_refresh()
     _validate_structure_and_controls()
     print("Phase 5 transition Coin ViewProvider validation passed")
 

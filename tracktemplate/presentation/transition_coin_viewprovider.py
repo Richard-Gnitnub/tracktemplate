@@ -1,5 +1,7 @@
 """Development-only ViewProvider fixture for one transition Coin scene."""
 
+from contextlib import contextmanager
+
 from tracktemplate.application.transition_state import TransitionStateError
 from tracktemplate.presentation.transition_coin import (
     TransitionCoinStyle,
@@ -67,7 +69,7 @@ def _build_selection_root(coin_module):
         ) from error
     if selection_root is None or any(
         not callable(getattr(selection_root, name, None))
-        for name in ("addChild", "removeAllChildren")
+        for name in ("addChild", "removeAllChildren", "replaceChild")
     ):
         raise _view_error(
             "invalid-coin-viewprovider",
@@ -94,6 +96,33 @@ def _cleanup_view_nodes(selection_root, binding):
     return tuple(errors)
 
 
+def _refresh_contract(
+    state_reader,
+    artifact_for_state,
+    source_property_name,
+):
+    values = (
+        state_reader,
+        artifact_for_state,
+        source_property_name,
+    )
+    if all(value is None for value in values):
+        return None, None, None
+    if (
+        not callable(state_reader)
+        or not callable(artifact_for_state)
+        or not isinstance(source_property_name, str)
+        or not source_property_name
+    ):
+        raise _view_error(
+            "invalid-coin-viewprovider-refresh",
+            "$.coin.refresh",
+            "state_reader, artifact_for_state and a property name "
+            "must be supplied together",
+        )
+    return state_reader, artifact_for_state, source_property_name
+
+
 class TransitionCoinViewProviderFixture:
     """Attach one removable Coin preview to a development-only ViewObject."""
 
@@ -103,6 +132,9 @@ class TransitionCoinViewProviderFixture:
         artifact,
         style,
         coin_module,
+        state_reader=None,
+        artifact_for_state=None,
+        source_property_name=None,
     ):
         if not isinstance(style, TransitionCoinStyle):
             raise _view_error(
@@ -110,14 +142,28 @@ class TransitionCoinViewProviderFixture:
                 "$.coin.style",
                 "expected TransitionCoinStyle",
             )
+        (
+            state_reader,
+            artifact_for_state,
+            source_property_name,
+        ) = _refresh_contract(
+            state_reader,
+            artifact_for_state,
+            source_property_name,
+        )
         self._artifact = artifact
         self._style = style
         self._coin_module = coin_module
+        self._state_reader = state_reader
+        self._artifact_for_state = artifact_for_state
+        self._source_property_name = source_property_name
+        self._document_update_deferrals = 0
         self._view_object = None
         self._view_root = None
         self._switch_node = None
         self._selection_root = None
         self._binding = None
+        self._retired_bindings = []
         self._discarded = False
         self._cleanup_pending = False
 
@@ -344,6 +390,121 @@ class TransitionCoinViewProviderFixture:
             )
         return mode
 
+    def _discard_retired_bindings(self):
+        errors = []
+        retained = []
+        for binding in self._retired_bindings:
+            try:
+                binding.discard()
+            except Exception as error:
+                retained.append(binding)
+                errors.append(str(error))
+        self._retired_bindings = retained
+        return tuple(errors)
+
+    def refresh_for_state(self, state):
+        """Replace the derived scene atomically for one canonical state."""
+        self._require_attached()
+        if self._artifact_for_state is None:
+            raise _view_error(
+                "coin-viewprovider-refresh-unavailable",
+                "$.coin.refresh",
+                "this fixture has no canonical-state refresh contract",
+            )
+
+        retired_errors = self._discard_retired_bindings()
+        if retired_errors:
+            self._cleanup_pending = True
+            raise _view_error(
+                "coin-viewprovider-refresh-failed",
+                "$.coin.refresh.cleanup",
+                "; ".join(retired_errors),
+            )
+        self._cleanup_pending = False
+
+        candidate = None
+        try:
+            artifact = self._artifact_for_state(state)
+            candidate = build_transition_coin_binding(
+                artifact,
+                self._style,
+                self._coin_module,
+            )
+            if (
+                candidate.source_signature
+                == self._binding.source_signature
+                and candidate.style_signature
+                == self._binding.style_signature
+            ):
+                candidate.discard()
+                return False
+            self._selection_root.replaceChild(
+                self._binding.root,
+                candidate.root,
+            )
+        except Exception as error:
+            cleanup_errors = []
+            if candidate is not None:
+                try:
+                    candidate.discard()
+                except Exception as cleanup_error:
+                    cleanup_errors.append(str(cleanup_error))
+            detail = str(error)
+            if cleanup_errors:
+                detail += "; candidate cleanup also failed: {}".format(
+                    "; ".join(cleanup_errors)
+                )
+            raise _view_error(
+                "coin-viewprovider-refresh-failed",
+                "$.coin.refresh",
+                detail,
+            ) from error
+
+        previous = self._binding
+        self._artifact = artifact
+        self._binding = candidate
+        try:
+            previous.discard()
+        except Exception as error:
+            self._retired_bindings.append(previous)
+            self._cleanup_pending = True
+            raise _view_error(
+                "coin-viewprovider-refresh-failed",
+                "$.coin.refresh.cleanup",
+                str(error),
+            ) from error
+        self._cleanup_pending = False
+        return True
+
+    @contextmanager
+    def defer_document_updates(self):
+        """Defer callback refresh while an adapter owns an atomic write."""
+        self._require_attached()
+        self._document_update_deferrals += 1
+        try:
+            yield
+        finally:
+            self._document_update_deferrals -= 1
+
+    def updateData(self, obj, property_name):
+        """Refresh after canonical property changes, including Undo/Redo."""
+        if (
+            self._source_property_name is None
+            or property_name != self._source_property_name
+            or self._document_update_deferrals
+            or not self.attached
+        ):
+            return None
+        try:
+            state = self._state_reader(obj)
+        except Exception as error:
+            raise _view_error(
+                "coin-viewprovider-refresh-failed",
+                "$.coin.refresh.state",
+                str(error),
+            ) from error
+        return self.refresh_for_state(state)
+
     def dispose(self):
         """Clear selectable contents fail-closed, with deterministic retry."""
         if self._discarded and not self._cleanup_pending:
@@ -353,6 +514,7 @@ class TransitionCoinViewProviderFixture:
             self._selection_root,
             self._binding,
         )
+        cleanup_errors += self._discard_retired_bindings()
         if cleanup_errors:
             self._cleanup_pending = True
             raise _view_error(
@@ -366,6 +528,7 @@ class TransitionCoinViewProviderFixture:
         self._switch_node = None
         self._selection_root = None
         self._binding = None
+        self._retired_bindings = []
         return True
 
     def dumps(self):
