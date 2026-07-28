@@ -894,14 +894,55 @@ This is not preview or exact geometry, a renderer decision, an operator
 workflow, export evidence or a performance claim. It does not close either
 remaining Phase 4 exit condition.
 
+## Renderer-neutral transition preview scene
+
+This Level 2 tranche starts from merged protected-main checkpoint
+`f7017e12b9d56e9ea23dd622f3e0e2b6ec280301`. The project owner accepted the
+recommended next bounded tranche on 2026-07-28. It adds one ephemeral
+`tracktemplate.presentation` contract for the selected transition centreline;
+it does not select or implement a renderer.
+
+`TransitionPreviewSpecification` makes the positive segment count a complete
+stage-owned signature input. The resulting scene contains one
+`track-centrelines` polyline in millimetres and
+`canonical-local-left-turn-v1`, with endpoint-inclusive station ordering,
+stable visual-to-transition identity, and non-identifying diagnostic labels.
+The domain alignment boundary remains the sole railway-mathematics owner.
+Endpoint sampling delegates to the unchanged B14/B15-parity calculation;
+interior sampling uses the fixed total transition length. Frozen B14/B15
+hashes, exact endpoint parity and independently evaluated analytical
+power-series coordinates protect the retained numerical behaviour.
+
+The actual preview payload now passes cold/current/reuse, numerical and
+diagnostic-label invalidation, sampling-contract invalidation, A-B-A
+change-back, zero-length, explicit discard and identical regeneration. The
+focused test was first observed failing because the authorised presentation
+module did not exist, classified `implementation-defect`. Its next run reached
+only the intentionally absent current-evidence heading, also classified
+`implementation-defect` at this tranche-record boundary. The first read-only
+staff review then rejected the initially passing interior-point oracle: partial
+stations had been treated as complete shorter clothoids. This was classified
+`implementation-defect` with a contributing `test-or-oracle-defect`; the
+fixed-length station calculation and independent analytical expectations
+repaired both, and the original focused proof passed.
+
+The qualified FreeCAD persistence fixture regenerates the same scene and source
+signature after FCStd reopen without changing canonical JSON, properties,
+object count or Undo/Redo history. No scene record is stored. In the final
+candidate tree, 141 repository Python/FCMacro files parsed, the focused and
+connected regressions passed, and the complete `ci` profile passed 45/45. This
+is a renderer-neutral preview geometry contract, not visible GUI evidence, a
+renderer decision, exact `Part` geometry, validation, export, production output
+or a performance claim. It closes neither remaining Phase 4 exit condition.
+
 ## Current Phase 4 exit-condition disposition
 
 | Exit condition | Current disposition |
 | --- | --- |
 | Selected-slice save/reopen without result or identity drift | Evidenced: exact canonical payload, result and identity pass disposable qualified-FreeCAD save/close/reopen |
-| Exact parameter invalidation including cold/reuse/change-back | Active: analysis and adapter-neutral derived lifecycle cases pass; stage-specific preview, exact-validation and export contracts/adapters remain due |
+| Exact parameter invalidation including cold/reuse/change-back | Active: analysis, lifecycle and the actual renderer-neutral preview scene pass; exact-validation and export contracts/adapters remain due |
 | Undo/redo and failed updates leave a valid document | Evidenced: atomic create/update, no-op, Undo/Redo, preflight rejection and injected post-write abort all pass |
-| Preview/exact geometry can be deleted and regenerated from canonical state | Pending: disposable artifact mechanics pass, but no Phase 5 renderer or Phase 6 exact geometry exists yet |
+| Preview/exact geometry can be deleted and regenerated from canonical state | Pending: the renderer-neutral preview scene passes deletion/regeneration, but no visible Phase 5 renderer or Phase 6 exact geometry exists yet |
 | Deterministic, fail-closed chair-definition package | Evidenced: neutral schema v1, immutable review record, exact decimals/units, constituent/procedure/interface/manufacturing separation, lineage, signed manifest linkage and failure matrix pass without enabling production; S1 evidence remains blocked |
 | Supported schema/version window agreed and tested | Evidenced: the read window, bounded B14/B15/mixed copied-target fixture and exact first-family support are accepted after independent challenge; operator wiring, whole-document migration, other families and production output remain excluded |
 
@@ -916,9 +957,9 @@ remaining Phase 4 exit condition.
   fixture-only copied-target boundary; no other family or complete document is
   qualified, and the current support flag must not be treated as an operator
   command.
-- The lifecycle now requires deterministic stage-owned contract signatures,
-  but Phase 5/6 owners must still define every renderer, exact-validation and
-  export input; adapters must not supply partial keys.
+- The preview scene now has a complete sampling signature and stable selection
+  identity, but Phase 5/6 owners must still define renderer/style,
+  exact-validation and export inputs; adapters must not supply partial keys.
 - Chair-package v1 is accepted only inside the bounded read window. Family
   completeness, numerical S1 data, exact generation and production admission
   remain Phase 9 work, not implicit consequences of that acceptance.

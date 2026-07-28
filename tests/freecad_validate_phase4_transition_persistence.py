@@ -254,6 +254,31 @@ def _validate_lifecycle(store, directory):
     assert cache.discard() == api.TRANSITION_DERIVED_STAGES
     assert all(cache.artifact(request.stage) is None for request in requests)
 
+    preview_specification = api.TransitionPreviewSpecification(
+        segment_count=4
+    )
+    preview_cache = api.TransitionDerivedCache()
+    preview_artifact = api.regenerate_transition_preview(
+        preview_cache,
+        updated,
+        preview_specification,
+    )
+    preview_source_signature = preview_artifact.source_signature
+    preview_scene = preview_artifact.payload
+    assert len(preview_scene.polylines) == 1
+    assert len(preview_scene.polylines[0].points) == 5
+    assert preview_scene.polylines[0].domain_id == (
+        updated.intent.transition_id
+    )
+    assert (
+        _custom_payload(created),
+        int(document.UndoCount),
+        int(document.RedoCount),
+        len(document.Objects),
+        tuple(created.PropertiesList),
+    ) == before_derived
+    assert preview_cache.discard("preview") == ("preview",)
+
     path = pathlib.Path(directory) / "transition-persistence.FCStd"
     persisted_payload = _custom_payload(created)
     document.saveAs(str(path))
@@ -290,6 +315,15 @@ def _validate_lifecycle(store, directory):
         len(reopened.Objects),
         tuple(reopened_object.PropertiesList),
     )
+    reopened_preview_cache = api.TransitionDerivedCache()
+    reopened_preview = api.regenerate_transition_preview(
+        reopened_preview_cache,
+        reopened_state,
+        preview_specification,
+    )
+    assert reopened_preview.source_signature == preview_source_signature
+    assert reopened_preview.payload == preview_scene
+    assert reopened_preview_cache.discard("preview") == ("preview",)
     for request in requests:
         assert reopened_cache.status(reopened_state, request) == "missing"
         artifact = reopened_cache.regenerate(

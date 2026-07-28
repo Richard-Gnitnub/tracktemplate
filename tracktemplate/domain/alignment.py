@@ -7,6 +7,7 @@ GEOMETRY_TOLERANCE = 1.0e-8
 
 __all__ = (
     "clothoid_entry_displacement",
+    "clothoid_entry_displacement_at_station",
     "transition_start_signed_offset",
     "solve_transition_length",
 )
@@ -39,6 +40,89 @@ def clothoid_entry_displacement(length, radius, integration_steps=240):
 
     scale = length * interval / 3.0
     return scale * cosine_sum, scale * sine_sum, alpha
+
+
+def _finite_geometry_value(name, value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError("{} must be a finite number".format(name))
+    try:
+        result = float(value)
+    except (OverflowError, TypeError, ValueError) as error:
+        raise ValueError("{} must be a finite number".format(name)) from error
+    if not math.isfinite(result):
+        raise ValueError("{} must be a finite number".format(name))
+    return result
+
+
+def _integrate_clothoid_station(station, end_angle, integration_steps):
+    """Integrate a clothoid from zero to one fixed-transition station."""
+    steps = max(40, int(integration_steps))
+    if steps % 2:
+        steps += 1
+    interval = 1.0 / float(steps)
+    cosine_sum = 0.0
+    sine_sum = 0.0
+
+    for index in range(steps + 1):
+        u = index * interval
+        theta = end_angle * u * u
+        weight = 1.0
+        if index not in (0, steps):
+            weight = 4.0 if index % 2 else 2.0
+        cosine_sum += weight * math.cos(theta)
+        sine_sum += weight * math.sin(theta)
+
+    scale = station * interval / 3.0
+    return scale * cosine_sum, scale * sine_sum, end_angle
+
+
+def clothoid_entry_displacement_at_station(
+    station,
+    transition_length,
+    radius,
+    integration_steps=240,
+):
+    """Return displacement and tangent at a station on a fixed Euler entry.
+
+    Lengths are millimetres in canonical local left-turn space. Curvature
+    increases linearly over the complete ``transition_length``, so the tangent
+    angle at ``station`` is ``station**2 / (2 * radius * transition_length)``.
+    """
+    station = _finite_geometry_value("station", station)
+    transition_length = _finite_geometry_value(
+        "transition_length",
+        transition_length,
+    )
+    radius = _finite_geometry_value("radius", radius)
+
+    if radius <= 0.0:
+        raise ValueError("A clothoid radius must be greater than zero.")
+    if transition_length < 0.0:
+        raise ValueError("A clothoid transition length must not be negative.")
+    if station < 0.0 or station > transition_length:
+        raise ValueError(
+            "A clothoid station must lie within the transition length."
+        )
+    if transition_length <= GEOMETRY_TOLERANCE:
+        return 0.0, 0.0, 0.0
+    if station == 0.0:
+        return 0.0, 0.0, 0.0
+    if station == transition_length:
+        # Retain the mechanically extracted B14/B15 endpoint calculation.
+        return clothoid_entry_displacement(
+            transition_length,
+            radius,
+            integration_steps,
+        )
+
+    end_angle = (
+        station * station / (2.0 * radius * transition_length)
+    )
+    return _integrate_clothoid_station(
+        station,
+        end_angle,
+        integration_steps,
+    )
 
 
 def transition_start_signed_offset(circle_centre_y, radius, transition_length):

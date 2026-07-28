@@ -4,7 +4,7 @@ Phase 3 exposed the mechanically extracted transition calculations and proved
 them through a temporary B15 comparison route. Phase 4 retains only the
 modular façade and adds bounded canonical transition-state and neutral
 chair-package contracts. The bounded derived-state lifecycle remains ephemeral
-and adapter-neutral.
+and adapter-neutral; its transition preview scene remains renderer-neutral.
 """
 
 from tracktemplate import DEVELOPMENT_CHECKPOINT
@@ -47,6 +47,17 @@ from tracktemplate.domain.alignment import (
     transition_start_signed_offset,
 )
 from tracktemplate.domain.transition import TransitionIntent
+from tracktemplate.presentation.transition_preview import (
+    TRANSITION_PREVIEW_CENTRELINE_LAYER_ID,
+    TRANSITION_PREVIEW_CONTRACT_ID,
+    TRANSITION_PREVIEW_FRAME_ID,
+    TRANSITION_PREVIEW_LENGTH_UNIT,
+    TransitionPreviewPoint,
+    TransitionPreviewPolyline,
+    TransitionPreviewScene,
+    TransitionPreviewSpecification,
+    regenerate_transition_preview,
+)
 
 
 __all__ = (
@@ -79,6 +90,15 @@ __all__ = (
     "transition_derived_source_signature",
     "transition_state_from_json",
     "transition_state_to_json",
+    "TRANSITION_PREVIEW_CENTRELINE_LAYER_ID",
+    "TRANSITION_PREVIEW_CONTRACT_ID",
+    "TRANSITION_PREVIEW_FRAME_ID",
+    "TRANSITION_PREVIEW_LENGTH_UNIT",
+    "TransitionPreviewPoint",
+    "TransitionPreviewPolyline",
+    "TransitionPreviewScene",
+    "TransitionPreviewSpecification",
+    "regenerate_transition_preview",
     "clothoid_entry_displacement",
     "transition_start_signed_offset",
     "solve_transition_length",
