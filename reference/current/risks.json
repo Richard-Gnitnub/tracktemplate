@@ -165,10 +165,10 @@
       "state": "Open",
       "treatment": "Remove",
       "control_effectiveness": "Partial",
-      "summary": "Bounded Coin display, visibility and programmatic selection work; mouse picking, editing, persistence, Undo/Redo and resource evidence remain incomplete.",
+      "summary": "Bounded Coin display, visibility and mouse-driven subelement selection work; editing, persistence, Undo/Redo and resource evidence remain incomplete.",
       "owner": "Phase 5 renderer owner; project owner accepts editing behaviour.",
       "deadline": "Remove uncertainty through the real-GUI renderer decision before Phase 5 exit.",
-      "required_work": "Measure selection, editing, Undo/Redo, persistence and resource behaviour in real GUI workflows.",
+      "required_work": "Measure representative selection scale, editing, Undo/Redo, persistence and resource behaviour in real GUI workflows.",
       "closure_evidence": "Accepted complete Phase 5 renderer decision record."
     },
     {

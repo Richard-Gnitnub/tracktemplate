@@ -388,6 +388,7 @@ def _validate_structure_and_controls():
     assert gui_proof.is_file()
     wrapper_text = wrapper.read_text(encoding="utf-8")
     runner_text = runner.read_text(encoding="utf-8")
+    gui_proof_text = gui_proof.read_text(encoding="utf-8")
     assert "run-isolated" in wrapper_text
     assert "run_phase5_transition_viewprovider.py" in wrapper_text
     assert "_wait_for_gui(client)" in runner_text
@@ -396,6 +397,17 @@ def _validate_structure_and_controls():
     assert "freecad_gui_validate_phase5_transition_coin_viewprovider.py" in (
         runner_text
     )
+    assert 'payload.get("selection_input") != "qt-mouse-click"' in (
+        runner_text
+    )
+    assert 'payload.get("pointer_target", {}).get("class_name")' in (
+        runner_text
+    )
+    assert '!= "QOpenGLWidget"' in runner_text
+    assert "QtTest.QTest.mouseMove(" in gui_proof_text
+    assert "QtTest.QTest.mouseClick(" in gui_proof_text
+    assert "proxy.pick_callback_count = 0" in gui_proof_text
+    assert "Gui.Selection.addSelection(" not in gui_proof_text
 
     plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"

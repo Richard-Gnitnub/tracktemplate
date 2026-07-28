@@ -283,9 +283,8 @@ def _validate_exit_conditions(
                 "editing, resource and acceptance evidence remain"
             ),
             (
-                "Pending — one disposable object/layer and programmatic "
-                "selection mapping are proved; pointer selection and scale "
-                "remain"
+                "Pending — one disposable object/layer and mouse-driven "
+                "selection mapping are proved; representative scale remains"
             ),
             (
                 "Pending — the fixture creates no `Part` shape, but no edit "

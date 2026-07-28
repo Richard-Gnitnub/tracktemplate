@@ -93,7 +93,7 @@ The current exit state is 0/4:
 | Exit condition | Current disposition |
 | --- | --- |
 | One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded GUI evidence; editing, resource and acceptance evidence remain |
-| Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one disposable object/layer and programmatic selection mapping are proved; pointer selection and scale remain |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one disposable object/layer and mouse-driven selection mapping are proved; representative scale remains |
 | Normal edits avoid dense exact `Part` geometry | Pending — the fixture creates no `Part` shape, but no edit workflow is proved |
 | Project owner accepts editing behaviour and documented limitations | Pending — editing behaviour has not yet been presented for owner acceptance |
 
@@ -180,13 +180,51 @@ application-command editing, atomic Undo/Redo, failure recovery, save/reopen,
 cache invalidation and representative resource measurements remain unproved.
 No renderer or Phase 5 exit is accepted.
 
+## Real pointer-selection tranche
+
+This Level 2 tranche replaces the fixture's programmatic selection step with
+an actual Qt pointer route. The qualified real-GUI proof finds a rendered red
+centreline pixel in the active 3D view, resolves the containing
+`QOpenGLWidget`, moves the pointer to that pixel and issues a left-button
+click. Test-only instrumentation is reset after the hover event and before the
+click, so the retained assertion proves that the click itself invoked
+`getElementPicked`. The resulting FreeCAD selection event must carry
+`TransitionPreviewCentreline` and resolve to the existing stable preview
+visual identity and canonical transition identity.
+
+The old proof first failed the new runner contract because it reported no
+mouse input or pick callback. The initial Qt mouse-click harness could select
+the whole object before the pointer/focus lifecycle was established,
+classified `fixture-or-harness-defect`; activating the view, focusing its
+OpenGL widget and moving the pointer before the measured click repaired that
+boundary. A later five-session stress run exposed one more harness defect:
+global `QApplication.widgetAt` lookup introduced a desktop exposure dependency
+and found no widget in one session. Direct lookup inside the active FreeCAD
+3D-view hierarchy removes that dependency. The first direct lookup used the
+pre-Qt-6 namespace and failed under PySide6, also classified
+`fixture-or-harness-defect`; importing `QOpenGLWidget` from
+`QtOpenGLWidgets` repaired the qualified profile without changing product
+behaviour.
+
+The original real-GUI command then passed in six consecutive fresh FreeCAD
+1.1.1 sessions. Each run clicked the `QOpenGLWidget`, invoked
+`getElementPicked` at least once after instrumentation reset, emitted the
+stable subelement selection event, mapped both identities, kept one disposable
+object and display mode, created no `Part` shape, and closed the document.
+The visible/hidden screenshot checks remained 4,188/0 red pixels.
+
+PR-14 remains Open/Remove with **Partial** control: mouse-driven subelement
+selection is now proved for this bounded fixture. Representative selection
+scale, application-command editing, atomic Undo/Redo, failure recovery,
+save/reopen, cache invalidation and resource measurements remain unproved.
+No renderer or Phase 5 exit is accepted.
+
 ## Next bounded tranche
 
-Prove mouse-driven picking on the disposable fixture, then add the smallest
-application-command edit seam with one atomic Undo/Redo unit and transactional
-failure recovery. Keep the fixture development-only and continue to exclude a
-product command, persisted schema and save route until those separate proofs
-are complete.
+Add the smallest application-command edit seam with one atomic Undo/Redo unit
+and transactional failure recovery. Keep the fixture development-only and
+continue to exclude a product command, persisted schema and save route until
+those separate proofs are complete.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).
