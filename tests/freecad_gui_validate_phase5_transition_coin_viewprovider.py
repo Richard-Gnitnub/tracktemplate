@@ -12,13 +12,22 @@ import FreeCADGui as Gui
 from pivy import coin
 
 try:
-    from PySide6 import QtGui, QtWidgets
+    from PySide6 import (
+        QtCore,
+        QtGui,
+        QtOpenGLWidgets,
+        QtTest,
+        QtWidgets,
+    )
+    _OpenGLWidget = QtOpenGLWidgets.QOpenGLWidget
 except ImportError:
     try:
-        from PySide2 import QtGui, QtWidgets
+        from PySide2 import QtCore, QtGui, QtTest, QtWidgets
+        _OpenGLWidget = QtWidgets.QOpenGLWidget
     except ImportError:
-        from PySide import QtGui
+        from PySide import QtCore, QtGui, QtOpenGL, QtTest
         QtWidgets = QtGui
+        _OpenGLWidget = QtOpenGL.QGLWidget
 
 
 ROOT = pathlib.Path(os.environ["TRACKTEMPLATE_REPO"])
@@ -78,6 +87,76 @@ def _red_pixel_count(path):
     return count
 
 
+def _red_pixel_columns(image):
+    columns = {}
+    for y_pos in range(image.height()):
+        for x_pos in range(image.width()):
+            colour = image.pixelColor(x_pos, y_pos)
+            red = colour.red()
+            green = colour.green()
+            blue = colour.blue()
+            if red >= 160 and red >= green * 2 and red >= blue * 2:
+                columns.setdefault(x_pos, []).append(y_pos)
+    return columns
+
+
+def _visible_centreline_target():
+    main_window = Gui.getMainWindow()
+    mdi_area = main_window.findChild(QtWidgets.QMdiArea)
+    subwindow = None if mdi_area is None else mdi_area.activeSubWindow()
+    if subwindow is None:
+        raise RuntimeError("FreeCAD has no active 3D-view subwindow")
+    view_widget = subwindow.widget()
+    if view_widget is None or not view_widget.isVisible():
+        raise RuntimeError("FreeCAD has no visible 3D-view widget")
+
+    image = view_widget.grab().toImage()
+    if image.isNull():
+        raise RuntimeError("FreeCAD created an unreadable 3D-view grab")
+    columns = _red_pixel_columns(image)
+    if len(columns) < 20:
+        raise RuntimeError(
+            "FreeCAD 3D-view grab did not contain the transition"
+        )
+    image_x = sorted(columns)[len(columns) // 2]
+    image_y_values = sorted(columns[image_x])
+    image_y = image_y_values[len(image_y_values) // 2]
+    view_point = QtCore.QPoint(
+        round(image_x * view_widget.width() / image.width()),
+        round(image_y * view_widget.height() / image.height()),
+    )
+    global_point = view_widget.mapToGlobal(view_point)
+    candidates = list(
+        view_widget.findChildren(_OpenGLWidget)
+    )
+    if isinstance(view_widget, _OpenGLWidget):
+        candidates.append(view_widget)
+    targets = []
+    for candidate in candidates:
+        candidate_point = candidate.mapFromGlobal(global_point)
+        if candidate.isVisible() and candidate.rect().contains(
+            candidate_point
+        ):
+            targets.append((candidate, candidate_point))
+    if len(targets) != 1:
+        raise RuntimeError(
+            "expected one OpenGL widget under the transition; found {}".format(
+                len(targets)
+            )
+        )
+    target, target_point = targets[0]
+    main_window.activateWindow()
+    mdi_area.setActiveSubWindow(subwindow)
+    target.setFocus()
+    _process_gui()
+    return target, target_point, {
+        "class_name": target.metaObject().className(),
+        "local_point": [target_point.x(), target_point.y()],
+        "object_name": target.objectName(),
+        "view_red_columns": len(columns),
+    }
+
+
 class _SelectionObserver:
     def __init__(self):
         self.events = []
@@ -97,6 +176,18 @@ class _SelectionObserver:
                 tuple(float(value) for value in point),
             )
         )
+
+
+class _ObservedTransitionCoinViewProviderFixture(
+    viewprovider.TransitionCoinViewProviderFixture
+):
+    def __init__(self, *args, **kwargs):
+        self.pick_callback_count = 0
+        super().__init__(*args, **kwargs)
+
+    def getElementPicked(self, picked_point):
+        self.pick_callback_count += 1
+        return super().getElementPicked(picked_point)
 
 
 def validate():
@@ -135,7 +226,7 @@ def validate():
         mode_count_before = int(view_object.SwitchNode.getNumChildren())
 
         artifact = _artifact()
-        proxy = viewprovider.TransitionCoinViewProviderFixture(
+        proxy = _ObservedTransitionCoinViewProviderFixture(
             view_object,
             artifact,
             renderer.TransitionCoinStyle(
@@ -189,12 +280,30 @@ def validate():
         _process_gui()
 
         Gui.Selection.clearSelection()
-        Gui.Selection.addSelection(obj, proxy.element_name)
+        target, target_point, pointer_target = (
+            _visible_centreline_target()
+        )
+        QtTest.QTest.mouseMove(target, target_point)
+        _process_gui()
+        proxy.pick_callback_count = 0
+        observer.events.clear()
+        QtTest.QTest.mouseClick(
+            target,
+            QtCore.Qt.LeftButton,
+            QtCore.Qt.NoModifier,
+            target_point,
+        )
         _process_gui()
         selected = Gui.Selection.getSelectionEx(document.Name)
         assert len(selected) == 1
         assert selected[0].Object is obj
-        assert tuple(selected[0].SubElementNames) == (proxy.element_name,)
+        selected_subelements = tuple(selected[0].SubElementNames)
+        assert selected_subelements == (proxy.element_name,), {
+            "events": observer.events,
+            "pick_callback_count": proxy.pick_callback_count,
+            "pointer_target": pointer_target,
+            "selected_subelements": selected_subelements,
+        }
         assert observer.events
         event = observer.events[-1]
         assert event[:3] == (
@@ -233,6 +342,9 @@ def validate():
             "part_shape_created": False,
             "display_modes_added": 1,
             "root_children_added": 0,
+            "selection_input": "qt-mouse-click",
+            "pick_callback_count": proxy.pick_callback_count,
+            "pointer_target": pointer_target,
             "screenshots": {
                 "hidden": str(hidden_path),
                 "visible": str(visible_path),

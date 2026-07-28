@@ -136,6 +136,12 @@ def main():
             or payload.get("display_modes_added") != 1
             or payload.get("root_children_added") != 0
             or payload.get("visible_red_pixels", 0) < 100
+            or payload.get("selection_input") != "qt-mouse-click"
+            or payload.get("pick_callback_count", 0) < 1
+            or payload.get("selection_event", {}).get("subelement")
+            != "TransitionPreviewCentreline"
+            or payload.get("pointer_target", {}).get("class_name")
+            != "QOpenGLWidget"
         ):
             raise RuntimeError(
                 "Phase 5 GUI proof returned an invalid result"
