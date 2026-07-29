@@ -446,13 +446,71 @@ with no missing, extra, unverifiable or defective finding after independently
 checking the purpose and recompute contracts, raw/source/report/manifest
 hashes, evidence wording and scope.
 
+## Representative multi-object selection and edit tranche
+
+This Level 2 test-and-evidence tranche defines the smallest complete
+multi-object workload for the currently qualified
+`plain-line-spacing-matched-transition-intent` family. One secondary track
+produces exactly two canonical records, Entry and Exit, so that pair—not the
+separate arbitrary 32-object resource fixture—is representative of the
+accepted fixture-only family shape. The two deterministic transition lengths
+make the local development previews visually distinct for pointer selection;
+they are test inputs, not product defaults, capacity evidence or a whole-layout
+population.
+
+The retained product paths are unchanged. A new host-independent workload
+definition supplies the stable `SET-001/curve-track/2/transition/entry` and
+`.../exit` identities. The real-GUI proof creates both compact
+`App::FeaturePython` records atomically, attaches the existing development-only
+Coin ViewProvider and retained cache to each, then uses a real Qt mouse click
+to select the red Exit subelement. It applies one existing internal
+application-command edit to that selected object, follows it through one Undo
+and Redo, and injects one pre-commit preview-refresh failure. Every stage must
+preserve both stable mappings, the untouched Entry canonical state/cache, two
+document objects, two logical Coin layers, 14 active selectable-scene nodes,
+zero `Shape` properties and the exact Undo/Redo history. The failed edit must
+restore the selected canonical state and cache without adding history.
+
+The existing isolated ViewProvider runner executes this proof after its
+single-object selection/edit/save-reopen regression from a new empty document
+in the same qualified GUI process. The 2026-07-29
+`transition-gui` regression profile passed all six requested steps, including
+51/51 standalone validators and qualified FreeCAD 1.1.1 persistence, Coin
+scene, edit-lifecycle and real-GUI proofs. The retained multi-object result
+selected `SET-001/curve-track/2/transition/exit` through a real Qt mouse click
+and preserved two objects, two layers, 14 active selectable-scene nodes, zero
+`Shape` properties and both stable mappings. Edit, Undo, Redo and failed-edit
+recovery caused exactly five selected-cache regenerations/requests with zero
+reuse; the Entry cache recorded zero requests, regenerations or reuse.
+
+During development, one exact-float expectation was classified as a
+**test-or-oracle defect** because the accepted analytical round trip is
+tolerance-bound; it now uses the existing `GEOMETRY_TOLERANCE`. Pointer
+targets contaminated by viewport furniture or too close to the viewport edge
+were classified as **fixture-or-harness defects**; the proof now chooses the
+most interior uniquely hittable canonical segment and reconciles Qt and Coin
+coordinates before clicking. No product selection logic was changed.
+
+The exact pre-repair command, source state, sentinel, raw output and first
+assertion were not preserved for either failure, contrary to the failed-test
+adjudication policy. The classifications remain technically supported by the
+retained tolerance and pointer-selection contracts, and the repaired exact
+qualified profile passes, but their chronology and original failing runs are
+not independently auditable. This is a process-evidence gap, not product
+behaviour or acceptance evidence.
+
+No product load hook, persisted schema, public API, exact/export path,
+dependency, renderer acceptance, owner editing-behaviour acceptance or Phase 5
+exit is included or accepted. PR-14 remains Open/Remove with **Partial**
+control and the structured risk and decision records are unchanged.
+
 ## Next bounded tranche
 
-Define and document a representative multi-object workload rationale, then
-exercise pointer selection and one application-command edit/Undo/Redo while
-preserving stable mapping, cache invalidation, object/layer/node counts and
-transactional recovery. Keep automatic product load wiring, renderer
-acceptance and owner editing-behaviour acceptance as separate later tranches.
+Define a development-only automatic attachment/load boundary for existing
+canonical transition objects, then prove deterministic attach, refresh,
+disposal and failure recovery without changing stored state or making the
+ViewProvider a product default. Keep renderer acceptance and owner
+editing-behaviour acceptance as separate later tranches.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).
