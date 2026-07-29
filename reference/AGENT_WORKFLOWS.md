@@ -234,6 +234,17 @@ draft-PR and bounded CI-repair authority for the current scope only. It never
 authorises merge, ready-for-review conversion, tagging, release, destructive
 history operations, gate acceptance or scope expansion.
 
+### `tracktemplate-continue`
+
+Path: `.agents/skills/tracktemplate-continue/SKILL.md`
+
+Invoke `$tracktemplate-continue` explicitly to integrate one previous green
+Level 1 or Level 2 pull request, synchronise protected `main`, implement one
+next bounded tranche and publish one new green draft pull request. The
+invocation removes routine Git prompts while retaining fail-closed stops for
+CI, reviews, conflicts, Level 3 authority and scope drift. It never merges the
+newly published draft in the same cycle.
+
 ### `tracktemplate-performance-engineering`
 
 Path: `.agents/skills/tracktemplate-performance-engineering/SKILL.md`
@@ -578,6 +589,18 @@ $tracktemplate-python-writing
 $tracktemplate-change-validation
     ↓
 $tracktemplate-quality-review
+```
+
+For one clean-main development cycle:
+
+```text
+$tracktemplate-continue
+    ↓
+verify and integrate one previous green Level 1/2 pull request
+    ↓
+applicable implementation and validation skills
+    ↓
+$tracktemplate-publish for one new green draft pull request
 ```
 
 For measured performance work:

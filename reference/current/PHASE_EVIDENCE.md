@@ -374,6 +374,25 @@ scene, edit lifecycle and isolated real-GUI proof. Raw logs are retained under
 schema, product command, operator route, screenshot hash, timing gate, renderer
 acceptance, risk treatment, authority decision or Phase 5 exit changes.
 
+## Continue development workflow automation
+
+The project owner classified this as Level 2 and authorised
+`$tracktemplate-continue` as one explicit clean-main development cycle. It may
+integrate one previous green Level 1 or Level 2 pull request, synchronise
+protected `main`, implement one next bounded tranche and delegate its
+publication to `$tracktemplate-publish`. It stops for failed or non-exact CI,
+blocking review, conflicts, scope drift or Level 3 authority, and never merges
+the newly published draft in the same invocation.
+
+The first agent-guidance proof failed because the initialised skill was not yet
+registered, classified `implementation-defect`. After the complete skill,
+register and delegated-publication route were added, the skill-creator,
+agent-guidance and resource-routing validators plus the complete 49/49
+standalone matrix passed. The authorised pilot verified PR #10 at green head
+`7e7b37c`, marked it ready, merged it normally as `5cf7cc7` and fast-forwarded
+clean local `main`. No phase status, exit, risk, decision, product behaviour or
+release authority changes.
+
 ## Next bounded tranche
 
 Measure representative cold/warm object count, recompute, latency and resource
