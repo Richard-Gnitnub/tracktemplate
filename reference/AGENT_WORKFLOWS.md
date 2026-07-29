@@ -33,6 +33,12 @@ interrupted handoff or unfamiliar dirty worktree makes that reconstruction
 material. Do not infer a requirement or accepted decision from a diff, commit
 message, branch name, test expectation or implementation comment.
 
+Before an explicit transfer to a new chat, usage reset or long pause, use
+`$tracktemplate-handoff` to write one temporary navigation packet outside the
+repository. The receiving session uses `$tracktemplate-context-recovery` with
+that packet and rechecks live repository, pull-request and CI state. The packet
+does not become project authority, current-phase evidence or a durable record.
+
 Before ending work, put each accepted durable fact in its existing canonical
 owner. Do not create generic per-task plans or chronicles that duplicate
 `PROJECT_PLAN.md`, the fixed current-phase records or another canonical
@@ -107,6 +113,16 @@ inspecting the working tree as implementation state. It uses hot, warm and cold
 context, an authority-ranked loss check and a transient context packet; it does
 not turn Git history, diffs, tests or conversation summaries into project
 authority.
+
+### `tracktemplate-handoff`
+
+Path: `.agents/skills/tracktemplate-handoff/SKILL.md`
+
+Use it only for an explicit session transfer. It creates one concise temporary
+packet outside the repository containing the owner’s requested outcome, exact
+authority limits, current implementation and validation state, and the next
+safe action. It grants no repository, Git, gate or product-change authority and
+must be consumed through context recovery, which revalidates all live state.
 
 ### `tracktemplate-freecad-addon-research`
 
@@ -366,7 +382,7 @@ optional visual mode creates only sanitised, self-contained temporary HTML and
 does not execute production code or become validation evidence. Explanation
 does not replace validation, quality review or project-owner acceptance.
 
-All twenty-three skills are deliberately instruction-only. They do not perform
+All twenty-five skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
@@ -391,6 +407,10 @@ $tracktemplate-architecture-review
 
 ```text
 $tracktemplate-context-recovery
+```
+
+```text
+$tracktemplate-handoff
 ```
 
 ```text
@@ -504,6 +524,16 @@ replace post-implementation validation.
 
 Validation determines what the evidence proves. Quality review determines
 whether the implementation and scope are acceptable given that evidence.
+
+For a planned session transfer:
+
+```text
+$tracktemplate-handoff
+    ↓
+temporary packet outside the repository
+    ↓
+new session: $tracktemplate-context-recovery with the packet path
+```
 
 For an architecture decision:
 
@@ -787,7 +817,7 @@ script or runtime package was copied or installed by this review.
 
 | Source and reviewed revision | Classification | TrackTemplate decision |
 | --- | --- | --- |
-| [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Adapt its documentation-drift audit, changelog curation and bounded simplification ideas through the corresponding local skills, while preserving TrackTemplate's canonical owners, frozen evidence and release gates. Adapt explain-diff's visual idea into a separate read-only explanation skill whose sanitised HTML exists only in temporary storage and is never production evidence. Do not install its router, auto-formatter, mutation hooks, `docs/plans/` or `docs/chronicles/` model, and do not grant changelog, simplification or explanation work automatic commit, tag, bulk-rewrite or release authority. |
+| [`reidemeister94/development-skills`](https://github.com/reidemeister94/development-skills/tree/92922f58f037191f2ccc909a69cbe297fc49efae), `92922f58f037191f2ccc909a69cbe297fc49efae`, MIT | Coding-agent workflow plugin with session-start and edit-time hooks | Adapt the useful standards-first, durable-rationale and resume principles through the existing authority map and local recovery skill. Adapt its explicit handoff idea through a local skill that writes only a temporary navigation packet and grants no Git, gate or product authority. Adapt its documentation-drift audit, changelog curation and bounded simplification ideas through the corresponding local skills, while preserving TrackTemplate's canonical owners, frozen evidence and release gates. Adapt explain-diff's visual idea into a separate read-only explanation skill whose sanitised HTML exists only in temporary storage and is never production evidence. Do not install its router, auto-formatter, mutation hooks, `docs/plans/` or `docs/chronicles/` model, and do not grant handoff, changelog, simplification or explanation work automatic commit, tag, bulk-rewrite or release authority. |
 | [`seb1n/awesome-ai-agent-skills`](https://github.com/seb1n/awesome-ai-agent-skills/tree/a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd), `a6c8c0ef3c240faefe1b0b5cabe1567beaea60fd`, MIT | Broad catalogue of generic instruction skills | Use only as a discovery source and admit each idea after project-specific review. Adapt stable-workflow automation without generic schedulers, watchers, destructive moves or new dependencies; adapt licence analysis through the existing fail-closed source/data/media/output controls without categorical legal conclusions; and adapt the complete API/integration group into one local contract skill. Its conditional network reference covers client resilience, OAuth, webhooks and GraphQL without assuming REST, installing an SDK or service, or loading network guidance for ordinary Python/FreeCAD boundaries. From the code-and-development group, admit only systematic debugging as a separate causal-investigation skill. Code documentation, review, refactoring and testing duplicate stronger local skills; generic version-control guidance conflicts with repository recovery and Git-authority controls. Embedding/vector retrieval infrastructure remains unjustified. |
 | [`pydantic/pydantic-ai`](https://github.com/pydantic/pydantic-ai/tree/ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5), `ed0f40c0e5061722f7d9f579ed7efff1b74e3ea5`, MIT | Python agent framework repository with root/scoped instructions and project-specific skills | Adapt its context-first, responsibility-to-project and patch-as-evidence patterns. TrackTemplate already supplies the corresponding authority map and local skills; add scoped `AGENTS.md` only where a directory has genuinely different rules. Do not add the Pydantic AI package as a TrackTemplate or FreeCAD runtime dependency without a separately approved in-product agent capability and compatibility, security, data, cost and validation evidence. |
 | A B Vijay Kumar, [Deep Dive SKILL.md Part 1](https://abvijaykumar.medium.com/deep-dive-skill-md-part-1-2-09fc9a536996) (published 2026-03-17) and [Part 2](https://abvijaykumar.medium.com/getting-deep-agents-to-work-with-skill-md-part-2-2-a65707eb5131) (published 2026-03-21), mutable web pages retrieved 2026-07-27, no reusable-content licence relied upon | Expository architecture and worked skill-building example, not project or platform authority | Adapt progressive disclosure, precise routing descriptions, conditional references, deterministic scripts, actionable diagnostics, validation loops and real-task iteration. No prose, sample code, dependencies, optional frontmatter or external package was copied. The unpinned pages remain research inputs only. |
