@@ -31,6 +31,22 @@ test oracle may be changed.
    tests assert values, identities, ordering, object state, findings, rollback,
    or output fingerprints as applicable.
 
+## Programmatic regression lifecycle
+
+Regression tests are retained executable requirements for as long as the
+behaviour they protect remains supported. A phase may introduce or qualify a
+regression, but closing or freezing that phase's evidence does not retire the
+test. Current-phase evidence records the result and its limits; it does not own
+the continuing test obligation.
+
+Stable deterministic regressions belong in programmatic CLI and CI profiles.
+Qualified headless FreeCAD and real-GUI regressions also remain programmatic,
+but run only when the affected boundary and available host require them. A
+phase-prefixed filename is not a retirement condition; prefer a
+behaviour-oriented name when the development boundary stabilises. Removing,
+weakening or replacing any regression remains subject to the existing test
+change rules below.
+
 ## Function-level expectation
 
 A strict one-test-file or one-test-case per function rule would create brittle

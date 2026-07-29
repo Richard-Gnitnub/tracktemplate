@@ -151,6 +151,37 @@ format-appropriate semantic metrics.
 
 Run from the repository root.
 
+### Programmatic regression pipeline
+
+Use the local pipeline as the normal concise entry point for retained
+regressions:
+
+```bash
+.venv/bin/python tools/run_regression_pipeline.py
+.venv/bin/python tools/run_regression_pipeline.py --profile transition
+.venv/bin/python tools/run_regression_pipeline.py --profile transition-gui
+```
+
+The default `standalone` profile parses every tracked Python and macro source
+and runs the complete clean-checkout standalone matrix. The `transition`
+profile adds the qualified headless transition persistence, Coin-scene and
+edit-lifecycle checks. The explicit `transition-gui` profile adds the isolated
+real-GUI ViewProvider workflow. Profile names describe durable behaviour, not
+phase acceptance; phase-prefixed test paths may be renamed when their boundary
+stabilises without retiring their contract.
+
+Each step requires both a zero exit status and its documented success sentinel.
+Raw output is retained under ignored
+`benchmark-output/validation-pipeline/` run directories while the terminal
+emits only step results and `TRACKTEMPLATE_REGRESSION_PIPELINE=`. The pipeline
+stops before later, more expensive layers after a failed prerequisite; the
+standalone runner itself still completes every standalone validator so one log
+exposes all observed failures.
+
+The qualified and GUI profiles are workstation evidence, not clean-checkout
+CI. The GUI profile remains explicit and does not establish screenshot hashes,
+numerical timing gates or a mandatory GUI-host workflow.
+
 The tracked [standalone CI workflow](../.github/workflows/ci.yml) runs on pushes
 to `main` and pull requests. It parses every tracked Python/macro source, then
 runs every `tests/validate_*.py` check through the complete-run standalone

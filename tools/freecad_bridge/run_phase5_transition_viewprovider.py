@@ -149,6 +149,15 @@ def main():
             or payload.get("undo_restored_initial") is not True
             or payload.get("redo_restored_edit") is not True
             or payload.get("edit_failure_recovered") is not True
+            or payload.get("preview_cache_retained") is not True
+            or payload.get("preview_cache_reuse_proved") is not True
+            or payload.get("preview_cache_reuse_count", 0) < 1
+            or payload.get("preview_cache_failure_recovered") is not True
+            or payload.get("preview_cache_discarded") is not True
+            or payload.get("change_back_undo_units") != 1
+            or payload.get("change_back_restored_initial") is not True
+            or payload.get("change_back_undo_restored_edit") is not True
+            or payload.get("change_back_redo_restored_initial") is not True
             or payload.get("persisted_schema_changed") is not False
             or payload.get("save_route_exercised") is not False
         ):
