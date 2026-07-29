@@ -280,12 +280,14 @@ def _validate_exit_conditions(
         == [
             (
                 "Pending — the Coin candidate has bounded selection, edit, "
-                "Undo/Redo and save/reopen evidence; representative resource, "
-                "maintainability and acceptance evidence remain"
+                "Undo/Redo, save/reopen and an eight-object resource baseline; "
+                "representative editing, maintainability and acceptance "
+                "evidence remain"
             ),
             (
-                "Pending — one disposable object/layer and mouse-driven "
-                "selection mapping are proved; representative scale remains"
+                "Pending — one disposable object/layer, mouse-driven selection "
+                "and stable mapping across an eight-object resource fixture are "
+                "proved; representative editing scale remains"
             ),
             (
                 "Pending — one bounded intent edit keeps one object and no "

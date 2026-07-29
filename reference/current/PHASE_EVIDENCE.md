@@ -92,8 +92,8 @@ The current exit state is 0/4:
 
 | Exit condition | Current disposition |
 | --- | --- |
-| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded selection, edit, Undo/Redo and save/reopen evidence; representative resource, maintainability and acceptance evidence remain |
-| Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one disposable object/layer and mouse-driven selection mapping are proved; representative scale remains |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded selection, edit, Undo/Redo, save/reopen and an eight-object resource baseline; representative editing, maintainability and acceptance evidence remain |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one disposable object/layer, mouse-driven selection and stable mapping across an eight-object resource fixture are proved; representative editing scale remains |
 | Normal edits avoid dense exact `Part` geometry | Pending — one bounded intent edit keeps one object and no `Part` shape; representative editing remains |
 | Project owner accepts editing behaviour and documented limitations | Pending — editing behaviour has not yet been presented for owner acceptance |
 
@@ -393,12 +393,46 @@ standalone matrix passed. The authorised pilot verified PR #10 at green head
 clean local `main`. No phase status, exit, risk, decision, product behaviour or
 release authority changes.
 
+## Bounded Coin performance baseline
+
+This Level 2 test-first tranche adds a deterministic workstation profiler for
+the development-only Coin candidate. Three fresh isolated FreeCAD GUI processes
+each attached eight logical transition objects with 32 preview segments from
+prepared analysed canonical state and empty per-object caches. Each process
+then performed one unmeasured warm-up and three unchanged-state measurements.
+Process launch, screenshots, pointer selection, save/reopen, exact validation
+and export are outside both measured boundaries.
+
+On the qualified FreeCAD 1.1.1 Flatpak profile, cold attachment took a median
+481.422 ms wall time (465.275–534.657 ms), 244.255 ms process CPU
+(241.092–266.276 ms) and 14.340 MiB RSS growth
+(14.340–29.398 MiB). Its one explicit recompute took a median 4.162 ms
+(4.033–4.318 ms). Every run retained exactly eight `App::FeaturePython`
+objects, eight current preview caches, eight display modes and eight stable
+selection mappings, with no added root child or `Part` shape.
+
+Across nine measured warm reuses, wall time was a median 30.798 ms
+(2.093–32.795 ms), process CPU was 4.472 ms (2.089–5.734 ms), and median RSS
+growth was 0.004 MiB (0–2.004 MiB). Every measurement reused all eight
+preview artifacts, replaced no scene, added no object or recompute and
+preserved all eight mappings. Cleanup left no retained cache, ViewProvider,
+document object or open document. The raw profile hash is
+`f3564e957e24062b5b9152b9a0b1095433b1809f8ec74a353606df5e8dab63c8`;
+ignored raw samples remain under the dated local benchmark directory.
+
+The operating-system file cache was uncontrolled and the warm series shared
+its process and document after warm-up. This is a bounded eight-object
+development fixture, not an accepted whole-product representative scale.
+No numerical budget, optimisation claim, renderer acceptance, risk treatment,
+authority decision or Phase 5 exit changes.
+
 ## Next bounded tranche
 
-Measure representative cold/warm object count, recompute, latency and resource
-behaviour for the bounded Coin candidate. Keep automatic product load wiring,
-renderer acceptance and owner editing-behaviour acceptance as separate later
-tranches.
+Measure one edit and atomic Undo/Redo within the retained eight-object fixture,
+including affected and unaffected cache/scene identity, latency, RSS, object
+and recompute behaviour. Keep automatic product load wiring, maintainability
+review, renderer acceptance and owner editing-behaviour acceptance as separate
+later tranches.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).

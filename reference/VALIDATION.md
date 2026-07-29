@@ -182,6 +182,23 @@ The qualified and GUI profiles are workstation evidence, not clean-checkout
 CI. The GUI profile remains explicit and does not establish screenshot hashes,
 numerical timing gates or a mandatory GUI-host workflow.
 
+### Bounded Coin performance baseline
+
+Run the Phase 5 candidate profile through the isolated qualified GUI:
+
+```bash
+.venv/bin/python tests/validate_phase5_transition_performance.py
+.venv/bin/python tools/phase5_transition_performance.py
+```
+
+The profile uses three fresh FreeCAD processes. Each measures one cold
+eight-object presentation attachment, then performs one unmeasured warm-up and
+three unchanged-state warm measurements. It records wall time, process CPU,
+RSS, document objects, explicit recomputes, cache reuse, selection mappings and
+cleanup. Process launch, screenshots, pointer selection, save/reopen, exact
+validation and export are excluded. Results are observations, not a numerical
+budget, renderer decision or whole-product performance claim.
+
 The tracked [standalone CI workflow](../.github/workflows/ci.yml) runs on pushes
 to `main` and pull requests. It parses every tracked Python/macro source, then
 runs every `tests/validate_*.py` check through the complete-run standalone
