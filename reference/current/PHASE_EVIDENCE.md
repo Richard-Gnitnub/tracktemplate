@@ -270,12 +270,78 @@ application-command edit, atomic Undo/Redo and transactional failure recovery
 are now proved. Representative editing and selection scale, save/reopen,
 cache invalidation, resource measurement and renderer acceptance remain open.
 
+## Retained preview-cache regression tranche
+
+This Level 2 test-led tranche retains one existing
+`TransitionDerivedCache` for the development ViewProvider lifecycle and
+injects its artifact function through the existing refresh seam. It adds no
+cache implementation, public API, persisted state, custom property or product
+wiring. The standalone regression covers cold creation, exact reuse,
+edit/Undo/Redo/change-back invalidation, equal change-back payloads, failure
+recovery and explicit cache disposal.
+
+The first focused run reached the newly required GUI-runner fields and failed,
+classified `fixture-or-harness-defect`; the repair remained inside the
+development GUI fixture and runner. Qualified FreeCAD 1.1.1 headless
+validation then printed its transition-edit sentinel with one-unit edit and
+change-back history plus exact rollback. The first isolated GUI run exposed a
+new assertion that compared Pivy wrapper identity rather than underlying Coin
+node identity, classified `test-or-oracle-defect`. Comparing the accepted
+node ID repaired that oracle, and the original command then passed in three
+consecutive fresh isolated sessions.
+
+Each retained GUI run used one cache for 11 requests, including two exact
+reuses, and deterministically restored the initial and edited source
+signatures through edit, Undo, Redo, change-back and injected failure. It kept
+one `App::FeaturePython` object and one display mode, created no `Part` shape,
+and restored the within-session 4,188/4,740-pixel visual states. Initial,
+edited and change-back captures were visually inspected. These are semantic
+within-session comparisons, not screenshot hashes or numerical timing gates.
+The required standalone CI workflow remains unchanged and does not run the
+GUI host.
+
+The first-party ViewProvider and transaction guidance was rechecked on
+2026-07-29 at the same Addon Academy revision
+`833bb4852af825e1826b83d6b75872d18b433486`. No save/reopen route,
+performance acceptance, renderer acceptance or Phase 5 exit is included.
+PR-14 and PR-16 remain Open with **Partial** controls.
+
+## Programmatic regression pipeline automation
+
+This Level 2 tooling and validation-policy tranche makes retained regression
+execution independent of phase closeout. One standard-library local runner
+composes syntax and complete standalone checks by default, adds the qualified
+headless transition lifecycle through a durable `transition` profile, and
+adds the isolated real-GUI proof only through the explicit
+`transition-gui` profile. Raw output remains in ignored per-run log
+directories while the terminal emits concise step results and one structured
+sentinel.
+
+The focused runner contract first failed because the accepted tool did not
+exist, classified `implementation-defect`; the repair boundary is limited to
+the local runner, its direct test and the canonical testing/validation
+documents. The contract covers profile composition, raw failure retention,
+missing-sentinel rejection and fail-fast exclusion of later expensive layers.
+
+The default pipeline passed tracked parsing and all 49 standalone validators.
+The first `transition-gui` invocation then stopped before later layers when its
+sandboxed subprocess could not connect to Flatpak, classified
+`environment-or-profile-defect`. The exact command reran under the approved
+qualified host and passed all six sentinels: parsing, standalone contracts,
+transition persistence, Coin scene, edit lifecycle and the isolated real-GUI
+ViewProvider regression.
+
+Hosted CI remains the deterministic standalone matrix and no screenshot hash,
+timing threshold or mandatory GUI-host workflow is added. These results do not
+accept the renderer or a Phase 5 exit. Phase status, risks and decisions are
+unchanged.
+
 ## Next bounded tranche
 
-Retain one development-only preview cache and prove edit, Undo, Redo and
-change-back invalidation without adding a save/reopen route or product wiring.
-Keep persistence lifecycle and representative resource evidence as later
-separate tranches.
+Prove that save/reopen reconstructs the disposable preview and cache from
+canonical state without persisting either derived object. Keep product wiring,
+representative resource evidence and renderer acceptance as separate later
+tranches.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).

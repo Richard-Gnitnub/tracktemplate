@@ -62,11 +62,11 @@ def _state(transition_length_mm):
     return api.analyse_transition_state(api.TransitionState(intent))
 
 
-def _artifact(state):
+def _artifact(cache, state, specification):
     return api.regenerate_transition_preview(
-        api.TransitionDerivedCache(),
+        cache,
         state,
-        api.TransitionPreviewSpecification(segment_count=32),
+        specification,
     )
 
 
@@ -231,6 +231,9 @@ def validate():
     undo_path = run_directory / "undo.png"
     redo_path = run_directory / "redo.png"
     recovered_path = run_directory / "recovered.png"
+    change_back_path = run_directory / "change-back.png"
+    change_back_undo_path = run_directory / "change-back-undo.png"
+    change_back_redo_path = run_directory / "change-back-redo.png"
 
     document = App.newDocument("Phase5TransitionViewProvider")
     document.UndoMode = 1
@@ -257,8 +260,21 @@ def validate():
             "state": None,
             "remaining": 0,
         }
+        preview_cache = api.TransitionDerivedCache()
+        preview_specification = api.TransitionPreviewSpecification(
+            segment_count=32
+        )
+        preview_request = preview_specification.derived_request()
+        cache_events = []
 
         def artifact_for_state(state):
+            previous = preview_cache.artifact("preview")
+            artifact = _artifact(
+                preview_cache,
+                state,
+                preview_specification,
+            )
+            cache_events.append((state, previous, artifact))
             if (
                 failure_control["remaining"]
                 and state == failure_control["state"]
@@ -267,9 +283,13 @@ def validate():
                 raise RuntimeError(
                     "injected GUI preview refresh failure"
                 )
-            return _artifact(state)
+            return artifact
 
         artifact = artifact_for_state(initial_state)
+        assert preview_cache.status(
+            initial_state,
+            preview_request,
+        ) == "current"
         proxy = _ObservedTransitionCoinViewProviderFixture(
             view_object,
             artifact,
@@ -305,6 +325,16 @@ def validate():
         assert proxy.selection_root.getTypeId().getName() == "SoFCSelection"
         assert int(proxy.selection_root.getNumChildren()) == 1
         view_object.DisplayMode = proxy.display_mode
+        initial_scene_root = proxy.selection_root.getChild(0)
+        assert proxy.refresh_for_state(initial_state) is False
+        assert cache_events[-1] == (
+            initial_state,
+            artifact,
+            artifact,
+        )
+        assert int(
+            proxy.selection_root.getChild(0).getNodeId()
+        ) == int(initial_scene_root.getNodeId())
 
         view = Gui.activeDocument().activeView()
         view.viewTop()
@@ -399,6 +429,16 @@ def validate():
         assert adapter.read_transition_object(obj) == edit_result.state
         assert proxy.source_signature != initial_source_signature
         edited_source_signature = proxy.source_signature
+        edited_artifact = preview_cache.artifact("preview")
+        assert edited_artifact.source_signature == edited_source_signature
+        assert preview_cache.status(
+            edit_result.state,
+            preview_request,
+        ) == "current"
+        assert preview_cache.status(
+            initial_state,
+            preview_request,
+        ) == "stale"
         edited_mapping = proxy.selection_for_element(proxy.element_name)
         assert edited_mapping.domain_id == mapped.domain_id
         assert edited_mapping.visual_id == mapped.visual_id
@@ -420,6 +460,15 @@ def validate():
         _process_gui()
         assert adapter.read_transition_object(obj) == initial_state
         assert proxy.source_signature == initial_source_signature
+        undo_artifact = preview_cache.artifact("preview")
+        assert undo_artifact.source_signature == (
+            artifact.source_signature
+        )
+        assert undo_artifact.payload == artifact.payload
+        assert preview_cache.status(
+            initial_state,
+            preview_request,
+        ) == "current"
         assert int(document.UndoCount) == 0
         assert int(document.RedoCount) == 1
         view.saveImage(str(undo_path), 1000, 700, "Current")
@@ -431,6 +480,15 @@ def validate():
         _process_gui()
         assert adapter.read_transition_object(obj) == edit_result.state
         assert proxy.source_signature == edited_source_signature
+        redo_artifact = preview_cache.artifact("preview")
+        assert redo_artifact.source_signature == (
+            edited_artifact.source_signature
+        )
+        assert redo_artifact.payload == edited_artifact.payload
+        assert preview_cache.status(
+            edit_result.state,
+            preview_request,
+        ) == "current"
         assert int(document.UndoCount) == 1
         assert int(document.RedoCount) == 0
         view.saveImage(str(redo_path), 1000, 700, "Current")
@@ -442,6 +500,8 @@ def validate():
             int(document.RedoCount),
             str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
             proxy.source_signature,
+            preview_cache.artifact("preview"),
+            len(cache_events),
         )
         noop_result = command.edit_transition_intent(
             edit_result.state,
@@ -454,6 +514,8 @@ def validate():
             int(document.RedoCount),
             str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
             proxy.source_signature,
+            preview_cache.artifact("preview"),
+            len(cache_events),
         ) == before_noop
 
         failure_state = _state(380.0)
@@ -491,21 +553,128 @@ def validate():
         assert proxy.selection_for_element(
             proxy.element_name
         ).domain_id == mapped.domain_id
+        assert preview_cache.status(
+            edit_result.state,
+            preview_request,
+        ) == "current"
+        assert preview_cache.status(
+            failure_state,
+            preview_request,
+        ) == "stale"
+        assert preview_cache.artifact(
+            "preview"
+        ).source_signature == edited_source_signature
+        assert cache_events[-2][0] == failure_state
+        assert cache_events[-1][0] == edit_result.state
         view.redraw()
         _process_gui()
         view.saveImage(str(recovered_path), 1000, 700, "Current")
         recovered_red_positions = _red_pixel_positions(recovered_path)
         assert recovered_red_positions == edited_red_positions
 
+        before_change_back_undos = int(document.UndoCount)
+        change_back_result = command.edit_transition_intent(
+            edit_result.state,
+            initial_state.intent,
+            edit_port,
+        )
+        assert change_back_result.changed is True
+        assert change_back_result.state == initial_state
+        assert adapter.read_transition_object(obj) == initial_state
+        assert proxy.source_signature == initial_source_signature
+        change_back_artifact = preview_cache.artifact("preview")
+        assert change_back_artifact.source_signature == (
+            artifact.source_signature
+        )
+        assert change_back_artifact.payload == artifact.payload
+        assert preview_cache.status(
+            initial_state,
+            preview_request,
+        ) == "current"
+        assert int(document.UndoCount) - before_change_back_undos == 1
+        assert int(document.RedoCount) == 0
+        assert tuple(obj.PropertiesList) == object_properties
+        assert tuple(view_object.PropertiesList) == view_properties
+        assert len(document.Objects) == 1
+        assert not hasattr(obj, "Shape")
+        assert proxy.selection_for_element(
+            proxy.element_name
+        ).domain_id == mapped.domain_id
+        view.redraw()
+        _process_gui()
+        view.saveImage(str(change_back_path), 1000, 700, "Current")
+        change_back_red_positions = _red_pixel_positions(
+            change_back_path
+        )
+        assert change_back_red_positions == visible_red_positions
+
+        document.undo()
+        view.redraw()
+        _process_gui()
+        assert adapter.read_transition_object(obj) == edit_result.state
+        assert proxy.source_signature == edited_source_signature
+        assert preview_cache.status(
+            edit_result.state,
+            preview_request,
+        ) == "current"
+        assert int(document.UndoCount) == 1
+        assert int(document.RedoCount) == 1
+        view.saveImage(
+            str(change_back_undo_path),
+            1000,
+            700,
+            "Current",
+        )
+        change_back_undo_red_positions = _red_pixel_positions(
+            change_back_undo_path
+        )
+        assert change_back_undo_red_positions == edited_red_positions
+
+        document.redo()
+        view.redraw()
+        _process_gui()
+        assert adapter.read_transition_object(obj) == initial_state
+        assert proxy.source_signature == initial_source_signature
+        assert preview_cache.status(
+            initial_state,
+            preview_request,
+        ) == "current"
+        assert int(document.UndoCount) == 2
+        assert int(document.RedoCount) == 0
+        view.saveImage(
+            str(change_back_redo_path),
+            1000,
+            700,
+            "Current",
+        )
+        change_back_redo_red_positions = _red_pixel_positions(
+            change_back_redo_path
+        )
+        assert change_back_redo_red_positions == visible_red_positions
+
+        cache_reuse_count = sum(
+            previous is current
+            for _state_value, previous, current in cache_events
+        )
+        cache_regeneration_count = len(cache_events) - cache_reuse_count
+        assert cache_reuse_count >= 1
+        assert cache_regeneration_count >= 1
+
         selection_root = proxy.selection_root
         assert proxy.dispose() is True
         assert proxy.attached is False
         assert int(selection_root.getNumChildren()) == 0
+        assert preview_cache.discard("preview") == ("preview",)
+        assert preview_cache.artifact("preview") is None
         document.removeObject(obj.Name)
         document.recompute()
         assert document.Objects == []
 
         payload = {
+            "change_back_redo_restored_initial": True,
+            "change_back_restored_initial": True,
+            "change_back_undo_restored_edit": True,
+            "change_back_undo_units": 1,
             "document_object_count": 1,
             "document_object_type": "App::FeaturePython",
             "edit_command_route": "internal-application-command",
@@ -518,6 +687,13 @@ def validate():
             "mapped_visual_id": mapped.visual_id,
             "part_shape_created": False,
             "persisted_schema_changed": False,
+            "preview_cache_discarded": True,
+            "preview_cache_failure_recovered": True,
+            "preview_cache_regeneration_count": cache_regeneration_count,
+            "preview_cache_request_count": len(cache_events),
+            "preview_cache_retained": True,
+            "preview_cache_reuse_count": cache_reuse_count,
+            "preview_cache_reuse_proved": True,
             "save_route_exercised": False,
             "display_modes_added": 1,
             "root_children_added": 0,
@@ -525,6 +701,9 @@ def validate():
             "pick_callback_count": proxy.pick_callback_count,
             "pointer_target": pointer_target,
             "screenshots": {
+                "change_back": str(change_back_path),
+                "change_back_redo": str(change_back_redo_path),
+                "change_back_undo": str(change_back_undo_path),
                 "edited": str(edited_path),
                 "hidden": str(hidden_path),
                 "recovered": str(recovered_path),
@@ -538,10 +717,18 @@ def validate():
                 "subelement": event[2],
             },
             "preview_signatures": {
+                "change_back": change_back_artifact.source_signature,
                 "edited": edited_source_signature,
                 "initial": initial_source_signature,
             },
             "red_pixel_counts": {
+                "change_back": len(change_back_red_positions),
+                "change_back_redo": len(
+                    change_back_redo_red_positions
+                ),
+                "change_back_undo": len(
+                    change_back_undo_red_positions
+                ),
                 "edited": len(edited_red_positions),
                 "recovered": len(recovered_red_positions),
                 "redo": len(redo_red_positions),

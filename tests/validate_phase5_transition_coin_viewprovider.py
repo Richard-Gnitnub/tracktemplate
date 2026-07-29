@@ -204,6 +204,36 @@ def _artifact(state=None):
     )
 
 
+class _PreviewCacheProbe:
+    """Observe one retained renderer-neutral preview-cache lifecycle."""
+
+    def __init__(self):
+        self.cache = api.TransitionDerivedCache()
+        self.specification = api.TransitionPreviewSpecification(
+            segment_count=4
+        )
+        self.calls = []
+
+    def artifact_for_state(self, state):
+        previous = self.cache.artifact("preview")
+        artifact = api.regenerate_transition_preview(
+            self.cache,
+            state,
+            self.specification,
+        )
+        self.calls.append((state, previous, artifact))
+        return artifact
+
+    def status(self, state):
+        return self.cache.status(
+            state,
+            self.specification.derived_request(),
+        )
+
+    def discard(self):
+        return self.cache.discard("preview")
+
+
 def _style():
     return renderer.TransitionCoinStyle(
         line_color_rgb=(0.9, 0.2, 0.1),
@@ -360,41 +390,47 @@ def _validate_partial_disposal():
 def _validate_state_refresh():
     initial = _state()
     changed = _state(340.0)
+    preview = _PreviewCacheProbe()
+    initial_artifact = preview.artifact_for_state(initial)
 
     class Source:
         state = initial
 
     source = Source()
-    built_states = []
 
     def state_reader(obj):
         assert obj is source
         return obj.state
 
-    def artifact_for_state(state):
-        built_states.append(state)
-        return _artifact(state)
-
     view_object = _ViewObject()
     proxy = viewprovider.TransitionCoinViewProviderFixture(
         view_object,
-        _artifact(initial),
+        initial_artifact,
         _style(),
         _FakeCoin,
         state_reader=state_reader,
-        artifact_for_state=artifact_for_state,
+        artifact_for_state=preview.artifact_for_state,
         source_property_name="CanonicalState",
     )
     selection_root = proxy.selection_root
     initial_root = selection_root.children[0]
     initial_source_signature = proxy.source_signature
     initial_selection = proxy.selection_for_element(proxy.element_name)
+    assert preview.status(initial) == "current"
 
     assert proxy.refresh_for_state(initial) is False
-    assert built_states == [initial]
+    assert preview.calls[-1] == (
+        initial,
+        initial_artifact,
+        initial_artifact,
+    )
     assert selection_root.children == [initial_root]
 
     assert proxy.refresh_for_state(changed) is True
+    changed_artifact = preview.cache.artifact("preview")
+    assert changed_artifact is not initial_artifact
+    assert preview.status(changed) == "current"
+    assert preview.status(initial) == "stale"
     changed_root = selection_root.children[0]
     assert changed_root is not initial_root
     assert initial_root.children == []
@@ -409,6 +445,13 @@ def _validate_state_refresh():
     assert proxy.source_signature == changed_source_signature
     assert proxy.updateData(source, "CanonicalState") is True
     assert proxy.source_signature == initial_source_signature
+    restored_artifact = preview.cache.artifact("preview")
+    assert restored_artifact.source_signature == (
+        initial_artifact.source_signature
+    )
+    assert restored_artifact.payload == initial_artifact.payload
+    assert preview.status(initial) == "current"
+    assert preview.status(changed) == "stale"
 
     source.state = changed
     with proxy.defer_document_updates():
@@ -416,10 +459,12 @@ def _validate_state_refresh():
         assert proxy.source_signature == initial_source_signature
         assert proxy.refresh_for_state(changed) is True
     assert proxy.source_signature == changed_source_signature
+    assert preview.status(changed) == "current"
 
     failure = RuntimeError("injected preview artifact failure")
 
     def failing_artifact_for_state(state):
+        preview.artifact_for_state(state)
         raise failure
 
     proxy._artifact_for_state = failing_artifact_for_state
@@ -438,8 +483,12 @@ def _validate_state_refresh():
         proxy.selection_root.children[0],
         proxy.selection_for_element(proxy.element_name),
     ) == before_failure
+    assert preview.status(initial) == "current"
+    assert preview.status(changed) == "stale"
 
-    proxy._artifact_for_state = artifact_for_state
+    proxy._artifact_for_state = preview.artifact_for_state
+    assert proxy.refresh_for_state(changed) is False
+    assert preview.status(changed) == "current"
     assert proxy.refresh_for_state(initial) is True
     assert proxy.source_signature == initial_source_signature
 
@@ -467,6 +516,8 @@ def _validate_state_refresh():
     assert proxy._retired_bindings == []
     assert len(discard_calls) == 2
     assert proxy.dispose() is True
+    assert preview.discard() == ("preview",)
+    assert preview.cache.artifact("preview") is None
 
     _expect_state_error(
         lambda: viewprovider.TransitionCoinViewProviderFixture(
@@ -535,6 +586,20 @@ def _validate_structure_and_controls():
     assert 'payload.get("edit_failure_recovered") is not True' in (
         runner_text
     )
+    assert 'payload.get("preview_cache_retained") is not True' in (
+        runner_text
+    )
+    assert 'payload.get("preview_cache_reuse_proved") is not True' in (
+        runner_text
+    )
+    assert 'payload.get("preview_cache_failure_recovered") is not True' in (
+        runner_text
+    )
+    assert 'payload.get("change_back_undo_units") != 1' in runner_text
+    assert (
+        'payload.get("change_back_restored_initial") is not True'
+        in runner_text
+    )
     assert 'payload.get("save_route_exercised") is not False' in (
         runner_text
     )
@@ -550,6 +615,11 @@ def _validate_structure_and_controls():
     assert "document.undo()" in gui_proof_text
     assert "document.redo()" in gui_proof_text
     assert "injected GUI preview refresh failure" in gui_proof_text
+    assert "preview_cache = api.TransitionDerivedCache()" in gui_proof_text
+    assert "change_back_result = command.edit_transition_intent(" in (
+        gui_proof_text
+    )
+    assert "hashlib" not in gui_proof_text
     assert ".saveAs(" not in gui_proof_text
     assert ".save(" not in gui_proof_text
 
@@ -568,6 +638,7 @@ def _validate_structure_and_controls():
         "## Application-command edit and atomic Undo/Redo tranche"
         in evidence
     )
+    assert "## Retained preview-cache regression tranche" in evidence
     assert "No renderer or Phase 5 exit is accepted" in evidence
 
 

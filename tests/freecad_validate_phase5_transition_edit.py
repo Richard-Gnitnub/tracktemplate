@@ -24,6 +24,16 @@ class _PreviewCoordinator:
         self.deferred = 0
         self.refreshes = []
         self.fail_after_switch_once = False
+        self.cache = api.TransitionDerivedCache()
+        self.specification = api.TransitionPreviewSpecification(
+            segment_count=32
+        )
+        self.artifact = api.regenerate_transition_preview(
+            self.cache,
+            state,
+            self.specification,
+        )
+        self.reuse_count = 0
 
     @contextmanager
     def defer_document_updates(self):
@@ -35,12 +45,26 @@ class _PreviewCoordinator:
 
     def refresh_for_state(self, state):
         assert self.deferred == 1
+        previous = self.artifact
+        self.artifact = api.regenerate_transition_preview(
+            self.cache,
+            state,
+            self.specification,
+        )
+        if self.artifact is previous:
+            self.reuse_count += 1
         self.state = state
         self.refreshes.append(state)
         if self.fail_after_switch_once:
             self.fail_after_switch_once = False
             raise RuntimeError("injected failure after preview switch")
-        return True
+        return self.artifact is not previous
+
+    def cache_status(self, state):
+        return self.cache.status(
+            state,
+            self.specification.derived_request(),
+        )
 
 
 def _state(transition_length_mm):
@@ -90,6 +114,12 @@ def validate():
         assert int(document.RedoCount) == 0
 
         preview = _PreviewCoordinator(initial)
+        initial_artifact = preview.artifact
+        assert preview.cache_status(initial) == "current"
+        with preview.defer_document_updates():
+            assert preview.refresh_for_state(initial) is False
+        assert preview.reuse_count == 1
+        assert preview.artifact is initial_artifact
         edit_port = adapter.FreeCADTransitionEditPort(
             store,
             document,
@@ -110,6 +140,10 @@ def validate():
         assert result.changed is True
         assert adapter.read_transition_object(obj) == result.state
         assert preview.state == result.state
+        edited_artifact = preview.artifact
+        assert edited_artifact is not initial_artifact
+        assert preview.cache_status(result.state) == "current"
+        assert preview.cache_status(initial) == "stale"
         assert preview.deferred == 0
         assert int(document.UndoCount) == 1
         assert int(document.RedoCount) == 0
@@ -118,19 +152,33 @@ def validate():
 
         document.undo()
         assert adapter.read_transition_object(obj) == initial
+        with preview.defer_document_updates():
+            assert preview.refresh_for_state(initial) is True
+        assert preview.artifact.source_signature == (
+            initial_artifact.source_signature
+        )
+        assert preview.artifact.payload == initial_artifact.payload
+        assert preview.cache_status(initial) == "current"
         assert int(document.UndoCount) == 0
         assert int(document.RedoCount) == 1
         document.redo()
         assert adapter.read_transition_object(obj) == result.state
+        with preview.defer_document_updates():
+            assert preview.refresh_for_state(result.state) is True
+        assert preview.artifact.source_signature == (
+            edited_artifact.source_signature
+        )
+        assert preview.artifact.payload == edited_artifact.payload
+        assert preview.cache_status(result.state) == "current"
         assert int(document.UndoCount) == 1
         assert int(document.RedoCount) == 0
-        preview.state = result.state
 
         before_noop = (
             int(document.UndoCount),
             int(document.RedoCount),
             str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
             tuple(preview.refreshes),
+            preview.artifact,
         )
         noop = command.edit_transition_intent(
             result.state,
@@ -143,6 +191,7 @@ def validate():
             int(document.RedoCount),
             str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
             tuple(preview.refreshes),
+            preview.artifact,
         ) == before_noop
 
         failure_state = _state(380.0)
@@ -172,6 +221,12 @@ def validate():
             tuple(obj.PropertiesList),
         ) == before_failure
         assert preview.state == result.state
+        assert preview.artifact.source_signature == (
+            edited_artifact.source_signature
+        )
+        assert preview.artifact.payload == edited_artifact.payload
+        assert preview.cache_status(result.state) == "current"
+        assert preview.cache_status(failure_state) == "stale"
         assert preview.deferred == 0
 
         _expect_adapter_error(
@@ -183,6 +238,45 @@ def validate():
         )
         assert adapter.read_transition_object(obj) == result.state
         assert int(document.UndoCount) == 1
+        assert len(document.Objects) == 1
+
+        before_change_back_undos = int(document.UndoCount)
+        change_back_result = command.edit_transition_intent(
+            result.state,
+            initial.intent,
+            edit_port,
+        )
+        assert change_back_result.changed is True
+        assert change_back_result.state == initial
+        assert adapter.read_transition_object(obj) == initial
+        assert preview.artifact.source_signature == (
+            initial_artifact.source_signature
+        )
+        assert preview.artifact.payload == initial_artifact.payload
+        assert preview.cache_status(initial) == "current"
+        assert int(document.UndoCount) - before_change_back_undos == 1
+        assert int(document.RedoCount) == 0
+
+        document.undo()
+        assert adapter.read_transition_object(obj) == result.state
+        with preview.defer_document_updates():
+            assert preview.refresh_for_state(result.state) is True
+        assert preview.artifact.source_signature == (
+            edited_artifact.source_signature
+        )
+        assert int(document.UndoCount) == 1
+        assert int(document.RedoCount) == 1
+
+        document.redo()
+        assert adapter.read_transition_object(obj) == initial
+        with preview.defer_document_updates():
+            assert preview.refresh_for_state(initial) is True
+        assert preview.artifact.source_signature == (
+            initial_artifact.source_signature
+        )
+        assert preview.artifact.payload == initial_artifact.payload
+        assert int(document.UndoCount) == 2
+        assert int(document.RedoCount) == 0
         assert len(document.Objects) == 1
 
         print("Phase 5 transition edit FreeCAD validation passed")
