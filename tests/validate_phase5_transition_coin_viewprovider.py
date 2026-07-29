@@ -324,6 +324,29 @@ def _validate_lifecycle_and_selection():
     )
 
 
+def _validate_restore_style_attach():
+    class RestoreStyleViewObject(_ViewObject):
+        @property
+        def Proxy(self):
+            return self._proxy
+
+        @Proxy.setter
+        def Proxy(self, value):
+            self._proxy = value
+
+    view_object = RestoreStyleViewObject()
+    proxy = viewprovider.TransitionCoinViewProviderFixture(
+        view_object,
+        _artifact(),
+        _style(),
+        _FakeCoin,
+    )
+    assert view_object.Proxy is proxy
+    assert proxy.attached is True
+    assert view_object.SwitchNode.children == [proxy.selection_root]
+    assert proxy.dispose() is True
+
+
 def _validate_attach_failure_cleanup():
     class PartialDisplayModeViewObject(_ViewObject):
         def addDisplayMode(self, node, name):
@@ -531,6 +554,61 @@ def _validate_state_refresh():
     )
 
 
+def _validate_disposable_reconstruction():
+    state = _state()
+    original_preview = _PreviewCacheProbe()
+    assert original_preview.status(state) == "missing"
+    original_artifact = original_preview.artifact_for_state(state)
+    original_view_object = _ViewObject()
+    original_proxy = viewprovider.TransitionCoinViewProviderFixture(
+        original_view_object,
+        original_artifact,
+        _style(),
+        _FakeCoin,
+    )
+    original_selection = original_proxy.selection_for_element(
+        original_proxy.element_name
+    )
+    original_selection_root = original_proxy.selection_root
+    original_scene_root = original_selection_root.children[0]
+
+    assert original_proxy.dumps() is None
+    assert original_proxy.dispose() is True
+    assert original_preview.discard() == ("preview",)
+    assert original_preview.status(state) == "missing"
+
+    reopened_preview = _PreviewCacheProbe()
+    assert reopened_preview.cache is not original_preview.cache
+    assert reopened_preview.status(state) == "missing"
+    reopened_artifact = reopened_preview.artifact_for_state(state)
+    assert reopened_artifact is not original_artifact
+    assert (
+        reopened_artifact.source_signature
+        == original_artifact.source_signature
+    )
+    assert reopened_artifact.payload == original_artifact.payload
+
+    reopened_view_object = _ViewObject()
+    reopened_proxy = viewprovider.TransitionCoinViewProviderFixture(
+        reopened_view_object,
+        reopened_artifact,
+        _style(),
+        _FakeCoin,
+    )
+    reopened_selection = reopened_proxy.selection_for_element(
+        reopened_proxy.element_name
+    )
+    assert reopened_proxy is not original_proxy
+    assert reopened_proxy.selection_root is not original_selection_root
+    assert reopened_proxy.selection_root.children[0] is not original_scene_root
+    assert reopened_selection == original_selection
+    assert reopened_proxy.source_signature == (
+        original_artifact.source_signature
+    )
+    assert reopened_proxy.dispose() is True
+    assert reopened_preview.discard() == ("preview",)
+
+
 def _validate_structure_and_controls():
     report = modular_structure.structure_report(ROOT)
     assert modular_structure.validate_report(report) == []
@@ -600,8 +678,26 @@ def _validate_structure_and_controls():
         'payload.get("change_back_restored_initial") is not True'
         in runner_text
     )
-    assert 'payload.get("save_route_exercised") is not False' in (
+    assert 'payload.get("save_route_exercised") is not True' in (
         runner_text
+    )
+    for field in (
+        "reopened_cache_is_new",
+        "reopened_cache_rebuilt",
+        "reopened_cache_started_missing",
+        "reopened_canonical_state_equal",
+        "reopened_derived_state_persisted",
+        "reopened_object_identity_preserved",
+        "reopened_preview_equivalent",
+        "reopened_schema_unchanged",
+        "reopened_viewprovider_is_new",
+        "reopened_viewprovider_rebuilt",
+    ):
+        assert 'payload.get("{}")'.format(field) in runner_text
+    assert 'payload.get("reopened_object_count") != 1' in runner_text
+    assert (
+        'payload.get("reopened_visible_red_pixels", 0) < 100'
+        in runner_text
     )
     assert 'payload.get("pointer_target", {}).get("class_name")' in (
         runner_text
@@ -620,8 +716,8 @@ def _validate_structure_and_controls():
         gui_proof_text
     )
     assert "hashlib" not in gui_proof_text
-    assert ".saveAs(" not in gui_proof_text
-    assert ".save(" not in gui_proof_text
+    assert "document.saveAs(" in gui_proof_text
+    assert "App.openDocument(" in gui_proof_text
 
     plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"
@@ -639,14 +735,20 @@ def _validate_structure_and_controls():
         in evidence
     )
     assert "## Retained preview-cache regression tranche" in evidence
+    assert (
+        "## Disposable preview save/reopen regression tranche"
+        in evidence
+    )
     assert "No renderer or Phase 5 exit is accepted" in evidence
 
 
 def validate():
     _validate_lifecycle_and_selection()
+    _validate_restore_style_attach()
     _validate_attach_failure_cleanup()
     _validate_partial_disposal()
     _validate_state_refresh()
+    _validate_disposable_reconstruction()
     _validate_structure_and_controls()
     print("Phase 5 transition Coin ViewProvider validation passed")
 

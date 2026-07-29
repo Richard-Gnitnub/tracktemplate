@@ -159,7 +159,19 @@ def main():
             or payload.get("change_back_undo_restored_edit") is not True
             or payload.get("change_back_redo_restored_initial") is not True
             or payload.get("persisted_schema_changed") is not False
-            or payload.get("save_route_exercised") is not False
+            or payload.get("save_route_exercised") is not True
+            or payload.get("reopened_object_count") != 1
+            or payload.get("reopened_object_identity_preserved") is not True
+            or payload.get("reopened_canonical_state_equal") is not True
+            or payload.get("reopened_schema_unchanged") is not True
+            or payload.get("reopened_derived_state_persisted") is not False
+            or payload.get("reopened_cache_started_missing") is not True
+            or payload.get("reopened_cache_rebuilt") is not True
+            or payload.get("reopened_cache_is_new") is not True
+            or payload.get("reopened_preview_equivalent") is not True
+            or payload.get("reopened_viewprovider_rebuilt") is not True
+            or payload.get("reopened_viewprovider_is_new") is not True
+            or payload.get("reopened_visible_red_pixels", 0) < 100
         ):
             raise RuntimeError(
                 "Phase 5 GUI proof returned an invalid result"

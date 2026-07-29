@@ -7,6 +7,7 @@ import math
 import os
 import pathlib
 import sys
+import zipfile
 
 import FreeCAD as App
 import FreeCADGui as Gui
@@ -234,6 +235,8 @@ def validate():
     change_back_path = run_directory / "change-back.png"
     change_back_undo_path = run_directory / "change-back-undo.png"
     change_back_redo_path = run_directory / "change-back-redo.png"
+    reopened_path = run_directory / "reopened.png"
+    saved_document_path = run_directory / "transition-reopen.FCStd"
 
     document = App.newDocument("Phase5TransitionViewProvider")
     document.UndoMode = 1
@@ -253,6 +256,7 @@ def validate():
         view_object = obj.ViewObject
         object_properties = tuple(obj.PropertiesList)
         view_properties = tuple(view_object.PropertiesList)
+        display_modes_before = tuple(view_object.listDisplayModes())
         root_count_before = int(view_object.RootNode.getNumChildren())
         mode_count_before = int(view_object.SwitchNode.getNumChildren())
 
@@ -660,12 +664,178 @@ def validate():
         assert cache_reuse_count >= 1
         assert cache_regeneration_count >= 1
 
-        selection_root = proxy.selection_root
-        assert proxy.dispose() is True
-        assert proxy.attached is False
-        assert int(selection_root.getNumChildren()) == 0
+        pick_callback_count = proxy.pick_callback_count
+        original_proxy = proxy
+        original_cache = preview_cache
+        original_reopen_artifact = preview_cache.artifact("preview")
+        original_reopen_selection = proxy.selection_for_element(
+            proxy.element_name
+        )
+        original_selection_root = proxy.selection_root
+        original_selection_root_id = int(
+            original_selection_root.getNodeId()
+        )
+        original_scene_root_id = int(
+            original_selection_root.getChild(0).getNodeId()
+        )
+        object_name = str(obj.Name)
+        canonical_payload = str(
+            getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)
+        )
+
+        assert original_proxy.dumps() is None
+        assert original_proxy.dispose() is True
+        assert original_proxy.attached is False
+        assert int(original_selection_root.getNumChildren()) == 0
+        view_object.Proxy = None
+        assert view_object.Proxy is None
         assert preview_cache.discard("preview") == ("preview",)
         assert preview_cache.artifact("preview") is None
+        assert preview_cache.status(
+            initial_state,
+            preview_request,
+        ) == "missing"
+        document.recompute()
+        assert tuple(obj.PropertiesList) == object_properties
+        assert tuple(view_object.PropertiesList) == view_properties
+        assert len(document.Objects) == 1
+        assert obj.Proxy is None
+        assert not hasattr(obj, "Shape")
+
+        document.saveAs(str(saved_document_path))
+        with zipfile.ZipFile(saved_document_path) as archive:
+            persisted_archive = b"\n".join(
+                archive.read(name)
+                for name in archive.namelist()
+            )
+        for transient_marker in (
+            b"TransitionCoinViewProviderFixture",
+            b"_ObservedTransitionCoinViewProviderFixture",
+            b"TransitionDerivedCache",
+            b"transition_coin_viewprovider",
+        ):
+            assert transient_marker not in persisted_archive
+        App.closeDocument(document.Name)
+        document = App.openDocument(str(saved_document_path))
+        _process_gui()
+        obj = document.getObject(object_name)
+        assert obj is not None
+        view_object = obj.ViewObject
+        reopened_state = adapter.read_transition_object(obj)
+        assert len(document.Objects) == 1
+        assert obj.TypeId == "App::FeaturePython"
+        assert str(obj.Name) == object_name
+        assert reopened_state == initial_state
+        assert reopened_state.intent.transition_id == (
+            initial_state.intent.transition_id
+        )
+        assert str(
+            getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)
+        ) == canonical_payload
+        assert tuple(obj.PropertiesList) == object_properties
+        assert tuple(view_object.PropertiesList) == view_properties
+        assert obj.Proxy is None
+        assert not isinstance(
+            view_object.Proxy,
+            viewprovider.TransitionCoinViewProviderFixture,
+        )
+        assert isinstance(view_object.Proxy, (int, type(None)))
+        assert not hasattr(obj, "Shape")
+        assert tuple(view_object.listDisplayModes()) == display_modes_before
+        assert (
+            int(view_object.RootNode.getNumChildren())
+            == root_count_before
+        )
+        assert (
+            int(view_object.SwitchNode.getNumChildren())
+            == mode_count_before
+        )
+        view_object.Proxy = None
+        assert view_object.Proxy is None
+
+        reopened_cache = api.TransitionDerivedCache()
+        assert reopened_cache is not original_cache
+        assert reopened_cache.status(
+            reopened_state,
+            preview_request,
+        ) == "missing"
+
+        def artifact_for_reopened_state(state):
+            return _artifact(
+                reopened_cache,
+                state,
+                preview_specification,
+            )
+
+        reopened_artifact = artifact_for_reopened_state(reopened_state)
+        assert reopened_artifact is not original_reopen_artifact
+        assert reopened_artifact.source_signature == (
+            original_reopen_artifact.source_signature
+        )
+        assert reopened_artifact.payload == (
+            original_reopen_artifact.payload
+        )
+        assert reopened_cache.status(
+            reopened_state,
+            preview_request,
+        ) == "current"
+
+        proxy = _ObservedTransitionCoinViewProviderFixture(
+            view_object,
+            reopened_artifact,
+            renderer.TransitionCoinStyle(
+                line_color_rgb=(0.9, 0.05, 0.02),
+                line_width=6.0,
+            ),
+            coin,
+            state_reader=adapter.read_transition_object,
+            artifact_for_state=artifact_for_reopened_state,
+            source_property_name=adapter.FREECAD_STATE_JSON_PROPERTY,
+        )
+        document.recompute()
+        assert proxy is not original_proxy
+        assert view_object.Proxy is proxy
+        assert int(proxy.selection_root.getNodeId()) != (
+            original_selection_root_id
+        )
+        assert int(proxy.selection_root.getChild(0).getNodeId()) != (
+            original_scene_root_id
+        )
+        assert proxy.selection_for_element(
+            proxy.element_name
+        ) == original_reopen_selection
+        assert proxy.source_signature == initial_source_signature
+        assert tuple(obj.PropertiesList) == object_properties
+        assert tuple(view_object.PropertiesList) == view_properties
+        assert len(document.Objects) == 1
+        assert not hasattr(obj, "Shape")
+        assert (
+            int(view_object.RootNode.getNumChildren())
+            == root_count_before
+        )
+        assert (
+            int(view_object.SwitchNode.getNumChildren())
+            == mode_count_before + 1
+        )
+
+        reopened_mode_index = int(
+            view_object.SwitchNode.findChild(proxy.selection_root)
+        )
+        assert reopened_mode_index >= 0
+        view_object.SwitchNode.whichChild.setValue(reopened_mode_index)
+        view = Gui.getDocument(document.Name).activeView()
+        view.viewTop()
+        view.fitAll()
+        view.redraw()
+        _process_gui()
+        view.saveImage(str(reopened_path), 1000, 700, "Current")
+        reopened_visible_red_pixels = _red_pixel_count(reopened_path)
+        assert reopened_visible_red_pixels >= 100
+
+        assert proxy.dispose() is True
+        view_object.Proxy = None
+        assert reopened_cache.discard("preview") == ("preview",)
+        assert reopened_cache.artifact("preview") is None
         document.removeObject(obj.Name)
         document.recompute()
         assert document.Objects == []
@@ -694,11 +864,23 @@ def validate():
             "preview_cache_retained": True,
             "preview_cache_reuse_count": cache_reuse_count,
             "preview_cache_reuse_proved": True,
-            "save_route_exercised": False,
+            "reopened_cache_is_new": True,
+            "reopened_cache_rebuilt": True,
+            "reopened_cache_started_missing": True,
+            "reopened_canonical_state_equal": True,
+            "reopened_derived_state_persisted": False,
+            "reopened_object_count": 1,
+            "reopened_object_identity_preserved": True,
+            "reopened_preview_equivalent": True,
+            "reopened_schema_unchanged": True,
+            "reopened_viewprovider_is_new": True,
+            "reopened_viewprovider_rebuilt": True,
+            "reopened_visible_red_pixels": reopened_visible_red_pixels,
+            "save_route_exercised": True,
             "display_modes_added": 1,
             "root_children_added": 0,
             "selection_input": "qt-mouse-click",
-            "pick_callback_count": proxy.pick_callback_count,
+            "pick_callback_count": pick_callback_count,
             "pointer_target": pointer_target,
             "screenshots": {
                 "change_back": str(change_back_path),
@@ -708,6 +890,7 @@ def validate():
                 "hidden": str(hidden_path),
                 "recovered": str(recovered_path),
                 "redo": str(redo_path),
+                "reopened": str(reopened_path),
                 "undo": str(undo_path),
                 "visible": str(visible_path),
             },
@@ -720,6 +903,7 @@ def validate():
                 "change_back": change_back_artifact.source_signature,
                 "edited": edited_source_signature,
                 "initial": initial_source_signature,
+                "reopened": reopened_artifact.source_signature,
             },
             "red_pixel_counts": {
                 "change_back": len(change_back_red_positions),
@@ -732,6 +916,7 @@ def validate():
                 "edited": len(edited_red_positions),
                 "recovered": len(recovered_red_positions),
                 "redo": len(redo_red_positions),
+                "reopened": reopened_visible_red_pixels,
                 "undo": len(undo_red_positions),
                 "visible": visible_red_pixels,
             },

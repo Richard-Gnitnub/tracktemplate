@@ -279,9 +279,9 @@ def _validate_exit_conditions(
         current_states
         == [
             (
-                "Pending — the Coin candidate has bounded selection, edit and "
-                "Undo/Redo evidence; save/reopen, resource, maintainability "
-                "and acceptance evidence remain"
+                "Pending — the Coin candidate has bounded selection, edit, "
+                "Undo/Redo and save/reopen evidence; representative resource, "
+                "maintainability and acceptance evidence remain"
             ),
             (
                 "Pending — one disposable object/layer and mouse-driven "

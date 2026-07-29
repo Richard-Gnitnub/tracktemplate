@@ -169,6 +169,9 @@ class TransitionCoinViewProviderFixture:
 
         try:
             view_object.Proxy = self
+            if not self.attached:
+                # Restored ViewObjects may not replay attach on assignment.
+                self.attach(view_object)
         except Exception:
             raise
         if not self.attached:
