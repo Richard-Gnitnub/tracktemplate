@@ -1,0 +1,6 @@
+interface:
+  display_name: "TrackTemplate Handoff"
+  short_description: "Prepare a temporary session handoff packet"
+  default_prompt: "Use $tracktemplate-handoff to prepare a temporary handoff for the next TrackTemplate session."
+policy:
+  allow_implicit_invocation: false

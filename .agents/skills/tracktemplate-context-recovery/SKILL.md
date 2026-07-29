@@ -27,27 +27,31 @@ uncommitted boundary, while excluding unrelated history and duplicated policy.
 1. State the exact task, affected boundary and facts that must survive
    compression.
 2. Read the root and applicable scoped `AGENTS.md` files.
-3. Read only the relevant parts of `reference/PROJECT_PLAN.md`: current phase
+3. When the request supplies a temporary handoff packet, read it as hot
+   navigation, verify its path and freshness, and retain its exact user
+   decisions and dirty-state warnings. Never let it outrank canonical
+   authority or treat its live Git/PR/CI state as current without rechecking.
+4. Read only the relevant parts of `reference/PROJECT_PLAN.md`: current phase
    status, applicable exit-condition status, risk summary, owner decisions and
    evidence links. Load closed-phase evidence only when the task depends on its
    accepted decision or oracle.
-4. Read the canonical owner of the affected subject from the `AGENTS.md`
+5. Read the canonical owner of the affected subject from the `AGENTS.md`
    ownership map.
-5. Read only the task-relevant sections of
+6. Read only the task-relevant sections of
    `reference/current/PHASE_EVIDENCE.md` and the applicable records from
    `reference/current/risks.json` or `gate-decisions.json`.
-6. Retrieve implementation evidence deterministically. Prefer exact paths,
+7. Retrieve implementation evidence deterministically. Prefer exact paths,
    identifiers and headings with `rg --files` and `rg`; use ontology concepts
    to expand stable product terms, not to infer live status. Inspect relevant
    source, tests, raw failures, Git status and diffs only after authority is
    established.
-7. Build or verify the [context packet](references/context-packet.md). Record
+8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
    excluded.
-8. Reconcile evidence with authority. If they conflict, follow the explicit
+9. Reconcile evidence with authority. If they conflict, follow the explicit
    current user decision, `AGENTS.md` and the canonical owner in that order;
    report the conflict.
-9. Continue only when the intended result, authority boundary, dirty-worktree
+10. Continue only when the intended result, authority boundary, dirty-worktree
    ownership, next safe slice and proof boundary are clear. Ask the user when a
    material decision cannot be recovered without guessing.
 
