@@ -92,7 +92,7 @@ The current exit state is 0/4:
 
 | Exit condition | Current disposition |
 | --- | --- |
-| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded selection, edit and Undo/Redo evidence; save/reopen, resource, maintainability and acceptance evidence remain |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded selection, edit, Undo/Redo and save/reopen evidence; representative resource, maintainability and acceptance evidence remain |
 | Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one disposable object/layer and mouse-driven selection mapping are proved; representative scale remains |
 | Normal edits avoid dense exact `Part` geometry | Pending — one bounded intent edit keeps one object and no `Part` shape; representative editing remains |
 | Project owner accepts editing behaviour and documented limitations | Pending — editing behaviour has not yet been presented for owner acceptance |
@@ -336,11 +336,49 @@ timing threshold or mandatory GUI-host workflow is added. These results do not
 accept the renderer or a Phase 5 exit. Phase status, risks and decisions are
 unchanged.
 
+## Disposable preview save/reopen regression tranche
+
+This Level 2 test-first tranche extends the development-only GUI fixture and
+durable `transition-gui` profile. Before saving, the fixture disposes its Coin
+graph and retained `TransitionDerivedCache`, clears the ViewObject proxy and
+keeps the existing single `App::FeaturePython` object. After reopen, the proof
+reads the same canonical state and manually constructs a new empty cache,
+preview artifact and ViewProvider fixture. This is lifecycle evidence, not an
+automatic product load hook.
+
+The focused test first failed at the old runner requirement that the save route
+remain unused, classified `fixture-or-harness-defect`. Qualified FreeCAD then
+exposed two restore-only display-mode assumptions, both classified
+`fixture-or-harness-defect`, plus its integer ViewObject proxy sentinel,
+classified `test-or-oracle-defect`. Proxy assignment after restore also did
+not replay `attach`, an `implementation-defect` in the development fixture; a
+bounded explicit-attach fallback repairs it. Because product load wiring
+remains excluded, the proof activates the rebuilt Coin switch child directly
+rather than claiming restored display-mode registration.
+Updating the current exit disposition then exposed one stale exact-string
+progress expectation, classified `test-or-oracle-defect` and aligned without
+changing the 0/4 count or accepting an exit.
+
+FreeCAD 1.1.1 saved and reopened one object with the same name, stable identity,
+canonical JSON, App and ViewObject property lists, and no `Shape`. The FCStd
+archive contained none of the fixture, cache or ViewProvider module markers.
+The replacement cache began `missing`, was a different instance, and rebuilt a
+different artifact with the same source signature and preview payload. A new
+ViewProvider and new Coin nodes rendered the reopened centreline with 4,188 red
+pixels; the original and reopened captures were visually inspected.
+
+The complete `transition-gui` regression passed all six layers, including
+tracked parsing, 49/49 standalone validators, qualified persistence, Coin
+scene, edit lifecycle and isolated real-GUI proof. Raw logs are retained under
+`benchmark-output/validation-pipeline/20260729T135422090742Z/`. No persisted
+schema, product command, operator route, screenshot hash, timing gate, renderer
+acceptance, risk treatment, authority decision or Phase 5 exit changes.
+
 ## Next bounded tranche
 
-Prove that save/reopen reconstructs the disposable preview and cache from
-canonical state without persisting either derived object. Keep product wiring,
-representative resource evidence and renderer acceptance as separate later
+Measure representative cold/warm object count, recompute, latency and resource
+behaviour for the bounded Coin candidate. Keep automatic product load wiring,
+renderer acceptance and owner editing-behaviour acceptance as separate later
 tranches.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
