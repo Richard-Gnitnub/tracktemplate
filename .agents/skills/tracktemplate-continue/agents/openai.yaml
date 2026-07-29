@@ -1,0 +1,6 @@
+interface:
+  display_name: "TrackTemplate Continue"
+  short_description: "Merge green work and start the next tranche"
+  default_prompt: "Use $tracktemplate-continue to merge the previous green Level 1/2 pull request and continue the next bounded TrackTemplate tranche."
+policy:
+  allow_implicit_invocation: false

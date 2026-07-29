@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-publish
-description: Publish a bounded, reviewed TrackTemplate working-tree change by validating it, creating an agent branch, making intentional commits, pushing, opening a draft pull request and monitoring required GitHub CI. Use only when the project owner explicitly invokes `$tracktemplate-publish`; the invocation authorises this publication loop but never merge, tag, release, destructive history changes or wider scope.
+description: Publish a bounded, reviewed TrackTemplate working-tree change by validating it, creating an agent branch, making intentional commits, pushing, opening a draft pull request and monitoring required GitHub CI. Use when the project owner explicitly invokes `$tracktemplate-publish` or when an explicit `$tracktemplate-continue` invocation delegates its new-tranche publication stage; this workflow never authorises merge, tag, release, destructive history changes or wider scope.
 ---
 
 # TrackTemplate publish
@@ -12,8 +12,10 @@ repeated commit/push/PR approvals or hidden authority expansion.
 
 ## Invocation authority
 
-Explicit `$tracktemplate-publish` invocation authorises all of the following
-for the current bounded change:
+Explicit `$tracktemplate-publish` invocation, or the publication stage
+delegated by an explicit
+[`$tracktemplate-continue`](../tracktemplate-continue/SKILL.md) invocation,
+authorises all of the following for the current bounded change:
 
 - inspect and validate the intended working-tree scope;
 - create an `agent/<description>` branch when starting on the default branch;
