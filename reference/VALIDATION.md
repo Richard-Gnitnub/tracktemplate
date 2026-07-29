@@ -476,6 +476,26 @@ timings do not establish an interaction budget or an optimisation claim; raw
 paths, FCStd files and JSON remain ignored, with a sanitised committed report
 under `reference/benchmarks/`.
 
+Current Phase 5 bounded Coin resource profile:
+
+```bash
+.venv/bin/python tests/validate_phase5_transition_coin_resource_profile.py
+.venv/bin/python tools/phase5_transition_coin_resource_profile.py
+```
+
+The fast standard-library validator protects the fixed 32-object fixture,
+three-process minimum, cold/warm measurement fields, stable identity and scene
+counts, cache reuse, zero-`Shape` and cleanup contracts without importing
+FreeCAD. The profiler runs three fresh isolated qualified FreeCAD GUI
+processes. Each constructs 32 logical objects and preview layers, performs one
+untimed warm-up and three measured unchanged refreshes, and records wall time,
+process CPU, explicit recompute duration, end-minus-start RSS, actual Coin-layer
+and active-node counts and individual samples. Correctness invariants are
+gates; timings remain descriptive and establish no representative workload,
+capacity or numerical budget. Raw JSON and logs remain ignored. The sanitised
+result and limitations are in
+[benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md](benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md).
+
 Repository recovery and ignored-data safety controls:
 
 ```bash

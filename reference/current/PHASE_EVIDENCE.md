@@ -92,8 +92,8 @@ The current exit state is 0/4:
 
 | Exit condition | Current disposition |
 | --- | --- |
-| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded selection, edit, Undo/Redo and save/reopen evidence; representative resource, maintainability and acceptance evidence remain |
-| Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one disposable object/layer and mouse-driven selection mapping are proved; representative scale remains |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded selection, edit, Undo/Redo, save/reopen and a 32-object resource observation; representative suitability, maintainability and acceptance remain |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one-object mouse mapping and a bounded 32-object/layer fixture are proved; representative selection suitability is not accepted |
 | Normal edits avoid dense exact `Part` geometry | Pending — one bounded intent edit keeps one object and no `Part` shape; representative editing remains |
 | Project owner accepts editing behaviour and documented limitations | Pending — editing behaviour has not yet been presented for owner acceptance |
 
@@ -393,12 +393,66 @@ standalone matrix passed. The authorised pilot verified PR #10 at green head
 clean local `main`. No phase status, exit, risk, decision, product behaviour or
 release authority changes.
 
+## Bounded Coin resource profile tranche
+
+This Level 2 evidence-tooling tranche fixes one 32-logical-object candidate
+fixture without changing product source. Each object keeps one compact
+canonical `App::FeaturePython` record, one 32-segment renderer-neutral preview,
+one disposable Coin layer, one selectable root, one display mode and one
+retained cache. The profile starts three fresh isolated qualified FreeCAD GUI
+processes, performs one cold construction per process, then one untimed
+same-state warm-up and three measured unchanged refreshes per process.
+Correctness invariants fail closed; wall time, process CPU, explicit recompute
+duration and end-minus-start RSS remain descriptive observations without a
+threshold.
+
+The focused validator first failed because its text scan treated an embedded
+bridge-code string as a host-side FreeCAD import, classified
+`test-or-oracle-defect`; an AST import check repaired the oracle. An excluded
+GUI attempt produced no sample and failed to retain the mutable launcher log,
+so its within-session sandbox diagnosis is not used as independent evidence.
+The repaired profiler now retains launcher output on child failure. The exact
+command ran through the approved qualified host and all three fresh FreeCAD
+1.1.1 samples passed.
+
+Every cold process retained exactly 32 document objects, 32 logical preview
+layers, 32 added display modes and 224 active Coin nodes below the selectable
+roots, with no `Shape` property and the same stable identity digest. Cold wall
+time was 852.459 ms median (850.431–867.260), explicit recompute was 3.939 ms
+(3.841–3.992) and RSS grew 20.270 MiB (20.121–20.297). Across nine measured
+warm observations, wall time was 16.247 ms median (15.225–20.511), explicit
+recompute was 0.217 ms (0.212–0.327) and end-minus-start RSS was 0.007812 MiB
+(0.003906–0.007812). Every warm action reused all 32 derived artifacts but also
+built and discarded candidate Coin bindings; it regenerated no preview,
+changed no active scene and preserved cross-process object, actual-layer,
+active-node and identity counts. Active nodes and RSS are before/after, not
+transient peaks. Each process disposed all proxies and caches and left no
+document or isolated FreeCAD process.
+
+The method, individual samples, raw hash and limits are in the
+[sanitised profile](../benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md).
+The 32-object fixture is a bounded diagnostic scale, not accepted as
+representative product capacity, interaction budget or renderer suitability.
+It does not exercise representative multi-object pointer selection or editing,
+and it adds no product load wiring, schema, exact/export path or runtime
+dependency. Phase 5 remains 0/4; PR-14 remains Open/Remove with **Partial**
+control and its structured risk record is unchanged.
+
+The final `transition-gui` regression pipeline passed parsing, all 50
+standalone validators, qualified transition persistence, Coin scene and edit
+lifecycle checks, and the isolated real-GUI ViewProvider check with every
+required sentinel. A fresh read-only reviewer then passed the complete tranche
+with no missing, extra, unverifiable or defective finding after independently
+checking the purpose and recompute contracts, raw/source/report/manifest
+hashes, evidence wording and scope.
+
 ## Next bounded tranche
 
-Measure representative cold/warm object count, recompute, latency and resource
-behaviour for the bounded Coin candidate. Keep automatic product load wiring,
-renderer acceptance and owner editing-behaviour acceptance as separate later
-tranches.
+Define and document a representative multi-object workload rationale, then
+exercise pointer selection and one application-command edit/Undo/Redo while
+preserving stable mapping, cache invalidation, object/layer/node counts and
+transactional recovery. Keep automatic product load wiring, renderer
+acceptance and owner editing-behaviour acceptance as separate later tranches.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).
