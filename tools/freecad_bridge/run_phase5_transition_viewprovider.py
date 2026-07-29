@@ -14,7 +14,15 @@ GUI_PROOF = (
     / "tests"
     / "freecad_gui_validate_phase5_transition_coin_viewprovider.py"
 )
+MULTI_OBJECT_GUI_PROOF = (
+    PROJECT_ROOT
+    / "tests"
+    / "freecad_gui_validate_phase5_transition_multi_object_edit.py"
+)
 SENTINEL = "TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI="
+MULTI_OBJECT_SENTINEL = (
+    "TRACKTEMPLATE_PHASE5_MULTI_OBJECT_EDIT_GUI="
+)
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(TOOL_ROOT / "src"))
 
@@ -77,16 +85,19 @@ print(json.dumps({
 """))
 
 
-def _sentinel_payload(result):
+def _sentinel_payload(result, sentinel=SENTINEL):
     output = str(result.get("output") or "")
     matches = [
-        line[len(SENTINEL):]
+        line[len(sentinel):]
         for line in output.splitlines()
-        if line.startswith(SENTINEL)
+        if line.startswith(sentinel)
     ]
     if len(matches) != 1:
         raise RuntimeError(
-            "Phase 5 GUI proof emitted {} sentinels".format(len(matches))
+            "Phase 5 GUI proof emitted {} {!r} sentinels".format(
+                len(matches),
+                sentinel,
+            )
         )
     return json.loads(matches[0])
 
@@ -176,11 +187,103 @@ def main():
             raise RuntimeError(
                 "Phase 5 GUI proof returned an invalid result"
             )
+        multi_object_result = execute_file(
+            client,
+            MULTI_OBJECT_GUI_PROOF,
+        )
+        multi_object_payload = _sentinel_payload(
+            multi_object_result,
+            MULTI_OBJECT_SENTINEL,
+        )
+        if (
+            multi_object_payload.get("freecad_version") != "1.1.1"
+            or multi_object_payload.get("workload_id")
+            != (
+                "phase5-qualified-plain-line-one-secondary-track-"
+                "entry-exit-v1"
+            )
+            or multi_object_payload.get("family_id")
+            != "plain-line-spacing-matched-transition-intent"
+            or multi_object_payload.get("document_object_count") != 2
+            or multi_object_payload.get("logical_layer_count") != 2
+            or multi_object_payload.get(
+                "active_coin_scene_node_count"
+            ) != 14
+            or multi_object_payload.get("part_shape_created") is not False
+            or multi_object_payload.get("selection_input")
+            != "qt-mouse-click"
+            or multi_object_payload.get("pick_callback_count", 0) < 1
+            or multi_object_payload.get("selected_end") != "Exit"
+            or multi_object_payload.get("selected_transition_id")
+            != "SET-001/curve-track/2/transition/exit"
+            or multi_object_payload.get(
+                "selection_event",
+                {},
+            ).get("subelement") != "TransitionPreviewCentreline"
+            or multi_object_payload.get(
+                "pointer_target",
+                {},
+            ).get("class_name") != "QOpenGLWidget"
+            or multi_object_payload.get("mapping_preserved") is not True
+            or multi_object_payload.get("edit_command_route")
+            != "internal-application-command"
+            or multi_object_payload.get("edit_undo_units") != 1
+            or multi_object_payload.get("undo_restored_initial") is not True
+            or multi_object_payload.get("redo_restored_edit") is not True
+            or multi_object_payload.get(
+                "sibling_state_preserved"
+            ) is not True
+            or multi_object_payload.get(
+                "sibling_state_stages"
+            ) != [
+                "initial",
+                "after_edit",
+                "after_undo",
+                "after_redo",
+                "after_failed_edit",
+            ]
+            or multi_object_payload.get(
+                "transactional_failure_recovered"
+            ) is not True
+            or multi_object_payload.get(
+                "failure_history_preserved"
+            ) is not True
+            or multi_object_payload.get(
+                "cache_invalidation",
+                {},
+            ).get("selected_deltas") != {
+                "regenerations": 5,
+                "requests": 5,
+                "reuses": 0,
+            }
+            or multi_object_payload.get(
+                "cache_invalidation",
+                {},
+            ).get("sibling_deltas") != {
+                "regenerations": 0,
+                "requests": 0,
+                "reuses": 0,
+            }
+            or multi_object_payload.get("cleanup") != {
+                "discarded_cache_count": 2,
+                "disposed_proxy_count": 2,
+                "object_count_before_close": 2,
+                "remaining_documents": [],
+            }
+            or not multi_object_payload.get("rationale")
+            or not multi_object_payload.get("representative_scope")
+        ):
+            raise RuntimeError(
+                "Phase 5 multi-object GUI proof returned an invalid result"
+            )
         print(
             SENTINEL
             + json.dumps(
                 {
                     "gui_ready": ready,
+                    "representative_multi_object_result": (
+                        multi_object_payload
+                    ),
                     "result": payload,
                 },
                 sort_keys=True,

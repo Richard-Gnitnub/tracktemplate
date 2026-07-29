@@ -496,6 +496,38 @@ capacity or numerical budget. Raw JSON and logs remain ignored. The sanitised
 result and limitations are in
 [benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md](benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md).
 
+Current Phase 5 representative Entry/Exit multi-object editing workload:
+
+```bash
+.venv/bin/python tests/validate_phase5_transition_multi_object_edit.py
+tools/freecad_bridge/run-phase5-transition-viewprovider
+```
+
+The standalone validator fixes the workload rationale and protects the
+real-GUI proof and runner without importing FreeCAD. The representative
+boundary is the smallest complete currently qualified plain-line transition
+family shape: one secondary track produces one canonical Entry and one
+canonical Exit record. Distinct deterministic transition lengths make those
+two development previews pointer-disambiguable; they are not product defaults.
+
+The existing isolated ViewProvider runner first retains the one-object
+lifecycle/save-reopen proof, then exercises the two-object workload in the same
+qualified real-GUI process from a new empty document. A real Qt mouse click
+must select the red Exit preview and resolve its stable domain identity. One
+application-command edit, Undo, Redo and an injected refresh failure must
+change and recover only that object and its retained cache while the Entry
+state/cache remains untouched. Every state must retain two compact
+`App::FeaturePython` objects, two Coin layers, 14 active selectable-scene nodes,
+zero `Shape` properties and identical stable selection mappings. The runner
+requires the inner
+`TRACKTEMPLATE_PHASE5_MULTI_OBJECT_EDIT_GUI=` result and emits the existing
+outer `TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI=` sentinel.
+
+This workload is representative only of the currently qualified fixture-only
+family shape. It does not establish whole-layout capacity, an interaction
+budget, automatic product load wiring, renderer suitability or owner
+acceptance.
+
 Repository recovery and ignored-data safety controls:
 
 ```bash
