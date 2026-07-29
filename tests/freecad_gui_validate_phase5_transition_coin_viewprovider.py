@@ -40,6 +40,9 @@ from tracktemplate.adapters.freecad import transition_state as adapter  # noqa: 
 from tracktemplate.application import transition_edit as command  # noqa: E402
 from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
 from tracktemplate.presentation import (  # noqa: E402
+    transition_coin_attachment as attachment,
+)
+from tracktemplate.presentation import (  # noqa: E402
     transition_coin_viewprovider as viewprovider,
 )
 
@@ -200,6 +203,23 @@ class _ObservedTransitionCoinViewProviderFixture(
         return super().getElementPicked(picked_point)
 
 
+class _FailingSoType:
+    @staticmethod
+    def fromName(name):
+        raise RuntimeError(
+            "injected post-open attachment failure for {!r}".format(name)
+        )
+
+
+class _FailingCoinModule:
+    SoSeparator = coin.SoSeparator
+    SoBaseColor = coin.SoBaseColor
+    SoDrawStyle = coin.SoDrawStyle
+    SoCoordinate3 = coin.SoCoordinate3
+    SoLineSet = coin.SoLineSet
+    SoType = _FailingSoType
+
+
 def _expect_adapter_error(action, code):
     try:
         action()
@@ -207,6 +227,15 @@ def _expect_adapter_error(action, code):
         assert error.code == code, error
         return error
     raise AssertionError("Expected TransitionDocumentError {!r}".format(code))
+
+
+def _expect_state_error(action, code):
+    try:
+        action()
+    except api.TransitionStateError as error:
+        assert error.code == code, error
+        return error
+    raise AssertionError("Expected TransitionStateError {!r}".format(code))
 
 
 def validate():
@@ -243,6 +272,7 @@ def validate():
     observer = _SelectionObserver()
     Gui.Selection.addObserver(observer)
     proxy = None
+    document_attachment = None
     try:
         qualification = bootstrap.require_qualified_runtime(
             ROOT
@@ -709,9 +739,11 @@ def validate():
                 for name in archive.namelist()
             )
         for transient_marker in (
+            b"TransitionCoinDocumentAttachmentFixture",
             b"TransitionCoinViewProviderFixture",
             b"_ObservedTransitionCoinViewProviderFixture",
             b"TransitionDerivedCache",
+            b"transition_coin_attachment",
             b"transition_coin_viewprovider",
         ):
             assert transient_marker not in persisted_archive
@@ -750,24 +782,89 @@ def validate():
             int(view_object.SwitchNode.getNumChildren())
             == mode_count_before
         )
-        view_object.Proxy = None
-        assert view_object.Proxy is None
+        reopened_original_proxy = view_object.Proxy
+        reopened_stored_snapshot = (
+            str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
+            int(document.UndoCount),
+            int(document.RedoCount),
+            len(document.Objects),
+            tuple(obj.PropertiesList),
+            tuple(view_object.PropertiesList),
+        )
+        reopened_view_snapshot = (
+            reopened_original_proxy,
+            tuple(view_object.listDisplayModes()),
+            int(view_object.RootNode.getNumChildren()),
+            int(view_object.SwitchNode.getNumChildren()),
+        )
+        reopened_style = renderer.TransitionCoinStyle(
+            line_color_rgb=(0.9, 0.05, 0.02),
+            line_width=6.0,
+        )
+        failed_attachment = _expect_state_error(
+            lambda: (
+                attachment.TransitionCoinDocumentAttachmentFixture(
+                    document,
+                    record_loader=adapter.read_transition_objects,
+                    state_reader=adapter.read_transition_object,
+                    source_property_name=(
+                        adapter.FREECAD_STATE_JSON_PROPERTY
+                    ),
+                    specification=preview_specification,
+                    style=reopened_style,
+                    coin_module=_FailingCoinModule,
+                )
+            ),
+            "coin-document-attachment-failed",
+        )
+        assert "injected post-open attachment failure" in str(
+            failed_attachment
+        )
+        assert (
+            str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
+            int(document.UndoCount),
+            int(document.RedoCount),
+            len(document.Objects),
+            tuple(obj.PropertiesList),
+            tuple(view_object.PropertiesList),
+        ) == reopened_stored_snapshot
+        assert (
+            view_object.Proxy,
+            tuple(view_object.listDisplayModes()),
+            int(view_object.RootNode.getNumChildren()),
+            int(view_object.SwitchNode.getNumChildren()),
+        ) == reopened_view_snapshot
 
-        reopened_cache = api.TransitionDerivedCache()
-        assert reopened_cache is not original_cache
-        assert reopened_cache.status(
-            reopened_state,
-            preview_request,
-        ) == "missing"
-
-        def artifact_for_reopened_state(state):
-            return _artifact(
-                reopened_cache,
-                state,
-                preview_specification,
+        document_attachment = (
+            attachment.TransitionCoinDocumentAttachmentFixture(
+                document,
+                record_loader=adapter.read_transition_objects,
+                state_reader=adapter.read_transition_object,
+                source_property_name=(
+                    adapter.FREECAD_STATE_JSON_PROPERTY
+                ),
+                specification=preview_specification,
+                style=reopened_style,
+                coin_module=coin,
             )
-
-        reopened_artifact = artifact_for_reopened_state(reopened_state)
+        )
+        assert document_attachment.attached is True
+        assert document_attachment.attachment_count == 1
+        assert document_attachment.transition_ids == (
+            reopened_state.intent.transition_id,
+        )
+        assert adapter.read_transition_objects(document) == (
+            (obj, reopened_state),
+        )
+        proxy = document_attachment.proxy_for_transition(
+            reopened_state.intent.transition_id
+        )
+        reopened_cache = document_attachment.cache_for_transition(
+            reopened_state.intent.transition_id
+        )
+        reopened_artifact = reopened_cache.artifact("preview")
+        assert reopened_cache is not original_cache
+        assert reopened_artifact is not None
         assert reopened_artifact is not original_reopen_artifact
         assert reopened_artifact.source_signature == (
             original_reopen_artifact.source_signature
@@ -779,19 +876,9 @@ def validate():
             reopened_state,
             preview_request,
         ) == "current"
-
-        proxy = _ObservedTransitionCoinViewProviderFixture(
-            view_object,
-            reopened_artifact,
-            renderer.TransitionCoinStyle(
-                line_color_rgb=(0.9, 0.05, 0.02),
-                line_width=6.0,
-            ),
-            coin,
-            state_reader=adapter.read_transition_object,
-            artifact_for_state=artifact_for_reopened_state,
-            source_property_name=adapter.FREECAD_STATE_JSON_PROPERTY,
-        )
+        assert document_attachment.refresh_transition(
+            reopened_state.intent.transition_id
+        ) is False
         document.recompute()
         assert proxy is not original_proxy
         assert view_object.Proxy is proxy
@@ -809,6 +896,14 @@ def validate():
         assert tuple(view_object.PropertiesList) == view_properties
         assert len(document.Objects) == 1
         assert not hasattr(obj, "Shape")
+        assert (
+            str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
+            int(document.UndoCount),
+            int(document.RedoCount),
+            len(document.Objects),
+            tuple(obj.PropertiesList),
+            tuple(view_object.PropertiesList),
+        ) == reopened_stored_snapshot
         assert (
             int(view_object.RootNode.getNumChildren())
             == root_count_before
@@ -832,10 +927,32 @@ def validate():
         reopened_visible_red_pixels = _red_pixel_count(reopened_path)
         assert reopened_visible_red_pixels >= 100
 
-        assert proxy.dispose() is True
-        view_object.Proxy = None
-        assert reopened_cache.discard("preview") == ("preview",)
+        reopened_selection_root = proxy.selection_root
+        assert document_attachment.dispose() == (
+            reopened_state.intent.transition_id,
+        )
+        assert document_attachment.attached is False
+        assert view_object.Proxy == reopened_original_proxy
+        assert int(reopened_selection_root.getNumChildren()) == 0
         assert reopened_cache.artifact("preview") is None
+        reopened_display_modes_after_disposal = tuple(
+            view_object.listDisplayModes()
+        )
+        assert reopened_display_modes_after_disposal == (
+            display_modes_before
+        )
+        assert (
+            int(view_object.SwitchNode.getNumChildren())
+            == mode_count_before + 1
+        )
+        assert (
+            str(getattr(obj, adapter.FREECAD_STATE_JSON_PROPERTY)),
+            int(document.UndoCount),
+            int(document.RedoCount),
+            len(document.Objects),
+            tuple(obj.PropertiesList),
+            tuple(view_object.PropertiesList),
+        ) == reopened_stored_snapshot
         document.removeObject(obj.Name)
         document.recompute()
         assert document.Objects == []
@@ -864,15 +981,29 @@ def validate():
             "preview_cache_retained": True,
             "preview_cache_reuse_count": cache_reuse_count,
             "preview_cache_reuse_proved": True,
+            "reopened_attachment_boundary": (
+                attachment.TRANSITION_COIN_DOCUMENT_ATTACHMENT_FIXTURE_ID
+            ),
+            "reopened_attachment_count": 1,
+            "reopened_attachment_disposed": True,
+            "reopened_attachment_explicit_post_open": True,
+            "reopened_attachment_failure_recovered": True,
+            "reopened_attachment_history_delta": 0,
+            "reopened_attachment_order": (
+                document_attachment.transition_ids
+            ),
+            "reopened_attachment_refresh_reused": True,
             "reopened_cache_is_new": True,
             "reopened_cache_rebuilt": True,
             "reopened_cache_started_missing": True,
             "reopened_canonical_state_equal": True,
             "reopened_derived_state_persisted": False,
+            "reopened_empty_switch_child_retained": True,
             "reopened_object_count": 1,
             "reopened_object_identity_preserved": True,
             "reopened_preview_equivalent": True,
             "reopened_schema_unchanged": True,
+            "reopened_stored_state_unchanged": True,
             "reopened_viewprovider_is_new": True,
             "reopened_viewprovider_rebuilt": True,
             "reopened_visible_red_pixels": reopened_visible_red_pixels,
@@ -931,7 +1062,9 @@ def validate():
     finally:
         Gui.Selection.removeObserver(observer)
         Gui.Selection.clearSelection()
-        if proxy is not None and proxy.attached:
+        if document_attachment is not None:
+            document_attachment.dispose()
+        elif proxy is not None and proxy.attached:
             proxy.dispose()
         if document.Name in App.listDocuments():
             App.closeDocument(document.Name)

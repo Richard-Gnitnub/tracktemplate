@@ -61,6 +61,7 @@ def _validate_adapter_source():
         "TransitionDocumentError",
         "FreeCADTransitionStore",
         "read_transition_object",
+        "read_transition_objects",
         "find_transition_object",
         "_write_transition_payload",
     } <= _definitions(tree)
@@ -158,6 +159,7 @@ def _validate_freecad_fixture_contract():
     functions = _definitions(tree)
     assert {
         "_validate_lifecycle",
+        "_validate_document_enumeration",
         "_validate_create_history_and_failures",
         "_validate_stale_and_corrupt_records",
         "_validate_runtime_gate",
@@ -172,6 +174,7 @@ def _validate_freecad_fixture_contract():
         "stale-analysis-discarded",
         "transaction-failed",
         "duplicate-stable-identity",
+        "read_transition_objects",
         "TransitionDerivedCache",
         "transition_derived_contract_signature",
         "cache.discard()",

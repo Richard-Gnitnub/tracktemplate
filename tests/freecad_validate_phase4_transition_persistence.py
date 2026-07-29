@@ -345,6 +345,61 @@ def _validate_lifecycle(store, directory):
     App.closeDocument(reopened.Name)
 
 
+def _validate_document_enumeration(store):
+    document = _new_document("Enumeration")
+    state_b = _analysed("transition:phase5:attachment:b")
+    state_a = _analysed("transition:phase5:attachment:a")
+    object_b, object_a = store.create_many(
+        document,
+        (state_b, state_a),
+    )
+    foreign = document.addObject(
+        "App::FeaturePython",
+        "OperatorOwnedEnumerationObject",
+    )
+    foreign.addProperty("App::PropertyString", "OperatorData")
+    foreign.OperatorData = "untouched"
+    other_record = _add_indexed_object(
+        document,
+        "OtherEnumerationRecord",
+        "tracktemplate.other-state",
+        "not transition JSON",
+    )
+    before = (
+        tuple(
+            (obj.Name, tuple(obj.PropertiesList))
+            for obj in document.Objects
+        ),
+        _custom_payload(object_a),
+        _custom_payload(object_b),
+        int(document.UndoCount),
+        int(document.RedoCount),
+        str(foreign.OperatorData),
+        str(other_record.TrackTemplateRecordType),
+    )
+    records = adapter.read_transition_objects(document)
+    assert records == (
+        (object_a, state_a),
+        (object_b, state_b),
+    )
+    assert tuple(
+        state.intent.transition_id for _obj, state in records
+    ) == tuple(sorted((state_a.intent.transition_id, state_b.intent.transition_id)))
+    assert (
+        tuple(
+            (obj.Name, tuple(obj.PropertiesList))
+            for obj in document.Objects
+        ),
+        _custom_payload(object_a),
+        _custom_payload(object_b),
+        int(document.UndoCount),
+        int(document.RedoCount),
+        str(foreign.OperatorData),
+        str(other_record.TrackTemplateRecordType),
+    ) == before
+    App.closeDocument(document.Name)
+
+
 def _validate_create_history_and_failures(store):
     state = _analysed("transition:phase4:create-history")
     document = _new_document("CreateHistory")
@@ -488,6 +543,10 @@ def _validate_stale_and_corrupt_records(store):
         ),
         "duplicate-stable-identity",
     )
+    _expect_adapter_error(
+        lambda: adapter.read_transition_objects(duplicate_document),
+        "duplicate-stable-identity",
+    )
     assert (
         len(duplicate_document.Objects),
         int(duplicate_document.UndoCount),
@@ -540,6 +599,7 @@ try:
         prefix="tracktemplate-phase4-persistence-"
     ) as temporary_directory:
         _validate_lifecycle(store, temporary_directory)
+        _validate_document_enumeration(store)
         _validate_create_history_and_failures(store)
         _validate_stale_and_corrupt_records(store)
         _validate_runtime_gate(qualification)
