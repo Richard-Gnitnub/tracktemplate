@@ -71,7 +71,10 @@ to the protected remote. Stop if any condition changes during the operation.
 3. Use the applicable specialist skills and implement the smallest coherent
    change.
 4. Run proportionate validation and a complete diff review. Classify every
-   failed proof before a retained repair.
+   failed proof before a retained repair. Follow the canonical
+   [validation-document boundary](../../../reference/VALIDATION.md#document-boundary).
+   Do not include `reference/VALIDATION.md` in a routine tranche unless its
+   durable validation contract changed.
 5. Apply the
    [`$tracktemplate-publish`](../tracktemplate-publish/SKILL.md) workflow to
    commit, push, open one draft pull request and monitor exact-head CI.

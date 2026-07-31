@@ -16,9 +16,24 @@ LEARNING = ROOT / "reference" / "LEARNING_FROM_EXPERIENCE.md"
 PLAN = ROOT / "reference" / "PROJECT_PLAN.md"
 AGENTS = ROOT / "AGENTS.md"
 ENGINEERING = ROOT / "reference" / "ENGINEERING_POLICY.md"
+VALIDATION = ROOT / "reference" / "VALIDATION.md"
 RISKS = ROOT / "reference" / "current" / "risks.json"
 FROZEN = ROOT / "reference" / "history" / "frozen-records.json"
 RECOVERY = ROOT / "reference" / "RECOVERY_AND_BACKUP.md"
+CHANGE_VALIDATION_SKILL = (
+    ROOT
+    / ".agents"
+    / "skills"
+    / "tracktemplate-change-validation"
+    / "SKILL.md"
+)
+CONTINUE_SKILL = (
+    ROOT
+    / ".agents"
+    / "skills"
+    / "tracktemplate-continue"
+    / "SKILL.md"
+)
 
 EXPECTED_IMMUTABLE_SOURCE_HASHES = {
     "AdvancedTurnout.FCMacro":
@@ -388,6 +403,54 @@ def validate_governance_controls(
             )
 
 
+def validate_validation_document_boundary() -> None:
+    validation = read(VALIDATION)
+    heading = "## Document boundary"
+    require(
+        validation.count(heading) == 1,
+        "VALIDATION.md must contain one document-boundary section",
+    )
+    boundary = validation.split(heading, 1)[1].split("\n## ", 1)[0]
+    boundary_flat = " ".join(boundary.split())
+    for fragment in (
+        "durable validation layers",
+        "stable runner profiles and entry points",
+        "minimum change matrix",
+        "does not by itself justify changing this document",
+        "Level 2 or Level 3 documentation lifecycle",
+        "current/PHASE_EVIDENCE.md",
+        "Do not use this document as a tranche log",
+    ):
+        require(
+            fragment in boundary_flat,
+            "VALIDATION.md document boundary lacks: " + fragment,
+        )
+
+    boundary_link = "../../../reference/VALIDATION.md#document-boundary"
+    change_validation = read(CHANGE_VALIDATION_SKILL)
+    for fragment in (
+        boundary_link,
+        "merely because a test was added or run",
+        "durable validation contract",
+    ):
+        require(
+            fragment in change_validation,
+            "change-validation skill lacks boundary control: " + fragment,
+        )
+
+    continue_skill = read(CONTINUE_SKILL)
+    for fragment in (
+        boundary_link,
+        "`reference/VALIDATION.md`",
+        "routine tranche",
+        "durable validation contract",
+    ):
+        require(
+            fragment in continue_skill,
+            "continue skill lacks boundary control: " + fragment,
+        )
+
+
 def main() -> None:
     quality = read(QUALITY)
     learning = read(LEARNING)
@@ -422,6 +485,7 @@ def main() -> None:
     validate_frozen_records()
     validate_current_qa_risks(quality)
     validate_governance_controls(plan, agents, engineering)
+    validate_validation_document_boundary()
     for relative, expected in EXPECTED_IMMUTABLE_SOURCE_HASHES.items():
         require(
             sha256(ROOT / relative) == expected,
