@@ -1,13 +1,14 @@
 # Phase 5 Lightweight Editing Prototype and Renderer Decision Evidence
 
-Status: **Open — project owner accepted Phase 5 opening on 2026-07-28; 0/4
-exits evidenced.**
+Status: **Open — 4/4 Phase 5 exits are evidenced and accepted under D-P5-002
+on 2026-07-31; phase closure has not been decided.**
 Phase 4 closed with all six revised exits accepted on 2026-07-28; its frozen
 record is [PHASE4_CLOSEOUT.md](../history/phase-closeouts/PHASE4_CLOSEOUT.md).
 
-This fixed live path records the open phase. Opening authorises bounded
-lightweight editing prototypes and renderer evaluation, not renderer
-acceptance or exit evidence.
+This fixed live path records the open phase. D-P5-001 authorised bounded
+lightweight editing prototypes and renderer evaluation. D-P5-002 now accepts
+Coin and the demonstrated B16 Entry/Exit editing boundary without closing the
+phase or opening Phase 6.
 
 ## Opening architecture review
 
@@ -88,14 +89,15 @@ new runtime dependency remain excluded and require their owning authority.
 
 ## Current Phase 5 exit-condition disposition
 
-The current exit state is 0/4:
+The current exit state is 4/4 evidenced and accepted. Phase closeout remains a
+separate Level 3 decision:
 
 | Exit condition | Current disposition |
 | --- | --- |
-| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending — the Coin candidate has bounded selection, edit, Undo/Redo, save/reopen and a 32-object resource observation; representative suitability, maintainability and acceptance remain |
-| Small logical object/layer count with deterministic selection-to-domain mapping | Pending — one-object mouse mapping and a bounded 32-object/layer fixture are proved; representative selection suitability is not accepted |
-| Normal edits avoid dense exact `Part` geometry | Pending — one bounded intent edit keeps one object and no `Part` shape; representative editing remains |
-| Project owner accepts editing behaviour and documented limitations | Pending — editing behaviour has not yet been presented for owner acceptance |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Accepted — Coin is selected for the demonstrated B16 Entry/Exit boundary using the retained correctness, editing, qualified FreeCAD, maintainability and descriptive 2–32-object resource evidence |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Accepted — one logical object and layer per transition, stable Entry/Exit identities and deterministic pointer mapping remain exact across the 2–32-object observations; no whole-layout claim is made |
+| Normal edits avoid dense exact `Part` geometry | Accepted — edit, no-op, Undo/Redo, failure recovery and reopen retain compact objects and zero `Shape` properties without constructing exact `Part` geometry |
+| Project owner accepts editing behaviour and documented limitations | Accepted — the owner explicitly accepts the demonstrated lifecycle and the confined one-empty-switch-child-per-object limitation at exact source commit `0f437f9de8c81f773a50e4b03c1ad6efd8a34169` |
 
 Phase 6 retains complete exact-validation/export signatures and invalidation,
 transient exact geometry, cleanup, output equivalence, rollback and end-to-end
@@ -104,22 +106,87 @@ production output, chair clearance or release work.
 
 ## Phase 5 decision-readiness map
 
-This is an evidence map, not a second status system or an acceptance decision.
-The formal state remains **0/4**, with every exit **Pending**.
+This is an evidence map, not a second status system. The formal state is
+**4/4 evidenced and accepted** under D-P5-002.
 
-| Exit condition | Formal status | Evidence already demonstrated | Remaining decision gap |
+| Exit condition | Formal status | Evidence already demonstrated | Accepted boundary and remaining exclusion |
 | --- | --- | --- | --- |
-| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending | Renderer-neutral and Coin rendering; stable pointer mapping; application-command and owner-visible parameter editing; atomic Undo/Redo and recovery; cache invalidation/reuse; explicit B16 lifecycle activation, save-time retirement and reopen reconstruction; Entry/Exit and 2–32-object observations; maintainability review | Decide whether the bounded interaction/resource evidence and one-empty-child confinement are acceptable, then make the explicit renderer decision |
-| Small logical object/layer count with deterministic selection-to-domain mapping | Pending | One-object, Entry/Exit and 2–32-object proofs retain exact object/layer/mapping counts, bounded active-node counts, zero `Shape` properties and complete cleanup | Agree the representative capacity and numerical interaction/resource budget and decide whether the confined residual is acceptable |
-| Normal edits avoid dense exact `Part` geometry | Pending | The explicit B16 lifecycle exposes the existing editor on Entry/Exit; edit, no-op, Undo/Redo, failure recovery and reopen retain compact objects, zero `Shape` properties and unchanged canonical/persisted state | Obtain explicit owner acceptance of the demonstrated editing behaviour and limitation |
-| Project owner accepts editing behaviour and documented limitations | Pending | The owner pack can show the explicit lifecycle scene/editor, exact validation, save/reopen behaviour, exclusions and the one-empty-child limitation | Answer the Level 3 renderer and editing-behaviour acceptance question; no acceptance is inferred from this evidence |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Accepted | Renderer-neutral and Coin rendering; stable pointer mapping; application-command and owner-visible parameter editing; atomic Undo/Redo and recovery; cache invalidation/reuse; explicit B16 lifecycle activation, save-time retirement and reopen reconstruction; Entry/Exit and 2–32-object observations; maintainability review | Coin is accepted only for the demonstrated boundary; another renderer, whole-layout suitability and a numerical budget remain excluded |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Accepted | One-object, Entry/Exit and 2–32-object proofs retain exact object/layer/mapping counts, bounded active-node counts, zero `Shape` properties and complete live-state cleanup | The accepted count and mapping evidence does not advertise wider product or whole-layout capacity |
+| Normal edits avoid dense exact `Part` geometry | Accepted | The explicit B16 lifecycle exposes the existing editor on Entry/Exit; edit, no-op, Undo/Redo, failure recovery and reopen retain compact objects, zero `Shape` properties and unchanged canonical/persisted state | Exact geometry, validation and export remain Phase 6 duties |
+| Project owner accepts editing behaviour and documented limitations | Accepted | The owner pack shows the explicit lifecycle scene/editor, retained validation results, save/reopen behaviour, exclusions and the one-empty-child limitation | The accepted limitation must reopen if later composition invalidates its strict containment |
 
 Unless a later change affects one of these boundaries or signals a regression,
 phase progression need not repeat the retained preview, Coin lifecycle,
 selection mapping, edit/Undo/Redo/recovery, cache, explicit reopen attachment,
 representative Entry/Exit, 32-object or maintainability proofs. Their existing
-regressions remain validation obligations; new work should close a remaining
-decision gap.
+regressions remain validation obligations. The phase may stop for a separate
+closeout decision without creating another implementation tranche.
+
+<a id="phase-5-coin-renderer-and-editing-acceptance-panel"></a>
+
+## Phase 5 Coin renderer and editing acceptance panel
+
+**Decision and exact source:** This Level 3 decision applies to PR #26 product
+source commit `0f437f9de8c81f773a50e4b03c1ad6efd8a34169`, based on protected
+`main` at `50c28eb0623002df5a5d4a40d07a18d727c55f63`. The product source
+remains unchanged by this authority-only record. Richard is project owner,
+decision chair and accepting authority. Codex is change owner and presenter.
+A separate read-only safety/risk
+challenger reviewed the exact exits, source diff, retained evidence and live
+risks before this record was changed and found no blocker.
+
+**Evidence reviewed:** The panel reviewed the exact Phase 5 exit wording, the
+accepted architecture and dependency direction, the complete PR #26 source
+diff, the prior fresh source review, the final-source `transition-gui` run at
+`benchmark-output/validation-pipeline/20260731T201653458832Z/`, the qualified
+FreeCAD 1.1.1 GUI artifacts, the 2–32-object interaction/resource profile, the
+Coin maintainability review, and the current decision and risk registers. The
+final profile parsed 171 files, passed 54/54 standalone validators and passed
+qualified persistence, Coin, edit-lifecycle and isolated real-GUI checks.
+
+**Independent recommendation:** **Proceed with bounded conditions.** The
+challenger found each exit evidenced at its exact wording and agreed that a
+numerical budget and whole-layout capacity are not implicit requirements. The
+challenger expressly dissented from inferring Phase 5 closure from 4/4 exit
+evidence. There was no other dissent.
+
+| Exact Phase 5 exit | Panel disposition |
+| --- | --- |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Evidenced and accepted: Coin satisfies the demonstrated Entry/Exit boundary using the retained correctness, owner-visible editing, qualified FreeCAD integration, maintainability and descriptive resource evidence. |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Evidenced and accepted: one compact object/layer per transition, bounded active nodes and stable mappings remain exact from the representative pair through 32 objects; the empty residual holds no live mapping or layer. |
+| Normal edits avoid dense exact `Part` geometry | Evidenced and accepted: normal edit, Undo/Redo, recovery and reopen proofs retain zero `Shape` properties and selected-only derived refresh. |
+| Project owner accepts editing behaviour and documented limitations | Evidenced and accepted by the owner's exact 2026-07-31 decision, including the explicit lifecycle and confined residual limitation. |
+
+**Risk and control disposition:** PR-14's stated closure evidence is now met,
+so it is removed from the live register. Reopen both PR-14 and D-P5-002 before
+retaining any later composition that permits more than one confined empty
+switch child per object or accumulation of live mappings, caches, proxies or
+active Coin children. PR-15, PR-16, PR-17, QA-R03 and QA-R04 remain
+Open/Partial; their exact/export cost, broader signatures, migration,
+release-GUI and numerical-budget exposures are outside this decision. PR-20
+and PR-22 remain Effective (current scope); this panel satisfies PR-22 for the
+accepted transfer. No other live-risk wording changes.
+
+| Accountable owner | Deadline | Bounded condition |
+| --- | --- | --- |
+| Decision-record owner | Before retention | Record D-P5-002 once here and in the structured decision register, with only a short linked dashboard summary. |
+| QA/integration owner | Before merging PR #26 | Obtain a fresh independent read-only review of the final decision/status diff and a green check at its updated exact head. |
+| B16 lifecycle owner | Every later composition change | Preserve explicit-only activation, duplicate rejection, save-time retirement, explicit deactivation before direct close and strict residual non-accumulation; reopen D-P5-002 and PR-14 before retaining a violation. |
+| Project owner | Before Phase 5 close or Phase 6 start | Make a separate explicit closeout/opening decision; 4/4 evidence alone supplies neither authority. |
+| Later-phase owners | Before excluded work | Obtain the owning authority for startup/Workbench integration, wider capacity claims, another renderer, schema/migration, exact/export, production, budgets, packaging or release. |
+
+**Owner decision and resulting authority:** On 2026-07-31 Richard selected
+Coin for the demonstrated B16 Entry/Exit transition-editing boundary and
+accepted the documented editing behaviour and confined one-empty-switch-child
+limitation. All four exact Phase 5 exits are therefore evidenced and accepted.
+This does not close Phase 5, open Phase 6 or authorise any excluded work.
+
+**Governance-budget exception:** This task changes renderer and exit authority,
+not product behaviour. Its panel, current evidence, structured decision,
+affected live-risk removal, dashboard update and status-control expectation
+updates are therefore the proportionate Level 3 record. Frozen history remains
+unchanged.
 
 ## Coin scene-graph feasibility tranche
 
@@ -1077,9 +1144,9 @@ FreeCAD retains the registered selection root because its Python interface has
 no supported removal operation. Disposal names and empties exactly one such
 child per object, rejects same-document reactivation without accumulation and
 relies on close/reopen to remove it. This is technically confined but remains
-an **unaccepted limitation** for the project owner. No automatic Addon startup,
-Workbench/menu policy, schema, migration, exact geometry, export, production
-output, numerical budget, renderer acceptance, Phase 5 acceptance or release
-authority changes. Phase 5 remains 0/4; PR-14 remains Open/Remove with
-**Partial** control; the project plan, risk register and decision register are
-unchanged.
+an **unaccepted limitation at this Level 2 tranche boundary**. No automatic
+Addon startup, Workbench/menu policy, schema, migration, exact geometry,
+export, production output, numerical budget, renderer acceptance, Phase 5
+acceptance or release authority changed in the tranche. D-P5-002 above later
+accepts the bounded limitation and records the resulting 4/4 exit state and
+PR-14 closure without changing this source evidence.

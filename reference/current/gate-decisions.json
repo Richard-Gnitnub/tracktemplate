@@ -24,6 +24,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#repository-driven-continuation-authority-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#repository-driven-continuation-authority-panel"
+    },
+    {
+      "id": "D-P5-002",
+      "decided_on": "2026-07-31",
+      "status": "Accepted",
+      "decision": "Accept Coin and the demonstrated B16 Entry/Exit transition-editing behaviour.",
+      "authority": "Coin is the selected lightweight renderer for the demonstrated B16 Entry/Exit transition-editing boundary at exact product source commit 0f437f9de8c81f773a50e4b03c1ad6efd8a34169. The documented explicit lifecycle, exactly-once attachment, duplicate rejection, owner-visible selection and editing, atomic edit/Undo/Redo behaviour, save-time deactivation, save/close/reopen reconstruction, explicit deactivation before direct close and technically confined one-empty-switch-child-per-object limitation until document close or reopen are accepted; canonical and persisted state remain unchanged. All four exact Phase 5 exits are evidenced; Phase 5 remains current pending a separate closeout decision.",
+      "exclusions": "No automatic Addon startup, permanent Workbench or menu integration, wider product or whole-layout capacity claim, another renderer, schema or migration change, exact geometry or export, production-output clearance, numerical performance budget, packaging or release, later-phase authority, Phase 5 closeout or Phase 6 opening is authorised. Reopen this decision and PR-14 if later composition invalidates the residual containment or permits live mappings, caches, proxies, active Coin children or more than one confined empty switch child per object to accumulate.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-5-coin-renderer-and-editing-acceptance-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-5-coin-renderer-and-editing-acceptance-panel"
     }
   ]
 }

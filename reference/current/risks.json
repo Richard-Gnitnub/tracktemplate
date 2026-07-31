@@ -160,18 +160,6 @@
       "closure_evidence": "Current backup records, cadence evidence and a successful Phase 11 recovery rehearsal."
     },
     {
-      "id": "PR-14",
-      "severity": "High",
-      "state": "Open",
-      "treatment": "Remove",
-      "control_effectiveness": "Partial",
-      "summary": "Bounded Coin display/visibility, deterministic mouse selection, command editing with atomic Undo/Redo and recovery, cache invalidation, save/reopen attachment, representative Entry/Exit selection/editing/reopen and a 32-object observation are proved; user-facing editing, representative interaction capacity, decision-usable ranges, product integration and owner acceptance remain open.",
-      "owner": "Phase 5 renderer owner; project owner accepts editing behaviour.",
-      "deadline": "Remove uncertainty through the real-GUI renderer decision before Phase 5 exit.",
-      "required_work": "Prove an actual user-facing transition parameter-editing control and owner-visible selected and edited states; measure representative interaction scale and decision-usable numerical resource and interaction ranges; resolve product lifecycle composition and the residual empty-switch-child limitation; obtain project-owner editing-behaviour and renderer acceptance.",
-      "closure_evidence": "Accepted complete Phase 5 renderer decision record."
-    },
-    {
       "id": "PR-15",
       "severity": "High",
       "state": "Open",

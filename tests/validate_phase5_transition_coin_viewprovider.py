@@ -1078,7 +1078,8 @@ def _validate_structure_and_controls():
     ).read_text(encoding="utf-8")
     assert (
         "| 5 | Lightweight editing prototype and renderer decision "
-        "| 0/4 evidenced | Current"
+        "| 4/4 evidenced | Current — exits accepted 2026-07-31; "
+        "closure pending |"
     ) in plan
     assert "## Development-only ViewProvider fixture tranche" in evidence
     assert (
@@ -1092,7 +1093,11 @@ def _validate_structure_and_controls():
     )
     assert "## Coin GUI harness consolidation tranche" in evidence
     assert "## Coin fake-protocol consolidation tranche" in evidence
-    assert "No renderer or Phase 5 exit is accepted" in evidence
+    assert (
+        'id="phase-5-coin-renderer-and-editing-acceptance-panel"'
+        in evidence
+    )
+    assert "This does not close Phase 5, open Phase 6" in evidence
 
 
 def validate():
