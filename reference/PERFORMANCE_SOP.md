@@ -221,7 +221,9 @@ budget. Do not subtract them from the independently recorded panel duration;
 use the source/lifecycle evidence to define the successor boundary and measure
 that boundary afresh.
 
-Until Phase 1 reconciles the complete instrumentation:
+Phase 1 closed after accepting the bounded instrumentation inventory and
+assigning the unresolved target measurements to their named later gates. Until
+those owners reconcile the complete instrumentation:
 
 - identify the exact instrumented scope on every committed report;
 - record missing workflow stages rather than assigning them estimated timings;

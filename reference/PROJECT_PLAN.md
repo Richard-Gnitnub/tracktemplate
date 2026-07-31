@@ -66,7 +66,7 @@ dashboard only.
 | PR-11 | Medium | Tolerate | Modularisation may add files without reducing runtime cost. |
 | PR-12 | Medium | Mitigate | Governance can duplicate facts and grow stale. |
 | PR-13 | Critical | Mitigate | Commands, history changes or disk failure could destroy unprotected data. |
-| PR-14 | High | Remove | Coin display and selection are proved only in a bounded fixture; editing, persistence and resource evidence remain incomplete. |
+| PR-14 | High | Remove | Bounded Coin display/visibility, deterministic mouse selection, command editing with atomic Undo/Redo and recovery, cache invalidation, save/reopen attachment, representative Entry/Exit selection/editing/reopen and a 32-object observation are proved; user-facing editing, representative capacity, decision-usable ranges, product integration and owner acceptance remain open. |
 | PR-15 | High | Mitigate | Deferred geometry could move rather than remove operator cost. |
 | PR-16 | High | Mitigate | Incomplete signatures could reuse stale results. |
 | PR-17 | Critical | Mitigate | Persistence or migration could corrupt supported documents. |

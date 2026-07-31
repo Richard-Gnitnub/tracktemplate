@@ -732,11 +732,11 @@ Project dashboard and current-record consistency:
 ```
 
 This enforces the compact project-plan sections and line budget, reconciles the
-Phase 4 dashboard with `current/PHASE_EVIDENCE.md`, validates the detailed
-current risk and decision JSON registers, protects the retired descriptive-path
-redirect and checks the least-privilege, SHA-pinned standalone CI workflow. It
-does not assess the quality of a decision's evidence or replace project-owner
-acceptance.
+current Phase 5 dashboard with `current/PHASE_EVIDENCE.md`, validates the
+detailed current risk and decision JSON registers, protects the retired
+descriptive-path redirect and checks the least-privilege, SHA-pinned standalone
+CI workflow. It does not assess the quality of a decision's evidence or replace
+project-owner acceptance.
 
 Fail-closed Phase 1 performance-boundary checks:
 
@@ -807,12 +807,13 @@ broadening fails closed. The standalone probe should report
 `linux-x86_64-flatpak-freecad-1.1.1`. It records no user path.
 
 The Phase 2 launcher now consumes the same authoritative evaluator through
-`tracktemplate.bootstrap`; this does not claim that the successor document
-migrator exists. Phase 4
-must add copied-target migration fixtures for each advertised B14/B15 entity
-family, including supported, future, versionless, corrupt/conflicting, failure,
-undo/redo and save/reopen cases. A configuration JSON migration is not evidence
-that an older `.FCStd` is supported.
+`tracktemplate.bootstrap`; that launcher alone does not establish document-
+migration support. Phase 4 later accepted copied-target fixture evidence for
+exactly `plain-line-spacing-matched-transition-intent`. Every additional
+advertised B14/B15 entity family must add the supported, future, versionless,
+corrupt/conflicting, failure, Undo/Redo and save/reopen cases in its owning
+later phase. A configuration JSON migration is not evidence that an older
+`.FCStd` is supported.
 
 Phase 1 licensing and manifest-control checks:
 

@@ -1,8 +1,10 @@
 # Licensing, Data Provenance, and Output Boundaries
 
-Status: **Base policy accepted by the project owner on 2026-07-20. The
-red-team executable-control amendments are implemented for owner review, and
-the scoped Phase 1 lineage audit remains open.**
+Status: **Base policy accepted by the project owner on 2026-07-20. The bounded
+Phase 1 inventory and lineage-register boundary was accepted complete at Phase
+1 closeout on 2026-07-22. The red-team executable-control amendments remain
+implemented for owner review. Production-data admission, rights and output-
+clearance obligations remain open or blocked at their named later gates.**
 
 This document defines how TrackTemplateMacro distinguishes software source,
 engineering knowledge, factual data, external evidence, Templot-specific
@@ -17,7 +19,8 @@ into professional legal clearance.
 
 The policy is deliberately prospective. It does not retroactively certify all
 current B14/B15 output for unrestricted publication or commercial use. That
-status requires the Phase 1 lineage audit defined below.
+status requires completion of the later-gate lineage, rights and output-
+clearance work defined below; Phase 1 closeout did not grant it.
 
 ## Responsibilities of the project documents
 
@@ -262,8 +265,9 @@ The permitted project statuses are:
 | `unknown` | Ownership, source, licence, output effect, or redistribution status is unresolved |
 
 No current B14/B15 output receives `project-cleared` merely because this policy
-was adopted. Until the Phase 1 audit closes, its project-control status is
-`unknown` unless a narrower output has its own completed record.
+was adopted. The accepted Phase 1 inventory did not clear those outputs; their
+project-control status remains `unknown` unless a narrower output completes
+its named later-gate record and passes the applicable manifest decision.
 
 The normative schema is
 [`schemas/dependency-manifest-v1.schema.json`](schemas/dependency-manifest-v1.schema.json).
@@ -373,8 +377,9 @@ recorded as an inactive alternate, not as evidence of the active 556b route.
 
 The two machine-readable files therefore house all four scoped Phase 1
 registers. Establishing the latter two registers satisfies the bounded-
-inventory deliverable only. It does not complete their field-level lineage,
-create an output dependency manifest, clear legacy output, or close Phase 1.
+inventory deliverable that contributed to accepted Phase 1 closeout. It did
+not complete their field-level lineage, create an output dependency manifest
+or clear legacy output; those obligations remain at their named later gates.
 
 For each applicable scope the project must:
 
@@ -394,11 +399,13 @@ For each applicable scope the project must:
    licence, intended commercial/publication use and non-copyright-rights record
    before implementation.
 
-Phase 1 must fully classify the first two scopes or leave the S1 pilot visibly
-blocked. For the third and fourth scopes it must establish the bounded register,
-current status, named owner and later release gate; unresolved legacy breadth
-does not become an implicit assertion of clearance. The release and output
-validators remain fail-closed for every individual package or output.
+At Phase 1 closeout, the first two scopes had to be fully classified or leave
+the S1 pilot visibly blocked; they were accepted in the latter state. The third
+and fourth scopes established the required bounded register, current status,
+named owner and later release gate. That completed the Phase 1 inventory
+boundary without turning unresolved legacy breadth into an assertion of
+clearance. The release and output validators remain fail-closed for every
+individual package or output.
 
 The audit may preserve Templot as a local numerical and geometric oracle. It
 does not require disguising the project's source-informed history or removing

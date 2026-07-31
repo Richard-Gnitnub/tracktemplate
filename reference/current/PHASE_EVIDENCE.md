@@ -102,6 +102,25 @@ transient exact geometry, cleanup, output equivalence, rollback and end-to-end
 performance. Phase 5 does not authorise those duties, operator migration,
 production output, chair clearance or release work.
 
+## Phase 5 decision-readiness map
+
+This is an evidence map, not a second status system or an acceptance decision.
+The formal state remains **0/4**, with every exit **Pending**.
+
+| Exit condition | Formal status | Evidence already demonstrated | Remaining decision gap |
+| --- | --- | --- | --- |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending | Renderer-neutral preview; disposable Coin scene and ViewProvider lifecycle; real pointer selection with stable visual-to-domain mapping; application-command editing, atomic Undo/Redo and failure recovery; retained-cache invalidation/reuse; save/close/reopen reconstruction through explicit post-open attachment; representative Entry/Exit selection, editing and reopen attachment; bounded 32-object observations; maintainability and dependency-direction review | Add an actual user-facing transition parameter-editing control and owner-visible selected/edited states; establish decision-usable interaction/resource ranges at representative scale; resolve product lifecycle/composition limits and the residual empty switch child; obtain project-owner renderer acceptance |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Pending | One-object and representative Entry/Exit pointer selection preserve stable mappings; the 32-object diagnostic retains 32 logical objects/layers and deterministic identities with measured active-node and resource observations | Prove representative interaction capacity rather than only the accepted fixture shape, agree decision-usable object/layer/interaction ranges and account for product composition and residual lifecycle limits |
+| Normal edits avoid dense exact `Part` geometry | Pending | The application-command edit, representative Entry/Exit edit, Undo/Redo, recovery and cache-invalidation workflows retain compact logical objects/layers and zero `Shape` properties | Exercise an actual user-facing parameter control and representative interaction workflow through the intended product lifecycle, then obtain editing-behaviour acceptance |
+| Project owner accepts editing behaviour and documented limitations | Pending | Retained GUI evidence can present pointer-selected, edited, Undo, Redo, recovered and reopened states together with the explicit post-open, fixture-scale, resource and empty-switch-child limitations | Present owner-visible selection and editing through a user-facing control, document decision-usable limits and obtain explicit project-owner editing-behaviour and renderer acceptance |
+
+Unless a later change affects one of these boundaries or signals a regression,
+phase progression need not repeat the retained preview, Coin lifecycle,
+selection mapping, edit/Undo/Redo/recovery, cache, explicit reopen attachment,
+representative Entry/Exit, 32-object or maintainability proofs. Their existing
+regressions remain validation obligations; new work should close a remaining
+decision gap.
+
 ## Coin scene-graph feasibility tranche
 
 This Level 2 tranche adds an internal, product-route-disabled Coin scene
@@ -777,13 +796,15 @@ one-object and representative captures were visually inspected. No renderer,
 exit condition, risk treatment, product route or owner acceptance changes;
 Phase 5 remains 0/4 and PR-14 remains Open/Remove with **Partial** control.
 
-## Next bounded tranche
+## Current outcome selection
 
-Consolidate only the fake Coin field, group and node protocol shared by the two
-standalone Coin validators. First prove one minimal helper covers both the
-scene-only contract and the ViewProvider selection, replacement and failure
-hooks; retain every distinct regression and keep product source, GUI workflows,
-renderer disposition and owner acceptance unchanged.
+The duplicated fake Coin field, group and node protocol remains a valid
+maintenance finding, but its consolidation is backlog work unless it directly
+blocks a named Phase 5 exit. It is likely Level 1 test maintenance, not Phase 5
+behavioural progress. The next implementation outcome must be selected from
+the remaining formal exit gaps above; this evidence record grants no automatic
+implementation authority. A later project-owner-approved chief-of-staff and
+continuation workflow should select the highest-value phase-moving outcome.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).
