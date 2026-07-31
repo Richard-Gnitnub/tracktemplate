@@ -46,6 +46,8 @@ def _layer(module):
         return "domain"
     if module.startswith(PACKAGE_NAME + ".presentation"):
         return "presentation"
+    if module.startswith(PACKAGE_NAME + ".ui"):
+        return "ui"
     return "undeclared"
 
 
@@ -182,6 +184,7 @@ def _edge_allowed(source_layer, target_layer):
         "application": {"application", "domain"},
         "adapter": {"adapter", "application", "domain"},
         "presentation": {"presentation", "application", "domain"},
+        "ui": {"ui", "application", "domain"},
         "api": {"package", "application", "domain", "presentation"},
         "bootstrap": {"package", "api"},
         "compatibility": {

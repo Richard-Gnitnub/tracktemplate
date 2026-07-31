@@ -938,12 +938,54 @@ ready or merging the newly published draft in the same invocation.
 
 ## Current outcome selection
 
-The completed fake Coin field, group and node protocol consolidation above
-retired its named test-maintenance finding. Completion neither closes a named
-Phase 5 exit nor selects the next implementation outcome. D-GOV-004 permits a
-future literal `$tracktemplate-continue` invocation to reconstruct current
-authority and select one worthwhile authorised Level 1/2 outcome; the decision
-itself does not invoke that cycle or create a task.
+The 2026-07-31 literal `$tracktemplate-continue` invocation reconstructed
+D-P5-001 and D-GOV-004 authority and selected the user-facing transition
+parameter editor below as the highest-value authorised outcome. It was
+classified **exit-closing**, Level 2: it directly reduces PR-14's explicit
+user-facing editing gap while leaving renderer and phase acceptance with the
+project owner. The read-only chief-of-staff diagnosis treated the preceding
+governance and test-maintenance sequence as a loop signal; the technical-lead
+route bounded the selected cross-layer slice to UI, the existing application
+command and the representative FreeCAD workflow.
+
+## User-facing transition parameter editor tranche
+
+This Level 2 tranche adds a transient, injected-Qt dialog and fail-closed
+selection controller in the already accepted `tracktemplate.ui` layer. The
+dialog exposes one transition-length field in millimetres, the exact selected
+stable identity, Apply/Close controls and a visible status. Its application
+command maps the requested length through the existing domain calculation to a
+complete replacement intent, reanalyses it and delegates to the existing
+transactional FreeCAD edit port. The UI directly imports neither FreeCAD, Qt
+nor railway math, and adds no public API, stored property, schema or automatic
+product-load route.
+
+The representative qualified FreeCAD 1.1.1 proof uses a real Qt mouse click to
+select the Exit preview, shows its identity and `420.000` mm state in a dialog
+parented to the FreeCAD main window, replaces the value with `360.000` by real
+keyboard input and clicks Apply. Exactly one Undo unit is created; Undo/Redo,
+stable mapping, sibling isolation, retained-cache invalidation, save/reopen and
+cleanup remain proved. Applying the initially displayed value creates no
+history. An injected refresh failure is visible and recoverable, and applying
+after selection is cleared changes no canonical state, history or cache
+counter. The selected and edited dialog captures under
+`benchmark-output/freecad-bridge/phase5-transition-parameter-editor-runs/20260731T165954689807Z/`
+were visually inspected and clearly show the exact identity, values and status.
+
+The complete `transition-gui` profile passed parsing, 52/52 standalone
+validators, qualified persistence, Coin-scene and edit-lifecycle checks and the
+isolated real-GUI workflow under
+`benchmark-output/validation-pipeline/20260731T165853384687Z/`. The initial
+sandboxed profile attempt could not connect Flatpak to its session service and
+ran no host assertion; the unchanged exact persistence command and complete
+profile then passed outside that sandbox boundary.
+
+This closes only the bounded fixture's actual-control and owner-visible-state
+evidence gap. Representative interaction capacity, decision-usable numerical
+and resource ranges, product lifecycle composition, the residual empty switch
+child and owner renderer/editing acceptance remain open. Phase 5 remains 0/4;
+PR-14 remains Open/Remove with **Partial** control, and the plan, structured
+risk and decision registers are unchanged.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 Phase 5 opening and renderer-evaluation authority; D-GOV-004 is the separate

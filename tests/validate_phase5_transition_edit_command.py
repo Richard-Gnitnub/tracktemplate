@@ -173,7 +173,9 @@ def _validate_internal_boundary():
     assert module["warning_signals"] == []
     assert module["imports"] == [
         "dataclasses",
+        "math",
         "tracktemplate.application.transition_state",
+        "tracktemplate.domain.alignment",
         "tracktemplate.domain.transition",
     ]
 
