@@ -13,6 +13,11 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import modular_structure  # noqa: E402
+from tests.phase5_transition_coin_test_protocol import (  # noqa: E402
+    _FakeCoin,
+    _Field,
+    _Group,
+)
 from tracktemplate import api  # noqa: E402
 from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
 from tracktemplate.presentation import (  # noqa: E402
@@ -32,96 +37,6 @@ SOURCE_HASHES = {
         "chair_performance_and_representation.FCMacro"
     ): "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
 }
-
-
-class _Field:
-    def __init__(self):
-        self.value = None
-
-    def setValue(self, *values):
-        self.value = values[0] if len(values) == 1 else tuple(values)
-
-    def setValues(self, start, count, values):
-        assert start == 0
-        assert count == len(values)
-        self.value = tuple(tuple(value) for value in values)
-
-    def getValue(self):
-        return self.value
-
-
-class _Group:
-    def __init__(self):
-        self.children = []
-
-    def addChild(self, child):
-        self.children.append(child)
-
-    def findChild(self, child):
-        try:
-            return self.children.index(child)
-        except ValueError:
-            return -1
-
-    def removeChild(self, child_or_index):
-        if isinstance(child_or_index, int):
-            del self.children[child_or_index]
-        else:
-            self.children.remove(child_or_index)
-
-    def removeAllChildren(self):
-        self.children.clear()
-
-    def replaceChild(self, old_child, new_child):
-        self.children[self.children.index(old_child)] = new_child
-
-    def getChild(self, index):
-        return self.children[index]
-
-
-class _BaseColor:
-    def __init__(self):
-        self.rgb = _Field()
-
-
-class _DrawStyle:
-    def __init__(self):
-        self.lineWidth = _Field()
-
-
-class _Coordinate3:
-    def __init__(self):
-        self.point = _Field()
-
-
-class _LineSet:
-    def __init__(self):
-        self.numVertices = _Field()
-
-
-class _SelectionRoot(_Group):
-    pass
-
-
-class _SelectionType:
-    def createInstance(self):
-        return _SelectionRoot()
-
-
-class _SoType:
-    @staticmethod
-    def fromName(name):
-        assert name == "SoFCSelection"
-        return _SelectionType()
-
-
-class _FakeCoin:
-    SoSeparator = _Group
-    SoBaseColor = _BaseColor
-    SoDrawStyle = _DrawStyle
-    SoCoordinate3 = _Coordinate3
-    SoLineSet = _LineSet
-    SoType = _SoType
 
 
 class _ViewObject:
@@ -1134,6 +1049,7 @@ def _validate_structure_and_controls():
         in evidence
     )
     assert "## Coin GUI harness consolidation tranche" in evidence
+    assert "## Coin fake-protocol consolidation tranche" in evidence
     assert "No renderer or Phase 5 exit is accepted" in evidence
 
 
