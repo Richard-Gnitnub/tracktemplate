@@ -313,6 +313,12 @@ def validate_sentinel_and_source_contracts():
     assert "document.recompute()" in gui_source
     assert "scene_root.getNumChildren()" in gui_source
     assert "refresh_for_state" in gui_source
+    source_record = profile._source_record()
+    harness_path = "tests/phase5_transition_coin_gui_harness.py"
+    assert profile.GUI_HARNESS == ROOT / harness_path
+    assert source_record[harness_path] == profile._sha256(
+        profile.GUI_HARNESS
+    )
 
     formatted = profile._format_sample_log(
         "child output\n",

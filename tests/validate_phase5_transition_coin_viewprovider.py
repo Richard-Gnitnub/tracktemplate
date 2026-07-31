@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Validate the development-only Phase 5 Coin ViewProvider fixture."""
 
+import ast
 import hashlib
+import importlib
 import math
 import pathlib
 import sys
@@ -885,6 +887,92 @@ def _validate_document_attachment():
     assert replaced.ViewObject.Proxy is None
 
 
+def _validate_shared_gui_harness():
+    helper_module = "tests.phase5_transition_coin_gui_harness"
+    helper_path = ROOT / "tests" / "phase5_transition_coin_gui_harness.py"
+    assert helper_path.is_file(), "missing shared Coin GUI test harness"
+
+    harness = importlib.import_module(helper_module)
+    processed = []
+    harness._process_gui(
+        lambda: processed.append("freecad"),
+        lambda: processed.append("qt"),
+    )
+    assert processed == ["freecad", "qt"] * 5
+
+    observer = harness._SelectionObserver()
+    observer.addSelection(
+        "Document",
+        "Object",
+        "TransitionPreviewCentreline",
+        (1, 2.5, 3),
+    )
+    assert observer.events == [(
+        "Document",
+        "Object",
+        "TransitionPreviewCentreline",
+        (1.0, 2.5, 3.0),
+    )]
+    assert issubclass(
+        harness._ObservedTransitionCoinViewProviderFixture,
+        viewprovider.TransitionCoinViewProviderFixture,
+    )
+
+    consumers = {
+        "freecad_gui_profile_phase5_transition_coin_resources.py": {
+            "_process_gui": "_shared_process_gui",
+        },
+        "freecad_gui_validate_phase5_transition_coin_viewprovider.py": {
+            "_ObservedTransitionCoinViewProviderFixture": None,
+            "_SelectionObserver": None,
+            "_process_gui": "_shared_process_gui",
+        },
+        "freecad_gui_validate_phase5_transition_multi_object_edit.py": {
+            "_ObservedTransitionCoinViewProviderFixture": None,
+            "_SelectionObserver": None,
+            "_process_gui": "_shared_process_gui",
+        },
+    }
+    consumer_paths = {
+        ROOT / "tests" / filename: expected_imports
+        for filename, expected_imports in consumers.items()
+    }
+    trees = {
+        path: ast.parse(
+            path.read_text(encoding="utf-8"),
+            filename=str(path),
+        )
+        for path in (helper_path, *consumer_paths)
+    }
+    for shared_name in (
+        "_ObservedTransitionCoinViewProviderFixture",
+        "_SelectionObserver",
+        "_process_gui",
+    ):
+        owners = [
+            path
+            for path, tree in trees.items()
+            for node in tree.body
+            if isinstance(node, (ast.ClassDef, ast.FunctionDef))
+            and node.name == shared_name
+        ]
+        assert owners == [helper_path], (shared_name, owners)
+
+    for path, expected_imports in consumer_paths.items():
+        tree = trees[path]
+        imported = {
+            alias.name: alias.asname
+            for node in tree.body
+            if isinstance(node, ast.ImportFrom)
+            and node.module == helper_module
+            for alias in node.names
+        }
+        assert imported == expected_imports, path.name
+        assert "_process_gui = functools.partial(" in path.read_text(
+            encoding="utf-8"
+        ), path.name
+
+
 def _validate_structure_and_controls():
     report = modular_structure.structure_report(ROOT)
     assert modular_structure.validate_report(report) == []
@@ -1045,6 +1133,7 @@ def _validate_structure_and_controls():
         "## Disposable preview save/reopen regression tranche"
         in evidence
     )
+    assert "## Coin GUI harness consolidation tranche" in evidence
     assert "No renderer or Phase 5 exit is accepted" in evidence
 
 
@@ -1056,6 +1145,7 @@ def validate():
     _validate_state_refresh()
     _validate_disposable_reconstruction()
     _validate_document_attachment()
+    _validate_shared_gui_harness()
     _validate_structure_and_controls()
     print("Phase 5 transition Coin ViewProvider validation passed")
 

@@ -717,12 +717,12 @@ Four options were reviewed:
 | Implement the SVG/Qt fallback for comparison | Not authorised or presently justified. No Coin failure has triggered the fallback and no SVG/Qt prototype exists. |
 
 No second product implementation of transition geometry, derived signatures,
-Coin construction or attachment lifecycle was found. The retained
-test-owned duplication has these owners and retirement conditions:
+Coin construction or attachment lifecycle was found. The review identified
+these test-owned duplication boundaries and retirement conditions:
 
 | Fixture duplication | Owner and retirement condition |
 | --- | --- |
-| `_process_gui` is repeated in the one-object, representative and resource-profiler workflows; `_SelectionObserver` and `_ObservedTransitionCoinViewProviderFixture` are repeated in the two real-GUI proofs | Phase 5 GUI and performance QA owners. Consolidate them in the next bounded, test-only mechanical tranche; both real-GUI workflows and the resource profile must retain their workloads, sentinels, correctness invariants and comparable measurement recipe and fields before any copy retires. Timing and RSS observations remain descriptive rather than exact-value gates. |
+| `_process_gui` was repeated in the one-object, representative and resource-profiler workflows; `_SelectionObserver` and `_ObservedTransitionCoinViewProviderFixture` were repeated in the two real-GUI proofs | Phase 5 GUI and performance QA owners. **Retired by the Coin GUI harness consolidation tranche below:** one test-owned helper now serves all three workflows after both real-GUI proofs and the resource profile retained their workloads, sentinels, correctness invariants and comparable measurement recipe and fields. Timing and RSS observations remain descriptive rather than exact-value gates. |
 | Fake Coin field/group/node primitives occur in both standalone Coin validators | Phase 5 presentation QA owner. Keep them separate until a minimal shared fake protocol covers both the scene-only contract and the ViewProvider's selection, replacement and failure hooks; retire the copies only after both focused validators prove the shared helper. |
 | One-object, representative and resource fixtures each compose caches and ViewProviders manually | Their respective QA/performance owners. This is intentional lower-boundary instrumentation, not another renderer. Replace duplicated composition only after an accepted product composition boundary exposes equivalent selection, failure and measurement observations; retain distinct regressions that protect different behaviour. |
 
@@ -749,19 +749,41 @@ required review output itself, so its evidence necessarily exceeds its zero
 implementation lines; no policy, phase, risk, decision or authority changes.
 Phase 5 remains 0/4 and PR-14 remains Open/Remove with **Partial** control.
 
+## Coin GUI harness consolidation tranche
+
+This Level 2 test-only mechanical refactor moves the exactly shared
+`_process_gui`, `_SelectionObserver` and
+`_ObservedTransitionCoinViewProviderFixture` primitives to one helper. The
+one-object, representative and resource-profiler workflows retain their
+existing composition, workloads, sentinels and assertions; product source,
+PySide/Qt compatibility, callback counts, screenshots, measurement fields and
+timing/RSS interpretation are unchanged. A standalone structural contract now
+requires the helper to remain the only definition owner and all three intended
+workflow consumers to import it.
+
+The focused structural proof stopped at the missing helper, classified
+`fixture-or-harness-defect`, then passed after the bounded extraction. Its
+exact failing output was observed in the working session but not retained in a
+raw run directory, so the chronology is not independently auditable. The
+complete `transition-gui` profile passed all six layers under
+`benchmark-output/validation-pipeline/20260731T114226102952Z/`, including 161
+parsed files, 51/51 standalone validators and the qualified real-GUI proofs.
+The three-process Coin resource profile under
+`benchmark-output/freecad-bridge/phase5-transition-coin-resource-runs/20260731T114159577093Z-profile/`
+hashes the shared helper and retained 32 objects/layers, 224 active nodes, zero
+`Shape` properties, nine unchanged warm observations with full cache reuse,
+all measurement fields and complete cleanup; timings remain descriptive. The
+one-object and representative captures were visually inspected. No renderer,
+exit condition, risk treatment, product route or owner acceptance changes;
+Phase 5 remains 0/4 and PR-14 remains Open/Remove with **Partial** control.
+
 ## Next bounded tranche
 
-Consolidate only the exactly shared Coin GUI harness primitives. Move
-`_process_gui` to one test-owned helper used by the one-object, representative
-and resource-profiler workflows; move `_SelectionObserver` and
-`_ObservedTransitionCoinViewProviderFixture` to that helper for the two
-real-GUI proofs. Preserve qualified PySide/Qt compatibility, callback counts,
-assertions, screenshots, existing sentinels, resource workload, correctness
-invariants, and comparable measurement recipe and fields. Timing and RSS
-observations remain descriptive. This is a mechanical test refactor: do not
-change product source, workload behaviour, product load wiring, renderer
-disposition or owner acceptance, and rerun the complete `transition-gui` and
-Phase 5 Coin resource profiles before retiring any copy.
+Consolidate only the fake Coin field, group and node protocol shared by the two
+standalone Coin validators. First prove one minimal helper covers both the
+scene-only contract and the ViewProvider selection, replacement and failure
+hooks; retain every distinct regression and keep product source, GUI workflows,
+renderer disposition and owner acceptance unchanged.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).
