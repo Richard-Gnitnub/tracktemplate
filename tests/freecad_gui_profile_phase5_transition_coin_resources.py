@@ -1,5 +1,6 @@
 """Profile a bounded Transition Coin fixture in the qualified FreeCAD GUI."""
 
+import functools
 import gc
 import hashlib
 import json
@@ -25,6 +26,9 @@ except ImportError:
 ROOT = pathlib.Path(os.environ["TRACKTEMPLATE_REPO"])
 sys.path.insert(0, str(ROOT))
 
+from tests.phase5_transition_coin_gui_harness import (  # noqa: E402
+    _process_gui as _shared_process_gui,
+)
 from tracktemplate import api, bootstrap  # noqa: E402
 from tracktemplate.adapters.freecad import transition_state as adapter  # noqa: E402
 from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
@@ -33,16 +37,17 @@ from tracktemplate.presentation import (  # noqa: E402
 )
 
 
+_process_gui = functools.partial(
+    _shared_process_gui,
+    Gui.updateGui,
+    QtWidgets.QApplication.processEvents,
+)
+
+
 PROFILE_ID = "phase5-transition-coin-resource-profile-v1"
 OBJECT_COUNT = 32
 PREVIEW_SEGMENT_COUNT = 32
 WARM_REPETITIONS = 3
-
-
-def _process_gui():
-    for _iteration in range(5):
-        Gui.updateGui()
-        QtWidgets.QApplication.processEvents()
 
 
 def _current_rss_mb():

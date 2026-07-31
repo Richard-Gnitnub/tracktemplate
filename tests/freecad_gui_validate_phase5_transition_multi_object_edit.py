@@ -1,6 +1,7 @@
 """Exercise representative multi-object selection and editing in FreeCAD."""
 
 import datetime
+import functools
 import json
 import os
 import pathlib
@@ -33,6 +34,11 @@ except ImportError:
 ROOT = pathlib.Path(os.environ["TRACKTEMPLATE_REPO"])
 sys.path.insert(0, str(ROOT))
 
+from tests.phase5_transition_coin_gui_harness import (  # noqa: E402
+    _ObservedTransitionCoinViewProviderFixture,
+    _SelectionObserver,
+    _process_gui as _shared_process_gui,
+)
 from tools import phase5_transition_representative_workload as workload  # noqa: E402
 from tracktemplate import api, bootstrap  # noqa: E402
 from tracktemplate.adapters.freecad import transition_state as adapter  # noqa: E402
@@ -41,8 +47,12 @@ from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
 from tracktemplate.presentation import (  # noqa: E402
     transition_coin_attachment as attachment,
 )
-from tracktemplate.presentation import (  # noqa: E402
-    transition_coin_viewprovider as viewprovider,
+
+
+_process_gui = functools.partial(
+    _shared_process_gui,
+    Gui.updateGui,
+    QtWidgets.QApplication.processEvents,
 )
 
 
@@ -50,12 +60,6 @@ SENTINEL = "TRACKTEMPLATE_PHASE5_MULTI_OBJECT_EDIT_GUI="
 FAMILY_ID = "plain-line-spacing-matched-transition-intent"
 SELECTED_END = "Exit"
 EXPECTED_ACTIVE_NODE_COUNT = 14
-
-
-def _process_gui():
-    for _iteration in range(5):
-        Gui.updateGui()
-        QtWidgets.QApplication.processEvents()
 
 
 def _red_pixel_count(path):
@@ -207,39 +211,6 @@ def _visible_centreline_target(view, target_record):
         "unique_hit_count": len(hit_records),
         "viewport_point": list(viewport_point),
     }
-
-
-class _SelectionObserver:
-    def __init__(self):
-        self.events = []
-
-    def addSelection(
-        self,
-        document_name,
-        object_name,
-        subelement_name,
-        point,
-    ):
-        self.events.append(
-            (
-                str(document_name),
-                str(object_name),
-                str(subelement_name),
-                tuple(float(value) for value in point),
-            )
-        )
-
-
-class _ObservedTransitionCoinViewProviderFixture(
-    viewprovider.TransitionCoinViewProviderFixture
-):
-    def __init__(self, *args, **kwargs):
-        self.pick_callback_count = 0
-        super().__init__(*args, **kwargs)
-
-    def getElementPicked(self, picked_point):
-        self.pick_callback_count += 1
-        return super().getElementPicked(picked_point)
 
 
 class _PreviewCoordinator:
@@ -642,6 +613,7 @@ def _exercise_reopened_attachment(
         b"TransitionCoinViewProviderFixture",
         b"_ObservedTransitionCoinViewProviderFixture",
         b"TransitionDerivedCache",
+        b"phase5_transition_coin_gui_harness",
         b"transition_coin_attachment",
         b"transition_coin_viewprovider",
     ):

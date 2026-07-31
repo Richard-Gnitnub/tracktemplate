@@ -27,6 +27,11 @@ GUI_SAMPLE = (
     / "tests"
     / "freecad_gui_profile_phase5_transition_coin_resources.py"
 )
+GUI_HARNESS = (
+    PROJECT_ROOT
+    / "tests"
+    / "phase5_transition_coin_gui_harness.py"
+)
 SAMPLE_SENTINEL = "TRACKTEMPLATE_PHASE5_COIN_RESOURCE_SAMPLE="
 PROFILE_SENTINEL = "TRACKTEMPLATE_PHASE5_COIN_RESOURCE_PROFILE="
 PROFILE_ID = "phase5-transition-coin-resource-profile-v1"
@@ -559,6 +564,7 @@ def _format_sample_log(stdout, stderr, launcher_output=""):
 def _source_record():
     paths = (
         GUI_SAMPLE,
+        GUI_HARNESS,
         pathlib.Path(__file__).resolve(),
         PROJECT_ROOT
         / "tracktemplate"
