@@ -1,9 +1,11 @@
 """Exercise representative multi-object selection and editing in FreeCAD."""
 
+import datetime
 import json
 import os
 import pathlib
 import sys
+import zipfile
 
 import FreeCAD as App
 import FreeCADGui as Gui
@@ -12,6 +14,7 @@ from pivy import coin
 try:
     from PySide6 import (
         QtCore,
+        QtGui,
         QtOpenGLWidgets,
         QtTest,
         QtWidgets,
@@ -19,7 +22,7 @@ try:
     _OpenGLWidget = QtOpenGLWidgets.QOpenGLWidget
 except ImportError:
     try:
-        from PySide2 import QtCore, QtTest, QtWidgets
+        from PySide2 import QtCore, QtGui, QtTest, QtWidgets
         _OpenGLWidget = QtWidgets.QOpenGLWidget
     except ImportError:
         from PySide import QtCore, QtGui, QtOpenGL, QtTest
@@ -36,6 +39,9 @@ from tracktemplate.adapters.freecad import transition_state as adapter  # noqa: 
 from tracktemplate.application import transition_edit as command  # noqa: E402
 from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
 from tracktemplate.presentation import (  # noqa: E402
+    transition_coin_attachment as attachment,
+)
+from tracktemplate.presentation import (  # noqa: E402
     transition_coin_viewprovider as viewprovider,
 )
 
@@ -50,6 +56,22 @@ def _process_gui():
     for _iteration in range(5):
         Gui.updateGui()
         QtWidgets.QApplication.processEvents()
+
+
+def _red_pixel_count(path):
+    image = QtGui.QImage(str(path))
+    if image.isNull():
+        raise RuntimeError("FreeCAD created an unreadable GUI screenshot")
+    count = 0
+    for y_pos in range(image.height()):
+        for x_pos in range(image.width()):
+            colour = image.pixelColor(x_pos, y_pos)
+            red = colour.red()
+            green = colour.green()
+            blue = colour.blue()
+            if red >= 160 and red >= green * 2 and red >= blue * 2:
+                count += 1
+    return count
 
 
 def _visible_centreline_target(view, target_record):
@@ -448,6 +470,9 @@ def _build_fixture(qualification):
             line_width = 3.0
         record = {
             "coordinator": coordinator,
+            "display_modes_before": tuple(
+                obj.ViewObject.listDisplayModes()
+            ),
             "initial_artifact": artifact,
             "initial_state": state,
             "object": obj,
@@ -485,7 +510,7 @@ def _build_fixture(qualification):
     return document, store, records, view
 
 
-def _dispose_fixture(document, records):
+def _dispose_records(records):
     disposed = 0
     discarded_caches = 0
     for record in records:
@@ -497,15 +522,411 @@ def _dispose_fixture(document, records):
             "preview"
         ) == ("preview",):
             discarded_caches += 1
-    object_count_before_close = len(document.Objects)
-    App.closeDocument(document.Name)
-    _process_gui()
+        view_object = record["object"].ViewObject
+        assert tuple(view_object.listDisplayModes()) == (
+            record["display_modes_before"]
+        )
+        assert int(view_object.RootNode.getNumChildren()) == (
+            record["root_child_count_before"]
+        )
+        assert int(view_object.SwitchNode.getNumChildren()) == (
+            record["switch_child_count_before"] + 1
+        )
     return {
         "discarded_cache_count": discarded_caches,
         "disposed_proxy_count": disposed,
+    }
+
+
+def _stored_snapshot(document, object_states):
+    return (
+        int(document.UndoCount),
+        int(document.RedoCount),
+        len(document.Objects),
+        tuple(
+            (
+                state.intent.transition_id,
+                str(obj.Name),
+                str(obj.TypeId),
+                str(
+                    getattr(
+                        obj,
+                        adapter.FREECAD_STATE_JSON_PROPERTY,
+                    )
+                ),
+                tuple(obj.PropertiesList),
+                tuple(obj.ViewObject.PropertiesList),
+                hasattr(obj, "Shape"),
+            )
+            for obj, state in object_states
+        ),
+    )
+
+
+def _view_snapshot(object_states):
+    return tuple(
+        (
+            state.intent.transition_id,
+            obj.ViewObject.Proxy,
+            tuple(obj.ViewObject.listDisplayModes()),
+            int(obj.ViewObject.RootNode.getNumChildren()),
+            int(obj.ViewObject.SwitchNode.getNumChildren()),
+        )
+        for obj, state in object_states
+    )
+
+
+def _exercise_reopened_attachment(
+    document,
+    records,
+    expected_mappings,
+    specification,
+):
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y%m%dT%H%M%S%fZ"
+    )
+    run_directory = (
+        ROOT
+        / "benchmark-output"
+        / "freecad-bridge"
+        / "phase5-viewprovider-runs"
+        / stamp
+    )
+    run_directory.mkdir(parents=True)
+    saved_document_path = (
+        run_directory / "representative-entry-exit-reopen.FCStd"
+    )
+    reopened_image_path = (
+        run_directory / "representative-entry-exit-reopened.png"
+    )
+
+    expected_object_states = adapter.read_transition_objects(document)
+    expected_order = tuple(
+        state.intent.transition_id
+        for _obj, state in expected_object_states
+    )
+    expected_by_identity = {
+        record["initial_state"].intent.transition_id: record
+        for record in records
+    }
+    expected_object_names = {
+        identity: str(record["object"].Name)
+        for identity, record in expected_by_identity.items()
+    }
+    original_caches = {
+        identity: record["coordinator"].cache
+        for identity, record in expected_by_identity.items()
+    }
+    original_artifacts = {
+        identity: cache.artifact("preview")
+        for identity, cache in original_caches.items()
+    }
+    assert all(
+        artifact is not None
+        for artifact in original_artifacts.values()
+    )
+
+    manual_cleanup = _dispose_records(records)
+    document.recompute()
+    assert adapter.read_transition_objects(document) == (
+        expected_object_states
+    )
+    document.saveAs(str(saved_document_path))
+    with zipfile.ZipFile(saved_document_path) as archive:
+        persisted_archive = b"\n".join(
+            archive.read(name)
+            for name in archive.namelist()
+        )
+    for transient_marker in (
+        b"TransitionCoinDocumentAttachmentFixture",
+        b"TransitionCoinViewProviderFixture",
+        b"_ObservedTransitionCoinViewProviderFixture",
+        b"TransitionDerivedCache",
+        b"transition_coin_attachment",
+        b"transition_coin_viewprovider",
+    ):
+        assert transient_marker not in persisted_archive
+
+    original_document_name = str(document.Name)
+    App.closeDocument(original_document_name)
+    _process_gui()
+    reopened_document = App.openDocument(str(saved_document_path))
+    _process_gui()
+    document_attachment = None
+    try:
+        reopened_object_states = adapter.read_transition_objects(
+            reopened_document
+        )
+        assert tuple(
+            state.intent.transition_id
+            for _obj, state in reopened_object_states
+        ) == expected_order
+        assert tuple(
+            state
+            for _obj, state in reopened_object_states
+        ) == tuple(
+            state
+            for _obj, state in expected_object_states
+        )
+        for obj, state in reopened_object_states:
+            original_record = expected_by_identity[
+                state.intent.transition_id
+            ]
+            assert str(obj.Name) == expected_object_names[
+                state.intent.transition_id
+            ]
+            assert obj.TypeId == "App::FeaturePython"
+            assert tuple(obj.PropertiesList) == (
+                original_record["object_properties"]
+            )
+            assert tuple(obj.ViewObject.PropertiesList) == (
+                original_record["view_properties"]
+            )
+            assert tuple(obj.ViewObject.listDisplayModes()) == (
+                original_record["display_modes_before"]
+            )
+            assert int(
+                obj.ViewObject.RootNode.getNumChildren()
+            ) == original_record["root_child_count_before"]
+            assert int(
+                obj.ViewObject.SwitchNode.getNumChildren()
+            ) == original_record["switch_child_count_before"]
+            assert obj.Proxy is None
+            assert isinstance(
+                obj.ViewObject.Proxy,
+                (int, type(None)),
+            )
+            assert not hasattr(obj, "Shape")
+
+        stored_before_attachment = _stored_snapshot(
+            reopened_document,
+            reopened_object_states,
+        )
+        view_before_attachment = _view_snapshot(
+            reopened_object_states
+        )
+        original_host_proxies = {
+            state.intent.transition_id: obj.ViewObject.Proxy
+            for obj, state in reopened_object_states
+        }
+
+        document_attachment = (
+            attachment.TransitionCoinDocumentAttachmentFixture(
+                reopened_document,
+                record_loader=adapter.read_transition_objects,
+                state_reader=adapter.read_transition_object,
+                source_property_name=(
+                    adapter.FREECAD_STATE_JSON_PROPERTY
+                ),
+                specification=specification,
+                style=renderer.TransitionCoinStyle(
+                    line_color_rgb=(0.9, 0.05, 0.02),
+                    line_width=6.0,
+                ),
+                coin_module=coin,
+            )
+        )
+        assert document_attachment.attached is True
+        assert document_attachment.attachment_count == (
+            workload.OBJECT_COUNT
+        )
+        assert document_attachment.transition_ids == expected_order
+
+        attached_records = []
+        attached_caches = {}
+        attached_artifacts = {}
+        attached_roots = {}
+        for obj, state in reopened_object_states:
+            identity = state.intent.transition_id
+            proxy = document_attachment.proxy_for_transition(
+                identity
+            )
+            cache = document_attachment.cache_for_transition(
+                identity
+            )
+            artifact = cache.artifact("preview")
+            assert cache is not original_caches[identity]
+            assert artifact is not None
+            assert artifact is not original_artifacts[identity]
+            assert artifact.source_signature == (
+                original_artifacts[identity].source_signature
+            )
+            assert artifact.payload == (
+                original_artifacts[identity].payload
+            )
+            assert cache.status(
+                state,
+                specification.derived_request(),
+            ) == "current"
+            attached_records.append({
+                "object": obj,
+                "proxy": proxy,
+            })
+            attached_caches[identity] = cache
+            attached_artifacts[identity] = artifact
+            attached_roots[identity] = proxy.selection_root
+
+        reopened_mappings = tuple(
+            _mapping(record)
+            for record in attached_records
+        )
+        assert reopened_mappings == expected_mappings
+        assert _count_coin_nodes(
+            attached_roots.values()
+        ) == EXPECTED_ACTIVE_NODE_COUNT
+
+        by_end = {
+            state.intent.end_name: state.intent.transition_id
+            for _obj, state in reopened_object_states
+        }
+        refreshed_identity = by_end[SELECTED_END]
+        sibling_identity = by_end["Entry"]
+        sibling_proxy = document_attachment.proxy_for_transition(
+            sibling_identity
+        )
+        sibling_source_signature = sibling_proxy.source_signature
+        sibling_selection_root = sibling_proxy.selection_root
+        assert attached_caches[sibling_identity].discard(
+            "preview"
+        ) == ("preview",)
+        assert attached_caches[sibling_identity].artifact(
+            "preview"
+        ) is None
+        refreshed = document_attachment.refresh_transition(
+            refreshed_identity
+        )
+        assert refreshed is False
+        assert attached_caches[refreshed_identity].artifact(
+            "preview"
+        ) is attached_artifacts[refreshed_identity]
+        assert attached_caches[sibling_identity].artifact(
+            "preview"
+        ) is None
+        assert sibling_proxy.source_signature == (
+            sibling_source_signature
+        )
+        assert sibling_proxy.selection_root is sibling_selection_root
+        assert tuple(
+            _mapping(record)
+            for record in attached_records
+        ) == expected_mappings
+        assert _stored_snapshot(
+            reopened_document,
+            reopened_object_states,
+        ) == stored_before_attachment
+
+        for record in attached_records:
+            view_object = record["object"].ViewObject
+            mode_index = tuple(
+                view_object.listDisplayModes()
+            ).index(record["proxy"].display_mode)
+            view_object.SwitchNode.whichChild.setValue(mode_index)
+        reopened_document.recompute()
+        view = Gui.activeDocument().activeView()
+        view.viewTop()
+        view.fitAll()
+        view.redraw()
+        _process_gui()
+        view.saveImage(
+            str(reopened_image_path),
+            1000,
+            700,
+            "Current",
+        )
+        visible_red_pixels = _red_pixel_count(
+            reopened_image_path
+        )
+        assert visible_red_pixels >= 100
+
+        dispose_result = document_attachment.dispose()
+        assert dispose_result == expected_order
+        assert document_attachment.attached is False
+        assert all(
+            int(root.getNumChildren()) == 0
+            for root in attached_roots.values()
+        )
+        assert all(
+            cache.artifact("preview") is None
+            for cache in attached_caches.values()
+        )
+        assert all(
+            obj.ViewObject.Proxy
+            == original_host_proxies[state.intent.transition_id]
+            for obj, state in reopened_object_states
+        )
+        for obj, state in reopened_object_states:
+            original_view = next(
+                entry
+                for entry in view_before_attachment
+                if entry[0] == state.intent.transition_id
+            )
+            assert tuple(obj.ViewObject.listDisplayModes()) == (
+                original_view[2]
+            )
+            assert int(
+                obj.ViewObject.RootNode.getNumChildren()
+            ) == original_view[3]
+            assert int(
+                obj.ViewObject.SwitchNode.getNumChildren()
+            ) == original_view[4] + 1
+        assert _stored_snapshot(
+            reopened_document,
+            reopened_object_states,
+        ) == stored_before_attachment
+
+        object_count_before_close = len(
+            reopened_document.Objects
+        )
+        result = {
+            "active_coin_scene_node_count": (
+                EXPECTED_ACTIVE_NODE_COUNT
+            ),
+            "all_caches_discarded": True,
+            "all_host_proxies_restored": True,
+            "all_selection_roots_cleared": True,
+            "attachment_boundary": (
+                attachment.TRANSITION_COIN_DOCUMENT_ATTACHMENT_FIXTURE_ID
+            ),
+            "attachment_count": workload.OBJECT_COUNT,
+            "attachment_order": expected_order,
+            "cache_is_new_count": workload.OBJECT_COUNT,
+            "derived_state_persisted": False,
+            "disposed": True,
+            "dispose_returned_transition_ids": dispose_result,
+            "document_object_count": workload.OBJECT_COUNT,
+            "empty_switch_children_retained": (
+                workload.OBJECT_COUNT
+            ),
+            "explicit_post_open": True,
+            "history_delta": 0,
+            "independent_refresh": True,
+            "logical_layer_count": workload.OBJECT_COUNT,
+            "part_shape_created": False,
+            "preview_equivalent_count": workload.OBJECT_COUNT,
+            "reopened_image": str(reopened_image_path),
+            "save_route_exercised": True,
+            "schema_unchanged": True,
+            "selection_mappings_preserved": True,
+            "sibling_cache_request_trap": "remained-missing",
+            "stored_state_unchanged": True,
+            "visible_red_pixels": visible_red_pixels,
+        }
+    finally:
+        if (
+            document_attachment is not None
+            and document_attachment.attached
+        ):
+            document_attachment.dispose()
+        if reopened_document.Name in App.listDocuments():
+            App.closeDocument(reopened_document.Name)
+        _process_gui()
+
+    cleanup = {
+        **manual_cleanup,
         "object_count_before_close": object_count_before_close,
         "remaining_documents": sorted(App.listDocuments()),
     }
+    return result, cleanup
 
 
 def validate():
@@ -830,8 +1251,16 @@ def validate():
             "Entry",
         )
         pick_callback_count = target_proxy.pick_callback_count
-        cleanup = _dispose_fixture(document, records)
+        working_document = document
         document = None
+        reopened_attachment, cleanup = (
+            _exercise_reopened_attachment(
+                working_document,
+                records,
+                failure_snapshot["mappings"],
+                target_record["coordinator"].specification,
+            )
+        )
         records = []
         assert cleanup == {
             "discarded_cache_count": workload.OBJECT_COUNT,
@@ -865,6 +1294,7 @@ def validate():
             "pick_callback_count": pick_callback_count,
             "pointer_target": pointer_target,
             "redo_restored_edit": True,
+            "reopened_attachment": reopened_attachment,
             "representative_scope": workload.WORKLOAD_SCOPE_LIMIT,
             "rationale": workload.WORKLOAD_RATIONALE,
             "selected_end": SELECTED_END,

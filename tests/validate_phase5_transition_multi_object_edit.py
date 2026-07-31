@@ -121,6 +121,15 @@ def _validate_gui_and_runner_contract():
     assert "command.edit_transition_intent" in gui_calls
     assert "document.undo" in gui_calls
     assert "document.redo" in gui_calls
+    assert "document.saveAs" in gui_calls
+    assert "App.openDocument" in gui_calls
+    assert "adapter.read_transition_objects" in gui_calls
+    assert (
+        "attachment.TransitionCoinDocumentAttachmentFixture"
+        in gui_calls
+    )
+    assert "document_attachment.refresh_transition" in gui_calls
+    assert "document_attachment.dispose" in gui_calls
     assert "Gui.Selection.addSelection" not in gui_calls
 
     gui_text = gui_proof.read_text(encoding="utf-8")
@@ -140,6 +149,26 @@ def _validate_gui_and_runner_contract():
     assert '"mapping_preserved": True' in gui_text
     assert '"sibling_state_preserved": all(' in gui_text
     assert '"sibling_state_stages": tuple(' in gui_text
+    assert (
+        '"reopened_attachment": reopened_attachment'
+        in gui_text
+    )
+    assert '"attachment_count": workload.OBJECT_COUNT' in gui_text
+    assert '"dispose_returned_transition_ids": dispose_result' in (
+        gui_text
+    )
+    assert '"explicit_post_open": True' in gui_text
+    assert '"independent_refresh": True' in gui_text
+    assert '"empty_switch_children_retained": (' in gui_text
+    assert '"selection_mappings_preserved": True' in gui_text
+    assert (
+        '"sibling_cache_request_trap": "remained-missing"'
+        in gui_text
+    )
+    assert '"stored_state_unchanged": True' in gui_text
+    assert '"all_caches_discarded": True' in gui_text
+    assert '"all_selection_roots_cleared": True' in gui_text
+    assert '"all_host_proxies_restored": True' in gui_text
 
     runner_text = runner.read_text(encoding="utf-8")
     assert (
@@ -151,6 +180,16 @@ def _validate_gui_and_runner_contract():
     assert '"cache_invalidation"' in runner_text
     assert '"sibling_state_stages"' in runner_text
     assert '"transactional_failure_recovered"' in runner_text
+    assert '"reopened_attachment"' in runner_text
+    assert '"attachment_order"' in runner_text
+    assert '"dispose_returned_transition_ids"' in runner_text
+    assert '"empty_switch_children_retained"' in runner_text
+    assert '"independent_refresh"' in runner_text
+    assert '"selection_mappings_preserved"' in runner_text
+    assert '"sibling_cache_request_trap"' in runner_text
+    assert '"all_caches_discarded"' in runner_text
+    assert '"all_selection_roots_cleared"' in runner_text
+    assert '"all_host_proxies_restored"' in runner_text
     assert '"representative_multi_object_result"' in runner_text
 
 
@@ -175,7 +214,15 @@ def _validate_scope_and_documentation():
         in validation
     )
     assert (
+        "saved/reopened representative Entry/Exit attachment"
+        in validation
+    )
+    assert (
         "## Representative multi-object selection and edit tranche"
+        in evidence
+    )
+    assert (
+        "## Representative save/reopen attachment tranche"
         in evidence
     )
     assert "No renderer or Phase 5 exit is accepted" in evidence
