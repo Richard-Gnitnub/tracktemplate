@@ -118,7 +118,10 @@ def _validate_gui_and_runner_contract():
     assert "store.create_many" in gui_calls
     assert "QtTest.QTest.mouseMove" in gui_calls
     assert "QtTest.QTest.mouseClick" in gui_calls
-    assert "command.edit_transition_intent" in gui_calls
+    assert "QtTest.QTest.keyClick" in gui_calls
+    assert "QtTest.QTest.keyClicks" in gui_calls
+    assert "editor.TransitionParameterEditorDialog" in gui_calls
+    assert "command.edit_transition_intent" not in gui_calls
     assert "document.undo" in gui_calls
     assert "document.redo" in gui_calls
     assert "document.saveAs" in gui_calls
@@ -146,6 +149,12 @@ def _validate_gui_and_runner_contract():
     assert '"after_undo"' in gui_text
     assert '"after_redo"' in gui_text
     assert '"transactional_failure_recovered": True' in gui_text
+    assert '"editor_input": "qt-keyboard-and-mouse"' in gui_text
+    assert '"editor_no_selection_rejected": True' in gui_text
+    assert '"editor_noop_history_delta": 0' in gui_text
+    assert '"editor_selected_state_visible": True' in gui_text
+    assert '"editor_edited_state_visible": True' in gui_text
+    assert '"editor_failure_diagnostic_visible": True' in gui_text
     assert '"mapping_preserved": True' in gui_text
     assert '"sibling_state_preserved": all(' in gui_text
     assert '"sibling_state_stages": tuple(' in gui_text
@@ -191,6 +200,9 @@ def _validate_gui_and_runner_contract():
     assert '"all_selection_roots_cleared"' in runner_text
     assert '"all_host_proxies_restored"' in runner_text
     assert '"representative_multi_object_result"' in runner_text
+    assert '"editor_route"' in runner_text
+    assert '"editor_selected_image"' in runner_text
+    assert '"editor_edited_image"' in runner_text
 
 
 def _validate_scope_and_documentation():

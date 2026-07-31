@@ -1,11 +1,17 @@
-"""Internal application command for the bounded transition editing fixture."""
+"""Internal application commands for bounded transition editing."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+import math
 
 from tracktemplate.application.transition_state import (
     TransitionState,
     analyse_transition_state,
     replace_transition_intent,
+    transition_analysis_status,
+)
+from tracktemplate.domain.alignment import (
+    GEOMETRY_TOLERANCE,
+    transition_start_signed_offset,
 )
 from tracktemplate.domain.transition import TransitionIntent
 
@@ -13,6 +19,7 @@ from tracktemplate.domain.transition import TransitionIntent
 __all__ = (
     "TransitionEditResult",
     "edit_transition_intent",
+    "edit_transition_length_mm",
 )
 
 
@@ -61,3 +68,46 @@ def edit_transition_intent(state, intent, edit_port):
         state=replacement,
         changed=True,
     )
+
+
+def edit_transition_length_mm(state, transition_length_mm, edit_port):
+    """Replace one transition length through the canonical intent boundary."""
+    if not isinstance(state, TransitionState):
+        raise TypeError("state must be a TransitionState")
+    if (
+        isinstance(transition_length_mm, bool)
+        or not isinstance(transition_length_mm, (int, float))
+    ):
+        raise ValueError("transition_length_mm must be a finite number")
+    try:
+        length_mm = float(transition_length_mm)
+    except (OverflowError, TypeError, ValueError) as error:
+        raise ValueError(
+            "transition_length_mm must be a finite number"
+        ) from error
+    if not math.isfinite(length_mm):
+        raise ValueError("transition_length_mm must be a finite number")
+    if length_mm < 0.0:
+        raise ValueError("transition_length_mm must not be negative")
+
+    if (
+        transition_analysis_status(state) == "current"
+        and math.isclose(
+            length_mm,
+            state.analysis.transition_length_mm,
+            rel_tol=0.0,
+            abs_tol=GEOMETRY_TOLERANCE,
+        )
+    ):
+        return edit_transition_intent(state, state.intent, edit_port)
+
+    intent = state.intent
+    replacement = replace(
+        intent,
+        target_signed_offset_mm=transition_start_signed_offset(
+            intent.circle_centre_y_mm,
+            intent.radius_mm,
+            length_mm,
+        ),
+    )
+    return edit_transition_intent(state, replacement, edit_port)

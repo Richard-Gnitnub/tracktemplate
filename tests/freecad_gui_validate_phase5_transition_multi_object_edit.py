@@ -42,11 +42,11 @@ from tests.phase5_transition_coin_gui_harness import (  # noqa: E402
 from tools import phase5_transition_representative_workload as workload  # noqa: E402
 from tracktemplate import api, bootstrap  # noqa: E402
 from tracktemplate.adapters.freecad import transition_state as adapter  # noqa: E402
-from tracktemplate.application import transition_edit as command  # noqa: E402
 from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
 from tracktemplate.presentation import (  # noqa: E402
     transition_coin_attachment as attachment,
 )
+from tracktemplate.ui import transition_parameter_editor as editor  # noqa: E402
 
 
 _process_gui = functools.partial(
@@ -410,13 +410,60 @@ def _assert_only_selected_regenerated(before, after, expected):
     }
 
 
-def _expect_adapter_error(action, code):
+def _selected_transition(document, store):
+    selected = tuple(Gui.Selection.getSelectionEx(document.Name))
+    if len(selected) != 1:
+        return None
+    selected_record = selected[0]
+    selected_object = selected_record.Object
+    subelements = tuple(selected_record.SubElementNames)
+    if len(subelements) != 1:
+        return None
+    proxy = selected_object.ViewObject.Proxy
+    selection_for_element = getattr(proxy, "selection_for_element", None)
+    if not callable(selection_for_element):
+        return None
+    mapping = selection_for_element(subelements[0])
+    if mapping is None:
+        return None
     try:
-        action()
-    except adapter.TransitionDocumentError as error:
-        assert error.code == code, error
-        return error
-    raise AssertionError("Expected TransitionDocumentError {!r}".format(code))
+        state = adapter.read_transition_object(selected_object)
+    except adapter.TransitionDocumentError:
+        return None
+    if mapping.domain_id != state.intent.transition_id:
+        return None
+    return editor.SelectedTransition(
+        state,
+        adapter.FreeCADTransitionEditPort(
+            store,
+            document,
+            selected_object,
+            proxy,
+        ),
+    )
+
+
+def _replace_line_edit_text(line_edit, text):
+    line_edit.setFocus()
+    QtTest.QTest.mouseClick(line_edit, QtCore.Qt.LeftButton)
+    QtTest.QTest.keyClick(
+        line_edit,
+        QtCore.Qt.Key_A,
+        QtCore.Qt.ControlModifier,
+    )
+    QtTest.QTest.keyClicks(line_edit, text)
+    _process_gui()
+    assert line_edit.text() == text
+
+
+def _capture_dialog(dialog, path):
+    _process_gui()
+    assert dialog.isVisible()
+    pixmap = dialog.grab()
+    assert not pixmap.isNull()
+    assert pixmap.save(str(path))
+    assert path.is_file()
+    assert path.stat().st_size > 0
 
 
 def _build_fixture(qualification):
@@ -916,6 +963,7 @@ def validate():
     observer = _SelectionObserver()
     Gui.Selection.addObserver(observer)
     document = None
+    parameter_dialog = None
     records = []
     try:
         document, store, records, view = _build_fixture(qualification)
@@ -1013,27 +1061,100 @@ def validate():
         assert selected_mapping.domain_id == expected_mapping.domain_id
         assert selected_mapping.visual_id == expected_mapping.visual_id
 
-        Gui.Selection.clearSelection()
         view.redraw()
         _process_gui()
+        stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
+            "%Y%m%dT%H%M%S%fZ"
+        )
+        editor_run_directory = (
+            ROOT
+            / "benchmark-output"
+            / "freecad-bridge"
+            / "phase5-transition-parameter-editor-runs"
+            / stamp
+        )
+        editor_run_directory.mkdir(parents=True)
+        selected_image_path = (
+            editor_run_directory / "selected-transition-editor.png"
+        )
+        edited_image_path = (
+            editor_run_directory / "edited-transition-editor.png"
+        )
+        controller = editor.TransitionParameterEditorController(
+            lambda: _selected_transition(document, store)
+        )
+        parameter_dialog = editor.TransitionParameterEditorDialog(
+            controller,
+            QtWidgets,
+            parent=Gui.getMainWindow(),
+        )
+        parameter_dialog.show()
+        _process_gui()
+        initial_length_text = parameter_dialog.length_edit.text()
+        assert parameter_dialog.dialog.parent() is Gui.getMainWindow()
+        assert parameter_dialog.dialog.isVisible()
+        assert parameter_dialog.selected_transition_id == (
+            target_initial_state.intent.transition_id
+        )
+        assert parameter_dialog.selected_identity_label.text() == (
+            target_initial_state.intent.transition_id
+        )
+        assert initial_length_text == "420.000"
+        assert parameter_dialog.apply_button.isEnabled()
+        assert parameter_dialog.status_label.text() == (
+            "Ready to edit the selected transition."
+        )
+        _capture_dialog(
+            parameter_dialog.dialog,
+            selected_image_path,
+        )
+
         document.clearUndos()
         assert int(document.UndoCount) == 0
         assert int(document.RedoCount) == 0
 
-        edit_port = adapter.FreeCADTransitionEditPort(
-            store,
-            document,
-            target_object,
-            target_proxy,
+        before_noop_counters = _cache_counters(records)
+        QtTest.QTest.mouseClick(
+            parameter_dialog.apply_button,
+            QtCore.Qt.LeftButton,
+        )
+        _process_gui()
+        assert parameter_dialog.last_result.changed is False
+        assert parameter_dialog.last_error is None
+        assert adapter.read_transition_object(target_object) == (
+            target_initial_state
+        )
+        assert _cache_counters(records) == before_noop_counters
+        assert int(document.UndoCount) == 0
+        assert int(document.RedoCount) == 0
+        assert parameter_dialog.status_label.text() == (
+            "No transition change was required."
+        )
+
+        _replace_line_edit_text(
+            parameter_dialog.length_edit,
+            "360.000",
         )
         before_edit_counters = _cache_counters(records)
-        edit_result = command.edit_transition_intent(
-            target_initial_state,
-            workload.edited_exit_intent(),
-            edit_port,
+        QtTest.QTest.mouseClick(
+            parameter_dialog.apply_button,
+            QtCore.Qt.LeftButton,
+        )
+        _process_gui()
+        edit_result = parameter_dialog.last_result
+        assert edit_result is not None
+        assert parameter_dialog.last_error is None
+        assert parameter_dialog.status_label.text() == (
+            "Edited transition {} to 360.000 mm.".format(
+                target_initial_state.intent.transition_id
+            )
         )
         view.redraw()
         _process_gui()
+        _capture_dialog(
+            parameter_dialog.dialog,
+            edited_image_path,
+        )
         after_edit_counters = _cache_counters(records)
         _assert_only_selected_regenerated(
             before_edit_counters,
@@ -1159,13 +1280,21 @@ def validate():
             int(document.UndoCount),
             int(document.RedoCount),
         )
-        failure_error = _expect_adapter_error(
-            lambda: command.edit_transition_intent(
-                edit_result.state,
-                workload.failed_exit_intent(),
-                edit_port,
-            ),
-            "transaction-failed",
+        _replace_line_edit_text(
+            parameter_dialog.length_edit,
+            "390.000",
+        )
+        QtTest.QTest.mouseClick(
+            parameter_dialog.apply_button,
+            QtCore.Qt.LeftButton,
+        )
+        _process_gui()
+        failure_error = parameter_dialog.last_error
+        assert isinstance(failure_error, adapter.TransitionDocumentError)
+        assert failure_error.code == "transaction-failed"
+        assert parameter_dialog.last_result is None
+        assert parameter_dialog.status_label.text().startswith(
+            "Edit not applied: transaction-failed"
         )
         view.redraw()
         _process_gui()
@@ -1211,6 +1340,48 @@ def validate():
             int(document.RedoCount),
         ) == before_failure_history
 
+        before_no_selection_state = adapter.read_transition_object(
+            target_object
+        )
+        before_no_selection_counters = _cache_counters(records)
+        before_no_selection_history = (
+            int(document.UndoCount),
+            int(document.RedoCount),
+        )
+        Gui.Selection.clearSelection()
+        _replace_line_edit_text(
+            parameter_dialog.length_edit,
+            "370.000",
+        )
+        QtTest.QTest.mouseClick(
+            parameter_dialog.apply_button,
+            QtCore.Qt.LeftButton,
+        )
+        _process_gui()
+        assert isinstance(
+            parameter_dialog.last_error,
+            editor.TransitionParameterSelectionError,
+        )
+        assert parameter_dialog.last_result is None
+        assert parameter_dialog.status_label.text().startswith(
+            "Edit not applied: Select one transition preview"
+        )
+        assert parameter_dialog.selected_identity_label.text() == "None"
+        assert parameter_dialog.length_edit.text() == ""
+        assert parameter_dialog.apply_button.isEnabled() is False
+        assert adapter.read_transition_object(target_object) == (
+            before_no_selection_state
+        )
+        assert _cache_counters(records) == before_no_selection_counters
+        assert (
+            int(document.UndoCount),
+            int(document.RedoCount),
+        ) == before_no_selection_history
+
+        parameter_dialog.close()
+        _process_gui()
+        assert parameter_dialog.dialog.isVisible() is False
+
         final_counters = _cache_counters(records)
         selected_deltas = _counter_delta(
             before_edit_counters,
@@ -1254,6 +1425,20 @@ def validate():
                 failure_snapshot["document_object_count"]
             ),
             "edit_command_route": "internal-application-command",
+            "editor_control": "transition-length-mm",
+            "editor_edited_image": str(edited_image_path),
+            "editor_edited_state_visible": True,
+            "editor_failure_diagnostic_visible": True,
+            "editor_initial_length_text": initial_length_text,
+            "editor_input": "qt-keyboard-and-mouse",
+            "editor_no_selection_rejected": True,
+            "editor_noop_history_delta": 0,
+            "editor_parent": "FreeCAD-main-window",
+            "editor_route": (
+                "user-interface-controller-to-internal-application-command"
+            ),
+            "editor_selected_image": str(selected_image_path),
+            "editor_selected_state_visible": True,
             "edit_undo_units": 1,
             "failure_history_preserved": True,
             "family_id": FAMILY_ID,
@@ -1294,6 +1479,8 @@ def validate():
         }
         print(SENTINEL + json.dumps(payload, sort_keys=True))
     finally:
+        if parameter_dialog is not None:
+            parameter_dialog.close()
         Gui.Selection.removeObserver(observer)
         Gui.Selection.clearSelection()
         for record in records:

@@ -518,24 +518,33 @@ result and limitations are in
 Current Phase 5 representative Entry/Exit multi-object editing workload:
 
 ```bash
+.venv/bin/python tests/validate_phase5_transition_parameter_editor.py
 .venv/bin/python tests/validate_phase5_transition_multi_object_edit.py
 tools/freecad_bridge/run-phase5-transition-viewprovider
 ```
 
-The standalone validator fixes the workload rationale and protects the
-real-GUI proof and runner without importing FreeCAD. The representative
-boundary is the smallest complete currently qualified plain-line transition
-family shape: one secondary track produces one canonical Entry and one
-canonical Exit record. Distinct deterministic transition lengths make those
-two development previews pointer-disambiguable; they are not product defaults.
+The standalone parameter-editor validator proves the internal length command,
+fail-closed selection controller and accepted UI dependency direction without
+importing Qt or FreeCAD. The multi-object validator fixes the workload rationale
+and protects the real-GUI proof and runner. The representative boundary is the
+smallest complete currently qualified plain-line transition family shape: one
+secondary track produces one canonical Entry and one canonical Exit record.
+Distinct deterministic transition lengths make those two development previews
+pointer-disambiguable; they are not product defaults.
 
 The existing isolated ViewProvider runner first retains the one-object
 lifecycle/save-reopen proof, then exercises the two-object workload in the same
 qualified real-GUI process from a new empty document. A real Qt mouse click
-must select the red Exit preview and resolve its stable domain identity. One
-application-command edit, Undo, Redo and an injected refresh failure must
-change and recover only that object and its retained cache while the Entry
-state/cache remains untouched. Every state must retain two compact
+must select the red Exit preview and resolve its stable domain identity. A
+modeless dialog parented to the FreeCAD main window must show that identity and
+its current transition length. Real Qt keyboard input and an Apply-button click
+must route one length edit through the internal application command. Undo,
+Redo, an injected refresh failure and a cleared-selection attempt must change,
+recover or reject only as intended while the Entry state/cache remains
+untouched. Applying the unchanged displayed value must create no history. The
+failure must remain visibly diagnostic and the no-selection attempt must change
+neither state, history nor cache counters. Selected and edited dialog captures
+are retained for visual inspection. Every state must retain two compact
 `App::FeaturePython` objects, two Coin layers, 14 active selectable-scene nodes,
 zero `Shape` properties and identical stable selection mappings. The runner
 requires the inner
@@ -544,7 +553,7 @@ outer `TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI=` sentinel.
 
 This workload is representative only of the currently qualified fixture-only
 family shape. It does not establish whole-layout capacity, an interaction
-budget, automatic product load wiring, renderer suitability or owner
+budget, automatic product load or menu wiring, renderer suitability or owner
 acceptance.
 
 Current Phase 5 development-only post-open attachment boundary:

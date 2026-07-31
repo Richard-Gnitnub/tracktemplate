@@ -219,6 +219,12 @@ def main():
             "reopened_attachment",
             {},
         )
+        editor_selected_image = pathlib.Path(str(
+            multi_object_payload.get("editor_selected_image", "")
+        ))
+        editor_edited_image = pathlib.Path(str(
+            multi_object_payload.get("editor_edited_image", "")
+        ))
         representative_order = [
             "SET-001/curve-track/2/transition/entry",
             "SET-001/curve-track/2/transition/exit",
@@ -255,6 +261,31 @@ def main():
             or multi_object_payload.get("mapping_preserved") is not True
             or multi_object_payload.get("edit_command_route")
             != "internal-application-command"
+            or multi_object_payload.get("editor_control")
+            != "transition-length-mm"
+            or multi_object_payload.get("editor_edited_state_visible")
+            is not True
+            or multi_object_payload.get(
+                "editor_failure_diagnostic_visible"
+            ) is not True
+            or multi_object_payload.get("editor_initial_length_text")
+            != "420.000"
+            or multi_object_payload.get("editor_input")
+            != "qt-keyboard-and-mouse"
+            or multi_object_payload.get("editor_no_selection_rejected")
+            is not True
+            or multi_object_payload.get("editor_noop_history_delta") != 0
+            or multi_object_payload.get("editor_parent")
+            != "FreeCAD-main-window"
+            or multi_object_payload.get("editor_route")
+            != (
+                "user-interface-controller-to-internal-application-command"
+            )
+            or multi_object_payload.get("editor_selected_state_visible")
+            is not True
+            or editor_selected_image == editor_edited_image
+            or not editor_selected_image.is_file()
+            or not editor_edited_image.is_file()
             or multi_object_payload.get("edit_undo_units") != 1
             or multi_object_payload.get("undo_restored_initial") is not True
             or multi_object_payload.get("redo_restored_edit") is not True
