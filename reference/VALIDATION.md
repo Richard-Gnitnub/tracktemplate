@@ -582,13 +582,14 @@ family shape. It does not establish whole-layout capacity, an interaction
 budget, automatic product load or menu wiring, renderer suitability or owner
 acceptance.
 
-Current Phase 5 development-only post-open attachment boundary:
+Current Phase 5 post-open attachment and explicit B16 lifecycle boundaries:
 
 ```bash
 .venv/bin/python tests/validate_phase4_transition_persistence.py
 flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
   tests/freecad_validate_phase4_transition_persistence.py
 .venv/bin/python tests/validate_phase5_transition_coin_viewprovider.py
+.venv/bin/python tests/validate_phase5_transition_editing_lifecycle.py
 tools/freecad_bridge/run-phase5-transition-viewprovider
 ```
 
@@ -627,15 +628,49 @@ reopened canonical JSON, property lists, object count and history unchanged.
 The known empty-switch-child limitation applies independently to both disposed
 records.
 
-This is a test-owned, post-open composition boundary. It is absent from
-`tracktemplate.api`, package initialisation, the product macro and FreeCAD
-startup or document observers. Passing it does not establish automatic product
-load wiring, supported migration, renderer suitability or owner acceptance.
-FreeCAD exposes display-mode registration but no Python removal operation, so
-disposal restores the original public display-mode list and clears all
-retained mappings and caches, but leaves one empty switch child until object
-deletion or document close/reopen. The checks require that limitation rather
-than describing disposal as complete view-state restoration.
+The attachment remains an internal, injected lower boundary and is absent from
+`tracktemplate.api` and package initialisation. The standalone lifecycle check
+additionally protects the explicit `TrackTemplate.FCMacro`
+`activate_transition_editing()` route. The macro's normal
+`FOUNDATION_RESULT = run_macro()` path remains unchanged and imports no host,
+Coin or Qt module unless that function is called. Activation must attach a
+non-empty stable-ID set once, reject active duplication, reuse one transient
+editor, clear only the target document's selection, retry partial attachment
+and observer cleanup, and retire without reactivation. Composition-level fault
+injection must prove that observer-registration rollback remains recoverable
+and that a failed observer removal retains the same observer for a successful
+retry. It also protects the versioned development contract and keeps the
+coordinator in the host-independent UI layer.
+
+The same existing isolated runner adds one third, focused real-GUI proof after
+the retained one-object and representative workflows; it does not create
+another orchestration loop. On the qualified Entry/Exit document, the explicit
+macro route must attach both transitions once, leave canonical JSON, built-in
+property lists, history, `Shape` count and the captured public `DisplayMode`
+state unchanged, reject a concurrent invocation, expose the existing editor,
+and preserve one edit with Undo/Redo. The transient document observer is
+registered only by successful explicit activation. A save must invoke
+FreeCAD's `slotStartSaveDocument`, retire the lifecycle before serialization,
+remove the observer, clear the target selection without clearing a selected
+sibling document, clear caches, proxies and active Coin children, and persist
+no transient marker. Close/reopen must then reconstruct new scene nodes and the
+original owner-visible Exit state after another explicit activation. Explicit
+deactivation must retire that rebuilt lifecycle before direct document close;
+the bounded composition adds no automatic close or permanent loading policy.
+The inner sentinel is
+`TRACKTEMPLATE_PHASE5_TRANSITION_EDITING_LIFECYCLE_GUI=`; the outer runner
+sentinel remains `TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI=`.
+
+FreeCAD exposes display-mode registration but no qualified Python removal
+operation. Disposal therefore restores the original public display-mode
+enumeration and switch selection and clears every retained mapping and cache,
+but leaves one named empty switch child. The lifecycle confines that residual
+to one child per object, rejects same-document reactivation without adding a
+second child, and relies on document close/reopen to remove it. The checks
+require this unaccepted limitation rather than describing disposal as complete
+view-state restoration. Passing them establishes no automatic startup,
+Workbench or menu wiring, migration support, renderer suitability, owner
+acceptance, release or output authority.
 
 Repository recovery and ignored-data safety controls:
 

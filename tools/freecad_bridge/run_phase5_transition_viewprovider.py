@@ -19,9 +19,17 @@ MULTI_OBJECT_GUI_PROOF = (
     / "tests"
     / "freecad_gui_validate_phase5_transition_multi_object_edit.py"
 )
+LIFECYCLE_GUI_PROOF = (
+    PROJECT_ROOT
+    / "tests"
+    / "freecad_gui_validate_phase5_transition_editing_lifecycle.py"
+)
 SENTINEL = "TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI="
 MULTI_OBJECT_SENTINEL = (
     "TRACKTEMPLATE_PHASE5_MULTI_OBJECT_EDIT_GUI="
+)
+LIFECYCLE_SENTINEL = (
+    "TRACKTEMPLATE_PHASE5_TRANSITION_EDITING_LIFECYCLE_GUI="
 )
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(TOOL_ROOT / "src"))
@@ -100,6 +108,63 @@ def _sentinel_payload(result, sentinel=SENTINEL):
             )
         )
     return json.loads(matches[0])
+
+
+def _validate_lifecycle_payload(payload):
+    expected_ids = [
+        "SET-001/curve-track/2/transition/entry",
+        "SET-001/curve-track/2/transition/exit",
+    ]
+    required_true = (
+        "active_children_cleared",
+        "caches_discarded",
+        "canonical_restored_before_save",
+        "deactivated",
+        "deactivated_then_closed",
+        "display_mode_property_unchanged",
+        "duplicate_active_blocked",
+        "duplicate_invocation_blocked",
+        "editor_visible",
+        "explicit_activation",
+        "proxies_restored",
+        "reopened",
+        "reopened_deactivated",
+        "reopened_new_scene_nodes",
+        "residual_not_accumulated",
+        "same_document_reactivation_blocked",
+        "save_auto_deactivated",
+        "schema_unchanged",
+        "selection_cleared",
+        "sibling_selection_preserved",
+        "stored_state_unchanged_after_deactivation",
+        "switch_selection_restored",
+        "undo_redo_preserved",
+    )
+    scene_image = pathlib.Path(str(payload.get("scene_image", "")))
+    editor_image = pathlib.Path(str(payload.get("editor_image", "")))
+    if (
+        payload.get("freecad_version") != "1.1.1"
+        or payload.get("exact_qualified_profile")
+        != "linux-x86_64-flatpak-freecad-1.1.1"
+        or payload.get("attachment_count") != 2
+        or payload.get("composition_boundary")
+        != "tracktemplate.transition-editing-lifecycle.development.v1"
+        or payload.get("transition_ids") != expected_ids
+        or payload.get("residual_empty_child_count") != 2
+        or payload.get("reopened_attachment_count") != 2
+        or payload.get("reopened_editor_length") != "420.000"
+        or payload.get("reopened_editor_selected_transition")
+        != expected_ids[1]
+        or payload.get("part_shape_created") is not False
+        or payload.get("remaining_documents") != []
+        or any(payload.get(name) is not True for name in required_true)
+        or not scene_image.is_file()
+        or not editor_image.is_file()
+    ):
+        raise RuntimeError(
+            "Phase 5 transition-editing lifecycle proof returned an "
+            "invalid result"
+        )
 
 
 def main():
@@ -386,6 +451,15 @@ def main():
             raise RuntimeError(
                 "Phase 5 multi-object GUI proof returned an invalid result"
             )
+        lifecycle_result = execute_file(
+            client,
+            LIFECYCLE_GUI_PROOF,
+        )
+        lifecycle_payload = _sentinel_payload(
+            lifecycle_result,
+            LIFECYCLE_SENTINEL,
+        )
+        _validate_lifecycle_payload(lifecycle_payload)
         print(
             SENTINEL
             + json.dumps(
@@ -395,6 +469,9 @@ def main():
                         multi_object_payload
                     ),
                     "result": payload,
+                    "transition_editing_lifecycle_result": (
+                        lifecycle_payload
+                    ),
                 },
                 sort_keys=True,
             )

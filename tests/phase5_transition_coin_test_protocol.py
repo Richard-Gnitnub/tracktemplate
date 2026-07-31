@@ -20,6 +20,7 @@ class _Field:
 class _Group:
     def __init__(self):
         self.children = []
+        self._name = ""
 
     def addChild(self, child):
         self.children.append(child)
@@ -44,6 +45,15 @@ class _Group:
 
     def getChild(self, index):
         return self.children[index]
+
+    def getNumChildren(self):
+        return len(self.children)
+
+    def setName(self, name):
+        self._name = str(name)
+
+    def getName(self):
+        return self._name
 
 
 class _BaseColor:

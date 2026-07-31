@@ -394,13 +394,18 @@ def _validate_structure_and_disabled_route():
     ]
 
     for relative in (
-        "TrackTemplate.FCMacro",
         "tracktemplate/api.py",
         "tracktemplate/presentation/__init__.py",
     ):
         assert "transition_coin" not in (ROOT / relative).read_text(
             encoding="utf-8"
         )
+    launcher_source = (ROOT / "TrackTemplate.FCMacro").read_text(
+        encoding="utf-8"
+    )
+    assert "tracktemplate.presentation.transition_coin" in launcher_source
+    assert launcher_source.count("activate_transition_editing(") == 1
+    assert launcher_source.rstrip().endswith("FOUNDATION_RESULT = run_macro()")
 
     script = """
 import importlib.abc
@@ -440,10 +445,18 @@ def _validate_controls():
     evidence = (
         ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
     ).read_text(encoding="utf-8")
-    assert "| 5 | Lightweight editing prototype and renderer decision | 0/4 evidenced | Current" in plan
+    assert (
+        "| 5 | Lightweight editing prototype and renderer decision "
+        "| 4/4 evidenced | Current — exits accepted 2026-07-31; "
+        "closure pending |"
+    ) in plan
     assert "## Coin scene-graph feasibility tranche" in evidence
     assert "## Coin fake-protocol consolidation tranche" in evidence
-    assert "No renderer or Phase 5 exit is accepted" in evidence
+    assert (
+        'id="phase-5-coin-renderer-and-editing-acceptance-panel"'
+        in evidence
+    )
+    assert "This does not close Phase 5, open Phase 6" in evidence
 
 
 def validate():

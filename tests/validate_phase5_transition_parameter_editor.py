@@ -222,10 +222,17 @@ def _validate_ui_and_dependency_boundary():
     ):
         assert required in source
 
-    for relative in ("tracktemplate/api.py", "TrackTemplate.FCMacro"):
-        public_source = (ROOT / relative).read_text(encoding="utf-8")
-        assert "edit_transition_length_mm" not in public_source
-        assert "TransitionParameterEditorDialog" not in public_source
+    public_source = (ROOT / "tracktemplate" / "api.py").read_text(
+        encoding="utf-8"
+    )
+    assert "edit_transition_length_mm" not in public_source
+    assert "TransitionParameterEditorDialog" not in public_source
+    launcher_source = (ROOT / "TrackTemplate.FCMacro").read_text(
+        encoding="utf-8"
+    )
+    assert "edit_transition_length_mm" not in launcher_source
+    assert "TransitionParameterEditorDialog" in launcher_source
+    assert launcher_source.count("activate_transition_editing(") == 1
 
     validation = (ROOT / "reference" / "VALIDATION.md").read_text(
         encoding="utf-8"

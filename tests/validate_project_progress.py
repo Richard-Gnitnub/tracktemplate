@@ -56,7 +56,11 @@ PHASE_TOTALS = {
     11: 7,
 }
 EXPECTED_RISK_IDS = {
-    *{"PR-{:02d}".format(value) for value in range(1, 23)},
+    *{
+        "PR-{:02d}".format(value)
+        for value in range(1, 23)
+        if value != 14
+    },
     "QA-R03",
     "QA-R04",
     "QA-R05",
@@ -75,7 +79,7 @@ EXPECTED_PHASE4_DECISION_IDS = {
     "D-P4-008",
     "D-P4-009",
 }
-EXPECTED_CURRENT_DECISION_IDS = {"D-P5-001", "D-GOV-004"}
+EXPECTED_CURRENT_DECISION_IDS = {"D-P5-001", "D-GOV-004", "D-P5-002"}
 EXPECTED_CONTINUATION_DECISION = (
     "Authorise explicit repository-driven continuation cycles."
 )
@@ -146,7 +150,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         == [
             "# Project Plan",
             "## Phase status",
-            "## Open Phase 5 exit conditions",
+            "## Phase 5 exit conditions",
             "## Live risks",
             "## Owner decisions",
             "## Authority and evidence links",
@@ -205,9 +209,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 4 must be closed with the accepted date",
     )
     _require(
-        rows[5]["evidenced"] == 0
-        and rows[5]["state"] == "Current — opened 2026-07-28",
-        "Phase 5 must be current at zero evidenced exits",
+        rows[5]["evidenced"] == 4
+        and rows[5]["state"]
+        == "Current — exits accepted 2026-07-31; closure pending",
+        "Phase 5 must remain current at four accepted exits pending closeout",
     )
     _require(
         rows[6]["evidenced"] == 0
@@ -235,7 +240,7 @@ def _validate_exit_conditions(
     current_evidence: str,
 ) -> None:
     plan_states: list[str] = []
-    for line in _section(plan, "Open Phase 5 exit conditions").splitlines():
+    for line in _section(plan, "Phase 5 exit conditions").splitlines():
         cells = _cells(line) if line.startswith("|") else []
         if len(cells) == 3 and cells[0] not in {"Exit condition", "---"}:
             plan_states.append(cells[1])
@@ -254,7 +259,7 @@ def _validate_exit_conditions(
             continue
         evidence_states.append(cells[1].split(":", 1)[0])
 
-    expected_plan = ["Pending", "Pending", "Pending", "Pending"]
+    expected_plan = ["Accepted", "Accepted", "Accepted", "Accepted"]
     expected_phase4 = [
         "Evidenced",
         "Evidenced",
@@ -278,9 +283,9 @@ def _validate_exit_conditions(
     )
     plan_flat = " ".join(plan.split())
     _require(
-        "Phase 5 retains visible renderer/style, selection, GUI-editing "
-        "and resource evidence" in plan_flat,
-        "Phase 5 receiving obligations are missing",
+        "D-P5-002 accepts Coin and the demonstrated B16 Entry/Exit editing "
+        "boundary, evidencing all four exact exits" in plan_flat,
+        "accepted Phase 5 boundary is missing",
     )
     _require(
         "Phase 6 retains complete stage-specific exact-validation/export "
@@ -289,12 +294,12 @@ def _validate_exit_conditions(
     )
     current_flat = " ".join(current_evidence.split())
     _require(
-        "Open — project owner accepted Phase 5 opening on 2026-07-28; "
-        "0/4 exits evidenced" in current_flat,
-        "current Phase 5 record does not show the accepted opening",
+        "Open — 4/4 Phase 5 exits are evidenced and accepted under D-P5-002 "
+        "on 2026-07-31; phase closure has not been decided" in current_flat,
+        "current Phase 5 record does not show the accepted exit state",
     )
     _require(
-        "The current exit state is 0/4" in current_evidence,
+        "The current exit state is 4/4 evidenced and accepted" in current_evidence,
         "current Phase 5 record has an invalid current count",
     )
     current_section = _section(
@@ -310,23 +315,27 @@ def _validate_exit_conditions(
         current_states
         == [
             (
-                "Pending — the Coin candidate has bounded selection, edit, "
-                "Undo/Redo, save/reopen and a 32-object resource observation; "
-                "representative suitability, maintainability and acceptance "
-                "remain"
+                "Accepted — Coin is selected for the demonstrated B16 "
+                "Entry/Exit boundary using the retained correctness, editing, "
+                "qualified FreeCAD, maintainability and descriptive "
+                "2–32-object resource evidence"
             ),
             (
-                "Pending — one-object mouse mapping and a bounded "
-                "32-object/layer fixture are proved; representative "
-                "selection suitability is not accepted"
+                "Accepted — one logical object and layer per transition, "
+                "stable Entry/Exit identities and deterministic pointer "
+                "mapping remain exact across the 2–32-object observations; "
+                "no whole-layout claim is made"
             ),
             (
-                "Pending — one bounded intent edit keeps one object and no "
-                "`Part` shape; representative editing remains"
+                "Accepted — edit, no-op, Undo/Redo, failure recovery and "
+                "reopen retain compact objects and zero `Shape` properties "
+                "without constructing exact `Part` geometry"
             ),
             (
-                "Pending — editing behaviour has not yet been presented for "
-                "owner acceptance"
+                "Accepted — the owner explicitly accepts the demonstrated "
+                "lifecycle and the confined one-empty-switch-child-per-object "
+                "limitation at exact source commit "
+                "`0f437f9de8c81f773a50e4b03c1ad6efd8a34169`"
             ),
         ],
         "current Phase 5 exit evidence drifted",
@@ -338,6 +347,11 @@ def _validate_exit_conditions(
     _require(
         'id="phase-5-opening-panel"' in current_evidence,
         "current Phase 5 opening panel is missing",
+    )
+    _require(
+        'id="phase-5-coin-renderer-and-editing-acceptance-panel"'
+        in current_evidence,
+        "Phase 5 renderer and editing acceptance panel is missing",
     )
     _require(
         "| Accountable owner | Deadline | Condition |" in current_evidence,
@@ -429,10 +443,6 @@ def _validate_risks(plan: str) -> None:
     _require(
         "Level 3" in str(by_id["PR-22"]["required_work"]),
         "PR-22 does not enforce Level 3 panel scope",
-    )
-    _require(
-        by_id["PR-14"]["control_effectiveness"] == "Partial",
-        "PR-14 does not reflect the bounded GUI fixture evidence",
     )
     for risk_id in ("PR-16", "PR-17", "QA-R03", "QA-R04"):
         _require(
@@ -581,6 +591,27 @@ def _validate_decisions(plan: str) -> None:
         and continuation_record["exclusions"]
         == EXPECTED_CONTINUATION_EXCLUSIONS,
         "D-GOV-004 continuation authority or exclusions drifted",
+    )
+    renderer_record = current_by_id["D-P5-002"]
+    _require(
+        renderer_record["decision"]
+        == (
+            "Accept Coin and the demonstrated B16 Entry/Exit "
+            "transition-editing behaviour."
+        )
+        and "0f437f9de8c81f773a50e4b03c1ad6efd8a34169"
+        in str(renderer_record["authority"])
+        and "All four exact Phase 5 exits are evidenced"
+        in str(renderer_record["authority"])
+        and "pending a separate closeout decision"
+        in str(renderer_record["authority"])
+        and "No automatic Addon startup"
+        in str(renderer_record["exclusions"])
+        and "Phase 5 closeout or Phase 6 opening"
+        in str(renderer_record["exclusions"])
+        and "Reopen this decision and PR-14"
+        in str(renderer_record["exclusions"]),
+        "D-P5-002 renderer authority or exclusions drifted",
     )
 
     records = document["decisions"]
