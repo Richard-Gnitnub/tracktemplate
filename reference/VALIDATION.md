@@ -563,12 +563,15 @@ canonical `App::FeaturePython` records, closes and reopens the FCStd, and
 invokes the document attachment explicitly. The attachment must enumerate
 Entry then Exit by stable identity, rebuild two new equivalent caches and Coin
 layers, preserve both pre-save selection mappings, and reuse an unchanged Exit
-refresh without changing the Entry artifact. It must retain two objects, two
-logical layers, 14 active selectable-scene nodes, zero `Shape` properties and
-zero attachment history delta. Batch disposal must clear both caches and
-selection roots, restore both original host proxies and leave the reopened
-canonical JSON, property lists, object count and history unchanged. The known
-empty-switch-child limitation applies independently to both disposed records.
+refresh after deliberately discarding Entry's cache as an observable sibling
+trap. Entry's cache must remain missing while its bound source signature,
+selection root and mapping remain unchanged. The attachment must retain two
+objects, two logical layers, 14 active selectable-scene nodes, zero `Shape`
+properties and zero attachment history delta. Batch disposal must clear both
+caches and selection roots, restore both original host proxies and leave the
+reopened canonical JSON, property lists, object count and history unchanged.
+The known empty-switch-child limitation applies independently to both disposed
+records.
 
 This is a test-owned, post-open composition boundary. It is absent from
 `tracktemplate.api`, package initialisation, the product macro and FreeCAD
