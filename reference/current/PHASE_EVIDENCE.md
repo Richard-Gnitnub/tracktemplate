@@ -742,7 +742,7 @@ these test-owned duplication boundaries and retirement conditions:
 | Fixture duplication | Owner and retirement condition |
 | --- | --- |
 | `_process_gui` was repeated in the one-object, representative and resource-profiler workflows; `_SelectionObserver` and `_ObservedTransitionCoinViewProviderFixture` were repeated in the two real-GUI proofs | Phase 5 GUI and performance QA owners. **Retired by the Coin GUI harness consolidation tranche below:** one test-owned helper now serves all three workflows after both real-GUI proofs and the resource profile retained their workloads, sentinels, correctness invariants and comparable measurement recipe and fields. Timing and RSS observations remain descriptive rather than exact-value gates. |
-| Fake Coin field/group/node primitives occur in both standalone Coin validators | Phase 5 presentation QA owner. Keep them separate until a minimal shared fake protocol covers both the scene-only contract and the ViewProvider's selection, replacement and failure hooks; retire the copies only after both focused validators prove the shared helper. |
+| Fake Coin field/group/node primitives occurred in both standalone Coin validators | Phase 5 presentation QA owner. **Retired by the Coin fake-protocol consolidation tranche below:** one minimal test-owned protocol now serves both validators after their scene-only and ViewProvider selection, replacement and failure regressions passed unchanged. |
 | One-object, representative and resource fixtures each compose caches and ViewProviders manually | Their respective QA/performance owners. This is intentional lower-boundary instrumentation, not another renderer. Replace duplicated composition only after an accepted product composition boundary exposes equivalent selection, failure and measurement observations; retain distinct regressions that protect different behaviour. |
 
 The explicit post-open boundary remains a limitation: there is no product load
@@ -796,15 +796,41 @@ one-object and representative captures were visually inspected. No renderer,
 exit condition, risk treatment, product route or owner acceptance changes;
 Phase 5 remains 0/4 and PR-14 remains Open/Remove with **Partial** control.
 
+## Coin fake-protocol consolidation tranche
+
+This Level 2 test-only mechanical refactor moves the union of the fake Coin
+field, group, drawing-node and selection-root protocol to one helper shared by
+the standalone scene and ViewProvider validators. A direct contract exercises
+field values, group lookup/replacement/removal and selection-root creation,
+requires one definition owner and requires both intended consumers to import
+it. The existing scene construction, mapping, disposal and injected failures,
+plus the ViewProvider selection, replacement, refresh, attachment and cleanup
+regressions, remain distinct and unchanged. Product source and GUI workflows
+do not import the helper.
+
+The test-first standalone pipeline stopped only at the missing helper with
+50/51 validators passing under
+`benchmark-output/validation-pipeline/20260731T120146543494Z/`, classified
+`fixture-or-harness-defect`. The first union omitted the ViewObject contract's
+existing `getChild` capability; the exact focused failure is retained under
+`benchmark-output/validation-focus/20260731T120348Z/`, also classified
+`fixture-or-harness-defect`. Restoring that load-bearing fake capability made
+the original command pass. The complete standalone pipeline then parsed 162
+files and passed 51/51 validators under
+`benchmark-output/validation-pipeline/20260731T120508110510Z/`. No FreeCAD or
+real-GUI run applies because only host-independent test fakes changed; no
+product source, renderer disposition, exit condition, risk treatment or owner
+acceptance changes. Phase 5 remains 0/4 and PR-14 remains Open/Remove with
+**Partial** control.
+
 ## Current outcome selection
 
-The duplicated fake Coin field, group and node protocol remains a valid
-maintenance finding, but its consolidation is backlog work unless it directly
-blocks a named Phase 5 exit. It is likely Level 1 test maintenance, not Phase 5
-behavioural progress. The next implementation outcome must be selected from
-the remaining formal exit gaps above; this evidence record grants no automatic
-implementation authority. A later project-owner-approved chief-of-staff and
-continuation workflow should select the highest-value phase-moving outcome.
+The completed fake Coin field, group and node protocol consolidation above
+retired its named test-maintenance finding. Completion neither closes a named
+Phase 5 exit nor grants automatic implementation authority. The next
+implementation outcome must be selected from the remaining formal exit gaps
+above. A later project-owner-approved chief-of-staff and continuation workflow
+should select the highest-value phase-moving outcome.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).

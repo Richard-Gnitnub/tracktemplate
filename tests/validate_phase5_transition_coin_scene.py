@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Validate the unexposed Phase 5 transition Coin scene adapter."""
 
+import ast
 import hashlib
+import importlib
 import math
 import pathlib
 import subprocess
@@ -12,6 +14,10 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import modular_structure  # noqa: E402
+from tests.phase5_transition_coin_test_protocol import (  # noqa: E402
+    _FakeCoin,
+    _Group,
+)
 from tracktemplate import api  # noqa: E402
 from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
 
@@ -25,58 +31,6 @@ SOURCE_HASHES = {
         "chair_performance_and_representation.FCMacro"
     ): "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
 }
-
-
-class _Field:
-    def __init__(self):
-        self.value = None
-
-    def setValue(self, *values):
-        self.value = values[0] if len(values) == 1 else tuple(values)
-
-    def setValues(self, start, count, values):
-        assert start == 0
-        assert count == len(values)
-        self.value = tuple(tuple(value) for value in values)
-
-
-class _Group:
-    def __init__(self):
-        self.children = []
-
-    def addChild(self, child):
-        self.children.append(child)
-
-    def removeAllChildren(self):
-        self.children.clear()
-
-
-class _BaseColor:
-    def __init__(self):
-        self.rgb = _Field()
-
-
-class _DrawStyle:
-    def __init__(self):
-        self.lineWidth = _Field()
-
-
-class _Coordinate3:
-    def __init__(self):
-        self.point = _Field()
-
-
-class _LineSet:
-    def __init__(self):
-        self.numVertices = _Field()
-
-
-class _FakeCoin:
-    SoSeparator = _Group
-    SoBaseColor = _BaseColor
-    SoDrawStyle = _DrawStyle
-    SoCoordinate3 = _Coordinate3
-    SoLineSet = _LineSet
 
 
 def _sha256(path):
@@ -333,6 +287,97 @@ def _validate_rejections():
     )
 
 
+def _validate_shared_test_protocol():
+    module_name = "tests.phase5_transition_coin_test_protocol"
+    helper_path = ROOT / "tests" / "phase5_transition_coin_test_protocol.py"
+    assert helper_path.is_file(), "missing shared Coin test protocol"
+
+    protocol = importlib.import_module(module_name)
+    field = protocol._Field()
+    field.setValue(1.0)
+    assert field.getValue() == 1.0
+    field.setValue(1.0, 2.0)
+    assert field.getValue() == (1.0, 2.0)
+    field.setValues(0, 2, ((1, 2, 3), (4, 5, 6)))
+    assert field.getValue() == ((1, 2, 3), (4, 5, 6))
+
+    first = object()
+    second = object()
+    replacement = object()
+    group = protocol._Group()
+    group.addChild(first)
+    group.addChild(second)
+    assert group.findChild(first) == 0
+    assert group.findChild(object()) == -1
+    group.replaceChild(first, replacement)
+    assert group.children == [replacement, second]
+    assert group.getChild(0) is replacement
+    group.removeChild(replacement)
+    group.removeChild(0)
+    assert group.children == []
+    group.addChild(first)
+    group.removeAllChildren()
+    assert group.children == []
+
+    selection_type = protocol._FakeCoin.SoType.fromName("SoFCSelection")
+    selection_root = selection_type.createInstance()
+    assert isinstance(selection_root, protocol._Group)
+
+    consumers = {
+        "validate_phase5_transition_coin_scene.py": {
+            "_FakeCoin": None,
+            "_Group": None,
+        },
+        "validate_phase5_transition_coin_viewprovider.py": {
+            "_FakeCoin": None,
+            "_Field": None,
+            "_Group": None,
+        },
+    }
+    consumer_paths = {
+        ROOT / "tests" / filename: expected_imports
+        for filename, expected_imports in consumers.items()
+    }
+    trees = {
+        path: ast.parse(
+            path.read_text(encoding="utf-8"),
+            filename=str(path),
+        )
+        for path in (helper_path, *consumer_paths)
+    }
+    for shared_name in (
+        "_BaseColor",
+        "_Coordinate3",
+        "_DrawStyle",
+        "_FakeCoin",
+        "_Field",
+        "_Group",
+        "_LineSet",
+        "_SelectionRoot",
+        "_SelectionType",
+        "_SoType",
+    ):
+        owners = [
+            path
+            for path, tree in trees.items()
+            for node in tree.body
+            if isinstance(node, ast.ClassDef)
+            and node.name == shared_name
+        ]
+        assert owners == [helper_path], (shared_name, owners)
+
+    for path, expected_imports in consumer_paths.items():
+        tree = trees[path]
+        imported = {
+            alias.name: alias.asname
+            for node in tree.body
+            if isinstance(node, ast.ImportFrom)
+            and node.module == module_name
+            for alias in node.names
+        }
+        assert imported == expected_imports, path.name
+
+
 def _validate_structure_and_disabled_route():
     report = modular_structure.structure_report(ROOT)
     assert modular_structure.validate_report(report) == []
@@ -397,6 +442,7 @@ def _validate_controls():
     ).read_text(encoding="utf-8")
     assert "| 5 | Lightweight editing prototype and renderer decision | 0/4 evidenced | Current" in plan
     assert "## Coin scene-graph feasibility tranche" in evidence
+    assert "## Coin fake-protocol consolidation tranche" in evidence
     assert "No renderer or Phase 5 exit is accepted" in evidence
 
 
@@ -405,6 +451,7 @@ def validate():
     _validate_scene_and_selection_mapping()
     _validate_failure_and_disposal()
     _validate_rejections()
+    _validate_shared_test_protocol()
     _validate_structure_and_disabled_route()
     _validate_controls()
     print("Phase 5 transition Coin scene validation passed")
