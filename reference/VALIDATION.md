@@ -9,6 +9,25 @@ correctness, FreeCAD integration, display behaviour and production output.
 add tests and the limited circumstances in which an existing test oracle may
 change.
 
+## Document boundary
+
+This document owns durable validation layers, evidence-interpretation rules,
+stable runner profiles and entry points, and the minimum change matrix. Change
+it only when one of those owned contracts changes.
+
+A new test, completed run, benchmark result or current-phase proof does not by
+itself justify changing this document. Put executable detail in the affected
+test or runner, evidence required by the
+[Level 2 or Level 3 documentation lifecycle](ENGINEERING_POLICY.md#documentation-lifecycle)
+in [current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md), and bounded
+measurement results in a dated report under `reference/benchmarks/`. Do not use
+this document as a tranche log.
+
+The existing detailed command catalogue remains pending a separate bounded
+simplification because it contains retained validation obligations. This
+boundary controls new changes now and does not authorise further per-tranche
+additions.
+
 ## Current version roles
 
 - `AdvancedTurnout.FCMacro` is the immutable B14 legacy comparison oracle (`10.2A8A7B14`).

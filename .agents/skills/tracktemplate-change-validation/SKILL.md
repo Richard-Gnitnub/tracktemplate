@@ -55,6 +55,10 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
 - Use the verified commands and evidence definitions in
   `reference/VALIDATION.md`. Do not create a second command catalogue in this
   skill.
+- Follow the canonical
+  [document boundary](../../../reference/VALIDATION.md#document-boundary). Do
+  not edit that file merely because a test was added or run. Change it only
+  when the task changes a durable validation contract that the document owns.
 - At minimum, parse every changed Python or macro file and run the fastest
   focused test that proves the changed behaviour.
 - Run affected regression suites and the applicable FreeCAD, GUI, persistence,
