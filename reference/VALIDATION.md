@@ -515,6 +515,32 @@ capacity or numerical budget. Raw JSON and logs remain ignored. The sanitised
 result and limitations are in
 [benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md](benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md).
 
+Current Phase 5 bounded transition interaction/resource range profile:
+
+```bash
+.venv/bin/python tests/validate_phase5_transition_interaction_range_profile.py
+.venv/bin/python tools/phase5_transition_interaction_range_profile.py
+```
+
+The fast standard-library validator protects the five declared scale points,
+three-fresh-process minimum, host-independent result validation, exact object,
+layer, node, mapping, edit-isolation, Undo and cleanup invariants, and explicit
+non-acceptance boundary without importing FreeCAD or Qt. The profiler repeats
+the qualified Entry/Exit family unit at 1, 2, 4, 8 and 16 set counts, giving
+2–32 logical objects. A test-only view grid makes the repeated local-frame
+previews separately hittable without changing canonical state or product
+placement.
+
+At every scale, each of three fresh isolated qualified GUI processes performs
+one real Qt pointer selection, opens the transient parameter editor, enters one
+length through real keyboard/button input, verifies one selected-only edit and
+one Undo, then disposes every cache, proxy and document. It records cold,
+selection, dialog, edit, Undo and cleanup wall/CPU/end-minus-start-RSS fields.
+Correctness invariants are gates; values remain descriptive and do not accept a
+capacity, interaction budget, renderer or optimisation. The sanitised method,
+observations and limitations are in
+[benchmarks/2026-07-31-phase5-transition-interaction-range-profile.md](benchmarks/2026-07-31-phase5-transition-interaction-range-profile.md).
+
 Current Phase 5 representative Entry/Exit multi-object editing workload:
 
 ```bash
