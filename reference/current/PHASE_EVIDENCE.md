@@ -987,6 +987,45 @@ child and owner renderer/editing acceptance remain open. Phase 5 remains 0/4;
 PR-14 remains Open/Remove with **Partial** control, and the plan, structured
 risk and decision registers are unchanged.
 
+## Bounded transition interaction/resource range tranche
+
+This Level 2 test-and-evidence tranche repeats the already qualified
+one-secondary-track Entry/Exit family unit at 1, 2, 4, 8 and 16 set counts,
+giving 2–32 compact logical objects. A test-only Coin translation grid makes
+the repeated local-frame previews separately hittable without changing
+canonical state, product source or placement semantics. It is a scaling probe,
+not support expansion, an accepted whole-layout population or product wiring.
+
+Three fresh isolated qualified FreeCAD 1.1.1 processes passed at every scale,
+15 processes total. Each retained exact object/layer/node counts, stable
+visual-to-domain mappings, zero `Shape` properties, one real Qt pointer
+selection, the visible parameter dialog, one real keyboard/button edit, one
+selected-only cache regeneration and one Undo restoring the complete initial
+canonical digest. Selection observations across all samples were
+8.280–55.109 ms and edit observations were 63.777–119.159 ms; the 32-object
+medians were 24.283 ms and 93.425 ms respectively. Cold end-minus-start RSS
+medians were 19.938–35.668 MiB with several roughly 35 MiB observations across
+otherwise roughly 19–20 MiB results. These are descriptive observations
+without a threshold, optimisation claim or perception budget. The method, all
+per-scale results, raw hash and limits are in the
+[sanitised profile](../benchmarks/2026-07-31-phase5-transition-interaction-range-profile.md).
+
+The test-first missing module was classified `implementation-defect`; a
+synthetic Undo-field omission and raw-segment-versus-one-mapping hit-test rule
+were `fixture-or-harness-defect`; cold recompute reuse and tolerance-equivalent
+analysed lengths exposed `test-or-oracle-defect` expectations. The original
+standalone or qualified proof passed after each bounded repair. Sandboxed
+attempts that never obtained GUI bridge readiness were
+`environment-or-profile-defect` and supply no product evidence.
+
+This materially advances PR-14's decision-usable interaction/resource-range
+evidence over repeated qualified family units, but does not accept the range as
+representative product capacity. Product lifecycle/composition, the residual
+empty switch child, an agreed numerical capacity/budget and owner
+renderer/editing acceptance remain open. Phase 5 remains 0/4; PR-14 remains
+Open/Remove with **Partial** control, and the project plan, structured risk and
+decision registers are unchanged.
+
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 Phase 5 opening and renderer-evaluation authority; D-GOV-004 is the separate
 continuation-governance decision in [gate-decisions.json](gate-decisions.json).

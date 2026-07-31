@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "accepted-frozen-records",
-  "updated_on": "2026-07-29",
+  "updated_on": "2026-07-31",
   "records": [
     {"category": "phase-closeout", "path": "reference/phase-evidence/BASELINE.md", "sha256": "ebbf117a0459ad85501544a0ebf993edbe528af69c9f6fb4d358f1042c871e1b"},
     {"category": "phase-closeout", "path": "reference/phase-evidence/PHASE1_CLOSEOUT.md", "sha256": "b2be49068364853691ccf9e4e0ce611e7081b1c8b1a0a8b361a263da1da03a73"},
@@ -31,6 +31,7 @@
     {"category": "benchmark", "path": "reference/benchmarks/2026-07-21-b14-crossover-timbering-characterisation.md", "sha256": "b4b85e99aa9358c5b64dd5323a1ab3642de8da1192b085bc8658a74b6718f8aa"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-07-22-b16-transition-performance-profile.md", "sha256": "f9b82a0875d0851bfea4b18b09bd3d939ef445c94dc78a4ad7638c3f4880d7ce"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-07-22-b16-transition-routed-workflow-parity.md", "sha256": "43326843fc4bf103794e1b260159f5cf7bef6edb9d6a9a908f7be557d5bb8530"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md", "sha256": "e30d0cd0aa27a06916c81b3d0126d80209514237fcb5080181ddb4ebe6f4a509"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md", "sha256": "e30d0cd0aa27a06916c81b3d0126d80209514237fcb5080181ddb4ebe6f4a509"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-07-31-phase5-transition-interaction-range-profile.md", "sha256": "a77b7b055b899749d25f7417c085825d27c61f2692b10a8586d4e022be2aff2f"}
   ]
 }
