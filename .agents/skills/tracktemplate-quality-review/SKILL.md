@@ -64,6 +64,54 @@ Report MISSING and EXTRA findings before code-quality findings. CANNOT_VERIFY
 does not imply failure, but it must remain visible and must not be treated as
 acceptance.
 
+Apply MISSING or EXTRA where appropriate when the change includes:
+
+- Level 1 maintenance recorded as Level 2 current-phase evidence;
+- a maintenance finding promoted into immediate development work;
+- chronological evidence narration that obscures the retained result;
+- a proposed next tranche unrelated to a named current exit gap;
+- repeated validation descriptions with no decision-relevant value; or
+- unnecessary follow-up created solely by the review without an accepted
+  blocker, requirement or risk.
+
+## Finding disposition
+
+Classify every actionable finding as exactly one of:
+
+- `BLOCKER` — the present change cannot be retained against an accepted
+  requirement, safety boundary or required proof;
+- `REQUIRED_BEFORE_EXIT` — the finding is demonstrably tied to an accepted
+  phase exit, requirement or live risk but does not block this bounded change;
+- `BACKLOG` — valid maintenance or improvement that is not needed for the
+  present change or named exit; or
+- `OPTIONAL` — a preference or possible improvement with no demonstrated
+  requirement.
+
+Recommend immediate remediation for a `BLOCKER`. Keep a
+`REQUIRED_BEFORE_EXIT` finding visible for its named exit, requirement or risk;
+outside an active `$tracktemplate-continue` cycle, repair it in the current
+cycle only when it directly prevents the selected outcome or proof. During an
+active continuation cycle, only a `BLOCKER` may return to implementation;
+`REQUIRED_BEFORE_EXIT`, `BACKLOG` and `OPTIONAL` findings do not join that
+cycle. Do not turn non-blocking findings into the next implementation tranche.
+
+## Progress assessment
+
+Report the actual task level from the change's behaviour or authority, not the
+author's label. Classify its progress impact as exactly one of:
+`exit-closing`, `necessary-enabling`, `neutral` or `regressive`.
+
+State whether any current-phase evidence entry is proportionate and appropriate
+under the actual task level. Name the phase exit, accepted requirement or live
+risk actually advanced, or state `none`. Flag when a maintenance finding or
+Level 1 change is being promoted incorrectly into phase work.
+
+The quality reviewer does not choose the project's next objective. Findings and
+the progress assessment are read-only inputs to
+[`$tracktemplate-chief-of-staff`](../tracktemplate-chief-of-staff/SKILL.md)
+when the owner requests prioritisation or an active `$tracktemplate-continue`
+cycle detects its loop conditions.
+
 ## Optional operator-morale roast
 
 When the user explicitly requests a roast:
@@ -111,19 +159,24 @@ Assess the relevant change for:
 Report:
 
 1. **Decision:** pass, pass with findings, or blocked.
-2. **Specification findings:** MISSING, EXTRA and CANNOT_VERIFY findings.
-3. **Confirmed defects:** ordered by impact, with exact paths or symbols and the
+2. **Progress assessment:** actual task level, progress impact, phase-evidence
+   proportionality and any maintenance incorrectly promoted into phase work.
+3. **Specification findings:** MISSING, EXTRA and CANNOT_VERIFY findings.
+4. **Finding disposition:** every actionable finding labelled `BLOCKER`,
+   `REQUIRED_BEFORE_EXIT`, `BACKLOG` or `OPTIONAL`.
+5. **Confirmed defects:** ordered by impact, with exact paths or symbols and the
    evidence supporting each finding.
-4. **Unnecessary complexity:** only where its lack of purpose has been established.
-5. **Behavioural risks:** including the affected architectural and railway boundaries.
-6. **Checks completed:** commands, inspections and evidence actually reviewed.
-7. **Checks still required:** especially real-GUI FreeCAD, export, performance, provenance, licensing or compatibility evidence that was not available.
-8. **Failed-test integrity:** classification, repair boundary, original proof
+6. **Unnecessary complexity:** only where its lack of purpose has been established.
+7. **Behavioural risks:** including the affected architectural and railway boundaries.
+8. **Checks completed:** commands, inspections and evidence actually reviewed.
+9. **Checks still required:** especially real-GUI FreeCAD, export, performance,
+   provenance, licensing or compatibility evidence that was not available.
+10. **Failed-test integrity:** classification, repair boundary, original proof
    rerun and any test/oracle authority used.
-9. **Reviewer independence:** fresh reviewer/session or disclosed same-agent
+11. **Reviewer independence:** fresh reviewer/session or disclosed same-agent
    review.
-10. **Scope:** whether unrelated files and behaviour remained unchanged.
-11. **Morale roast:** only when explicitly requested, after the factual review.
+12. **Scope:** whether unrelated files and behaviour remained unchanged.
+13. **Morale roast:** only when explicitly requested, after the factual review.
 
 Omit failed-test integrity when no failed test or repair is in scope. Do not
 present preferences as defects, and do not imply that an unperformed check

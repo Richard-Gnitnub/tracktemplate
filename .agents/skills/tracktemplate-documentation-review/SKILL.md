@@ -59,6 +59,32 @@ Read only the documents relevant to the present change:
 - Report material proposed for removal when deletion could change historical,
   legal, safety, licensing or evidential meaning.
 
+## Decision-relevant current phase evidence
+
+When reviewing `reference/current/PHASE_EVIDENCE.md`, keep the record useful for
+an exit or owner decision rather than turning it into a laboratory diary. A
+Level 2 entry should normally state:
+
+- scope and retained result;
+- decisive evidence;
+- phase or risk contribution;
+- material limitation;
+- authority unchanged or the decision still required; and
+- a link to detailed logs or benchmark reports where applicable.
+
+Do not reproduce:
+
+- every failed development attempt;
+- repeated command catalogues;
+- repeated full validator totals when one concise pipeline result is enough;
+- unchanged exclusions already owned by the phase opening; or
+- Level 1 maintenance history.
+
+Preserve a failed-test classification in the phase record only when it
+materially changes confidence, auditability or the decision. Retain detailed
+raw history in logs and pull-request evidence. A Level 1 maintenance task must
+not nominate itself as the next phase-development tranche.
+
 ## Output
 
 Report:

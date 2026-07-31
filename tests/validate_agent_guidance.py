@@ -29,6 +29,10 @@ ALLOWED_SKILL_ENTRIES = {
 }
 MAX_SKILL_LINES = 500
 RESOURCE_DIRECTORY_NAMES = ("assets", "references", "scripts")
+PROGRESSION_SKILL_NAMES = {
+    "tracktemplate-chief-of-staff",
+    "tracktemplate-technical-lead",
+}
 
 
 def require(condition: bool, message: str) -> None:
@@ -183,6 +187,192 @@ def validate_skill_resource_routing(
     )
 
 
+def validate_progress_skill_metadata(directory: Path, name: str) -> None:
+    """Require the two new skills to expose valid generated UI metadata."""
+    if name not in PROGRESSION_SKILL_NAMES:
+        return
+
+    metadata_path = directory / "agents" / "openai.yaml"
+    metadata = read(metadata_path)
+    values: dict[str, str] = {}
+    for key in ("display_name", "short_description", "default_prompt"):
+        match = re.search(
+            rf'^  {key}: "([^"\n]+)"$',
+            metadata,
+            re.MULTILINE,
+        )
+        require(match is not None, f"{metadata_path.relative_to(ROOT)} lacks {key}")
+        values[key] = match.group(1)
+
+    require(
+        25 <= len(values["short_description"]) <= 64,
+        f"{metadata_path.relative_to(ROOT)} short_description is not 25-64 chars",
+    )
+    require(
+        f"${name}" in values["default_prompt"],
+        f"{metadata_path.relative_to(ROOT)} default_prompt lacks ${name}",
+    )
+
+
+def validate_progress_delivery_structure() -> None:
+    """Protect the new role separation without duplicating skill prose."""
+    skill_root = ROOT / ".agents" / "skills"
+    expected_headings = {
+        "tracktemplate-chief-of-staff": {
+            "Read-only authority boundary",
+            "Reconstruct current progress",
+            "Classify recent tranches",
+            "Next-outcome brief",
+        },
+        "tracktemplate-technical-lead": {
+            "Confirm authority",
+            "Inspect the delivery boundary",
+            "Compose existing specialists",
+            "Boundaries",
+        },
+        "tracktemplate-continue": {
+            "Reconstruct repository authority",
+            "Select one outcome or stop",
+            "Validate and review",
+            "Owner acceptance pack",
+        },
+    }
+    expected_links = {
+        "tracktemplate-chief-of-staff": {"tracktemplate-continue"},
+        "tracktemplate-technical-lead": {
+            "tracktemplate-api-design",
+            "tracktemplate-architecture-review",
+            "tracktemplate-change-validation",
+            "tracktemplate-continue",
+            "tracktemplate-publish",
+            "tracktemplate-quality-review",
+        },
+        "tracktemplate-continue": {
+            "tracktemplate-change-validation",
+            "tracktemplate-chief-of-staff",
+            "tracktemplate-publish",
+            "tracktemplate-quality-review",
+            "tracktemplate-technical-lead",
+        },
+    }
+
+    for name, required_headings in expected_headings.items():
+        skill_file = skill_root / name / "SKILL.md"
+        text = read(skill_file)
+        headings = set(re.findall(r"^## (.+)$", text, re.MULTILINE))
+        require(
+            required_headings <= headings,
+            f"{name} lacks required sections: {sorted(required_headings - headings)}",
+        )
+        targets = direct_markdown_targets(skill_file, text)
+        linked_skills = {
+            target.parent.name
+            for target in targets
+            if target.name == "SKILL.md" and target.parent.parent == skill_root
+        }
+        require(
+            expected_links[name] <= linked_skills,
+            f"{name} lacks composition links: "
+            f"{sorted(expected_links[name] - linked_skills)}",
+        )
+
+    require(
+        not (skill_root / "tracktemplate-deliver-outcome").exists(),
+        "continuation must not be duplicated by tracktemplate-deliver-outcome",
+    )
+
+
+def validate_continue_invocation_policy(workflows: str) -> None:
+    """Protect the accepted explicit trigger and blocker-only repair boundary."""
+    skill_file = SKILLS_ROOT / "tracktemplate-continue" / "SKILL.md"
+    skill_text = read(skill_file)
+    description = parse_frontmatter(skill_file, skill_text)["description"]
+    metadata_path = skill_file.parent / "agents" / "openai.yaml"
+    metadata = read(metadata_path)
+    publish_root = SKILLS_ROOT / "tracktemplate-publish"
+    publish_text = read(publish_root / "SKILL.md")
+    publish_metadata = read(publish_root / "agents" / "openai.yaml")
+    quality_text = read(SKILLS_ROOT / "tracktemplate-quality-review" / "SKILL.md")
+    normalized_skill_text = " ".join(skill_text.split())
+    normalized_workflows = " ".join(workflows.split())
+    normalized_publish_text = " ".join(publish_text.split())
+    normalized_quality_text = " ".join(quality_text.split())
+
+    require(
+        "Use only when the project owner explicitly invokes the literal "
+        "`$tracktemplate-continue` command; natural-language equivalents do not "
+        "activate it."
+        in description,
+        "tracktemplate-continue description lost its literal-only trigger",
+    )
+    require(
+        re.search(
+            r"^  allow_implicit_invocation: false$",
+            metadata,
+            re.MULTILINE,
+        )
+        is not None,
+        "tracktemplate-continue must remain unavailable to implicit routing",
+    )
+    require(
+        re.search(
+            r"^  allow_implicit_invocation: false$",
+            publish_metadata,
+            re.MULTILINE,
+        )
+        is not None,
+        "tracktemplate-publish must remain unavailable to implicit routing",
+    )
+    require(
+        "Only a project-owner command containing the literal "
+        "`$tracktemplate-continue` invocation activates it."
+        in normalized_workflows,
+        "AGENT_WORKFLOWS lost the explicit continuation boundary",
+    )
+    require(
+        "description and its metadata permits implicit invocation. The handoff "
+        "and continue skills require their literal project-owner invocations; "
+        "publish requires either its literal invocation or delegation from an "
+        "active literal `$tracktemplate-continue` cycle."
+        in normalized_workflows
+        and "Does not activate TrackTemplate publish; request the literal "
+        "`$tracktemplate-publish` invocation"
+        in normalized_workflows,
+        "AGENT_WORKFLOWS lost an explicit-only project-skill boundary",
+    )
+    require(
+        "Do not repair `REQUIRED_BEFORE_EXIT`, `BACKLOG` or `OPTIONAL` findings "
+        "in this cycle."
+        in normalized_skill_text,
+        "tracktemplate-continue no longer limits repair to blockers",
+    )
+    require(
+        "no more than two total repair-and-review passes"
+        in normalized_skill_text
+        and "another separate read-only staff review of the complete repaired "
+        "source before publication"
+        in normalized_skill_text,
+        "tracktemplate-continue lost its shared repair or final-review limit",
+    )
+    require(
+        "It does not delegate this skill's repair authority."
+        in normalized_publish_text
+        and "without changing source or Git state" in normalized_publish_text,
+        "delegated publication can mutate final-reviewed source",
+    )
+    require(
+        "During an active continuation cycle, only a `BLOCKER` may return to "
+        "implementation; `REQUIRED_BEFORE_EXIT`, `BACKLOG` and `OPTIONAL` "
+        "findings do not join that cycle."
+        in normalized_quality_text
+        and "During an active continuation cycle, only a `BLOCKER` may return "
+        "to implementation; `REQUIRED_BEFORE_EXIT`, `BACKLOG` and `OPTIONAL` "
+        "items do not join that cycle."
+        in normalized_workflows,
+        "non-blocking review findings can enter a continuation repair pass",
+    )
+
+
 def validate_links(documents: list[Path]) -> None:
     broken: list[str] = []
     for document in documents:
@@ -242,12 +432,15 @@ def main() -> None:
             ),
         )
         validate_skill_resource_routing(directory, text)
+        validate_progress_skill_metadata(directory, name)
         names.append(name)
         markdown_documents.extend(sorted(directory.rglob("*.md")))
 
     require(len(names) == len(set(names)), "duplicate skill names")
 
     workflows = read(WORKFLOWS)
+    validate_progress_delivery_structure()
+    validate_continue_invocation_policy(workflows)
     registered_headings = REGISTER_HEADING_RE.findall(workflows)
     registered_paths = REGISTER_PATH_RE.findall(workflows)
     path_names = [name for _, name in registered_paths]

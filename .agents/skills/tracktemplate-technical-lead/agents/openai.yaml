@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Technical Lead"
+  short_description: "Shape one coherent cross-specialist delivery slice"
+  default_prompt: "Use $tracktemplate-technical-lead to shape and deliver one selected Level 1 or Level 2 outcome."

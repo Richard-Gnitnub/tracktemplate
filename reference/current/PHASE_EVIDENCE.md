@@ -823,14 +823,128 @@ product source, renderer disposition, exit condition, risk treatment or owner
 acceptance changes. Phase 5 remains 0/4 and PR-14 remains Open/Remove with
 **Partial** control.
 
+<a id="repository-driven-continuation-authority-panel"></a>
+
+## Repository-driven continuation authority panel and owner decision
+
+**Decision and source state:** This Level 3 governance decision starts from
+branch `agent/automate-tracktemplate-continue` at
+`5fa9da017a60ac1dee5a70d4c8ebb8fb97fc9052`; local `main` and `origin/main`
+were at the same commit. The prospective panel reviewed the complete initial
+working-tree proposal: seven modified guidance/test files and four new chief-
+of-staff and technical-lead skill/metadata files. No product, FreeCAD,
+railway, persistence, export or current-status file was changed in that source
+state. A strictly read-only staff review classified repository-driven outcome
+selection as Level 3 and blocked the alternate natural-language trigger.
+
+**Participants, evidence and independence:** Richard is project owner,
+decision chair and accepting authority. Codex is change owner and presenter. A
+fresh independent QA/risk reviewer challenged the proposal and made no
+implementation, repository or external-state change. The reviewer was given
+the intended decision and prior blockers, but checked them against the raw
+diff rather than treating them as accepted. The panel reviewed repository
+`AGENTS.md`, the [engineering policy](../ENGINEERING_POLICY.md),
+[dashboard](../PROJECT_PLAN.md), [live risks](risks.json), existing
+[decisions](gate-decisions.json), [recovery policy](../RECOVERY_AND_BACKUP.md),
+[agent workflow catalogue](../AGENT_WORKFLOWS.md), the continue, publish,
+chief-of-staff, technical-lead, validation and quality-review skill contracts,
+and the agent-guidance and project-progress validators. Focused agent-guidance,
+project-progress, QA/link and whitespace checks passed against the prospective
+source; complete final-source standalone validation and a fresh read-only
+staff review remained conditions of retention.
+
+**Risk disposition:** No risk state, treatment or control-effectiveness value
+changes:
+
+| Risk | Panel disposition |
+| --- | --- |
+| PR-12 — governance duplication/staleness | Remains Open/Mitigate/**Partial**. The skill surface grows from 25 to 27, but fixed owners, direct routing, structural validation and one canonical decision record bound the added surface. |
+| PR-13 — destructive command/history/data exposure | Remains Open/Mitigate/**Effective (current scope)** while every cycle retains clean-tree ownership, exact-head CI, normal protected merge, idempotent recovery and all destructive-operation exclusions. The Critical severity required the independent challenger. |
+| PR-20 — scope expansion | Remains Open/Mitigate/**Effective (current scope)** with one outcome, exact candidate classification, named contribution, maintenance non-promotion, a clean stop and a Level 3 stop. |
+| PR-22 — unchallenged authority transfer | Remains Open/Remove/**Effective (current scope)** because this panel and the linked owner decision precede activation and delegate no later Level 3 decision. |
+| PR-14, PR-15, PR-16, PR-17, QA-R03 and QA-R04 | Remain unchanged. Their product, GUI, performance, signature, persistence and recovery evidence applies only if a later authorised outcome reaches the affected boundary. |
+
+**Recommendation, conditions and unknowns:** The independent recommendation is
+**Proceed with bounded conditions**:
+
+| Accountable owner | Deadline or trigger | Condition |
+| --- | --- | --- |
+| Project owner | Before authority transfer | Accept the exact explicit-only decision and all exclusions. |
+| Agent-guidance owner | Before retention | Remove every alternate natural-language activation route, retain `allow_implicit_invocation: false` and protect the literal invocation contract with a focused check. |
+| Agent-guidance owner | Before final validation | Allow only `BLOCKER` findings to return to implementation, with at most two repair-and-review passes; never repair other finding classes in that cycle. |
+| Continuation agent | Before branch creation in every invocation | Reconstruct canonical authority, classify credible candidates, select at most one already-authorised Level 1/2 outcome or stop, and treat no next-tranche sentence, review finding or source shape as authority. |
+| Continuation and publication agents | Before every Git or external mutation | Preserve clean-tree, exact-head, protected-base, review, conflict, recovery, no-bypass, no-destructive-operation and newly-published-draft non-merge boundaries. |
+| Validation and review owners | Before retention or publication | Validate the final records, guidance, metadata, resources and complete standalone profile; exercise positive, negative and composition routing; then obtain a fresh independent read-only staff review. |
+
+There was no dissent. Future outcome selection and its applicable FreeCAD/GUI
+proof depend on repository state when the literal command is invoked. GitHub
+mergeability, credentials and exact-head CI also remain live per-invocation
+facts. This workflow adds no scheduler, watcher, recursive governance loop or
+runtime dependency.
+
+**Final routing evidence:** A fresh read-only evaluator exercised nine natural
+activation and composition cases against the final guidance without invoking a
+workflow, inspecting live pull-request state or making a repository or external
+change:
+
+| Probe | Result |
+| --- | --- |
+| Literal `$tracktemplate-continue` | Continue activates; protected `main` synchronisation, conditional chief/technical-lead composition, blocker-only review, shared two-pass repair and review-frozen publication remain in the execution path. |
+| Natural-language merge-and-continue request | Continue does not activate; the literal command is required and no generic workflow may substitute. |
+| Stuck/maintenance-heavy progress diagnosis | Chief of staff activates alone, read-only, and produces one transient brief or clean stop. |
+| Already-authorised cross-specialist Level 2 outcome | Technical lead activates, composes applicable specialists and stops before Level 3 or an unresolved product choice. |
+| `Next bounded tranche` cited as implementation authority | The sentence supplies no authority and does not activate a progression role by itself. |
+| Read-only traceback diagnosis and pull-request review | Debugging and quality review route independently without continuation, delivery or publication authority. |
+| Literal and natural-language publication requests | Literal `$tracktemplate-publish` activates direct publish; the natural-language variant activates no TrackTemplate or generic substitute. |
+
+Earlier read-only probes exposed the natural-publication example, its generic
+implicit-routing sentence and a composed non-blocker repair path. Those
+`implementation-defect` findings were corrected before the final probe. The
+final evaluator reported **PASS** with no remaining routing or execution-path
+defect.
+
+**Governance-budget exception:** This task deliberately changes governance
+authority, so its skills, routing, panel, decision register, dashboard summary
+and fail-closed checks necessarily exceed its zero product lines. The change
+does not alter the engineering policy, frozen history or live risk register.
+
+**Owner decision and resulting authority:** On 2026-07-31 Richard stated, “I
+accept this exact Level 3 decision and authorise its implementation within the
+stated boundaries and exclusions.” D-GOV-004 therefore authorises a cycle only
+when the project owner invokes the literal `$tracktemplate-continue` command;
+acceptance, discussion, quotation, description or a natural-language
+equivalent does not invoke it. Each invocation may integrate one previous
+exact-green authorised Level 1/2 pull request, synchronise protected `main`,
+reconstruct canonical authority, classify credible candidates as
+`exit-closing`, `necessary-enabling`, `maintenance` or
+`governance-or-tooling`, and deliver one highest-value worthwhile outcome
+already authorised at Level 1 or Level 2 or stop cleanly. It may compose the
+read-only, transient chief of staff and the Level 1/2-only technical lead,
+validate, obtain separate read-only staff review, repair only `BLOCKER`
+findings through at most two shared passes, and repeat affected final validation
+and a new separate read-only staff review after every repair. Publication is
+review-frozen to the exact final-reviewed source; it has no independent repair
+authority. The cycle may then publish one exact-green draft and provide the
+plain-English acceptance pack.
+
+D-GOV-004 does not make a `Next bounded tranche` sentence, review finding,
+branch, test or source shape authoritative; does not promote maintenance,
+governance/tooling or non-blocking findings automatically; and does not
+authorise a Level 3 decision, renderer or phase acceptance, migration support,
+production output or chair clearance, release or tagging, protection bypass,
+force push, history rewrite, destructive reset/restore, `git clean`, branch
+deletion, another destructive operation, unresolved product choice, or marking
+ready or merging the newly published draft in the same invocation.
+
 ## Current outcome selection
 
 The completed fake Coin field, group and node protocol consolidation above
 retired its named test-maintenance finding. Completion neither closes a named
-Phase 5 exit nor grants automatic implementation authority. The next
-implementation outcome must be selected from the remaining formal exit gaps
-above. A later project-owner-approved chief-of-staff and continuation workflow
-should select the highest-value phase-moving outcome.
+Phase 5 exit nor selects the next implementation outcome. D-GOV-004 permits a
+future literal `$tracktemplate-continue` invocation to reconstruct current
+authority and select one worthwhile authorised Level 1/2 outcome; the decision
+itself does not invoke that cycle or create a task.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
-only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).
+Phase 5 opening and renderer-evaluation authority; D-GOV-004 is the separate
+continuation-governance decision in [gate-decisions.json](gate-decisions.json).
