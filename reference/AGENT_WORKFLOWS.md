@@ -250,16 +250,46 @@ draft-PR and bounded CI-repair authority for the current scope only. It never
 authorises merge, ready-for-review conversion, tagging, release, destructive
 history operations, gate acceptance or scope expansion.
 
+### `tracktemplate-chief-of-staff`
+
+Path: `.agents/skills/tracktemplate-chief-of-staff/SKILL.md`
+
+Use it when the owner says progress appears stuck, circular,
+maintenance/evidence-heavy or unclear, and compose it from
+`$tracktemplate-continue` when that workflow detects its defined loop
+conditions. It classifies recent work against named exits and risks and
+produces exactly one transient, advisory next-outcome brief. It is read-only,
+is not required for every routine change and cannot accept project authority.
+
+### `tracktemplate-technical-lead`
+
+Path: `.agents/skills/tracktemplate-technical-lead/SKILL.md`
+
+Use it when the owner selects an accepted repository outcome or an explicit
+`$tracktemplate-continue` cycle selects an authorised Level 1 or Level 2
+outcome that needs a cross-specialist implementation route. It defines one
+smallest end-to-end vertical slice and composes the existing specialist skills
+through validation and separate read-only quality review. It does not own
+general prioritisation, independent review, debugging, publication mechanics
+or Level 3 acceptance, and its composition does not replace any specialist.
+
 ### `tracktemplate-continue`
 
 Path: `.agents/skills/tracktemplate-continue/SKILL.md`
 
-Invoke `$tracktemplate-continue` explicitly to integrate one previous green
-Level 1 or Level 2 pull request, synchronise protected `main`, implement one
-next bounded tranche and publish one new green draft pull request. The
-invocation removes routine Git prompts while retaining fail-closed stops for
-CI, reviews, conflicts, Level 3 authority and scope drift. It never merges the
-newly published draft in the same cycle.
+Invoke `$tracktemplate-continue` explicitly for one complete repository-driven
+Level 1 or Level 2 cycle. It integrates one previous exact-green pull request,
+synchronises protected `main`, reconstructs current authority, selects the
+highest-value authorised outcome, composes delivery/validation/review and
+publishes one new exact-green draft. It may stop after integration when no
+worthwhile phase-moving task exists, and never manufactures a tranche or merges
+the newly published draft in the same cycle.
+
+Only a project-owner command containing the literal `$tracktemplate-continue`
+invocation activates it. Natural-language equivalents, quotations and
+descriptions do not supply its authority; its metadata therefore retains
+`allow_implicit_invocation: false`. The accepted standing boundary is recorded
+by [D-GOV-004](current/PHASE_EVIDENCE.md#repository-driven-continuation-authority-panel).
 
 ### `tracktemplate-performance-engineering`
 
@@ -382,7 +412,7 @@ optional visual mode creates only sanitised, self-contained temporary HTML and
 does not execute production code or become validation evidence. Explanation
 does not replace validation, quality review or project-owner acceptance.
 
-All twenty-five skills are deliberately instruction-only. They do not perform
+All twenty-seven skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
@@ -458,6 +488,22 @@ $tracktemplate-task-automation
 ```
 
 ```text
+$tracktemplate-publish
+```
+
+```text
+$tracktemplate-chief-of-staff
+```
+
+```text
+$tracktemplate-technical-lead
+```
+
+```text
+$tracktemplate-continue
+```
+
+```text
 $tracktemplate-performance-engineering
 ```
 
@@ -494,7 +540,36 @@ $tracktemplate-explain-change
 ```
 
 Codex may also select a skill implicitly when the request clearly matches its
-description.
+description and its metadata permits implicit invocation. The handoff and
+continue skills require their literal project-owner invocations; publish
+requires either its literal invocation or delegation from an active literal
+`$tracktemplate-continue` cycle. Do not substitute a generic workflow for an
+explicit-only project skill.
+
+Chief of staff activates for an unambiguous direct request to diagnose progress
+or when an active `$tracktemplate-continue` cycle detects its loop conditions;
+an incidental maintenance or review finding alone does not activate it. It is
+not required for every routine change. Technical lead activates for a selected,
+authorised Level 1 or Level 2 outcome that needs cross-specialist integration;
+it composes rather than replaces specialist skills.
+
+Natural routing examples preserve these boundaries:
+
+| Request | Route |
+| --- | --- |
+| “I think Phase 5 is looping. Review recent progress and identify the single highest-value next outcome.” | Chief of staff: read-only progress diagnosis and one transient brief. |
+| “Take the selected current-phase outcome and drive the smallest technically coherent vertical slice.” | Technical lead plus the applicable specialist skills. |
+| `$tracktemplate-continue` | Continue owns one repository-driven integration, delivery, validation, review and draft-publication cycle. |
+| “Merge the last green pull request and continue with whatever is next.” | Does not activate continue; request the literal `$tracktemplate-continue` invocation before using its one-cycle authority. |
+| “Diagnose this traceback.” | Debugging only unless later evidence authorises a fix; neither new role activates. |
+| “Review this pull request without modifying it.” | Read-only quality review; technical lead does not activate. |
+| `$tracktemplate-publish` | Publish owns the bounded validation, branch, commit, draft and exact-head CI workflow. |
+| “Publish this already validated branch.” | Does not activate TrackTemplate publish; request the literal `$tracktemplate-publish` invocation and do not substitute another publication workflow. |
+
+Current phase evidence is not an automatic task queue, and a staff-review
+finding does not automatically become the next tranche. No skill can accept
+Level 3 authority for the project owner. There is deliberately no separate
+`tracktemplate-deliver-outcome` skill; continue composes the existing roles.
 
 Classify the task under
 [ENGINEERING_POLICY.md](ENGINEERING_POLICY.md) before selecting workflows.
@@ -559,6 +634,23 @@ $tracktemplate-change-validation
 $tracktemplate-quality-review
 ```
 
+For a direct progress-diagnosis request outside a continuation cycle:
+
+```text
+repository authority and latest relevant staff review
+    ↓
+$tracktemplate-chief-of-staff
+    ↓
+one transient next-outcome brief
+    ↓
+project owner accepts, adjusts or stops before any later delivery request
+```
+
+A staff-review `BACKLOG` or `OPTIONAL` finding does not automatically become
+the next tranche. Chief-of-staff advice changes no project authority. If the
+selected outcome is Level 3, stop technical delivery and use its owning
+evidence-review, panel and project-owner decision workflow.
+
 For an API or schema change:
 
 ```text
@@ -621,17 +713,39 @@ $tracktemplate-change-validation
 $tracktemplate-quality-review
 ```
 
-For one clean-main development cycle:
+For one complete repository-driven development cycle:
 
 ```text
+repository authority
+    ↓
 $tracktemplate-continue
     ↓
-verify and integrate one previous green Level 1/2 pull request
+verify and integrate one previous exact-green Level 1/2 pull request,
+then synchronise protected main
     ↓
-applicable implementation and validation skills
+conditional $tracktemplate-chief-of-staff when loop conditions are met
     ↓
-$tracktemplate-publish for one new green draft pull request
+$tracktemplate-technical-lead when cross-specialist integration is needed
+    ↓
+applicable specialist skills
+    ↓
+$tracktemplate-change-validation
+    ↓
+separate read-only $tracktemplate-quality-review
+    ↓
+bounded blocker repair only, at most two passes
+    ↓
+$tracktemplate-publish in review-frozen mode
+    ↓
+plain-English owner acceptance pack
 ```
+
+A clear routine outcome may skip chief of staff, and a trivial isolated edit may
+skip technical lead. When no worthwhile authorised phase-moving outcome exists,
+continue stops on clean protected `main` before branch creation. A newly
+published draft is never marked ready or merged in the same invocation.
+Delegated publication may not mutate the reviewed source; an exact-head CI
+blocker returns to the same two-pass validation-and-review loop.
 
 For measured performance work:
 
@@ -748,6 +862,17 @@ another independence limitation. After an adverse verdict, separate authorised
 remediation from that pass, rerun affected validation and review the resulting
 complete diff again.
 
+Disposition each actionable staff-review finding as `BLOCKER`,
+`REQUIRED_BEFORE_EXIT`, `BACKLOG` or `OPTIONAL`. Only a `BLOCKER` returns
+automatically to technical delivery. Outside an active
+`$tracktemplate-continue` cycle, a `REQUIRED_BEFORE_EXIT` item may join the same
+cycle only when it directly prevents the selected outcome or proof. During an
+active continuation cycle, only a `BLOCKER` may return to implementation;
+`REQUIRED_BEFORE_EXIT`, `BACKLOG` and `OPTIONAL` items do not join that cycle.
+When progress is unclear or an active continuation cycle detects a loop, pass
+the review as read-only chief-of-staff input rather than allowing the reviewer
+to choose the next objective.
+
 For a failed test:
 
 ```text
@@ -843,7 +968,9 @@ run:
 The validator checks skill frontmatter, directory/name agreement, the
 below-500-line `SKILL.md` budget, direct routing for every reference, script and
 asset file, one-level reference layout, local links, the skill register and root
-routing. It does not judge whether a skill's instructions are substantively
+routing. Its progression-role checks are limited to required UI metadata,
+section structure and direct composition links; they do not duplicate the skill
+prose. The validator does not judge whether instructions are substantively
 correct, route correctly under a model or prove project validation.
 
 ## Skill maintenance rules

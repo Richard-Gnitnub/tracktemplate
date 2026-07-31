@@ -12,10 +12,8 @@ repeated commit/push/PR approvals or hidden authority expansion.
 
 ## Invocation authority
 
-Explicit `$tracktemplate-publish` invocation, or the publication stage
-delegated by an explicit
-[`$tracktemplate-continue`](../tracktemplate-continue/SKILL.md) invocation,
-authorises all of the following for the current bounded change:
+Explicit `$tracktemplate-publish` invocation authorises all of the following
+for the current bounded change:
 
 - inspect and validate the intended working-tree scope;
 - create an `agent/<description>` branch when starting on the default branch;
@@ -24,6 +22,16 @@ authorises all of the following for the current bounded change:
 - monitor required CI for the exact pushed commit; and
 - classify, repair, revalidate, commit and push failures whose fixes remain
   inside the same accepted scope.
+
+The publication stage delegated by an explicit
+[`$tracktemplate-continue`](../tracktemplate-continue/SKILL.md) invocation is
+narrower. It is review-frozen: it authorises the branch, commit, push, draft and
+exact-head monitoring actions above only for the exact source state already
+covered by that cycle's final validation and separate read-only staff review.
+It does not delegate this skill's repair authority. Return a failed required CI
+check to the continuation workflow without editing, committing or pushing a
+repair; that workflow owns its shared pass limit, revalidation and renewed
+staff review.
 
 The invocation does not authorise merging, marking a draft ready, tagging,
 releasing, force pushing, rewriting history, deleting branches, weakening
@@ -45,6 +53,9 @@ boundaries.
 5. Use `$tracktemplate-change-validation` and
    `$tracktemplate-quality-review` when their evidence has not already been
    completed for the exact source state.
+6. For review-frozen delegation, record the reviewed path set and content state
+   supplied by `$tracktemplate-continue`; stop if the current or staged source
+   differs from it.
 
 ## Publication workflow
 
@@ -57,7 +68,8 @@ boundaries.
    coherent commits when that improves review. Stage explicit paths; do not
    use broad staging when the tree contains unrelated changes.
 4. Review the staged diff and run the proportionate checks against the staged
-   source state. Commit with concise outcome-led messages.
+   source state. In review-frozen mode, verify that it exactly matches the
+   recorded final-reviewed source. Commit with concise outcome-led messages.
 5. Push with upstream tracking. Never force push.
 6. Reuse an existing pull request for the same head branch or create one draft
    pull request targeting the resolved default branch. Its body must state:
@@ -65,12 +77,18 @@ boundaries.
    still outstanding and risk or authority changes.
 7. Inspect required checks for the exact commit SHA. A local pass does not
    substitute for GitHub Actions.
-8. On failure, preserve the failing run, job, step and first relevant output;
-   classify it under `reference/TESTING_POLICY.md`; reproduce it locally when
-   possible; repair only the classified boundary; rerun the original proof and
-   affected profile; review the diff; commit and push the bounded repair.
-9. Repeat monitoring until required checks pass or a genuine authority,
-   environment or external-service blocker remains.
+8. On failure, preserve the failing run, job, step and first relevant output.
+   In review-frozen mode, stop and return that evidence to
+   `$tracktemplate-continue` without changing source or Git state. For a direct
+   explicit publish invocation, classify it under `reference/TESTING_POLICY.md`,
+   reproduce it locally when possible, repair only the classified boundary,
+   rerun the original proof and affected profile, review the diff, commit and
+   push the bounded repair.
+9. For a direct explicit invocation, repeat monitoring until required checks
+   pass or a genuine authority, environment or external-service blocker
+   remains. For review-frozen delegation, resume only with a new exact source
+   state that the continuation workflow has revalidated and sent through
+   another separate read-only staff review within its shared pass limit.
 10. Stop with a green draft pull request. Merging requires a separate explicit
     project-owner instruction.
 

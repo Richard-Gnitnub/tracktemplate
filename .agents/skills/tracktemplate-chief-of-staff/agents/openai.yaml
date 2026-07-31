@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Chief of Staff"
+  short_description: "Diagnose progress loops and prioritise one outcome"
+  default_prompt: "Use $tracktemplate-chief-of-staff to diagnose current progress and recommend one highest-value next outcome."

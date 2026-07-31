@@ -75,7 +75,38 @@ EXPECTED_PHASE4_DECISION_IDS = {
     "D-P4-008",
     "D-P4-009",
 }
-EXPECTED_CURRENT_DECISION_IDS = {"D-P5-001"}
+EXPECTED_CURRENT_DECISION_IDS = {"D-P5-001", "D-GOV-004"}
+EXPECTED_CONTINUATION_DECISION = (
+    "Authorise explicit repository-driven continuation cycles."
+)
+EXPECTED_CONTINUATION_AUTHORITY = (
+    "Only an explicit project-owner invocation containing the literal "
+    "`$tracktemplate-continue` command starts one cycle. That cycle may "
+    "integrate one previous exact-green authorised Level 1 or Level 2 pull "
+    "request, synchronise protected main in every path, reconstruct canonical "
+    "repository authority, classify candidates, select and deliver one "
+    "highest-value worthwhile authorised Level 1 or Level 2 outcome or stop "
+    "cleanly, use the bounded chief-of-staff and technical-lead workflows where "
+    "applicable, validate and obtain separate read-only staff review, repair "
+    "BLOCKER findings only through at most two shared repair-and-review passes "
+    "with affected final validation and a new separate read-only review after "
+    "every repair, delegate only review-frozen publication of the exact "
+    "final-reviewed source, and publish one exact-green draft pull request "
+    "before stopping with a plain-English owner acceptance pack."
+)
+EXPECTED_CONTINUATION_EXCLUSIONS = (
+    "Natural-language equivalents do not invoke it. A next-tranche sentence, "
+    "review finding, branch name, test expectation or source shape is not "
+    "authority; maintenance, governance/tooling and non-blocking review "
+    "findings cannot nominate themselves as the next tranche. Delegated "
+    "publication has no independent source-edit or CI-repair authority. No "
+    "Level 3 decision, renderer or phase acceptance, migration support, "
+    "production output or chair clearance, release or tagging, protection "
+    "bypass, force push, history rewrite, destructive reset or restore, git "
+    "clean, branch deletion, destructive operation, unresolved product choice "
+    "or same-invocation readying or merge of the newly published draft is "
+    "authorised."
+)
 ALLOWED_TREATMENTS = {"Tolerate", "Remove", "Mitigate"}
 ALLOWED_SEVERITIES = {"Low", "Medium", "High", "Critical"}
 ALLOWED_EFFECTIVENESS = {
@@ -474,60 +505,82 @@ def _validate_decisions(plan: str) -> None:
         "current decisions must be a list",
     )
     _require(
-        len(current_records) == 1
-        and isinstance(current_records[0], dict),
-        "Phase 5 opening must have one structured decision",
+        len(current_records) == len(EXPECTED_CURRENT_DECISION_IDS)
+        and all(isinstance(record, dict) for record in current_records),
+        "current decision register has an unexpected record count or shape",
     )
-    current_record = current_records[0]
-    _require(
-        set(current_record) == expected_fields,
-        "current decision fields changed",
-    )
-    _require(
-        current_record["id"] in EXPECTED_CURRENT_DECISION_IDS
-        and current_record["status"] == "Accepted",
-        "Phase 5 opening decision is missing or unaccepted",
-    )
-    _require(
-        re.fullmatch(
-            r"\d{4}-\d{2}-\d{2}",
-            str(current_record["decided_on"]),
+    current_by_id: dict[str, dict[str, object]] = {}
+    for current_record in current_records:
+        _require(
+            set(current_record) == expected_fields,
+            "current decision fields changed",
         )
-        is not None,
-        "Phase 5 opening date is not ISO formatted",
-    )
+        decision_id = current_record["id"]
+        _require(
+            isinstance(decision_id, str)
+            and decision_id not in current_by_id,
+            "duplicate current decision ID",
+        )
+        _require(
+            current_record["status"] == "Accepted",
+            "unaccepted current decision",
+        )
+        _require(
+            re.fullmatch(
+                r"\d{4}-\d{2}-\d{2}",
+                str(current_record["decided_on"]),
+            )
+            is not None,
+            "current decision date is not ISO formatted",
+        )
+        _require(
+            current_record["panel_required_under_current_policy"] is True,
+            "current Level 3 decision lost its panel requirement",
+        )
+        for field in ("decision", "authority", "exclusions", "evidence"):
+            _require(
+                isinstance(current_record[field], str)
+                and bool(current_record[field].strip()),
+                "{} lacks {}".format(decision_id, field),
+            )
+        current_evidence_path = (
+            ROOT / str(current_record["evidence"]).split("#", 1)[0]
+        )
+        _require(
+            current_evidence_path.is_file(),
+            "current decision evidence path is missing",
+        )
+        panel_path_text, separator, panel_anchor = str(
+            current_record["panel_record"]
+        ).partition("#")
+        panel_path = ROOT / panel_path_text
+        _require(panel_path.is_file(), "current panel record path is missing")
+        _require(
+            separator
+            and 'id="{}"'.format(panel_anchor) in _read(panel_path),
+            "current panel record anchor is missing",
+        )
+        current_by_id[decision_id] = current_record
+
     _require(
-        current_record["panel_required_under_current_policy"] is True,
-        "Phase 5 opening lost its panel requirement",
+        set(current_by_id) == EXPECTED_CURRENT_DECISION_IDS,
+        "current decision IDs drifted",
     )
+    opening_record = current_by_id["D-P5-001"]
     _require(
-        "Phase 5 is open at 0/4" in str(current_record["authority"])
+        "Phase 5 is open at 0/4" in str(opening_record["authority"])
         and "No renderer or exit is accepted"
-        in str(current_record["exclusions"]),
+        in str(opening_record["exclusions"]),
         "Phase 5 opening authority or exclusions drifted",
     )
-    for field in ("decision", "authority", "exclusions", "evidence"):
-        _require(
-            isinstance(current_record[field], str)
-            and bool(current_record[field].strip()),
-            "D-P5-001 lacks {}".format(field),
-        )
-    current_evidence_path = (
-        ROOT / str(current_record["evidence"]).split("#", 1)[0]
-    )
+    continuation_record = current_by_id["D-GOV-004"]
     _require(
-        current_evidence_path.is_file(),
-        "Phase 5 decision evidence path is missing",
-    )
-    panel_path_text, separator, panel_anchor = str(
-        current_record["panel_record"]
-    ).partition("#")
-    panel_path = ROOT / panel_path_text
-    _require(panel_path.is_file(), "Phase 5 panel record path is missing")
-    _require(
-        separator
-        and 'id="{}"'.format(panel_anchor) in _read(panel_path),
-        "Phase 5 panel record anchor is missing",
+        continuation_record["decision"] == EXPECTED_CONTINUATION_DECISION
+        and continuation_record["authority"]
+        == EXPECTED_CONTINUATION_AUTHORITY
+        and continuation_record["exclusions"]
+        == EXPECTED_CONTINUATION_EXCLUSIONS,
+        "D-GOV-004 continuation authority or exclusions drifted",
     )
 
     records = document["decisions"]

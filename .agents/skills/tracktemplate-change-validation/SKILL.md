@@ -79,6 +79,12 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
 - When repeated focused fixes fail against the same proof, stop applying local
   patches and reassess the premise, affected boundary, baseline and proposed
   approach. Record the unresolved cause rather than suppressing the failure.
+- When repeated fixture, harness or oracle repairs do not reduce the original
+  product or exit uncertainty, stop instead of creating another local tranche
+  and route the progress question to
+  [`$tracktemplate-chief-of-staff`](../tracktemplate-chief-of-staff/SKILL.md)
+  when the owner or an active `$tracktemplate-continue` cycle has authorised
+  that diagnosis.
 - Do not describe a copied-target fixture, local comparison path, prototype,
   headless smoke or partial workflow as supported production behaviour.
 - Do not claim a phase, milestone, release, migration family, package or output
@@ -110,6 +116,21 @@ layer.
 Changing a test or oracle still requires the canonical change control in
 `reference/TESTING_POLICY.md`. A test failure, an implementation preference or
 the desire for a green suite is not that evidence.
+
+## Evidence recording boundary
+
+Keep raw validation and failed-test evidence complete in retained logs or pull-
+request evidence. That record includes the exact commands, environments,
+sentinels, output, chronology, classifications and repair reruns needed to audit
+the proof.
+
+Current phase evidence has a different purpose. When the task is Level 2 or
+Level 3 and its documentation lifecycle calls for an entry, provide only the
+concise, decision-relevant result, decisive proof, contribution, material
+limitation and unchanged authority or required decision. Do not copy the full
+failed-test chronology into phase evidence unless the chronology itself changes
+the evidential conclusion. Level 1 validation or maintenance does not create a
+current-phase evidence entry.
 
 ## Output
 
