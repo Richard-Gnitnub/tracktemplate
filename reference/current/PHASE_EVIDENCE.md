@@ -665,16 +665,103 @@ editing-behaviour acceptance. Phase 5 remains 0/4; PR-14 remains
 Open/Remove with **Partial** control and the risk and decision registers are
 unchanged.
 
+## Coin maintainability and reuse review tranche
+
+This Level 2 evidence-only review assesses the retained Coin candidate against
+the renderer-neutral preview contract and accepted dependency direction. It
+changes no source, supported interface, composition route or behaviour. The
+review recommends retaining the current separation as the smallest reversible
+option; it does not recommend product promotion or accept a renderer.
+
+The current ownership map separates authoritative definitions from deliberate
+validation at an injected boundary:
+
+| Invariant or responsibility | Authoritative implementation and boundary |
+| --- | --- |
+| Canonical transition intent and stable-identity validation | `tracktemplate/domain/transition.py`; `TransitionIntent` owns the FreeCAD-independent inputs and validates `transition_id` |
+| Transition and easement mathematics | `tracktemplate/domain/alignment.py`; the domain owns the railway calculation used by the application analysis |
+| Versioned transition state and analysis lifecycle | `tracktemplate/application/transition_state.py`, exposed through the narrow `tracktemplate.api` façade; it owns state, analysis orchestration, signatures, status and JSON |
+| Complete derived-stage signatures and disposable cache policy | `tracktemplate/application/transition_derived.py`, exposed through `tracktemplate.api`; adapters and renderers do not invent cache keys |
+| Renderer-neutral centreline scene, units, frame, semantic layer and visual/domain identities | `tracktemplate/presentation/transition_preview.py`, exposed through `tracktemplate.api`; this is the only retained preview sampler |
+| Coin style signature, node construction and node-to-domain mapping | `tracktemplate/presentation/transition_coin.py`; an internal presentation adapter that consumes a preview artifact and owns one disposable binding |
+| Per-ViewObject display, selection, refresh and retryable cleanup | `tracktemplate/presentation/transition_coin_viewprovider.py`; a development-only fixture that owns its selection root and Coin binding |
+| Explicit multi-record attachment, callback-boundary validation, cache/proxy ownership and batch rollback | `tracktemplate/presentation/transition_coin_attachment.py`; a development-only fixture that validates and normalises injected records before it attaches them |
+| FreeCAD record enumeration and canonical persistence | `tracktemplate/adapters/freecad/transition_state.py`; `read_transition_objects()` owns document membership, record validation, duplicate rejection and stable-ID ordering |
+| Validated edit intent and atomic FreeCAD transaction integration | `tracktemplate/application/transition_edit.py` owns the command. `FreeCADTransitionStore._update()` owns the property write, verification, commit and abort path; `FreeCADTransitionEditPort` coordinates that mutation with deferred preview refresh and recovery |
+
+The adapter is authoritative for enumerating canonical FreeCAD records. The
+attachment fixture deliberately rechecks document membership, duplicate object
+and stable identities, and stable-ID order because its injected callback can
+return arbitrary records; the standalone attachment validator supplies
+reversed records to prove that boundary. This is adapter-neutral defensive
+validation, not a second persistence or identity authority. Retire it only if
+an accepted, typed composition contract guarantees validated and ordered
+callback results.
+
+The modular-structure guard reports no cycle, prohibited layer edge, forbidden
+domain dependency or structural warning. Presentation imports only
+presentation, application and domain modules. The Coin module is injected, the
+ViewObject is capability-checked and the document adapter is supplied through
+callbacks; retained presentation source imports neither `FreeCAD`,
+`FreeCADGui`, Qt/PySide, `pivy` nor the FreeCAD adapter. Coin fixtures remain
+absent from `tracktemplate.api`, package initialisation and
+`TrackTemplate.FCMacro`.
+
+Four options were reviewed:
+
+| Option | Review disposition |
+| --- | --- |
+| Retain the layered, product-route-disabled Coin candidate | Recommended. It preserves the renderer-neutral contract, narrow lifecycle ownership and reversible composition while later evidence remains open. |
+| Promote the current fixture into automatic product composition | Deferred. Explicit post-open invocation, restoration limits, product loading and owner editing-behaviour acceptance remain unresolved. |
+| Extract all similar test code during this review | Deferred to separate mechanical tranches. Mixing helper movement with the evidence review would obscure whether GUI coverage changed. |
+| Implement the SVG/Qt fallback for comparison | Not authorised or presently justified. No Coin failure has triggered the fallback and no SVG/Qt prototype exists. |
+
+No second product implementation of transition geometry, derived signatures,
+Coin construction or attachment lifecycle was found. The retained
+test-owned duplication has these owners and retirement conditions:
+
+| Fixture duplication | Owner and retirement condition |
+| --- | --- |
+| `_process_gui` is repeated in the one-object, representative and resource-profiler workflows; `_SelectionObserver` and `_ObservedTransitionCoinViewProviderFixture` are repeated in the two real-GUI proofs | Phase 5 GUI and performance QA owners. Consolidate them in the next bounded, test-only mechanical tranche; both real-GUI workflows and the resource profile must retain their workloads, sentinels, correctness invariants and comparable measurement recipe and fields before any copy retires. Timing and RSS observations remain descriptive rather than exact-value gates. |
+| Fake Coin field/group/node primitives occur in both standalone Coin validators | Phase 5 presentation QA owner. Keep them separate until a minimal shared fake protocol covers both the scene-only contract and the ViewProvider's selection, replacement and failure hooks; retire the copies only after both focused validators prove the shared helper. |
+| One-object, representative and resource fixtures each compose caches and ViewProviders manually | Their respective QA/performance owners. This is intentional lower-boundary instrumentation, not another renderer. Replace duplicated composition only after an accepted product composition boundary exposes equivalent selection, failure and measurement observations; retain distinct regressions that protect different behaviour. |
+
+The explicit post-open boundary remains a limitation: there is no product load
+hook or accepted observer lifecycle. The empty-switch-child behaviour also
+remains: disposal clears every live Coin child, mapping and cache and restores
+the original public display-mode list and host proxy, but FreeCAD provides no
+qualified Python removal operation for the registered switch child. Closure
+requires either a supported removal mechanism or an accepted product lifecycle
+that confines the residual empty child to object deletion/document close and
+presents that limitation for owner acceptance.
+
+The SVG/Qt fallback has no implementation, selection mapping, editing,
+Undo/Redo, save/reopen, cleanup, object/layer, resource or maintainability
+evidence. The review therefore cannot make a relative renderer comparison.
+The fallback remains available only if later Coin evidence fails; its missing
+evidence is not converted into a requirement to build a second renderer.
+
+Focused standalone preview, Coin-scene, ViewProvider, representative workload
+and modular-foundation validators all passed. No GUI was rerun because this
+review changes documentation only and relies on the existing retained
+real-GUI evidence without upgrading it. The documentation-only delta is the
+required review output itself, so its evidence necessarily exceeds its zero
+implementation lines; no policy, phase, risk, decision or authority changes.
+Phase 5 remains 0/4 and PR-14 remains Open/Remove with **Partial** control.
+
 ## Next bounded tranche
 
-Perform one bounded maintainability and reuse review of the retained Coin
-candidate against the renderer-neutral preview contract and accepted layer
-direction. Name the authoritative implementation for each shared invariant,
-dependency direction, lifecycle and cleanup ownership, fixture duplication and
-retirement conditions, including the explicit post-open and empty-switch-child
-limitations. Record missing comparison evidence for the unimplemented SVG/Qt
-fallback rather than adding another renderer. Keep renderer acceptance, product
-load wiring and owner editing-behaviour acceptance as separate later tranches.
+Consolidate only the exactly shared Coin GUI harness primitives. Move
+`_process_gui` to one test-owned helper used by the one-object, representative
+and resource-profiler workflows; move `_SelectionObserver` and
+`_ObservedTransitionCoinViewProviderFixture` to that helper for the two
+real-GUI proofs. Preserve qualified PySide/Qt compatibility, callback counts,
+assertions, screenshots, existing sentinels, resource workload, correctness
+invariants, and comparable measurement recipe and fields. Timing and RSS
+observations remain descriptive. This is a mechanical test refactor: do not
+change product source, workload behaviour, product load wiring, renderer
+disposition or owner acceptance, and rerun the complete `transition-gui` and
+Phase 5 Coin resource profiles before retiring any copy.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).
