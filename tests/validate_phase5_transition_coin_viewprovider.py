@@ -14,6 +14,9 @@ from tools import modular_structure  # noqa: E402
 from tracktemplate import api  # noqa: E402
 from tracktemplate.presentation import transition_coin as renderer  # noqa: E402
 from tracktemplate.presentation import (  # noqa: E402
+    transition_coin_attachment as attachment,
+)
+from tracktemplate.presentation import (  # noqa: E402
     transition_coin_viewprovider as viewprovider,
 )
 
@@ -120,14 +123,23 @@ class _FakeCoin:
 
 
 class _ViewObject:
-    def __init__(self):
+    def __init__(
+        self,
+        *,
+        initial_proxy=None,
+        fail_display_mode=False,
+        fail_proxy_restore=False,
+    ):
         self.RootNode = _Group()
         self.SwitchNode = _Group()
         self.SwitchNode.whichChild = _Field()
         self.RootNode.addChild(self.SwitchNode)
         self.Object = object()
-        self._proxy = None
+        self._proxy = initial_proxy
         self._display_modes = []
+        self._fail_display_mode = fail_display_mode
+        self._fail_proxy_restore = fail_proxy_restore
+        self._initial_proxy = initial_proxy
 
     @property
     def Proxy(self):
@@ -135,10 +147,20 @@ class _ViewObject:
 
     @Proxy.setter
     def Proxy(self, value):
+        if (
+            self._fail_proxy_restore
+            and value == self._initial_proxy
+            and self._proxy is not self._initial_proxy
+        ):
+            raise RuntimeError("injected proxy restoration failure")
         self._proxy = value
+        if value is None or isinstance(value, int):
+            return
         value.attach(self)
 
     def addDisplayMode(self, node, name):
+        if self._fail_display_mode:
+            raise RuntimeError("injected document attachment failure")
         self.SwitchNode.addChild(node)
         self._display_modes.append(name)
         self.SwitchNode.whichChild.setValue(
@@ -175,11 +197,16 @@ def _sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _state(transition_length_mm=300.0):
+def _state(
+    transition_length_mm=300.0,
+    *,
+    transition_id="transition:phase5:viewprovider",
+    end_name="Entry",
+):
     circle_centre_y_mm = 624.7779655573173
     radius_mm = 655.0
     intent = api.TransitionIntent(
-        transition_id="transition:phase5:viewprovider",
+        transition_id=transition_id,
         circle_centre_y_mm=circle_centre_y_mm,
         radius_mm=radius_mm,
         target_signed_offset_mm=api.transition_start_signed_offset(
@@ -189,7 +216,7 @@ def _state(transition_length_mm=300.0):
         ),
         total_angle_rad=math.pi / 2.0,
         track_name="Phase 5 ViewProvider transition",
-        end_name="Entry",
+        end_name=end_name,
     )
     return api.analyse_transition_state(api.TransitionState(intent))
 
@@ -609,6 +636,255 @@ def _validate_disposable_reconstruction():
     assert reopened_preview.discard() == ("preview",)
 
 
+class _Document:
+    def __init__(self):
+        self.Objects = []
+
+
+class _DocumentObject:
+    def __init__(
+        self,
+        document,
+        name,
+        state,
+        *,
+        initial_proxy=None,
+        fail_display_mode=False,
+        fail_proxy_restore=False,
+    ):
+        self.Document = document
+        self.Name = name
+        self.state = state
+        self.ViewObject = _ViewObject(
+            initial_proxy=initial_proxy,
+            fail_display_mode=fail_display_mode,
+            fail_proxy_restore=fail_proxy_restore,
+        )
+        self.ViewObject.Object = self
+        document.Objects.append(self)
+
+
+def _attachment_records(document):
+    return tuple(
+        (obj, obj.state)
+        for obj in reversed(document.Objects)
+    )
+
+
+def _attachment_state_reader(obj):
+    return obj.state
+
+
+def _validate_document_attachment():
+    document = _Document()
+    entry_state = _state(
+        300.0,
+        transition_id="transition:phase5:attachment:entry",
+        end_name="Entry",
+    )
+    exit_state = _state(
+        420.0,
+        transition_id="transition:phase5:attachment:exit",
+        end_name="Exit",
+    )
+    entry = _DocumentObject(
+        document,
+        "EntryObject",
+        entry_state,
+        initial_proxy=0,
+    )
+    exit_record = _DocumentObject(
+        document,
+        "ExitObject",
+        exit_state,
+    )
+    specification = api.TransitionPreviewSpecification(segment_count=4)
+    attached = attachment.TransitionCoinDocumentAttachmentFixture(
+        document,
+        record_loader=_attachment_records,
+        state_reader=_attachment_state_reader,
+        source_property_name="TrackTemplateStateJSON",
+        specification=specification,
+        style=_style(),
+        coin_module=_FakeCoin,
+    )
+    assert attached.attached is True
+    assert attached.attachment_count == 2
+    assert attached.transition_ids == (
+        entry_state.intent.transition_id,
+        exit_state.intent.transition_id,
+    )
+    entry_proxy = attached.proxy_for_transition(
+        entry_state.intent.transition_id
+    )
+    exit_proxy = attached.proxy_for_transition(
+        exit_state.intent.transition_id
+    )
+    entry_cache = attached.cache_for_transition(
+        entry_state.intent.transition_id
+    )
+    exit_cache = attached.cache_for_transition(
+        exit_state.intent.transition_id
+    )
+    assert entry.ViewObject.Proxy is entry_proxy
+    assert exit_record.ViewObject.Proxy is exit_proxy
+    assert entry_cache.status(
+        entry_state,
+        specification.derived_request(),
+    ) == "current"
+    assert exit_cache.status(
+        exit_state,
+        specification.derived_request(),
+    ) == "current"
+
+    changed_exit = _state(
+        360.0,
+        transition_id=exit_state.intent.transition_id,
+        end_name="Exit",
+    )
+    previous_signature = exit_proxy.source_signature
+    exit_record.state = changed_exit
+    assert attached.refresh_transition(
+        exit_state.intent.transition_id
+    ) is True
+    assert exit_proxy.source_signature != previous_signature
+    assert attached.refresh_transition(
+        exit_state.intent.transition_id
+    ) is False
+    _expect_state_error(
+        lambda: attached.proxy_for_transition(
+            "transition:phase5:attachment:missing"
+        ),
+        "unknown-coin-document-transition",
+    )
+
+    assert attached.dispose() == attached.transition_ids
+    assert attached.attached is False
+    assert entry.ViewObject.Proxy == 0
+    assert exit_record.ViewObject.Proxy is None
+    assert entry_cache.artifact("preview") is None
+    assert exit_cache.artifact("preview") is None
+    for record in (entry, exit_record):
+        assert len(record.ViewObject.SwitchNode.children) == 1
+        assert record.ViewObject.SwitchNode.children[0].children == []
+    assert attached.dispose() == ()
+    _expect_state_error(
+        lambda: attached.refresh_transition(
+            exit_state.intent.transition_id
+        ),
+        "discarded-coin-document-attachment",
+    )
+
+    failing_document = _Document()
+    first_state = _state(
+        300.0,
+        transition_id="transition:phase5:attachment:a",
+    )
+    second_state = _state(
+        420.0,
+        transition_id="transition:phase5:attachment:b",
+        end_name="Exit",
+    )
+    first = _DocumentObject(
+        failing_document,
+        "FirstObject",
+        first_state,
+        initial_proxy=0,
+    )
+    second = _DocumentObject(
+        failing_document,
+        "SecondObject",
+        second_state,
+        fail_display_mode=True,
+    )
+    failure = _expect_state_error(
+        lambda: attachment.TransitionCoinDocumentAttachmentFixture(
+            failing_document,
+            record_loader=_attachment_records,
+            state_reader=_attachment_state_reader,
+            source_property_name="TrackTemplateStateJSON",
+            specification=specification,
+            style=_style(),
+            coin_module=_FakeCoin,
+        ),
+        "coin-document-attachment-failed",
+    )
+    assert "injected document attachment failure" in str(failure)
+    assert first.ViewObject.Proxy == 0
+    assert second.ViewObject.Proxy is None
+    assert first.state == first_state
+    assert second.state == second_state
+    assert len(first.ViewObject.SwitchNode.children) == 1
+    assert first.ViewObject.SwitchNode.children[0].children == []
+    assert second.ViewObject.SwitchNode.children == []
+
+    cleanup_failure_document = _Document()
+    cleanup_failure_state = _state(
+        transition_id="transition:phase5:attachment:cleanup-failure",
+    )
+    _DocumentObject(
+        cleanup_failure_document,
+        "CleanupFailureObject",
+        cleanup_failure_state,
+        initial_proxy=0,
+        fail_display_mode=True,
+        fail_proxy_restore=True,
+    )
+    cleanup_failure = _expect_state_error(
+        lambda: attachment.TransitionCoinDocumentAttachmentFixture(
+            cleanup_failure_document,
+            record_loader=_attachment_records,
+            state_reader=_attachment_state_reader,
+            source_property_name="TrackTemplateStateJSON",
+            specification=specification,
+            style=_style(),
+            coin_module=_FakeCoin,
+        ),
+        "coin-document-attachment-failed",
+    )
+    assert "injected document attachment failure" in str(cleanup_failure)
+    assert "injected proxy restoration failure" in str(cleanup_failure)
+
+    replaced_document = _Document()
+    replaced_state = _state(
+        transition_id="transition:phase5:attachment:replaced",
+    )
+    replaced = _DocumentObject(
+        replaced_document,
+        "ReplacedProxyObject",
+        replaced_state,
+    )
+    replaced_attachment = (
+        attachment.TransitionCoinDocumentAttachmentFixture(
+            replaced_document,
+            record_loader=_attachment_records,
+            state_reader=_attachment_state_reader,
+            source_property_name="TrackTemplateStateJSON",
+            specification=specification,
+            style=_style(),
+            coin_module=_FakeCoin,
+        )
+    )
+    managed_proxy = replaced.ViewObject.Proxy
+    managed_cache = replaced_attachment.cache_for_transition(
+        replaced_state.intent.transition_id
+    )
+    external_proxy = object()
+    replaced.ViewObject._proxy = external_proxy
+    _expect_state_error(
+        replaced_attachment.dispose,
+        "coin-document-attachment-dispose-failed",
+    )
+    assert replaced.ViewObject.Proxy is external_proxy
+    assert replaced_attachment.attached is False
+    assert managed_cache.artifact("preview") is None
+    replaced.ViewObject._proxy = managed_proxy
+    assert replaced_attachment.dispose() == (
+        replaced_state.intent.transition_id,
+    )
+    assert replaced.ViewObject.Proxy is None
+
+
 def _validate_structure_and_controls():
     report = modular_structure.structure_report(ROOT)
     assert modular_structure.validate_report(report) == []
@@ -623,15 +899,27 @@ def _validate_structure_and_controls():
         "tracktemplate.application.transition_state",
         "tracktemplate.presentation.transition_coin",
     ]
+    attachment_module = modules[
+        "tracktemplate.presentation.transition_coin_attachment"
+    ]
+    assert attachment_module["layer"] == "presentation"
+    assert attachment_module["warning_signals"] == []
+    assert attachment_module["imports"] == [
+        "tracktemplate.application.transition_derived",
+        "tracktemplate.application.transition_state",
+        "tracktemplate.presentation.transition_coin",
+        "tracktemplate.presentation.transition_coin_viewprovider",
+        "tracktemplate.presentation.transition_preview",
+    ]
 
     for relative in (
         "TrackTemplate.FCMacro",
         "tracktemplate/api.py",
         "tracktemplate/presentation/__init__.py",
     ):
-        assert "transition_coin_viewprovider" not in (
-            ROOT / relative
-        ).read_text(encoding="utf-8")
+        source = (ROOT / relative).read_text(encoding="utf-8")
+        assert "transition_coin_viewprovider" not in source
+        assert "transition_coin_attachment" not in source
     for relative, expected in SOURCE_HASHES.items():
         assert _sha256(ROOT / relative) == expected
 
@@ -682,11 +970,24 @@ def _validate_structure_and_controls():
         runner_text
     )
     for field in (
+        "reopened_attachment_boundary",
+        "reopened_attachment_count",
+        "reopened_attachment_disposed",
+        "reopened_attachment_explicit_post_open",
+        "reopened_attachment_failure_recovered",
+        "reopened_attachment_history_delta",
+        "reopened_attachment_order",
+        "reopened_attachment_refresh_reused",
+        "reopened_stored_state_unchanged",
+    ):
+        assert 'payload.get("{}")'.format(field) in runner_text
+    for field in (
         "reopened_cache_is_new",
         "reopened_cache_rebuilt",
         "reopened_cache_started_missing",
         "reopened_canonical_state_equal",
         "reopened_derived_state_persisted",
+        "reopened_empty_switch_child_retained",
         "reopened_object_identity_preserved",
         "reopened_preview_equivalent",
         "reopened_schema_unchanged",
@@ -718,6 +1019,11 @@ def _validate_structure_and_controls():
     assert "hashlib" not in gui_proof_text
     assert "document.saveAs(" in gui_proof_text
     assert "App.openDocument(" in gui_proof_text
+    assert "adapter.read_transition_objects" in gui_proof_text
+    assert (
+        "TransitionCoinDocumentAttachmentFixture(" in gui_proof_text
+    )
+    assert "injected post-open attachment failure" in gui_proof_text
 
     plan = (ROOT / "reference" / "PROJECT_PLAN.md").read_text(
         encoding="utf-8"
@@ -749,6 +1055,7 @@ def validate():
     _validate_partial_disposal()
     _validate_state_refresh()
     _validate_disposable_reconstruction()
+    _validate_document_attachment()
     _validate_structure_and_controls()
     print("Phase 5 transition Coin ViewProvider validation passed")
 

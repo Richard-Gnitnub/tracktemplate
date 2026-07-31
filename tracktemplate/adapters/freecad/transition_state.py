@@ -35,6 +35,7 @@ __all__ = (
     "TransitionDocumentError",
     "find_transition_object",
     "read_transition_object",
+    "read_transition_objects",
 )
 
 
@@ -205,6 +206,37 @@ def read_transition_object(obj):
             _object_name(obj),
             source_code=error.code,
         ) from error
+
+
+def read_transition_objects(document):
+    """Read every canonical transition record in stable-identity order."""
+    document = _require_open_document(document)
+    records = []
+    identities = {}
+    for obj in sorted(document.Objects, key=lambda item: str(item.Name)):
+        if not _is_transition_candidate(obj):
+            continue
+        state = read_transition_object(obj)
+        identity = state.intent.transition_id
+        previous = identities.get(identity)
+        if previous is not None:
+            raise TransitionDocumentError(
+                "duplicate-stable-identity",
+                "canonical objects {!r} and {!r} use transition "
+                "identity {!r}".format(
+                    _object_name(previous),
+                    _object_name(obj),
+                    identity,
+                ),
+            )
+        identities[identity] = obj
+        records.append((obj, state))
+    return tuple(
+        sorted(
+            records,
+            key=lambda record: record[1].intent.transition_id,
+        )
+    )
 
 
 def find_transition_object(document, transition_id):

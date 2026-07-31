@@ -528,6 +528,44 @@ family shape. It does not establish whole-layout capacity, an interaction
 budget, automatic product load wiring, renderer suitability or owner
 acceptance.
 
+Current Phase 5 development-only post-open attachment boundary:
+
+```bash
+.venv/bin/python tests/validate_phase4_transition_persistence.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase4_transition_persistence.py
+.venv/bin/python tests/validate_phase5_transition_coin_viewprovider.py
+tools/freecad_bridge/run-phase5-transition-viewprovider
+```
+
+The persistence checks protect and exercise the read-only
+`read_transition_objects(document)` adapter operation. Qualified FreeCAD must
+ignore foreign records, validate every canonical transition record, reject
+duplicate stable identities, return `(object, state)` pairs in transition-ID
+order and change no property or Undo/Redo state.
+
+The ViewProvider checks cover the explicitly invoked
+`TransitionCoinDocumentAttachmentFixture`. The host-independent proof uses two
+records supplied out of order, refreshes only one retained cache, restores
+both original default proxies on disposal and clears every live binding and
+cache after an injected second-object attach failure. The isolated real-GUI
+proof saves and reopens one canonical record, confirms that no transient
+attachment marker was persisted, injects and recovers from a Coin attach
+failure, then invokes the document attachment once. It requires a new cache
+and ViewProvider with an equivalent preview, a reused no-op refresh, visible
+rendering, cleared derived state on disposal, restored host proxy and unchanged
+canonical JSON, property lists, object count and history throughout.
+
+This is a test-owned, post-open composition boundary. It is absent from
+`tracktemplate.api`, package initialisation, the product macro and FreeCAD
+startup or document observers. Passing it does not establish automatic product
+load wiring, supported migration, renderer suitability or owner acceptance.
+FreeCAD exposes display-mode registration but no Python removal operation, so
+disposal restores the original public display-mode list and clears all
+retained mappings and caches, but leaves one empty switch child until object
+deletion or document close/reopen. The checks require that limitation rather
+than describing disposal as complete view-state restoration.
+
 Repository recovery and ignored-data safety controls:
 
 ```bash

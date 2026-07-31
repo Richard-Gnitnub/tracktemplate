@@ -504,12 +504,96 @@ dependency, renderer acceptance, owner editing-behaviour acceptance or Phase 5
 exit is included or accepted. PR-14 remains Open/Remove with **Partial**
 control and the structured risk and decision records are unchanged.
 
+## Development-only post-open attachment boundary tranche
+
+This Level 2 tranche replaces manual per-object reconstruction in the
+save/reopen fixture with one explicitly invoked, development-only document
+attachment boundary. The FreeCAD adapter now has one read-only enumeration
+operation that ignores foreign records, validates every canonical transition
+record, rejects duplicate stable identities and returns `(object, state)`
+pairs in transition-ID order. The presentation fixture consumes that operation
+through injected callbacks, creates one new disposable preview cache and
+ViewProvider per record, and clears every completed live binding and cache if
+any attach fails. It rejects an existing non-default ViewProvider rather than
+overwriting it and restores each original default proxy on failure or disposal.
+
+The selected composition is deliberately post-open and explicit. Import-time
+or global document-observer wiring was rejected for this tranche because the
+qualified Python observer boundary has no reliable finish-restore callback,
+callbacks may see partially restored properties, and global registration would
+prematurely resemble a product default. The fixture is not imported by
+`tracktemplate.api`, package initialisation or `TrackTemplate.FCMacro`; it
+adds no observer, command, custom property, transaction, schema or persisted
+proxy state.
+
+The first focused command failed with an `ImportError` because the authorised
+attachment module did not yet exist, classified `implementation-defect`.
+The exact default regression pipeline retained that failure at
+`benchmark-output/validation-pipeline/20260729T181635090648Z/`: tracked parsing
+passed and 50/51 standalone validators passed, with only the new ViewProvider
+proof failing. After implementation, the same focused proof passed. Its
+host-independent two-record fixture supplies records out of order, proves
+stable attachment order and independent refresh/reuse, restores both original
+proxies and empties both caches on disposal, and rolls back the first completed
+attachment's live contents, cache and proxy after an injected second-object
+failure without changing either canonical state. The documented empty switch
+child remains for that completed attachment.
+
+A final adversarial diagnostic check first failed because an injected proxy
+restoration failure hid the original attach failure from the structured error
+text, classified `implementation-defect`. The cleanup owner now preserves the
+primary failure and appends the secondary cleanup failure; the exact focused
+proof passed without weakening either recovery assertion.
+
+The qualified FreeCAD 1.1.1 persistence proof passed. It enumerated two
+canonical records in stable-ID order while ignoring one operator object and
+one other TrackTemplate record, and retained the exact object/property
+inventory, payloads and Undo/Redo counts. Duplicate identities fail closed.
+The isolated real-GUI command
+`tools/freecad_bridge/run-phase5-transition-viewprovider` also passed. After
+save/reopen, an injected Coin selection-root failure restored the original
+integer-or-null host proxy and left canonical JSON, properties, object count,
+history and view-node counts unchanged. A subsequent explicit attachment
+enumerated the one existing record, rebuilt a new equivalent cache,
+ViewProvider and Coin graph, reused an unchanged refresh and rendered 4,188 red
+pixels. Disposal cleared the preview cache and selectable children, restored
+the original host proxy and again left the stored snapshot and history
+unchanged. FreeCAD exposes no Python operation to unregister a display mode,
+so the proof also requires the known development-fixture limitation: the
+original public display-mode list is restored but one empty switch child
+remains until object deletion or document close/reopen. No live Coin child,
+selection mapping or cache remains in that slot. An intermediate assertion
+expected a retained public mode name and failed with `IndexError` in the
+qualified host, classified `test-or-oracle-defect`; aligning it to the observed
+public-list/switch-child split changed no product behaviour.
+
+The final `transition-gui` regression profile passed all six layers: parsing
+160 tracked Python/FCMacro files, 51/51 standalone validators, qualified
+transition persistence, Coin scene, edit lifecycle and the isolated real-GUI
+ViewProvider proof. Raw logs are retained under
+`benchmark-output/validation-pipeline/20260729T184223671826Z/`. The original
+and post-open 1000×700 captures from the final GUI run were visually inspected;
+both show the same clean red transition centreline and each contains the
+required 4,188 red pixels.
+
+The lifecycle choices follow first-party guidance reviewed on 2026-07-29 from
+the [FreeCAD Addon Academy document-object guide](https://freecad.github.io/Addon-Academy/Guides/Code/Document-Objects/)
+at revision `833bb4852af825e1826b83d6b75872d18b433486`, the qualified
+FreeCAD 1.1.1 `DocumentObserverPython` sources at
+`0108fd4b4850cc46e625b60e53cea7a7bbe69f8d`, and the
+[FreeCAD ViewProvider Python API](https://freecad.github.io/SourceDoc/d9/dbf/classGui_1_1ViewProviderPythonFeatureT.html).
+This evidence accepts neither product load wiring nor supported migration.
+No renderer, owner editing behaviour or Phase 5 exit is accepted; PR-14
+remains Open/Remove with **Partial** control and the risk and decision
+registers are unchanged.
+
 ## Next bounded tranche
 
-Define a development-only automatic attachment/load boundary for existing
-canonical transition objects, then prove deterministic attach, refresh,
-disposal and failure recovery without changing stored state or making the
-ViewProvider a product default. Keep renderer acceptance and owner
+Exercise the explicit development-only attachment boundary against a
+saved/reopened representative Entry/Exit document in one qualified real-GUI
+proof. Verify stable two-object ordering, independent refresh and disposal,
+and unchanged stable selection mappings without adding product load wiring.
+Keep maintainability comparison, renderer acceptance and owner
 editing-behaviour acceptance as separate later tranches.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
