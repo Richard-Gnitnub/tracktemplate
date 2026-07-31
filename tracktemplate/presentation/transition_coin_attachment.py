@@ -132,10 +132,21 @@ def _require_default_proxy(view_object, obj):
 
 
 class _AttachmentEntry:
-    def __init__(self, obj, view_object, original_proxy, cache, proxy):
+    def __init__(
+        self,
+        obj,
+        view_object,
+        original_proxy,
+        original_switch_child,
+        original_display_mode_state,
+        cache,
+        proxy,
+    ):
         self.obj = obj
         self.view_object = view_object
         self.original_proxy = original_proxy
+        self.original_switch_child = original_switch_child
+        self.original_display_mode_state = original_display_mode_state
         self.cache = cache
         self.proxy = proxy
 
@@ -156,6 +167,8 @@ def _cleanup_resources(
     view_object,
     proxy,
     original_proxy,
+    original_switch_child,
+    original_display_mode_state,
     cache,
 ):
     errors = []
@@ -207,6 +220,28 @@ def _cleanup_resources(
                     label
                 )
             )
+    try:
+        _restore_display_mode(
+            view_object,
+            original_display_mode_state,
+            obj,
+        )
+    except Exception as error:
+        errors.append(
+            "display-mode property restoration failed for {!r}: {}".format(
+                label,
+                error,
+            )
+        )
+    try:
+        view_object.SwitchNode.whichChild.setValue(original_switch_child)
+    except Exception as error:
+        errors.append(
+            "display-mode restoration failed for {!r}: {}".format(
+                label,
+                error,
+            )
+        )
     return tuple(errors)
 
 
@@ -216,11 +251,19 @@ def _dispose_entry(entry):
         entry.view_object,
         entry.proxy,
         entry.original_proxy,
+        entry.original_switch_child,
+        entry.original_display_mode_state,
         entry.cache,
     )
 
 
-def _dispose_candidate(view_object, original_proxy, cache):
+def _dispose_candidate(
+    view_object,
+    original_proxy,
+    original_switch_child,
+    original_display_mode_state,
+    cache,
+):
     try:
         candidate = view_object.Proxy
     except Exception as error:
@@ -237,6 +280,24 @@ def _dispose_candidate(view_object, original_proxy, cache):
             cleanup_errors.append(
                 "ViewProvider restoration failed: {}".format(proxy_error)
             )
+        try:
+            _restore_display_mode(
+                view_object,
+                original_display_mode_state,
+                None,
+            )
+        except Exception as display_mode_error:
+            cleanup_errors.append(
+                "display-mode property restoration failed: {}".format(
+                    display_mode_error
+                )
+            )
+        try:
+            view_object.SwitchNode.whichChild.setValue(original_switch_child)
+        except Exception as switch_error:
+            cleanup_errors.append(
+                "display-mode restoration failed: {}".format(switch_error)
+            )
         detail = "failed ViewProvider cannot be read: {}".format(error)
         if cleanup_errors:
             detail += "; cleanup also failed: {}".format(
@@ -248,8 +309,107 @@ def _dispose_candidate(view_object, original_proxy, cache):
         view_object,
         candidate,
         original_proxy,
+        original_switch_child,
+        original_display_mode_state,
         cache,
     )
+
+
+def _display_mode_state(view_object, obj):
+    try:
+        get_enumerations = view_object.getEnumerationsOfProperty
+        enumerations = tuple(
+            str(value)
+            for value in get_enumerations("DisplayMode")
+        )
+        current = view_object.DisplayMode
+    except Exception as error:
+        raise _attachment_error(
+            "invalid-coin-document-attachment",
+            "$.coin.document_attachment.display_mode",
+            "record {!r} has no readable display-mode property".format(
+                _object_name(obj)
+            ),
+        ) from error
+    current = None if current is None else str(current)
+    if current is not None and current not in enumerations:
+        raise _attachment_error(
+            "invalid-coin-document-attachment",
+            "$.coin.document_attachment.display_mode",
+            "record {!r} has an inconsistent display-mode property".format(
+                _object_name(obj)
+            ),
+        )
+    return enumerations, current
+
+
+def _restore_display_mode(view_object, state, obj):
+    enumerations, current = state
+    try:
+        view_object.DisplayMode = list(enumerations)
+        if current is not None:
+            view_object.DisplayMode = current
+        observed = _display_mode_state(view_object, obj)
+    except Exception as error:
+        if getattr(error, "code", None) == "invalid-coin-document-attachment":
+            raise
+        raise _attachment_error(
+            "coin-document-attachment-failed",
+            "$.coin.document_attachment.display_mode",
+            "record {!r} cannot restore its display-mode property".format(
+                _object_name(obj)
+            ),
+        ) from error
+    if observed != state:
+        raise _attachment_error(
+            "coin-document-attachment-failed",
+            "$.coin.document_attachment.display_mode",
+            "record {!r} did not restore its display-mode property".format(
+                _object_name(obj)
+            ),
+        )
+
+
+def _switch_child(view_object, obj):
+    try:
+        field = view_object.SwitchNode.whichChild
+        value = int(field.getValue())
+        set_value = field.setValue
+    except Exception as error:
+        raise _attachment_error(
+            "invalid-coin-document-attachment",
+            "$.coin.document_attachment.records",
+            "record {!r} has no controllable display-mode switch".format(
+                _object_name(obj)
+            ),
+        ) from error
+    if not callable(set_value):
+        raise _attachment_error(
+            "invalid-coin-document-attachment",
+            "$.coin.document_attachment.records",
+            "record {!r} has no controllable display-mode switch".format(
+                _object_name(obj)
+            ),
+        )
+    return value
+
+
+def _show_selection_root(view_object, proxy, obj):
+    try:
+        switch = view_object.SwitchNode
+        index = int(switch.findChild(proxy.selection_root))
+        if index < 0:
+            raise ValueError("the selection root is not registered")
+        switch.whichChild.setValue(index)
+    except Exception as error:
+        raise _attachment_error(
+            "coin-document-attachment-failed",
+            "$.coin.document_attachment.display_mode",
+            "record {!r} cannot show its transition preview: {}".format(
+                _object_name(obj),
+                error,
+            ),
+        ) from error
 
 
 class TransitionCoinDocumentAttachmentFixture:
@@ -401,6 +561,8 @@ class TransitionCoinDocumentAttachmentFixture:
                 "canonical state changed while the attachment was prepared",
             )
         original_proxy = _require_default_proxy(view_object, obj)
+        original_switch_child = _switch_child(view_object, obj)
+        original_display_mode_state = _display_mode_state(view_object, obj)
         cache = TransitionDerivedCache()
 
         def artifact_for_state(state):
@@ -423,10 +585,18 @@ class TransitionCoinDocumentAttachmentFixture:
                 artifact_for_state=artifact_for_state,
                 source_property_name=self._source_property_name,
             )
+            _restore_display_mode(
+                view_object,
+                original_display_mode_state,
+                obj,
+            )
+            _show_selection_root(view_object, proxy, obj)
         except Exception as error:
             cleanup_errors = _dispose_candidate(
                 view_object,
                 original_proxy,
+                original_switch_child,
+                original_display_mode_state,
                 cache,
             )
             if cleanup_errors:
@@ -444,6 +614,8 @@ class TransitionCoinDocumentAttachmentFixture:
             obj,
             view_object,
             original_proxy,
+            original_switch_child,
+            original_display_mode_state,
             cache,
             proxy,
         )

@@ -14,10 +14,14 @@ TRANSITION_COIN_VIEWPROVIDER_FIXTURE_ID = (
 )
 TRANSITION_COIN_VIEW_ELEMENT = "TransitionPreviewCentreline"
 TRANSITION_COIN_VIEW_MODE = "Transition Preview"
+TRANSITION_COIN_RESIDUAL_NODE_NAME = (
+    "TrackTemplateTransitionPreviewResidualV1"
+)
 
 __all__ = (
     "TRANSITION_COIN_VIEW_ELEMENT",
     "TRANSITION_COIN_VIEW_MODE",
+    "TRANSITION_COIN_RESIDUAL_NODE_NAME",
     "TRANSITION_COIN_VIEWPROVIDER_FIXTURE_ID",
     "TransitionCoinViewProviderFixture",
 )
@@ -37,6 +41,7 @@ def _require_view_object(view_object):
         or not callable(add_display_mode)
         or not callable(getattr(switch, "findChild", None))
         or not callable(getattr(switch, "getChild", None))
+        or not callable(getattr(switch, "getNumChildren", None))
     ):
         raise _view_error(
             "invalid-coin-viewprovider",
@@ -44,6 +49,43 @@ def _require_view_object(view_object):
             "expected a FreeCAD ViewObject with display-mode nodes",
         )
     return root, switch, add_display_mode
+
+
+def _node_name(node):
+    try:
+        name = node.getName()
+        get_string = getattr(name, "getString", None)
+        return str(get_string() if callable(get_string) else name)
+    except Exception as error:
+        raise _view_error(
+            "invalid-coin-viewprovider",
+            "$.coin.view_object.SwitchNode",
+            "display-mode node names cannot be inspected",
+        ) from error
+
+
+def _require_no_residual(switch_node):
+    try:
+        children = tuple(
+            switch_node.getChild(index)
+            for index in range(int(switch_node.getNumChildren()))
+        )
+    except Exception as error:
+        raise _view_error(
+            "invalid-coin-viewprovider",
+            "$.coin.view_object.SwitchNode",
+            "display-mode children cannot be inspected",
+        ) from error
+    if any(
+        _node_name(child) == TRANSITION_COIN_RESIDUAL_NODE_NAME
+        for child in children
+    ):
+        raise _view_error(
+            "coin-viewprovider-residual-conflict",
+            "$.coin.view_object.SwitchNode",
+            "a confined transition preview node already exists; close and "
+            "reopen the document before activating transition editing again",
+        )
 
 
 def _build_selection_root(coin_module):
@@ -69,13 +111,20 @@ def _build_selection_root(coin_module):
         ) from error
     if selection_root is None or any(
         not callable(getattr(selection_root, name, None))
-        for name in ("addChild", "removeAllChildren", "replaceChild")
+        for name in (
+            "addChild",
+            "getName",
+            "removeAllChildren",
+            "replaceChild",
+            "setName",
+        )
     ):
         raise _view_error(
             "invalid-coin-viewprovider",
             "$.coin.module.SoFCSelection",
             "expected a mutable SoFCSelection node",
         )
+    selection_root.setName(TRANSITION_COIN_RESIDUAL_NODE_NAME)
     return selection_root
 
 
@@ -268,6 +317,12 @@ class TransitionCoinViewProviderFixture:
         view_root = None
         switch_node = None
         try:
+            (
+                view_root,
+                switch_node,
+                add_display_mode,
+            ) = _require_view_object(view_object)
+            _require_no_residual(switch_node)
             binding = build_transition_coin_binding(
                 self._artifact,
                 self._style,
@@ -275,11 +330,6 @@ class TransitionCoinViewProviderFixture:
             )
             selection_root = _build_selection_root(self._coin_module)
             selection_root.addChild(binding.root)
-            (
-                view_root,
-                switch_node,
-                add_display_mode,
-            ) = _require_view_object(view_object)
             add_display_mode(
                 selection_root,
                 TRANSITION_COIN_VIEW_MODE,
@@ -296,6 +346,12 @@ class TransitionCoinViewProviderFixture:
             self._binding = binding
             self._discarded = True
             self._cleanup_pending = bool(cleanup_errors)
+            if (
+                isinstance(error, TransitionStateError)
+                and error.code == "coin-viewprovider-residual-conflict"
+                and not cleanup_errors
+            ):
+                raise
             detail = str(error)
             if cleanup_errors:
                 detail += "; cleanup also failed: {}".format(

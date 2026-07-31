@@ -394,13 +394,18 @@ def _validate_structure_and_disabled_route():
     ]
 
     for relative in (
-        "TrackTemplate.FCMacro",
         "tracktemplate/api.py",
         "tracktemplate/presentation/__init__.py",
     ):
         assert "transition_coin" not in (ROOT / relative).read_text(
             encoding="utf-8"
         )
+    launcher_source = (ROOT / "TrackTemplate.FCMacro").read_text(
+        encoding="utf-8"
+    )
+    assert "tracktemplate.presentation.transition_coin" in launcher_source
+    assert launcher_source.count("activate_transition_editing(") == 1
+    assert launcher_source.rstrip().endswith("FOUNDATION_RESULT = run_macro()")
 
     script = """
 import importlib.abc

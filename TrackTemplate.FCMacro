@@ -152,4 +152,169 @@ def run_macro(launch_workflow=False):
     return result
 
 
+def activate_transition_editing(document=None):
+    """Explicitly compose one reversible B16 Coin editing lifecycle."""
+    repository_root = _launcher_root()
+    api, bootstrap = _load_foundation(repository_root)
+    qualification = bootstrap.require_qualified_runtime(
+        repository_root
+        / "reference"
+        / "contracts"
+        / "phase1-compatibility.json"
+    )
+
+    app = importlib.import_module("FreeCAD")
+    gui = importlib.import_module("FreeCADGui")
+    coin = importlib.import_module("pivy.coin")
+    qt_widgets = importlib.import_module("PySide6.QtWidgets")
+    adapter = importlib.import_module(
+        "tracktemplate.adapters.freecad.transition_state"
+    )
+    attachment_module = importlib.import_module(
+        "tracktemplate.presentation.transition_coin_attachment"
+    )
+    renderer = importlib.import_module(
+        "tracktemplate.presentation.transition_coin"
+    )
+    editor = importlib.import_module(
+        "tracktemplate.ui.transition_parameter_editor"
+    )
+    lifecycle_module = importlib.import_module(
+        "tracktemplate.ui.transition_editing_lifecycle"
+    )
+
+    if document is None:
+        document = app.ActiveDocument
+    if document is None:
+        raise RuntimeError(
+            "Open a document with canonical Entry/Exit transitions before "
+            "activating transition editing."
+        )
+
+    records = adapter.read_transition_objects(document)
+    if not records:
+        raise RuntimeError(
+            "The active document contains no canonical transitions to attach."
+        )
+    unsupported = tuple(
+        state.intent.transition_id
+        for _obj, state in records
+        if state.intent.end_name not in ("Entry", "Exit")
+    )
+    if unsupported:
+        raise RuntimeError(
+            "The bounded B16 lifecycle supports Entry/Exit transitions only: "
+            + ", ".join(unsupported)
+        )
+
+    store = adapter.FreeCADTransitionStore(qualification)
+
+    def attachment_factory():
+        return attachment_module.TransitionCoinDocumentAttachmentFixture(
+            document,
+            record_loader=adapter.read_transition_objects,
+            state_reader=adapter.read_transition_object,
+            source_property_name=adapter.FREECAD_STATE_JSON_PROPERTY,
+            specification=api.TransitionPreviewSpecification(
+                segment_count=32
+            ),
+            style=renderer.TransitionCoinStyle(
+                line_color_rgb=(0.9, 0.05, 0.02),
+                line_width=6.0,
+            ),
+            coin_module=coin,
+        )
+
+    def selection_reader():
+        try:
+            selected = tuple(
+                gui.Selection.getSelectionEx(str(document.Name))
+            )
+        except Exception:
+            return None
+        if len(selected) != 1:
+            return None
+        selected_record = selected[0]
+        selected_object = selected_record.Object
+        subelements = tuple(selected_record.SubElementNames)
+        if len(subelements) != 1:
+            return None
+        try:
+            proxy = selected_object.ViewObject.Proxy
+            mapping = proxy.selection_for_element(subelements[0])
+            state = adapter.read_transition_object(selected_object)
+        except (AttributeError, TypeError, ValueError, RuntimeError):
+            return None
+        if mapping.domain_id != state.intent.transition_id:
+            return None
+        return editor.SelectedTransition(
+            state,
+            adapter.FreeCADTransitionEditPort(
+                store,
+                document,
+                selected_object,
+                proxy,
+            ),
+        )
+
+    def dialog_factory(controller):
+        return editor.TransitionParameterEditorDialog(
+            controller,
+            qt_widgets,
+            parent=gui.getMainWindow(),
+        )
+
+    observer_holder = []
+
+    def clear_document_selection():
+        gui.Selection.clearSelection(str(document.Name))
+
+    def remove_document_observer():
+        if observer_holder:
+            observer = observer_holder[0]
+            app.removeDocumentObserver(observer)
+            observer_holder.pop()
+
+    class _SaveDeactivationObserver:
+        def _deactivate_target(self, observed_document):
+            if str(observed_document.Name) != str(document.Name):
+                return
+            if editing_lifecycle.state in ("active", "cleanup-failed"):
+                editing_lifecycle.deactivate()
+
+        def slotStartSaveDocument(self, observed_document, filename):
+            self._deactivate_target(observed_document)
+
+    editing_lifecycle = lifecycle_module.TransitionEditingLifecycle(
+        attachment_factory=attachment_factory,
+        selection_reader=selection_reader,
+        selection_clearer=clear_document_selection,
+        dialog_factory=dialog_factory,
+        cleanup_callback=remove_document_observer,
+    )
+    editing_lifecycle.activate()
+    observer = _SaveDeactivationObserver()
+    observer_holder.append(observer)
+    try:
+        app.addDocumentObserver(observer)
+    except Exception as registration_error:
+        try:
+            editing_lifecycle.deactivate()
+        except lifecycle_module.TransitionEditingLifecycleError as error:
+            failure = lifecycle_module.TransitionEditingLifecycleError(
+                "transition-editing-observer-registration-failed",
+                "{}; cleanup also failed: {}".format(
+                    registration_error,
+                    error,
+                ),
+            )
+            failure.recovery_lifecycle = editing_lifecycle
+            raise failure from registration_error
+        raise lifecycle_module.TransitionEditingLifecycleError(
+            "transition-editing-observer-registration-failed",
+            str(registration_error),
+        ) from registration_error
+    return editing_lifecycle
+
+
 FOUNDATION_RESULT = run_macro()

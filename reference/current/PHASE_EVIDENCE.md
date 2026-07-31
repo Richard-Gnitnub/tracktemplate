@@ -109,10 +109,10 @@ The formal state remains **0/4**, with every exit **Pending**.
 
 | Exit condition | Formal status | Evidence already demonstrated | Remaining decision gap |
 | --- | --- | --- | --- |
-| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending | Renderer-neutral preview; disposable Coin scene and ViewProvider lifecycle; real pointer selection with stable visual-to-domain mapping; application-command editing, atomic Undo/Redo and failure recovery; retained-cache invalidation/reuse; save/close/reopen reconstruction through explicit post-open attachment; representative Entry/Exit selection, editing and reopen attachment; bounded 32-object observations; maintainability and dependency-direction review | Add an actual user-facing transition parameter-editing control and owner-visible selected/edited states; establish decision-usable interaction/resource ranges at representative scale; resolve product lifecycle/composition limits and the residual empty switch child; obtain project-owner renderer acceptance |
-| Small logical object/layer count with deterministic selection-to-domain mapping | Pending | One-object and representative Entry/Exit pointer selection preserve stable mappings; the 32-object diagnostic retains 32 logical objects/layers and deterministic identities with measured active-node and resource observations | Prove representative interaction capacity rather than only the accepted fixture shape, agree decision-usable object/layer/interaction ranges and account for product composition and residual lifecycle limits |
-| Normal edits avoid dense exact `Part` geometry | Pending | The application-command edit, representative Entry/Exit edit, Undo/Redo, recovery and cache-invalidation workflows retain compact logical objects/layers and zero `Shape` properties | Exercise an actual user-facing parameter control and representative interaction workflow through the intended product lifecycle, then obtain editing-behaviour acceptance |
-| Project owner accepts editing behaviour and documented limitations | Pending | Retained GUI evidence can present pointer-selected, edited, Undo, Redo, recovered and reopened states together with the explicit post-open, fixture-scale, resource and empty-switch-child limitations | Present owner-visible selection and editing through a user-facing control, document decision-usable limits and obtain explicit project-owner editing-behaviour and renderer acceptance |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Pending | Renderer-neutral and Coin rendering; stable pointer mapping; application-command and owner-visible parameter editing; atomic Undo/Redo and recovery; cache invalidation/reuse; explicit B16 lifecycle activation, save-time retirement and reopen reconstruction; Entry/Exit and 2–32-object observations; maintainability review | Decide whether the bounded interaction/resource evidence and one-empty-child confinement are acceptable, then make the explicit renderer decision |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Pending | One-object, Entry/Exit and 2–32-object proofs retain exact object/layer/mapping counts, bounded active-node counts, zero `Shape` properties and complete cleanup | Agree the representative capacity and numerical interaction/resource budget and decide whether the confined residual is acceptable |
+| Normal edits avoid dense exact `Part` geometry | Pending | The explicit B16 lifecycle exposes the existing editor on Entry/Exit; edit, no-op, Undo/Redo, failure recovery and reopen retain compact objects, zero `Shape` properties and unchanged canonical/persisted state | Obtain explicit owner acceptance of the demonstrated editing behaviour and limitation |
+| Project owner accepts editing behaviour and documented limitations | Pending | The owner pack can show the explicit lifecycle scene/editor, exact validation, save/reopen behaviour, exclusions and the one-empty-child limitation | Answer the Level 3 renderer and editing-behaviour acceptance question; no acceptance is inferred from this evidence |
 
 Unless a later change affects one of these boundaries or signals a regression,
 phase progression need not repeat the retained preview, Coin lifecycle,
@@ -1029,3 +1029,57 @@ decision registers are unchanged.
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 Phase 5 opening and renderer-evaluation authority; D-GOV-004 is the separate
 continuation-governance decision in [gate-decisions.json](gate-decisions.json).
+
+## Explicit B16 transition-editing lifecycle tranche
+
+This Level 2, **exit-closing** tranche adds one explicit
+`activate_transition_editing()` composition function to the B16 macro and one
+host-independent, versioned UI lifecycle coordinator. The default macro path,
+`tracktemplate.api`, package initialisation and FreeCAD startup remain
+unchanged. Only a successful explicit call lazily imports FreeCAD, Coin and Qt,
+enumerates the existing canonical Entry/Exit records, attaches each exactly
+once and registers a transient save observer. Observer ownership is retryable:
+failed removal retains the same registered observer, and a partial registration
+failure exposes the lifecycle needed to complete rollback. The architecture
+review retained the macro as the accepted cross-layer composition root rather
+than adding a new package layer or choosing Workbench/menu loading policy.
+First-party
+FreeCAD guidance reviewed on 2026-07-31 supports explicit commands, transient
+ViewProvider graphics and `slotStartSaveDocument` document observers; it does
+not expose a qualified Python display-mode removal operation.
+
+In isolated qualified FreeCAD 1.1.1, two canonical Entry/Exit records attach
+once with their original public `DisplayMode` enumeration, canonical JSON,
+property lists, history and zero-`Shape` state unchanged. A concurrent lifecycle
+and a second macro invocation are rejected without adding a node. The existing
+modeless editor shows
+`SET-001/curve-track/2/transition/exit` at `420.000` mm; one `360.000` mm edit,
+Undo and Redo use the retained command and transactional port, then the initial
+state is restored. Saving while active invokes the transient observer, closes
+the editor, clears only the target document's FreeCAD selection while
+preserving a selected sibling document, discards both caches and active Coin
+children, restores both default proxies and display selections, unregisters
+the observer and serializes no lifecycle marker. Close/reopen followed by a
+new explicit call constructs different scene nodes and restores the original
+visible Exit state; explicit deactivation then permits clean direct close. No
+automatic document-close or product-loading policy is added. The scene and
+editor captures under
+`benchmark-output/freecad-bridge/phase5-transition-lifecycle-runs/20260731T201755609094Z/`
+were visually inspected and are clear.
+
+The complete final-source `transition-gui` profile parsed 171 tracked Python
+and FCMacro files, passed 54/54 standalone validators, qualified persistence,
+Coin-scene and edit-lifecycle checks, and the combined isolated real-GUI
+workflow. Raw logs are retained under
+`benchmark-output/validation-pipeline/20260731T201653458832Z/`.
+
+FreeCAD retains the registered selection root because its Python interface has
+no supported removal operation. Disposal names and empties exactly one such
+child per object, rejects same-document reactivation without accumulation and
+relies on close/reopen to remove it. This is technically confined but remains
+an **unaccepted limitation** for the project owner. No automatic Addon startup,
+Workbench/menu policy, schema, migration, exact geometry, export, production
+output, numerical budget, renderer acceptance, Phase 5 acceptance or release
+authority changes. Phase 5 remains 0/4; PR-14 remains Open/Remove with
+**Partial** control; the project plan, risk register and decision register are
+unchanged.

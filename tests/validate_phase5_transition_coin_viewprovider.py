@@ -50,10 +50,13 @@ class _ViewObject:
         self.RootNode = _Group()
         self.SwitchNode = _Group()
         self.SwitchNode.whichChild = _Field()
+        self.SwitchNode.whichChild.setValue(-1)
         self.RootNode.addChild(self.SwitchNode)
         self.Object = object()
         self._proxy = initial_proxy
         self._display_modes = []
+        self._display_mode = None
+        self._display_mode_enumerations = []
         self._fail_display_mode = fail_display_mode
         self._fail_proxy_restore = fail_proxy_restore
         self._initial_proxy = initial_proxy
@@ -72,14 +75,39 @@ class _ViewObject:
             raise RuntimeError("injected proxy restoration failure")
         self._proxy = value
         if value is None or isinstance(value, int):
+            self._display_modes = []
             return
         value.attach(self)
+
+    @property
+    def DisplayMode(self):
+        return self._display_mode
+
+    @DisplayMode.setter
+    def DisplayMode(self, value):
+        if isinstance(value, (list, tuple)):
+            self._display_mode_enumerations = list(value)
+            self._display_mode = (
+                self._display_mode_enumerations[0]
+                if self._display_mode_enumerations
+                else None
+            )
+            return
+        if value not in self._display_mode_enumerations:
+            raise ValueError("display mode is not registered")
+        self._display_mode = value
+
+    def getEnumerationsOfProperty(self, property_name):
+        assert property_name == "DisplayMode"
+        return list(self._display_mode_enumerations)
 
     def addDisplayMode(self, node, name):
         if self._fail_display_mode:
             raise RuntimeError("injected document attachment failure")
         self.SwitchNode.addChild(node)
         self._display_modes.append(name)
+        self._display_mode_enumerations = list(self._display_modes)
+        self._display_mode = name
         self.SwitchNode.whichChild.setValue(
             len(self.SwitchNode.children) - 1
         )
@@ -645,6 +673,10 @@ def _validate_document_attachment():
     )
     assert entry.ViewObject.Proxy is entry_proxy
     assert exit_record.ViewObject.Proxy is exit_proxy
+    assert entry.ViewObject.SwitchNode.whichChild.getValue() == 0
+    assert exit_record.ViewObject.SwitchNode.whichChild.getValue() == 0
+    assert entry.ViewObject.DisplayMode is None
+    assert exit_record.ViewObject.DisplayMode is None
     assert entry_cache.status(
         entry_state,
         specification.derived_request(),
@@ -679,6 +711,10 @@ def _validate_document_attachment():
     assert attached.attached is False
     assert entry.ViewObject.Proxy == 0
     assert exit_record.ViewObject.Proxy is None
+    assert entry.ViewObject.SwitchNode.whichChild.getValue() == -1
+    assert exit_record.ViewObject.SwitchNode.whichChild.getValue() == -1
+    assert entry.ViewObject.DisplayMode is None
+    assert exit_record.ViewObject.DisplayMode is None
     assert entry_cache.artifact("preview") is None
     assert exit_cache.artifact("preview") is None
     for record in (entry, exit_record):
@@ -916,13 +952,19 @@ def _validate_structure_and_controls():
     ]
 
     for relative in (
-        "TrackTemplate.FCMacro",
         "tracktemplate/api.py",
         "tracktemplate/presentation/__init__.py",
     ):
         source = (ROOT / relative).read_text(encoding="utf-8")
         assert "transition_coin_viewprovider" not in source
         assert "transition_coin_attachment" not in source
+    launcher_source = (ROOT / "TrackTemplate.FCMacro").read_text(
+        encoding="utf-8"
+    )
+    assert "tracktemplate.presentation.transition_coin_attachment" in (
+        launcher_source
+    )
+    assert launcher_source.count("activate_transition_editing(") == 1
     for relative, expected in SOURCE_HASHES.items():
         assert _sha256(ROOT / relative) == expected
 
