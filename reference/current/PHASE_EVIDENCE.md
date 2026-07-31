@@ -587,14 +587,94 @@ No renderer, owner editing behaviour or Phase 5 exit is accepted; PR-14
 remains Open/Remove with **Partial** control and the risk and decision
 registers are unchanged.
 
+## Representative save/reopen attachment tranche
+
+This Level 2 test-and-evidence tranche extends only the existing representative
+GUI fixture, its runner contract and the validation owners. After the retained
+Entry/Exit pointer-selection and edit lifecycle, the proof disposes both manual
+ViewProviders and caches, saves the two canonical `App::FeaturePython`
+records, closes and reopens the FCStd, then invokes the existing
+development-only document attachment explicitly. No product source, load hook,
+observer, command, schema, property or runtime dependency changes.
+
+The test-first standalone profile stopped at the newly required `saveAs`
+contract with 50/51 validators passing, classified
+`fixture-or-harness-defect` because the GUI proof had not yet implemented the
+required exercise; the exact logs are under
+`benchmark-output/validation-pipeline/20260731T065424831459Z/`. A static
+assertion then required an incidental literal dictionary shape, classified
+`test-or-oracle-defect` and replaced by the named payload-boundary check; that
+failure is retained under
+`benchmark-output/validation-pipeline/20260731T065825986959Z/`. The qualified
+GUI proof subsequently exposed one deleted FreeCAD-wrapper access and one
+restore-only `DisplayMode` assignment, both
+`fixture-or-harness-defect`, plus an incorrect expectation that an unchanged
+refresh return its artifact rather than `False`, a `test-or-oracle-defect`.
+The repairs snapshot plain identifiers before close, relinquish the deleted
+document handle, retain cache-identity assertions and activate the rebuilt
+switch children through the already qualified route. Those three GUI attempts
+left their FCStd artifacts under run directories
+`20260731T065947200499Z`, `20260731T070056548727Z` and
+`20260731T070154732864Z`, but their raw bridge output and exact interim
+source-state packets were not retained. Their proposed classifications and
+chronology are therefore not independently auditable, and none is treated as
+passing evidence.
+
+The subsequent six-layer profile under
+`benchmark-output/validation-pipeline/20260731T070525796802Z/` stopped at the
+project-progress assertion that the current Phase 5 exit evidence had drifted.
+This was classified `implementation-defect` in the retained documentation: an
+attempted evidence edit had changed the validator-controlled 0/4 exit
+disposition without Level 3 authority. Restoring the accepted disposition
+repaired the documentation scope; no validator or phase authority changed.
+
+The exact qualified FreeCAD 1.1.1 command
+`tools/freecad_bridge/run-phase5-transition-viewprovider` passed. The reopened
+attachment enumerated
+`SET-001/curve-track/2/transition/entry` then
+`SET-001/curve-track/2/transition/exit`, rebuilt two new equivalent caches and
+Coin layers, retained two objects, two logical layers, 14 active selectable
+scene nodes and zero `Shape` properties, and preserved both pre-save stable
+selection mappings. Refreshing unchanged Exit reused its artifact without
+changing Entry state, visual source or mapping. Before that refresh, the proof
+deliberately discarded Entry's cache artifact; it remained missing afterwards
+while Entry's bound source signature and selection root stayed identical. This
+observable trap establishes that the Exit request did not request or rebuild
+the sibling cache. Batch disposal cleared both caches and selection roots,
+restored both original host proxies and changed neither canonical JSON,
+properties, object count nor reopened history.
+
+The retained 1000×700 reopened capture contains 5,234 red pixels and was
+visually inspected; it shows the two distinct representative centrelines. As
+with the one-object proof, disposal restores each public display-mode list but
+leaves one empty switch child per record until object deletion or document
+close/reopen. The first-party document-object guidance was rechecked on
+2026-07-31 at unchanged Addon Academy revision
+`833bb4852af825e1826b83d6b75872d18b433486`; the qualified FreeCAD 1.1.1
+revision remains `0108fd4b4850cc46e625b60e53cea7a7bbe69f8d`.
+
+The complete `transition-gui` profile passed tracked parsing, all 51
+standalone validators, qualified transition persistence, Coin-scene and edit
+lifecycle checks, and the isolated real-GUI proof. Raw logs are retained under
+`benchmark-output/validation-pipeline/20260731T072127239431Z/`.
+
+This is representative evidence only for the accepted fixture-only family
+shape. It establishes no whole-layout capacity, interaction budget, automatic
+product load route, supported migration, renderer acceptance or owner
+editing-behaviour acceptance. Phase 5 remains 0/4; PR-14 remains
+Open/Remove with **Partial** control and the risk and decision registers are
+unchanged.
+
 ## Next bounded tranche
 
-Exercise the explicit development-only attachment boundary against a
-saved/reopened representative Entry/Exit document in one qualified real-GUI
-proof. Verify stable two-object ordering, independent refresh and disposal,
-and unchanged stable selection mappings without adding product load wiring.
-Keep maintainability comparison, renderer acceptance and owner
-editing-behaviour acceptance as separate later tranches.
+Perform one bounded maintainability and reuse review of the retained Coin
+candidate against the renderer-neutral preview contract and accepted layer
+direction. Name the authoritative implementation for each shared invariant,
+dependency direction, lifecycle and cleanup ownership, fixture duplication and
+retirement conditions, including the explicit post-open and empty-switch-child
+limitations. Record missing comparison evidence for the unimplemented SVG/Qt
+fallback rather than adding another renderer. Keep renderer acceptance, product
+load wiring and owner editing-behaviour acceptance as separate later tranches.
 
 The current risk state is in [risks.json](risks.json). D-P5-001 remains the
 only Phase 5 authority decision in [gate-decisions.json](gate-decisions.json).

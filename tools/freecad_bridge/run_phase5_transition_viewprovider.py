@@ -215,6 +215,14 @@ def main():
             multi_object_result,
             MULTI_OBJECT_SENTINEL,
         )
+        reopened_attachment = multi_object_payload.get(
+            "reopened_attachment",
+            {},
+        )
+        representative_order = [
+            "SET-001/curve-track/2/transition/entry",
+            "SET-001/curve-track/2/transition/exit",
+        ]
         if (
             multi_object_payload.get("freecad_version") != "1.1.1"
             or multi_object_payload.get("workload_id")
@@ -268,6 +276,57 @@ def main():
             or multi_object_payload.get(
                 "failure_history_preserved"
             ) is not True
+            or reopened_attachment.get(
+                "active_coin_scene_node_count"
+            ) != 14
+            or reopened_attachment.get("attachment_boundary")
+            != (
+                "tracktemplate.transition-coin-document-attachment."
+                "fixture.v1"
+            )
+            or reopened_attachment.get("attachment_count") != 2
+            or reopened_attachment.get("attachment_order")
+            != representative_order
+            or reopened_attachment.get("cache_is_new_count") != 2
+            or reopened_attachment.get("derived_state_persisted")
+            is not False
+            or reopened_attachment.get("disposed") is not True
+            or reopened_attachment.get(
+                "dispose_returned_transition_ids"
+            )
+            != representative_order
+            or reopened_attachment.get("document_object_count") != 2
+            or reopened_attachment.get(
+                "empty_switch_children_retained"
+            ) != 2
+            or reopened_attachment.get("explicit_post_open")
+            is not True
+            or reopened_attachment.get("history_delta") != 0
+            or reopened_attachment.get("independent_refresh")
+            is not True
+            or reopened_attachment.get("logical_layer_count") != 2
+            or reopened_attachment.get("part_shape_created")
+            is not False
+            or reopened_attachment.get("preview_equivalent_count") != 2
+            or reopened_attachment.get("save_route_exercised")
+            is not True
+            or reopened_attachment.get("schema_unchanged") is not True
+            or reopened_attachment.get(
+                "selection_mappings_preserved"
+            ) is not True
+            or reopened_attachment.get(
+                "sibling_cache_request_trap"
+            ) != "remained-missing"
+            or reopened_attachment.get("stored_state_unchanged")
+            is not True
+            or reopened_attachment.get("all_caches_discarded")
+            is not True
+            or reopened_attachment.get(
+                "all_selection_roots_cleared"
+            ) is not True
+            or reopened_attachment.get("all_host_proxies_restored")
+            is not True
+            or reopened_attachment.get("visible_red_pixels", 0) < 100
             or multi_object_payload.get(
                 "cache_invalidation",
                 {},

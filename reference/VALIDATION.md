@@ -556,6 +556,20 @@ and ViewProvider with an equivalent preview, a reused no-op refresh, visible
 rendering, cleared derived state on disposal, restored host proxy and unchanged
 canonical JSON, property lists, object count and history throughout.
 
+The same runner then proves the
+saved/reopened representative Entry/Exit attachment boundary. It first
+disposes the two manual editing fixtures and caches, saves only the two
+canonical `App::FeaturePython` records, closes and reopens the FCStd, and
+invokes the document attachment explicitly. The attachment must enumerate
+Entry then Exit by stable identity, rebuild two new equivalent caches and Coin
+layers, preserve both pre-save selection mappings, and reuse an unchanged Exit
+refresh without changing the Entry artifact. It must retain two objects, two
+logical layers, 14 active selectable-scene nodes, zero `Shape` properties and
+zero attachment history delta. Batch disposal must clear both caches and
+selection roots, restore both original host proxies and leave the reopened
+canonical JSON, property lists, object count and history unchanged. The known
+empty-switch-child limitation applies independently to both disposed records.
+
 This is a test-owned, post-open composition boundary. It is absent from
 `tracktemplate.api`, package initialisation, the product macro and FreeCAD
 startup or document observers. Passing it does not establish automatic product
