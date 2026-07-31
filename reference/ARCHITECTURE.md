@@ -117,12 +117,20 @@ Avoid one persistent document object per rail segment, timber, chair, marker, or
 The initial host and legacy-ingress boundary is fixed by
 [`contracts/phase1-compatibility.json`](contracts/phase1-compatibility.json).
 Only a qualified FreeCAD runtime may write through this adapter. B14 and B15
-are the bounded future migration sources, including their expected mixed
-version set, but migration always targets a user-approved copy/new document
-and remains controlled by entity family. Unknown, future, versionless, corrupt or
+remain the bounded migration sources, including their expected mixed version
+set, but migration always targets a user-approved copy/new document and
+remains controlled by entity family. Unknown, future, versionless, corrupt or
 insufficiently parametric state is inspection-only or blocked; legacy exact
-shapes are evidence rather than authoritative state. The canonical successor
-schema and executable migrations remain Phase 4 work.
+shapes are evidence rather than authoritative state.
+
+Within its exact accepted boundary, Phase 4 established canonical transition-
+state v1, application-owned signatures and invalidation, compact FreeCAD
+persistence, a disposable derived-state lifecycle, renderer-neutral preview
+state, the neutral chair-definition package v1 boundary and fixture-only
+copied-target support for the spacing-matched plain-line transition family.
+Exact geometry and export remain Phase 6 work. Wider product/operator
+migration, whole-document support, alignment, turnout, crossover, timber,
+chair and other entity-family migration remain later-phase work.
 
 ### 4. Lightweight presentation adapter
 
@@ -211,11 +219,11 @@ the final S1 geometry oracle, or a precedent for new chair families.
 The owner-accepted Phase 1 package/evidence decisions are in
 [S1_PILOT_PLAN.md](phase-evidence/S1_PILOT_PLAN.md). Its exact decimal source-quantity,
 full-size millimetre, chair-local frame and validate-before-mutation rules are
-accepted architectural direction, not an implemented schema.
-It deliberately leaves the prototype designation, primary evidence, rail
-section, final package licence, rights reviews and numerical tolerances
+retained in the neutral chair-definition package v1 boundary accepted in Phase
+4. The plan deliberately leaves the prototype designation, primary evidence,
+rail section, final package licence, rights reviews and numerical tolerances
 blocked; neither the working S1 name nor the conditional CC0 target is
-canonical data.
+canonical production data.
 
 ### Chair assimilation boundary
 
@@ -405,13 +413,13 @@ The following require prototypes or user decisions and are not settled by this d
 - exact Addon manifest, loading/update mechanics, catalogue-submission route
   and supported lifetime of the compatibility macro launcher;
 - numerical performance budgets and representative benchmark documents;
-- canonical successor schema, B14/B15 family-migration implementations and
-  fixtures, plus evidence for any proposed expansion beyond the accepted
-  ingress/runtime matrix;
-- implementation of the chair-definition package schema and accepted
-  schema-version window; the Phase 1 S1 plan recommends exact source-value
-  representation, full-size millimetres, an explicit chair-local frame and
-  fail-closed loading, accepted as direction and subject to Phase 4 tests;
+- later B14/B15 family-migration implementations and fixtures beyond accepted
+  transition-state v1 and the fixture-only spacing-matched plain-line family,
+  plus evidence for any proposed expansion of the ingress/runtime matrix;
+- production chair definitions and package admission beyond the accepted
+  neutral chair-definition package v1 boundary, including the primary S1
+  evidence, numerical tolerances, rights and intended-use decisions retained
+  by the Phase 1 S1 plan;
 - accepted evidence, fit metrics and tolerances for the first S1 assimilation
   pilot, including confirmation of its precise prototype designation, rights
   chain, intended package licence and commercial/publication use; and

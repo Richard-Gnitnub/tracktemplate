@@ -1,9 +1,10 @@
 # Reference Source Provenance and Licensing Decision Record
 
 Status: **COMPLETE for the Phase 0 source snapshot, project licence,
-attribution, and ZIP redistribution decision accepted on 2026-07-19. The
-Phase 1 production-data and output-lineage audit is OPEN under the policy
-accepted on 2026-07-20.**
+attribution and ZIP redistribution decision accepted on 2026-07-19, and for
+the bounded Phase 1 inventory and lineage-register boundary accepted at Phase
+1 closeout on 2026-07-22. Production-data admission, rights and output-
+clearance obligations remain open or blocked at their named later gates.**
 
 This record captures what can be established from the repository and the local
 reference material. It is a project-control record, not legal advice or a legal

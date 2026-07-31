@@ -198,8 +198,10 @@ The outer ingress policy is not open-ended: the Phase 1
 [`compatibility contract`](contracts/phase1-compatibility.json) recognises B14,
 B15 and their expected mixed set only. A compatibility adapter must preflight
 read-only, fail closed on unknown/future/conflicting state, and migrate into a
-copy/new canonical target. Each advertised entity family needs its own Phase 4
-fixture before the adapter may write it.
+copy/new canonical target. Phase 4 accepted fixture-only support for exactly
+`plain-line-spacing-matched-transition-intent`; each additional advertised
+entity family needs its own fixture and acceptance in its owning later phase
+before the adapter may write it.
 
 Git history is the record of old implementations. Do not keep historical function bodies active merely to preserve a source changelog.
 
@@ -381,9 +383,11 @@ Status: **Complete — exit evidence accepted by the project owner on
 - Keep the extracted domain/API compatible with the recorded CPython 3.12.0
   floor and exercise it in both the standalone 3.12.3 environment and the
   qualified FreeCAD-bundled 3.13.14 runtime.
-- Add only a development composition guard for the exact qualified host; the
-  production document detector/migrator remains a Phase 4 compatibility
-  adapter and the final Addon metadata remains Phase 10 work.
+- Add only a development composition guard for the exact qualified host. At
+  the Stage M2 boundary the document detector/migrator remained assigned to
+  Phase 4; Phase 4 later accepted its bounded ingress, compact persistence and
+  exact fixture-only first-family support. Wider product/operator migration
+  remains later work, and final Addon metadata remains Phase 10 work.
 
 Exit condition: **evidenced.** The minimal boundary and loading approach work in
 both isolated standalone Python and the qualified FreeCAD runtime, with no
@@ -502,11 +506,13 @@ Modularisation is complete when:
 
 - exact Workbench/Addon manifest, loading/update and Addon Manager catalogue
   submission mechanics, plus the compatibility launcher's supported lifetime;
-- B14/B15 family-migration implementation/fixtures and qualification evidence
-  for any proposed runtime or legacy-window expansion;
-- record/type approach compatible with the supported FreeCAD Python runtime;
-- exact chair-definition package schema, source-value representation and
-  canonical unit strategy;
+- B14/B15 family-migration implementations, fixtures and qualification
+  evidence beyond the accepted fixture-only spacing-matched plain-line family
+  or for any proposed runtime/legacy-window expansion;
+- record/type approaches for later families beyond accepted transition-state
+  v1, compatible with the supported FreeCAD Python runtime;
+- production chair definitions, evidence and admission beyond the accepted
+  neutral chair-definition package v1 schema and canonical-unit strategy;
 - optional scan/CAD evidence readers and fitting implementation for the S1
   pilot, subject to the no-new-runtime-dependency rule;
 - tooling for dependency-cycle and structural-metric enforcement.
