@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "current_phase": 5,
+  "updated_on": "2026-08-01",
+  "decisions": [
+    {
+      "id": "D-P5-001",
+      "decided_on": "2026-07-28",
+      "status": "Accepted",
+      "decision": "Open Phase 5.",
+      "authority": "Phase 5 is open at 0/4 for bounded lightweight renderer prototypes and editing evidence on the selected transition slice.",
+      "exclusions": "No renderer or exit is accepted; exact geometry/export, operator migration or support expansion, production output, chair clearance, packaging/release, accepted-oracle retirement, persisted-schema change and new runtime dependencies remain excluded.",
+      "evidence": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#phase-5-opening-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#phase-5-opening-panel"
+    },
+    {
+      "id": "D-GOV-004",
+      "decided_on": "2026-07-31",
+      "status": "Accepted",
+      "decision": "Authorise explicit repository-driven continuation cycles.",
+      "authority": "Only an explicit project-owner invocation containing the literal `$tracktemplate-continue` command starts one cycle. That cycle may integrate one previous exact-green authorised Level 1 or Level 2 pull request, synchronise protected main in every path, reconstruct canonical repository authority, classify candidates, select and deliver one highest-value worthwhile authorised Level 1 or Level 2 outcome or stop cleanly, use the bounded chief-of-staff and technical-lead workflows where applicable, validate and obtain separate read-only staff review, repair BLOCKER findings only through at most two shared repair-and-review passes with affected final validation and a new separate read-only review after every repair, delegate only review-frozen publication of the exact final-reviewed source, and publish one exact-green draft pull request before stopping with a plain-English owner acceptance pack.",
+      "exclusions": "Natural-language equivalents do not invoke it. A next-tranche sentence, review finding, branch name, test expectation or source shape is not authority; maintenance, governance/tooling and non-blocking review findings cannot nominate themselves as the next tranche. Delegated publication has no independent source-edit or CI-repair authority. No Level 3 decision, renderer or phase acceptance, migration support, production output or chair clearance, release or tagging, protection bypass, force push, history rewrite, destructive reset or restore, git clean, branch deletion, destructive operation, unresolved product choice or same-invocation readying or merge of the newly published draft is authorised.",
+      "evidence": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#repository-driven-continuation-authority-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#repository-driven-continuation-authority-panel"
+    },
+    {
+      "id": "D-P5-002",
+      "decided_on": "2026-07-31",
+      "status": "Accepted",
+      "decision": "Accept Coin and the demonstrated B16 Entry/Exit transition-editing behaviour.",
+      "authority": "Coin is the selected lightweight renderer for the demonstrated B16 Entry/Exit transition-editing boundary at exact product source commit 0f437f9de8c81f773a50e4b03c1ad6efd8a34169. The documented explicit lifecycle, exactly-once attachment, duplicate rejection, owner-visible selection and editing, atomic edit/Undo/Redo behaviour, save-time deactivation, save/close/reopen reconstruction, explicit deactivation before direct close and technically confined one-empty-switch-child-per-object limitation until document close or reopen are accepted; canonical and persisted state remain unchanged. All four exact Phase 5 exits are evidenced; Phase 5 remains current pending a separate closeout decision.",
+      "exclusions": "No automatic Addon startup, permanent Workbench or menu integration, wider product or whole-layout capacity claim, another renderer, schema or migration change, exact geometry or export, production-output clearance, numerical performance budget, packaging or release, later-phase authority, Phase 5 closeout or Phase 6 opening is authorised. Reopen this decision and PR-14 if later composition invalidates the residual containment or permits live mappings, caches, proxies, active Coin children or more than one confined empty switch child per object to accumulate.",
+      "evidence": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#phase-5-coin-renderer-and-editing-acceptance-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#phase-5-coin-renderer-and-editing-acceptance-panel"
+    },
+    {
+      "id": "D-P5-003",
+      "decided_on": "2026-08-01",
+      "status": "Accepted",
+      "decision": "Close Phase 5.",
+      "authority": "Phase 5 is closed at 4/4. Its accepted evidence, decisions and risk snapshot are frozen; the project dashboard is updated; and clean fixed-path Phase 6 administrative holding records are established at 0/5, Not started, unopened and unauthorised. The required new non-overwriting independent backup covering Git and ignored Phase 5 raw evidence passed before closeout status was retained.",
+      "exclusions": "Phase 6 is not opened and no Phase 6 product behaviour is authorised. Migration, exact geometry or export, production output, packaging, release and all later-phase authority remain excluded. The D-P5-002 and retired PR-14 reopen trigger remains mandatory if later composition invalidates residual Coin-child containment. This decision does not authorise publication or merge of the closeout change and creates no automatic new-work or governance loop.",
+      "evidence": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#phase-5-closeout-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#phase-5-closeout-panel"
+    }
+  ]
+}

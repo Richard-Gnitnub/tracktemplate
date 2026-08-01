@@ -533,7 +533,11 @@ def _validate_structure_and_explicit_route():
         encoding="utf-8"
     )
     evidence = (
-        ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
+        ROOT
+        / "reference"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE5_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     assert "explicit B16 lifecycle boundaries" in validation
     assert "save-time retirement and reopen reconstruction" in evidence

@@ -289,7 +289,7 @@ Only a project-owner command containing the literal `$tracktemplate-continue`
 invocation activates it. Natural-language equivalents, quotations and
 descriptions do not supply its authority; its metadata therefore retains
 `allow_implicit_invocation: false`. The accepted standing boundary is recorded
-by [D-GOV-004](current/PHASE_EVIDENCE.md#repository-driven-continuation-authority-panel).
+by [D-GOV-004](history/phase-closeouts/PHASE5_CLOSEOUT.md#repository-driven-continuation-authority-panel).
 
 ### `tracktemplate-performance-engineering`
 

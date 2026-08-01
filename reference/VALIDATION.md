@@ -495,7 +495,7 @@ timings do not establish an interaction budget or an optimisation claim; raw
 paths, FCStd files and JSON remain ignored, with a sanitised committed report
 under `reference/benchmarks/`.
 
-Current Phase 5 bounded Coin resource profile:
+Retained Phase 5 bounded Coin resource profile:
 
 ```bash
 .venv/bin/python tests/validate_phase5_transition_coin_resource_profile.py
@@ -515,7 +515,7 @@ capacity or numerical budget. Raw JSON and logs remain ignored. The sanitised
 result and limitations are in
 [benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md](benchmarks/2026-07-29-phase5-transition-coin-resource-profile.md).
 
-Current Phase 5 bounded transition interaction/resource range profile:
+Retained Phase 5 bounded transition interaction/resource range profile:
 
 ```bash
 .venv/bin/python tests/validate_phase5_transition_interaction_range_profile.py
@@ -541,7 +541,7 @@ capacity, interaction budget, renderer or optimisation. The sanitised method,
 observations and limitations are in
 [benchmarks/2026-07-31-phase5-transition-interaction-range-profile.md](benchmarks/2026-07-31-phase5-transition-interaction-range-profile.md).
 
-Current Phase 5 representative Entry/Exit multi-object editing workload:
+Retained Phase 5 representative Entry/Exit multi-object editing workload:
 
 ```bash
 .venv/bin/python tests/validate_phase5_transition_parameter_editor.py
@@ -582,7 +582,7 @@ family shape. It does not establish whole-layout capacity, an interaction
 budget, automatic product load or menu wiring, renderer suitability or owner
 acceptance.
 
-Current Phase 5 post-open attachment and explicit B16 lifecycle boundaries:
+Retained Phase 5 post-open attachment and explicit B16 lifecycle boundaries:
 
 ```bash
 .venv/bin/python tests/validate_phase4_transition_persistence.py
@@ -667,10 +667,12 @@ enumeration and switch selection and clears every retained mapping and cache,
 but leaves one named empty switch child. The lifecycle confines that residual
 to one child per object, rejects same-document reactivation without adding a
 second child, and relies on document close/reopen to remove it. The checks
-require this unaccepted limitation rather than describing disposal as complete
-view-state restoration. Passing them establishes no automatic startup,
-Workbench or menu wiring, migration support, renderer suitability, owner
-acceptance, release or output authority.
+require this documented bounded limitation rather than describing disposal as
+complete view-state restoration. D-P5-002 accepts it only for the demonstrated
+Entry/Exit boundary recorded in the
+[frozen Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md#phase-5-coin-renderer-and-editing-acceptance-panel).
+Passing the checks alone grants no renderer, phase, startup, Workbench/menu,
+migration, release or output authority.
 
 Repository recovery and ignored-data safety controls:
 
@@ -802,10 +804,11 @@ Project dashboard and current-record consistency:
 ```
 
 This enforces the compact project-plan sections and line budget, reconciles the
-current Phase 5 dashboard with `current/PHASE_EVIDENCE.md`, validates the
-detailed current risk and decision JSON registers, protects the retired
-descriptive-path redirect and checks the least-privilege, SHA-pinned standalone
-CI workflow. It does not assess the quality of a decision's evidence or replace
+frozen Phase 5 closeout and unopened Phase 6 holding state with
+`current/PHASE_EVIDENCE.md`, validates the detailed frozen/current risk and
+decision JSON registers, protects the retired descriptive-path redirect and
+checks the least-privilege, SHA-pinned standalone CI workflow. It does not
+assess the quality of a decision's evidence, open a phase or replace
 project-owner acceptance.
 
 Fail-closed Phase 1 performance-boundary checks:

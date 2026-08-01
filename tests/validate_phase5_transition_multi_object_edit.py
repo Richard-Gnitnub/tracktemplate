@@ -219,7 +219,11 @@ def _validate_scope_and_documentation():
         encoding="utf-8"
     )
     evidence = (
-        ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
+        ROOT
+        / "reference"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE5_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     assert (
         "representative Entry/Exit multi-object editing workload"
