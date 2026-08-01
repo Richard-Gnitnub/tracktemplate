@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import math
 
 from tracktemplate.application.transition_derived import (
+    TransitionDerivedArtifact,
     TransitionDerivedCache,
     TransitionDerivedRequest,
     transition_derived_contract_signature,
@@ -56,6 +57,7 @@ __all__ = (
     "TransitionExactSpecification",
     "TransitionExactValidationResult",
     "regenerate_transition_exact",
+    "transition_exact_result_from_artifact",
 )
 
 
@@ -341,6 +343,25 @@ def _centreline_record(centreline):
     }
 
 
+def _centreline_signature(centreline):
+    return transition_derived_contract_signature(
+        TRANSITION_EXACT_ARTIFACT_ID,
+        _centreline_record(centreline),
+    )
+
+
+def _validation_result_signature(source_signature, artifact_signature):
+    return transition_derived_contract_signature(
+        TRANSITION_EXACT_RESULT_ID,
+        {
+            "artifact_signature": artifact_signature,
+            "oracle_id": TRANSITION_EXACT_ORACLE_ID,
+            "source_signature": source_signature,
+            "status": "valid",
+        },
+    )
+
+
 def _build_transition_exact_result(state, specification, source_signature):
     try:
         stations, chord_error_bound_mm = (
@@ -384,18 +405,10 @@ def _build_transition_exact_result(state, specification, source_signature):
         chord_error_bound_mm=chord_error_bound_mm,
         points=points,
     )
-    artifact_signature = transition_derived_contract_signature(
-        TRANSITION_EXACT_ARTIFACT_ID,
-        _centreline_record(centreline),
-    )
-    result_signature = transition_derived_contract_signature(
-        TRANSITION_EXACT_RESULT_ID,
-        {
-            "artifact_signature": artifact_signature,
-            "oracle_id": TRANSITION_EXACT_ORACLE_ID,
-            "source_signature": source_signature,
-            "status": "valid",
-        },
+    artifact_signature = _centreline_signature(centreline)
+    result_signature = _validation_result_signature(
+        source_signature,
+        artifact_signature,
     )
     return TransitionExactValidationResult(
         source_signature=source_signature,
@@ -403,6 +416,37 @@ def _build_transition_exact_result(state, specification, source_signature):
         result_signature=result_signature,
         centreline=centreline,
     )
+
+
+def transition_exact_result_from_artifact(artifact):
+    """Return the verified result from one self-consistent exact artifact."""
+    if not isinstance(artifact, TransitionDerivedArtifact):
+        raise TypeError("artifact must be a TransitionDerivedArtifact")
+    result = artifact.payload
+    expected_artifact_signature = None
+    expected_result_signature = None
+    if isinstance(result, TransitionExactValidationResult):
+        expected_artifact_signature = _centreline_signature(
+            result.centreline,
+        )
+        expected_result_signature = _validation_result_signature(
+            artifact.source_signature,
+            expected_artifact_signature,
+        )
+    if (
+        artifact.stage != "exact-validation"
+        or not isinstance(result, TransitionExactValidationResult)
+        or result.source_signature != artifact.source_signature
+        or result.artifact_signature != expected_artifact_signature
+        or result.result_signature != expected_result_signature
+    ):
+        raise _exact_error(
+            "invalid-exact-artifact",
+            "$.exact",
+            "the supplied exact-stage artifact contains an incompatible "
+            "payload",
+        )
+    return result
 
 
 def regenerate_transition_exact(cache, state, specification):
@@ -433,32 +477,5 @@ def regenerate_transition_exact(cache, state, specification):
         )
 
     artifact = cache.regenerate(state, request, build)
-    result = artifact.payload
-    expected_artifact_signature = None
-    expected_result_signature = None
-    if isinstance(result, TransitionExactValidationResult):
-        expected_artifact_signature = transition_derived_contract_signature(
-            TRANSITION_EXACT_ARTIFACT_ID,
-            _centreline_record(result.centreline),
-        )
-        expected_result_signature = transition_derived_contract_signature(
-            TRANSITION_EXACT_RESULT_ID,
-            {
-                "artifact_signature": expected_artifact_signature,
-                "oracle_id": TRANSITION_EXACT_ORACLE_ID,
-                "source_signature": artifact.source_signature,
-                "status": "valid",
-            },
-        )
-    if (
-        not isinstance(result, TransitionExactValidationResult)
-        or result.source_signature != artifact.source_signature
-        or result.artifact_signature != expected_artifact_signature
-        or result.result_signature != expected_result_signature
-    ):
-        raise _exact_error(
-            "invalid-exact-artifact",
-            "$.exact",
-            "the current exact-stage cache contains an incompatible payload",
-        )
+    transition_exact_result_from_artifact(artifact)
     return artifact

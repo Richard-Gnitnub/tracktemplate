@@ -5,8 +5,9 @@ them through a temporary B15 comparison route. Phase 4 retains only the
 modular façade and adds bounded canonical transition-state and neutral
 chair-package contracts. The bounded derived-state lifecycle remains ephemeral
 and adapter-neutral; its transition preview scene remains renderer-neutral.
-Phase 6 adds one bounded exact-centreline contract without constructing host
-geometry or output.
+Phase 6 exposes bounded exact-centreline and artifact-verification contracts;
+concrete adapters may construct transient host geometry without exposing it
+through this façade. No output contract is accepted here.
 """
 
 from tracktemplate import DEVELOPMENT_CHECKPOINT
@@ -57,6 +58,7 @@ from tracktemplate.application.transition_exact import (
     TransitionExactSpecification,
     TransitionExactValidationResult,
     regenerate_transition_exact,
+    transition_exact_result_from_artifact,
 )
 from tracktemplate.domain.alignment import (
     clothoid_entry_displacement,
@@ -118,6 +120,7 @@ __all__ = (
     "TransitionExactSpecification",
     "TransitionExactValidationResult",
     "regenerate_transition_exact",
+    "transition_exact_result_from_artifact",
     "transition_state_from_json",
     "transition_state_to_json",
     "TRANSITION_PREVIEW_CENTRELINE_LAYER_ID",

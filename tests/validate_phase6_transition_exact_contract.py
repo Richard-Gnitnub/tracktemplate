@@ -175,6 +175,10 @@ def _validate_specification_and_public_contract():
         is exact.TransitionExactValidationResult
     )
     assert api.regenerate_transition_exact is exact.regenerate_transition_exact
+    assert (
+        api.transition_exact_result_from_artifact
+        is exact.transition_exact_result_from_artifact
+    )
     for name in exact.__all__:
         assert name in api.__all__
 
@@ -314,6 +318,7 @@ def _validate_lifecycle_and_failure_atomicity():
     cache = api.TransitionDerivedCache()
     assert cache.status(state, request) == "missing"
     first = api.regenerate_transition_exact(cache, state, specification)
+    assert api.transition_exact_result_from_artifact(first) is first.payload
     assert cache.status(state, request) == "current"
     assert (
         api.regenerate_transition_exact(cache, state, specification)
@@ -437,6 +442,22 @@ def _validate_lifecycle_and_failure_atomicity():
             ),
             "invalid-exact-artifact",
         )
+
+    wrong_stage = api.TransitionDerivedArtifact(
+        stage="preview",
+        source_signature=first.source_signature,
+        payload=first.payload,
+    )
+    _expect_state_error(
+        lambda: api.transition_exact_result_from_artifact(wrong_stage),
+        "invalid-exact-artifact",
+    )
+    try:
+        api.transition_exact_result_from_artifact(object())
+    except TypeError:
+        pass
+    else:
+        raise AssertionError("Expected exact-artifact TypeError")
 
 
 def _validate_zero_length_and_domain_limits():
