@@ -142,6 +142,38 @@ retirement or exit acceptance. All five Phase 6 exits therefore remain
 Pending; transient exact FreeCAD geometry, transactional private-development
 export and complete edit-through-export performance remain separate work.
 
+## B16 Entry/Exit transient exact geometry
+
+This exit-closing Level 2 tranche starts from protected-main merge
+`1e812612c8eab818554bf0d5d0208ebcc79b2490`. The FreeCAD adapter verifies the
+signed exact-centreline artifact, allocates a per-invocation temporary name
+absent from the pre-operation registry, and verifies the returned document as
+one newly registered identity before adding its sole `Part::Feature`. Cleanup
+closes only that positively owned document and fails closed when ownership is
+ambiguous. The adapter then validates ordered coordinates, bounds, polyline
+length, topology and kernel validity, and returns only a deterministic signed
+numeric receipt after disposal. Non-zero profiles are open wires; the accepted
+zero-length analytical boundary becomes one vertex. It introduces no railway
+calculation or persistent truth.
+
+The qualified FreeCAD 1.1.1/OpenCASCADE 7.8.1 proof exercised deterministic
+repeat construction, a pre-existing same-named hidden temporary document while
+inactive and active, ambiguous ownership rejection before object creation,
+nested construction, zero length, invalid artifact rejection, cancellation,
+cancellation-check failure and injected Part-build failure. Every path closed
+only its owned temporary document, restored both an existing and an empty
+active-document state, and preserved every pre-existing document and object,
+their tested properties and values, FileName and Undo/Redo counts. At the final
+source shape, 176 tracked Python/FCMacro files parsed and the complete
+standalone CI profile passed 55/55 validators.
+
+This tranche provides technical evidence toward the transient-cleanup exit
+gap but accepts no Phase 6 exit. It adds no retained `Part` shape, persisted
+property or schema, GUI operation, export writer, file, manifest, overwrite
+policy, output equivalence or clearance, legacy retirement, product tolerance
+default or performance budget. Transactional private-development export and
+complete edit-through-export performance therefore remain separate work.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition

@@ -694,6 +694,25 @@ object, property or Undo/Redo change. Its sentinel is
 creates no `Part` geometry, target-format output, production clearance,
 operator workflow or Phase 6 exit evidence.
 
+Phase 6 transient Entry/Exit exact geometry:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase6_transition_exact_geometry.py
+```
+
+This qualified-host proof constructs the verified exact centreline as one open
+`Part` wire, or one vertex for zero length, on a single `Part::Feature` in a
+hidden temporary document. It checks ordered coordinates, bounds, polyline
+length, topology, planarity, kernel validity and deterministic signed neutral
+measurements. Success, cancellation, cancellation-check failure and injected
+Part-build failure must all close the temporary document, restore the prior
+active document and leave the editable document, its properties and Undo/Redo
+history unchanged. Its sentinel is
+`Phase 6 transition transient exact geometry validation passed`. No
+`Part.Shape` crosses the adapter, no file is written, and the result supplies
+no GUI, target-format, production-clearance or Phase 6 exit acceptance.
+
 Repository recovery and ignored-data safety controls:
 
 ```bash
