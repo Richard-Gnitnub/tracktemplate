@@ -7,9 +7,10 @@ description: Run one complete repository-driven TrackTemplate development cycle 
 
 ## Outcome
 
-Make `$tracktemplate-continue` the normal repository-driven command for one
-complete Level 1 or Level 2 cycle. Finish one previous exact-green pull request,
-synchronise protected `main`, reconstruct existing project context and either:
+Make `$tracktemplate-continue` the normal vision-led, repository-driven command
+for one complete Level 1 or Level 2 cycle. Finish one previous exact-green pull
+request, synchronise protected `main`, reconstruct existing project context and
+either:
 
 - deliver the single highest-value worthwhile authorised outcome as one new
   exact-green draft pull request; or
@@ -23,6 +24,10 @@ Only a project-owner command containing the literal `$tracktemplate-continue`
 invocation activates this skill. Accepting, discussing, quoting or describing
 the workflow does not activate it, and no natural-language equivalent supplies
 its one-cycle authority.
+
+It does not mean “find something unfinished and continue coding.” The selected
+outcome must be grounded in the current authorised programme, exact active
+phase criterion and repository evidence; otherwise stop cleanly.
 
 ## One-cycle authority
 
@@ -46,6 +51,13 @@ licensing/provenance authority, tagging, release, force push, history rewrite,
 branch deletion, protection bypass, destructive operation or wider product
 scope. Stop for a genuine product or user-experience choice; do not ask the
 owner to repeat information already owned by the repository.
+
+[D-GOV-004](../../../reference/history/phase-closeouts/PHASE5_CLOSEOUT.md#repository-driven-continuation-authority-panel)
+continues to own literal invocation, one-cycle execution and Level 1/2 limits.
+[D-GOV-005](../../../reference/current/PHASE_EVIDENCE.md#product-vision-and-execution-governance-panel)
+governs vision-led selection and result reconciliation after invocation. It
+does not invoke this skill, widen execution authority or turn a Level 3 choice
+into an implementable task.
 
 ## Verify and integrate the previous pull request
 
@@ -76,6 +88,9 @@ After protected `main` is current and before creating a branch, reconstruct the
 next-outcome boundary from:
 
 - repository `AGENTS.md`;
+- the canonical
+  [`PRODUCT_VISION.md`](../../../reference/PRODUCT_VISION.md), including the
+  current programme and later-horizon non-authority;
 - [`PROJECT_PLAN.md`](../../../reference/PROJECT_PLAN.md);
 - current phase evidence and the current risk and decision registers;
 - the canonical owner of the affected subject;
@@ -101,6 +116,26 @@ Name the exact current exit gap, accepted requirement, live risk or blocking
 dependency it reduces. Prefer the smallest coherent outcome with the greatest
 decision-readiness or owner-visible value. Exclude optional maintenance and do
 not let a staff-review finding nominate itself as the next tranche.
+
+Trace every candidate as delegated agent task → bounded work item → evidenced
+finding or active exit → current authorised programme → Product Vision. Vision
+informs direction but never independently authorises scope. Before delegation
+or branch creation, record:
+
+- the product outcome and exact active phase criterion;
+- the repository evidence proving the gap;
+- the authorised change level;
+- accepted behaviour that could regress;
+- the smallest intervention and bounded files;
+- required validation and independent acceptance evidence; and
+- explicit non-goals and preserved non-claims.
+
+Before substantially repeating an action, identify new repository evidence, a
+changed testable hypothesis, newly authorised scope or method, a corrected
+environment or fixture, an independently identified defect, or a narrower task
+with different evidence. With none of these, do not continue the loop: report
+the repeated state and blocker, assign investigation or governance where
+appropriate, and do not represent activity as progress.
 
 Compose
 [`$tracktemplate-chief-of-staff`](../tracktemplate-chief-of-staff/SKILL.md)
@@ -148,6 +183,12 @@ it is needed, use every applicable specialist skill, inspect actual callers and
 tests, implement the smallest coherent vertical slice, prefer existing
 regression infrastructure and keep optional cleanup outside the tranche.
 
+The delegated objective must state allowed files and task level, evidence,
+non-goals and phase criterion. After delivery, reconcile the agent's claim with
+actual changed files and exact validation. Work claimed, present, validated and
+independently accepted are distinct, and the implementer is never sole
+acceptance authority.
+
 ## Validate and review
 
 1. Invoke
@@ -156,7 +197,9 @@ regression infrastructure and keep optional cleanup outside the tranche.
    final proof. Follow the canonical
    [validation-document boundary](../../../reference/VALIDATION.md#document-boundary);
    do not include `reference/VALIDATION.md` in a routine tranche unless its
-   durable validation contract changed.
+   durable validation contract changed. Include the relevant regression and
+   document/ViewProvider lifecycle evidence when the selected behaviour crosses
+   those boundaries.
 2. Give the completed change and raw evidence to a separate read-only
    [`$tracktemplate-quality-review`](../tracktemplate-quality-review/SKILL.md).
    Prefer a fresh reviewer, sub-agent or session when the active client
@@ -185,6 +228,11 @@ Stop without creating another tranche when:
 
 Do not weaken validation, change an accepted oracle or start another outcome to
 obtain a green result.
+
+Before publication, reconcile the evidence against the exact active exit. Do
+not convert partial implementation or a green test into exit acceptance, and
+preserve every explicit product, programme, phase, output and migration
+non-claim.
 
 ## Publish one draft
 
@@ -222,6 +270,10 @@ At the end of a successful implementation cycle, report in plain English:
 11. **Draft pull request**
 12. **Owner decision required**
 
+State separately what the agent claimed, what the repository contains, what
+the evidence validates and what an independent authority has accepted. Name the
+exact active criterion and explicitly say whether its formal status changed.
+
 For GUI work, include representative screenshots when available. Pixel counts,
 hashes and raw logs may support the proof but do not replace a human-readable
 visual demonstration.
@@ -237,5 +289,6 @@ On rerun, inspect external and local state first and resume from the first
 incomplete stage. Do not duplicate a merge, branch, commit or pull request.
 Report the previous integration and merge commit, the selected classification
 and named contribution, local and exact-head remote validation, review verdict,
-new draft and every authority boundary left open. When stopping after
-integration, say explicitly that no new tranche was manufactured.
+new draft, exact phase-exit reconciliation, preserved non-claims and every
+authority boundary left open. When stopping after integration, say explicitly
+that no new tranche was manufactured.

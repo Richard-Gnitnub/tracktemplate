@@ -1,8 +1,10 @@
-# Track Template Macro Architecture
+# TrackTemplate Architecture
 
 Status: accepted strategic direction; implementation is intentionally phased.
 
-The authoritative phase sequence and status are maintained in
+The [product vision](PRODUCT_VISION.md) owns product purpose, the current Core
+migration programme and the subsequent Layout Editor horizon. The
+authoritative phase sequence and status are maintained in
 [PROJECT_PLAN.md](PROJECT_PLAN.md); true-gate policy is maintained in
 [ENGINEERING_POLICY.md](ENGINEERING_POLICY.md).
 The supporting [product-system ontology](ONTOLOGY.md) projects the stable
@@ -13,22 +15,30 @@ does not replace this document or record delivery status.
 
 The project grew successfully by adding validated capability in stages: parametric curves and easements, station/straight and multi-track features, turnouts, crossovers, timbering, chair analysis, integration, and production export. That iterative approach proved the railway calculations, but it also concentrated domain logic, FreeCAD document management, display construction, exact shape generation, persistence, and export in one increasingly resource-intensive macro.
 
-The next phase is architectural rather than another feature layer. It must reduce interactive cost without sacrificing the accepted railway results.
+The current Core migration is architectural rather than another feature
+layer. It must reduce interactive cost without sacrificing accepted railway
+results, and it must end with the modular package as the one authoritative
+runtime implementation behind the normal FreeCAD Workbench/Addon route.
 
 ## Accepted direction
 
-The system will separate the authoritative parametric model from its interactive display and its production geometry.
+The system separates authoritative canonical state from interactive display
+and production geometry. The accepted presentation direction is explicit:
 
 ```text
-Parametric railway model + provenance-classified chair definitions
+canonical TrackTemplate state
         |
-        +--> analytical results and validation findings
-        |
-        +--> lightweight derived 2D preview for editing
-        |
-        `--> transient exact geometry for validation/export
+        `--> railway geometry and analysis
                     |
-                    `--> SVG / DXF / STL / STEP / manifests
+                    +--> immutable presentation snapshot
+                    |           |
+                    |           `--> batched Coin representation
+                    |
+                    `--> explicit exact-validation request
+                                |
+                                `--> transient exact geometry
+                                            |
+                                            `--> authorised outputs
 ```
 
 The live document should remain lightweight. Exact OpenCASCADE `Part` shapes, solids, Boolean operations, and dense per-element FreeCAD objects should not be created during routine editing when a derived 2D representation can provide the required feedback.
@@ -38,9 +48,16 @@ Exact geometry is permitted at an explicit **Validate** or **Export** boundary. 
 ## Architectural principles
 
 1. **Railway semantics are authoritative.** Parameters, stable identities, topology, alignments, timber decisions, chair assignments, and production metadata are the source of truth.
-2. **The viewport is a projection.** SVG, Coin scene-graph nodes, or another lightweight renderer display the model; they do not replace it.
+2. **The viewport is a projection.** Coin scene-graph nodes display the normal
+   editing model; they do not replace it. D-P5-002 accepts Coin only for its
+   demonstrated B16 Entry/Exit boundary, so the wider shared renderer remains
+   implementation work rather than an accepted capability.
 3. **Users edit intent, not generated paths.** Editing acts on parameters or defined semantic handles. Arbitrary edits to a rendered SVG path are not accepted unless a deterministic round trip back to the parametric model is designed and validated.
-4. **Exact geometry is demand-driven.** Build only the geometry required for the requested validation or output format, and dispose of transient geometry after use.
+4. **Exact geometry is demand-driven.** Build only the geometry required for
+   an explicit validation, export or materialisation request, and dispose of
+   transient geometry after use. Selection and ordinary parameter editing do
+   not regenerate it unless a separately accepted workflow requires that
+   behaviour.
 5. **Persistence is compact and versioned.** Store canonical parameters and results, not redundant derived geometry. Schema changes require an explicit migration path.
 6. **Derived state is fingerprinted.** Preview, analysis, validation, and export caches must be tied to complete input signatures. Stale speed is a correctness failure.
 7. **Export remains deterministic and transactional.** Staging, preflight, manifest generation, overwrite handling, commit, and rollback remain production invariants.
@@ -65,6 +82,22 @@ Exact geometry is permitted at an explicit **Validate** or **Export** boundary. 
     layer direction. Exploratory code is removed or deliberately promoted to
     these standards before it becomes retained project code; any necessary
     temporary duplication has a named owner and retirement condition.
+
+## Accepted Level 3 product-direction decisions
+
+D-GOV-005 records the following architectural clauses. They govern direction;
+their acceptance does not claim that a shared renderer, wider exact geometry,
+another migrated family or a future Layout Editor capability is implemented.
+
+| Clause | Accepted direction | Implementation boundary retained |
+| --- | --- | --- |
+| D-GOV-005-A — canonical authority | Versioned railway intent, identities, topology, analysis decisions, production intent and accepted definitions are canonical. Coin nodes, ViewProvider state, transient/generated `Part` geometry, caches, previews, exports, reports and manifests are derived and replaceable. | Existing schemas and accepted family boundaries are unchanged. |
+| D-GOV-005-B — presentation pipeline | Canonical state feeds railway geometry and analysis, then an immutable presentation snapshot, then a batched Coin representation. | The accepted B16 Entry/Exit scene remains the only demonstrated slice; no shared renderer is claimed. |
+| D-GOV-005-C — normal editing view | Routine editing is fast Coin-based 2D or pseudo-2D with rails and sleepers/timbers, construction information and optional chair, analysis and warning layers, without a `Part` dependency. | The current centreline fixture does not yet implement the complete normal view. |
+| D-GOV-005-D — exact geometry | Exact geometry is explicit, on demand, derived, safe to delete and regenerate, and not automatically rebuilt for ordinary selection or editing. | Accepted transient geometry remains limited to the Phase 6 Entry/Exit evidence. |
+| D-GOV-005-E — display modes | Register only genuinely distinct FreeCAD display modes owned by that ViewProvider. Detail, construction and analysis choices normally remain internal layer switches or presets. Invalid restored modes fail closed or recover through the accepted lifecycle without becoming canonical state. | No current ViewProvider is replaced and no display-mode migration is implemented by this decision. |
+| D-GOV-005-F — presentation performance | Batch rails, sleeper/timber faces and chair markers; avoid one FreeCAD object per sleeper/chair and one transform per chair; separate static geometry from dynamic overlays/labels; do not rebuild the complete scene graph for selection-only changes. | Numerical budgets and a product-wide renderer remain unaccepted. |
+| D-GOV-005-G — product horizons | TrackTemplate Core migration is the current programme; TrackTemplate Layout Editor is a subsequent programme. | Future extension direction does not alter an active phase or authorise Layout Editor implementation. |
 
 ## Target layers
 
@@ -134,17 +167,42 @@ chair and other entity-family migration remain later-phase work.
 
 ### 4. Lightweight presentation adapter
 
-The normal editing view is derived 2D geometry grouped into a few semantic/style layers, for example:
+The normal editing view is a derived Coin-based 2D or pseudo-2D snapshot
+grouped into a small number of semantic/style batches, for example:
 
-- track centrelines and rails;
-- timber outlines and centres;
-- chair symbols;
-- construction datums and diagnostics;
-- selection and edit handles.
+- running, switch, closure, check and crossing rails;
+- sleeper and turnout-timber faces, outlines and centres;
+- construction marks, template joints and registration features;
+- optional chair markers, analysis findings and warnings; and
+- selection and edit handles plus dynamic labels.
 
-A custom FreeCAD ViewProvider backed by Coin line/face primitives is the leading option because it separates the editable document object from its GUI representation. An embedded SVG-based view remains a prototype option, not an accepted storage model.
+A custom FreeCAD ViewProvider backed by batched Coin line/face primitives is
+the accepted direction because it separates the editable document object from
+its GUI representation. The renderer consumes an immutable presentation
+snapshot rather than querying or mutating canonical state while drawing.
 
 The renderer must provide a mapping from a selected visual element back to a stable domain identity. View-only coordinates must never become an independent source of railway truth.
+
+Static rails, sleeper/timber faces and chair-marker batches remain separate
+from dynamic selection overlays, warnings and labels. A selection-only change
+updates the affected dynamic state; it does not justify rebuilding the whole
+scene graph. The normal representation does not allocate one persistent
+FreeCAD object per sleeper or chair, or one Coin transform per chair.
+
+#### ViewProvider display modes and view layers
+
+A ViewProvider registers only modes that represent genuinely distinct FreeCAD
+display pipelines, and every registered mode belongs to that ViewProvider.
+Construction detail, chair visibility, analysis findings and similar options
+normally use internal view-layer switches or named presets rather than a large
+cross-product of registered display modes.
+
+On restore or temporary attachment, a mode not owned by the active
+ViewProvider must not be treated as valid merely because its name was stored.
+The lifecycle validates the restored enumeration/current-mode pair and either
+preserves a valid prior mode, selects an owned safe mode under an accepted
+contract, or fails closed with recoverable diagnostics. Display-mode strings,
+switch indices and Coin nodes remain derived state.
 
 ### 5. Exact geometry adapter
 
@@ -156,6 +214,12 @@ This adapter converts selected domain records into the minimum `Part` geometry n
 - FreeCAD exporters that require `Part::Feature` objects.
 
 Prefer a temporary or isolated document and remove generated objects after validation/export. Persistent production shapes are created only when the user explicitly requests materialisation as a retained result.
+
+Transient or materialised exact objects remain derived and replaceable. They
+must be safe to delete and regenerate from current signed canonical state.
+Ordinary selection, visibility changes and parameter editing mark applicable
+exact stages dirty; they do not rebuild exact geometry automatically unless an
+accepted workflow explicitly requires it.
 
 Direct SVG generation from canonical 2D records may bypass `Part` construction when scale, bounds, categories, identifiers, and output equivalence can be validated. Formats that require BRep or mesh geometry still use the exact adapter.
 
@@ -356,6 +420,13 @@ Initial numerical budgets will be set from measured baselines rather than guesse
 
 The acceptance comparison must include both cold-cache and unchanged-result reuse. See [PERFORMANCE_SOP.md](PERFORMANCE_SOP.md).
 
+Normal-view resource direction is also structural: batch like rail primitives,
+sleeper/timber faces and chair markers; keep static geometry apart from dynamic
+overlays and labels; avoid per-sleeper/per-chair document objects and
+per-chair transforms; and update only affected derived batches. These rules do
+not establish a numerical performance budget or claim that the current bounded
+renderer already satisfies the complete product workload.
+
 ## Validation requirements
 
 Every migrated slice requires:
@@ -379,6 +450,9 @@ See [VALIDATION.md](VALIDATION.md).
 This is the architectural sequence. Numbered phase status is in
 [PROJECT_PLAN.md](PROJECT_PLAN.md), while detailed current exit evidence is in
 [current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md).
+It implements the current TrackTemplate Core programme in
+[PRODUCT_VISION.md](PRODUCT_VISION.md); the subsequent Layout Editor does not
+join this sequence without separate Level 3 authority.
 
 1. **Baseline:** preserve representative documents and benchmark reports for current workflows.
 2. **Create seams:** isolate domain calculations, FreeCAD document writes, view construction, and export calls without changing results.
@@ -407,9 +481,11 @@ The extraction boundaries, dependency rules, anti-bloat safeguards and phased so
 
 The following require prototypes or user decisions and are not settled by this document:
 
-- Coin ViewProvider versus an embedded SVG/Qt renderer for the editing view;
 - required granularity of viewport selection and direct manipulation handles;
-- temporary-document lifecycle for exact geometry;
+- product-wide composition of the accepted Coin direction beyond the bounded
+  B16 Entry/Exit lifecycle, including the shared snapshot/batching boundary;
+- exact materialisation and lifecycle policy beyond the accepted disposable
+  Entry/Exit exact-geometry boundary;
 - exact Addon manifest, loading/update mechanics, catalogue-submission route
   and supported lifetime of the compatibility macro launcher;
 - numerical performance budgets and representative benchmark documents;

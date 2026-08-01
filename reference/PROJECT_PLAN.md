@@ -9,6 +9,14 @@ Implementation detail belongs in the frozen phase closeout or
 [current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md); detailed current risks
 and decisions belong in the JSON registers beside the live record.
 
+The active programme is the TrackTemplate Core macro-to-Addon migration in
+[PRODUCT_VISION.md](PRODUCT_VISION.md). Migration completes only when the Addon
+is the normal route, the modular package is the sole runtime without a legacy-
+macro dependency, advertised Core parity/output is accepted, the distribution
+is reproducible and release qualification passes. The Layout Editor is
+subsequent: it does not alter Phase 6 exits. Future architecture may be recorded
+now without being implemented now.
+
 ## Phase status
 
 | Phase | Outcome | Exit status | State |
@@ -67,16 +75,16 @@ dashboard only.
 | PR-09 | Critical | Remove | A restricted dependency could reach an advertised production path. |
 | PR-10 | High | Remove | Duplicate definitions or patches could hide the live implementation. |
 | PR-11 | Medium | Tolerate | Modularisation may add files without reducing runtime cost. |
-| PR-12 | Medium | Mitigate | Governance can duplicate facts and grow stale. |
+| PR-12 | Medium | Mitigate | Product direction or task selection can fragment and grow stale. |
 | PR-13 | Critical | Mitigate | Commands, history changes or disk failure could destroy unprotected data. |
 | PR-15 | High | Mitigate | Deferred geometry could move rather than remove operator cost. |
 | PR-16 | High | Mitigate | Incomplete signatures could reuse stale results. |
 | PR-17 | Critical | Mitigate | Persistence or migration could corrupt supported documents. |
 | PR-18 | High | Remove | Legacy/modular dual paths could become permanent duplication. |
 | PR-19 | High | Remove | A distributed Addon could drift from authoritative source. |
-| PR-20 | Medium | Mitigate | Feature work could silently expand migration scope. |
+| PR-20 | Medium | Mitigate | Future-product direction could silently expand migration scope or leak derived authority. |
 | PR-21 | High | Mitigate | Source provenance or licence could become ambiguous. |
-| PR-22 | High | Remove | A true authority transfer could occur without structured challenge. |
+| PR-22 | High | Remove | Authority could transfer, or self-acceptance occur, without independent challenge. |
 | QA-R03 | High | Remove | Release-critical GUI and end-to-end evidence remains incomplete. |
 | QA-R04 | High | Mitigate | Modular end-to-end performance budgets remain unfrozen. |
 | QA-R05 | Low | Tolerate | Root navigation exists; install and operator guidance remains future work. |
@@ -109,10 +117,13 @@ decisions.
 | D-P5-002 | 2026-07-31 | Accepted | Coin and the demonstrated B16 Entry/Exit editing behaviour accepted; 4/4 exits evidenced while closeout remained a separate decision. |
 | D-P5-003 | 2026-08-01 | Accepted | Phase 5 closed at 4/4; Phase 6 holding records created at 0/5 without opening or authorising the phase. |
 | D-P6-001 | 2026-08-01 | Accepted | Phase 6 opened at 0/5 for bounded B16 Entry/Exit exact-validation and private-development export-seam work; all stated exclusions remain. |
+| D-GOV-005 | 2026-08-01 | Accepted | Product vision, architectural direction and vision-led work selection adopted without changing Phase 6 scope or D-GOV-004 execution authority. |
 
 ## Authority and evidence links
 
 - [Current Phase 6 evidence](current/PHASE_EVIDENCE.md)
+- [Canonical product vision](PRODUCT_VISION.md)
+- [Capability evidence matrix](CAPABILITY_MATRIX.md)
 - [Frozen Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md)
 - [Frozen Phase 5 decisions](history/phase-closeouts/PHASE5_GATE_DECISIONS.json)
 - [Frozen Phase 5 risk snapshot](history/phase-closeouts/PHASE5_RISKS.json)

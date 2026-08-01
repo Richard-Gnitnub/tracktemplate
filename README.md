@@ -1,17 +1,18 @@
 # TrackTemplate
 
-TrackTemplate is an in-development FreeCAD system for parametric model-railway
-track templates: plain line, turnouts, crossovers, timbering, chairs,
-persistence, display and production export.
+TrackTemplate is an in-development FreeCAD-native Workbench for the parametric
+design, visualisation and production of model railway track templates.
 
-Phase 5 is complete. Phase 6 is not started, unopened and unauthorised. The
-project is not yet a production-ready Addon and does not claim project-cleared
-production output.
+Phase 6 is current at 0/5 accepted exits. The project is not yet an installable,
+production-ready Addon and does not claim project-cleared production output or
+completed macro migration.
 
 ## Repository orientation
 
+- [Product vision](reference/PRODUCT_VISION.md)
 - [Current project status](reference/PROJECT_PLAN.md)
-- [Current unopened Phase 6 holding record](reference/current/PHASE_EVIDENCE.md)
+- [Current Phase 6 evidence](reference/current/PHASE_EVIDENCE.md)
+- [Capability matrix](reference/CAPABILITY_MATRIX.md)
 - [Architecture](reference/ARCHITECTURE.md)
 - [Engineering policy](reference/ENGINEERING_POLICY.md)
 - [Validation strategy](reference/VALIDATION.md)
