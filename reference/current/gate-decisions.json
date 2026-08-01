@@ -13,6 +13,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-opening-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-opening-panel"
+    },
+    {
+      "id": "D-GOV-005",
+      "decided_on": "2026-08-01",
+      "status": "Accepted",
+      "decision": "Adopt the TrackTemplate product vision and vision-led execution model.",
+      "authority": "`reference/PRODUCT_VISION.md` owns product purpose, the current TrackTemplate Core migration, the subsequent Layout Editor horizon and migration-completion meaning. Architecture adopts D-GOV-005-A through D-GOV-005-G for canonical state, immutable presentation snapshots, batched Coin presentation, the lightweight normal editing view, on-demand exact geometry, ViewProvider-owned display modes, presentation performance and product horizons. Work selection follows product vision, architecture, authorised programme, active phase, current evidence, bounded work item, delegated assignment, then independent evidence and acceptance. The Chief of Staff and literal `$tracktemplate-continue` workflow apply that vision-led selection, loop-prevention and result-accountability model.",
+      "exclusions": "Product vision supplies direction, not scope. D-GOV-004 continues to own literal continuation invocation and its one-cycle Level 1/2 execution limit. No Phase 6 criterion or exit status changes. No shared renderer, ViewProvider replacement, exact-geometry expansion, output, persistence, railway calculation, map/background, connected placement, constituent editing or layout solving is implemented or authorised. No pull request, migration completion, output clearance, package, release or phase exit is accepted; draft PR #31 remains separate and unaccepted.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#product-vision-and-execution-governance-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#product-vision-and-execution-governance-panel"
     }
   ]
 }

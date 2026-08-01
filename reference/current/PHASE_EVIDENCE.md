@@ -174,6 +174,97 @@ policy, output equivalence or clearance, legacy retirement, product tolerance
 default or performance budget. Transactional private-development export and
 complete edit-through-export performance therefore remain separate work.
 
+<a id="product-vision-and-execution-governance-panel"></a>
+
+## Product vision and execution governance panel
+
+**Decision and repository state:** This Level 3 governance decision applies to
+accepted `main` at `61237508b0c1fefedcf740afd230e5e563acab3e`, the merge commit
+for PR #30. PR #30 is therefore merged, not pending. Draft PR #31 and its
+bounded transition-DXF branch remain separate, unaccepted Phase 6
+implementation; this governance branch was created from accepted `main` and
+does not alter, rebase, ready or merge that work. Phase 6 remains current at
+0/5, and this panel admits no new phase-exit evidence.
+
+**Options reviewed:** Three governance shapes were compared:
+
+| Option | Disposition |
+| --- | --- |
+| Infer direction from the plan and select its next unchecked item | Rejected: phase ordering is not product purpose, and an unchecked entry is not bounded task authority. |
+| Repeat the complete vision in `AGENTS.md`, skills and planning records | Rejected: duplicated authority would worsen PR-12 and allow the copies to drift. |
+| One canonical Product Vision, accepted architecture clauses and linked vision-led workflow controls | Recommended: it gives purpose one owner while keeping programme, phase, evidence, assignment and acceptance authorities distinct. |
+
+**Participants, evidence and independence:** Richard is project owner,
+decision chair and accepting authority for the governing direction. Codex is
+the architecture-review presenter, risk challenger and governance-patch change
+owner, so those roles are not independent. A fresh read-only quality review of
+the complete final patch and raw validation is required before readiness can be
+reported; that review cannot itself accept the Level 3 decision or a Phase 6
+exit.
+
+The review reconciled `AGENTS.md`, Engineering Policy, this live record and its
+risk/decision registers, the Project Plan, the frozen Phase 5 closeout, Agent
+Workflows, the Chief of Staff and continue skills, documentation-authority
+rules, architecture and modularisation owners, ViewProvider/Coin source and
+lifecycle tests, exact-geometry/export boundaries, the Phase 1 legacy
+capability inventory and fixtures, accepted source/branch history, and the open
+pull-request relationship. Source and tests were treated as evidence rather
+than decision authority.
+
+**Risk disposition:** PR-12 remains Open/Mitigate/Partial: a single Product
+Vision owner and link-based routing reduce product-direction and task-selection
+ambiguity, but the enlarged governance surface can still drift. PR-20 remains
+Open/Mitigate/Effective (current scope): Core and Layout Editor horizons, task
+traceability and explicit non-goals control future-scope contamination, but
+later implementation must keep proving the boundary. PR-22 remains
+Open/Remove/Effective (current scope): the structured decision and separation
+of claimed, present, validated and independently accepted states control this
+authority transfer, while final patch review and owner acceptance remain
+separate. No implementation risk is removed or downgraded.
+
+**Recommendation and bounded conditions:** Proceed with the canonical vision,
+architecture clauses and vision-led workflow under these conditions:
+
+| Accountable owner | Condition |
+| --- | --- |
+| Documentation-control owner | Keep product purpose and programme horizons in `PRODUCT_VISION.md`; link rather than copy them elsewhere. |
+| Architecture owner | Treat D-GOV-005-A through D-GOV-005-G as direction and label every undemonstrated renderer, display, exact or performance capability honestly. |
+| Chief of Staff or continuation owner | Trace each assignment to an evidenced finding or active exit, state regressions/evidence/non-goals, prevent unchanged loops and reconcile claimed, present, validated and accepted states. |
+| Phase owner | Apply only the active phase authority. Future Layout Editor direction neither changes Phase 6 exits nor supplies implementation authority. |
+| Quality reviewer and project owner | Keep implementation review independent where required; do not allow an implementer or validator to become sole acceptance authority. |
+
+**Governance-budget exception:** This owner-authorised task changes product,
+architecture and workflow authority, so its canonical vision, Level 3 panel,
+decision/risk records, dashboard links and structural validators necessarily
+exceed the zero product-code change. It rewrites no frozen history and adds no
+production architecture merely to demonstrate the documentation.
+
+**Owner authorisation and resulting decision:** On 2026-08-01 the project owner
+explicitly authorised this Level 3 governance work and supplied the product and
+execution boundaries recorded here. The resulting decision is:
+
+> **D-GOV-005 — Adopt the TrackTemplate product vision and vision-led execution
+> model**
+>
+> `PRODUCT_VISION.md` owns product purpose, the current TrackTemplate Core
+> migration, the later Layout Editor horizon and migration-completion meaning.
+> Architecture adopts D-GOV-005-A through D-GOV-005-G for canonical state,
+> immutable snapshots, batched Coin presentation, lightweight normal editing,
+> on-demand exact geometry, ViewProvider-owned display modes, presentation
+> performance and product horizons. Work selection follows vision →
+> architecture → programme → phase → evidence → bounded item → assignment →
+> independent evidence and acceptance. The Chief of Staff and literal
+> `$tracktemplate-continue` workflow apply that selection and accountability
+> model.
+>
+> Vision supplies direction, not scope. D-GOV-004 continues to own literal
+> continuation invocation and its one-cycle Level 1/2 execution limit. This
+> decision changes no Phase 6 criterion or exit status; implements no shared
+> renderer, ViewProvider, exact-geometry expansion, output, persistence or
+> railway calculation; authorises no Layout Editor feature; accepts no pull
+> request, migration completion, output clearance, package, release or phase
+> exit; and leaves draft PR #31 separate and unaccepted.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -200,8 +291,9 @@ retaining any later composition that invalidates the containment or permits
 live mappings, caches, proxies, active Coin children or additional residual
 switch children to accumulate.
 
-The 24 risks present at Phase 5 closeout carry forward unchanged in
-[risks.json](risks.json). [gate-decisions.json](gate-decisions.json) owns the
-structured D-P6-001 decision. The opening creates only the authority quoted
-above; every exit, clearance, support, schema, oracle-retirement, budget,
-packaging, release and later-phase decision remains separately controlled.
+The 24 risks present at Phase 5 closeout remain live in
+[risks.json](risks.json); D-GOV-005 updates only the control wording for PR-12,
+PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
+D-P6-001 and D-GOV-005. Those decisions create only the authority quoted above;
+every exit, clearance, support, schema, oracle-retirement, budget, packaging,
+release and later-phase decision remains separately controlled.

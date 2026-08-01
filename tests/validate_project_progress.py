@@ -7,9 +7,15 @@ import json
 import pathlib
 import re
 
+from governance_markdown import direct_section_content
+
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\(([^)]+)\)")
 PLAN_PATH = ROOT / "reference" / "PROJECT_PLAN.md"
+PRODUCT_VISION_PATH = ROOT / "reference" / "PRODUCT_VISION.md"
+CAPABILITY_MATRIX_PATH = ROOT / "reference" / "CAPABILITY_MATRIX.md"
+ARCHITECTURE_PATH = ROOT / "reference" / "ARCHITECTURE.md"
 CURRENT_EVIDENCE_PATH = ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
 RISKS_PATH = ROOT / "reference" / "current" / "risks.json"
 CURRENT_DECISIONS_PATH = (
@@ -106,7 +112,7 @@ EXPECTED_PHASE5_DECISION_IDS = {
     "D-P5-002",
     "D-P5-003",
 }
-EXPECTED_PHASE6_DECISION_IDS = {"D-P6-001"}
+EXPECTED_PHASE6_DECISION_IDS = {"D-P6-001", "D-GOV-005"}
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
     "open Phase 6 at 0/5 for bounded exact-validation and export-seam work "
@@ -125,6 +131,33 @@ EXPECTED_PHASE6_EXCLUSIONS = (
     "packaging, release, or later-phase authority is accepted. Any required "
     "manifest-schema change receives separate API, licensing, validation, "
     "and owner review."
+)
+EXPECTED_VISION_DECISION = (
+    "Adopt the TrackTemplate product vision and vision-led execution model."
+)
+EXPECTED_VISION_AUTHORITY = (
+    "`reference/PRODUCT_VISION.md` owns product purpose, the current "
+    "TrackTemplate Core migration, the subsequent Layout Editor horizon and "
+    "migration-completion meaning. Architecture adopts D-GOV-005-A through "
+    "D-GOV-005-G for canonical state, immutable presentation snapshots, "
+    "batched Coin presentation, the lightweight normal editing view, "
+    "on-demand exact geometry, ViewProvider-owned display modes, presentation "
+    "performance and product horizons. Work selection follows product vision, "
+    "architecture, authorised programme, active phase, current evidence, "
+    "bounded work item, delegated assignment, then independent evidence and "
+    "acceptance. The Chief of Staff and literal `$tracktemplate-continue` "
+    "workflow apply that vision-led selection, loop-prevention and "
+    "result-accountability model."
+)
+EXPECTED_VISION_EXCLUSIONS = (
+    "Product vision supplies direction, not scope. D-GOV-004 continues to own "
+    "literal continuation invocation and its one-cycle Level 1/2 execution "
+    "limit. No Phase 6 criterion or exit status changes. No shared renderer, "
+    "ViewProvider replacement, exact-geometry expansion, output, persistence, "
+    "railway calculation, map/background, connected placement, constituent "
+    "editing or layout solving is implemented or authorised. No pull request, "
+    "migration completion, output clearance, package, release or phase exit "
+    "is accepted; draft PR #31 remains separate and unaccepted."
 )
 EXPECTED_CONTINUATION_DECISION = (
     "Authorise explicit repository-driven continuation cycles."
@@ -181,12 +214,164 @@ def _cells(line: str) -> list[str]:
     return [cell.strip() for cell in line.strip().strip("|").split("|")]
 
 
+def _semantic_markdown(value: str) -> str:
+    """Normalise presentation whitespace while retaining Markdown targets."""
+    value = re.sub(r"(?<=\w)-\s*\n\s*(?=\w)", "-", value)
+    value = value.replace("**", "").replace("`", "")
+    return " ".join(value.split())
+
+
+def _semantic_text(value: str) -> str:
+    """Normalise presentation Markdown after its structure is isolated."""
+    return MARKDOWN_LINK_RE.sub(r"\1", _semantic_markdown(value))
+
+
+def _document_preamble(text: str, title: str) -> str:
+    """Return direct document preamble content before any child heading."""
+    title_marker = "# " + title
+    _require(
+        text.startswith(title_marker + "\n"),
+        "document title drifted: " + title,
+    )
+    return direct_section_content(text, title, level=1)
+
+
+def _raw_paragraphs(text: str) -> list[str]:
+    """Return non-empty Markdown paragraphs without semantic normalisation."""
+    return [
+        block
+        for block in re.split(r"\n[ \t]*\n", text)
+        if block.strip()
+    ]
+
+
+def _paragraphs(text: str) -> list[str]:
+    """Return semantic paragraphs while ignoring line wrapping and Markdown."""
+    return [_semantic_text(block) for block in _raw_paragraphs(text)]
+
+
+def _require_paragraph(text: str, expected: str, message: str) -> str:
+    """Require one exact semantic paragraph and return its raw Markdown."""
+    expected_semantic = _semantic_text(expected)
+    for paragraph in _raw_paragraphs(text):
+        if _semantic_text(paragraph) == expected_semantic:
+            return paragraph
+    raise AssertionError(message)
+
+
+def _require_links(
+    paragraph: str,
+    expected: tuple[tuple[str, str], ...],
+    message: str,
+) -> None:
+    """Require the exact label-target associations in one paragraph."""
+    actual = tuple(
+        (_semantic_text(label), target.strip())
+        for label, target in MARKDOWN_LINK_RE.findall(paragraph)
+    )
+    _require(actual == expected, message)
+
+
+def _table_blocks(section: str) -> list[list[str]]:
+    """Return each contiguous Markdown table as a separate line block."""
+    blocks: list[list[str]] = []
+    current: list[str] = []
+    for line in section.splitlines():
+        if line.startswith("|"):
+            current.append(line)
+        elif current:
+            blocks.append(current)
+            current = []
+    if current:
+        blocks.append(current)
+    return blocks
+
+
+def _structured_table_rows(
+    section: str,
+    expected_header: tuple[str, ...],
+    table_name: str,
+) -> dict[str, list[str]]:
+    """Return rows from exactly one table with the expected header."""
+    semantic_header = [_semantic_markdown(cell) for cell in expected_header]
+    candidates = []
+    for block in _table_blocks(section):
+        header = [_semantic_markdown(cell) for cell in _cells(block[0])]
+        if header == semantic_header:
+            candidates.append(block)
+    _require(
+        len(candidates) == 1,
+        table_name + " must contain exactly one governing table",
+    )
+    block = candidates[0]
+    _require(
+        len(block) >= 2
+        and len(_cells(block[1])) == len(expected_header)
+        and all(
+            re.fullmatch(r":?-{3,}:?", cell) is not None
+            for cell in _cells(block[1])
+        ),
+        table_name + " has an invalid Markdown separator row",
+    )
+
+    rows: dict[str, list[str]] = {}
+    for line in block[2:]:
+        cells = _cells(line)
+        _require(
+            len(cells) == len(expected_header),
+            table_name + " contains a row with the wrong cell count",
+        )
+        semantic_cells = [_semantic_markdown(cell) for cell in cells]
+        _require(
+            semantic_cells[0] not in rows,
+            "duplicate structured governance row: " + semantic_cells[0],
+        )
+        rows[semantic_cells[0]] = semantic_cells
+    return rows
+
+
+def _numbered_items(section: str) -> list[tuple[int, str]]:
+    """Return one Markdown ordered list without depending on line wrapping."""
+    items: list[tuple[int, str]] = []
+    for match in re.finditer(
+        r"^(\d+)\. (.*?)(?=^\d+\. |\n\n|\Z)",
+        section,
+        re.DOTALL | re.MULTILINE,
+    ):
+        items.append((int(match.group(1)), _semantic_text(match.group(2))))
+    return items
+
+
 def _section(text: str, heading: str) -> str:
     marker = "## " + heading
     _require(marker in text, "missing project-plan section: " + marker)
     tail = text.split(marker, 1)[1]
     next_heading = re.search(r"^## ", tail, re.MULTILINE)
     return tail if next_heading is None else tail[:next_heading.start()]
+
+
+def _validate_plan_programme(plan: str) -> None:
+    """Bind programme and horizon claims to the dashboard preamble."""
+    preamble = direct_section_content(plan, "Project Plan", level=1)
+    expected = (
+        "The active programme is the TrackTemplate Core macro-to-Addon migration "
+        "in PRODUCT_VISION.md. Migration completes only when the Addon is the "
+        "normal route, the modular package is the sole runtime without a "
+        "legacy-macro dependency, advertised Core parity/output is accepted, "
+        "the distribution is reproducible and release qualification passes. "
+        "The Layout Editor is subsequent: it does not alter Phase 6 exits. "
+        "Future architecture may be recorded now without being implemented now."
+    )
+    programme_paragraph = _require_paragraph(
+        preamble,
+        expected,
+        "project plan lost its local current-programme and future-horizon clause",
+    )
+    _require_links(
+        programme_paragraph,
+        (("PRODUCT_VISION.md", "PRODUCT_VISION.md"),),
+        "project plan Product Vision authority link or destination drifted",
+    )
 
 
 def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
@@ -222,6 +407,11 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
     _require(
         "current/PHASE_EVIDENCE.md" in plan,
         "project plan does not route to the fixed current evidence path",
+    )
+    _validate_plan_programme(plan)
+    _require(
+        "CAPABILITY_MATRIX.md" in plan,
+        "project plan does not route to the capability evidence map",
     )
     _require(
         "history/phase-closeouts/PHASE4_CLOSEOUT.md" in plan,
@@ -527,10 +717,8 @@ def _validate_risks(plan: str) -> None:
     )
     records = document["risks"]
     _require(isinstance(records, list), "risks must be a list")
-    _require(
-        phase5_document["risks"] == records,
-        "Phase 5 risks did not carry unchanged into Phase 6",
-    )
+    phase5_records = phase5_document["risks"]
+    _require(isinstance(phase5_records, list), "Phase 5 risks must be a list")
 
     expected_fields = {
         "id",
@@ -575,9 +763,56 @@ def _validate_risks(plan: str) -> None:
         by_id[risk_id] = record
 
     _require(set(by_id) == EXPECTED_RISK_IDS, "live risk IDs drifted")
+    phase5_by_id = {
+        str(record["id"]): record
+        for record in phase5_records
+        if isinstance(record, dict) and "id" in record
+    }
     _require(
-        "Level 3" in str(by_id["PR-22"]["required_work"]),
-        "PR-22 does not enforce Level 3 panel scope",
+        set(phase5_by_id) == set(by_id),
+        "current risks do not preserve the frozen Phase 5 risk set",
+    )
+    governance_risks = {"PR-12", "PR-20", "PR-22"}
+    immutable_risk_fields = expected_fields - {
+        "summary",
+        "owner",
+        "required_work",
+        "closure_evidence",
+    }
+    for risk_id, record in by_id.items():
+        frozen = phase5_by_id[risk_id]
+        if risk_id not in governance_risks:
+            _require(
+                record == frozen,
+                "non-governance risk changed from Phase 5: " + risk_id,
+            )
+            continue
+        for field in immutable_risk_fields:
+            _require(
+                record[field] == frozen[field],
+                "governance-only risk changed protected field: "
+                + risk_id
+                + "/"
+                + field,
+            )
+    _require(
+        "Product Vision owner" in str(by_id["PR-12"]["required_work"])
+        and "unchanged execution loops"
+        in str(by_id["PR-12"]["required_work"]),
+        "PR-12 lacks product-direction or loop-prevention control",
+    )
+    _require(
+        "canonical-versus-derived authority"
+        in str(by_id["PR-20"]["required_work"])
+        and "Layout Editor" in str(by_id["PR-20"]["required_work"]),
+        "PR-20 lacks horizon and canonical-authority scope controls",
+    )
+    _require(
+        "Level 3" in str(by_id["PR-22"]["required_work"])
+        and "independently accepted" in str(by_id["PR-22"]["required_work"])
+        and "sole acceptance authority"
+        in str(by_id["PR-22"]["required_work"]),
+        "PR-22 does not enforce independent Level 3 acceptance",
     )
     for risk_id in ("PR-16", "PR-17", "QA-R03", "QA-R04"):
         _require(
@@ -659,20 +894,45 @@ def _validate_decisions(plan: str) -> None:
     phase6_records = current_document["decisions"]
     _require(
         isinstance(phase6_records, list)
-        and len(phase6_records) == 1
-        and isinstance(phase6_records[0], dict),
-        "current decision register must contain exactly D-P6-001",
+        and len(phase6_records) == len(EXPECTED_PHASE6_DECISION_IDS)
+        and all(isinstance(record, dict) for record in phase6_records),
+        "current decision register has an unexpected record count or shape",
     )
-    phase6_record = phase6_records[0]
+    phase6_by_id: dict[str, dict[str, object]] = {}
+    for record in phase6_records:
+        _require(set(record) == expected_fields, "current decision fields changed")
+        decision_id = record["id"]
+        _require(
+            isinstance(decision_id, str) and decision_id not in phase6_by_id,
+            "duplicate current decision ID",
+        )
+        _require(
+            record["decided_on"] == "2026-08-01"
+            and record["status"] == "Accepted"
+            and record["panel_required_under_current_policy"] is True,
+            "current Level 3 decision status or panel requirement drifted",
+        )
+        panel_record = str(record["panel_record"])
+        panel_path_text, separator, panel_anchor = panel_record.partition("#")
+        panel_path = ROOT / panel_path_text
+        _require(panel_path.is_file(), "current panel record path is missing")
+        _require(
+            separator and 'id="{}"'.format(panel_anchor) in _read(panel_path),
+            "current panel record anchor is missing",
+        )
+        _require(
+            record["evidence"] == panel_record,
+            "current decision evidence does not match its panel",
+        )
+        phase6_by_id[decision_id] = record
     _require(
-        set(phase6_record) == expected_fields,
-        "D-P6-001 decision fields changed",
+        set(phase6_by_id) == EXPECTED_PHASE6_DECISION_IDS,
+        "current decision IDs drifted",
     )
+
+    phase6_record = phase6_by_id["D-P6-001"]
     _require(
-        phase6_record["id"] in EXPECTED_PHASE6_DECISION_IDS
-        and phase6_record["decided_on"] == "2026-08-01"
-        and phase6_record["status"] == "Accepted"
-        and phase6_record["decision"] == "Open Phase 6."
+        phase6_record["decision"] == "Open Phase 6."
         and phase6_record["authority"] == EXPECTED_PHASE6_AUTHORITY
         and phase6_record["exclusions"] == EXPECTED_PHASE6_EXCLUSIONS,
         "D-P6-001 authority or exclusions drifted",
@@ -686,12 +946,19 @@ def _validate_decisions(plan: str) -> None:
         and phase6_record["panel_record"] == phase6_panel,
         "D-P6-001 panel routing drifted",
     )
-    panel_path_text, separator, panel_anchor = phase6_panel.partition("#")
-    panel_path = ROOT / panel_path_text
-    _require(panel_path.is_file(), "D-P6-001 panel record path is missing")
+
+    vision_record = phase6_by_id["D-GOV-005"]
+    vision_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#product-vision-and-execution-governance-panel"
+    )
     _require(
-        separator and 'id="{}"'.format(panel_anchor) in _read(panel_path),
-        "D-P6-001 panel record anchor is missing",
+        vision_record["decision"] == EXPECTED_VISION_DECISION
+        and vision_record["authority"] == EXPECTED_VISION_AUTHORITY
+        and vision_record["exclusions"] == EXPECTED_VISION_EXCLUSIONS
+        and vision_record["evidence"] == vision_panel
+        and vision_record["panel_record"] == vision_panel,
+        "D-GOV-005 authority, exclusions or panel routing drifted",
     )
     current_records = document["decisions"]
     _require(
@@ -946,6 +1213,756 @@ def _validate_decisions(plan: str) -> None:
     )
 
 
+def _validate_product_vision(vision: str) -> None:
+    """Validate Product Vision meaning in the sections that own each clause."""
+    required_vision_headings = {
+        "Product definition",
+        "Vision and execution authority",
+        "Canonical and derived authority",
+        "Normal design experience",
+        "On-demand exact geometry and production",
+        "Product horizons",
+        "Migration completion",
+        "Present-programme non-goals",
+        "Product acceptance journey",
+    }
+    vision_headings = set(re.findall(r"^## (.+)$", vision, re.MULTILINE))
+    _require(
+        required_vision_headings <= vision_headings,
+        "Product Vision lacks required governing sections",
+    )
+
+    preamble = _document_preamble(vision, "TrackTemplate Product Vision")
+    authority_paragraph = _require_paragraph(
+        preamble,
+        (
+            "This document says what TrackTemplate is and what the current "
+            "programme is trying to establish. ARCHITECTURE.md owns the "
+            "technical invariants, PROJECT_PLAN.md owns live phase and exit "
+            "status, and CAPABILITY_MATRIX.md records bounded repository "
+            "evidence. Product vision directs work; it does not independently "
+            "authorise a feature, phase exit, migration family, output clearance "
+            "or release."
+        ),
+        "Product Vision lost its local direction-without-authority clause",
+    )
+    _require_links(
+        authority_paragraph,
+        (
+            ("ARCHITECTURE.md", "ARCHITECTURE.md"),
+            ("PROJECT_PLAN.md", "PROJECT_PLAN.md"),
+            ("CAPABILITY_MATRIX.md", "CAPABILITY_MATRIX.md"),
+        ),
+        "Product Vision authority links or destinations drifted",
+    )
+
+    definition = direct_section_content(vision, "Product definition")
+    _require_paragraph(
+        definition,
+        (
+            "Templot is the closest product analogy because both products centre "
+            "on parametric model-railway templates rather than generic drawing "
+            "primitives. The analogy communicates the intended railway breadth "
+            "and template-led way of working. It does not claim file-format "
+            "compatibility, identical interaction, shared implementation, "
+            "transferred rights or feature parity at the current repository state."
+        ),
+        "Product Vision lost its bounded Templot analogy",
+    )
+    _require_paragraph(
+        definition,
+        (
+            "TrackTemplate's distinction is that FreeCAD is the host product "
+            "boundary. The normal result is an installable TrackTemplate Workbench "
+            "backed by the modular tracktemplate package, FreeCAD documents and "
+            "transactions, FreeCAD-native selection and task-panel workflows, and "
+            "explicit use of FreeCAD/OpenCASCADE where exact geometry is required. "
+            "The accepted legacy macro remains comparison and migration evidence; "
+            "it must not be a runtime dependency of the completed Addon."
+        ),
+        "Product Vision lost its FreeCAD-native migration boundary",
+    )
+
+    authority = direct_section_content(
+        vision,
+        "Vision and execution authority",
+    )
+    _require(
+        _numbered_items(authority)
+        == [
+            (1, "this canonical product vision;"),
+            (2, "accepted architectural invariants;"),
+            (3, "the current authorised programme;"),
+            (4, "the active phase and its exact exit criteria;"),
+            (5, "current risks, findings and repository evidence;"),
+            (6, "one selected bounded work item;"),
+            (7, "one explicit delegated assignment; and"),
+            (8, "independent evidence and acceptance."),
+        ],
+        "Product Vision authority hierarchy or ordering drifted",
+    )
+    _require_paragraph(
+        authority,
+        (
+            "Every agent assignment must support a bounded work item that closes "
+            "an evidenced finding or advances an active exit criterion, advances "
+            "the current authorised programme and thereby helps establish this "
+            "vision. A later horizon may inform an extension point, but it cannot "
+            "authorise present implementation."
+        ),
+        "Product Vision lost its assignment trace or future-authority polarity",
+    )
+
+    current_programme = direct_section_content(
+        vision,
+        "Current programme: TrackTemplate Core migration",
+        level=3,
+    )
+    _require_paragraph(
+        current_programme,
+        (
+            "The current programme faithfully converts the accepted legacy macro "
+            "into a modular, tested, maintainable, installable and operational "
+            "FreeCAD Addon. It preserves accepted behaviour, geometry, workflows, "
+            "persistence and production outputs while moving authority into the "
+            "modular package."
+        ),
+        "Product Vision lost its current Core-migration clause",
+    )
+    future_programme = direct_section_content(
+        vision,
+        "Subsequent programme: TrackTemplate Layout Editor",
+        level=3,
+    )
+    _require_paragraph(
+        future_programme,
+        (
+            "These capabilities are future until separately authorised. Recording "
+            "their direction does not add an implementation task or alter a "
+            "current exit."
+        ),
+        "Product Vision lost its future Layout Editor non-authority clause",
+    )
+    _require(
+        vision.index("### Current programme: TrackTemplate Core migration")
+        < vision.index("### Subsequent programme: TrackTemplate Layout Editor")
+        < vision.index("## Migration completion"),
+        "Product Vision current/future programme ordering drifted",
+    )
+    migration = direct_section_content(vision, "Migration completion")
+    _require_paragraph(
+        migration,
+        (
+            "Completion of one phase or one capability family is not "
+            "macro-migration completion. Layout Editor features are not "
+            "prerequisites for Core migration."
+        ),
+        "Product Vision lost its migration-completion boundary",
+    )
+
+
+def _validate_architecture_direction(architecture: str) -> None:
+    """Validate each D-GOV-005 clause as one structured architecture record."""
+    section = direct_section_content(
+        architecture,
+        "Accepted Level 3 product-direction decisions",
+    )
+    _require_paragraph(
+        section,
+        (
+            "D-GOV-005 records the following architectural clauses. They govern "
+            "direction; their acceptance does not claim that a shared renderer, "
+            "wider exact geometry, another migrated family or a future Layout "
+            "Editor capability is implemented."
+        ),
+        "architecture lost its direction-not-delivery clause",
+    )
+    expected_rows = {
+        "D-GOV-005-A — canonical authority": (
+            "Versioned railway intent, identities, topology, analysis decisions, "
+            "production intent and accepted definitions are canonical. Coin nodes, "
+            "ViewProvider state, transient/generated Part geometry, caches, previews, "
+            "exports, reports and manifests are derived and replaceable.",
+            "Existing schemas and accepted family boundaries are unchanged.",
+        ),
+        "D-GOV-005-B — presentation pipeline": (
+            "Canonical state feeds railway geometry and analysis, then an immutable "
+            "presentation snapshot, then a batched Coin representation.",
+            "The accepted B16 Entry/Exit scene remains the only demonstrated slice; "
+            "no shared renderer is claimed.",
+        ),
+        "D-GOV-005-C — normal editing view": (
+            "Routine editing is fast Coin-based 2D or pseudo-2D with rails and "
+            "sleepers/timbers, construction information and optional chair, analysis "
+            "and warning layers, without a Part dependency.",
+            "The current centreline fixture does not yet implement the complete "
+            "normal view.",
+        ),
+        "D-GOV-005-D — exact geometry": (
+            "Exact geometry is explicit, on demand, derived, safe to delete and "
+            "regenerate, and not automatically rebuilt for ordinary selection or "
+            "editing.",
+            "Accepted transient geometry remains limited to the Phase 6 Entry/Exit "
+            "evidence.",
+        ),
+        "D-GOV-005-E — display modes": (
+            "Register only genuinely distinct FreeCAD display modes owned by that "
+            "ViewProvider. Detail, construction and analysis choices normally remain "
+            "internal layer switches or presets. Invalid restored modes fail closed "
+            "or recover through the accepted lifecycle without becoming canonical "
+            "state.",
+            "No current ViewProvider is replaced and no display-mode migration is "
+            "implemented by this decision.",
+        ),
+        "D-GOV-005-F — presentation performance": (
+            "Batch rails, sleeper/timber faces and chair markers; avoid one FreeCAD "
+            "object per sleeper/chair and one transform per chair; separate static "
+            "geometry from dynamic overlays/labels; do not rebuild the complete scene "
+            "graph for selection-only changes.",
+            "Numerical budgets and a product-wide renderer remain unaccepted.",
+        ),
+        "D-GOV-005-G — product horizons": (
+            "TrackTemplate Core migration is the current programme; TrackTemplate "
+            "Layout Editor is a subsequent programme.",
+            "Future extension direction does not alter an active phase or authorise "
+            "Layout Editor implementation.",
+        ),
+    }
+    rows = _structured_table_rows(
+        section,
+        (
+            "Clause",
+            "Accepted direction",
+            "Implementation boundary retained",
+        ),
+        "architecture D-GOV-005 record",
+    )
+    _require(
+        list(rows) == list(expected_rows),
+        "architecture D-GOV-005 clause set or ordering drifted",
+    )
+    for clause, expected in expected_rows.items():
+        expected_cells = [
+            _semantic_markdown(cell)
+            for cell in (clause, *expected)
+        ]
+        _require(
+            rows.get(clause) == expected_cells,
+            "architecture {} semantic record drifted".format(
+                clause.split(" — ", 1)[0]
+            ),
+        )
+
+
+def _validate_capability_matrix(matrix: str) -> None:
+    """Validate accepted-source, Addon and future status in local matrix units."""
+    preamble = _document_preamble(matrix, "TrackTemplate Capability Matrix")
+    _require_paragraph(
+        preamble,
+        (
+            "This matrix compares the accepted legacy baseline with the modular "
+            "B16 checkpoint destined for the Addon. It was reconciled on 2026-08-01 "
+            "against accepted main at 61237508b0c1fefedcf740afd230e5e563acab3e, "
+            "the frozen Phase 1 inventory and Phase 5 closeout, and current Phase 6 "
+            "evidence. Draft PR #31 is not counted as accepted Addon capability."
+        ),
+        "capability matrix lost its local accepted-source and PR-status clause",
+    )
+    _require_paragraph(
+        preamble,
+        (
+            "The Addon column describes the modular tracktemplate implementation, "
+            "not an installable or production-ready Addon claim. Formal phase "
+            "status remains in PROJECT_PLAN.md."
+        ),
+        "capability matrix lost its local Addon-status authority clause",
+    )
+
+    rows = _structured_table_rows(
+        direct_section_content(matrix, "Matrix"),
+        (
+            "Capability",
+            "Legacy macro baseline",
+            "Current Addon",
+            "Canonical state",
+            "Coin presentation",
+            "Exact geometry",
+            "Export",
+            "Persistence",
+            "Accepted fixture or evidence",
+            "Classification",
+        ),
+        "capability matrix",
+    )
+    expected_rows = (
+        (
+            "Straight track",
+            "C — bounded straight/station workflow",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "[Phase 1 workflow inventory](phase-evidence/"
+            "PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory); "
+            "[straight/station series](benchmarks/"
+            "2026-07-20-b14-straight-station-workflow-series.md)",
+            "Partial",
+        ),
+        (
+            "Curves",
+            "C — bounded curve/easement create, edit and output oracles",
+            "P — Entry/Exit transition slice only",
+            "P — transition-state v1 only",
+            "P — transition centreline only",
+            "P — transition centreline only",
+            "A",
+            "P — transition records only",
+            "[Phase 1 workflow contract](contracts/"
+            "phase1-workflow-coverage.json); [Phase 5 closeout](history/"
+            "phase-closeouts/PHASE5_CLOSEOUT.md); [Phase 6 evidence](current/"
+            "PHASE_EVIDENCE.md)",
+            "Partial",
+        ),
+        (
+            "Euler transitions",
+            "C — accepted B14/B15 calculation and workflow evidence",
+            "C — bounded B16 Entry/Exit slice",
+            "C — signed transition-state v1 boundary",
+            "C — accepted bounded centreline view",
+            "C — transient exact centreline",
+            "A",
+            "C — bounded transition records",
+            "[Transition pilot](contracts/phase1-transition-pilot.json); "
+            "[Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md); "
+            "[Phase 6 evidence](current/PHASE_EVIDENCE.md)",
+            "Partial",
+        ),
+        (
+            "Multiple parallel tracks",
+            "C — fixed two-track fixture",
+            "P — fixture-only Entry/Exit records for one secondary track",
+            "P",
+            "P — representative pair only",
+            "P — transition records only",
+            "A",
+            "P",
+            "[Workflow coverage contract](contracts/"
+            "phase1-workflow-coverage.json); [Phase 5 closeout](history/"
+            "phase-closeouts/PHASE5_CLOSEOUT.md#"
+            "representative-multi-object-selection-and-edit-tranche)",
+            "Partial",
+        ),
+        (
+            "General track widening",
+            "P — B14 source contains a general track/platform-widening route; "
+            "no dedicated accepted general-widening fixture was found",
+            "A — spacing-transition evidence does not establish general widening",
+            "A for general widening",
+            "A for general widening",
+            "A for general widening",
+            "A",
+            "A for general widening",
+            "[B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 workflow "
+            "inventory](phase-evidence/PHASE1_INVENTORY.md#"
+            "release-critical-workflow-coverage-inventory)",
+            "Partial",
+        ),
+        (
+            "Spacing-matched Entry/Exit transitions",
+            "C — accepted spacing-matched secondary plain-line Entry/Exit fixture",
+            "P — fixture-only accepted Entry/Exit slice",
+            "P — transition-state v1 records derived from start/curve/finish "
+            "spacing",
+            "P — bounded transition centreline pair only",
+            "P — transient transition centrelines only",
+            "A — no accepted modular export",
+            "P — bounded transition records only",
+            "[Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md#"
+            "exact-family-support-enablement); [Phase 5 closeout](history/"
+            "phase-closeouts/PHASE5_CLOSEOUT.md#"
+            "representative-multi-object-selection-and-edit-tranche); "
+            "[Phase 6 evidence](current/PHASE_EVIDENCE.md#"
+            "b16-entryexit-transient-exact-geometry)",
+            "Partial",
+        ),
+        (
+            "Turnouts",
+            "C — bounded REA C10 lifecycle oracle",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "[Workflow coverage contract](contracts/"
+            "phase1-workflow-coverage.json); [turnout series](benchmarks/"
+            "2026-07-20-b14-standalone-turnout-workflow-series.md)",
+            "Partial",
+        ),
+        (
+            "Crossovers",
+            "C — bounded XO-001 geometry and lifecycle evidence",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "[Crossover feasibility contract](contracts/"
+            "phase1-crossover-feasibility.json); [workflow coverage contract]"
+            "(contracts/phase1-workflow-coverage.json)",
+            "Partial",
+        ),
+        (
+            "Sleepers and turnout timbers",
+            "C — bounded automatic crossover-timbering evidence",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "[Timbering contract](contracts/phase1-crossover-timbering.json); "
+            "[Phase 1 workflow inventory](phase-evidence/PHASE1_INVENTORY.md#"
+            "release-critical-workflow-coverage-inventory)",
+            "Partial",
+        ),
+        (
+            "Chair analysis",
+            "C — bounded logical analysis, invalidation and persistence evidence",
+            "A — chair analysis is not migrated",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "[Chair persistence contract](contracts/"
+            "phase1-chair-analysis-persistence.json); [chair invalidation "
+            "contract](contracts/phase1-chair-analysis-invalidation.json)",
+            "Partial",
+        ),
+        (
+            "Procedural chairs and support components",
+            "P — five-box bodies are legacy gap evidence, not the production "
+            "oracle",
+            "P — neutral package validation boundary only",
+            "P — chair-definition package v1",
+            "A",
+            "A",
+            "A",
+            "P — serialisable package, not supported FreeCAD product persistence",
+            "[Chair package fixture](../tests/fixtures/"
+            "chair-definition-v1-contract.json); [architecture boundary]"
+            "(ARCHITECTURE.md#chair-definition-and-procedural-geometry-contract)",
+            "Partial",
+        ),
+        (
+            "Platforms",
+            "P — substantial B14 source exists; the accepted inventory retains "
+            "physical platform and wider-workflow gaps",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "[B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 workflow "
+            "inventory](phase-evidence/PHASE1_INVENTORY.md#"
+            "release-critical-workflow-coverage-inventory)",
+            "Partial",
+        ),
+        (
+            "Formation boards",
+            "P — substantial B14 source exists; no dedicated accepted "
+            "formation-board migration fixture was found",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "A",
+            "[B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 inventory]"
+            "(phase-evidence/PHASE1_INVENTORY.md)",
+            "Partial",
+        ),
+        (
+            "SVG",
+            "C — fixed plain-line selected and Generate-path output oracles",
+            "A",
+            "P — bounded transition intent exists, not an SVG output contract",
+            "—",
+            "P — centreline-only exact seam",
+            "A",
+            "—",
+            "[Workflow coverage contract](contracts/"
+            "phase1-workflow-coverage.json); [selected-export series](benchmarks/"
+            "2026-07-19-b14-ordinary-track-selected-export-series.md)",
+            "Partial",
+        ),
+        (
+            "DXF",
+            "C — fixed plain-line selected and Generate-path output oracles",
+            "A on accepted main; draft PR #31 is unaccepted",
+            "P — bounded transition intent exists",
+            "—",
+            "P — transient transition centreline",
+            "A on accepted main",
+            "—",
+            "[Workflow coverage contract](contracts/"
+            "phase1-workflow-coverage.json); [current Phase 6 evidence]"
+            "(current/PHASE_EVIDENCE.md)",
+            "Partial",
+        ),
+        (
+            "STL",
+            "C — fixed plain-line legacy output oracle",
+            "A",
+            "A for solids/meshes",
+            "—",
+            "A for required production solids/meshes",
+            "A",
+            "—",
+            "[Workflow coverage contract](contracts/"
+            "phase1-workflow-coverage.json); [create-time export series]"
+            "(benchmarks/"
+            "2026-07-19-b14-ordinary-track-create-time-export-series.md)",
+            "Partial",
+        ),
+        (
+            "STEP",
+            "C — fixed plain-line legacy output oracle",
+            "A",
+            "A for B-rep production scope",
+            "—",
+            "A for required production B-reps",
+            "A",
+            "—",
+            "[Workflow coverage contract](contracts/"
+            "phase1-workflow-coverage.json); [create-time export series]"
+            "(benchmarks/"
+            "2026-07-19-b14-ordinary-track-create-time-export-series.md)",
+            "Partial",
+        ),
+        (
+            "Calibrated map or image reference layers",
+            "U",
+            "F",
+            "F",
+            "F",
+            "—",
+            "U",
+            "F",
+            "[Product vision](PRODUCT_VISION.md#"
+            "subsequent-programme-tracktemplate-layout-editor); no accepted "
+            "implementation fixture found",
+            "Future",
+        ),
+        (
+            "FreeCAD sketch reference layers",
+            "U",
+            "F",
+            "F",
+            "F",
+            "—",
+            "U",
+            "F",
+            "[Product vision](PRODUCT_VISION.md#"
+            "subsequent-programme-tracktemplate-layout-editor); no accepted "
+            "implementation fixture found",
+            "Future",
+        ),
+        (
+            "Complete-template placement and rotation",
+            "U for the Layout Editor meaning",
+            "F",
+            "F",
+            "F",
+            "—",
+            "U",
+            "F",
+            "[Product vision](PRODUCT_VISION.md#"
+            "subsequent-programme-tracktemplate-layout-editor); existing "
+            "turnout host placement is a different bounded legacy workflow",
+            "Future",
+        ),
+        (
+            "Connected placement, extension, attach and detach",
+            "U for the Layout Editor meaning",
+            "F",
+            "F",
+            "F",
+            "—",
+            "U",
+            "F",
+            "[Product vision](PRODUCT_VISION.md#"
+            "subsequent-programme-tracktemplate-layout-editor); no accepted "
+            "connected-layout fixture found",
+            "Future",
+        ),
+        (
+            "Constituent template geometry editing",
+            "U",
+            "F",
+            "F",
+            "F",
+            "F where later validation requires it",
+            "U",
+            "F",
+            "[Product vision](PRODUCT_VISION.md#"
+            "subsequent-programme-tracktemplate-layout-editor); no accepted "
+            "implementation fixture found",
+            "Future",
+        ),
+        (
+            "Fixed-end fitting and connected-layout solving",
+            "U",
+            "F",
+            "F",
+            "F",
+            "F where later validation requires it",
+            "U",
+            "F",
+            "[Product vision](PRODUCT_VISION.md#"
+            "subsequent-programme-tracktemplate-layout-editor); no accepted "
+            "solver fixture found",
+            "Future",
+        ),
+    )
+    _require(
+        list(rows) == [row[0] for row in expected_rows],
+        "capability matrix capability set or ordering drifted",
+    )
+    for expected_row in expected_rows:
+        capability = expected_row[0]
+        expected_cells = [
+            _semantic_markdown(cell)
+            for cell in expected_row
+        ]
+        _require(
+            rows.get(capability) == expected_cells,
+            "capability matrix structured row drifted: " + capability,
+        )
+
+    evidence_limits = direct_section_content(
+        matrix,
+        "Evidence limits and maintenance",
+    )
+    _require_paragraph(
+        evidence_limits,
+        (
+            "C never widens the evidence named in its cell. In particular, the "
+            "accepted Coin and transient exact-geometry results cover the B16 "
+            "Entry/Exit transition slice, not a shared renderer, complete curve "
+            "family or whole layout. A legacy C does not mean that the capability "
+            "has migrated."
+        ),
+        "capability matrix lost its legacy-to-Addon evidence limit",
+    )
+    _require_paragraph(
+        evidence_limits,
+        (
+            "The spacing-matched Entry/Exit row is confined to the accepted "
+            "bounded centreline and transition-record slice. It does not "
+            "establish general track widening, a shared renderer, complete rail, "
+            "sleeper/timber or chair presentation, manufacturing geometry, modular "
+            "export or a Phase 6 exit."
+        ),
+        "capability matrix lost its spacing-transition evidence limits",
+    )
+
+
+def _blockquote_paragraphs(section: str) -> list[str]:
+    """Return semantic paragraphs from Markdown blockquotes in one section."""
+    paragraphs: list[str] = []
+    lines: list[str] = []
+    for line in section.splitlines():
+        if line.startswith(">"):
+            content = line[1:].lstrip()
+            if content:
+                lines.append(content)
+            elif lines:
+                paragraphs.append(_semantic_text("\n".join(lines)))
+                lines = []
+        elif lines:
+            paragraphs.append(_semantic_text("\n".join(lines)))
+            lines = []
+    if lines:
+        paragraphs.append(_semantic_text("\n".join(lines)))
+    return paragraphs
+
+
+def _validate_current_governance_evidence(current_evidence: str) -> None:
+    """Validate D-GOV-005 state and D-GOV-004 non-regression in its panel."""
+    _require(
+        '<a id="product-vision-and-execution-governance-panel"></a>'
+        in current_evidence,
+        "current evidence lost the D-GOV-005 panel anchor",
+    )
+    section = direct_section_content(
+        current_evidence,
+        "Product vision and execution governance panel",
+    )
+    _require_paragraph(
+        section,
+        (
+            "Decision and repository state: This Level 3 governance decision "
+            "applies to accepted main at "
+            "61237508b0c1fefedcf740afd230e5e563acab3e, the merge commit for PR "
+            "#30. PR #30 is therefore merged, not pending. Draft PR #31 and its "
+            "bounded transition-DXF branch remain separate, unaccepted Phase 6 "
+            "implementation; this governance branch was created from accepted "
+            "main and does not alter, rebase, ready or merge that work. Phase 6 "
+            "remains current at 0/5, and this panel admits no new phase-exit evidence."
+        ),
+        "current evidence lost its local repository, PR or Phase 6 state clause",
+    )
+    quoted = _blockquote_paragraphs(section)
+    expected_quoted = [
+        _semantic_text(
+            "D-GOV-005 — Adopt the TrackTemplate product vision and vision-led "
+            "execution model"
+        ),
+        _semantic_text(
+            "PRODUCT_VISION.md owns product purpose, the current TrackTemplate "
+            "Core migration, the later Layout Editor horizon and "
+            "migration-completion meaning. Architecture adopts D-GOV-005-A "
+            "through D-GOV-005-G for canonical state, immutable snapshots, "
+            "batched Coin presentation, lightweight normal editing, on-demand "
+            "exact geometry, ViewProvider-owned display modes, presentation "
+            "performance and product horizons. Work selection follows vision → "
+            "architecture → programme → phase → evidence → bounded item → "
+            "assignment → independent evidence and acceptance. The Chief of "
+            "Staff and literal $tracktemplate-continue workflow apply that "
+            "selection and accountability model."
+        ),
+        _semantic_text(
+            "Vision supplies direction, not scope. D-GOV-004 continues to own "
+            "literal continuation invocation and its one-cycle Level 1/2 "
+            "execution limit. This decision changes no Phase 6 criterion or exit "
+            "status; implements no shared renderer, ViewProvider, exact-geometry "
+            "expansion, output, persistence or railway calculation; authorises no "
+            "Layout Editor feature; accepts no pull request, migration completion, "
+            "output clearance, package, release or phase exit; and leaves draft "
+            "PR #31 separate and unaccepted."
+        ),
+    ]
+    _require(
+        quoted == expected_quoted,
+        "current evidence D-GOV-005 authority block drifted or gained a "
+        "competing record",
+    )
+
+
+def _validate_product_direction(current_evidence: str) -> None:
+    """Require localised vision, architecture and evidence-map boundaries."""
+    _validate_product_vision(_read(PRODUCT_VISION_PATH))
+    _validate_architecture_direction(_read(ARCHITECTURE_PATH))
+    _validate_capability_matrix(_read(CAPABILITY_MATRIX_PATH))
+    _validate_current_governance_evidence(current_evidence)
+
+
 def _validate_fixed_paths() -> None:
     redirect = _read(REDIRECT_PATH)
     _require(
@@ -995,6 +2012,7 @@ def main() -> None:
     )
     _validate_risks(plan)
     _validate_decisions(plan)
+    _validate_product_direction(current_evidence)
     _validate_fixed_paths()
     _validate_ci_workflow()
     print("Project dashboard and current-record validation passed")

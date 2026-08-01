@@ -18,15 +18,21 @@ Skills complement `AGENTS.md`; they do not replace it. A skill may link to a
 canonical document, but it must not copy enough of that document to become a
 second policy owner.
 
+[`PRODUCT_VISION.md`](PRODUCT_VISION.md) owns product purpose, programme
+horizons and Core-migration completion. Architecture, plan, evidence, skills and
+source apply that direction within their narrower authority; none may silently
+become an alternative product-vision owner.
+
 ## Session continuity
 
 At the start of resumed work, reconstruct authority in this order:
 
 1. repository and scoped `AGENTS.md`;
-2. `reference/PROJECT_PLAN.md`;
-3. `reference/current/PHASE_EVIDENCE.md` and the current JSON registers;
-4. the canonical owner of the affected subject; and
-5. source, tests, Git history and diffs as implementation evidence.
+2. `reference/PRODUCT_VISION.md` and accepted architectural invariants;
+3. `reference/PROJECT_PLAN.md` for the authorised programme, phase and exits;
+4. `reference/current/PHASE_EVIDENCE.md` and the current JSON registers;
+5. the canonical owner of the affected subject; and
+6. source, tests, Git history and diffs as implementation evidence.
 
 Use `$tracktemplate-context-recovery` when a new session, compaction,
 interrupted handoff or unfamiliar dirty worktree makes that reconstruction
@@ -257,9 +263,14 @@ Path: `.agents/skills/tracktemplate-chief-of-staff/SKILL.md`
 Use it when the owner says progress appears stuck, circular,
 maintenance/evidence-heavy or unclear, and compose it from
 `$tracktemplate-continue` when that workflow detects its defined loop
-conditions. It classifies recent work against named exits and risks and
-produces exactly one transient, advisory next-outcome brief. It is read-only,
-is not required for every routine change and cannot accept project authority.
+conditions. It is a vision-informed programme orchestrator: it reconciles
+programme, phase, evidence and pull-request state; detects loops; controls task
+accountability; compares the selected work with credible maintenance, evidence,
+risk-reduction and other authorised alternatives; and produces exactly one
+transient, advisory assignment or stop brief. Its assignment must state **Why
+this outranks maintenance alternatives**; a highest-value label without that
+comparison is insufficient. It is read-only, is not required for every routine
+change and cannot implement or accept project authority.
 
 ### `tracktemplate-technical-lead`
 
@@ -279,17 +290,21 @@ Path: `.agents/skills/tracktemplate-continue/SKILL.md`
 
 Invoke `$tracktemplate-continue` explicitly for one complete repository-driven
 Level 1 or Level 2 cycle. It integrates one previous exact-green pull request,
-synchronises protected `main`, reconstructs current authority, selects the
-highest-value authorised outcome, composes delivery/validation/review and
-publishes one new exact-green draft. It may stop after integration when no
-worthwhile phase-moving task exists, and never manufactures a tranche or merges
-the newly published draft in the same cycle.
+synchronises protected `main`, reads the Product Vision and current authority,
+selects one repository-evidenced gap traceable to an exact phase criterion,
+composes bounded delivery/validation/independent review, reconciles the result
+and publishes one new exact-green draft. It may stop after integration when no
+worthwhile programme-moving task exists, and never manufactures a tranche or
+merges the newly published draft in the same cycle.
 
 Only a project-owner command containing the literal `$tracktemplate-continue`
 invocation activates it. Natural-language equivalents, quotations and
 descriptions do not supply its authority; its metadata therefore retains
 `allow_implicit_invocation: false`. The accepted standing boundary is recorded
 by [D-GOV-004](history/phase-closeouts/PHASE5_CLOSEOUT.md#repository-driven-continuation-authority-panel).
+[D-GOV-005](current/PHASE_EVIDENCE.md#product-vision-and-execution-governance-panel)
+adds vision-led selection and result accountability without changing that
+invocation or Level 1/2 execution authority.
 
 ### `tracktemplate-performance-engineering`
 
@@ -570,6 +585,10 @@ Current phase evidence is not an automatic task queue, and a staff-review
 finding does not automatically become the next tranche. No skill can accept
 Level 3 authority for the project owner. There is deliberately no separate
 `tracktemplate-deliver-outcome` skill; continue composes the existing roles.
+Product vision informs candidate value but never authorises implementation or
+widens an active exit. Selection must trace agent task → bounded work item →
+finding/exit → current programme → vision and state regression evidence and
+explicit non-goals before delivery.
 
 Classify the task under
 [ENGINEERING_POLICY.md](ENGINEERING_POLICY.md) before selecting workflows.
@@ -637,11 +656,11 @@ $tracktemplate-quality-review
 For a direct progress-diagnosis request outside a continuation cycle:
 
 ```text
-repository authority and latest relevant staff review
+Product Vision, programme, phase, repository/PR evidence and latest review
     ↓
 $tracktemplate-chief-of-staff
     ↓
-one transient next-outcome brief
+one transient bounded assignment or stop brief
     ↓
 project owner accepts, adjusts or stops before any later delivery request
 ```
@@ -716,12 +735,16 @@ $tracktemplate-quality-review
 For one complete repository-driven development cycle:
 
 ```text
-repository authority
+Product Vision, governance, programme, phase, repository and PR evidence
     ↓
 $tracktemplate-continue
     ↓
 verify and integrate one previous exact-green Level 1/2 pull request,
 then synchronise protected main
+    ↓
+select one authorised evidenced gap; state outcome, criterion, level,
+regression risk, acceptance evidence, explicit non-goals and why it outranks
+credible maintenance, evidence, risk-reduction and authorised alternatives
     ↓
 conditional $tracktemplate-chief-of-staff when loop conditions are met
     ↓
@@ -734,6 +757,9 @@ $tracktemplate-change-validation
 separate read-only $tracktemplate-quality-review
     ↓
 bounded blocker repair only, at most two passes
+    ↓
+reconcile claimed, present, validated and independently accepted state
+against the exact phase exit; preserve non-claims
     ↓
 $tracktemplate-publish in review-frozen mode
     ↓

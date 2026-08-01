@@ -141,11 +141,11 @@
       "state": "Open",
       "treatment": "Mitigate",
       "control_effectiveness": "Partial",
-      "summary": "Governance can duplicate facts and grow stale.",
-      "owner": "Documentation-control and current phase owners; Phase 10/11 QA owner reviews.",
+      "summary": "Product direction, task-selection rationale or governance facts could fragment, duplicate and grow stale.",
+      "owner": "Product-vision, documentation-control and current phase owners; Phase 10/11 QA owner reviews.",
       "deadline": "Apply the governance budget in Phase 4 and pass focused documentation audits at Phases 10 and 11.",
-      "required_work": "Use fixed live paths, one fact owner, frozen history, three-level task classification and CI-enforced consistency.",
-      "closure_evidence": "Passing current-path, change-level, link, progress and frozen-record checks with no routine historical rewrites."
+      "required_work": "Use one Product Vision owner, the accepted authority hierarchy, vision-led bounded selection, fixed live paths, frozen history, three-level task classification and CI-enforced consistency; stop unchanged execution loops rather than recording activity as progress.",
+      "closure_evidence": "Passing current-path, change-level, link, progress and frozen-record checks, plus reviewed task traces and loop dispositions with no routine historical rewrites."
     },
     {
       "id": "PR-13",
@@ -225,11 +225,11 @@
       "state": "Open",
       "treatment": "Mitigate",
       "control_effectiveness": "Effective (current scope)",
-      "summary": "Feature work could destabilise or silently expand the migration.",
+      "summary": "Future-product direction could destabilise or silently expand Core migration, or let derived representations acquire canonical authority.",
       "owner": "Project owner owns release scope; current phase owner triages changes.",
       "deadline": "Maintain bounded tranches, freeze features at Phase 10 and allow only blockers at Phase 11.",
-      "required_work": "Classify scope before implementation and defer unrelated feature additions.",
-      "closure_evidence": "Bounded diffs, Phase 10 feature freeze and Phase 11 blocker-only record."
+      "required_work": "Trace each task to an evidenced active-phase gap, preserve canonical-versus-derived authority, state explicit non-goals and defer Layout Editor or unrelated feature additions.",
+      "closure_evidence": "Bounded diffs and reviewed non-claims through migration, the Phase 10 feature freeze and the Phase 11 blocker-only record."
     },
     {
       "id": "PR-21",
@@ -249,11 +249,11 @@
       "state": "Open",
       "treatment": "Remove",
       "control_effectiveness": "Effective (current scope)",
-      "summary": "A true authority transfer could occur without structured safety/risk challenge.",
-      "owner": "Change owner presents; QA/risk reviewer challenges; project owner decides.",
+      "summary": "A true authority transfer or implementation self-acceptance could occur without structured independent safety/risk challenge.",
+      "owner": "Change owner presents; independent QA/risk reviewer challenges; project owner decides.",
       "deadline": "Classify every task and apply the panel to every Level 3 authority/release task from Phase 4 onward.",
-      "required_work": "Keep Level 1 and Level 2 work out of panels; record evidence, dissent, recommendation and decision for every Level 3 gate.",
-      "closure_evidence": "Linked panel and owner-decision records for every Level 3 authority or release transfer."
+      "required_work": "Keep Level 1 and Level 2 work out of panels; record evidence, dissent, recommendation and decision for every Level 3 gate; distinguish claimed, present, validated and independently accepted work; never let an implementer become sole acceptance authority.",
+      "closure_evidence": "Linked panels, independent reviews and owner-decision records for every Level 3 authority or release transfer."
     },
     {
       "id": "QA-R03",

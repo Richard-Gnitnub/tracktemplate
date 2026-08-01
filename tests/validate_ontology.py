@@ -32,6 +32,18 @@ ONTOLOGY_ID = (
 )
 TERM_NAMESPACE = ONTOLOGY_ID + "#"
 ONTOLOGY_VERSION = "0.1.0"
+EXPECTED_AUTHORITY_IDS = (
+    "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/"
+    "reference/PRODUCT_VISION.md",
+    "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/"
+    "reference/ARCHITECTURE.md",
+    "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/"
+    "reference/TERMINOLOGY.md",
+    "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/"
+    "reference/LICENSING_BOUNDARIES.md",
+    "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/"
+    "reference/PROVENANCE.md",
+)
 
 EXPECTED_CONTEXT = {
     "dcterms": "http://purl.org/dc/terms/",
@@ -292,6 +304,20 @@ def optional_value_id(value):
     return identifier if isinstance(identifier, str) else None
 
 
+def validate_ontology_authorities(ontology):
+    """Keep the JSON-LD authority map aligned with the human ontology owner."""
+    authorities = ontology.get("rdfs:isDefinedBy")
+    require(
+        isinstance(authorities, list),
+        "ontology rdfs:isDefinedBy authority relationship must be a list",
+    )
+    identifiers = tuple(value_id(value) for value in authorities)
+    require(
+        identifiers == EXPECTED_AUTHORITY_IDS,
+        "ontology authority relationship drifted or omitted Product Vision",
+    )
+
+
 def all_identifier_references(value):
     """Yield every JSON-LD identifier nested beneath a value."""
     if isinstance(value, dict):
@@ -442,6 +468,20 @@ def validate_document(document_text, graph_ids):
     require(
         "supporting semantic reference" in document_text,
         "ontology responsibility classification is missing",
+    )
+    authority_marker = "## Authority and use"
+    require(
+        authority_marker in document_text,
+        "human ontology authority section is missing",
+    )
+    authority_section = document_text.split(authority_marker, 1)[1]
+    authority_section = authority_section.split("\n## ", 1)[0]
+    authority_section = " ".join(authority_section.split())
+    require(
+        "[PRODUCT_VISION.md](PRODUCT_VISION.md) owns product purpose, programme "
+        "horizons and Core-migration completion."
+        in authority_section,
+        "human ontology omitted the canonical Product Vision authority",
     )
     require(
         "ordinary track" not in document_text.lower(),
@@ -624,6 +664,7 @@ def main():
         == ONTOLOGY_ID + "/" + ONTOLOGY_VERSION,
         "ontology version IRI drifted",
     )
+    validate_ontology_authorities(ontology)
 
     class_ids = {
         node["@id"] for node in graph if node.get("@type") == "owl:Class"
