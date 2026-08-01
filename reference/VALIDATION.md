@@ -674,6 +674,26 @@ Entry/Exit boundary recorded in the
 Passing the checks alone grants no renderer, phase, startup, Workbench/menu,
 migration, release or output authority.
 
+Phase 6 adapter-neutral Entry/Exit exact-centreline contract:
+
+```bash
+.venv/bin/python tests/validate_phase6_transition_exact_contract.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase6_transition_exact_contract.py
+```
+
+The standalone proof covers the explicit caller-owned chord-error tolerance
+and segment ceiling, canonical local left-turn frame and units, deterministic
+station ordering, conservative Euler-curvature interpolation bound,
+independent high-precision Fresnel-series coordinates, zero-length and
+fail-closed resolution cases, signed result reuse/change/change-back and
+failure atomicity. The qualified FreeCAD smoke proves the additive public
+contract runs in the accepted host profile without creating a document,
+object, property or Undo/Redo change. Its sentinel is
+`Phase 6 transition exact qualified FreeCAD validation passed`. This route
+creates no `Part` geometry, target-format output, production clearance,
+operator workflow or Phase 6 exit evidence.
+
 Repository recovery and ignored-data safety controls:
 
 ```bash

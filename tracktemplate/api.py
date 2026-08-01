@@ -5,6 +5,8 @@ them through a temporary B15 comparison route. Phase 4 retains only the
 modular façade and adds bounded canonical transition-state and neutral
 chair-package contracts. The bounded derived-state lifecycle remains ephemeral
 and adapter-neutral; its transition preview scene remains renderer-neutral.
+Phase 6 adds one bounded exact-centreline contract without constructing host
+geometry or output.
 """
 
 from tracktemplate import DEVELOPMENT_CHECKPOINT
@@ -40,6 +42,21 @@ from tracktemplate.application.transition_derived import (
     TransitionDerivedRequest,
     transition_derived_contract_signature,
     transition_derived_source_signature,
+)
+from tracktemplate.application.transition_exact import (
+    TRANSITION_EXACT_ANGLE_UNIT,
+    TRANSITION_EXACT_ARTIFACT_ID,
+    TRANSITION_EXACT_CONTRACT_ID,
+    TRANSITION_EXACT_FRAME_ID,
+    TRANSITION_EXACT_INTEGRATION_STEPS,
+    TRANSITION_EXACT_LENGTH_UNIT,
+    TRANSITION_EXACT_ORACLE_ID,
+    TRANSITION_EXACT_RESULT_ID,
+    TransitionExactCentreline,
+    TransitionExactPoint,
+    TransitionExactSpecification,
+    TransitionExactValidationResult,
+    regenerate_transition_exact,
 )
 from tracktemplate.domain.alignment import (
     clothoid_entry_displacement,
@@ -88,6 +105,19 @@ __all__ = (
     "transition_analysis_status",
     "transition_derived_contract_signature",
     "transition_derived_source_signature",
+    "TRANSITION_EXACT_ANGLE_UNIT",
+    "TRANSITION_EXACT_ARTIFACT_ID",
+    "TRANSITION_EXACT_CONTRACT_ID",
+    "TRANSITION_EXACT_FRAME_ID",
+    "TRANSITION_EXACT_INTEGRATION_STEPS",
+    "TRANSITION_EXACT_LENGTH_UNIT",
+    "TRANSITION_EXACT_ORACLE_ID",
+    "TRANSITION_EXACT_RESULT_ID",
+    "TransitionExactCentreline",
+    "TransitionExactPoint",
+    "TransitionExactSpecification",
+    "TransitionExactValidationResult",
+    "regenerate_transition_exact",
     "transition_state_from_json",
     "transition_state_to_json",
     "TRANSITION_PREVIEW_CENTRELINE_LAYER_ID",

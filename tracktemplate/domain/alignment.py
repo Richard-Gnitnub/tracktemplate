@@ -8,6 +8,7 @@ GEOMETRY_TOLERANCE = 1.0e-8
 __all__ = (
     "clothoid_entry_displacement",
     "clothoid_entry_displacement_at_station",
+    "clothoid_entry_polyline_stations",
     "transition_start_signed_offset",
     "solve_transition_length",
 )
@@ -123,6 +124,104 @@ def clothoid_entry_displacement_at_station(
         end_angle,
         integration_steps,
     )
+
+
+def clothoid_entry_polyline_stations(
+    transition_length_mm,
+    radius_mm,
+    maximum_chord_error_mm,
+    maximum_segment_count,
+):
+    """Return stations for a chord-bounded Euler centreline polyline.
+
+    Stations are millimetres in canonical local left-turn space and include
+    both endpoints.  For an arc-length interval ``h`` on this Euler entry,
+    ``|r''(s)|`` is bounded by ``1 / radius_mm``.  Linear interpolation is
+    therefore bounded by ``h**2 / (8 * radius_mm)``.  The second return value
+    is that conservative bound for the equal station intervals selected here.
+    """
+    transition_length_mm = _finite_geometry_value(
+        "transition_length_mm",
+        transition_length_mm,
+    )
+    radius_mm = _finite_geometry_value("radius_mm", radius_mm)
+    maximum_chord_error_mm = _finite_geometry_value(
+        "maximum_chord_error_mm",
+        maximum_chord_error_mm,
+    )
+    if transition_length_mm < 0.0:
+        raise ValueError("A clothoid transition length must not be negative.")
+    if radius_mm <= 0.0:
+        raise ValueError("A clothoid radius must be greater than zero.")
+    if maximum_chord_error_mm <= 0.0:
+        raise ValueError("Maximum chord error must be greater than zero.")
+    if (
+        isinstance(maximum_segment_count, bool)
+        or not isinstance(maximum_segment_count, int)
+        or maximum_segment_count < 1
+    ):
+        raise ValueError("Maximum segment count must be a positive integer.")
+
+    if transition_length_mm == 0.0:
+        return (0.0,), 0.0
+    if transition_length_mm <= GEOMETRY_TOLERANCE:
+        raise ValueError(
+            "A non-zero clothoid length is below the geometry tolerance."
+        )
+
+    chord_scale = 8.0 * radius_mm * maximum_chord_error_mm
+    maximum_station_interval_mm = (
+        math.sqrt(chord_scale)
+        if math.isfinite(chord_scale)
+        else math.inf
+    )
+    if maximum_station_interval_mm <= 0.0:
+        raise ValueError(
+            "The requested chord error is below the supported numerical range."
+        )
+
+    required_ratio = transition_length_mm / maximum_station_interval_mm
+    if (
+        not math.isfinite(required_ratio)
+        or required_ratio > maximum_segment_count
+    ):
+        raise ValueError(
+            "The requested chord error requires more than {} segments.".format(
+                maximum_segment_count
+            )
+        )
+    segment_count = max(1, int(math.ceil(required_ratio)))
+    station_interval_mm = transition_length_mm / float(segment_count)
+    chord_error_bound_mm = (
+        (station_interval_mm / radius_mm)
+        * station_interval_mm
+        / 8.0
+    )
+    if (
+        not math.isfinite(chord_error_bound_mm)
+        or chord_error_bound_mm > maximum_chord_error_mm
+    ):
+        if segment_count >= maximum_segment_count:
+            raise ValueError(
+                "The requested chord error requires more than {} segments.".format(
+                    maximum_segment_count
+                )
+            )
+        segment_count += 1
+        station_interval_mm = transition_length_mm / float(segment_count)
+        chord_error_bound_mm = (
+            (station_interval_mm / radius_mm)
+            * station_interval_mm
+            / 8.0
+        )
+
+    stations = tuple(
+        transition_length_mm
+        if index == segment_count
+        else transition_length_mm * (float(index) / float(segment_count))
+        for index in range(segment_count + 1)
+    )
+    return stations, chord_error_bound_mm
 
 
 def transition_start_signed_offset(circle_centre_y, radius, transition_length):
