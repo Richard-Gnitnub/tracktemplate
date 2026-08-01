@@ -48,17 +48,39 @@ def _artifact(transition_length_mm=300.0):
     )
 
 
-def _editable_snapshot(document, obj):
+def _property_snapshot(container):
+    names = tuple(getattr(container, "PropertiesList", ()))
+    return tuple(
+        (name, repr(getattr(container, name)))
+        for name in names
+    )
+
+
+def _application_snapshot():
     return (
-        tuple(sorted(App.listDocuments())),
         App.ActiveDocument,
-        tuple(document.Objects),
-        tuple(obj.PropertiesList),
-        str(obj.OperatorData),
-        str(obj.Label),
-        int(document.UndoCount),
-        int(document.RedoCount),
-        str(document.FileName),
+        tuple(
+            (
+                name,
+                document,
+                str(document.Label),
+                str(document.FileName),
+                bool(document.Temporary),
+                int(document.UndoCount),
+                int(document.RedoCount),
+                tuple(
+                    (
+                        obj,
+                        str(obj.Name),
+                        str(obj.TypeId),
+                        tuple(obj.PropertiesList),
+                        _property_snapshot(obj),
+                    )
+                    for obj in document.Objects
+                ),
+            )
+            for name, document in sorted(App.listDocuments().items())
+        ),
     )
 
 
@@ -73,6 +95,25 @@ def _new_editable_document():
     document.commitTransaction()
     document.recompute()
     assert App.ActiveDocument is document
+    return document, obj
+
+
+def _new_colliding_temporary_document():
+    document = App.newDocument(
+        adapter.TRANSITION_EXACT_GEOMETRY_DOCUMENT_NAME,
+        "Pre-existing operator-owned temporary document",
+        True,
+        True,
+    )
+    obj = document.addObject("App::FeaturePython", "CollidingOwner")
+    obj.addProperty("App::PropertyString", "OperatorData")
+    obj.OperatorData = "pre-existing collision must remain unchanged"
+    obj.Label = "Pre-existing colliding object"
+    document.recompute()
+    assert str(document.Name) == (
+        adapter.TRANSITION_EXACT_GEOMETRY_DOCUMENT_NAME
+    )
+    assert bool(document.Temporary) is True
     return document, obj
 
 
@@ -95,20 +136,50 @@ def _expect_geometry_error(action, code):
     )
 
 
-def _temporary_documents(editable_document):
+def _new_documents(previous_documents):
     return tuple(
         document
-        for document in App.listDocuments().values()
-        if document is not editable_document
+        for name, document in App.listDocuments().items()
+        if name not in previous_documents
     )
 
 
-def _validate_success_and_determinism(document, obj, artifact):
-    before = _editable_snapshot(document, obj)
+def _validate_ambiguous_ownership(document, collision, artifact):
+    App.setActiveDocument(str(document.Name))
+    before = _application_snapshot()
+    missing = object()
+    original_request = getattr(
+        adapter,
+        "_request_temporary_document",
+        missing,
+    )
+
+    def return_preexisting_document(*_args, **_kwargs):
+        return collision
+
+    adapter._request_temporary_document = return_preexisting_document
+    try:
+        error = _expect_geometry_error(
+            lambda: adapter.build_transition_exact_geometry(artifact),
+            "exact-geometry-document-ownership-ambiguous",
+        )
+        assert "newly created" in error.detail
+    finally:
+        if original_request is missing:
+            del adapter._request_temporary_document
+        else:
+            adapter._request_temporary_document = original_request
+    assert _application_snapshot() == before
+
+
+def _validate_success_and_determinism(document, artifact):
+    App.setActiveDocument(str(document.Name))
+    before = _application_snapshot()
+    previous_documents = dict(App.listDocuments())
     observations = []
 
     def observe_without_cancelling():
-        temporary = _temporary_documents(document)
+        temporary = _new_documents(previous_documents)
         observations.append(
             tuple(
                 (
@@ -140,6 +211,11 @@ def _validate_success_and_determinism(document, obj, artifact):
     assert len(observations) == 3
     assert observations[0] == ()
     assert len(observations[1]) == 1
+    temporary_name = observations[1][0][0]
+    assert temporary_name.startswith(
+        adapter.TRANSITION_EXACT_GEOMETRY_DOCUMENT_NAME + "_"
+    )
+    assert temporary_name not in previous_documents
     assert observations[1][0][1] == (
         "Track Template transient exact geometry"
     )
@@ -153,7 +229,7 @@ def _validate_success_and_determinism(document, obj, artifact):
         ),
     )
     assert observations[2][0][4][0][2] == "Wire"
-    assert _editable_snapshot(document, obj) == before
+    assert _application_snapshot() == before
 
     result = api.transition_exact_result_from_artifact(artifact)
     centreline = result.centreline
@@ -203,18 +279,60 @@ def _validate_success_and_determinism(document, obj, artifact):
     changed = adapter.build_transition_exact_geometry(_artifact(260.0))
     assert changed.exact_result_signature != receipt.exact_result_signature
     assert changed.geometry_signature != receipt.geometry_signature
-    assert _editable_snapshot(document, obj) == before
+    assert _application_snapshot() == before
 
 
-def _validate_cancellation_and_failure(document, obj, artifact):
-    before = _editable_snapshot(document, obj)
+def _validate_active_collision(collision, artifact):
+    App.setActiveDocument(str(collision.Name))
+    assert App.ActiveDocument is collision
+    before = _application_snapshot()
+    receipt = adapter.build_transition_exact_geometry(artifact)
+    assert receipt.shape_type == "Wire"
+    assert _application_snapshot() == before
+
+
+def _validate_nested_construction(document, artifact):
+    App.setActiveDocument(str(document.Name))
+    before = _application_snapshot()
+    previous_documents = dict(App.listDocuments())
+    cancellation_calls = 0
+    nested_receipts = []
+
+    def construct_nested_without_cancelling():
+        nonlocal cancellation_calls
+        cancellation_calls += 1
+        if cancellation_calls == 2:
+            outer_documents = _new_documents(previous_documents)
+            assert len(outer_documents) == 1
+            outer_document = outer_documents[0]
+            assert App.ActiveDocument is document
+            nested_receipts.append(
+                adapter.build_transition_exact_geometry(artifact)
+            )
+            assert App.ActiveDocument is document
+            assert _new_documents(previous_documents) == (outer_document,)
+        return False
+
+    outer_receipt = adapter.build_transition_exact_geometry(
+        artifact,
+        cancellation_requested=construct_nested_without_cancelling,
+    )
+    assert cancellation_calls == 3
+    assert nested_receipts == [outer_receipt]
+    assert _application_snapshot() == before
+
+
+def _validate_cancellation_and_failure(document, artifact):
+    App.setActiveDocument(str(document.Name))
+    before = _application_snapshot()
+    previous_documents = dict(App.listDocuments())
     cancellation_calls = 0
 
     def cancel_after_shape_construction():
         nonlocal cancellation_calls
         cancellation_calls += 1
         if cancellation_calls == 3:
-            temporary = _temporary_documents(document)
+            temporary = _new_documents(previous_documents)
             assert len(temporary) == 1
             assert len(temporary[0].Objects) == 1
             assert str(temporary[0].Objects[0].Shape.ShapeType) == "Wire"
@@ -229,7 +347,7 @@ def _validate_cancellation_and_failure(document, obj, artifact):
         "exact-geometry-cancelled",
     )
     assert cancellation_calls == 3
-    assert _editable_snapshot(document, obj) == before
+    assert _application_snapshot() == before
 
     check_calls = 0
 
@@ -250,12 +368,12 @@ def _validate_cancellation_and_failure(document, obj, artifact):
         "exact-geometry-cancellation-check-failed",
     )
     assert "injected cancellation-check failure" in error.detail
-    assert _editable_snapshot(document, obj) == before
+    assert _application_snapshot() == before
 
     original_shape_builder = adapter._make_transition_shape
 
     def fail_shape_build(_centreline):
-        temporary = _temporary_documents(document)
+        temporary = _new_documents(previous_documents)
         assert len(temporary) == 1
         assert len(temporary[0].Objects) == 1
         raise RuntimeError("injected Part build failure")
@@ -269,11 +387,12 @@ def _validate_cancellation_and_failure(document, obj, artifact):
         assert "injected Part build failure" in error.detail
     finally:
         adapter._make_transition_shape = original_shape_builder
-    assert _editable_snapshot(document, obj) == before
+    assert _application_snapshot() == before
 
 
-def _validate_invalid_and_zero_length(document, obj, artifact):
-    before = _editable_snapshot(document, obj)
+def _validate_invalid_and_zero_length(document, artifact):
+    App.setActiveDocument(str(document.Name))
+    before = _application_snapshot()
     result = artifact.payload
     corrupt = api.TransitionDerivedArtifact(
         stage="exact-validation",
@@ -288,7 +407,7 @@ def _validate_invalid_and_zero_length(document, obj, artifact):
         "invalid-exact-artifact",
     )
     assert error.source_code == "invalid-exact-artifact"
-    assert _editable_snapshot(document, obj) == before
+    assert _application_snapshot() == before
 
     zero_receipt = adapter.build_transition_exact_geometry(_artifact(0.0))
     assert zero_receipt.shape_type == "Vertex"
@@ -297,7 +416,7 @@ def _validate_invalid_and_zero_length(document, obj, artifact):
     assert zero_receipt.polyline_length_mm == 0.0
     assert zero_receipt.minimum_x_mm == zero_receipt.maximum_x_mm == 0.0
     assert zero_receipt.minimum_y_mm == zero_receipt.maximum_y_mm == 0.0
-    assert _editable_snapshot(document, obj) == before
+    assert _application_snapshot() == before
 
     for invalid in (object(), True):
         try:
@@ -312,12 +431,13 @@ def _validate_invalid_and_zero_length(document, obj, artifact):
             pass
         else:
             raise AssertionError("Expected exact-geometry TypeError")
-    assert _editable_snapshot(document, obj) == before
+    assert _application_snapshot() == before
 
 
 def validate():
     assert App.listDocuments() == {}, (
-        "the exact-geometry validator requires an isolated FreeCAD process"
+        "the exact-geometry validator requires an isolated FreeCAD process; "
+        "observed {!r}".format(tuple(App.listDocuments()))
     )
     assert App.ActiveDocument is None
     qualification = bootstrap.require_qualified_runtime(
@@ -327,20 +447,21 @@ def validate():
         "linux-x86_64-flatpak-freecad-1.1.1"
     )
 
-    document, obj = _new_editable_document()
+    document, _obj = _new_editable_document()
+    collision, _collision_obj = _new_colliding_temporary_document()
+    assert App.ActiveDocument is document
     artifact = _artifact()
     try:
-        _validate_success_and_determinism(document, obj, artifact)
-        _validate_cancellation_and_failure(document, obj, artifact)
-        _validate_invalid_and_zero_length(document, obj, artifact)
+        _validate_success_and_determinism(document, artifact)
+        _validate_ambiguous_ownership(document, collision, artifact)
+        _validate_active_collision(collision, artifact)
+        _validate_nested_construction(document, artifact)
+        _validate_cancellation_and_failure(document, artifact)
+        _validate_invalid_and_zero_length(document, artifact)
     finally:
-        for name in tuple(App.listDocuments()):
-            if (
-                name == EDITABLE_DOCUMENT_NAME
-                or name.startswith(
-                    adapter.TRANSITION_EXACT_GEOMETRY_DOCUMENT_NAME
-                )
-            ):
+        for test_document in (collision, document):
+            name = str(test_document.Name)
+            if App.listDocuments().get(name) is test_document:
                 App.closeDocument(name)
 
     assert App.listDocuments() == {}

@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 import math
+import uuid
 
 import FreeCAD as App
 import Part
@@ -27,6 +28,7 @@ TRANSITION_EXACT_GEOMETRY_OBJECT_NAME = "TransitionExactCentreline"
 TRANSITION_EXACT_GEOMETRY_NUMERICAL_TOLERANCE_MM = 1.0e-8
 _SIGNATURE_PREFIX = "sha256:"
 _LOWER_HEXADECIMAL = "0123456789abcdef"
+_TEMPORARY_DOCUMENT_NAME_ATTEMPTS = 16
 
 __all__ = (
     "TRANSITION_EXACT_GEOMETRY_CONTRACT_ID",
@@ -421,17 +423,103 @@ def _receipt(result, measurements):
     )
 
 
-def _cleanup_temporary_document(document, previous_active, previous_name):
+def _same_document_registry(observed, expected):
+    return (
+        set(observed) == set(expected)
+        and all(
+            observed.get(name) is document
+            for name, document in expected.items()
+        )
+    )
+
+
+def _allocate_temporary_document_name(previous_documents):
+    if not _same_document_registry(
+        dict(App.listDocuments()),
+        previous_documents,
+    ):
+        raise _geometry_error(
+            "exact-geometry-document-ownership-ambiguous",
+            "the FreeCAD document registry changed before temporary "
+            "document creation",
+        )
+    for _attempt in range(_TEMPORARY_DOCUMENT_NAME_ATTEMPTS):
+        document_name = "{}_{}".format(
+            TRANSITION_EXACT_GEOMETRY_DOCUMENT_NAME,
+            uuid.uuid4().hex,
+        )
+        if document_name not in previous_documents:
+            return document_name
+    raise _geometry_error(
+        "exact-geometry-document-ownership-ambiguous",
+        "a unique temporary FreeCAD document name could not be allocated",
+    )
+
+
+def _request_temporary_document(document_name):
+    return App.newDocument(
+        document_name,
+        "Track Template transient exact geometry",
+        True,
+        True,
+    )
+
+
+def _create_owned_temporary_document(previous_documents):
+    document_name = _allocate_temporary_document_name(previous_documents)
+    document = _request_temporary_document(document_name)
+    observed_documents = dict(App.listDocuments())
+    expected_names = set(previous_documents) | {document_name}
+    ownership_established = (
+        document is not None
+        and str(document.Name) == document_name
+        and set(observed_documents) == expected_names
+        and observed_documents.get(document_name) is document
+        and all(
+            observed_documents.get(name) is previous_document
+            for name, previous_document in previous_documents.items()
+        )
+    )
+    if not ownership_established:
+        raise _geometry_error(
+            "exact-geometry-document-ownership-ambiguous",
+            "FreeCAD did not return exactly one newly created temporary "
+            "document owned by this invocation",
+        )
+    return document_name, document
+
+
+def _cleanup_temporary_document(
+    document,
+    document_name,
+    previous_documents,
+    previous_active,
+    previous_name,
+):
     errors = []
-    document_name = str(document.Name) if document is not None else ""
-    if document_name:
+    if document is not None:
         try:
-            if document_name in App.listDocuments():
+            registered = App.listDocuments().get(document_name)
+            if registered is document:
                 App.closeDocument(document_name)
-            if document_name in App.listDocuments():
+            else:
+                errors.append(
+                    "temporary document ownership could not be confirmed "
+                    "during cleanup"
+                )
+            if App.listDocuments().get(document_name) is document:
                 errors.append("temporary document remained open")
         except Exception as error:
             errors.append("temporary document close failed: {}".format(error))
+
+    observed_documents = dict(App.listDocuments())
+    if not _same_document_registry(
+        observed_documents,
+        previous_documents,
+    ):
+        errors.append(
+            "the pre-operation document registry was not restored"
+        )
     try:
         if previous_active is None:
             if App.ActiveDocument is not None:
@@ -441,7 +529,7 @@ def _cleanup_temporary_document(document, previous_active, previous_name):
                     "the prior empty active-document state was not restored"
                 )
         else:
-            registered = App.listDocuments().get(previous_name)
+            registered = observed_documents.get(previous_name)
             if registered is not previous_active:
                 errors.append(
                     "the prior active document is no longer registered"
@@ -485,21 +573,26 @@ def build_transition_exact_geometry(
         ) from error
 
     previous_active = App.ActiveDocument
+    previous_documents = dict(App.listDocuments())
     previous_name = (
         str(previous_active.Name) if previous_active is not None else ""
     )
     document = None
+    document_name = ""
     receipt = None
     operation_error = None
     cleanup_error = None
     try:
         _check_cancellation(cancellation_requested)
-        document = App.newDocument(
-            TRANSITION_EXACT_GEOMETRY_DOCUMENT_NAME,
-            "Track Template transient exact geometry",
-            True,
-            True,
+        document_name, document = _create_owned_temporary_document(
+            previous_documents,
         )
+        if not bool(document.Temporary) or str(document.FileName):
+            raise _geometry_error(
+                "invalid-exact-geometry-document",
+                "the owned exact-geometry document must be temporary and "
+                "unsaved",
+            )
         obj = document.addObject(
             "Part::Feature",
             TRANSITION_EXACT_GEOMETRY_OBJECT_NAME,
@@ -516,6 +609,8 @@ def build_transition_exact_geometry(
         try:
             _cleanup_temporary_document(
                 document,
+                document_name,
+                previous_documents,
                 previous_active,
                 previous_name,
             )

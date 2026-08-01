@@ -146,21 +146,26 @@ export and complete edit-through-export performance remain separate work.
 
 This exit-closing Level 2 tranche starts from protected-main merge
 `1e812612c8eab818554bf0d5d0208ebcc79b2490`. The FreeCAD adapter verifies the
-signed exact-centreline artifact, constructs its minimum planar `Part` shape
-on one `Part::Feature` in a hidden temporary document, validates ordered
-coordinates, bounds, polyline length, topology and kernel validity, and returns
-only a deterministic signed numeric receipt after disposal. Non-zero profiles
-are open wires; the accepted zero-length analytical boundary becomes one
-vertex. The adapter introduces no railway calculation or persistent truth.
+signed exact-centreline artifact, allocates a per-invocation temporary name
+absent from the pre-operation registry, and verifies the returned document as
+one newly registered identity before adding its sole `Part::Feature`. Cleanup
+closes only that positively owned document and fails closed when ownership is
+ambiguous. The adapter then validates ordered coordinates, bounds, polyline
+length, topology and kernel validity, and returns only a deterministic signed
+numeric receipt after disposal. Non-zero profiles are open wires; the accepted
+zero-length analytical boundary becomes one vertex. It introduces no railway
+calculation or persistent truth.
 
 The qualified FreeCAD 1.1.1/OpenCASCADE 7.8.1 proof exercised deterministic
-repeat construction, zero length, invalid artifact rejection, cancellation,
+repeat construction, a pre-existing same-named hidden temporary document while
+inactive and active, ambiguous ownership rejection before object creation,
+nested construction, zero length, invalid artifact rejection, cancellation,
 cancellation-check failure and injected Part-build failure. Every path closed
-the temporary document, restored both an existing and an empty active-document
-state, and preserved the editable document object, properties, values,
-FileName and Undo/Redo counts. At the final source shape, 176 tracked
-Python/FCMacro files parsed and the complete standalone CI profile passed
-55/55 validators.
+only its owned temporary document, restored both an existing and an empty
+active-document state, and preserved every pre-existing document and object,
+their tested properties and values, FileName and Undo/Redo counts. At the final
+source shape, 176 tracked Python/FCMacro files parsed and the complete
+standalone CI profile passed 55/55 validators.
 
 This tranche provides technical evidence toward the transient-cleanup exit
 gap but accepts no Phase 6 exit. It adds no retained `Part` shape, persisted
