@@ -5,9 +5,10 @@ them through a temporary B15 comparison route. Phase 4 retains only the
 modular façade and adds bounded canonical transition-state and neutral
 chair-package contracts. The bounded derived-state lifecycle remains ephemeral
 and adapter-neutral; its transition preview scene remains renderer-neutral.
-Phase 6 exposes bounded exact-centreline and artifact-verification contracts;
-concrete adapters may construct transient host geometry without exposing it
-through this façade. No output contract is accepted here.
+Phase 6 exposes bounded exact-centreline, artifact-verification and private-
+development DXF export contracts. Concrete adapters may construct transient
+host geometry and commit files without exposing host objects through this
+façade. No operator workflow or output clearance is accepted here.
 """
 
 from tracktemplate import DEVELOPMENT_CHECKPOINT
@@ -59,6 +60,20 @@ from tracktemplate.application.transition_exact import (
     TransitionExactValidationResult,
     regenerate_transition_exact,
     transition_exact_result_from_artifact,
+)
+from tracktemplate.application.transition_export import (
+    TRANSITION_DXF_EXPORT_AUDIT_SCOPE,
+    TRANSITION_DXF_EXPORT_COLLISION_POLICY,
+    TRANSITION_DXF_EXPORT_CONTRACT_ID,
+    TRANSITION_DXF_EXPORT_FORMAT_ID,
+    TRANSITION_DXF_EXPORT_LAYER_NAME,
+    TRANSITION_DXF_EXPORT_MANIFEST_SCHEMA_ID,
+    TRANSITION_DXF_EXPORT_PROJECT_STATUS,
+    TRANSITION_DXF_EXPORT_RESULT_ID,
+    TransitionDxfExportPlan,
+    TransitionDxfExportReceipt,
+    TransitionDxfExportRequest,
+    prepare_transition_dxf_export,
 )
 from tracktemplate.domain.alignment import (
     clothoid_entry_displacement,
@@ -121,6 +136,18 @@ __all__ = (
     "TransitionExactValidationResult",
     "regenerate_transition_exact",
     "transition_exact_result_from_artifact",
+    "TRANSITION_DXF_EXPORT_AUDIT_SCOPE",
+    "TRANSITION_DXF_EXPORT_COLLISION_POLICY",
+    "TRANSITION_DXF_EXPORT_CONTRACT_ID",
+    "TRANSITION_DXF_EXPORT_FORMAT_ID",
+    "TRANSITION_DXF_EXPORT_LAYER_NAME",
+    "TRANSITION_DXF_EXPORT_MANIFEST_SCHEMA_ID",
+    "TRANSITION_DXF_EXPORT_PROJECT_STATUS",
+    "TRANSITION_DXF_EXPORT_RESULT_ID",
+    "TransitionDxfExportPlan",
+    "TransitionDxfExportReceipt",
+    "TransitionDxfExportRequest",
+    "prepare_transition_dxf_export",
     "transition_state_from_json",
     "transition_state_to_json",
     "TRANSITION_PREVIEW_CENTRELINE_LAYER_ID",

@@ -174,6 +174,45 @@ policy, output equivalence or clearance, legacy retirement, product tolerance
 default or performance budget. Transactional private-development export and
 complete edit-through-export performance therefore remain separate work.
 
+## B16 Entry/Exit private-development DXF export
+
+This exit-closing Level 2 tranche starts from protected-main merge
+`61237508b0c1fefedcf740afd230e5e563acab3e`. It adds one signed export-stage
+contract for the current exact-validation result and one deterministic ASCII
+DXF 2000 writer for the accepted Entry/Exit centreline. The contract binds the
+format, canonical local frame, millimetres, layer, collision policy, generator
+version, dependency-manifest schema and deliberately `unknown` project status.
+The writer emits one open `LWPOLYLINE`, or one `POINT` at zero length, beside a
+schema-v1 output dependency manifest whose canonical-model digest and artifact
+hashes are independently checkable. Hidden staging, no-overwrite collision
+handling, byte-identical reuse, identity-checked commit rollback and
+ownership-aware cleanup keep the two-file operation failure-safe without
+mutating canonical or editable-document state.
+
+The standalone proof independently parsed the DXF group codes and ordered
+coordinates; accepted the manifest only as `unknown`; rejected it under
+`--require-project-cleared`; and covered stale/corrupt input, zero length,
+unsafe or symbolic-link destinations, partial and different collisions,
+external destination change, cancellation at each pre-commit boundary,
+staged corruption, injected write/commit failure and ambiguous rollback
+ownership. Qualified FreeCAD 1.1.1/OpenCASCADE 7.8.1 rebuilt and disposed the
+exact Part geometry, reopened the resulting `AC1015` file as one millimetre-
+scale polyline with no unsupported feature, and preserved all pre-existing
+documents, objects, tested properties, values, active-document state and
+Undo/Redo counts across success, reuse, cancellation, injected geometry-build
+failure, truthful injected geometry-cleanup failure and commit rollback. At
+the final source shape, 181 Python/FCMacro
+files parsed, all 56 standalone CI validators passed, and the upstream exact-
+contract and transient-geometry qualified checks also passed.
+
+This tranche supplies bounded technical evidence toward exact target output
+and deterministic, failure-safe export only. It selects no product-wide format
+roster, adds no operator/GUI or migration route, persisted schema, retained
+shape, production or physical-output clearance, `project-cleared` status,
+performance budget, legacy retirement, Phase 6 exit or later-phase authority.
+The current 0/5 exit disposition therefore remains unchanged pending separate
+owner acceptance and the remaining complete edit/Validate/Export evidence.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
