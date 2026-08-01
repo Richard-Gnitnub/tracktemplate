@@ -6,10 +6,15 @@ belongs in [PROJECT_PLAN.md](PROJECT_PLAN.md) and detailed live evidence in
 here.
 
 The authoritative delivery phases from the current baseline to a release candidate are defined in [PROJECT_PLAN.md](PROJECT_PLAN.md). The `M` stages below describe only the modularisation workstream and intentionally do not create a second project phase scheme.
+They implement the current TrackTemplate Core programme in
+[PRODUCT_VISION.md](PRODUCT_VISION.md), not the subsequent Layout Editor.
 
 ## Objective
 
-Replace the growing single-file implementation with cohesive, reusable modules while preserving every accepted railway and production result.
+Replace the growing single-file implementation with cohesive, reusable modules
+until the installable FreeCAD Workbench/Addon uses the modular package as its
+one authoritative runtime implementation, while preserving every accepted
+railway and production result.
 
 Modularisation supports the architecture in [ARCHITECTURE.md](ARCHITECTURE.md). It is not expected to reduce FreeCAD memory or recompute cost by itself. Its purpose is to create enforceable boundaries so domain calculations can be reused and tested independently, FreeCAD work can be deferred, and performance changes can be made safely.
 
@@ -42,8 +47,11 @@ Some shadowing definitions are captured by compatibility aliases or class assign
 - Do not split code solely to meet a line-count target.
 - Do not create dozens of tiny modules with circular imports or shared mutable globals.
 - Do not convert every dictionary or function to a new abstraction in one pass.
-- Do not invent the renderer or the Workbench/Addon loading, update and
-  catalogue mechanics without the prototypes required by `ARCHITECTURE.md`.
+- Do not widen the accepted Coin direction beyond demonstrated evidence or
+  invent Workbench/Addon loading, update and catalogue mechanics without the
+  prototypes required by `ARCHITECTURE.md`.
+- Do not implement Layout Editor maps, complete-template placement,
+  connections, constituent editing or solving as part of Core migration.
 - Do not remove compatibility behaviour until representative legacy files and workflows pass.
 
 ## Target dependency direction
@@ -157,13 +165,16 @@ still require separate approval.
 
 Owns derived lightweight display:
 
-- grouped scene layers;
+- immutable presentation snapshots and grouped, batched Coin scene layers;
 - styles and visibility;
 - stable visual-to-domain selection mapping;
 - edit handles that issue application commands;
-- redraw and incremental update policy.
+- internal detail/construction/analysis layer switches or presets; and
+- selected-batch redraw and incremental update policy.
 
-It must not store independent geometry that can diverge from canonical domain state.
+It must not store independent geometry that can diverge from canonical domain
+state, allocate a persistent FreeCAD object per sleeper/chair or require exact
+`Part` geometry for ordinary editing.
 
 ### Export adapter
 
@@ -296,6 +307,8 @@ target. Phase 1 records the intended initial compatibility metadata
 (`freecadmin`/`freecadmax` 1.1.1 and `pythonmin` 3.12.0); Phase 10 must
 revalidate it against the then-current official schema and runtime matrix
 before generating `package.xml`.
+The complete Core-migration acceptance boundary remains in
+[PRODUCT_VISION.md](PRODUCT_VISION.md#migration-completion).
 
 ## Extraction method
 
@@ -500,6 +513,8 @@ Modularisation is complete when:
 - legacy documents use explicit migrations rather than historical live implementations;
 - no import-time monkey-patch chain chooses the active production behaviour;
 - the modular source and distribution artifact cannot drift;
+- the Addon is the normal operator route and has no legacy-macro runtime
+  dependency;
 - validation and performance checks pass for representative workflows.
 
 ## Open decisions

@@ -7,11 +7,14 @@ import re
 from pathlib import Path
 from urllib.parse import unquote
 
+from governance_markdown import direct_section_content
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS_ROOT = ROOT / ".agents" / "skills"
 WORKFLOWS = ROOT / "reference" / "AGENT_WORKFLOWS.md"
 AGENTS = ROOT / "AGENTS.md"
+PRODUCT_VISION = ROOT / "reference" / "PRODUCT_VISION.md"
 
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 REGISTER_HEADING_RE = re.compile(r"^### `([a-z0-9]+(?:-[a-z0-9]+)*)`$", re.MULTILINE)
@@ -43,6 +46,139 @@ def require(condition: bool, message: str) -> None:
 def read(path: Path) -> str:
     require(path.is_file(), f"missing required agent guidance: {path.relative_to(ROOT)}")
     return path.read_text(encoding="utf-8")
+
+
+def semantic_text(value: str) -> str:
+    """Normalise only line wrapping and Markdown presentation."""
+    value = re.sub(r"(?<=\w)-\s*\n\s*(?=\w)", "-", value)
+    value = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", value)
+    value = value.replace("**", "").replace("`", "")
+    return " ".join(value.split())
+
+
+def semantic_paragraphs(text: str) -> list[str]:
+    """Return local semantic paragraphs independent of Markdown wrapping."""
+    return [
+        semantic_text(block)
+        for block in re.split(r"\n[ \t]*\n", text)
+        if block.strip()
+    ]
+
+
+def bullet_items(text: str) -> list[str]:
+    """Return top-level bullet items with wrapped continuation lines joined."""
+    items: list[str] = []
+    current: list[str] = []
+    for line in text.splitlines():
+        if line.startswith("- "):
+            if current:
+                items.append(semantic_text("\n".join(current)))
+            current = [line[2:]]
+        elif current and (line.startswith("  ") or not line.strip()):
+            if line.strip():
+                current.append(line.strip())
+        elif current:
+            items.append(semantic_text("\n".join(current)))
+            current = []
+    if current:
+        items.append(semantic_text("\n".join(current)))
+    return items
+
+
+def validate_explicit_agent_safeguards(agents: str) -> None:
+    """Protect every accepted no-silent-change and terminology boundary."""
+    change_items = bullet_items(
+        direct_section_content(agents, "Proportional change discipline")
+    )
+    expected_change = semantic_text(
+        "Do not silently change geometry, units, frames, sampling, tolerances, "
+        "topology, timbering, chairs, stable identities, ordering, schemas, "
+        "stored properties, visibility, transactions, rollback, cache invalidation "
+        "or output."
+    )
+    require(
+        expected_change in change_items,
+        "AGENTS lost or weakened an explicit no-silent-change safeguard",
+    )
+
+    terminology_items = bullet_items(
+        direct_section_content(
+            agents,
+            "Railway, rights and persistence safeguards",
+        )
+    )
+    expected_terminology = semantic_text(
+        "Use plain line for track without switches and crossings. Do not introduce "
+        "ordinary track in new prose, UI, schemas or APIs; existing identifiers "
+        "are frozen compatibility evidence."
+    )
+    require(
+        expected_terminology in terminology_items,
+        "AGENTS lost or weakened its explicit terminology-surface boundary",
+    )
+
+
+def validate_chief_comparative_priority(chief: str, workflows: str) -> None:
+    """Require comparative priority in both the brief and workflow contract."""
+    brief = direct_section_content(chief, "Next-outcome brief")
+    required_explanation = semantic_text(
+        "The brief must compare the selected work with credible maintenance, "
+        "evidence, risk-reduction and other authorised alternatives. Calling an "
+        "item \"highest-value\" without that comparative rationale is insufficient."
+    )
+    require(
+        required_explanation in semantic_paragraphs(brief),
+        "Chief of Staff lost its comparative-rationale rule",
+    )
+    require(
+        "Why this outranks maintenance alternatives" in bullet_items(brief),
+        "Chief of Staff brief lost its comparative-priority assignment field",
+    )
+
+    workflow_section = direct_section_content(
+        workflows,
+        "`tracktemplate-chief-of-staff`",
+        level=3,
+    )
+    combined_priority_text = semantic_text(
+        brief + "\n" + workflow_section
+    ).lower()
+    prohibited_priority_polarities = (
+        "comparison is optional",
+        "comparison may be omitted",
+        "comparison can be omitted",
+        "comparison need not be made",
+        "highest value is sufficient",
+        "highest-value is sufficient",
+        "alternatives need not be considered",
+        "alternatives may be ignored",
+    )
+    require(
+        not any(
+            phrase in combined_priority_text
+            for phrase in prohibited_priority_polarities
+        ),
+        "Chief of Staff comparative priority became optional or unnecessary",
+    )
+    required_workflow_clause = semantic_text(
+        "Use it when the owner says progress appears stuck, circular, "
+        "maintenance/evidence-heavy or unclear, and compose it from "
+        "$tracktemplate-continue when that workflow detects its defined loop "
+        "conditions. It is a vision-informed programme orchestrator: it "
+        "reconciles programme, "
+        "phase, evidence and pull-request state; detects loops; controls task "
+        "accountability; compares the selected work with credible maintenance, "
+        "evidence, risk-reduction and other authorised alternatives; and produces "
+        "exactly one transient, advisory assignment or stop brief. Its assignment "
+        "must state Why this outranks maintenance alternatives; a highest-value "
+        "label without that comparison is insufficient. It is read-only, is not "
+        "required for every routine change and cannot implement or accept project "
+        "authority."
+    )
+    require(
+        required_workflow_clause in semantic_paragraphs(workflow_section),
+        "AGENT_WORKFLOWS lost the comparative-priority contract",
+    )
 
 
 def parse_frontmatter(path: Path, text: str) -> dict[str, str]:
@@ -222,6 +358,10 @@ def validate_progress_delivery_structure() -> None:
             "Read-only authority boundary",
             "Reconstruct current progress",
             "Classify recent tranches",
+            "Vision-led selection",
+            "Execution control and accountability",
+            "Loop prevention",
+            "Delegated-result reconciliation",
             "Next-outcome brief",
         },
         "tracktemplate-technical-lead": {
@@ -373,6 +513,69 @@ def validate_continue_invocation_policy(workflows: str) -> None:
     )
 
 
+def validate_vision_led_workflows(workflows: str) -> None:
+    """Protect authority routing without duplicating the governing prose."""
+    agents = read(AGENTS)
+    vision = read(PRODUCT_VISION)
+    chief = read(SKILLS_ROOT / "tracktemplate-chief-of-staff" / "SKILL.md")
+    continuation = read(SKILLS_ROOT / "tracktemplate-continue" / "SKILL.md")
+    normalized_chief = " ".join(chief.split())
+    normalized_continuation = " ".join(continuation.split())
+    normalized_workflows = " ".join(workflows.split())
+
+    validate_explicit_agent_safeguards(agents)
+    validate_chief_comparative_priority(chief, workflows)
+
+    require(
+        "reference/PRODUCT_VISION.md" in agents
+        and "PRODUCT_VISION.md" in workflows,
+        "agent guidance does not route through the canonical Product Vision",
+    )
+    require(
+        "Vision and execution authority" in vision
+        and "Current programme: TrackTemplate Core migration" in vision
+        and "Subsequent programme: TrackTemplate Layout Editor" in vision,
+        "canonical Product Vision lacks programme or execution authority",
+    )
+    require(
+        "vision-informed programme orchestrator, not a task-list iterator"
+        in normalized_chief
+        and "Which active phase criterion does it advance?" in chief
+        and "Work claimed, work actually present, work validated and work "
+        "independently accepted are four different states."
+        in normalized_chief,
+        "chief of staff lost vision-led selection or result accountability",
+    )
+    for changed_basis in (
+        "new repository evidence",
+        "a changed and testable hypothesis",
+        "newly authorised scope or method",
+        "a corrected environment or fixture",
+        "an independently identified defect",
+        "a narrower task with different acceptance evidence",
+    ):
+        require(
+            changed_basis in normalized_chief,
+            "chief of staff lost loop-prevention basis: " + changed_basis,
+        )
+    require(
+        "find something unfinished and continue coding"
+        in normalized_continuation
+        and "D-GOV-004" in continuation
+        and "D-GOV-005" in continuation
+        and "does not invoke this skill, widen execution authority"
+        in normalized_continuation,
+        "continue lost its vision-led selection or standing authority boundary",
+    )
+    require(
+        "agent task → bounded work item → finding/exit → current programme → "
+        "vision" in normalized_workflows
+        and "claimed, present, validated and independently accepted"
+        in normalized_workflows,
+        "agent workflows lost assignment traceability or acceptance separation",
+    )
+
+
 def validate_links(documents: list[Path]) -> None:
     broken: list[str] = []
     for document in documents:
@@ -393,7 +596,7 @@ def main() -> None:
     require(skill_directories, "no repository skills found")
 
     names: list[str] = []
-    markdown_documents: list[Path] = [AGENTS, WORKFLOWS]
+    markdown_documents: list[Path] = [AGENTS, WORKFLOWS, PRODUCT_VISION]
 
     for directory in skill_directories:
         skill_file = directory / "SKILL.md"
@@ -441,6 +644,7 @@ def main() -> None:
     workflows = read(WORKFLOWS)
     validate_progress_delivery_structure()
     validate_continue_invocation_policy(workflows)
+    validate_vision_led_workflows(workflows)
     registered_headings = REGISTER_HEADING_RE.findall(workflows)
     registered_paths = REGISTER_PATH_RE.findall(workflows)
     path_names = [name for _, name in registered_paths]
@@ -482,6 +686,10 @@ def main() -> None:
     require(
         "reference/current/PHASE_EVIDENCE.md" in agents,
         "AGENTS.md does not route to the fixed current phase record",
+    )
+    require(
+        "reference/PRODUCT_VISION.md" in agents,
+        "AGENTS.md does not route to the canonical Product Vision",
     )
     require(
         100 <= len(agents.splitlines()) <= 140,

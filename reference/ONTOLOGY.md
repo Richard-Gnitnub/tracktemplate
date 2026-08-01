@@ -10,8 +10,10 @@ licensing decisions, provenance evidence or live delivery status.
 The ontology is a navigational and integration aid. Follow the more specific
 canonical owner whenever it supplies a tighter requirement:
 
+- [PRODUCT_VISION.md](PRODUCT_VISION.md) owns product purpose, programme
+  horizons and Core-migration completion.
 - [ARCHITECTURE.md](ARCHITECTURE.md) owns canonical state, derived views,
-  persistence, validation, export and product boundaries.
+  persistence, validation and export boundaries.
 - [TERMINOLOGY.md](TERMINOLOGY.md) owns accepted railway language and unresolved
   terminology reviews.
 - [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) owns classifications,
@@ -197,6 +199,8 @@ mapping is incomplete.
 
 - Change this ontology only when an accepted stable concept or relationship
   changes. Record phase progress only in `PROJECT_PLAN.md`.
+- Keep programme horizons in `PRODUCT_VISION.md`; the ontology must not turn a
+  future concept into authorised scope.
 - Update the human and JSON-LD representations together.
 - Preserve ontology term IRIs once published. Rename by adding a new term and
   an explicit compatibility/deprecation relationship rather than reusing an

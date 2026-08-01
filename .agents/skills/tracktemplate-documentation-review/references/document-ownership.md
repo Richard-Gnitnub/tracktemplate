@@ -5,6 +5,8 @@ shortening or deleting documentation.
 
 | Information | Canonical owner |
 | --- | --- |
+| Product purpose, programme horizons and Core-migration completion | `reference/PRODUCT_VISION.md` |
+| Cross-programme capability/evidence classification | `reference/CAPABILITY_MATRIX.md` |
 | Phase and exit-condition status plus risk/decision summaries | `reference/PROJECT_PLAN.md` |
 | Strategic architecture and canonical state | `reference/ARCHITECTURE.md` |
 | Source organisation and dependency direction | `reference/MODULARISATION_PLAN.md` |

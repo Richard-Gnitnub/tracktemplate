@@ -26,6 +26,9 @@
       "owl:versionInfo": "0.1.0",
       "rdfs:isDefinedBy": [
         {
+          "@id": "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/reference/PRODUCT_VISION.md"
+        },
+        {
           "@id": "https://github.com/Richard-Gnitnub/tracktemplate/blob/main/reference/ARCHITECTURE.md"
         },
         {
