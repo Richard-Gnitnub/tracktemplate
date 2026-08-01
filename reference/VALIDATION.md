@@ -804,7 +804,7 @@ Project dashboard and current-record consistency:
 ```
 
 This enforces the compact project-plan sections and line budget, reconciles the
-frozen Phase 5 closeout and unopened Phase 6 holding state with
+frozen Phase 5 closeout and accepted Phase 6 opening state with
 `current/PHASE_EVIDENCE.md`, validates the detailed frozen/current risk and
 decision JSON registers, protects the retired descriptive-path redirect and
 checks the least-privilege, SHA-pinned standalone CI workflow. It does not

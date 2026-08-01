@@ -1,43 +1,130 @@
-# Phase 6 Explicit Exact-Validation and Export Seam Holding Record
+# Phase 6 Explicit Exact-Validation and Export Seam Evidence
 
-Status: **Not started — 0/5 exits evidenced. This is an administrative
-holding record only; Phase 6 is unopened and unauthorised. A separate Level 3
-owner decision is required before any Phase 6 work starts.**
+Status: **Current — opened at 0/5 under D-P6-001 on 2026-08-01. No
+Phase 6 exit is evidenced or accepted.**
 
 Phase 5 closed at 4/4 under D-P5-003 on 2026-08-01. Its complete accepted
 evidence, decisions and risk snapshot are frozen in the
 [Phase 5 closeout](../history/phase-closeouts/PHASE5_CLOSEOUT.md). This fixed
-live path exists to preserve unambiguous current-record routing; it supplies no
-implementation, gate or product authority.
+live path owns current Phase 6 evidence and does not alter that frozen record.
 
-## Administrative boundary
+## Opening architecture review
 
-Phase 6 is the planned explicit exact-validation and export seam. Its receiving
-duties remain those assigned by D-P4-008: complete stage-specific
-exact-validation/export signatures and invalidation, transient exact geometry
-and cleanup, output equivalence, rollback, and end-to-end performance. These
-are planning obligations, not an authorised tranche.
+Phase 6 owns the explicit exact-validation and export seam: complete
+stage-specific signatures and invalidation, transient exact geometry and
+cleanup, output equivalence, transactional export and rollback, and complete
+edit-through-export performance evidence. The accepted B16 Entry/Exit slice
+supplies bounded canonical transition intent and lightweight editing behaviour,
+but no exact artifact, exact oracle, export writer, output clearance or Phase 6
+performance result has yet been accepted.
 
-No Phase 6 evidence has been admitted, no opening panel has convened, and the
-current structured decision register is intentionally empty. A future opening
-proposal must reconstruct authority from the canonical repository, complete
-the Level 3 process, present its exact conditions and exclusions, and receive
-explicit project-owner acceptance before files are changed for Phase 6.
+Three routes were reviewed:
+
+| Route | Disposition |
+| --- | --- |
+| Keep Phase 6 unopened | Safe but does not advance an accepted exact-validation or export exit; superseded by D-P6-001. |
+| Port the complete B14 export path | Rejected because it expands to whole-layout and later-family work, retains exact legacy shapes rather than the B16 canonical boundary, and would carry a characterised partial-output failure into the successor path. |
+| Establish a narrow B16 Entry/Exit Validate/Export seam | Recommended as the smallest reversible route that can prove one exact artifact and oracle, transient FreeCAD geometry, transactional private-development output and complete cost without accepting migration or production clearance. |
+
+<a id="phase-6-opening-panel"></a>
+
+## Phase 6 opening panel and owner decision
+
+**Decision and exact source state:** This Level 3 opening applies to clean
+protected `main` at `35d4124c28d6be7e536a5f3773681ff0bf243283`, the merge
+commit for [PR #27](https://github.com/Richard-Gnitnub/tracktemplate/pull/27).
+This authority-only record changes no product source; all five Phase 6 exits
+remain unevidenced at 0/5.
+
+**Participants, evidence and independence:** Richard is project owner,
+decision chair and accepting authority. Codex performed the separate fresh
+read-only opening review and is the decision-record change owner; it had no
+Phase 6 implementation role because no Phase 6 product implementation exists.
+The same reviewer synthesised the architecture recommendation and risk
+challenge, so those two review roles were not independent. This was an
+engineering control review, not professional legal advice.
+
+**Evidence reviewed:** The panel reviewed the
+[project dashboard](../PROJECT_PLAN.md), the 24 live risks in
+[risks.json](risks.json), the frozen
+[Phase 5 handoff](../history/phase-closeouts/PHASE5_CLOSEOUT.md), the accepted
+[exact-geometry and export architecture](../ARCHITECTURE.md#5-exact-geometry-adapter),
+the [validation boundary](../VALIDATION.md#5-exact-geometry-and-export-validation),
+the [generated-output controls](../LICENSING_BOUNDARIES.md#generated-output-policy),
+the B16 Entry/Exit transition source and tests, and the characterised B14
+create-time export failure. At the exact source state, the local standalone CI
+profile passed 54/54 validators and the merged PR's protected GitHub Actions
+check passed. No Phase 6 FreeCAD exact-geometry, target-format export, real-GUI
+or performance result exists; that absence is the correct 0/5 opening state.
+
+**Risk disposition:** PR-09 remains Critical/Remove/Partial; Phase 6 may build
+only a private-development output path and may not advertise or clear output
+while any dependency is restricted, reference-only or unknown. PR-13 remains
+Critical/Mitigate/Effective (current scope), subject to current checkpoints,
+copied FreeCAD inputs and disposable destinations before risky work. PR-17
+remains Critical/Mitigate/Partial because this opening grants no persistence or
+migration authority. PR-15, PR-16, QA-R03 and QA-R04 remain Partial for deferred
+cost, signatures, end-to-end evidence and budgets. PR-20, PR-21 and PR-22 remain
+Effective (current scope) only while the slice, provenance and structured
+challenge remain bounded. D-P5-002 and the retired PR-14 exposure must reopen
+if later composition invalidates the accepted Coin residual containment. No
+risk treatment or control-effectiveness value changes.
+
+**Recommendation, bounded conditions and unknowns:** The separate review
+recommended **Proceed with bounded conditions**:
+
+| Accountable owner | Deadline | Condition |
+| --- | --- | --- |
+| Exact-validation and export owners | Before retaining exact or export behaviour | Define the selected exact artifact, oracle, units, frame, tolerances and equivalence contract; prove the current B16 transition intent is sufficient; do not port the complete B14 exporter. |
+| Signature owner | Before retaining reuse or caching | Cover every analysis, exact-validation and export input with complete stage signatures; prove miss, reuse, change, change-back, invalidation and stale-result rejection. |
+| FreeCAD exact-geometry owner | Before retaining transient geometry | Use temporary or isolated FreeCAD scope; prove success, failure and cancellation cleanup and that the editable document remains unchanged. |
+| Export owner | Before retaining a target-format writer | Resolve safe destinations, deterministic names, collisions and overwrite policy; stage and validate the complete set; commit atomically or roll back completely with a truthful summary. |
+| API, licensing and provenance owners | Before any manifest-schema change or output-clearance proposal | Produce a dependency manifest for the selected output and keep it private-development unless its status supports the declared use. Give any required manifest-schema change separate API, licensing, validation and owner review. |
+| Performance owner | Before a Phase 6 exit proposal | Measure comparable cold and warm Edit, Validate, Export and complete end-to-end cost with correctness checks; do not invent a numerical budget. |
+| Recovery and scope owners | Before each risky host/export run and throughout Phase 6 | Use copied FCStd inputs, disposable output destinations and a current recoverable checkpoint; preserve the legacy oracle and the D-P5-002 reopen condition. |
+
+The first exact artifact/oracle, target format and whether the current manifest
+schema can express the successor transition scope remain Level 2 investigation
+results. There was no dissent from the bounded recommendation.
+
+**Governance-budget exception:** This task transfers phase authority rather
+than implementing product behaviour, so the required Level 3 panel, evidence,
+decision register, dashboard and executable status-control changes necessarily
+exceed its zero product lines. No policy or frozen historical record changes.
+
+**Owner decision and resulting authority:** On 2026-08-01 Richard stated,
+“I accept D-P6-001 exactly as presented.” The accepted decision is:
+
+> **D-P6-001 — Open Phase 6**
+>
+> At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, open Phase 6
+> at 0/5 for bounded exact-validation and export-seam work on the accepted B16
+> Entry/Exit transition slice. Separate Level 2 tranches may establish the
+> exact artifact/oracle and contracts, complete stage signatures and
+> invalidation, transient exact geometry in disposable FreeCAD scope,
+> private-development target-format export with atomic staging and rollback,
+> and complete edit/Validate/Export performance evidence.
+>
+> No Phase 6 exit, production-output clearance, `project-cleared` status,
+> operator or migration route, whole-layout or complete B14 export port,
+> persisted-schema change, retained production shape, legacy-oracle retirement,
+> numerical performance budget, new runtime dependency, packaging, release, or
+> later-phase authority is accepted. Any required manifest-schema change
+> receives separate API, licensing, validation, and owner review.
 
 <a id="current-phase-6-exit-condition-disposition"></a>
 
-## Starting Phase 6 exit-condition disposition
+## Current Phase 6 exit-condition disposition
+
+The accepted opening state is 0/5. No row is partly evidenced or accepted:
 
 | Exit condition | Current disposition |
 | --- | --- |
-| The selected slice has equivalent exact validation and production output for the agreed scope | Pending — Phase 6 is not opened |
-| No transient production objects leak into the editable document | Pending — Phase 6 is not opened |
-| Export is deterministic and failure-safe | Pending — Phase 6 is not opened |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — Phase 6 is not opened |
-| The legacy path remains available until parity and project-owner acceptance permit removal | Pending — Phase 6 is not opened |
-
-The table establishes the planned starting state only. It is not evidence that
-any exit is partly met and must not nominate or authorise a next tranche.
+| The selected slice has equivalent exact validation and production output for the agreed scope | Pending — no Phase 6 evidence admitted |
+| No transient production objects leak into the editable document | Pending — no Phase 6 evidence admitted |
+| Export is deterministic and failure-safe | Pending — no Phase 6 evidence admitted |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — no Phase 6 evidence admitted |
+| The legacy path remains available until parity and project-owner acceptance permit removal | Pending — no Phase 6 evidence admitted |
 
 ## Carried controls and exclusions
 
@@ -52,12 +139,7 @@ live mappings, caches, proxies, active Coin children or additional residual
 switch children to accumulate.
 
 The 24 risks present at Phase 5 closeout carry forward unchanged in
-[risks.json](risks.json). No current Phase 6 owner decision exists in
-[gate-decisions.json](gate-decisions.json).
-
-Phase 6 remains excluded along with migration support, wider product or
-whole-layout claims, automatic Addon startup, permanent Workbench/menu policy,
-schema change, another renderer, exact geometry/export implementation,
-production-output clearance, numerical performance budgets, packaging,
-release and all later-phase work. Product implementation must remain stopped
-until a separate accepted opening decision supplies the required authority.
+[risks.json](risks.json). [gate-decisions.json](gate-decisions.json) owns the
+structured D-P6-001 decision. The opening creates only the authority quoted
+above; every exit, clearance, support, schema, oracle-retirement, budget,
+packaging, release and later-phase decision remains separately controlled.
