@@ -112,6 +112,36 @@ exceed its zero product lines. No policy or frozen historical record changes.
 > later-phase authority is accepted. Any required manifest-schema change
 > receives separate API, licensing, validation, and owner review.
 
+## B16 Entry/Exit exact-centreline contract
+
+This necessary-enabling Level 2 tranche starts from protected-main merge
+`838f6b52389ea604fecceb307773077873ccfe40`. It adds one ephemeral,
+adapter-neutral exact-validation profile for the accepted transition slice.
+The caller supplies the maximum analytical chord error and a hard segment
+ceiling; the signed v1 contract also fixes canonical local left-turn space,
+millimetres/radians, the existing B15-parity numerical profile and its explicit
+integration setting. Equal arc-length stations use the conservative Euler
+curvature interpolation bound `h^2 / (8R)`, preserve both endpoints and return
+one deterministic centreline, artifact signature and validation-result
+signature suitable as a later export-stage dependency.
+
+The focused standalone proof compares every retained point with an independent
+high-precision Fresnel power series, samples every chord against the analytical
+bound, and covers zero length, invalid resolution, segment-cap rejection,
+miss/reuse, label-only reuse, numerical change, change-back, stale-state
+rejection and failure atomicity. The qualified FreeCAD 1.1.1 smoke printed
+`Phase 6 transition exact qualified FreeCAD validation passed` and changed no
+document, object, property, active document or Undo/Redo state. At the final
+source shape, 174 tracked Python/FCMacro files parsed and the complete
+standalone CI profile passed 55/55 validators.
+
+This tranche creates no `Part` geometry, target-format writer, dependency
+manifest, file output, editable-document mutation, persisted property or
+schema, GUI command, production clearance, product tolerance default, legacy
+retirement or exit acceptance. All five Phase 6 exits therefore remain
+Pending; transient exact FreeCAD geometry, transactional private-development
+export and complete edit-through-export performance remain separate work.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
