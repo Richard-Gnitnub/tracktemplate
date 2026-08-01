@@ -1074,12 +1074,15 @@ def _validate_structure_and_controls():
         encoding="utf-8"
     )
     evidence = (
-        ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
+        ROOT
+        / "reference"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE5_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     assert (
         "| 5 | Lightweight editing prototype and renderer decision "
-        "| 4/4 evidenced | Current — exits accepted 2026-07-31; "
-        "closure pending |"
+        "| 4/4 evidenced | Complete — accepted 2026-08-01 |"
     ) in plan
     assert "## Development-only ViewProvider fixture tranche" in evidence
     assert (

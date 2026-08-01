@@ -1,13 +1,13 @@
 # Project Plan
 
-Status: **Phase 5 current — 4/4 exits evidenced and accepted under D-P5-002
-on 2026-07-31. Phase closure has not been decided.**
+Status: **Phase 5 complete — closed at 4/4 under D-P5-003 on 2026-08-01.
+Phase 6 remains 0/5, Not started, unopened and unauthorised.**
 
 This file is the project dashboard. It owns only phase status, exit-condition
 status, the live-risk summary, owner-decision summary and links to evidence.
-Implementation detail belongs in
+Implementation detail belongs in the frozen phase closeout or
 [current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md); detailed current risks
-and decisions belong in the JSON registers beside it.
+and decisions belong in the JSON registers beside the live record.
 
 ## Phase status
 
@@ -18,30 +18,31 @@ and decisions belong in the JSON registers beside it.
 | 2 | Minimal modular foundation and validation harness | 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 3 | First parity-proven vertical slice | 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 4 | Canonical state, signatures and persistence | 6/6 evidenced | Complete — accepted 2026-07-28 |
-| 5 | Lightweight editing prototype and renderer decision | 4/4 evidenced | Current — exits accepted 2026-07-31; closure pending |
-| 6 | Explicit exact-validation and export seam | 0/5 evidenced | Not started |
+| 5 | Lightweight editing prototype and renderer decision | 4/4 evidenced | Complete — accepted 2026-08-01 |
+| 6 | Explicit exact-validation and export seam | 0/5 evidenced | Not started — unopened and unauthorised |
 | 7 | Core alignment, station and multiple-track migration | 0/4 evidenced | Not started |
 | 8 | Turnout, crossover and timbering migration | 0/4 evidenced | Not started |
 | 9 | Chair definitions, assisted assimilation, production records and export completion | 0/9 evidenced | Not started |
 | 10 | Workbench integration, launcher reduction and beta Addon packaging | 0/5 evidenced | Not started |
 | 11 | Stabilisation and release-candidate qualification | 0/7 evidenced | Not started |
 
-## Phase 5 exit conditions
+## Phase 5 final exit conditions
 
 | Exit condition | Status | Evidence |
 | --- | --- | --- |
-| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Accepted | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-5-exit-condition-disposition) |
-| Small logical object/layer count with deterministic selection-to-domain mapping | Accepted | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-5-exit-condition-disposition) |
-| Normal edits avoid dense exact `Part` geometry | Accepted | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-5-exit-condition-disposition) |
-| Project owner accepts editing behaviour and documented limitations | Accepted | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-5-exit-condition-disposition) |
+| One renderer accepted using correctness, editing, FreeCAD integration, maintainability and measured resource evidence | Accepted | [Frozen disposition](history/phase-closeouts/PHASE5_CLOSEOUT.md#current-phase-5-exit-condition-disposition) |
+| Small logical object/layer count with deterministic selection-to-domain mapping | Accepted | [Frozen disposition](history/phase-closeouts/PHASE5_CLOSEOUT.md#current-phase-5-exit-condition-disposition) |
+| Normal edits avoid dense exact `Part` geometry | Accepted | [Frozen disposition](history/phase-closeouts/PHASE5_CLOSEOUT.md#current-phase-5-exit-condition-disposition) |
+| Project owner accepts editing behaviour and documented limitations | Accepted | [Frozen disposition](history/phase-closeouts/PHASE5_CLOSEOUT.md#current-phase-5-exit-condition-disposition) |
 
-D-P5-001 opened bounded Phase 5 renderer evaluation at 0/4. D-P5-002 accepts
+D-P5-001 opened bounded Phase 5 renderer evaluation at 0/4. D-P5-002 accepted
 Coin and the demonstrated B16 Entry/Exit editing boundary, evidencing all four
-exact exits. It does not close Phase 5 or open Phase 6. Phase 6 retains complete
-stage-specific exact-validation/export signatures and invalidation, transient
-exact-geometry regeneration/cleanup, output equivalence, rollback and
+exact exits. D-P5-003 closed Phase 5 without opening Phase 6. Phase 6 retains
+complete stage-specific exact-validation/export signatures and invalidation,
+transient exact-geometry regeneration/cleanup, output equivalence, rollback and
 end-to-end performance. Exact-family support remains fixture-only; operator
-migration, production output and release work remain excluded.
+migration, production output and release work remain excluded and
+unauthorised.
 
 ## Live risks
 
@@ -81,9 +82,11 @@ dashboard only.
 ## Owner decisions
 
 [history/phase-closeouts/PHASE4_GATE_DECISIONS.json](history/phase-closeouts/PHASE4_GATE_DECISIONS.json)
-owns the displayed Phase 4 decisions. [current/gate-decisions.json](current/gate-decisions.json)
-owns Phase 5 decisions; detailed evidence is in the linked current or frozen
-phase record.
+owns the displayed Phase 4 decisions, and
+[history/phase-closeouts/PHASE5_GATE_DECISIONS.json](history/phase-closeouts/PHASE5_GATE_DECISIONS.json)
+owns the displayed Phase 5 decisions. The unopened Phase 6
+[current decision register](current/gate-decisions.json) is intentionally
+empty.
 
 | ID | Date | Status | Decision boundary |
 | --- | --- | --- | --- |
@@ -101,11 +104,15 @@ phase record.
 | D-P4-009 | 2026-07-28 | Accepted | Phase 4 closed at 6/6; evidence and Phase 4 registers frozen; Phase 5 remains not started. |
 | D-P5-001 | 2026-07-28 | Accepted | Phase 5 opened at 0/4 for bounded lightweight renderer evaluation; no renderer accepted. |
 | D-GOV-004 | 2026-07-31 | Accepted | Literal `$tracktemplate-continue` invocation may run one bounded repository-driven Level 1/2 cycle; all Level 3 and same-cycle new-draft merge authority remains excluded. |
-| D-P5-002 | 2026-07-31 | Accepted | Coin and the demonstrated B16 Entry/Exit editing behaviour accepted; 4/4 exits evidenced, with Phase 5 closeout still pending. |
+| D-P5-002 | 2026-07-31 | Accepted | Coin and the demonstrated B16 Entry/Exit editing behaviour accepted; 4/4 exits evidenced while closeout remained a separate decision. |
+| D-P5-003 | 2026-08-01 | Accepted | Phase 5 closed at 4/4; Phase 6 holding records created at 0/5 without opening or authorising the phase. |
 
 ## Authority and evidence links
 
-- [Current Phase 5 evidence](current/PHASE_EVIDENCE.md)
+- [Current unopened Phase 6 holding record](current/PHASE_EVIDENCE.md)
+- [Frozen Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md)
+- [Frozen Phase 5 decisions](history/phase-closeouts/PHASE5_GATE_DECISIONS.json)
+- [Frozen Phase 5 risk snapshot](history/phase-closeouts/PHASE5_RISKS.json)
 - [Frozen Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md)
 - [Frozen Phase 4 decisions](history/phase-closeouts/PHASE4_GATE_DECISIONS.json)
 - [Frozen Phase 4 risk snapshot](history/phase-closeouts/PHASE4_RISKS.json)

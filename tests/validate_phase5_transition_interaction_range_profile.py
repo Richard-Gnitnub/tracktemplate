@@ -295,7 +295,11 @@ def validate_evidence_links_if_present():
     assert "three fresh" in report_flat
     assert "does not accept" in report_flat
     evidence = (
-        ROOT / "reference/current/PHASE_EVIDENCE.md"
+        ROOT
+        / "reference"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE5_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     validation = (ROOT / "reference/VALIDATION.md").read_text(
         encoding="utf-8"

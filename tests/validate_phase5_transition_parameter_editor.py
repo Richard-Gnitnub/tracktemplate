@@ -238,7 +238,11 @@ def _validate_ui_and_dependency_boundary():
         encoding="utf-8"
     )
     evidence = (
-        ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
+        ROOT
+        / "reference"
+        / "history"
+        / "phase-closeouts"
+        / "PHASE5_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     assert "fail-closed selection controller" in validation
     assert "Real Qt keyboard input" in validation
