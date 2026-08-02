@@ -112,7 +112,7 @@ EXPECTED_PHASE5_DECISION_IDS = {
     "D-P5-002",
     "D-P5-003",
 }
-EXPECTED_PHASE6_DECISION_IDS = {"D-P6-001", "D-GOV-005"}
+EXPECTED_PHASE6_DECISION_IDS = {"D-P6-001", "D-GOV-005", "D-P6-002"}
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
     "open Phase 6 at 0/5 for bounded exact-validation and export-seam work "
@@ -132,6 +132,102 @@ EXPECTED_PHASE6_EXCLUSIONS = (
     "manifest-schema change receives separate API, licensing, validation, "
     "and owner review."
 )
+EXPECTED_EXIT2_DECISION = (
+    "Accept Phase 6 Exit 2 and retain Exit 3 Pending."
+)
+EXPECTED_EXIT2_AUTHORITY = (
+    "At accepted `main` source state "
+    "`a5b6a79bf3e73e1673d440077bd65000986bb4c7`, accept Phase 6 Exit 2, "
+    "“No transient production objects leak into the editable document”, as "
+    "`Evidenced` and owner-accepted only for the accepted B16 Entry/Exit "
+    "transition exact-validation and export routes assessed by this panel. "
+    "Phase 6 advances from 0/5 to 1/5. Exit 3 remains Pending until its six "
+    "recorded required-before-exit conditions are satisfied and a fresh Level "
+    "3 evidence-admission review recommends acceptance."
+)
+EXPECTED_EXIT2_EXCLUSIONS = (
+    "No Phase 6 exit 1, 3, 4 or 5; production or physical-output clearance; "
+    "`project-cleared` status; output equivalence; product-wide export roster; "
+    "GUI or operator workflow; persisted or retained exact geometry; "
+    "whole-B14 or whole-layout parity; legacy retirement; performance "
+    "acceptance; packaging or release authority; or risk downgrade is granted. "
+    "The export remains private-development with deliberately `unknown` "
+    "project status, and PR #33 performance evidence does not satisfy Exit 4."
+)
+EXPECTED_PHASE6_DISPOSITIONS = [
+    (
+        "Pending — exact-validation and private-development DXF evidence "
+        "exists, but agreed output equivalence and production clearance "
+        "remain absent"
+    ),
+    (
+        "Evidenced and owner-accepted under D-P6-002 — bounded to the accepted "
+        "B16 Entry/Exit exact-validation and export routes with the recorded "
+        "limitations"
+    ),
+    (
+        "Pending — deterministic output and handled in-process rollback are "
+        "evidenced, but the six required-before-exit conditions remain open"
+    ),
+    (
+        "Pending — no accepted beyond-normal-noise improvement evidence; PR "
+        "#33 is excluded and does not satisfy this exit"
+    ),
+    (
+        "Pending — B14 remains available, but whole-scope parity and retirement "
+        "authority remain absent"
+    ),
+]
+EXPECTED_EXIT3_CONDITION_ROWS = {
+    "Export transaction owner": [
+        "Export transaction owner",
+        "Before another Exit 3 panel",
+        (
+            "Provide atomic durable commit or an explicit recoverable "
+            "transaction protocol for the DXF-and-manifest set."
+        ),
+    ],
+    "Export path-safety owner": [
+        "Export path-safety owner",
+        "Before another Exit 3 panel",
+        (
+            "Provide descriptor-relative path control sufficient to address "
+            "rename and symbolic-link races."
+        ),
+    ],
+    "Export validation owner": [
+        "Export validation owner",
+        "Before another Exit 3 panel",
+        (
+            "Provide focused interruption, partial-commit and recovery "
+            "evidence."
+        ),
+    ],
+    "Qualified FreeCAD validation owner": [
+        "Qualified FreeCAD validation owner",
+        "Before another Exit 3 panel",
+        (
+            "Import and validate the zero-length DXF POINT in the qualified "
+            "FreeCAD profile."
+        ),
+    ],
+    "Validation-document owner": [
+        "Validation-document owner",
+        "Before another Exit 3 panel",
+        (
+            "Register the qualified command and required success sentinel "
+            "durably in reference/VALIDATION.md."
+        ),
+    ],
+    "Phase owner and independent reviewers": [
+        "Phase owner and independent reviewers",
+        "After the preceding conditions pass",
+        (
+            "Conduct a fresh Level 3 evidence-admission review before any "
+            "Exit 3 acceptance."
+        ),
+    ],
+}
 EXPECTED_VISION_DECISION = (
     "Adopt the TrackTemplate product vision and vision-led execution model."
 )
@@ -454,10 +550,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 5 must be closed with all four accepted exits",
     )
     _require(
-        rows[6]["evidenced"] == 0
+        rows[6]["evidenced"] == 1
         and str(rows[6]["state"])
         == "Current — opened 2026-08-01",
-        "Phase 6 must remain current at its accepted opening state",
+        "Phase 6 must remain current at the accepted 1/5 state",
     )
     _require(
         [
@@ -469,10 +565,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the dashboard must identify only Phase 6 as current",
     )
     _require(
-        "Phase 6 current" in plan
-        and "opened at 0/5 under D-P6-001 on 2026-08-01"
+        "Phase 6 current — 1/5 evidenced" in " ".join(plan.split())
+        and "Exit 2 was owner-accepted under D-P6-002 on 2026-08-02"
         in " ".join(plan.split()),
-        "the accepted Phase 6 opening status is missing",
+        "the accepted Phase 6 1/5 status is missing",
     )
     return rows
 
@@ -503,7 +599,13 @@ def _validate_exit_conditions(
             continue
         phase4_states.append(cells[1].split(":", 1)[0])
 
-    expected_plan = ["Pending", "Pending", "Pending", "Pending", "Pending"]
+    expected_plan = [
+        "Pending",
+        "Evidenced — owner-accepted 2026-08-02",
+        "Pending",
+        "Pending",
+        "Pending",
+    ]
     expected_phase4 = [
         "Evidenced",
         "Evidenced",
@@ -602,6 +704,13 @@ def _validate_exit_conditions(
         "work" in plan_flat,
         "Phase 6 opening boundary is missing",
     )
+    _require(
+        "D-P6-002 accepts only the bounded transient-object Exit 2" in plan_flat
+        and "advances Phase 6 to 1/5" in plan_flat
+        and "Exit 3 remains Pending with six required-before-exit conditions"
+        in plan_flat,
+        "Phase 6 Exit 2 acceptance or Exit 3 boundary is missing",
+    )
 
     current_flat = " ".join(current_evidence.split())
     decision_quote_flat = " ".join(
@@ -612,9 +721,9 @@ def _validate_exit_conditions(
         ).split()
     )
     _require(
-        "Current — opened at 0/5 under D-P6-001 on 2026-08-01. No Phase 6 "
-        "exit is evidenced or accepted" in current_flat,
-        "current record does not preserve the accepted Phase 6 opening state",
+        "Current — 1/5 evidenced. Exit 2 was owner-accepted under D-P6-002 on "
+        "2026-08-02; exits 1, 3, 4 and 5 remain Pending" in current_flat,
+        "current record does not preserve the accepted Phase 6 1/5 state",
     )
     _require(
         "Phase 5 closeout" in current_evidence
@@ -649,11 +758,8 @@ def _validate_exit_conditions(
                 "project-owner acceptance permit removal"
             ),
         ]
-        and all(
-            row[1] == "Pending — no Phase 6 evidence admitted"
-            for row in current_rows
-        ),
-        "Phase 6 exits must remain five pending rows at opening",
+        and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS,
+        "Phase 6 exits do not match the accepted 1/5 dispositions",
     )
     _require(
         'id="phase-6-opening-panel"' in current_evidence
@@ -662,6 +768,51 @@ def _validate_exit_conditions(
         and EXPECTED_PHASE6_AUTHORITY in decision_quote_flat
         and EXPECTED_PHASE6_EXCLUSIONS in decision_quote_flat,
         "Phase 6 opening panel or exact owner acceptance is missing",
+    )
+    exit2_panel_heading = (
+        "Phase 6 Exits 2 and 3 evidence-admission panel and owner decision"
+    )
+    _require(
+        '<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>\n\n'
+        "## "
+        + exit2_panel_heading
+        in current_evidence,
+        "D-P6-002 panel anchor or heading association is missing",
+    )
+    exit2_panel_section = direct_section_content(
+        current_evidence,
+        exit2_panel_heading,
+    )
+    _require_paragraph(
+        exit2_panel_section,
+        (
+            "Panel recommendation: Exit 2 was Proceed with bounded conditions "
+            "and sufficient to recommend Evidenced. Exit 3 was Do not proceed "
+            "and must remain Pending. There was no dissent between the "
+            "independent reviewers."
+        ),
+        "D-P6-002 panel recommendation drifted",
+    )
+    exit2_quoted = _blockquote_paragraphs(exit2_panel_section)
+    _require(
+        exit2_quoted
+        == [
+            _semantic_text(
+                "D-P6-002 — Accept Phase 6 Exit 2 and retain Exit 3 Pending"
+            ),
+            _semantic_text(EXPECTED_EXIT2_AUTHORITY),
+            _semantic_text(EXPECTED_EXIT2_EXCLUSIONS),
+        ],
+        "D-P6-002 panel exact owner decision drifted or was relocated",
+    )
+    condition_rows = _structured_table_rows(
+        exit2_panel_section,
+        ("Accountable owner", "Deadline", "Condition"),
+        "Exit 3 required-before-exit conditions",
+    )
+    _require(
+        condition_rows == EXPECTED_EXIT3_CONDITION_ROWS,
+        "Exit 3 required-before-exit conditions drifted",
     )
 
 
@@ -858,7 +1009,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-01",
+        and current_document["updated_on"] == "2026-08-02",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -907,7 +1058,12 @@ def _validate_decisions(plan: str) -> None:
             "duplicate current decision ID",
         )
         _require(
-            record["decided_on"] == "2026-08-01"
+            record["decided_on"]
+            == (
+                "2026-08-02"
+                if decision_id == "D-P6-002"
+                else "2026-08-01"
+            )
             and record["status"] == "Accepted"
             and record["panel_required_under_current_policy"] is True,
             "current Level 3 decision status or panel requirement drifted",
@@ -959,6 +1115,19 @@ def _validate_decisions(plan: str) -> None:
         and vision_record["evidence"] == vision_panel
         and vision_record["panel_record"] == vision_panel,
         "D-GOV-005 authority, exclusions or panel routing drifted",
+    )
+    exit2_record = phase6_by_id["D-P6-002"]
+    exit2_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exits-2-and-3-evidence-admission-panel"
+    )
+    _require(
+        exit2_record["decision"] == EXPECTED_EXIT2_DECISION
+        and exit2_record["authority"] == EXPECTED_EXIT2_AUTHORITY
+        and exit2_record["exclusions"] == EXPECTED_EXIT2_EXCLUSIONS
+        and exit2_record["evidence"] == exit2_panel
+        and exit2_record["panel_record"] == exit2_panel,
+        "D-P6-002 authority, exclusions or panel routing drifted",
     )
     current_records = document["decisions"]
     _require(
@@ -1461,10 +1630,12 @@ def _validate_capability_matrix(matrix: str) -> None:
         preamble,
         (
             "This matrix compares the accepted legacy baseline with the modular "
-            "B16 checkpoint destined for the Addon. It was reconciled on 2026-08-01 "
-            "against accepted main at 61237508b0c1fefedcf740afd230e5e563acab3e, "
+            "B16 checkpoint destined for the Addon. It was reconciled on 2026-08-02 "
+            "against accepted main at a5b6a79bf3e73e1673d440077bd65000986bb4c7, "
             "the frozen Phase 1 inventory and Phase 5 closeout, and current Phase 6 "
-            "evidence. Draft PR #31 is not counted as accepted Addon capability."
+            "evidence. PR #31's private-development DXF slice is present; D-P6-002 "
+            "accepts only the bounded transient-object exit, not export failure "
+            "safety or output clearance."
         ),
         "capability matrix lost its local accepted-source and PR-status clause",
     )
@@ -1517,7 +1688,7 @@ def _validate_capability_matrix(matrix: str) -> None:
             "P — transition-state v1 only",
             "P — transition centreline only",
             "P — transition centreline only",
-            "A",
+            "P — private-development DXF only",
             "P — transition records only",
             "[Phase 1 workflow contract](contracts/"
             "phase1-workflow-coverage.json); [Phase 5 closeout](history/"
@@ -1532,7 +1703,7 @@ def _validate_capability_matrix(matrix: str) -> None:
             "C — signed transition-state v1 boundary",
             "C — accepted bounded centreline view",
             "C — transient exact centreline",
-            "A",
+            "P — private-development DXF only",
             "C — bounded transition records",
             "[Transition pilot](contracts/phase1-transition-pilot.json); "
             "[Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md); "
@@ -1577,14 +1748,14 @@ def _validate_capability_matrix(matrix: str) -> None:
             "spacing",
             "P — bounded transition centreline pair only",
             "P — transient transition centrelines only",
-            "A — no accepted modular export",
+            "P — private-development DXF only",
             "P — bounded transition records only",
             "[Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md#"
             "exact-family-support-enablement); [Phase 5 closeout](history/"
             "phase-closeouts/PHASE5_CLOSEOUT.md#"
             "representative-multi-object-selection-and-edit-tranche); "
             "[Phase 6 evidence](current/PHASE_EVIDENCE.md#"
-            "b16-entryexit-transient-exact-geometry)",
+            "phase-6-exits-2-and-3-evidence-admission-panel)",
             "Partial",
         ),
         (
@@ -1704,15 +1875,16 @@ def _validate_capability_matrix(matrix: str) -> None:
         (
             "DXF",
             "C — fixed plain-line selected and Generate-path output oracles",
-            "A on accepted main; draft PR #31 is unaccepted",
+            "P — private-development Entry/Exit writer only",
             "P — bounded transition intent exists",
             "—",
             "P — transient transition centreline",
-            "A on accepted main",
+            "P — deterministic output with failure-safe exit still Pending",
             "—",
             "[Workflow coverage contract](contracts/"
             "phase1-workflow-coverage.json); [current Phase 6 evidence]"
-            "(current/PHASE_EVIDENCE.md)",
+            "(current/PHASE_EVIDENCE.md#"
+            "phase-6-exits-2-and-3-evidence-admission-panel)",
             "Partial",
         ),
         (
@@ -1864,10 +2036,12 @@ def _validate_capability_matrix(matrix: str) -> None:
         evidence_limits,
         (
             "The spacing-matched Entry/Exit row is confined to the accepted "
-            "bounded centreline and transition-record slice. It does not "
-            "establish general track widening, a shared renderer, complete rail, "
-            "sleeper/timber or chair presentation, manufacturing geometry, modular "
-            "export or a Phase 6 exit."
+            "bounded centreline, transition-record and private-development DXF "
+            "slice. It does not establish general track widening, a shared "
+            "renderer, complete rail, sleeper/timber or chair presentation, "
+            "manufacturing geometry, output equivalence, production clearance or "
+            "any Phase 6 exit beyond D-P6-002's bounded transient-object "
+            "acceptance."
         ),
         "capability matrix lost its spacing-transition evidence limits",
     )

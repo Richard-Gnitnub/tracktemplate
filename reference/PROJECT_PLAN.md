@@ -1,7 +1,7 @@
 # Project Plan
 
-Status: **Phase 6 current — opened at 0/5 under D-P6-001 on 2026-08-01.
-No Phase 6 exit is evidenced or accepted.**
+Status: **Phase 6 current — 1/5 evidenced. Exit 2 was owner-accepted under
+D-P6-002 on 2026-08-02; exits 1, 3, 4 and 5 remain Pending.**
 
 This file is the project dashboard. It owns only phase status, exit-condition
 status, the live-risk summary, owner-decision summary and links to evidence.
@@ -27,7 +27,7 @@ now without being implemented now.
 | 3 | First parity-proven vertical slice | 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 4 | Canonical state, signatures and persistence | 6/6 evidenced | Complete — accepted 2026-07-28 |
 | 5 | Lightweight editing prototype and renderer decision | 4/4 evidenced | Complete — accepted 2026-08-01 |
-| 6 | Explicit exact-validation and export seam | 0/5 evidenced | Current — opened 2026-08-01 |
+| 6 | Explicit exact-validation and export seam | 1/5 evidenced | Current — opened 2026-08-01 |
 | 7 | Core alignment, station and multiple-track migration | 0/4 evidenced | Not started |
 | 8 | Turnout, crossover and timbering migration | 0/4 evidenced | Not started |
 | 9 | Chair definitions, assisted assimilation, production records and export completion | 0/9 evidenced | Not started |
@@ -39,20 +39,19 @@ now without being implemented now.
 | Exit condition | Status | Evidence |
 | --- | --- | --- |
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-6-exit-condition-disposition) |
-| No transient production objects leak into the editable document | Pending | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-6-exit-condition-disposition) |
+| No transient production objects leak into the editable document | Evidenced — owner-accepted 2026-08-02 | [D-P6-002 panel and decision](current/PHASE_EVIDENCE.md#phase-6-exits-2-and-3-evidence-admission-panel) |
 | Export is deterministic and failure-safe | Pending | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-6-exit-condition-disposition) |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-6-exit-condition-disposition) |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending | [Current disposition](current/PHASE_EVIDENCE.md#current-phase-6-exit-condition-disposition) |
 
 D-P5-002 accepted Coin and the demonstrated B16 Entry/Exit editing boundary,
-evidencing all four exact exits. D-P5-003 closed Phase 5 without opening Phase
+evidencing all four exact exits; D-P5-003 closed Phase 5 without opening Phase
 6. D-P6-001 later opened Phase 6 at 0/5 for bounded exact-validation and
-private-development export-seam work on that accepted slice through separate
-Level 2 tranches. No Phase 6 exit, production-output clearance, operator or
-migration route, whole-layout or complete B14 export port, persisted-schema
-change, retained production shape, legacy-oracle retirement, numerical
-performance budget, new runtime dependency, packaging, release or later-phase
-authority is accepted.
+private-development export-seam work. D-P6-002 accepts only the bounded
+transient-object Exit 2 and advances Phase 6 to 1/5; Exit 3 remains Pending
+with six required-before-exit conditions. Production clearance, migration,
+retained geometry, legacy retirement, performance, packaging and release
+authority remain excluded.
 
 ## Live risks
 
@@ -118,6 +117,7 @@ decisions.
 | D-P5-003 | 2026-08-01 | Accepted | Phase 5 closed at 4/4; Phase 6 holding records created at 0/5 without opening or authorising the phase. |
 | D-P6-001 | 2026-08-01 | Accepted | Phase 6 opened at 0/5 for bounded B16 Entry/Exit exact-validation and private-development export-seam work; all stated exclusions remain. |
 | D-GOV-005 | 2026-08-01 | Accepted | Product vision, architectural direction and vision-led work selection adopted without changing Phase 6 scope or D-GOV-004 execution authority. |
+| D-P6-002 | 2026-08-02 | Accepted | Only Phase 6 Exit 2 is evidenced and owner-accepted for the bounded B16 Entry/Exit slice; Exit 3 remains Pending and Phase 6 is 1/5. |
 
 ## Authority and evidence links
 
