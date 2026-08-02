@@ -633,9 +633,8 @@ def validate_current_evidence_mutations() -> None:
     )
     competing_authority = replace_once(
         evidence,
-        '<a id="current-phase-6-exit-condition-disposition"></a>',
-        competing_quote
-        + '<a id="current-phase-6-exit-condition-disposition"></a>',
+        authority,
+        authority + "\n\n" + competing_quote.rstrip(),
     )
     expect_rejected(
         "phase-evidence/competing-contradictory-authority-blockquote",
