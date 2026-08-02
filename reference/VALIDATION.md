@@ -713,6 +713,29 @@ history unchanged. Its sentinel is
 `Part.Shape` crosses the adapter, no file is written, and the result supplies
 no GUI, target-format, production-clearance or Phase 6 exit acceptance.
 
+Phase 6 private-development Entry/Exit DXF transaction and import:
+
+```bash
+.venv/bin/python tests/validate_phase6_transition_dxf_export.py
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
+  tests/freecad_validate_phase6_transition_dxf_export.py
+```
+
+The standalone proof covers deterministic DXF and dependency-manifest bytes,
+descriptor-relative destination control, rename and symbolic-link replacement,
+durable journal/staging/directory synchronisation, abrupt interruption after
+one and both commit links and after the first late-identity rollback unlink,
+ownership-checked rollback or complete-set reuse, collision refusal and
+cleanup. Its sentinel is
+`Phase 6 transition DXF export validation passed`. The qualified FreeCAD proof
+imports both the non-zero `LWPOLYLINE` and zero-length `POINT`, and repeats
+document isolation, cancellation, injected failure and rollback checks. Its
+required sentinel is
+`Phase 6 transition DXF qualified FreeCAD validation passed`. These commands
+remain bounded to the accepted Entry/Exit slice and private-development
+`unknown` output; they supply no GUI, production-output, Phase 6 exit or release
+acceptance.
+
 Repository recovery and ignored-data safety controls:
 
 ```bash

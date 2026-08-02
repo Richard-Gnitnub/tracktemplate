@@ -16,6 +16,7 @@ PLAN_PATH = ROOT / "reference" / "PROJECT_PLAN.md"
 PRODUCT_VISION_PATH = ROOT / "reference" / "PRODUCT_VISION.md"
 CAPABILITY_MATRIX_PATH = ROOT / "reference" / "CAPABILITY_MATRIX.md"
 ARCHITECTURE_PATH = ROOT / "reference" / "ARCHITECTURE.md"
+VALIDATION_PATH = ROOT / "reference" / "VALIDATION.md"
 CURRENT_EVIDENCE_PATH = ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
 RISKS_PATH = ROOT / "reference" / "current" / "risks.json"
 CURRENT_DECISIONS_PATH = (
@@ -166,8 +167,9 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "limitations"
     ),
     (
-        "Pending — deterministic output and handled in-process rollback are "
-        "evidenced, but the six required-before-exit conditions remain open"
+        "Pending — technical evidence now addresses required conditions 1–5, "
+        "but condition 6 still requires a fresh Level 3 evidence-admission "
+        "review and owner decision"
     ),
     (
         "Pending — PR #33 accounts for complete cold/warm Edit, Validate and "
@@ -233,6 +235,49 @@ EXPECTED_EXIT3_CONDITION_ROWS = {
             "Conduct a fresh Level 3 evidence-admission review before any "
             "Exit 3 acceptance."
         ),
+    ],
+}
+EXPECTED_EXIT3_RECOVERY_ROWS = {
+    "Recoverable DXF-and-manifest transaction": [
+        "Recoverable DXF-and-manifest transaction",
+        (
+            "Present — durable journal, file and directory synchronisation "
+            "plus next-invocation rollback or complete-set reuse; not yet "
+            "admitted by a Level 3 panel"
+        ),
+    ],
+    "Descriptor-relative rename and symbolic-link control": [
+        "Descriptor-relative rename and symbolic-link control",
+        (
+            "Present — all transaction operations use the bound directory "
+            "descriptor and focused replacement proofs fail closed; not yet "
+            "admitted by a Level 3 panel"
+        ),
+    ],
+    "Interruption, partial-commit and recovery proof": [
+        "Interruption, partial-commit and recovery proof",
+        (
+            "Present — abrupt one-link and two-link child-process termination "
+            "proofs pass; not yet admitted by a Level 3 panel"
+        ),
+    ],
+    "Qualified zero-length POINT import": [
+        "Qualified zero-length POINT import",
+        (
+            "Present — qualified FreeCAD imports one exact vertex and restores "
+            "host state; not yet admitted by a Level 3 panel"
+        ),
+    ],
+    "Durable qualified command and sentinel": [
+        "Durable qualified command and sentinel",
+        (
+            "Present in reference/VALIDATION.md; not yet admitted by a Level "
+            "3 panel"
+        ),
+    ],
+    "Fresh Level 3 evidence-admission review": [
+        "Fresh Level 3 evidence-admission review",
+        "Open — required before Exit 3 can be recommended or accepted",
     ],
 }
 EXPECTED_VISION_DECISION = (
@@ -712,7 +757,8 @@ def _validate_exit_conditions(
         "Phase 6 opening boundary is missing",
     )
     _require(
-        "D-P6-002 accepts only the bounded transient-object Exit 2" in plan_flat
+        "D-P6-002 accepts only the bounded transient-object Exit 2"
+        in plan_flat
         and "advances Phase 6 to 1/5" in plan_flat
         and "Exit 3 remains Pending with six required-before-exit conditions"
         in plan_flat,
@@ -754,6 +800,54 @@ def _validate_exit_conditions(
         "Phase 5 closeout" in current_evidence
         and "history/phase-closeouts/PHASE5_CLOSEOUT.md" in current_evidence,
         "current Phase 6 record does not link its frozen predecessor",
+    )
+    recovery_section = _section(
+        current_evidence,
+        "B16 Entry/Exit durable DXF recovery",
+    )
+    recovery_flat = " ".join(recovery_section.split())
+    _require(
+        "7acdab4f925592d49394960c76f7552e1b47be9d" in recovery_section
+        and "versioned internal journal" in recovery_flat
+        and "immediately after the first and second final links"
+        in recovery_flat
+        and (
+            "Phase 6 transition DXF qualified FreeCAD validation passed"
+        )
+        in recovery_section
+        and "Phase 6 therefore remains 1/5 with Exit 3 Pending"
+        in recovery_flat,
+        "Phase 6 durable DXF recovery evidence boundary drifted",
+    )
+    recovery_rows = _structured_table_rows(
+        recovery_section,
+        (
+            "Exit 3 required-before-exit condition",
+            "Present evidence after this tranche",
+        ),
+        "Exit 3 recovery evidence status",
+    )
+    _require(
+        recovery_rows == EXPECTED_EXIT3_RECOVERY_ROWS,
+        "Exit 3 recovery evidence status drifted or implied acceptance",
+    )
+    validation = _read(VALIDATION_PATH)
+    _require(
+        (
+            ".venv/bin/python "
+            "tests/validate_phase6_transition_dxf_export.py"
+        )
+        in validation
+        and (
+            "flatpak run --command=FreeCADCmd org.freecad.FreeCAD \\\n"
+            "  tests/freecad_validate_phase6_transition_dxf_export.py"
+        )
+        in validation
+        and (
+            "Phase 6 transition DXF qualified FreeCAD validation passed"
+        )
+        in validation,
+        "the durable transition DXF command or qualified sentinel is missing",
     )
     current_section = _section(
         current_evidence,
@@ -1904,12 +1998,15 @@ def _validate_capability_matrix(matrix: str) -> None:
             "P — bounded transition intent exists",
             "—",
             "P — transient transition centreline",
-            "P — deterministic output with failure-safe exit still Pending",
+            (
+                "P — deterministic output and bounded recovery evidence; "
+                "failure-safe exit still Pending for Level 3 review"
+            ),
             "—",
             "[Workflow coverage contract](contracts/"
             "phase1-workflow-coverage.json); [current Phase 6 evidence]"
             "(current/PHASE_EVIDENCE.md#"
-            "phase-6-exits-2-and-3-evidence-admission-panel)",
+            "b16-entry-exit-durable-dxf-recovery)",
             "Partial",
         ),
         (

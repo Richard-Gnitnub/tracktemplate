@@ -23,10 +23,9 @@ from tracktemplate.adapters.freecad import transition_exact  # noqa: E402
 EDITABLE_DOCUMENT_NAME = "Phase6TransitionDxfExportEditable"
 
 
-def _state():
+def _state(transition_length_mm=300.0):
     circle_centre_y_mm = 624.7779655573173
     radius_mm = 655.0
-    transition_length_mm = 300.0
     intent = api.TransitionIntent(
         transition_id="transition:phase6:dxf-export-freecad",
         circle_centre_y_mm=circle_centre_y_mm,
@@ -43,8 +42,8 @@ def _state():
     return api.analyse_transition_state(api.TransitionState(intent))
 
 
-def _fixture(output_directory):
-    state = _state()
+def _fixture(output_directory, transition_length_mm=300.0):
+    state = _state(transition_length_mm)
     specification = api.TransitionExactSpecification(0.05, 64)
     artifact = api.regenerate_transition_exact(
         api.TransitionDerivedCache(),
@@ -178,6 +177,10 @@ def _validate_freecad_dxf_import(dxf_path, exact_result):
             if "Shape" in obj.PropertiesList and not obj.Shape.isNull()
         )
         assert shapes, "FreeCAD imported no exact shape from the DXF"
+        if len(exact_result.centreline.points) == 1:
+            assert any(
+                str(shape.ShapeType) == "Vertex" for shape in shapes
+            ), "FreeCAD did not import the zero-length DXF POINT as a vertex"
         minimum_x = min(shape.BoundBox.XMin for shape in shapes)
         minimum_y = min(shape.BoundBox.YMin for shape in shapes)
         maximum_x = max(shape.BoundBox.XMax for shape in shapes)
@@ -316,6 +319,30 @@ def _validate_cancellation(root, editable, state, specification, artifact):
     assert observed_temporary_shape is True
     assert _application_snapshot() == before
     assert list(output.iterdir()) == []
+
+
+def _validate_zero_length_point_import(root, editable):
+    output = root / "zero-length"
+    output.mkdir()
+    state, specification, artifact, request = _fixture(output, 0.0)
+    App.setActiveDocument(str(editable.Name))
+    before = _application_snapshot()
+    receipt = exporter.export_transition_dxf(
+        state,
+        artifact,
+        specification,
+        request,
+    )
+    assert receipt.disposition == "created"
+    assert receipt.project_status == "unknown"
+    assert _application_snapshot() == before
+    dxf_path = output / receipt.dxf_filename
+    assert "\nPOINT\n" in dxf_path.read_text(encoding="ascii")
+    exact_result = api.transition_exact_result_from_artifact(artifact)
+    assert len(exact_result.centreline.points) == 1
+    _validate_freecad_dxf_import(dxf_path, exact_result)
+    assert _application_snapshot() == before
+    _assert_no_staging(output)
 
 
 def _validate_geometry_failure(
@@ -460,12 +487,22 @@ def _validate_commit_rollback(
     original_link = exporter._link_file
     link_calls = 0
 
-    def fail_second_link(source, destination):
+    def fail_second_link(
+        source_directory_descriptor,
+        source_name,
+        destination_directory_descriptor,
+        destination_name,
+    ):
         nonlocal link_calls
         link_calls += 1
         if link_calls == 2:
             raise OSError("injected qualified commit failure")
-        original_link(source, destination)
+        original_link(
+            source_directory_descriptor,
+            source_name,
+            destination_directory_descriptor,
+            destination_name,
+        )
 
     exporter._link_file = fail_second_link
     try:
@@ -518,6 +555,7 @@ def validate():
                 specification,
                 artifact,
             )
+            _validate_zero_length_point_import(root, editable)
             _validate_geometry_failure(
                 root,
                 editable,
