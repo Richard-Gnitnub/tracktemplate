@@ -170,14 +170,21 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "evidenced, but the six required-before-exit conditions remain open"
     ),
     (
-        "Pending — no accepted beyond-normal-noise improvement evidence; PR "
-        "#33 is excluded and does not satisfy this exit"
+        "Pending — PR #33 accounts for complete cold/warm Edit, Validate and "
+        "Export cost, but the edit range overlaps Phase 5 and demonstrates no "
+        "improvement beyond normal measurement noise; it does not satisfy "
+        "Exit 4"
     ),
     (
         "Pending — B14 remains available, but whole-scope parity and retirement "
         "authority remain absent"
     ),
 ]
+EXPECTED_PHASE6_PERFORMANCE_DISPOSITION = (
+    "Under D-P6-002, Phase 6 remains 1/5 with Exit 2 alone Evidenced and "
+    "owner-accepted; this evidence does not satisfy Exit 4, which remains "
+    "Pending."
+)
 EXPECTED_EXIT3_CONDITION_ROWS = {
     "Export transaction owner": [
         "Export transaction owner",
@@ -724,6 +731,24 @@ def _validate_exit_conditions(
         "Current — 1/5 evidenced. Exit 2 was owner-accepted under D-P6-002 on "
         "2026-08-02; exits 1, 3, 4 and 5 remain Pending" in current_flat,
         "current record does not preserve the accepted Phase 6 1/5 state",
+    )
+    performance_section = _section(
+        current_evidence,
+        "B16 Entry/Exit edit-through-export performance",
+    )
+    performance_flat = " ".join(performance_section.split())
+    _require(
+        "This bounded Level 2 performance-evidence tranche" in performance_flat
+        and "The complete cold journey was" in performance_flat
+        and "does not establish an improvement beyond normal noise"
+        in performance_flat
+        and EXPECTED_PHASE6_PERFORMANCE_DISPOSITION in performance_flat
+        and (
+            "../benchmarks/"
+            "2026-08-02-phase6-transition-pipeline-performance.md"
+        )
+        in performance_section,
+        "Phase 6 performance evidence boundary drifted",
     )
     _require(
         "Phase 5 closeout" in current_evidence

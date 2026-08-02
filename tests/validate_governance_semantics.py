@@ -633,9 +633,8 @@ def validate_current_evidence_mutations() -> None:
     )
     competing_authority = replace_once(
         evidence,
-        '<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>',
-        competing_quote
-        + '<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>',
+        authority,
+        authority + "\n\n" + competing_quote.rstrip(),
     )
     expect_rejected(
         "phase-evidence/competing-contradictory-authority-blockquote",
@@ -690,6 +689,42 @@ def validate_current_evidence_mutations() -> None:
             replace_once(evidence, exit3_row, exit3_promoted),
         ),
         "Phase 6 exits do not match the accepted 1/5 dispositions",
+    )
+
+    exit4_row = table_row_containing(
+        evidence,
+        "PR #33 accounts for complete cold/warm Edit, Validate and Export cost",
+    )
+    exit4_promoted = replace_once(
+        exit4_row,
+        "Pending — PR #33 accounts",
+        "Evidenced — PR #33 accounts",
+    )
+    expect_rejected(
+        "phase-evidence/exit4-prematurely-evidenced",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(evidence, exit4_row, exit4_promoted),
+        ),
+        "Phase 6 exits do not match the accepted 1/5 dispositions",
+    )
+
+    performance_promoted = replace_once(
+        evidence,
+        "this evidence does not satisfy Exit 4, which remains Pending",
+        "this evidence satisfies Exit 4",
+    )
+    expect_rejected(
+        "phase-evidence/performance-evidence-promoted-to-exit4",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            performance_promoted,
+        ),
+        "Phase 6 performance evidence boundary drifted",
     )
 
     transaction_condition = table_row_containing(

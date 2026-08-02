@@ -307,6 +307,52 @@ execution boundaries recorded here. The resulting decision is:
 > request, migration completion, output clearance, package, release or phase
 > exit; and leaves draft PR #31 separate and unaccepted.
 
+## B16 Entry/Exit edit-through-export performance
+
+This bounded Level 2 performance-evidence tranche starts from protected-main
+merge
+`a5b6a79bf3e73e1673d440077bd65000986bb4c7`. It changes no product source. A
+test-owned profiler composes the accepted two-object Entry/Exit editor, the
+explicit exact-validation contract and transient FreeCAD wire, and the
+private-development DXF exporter as one reconciled action. Three fresh
+isolated FreeCAD 1.1.1/OpenCASCADE 7.8.1 processes each applied the selected
+Exit edit, validated exact geometry, created the two-file output, then ran one
+untimed warm-up and three measured unchanged Validate/Export reuse cycles.
+
+The complete cold journey was 219.127 ms median (112.567–239.585), comprising
+103.827 ms edit, 73.026 ms Validate and 41.259 ms created-export medians, with a
+per-run uncovered median of 0.768 ms. End-minus-start RSS grew 4.180 MiB median
+and the process high-water mark grew 3.918 MiB. Across nine measured reuse
+cycles, Validate/Export was 8.972 ms median (8.525–9.997), with zero median
+RSS and process-high-water delta. Each cycle still rebuilt and disposed exact
+geometry; it did not hide deferred work by skipping validation.
+
+Every run preserved the two compact editable objects, stable mapping, 16
+active test-scene nodes and zero `Shape` properties; created one Undo unit;
+returned the same 24-vertex/23-edge exact-wire signature from Validate and
+Export; left no transient document or staging entry; and produced the same
+1,426-byte DXF and 6,829-byte `unknown`-status manifest. The raw and sanitised
+method, hashes, individual values, failed-proof classifications and limits are
+in the
+[performance report](../benchmarks/2026-08-02-phase6-transition-pipeline-performance.md).
+
+Retained validation compiled the changed Python, passed the focused profiler
+contract, all 58 standalone validators, qualified exact-contract, transient
+exact-geometry and DXF-export checks, and all six `transition-gui` pipeline
+steps including the isolated real-GUI ViewProvider proof. No product visual
+behaviour changed, so no screenshot evidence was required.
+
+The measured edit range overlaps the accepted Phase 5 one-set edit range, so
+this tranche does not establish an improvement beyond normal noise. The B14
+plain-line actions are not equivalent in document, exact-geometry or output
+scope and are not used to claim a speed-up. The evidence populates the Phase 1
+explicit Validate, export-from-validated and complete-journey slots for this
+slice, improving PR-15/QA-R04 decision readiness without changing their
+Partial controls. It accepts no numerical budget, B14 equivalence, output
+clearance, product capacity, operator route, legacy retirement or Phase 6
+exit. Under D-P6-002, Phase 6 remains 1/5 with Exit 2 alone Evidenced and
+owner-accepted; this evidence does not satisfy Exit 4, which remains Pending.
+
 <a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>
 
 ## Phase 6 Exits 2 and 3 evidence-admission panel and owner decision
@@ -426,7 +472,7 @@ The accepted current state is 1/5 under D-P6-002:
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Pending — deterministic output and handled in-process rollback are evidenced, but the six required-before-exit conditions remain open |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — no accepted beyond-normal-noise improvement evidence; PR #33 is excluded and does not satisfy this exit |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
 ## Carried controls and exclusions
