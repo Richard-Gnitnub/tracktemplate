@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate IDE Workspace Alignment"
+  short_description: "Align PyCharm projects with Git worktrees"
+  default_prompt: "Use $tracktemplate-ide-workspace-alignment to compare my PyCharm project with its backing Git worktree safely."

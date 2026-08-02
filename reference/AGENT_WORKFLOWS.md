@@ -120,6 +120,17 @@ context, an authority-ranked loss check and a transient context packet; it does
 not turn Git history, diffs, tests or conversation summaries into project
 authority.
 
+### `tracktemplate-ide-workspace-alignment`
+
+Path: `.agents/skills/tracktemplate-ide-workspace-alignment/SKILL.md`
+
+Use it to compare the operator-facing PyCharm project with Git-authoritative
+worktrees, branches, heads and pull-request state. It owns IDE project-path,
+VCS-root, interpreter, virtual-environment and run-directory alignment while
+Git workflows remain authoritative for reachability and every Git mutation. It
+detects stale merged branches, distinguishes file-backed evidence from physical
+window confirmation and keeps active work out of disposable `/tmp` state.
+
 ### `tracktemplate-handoff`
 
 Path: `.agents/skills/tracktemplate-handoff/SKILL.md`
@@ -295,7 +306,9 @@ selects one repository-evidenced gap traceable to an exact phase criterion,
 composes bounded delivery/validation/independent review, reconciles the result
 and publishes one new exact-green draft. It may stop after integration when no
 worthwhile programme-moving task exists, and never manufactures a tranche or
-merges the newly published draft in the same cycle.
+merges the newly published draft in the same cycle. It composes IDE workspace
+alignment before its first Git mutation and again after protected `main`
+synchronisation, without inheriting new Git or IDE-setting authority.
 
 Only a project-owner command containing the literal `$tracktemplate-continue`
 invocation activates it. Natural-language equivalents, quotations and
@@ -427,7 +440,7 @@ optional visual mode creates only sanitised, self-contained temporary HTML and
 does not execute production code or become validation evidence. Explanation
 does not replace validation, quality review or project-owner acceptance.
 
-All twenty-seven skills are deliberately instruction-only. They do not perform
+All twenty-eight skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
@@ -452,6 +465,10 @@ $tracktemplate-architecture-review
 
 ```text
 $tracktemplate-context-recovery
+```
+
+```text
+$tracktemplate-ide-workspace-alignment
 ```
 
 ```text
@@ -574,6 +591,7 @@ Natural routing examples preserve these boundaries:
 | --- | --- |
 | “I think Phase 5 is looping. Review recent progress and identify the single highest-value next outcome.” | Chief of staff: read-only progress diagnosis and one transient brief. |
 | “Take the selected current-phase outcome and drive the smallest technically coherent vertical slice.” | Technical lead plus the applicable specialist skills. |
+| “PyCharm is still showing a merged branch; reconcile it with current main without losing worktree state.” | IDE workspace alignment compares the operator project with Git authority; the Git workflow owns any separately authorised switch or move. |
 | `$tracktemplate-continue` | Continue owns one repository-driven integration, delivery, validation, review and draft-publication cycle. |
 | “Merge the last green pull request and continue with whatever is next.” | Does not activate continue; request the literal `$tracktemplate-continue` invocation before using its one-cycle authority. |
 | “Diagnose this traceback.” | Debugging only unless later evidence authorises a fix; neither new role activates. |
@@ -618,6 +636,18 @@ replace post-implementation validation.
 
 Validation determines what the evidence proves. Quality review determines
 whether the implementation and scope are acceptable given that evidence.
+
+For IDE workspace alignment:
+
+```text
+Git-owned read-only worktree, branch, reachability and pull-request evidence
+    ↓
+$tracktemplate-ide-workspace-alignment
+    ↓
+separately authorised Git reconciliation when needed
+    ↓
+repeat file/Git comparison and obtain any operator-only UI confirmation
+```
 
 For a planned session transfer:
 
@@ -739,8 +769,12 @@ Product Vision, governance, programme, phase, repository and PR evidence
     ↓
 $tracktemplate-continue
     ↓
+read-only $tracktemplate-ide-workspace-alignment before Git mutation
+    ↓
 verify and integrate one previous exact-green Level 1/2 pull request,
 then synchronise protected main
+    ↓
+repeat IDE workspace alignment before branch creation
     ↓
 select one authorised evidenced gap; state outcome, criterion, level,
 regression risk, acceptance evidence, explicit non-goals and why it outranks

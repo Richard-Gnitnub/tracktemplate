@@ -616,6 +616,46 @@ output, `project-cleared`, equivalence, legacy-retirement, packaging or release
 authority. Phase 6 remains 1/5 with Exit 2 alone Evidenced and owner-accepted;
 Exit 3 remains Pending.
 
+## IDE workspace-alignment workflow maintenance
+
+This bounded Level 2 governance/tooling tranche starts from protected `main` at
+`695627441edcc52ce719fc77902da6f06db66c84` and changes no TrackTemplate
+product, railway, FreeCAD or export behaviour. Read-only Git, GitHub,
+filesystem and PyCharm metadata showed that the primary project remained on
+merged PR #33 while clean accepted `main` was not checked out, and that active
+uncommitted recovery-authority work existed solely in a `/tmp` worktree. PR
+#33's exact tip and every unique commit were proved contained in accepted
+`main` before the primary checkout changed.
+
+The Git-owned reconciliation moved the dirty worktree intact to a named
+persistent project location; its seven-path status and binary patch SHA-256
+`dab531699189437c07ffbbb07c281e26098338cf4748adb9e2c3b878db2f0543`
+remained exact. The primary PyCharm directory now backs clean `main` at exact
+`origin/main`; the configured project virtual environment, VCS root and run
+working directory remain unchanged. The physical PyCharm branch indicator
+still requires operator confirmation because it cannot be observed from the
+agent sandbox.
+
+The new instruction-only
+[`tracktemplate-ide-workspace-alignment`](../../.agents/skills/tracktemplate-ide-workspace-alignment/SKILL.md)
+skill separates file-backed IDE comparison from Git authority and operator-only
+UI evidence. `$tracktemplate-continue` composes it before Git mutation and
+again after protected-main synchronisation. The agent-guidance validator
+fails closed on the new metadata, structure and composition links, and
+[LFE-016](../LEARNING_FROM_EXPERIENCE.md) records the reusable lesson.
+
+The skill-structure check, tracked Python/FCMacro parsing, focused agent-
+guidance and resource-routing checks, project-progress control, repository QA
+and documentation controls all passed. Governance mutation validation rejected
+95/95 mutations with zero escapes, and the complete standalone CI profile
+passed 58/58. No FreeCAD or GUI rerun was selected because neither product nor
+host behaviour changed.
+
+This maintenance has no Phase 6 exit contribution. Phase 6 remains 1/5; Exit
+2 alone remains Evidenced and owner-accepted; exits 1, 3, 4 and 5 remain
+Pending. Risk states, output authority, accepted evidence and all product
+boundaries remain unchanged.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
