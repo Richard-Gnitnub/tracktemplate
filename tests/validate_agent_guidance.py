@@ -32,8 +32,9 @@ ALLOWED_SKILL_ENTRIES = {
 }
 MAX_SKILL_LINES = 500
 RESOURCE_DIRECTORY_NAMES = ("assets", "references", "scripts")
-PROGRESSION_SKILL_NAMES = {
+REQUIRED_SKILL_METADATA_NAMES = {
     "tracktemplate-chief-of-staff",
+    "tracktemplate-ide-workspace-alignment",
     "tracktemplate-technical-lead",
 }
 
@@ -324,8 +325,8 @@ def validate_skill_resource_routing(
 
 
 def validate_progress_skill_metadata(directory: Path, name: str) -> None:
-    """Require the two new skills to expose valid generated UI metadata."""
-    if name not in PROGRESSION_SKILL_NAMES:
+    """Require selected skills to expose valid generated UI metadata."""
+    if name not in REQUIRED_SKILL_METADATA_NAMES:
         return
 
     metadata_path = directory / "agents" / "openai.yaml"
@@ -376,6 +377,14 @@ def validate_progress_delivery_structure() -> None:
             "Validate and review",
             "Owner acceptance pack",
         },
+        "tracktemplate-ide-workspace-alignment": {
+            "Responsibility boundary",
+            "Evidence boundary",
+            "Alignment workflow",
+            "Steady-state convention",
+            "Composition with TrackTemplate continue",
+            "Report",
+        },
     }
     expected_links = {
         "tracktemplate-chief-of-staff": {"tracktemplate-continue"},
@@ -390,9 +399,14 @@ def validate_progress_delivery_structure() -> None:
         "tracktemplate-continue": {
             "tracktemplate-change-validation",
             "tracktemplate-chief-of-staff",
+            "tracktemplate-ide-workspace-alignment",
             "tracktemplate-publish",
             "tracktemplate-quality-review",
             "tracktemplate-technical-lead",
+        },
+        "tracktemplate-ide-workspace-alignment": {
+            "tracktemplate-context-recovery",
+            "tracktemplate-continue",
         },
     }
 
@@ -420,6 +434,170 @@ def validate_progress_delivery_structure() -> None:
         not (skill_root / "tracktemplate-deliver-outcome").exists(),
         "continuation must not be duplicated by tracktemplate-deliver-outcome",
     )
+
+
+def validate_ide_workspace_alignment_contract(
+    ide_skill: str,
+    continuation: str,
+) -> None:
+    """Protect the IDE/Git authority and loss-safe workspace contract."""
+    responsibility = direct_section_content(
+        ide_skill,
+        "Responsibility boundary",
+    )
+    required_git_boundary = semantic_text(
+        "Keep Git workflows authoritative for branches, worktrees, commits, "
+        "upstreams, pull requests, reachability and every safe Git operation. "
+        "This skill may ask for that evidence and describe the required end "
+        "state, but it does not grant checkout, move, removal, prune, "
+        "deletion, "
+        "commit, push or merge authority."
+    )
+    require(
+        required_git_boundary in semantic_paragraphs(responsibility),
+        "IDE workspace alignment lost its Git-only authority boundary",
+    )
+
+    evidence = direct_section_content(ide_skill, "Evidence boundary")
+    required_operator_boundary = semantic_text(
+        "Treat these as operator-confirmed unless the active host environment "
+        "can prove them directly:"
+    )
+    require(
+        required_operator_boundary in semantic_paragraphs(evidence),
+        "IDE workspace alignment lost its operator-only evidence boundary",
+    )
+    evidence_items = bullet_items(evidence)
+    for required_item in (
+        "which physical PyCharm window is visible and focused;",
+        (
+            "the branch indicator and project path presently shown in that "
+            "window;"
+        ),
+        "unsaved editor buffers or Local History not represented on disk;",
+        "the run/debug configuration selected in the UI; and",
+        (
+            "whether PyCharm has refreshed its VCS state after an external "
+            "Git action."
+        ),
+    ):
+        require(
+            semantic_text(required_item) in evidence_items,
+            "IDE workspace alignment lost operator-only UI evidence: "
+            + required_item,
+        )
+    required_no_inference = semantic_text(
+        "Never infer the Git branch from a run-configuration name, coverage "
+        "filename, recent-file entry, window title or SDK label. Resolve it "
+        "from the backing Git worktree."
+    )
+    require(
+        required_no_inference in semantic_paragraphs(evidence),
+        "IDE workspace alignment permits non-Git branch inference",
+    )
+
+    steady_state = semantic_text(
+        direct_section_content(ide_skill, "Steady-state convention")
+    )
+    required_steady_state = semantic_text(
+        "Primary PyCharm project clean accepted main stable interpreter "
+        "operator's canonical project view Named persistent worktrees one per "
+        "active implementation or PR branch opened as separate PyCharm "
+        "projects when needed Temporary /tmp worktrees disposable review and "
+        "integration "
+        "only never the sole location of active, uncommitted or unpushed work"
+    )
+    require(
+        required_steady_state in steady_state,
+        "IDE workspace alignment lost its primary/persistent/temporary model",
+    )
+
+    pre_mutation = semantic_text(
+        direct_section_content(
+            continuation,
+            "Align the operator-facing workspace",
+        )
+    )
+    require(
+        "Before the first checkout, branch or worktree mutation, compose "
+        "$tracktemplate-ide-workspace-alignment" in pre_mutation
+        and "The IDE skill supplies no Git authority and must never infer a "
+        "branch from a run-configuration or window name." in pre_mutation,
+        "tracktemplate-continue lost its pre-mutation IDE alignment boundary",
+    )
+    post_sync = semantic_text(
+        direct_section_content(
+            continuation,
+            "Verify and integrate the previous pull request",
+        )
+    )
+    require(
+        "Repeat the IDE comparison after synchronisation." in post_sync,
+        "tracktemplate-continue lost its post-synchronisation IDE comparison",
+    )
+
+
+def require_ide_contract_mutation_rejected(
+    ide_skill: str,
+    continuation: str,
+    mutation: str,
+) -> None:
+    """Require one representative IDE-contract mutation to fail closed."""
+    try:
+        validate_ide_workspace_alignment_contract(ide_skill, continuation)
+    except AssertionError:
+        return
+    raise AssertionError(
+        "IDE workspace contract mutation escaped: " + mutation
+    )
+
+
+def validate_ide_workspace_alignment_mutations(
+    ide_skill: str,
+    continuation: str,
+) -> None:
+    """Exercise representative deletion and inversion mutations."""
+    for mutation, original, replacement in (
+        ("Git authority inversion", "does not grant", "grants"),
+        ("operator evidence inversion", "operator-confirmed", "file-proved"),
+        ("branch inference inversion", "Never infer", "Infer"),
+        (
+            "temporary-worktree safeguard deletion",
+            "never the sole location of active, uncommitted or unpushed work",
+            "",
+        ),
+    ):
+        require(
+            original in ide_skill,
+            "IDE mutation target drifted: " + mutation,
+        )
+        require_ide_contract_mutation_rejected(
+            ide_skill.replace(original, replacement, 1),
+            continuation,
+            mutation,
+        )
+
+    for mutation, original, replacement in (
+        (
+            "pre-mutation comparison inversion",
+            "Before the first checkout",
+            "After the first checkout",
+        ),
+        (
+            "post-synchronisation comparison deletion",
+            "Repeat the IDE comparison after synchronisation.",
+            "",
+        ),
+    ):
+        require(
+            original in continuation,
+            "IDE mutation target drifted: " + mutation,
+        )
+        require_ide_contract_mutation_rejected(
+            ide_skill,
+            continuation.replace(original, replacement, 1),
+            mutation,
+        )
 
 
 def validate_continue_invocation_policy(workflows: str) -> None:
@@ -643,6 +821,12 @@ def main() -> None:
 
     workflows = read(WORKFLOWS)
     validate_progress_delivery_structure()
+    ide_skill = read(
+        SKILLS_ROOT / "tracktemplate-ide-workspace-alignment" / "SKILL.md"
+    )
+    continuation = read(SKILLS_ROOT / "tracktemplate-continue" / "SKILL.md")
+    validate_ide_workspace_alignment_contract(ide_skill, continuation)
+    validate_ide_workspace_alignment_mutations(ide_skill, continuation)
     validate_continue_invocation_policy(workflows)
     validate_vision_led_workflows(workflows)
     registered_headings = REGISTER_HEADING_RE.findall(workflows)

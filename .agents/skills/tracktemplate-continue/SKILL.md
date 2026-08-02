@@ -59,6 +59,16 @@ governs vision-led selection and result reconciliation after invocation. It
 does not invoke this skill, widen execution authority or turn a Level 3 choice
 into an implementable task.
 
+## Align the operator-facing workspace
+
+Before the first checkout, branch or worktree mutation, compose
+[`$tracktemplate-ide-workspace-alignment`](../tracktemplate-ide-workspace-alignment/SKILL.md)
+to compare the primary PyCharm project, interpreter, VCS roots and run working
+directories with Git-authoritative worktree, branch, HEAD and pull-request
+evidence. Report the complete pre-change arrangement and preserve any dirty,
+unique, unpushed or active state. The IDE skill supplies no Git authority and
+must never infer a branch from a run-configuration or window name.
+
 ## Verify and integrate the previous pull request
 
 1. Read the current dashboard sufficiently to identify the previous tranche's
@@ -81,6 +91,13 @@ protected remote and verify that local `main` is clean and exactly current
 before reconstructing authority or creating a branch. Stop if synchronisation
 cannot complete without a merge, rebase, reset or protection bypass. Never
 merge the new draft created later in this cycle.
+
+Repeat the IDE comparison after synchronisation. Require the intended primary
+project directory to back clean exact protected `main`; map active work to
+named persistent worktrees; and retain `/tmp` worktrees only as accounted,
+disposable review or integration state. When the physical PyCharm window is
+not observable, name the project-path and branch-indicator confirmation the
+operator must perform rather than claiming visible UI evidence.
 
 ## Reconstruct repository authority
 
