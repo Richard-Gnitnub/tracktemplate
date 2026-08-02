@@ -170,6 +170,29 @@ def _transaction_artifacts(path):
     )
 
 
+def _staging_snapshot(path):
+    metadata = path.stat()
+    return (
+        (
+            metadata.st_dev,
+            metadata.st_ino,
+            metadata.st_mode,
+            metadata.st_mtime_ns,
+        ),
+        tuple(
+            (
+                item.name,
+                item.stat().st_dev,
+                item.stat().st_ino,
+                item.stat().st_mode,
+                item.stat().st_mtime_ns,
+                item.read_bytes(),
+            )
+            for item in sorted(path.iterdir())
+        ),
+    )
+
+
 def _dxf_pairs(value):
     lines = value.decode("ascii").splitlines()
     assert lines and len(lines) % 2 == 0
@@ -887,6 +910,300 @@ def _validate_descriptor_relative_rename_controls():
         _assert_no_staging(moved)
 
 
+def _validate_preexisting_staging_is_preserved():
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        dxf_value = adapter._dxf_bytes(plan)
+        manifest_value = adapter._manifest_bytes(
+            plan,
+            adapter._sha256_bytes(dxf_value),
+        )
+        stage_name = adapter._transaction_names(
+            plan.dxf_filename,
+            plan.manifest_filename,
+        )[3]
+        stage_path = output / stage_name
+        foreign_snapshot = None
+
+        def create_foreign_stage(candidate, _cancel):
+            nonlocal foreign_snapshot
+            stage_path.mkdir(mode=0o700)
+            (stage_path / plan.dxf_filename).write_bytes(dxf_value)
+            (stage_path / plan.manifest_filename).write_bytes(
+                manifest_value
+            )
+            foreign_snapshot = _staging_snapshot(stage_path)
+            return _geometry_receipt(candidate)
+
+        error = _expect_export_error(
+            lambda: _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+                builder=create_foreign_stage,
+            ),
+            "transition-dxf-export-staging-failed",
+        )
+        assert error.source_code == "FileExistsError"
+        assert foreign_snapshot is not None
+        assert stage_path.is_dir()
+        assert _staging_snapshot(stage_path) == foreign_snapshot
+        assert error.destination_changed is True
+        assert error.cleanup_complete is False
+        assert error.recoverable is False
+        assert _transaction_artifacts(output) == (stage_name,)
+        assert not (output / plan.dxf_filename).exists()
+        assert not (output / plan.manifest_filename).exists()
+
+        recovery_error = _expect_export_error(
+            lambda: _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+            ),
+            "transition-dxf-export-recovery-failed",
+        )
+        assert recovery_error.destination_changed is True
+        assert recovery_error.cleanup_complete is False
+        assert recovery_error.recoverable is False
+        assert stage_path.is_dir()
+        assert _staging_snapshot(stage_path) == foreign_snapshot
+
+
+def _validate_staging_identity_races_fail_closed():
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        dxf_value = adapter._dxf_bytes(plan)
+        manifest_value = adapter._manifest_bytes(
+            plan,
+            adapter._sha256_bytes(dxf_value),
+        )
+        stage_name = adapter._transaction_names(
+            plan.dxf_filename,
+            plan.manifest_filename,
+        )[3]
+        stage_path = output / stage_name
+        relocated = output / "relocated-created-stage"
+        original_metadata = adapter._stage_metadata
+        foreign_snapshot = None
+        substituted = False
+
+        def substitute_after_creation(directory_descriptor, name):
+            nonlocal foreign_snapshot, substituted
+            if not substituted and name == stage_name:
+                os.rename(
+                    name,
+                    relocated.name,
+                    src_dir_fd=directory_descriptor,
+                    dst_dir_fd=directory_descriptor,
+                )
+                os.mkdir(name, 0o700, dir_fd=directory_descriptor)
+                (stage_path / plan.dxf_filename).write_bytes(dxf_value)
+                (stage_path / plan.manifest_filename).write_bytes(
+                    manifest_value
+                )
+                foreign_snapshot = _staging_snapshot(stage_path)
+                substituted = True
+            return original_metadata(directory_descriptor, name)
+
+        def arm_substitution(candidate, _cancel):
+            adapter._stage_metadata = substitute_after_creation
+            return _geometry_receipt(candidate)
+
+        try:
+            error = _expect_export_error(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                    builder=arm_substitution,
+                ),
+                "transition-dxf-export-staging-failed",
+            )
+        finally:
+            adapter._stage_metadata = original_metadata
+        assert foreign_snapshot is not None
+        assert relocated.is_dir()
+        assert stage_path.is_dir()
+        assert _staging_snapshot(stage_path) == foreign_snapshot
+        assert error.destination_changed is True
+        assert error.cleanup_complete is False
+        assert error.recoverable is False
+        assert not (output / plan.dxf_filename).exists()
+        assert not (output / plan.manifest_filename).exists()
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        output = root / "output"
+        working = root / "working"
+        output.mkdir()
+        working.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        stage_name = adapter._transaction_names(
+            plan.dxf_filename,
+            plan.manifest_filename,
+        )[3]
+        original_metadata = adapter._stage_metadata
+        metadata_calls = 0
+
+        def remove_during_identity_binding(directory_descriptor, name):
+            nonlocal metadata_calls
+            metadata_calls += 1
+            if metadata_calls == 2:
+                os.rmdir(name, dir_fd=directory_descriptor)
+                return None
+            return original_metadata(directory_descriptor, name)
+
+        def arm_removal(candidate, _cancel):
+            adapter._stage_metadata = remove_during_identity_binding
+            return _geometry_receipt(candidate)
+
+        previous_directory = os.getcwd()
+        try:
+            os.chdir(working)
+            error = _expect_export_error(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                    builder=arm_removal,
+                ),
+                "transition-dxf-export-staging-failed",
+            )
+        finally:
+            os.chdir(previous_directory)
+            adapter._stage_metadata = original_metadata
+        assert metadata_calls == 2
+        assert tuple(working.iterdir()) == ()
+        assert error.destination_changed is True
+        assert error.cleanup_complete is False
+        assert error.recoverable is False
+        assert not (output / plan.dxf_filename).exists()
+        assert not (output / plan.manifest_filename).exists()
+
+    for fail_before_commit in (False, True):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = pathlib.Path(temporary) / "output"
+            output.mkdir()
+            state, specification, artifact, request = _fixture(output)
+            plan = api.prepare_transition_dxf_export(
+                state,
+                artifact,
+                specification,
+                request,
+            )
+            stage_name = adapter._transaction_names(
+                plan.dxf_filename,
+                plan.manifest_filename,
+            )[3]
+            stage_path = output / stage_name
+            relocated = output / "relocated-owned-stage"
+            expected_names = {
+                plan.dxf_filename,
+                plan.manifest_filename,
+            }
+            original_remove = adapter._remove_owned_file
+            original_commit = adapter._commit_staged_files
+            removed_names = set()
+            foreign_snapshot = None
+
+            def substitute_before_directory_removal(
+                directory_descriptor,
+                name,
+                expected_snapshot,
+                *,
+                error_code,
+                description,
+            ):
+                nonlocal foreign_snapshot
+                original_remove(
+                    directory_descriptor,
+                    name,
+                    expected_snapshot,
+                    error_code=error_code,
+                    description=description,
+                )
+                if name in expected_names:
+                    removed_names.add(name)
+                if (
+                    removed_names == expected_names
+                    and foreign_snapshot is None
+                ):
+                    stage_path.rename(relocated)
+                    stage_path.mkdir(mode=0o700)
+                    foreign_snapshot = _staging_snapshot(stage_path)
+
+            def fail_commit(*_args):
+                raise OSError("injected pre-commit failure")
+
+            adapter._remove_owned_file = (
+                substitute_before_directory_removal
+            )
+            if fail_before_commit:
+                adapter._commit_staged_files = fail_commit
+            try:
+                error = _expect_export_error(
+                    lambda: _export_with_stub(
+                        state,
+                        artifact,
+                        specification,
+                        request,
+                    ),
+                    "transition-dxf-export-cleanup-failed",
+                )
+            finally:
+                adapter._remove_owned_file = original_remove
+                adapter._commit_staged_files = original_commit
+            assert foreign_snapshot is not None
+            assert relocated.is_dir()
+            assert stage_path.is_dir()
+            assert _staging_snapshot(stage_path) == foreign_snapshot
+            assert error.destination_changed is True
+            assert error.cleanup_complete is False
+            assert error.recoverable is False
+            assert not (output / plan.dxf_filename).exists()
+            assert not (output / plan.manifest_filename).exists()
+
+            recovery_error = _expect_export_error(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                ),
+                "transition-dxf-export-recovery-failed",
+            )
+            assert recovery_error.cleanup_complete is False
+            assert stage_path.is_dir()
+            assert _staging_snapshot(stage_path) == foreign_snapshot
+
+
 def _validate_late_rename_rollback_recovery():
     assert hasattr(os, "fork")
     with tempfile.TemporaryDirectory() as temporary:
@@ -1338,6 +1655,8 @@ def validate():
     _validate_destination_and_collision_controls()
     _validate_cancellation_stale_geometry_and_destination_change()
     _validate_descriptor_relative_rename_controls()
+    _validate_preexisting_staging_is_preserved()
+    _validate_staging_identity_races_fail_closed()
     _validate_late_rename_rollback_recovery()
     _validate_interruption_partial_commit_and_recovery()
     _validate_changed_staging_is_preserved()

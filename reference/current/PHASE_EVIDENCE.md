@@ -479,8 +479,9 @@ directory exists. Staged files and directories are synchronised before commit;
 each final link and the recovered complete set are synchronised before success.
 On the next invocation, a byte-complete interrupted pair is retained and
 reused, while an identity-matched partial pair is rolled back before a fresh
-commit. A changed file, unsafe entry or ambiguous ownership fails closed and
-retains the journal/staging evidence rather than deleting an unowned path.
+commit. Once staging ownership is established, changed content and unsafe
+entries fail closed and retain the journal/staging evidence. The subsequent
+Level 3 review found a distinct pre-creation ownership race, repaired below.
 
 The standalone validator passed with
 `Phase 6 transition DXF export validation passed`. It terminates a child
@@ -524,6 +525,68 @@ physical-output clearance, `project-cleared` status, performance improvement,
 legacy retirement, packaging, release or Exit 3 acceptance is claimed. Phase 6
 therefore remains 1/5 with Exit 3 Pending. PR-09, PR-13, PR-16 and QA-R03 retain
 their recorded states; no risk treatment or effectiveness changes.
+
+## B16 Entry/Exit staging-ownership repair
+
+This bounded Level 2 repair starts from protected `main` at
+`284695784004320d541cd3fc5def4369e43c7f5c`. The fresh Exit 3 evidence-
+admission panel reproduced one implementation defect: after recovery but
+before staging creation, a foreign directory could appear at the deterministic
+stage name with the exact expected filenames and bytes. `mkdir` then failed
+before the exporter captured identity, but live cleanup treated matching
+content as ownership and deleted the foreign directory while reporting
+complete cleanup. The panel therefore recommended **Do not proceed** for Exit
+3 at that source state.
+
+The retained regression first failed against the accepted source because the
+foreign directory no longer existed after the staging error. The repair now
+treats a pre-existing stage as unclaimable, captures its device/inode identity
+from the descriptor opened immediately after successful creation, verifies the
+pathname against that descriptor before returning it, and refuses live staging
+cleanup when no creation identity was captured. On the reproduced failure it
+removes only the invocation-owned journal; the foreign directory, both files,
+their identities, metadata and bytes remain unchanged, no output is produced,
+and the diagnostic reports `destination_changed=True`,
+`cleanup_complete=False` and `recoverable=False`. A later invocation sees a
+stage without an ownership journal and again fails closed without altering it.
+
+Fresh independent review rejected the first repair candidate after finding two
+adjacent identity gaps. A stage that disappeared between repeated metadata
+lookups could return a null directory descriptor and redirect relative writes
+to the process working directory. A stage renamed after its owned files were
+removed could be replaced by an empty foreign directory that the following
+pathname `rmdir` deleted. The final candidate makes a missing expected stage a
+hard failure, never returns a null created-stage descriptor, retains the opened
+descriptor through cleanup, and re-verifies its device/inode identity at the
+pathname immediately before directory removal. If that last check fails, only
+the invocation-owned journal is removed once there is no final output or the
+exact committed output pair is identity-checked and rolled back; the
+foreign directory and any relocated owned stage are retained with incomplete
+cleanup reported.
+
+Focused regressions now also inject a post-`mkdir` replacement before the first
+pathname metadata check, disappearance during durable identity binding, and a
+replacement immediately before directory removal both before and after commit.
+They prove that foreign state is retained, the process working directory
+remains untouched, no output pair survives, and a later invocation again fails
+closed. These retained reds failed against the earlier candidate through
+foreign deletion, false success or the null-descriptor path before the final
+repair passed them.
+
+The focused standalone exporter validator passes with
+`Phase 6 transition DXF export validation passed`. Its existing success,
+failure, interruption and recovery cases continue to prove cleanup of staging
+that the invocation genuinely created and identity-bound. The DXF and manifest
+names, bytes, schema, collision policy, durable transaction protocol,
+qualified-import contract and deliberately `unknown` project status remain
+unchanged.
+
+This repair supplies present technical evidence only. It does not accept Exit
+3, satisfy the required fresh post-repair Level 3 evidence-admission panel,
+alter another exit or risk state, or grant GUI, operator, production, physical-
+output, `project-cleared`, equivalence, legacy-retirement, packaging or release
+authority. Phase 6 remains 1/5 with Exit 2 alone Evidenced and owner-accepted;
+Exit 3 remains Pending.
 
 <a id="current-phase-6-exit-condition-disposition"></a>
 

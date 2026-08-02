@@ -1085,6 +1085,14 @@ def _open_stage_directory(
 ):
     metadata = _stage_metadata(directory_descriptor, stage_name)
     if metadata is None:
+        if expected_identity is not None:
+            raise _export_error(
+                "transition-dxf-export-recovery-failed",
+                "the identity-bound staging directory disappeared",
+                destination_changed=True,
+                cleanup_complete=False,
+                recoverable=False,
+            )
         return None
     flags = (
         os.O_RDONLY
@@ -1125,21 +1133,119 @@ def _open_stage_directory(
     return descriptor
 
 
+def _open_created_staging_directory(directory_descriptor, stage_name):
+    flags = (
+        os.O_RDONLY
+        | os.O_DIRECTORY
+        | os.O_NOFOLLOW
+        | getattr(os, "O_CLOEXEC", 0)
+    )
+    try:
+        descriptor = os.open(
+            stage_name,
+            flags,
+            dir_fd=directory_descriptor,
+        )
+    except OSError as error:
+        raise _export_error(
+            "transition-dxf-export-recovery-failed",
+            "the created staging directory could not be opened safely",
+            source_code=type(error).__name__,
+            destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
+        ) from error
+    try:
+        opened = os.fstat(descriptor)
+        identity = (opened.st_dev, opened.st_ino)
+        if (
+            not stat.S_ISDIR(opened.st_mode)
+            or opened.st_uid != os.geteuid()
+            or opened.st_mode & (stat.S_IWGRP | stat.S_IWOTH)
+        ):
+            raise _export_error(
+                "transition-dxf-export-recovery-failed",
+                "the created staging directory ownership is ambiguous",
+                destination_changed=True,
+                cleanup_complete=False,
+                recoverable=False,
+            )
+        metadata = _stage_metadata(directory_descriptor, stage_name)
+        if (
+            metadata is None
+            or (metadata.st_dev, metadata.st_ino) != identity
+        ):
+            raise _export_error(
+                "transition-dxf-export-recovery-failed",
+                "the created staging directory changed before identity "
+                "binding",
+                destination_changed=True,
+                cleanup_complete=False,
+                recoverable=False,
+            )
+        return descriptor, identity
+    except Exception:
+        os.close(descriptor)
+        raise
+
+
 def _create_staging_directory(directory_descriptor, stage_name):
+    stage_descriptor = None
     try:
         os.mkdir(stage_name, 0o700, dir_fd=directory_descriptor)
-        os.fsync(directory_descriptor)
-        stage_descriptor = _open_stage_directory(
-            directory_descriptor,
-            stage_name,
-        )
-        metadata = os.fstat(stage_descriptor)
-        return stage_descriptor, (metadata.st_dev, metadata.st_ino)
+    except FileExistsError as error:
+        raise _export_error(
+            "transition-dxf-export-staging-failed",
+            "the transaction staging directory already exists and cannot "
+            "be claimed",
+            source_code=type(error).__name__,
+            destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
+        ) from error
     except OSError as error:
         raise _export_error(
             "transition-dxf-export-staging-failed",
             "the owned staging directory could not be created durably",
             source_code=type(error).__name__,
+        ) from error
+
+    try:
+        stage_descriptor, stage_identity = (
+            _open_created_staging_directory(
+                directory_descriptor,
+                stage_name,
+            )
+        )
+        os.fsync(directory_descriptor)
+        metadata = _stage_metadata(directory_descriptor, stage_name)
+        if (
+            metadata is None
+            or (metadata.st_dev, metadata.st_ino) != stage_identity
+        ):
+            raise _export_error(
+                "transition-dxf-export-recovery-failed",
+                "the created staging directory changed before durable "
+                "identity binding",
+                destination_changed=True,
+                cleanup_complete=False,
+                recoverable=False,
+            )
+        return stage_descriptor, stage_identity
+    except Exception as error:
+        if stage_descriptor is not None:
+            os.close(stage_descriptor)
+        source_code = str(
+            getattr(error, "code", "") or type(error).__name__
+        )
+        raise _export_error(
+            "transition-dxf-export-staging-failed",
+            "the created staging directory could not be identity-bound "
+            "durably",
+            source_code=source_code,
+            destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
         ) from error
 
 
@@ -1156,6 +1262,8 @@ def _cleanup_staging(
     )
     if stage_descriptor is None:
         return
+    opened = os.fstat(stage_descriptor)
+    stage_identity = (opened.st_dev, opened.st_ino)
     expected_hashes = dict(entries)
     expected_names = set(expected_hashes)
     try:
@@ -1198,6 +1306,30 @@ def _cleanup_staging(
                 description="a staged transaction file",
             )
         os.fsync(stage_descriptor)
+        metadata = _stage_metadata(directory_descriptor, stage_name)
+        if (
+            metadata is None
+            or (metadata.st_dev, metadata.st_ino) != stage_identity
+        ):
+            raise _export_error(
+                "transition-dxf-export-cleanup-failed",
+                "the staging directory identity changed before removal",
+                destination_changed=True,
+                cleanup_complete=False,
+                recoverable=False,
+            )
+        try:
+            os.rmdir(stage_name, dir_fd=directory_descriptor)
+            os.fsync(directory_descriptor)
+        except OSError as error:
+            raise _export_error(
+                "transition-dxf-export-cleanup-failed",
+                "the owned staging directory could not be removed",
+                source_code=type(error).__name__,
+                cleanup_complete=False,
+            ) from error
+    except TransitionDxfExportError:
+        raise
     except OSError as error:
         raise _export_error(
             "transition-dxf-export-cleanup-failed",
@@ -1207,16 +1339,6 @@ def _cleanup_staging(
         ) from error
     finally:
         os.close(stage_descriptor)
-    try:
-        os.rmdir(stage_name, dir_fd=directory_descriptor)
-        os.fsync(directory_descriptor)
-    except OSError as error:
-        raise _export_error(
-            "transition-dxf-export-cleanup-failed",
-            "the owned staging directory could not be removed",
-            source_code=type(error).__name__,
-            cleanup_complete=False,
-        ) from error
 
 
 def _remove_owned_file(
@@ -1860,6 +1982,15 @@ def _cleanup_transaction(
     stage_identity,
     entries,
 ):
+    if stage_identity is None:
+        raise _export_error(
+            "transition-dxf-export-cleanup-failed",
+            "staging cleanup was not attempted without a captured "
+            "creation identity",
+            destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
+        )
     _cleanup_staging(
         directory_descriptor,
         stage_name,
@@ -2170,26 +2301,86 @@ def export_transition_dxf(
             operation_error = error
 
         cleanup_error = None
-        if (
-            journal_snapshot is not None
-            and (
+        if journal_snapshot is not None:
+            if stage_identity is None and operation_error is not None:
+                try:
+                    _remove_owned_file(
+                        directory_descriptor,
+                        journal_name,
+                        journal_snapshot,
+                        error_code=(
+                            "transition-dxf-export-cleanup-failed"
+                        ),
+                        description="the durable transaction journal",
+                    )
+                except TransitionDxfExportError as error:
+                    cleanup_error = error
+            elif (
                 operation_error is None
                 or getattr(operation_error, "cleanup_complete", True)
-            )
-        ):
-            try:
-                _cleanup_transaction(
-                    directory_descriptor,
-                    journal_name,
-                    journal_snapshot,
-                    stage_name,
-                    stage_identity,
-                    entries,
-                )
-            except TransitionDxfExportError as error:
-                cleanup_error = error
+            ):
+                try:
+                    _cleanup_transaction(
+                        directory_descriptor,
+                        journal_name,
+                        journal_snapshot,
+                        stage_name,
+                        stage_identity,
+                        entries,
+                    )
+                except TransitionDxfExportError as error:
+                    cleanup_error = error
 
         if cleanup_error is not None:
+            stage_ownership_lost = stage_identity is None
+            if not stage_ownership_lost:
+                try:
+                    current_stage = _stage_metadata(
+                        directory_descriptor,
+                        stage_name,
+                    )
+                except TransitionDxfExportError:
+                    stage_ownership_lost = True
+                else:
+                    stage_ownership_lost = (
+                        current_stage is None
+                        or (
+                            current_stage.st_dev,
+                            current_stage.st_ino,
+                        )
+                        != stage_identity
+                    )
+            rollback_error = None
+            if committed_snapshots is not None:
+                try:
+                    _rollback_committed_files(
+                        directory_descriptor,
+                        entries,
+                        committed_snapshots,
+                    )
+                except TransitionDxfExportError as error:
+                    rollback_error = error
+            journal_cleanup_error = None
+            if (
+                rollback_error is None
+                and (
+                    committed_snapshots is not None
+                    or stage_ownership_lost
+                )
+            ):
+                try:
+                    _remove_owned_file(
+                        directory_descriptor,
+                        journal_name,
+                        journal_snapshot,
+                        error_code=(
+                            "transition-dxf-export-cleanup-failed"
+                        ),
+                        description="the durable transaction journal",
+                    )
+                except TransitionDxfExportError as error:
+                    journal_cleanup_error = error
+            terminal_error = rollback_error or journal_cleanup_error
             changed = bool(
                 cleanup_error.destination_changed
                 or operation_error is None
@@ -2197,15 +2388,25 @@ def export_transition_dxf(
             )
             raise _export_error(
                 "transition-dxf-export-cleanup-failed",
-                cleanup_error.detail,
+                (
+                    cleanup_error.detail
+                    if terminal_error is None
+                    else "{}; owned output rollback or journal cleanup "
+                    "was incomplete".format(cleanup_error.detail)
+                ),
                 source_code=str(
                     getattr(operation_error, "code", "")
+                    or getattr(terminal_error, "source_code", "")
                     or cleanup_error.source_code
                 ),
                 destination_changed=changed,
                 cleanup_complete=False,
-                recoverable=cleanup_error.recoverable,
-            ) from (operation_error or cleanup_error)
+                recoverable=(
+                    cleanup_error.recoverable
+                    if terminal_error is None
+                    else False
+                ),
+            ) from (operation_error or terminal_error or cleanup_error)
         if operation_error is not None:
             if isinstance(operation_error, TransitionDxfExportError):
                 raise operation_error

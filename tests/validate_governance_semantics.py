@@ -739,6 +739,55 @@ def validate_current_evidence_mutations() -> None:
         "Exit 3 recovery evidence status drifted or implied acceptance",
     )
 
+    staging_preservation_weakened = replace_once(
+        evidence,
+        "metadata and bytes remain unchanged",
+        "metadata and bytes may be removed",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-staging-ownership-preservation-weakened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            staging_preservation_weakened,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    staging_descriptor_weakened = replace_once(
+        evidence,
+        "never returns a null created-stage descriptor",
+        "may return a null created-stage descriptor",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-staging-null-descriptor-permitted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            staging_descriptor_weakened,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    staging_rmdir_weakened = replace_once(
+        evidence,
+        "re-verifies its device/inode identity at the\n"
+        "pathname immediately before directory removal",
+        "verifies its device/inode identity only before file removal",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-staging-rmdir-identity-check-removed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            staging_rmdir_weakened,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
     exit4_row = table_row_containing(
         evidence,
         "PR #33 accounts for complete cold/warm Edit, Validate and Export cost",

@@ -831,6 +831,40 @@ def _validate_exit_conditions(
         recovery_rows == EXPECTED_EXIT3_RECOVERY_ROWS,
         "Exit 3 recovery evidence status drifted or implied acceptance",
     )
+    staging_repair_section = _section(
+        current_evidence,
+        "B16 Entry/Exit staging-ownership repair",
+    )
+    staging_repair_flat = " ".join(staging_repair_section.split())
+    _require(
+        "284695784004320d541cd3fc5def4369e43c7f5c"
+        in staging_repair_section
+        and "recommended **Do not proceed** for Exit 3"
+        in staging_repair_flat
+        and "metadata and bytes remain unchanged" in staging_repair_flat
+        and "destination_changed=True" in staging_repair_section
+        and "cleanup_complete=False" in staging_repair_section
+        and "recoverable=False" in staging_repair_section
+        and "no output is produced" in staging_repair_flat
+        and "never returns a null created-stage descriptor"
+        in staging_repair_flat
+        and (
+            "re-verifies its device/inode identity at the pathname "
+            "immediately before directory removal"
+        )
+        in staging_repair_flat
+        and "the process working directory remains untouched"
+        in staging_repair_flat
+        and "the exact committed output pair is identity-checked and "
+        "rolled back"
+        in staging_repair_flat
+        and (
+            "Phase 6 remains 1/5 with Exit 2 alone Evidenced and "
+            "owner-accepted; Exit 3 remains Pending"
+        )
+        in staging_repair_flat,
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
     validation = _read(VALIDATION_PATH)
     _require(
         (
