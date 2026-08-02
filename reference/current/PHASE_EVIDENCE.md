@@ -656,6 +656,250 @@ This maintenance has no Phase 6 exit contribution. Phase 6 remains 1/5; Exit
 Pending. Risk states, output authority, accepted evidence and all product
 boundaries remain unchanged.
 
+<a id="phase-6-exit-3-recovery-authority-contract-panel"></a>
+
+## Phase 6 Exit 3 recovery-authority contract panel and owner decision
+
+This bounded Level 3 correction cycle starts from accepted `main` at
+`cee78cff84618c6a5be3be99714682f5822c814f`. Its product outcome is a safe,
+reviewable cross-process recovery contract for the private-development B16
+Entry/Exit DXF-and-manifest pair. It assesses only the architecture and
+authority needed to address Exit 3 conditions 1 and 3; it changes no product
+source, admits no implementation evidence and accepts no Phase 6 exit.
+
+The project owner's 2026-08-02 instructions first authorised selection of the
+safest recovery-authority contract and then authorised this correction after
+the initial unaccepted draft failed independent review. That draft allowed a
+live invocation to verify and then unlink a published pathname. The
+filesystem-security and architecture/API reviews rejected the separate
+verification-to-unlink interval: even a link initially created by this process
+can be substituted before pathname deletion, and POSIX supplies no
+expected-inode atomic condition for that deletion. The rejected draft remains
+preserved source evidence; it is not decision authority.
+
+The corrected successor was reconstructed on current accepted `main`, retaining
+the accepted PR #37 IDE-workspace evidence. Fresh read-only
+filesystem-security, architecture/API, governance and staff-level quality
+reviewers assessed the complete successor diff. None implemented the decision
+or holds owner acceptance authority.
+
+**Why this decision outranks maintenance alternatives:** PR #35 and PR #36
+already supply bounded descriptor-relative path control, anonymous payload
+creation, no-overwrite publication, durability and foreign-state preservation
+evidence. The remaining technical gap is a safe cross-process recovery rule,
+not another replay of those proofs. Selecting a non-destructive rule removes
+the design loop before implementation without adding an operator workflow,
+trust service or output representation.
+
+**Present evidence considered:**
+
+| Evidence | Panel disposition |
+| --- | --- |
+| Accepted `main` exporter | Anonymous `O_TMPFILE` payloads, no-overwrite descriptor-relative links and directory synchronisation are present; the current verify-then-unlink rollback path is not accepted as post-publication recovery authority, and persisted controls are deliberately not trusted for deletion |
+| Application contract | The deterministic two-file result, final names and bytes, manifest schema and contract IDs, `reuse-identical-or-fail` collision policy and `created`/`reused` receipt dispositions are current public constraints |
+| Repository consumer inventory | Current validators and profilers are the only repository consumers of the concrete export result; no accepted consumer treats exact-partial collision failure as a required outcome |
+| Retained interruption and ownership evidence | One- and two-link termination, collision, substitution, rollback and foreign-control preservation evidence is present, but current source rejects residue rather than recovering it |
+| Rejected initial decision draft | Authenticating a final and then unlinking its pathname has an exploitable substitution interval; content, UID, permissions, hashes, xattrs and first-observed identity cannot repair that authority defect |
+| POSIX/Linux primitive contract | Anonymous creation supplies a live creation-bound descriptor, no-overwrite `linkat` can add an absent name, and file plus directory `fsync` supplies the bounded durability order; pathname deletion has no expected-inode atomic condition |
+| Fresh independent reviews | Strict add-only, journal-free monotonic completion is the narrowest compatible rule and needs no new receipt or manifest schema; post-publication pathname rollback is excluded |
+
+This is present design and implementation evidence, not accepted Exit 3
+evidence. D-P6-003 accepts only the recovery-authority contract and later
+Level 2 boundary recorded below. The current source still implements the PR
+#36 preserve-and-reject behaviour, including the verify-then-unlink path that
+the corrected decision forbids after publication; automatic recovery is not
+present.
+
+**Options and disposition:**
+
+| Option | Disposition |
+| --- | --- |
+| Preserve all interruption residue and stop | Safe as the current fallback, but cannot satisfy recovery conditions 1 and 3; rejected as the final contract |
+| Trust a destination-local journal, owner UID, permissions, hashes, xattrs or first-observed identity | Rejected; the same-UID actor can forge or replace every proposed authority source |
+| Verify an invocation-created link and then unlink its pathname | Rejected; verification and pathname deletion are separate operations, so substitution defeats the claimed ownership condition |
+| Add an external key, replay ledger, helper service or long-lived broker | Rejected for this slice; it adds credential lifecycle, platform dependencies and a larger trust boundary |
+| Quarantine or recover through an operator decision | Retained only as optional future disposition; it adds an unauthorised GUI/operator workflow and is unnecessary for deterministic completion |
+| Publish a generation directory, selector or single bundle | Retained only as a fallback if this protocol is disproved; it changes the output layout or requires protocol-aware consumers |
+| Strict add-only, journal-free monotonic completion | Selected; it recovers only by preserving compatible state and adding an absent exact member, never by deleting published or foreign state |
+
+**Selected contract:** Strict add-only, journal-free monotonic completion is
+defined by all of these mandatory invariants:
+
+1. Every invocation recomputes the exact expected pair from current signed
+   inputs, binds the real destination directory by descriptor and prepares all
+   unpublished payloads in anonymous, creation-bound descriptors.
+2. Before publication, abandonment consists only of closing owned anonymous
+   descriptors; no pathname cleanup authority is inferred.
+3. Publication may only add an absent deterministic final pathname, without
+   overwrite, from its synchronised anonymous descriptor.
+4. No published final file may be unlinked, renamed, rewritten, truncated,
+   replaced or otherwise claimed by TrackTemplate.
+5. Pathname-based rollback ends permanently at the first successful final
+   link.
+6. After any post-publication failure, every published final is preserved,
+   including an exact partial or complete output pair.
+7. A later invocation may add only an absent exact counterpart; it may not
+   reconstruct, replace or remove the member already present.
+8. Existing finals are inspected descriptor-relatively for regular-file type
+   and exact bytes, but that inspection grants no deletion or replacement
+   authority.
+9. Success is reported only after the complete final pair and required
+   durability state are independently revalidated as exact.
+10. Substitution, ambiguity, collision, replay, inconsistency, a symbolic link
+    or non-regular member fails closed without further mutation.
+11. A race discovered after an addition leaves every published file untouched
+    and reports failure truthfully, even if an exact pair is then observed.
+12. `cleanup_complete`, `recoverable`, `destination_changed` and related
+    diagnostics describe the state actually retained, not an intended
+    rollback.
+13. Identical complete-pair reuse, deterministic bytes and filenames, manifest
+    schema, contract IDs, no-overwrite behaviour and collision refusal remain
+    unchanged.
+14. A host or filesystem without every required anonymous-file,
+    descriptor-relative no-overwrite link and durability primitive fails
+    closed.
+
+Historical journals, `.new` links and stage artifacts are inert foreign
+residue: they are never opened, parsed, modified or deleted and their presence
+neither permits nor blocks final-set completion. If neither final exists, the
+exporter may add both. If exactly one exact regular member exists, it preserves
+that member's inode, metadata and bytes and adds only the missing exact
+counterpart. If both exact regular members exist, it independently revalidates
+and reuses the pair. Any other state fails unchanged.
+
+These security statements are absolute within the bounded contract:
+authenticating or verifying a pathname does not create authority to delete it;
+POSIX pathname deletion has no expected-inode atomic condition; rollback ends
+permanently at the first publication link; cross-process recovery means safe
+monotonic completion, not destructive cleanup; and foreign or uncertain
+destination state is never removed by TrackTemplate.
+
+Diagnostics remain conservative. `destination_changed=True` after any
+successful addition, and uncertainty caused by interference must not be
+reported as an unchanged destination. `cleanup_complete=True` may describe
+only a clean pre-publication failure after every invocation-owned unpublished
+resource is closed. A surviving published final on a failed invocation requires
+`cleanup_complete=False`; it was not rolled back. `recoverable=True` requires
+an independently revalidated exact zero-member, partial or complete destination
+with safe retry or remaining add-only authority; ambiguity, mismatch, uncertain
+durability or an unsupported primitive is not recoverable. Content equivalence
+establishes compatibility for reuse or addition only; it never grants
+ownership, deletion or replacement authority.
+
+This preserves the final filenames, DXF and manifest bytes, manifest schema
+and contract IDs, two-file layout, deterministic generation, no-overwrite
+behaviour and `reuse-identical-or-fail` policy. It accepts one narrow observable
+refinement: an exact regular partial pair may be completed instead of rejected
+as a collision. `created` continues to mean that the invocation published at
+least one member; `reused` continues to mean that the complete pair already
+existed. The collision policy is therefore defined per final member: reuse an
+exact regular member, create only its absent deterministic counterpart and fail
+on a non-identical or non-regular existing member. No material owner choice
+remains because this refinement is inside the owner-delegated contract
+selection and introduces no UI, configuration, dependency, trust root or
+output representation.
+
+**Bounded later Level 2 authority and conditions:**
+
+| Accountable owner | Required work before publication |
+| --- | --- |
+| Export adapter owner | Implement only the strict add-only, journal-free monotonic state machine in `tracktemplate/adapters/export/transition_dxf.py`; retain bound-directory, anonymous-file and no-overwrite controls, close owned descriptors before publication on failure, and remove every post-publication pathname rollback path |
+| Application-contract owner | Define `reuse-identical-or-fail` per final member in narrowly necessary wording in `tracktemplate/application/transition_export.py`; freeze both export contract/result IDs, the collision-policy value and receipt dispositions; stop for a separate API decision if an accepted consumer depends on exact-partial failure or truthful implementation needs another public change |
+| Validation owner | Retain focused zero-member, DXF-only, manifest-only, complete-pair, mismatch, symlink, non-regular, cancellation, injected-failure, rename and substitution cases; prove pre-publication descriptor abandonment, interruption after each addition, post-addition races and next-invocation monotonic completion; prove fresh and partial creation have identical output fingerprints and `created` result signatures |
+| Filesystem-security owner | Prove pre-existing exact members and inert controls retain inode identity, metadata and bytes; prove equality and pathname verification never authorise deletion; prove no published final is unlinked or otherwise mutated after any failure, race or later invocation; and prove diagnostics match exact retained states |
+| Documentation and governance owner | Record the implemented evidence without changing Phase 6 from 1/5 or implying that Exit 3 is Evidenced; retain exact output fingerprints and deliberately `unknown` project status |
+| Independent reviewers | Review the exact Level 2 head for architecture/API, filesystem-security and quality; after merge, leave Exit 3 Pending for a fresh bounded Level 3 evidence-admission panel |
+
+The authorised implementation remains limited to the exporter, narrowly
+necessary application-contract wording, its focused retained validator, one
+concise current-evidence entry and directly dependent governance controls. It
+must stop without publication if it would read or delete legacy controls,
+unlink, rename, rewrite, truncate or replace a published final, derive deletion
+authority from content, metadata or pathname verification, change final
+names/bytes/schema/layout, weaken collision refusal, change contract/result IDs
+or the collision-policy value, or add an operator workflow, secret store,
+helper service, generic storage framework or runtime dependency.
+
+**Residual limitations and risk panel:** The pair is recoverable rather than
+simultaneously visible through one namespace operation. A partial exact set
+may remain until another invocation; there is no background or operator
+recovery. Changed expected bytes correctly leave an old partial as a preserved
+collision. Detected active same-UID interference fails closed, but the exporter
+cannot prevent mutation after its final observation. Historical controls may
+remain as inert hidden residue. Descriptor-link and durability evidence remains
+bounded to the qualified Linux/filesystem profile. Additional physical-power-
+loss matrices, malformed or orphaned controls, lock contention, unpublished-
+journal interruption and bounded residue reads remain optional future
+hardening rather than new mandatory blockers for this bounded contract.
+
+PR-09 remains Critical/Remove/Partial, PR-13 remains
+Critical/Mitigate/Effective within its current scope, PR-16 remains
+High/Mitigate/Partial, PR-22 remains High/Remove/Effective within its current
+scope and QA-R03 remains High/Remove/Partial. The contract reduces the design's
+need for destructive cross-process authority but supplies no implementation
+evidence or risk closure, so no risk state, treatment or effectiveness changes.
+Phase 6 remains 1/5 with Exit 2 alone Evidenced and owner-accepted; Exit 3 and
+exits 1, 4 and 5 remain Pending.
+
+**Panel recommendation:** **Proceed with bounded conditions.** The fresh
+filesystem-security and architecture/API reviewers accept the strict add-only
+contract and later Level 2 boundary; the governance and staff-level quality
+review finds no status, evidence or authority contradiction. No material owner
+choice or dissent remains.
+
+Under the authority explicitly delegated in the project owner's 2026-08-02
+instruction, the resulting decision is:
+
+> **D-P6-003 — Select strict add-only, journal-free monotonic completion for
+> Exit 3 recovery**
+>
+> At accepted `main` source state `cee78cff84618c6a5be3be99714682f5822c814f`,
+> select strict add-only, journal-free monotonic completion as the required
+> cross-process recovery-authority contract for the bounded B16 Entry/Exit
+> DXF-and-manifest pair. A later bounded Level 2 tranche is authorised to
+> recompute the exact expected pair, create unpublished payloads only in
+> anonymous creation-bound descriptors, abandon unpublished work only by
+> closing those descriptors, inspect existing finals without acquiring
+> mutation authority, and publish only by adding an absent final pathname
+> without overwrite. The first successful final link permanently ends
+> rollback. No published final may be unlinked, renamed, rewritten, truncated
+> or replaced; authenticating or verifying a pathname does not grant deletion
+> authority, and POSIX pathname deletion has no expected-inode atomic
+> condition. After any post-publication failure, all published finals are
+> preserved, including any exact partial or complete output pair. A later
+> invocation may add only an absent exact counterpart, and success may be
+> reported only after the complete final pair is independently revalidated as
+> exact. Mismatch, non-regular finals, symbolic links, collision, replay,
+> substitution, inconsistency, ambiguity or unsupported primitives fail closed
+> without further mutation. Foreign or uncertain destination state is never
+> removed, and `cleanup_complete`, `recoverable`, `destination_changed` and
+> related diagnostics must describe the state actually retained.
+> `recoverable=True` is permitted only after independently revalidating an
+> exact zero-member, partial or complete destination with safe retry or
+> remaining add-only authority; ambiguity, mismatch, uncertain durability or
+> an unsupported primitive remains non-recoverable. Any successful addition
+> requires `destination_changed=True`, and any surviving published final on a
+> failed invocation requires `cleanup_complete=False`. Identical complete-pair
+> reuse, deterministic filenames and bytes, manifest schema and contract IDs,
+> the two-file layout, no-overwrite behaviour and
+> `reuse-identical-or-fail` collision refusal remain unchanged; one exact
+> regular partial member may now be completed rather than treated as a
+> collision. Phase 6 remains 1/5 and Exit 3 remains Pending until
+> implementation, focused interruption/recovery evidence and a fresh Level 3
+> evidence-admission review.
+>
+> No product code is changed by this decision. It does not mark Exit 3 or
+> another exit `Evidenced` or owner-accepted; grant production,
+> physical-output, `project-cleared`, equivalence, GUI, operator, wider-family,
+> performance, legacy-retirement, packaging or release authority; or change a
+> risk state. It does not authorise post-publication unlink, rename, rewrite,
+> truncation, replacement or pathname-based rollback; reading or deleting
+> pre-existing controls; mutation of any foreign or uncertain destination
+> state; deriving deletion authority from equality, metadata or pathname
+> verification; changing output names/bytes/schema/layout, contract/result IDs
+> or the collision-policy value; or adding a trust service, generic storage
+> framework or runtime dependency.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -666,7 +910,7 @@ The accepted current state is 1/5 under D-P6-002:
 | --- | --- |
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
-| Export is deterministic and failure-safe | Pending — conditions 1 and 3 remain open because no independently trusted cross-process recovery protocol or proof exists; conditions 2, 4 and 5 retain bounded evidence; condition 6 requires a fresh Level 3 evidence-admission review only after the technical gaps close |
+| Export is deterministic and failure-safe | Pending — D-P6-003 selects a strict add-only, journal-free monotonic recovery contract, but condition 1 lacks implementation and condition 3 lacks focused proof; conditions 2, 4 and 5 retain bounded evidence; condition 6 requires a fresh Level 3 evidence-admission review only after those gaps close |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
@@ -685,6 +929,8 @@ switch children to accumulate.
 The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json); D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
-D-P6-001, D-GOV-005 and D-P6-002. Only Exit 2 receives the authority quoted
-above; every other exit, clearance, support, schema, oracle-retirement, budget,
-packaging, release and later-phase decision remains separately controlled.
+D-P6-001, D-GOV-005, D-P6-002 and D-P6-003. Only Exit 2 receives Evidenced and
+owner-accepted status; D-P6-003 selects a recovery contract and later Level 2
+boundary only. Every other exit, clearance, support, schema,
+oracle-retirement, budget, packaging, release and later-phase decision remains
+separately controlled.

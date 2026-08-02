@@ -233,8 +233,73 @@ The export layer keeps the existing safety model:
 4. Write into a hidden staging location.
 5. Validate bounds, scale, topology, manifest entries, and recorded
    output-affecting package/rights dependencies.
-6. Commit the complete output set atomically.
-7. Roll back failures and clean transient geometry.
+6. Commit the complete output set atomically or, for an explicitly accepted
+   bounded protocol, complete it monotonically under that protocol's named
+   invariants.
+7. Apply the accepted transaction's failure rules and clean transient
+   geometry without claiming authority over foreign or published state.
+
+#### D-P6-003 cross-process recovery authority
+
+For the bounded B16 Entry/Exit DXF-and-manifest pair, D-P6-003 selects a strict
+add-only, journal-free monotonic-completion protocol. Recovery authority is
+constructive, not destructive: a later process may add an absent deterministic
+member, but TrackTemplate never removes foreign, uncertain or published
+destination state.
+
+Each invocation recomputes the exact expected pair from current signed inputs,
+binds the real destination directory by descriptor and prepares unpublished
+payloads in anonymous, creation-bound descriptors. Before publication, failure
+is abandoned only by closing those owned anonymous descriptors. Historical
+journals, temporary-journal links and stage artifacts are inert foreign
+residue: they are not opened, parsed, modified, deleted or used to permit or
+block final-set completion. Inspecting an existing final for type and exactness
+does not grant authority to delete, replace or otherwise mutate its pathname.
+The two final names alone have these outcomes:
+
+- when neither exists, add each absent final pathname without overwrite from
+  its synchronised anonymous descriptor;
+- when exactly one exact regular member exists, preserve it unchanged and add
+  only its missing exact counterpart;
+- when both exact regular members exist, independently revalidate and reuse
+  the pair; and
+- on a mismatch, symbolic link, non-regular member, collision, replay,
+  substitution, inconsistency or ambiguous observation, fail closed without
+  further mutation.
+
+Publication remains descriptor-relative and no-overwrite, with directory
+synchronisation. The first successful final link permanently ends rollback:
+no published final may thereafter be unlinked, renamed, rewritten, truncated,
+replaced or otherwise claimed by TrackTemplate. Authenticating or verifying a
+pathname does not create authority to delete it, and POSIX pathname deletion
+has no expected-inode atomic condition. A race or other failure discovered
+after an addition therefore leaves the exact partial or complete output set
+untouched and reports failure truthfully. A later invocation may add only an
+absent exact counterpart, and success may be reported only after the complete
+final pair is independently revalidated as exact. Unsupported host or
+filesystem primitives fail closed.
+
+`destination_changed`, `cleanup_complete`, `recoverable` and related
+diagnostics describe the state actually retained. `recoverable=True` requires
+an independently revalidated exact zero-member, partial or complete destination
+with safe retry or remaining add-only authority; ambiguity, mismatch, uncertain
+durability or an unsupported primitive is not recoverable. Any successful
+addition sets `destination_changed=True`, and any surviving published final on
+a failed invocation sets `cleanup_complete=False`. Closing all unpublished
+anonymous descriptors does not imply that a partial published set was rolled
+back.
+Content equivalence establishes compatibility for reuse or completion only;
+it never establishes ownership, deletion or replacement authority.
+
+This contract preserves the final filenames, DXF and manifest bytes, manifest
+schema and contract IDs, two-file layout and `reuse-identical-or-fail` policy.
+That policy applies per final member: preserve an identical regular member,
+create only its absent deterministic counterpart and fail on any non-identical
+or non-regular existing member. It deliberately refines one collision outcome:
+a lone exact regular final member may be completed instead of rejected. The
+implementation and focused interruption/recovery proof remain a later bounded
+Level 2 tranche; Exit 3 remains Pending until a fresh Level 3
+evidence-admission decision.
 
 ## Chair-definition and procedural-geometry contract
 
