@@ -673,12 +673,12 @@ def validate_current_evidence_mutations() -> None:
 
     exit3_row = table_row_containing(
         evidence,
-        "condition 6 still requires a fresh Level 3 evidence-admission review",
+        "conditions 1 and 3 remain open",
     )
     exit3_promoted = replace_once(
         exit3_row,
-        "Pending — technical evidence",
-        "Evidenced — technical evidence",
+        "Pending — conditions 1 and 3 remain open",
+        "Evidenced — conditions 1 and 3 remain open",
     )
     expect_rejected(
         "phase-evidence/exit3-prematurely-evidenced",
@@ -717,12 +717,12 @@ def validate_current_evidence_mutations() -> None:
 
     recovery_transaction_row = table_row_containing(
         evidence,
-        "durable journal, file and directory synchronisation",
+        "no independently trusted creation authority",
     )
     recovery_transaction_accepted = replace_once(
         recovery_transaction_row,
-        "not yet admitted by a Level 3 panel",
-        "accepted as satisfying Exit 3",
+        "**Open technical gap**",
+        "Present and accepted as satisfying Exit 3",
     )
     expect_rejected(
         "phase-evidence/exit3-recovery-evidence-self-accepted",
@@ -737,6 +737,122 @@ def validate_current_evidence_mutations() -> None:
             ),
         ),
         "Exit 3 recovery evidence status drifted or implied acceptance",
+    )
+
+    preexisting_controls_weakened = replace_once(
+        evidence,
+        "preserved unchanged and rejected as\nunclaimable",
+        "parsed and removed when their content matches",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-preexisting-controls-preservation-weakened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            preexisting_controls_weakened,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    interruption_recovery_overclaimed = replace_once(
+        evidence,
+        "They do not claim automatic recovery",
+        "They prove automatic recovery",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-interruption-recovery-overclaimed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            interruption_recovery_overclaimed,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    control_metadata_weakened = replace_once(
+        evidence,
+        "including access time",
+        "excluding access time",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-foreign-control-atime-omitted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            control_metadata_weakened,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    staging_preservation_weakened = replace_once(
+        evidence,
+        "preserves the foreign directory, every\n"
+        "file, their identities, metadata and bytes",
+        "may delete the foreign directory or matching files",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-staging-ownership-preservation-weakened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            staging_preservation_weakened,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    staging_creation_ownership_weakened = replace_once(
+        evidence,
+        "`O_TMPFILE`, captures the device/inode identity immediately from the "
+        "descriptor\nreturned by that creation operation",
+        "a pathname-created file whose identity is first observed later",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-staging-atomic-ownership-weakened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            staging_creation_ownership_weakened,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    journal_creation_ownership_weakened = replace_once(
+        evidence,
+        "journal is also created anonymously and linked\nfrom its still-open "
+        "descriptor",
+        "journal is created at a pathname and reopened later",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-journal-atomic-ownership-weakened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            journal_creation_ownership_weakened,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    staging_path_cleanup_reintroduced = replace_once(
+        evidence,
+        "Normal stage cleanup is descriptor close; there is no staging "
+        "pathname or\ndirectory removal",
+        "Normal stage cleanup removes a pathname-created directory",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-staging-path-cleanup-reintroduced",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            staging_path_cleanup_reintroduced,
+        ),
+        "Phase 6 staging-ownership repair evidence drifted",
     )
 
     exit4_row = table_row_containing(

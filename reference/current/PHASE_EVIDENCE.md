@@ -476,25 +476,26 @@ descriptor and performs journal, staging, inspection, hard-link commit,
 rollback and cleanup operations relative to that descriptor. A versioned
 internal journal is published and synchronised before the owned staging
 directory exists. Staged files and directories are synchronised before commit;
-each final link and the recovered complete set are synchronised before success.
-On the next invocation, a byte-complete interrupted pair is retained and
-reused, while an identity-matched partial pair is rolled back before a fresh
-commit. A changed file, unsafe entry or ambiguous ownership fails closed and
-retains the journal/staging evidence rather than deleting an unowned path.
+each final link is synchronised before success. The original implementation
+also attempted next-invocation rollback or complete-set reuse from a persisted
+journal. The later ownership reviews recorded below showed that a
+first-observed journal cannot prove its own or an output file's creation
+ownership, so that automatic recovery claim is withdrawn.
 
 The standalone validator passed with
 `Phase 6 transition DXF export validation passed`. It terminates a child
-process immediately after the first and second final links, then proves the
-one-file state is ownership-checked, rolled back and recreated and the complete
-two-file state is adopted byte-for-byte. It also replaces the requested
+process immediately after the first and second final links. At the original
+source state it observed one-file rollback/recreation and complete-pair reuse,
+but those observations did not establish creation-bound authority for the
+persisted journal and are not current recovery evidence. It also replaces the requested
 directory with a symbolic link during exact validation, after the first link
 and after transaction cleanup, proving the redirected directory receives no
 file and the bound original directory is rolled back and cleaned. Abrupt
 termination after the first late-identity rollback unlink retains newly
-published journal and staging controls; the next invocation rolls back the
-partial pair and completes a fresh commit. Existing deterministic repeat,
-zero-length, collision, cancellation, staged-failure and ambiguous-ownership
-proofs remain green.
+published journal and staging controls. The corrected proof below requires
+every later invocation to preserve and reject that first-observed residue.
+Existing deterministic repeat, zero-length, collision, cancellation,
+staged-failure and in-process rollback proofs remain green.
 
 The qualified FreeCAD 1.1.1 profile passed with
 `Phase 6 transition DXF qualified FreeCAD validation passed`. In addition to
@@ -506,15 +507,16 @@ document or Undo/Redo history. The stable command and sentinel are now owned by
 
 | Exit 3 required-before-exit condition | Present evidence after this tranche |
 | --- | --- |
-| Recoverable DXF-and-manifest transaction | Present — durable journal, file and directory synchronisation plus next-invocation rollback or complete-set reuse; not yet admitted by a Level 3 panel |
+| Recoverable DXF-and-manifest transaction | **Open technical gap** — durable live-invocation controls and in-process rollback are present, but no independently trusted creation authority supports cross-process automatic recovery |
 | Descriptor-relative rename and symbolic-link control | Present — all transaction operations use the bound directory descriptor and focused replacement proofs fail closed; not yet admitted by a Level 3 panel |
-| Interruption, partial-commit and recovery proof | Present — abrupt one-link and two-link child-process termination proofs pass; not yet admitted by a Level 3 panel |
+| Interruption, partial-commit and recovery proof | **Open technical gap** — abrupt one-link and two-link termination now prove exact residue preservation and fail-closed rejection, not automatic recovery |
 | Qualified zero-length `POINT` import | Present — qualified FreeCAD imports one exact vertex and restores host state; not yet admitted by a Level 3 panel |
 | Durable qualified command and sentinel | Present in `reference/VALIDATION.md`; not yet admitted by a Level 3 panel |
 | Fresh Level 3 evidence-admission review | **Open** — required before Exit 3 can be recommended or accepted |
 
-The interruption harness proves recovery after abrupt process termination, not
-a physical power-cut or every filesystem failure mode. The descriptor controls
+The interruption harness proves preservation after abrupt process termination,
+not automatic recovery, a physical power-cut or every filesystem failure mode.
+The descriptor controls
 and directory synchronisation are qualified only on the accepted Linux/FreeCAD
 profile; the advisory lock serialises cooperating exporter calls, while
 detected same-user interference is handled fail-closed and active racing is
@@ -524,6 +526,95 @@ physical-output clearance, `project-cleared` status, performance improvement,
 legacy retirement, packaging, release or Exit 3 acceptance is claimed. Phase 6
 therefore remains 1/5 with Exit 3 Pending. PR-09, PR-13, PR-16 and QA-R03 retain
 their recorded states; no risk treatment or effectiveness changes.
+
+## B16 Entry/Exit staging-ownership repair
+
+This bounded Level 2 repair starts from protected `main` at
+`284695784004320d541cd3fc5def4369e43c7f5c`. The fresh Exit 3 evidence-
+admission panel reproduced one implementation defect: after recovery but
+before staging creation, a foreign directory could appear at the deterministic
+stage name with the exact expected filenames and bytes. `mkdir` then failed
+before the exporter captured identity, but live cleanup treated matching
+content as ownership and deleted the foreign directory while reporting
+complete cleanup. The panel therefore recommended **Do not proceed** for Exit
+3 at that source state.
+
+The first repair candidate at
+`25360f23fc8393517d8c3ab7145cf7812193dc94` correctly refused a pre-existing
+stage, but fresh exact-head review found a remaining `mkdir`-to-first-open
+ownership interval. A targeted disposable probe replaced the newly created
+directory during that interval with a same-user foreign directory containing
+the exact expected filenames and bytes. The candidate deleted the foreign
+state and falsely reported `destination_changed=False`,
+`cleanup_complete=True` and `recoverable=True`. Content equivalence, owner UID,
+permissions and an inode first observed after creation do not establish
+creation ownership.
+
+The first independent review of the anonymous-file candidate found the same
+principle still violated by cross-process recovery. A pre-existing, valid v2
+journal could self-report the live snapshot of one foreign final file; the next
+invocation trusted that first-observed record and deleted both the foreign file
+and journal. A lone v1 journal was preserved but read before rejection, which
+changed its access time. The candidate was therefore blocked again before
+publication. There is no independently trusted cross-process root by which a
+same-user writable destination can distinguish such a journal from one created
+by an earlier invocation.
+
+The supported Python/POSIX surface has no operation that both creates a
+directory and returns its descriptor atomically, so another pathname check
+cannot close that interval. The corrected candidate eliminates directory
+staging. It creates each output in an anonymous regular staging file with
+`O_TMPFILE`, captures the device/inode identity immediately from the descriptor
+returned by that creation operation, then writes, synchronises and validates
+the same descriptor. The internal v2 interruption journal records the exact
+creation-bound snapshots. That journal is also created anonymously and linked
+from its still-open descriptor before `linkat(AT_EMPTY_PATH)` commits either
+output file; `.new` remains only a reserved ambiguity detector.
+Normal stage cleanup is descriptor close; there is no staging pathname or
+directory removal. At invocation start, any existing journal, temporary-journal
+link or legacy deterministic stage pathname is detected by descriptor-relative
+non-reading metadata inspection, preserved unchanged and rejected as
+unclaimable. Only controls created and identity-bound during the live
+invocation may enter its in-process cleanup.
+
+The retained public-export regression fails against `25360f23...` because the
+foreign directory is deleted and the false diagnostic is returned. Against the
+corrected candidate, substitution before atomic staging, during durable journal
+binding and immediately before cleanup preserves the foreign directory, every
+file, their identities, metadata and bytes. No final output survives, and no
+file appears in the process working directory; the diagnostic reports
+`destination_changed=True`,
+`cleanup_complete=False` and `recoverable=False`; and a later invocation again
+fails closed without altering the foreign state. A normal invocation proves
+both anonymous files have zero links before commit and cleans them without any
+directory-removal call. Existing cancellation, injected failure, one- and two-
+link interruption, in-process rollback, rename, symbolic-link, deterministic-
+reuse and collision cases remain passing. The interruption cases now prove
+that one-file, two-file and late-rollback residue plus its journal remain exact
+and are rejected on the next invocation. They do not claim automatic recovery.
+Focused foreign-control cases likewise preserve a self-attesting v2 journal,
+matching partial DXF, lone v1 journal and `.new` control, including access time,
+without reading their content or creating working-directory files.
+
+The focused standalone exporter validator passes with
+`Phase 6 transition DXF export validation passed`. The final DXF and manifest
+names, bytes and public schema, collision policy, qualified-import contract and
+deliberately `unknown` project status remain unchanged. The earlier qualified
+FreeCAD import evidence is retained evidence rather than a fresh host run; this
+repair changes internal filesystem transaction behaviour, not the imported DXF
+contract. Filesystems or hosts without the required anonymous-file and
+descriptor-link primitives fail closed. All pre-existing transaction-control
+residue remains preserved for external disposition rather than unsafe
+automatic recovery. An independently trusted recoverable transaction protocol
+and corresponding interruption/recovery proof therefore remain open Exit 3
+technical gaps.
+
+This repair supplies present technical evidence only. It does not accept Exit
+3, satisfy the required fresh post-repair Level 3 evidence-admission panel,
+alter another exit or risk state, or grant GUI, operator, production, physical-
+output, `project-cleared`, equivalence, legacy-retirement, packaging or release
+authority. Phase 6 remains 1/5 with Exit 2 alone Evidenced and owner-accepted;
+Exit 3 remains Pending.
 
 <a id="current-phase-6-exit-condition-disposition"></a>
 
@@ -535,7 +626,7 @@ The accepted current state is 1/5 under D-P6-002:
 | --- | --- |
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
-| Export is deterministic and failure-safe | Pending — technical evidence now addresses required conditions 1–5, but condition 6 still requires a fresh Level 3 evidence-admission review and owner decision |
+| Export is deterministic and failure-safe | Pending — conditions 1 and 3 remain open because no independently trusted cross-process recovery protocol or proof exists; conditions 2, 4 and 5 retain bounded evidence; condition 6 requires a fresh Level 3 evidence-admission review only after the technical gaps close |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
