@@ -1,7 +1,7 @@
 # Phase 6 Explicit Exact-Validation and Export Seam Evidence
 
-Status: **Current — opened at 0/5 under D-P6-001 on 2026-08-01. No
-Phase 6 exit is evidenced or accepted.**
+Status: **Current — 1/5 evidenced. Exit 2 was owner-accepted under D-P6-002
+on 2026-08-02; exits 1, 3, 4 and 5 remain Pending.**
 
 Phase 5 closed at 4/4 under D-P5-003 on 2026-08-01. Its complete accepted
 evidence, decisions and risk snapshot are frozen in the
@@ -138,9 +138,10 @@ standalone CI profile passed 55/55 validators.
 This tranche creates no `Part` geometry, target-format writer, dependency
 manifest, file output, editable-document mutation, persisted property or
 schema, GUI command, production clearance, product tolerance default, legacy
-retirement or exit acceptance. All five Phase 6 exits therefore remain
-Pending; transient exact FreeCAD geometry, transactional private-development
-export and complete edit-through-export performance remain separate work.
+retirement or exit acceptance. At tranche retention all five Phase 6 exits
+therefore remained Pending; D-P6-002 later accepts only Exit 2. Transient exact
+FreeCAD geometry, transactional private-development export and complete
+edit-through-export performance remained separate work.
 
 ## B16 Entry/Exit transient exact geometry
 
@@ -186,8 +187,9 @@ The writer emits one open `LWPOLYLINE`, or one `POINT` at zero length, beside a
 schema-v1 output dependency manifest whose canonical-model digest and artifact
 hashes are independently checkable. Hidden staging, no-overwrite collision
 handling, byte-identical reuse, identity-checked commit rollback and
-ownership-aware cleanup keep the two-file operation failure-safe without
-mutating canonical or editable-document state.
+ownership-aware cleanup contain the tested in-process failure paths without
+mutating canonical or editable-document state. They do not make the two-file
+commit crash-atomic or close a pathname race.
 
 The standalone proof independently parsed the DXF group codes and ordered
 coordinates; accepted the manifest only as `unknown`; rejected it under
@@ -210,8 +212,9 @@ and deterministic, failure-safe export only. It selects no product-wide format
 roster, adds no operator/GUI or migration route, persisted schema, retained
 shape, production or physical-output clearance, `project-cleared` status,
 performance budget, legacy retirement, Phase 6 exit or later-phase authority.
-The current 0/5 exit disposition therefore remains unchanged pending separate
-owner acceptance and the remaining complete edit/Validate/Export evidence.
+At tranche retention the 0/5 exit disposition therefore remained unchanged
+pending separate owner acceptance. D-P6-002 later accepts Exit 2 only; Exit 3
+remains Pending with the required-before-exit conditions recorded below.
 
 <a id="product-vision-and-execution-governance-panel"></a>
 
@@ -306,7 +309,8 @@ execution boundaries recorded here. The resulting decision is:
 
 ## B16 Entry/Exit edit-through-export performance
 
-This exit-closing Level 2 evidence tranche starts from protected-main merge
+This bounded Level 2 performance-evidence tranche starts from protected-main
+merge
 `a5b6a79bf3e73e1673d440077bd65000986bb4c7`. It changes no product source. A
 test-owned profiler composes the accepted two-object Entry/Exit editor, the
 explicit exact-validation contract and transient FreeCAD wire, and the
@@ -346,21 +350,130 @@ explicit Validate, export-from-validated and complete-journey slots for this
 slice, improving PR-15/QA-R04 decision readiness without changing their
 Partial controls. It accepts no numerical budget, B14 equivalence, output
 clearance, product capacity, operator route, legacy retirement or Phase 6
-exit; the formal disposition remains 0/5 Pending.
+exit. Under D-P6-002, Phase 6 remains 1/5 with Exit 2 alone Evidenced and
+owner-accepted; this evidence does not satisfy Exit 4, which remains Pending.
+
+<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>
+
+## Phase 6 Exits 2 and 3 evidence-admission panel and owner decision
+
+**Decision and exact source state:** This Level 3 evidence-admission panel
+applies to accepted `main` at
+`a5b6a79bf3e73e1673d440077bd65000986bb4c7`, the merge commit for
+[PR #31](https://github.com/Richard-Gnitnub/tracktemplate/pull/31). It assesses
+only Exit 2, “No transient production objects leak into the editable document”,
+and Exit 3, “Export is deterministic and failure-safe”. Before the owner
+decision all Phase 6 exits remained Pending at 0/5. PR #33 performance evidence
+and the working tree on its draft branch were excluded.
+
+**Participants, roles and independence:** Richard is project owner, panel chair
+and accepting authority. Codex presented the repository evidence and is the
+acceptance-alignment change owner. Separate fresh read-only quality and
+engineering risk reviewers, neither of whom implemented PR #30 or PR #31,
+challenged the panel evidence and independently agreed that Exit 2 was
+sufficiently evidenced while Exit 3 was not. The panel review was read-only;
+this later alignment changes control documentation and its fail-closed
+validator only.
+
+**Evidence reviewed:** The panel reviewed the exact accepted source and tests
+from [PR #30](https://github.com/Richard-Gnitnub/tracktemplate/pull/30) and PR
+#31, their successful protected standalone CI runs, the retained 56/56 local
+standalone result, the qualified FreeCAD 1.1.1/OpenCASCADE 7.8.1 success,
+cancellation, injected-failure, cleanup, deterministic-reuse, collision and
+rollback records, the exact/export architecture, current risks and output-
+status controls. Established qualified FreeCAD proofs were not repeated, and
+no GUI or operator proof was admitted.
+
+**Exit 2 evidence admitted:** The signed exact adapter creates its sole
+`Part::Feature` only in a UUID-named hidden temporary document whose identity
+and ownership are checked before cleanup. It returns a signed numeric receipt,
+not a `Part.Shape`. Qualified evidence covers success, deterministic repeat,
+zero length, active and inactive document-name collisions, ambiguous ownership,
+nested construction, cancellation, cancellation-check failure and injected
+Part-build failure. Existing documents, objects, tested properties, filenames,
+active-document state and Undo/Redo history remain unchanged. PR #31 also
+proves that export stops when cleanup is incomplete.
+
+**Exit 2 retained limitations:** The acceptance is confined to the assessed B16
+Entry/Exit exact-validation and export routes. It does not cover GUI observers,
+retained shapes, wider template families, operator workflows or product-wide
+behaviour. Host-close failure or post-creation registry interference may leave
+a separate temporary document while reporting `cleanup_complete=False` and
+producing no output. The qualified-host raw stdout/status artifact and an
+executable final-harness red replay against the pre-repair source were not
+retained. These are accepted evidence limitations and do not widen or negate
+the literal bounded criterion.
+
+**Exit 3 evidence and finding:** Deterministic DXF/manifest bytes, hashes and
+filenames, byte-identical reuse, independent DXF parsing, non-zero qualified
+FreeCAD import, collision refusal, cancellation, staged-failure handling and
+caught in-process rollback remain valid bounded evidence. They are
+insufficient for Exit 3 because the files commit through sequential hard links
+without crash recovery or durable directory commit, path operations are not
+descriptor-relative, the zero-length `POINT` lacks qualified import evidence,
+and the qualified command/sentinel is not durably registered.
+
+**Exit 3 required-before-exit conditions:**
+
+| Accountable owner | Deadline | Condition |
+| --- | --- | --- |
+| Export transaction owner | Before another Exit 3 panel | Provide atomic durable commit or an explicit recoverable transaction protocol for the DXF-and-manifest set. |
+| Export path-safety owner | Before another Exit 3 panel | Provide descriptor-relative path control sufficient to address rename and symbolic-link races. |
+| Export validation owner | Before another Exit 3 panel | Provide focused interruption, partial-commit and recovery evidence. |
+| Qualified FreeCAD validation owner | Before another Exit 3 panel | Import and validate the zero-length DXF `POINT` in the qualified FreeCAD profile. |
+| Validation-document owner | Before another Exit 3 panel | Register the qualified command and required success sentinel durably in `reference/VALIDATION.md`. |
+| Phase owner and independent reviewers | After the preceding conditions pass | Conduct a fresh Level 3 evidence-admission review before any Exit 3 acceptance. |
+
+**Risk disposition:** PR-09 remains Critical/Remove/Partial; PR-13 remains
+Critical/Mitigate/Effective (current scope); PR-16 remains
+High/Mitigate/Partial; and QA-R03 remains High/Remove/Partial. PR-22 remains
+Effective (current scope) because independent challenge and owner decision are
+separate. No risk treatment or control-effectiveness value changes.
+
+**Panel recommendation:** Exit 2 was **Proceed with bounded conditions** and
+sufficient to recommend `Evidenced`. Exit 3 was **Do not proceed** and must
+remain Pending. There was no dissent between the independent reviewers.
+
+**Governance-budget exception:** This task transfers one phase-exit authority,
+so its Level 3 evidence, decision, dashboard and executable status-control
+changes necessarily exceed its zero product-source lines. It changes no frozen
+history, product behaviour, risk register or validation contract.
+
+**Owner decision and resulting authority:** On 2026-08-02 Richard explicitly
+accepted the panel recommendation. The resulting decision is:
+
+> **D-P6-002 — Accept Phase 6 Exit 2 and retain Exit 3 Pending**
+>
+> At accepted `main` source state
+> `a5b6a79bf3e73e1673d440077bd65000986bb4c7`, accept Phase 6 Exit 2,
+> “No transient production objects leak into the editable document”, as
+> `Evidenced` and owner-accepted only for the accepted B16 Entry/Exit transition
+> exact-validation and export routes assessed by this panel. Phase 6 advances
+> from 0/5 to 1/5. Exit 3 remains Pending until its six recorded
+> required-before-exit conditions are satisfied and a fresh Level 3
+> evidence-admission review recommends acceptance.
+>
+> No Phase 6 exit 1, 3, 4 or 5; production or physical-output clearance;
+> `project-cleared` status; output equivalence; product-wide export roster;
+> GUI or operator workflow; persisted or retained exact geometry; whole-B14 or
+> whole-layout parity; legacy retirement; performance acceptance; packaging or
+> release authority; or risk downgrade is granted. The export remains
+> private-development with deliberately `unknown` project status, and PR #33
+> performance evidence does not satisfy Exit 4.
 
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
 
-The accepted opening state is 0/5. No row is partly evidenced or accepted:
+The accepted current state is 1/5 under D-P6-002:
 
 | Exit condition | Current disposition |
 | --- | --- |
-| The selected slice has equivalent exact validation and production output for the agreed scope | Pending — no Phase 6 evidence admitted |
-| No transient production objects leak into the editable document | Pending — no Phase 6 evidence admitted |
-| Export is deterministic and failure-safe | Pending — no Phase 6 evidence admitted |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — no Phase 6 evidence admitted |
-| The legacy path remains available until parity and project-owner acceptance permit removal | Pending — no Phase 6 evidence admitted |
+| The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
+| No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
+| Export is deterministic and failure-safe | Pending — deterministic output and handled in-process rollback are evidenced, but the six required-before-exit conditions remain open |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
+| The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
 ## Carried controls and exclusions
 
@@ -377,6 +490,6 @@ switch children to accumulate.
 The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json); D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
-D-P6-001 and D-GOV-005. Those decisions create only the authority quoted above;
-every exit, clearance, support, schema, oracle-retirement, budget, packaging,
-release and later-phase decision remains separately controlled.
+D-P6-001, D-GOV-005 and D-P6-002. Only Exit 2 receives the authority quoted
+above; every other exit, clearance, support, schema, oracle-retirement, budget,
+packaging, release and later-phase decision remains separately controlled.
