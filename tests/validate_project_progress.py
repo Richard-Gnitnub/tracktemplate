@@ -167,9 +167,10 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "limitations"
     ),
     (
-        "Pending — technical evidence now addresses required conditions 1–5, "
-        "but condition 6 still requires a fresh Level 3 evidence-admission "
-        "review and owner decision"
+        "Pending — conditions 1 and 3 remain open because no independently "
+        "trusted cross-process recovery protocol or proof exists; conditions "
+        "2, 4 and 5 retain bounded evidence; condition 6 requires a fresh "
+        "Level 3 evidence-admission review only after the technical gaps close"
     ),
     (
         "Pending — PR #33 accounts for complete cold/warm Edit, Validate and "
@@ -241,9 +242,9 @@ EXPECTED_EXIT3_RECOVERY_ROWS = {
     "Recoverable DXF-and-manifest transaction": [
         "Recoverable DXF-and-manifest transaction",
         (
-            "Present — durable journal, file and directory synchronisation "
-            "plus next-invocation rollback or complete-set reuse; not yet "
-            "admitted by a Level 3 panel"
+            "Open technical gap — durable live-invocation controls and "
+            "in-process rollback are present, but no independently trusted "
+            "creation authority supports cross-process automatic recovery"
         ),
     ],
     "Descriptor-relative rename and symbolic-link control": [
@@ -257,8 +258,9 @@ EXPECTED_EXIT3_RECOVERY_ROWS = {
     "Interruption, partial-commit and recovery proof": [
         "Interruption, partial-commit and recovery proof",
         (
-            "Present — abrupt one-link and two-link child-process termination "
-            "proofs pass; not yet admitted by a Level 3 panel"
+            "Open technical gap — abrupt one-link and two-link termination now "
+            "prove exact residue preservation and fail-closed rejection, not "
+            "automatic recovery"
         ),
     ],
     "Qualified zero-length POINT import": [
@@ -811,6 +813,7 @@ def _validate_exit_conditions(
         and "versioned internal journal" in recovery_flat
         and "immediately after the first and second final links"
         in recovery_flat
+        and "automatic recovery claim is withdrawn" in recovery_flat
         and (
             "Phase 6 transition DXF qualified FreeCAD validation passed"
         )
@@ -839,25 +842,44 @@ def _validate_exit_conditions(
     _require(
         "284695784004320d541cd3fc5def4369e43c7f5c"
         in staging_repair_section
+        and "25360f23fc8393517d8c3ab7145cf7812193dc94"
+        in staging_repair_section
         and "recommended **Do not proceed** for Exit 3"
         in staging_repair_flat
-        and "metadata and bytes remain unchanged" in staging_repair_flat
+        and "remaining `mkdir`-to-first-open ownership interval"
+        in staging_repair_flat
+        and "Content equivalence" in staging_repair_flat
+        and "O_TMPFILE" in staging_repair_section
+        and "linkat(AT_EMPTY_PATH)" in staging_repair_section
+        and "internal v2 interruption journal" in staging_repair_flat
+        and "journal is also created anonymously and linked from its "
+        "still-open descriptor" in staging_repair_flat
+        and "`.new` remains only a reserved ambiguity detector"
+        in staging_repair_flat
+        and "no staging pathname or directory removal"
+        in staging_repair_flat
+        and "identities, metadata and bytes" in staging_repair_flat
         and "destination_changed=True" in staging_repair_section
         and "cleanup_complete=False" in staging_repair_section
         and "recoverable=False" in staging_repair_section
-        and "no output is produced" in staging_repair_flat
-        and "never returns a null created-stage descriptor"
+        and "No final output survives" in staging_repair_flat
+        and "file appears in the process working directory"
         in staging_repair_flat
-        and (
-            "re-verifies its device/inode identity at the pathname "
-            "immediately before directory removal"
-        )
+        and "both anonymous files have zero links before commit"
         in staging_repair_flat
-        and "the process working directory remains untouched"
+        and "valid v2 journal" in staging_repair_flat
+        and "changed its access time" in staging_repair_flat
+        and "descriptor-relative non-reading metadata inspection"
         in staging_repair_flat
-        and "the exact committed output pair is identity-checked and "
-        "rolled back"
+        and "preserved unchanged and rejected as unclaimable"
         in staging_repair_flat
+        and "matching partial DXF" in staging_repair_flat
+        and "lone v1 journal and `.new` control" in staging_repair_flat
+        and "including access time" in staging_repair_flat
+        and "do not claim automatic recovery" in staging_repair_flat
+        and "All pre-existing transaction-control residue remains preserved"
+        in staging_repair_flat
+        and "remain open Exit 3 technical gaps" in staging_repair_flat
         and (
             "Phase 6 remains 1/5 with Exit 2 alone Evidenced and "
             "owner-accepted; Exit 3 remains Pending"
