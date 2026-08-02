@@ -113,7 +113,12 @@ EXPECTED_PHASE5_DECISION_IDS = {
     "D-P5-002",
     "D-P5-003",
 }
-EXPECTED_PHASE6_DECISION_IDS = {"D-P6-001", "D-GOV-005", "D-P6-002"}
+EXPECTED_PHASE6_DECISION_IDS = {
+    "D-P6-001",
+    "D-GOV-005",
+    "D-P6-002",
+    "D-P6-003",
+}
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
     "open Phase 6 at 0/5 for bounded exact-validation and export-seam work "
@@ -155,6 +160,63 @@ EXPECTED_EXIT2_EXCLUSIONS = (
     "The export remains private-development with deliberately `unknown` "
     "project status, and PR #33 performance evidence does not satisfy Exit 4."
 )
+EXPECTED_EXIT3_RECOVERY_DECISION = (
+    "Select strict add-only, journal-free monotonic completion for Exit 3 "
+    "recovery."
+)
+EXPECTED_EXIT3_RECOVERY_AUTHORITY = (
+    "At accepted `main` source state "
+    "`cee78cff84618c6a5be3be99714682f5822c814f`, select strict add-only, "
+    "journal-free monotonic completion as the required cross-process "
+    "recovery-authority contract for the bounded B16 Entry/Exit "
+    "DXF-and-manifest pair. A later bounded Level 2 tranche is authorised to "
+    "recompute the exact expected pair, create unpublished payloads only in "
+    "anonymous creation-bound descriptors, abandon unpublished work only by "
+    "closing those descriptors, inspect existing finals without acquiring "
+    "mutation authority, and publish only by adding an absent final pathname "
+    "without overwrite. The first successful final link permanently ends "
+    "rollback. No published final may be unlinked, renamed, rewritten, "
+    "truncated or replaced; authenticating or verifying a pathname does not "
+    "grant deletion authority, and POSIX pathname deletion has no "
+    "expected-inode atomic condition. After any post-publication failure, all "
+    "published finals are preserved, including any exact partial or complete "
+    "output pair. A later invocation may add only an absent exact counterpart, "
+    "and success may be reported only after the complete final pair is "
+    "independently revalidated as exact. Mismatch, non-regular finals, symbolic "
+    "links, collision, replay, substitution, inconsistency, ambiguity or "
+    "unsupported primitives fail closed without further mutation. Foreign or "
+    "uncertain destination state is never removed, and `cleanup_complete`, "
+    "`recoverable`, `destination_changed` and related diagnostics must describe "
+    "the state actually retained. `recoverable=True` is permitted only after "
+    "independently revalidating an exact zero-member, partial or complete "
+    "destination with safe retry or remaining add-only authority; ambiguity, "
+    "mismatch, uncertain durability or an unsupported primitive remains "
+    "non-recoverable. Any successful addition requires "
+    "`destination_changed=True`, and any surviving published final on a failed "
+    "invocation requires `cleanup_complete=False`. Identical complete-pair "
+    "reuse, deterministic filenames and bytes, manifest schema and contract "
+    "IDs, the two-file layout, no-overwrite behaviour and "
+    "`reuse-identical-or-fail` collision refusal remain unchanged; one exact "
+    "regular partial member may now be completed rather than treated as a "
+    "collision. "
+    "Phase 6 remains 1/5 and Exit 3 remains Pending until implementation, "
+    "focused interruption/recovery evidence and a fresh Level 3 "
+    "evidence-admission review."
+)
+EXPECTED_EXIT3_RECOVERY_EXCLUSIONS = (
+    "No product code is changed by this decision. It does not mark Exit 3 or "
+    "another exit `Evidenced` or owner-accepted; grant production, "
+    "physical-output, `project-cleared`, equivalence, GUI, operator, "
+    "wider-family, performance, legacy-retirement, packaging or release "
+    "authority; or change a risk state. It does not authorise "
+    "post-publication unlink, rename, rewrite, truncation, replacement or "
+    "pathname-based rollback; reading or deleting pre-existing controls; "
+    "mutation of any foreign or uncertain destination state; deriving deletion "
+    "authority from equality, metadata or pathname verification; changing "
+    "output names/bytes/schema/layout, contract/result IDs or the "
+    "collision-policy value; or adding a trust service, generic storage "
+    "framework or runtime dependency."
+)
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
         "Pending — exact-validation and private-development DXF evidence "
@@ -167,10 +229,11 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "limitations"
     ),
     (
-        "Pending — conditions 1 and 3 remain open because no independently "
-        "trusted cross-process recovery protocol or proof exists; conditions "
-        "2, 4 and 5 retain bounded evidence; condition 6 requires a fresh "
-        "Level 3 evidence-admission review only after the technical gaps close"
+        "Pending — D-P6-003 selects a strict add-only, journal-free monotonic "
+        "recovery contract, but condition 1 lacks implementation and "
+        "condition 3 lacks focused proof; conditions 2, 4 and 5 retain bounded "
+        "evidence; condition 6 requires a fresh Level 3 evidence-admission "
+        "review only after those gaps close"
     ),
     (
         "Pending — PR #33 accounts for complete cold/warm Edit, Validate and "
@@ -500,6 +563,41 @@ def _section(text: str, heading: str) -> str:
     return tail if next_heading is None else tail[:next_heading.start()]
 
 
+def _validate_transition_export_validation(validation: str) -> None:
+    """Keep the current command evidence distinct from D-P6-003 authority."""
+    validation_flat = " ".join(validation.split())
+    _require(
+        (
+            ".venv/bin/python "
+            "tests/validate_phase6_transition_dxf_export.py"
+        )
+        in validation
+        and (
+            "flatpak run --command=FreeCADCmd org.freecad.FreeCAD \\\n"
+            "  tests/freecad_validate_phase6_transition_dxf_export.py"
+        )
+        in validation
+        and (
+            "Phase 6 transition DXF qualified FreeCAD validation passed"
+        )
+        in validation
+        and "preservation and next-invocation rejection of unclaimable residue"
+        in validation_flat
+        and "nor prove automatic cross-process recovery"
+        in validation_flat
+        and (
+            "D-P6-003 selects strict add-only, journal-free monotonic "
+            "completion for a later bounded Level 2 implementation and "
+            "focused proof"
+        )
+        in validation_flat
+        and "these current commands do not prove that future contract"
+        in validation_flat,
+        "the transition DXF command, sentinel or recovery-evidence boundary "
+        "is missing",
+    )
+
+
 def _validate_plan_programme(plan: str) -> None:
     """Bind programme and horizon claims to the dashboard preamble."""
     preamble = direct_section_content(plan, "Project Plan", level=1)
@@ -762,9 +860,15 @@ def _validate_exit_conditions(
         "D-P6-002 accepts only the bounded transient-object Exit 2"
         in plan_flat
         and "advances Phase 6 to 1/5" in plan_flat
-        and "Exit 3 remains Pending with six required-before-exit conditions"
+        and "D-P6-003 selects strict add-only, journal-free monotonic "
+        "completion" in plan_flat
+        and "authorises its later bounded Level 2 implementation" in plan_flat
+        and "Exit 3 remains Pending with condition 1 unimplemented"
+        in plan_flat
+        and "condition 3 unproved" in plan_flat
+        and "fresh condition 6 evidence-admission panel still required"
         in plan_flat,
-        "Phase 6 Exit 2 acceptance or Exit 3 boundary is missing",
+        "Phase 6 Exit 2 acceptance or Exit 3 contract boundary is missing",
     )
 
     current_flat = " ".join(current_evidence.split())
@@ -887,24 +991,109 @@ def _validate_exit_conditions(
         in staging_repair_flat,
         "Phase 6 staging-ownership repair evidence drifted",
     )
-    validation = _read(VALIDATION_PATH)
-    _require(
-        (
-            ".venv/bin/python "
-            "tests/validate_phase6_transition_dxf_export.py"
-        )
-        in validation
-        and (
-            "flatpak run --command=FreeCADCmd org.freecad.FreeCAD \\\n"
-            "  tests/freecad_validate_phase6_transition_dxf_export.py"
-        )
-        in validation
-        and (
-            "Phase 6 transition DXF qualified FreeCAD validation passed"
-        )
-        in validation,
-        "the durable transition DXF command or qualified sentinel is missing",
+    recovery_contract_heading = (
+        "Phase 6 Exit 3 recovery-authority contract panel and owner decision"
     )
+    _require(
+        '<a id="phase-6-exit-3-recovery-authority-contract-panel"></a>\n\n'
+        "## "
+        + recovery_contract_heading
+        in current_evidence,
+        "D-P6-003 panel anchor or heading association is missing",
+    )
+    recovery_contract_section = direct_section_content(
+        current_evidence,
+        recovery_contract_heading,
+    )
+    recovery_contract_flat = " ".join(recovery_contract_section.split())
+    for required_contract_clause in (
+        "strict add-only, journal-free monotonic completion",
+        "unpublished payloads in anonymous, creation-bound descriptors",
+        "Before publication, abandonment consists only of closing owned "
+        "anonymous descriptors",
+        "Publication may only add an absent deterministic final pathname",
+        "No published final file may be unlinked, renamed, rewritten, "
+        "truncated, replaced",
+        "Pathname-based rollback ends permanently at the first successful "
+        "final link",
+        "After any post-publication failure, every published final is "
+        "preserved",
+        "A later invocation may add only an absent exact counterpart",
+        "inspection grants no deletion or replacement authority",
+        "Success is reported only after the complete final pair and required "
+        "durability state are independently revalidated as exact",
+        "Substitution, ambiguity, collision, replay, inconsistency",
+        "A race discovered after an addition leaves every published file "
+        "untouched",
+        "`cleanup_complete`, `recoverable`, `destination_changed`",
+        "`recoverable=True` requires an independently revalidated exact "
+        "zero-member, partial or complete destination",
+        "A surviving published final on a failed invocation requires "
+        "`cleanup_complete=False`",
+        "Identical complete-pair reuse, deterministic bytes and filenames",
+        "host or filesystem without every required anonymous-file",
+        "authenticating or verifying a pathname does not create authority to "
+        "delete it",
+        "POSIX pathname deletion has no expected-inode atomic condition",
+        "cross-process recovery means safe monotonic completion, not "
+        "destructive cleanup",
+        "foreign or uncertain destination state is never removed by "
+        "TrackTemplate",
+        "inert foreign residue",
+        "presence neither permits nor blocks final-set completion",
+        "Content equivalence establishes compatibility for reuse or addition "
+        "only",
+        "an exact regular partial pair may be completed instead of rejected",
+        "collision policy is therefore defined per final member",
+        "no accepted consumer treats exact-partial collision failure as a "
+        "required outcome",
+        "No material owner choice remains",
+        "automatic recovery is not present",
+        "prove pre-publication descriptor abandonment, interruption after "
+        "each addition, post-addition races and next-invocation monotonic "
+        "completion",
+        "Phase 6 remains 1/5",
+        "Exit 3 remains Pending",
+        "no risk state, treatment or effectiveness changes",
+        "tracktemplate/adapters/export/transition_dxf.py",
+        "tracktemplate/application/transition_export.py",
+        "must stop without publication",
+        "freeze both export contract/result IDs",
+        "identical output fingerprints and `created` result signatures",
+        "generic storage framework or runtime dependency",
+    ):
+        _require(
+            required_contract_clause in recovery_contract_flat,
+            "D-P6-003 recovery-authority contract or status boundary drifted",
+        )
+    _require_paragraph(
+        recovery_contract_section,
+        (
+            "Panel recommendation: Proceed with bounded conditions. The "
+            "fresh filesystem-security and architecture/API reviewers accept "
+            "the strict add-only contract and later Level 2 boundary; the "
+            "governance and staff-level quality review finds no status, "
+            "evidence or authority contradiction. No material owner choice or "
+            "dissent remains."
+        ),
+        "D-P6-003 panel recommendation drifted",
+    )
+    recovery_contract_quoted = _blockquote_paragraphs(
+        recovery_contract_section
+    )
+    _require(
+        recovery_contract_quoted
+        == [
+            _semantic_text(
+                "D-P6-003 — Select strict add-only, journal-free monotonic "
+                "completion for Exit 3 recovery"
+            ),
+            _semantic_text(EXPECTED_EXIT3_RECOVERY_AUTHORITY),
+            _semantic_text(EXPECTED_EXIT3_RECOVERY_EXCLUSIONS),
+        ],
+        "D-P6-003 exact owner decision drifted or was relocated",
+    )
+    _validate_transition_export_validation(_read(VALIDATION_PATH))
     current_section = _section(
         current_evidence,
         "Current Phase 6 exit-condition disposition",
@@ -1236,7 +1425,7 @@ def _validate_decisions(plan: str) -> None:
             record["decided_on"]
             == (
                 "2026-08-02"
-                if decision_id == "D-P6-002"
+                if decision_id in {"D-P6-002", "D-P6-003"}
                 else "2026-08-01"
             )
             and record["status"] == "Accepted"
@@ -1303,6 +1492,23 @@ def _validate_decisions(plan: str) -> None:
         and exit2_record["evidence"] == exit2_panel
         and exit2_record["panel_record"] == exit2_panel,
         "D-P6-002 authority, exclusions or panel routing drifted",
+    )
+    recovery_contract_record = phase6_by_id["D-P6-003"]
+    recovery_contract_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-3-recovery-authority-contract-panel"
+    )
+    _require(
+        recovery_contract_record["decision"]
+        == EXPECTED_EXIT3_RECOVERY_DECISION
+        and recovery_contract_record["authority"]
+        == EXPECTED_EXIT3_RECOVERY_AUTHORITY
+        and recovery_contract_record["exclusions"]
+        == EXPECTED_EXIT3_RECOVERY_EXCLUSIONS
+        and recovery_contract_record["evidence"] == recovery_contract_panel
+        and recovery_contract_record["panel_record"]
+        == recovery_contract_panel,
+        "D-P6-003 authority, exclusions or panel routing drifted",
     )
     current_records = document["decisions"]
     _require(
@@ -1796,6 +2002,65 @@ def _validate_architecture_direction(architecture: str) -> None:
                 clause.split(" — ", 1)[0]
             ),
         )
+    recovery_section = direct_section_content(
+        architecture,
+        "D-P6-003 cross-process recovery authority",
+        level=4,
+    )
+    recovery_semantic = _semantic_text(recovery_section)
+    for required_clause in (
+        "strict add-only, journal-free monotonic-completion protocol",
+        "Recovery authority is constructive, not destructive",
+        "unpublished payloads in anonymous, creation-bound descriptors",
+        "Before publication, failure is abandoned only by closing those owned "
+        "anonymous descriptors",
+        "not opened, parsed, modified, deleted or used to permit or block "
+        "final-set completion",
+        "when exactly one exact regular member exists, preserve it unchanged "
+        "and add only its missing exact counterpart",
+        "on a mismatch, symbolic link, non-regular member, collision, replay, "
+        "substitution, inconsistency or ambiguous observation, fail closed "
+        "without further mutation",
+        "The first successful final link permanently ends rollback",
+        "no published final may thereafter be unlinked, renamed, rewritten, "
+        "truncated, replaced",
+        "Authenticating or verifying a pathname does not create authority to "
+        "delete it",
+        "POSIX pathname deletion has no expected-inode atomic condition",
+        "A later invocation may add only an absent exact counterpart",
+        "success may be reported only after the complete final pair is "
+        "independently revalidated as exact",
+        "Unsupported host or filesystem primitives fail closed",
+        "diagnostics describe the state actually retained",
+        "recoverable=True requires an independently revalidated exact "
+        "zero-member, partial or complete destination",
+        "any surviving published final on a failed invocation sets "
+        "cleanup_complete=False",
+        "Content equivalence establishes compatibility for reuse or "
+        "completion only; it never establishes ownership, deletion or "
+        "replacement authority",
+        "one collision outcome: a lone exact regular final member may be "
+        "completed instead of rejected",
+        "That policy applies per final member",
+        "Exit 3 remains Pending",
+    ):
+        _require(
+            required_clause in recovery_semantic,
+            "architecture D-P6-003 recovery contract drifted",
+        )
+    export_section = direct_section_content(
+        architecture,
+        "6. Export adapter",
+        level=3,
+    )
+    _require(
+        "Commit the complete output set atomically or, for an explicitly "
+        "accepted bounded protocol, complete it monotonically under that "
+        "protocol's named invariants" in _semantic_text(export_section)
+        and "without claiming authority over foreign or published state"
+        in _semantic_text(export_section),
+        "architecture export commit contract drifted",
+    )
 
 
 def _validate_capability_matrix(matrix: str) -> None:

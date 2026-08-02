@@ -725,8 +725,13 @@ The standalone proof covers deterministic DXF and dependency-manifest bytes,
 descriptor-relative destination control, rename and symbolic-link replacement,
 durable journal/staging/directory synchronisation, abrupt interruption after
 one and both commit links and after the first late-identity rollback unlink,
-ownership-checked rollback or complete-set reuse, collision refusal and
-cleanup. Its sentinel is
+preservation and next-invocation rejection of unclaimable residue, the current
+verify-then-unlink rollback path, complete exact-set reuse, collision refusal
+and cleanup. They neither establish an expected-inode atomic pathname deletion
+primitive nor prove automatic cross-process recovery. D-P6-003 selects strict
+add-only, journal-free monotonic completion for a later bounded Level 2
+implementation and focused proof; these current commands do not prove that
+future contract. The standalone sentinel is
 `Phase 6 transition DXF export validation passed`. The qualified FreeCAD proof
 imports both the non-zero `LWPOLYLINE` and zero-length `POINT`, and repeats
 document isolation, cancellation, injected failure and rollback checks. Its

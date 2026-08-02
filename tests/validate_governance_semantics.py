@@ -223,7 +223,7 @@ def validate_product_vision_mutations() -> None:
 
 
 def validate_architecture_mutations() -> None:
-    """Keep one complete D-GOV-005 record inside its owning table."""
+    """Keep accepted direction and recovery authority in their owning units."""
     architecture = read("reference/ARCHITECTURE.md")
     row = table_row_containing(architecture, "D-GOV-005-B")
     record_diagnostic = "architecture D-GOV-005-B semantic record drifted"
@@ -322,6 +322,81 @@ def validate_architecture_mutations() -> None:
         ),
         set_diagnostic,
     )
+
+    recovery_cases = (
+        (
+            "architecture/exit3-recovery-made-destructive",
+            replace_once(
+                architecture,
+                "Recovery authority is\nconstructive, not destructive",
+                "Recovery authority is\ndestructive, not constructive",
+            ),
+        ),
+        (
+            "architecture/exit3-inert-controls-given-authority",
+            replace_once(
+                architecture,
+                "not opened, parsed, modified, deleted or used to permit or\n"
+                "block final-set completion",
+                "opened and deleted to permit or\n"
+                "block final-set completion",
+            ),
+        ),
+        (
+            "architecture/exit3-content-becomes-removal-authority",
+            replace_once(
+                architecture,
+                "it never establishes ownership, deletion or replacement "
+                "authority",
+                "it establishes ownership, deletion and replacement "
+                "authority",
+            ),
+        ),
+        (
+            "architecture/exit3-post-link-rollback-reintroduced",
+            replace_once(
+                architecture,
+                "The first successful final link permanently ends rollback",
+                "The first successful final link permits pathname rollback",
+            ),
+        ),
+        (
+            "architecture/exit3-expected-inode-delete-invented",
+            replace_once(
+                architecture,
+                "POSIX pathname deletion\nhas no expected-inode atomic "
+                "condition",
+                "POSIX pathname deletion\nhas an expected-inode atomic "
+                "condition",
+            ),
+        ),
+        (
+            "architecture/exit3-published-final-mutation-authorised",
+            replace_once(
+                architecture,
+                "no published final may thereafter be unlinked, renamed, "
+                "rewritten, truncated,\nreplaced",
+                "a published final may thereafter be unlinked, renamed, "
+                "rewritten, truncated,\nreplaced",
+            ),
+        ),
+        (
+            "architecture/exit3-prematurely-accepted",
+            replace_once(
+                architecture,
+                "Exit 3 remains Pending",
+                "Exit 3 is accepted",
+            ),
+        ),
+    )
+    for name, mutated in recovery_cases:
+        expect_rejected(
+            name,
+            lambda value=mutated: progress._validate_architecture_direction(
+                value
+            ),
+            "architecture D-P6-003 recovery contract drifted",
+        )
 
 
 def validate_capability_matrix_mutations() -> None:
@@ -673,12 +748,13 @@ def validate_current_evidence_mutations() -> None:
 
     exit3_row = table_row_containing(
         evidence,
-        "conditions 1 and 3 remain open",
+        "D-P6-003 selects a strict add-only, journal-free monotonic recovery "
+        "contract",
     )
     exit3_promoted = replace_once(
         exit3_row,
-        "Pending — conditions 1 and 3 remain open",
-        "Evidenced — conditions 1 and 3 remain open",
+        "Pending — D-P6-003 selects",
+        "Evidenced — D-P6-003 selects",
     )
     expect_rejected(
         "phase-evidence/exit3-prematurely-evidenced",
@@ -853,6 +929,159 @@ def validate_current_evidence_mutations() -> None:
             staging_path_cleanup_reintroduced,
         ),
         "Phase 6 staging-ownership repair evidence drifted",
+    )
+
+    inert_controls_trusted = replace_once(
+        evidence,
+        "presence\nneither permits nor blocks final-set completion",
+        "presence\nauthorises deletion and blocks final-set completion",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-inert-controls-given-authority",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            inert_controls_trusted,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
+    )
+
+    equality_becomes_deletion_authority = replace_once(
+        evidence,
+        "Content equivalence\n"
+        "establishes compatibility for reuse or addition only; it never "
+        "grants\nownership, deletion or replacement authority",
+        "Content equivalence establishes ownership\n"
+        "and grants deletion and replacement authority",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-equality-becomes-deletion-authority",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            equality_becomes_deletion_authority,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
+    )
+
+    post_link_rollback_reintroduced = replace_once(
+        evidence,
+        "Pathname-based rollback ends permanently at the first successful "
+        "final\n   link",
+        "Pathname-based rollback remains available after the first successful "
+        "final\n   link",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-post-link-rollback-reintroduced",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            post_link_rollback_reintroduced,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
+    )
+
+    expected_inode_delete_invented = replace_once(
+        evidence,
+        "POSIX pathname deletion has no expected-inode atomic condition",
+        "POSIX pathname deletion has an expected-inode atomic condition",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-expected-inode-delete-invented",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            expected_inode_delete_invented,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
+    )
+
+    published_mutation_authorised = replace_once(
+        evidence,
+        "No published final file may be unlinked, renamed, rewritten, "
+        "truncated,\n   replaced",
+        "A published final file may be unlinked, renamed, rewritten, "
+        "truncated,\n   replaced",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-published-final-mutation-authorised",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            published_mutation_authorised,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
+    )
+
+    race_cleanup_authorised = replace_once(
+        evidence,
+        "A race discovered after an addition leaves every published file "
+        "untouched",
+        "A race discovered after an addition permits published-file cleanup",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-race-cleanup-authorised",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            race_cleanup_authorised,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
+    )
+
+    zero_member_recovery_excluded = replace_once(
+        evidence,
+        "an independently revalidated exact zero-member, partial or complete "
+        "destination",
+        "an independently revalidated exact partial or complete destination",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-zero-member-recovery-excluded",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            zero_member_recovery_excluded,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
+    )
+
+    partial_completion_withdrawn = replace_once(
+        evidence,
+        "an exact regular partial pair may be completed instead of rejected",
+        "an exact regular partial pair must remain unrecoverable",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-monotonic-completion-withdrawn",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            partial_completion_withdrawn,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
+    )
+
+    owner_choice_reopened = replace_once(
+        evidence,
+        "No material owner choice\nremains",
+        "A material owner choice\nremains",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-owner-choice-reopened-after-decision",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            owner_choice_reopened,
+        ),
+        "D-P6-003 recovery-authority contract or status boundary drifted",
     )
 
     exit4_row = table_row_containing(
@@ -1050,6 +1279,50 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan Phase 6 exit states drifted",
     )
+
+    recovery_decision_row = table_row_containing(plan, "| D-P6-003 |")
+    expect_rejected(
+        "project-plan/d-p6-003-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, recovery_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
+
+
+def validate_transition_export_validation_mutations() -> None:
+    """Reject promotion of current interruption checks into D-P6-003 proof."""
+    validation = read("reference/VALIDATION.md")
+    diagnostic = (
+        "the transition DXF command, sentinel or recovery-evidence boundary "
+        "is missing"
+    )
+    cases = (
+        (
+            "validation/exit3-current-command-claims-automatic-recovery",
+            replace_once(
+                validation,
+                "nor prove automatic cross-process recovery",
+                "and prove automatic cross-process recovery",
+            ),
+        ),
+        (
+            "validation/exit3-future-contract-claimed-by-current-command",
+            replace_once(
+                validation,
+                "these current commands do not prove that\nfuture contract",
+                "these current commands prove that\nfuture contract",
+            ),
+        ),
+    )
+    for name, mutated in cases:
+        expect_rejected(
+            name,
+            lambda value=mutated: (
+                progress._validate_transition_export_validation(value)
+            ),
+            diagnostic,
+        )
 
 
 def validate_agents_mutations() -> None:
@@ -1358,6 +1631,7 @@ def main() -> None:
     validate_capability_matrix_mutations()
     validate_current_evidence_mutations()
     validate_project_plan_mutations()
+    validate_transition_export_validation_mutations()
     validate_agents_mutations()
     validate_chief_mutations()
     validate_ontology_mutation()
