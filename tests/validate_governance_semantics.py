@@ -502,8 +502,8 @@ def validate_capability_matrix_mutations() -> None:
 
     spacing_export = replace_once(
         spacing_row,
-        "A — no accepted modular export",
-        "C — accepted modular export",
+        "P — private-development DXF only",
+        "C — production-cleared modular export",
     )
     expect_rejected(
         "capability-matrix/spacing-transition-modular-export-claimed",
@@ -633,9 +633,9 @@ def validate_current_evidence_mutations() -> None:
     )
     competing_authority = replace_once(
         evidence,
-        '<a id="current-phase-6-exit-condition-disposition"></a>',
+        '<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>',
         competing_quote
-        + '<a id="current-phase-6-exit-condition-disposition"></a>',
+        + '<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>',
     )
     expect_rejected(
         "phase-evidence/competing-contradictory-authority-blockquote",
@@ -643,6 +643,116 @@ def validate_current_evidence_mutations() -> None:
             competing_authority
         ),
         authority_diagnostic,
+    )
+
+    plan = read("reference/PROJECT_PLAN.md")
+    phase4_closeout = read(
+        "reference/history/phase-closeouts/PHASE4_CLOSEOUT.md"
+    )
+    phase5_closeout = read(
+        "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md"
+    )
+    exit2_row = table_row_containing(
+        evidence,
+        "Evidenced and owner-accepted under D-P6-002",
+    )
+    exit2_downgraded = replace_once(
+        exit2_row,
+        "Evidenced and owner-accepted under D-P6-002",
+        "Pending",
+    )
+    expect_rejected(
+        "phase-evidence/exit2-acceptance-downgraded",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(evidence, exit2_row, exit2_downgraded),
+        ),
+        "Phase 6 exits do not match the accepted 1/5 dispositions",
+    )
+
+    exit3_row = table_row_containing(
+        evidence,
+        "the six required-before-exit conditions remain open",
+    )
+    exit3_promoted = replace_once(
+        exit3_row,
+        "Pending — deterministic output",
+        "Evidenced — deterministic output",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-prematurely-evidenced",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(evidence, exit3_row, exit3_promoted),
+        ),
+        "Phase 6 exits do not match the accepted 1/5 dispositions",
+    )
+
+    transaction_condition = table_row_containing(
+        evidence,
+        "Provide atomic durable commit",
+    )
+    weakened_transaction_condition = replace_once(
+        transaction_condition,
+        "atomic durable commit or an explicit recoverable transaction protocol",
+        "best-effort sequential commit",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-transaction-condition-weakened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                transaction_condition,
+                weakened_transaction_condition,
+            ),
+        ),
+        "Exit 3 required-before-exit conditions drifted",
+    )
+
+    recommendation_inverted = replace_once(
+        evidence,
+        "**Panel recommendation:** Exit 2 was **Proceed with bounded conditions**",
+        "**Panel recommendation:** Exit 2 was **Do not proceed**",
+    )
+    expect_rejected(
+        "phase-evidence/exit2-panel-recommendation-inverted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            recommendation_inverted,
+        ),
+        "D-P6-002 panel recommendation drifted",
+    )
+
+    exit2_authority = blockquote_paragraph_containing(
+        evidence,
+        "At accepted `main` source state",
+    )
+    authority_removed = replace_once(evidence, exit2_authority, "")
+    authority_relocated = replace_once(
+        authority_removed,
+        '<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>',
+        exit2_authority
+        + "\n\n"
+        + '<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>',
+    )
+    expect_rejected(
+        "phase-evidence/exit2-owner-authority-relocated-outside-panel",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            authority_relocated,
+        ),
+        "D-P6-002 panel exact owner decision drifted or was relocated",
     )
 
 
@@ -703,6 +813,43 @@ def validate_project_plan_mutations() -> None:
         "project-plan/programme-clause-in-unrelated-nested-section",
         lambda: progress._validate_plan_programme(nested_programme),
         diagnostic,
+    )
+
+    phase6_row = table_row_containing(
+        plan,
+        "| 6 | Explicit exact-validation and export seam",
+    )
+    phase6_zero = replace_once(
+        phase6_row,
+        "1/5 evidenced",
+        "0/5 evidenced",
+    )
+    expect_rejected(
+        "project-plan/phase6-count-returned-to-zero",
+        lambda: progress._validate_plan_shape(
+            replace_once(plan, phase6_row, phase6_zero)
+        ),
+        "Phase 6 must remain current at the accepted 1/5 state",
+    )
+
+    exit2_row = table_row_containing(
+        plan,
+        "Evidenced — owner-accepted 2026-08-02",
+    )
+    exit2_pending = replace_once(
+        exit2_row,
+        "Evidenced — owner-accepted 2026-08-02",
+        "Pending",
+    )
+    expect_rejected(
+        "project-plan/exit2-returned-to-pending",
+        lambda: progress._validate_exit_conditions(
+            replace_once(plan, exit2_row, exit2_pending),
+            read("reference/history/phase-closeouts/PHASE4_CLOSEOUT.md"),
+            read("reference/history/phase-closeouts/PHASE5_CLOSEOUT.md"),
+            read("reference/current/PHASE_EVIDENCE.md"),
+        ),
+        "project-plan Phase 6 exit states drifted",
     )
 
 

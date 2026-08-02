@@ -4,10 +4,11 @@ Status: **current repository-evidence map for product planning; not phase,
 migration-family, output-clearance or release acceptance.**
 
 This matrix compares the accepted legacy baseline with the modular B16
-checkpoint destined for the Addon. It was reconciled on 2026-08-01 against
-accepted `main` at `61237508b0c1fefedcf740afd230e5e563acab3e`, the frozen
-Phase 1 inventory and Phase 5 closeout, and current Phase 6 evidence. Draft PR
-#31 is not counted as accepted Addon capability.
+checkpoint destined for the Addon. It was reconciled on 2026-08-02 against
+accepted `main` at `a5b6a79bf3e73e1673d440077bd65000986bb4c7`, the frozen
+Phase 1 inventory and Phase 5 closeout, and current Phase 6 evidence. PR #31's
+private-development DXF slice is present; D-P6-002 accepts only the bounded
+transient-object exit, not export failure safety or output clearance.
 
 The Addon column describes the modular `tracktemplate` implementation, not an
 installable or production-ready Addon claim. Formal phase status remains in
@@ -33,11 +34,11 @@ is absent.
 | Capability | Legacy macro baseline | Current Addon | Canonical state | Coin presentation | Exact geometry | Export | Persistence | Accepted fixture or evidence | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Straight track | C — bounded straight/station workflow | A | A | A | A | A | A | [Phase 1 workflow inventory](phase-evidence/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory); [straight/station series](benchmarks/2026-07-20-b14-straight-station-workflow-series.md) | Partial |
-| Curves | C — bounded curve/easement create, edit and output oracles | P — Entry/Exit transition slice only | P — transition-state v1 only | P — transition centreline only | P — transition centreline only | A | P — transition records only | [Phase 1 workflow contract](contracts/phase1-workflow-coverage.json); [Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md); [Phase 6 evidence](current/PHASE_EVIDENCE.md) | Partial |
-| Euler transitions | C — accepted B14/B15 calculation and workflow evidence | C — bounded B16 Entry/Exit slice | C — signed transition-state v1 boundary | C — accepted bounded centreline view | C — transient exact centreline | A | C — bounded transition records | [Transition pilot](contracts/phase1-transition-pilot.json); [Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md); [Phase 6 evidence](current/PHASE_EVIDENCE.md) | Partial |
+| Curves | C — bounded curve/easement create, edit and output oracles | P — Entry/Exit transition slice only | P — transition-state v1 only | P — transition centreline only | P — transition centreline only | P — private-development DXF only | P — transition records only | [Phase 1 workflow contract](contracts/phase1-workflow-coverage.json); [Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md); [Phase 6 evidence](current/PHASE_EVIDENCE.md) | Partial |
+| Euler transitions | C — accepted B14/B15 calculation and workflow evidence | C — bounded B16 Entry/Exit slice | C — signed transition-state v1 boundary | C — accepted bounded centreline view | C — transient exact centreline | P — private-development DXF only | C — bounded transition records | [Transition pilot](contracts/phase1-transition-pilot.json); [Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md); [Phase 6 evidence](current/PHASE_EVIDENCE.md) | Partial |
 | Multiple parallel tracks | C — fixed two-track fixture | P — fixture-only Entry/Exit records for one secondary track | P | P — representative pair only | P — transition records only | A | P | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md#representative-multi-object-selection-and-edit-tranche) | Partial |
 | General track widening | P — B14 source contains a general track/platform-widening route; no dedicated accepted general-widening fixture was found | A — spacing-transition evidence does not establish general widening | A for general widening | A for general widening | A for general widening | A | A for general widening | [B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 workflow inventory](phase-evidence/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory) | Partial |
-| Spacing-matched Entry/Exit transitions | C — accepted spacing-matched secondary plain-line Entry/Exit fixture | P — fixture-only accepted Entry/Exit slice | P — transition-state v1 records derived from start/curve/finish spacing | P — bounded transition centreline pair only | P — transient transition centrelines only | A — no accepted modular export | P — bounded transition records only | [Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md#exact-family-support-enablement); [Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md#representative-multi-object-selection-and-edit-tranche); [Phase 6 evidence](current/PHASE_EVIDENCE.md#b16-entryexit-transient-exact-geometry) | Partial |
+| Spacing-matched Entry/Exit transitions | C — accepted spacing-matched secondary plain-line Entry/Exit fixture | P — fixture-only accepted Entry/Exit slice | P — transition-state v1 records derived from start/curve/finish spacing | P — bounded transition centreline pair only | P — transient transition centrelines only | P — private-development DXF only | P — bounded transition records only | [Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md#exact-family-support-enablement); [Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md#representative-multi-object-selection-and-edit-tranche); [Phase 6 evidence](current/PHASE_EVIDENCE.md#phase-6-exits-2-and-3-evidence-admission-panel) | Partial |
 | Turnouts | C — bounded REA C10 lifecycle oracle | A | A | A | A | A | A | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [turnout series](benchmarks/2026-07-20-b14-standalone-turnout-workflow-series.md) | Partial |
 | Crossovers | C — bounded XO-001 geometry and lifecycle evidence | A | A | A | A | A | A | [Crossover feasibility contract](contracts/phase1-crossover-feasibility.json); [workflow coverage contract](contracts/phase1-workflow-coverage.json) | Partial |
 | Sleepers and turnout timbers | C — bounded automatic crossover-timbering evidence | A | A | A | A | A | A | [Timbering contract](contracts/phase1-crossover-timbering.json); [Phase 1 workflow inventory](phase-evidence/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory) | Partial |
@@ -46,7 +47,7 @@ is absent.
 | Platforms | P — substantial B14 source exists; the accepted inventory retains physical platform and wider-workflow gaps | A | A | A | A | A | A | [B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 workflow inventory](phase-evidence/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory) | Partial |
 | Formation boards | P — substantial B14 source exists; no dedicated accepted formation-board migration fixture was found | A | A | A | A | A | A | [B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 inventory](phase-evidence/PHASE1_INVENTORY.md) | Partial |
 | SVG | C — fixed plain-line selected and Generate-path output oracles | A | P — bounded transition intent exists, not an SVG output contract | — | P — centreline-only exact seam | A | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [selected-export series](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md) | Partial |
-| DXF | C — fixed plain-line selected and Generate-path output oracles | A on accepted `main`; draft PR #31 is unaccepted | P — bounded transition intent exists | — | P — transient transition centreline | A on accepted `main` | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [current Phase 6 evidence](current/PHASE_EVIDENCE.md) | Partial |
+| DXF | C — fixed plain-line selected and Generate-path output oracles | P — private-development Entry/Exit writer only | P — bounded transition intent exists | — | P — transient transition centreline | P — deterministic output with failure-safe exit still Pending | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [current Phase 6 evidence](current/PHASE_EVIDENCE.md#phase-6-exits-2-and-3-evidence-admission-panel) | Partial |
 | STL | C — fixed plain-line legacy output oracle | A | A for solids/meshes | — | A for required production solids/meshes | A | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [create-time export series](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md) | Partial |
 | STEP | C — fixed plain-line legacy output oracle | A | A for B-rep production scope | — | A for required production B-reps | A | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [create-time export series](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md) | Partial |
 | Calibrated map or image reference layers | U | F | F | F | — | U | F | [Product vision](PRODUCT_VISION.md#subsequent-programme-tracktemplate-layout-editor); no accepted implementation fixture found | Future |
@@ -64,9 +65,11 @@ slice, not a shared renderer, complete curve family or whole layout. A legacy
 `C` does not mean that the capability has migrated.
 
 The spacing-matched Entry/Exit row is confined to the accepted bounded
-centreline and transition-record slice. It does not establish general track
-widening, a shared renderer, complete rail, sleeper/timber or chair
-presentation, manufacturing geometry, modular export or a Phase 6 exit.
+centreline, transition-record and private-development DXF slice. It does not
+establish general track widening, a shared renderer, complete rail,
+sleeper/timber or chair presentation, manufacturing geometry, output
+equivalence, production clearance or any Phase 6 exit beyond D-P6-002's
+bounded transient-object acceptance.
 
 Update this matrix only from accepted repository evidence. Use `U` when a
 source search or general product description cannot establish a tested
