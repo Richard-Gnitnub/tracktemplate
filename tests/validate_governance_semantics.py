@@ -673,12 +673,12 @@ def validate_current_evidence_mutations() -> None:
 
     exit3_row = table_row_containing(
         evidence,
-        "the six required-before-exit conditions remain open",
+        "condition 6 still requires a fresh Level 3 evidence-admission review",
     )
     exit3_promoted = replace_once(
         exit3_row,
-        "Pending — deterministic output",
-        "Evidenced — deterministic output",
+        "Pending — technical evidence",
+        "Evidenced — technical evidence",
     )
     expect_rejected(
         "phase-evidence/exit3-prematurely-evidenced",
@@ -689,6 +689,54 @@ def validate_current_evidence_mutations() -> None:
             replace_once(evidence, exit3_row, exit3_promoted),
         ),
         "Phase 6 exits do not match the accepted 1/5 dispositions",
+    )
+
+    recovery_review_row = table_row_containing(
+        evidence,
+        "required before Exit 3 can be recommended or accepted",
+    )
+    recovery_review_closed = replace_once(
+        recovery_review_row,
+        "**Open** — required before Exit 3 can be recommended or accepted",
+        "Evidenced — no further review required",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-recovery-review-prematurely-closed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                recovery_review_row,
+                recovery_review_closed,
+            ),
+        ),
+        "Exit 3 recovery evidence status drifted or implied acceptance",
+    )
+
+    recovery_transaction_row = table_row_containing(
+        evidence,
+        "durable journal, file and directory synchronisation",
+    )
+    recovery_transaction_accepted = replace_once(
+        recovery_transaction_row,
+        "not yet admitted by a Level 3 panel",
+        "accepted as satisfying Exit 3",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-recovery-evidence-self-accepted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                recovery_transaction_row,
+                recovery_transaction_accepted,
+            ),
+        ),
+        "Exit 3 recovery evidence status drifted or implied acceptance",
     )
 
     exit4_row = table_row_containing(

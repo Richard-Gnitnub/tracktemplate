@@ -461,6 +461,70 @@ accepted the panel recommendation. The resulting decision is:
 > private-development with deliberately `unknown` project status, and PR #33
 > performance evidence does not satisfy Exit 4.
 
+<a id="b16-entry-exit-durable-dxf-recovery"></a>
+
+## B16 Entry/Exit durable DXF recovery
+
+This bounded Level 2 tranche starts from protected `main` at
+`7acdab4f925592d49394960c76f7552e1b47be9d`. It changes only the accepted
+Entry/Exit private-development DXF route and its validation. The existing DXF
+and manifest names, bytes, schema, collision policy, deliberately `unknown`
+project status and transient exact-geometry boundary remain unchanged.
+
+The exporter now locks and binds the validated output directory to one real
+descriptor and performs journal, staging, inspection, hard-link commit,
+rollback and cleanup operations relative to that descriptor. A versioned
+internal journal is published and synchronised before the owned staging
+directory exists. Staged files and directories are synchronised before commit;
+each final link and the recovered complete set are synchronised before success.
+On the next invocation, a byte-complete interrupted pair is retained and
+reused, while an identity-matched partial pair is rolled back before a fresh
+commit. A changed file, unsafe entry or ambiguous ownership fails closed and
+retains the journal/staging evidence rather than deleting an unowned path.
+
+The standalone validator passed with
+`Phase 6 transition DXF export validation passed`. It terminates a child
+process immediately after the first and second final links, then proves the
+one-file state is ownership-checked, rolled back and recreated and the complete
+two-file state is adopted byte-for-byte. It also replaces the requested
+directory with a symbolic link during exact validation, after the first link
+and after transaction cleanup, proving the redirected directory receives no
+file and the bound original directory is rolled back and cleaned. Abrupt
+termination after the first late-identity rollback unlink retains newly
+published journal and staging controls; the next invocation rolls back the
+partial pair and completes a fresh commit. Existing deterministic repeat,
+zero-length, collision, cancellation, staged-failure and ambiguous-ownership
+proofs remain green.
+
+The qualified FreeCAD 1.1.1 profile passed with
+`Phase 6 transition DXF qualified FreeCAD validation passed`. In addition to
+the existing non-zero `LWPOLYLINE`, isolation, cancellation and injected
+rollback checks, FreeCAD imported the zero-length `POINT` as one vertex at the
+exact bounded coordinate without changing the editable document, active
+document or Undo/Redo history. The stable command and sentinel are now owned by
+[`VALIDATION.md`](../VALIDATION.md#verified-commands-and-ci).
+
+| Exit 3 required-before-exit condition | Present evidence after this tranche |
+| --- | --- |
+| Recoverable DXF-and-manifest transaction | Present — durable journal, file and directory synchronisation plus next-invocation rollback or complete-set reuse; not yet admitted by a Level 3 panel |
+| Descriptor-relative rename and symbolic-link control | Present — all transaction operations use the bound directory descriptor and focused replacement proofs fail closed; not yet admitted by a Level 3 panel |
+| Interruption, partial-commit and recovery proof | Present — abrupt one-link and two-link child-process termination proofs pass; not yet admitted by a Level 3 panel |
+| Qualified zero-length `POINT` import | Present — qualified FreeCAD imports one exact vertex and restores host state; not yet admitted by a Level 3 panel |
+| Durable qualified command and sentinel | Present in `reference/VALIDATION.md`; not yet admitted by a Level 3 panel |
+| Fresh Level 3 evidence-admission review | **Open** — required before Exit 3 can be recommended or accepted |
+
+The interruption harness proves recovery after abrupt process termination, not
+a physical power-cut or every filesystem failure mode. The descriptor controls
+and directory synchronisation are qualified only on the accepted Linux/FreeCAD
+profile; the advisory lock serialises cooperating exporter calls, while
+detected same-user interference is handled fail-closed and active racing is
+not prevented. No GUI or
+operator workflow, broader template family, output equivalence, production or
+physical-output clearance, `project-cleared` status, performance improvement,
+legacy retirement, packaging, release or Exit 3 acceptance is claimed. Phase 6
+therefore remains 1/5 with Exit 3 Pending. PR-09, PR-13, PR-16 and QA-R03 retain
+their recorded states; no risk treatment or effectiveness changes.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -471,7 +535,7 @@ The accepted current state is 1/5 under D-P6-002:
 | --- | --- |
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
-| Export is deterministic and failure-safe | Pending — deterministic output and handled in-process rollback are evidenced, but the six required-before-exit conditions remain open |
+| Export is deterministic and failure-safe | Pending — technical evidence now addresses required conditions 1–5, but condition 6 still requires a fresh Level 3 evidence-admission review and owner decision |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 

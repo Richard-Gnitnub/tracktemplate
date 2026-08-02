@@ -8,7 +8,6 @@ import json
 import math
 import os
 import pathlib
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -158,6 +157,16 @@ def _assert_no_staging(path):
     assert not any(
         item.name.startswith(".tracktemplate-transition-dxf-")
         for item in path.iterdir()
+    )
+
+
+def _transaction_artifacts(path):
+    return tuple(
+        sorted(
+            item.name
+            for item in path.iterdir()
+            if item.name.startswith(".tracktemplate-transition-dxf-")
+        )
     )
 
 
@@ -749,6 +758,412 @@ def _validate_cancellation_stale_geometry_and_destination_change():
         _assert_no_staging(output)
 
 
+def _validate_descriptor_relative_rename_controls():
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        output = root / "output"
+        moved = root / "moved-output"
+        redirect = root / "redirect"
+        output.mkdir()
+        redirect.mkdir()
+        marker = output / "operator-owned.txt"
+        marker.write_text("unchanged", encoding="utf-8")
+        baseline = _directory_snapshot(output)
+        state, specification, artifact, request = _fixture(output)
+
+        def rename_during_geometry(candidate, _cancel):
+            output.rename(moved)
+            os.symlink(redirect, output, target_is_directory=True)
+            return _geometry_receipt(candidate)
+
+        error = _expect_export_error(
+            lambda: _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+                builder=rename_during_geometry,
+            ),
+            "transition-dxf-export-destination-changed",
+        )
+        assert error.destination_changed is True
+        assert output.is_symlink()
+        assert _directory_snapshot(moved) == baseline
+        assert list(redirect.iterdir()) == []
+        _assert_no_staging(moved)
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        output = root / "output"
+        moved = root / "moved-output"
+        redirect = root / "redirect"
+        output.mkdir()
+        redirect.mkdir()
+        marker = output / "operator-owned.txt"
+        marker.write_text("unchanged", encoding="utf-8")
+        baseline = _directory_snapshot(output)
+        state, specification, artifact, request = _fixture(output)
+        original_cleanup = adapter._cleanup_transaction
+        renamed = False
+
+        def rename_after_cleanup(*args):
+            nonlocal renamed
+            original_cleanup(*args)
+            if not renamed:
+                output.rename(moved)
+                os.symlink(redirect, output, target_is_directory=True)
+                renamed = True
+
+        adapter._cleanup_transaction = rename_after_cleanup
+        try:
+            error = _expect_export_error(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                ),
+                "transition-dxf-export-destination-changed",
+            )
+            assert error.destination_changed is True
+            assert error.cleanup_complete is True
+        finally:
+            adapter._cleanup_transaction = original_cleanup
+        assert output.is_symlink()
+        assert _directory_snapshot(moved) == baseline
+        assert list(redirect.iterdir()) == []
+        _assert_no_staging(moved)
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        output = root / "output"
+        moved = root / "moved-output"
+        redirect = root / "redirect"
+        output.mkdir()
+        redirect.mkdir()
+        marker = output / "operator-owned.txt"
+        marker.write_text("unchanged", encoding="utf-8")
+        baseline = _directory_snapshot(output)
+        state, specification, artifact, request = _fixture(output)
+        original_link = adapter._link_file
+        link_calls = 0
+
+        def rename_after_first_link(
+            source_directory_descriptor,
+            source_name,
+            destination_directory_descriptor,
+            destination_name,
+        ):
+            nonlocal link_calls
+            link_calls += 1
+            original_link(
+                source_directory_descriptor,
+                source_name,
+                destination_directory_descriptor,
+                destination_name,
+            )
+            if link_calls == 1:
+                output.rename(moved)
+                os.symlink(redirect, output, target_is_directory=True)
+
+        adapter._link_file = rename_after_first_link
+        try:
+            error = _expect_export_error(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                ),
+                "transition-dxf-export-destination-changed",
+            )
+            assert error.destination_changed is True
+            assert error.cleanup_complete is True
+        finally:
+            adapter._link_file = original_link
+        assert output.is_symlink()
+        assert _directory_snapshot(moved) == baseline
+        assert list(redirect.iterdir()) == []
+        _assert_no_staging(moved)
+
+
+def _validate_late_rename_rollback_recovery():
+    assert hasattr(os, "fork")
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        output = root / "output"
+        moved = root / "moved-output"
+        redirect = root / "redirect"
+        output.mkdir()
+        redirect.mkdir()
+        marker = output / "operator-owned.txt"
+        marker.write_text("unchanged", encoding="utf-8")
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        final_names = {plan.dxf_filename, plan.manifest_filename}
+        expected_status = 79
+        process_id = os.fork()
+        if process_id == 0:
+            original_cleanup = adapter._cleanup_transaction
+            original_unlink = adapter._unlink_owned_file
+
+            def rename_after_cleanup(*args):
+                original_cleanup(*args)
+                output.rename(moved)
+                os.symlink(redirect, output, target_is_directory=True)
+
+            def interrupt_final_rollback(
+                directory_descriptor,
+                name,
+                expected_snapshot,
+            ):
+                original_unlink(
+                    directory_descriptor,
+                    name,
+                    expected_snapshot,
+                )
+                if name in final_names:
+                    os._exit(expected_status)
+
+            adapter._cleanup_transaction = rename_after_cleanup
+            adapter._unlink_owned_file = interrupt_final_rollback
+            try:
+                _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                )
+            except BaseException:
+                os._exit(90)
+            os._exit(91)
+
+        waited_process, status = os.waitpid(process_id, 0)
+        assert waited_process == process_id
+        assert os.WIFEXITED(status), status
+        assert os.WEXITSTATUS(status) == expected_status, status
+        assert output.is_symlink()
+        assert (moved / marker.name).read_text(
+            encoding="utf-8"
+        ) == "unchanged"
+        assert sum(
+            int((moved / name).is_file()) for name in final_names
+        ) == 1
+        assert len(_transaction_artifacts(moved)) == 2
+
+        output.unlink()
+        moved.rename(output)
+        recovered = _export_with_stub(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        assert recovered.disposition == "created"
+        assert (output / recovered.dxf_filename).is_file()
+        assert (output / recovered.manifest_filename).is_file()
+        assert marker.read_text(encoding="utf-8") == "unchanged"
+        _assert_no_staging(output)
+
+
+def _interrupt_after_link(
+    state,
+    artifact,
+    specification,
+    request,
+    link_count,
+):
+    assert hasattr(os, "fork")
+    expected_status = 70 + link_count
+    process_id = os.fork()
+    if process_id == 0:
+        original_link = adapter._link_file
+        observed_links = 0
+
+        def interrupt_link(
+            source_directory_descriptor,
+            source_name,
+            destination_directory_descriptor,
+            destination_name,
+        ):
+            nonlocal observed_links
+            observed_links += 1
+            original_link(
+                source_directory_descriptor,
+                source_name,
+                destination_directory_descriptor,
+                destination_name,
+            )
+            if observed_links == link_count:
+                os._exit(expected_status)
+
+        adapter._link_file = interrupt_link
+        try:
+            _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+            )
+        except BaseException:
+            os._exit(90)
+        os._exit(91)
+    waited_process, status = os.waitpid(process_id, 0)
+    assert waited_process == process_id
+    assert os.WIFEXITED(status), status
+    assert os.WEXITSTATUS(status) == expected_status, status
+
+
+def _validate_interruption_partial_commit_and_recovery():
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        _interrupt_after_link(
+            state,
+            artifact,
+            specification,
+            request,
+            1,
+        )
+        assert (output / plan.dxf_filename).is_file()
+        assert not (output / plan.manifest_filename).exists()
+        assert len(_transaction_artifacts(output)) == 2
+
+        recovered = _export_with_stub(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        assert recovered.disposition == "created"
+        assert set(item.name for item in output.iterdir()) == {
+            recovered.dxf_filename,
+            recovered.manifest_filename,
+        }
+        _assert_no_staging(output)
+
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        _interrupt_after_link(
+            state,
+            artifact,
+            specification,
+            request,
+            2,
+        )
+        before = (
+            (output / plan.dxf_filename).read_bytes(),
+            (output / plan.manifest_filename).read_bytes(),
+        )
+        assert len(_transaction_artifacts(output)) == 2
+
+        recovered = _export_with_stub(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        assert recovered.disposition == "reused"
+        assert (
+            (output / plan.dxf_filename).read_bytes(),
+            (output / plan.manifest_filename).read_bytes(),
+        ) == before
+        _assert_no_staging(output)
+
+
+def _validate_changed_staging_is_preserved():
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        original_write = adapter._write_staged_file
+
+        def corrupt_manifest_write(directory_descriptor, name, value):
+            original_write(
+                directory_descriptor,
+                name,
+                b"{}\n" if name.endswith(".json") else value,
+            )
+
+        adapter._write_staged_file = corrupt_manifest_write
+        try:
+            error = _expect_export_error(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                ),
+                "transition-dxf-export-cleanup-failed",
+            )
+        finally:
+            adapter._write_staged_file = original_write
+        assert error.source_code == "invalid-transition-dxf-export-manifest"
+        assert error.destination_changed is True
+        assert error.cleanup_complete is False
+        assert error.recoverable is False
+        assert not (output / plan.dxf_filename).exists()
+        assert not (output / plan.manifest_filename).exists()
+        residue = _transaction_artifacts(output)
+        assert len(residue) == 2, residue
+        stage_directories = tuple(
+            item for item in output.iterdir() if item.is_dir()
+        )
+        assert len(stage_directories) == 1
+        stage_directory = stage_directories[0]
+        assert set(item.name for item in stage_directory.iterdir()) == {
+            plan.dxf_filename,
+            plan.manifest_filename,
+        }
+        assert (
+            stage_directory / plan.manifest_filename
+        ).read_bytes() == b"{}\n"
+
+        recovery_error = _expect_export_error(
+            lambda: _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+            ),
+            "transition-dxf-export-cleanup-failed",
+        )
+        assert recovery_error.destination_changed is True
+        assert recovery_error.cleanup_complete is False
+        assert recovery_error.recoverable is False
+        assert _transaction_artifacts(output) == residue
+        assert set(item.name for item in stage_directory.iterdir()) == {
+            plan.dxf_filename,
+            plan.manifest_filename,
+        }
+
+
 def _validate_staging_commit_rollback_and_ownership():
     with tempfile.TemporaryDirectory() as temporary:
         output = pathlib.Path(temporary) / "output"
@@ -784,12 +1199,12 @@ def _validate_staging_commit_rollback_and_ownership():
         original_write = adapter._write_staged_file
         write_calls = 0
 
-        def fail_second_write(path, value):
+        def fail_second_write(directory_descriptor, name, value):
             nonlocal write_calls
             write_calls += 1
             if write_calls == 2:
                 raise OSError("injected second staging write failure")
-            original_write(path, value)
+            original_write(directory_descriptor, name, value)
 
         adapter._write_staged_file = fail_second_write
         try:
@@ -808,37 +1223,25 @@ def _validate_staging_commit_rollback_and_ownership():
         assert _directory_snapshot(output) == baseline
         _assert_no_staging(output)
 
-        def corrupt_manifest_write(path, value):
-            original_write(
-                path,
-                b"{}\n" if path.endswith(".json") else value,
-            )
-
-        adapter._write_staged_file = corrupt_manifest_write
-        try:
-            _expect_export_error(
-                lambda: _export_with_stub(
-                    state,
-                    artifact,
-                    specification,
-                    request,
-                ),
-                "invalid-transition-dxf-export-manifest",
-            )
-        finally:
-            adapter._write_staged_file = original_write
-        assert _directory_snapshot(output) == baseline
-        _assert_no_staging(output)
-
         original_link = adapter._link_file
         link_calls = 0
 
-        def fail_second_link(source, destination):
+        def fail_second_link(
+            source_directory_descriptor,
+            source_name,
+            destination_directory_descriptor,
+            destination_name,
+        ):
             nonlocal link_calls
             link_calls += 1
             if link_calls == 2:
                 raise OSError("injected second commit failure")
-            original_link(source, destination)
+            original_link(
+                source_directory_descriptor,
+                source_name,
+                destination_directory_descriptor,
+                destination_name,
+            )
 
         adapter._link_file = fail_second_link
         try:
@@ -860,14 +1263,37 @@ def _validate_staging_commit_rollback_and_ownership():
         link_calls = 0
         replaced_path = None
 
-        def replace_first_link_then_fail(source, destination):
+        def replace_first_link_then_fail(
+            source_directory_descriptor,
+            source_name,
+            destination_directory_descriptor,
+            destination_name,
+        ):
             nonlocal link_calls, replaced_path
             link_calls += 1
             if link_calls == 1:
-                original_link(source, destination)
-                os.unlink(destination)
-                shutil.copyfile(source, destination)
-                replaced_path = pathlib.Path(destination)
+                original_link(
+                    source_directory_descriptor,
+                    source_name,
+                    destination_directory_descriptor,
+                    destination_name,
+                )
+                value, _snapshot = adapter._read_regular_file(
+                    source_directory_descriptor,
+                    source_name,
+                    error_code="test-read-failed",
+                    description="the injected staged file",
+                )
+                os.unlink(
+                    destination_name,
+                    dir_fd=destination_directory_descriptor,
+                )
+                original_write(
+                    destination_directory_descriptor,
+                    destination_name,
+                    value,
+                )
+                replaced_path = output / destination_name
                 return
             raise OSError("injected commit failure after replacement")
 
@@ -889,7 +1315,20 @@ def _validate_staging_commit_rollback_and_ownership():
         assert replaced_path is not None and replaced_path.exists()
         assert marker.read_text(encoding="utf-8") == "unchanged"
         assert len(list(output.glob("*.dependency-manifest.json"))) == 0
-        _assert_no_staging(output)
+        residue = _transaction_artifacts(output)
+        assert len(residue) == 2, residue
+        recovery_error = _expect_export_error(
+            lambda: _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+            ),
+            "transition-dxf-export-rollback-failed",
+        )
+        assert recovery_error.destination_changed is True
+        assert recovery_error.cleanup_complete is False
+        assert _transaction_artifacts(output) == residue
 
 
 def validate():
@@ -898,6 +1337,10 @@ def validate():
     _validate_success_manifest_reuse_and_zero_length()
     _validate_destination_and_collision_controls()
     _validate_cancellation_stale_geometry_and_destination_change()
+    _validate_descriptor_relative_rename_controls()
+    _validate_late_rename_rollback_recovery()
+    _validate_interruption_partial_commit_and_recovery()
+    _validate_changed_staging_is_preserved()
     _validate_staging_commit_rollback_and_ownership()
     print("Phase 6 transition DXF export validation passed")
 
