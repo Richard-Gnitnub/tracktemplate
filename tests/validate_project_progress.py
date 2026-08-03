@@ -229,11 +229,10 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "limitations"
     ),
     (
-        "Pending — D-P6-003 selects a strict add-only, journal-free monotonic "
-        "recovery contract, but condition 1 lacks implementation and "
-        "condition 3 lacks focused proof; conditions 2, 4 and 5 retain bounded "
-        "evidence; condition 6 requires a fresh Level 3 evidence-admission "
-        "review only after those gaps close"
+        "Pending — the bounded D-P6-003 add-only implementation and focused "
+        "condition 1/3 proof are present; conditions 2, 4 and 5 retain bounded "
+        "evidence, while condition 6 still requires a fresh Level 3 "
+        "evidence-admission review and explicit owner acceptance"
     ),
     (
         "Pending — PR #33 accounts for complete cold/warm Edit, Validate and "
@@ -564,7 +563,7 @@ def _section(text: str, heading: str) -> str:
 
 
 def _validate_transition_export_validation(validation: str) -> None:
-    """Keep the current command evidence distinct from D-P6-003 authority."""
+    """Bind the current commands to bounded D-P6-003 implementation proof."""
     validation_flat = " ".join(validation.split())
     _require(
         (
@@ -581,17 +580,37 @@ def _validate_transition_export_validation(validation: str) -> None:
             "Phase 6 transition DXF qualified FreeCAD validation passed"
         )
         in validation
-        and "preservation and next-invocation rejection of unclaimable residue"
+        and "exact zero-member, DXF-only, manifest-only and complete-pair states"
         in validation_flat
-        and "nor prove automatic cross-process recovery"
+        and "inert historical controls" in validation_flat
+        and "interruption after each addition" in validation_flat
+        and "next-invocation monotonic completion" in validation_flat
+        and "required directory synchronisation before complete-pair reuse"
         in validation_flat
+        and "fail-closed preservation when that synchronisation fails"
+        in validation_flat
+        and "resolve-to-bind removal and substitution" in validation_flat
+        and "post-lock substitution" in validation_flat
+        and "initial-member and post-addition substitution" in validation_flat
+        and "unsupported primitives" in validation_flat
+        and "non-regular-final and byte-collision refusal" in validation_flat
+        and "active-lock fail-closed diagnostics" in validation_flat
+        and "observed descriptor-close abandonment" in validation_flat
+        and "truthful retained-state diagnostics" in validation_flat
         and (
-            "D-P6-003 selects strict add-only, journal-free monotonic "
-            "completion for a later bounded Level 2 implementation and "
-            "focused proof"
+            "It proves the bounded D-P6-003 strict add-only, journal-free "
+            "implementation"
         )
         in validation_flat
-        and "these current commands do not prove that future contract"
+        and "no published final is removed, rewritten or replaced by "
+        "TrackTemplate"
+        in validation_flat
+        and "exact partial preservation and next-invocation completion"
+        in validation_flat
+        and (
+            "they supply no GUI, production-output, Phase 6 exit or release "
+            "acceptance"
+        )
         in validation_flat,
         "the transition DXF command, sentinel or recovery-evidence boundary "
         "is missing",
@@ -1093,6 +1112,51 @@ def _validate_exit_conditions(
         ],
         "D-P6-003 exact owner decision drifted or was relocated",
     )
+    implementation_heading = (
+        "B16 Entry/Exit add-only DXF monotonic recovery"
+    )
+    implementation_section = direct_section_content(
+        current_evidence,
+        implementation_heading,
+    )
+    implementation_flat = _semantic_text(implementation_section)
+    for required_implementation_clause in (
+        "ccacb5ca638b1e3a79fb59107a97d90e9434f0d5",
+        "exact regular partial pair raised "
+        "transition-dxf-export-collision",
+        "stages only absent payloads in anonymous creation-bound descriptors",
+        "Historical journals, .new files and stage directories are inert",
+        "no post-publication rollback, journal cleanup or final-path unlink "
+        "route",
+        "Phase 6 transition DXF export validation passed",
+        "same created result signature as fresh creation",
+        "next-invocation completion only after required directory "
+        "synchronisation",
+        "fail-closed complete-pair preservation when that synchronisation "
+        "fails",
+        "resolve-to-bind removal and substitution",
+        "post-lock, initial-member and post-addition substitution",
+        "active-lock ambiguity",
+        "non-regular and byte-collision refusal",
+        "observed descriptor closure on pre-publication abandonment",
+        "sentinel proving no unlink, rename, replace or rmdir call",
+        "6861d0565a737615ec5b242aaa8d2b3efd51b0e22aad9d93fb929489a25fd861",
+        "16de67625d952e9bb0c7c3f7891b30987f78d7c5878a9838999ab0909f131552",
+        "7b2757bc3559013a2399df7efe6c25721288f8dad56b6cc05d93c2938c86c2b1",
+        "8cff21c710de1da266d0a0c590cd90dc4edf46c37403275c146e2ffe5a9b3e9f",
+        "Phase 6 transition DXF qualified FreeCAD validation passed",
+        "Conditions 1 and 3 now have bounded evidence",
+        "Condition 6 remains open",
+        "not an Exit 3 evidence-admission or owner-acceptance decision",
+        "Phase 6 remains 1/5 with only Exit 2 Evidenced and owner-accepted",
+        "Exit 3 remains Pending",
+        "PR-09, PR-13, PR-16, PR-22 and QA-R03 retain their existing states",
+    ):
+        _require(
+            required_implementation_clause in implementation_flat,
+            "Phase 6 add-only recovery implementation evidence drifted: "
+            + required_implementation_clause,
+        )
     _validate_transition_export_validation(_read(VALIDATION_PATH))
     current_section = _section(
         current_evidence,

@@ -104,8 +104,9 @@ class TransitionDxfExportRequest:
     """One private-development destination request.
 
     The adapter resolves this path and rejects relative, symbolic-link or
-    unsafe destination state. Existing complete output is reused only when
-    both files are byte-identical; this contract never overwrites a file.
+    unsafe destination state. Existing regular members are reused per final
+    filename only when byte-identical; an absent exact counterpart may be
+    added, but this contract never overwrites or mutates a published file.
     """
 
     output_directory: str

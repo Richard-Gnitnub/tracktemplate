@@ -900,6 +900,68 @@ instruction, the resulting decision is:
 > or the collision-policy value; or adding a trust service, generic storage
 > framework or runtime dependency.
 
+## B16 Entry/Exit add-only DXF monotonic recovery
+
+This bounded Level 2 tranche starts from accepted `main` at
+`ccacb5ca638b1e3a79fb59107a97d90e9434f0d5` and implements only the
+D-P6-003 recovery contract for the private-development B16 Entry/Exit
+DXF-and-manifest pair. Before the source change, the retained focused
+regression failed because an exact regular partial pair raised
+`transition-dxf-export-collision` instead of adding its absent counterpart.
+
+The exporter now recomputes and validates the exact pair, binds the destination
+directory by descriptor, stages only absent payloads in anonymous
+creation-bound descriptors and publishes through no-overwrite `linkat`.
+Existing exact regular members are inspected without mutation authority and
+retain inode identity, metadata and bytes. Historical journals, `.new` files
+and stage directories are inert: the exporter neither reads nor changes them,
+and their presence does not block completion. The source contains no
+post-publication rollback, journal cleanup or final-path unlink route.
+
+The retained standalone validator passed with its required
+`Phase 6 transition DXF export validation passed` sentinel. It covers fresh,
+DXF-only, manifest-only and complete states; exact partial completion with the
+same `created` result signature as fresh creation; interruption after each
+addition; next-invocation completion only after required directory
+synchronisation; fail-closed complete-pair preservation when that
+synchronisation fails; cancellation and injected failure after one addition;
+uncertain durability; unsupported primitives; resolve-to-bind removal and
+substitution; post-lock, initial-member and post-addition substitution;
+directory rename and symbolic-link races; active-lock ambiguity; non-regular
+and byte-collision refusal; inert foreign controls; observed descriptor closure on
+pre-publication abandonment; and a sentinel proving no unlink, rename, replace
+or rmdir call over normal publication. It freezes the accepted-main output
+hashes:
+
+| Fixture | DXF SHA-256 | Manifest SHA-256 |
+| --- | --- | --- |
+| 300 mm transition | `6861d0565a737615ec5b242aaa8d2b3efd51b0e22aad9d93fb929489a25fd861` | `16de67625d952e9bb0c7c3f7891b30987f78d7c5878a9838999ab0909f131552` |
+| zero-length transition | `7b2757bc3559013a2399df7efe6c25721288f8dad56b6cc05d93c2938c86c2b1` | `8cff21c710de1da266d0a0c590cd90dc4edf46c37403275c146e2ffe5a9b3e9f` |
+
+The qualified FreeCAD 1.1.1 profile also passed with
+`Phase 6 transition DXF qualified FreeCAD validation passed`. It retained
+editable-document and active-document isolation, imported both the
+`LWPOLYLINE` and zero-length `POINT`, preserved an exact partial after an
+injected second-addition failure and completed it on the next invocation.
+
+This is present Level 2 implementation and focused recovery evidence, not an
+Exit 3 evidence-admission or owner-acceptance decision. Conditions 1 and 3 now
+have bounded evidence; descriptor-relative path control, qualified `POINT`
+import and durable command registration remain retained evidence for
+conditions 2, 4 and 5. Condition 6 remains open: a fresh Level 3 panel must
+distinguish criterion requirements, accepted bounded limitations and optional
+hardening before any Exit 3 recommendation.
+
+The pair remains sequentially visible rather than namespace-atomic; an exact
+partial may remain until a later invocation. There is no background or operator
+recovery, and changed expected bytes leave old partial output as a preserved
+collision. Evidence remains bounded to the qualified Linux/filesystem profile
+and the accepted Entry/Exit slice. Phase 6 remains 1/5 with only Exit 2
+Evidenced and owner-accepted; Exit 3 remains Pending. PR-09, PR-13, PR-16,
+PR-22 and QA-R03 retain their existing states, and no production, physical
+output, `project-cleared`, GUI, release, packaging or legacy-retirement
+authority changes.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -910,7 +972,7 @@ The accepted current state is 1/5 under D-P6-002:
 | --- | --- |
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
-| Export is deterministic and failure-safe | Pending — D-P6-003 selects a strict add-only, journal-free monotonic recovery contract, but condition 1 lacks implementation and condition 3 lacks focused proof; conditions 2, 4 and 5 retain bounded evidence; condition 6 requires a fresh Level 3 evidence-admission review only after those gaps close |
+| Export is deterministic and failure-safe | Pending — the bounded D-P6-003 add-only implementation and focused condition 1/3 proof are present; conditions 2, 4 and 5 retain bounded evidence, while condition 6 still requires a fresh Level 3 evidence-admission review and explicit owner acceptance |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 

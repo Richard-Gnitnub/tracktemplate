@@ -1,6 +1,7 @@
 """Failure-safe private-development DXF export for one transition."""
 
 import ctypes
+import errno
 import hashlib
 import json
 import math
@@ -31,10 +32,6 @@ _DXF_ACAD_VERSION = "AC1015"
 _MANIFEST_REVIEW_DATE = "2026-08-01"
 _MANIFEST_REVIEWER = "TrackTemplate Phase 6 export control"
 _SIGNATURE_PREFIX = "sha256:"
-_STAGING_PREFIX = ".tracktemplate-transition-dxf-"
-_TRANSACTION_SCHEMA_ID = "tracktemplate.transition-dxf.transaction.v2"
-_TRANSACTION_JOURNAL_PREFIX = _STAGING_PREFIX + "transaction-"
-_TRANSACTION_STAGE_PREFIX = _STAGING_PREFIX + "stage-"
 # Linux linkat flag used by the qualified Linux x86_64 profile.
 _AT_EMPTY_PATH = 0x1000
 
@@ -191,10 +188,8 @@ def _require_descriptor_controls():
         getattr(os, "O_TMPFILE", 0),
     )
     required_dir_fd = (
-        os.link,
         os.open,
         os.stat,
-        os.unlink,
     )
     if (
         fcntl is None
@@ -202,7 +197,6 @@ def _require_descriptor_controls():
         or not all(required_flags)
         or any(item not in os.supports_dir_fd for item in required_dir_fd)
         or os.stat not in os.supports_follow_symlinks
-        or os.link not in os.supports_follow_symlinks
     ):
         raise _export_error(
             "unsupported-transition-dxf-export-filesystem",
@@ -228,6 +222,8 @@ def _open_output_directory(path, expected_identity):
             "the output directory changed before it could be bound",
             source_code=type(error).__name__,
             destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
         ) from error
     try:
         metadata = os.fstat(descriptor)
@@ -239,6 +235,8 @@ def _open_output_directory(path, expected_identity):
                 "transition-dxf-export-destination-changed",
                 "the output directory changed before it could be bound",
                 destination_changed=True,
+                cleanup_complete=False,
+                recoverable=False,
             )
         try:
             fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -247,12 +245,15 @@ def _open_output_directory(path, expected_identity):
                 "transition-dxf-export-transaction-active",
                 "another transition DXF transaction owns this directory",
                 source_code=type(error).__name__,
+                cleanup_complete=False,
+                recoverable=False,
             ) from error
         except OSError as error:
             raise _export_error(
                 "unsupported-transition-dxf-export-filesystem",
                 "the output directory cannot provide the required lock",
                 source_code=type(error).__name__,
+                cleanup_complete=False,
                 recoverable=False,
             ) from error
         _verify_directory_identity(path, expected_identity)
@@ -271,6 +272,8 @@ def _verify_directory_identity(path, expected_identity):
             "the output directory changed during export",
             source_code=type(error).__name__,
             destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
         ) from error
     observed = (metadata.st_dev, metadata.st_ino)
     if (
@@ -283,6 +286,8 @@ def _verify_directory_identity(path, expected_identity):
             "transition-dxf-export-destination-changed",
             "the output directory changed during export",
             destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
         )
 
 
@@ -327,6 +332,7 @@ def _file_snapshot(
         | os.O_NOFOLLOW
         | getattr(os, "O_CLOEXEC", 0)
         | getattr(os, "O_NONBLOCK", 0)
+        | getattr(os, "O_NOATIME", 0)
     )
     try:
         descriptor = os.open(
@@ -339,6 +345,9 @@ def _file_snapshot(
             error_code,
             "{} cannot be opened safely".format(description),
             source_code=type(error).__name__,
+            destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
         ) from error
     try:
         opened_metadata = os.fstat(descriptor)
@@ -350,6 +359,9 @@ def _file_snapshot(
             raise _export_error(
                 error_code,
                 "{} changed while it was opened".format(description),
+                destination_changed=True,
+                cleanup_complete=False,
+                recoverable=False,
             )
         digest = _sha256_descriptor(descriptor)
         final_metadata = os.fstat(descriptor)
@@ -367,12 +379,18 @@ def _file_snapshot(
             raise _export_error(
                 error_code,
                 "{} changed while it was read".format(description),
+                destination_changed=True,
+                cleanup_complete=False,
+                recoverable=False,
             )
     except OSError as error:
         raise _export_error(
             error_code,
             "{} changed while it was read".format(description),
             source_code=type(error).__name__,
+            destination_changed=True,
+            cleanup_complete=False,
+            recoverable=False,
         ) from error
     finally:
         os.close(descriptor)
@@ -927,145 +945,6 @@ def _write_staged_file(directory_descriptor, name, value):
         ) from error
 
 
-def _transaction_names(dxf_name, manifest_name):
-    value = (
-        TRANSITION_DXF_EXPORT_CONTRACT_ID
-        + "\x00"
-        + dxf_name
-        + "\x00"
-        + manifest_name
-    ).encode("utf-8")
-    key = _sha256_bytes(value)
-    journal_name = _TRANSACTION_JOURNAL_PREFIX + key + ".json"
-    return (
-        key,
-        journal_name,
-        journal_name + ".new",
-        _TRANSACTION_STAGE_PREFIX + key,
-    )
-
-
-def _transaction_document(
-    dxf_name,
-    dxf_sha256,
-    manifest_name,
-    manifest_sha256,
-    staged_snapshots,
-):
-    key, _journal, _temporary, _legacy_stage = _transaction_names(
-        dxf_name,
-        manifest_name,
-    )
-    return {
-        "schema": _TRANSACTION_SCHEMA_ID,
-        "contract_id": TRANSITION_DXF_EXPORT_CONTRACT_ID,
-        "output_set_key": key,
-        "staging": "anonymous-regular-files",
-        "entries": [
-            {
-                "final_name": dxf_name,
-                "sha256": dxf_sha256,
-                "staged_snapshot": list(staged_snapshots[dxf_name]),
-            },
-            {
-                "final_name": manifest_name,
-                "sha256": manifest_sha256,
-                "staged_snapshot": list(
-                    staged_snapshots[manifest_name]
-                ),
-            },
-        ],
-    }
-
-
-def _transaction_bytes(document):
-    return (
-        json.dumps(
-            document,
-            allow_nan=False,
-            ensure_ascii=True,
-            separators=(",", ":"),
-            sort_keys=True,
-        )
-        + "\n"
-    ).encode("utf-8")
-
-
-def _path_metadata(directory_descriptor, name, description):
-    try:
-        metadata = os.stat(
-            name,
-            dir_fd=directory_descriptor,
-            follow_symlinks=False,
-        )
-    except FileNotFoundError:
-        return None
-    except OSError as error:
-        raise _export_error(
-            "transition-dxf-export-recovery-failed",
-            "{} cannot be inspected".format(description),
-            source_code=type(error).__name__,
-            destination_changed=True,
-            cleanup_complete=False,
-            recoverable=False,
-        ) from error
-    return metadata
-
-
-def _ensure_no_legacy_stage(
-    directory_descriptor,
-    legacy_stage_name,
-    *,
-    error_code,
-):
-    if (
-        _path_metadata(
-            directory_descriptor,
-            legacy_stage_name,
-            "the legacy staging pathname",
-        )
-        is not None
-    ):
-        raise _export_error(
-            error_code,
-            "a legacy staging pathname exists without creation-bound "
-            "ownership",
-            source_code="FileExistsError",
-            destination_changed=True,
-            cleanup_complete=False,
-            recoverable=False,
-        )
-
-
-def _reject_preexisting_transaction_controls(
-    directory_descriptor,
-    journal_name,
-    temporary_name,
-    legacy_stage_name,
-):
-    controls = (
-        (journal_name, "the durable transaction journal"),
-        (temporary_name, "the transaction journal staging link"),
-        (legacy_stage_name, "the legacy staging pathname"),
-    )
-    for name, description in controls:
-        if _path_metadata(
-            directory_descriptor,
-            name,
-            description,
-        ) is not None:
-            raise _export_error(
-                "transition-dxf-export-recovery-failed",
-                "{} exists without creation-bound ownership".format(
-                    description
-                ),
-                source_code="FileExistsError",
-                destination_changed=True,
-                cleanup_complete=False,
-                recoverable=False,
-            )
-
-
 def _close_staged_files(staged_files):
     close_error = None
     for descriptor, _snapshot in staged_files.values():
@@ -1086,32 +965,16 @@ def _close_staged_files(staged_files):
 
 def _create_staged_files(
     directory_descriptor,
-    legacy_stage_name,
     values,
 ):
     staged_files = {}
     try:
-        _ensure_no_legacy_stage(
-            directory_descriptor,
-            legacy_stage_name,
-            error_code="transition-dxf-export-staging-failed",
-        )
         for name, value in values:
-            _ensure_no_legacy_stage(
-                directory_descriptor,
-                legacy_stage_name,
-                error_code="transition-dxf-export-staging-failed",
-            )
             staged_files[name] = _write_staged_file(
                 directory_descriptor,
                 name,
                 value,
             )
-        _ensure_no_legacy_stage(
-            directory_descriptor,
-            legacy_stage_name,
-            error_code="transition-dxf-export-staging-failed",
-        )
         return staged_files
     except Exception as error:
         try:
@@ -1156,432 +1019,387 @@ def _staged_file_snapshots(staged_files, *, expected_link_count):
     return snapshots
 
 
-def _remove_owned_file(
-    directory_descriptor,
-    name,
-    expected_snapshot,
-    *,
-    error_code,
-    description,
-):
-    snapshot = _file_snapshot(
-        directory_descriptor,
-        name,
-        error_code=error_code,
-        description=description,
-    )
-    if snapshot != expected_snapshot:
-        raise _export_error(
-            error_code,
-            "{} ownership changed".format(description),
-            destination_changed=True,
-            cleanup_complete=False,
-            recoverable=False,
-        )
-    try:
-        os.unlink(name, dir_fd=directory_descriptor)
-        os.fsync(directory_descriptor)
-    except OSError as error:
-        raise _export_error(
-            error_code,
-            "{} could not be removed durably".format(description),
-            source_code=type(error).__name__,
-            cleanup_complete=False,
-        ) from error
-
-
-def _create_transaction_journal(
-    directory_descriptor,
-    journal_name,
-    temporary_name,
-    document,
-):
-    value = _transaction_bytes(document)
-    flags = (
-        os.O_RDWR
-        | os.O_TMPFILE
-        | getattr(os, "O_CLOEXEC", 0)
-    )
-    journal_descriptor = None
-    journal_linked = False
-    try:
-        for name, description in (
-            (journal_name, "the durable transaction journal"),
-            (temporary_name, "the transaction journal staging link"),
-        ):
-            if _path_metadata(
-                directory_descriptor,
-                name,
-                description,
-            ) is not None:
-                raise _export_error(
-                    "transition-dxf-export-journal-failed",
-                    "{} exists without creation-bound ownership".format(
-                        description
-                    ),
-                    source_code="FileExistsError",
-                    destination_changed=True,
-                    cleanup_complete=False,
-                    recoverable=False,
-                )
-        journal_descriptor = os.open(
-            ".",
-            flags,
-            0o600,
-            dir_fd=directory_descriptor,
-        )
-        created = os.fstat(journal_descriptor)
-        identity = (created.st_dev, created.st_ino)
-        if not stat.S_ISREG(created.st_mode) or created.st_nlink != 0:
-            raise _export_error(
-                "transition-dxf-export-journal-failed",
-                "the interruption journal was not created with exclusive "
-                "ownership",
-                destination_changed=True,
-                cleanup_complete=False,
-                recoverable=False,
-            )
-        _write_all(journal_descriptor, value)
-        os.fsync(journal_descriptor)
-        anonymous_snapshot = _descriptor_snapshot(
-            journal_descriptor,
-            error_code="transition-dxf-export-journal-failed",
-            description="the anonymous interruption journal",
-            expected_identity=identity,
-            expected_link_count=0,
-        )
-        if anonymous_snapshot[-1] != _sha256_bytes(value):
-            raise _export_error(
-                "transition-dxf-export-journal-failed",
-                "the interruption journal changed while it was written",
-                destination_changed=True,
-                cleanup_complete=False,
-                recoverable=False,
-            )
-        _link_file(
-            journal_descriptor,
-            None,
-            directory_descriptor,
-            journal_name,
-        )
-        journal_linked = True
-        os.fsync(directory_descriptor)
-        linked_snapshot = _descriptor_snapshot(
-            journal_descriptor,
-            error_code="transition-dxf-export-journal-failed",
-            description="the linked interruption journal",
-            expected_identity=identity,
-            expected_link_count=1,
-        )
-        journal_metadata = _path_metadata(
-            directory_descriptor,
-            journal_name,
-            "the durable transaction journal",
-        )
-        if (
-            journal_metadata is None
-            or _metadata_snapshot(journal_metadata)
-            != linked_snapshot[:-1]
-        ):
-            raise _export_error(
-                "transition-dxf-export-journal-failed",
-                "the transaction journal did not retain its identity",
-                destination_changed=True,
-                cleanup_complete=False,
-                recoverable=False,
-            )
-        if _path_metadata(
-            directory_descriptor,
-            temporary_name,
-            "the transaction journal staging link",
-        ) is not None:
-            raise _export_error(
-                "transition-dxf-export-journal-failed",
-                "the transaction journal staging link appeared without "
-                "creation-bound ownership",
-                source_code="FileExistsError",
-                destination_changed=True,
-                cleanup_complete=False,
-                recoverable=False,
-            )
-        return linked_snapshot
-    except Exception as error:
-        if isinstance(error, TransitionDxfExportError):
-            raise
-        raise _export_error(
-            "transition-dxf-export-journal-failed",
-            "the transaction journal could not be committed durably",
-            source_code=type(error).__name__,
-            destination_changed=isinstance(error, FileExistsError),
-            cleanup_complete=not journal_linked,
-            recoverable=False,
-        ) from error
-    finally:
-        if journal_descriptor is not None:
-            os.close(journal_descriptor)
-
-
 def _link_file(
     source_directory_descriptor,
-    source_name,
     destination_directory_descriptor,
     destination_name,
 ):
-    if source_name is None:
-        ctypes.set_errno(0)
-        result = _LINKAT(
-            source_directory_descriptor,
-            b"",
-            destination_directory_descriptor,
-            os.fsencode(destination_name),
-            _AT_EMPTY_PATH,
+    ctypes.set_errno(0)
+    result = _LINKAT(
+        source_directory_descriptor,
+        b"",
+        destination_directory_descriptor,
+        os.fsencode(destination_name),
+        _AT_EMPTY_PATH,
+    )
+    if result != 0:
+        error_number = ctypes.get_errno()
+        raise OSError(
+            error_number,
+            os.strerror(error_number),
+            destination_name,
         )
-        if result != 0:
-            error_number = ctypes.get_errno()
-            raise OSError(
-                error_number,
-                os.strerror(error_number),
-                destination_name,
-            )
-        return
-    os.link(
-        source_name,
-        destination_name,
-        src_dir_fd=source_directory_descriptor,
-        dst_dir_fd=destination_directory_descriptor,
-        follow_symlinks=False,
+
+
+def _copy_export_error(
+    error,
+    *,
+    destination_changed,
+    cleanup_complete,
+    recoverable,
+):
+    if isinstance(error, TransitionDxfExportError):
+        code = error.code
+        message = error.detail
+        source_code = error.source_code
+    else:
+        code = "transition-dxf-export-failed"
+        message = "the transition DXF export failed"
+        source_code = type(error).__name__
+    return _export_error(
+        code,
+        message,
+        source_code=source_code,
+        destination_changed=destination_changed,
+        cleanup_complete=cleanup_complete,
+        recoverable=recoverable,
     )
 
 
-def _unlink_owned_file(
+def _owned_publication_snapshots(
     directory_descriptor,
-    name,
-    expected_snapshot,
+    staged_files,
 ):
-    snapshot = _file_snapshot(directory_descriptor, name)
-    if snapshot != expected_snapshot:
+    owned = {}
+    ambiguous = False
+    for name, (descriptor, expected_snapshot) in staged_files.items():
+        try:
+            metadata = os.fstat(descriptor)
+            snapshot = _descriptor_snapshot(
+                descriptor,
+                error_code="transition-dxf-export-commit-identity-failed",
+                description="the anonymous staged {}".format(name),
+                expected_identity=expected_snapshot[:2],
+            )
+        except (OSError, TransitionDxfExportError):
+            ambiguous = True
+            continue
+        if snapshot != expected_snapshot:
+            ambiguous = True
+            continue
+        if metadata.st_nlink == 0:
+            continue
+        if metadata.st_nlink != 1:
+            ambiguous = True
+            continue
+        try:
+            path_snapshot = _file_snapshot(
+                directory_descriptor,
+                name,
+                error_code=(
+                    "transition-dxf-export-commit-identity-failed"
+                ),
+                description="a newly published output",
+            )
+        except TransitionDxfExportError:
+            ambiguous = True
+            continue
+        if path_snapshot != expected_snapshot:
+            ambiguous = True
+            continue
+        owned[name] = expected_snapshot
+    return owned, ambiguous
+
+
+def _observe_failed_destination(
+    directory_descriptor,
+    output_directory,
+    directory_identity,
+    entries,
+    initial_snapshots,
+    staged_files,
+):
+    names = tuple(name for name, _digest in entries)
+    expected_hashes = {
+        name: digest for name, digest in entries
+    }
+    ambiguous = False
+    directory_changed = False
+    try:
+        _verify_directory_identity(
+            output_directory,
+            directory_identity,
+        )
+    except TransitionDxfExportError:
+        ambiguous = True
+        directory_changed = True
+
+    try:
+        observed = _target_snapshots(
+            directory_descriptor,
+            names[0],
+            names[1],
+        )
+    except TransitionDxfExportError:
+        observed = None
+        ambiguous = True
+
+    owned, owned_ambiguous = _owned_publication_snapshots(
+        directory_descriptor,
+        staged_files,
+    )
+    ambiguous = ambiguous or owned_ambiguous
+    destination_changed = directory_changed
+    exact_state = observed is not None
+    final_count = 0
+    if observed is not None:
+        destination_changed = (
+            destination_changed or observed != initial_snapshots
+        )
+        for name, before, after in zip(
+            names,
+            initial_snapshots,
+            observed,
+        ):
+            if after is not None:
+                final_count += 1
+                if after[-1] != expected_hashes[name]:
+                    exact_state = False
+            if before is not None:
+                if after != before:
+                    ambiguous = True
+            elif after is not None and owned.get(name) != after:
+                ambiguous = True
+            if name in owned and after != owned[name]:
+                ambiguous = True
+        destination_changed = destination_changed or bool(owned)
+
+    return {
+        "ambiguous": ambiguous,
+        "cleanup_complete": observed is not None and final_count == 0,
+        "destination_changed": destination_changed,
+        "recoverable": (
+            observed is not None
+            and exact_state
+            and not ambiguous
+            and final_count in (0, 1, 2)
+        ),
+    }
+
+
+def _raise_bound_failure(
+    error,
+    directory_descriptor,
+    output_directory,
+    directory_identity,
+    entries,
+    initial_snapshots,
+    staged_files,
+):
+    state = _observe_failed_destination(
+        directory_descriptor,
+        output_directory,
+        directory_identity,
+        entries,
+        initial_snapshots,
+        staged_files,
+    )
+    close_error = None
+    try:
+        _close_staged_files(staged_files)
+    except TransitionDxfExportError as cleanup_error:
+        close_error = cleanup_error
+
+    source_error = (
+        error
+        if isinstance(error, TransitionDxfExportError)
+        else _export_error(
+            "transition-dxf-export-failed",
+            "the transition DXF export failed",
+            source_code=type(error).__name__,
+        )
+    )
+    cleanup_complete = (
+        state["cleanup_complete"]
+        and close_error is None
+        and source_error.cleanup_complete
+    )
+    recoverable = (
+        state["recoverable"]
+        and close_error is None
+        and source_error.recoverable
+    )
+    if state["ambiguous"]:
+        recoverable = False
+    if close_error is not None:
+        source_code = str(
+            source_error.source_code
+            or source_error.code
+            or close_error.source_code
+            or close_error.code
+        )
         raise _export_error(
-            "transition-dxf-export-rollback-failed",
-            "a newly linked output could not be identified for rollback",
-            destination_changed=True,
+            "transition-dxf-export-cleanup-failed",
+            "the export failed and anonymous descriptor cleanup was "
+            "incomplete",
+            source_code=source_code,
+            destination_changed=(
+                state["destination_changed"]
+                or source_error.destination_changed
+            ),
             cleanup_complete=False,
             recoverable=False,
-        )
-    os.unlink(name, dir_fd=directory_descriptor)
+        ) from close_error
+    raise _copy_export_error(
+        source_error,
+        destination_changed=(
+            state["destination_changed"]
+            or source_error.destination_changed
+        ),
+        cleanup_complete=cleanup_complete,
+        recoverable=recoverable,
+    ) from error
 
 
-def _rollback_partial_commit(
-    directory_descriptor,
-    staged_snapshots,
-    entries,
-):
-    linked = []
-    for name, expected_sha256 in entries:
-        snapshot = _file_snapshot(directory_descriptor, name)
-        if snapshot is None:
-            continue
-        if (
-            snapshot[-1] != expected_sha256
-            or snapshot != staged_snapshots[name]
-        ):
-            raise _export_error(
-                "transition-dxf-export-rollback-failed",
-                "a partial output no longer has owned staged identity",
-                destination_changed=True,
-                cleanup_complete=False,
-                recoverable=False,
-            )
-        linked.append((name, snapshot))
-    for name, snapshot in reversed(linked):
-        _unlink_owned_file(directory_descriptor, name, snapshot)
-    os.fsync(directory_descriptor)
-
-
-def _commit_staged_files(
+def _publish_staged_files(
     directory_descriptor,
     staged_files,
     entries,
     output_directory,
     directory_identity,
+    cancellation_requested,
 ):
-    try:
-        staged = _staged_file_snapshots(
-            staged_files,
-            expected_link_count=0,
+    staged = _staged_file_snapshots(
+        staged_files,
+        expected_link_count=0,
+    )
+    for name, _expected_sha256 in entries:
+        _check_cancellation(cancellation_requested)
+        _verify_directory_identity(
+            output_directory,
+            directory_identity,
         )
-        for name, _expected_sha256 in entries:
+        try:
             _link_file(
                 staged_files[name][0],
-                None,
                 directory_descriptor,
                 name,
             )
-            os.fsync(directory_descriptor)
-            if _file_snapshot(directory_descriptor, name) != staged[name]:
-                raise _export_error(
-                    "transition-dxf-export-commit-identity-failed",
-                    "a committed output is not the owned staged file",
-                )
-            _verify_directory_identity(
-                output_directory,
-                directory_identity,
-            )
-        if tuple(
-            _file_snapshot(directory_descriptor, name)
-            for name, _digest in entries
-        ) != tuple(staged[name] for name, _digest in entries):
+        except FileExistsError as error:
             raise _export_error(
-                "transition-dxf-export-commit-identity-failed",
-                "the committed output set changed before completion",
-            )
-        os.fsync(directory_descriptor)
-        _verify_directory_identity(output_directory, directory_identity)
-        return staged
-    except Exception as error:
-        try:
-            _rollback_partial_commit(
-                directory_descriptor,
-                staged,
-                entries,
-            )
-        except Exception as rollback_error:
-            raise _export_error(
-                "transition-dxf-export-rollback-failed",
-                "the staged-file commit failed and rollback was incomplete",
-                source_code=str(
-                    getattr(error, "code", "") or type(error).__name__
-                ),
-                destination_changed=True,
-                cleanup_complete=False,
+                "transition-dxf-export-collision",
+                "an absent deterministic output appeared during "
+                "publication",
+                source_code=type(error).__name__,
                 recoverable=False,
-            ) from rollback_error
-        if isinstance(error, TransitionDxfExportError):
-            raise error
-        raise _export_error(
-            "transition-dxf-export-commit-failed",
-            "the staged-file commit failed and was rolled back completely",
-            source_code=type(error).__name__,
-        ) from error
-
-
-def _rollback_committed_files(
-    directory_descriptor,
-    entries,
-    expected_snapshots,
-):
-    observed = {}
-    for name, expected_sha256 in entries:
-        snapshot = _file_snapshot(
-            directory_descriptor,
-            name,
-            error_code="transition-dxf-export-rollback-failed",
-            description="a newly committed output",
+            ) from error
+        except OSError as error:
+            if error.errno in (
+                errno.EINVAL,
+                errno.ENOSYS,
+                errno.EOPNOTSUPP,
+                errno.EPERM,
+            ):
+                raise _export_error(
+                    "unsupported-transition-dxf-export-filesystem",
+                    "the filesystem cannot publish an anonymous file by "
+                    "descriptor",
+                    source_code=type(error).__name__,
+                    recoverable=False,
+                ) from error
+            raise _export_error(
+                "transition-dxf-export-commit-failed",
+                "an exact output could not be added without overwrite",
+                source_code=type(error).__name__,
+            ) from error
+        try:
+            os.fsync(directory_descriptor)
+        except OSError as error:
+            raise _export_error(
+                "transition-dxf-export-commit-failed",
+                "an added output could not be made durably visible",
+                source_code=type(error).__name__,
+                recoverable=False,
+            ) from error
+        linked_snapshot = _descriptor_snapshot(
+            staged_files[name][0],
+            error_code="transition-dxf-export-commit-identity-failed",
+            description="the newly linked {}".format(name),
+            expected_identity=staged[name][:2],
+            expected_link_count=1,
         )
         if (
-            snapshot is None
-            or snapshot != expected_snapshots[name]
-            or snapshot[-1] != expected_sha256
+            linked_snapshot != staged[name]
+            or _file_snapshot(
+                directory_descriptor,
+                name,
+                error_code=(
+                    "transition-dxf-export-commit-identity-failed"
+                ),
+                description="the newly linked output",
+            )
+            != staged[name]
         ):
             raise _export_error(
-                "transition-dxf-export-rollback-failed",
-                "a newly committed output changed before final rollback",
+                "transition-dxf-export-commit-identity-failed",
+                "a newly linked output changed after publication",
                 destination_changed=True,
                 cleanup_complete=False,
                 recoverable=False,
             )
-        observed[name] = snapshot
-    try:
-        for name, _expected_sha256 in reversed(entries):
-            _unlink_owned_file(
-                directory_descriptor,
-                name,
-                observed[name],
-            )
-            os.fsync(directory_descriptor)
-    except TransitionDxfExportError:
-        raise
-    except OSError as error:
+        _verify_directory_identity(
+            output_directory,
+            directory_identity,
+        )
+    return staged
+
+
+def _revalidate_complete_pair(
+    directory_descriptor,
+    output_directory,
+    directory_identity,
+    names,
+    expected_snapshots,
+):
+    _verify_directory_identity(output_directory, directory_identity)
+    observed = _target_snapshots(
+        directory_descriptor,
+        names[0],
+        names[1],
+    )
+    if observed != expected_snapshots:
         raise _export_error(
-            "transition-dxf-export-rollback-failed",
-            "the committed output set could not be rolled back durably",
-            source_code=type(error).__name__,
+            "transition-dxf-export-commit-identity-failed",
+            "the complete output pair changed before final validation",
             destination_changed=True,
             cleanup_complete=False,
             recoverable=False,
-        ) from error
-
-
-def _create_rollback_controls(
-    directory_descriptor,
-    journal_name,
-    journal_temporary_name,
-    transaction_document,
-    entries,
-    expected_snapshots,
-):
-    for name, expected_sha256 in entries:
-        snapshot = _file_snapshot(
-            directory_descriptor,
-            name,
-            error_code="transition-dxf-export-rollback-failed",
-            description="a newly committed output",
         )
-        if (
-            snapshot is None
-            or snapshot != expected_snapshots[name]
-            or snapshot[-1] != expected_sha256
-        ):
-            raise _export_error(
-                "transition-dxf-export-rollback-failed",
-                "the committed output set changed before rollback controls "
-                "could be established",
-                destination_changed=True,
-                cleanup_complete=False,
-                recoverable=False,
-            )
-
     try:
-        return _create_transaction_journal(
-            directory_descriptor,
-            journal_name,
-            journal_temporary_name,
-            transaction_document,
-        )
-    except Exception as error:
-        if isinstance(error, TransitionDxfExportError):
-            source_code = error.code
-            recoverable = error.recoverable
-        else:
-            source_code = type(error).__name__
-            recoverable = False
+        os.fsync(directory_descriptor)
+    except OSError as error:
         raise _export_error(
-            "transition-dxf-export-rollback-failed",
-            "durable rollback controls could not be established",
-            source_code=source_code,
+            "transition-dxf-export-commit-failed",
+            "the complete output pair durability could not be established",
+            source_code=type(error).__name__,
+            recoverable=False,
+        ) from error
+    _verify_directory_identity(output_directory, directory_identity)
+    if (
+        _target_snapshots(
+            directory_descriptor,
+            names[0],
+            names[1],
+        )
+        != expected_snapshots
+    ):
+        raise _export_error(
+            "transition-dxf-export-commit-identity-failed",
+            "the complete output pair changed during final validation",
             destination_changed=True,
             cleanup_complete=False,
-            recoverable=recoverable,
-        ) from error
-
-
-def _cleanup_transaction(
-    directory_descriptor,
-    journal_name,
-    journal_snapshot,
-    legacy_stage_name,
-):
-    _ensure_no_legacy_stage(
-        directory_descriptor,
-        legacy_stage_name,
-        error_code="transition-dxf-export-cleanup-failed",
-    )
-    _remove_owned_file(
-        directory_descriptor,
-        journal_name,
-        journal_snapshot,
-        error_code="transition-dxf-export-cleanup-failed",
-        description="the durable transaction journal",
-    )
+            recoverable=False,
+        )
 
 
 def _default_geometry_builder(artifact, cancellation_requested):
@@ -1645,13 +1463,12 @@ def export_transition_dxf(
     request,
     cancellation_requested=None,
 ):
-    """Validate, stage and commit one private-development DXF output set.
+    """Validate and monotonically publish one private-development pair.
 
-    The complete exact-stage dependency is checked before filesystem work.
-    The destination is bound to one locked directory descriptor. Two
-    deterministic files are committed through a durable interruption journal;
-    identical existing files may be reused when no unowned transaction control
-    exists, but nothing is overwritten or recovered from first-observed state.
+    The destination is bound to one locked directory descriptor. Existing
+    exact regular members are preserved, absent members are published from
+    anonymous creation-bound descriptors without overwrite, and no published
+    pathname is removed or replaced.
     """
     if cancellation_requested is not None and not callable(
         cancellation_requested
@@ -1682,115 +1499,136 @@ def export_transition_dxf(
         (plan.dxf_filename, dxf_sha256),
         (plan.manifest_filename, manifest_sha256),
     )
-    (
-        _transaction_key,
-        journal_name,
-        journal_temporary_name,
-        legacy_stage_name,
-    ) = _transaction_names(plan.dxf_filename, plan.manifest_filename)
+    values = {
+        plan.dxf_filename: dxf_value,
+        plan.manifest_filename: manifest_value,
+    }
+    names = tuple(name for name, _digest in entries)
+    expected_hashes = {
+        name: digest for name, digest in entries
+    }
     directory_descriptor = _open_output_directory(
         output_directory,
         directory_identity,
     )
+    staged_files = {}
     try:
-        _reject_preexisting_transaction_controls(
-            directory_descriptor,
-            journal_name,
-            journal_temporary_name,
-            legacy_stage_name,
-        )
-        initial_snapshots = _target_snapshots(
-            directory_descriptor,
-            plan.dxf_filename,
-            plan.manifest_filename,
-        )
-        if (initial_snapshots[0] is None) != (
-            initial_snapshots[1] is None
-        ):
-            raise _export_error(
-                "transition-dxf-export-collision",
-                "only part of the deterministic output set already exists",
+        try:
+            initial_snapshots = _target_snapshots(
+                directory_descriptor,
+                names[0],
+                names[1],
             )
-        if initial_snapshots[0] is not None:
-            expected_hashes = (dxf_sha256, manifest_sha256)
-            observed_hashes = tuple(
-                item[-1] for item in initial_snapshots
-            )
-            if observed_hashes != expected_hashes:
+        except TransitionDxfExportError as error:
+            raise _copy_export_error(
+                error,
+                destination_changed=error.destination_changed,
+                cleanup_complete=False,
+                recoverable=False,
+            ) from error
+
+        try:
+            for name, snapshot in zip(names, initial_snapshots):
+                if (
+                    snapshot is not None
+                    and snapshot[-1] != expected_hashes[name]
+                ):
+                    raise _export_error(
+                        "transition-dxf-export-collision",
+                        "an existing output is not byte-identical and "
+                        "cannot be overwritten",
+                        cleanup_complete=False,
+                        recoverable=False,
+                    )
+
+            _check_cancellation(cancellation_requested)
+            try:
+                geometry_receipt = _default_geometry_builder(
+                    artifact,
+                    cancellation_requested,
+                )
+            except TransitionDxfExportError:
+                raise
+            except Exception as error:
+                cleanup_complete = getattr(
+                    error,
+                    "cleanup_complete",
+                    True,
+                )
+                recoverable = getattr(error, "recoverable", True)
+                if not isinstance(cleanup_complete, bool):
+                    cleanup_complete = False
+                if not isinstance(recoverable, bool):
+                    recoverable = False
                 raise _export_error(
-                    "transition-dxf-export-collision",
-                    "existing output is not byte-identical and cannot be "
-                    "overwritten",
+                    (
+                        "transition-dxf-exact-geometry-failed"
+                        if cleanup_complete
+                        else (
+                            "transition-dxf-exact-geometry-cleanup-failed"
+                        )
+                    ),
+                    (
+                        "transient exact geometry rejected the export"
+                        if cleanup_complete
+                        else (
+                            "transient exact geometry cleanup was "
+                            "incomplete"
+                        )
+                    ),
+                    source_code=str(
+                        getattr(error, "code", type(error).__name__)
+                    ),
+                    cleanup_complete=cleanup_complete,
+                    recoverable=recoverable,
+                ) from error
+            geometry_receipt = _validated_geometry_receipt(
+                geometry_receipt,
+                plan,
+            )
+            _check_cancellation(cancellation_requested)
+            _verify_directory_identity(
+                output_directory,
+                directory_identity,
+            )
+            if (
+                _target_snapshots(
+                    directory_descriptor,
+                    names[0],
+                    names[1],
+                )
+                != initial_snapshots
+            ):
+                raise _export_error(
+                    "transition-dxf-export-destination-changed",
+                    "the deterministic output filenames changed during "
+                    "validation",
+                    destination_changed=True,
+                    cleanup_complete=False,
+                    recoverable=False,
                 )
 
-        _check_cancellation(cancellation_requested)
-        try:
-            geometry_receipt = _default_geometry_builder(
-                artifact,
-                cancellation_requested,
+            missing_entries = tuple(
+                entry
+                for entry, snapshot in zip(entries, initial_snapshots)
+                if snapshot is None
             )
-        except TransitionDxfExportError:
-            raise
-        except Exception as error:
-            cleanup_complete = getattr(error, "cleanup_complete", True)
-            recoverable = getattr(error, "recoverable", True)
-            if not isinstance(cleanup_complete, bool):
-                cleanup_complete = False
-            if not isinstance(recoverable, bool):
-                recoverable = False
-            raise _export_error(
-                (
-                    "transition-dxf-exact-geometry-failed"
-                    if cleanup_complete
-                    else "transition-dxf-exact-geometry-cleanup-failed"
-                ),
-                (
-                    "transient exact geometry rejected the export"
-                    if cleanup_complete
-                    else "transient exact geometry cleanup was incomplete"
-                ),
-                source_code=str(
-                    getattr(error, "code", type(error).__name__)
-                ),
-                cleanup_complete=cleanup_complete,
-                recoverable=recoverable,
-            ) from error
-        geometry_receipt = _validated_geometry_receipt(
-            geometry_receipt,
-            plan,
-        )
-        _check_cancellation(cancellation_requested)
-        _verify_directory_identity(output_directory, directory_identity)
-        if (
-            _target_snapshots(
-                directory_descriptor,
-                plan.dxf_filename,
-                plan.manifest_filename,
-            )
-            != initial_snapshots
-        ):
-            raise _export_error(
-                "transition-dxf-export-destination-changed",
-                "the deterministic output filenames changed during "
-                "validation",
-            )
-        if initial_snapshots[0] is not None:
-            return _receipt(
-                plan,
-                geometry_receipt,
-                dxf_sha256,
-                manifest_sha256,
-                "reused",
-            )
-
-        staged_files = {}
-        try:
-            transaction_document = None
-            journal_snapshot = None
-            committed_snapshots = None
-            operation_error = None
-            result = None
-            try:
+            if not missing_entries:
+                _revalidate_complete_pair(
+                    directory_descriptor,
+                    output_directory,
+                    directory_identity,
+                    names,
+                    initial_snapshots,
+                )
+                result = _receipt(
+                    plan,
+                    geometry_receipt,
+                    dxf_sha256,
+                    manifest_sha256,
+                    "reused",
+                )
+            else:
                 result = _receipt(
                     plan,
                     geometry_receipt,
@@ -1800,25 +1638,24 @@ def export_transition_dxf(
                 )
                 staged_files = _create_staged_files(
                     directory_descriptor,
-                    legacy_stage_name,
-                    (
-                        (plan.dxf_filename, dxf_value),
-                        (plan.manifest_filename, manifest_value),
+                    tuple(
+                        (name, values[name])
+                        for name, _digest in missing_entries
                     ),
                 )
-                observed_dxf = _read_staged_descriptor(
-                    staged_files[plan.dxf_filename][0],
-                    staged_files[plan.dxf_filename][1],
-                    "the staged DXF",
+                observed_values = dict(values)
+                for name, _digest in missing_entries:
+                    observed_values[name] = _read_staged_descriptor(
+                        staged_files[name][0],
+                        staged_files[name][1],
+                        "the staged {}".format(name),
+                    )
+                _validate_dxf(
+                    observed_values[plan.dxf_filename],
+                    plan,
                 )
-                observed_manifest = _read_staged_descriptor(
-                    staged_files[plan.manifest_filename][0],
-                    staged_files[plan.manifest_filename][1],
-                    "the staged dependency manifest",
-                )
-                _validate_dxf(observed_dxf, plan)
                 _validate_manifest(
-                    observed_manifest,
+                    observed_values[plan.manifest_filename],
                     plan,
                     dxf_sha256,
                 )
@@ -1830,185 +1667,63 @@ def export_transition_dxf(
                 if (
                     _target_snapshots(
                         directory_descriptor,
-                        plan.dxf_filename,
-                        plan.manifest_filename,
+                        names[0],
+                        names[1],
                     )
                     != initial_snapshots
                 ):
                     raise _export_error(
                         "transition-dxf-export-destination-changed",
                         "the deterministic output filenames changed "
-                        "before commit",
+                        "before publication",
+                        destination_changed=True,
+                        cleanup_complete=False,
+                        recoverable=False,
                     )
-                staged_snapshots = {
-                    name: snapshot
-                    for name, (_descriptor, snapshot)
-                    in staged_files.items()
-                }
-                transaction_document = _transaction_document(
-                    plan.dxf_filename,
-                    dxf_sha256,
-                    plan.manifest_filename,
-                    manifest_sha256,
-                    staged_snapshots,
-                )
-                _ensure_no_legacy_stage(
-                    directory_descriptor,
-                    legacy_stage_name,
-                    error_code="transition-dxf-export-staging-failed",
-                )
-                journal_snapshot = _create_transaction_journal(
-                    directory_descriptor,
-                    journal_name,
-                    journal_temporary_name,
-                    transaction_document,
-                )
-                _ensure_no_legacy_stage(
-                    directory_descriptor,
-                    legacy_stage_name,
-                    error_code="transition-dxf-export-staging-failed",
-                )
-                committed_snapshots = _commit_staged_files(
+                staged_snapshots = _publish_staged_files(
                     directory_descriptor,
                     staged_files,
-                    entries,
+                    missing_entries,
                     output_directory,
                     directory_identity,
+                    cancellation_requested,
                 )
-            except Exception as error:
-                operation_error = error
+                expected_snapshots = tuple(
+                    before
+                    if before is not None
+                    else staged_snapshots[name]
+                    for name, before in zip(names, initial_snapshots)
+                )
+                _revalidate_complete_pair(
+                    directory_descriptor,
+                    output_directory,
+                    directory_identity,
+                    names,
+                    expected_snapshots,
+                )
+        except Exception as error:
+            _raise_bound_failure(
+                error,
+                directory_descriptor,
+                output_directory,
+                directory_identity,
+                entries,
+                initial_snapshots,
+                staged_files,
+            )
 
-            cleanup_error = None
-            if (
-                journal_snapshot is not None
-                and (
-                    operation_error is None
-                    or getattr(operation_error, "cleanup_complete", True)
-                    or getattr(operation_error, "code", "")
-                    == "transition-dxf-export-staging-failed"
-                )
-            ):
-                try:
-                    _cleanup_transaction(
-                        directory_descriptor,
-                        journal_name,
-                        journal_snapshot,
-                        legacy_stage_name,
-                    )
-                except TransitionDxfExportError as error:
-                    cleanup_error = error
-
-            if cleanup_error is not None:
-                rollback_error = None
-                if committed_snapshots is not None:
-                    try:
-                        _rollback_committed_files(
-                            directory_descriptor,
-                            entries,
-                            committed_snapshots,
-                        )
-                    except TransitionDxfExportError as error:
-                        rollback_error = error
-                journal_cleanup_error = None
-                if rollback_error is None:
-                    try:
-                        _remove_owned_file(
-                            directory_descriptor,
-                            journal_name,
-                            journal_snapshot,
-                            error_code=(
-                                "transition-dxf-export-cleanup-failed"
-                            ),
-                            description=(
-                                "the durable transaction journal"
-                            ),
-                        )
-                    except TransitionDxfExportError as error:
-                        journal_cleanup_error = error
-                terminal_error = rollback_error or journal_cleanup_error
-                changed = bool(
-                    cleanup_error.destination_changed
-                    or committed_snapshots is not None
-                    or getattr(
-                        operation_error,
-                        "destination_changed",
-                        False,
-                    )
-                )
-                raise _export_error(
-                    "transition-dxf-export-cleanup-failed",
-                    (
-                        cleanup_error.detail
-                        if terminal_error is None
-                        else "{}; owned output rollback or journal cleanup "
-                        "was incomplete".format(cleanup_error.detail)
-                    ),
-                    source_code=str(
-                        getattr(operation_error, "code", "")
-                        or getattr(terminal_error, "source_code", "")
-                        or cleanup_error.source_code
-                    ),
-                    destination_changed=changed,
-                    cleanup_complete=False,
-                    recoverable=(
-                        cleanup_error.recoverable
-                        if terminal_error is None
-                        else False
-                    ),
-                ) from (
-                    operation_error or terminal_error or cleanup_error
-                )
-            if operation_error is not None:
-                if isinstance(operation_error, TransitionDxfExportError):
-                    raise operation_error
-                raise _export_error(
-                    "transition-dxf-export-failed",
-                    "the staged export failed before a complete result was "
-                    "returned",
-                    source_code=type(operation_error).__name__,
-                ) from operation_error
-            if committed_snapshots is not None:
-                try:
-                    _verify_directory_identity(
-                        output_directory,
-                        directory_identity,
-                    )
-                except TransitionDxfExportError as identity_error:
-                    try:
-                        rollback_journal_snapshot = (
-                            _create_rollback_controls(
-                                directory_descriptor,
-                                journal_name,
-                                journal_temporary_name,
-                                transaction_document,
-                                entries,
-                                committed_snapshots,
-                            )
-                        )
-                        _rollback_committed_files(
-                            directory_descriptor,
-                            entries,
-                            committed_snapshots,
-                        )
-                        _cleanup_transaction(
-                            directory_descriptor,
-                            journal_name,
-                            rollback_journal_snapshot,
-                            legacy_stage_name,
-                        )
-                    except TransitionDxfExportError as rollback_error:
-                        raise _export_error(
-                            "transition-dxf-export-rollback-failed",
-                            "the output destination changed after commit "
-                            "and rollback was incomplete",
-                            source_code=identity_error.code,
-                            destination_changed=True,
-                            cleanup_complete=False,
-                            recoverable=False,
-                        ) from rollback_error
-                    raise identity_error
-            return result
-        finally:
+        try:
             _close_staged_files(staged_files)
+        except TransitionDxfExportError as error:
+            raise _export_error(
+                "transition-dxf-export-cleanup-failed",
+                "the complete output pair was retained but anonymous "
+                "descriptor cleanup was incomplete",
+                source_code=str(error.source_code or error.code),
+                destination_changed=bool(missing_entries),
+                cleanup_complete=False,
+                recoverable=False,
+            ) from error
+        return result
     finally:
         os.close(directory_descriptor)

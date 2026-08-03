@@ -722,19 +722,24 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
 ```
 
 The standalone proof covers deterministic DXF and dependency-manifest bytes,
-descriptor-relative destination control, rename and symbolic-link replacement,
-durable journal/staging/directory synchronisation, abrupt interruption after
-one and both commit links and after the first late-identity rollback unlink,
-preservation and next-invocation rejection of unclaimable residue, the current
-verify-then-unlink rollback path, complete exact-set reuse, collision refusal
-and cleanup. They neither establish an expected-inode atomic pathname deletion
-primitive nor prove automatic cross-process recovery. D-P6-003 selects strict
-add-only, journal-free monotonic completion for a later bounded Level 2
-implementation and focused proof; these current commands do not prove that
-future contract. The standalone sentinel is
+descriptor-relative destination control, resolve-to-bind removal and
+substitution, post-lock substitution, directory-rename and symbolic-link
+races, anonymous creation-bound staging and observed descriptor-close
+abandonment, exact zero-member, DXF-only, manifest-only and complete-pair
+states, inert historical controls, interruption after each addition,
+next-invocation monotonic completion, required directory synchronisation before
+complete-pair reuse and fail-closed preservation when that synchronisation
+fails, cancellation and injected failure after one addition,
+initial-member and post-addition substitution, unsupported primitives,
+complete exact-set reuse, non-regular-final and byte-collision refusal, active-lock
+fail-closed diagnostics and truthful retained-state
+diagnostics. It proves the bounded D-P6-003 strict add-only, journal-free
+implementation without granting deletion authority: no published final is
+removed, rewritten or replaced by TrackTemplate. The standalone sentinel is
 `Phase 6 transition DXF export validation passed`. The qualified FreeCAD proof
 imports both the non-zero `LWPOLYLINE` and zero-length `POINT`, and repeats
-document isolation, cancellation, injected failure and rollback checks. Its
+document isolation, cancellation, injected second-addition failure, exact
+partial preservation and next-invocation completion. Its
 required sentinel is
 `Phase 6 transition DXF qualified FreeCAD validation passed`. These commands
 remain bounded to the accepted Entry/Exit slice and private-development
