@@ -189,6 +189,42 @@ def _descriptor_is_open(descriptor):
     return True
 
 
+def _assert_acyclic_exception_chain(error):
+    observed = {}
+    pending = [error]
+    while pending:
+        current = pending.pop()
+        if current is None:
+            continue
+        identity = id(current)
+        assert identity not in observed, "cyclic exception graph"
+        observed[identity] = current
+        pending.append(current.__cause__)
+        pending.append(current.__context__)
+    return tuple(observed.values())
+
+
+def _assert_directory_lock_released(path):
+    descriptor = os.open(
+        path,
+        os.O_RDONLY
+        | os.O_DIRECTORY
+        | os.O_NOFOLLOW
+        | getattr(os, "O_CLOEXEC", 0),
+    )
+    locked = False
+    try:
+        adapter.fcntl.flock(
+            descriptor,
+            adapter.fcntl.LOCK_EX | adapter.fcntl.LOCK_NB,
+        )
+        locked = True
+    finally:
+        if locked:
+            adapter.fcntl.flock(descriptor, adapter.fcntl.LOCK_UN)
+        os.close(descriptor)
+
+
 def _historical_transaction_names(plan):
     value = (
         contract.TRANSITION_DXF_EXPORT_CONTRACT_ID
@@ -1343,6 +1379,353 @@ def _validate_changed_anonymous_staging_is_discarded():
         _assert_no_staging(output)
 
 
+def _validate_resource_acquisition_baseexception_matrix():
+    class LifecycleInterruption(BaseException):
+        pass
+
+    directory_cases = (
+        (
+            "directory-fstat",
+            KeyboardInterrupt("interrupt directory fstat"),
+        ),
+        (
+            "directory-lock",
+            SystemExit(37),
+        ),
+        (
+            "directory-identity",
+            LifecycleInterruption("interrupt directory identity check"),
+        ),
+    )
+    for boundary, interruption in directory_cases:
+        with tempfile.TemporaryDirectory() as temporary:
+            output = pathlib.Path(temporary) / boundary
+            output.mkdir()
+            metadata = os.lstat(output)
+            identity = (metadata.st_dev, metadata.st_ino)
+            original_fstat = adapter.os.fstat
+            original_flock = adapter.fcntl.flock
+            original_verify = adapter._verify_directory_identity
+            descriptors = []
+
+            def interrupt_fstat(descriptor):
+                descriptors.append(descriptor)
+                raise interruption
+
+            def interrupt_lock(descriptor, operation):
+                original_flock(descriptor, operation)
+                descriptors.append(descriptor)
+                raise interruption
+
+            def observe_lock(descriptor, operation):
+                original_flock(descriptor, operation)
+                descriptors.append(descriptor)
+
+            def interrupt_identity(_path, _identity):
+                raise interruption
+
+            if boundary == "directory-fstat":
+                adapter.os.fstat = interrupt_fstat
+            elif boundary == "directory-lock":
+                adapter.fcntl.flock = interrupt_lock
+            else:
+                adapter.fcntl.flock = observe_lock
+                adapter._verify_directory_identity = interrupt_identity
+            try:
+                _expect_interruption(
+                    lambda: adapter._open_output_directory(
+                        str(output),
+                        identity,
+                    ),
+                    interruption,
+                )
+            finally:
+                adapter._verify_directory_identity = original_verify
+                adapter.fcntl.flock = original_flock
+                adapter.os.fstat = original_fstat
+
+            open_states = [
+                _descriptor_is_open(descriptor)
+                for descriptor in descriptors
+            ]
+            for descriptor, is_open in zip(descriptors, open_states):
+                if is_open:
+                    os.close(descriptor)
+            assert len(descriptors) == 1, (boundary, descriptors)
+            assert open_states == [False], (boundary, open_states)
+            _assert_directory_lock_released(output)
+            diagnostic = interruption.__cause__
+            assert isinstance(
+                diagnostic,
+                adapter.TransitionDxfExportError,
+            ), boundary
+            assert diagnostic.code == "transition-dxf-export-failed"
+            assert diagnostic.source_code == type(interruption).__name__
+            assert diagnostic.destination_changed is True
+            assert diagnostic.cleanup_complete is True
+            assert diagnostic.recoverable is False
+            _assert_acyclic_exception_chain(interruption)
+            assert list(output.iterdir()) == []
+
+            descriptor = adapter._open_output_directory(
+                str(output),
+                identity,
+            )
+            os.close(descriptor)
+
+    existing_final_cases = (
+        (
+            "existing-final-inspection",
+            LifecycleInterruption("interrupt existing-final inspection"),
+        ),
+        (
+            "existing-final-close",
+            SystemExit(41),
+        ),
+    )
+    for boundary, interruption in existing_final_cases:
+        with tempfile.TemporaryDirectory() as temporary:
+            output = pathlib.Path(temporary) / boundary
+            output.mkdir()
+            state, specification, artifact, request = _fixture(output)
+            created = _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+            )
+            assert created.disposition == "created"
+            before = _regular_file_snapshots(output)
+            original_digest = adapter._sha256_descriptor
+            original_close = adapter.os.close
+            inspected_descriptors = []
+            close_interrupted = False
+
+            def interrupt_digest(descriptor):
+                inspected_descriptors.append(descriptor)
+                raise interruption
+
+            def observe_digest(descriptor):
+                inspected_descriptors.append(descriptor)
+                return original_digest(descriptor)
+
+            def interrupt_inspection_close(descriptor):
+                nonlocal close_interrupted
+                if (
+                    inspected_descriptors
+                    and descriptor == inspected_descriptors[0]
+                    and not close_interrupted
+                ):
+                    close_interrupted = True
+                    raise interruption
+                return original_close(descriptor)
+
+            if boundary == "existing-final-inspection":
+                adapter._sha256_descriptor = interrupt_digest
+            else:
+                adapter._sha256_descriptor = observe_digest
+                adapter.os.close = interrupt_inspection_close
+            try:
+                _expect_interruption(
+                    lambda: _export_with_stub(
+                        state,
+                        artifact,
+                        specification,
+                        request,
+                    ),
+                    interruption,
+                )
+            finally:
+                adapter.os.close = original_close
+                adapter._sha256_descriptor = original_digest
+
+            assert len(inspected_descriptors) == 1, (
+                boundary,
+                inspected_descriptors,
+            )
+            descriptor_open = _descriptor_is_open(
+                inspected_descriptors[0]
+            )
+            if boundary == "existing-final-inspection":
+                assert descriptor_open is False
+                expected_code = "transition-dxf-export-failed"
+                expected_destination_changed = True
+                expected_cleanup = True
+                expected_recoverable = False
+            else:
+                assert close_interrupted is True
+                expected_code = "transition-dxf-export-cleanup-failed"
+                expected_destination_changed = False
+                expected_cleanup = False
+                expected_recoverable = False
+            diagnostic = interruption.__cause__
+            assert isinstance(
+                diagnostic,
+                adapter.TransitionDxfExportError,
+            ), boundary
+            assert diagnostic.code == expected_code
+            assert diagnostic.source_code == type(interruption).__name__
+            assert (
+                diagnostic.destination_changed
+                is expected_destination_changed
+            )
+            assert diagnostic.cleanup_complete is expected_cleanup
+            assert diagnostic.recoverable is expected_recoverable
+            _assert_acyclic_exception_chain(interruption)
+            _assert_directory_lock_released(output)
+            assert _regular_file_snapshots(output) == before
+
+            reused = _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+            )
+            assert reused.disposition == "reused"
+            assert _regular_file_snapshots(output) == before
+            if descriptor_open:
+                original_close(inspected_descriptors[0])
+
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "anonymous-staging"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        original_fstat = adapter.os.fstat
+        staged_descriptors = []
+        interruption = LifecycleInterruption(
+            "interrupt anonymous staging acquisition"
+        )
+
+        def interrupt_first_anonymous_fstat(descriptor):
+            metadata = original_fstat(descriptor)
+            if metadata.st_nlink == 0 and not staged_descriptors:
+                staged_descriptors.append(descriptor)
+                raise interruption
+            return metadata
+
+        adapter.os.fstat = interrupt_first_anonymous_fstat
+        try:
+            _expect_interruption(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                ),
+                interruption,
+            )
+        finally:
+            adapter.os.fstat = original_fstat
+        assert len(staged_descriptors) == 1
+        _assert_descriptors_closed(staged_descriptors)
+        _assert_directory_lock_released(output)
+        diagnostic = interruption.__cause__
+        assert isinstance(diagnostic, adapter.TransitionDxfExportError)
+        assert diagnostic.code == "transition-dxf-export-failed"
+        assert diagnostic.source_code == "LifecycleInterruption"
+        assert diagnostic.destination_changed is False
+        assert diagnostic.cleanup_complete is True
+        assert diagnostic.recoverable is True
+        _assert_acyclic_exception_chain(interruption)
+        assert list(output.iterdir()) == []
+
+        recovered = _export_with_stub(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        assert recovered.disposition == "created"
+
+
+def _validate_existing_final_cleanup_failure_graph():
+    class ExistingFinalInterruption(BaseException):
+        pass
+
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        created = _export_with_stub(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        assert created.disposition == "created"
+        before = _regular_file_snapshots(output)
+        original_digest = adapter._sha256_descriptor
+        original_close = adapter.os.close
+        inspected_descriptors = []
+        close_failed = False
+        interruption = ExistingFinalInterruption(
+            "interrupt existing-final inspection"
+        )
+
+        def interrupt_digest(descriptor):
+            inspected_descriptors.append(descriptor)
+            raise interruption
+
+        def fail_inspection_close(descriptor):
+            nonlocal close_failed
+            if (
+                inspected_descriptors
+                and descriptor == inspected_descriptors[0]
+                and not close_failed
+            ):
+                close_failed = True
+                raise OSError("injected existing-final close failure")
+            return original_close(descriptor)
+
+        adapter._sha256_descriptor = interrupt_digest
+        adapter.os.close = fail_inspection_close
+        try:
+            _expect_interruption(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                ),
+                interruption,
+            )
+        finally:
+            adapter.os.close = original_close
+            adapter._sha256_descriptor = original_digest
+
+        assert len(inspected_descriptors) == 1, inspected_descriptors
+        descriptor = inspected_descriptors[0]
+        descriptor_open = _descriptor_is_open(descriptor)
+        if descriptor_open:
+            original_close(descriptor)
+        assert close_failed is True
+        assert descriptor_open is True
+        diagnostic = interruption.__cause__
+        assert isinstance(diagnostic, adapter.TransitionDxfExportError)
+        assert diagnostic.code == "transition-dxf-export-cleanup-failed"
+        assert diagnostic.source_code == "ExistingFinalInterruption"
+        assert diagnostic.destination_changed is False
+        assert diagnostic.cleanup_complete is False
+        assert diagnostic.recoverable is False
+        graph = _assert_acyclic_exception_chain(interruption)
+        assert any(
+            isinstance(error, OSError)
+            and str(error) == "injected existing-final close failure"
+            for error in graph
+        )
+        _assert_directory_lock_released(output)
+        assert _regular_file_snapshots(output) == before
+
+        reused = _export_with_stub(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        assert reused.disposition == "reused"
+        assert _regular_file_snapshots(output) == before
+
+
 def _validate_staging_baseexception_cleanup():
     class StagingInterruption(BaseException):
         pass
@@ -1463,6 +1846,12 @@ def _validate_cleanup_failure_preserves_baseexception():
                 diagnostic.__cause__,
                 adapter.TransitionDxfExportError,
             )
+            graph = _assert_acyclic_exception_chain(interruption)
+            assert any(
+                isinstance(error, OSError)
+                and str(error) == "injected anonymous close failure"
+                for error in graph
+            )
             assert list(output.iterdir()) == []
 
 
@@ -1549,6 +1938,7 @@ def _validate_success_cleanup_baseexception():
         assert diagnostic.destination_changed is True
         assert diagnostic.cleanup_complete is False
         assert diagnostic.recoverable is False
+        _assert_acyclic_exception_chain(interruption)
         assert (output / plan.dxf_filename).is_file()
         assert (output / plan.manifest_filename).is_file()
         _assert_no_staging(output)
@@ -1640,6 +2030,7 @@ def _validate_directory_close_failure_preserves_baseexception():
         assert diagnostic.destination_changed is False
         assert diagnostic.cleanup_complete is False
         assert diagnostic.recoverable is False
+        _assert_acyclic_exception_chain(interruption)
         assert list(output.iterdir()) == []
 
 
@@ -1703,6 +2094,7 @@ def _interrupted_export(output, interruption, *, after_addition):
     assert diagnostic.destination_changed is after_addition
     assert diagnostic.cleanup_complete is not after_addition
     assert diagnostic.recoverable is True
+    _assert_acyclic_exception_chain(interruption)
     return state, specification, artifact, request, plan
 
 
@@ -1809,6 +2201,7 @@ def _validate_uncertain_durability_baseexception():
         assert diagnostic.destination_changed is True
         assert diagnostic.cleanup_complete is False
         assert diagnostic.recoverable is False
+        _assert_acyclic_exception_chain(interruption)
         dxf_path = output / plan.dxf_filename
         assert dxf_path.is_file()
         assert not (output / plan.manifest_filename).exists()
@@ -2514,6 +2907,8 @@ def validate():
     _validate_rename_after_addition_preserves_output()
     _validate_anonymous_staging_has_no_pathname_deletion()
     _validate_changed_anonymous_staging_is_discarded()
+    _validate_resource_acquisition_baseexception_matrix()
+    _validate_existing_final_cleanup_failure_graph()
     _validate_staging_baseexception_cleanup()
     _validate_cleanup_failure_preserves_baseexception()
     _validate_success_cleanup_baseexception()

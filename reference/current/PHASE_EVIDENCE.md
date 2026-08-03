@@ -1014,6 +1014,53 @@ during cleanup remain outside this surviving-host proof. This is repair
 evidence only: Exit 3 remains Pending for a fresh Level 3 panel, Phase 6 remains
 1/5 and no risk or output authority changes.
 
+## B16 Entry/Exit systemic descriptor-and-lock ownership repair
+
+This bounded Level 2 repair starts from protected `main` at
+`d43ba79593f0b03cf7afa1155412d95818c7307c`. Retained pre-fix proof found a
+directory descriptor still open after a direct interruption during its first
+`fstat`, and an existing-final inspection descriptor still open with no
+structured cause after interruption of its close. Both failures were
+classified `implementation-defect` at the private transition-DXF resource-
+ownership boundary.
+
+Every exporter-owned descriptor close now passes through one private
+non-throwing close primitive. The acquiring scope closes output-directory and
+existing-final descriptors until their ownership transfer or return; the bound
+operation continues to own registered anonymous staging descriptors and the
+returned locked directory descriptor. Direct `KeyboardInterrupt`,
+`SystemExit` and custom `BaseException` instances remain the top-level object;
+cleanup failure is bounded chained context, all remaining owned closes are
+attempted, and every `__cause__` and `__context__` edge is proved free of a
+repeated exception identity while the close-error detail remains inspectable.
+Before publication,
+successful cleanup releases the lock and creates no final. A fresh invocation
+may safely retry, while the interrupted invocation remains conservatively
+changed/non-recoverable until exact destination state is independently
+revalidated. After the first link, exact finals remain untouched and link-to-
+directory-sync interruption remains durability-uncertain and non-recoverable.
+A close whose outcome is itself interrupted is reported cleanup-incomplete
+rather than claimed closed.
+
+The focused standalone exporter validator passed with `Phase 6 transition DXF
+export validation passed`; the qualified FreeCAD 1.1.1 exporter/import
+validator passed with `Phase 6 transition DXF qualified FreeCAD validation
+passed`. The complete standalone profile, project-progress control, governance
+mutation control and diff check also passed. The regression matrix covers
+directory open/lock/identity acquisition, existing-final inspection and close,
+existing-final and anonymous close failure during a direct interruption,
+anonymous staging acquisition, normal and failed cleanup, post-link/pre-sync
+interruption, exact-state preservation, safe or refused recovery diagnostics
+and deterministic retry. Existing filenames, bytes, hashes, manifest schema,
+public identifiers, receipt dispositions and add-only/no-overwrite collision
+authority remain unchanged.
+
+This is surviving-host implementation evidence, not Exit 3 admission or owner
+acceptance. Process kill, `os._exit`, a second asynchronous interruption during
+cleanup, wider host/filesystem durability, GUI/operator recovery and
+production clearance remain outside the proof. Phase 6 remains 1/5, Exit 3
+remains Pending and no risk state or authority changes.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition

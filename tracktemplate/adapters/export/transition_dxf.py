@@ -206,6 +206,31 @@ def _require_descriptor_controls():
         )
 
 
+def _close_owned_descriptor(descriptor):
+    """Attempt one owned close without replacing an active failure."""
+    try:
+        os.close(descriptor)
+    except BaseException as error:
+        # A close raised inside another handler otherwise points back to the
+        # active failure and can close a later diagnostic chain into a cycle.
+        error.__context__ = None
+        return error
+    return None
+
+
+def _raise_cleaned_interruption(error):
+    diagnostic = _structured_failure(error)
+    if diagnostic is None:
+        diagnostic = _export_error(
+            "transition-dxf-export-failed",
+            "the transition DXF export was interrupted",
+            source_code=type(error).__name__,
+            destination_changed=True,
+            recoverable=False,
+        )
+    raise error from diagnostic
+
+
 def _open_output_directory(path, expected_identity):
     _require_descriptor_controls()
     flags = (
@@ -258,8 +283,17 @@ def _open_output_directory(path, expected_identity):
             ) from error
         _verify_directory_identity(path, expected_identity)
         return descriptor
-    except Exception:
-        os.close(descriptor)
+    except BaseException as error:
+        close_error = _close_owned_descriptor(descriptor)
+        if close_error is not None:
+            _raise_descriptor_cleanup_failure(
+                error,
+                close_error,
+                "the output-directory descriptor could not be closed",
+                False,
+            )
+        if not isinstance(error, Exception):
+            _raise_cleaned_interruption(error)
         raise
 
 
@@ -350,50 +384,70 @@ def _file_snapshot(
             recoverable=False,
         ) from error
     try:
-        opened_metadata = os.fstat(descriptor)
-        if (
-            not stat.S_ISREG(opened_metadata.st_mode)
-            or _metadata_snapshot(opened_metadata)
-            != _metadata_snapshot(metadata)
-        ):
-            raise _export_error(
-                error_code,
-                "{} changed while it was opened".format(description),
-                destination_changed=True,
-                cleanup_complete=False,
-                recoverable=False,
+        try:
+            opened_metadata = os.fstat(descriptor)
+            if (
+                not stat.S_ISREG(opened_metadata.st_mode)
+                or _metadata_snapshot(opened_metadata)
+                != _metadata_snapshot(metadata)
+            ):
+                raise _export_error(
+                    error_code,
+                    "{} changed while it was opened".format(description),
+                    destination_changed=True,
+                    cleanup_complete=False,
+                    recoverable=False,
+                )
+            digest = _sha256_descriptor(descriptor)
+            final_metadata = os.fstat(descriptor)
+            path_metadata = os.stat(
+                name,
+                dir_fd=directory_descriptor,
+                follow_symlinks=False,
             )
-        digest = _sha256_descriptor(descriptor)
-        final_metadata = os.fstat(descriptor)
-        path_metadata = os.stat(
-            name,
-            dir_fd=directory_descriptor,
-            follow_symlinks=False,
-        )
-        if (
-            _metadata_snapshot(final_metadata)
-            != _metadata_snapshot(opened_metadata)
-            or _metadata_snapshot(path_metadata)
-            != _metadata_snapshot(opened_metadata)
-        ):
+            if (
+                _metadata_snapshot(final_metadata)
+                != _metadata_snapshot(opened_metadata)
+                or _metadata_snapshot(path_metadata)
+                != _metadata_snapshot(opened_metadata)
+            ):
+                raise _export_error(
+                    error_code,
+                    "{} changed while it was read".format(description),
+                    destination_changed=True,
+                    cleanup_complete=False,
+                    recoverable=False,
+                )
+        except OSError as error:
             raise _export_error(
                 error_code,
                 "{} changed while it was read".format(description),
+                source_code=type(error).__name__,
                 destination_changed=True,
                 cleanup_complete=False,
                 recoverable=False,
+            ) from error
+    except BaseException as error:
+        close_error = _close_owned_descriptor(descriptor)
+        if close_error is not None:
+            _raise_descriptor_cleanup_failure(
+                error,
+                close_error,
+                "an existing-final inspection descriptor could not be "
+                "closed",
+                False,
             )
-    except OSError as error:
-        raise _export_error(
-            error_code,
-            "{} changed while it was read".format(description),
-            source_code=type(error).__name__,
-            destination_changed=True,
-            cleanup_complete=False,
-            recoverable=False,
-        ) from error
-    finally:
-        os.close(descriptor)
+        if not isinstance(error, Exception):
+            _raise_cleaned_interruption(error)
+        raise
+    close_error = _close_owned_descriptor(descriptor)
+    if close_error is not None:
+        _raise_descriptor_cleanup_failure(
+            None,
+            close_error,
+            "an existing-final inspection descriptor could not be closed",
+            False,
+        )
     return _metadata_snapshot(opened_metadata) + (digest,)
 
 
@@ -950,9 +1004,8 @@ def _write_staged_file(
             and staged_files.get(name, (None, None))[0] == descriptor
         )
         if descriptor is not None and not registered:
-            try:
-                os.close(descriptor)
-            except OSError as close_error:
+            close_error = _close_owned_descriptor(descriptor)
+            if close_error is not None:
                 cleanup_diagnostic = _export_error(
                     "transition-dxf-export-cleanup-failed",
                     "an anonymous staging descriptor could not be closed",
@@ -978,9 +1031,8 @@ def _close_staged_files(staged_files):
     close_error = None
     interruption = None
     for descriptor, _snapshot in staged_files.values():
-        try:
-            os.close(descriptor)
-        except BaseException as error:
+        error = _close_owned_descriptor(descriptor)
+        if error is not None:
             if isinstance(error, Exception):
                 close_error = close_error or error
             elif interruption is None:
@@ -1053,9 +1105,10 @@ def _raise_completion_cleanup_failure(error, destination_changed):
     raise error from diagnostic
 
 
-def _raise_directory_cleanup_failure(
+def _raise_descriptor_cleanup_failure(
     primary_error,
     close_error,
+    message,
     destination_changed,
 ):
     source_error = (
@@ -1063,7 +1116,7 @@ def _raise_directory_cleanup_failure(
     )
     diagnostic = _cleanup_failure_diagnostic(
         source_error,
-        "the bound output-directory descriptor could not be closed",
+        message,
         destination_changed,
     )
     if primary_error is None:
@@ -1329,6 +1382,9 @@ def _bound_failure_diagnostic(
                 "anonymous staging descriptor cleanup was incomplete",
                 False,
             )
+        # Cleanup ran while the primary failure was active. Keep its explicit
+        # close-error cause, but detach the implicit path back to that failure.
+        cleanup_diagnostic.__context__ = None
         close_error = close_error or cleanup_diagnostic
 
     source_error = (
@@ -1892,21 +1948,21 @@ def export_transition_dxf(
                 bool(missing_entries),
             )
     except BaseException as error:
-        try:
-            os.close(directory_descriptor)
-        except BaseException as close_error:
-            _raise_directory_cleanup_failure(
+        close_error = _close_owned_descriptor(directory_descriptor)
+        if close_error is not None:
+            _raise_descriptor_cleanup_failure(
                 error,
                 close_error,
+                "the bound output-directory descriptor could not be closed",
                 False,
             )
         raise
-    try:
-        os.close(directory_descriptor)
-    except BaseException as close_error:
-        _raise_directory_cleanup_failure(
+    close_error = _close_owned_descriptor(directory_descriptor)
+    if close_error is not None:
+        _raise_descriptor_cleanup_failure(
             None,
             close_error,
+            "the bound output-directory descriptor could not be closed",
             bool(missing_entries),
         )
     return result
