@@ -725,9 +725,14 @@ The standalone proof covers deterministic DXF and dependency-manifest bytes,
 descriptor-relative destination control, resolve-to-bind removal and
 substitution, post-lock substitution, directory-rename and symbolic-link
 races, anonymous creation-bound staging and observed descriptor-close
-abandonment, exact zero-member, DXF-only, manifest-only and complete-pair
-states, inert historical controls, interruption after each addition,
-next-invocation monotonic completion, required directory synchronisation before
+abandonment, surviving-host `BaseException` propagation with chained truthful
+retained-state diagnostics, preservation of the original interruption when
+an anonymous close itself fails, best-effort remaining anonymous closes and
+non-replacing bound-directory close diagnostics, non-recoverable
+post-link/pre-sync durability uncertainty, exact zero-member, DXF-only,
+manifest-only and complete-pair states, inert historical controls,
+interruption after each addition, next-invocation monotonic completion,
+required directory synchronisation before
 complete-pair reuse and fail-closed preservation when that synchronisation
 fails, cancellation and injected failure after one addition,
 initial-member and post-addition substitution, unsupported primitives,
@@ -739,8 +744,8 @@ removed, rewritten or replaced by TrackTemplate. The standalone sentinel is
 `Phase 6 transition DXF export validation passed`. The qualified FreeCAD proof
 imports both the non-zero `LWPOLYLINE` and zero-length `POINT`, and repeats
 document isolation, cancellation, injected second-addition failure, exact
-partial preservation and next-invocation completion. Its
-required sentinel is
+partial preservation and next-invocation completion, plus surviving-host
+interruption cleanup. Its required sentinel is
 `Phase 6 transition DXF qualified FreeCAD validation passed`. These commands
 remain bounded to the accepted Entry/Exit slice and private-development
 `unknown` output; they supply no GUI, production-output, Phase 6 exit or release

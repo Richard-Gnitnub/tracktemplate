@@ -128,6 +128,17 @@ def _expect_export_error(action, code):
     raise AssertionError("Expected TransitionDxfExportError {!r}".format(code))
 
 
+def _expect_interruption(action, expected):
+    try:
+        action()
+    except BaseException as error:
+        assert error is expected, (type(error), error)
+        return
+    raise AssertionError(
+        "Expected interruption {!r}".format(type(expected).__name__)
+    )
+
+
 def _expect_state_error(action, code):
     try:
         action()
@@ -168,6 +179,14 @@ def _assert_descriptors_closed(descriptors):
         except OSError:
             continue
         raise AssertionError("anonymous staging descriptor remained open")
+
+
+def _descriptor_is_open(descriptor):
+    try:
+        os.fstat(descriptor)
+    except OSError:
+        return False
+    return True
 
 
 def _historical_transaction_names(plan):
@@ -1275,11 +1294,19 @@ def _validate_changed_anonymous_staging_is_discarded():
         original_write = adapter._write_staged_file
         staged_descriptors = []
 
-        def corrupt_manifest_write(directory_descriptor, name, value):
+        def corrupt_manifest_write(
+            directory_descriptor,
+            name,
+            value,
+            staged_files,
+            operation_state,
+        ):
             staged_file = original_write(
                 directory_descriptor,
                 name,
                 b"{}\n" if name.endswith(".json") else value,
+                staged_files,
+                operation_state,
             )
             staged_descriptors.append(staged_file[0])
             return staged_file
@@ -1313,6 +1340,490 @@ def _validate_changed_anonymous_staging_is_discarded():
             request,
         )
         assert recovered.disposition == "created"
+        _assert_no_staging(output)
+
+
+def _validate_staging_baseexception_cleanup():
+    class StagingInterruption(BaseException):
+        pass
+
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        directory_descriptor = os.open(
+            output,
+            os.O_RDONLY
+            | os.O_DIRECTORY
+            | os.O_NOFOLLOW
+            | getattr(os, "O_CLOEXEC", 0),
+        )
+        original_write_all = adapter._write_all
+        staged_descriptors = []
+        interruption = StagingInterruption("interrupt staged write")
+
+        def interrupt_second_write(descriptor, value):
+            staged_descriptors.append(descriptor)
+            if len(staged_descriptors) == 2:
+                raise interruption
+            original_write_all(descriptor, value)
+
+        adapter._write_all = interrupt_second_write
+        staged_files = {}
+        operation_state = {
+            "cleanup_error": None,
+            "durability_uncertain": False,
+        }
+        try:
+            _expect_interruption(
+                lambda: adapter._create_staged_files(
+                    directory_descriptor,
+                    (
+                        ("first.dxf", b"first\n"),
+                        ("second.json", b"{}\n"),
+                    ),
+                    staged_files,
+                    operation_state,
+                ),
+                interruption,
+            )
+        finally:
+            adapter._close_staged_files(staged_files)
+            adapter._write_all = original_write_all
+            os.close(directory_descriptor)
+        assert len(staged_descriptors) == 2
+        _assert_descriptors_closed(staged_descriptors)
+
+
+def _validate_cleanup_failure_preserves_baseexception():
+    class CleanupInterruption(BaseException):
+        pass
+
+    for failed_descriptor_index in (0, 1):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = pathlib.Path(temporary) / "output"
+            output.mkdir()
+            state, specification, artifact, request = _fixture(output)
+            original_write_all = adapter._write_all
+            original_close = adapter.os.close
+            staged_descriptors = []
+            close_failed = False
+            interruption = CleanupInterruption(
+                "preserve interruption through close failure"
+            )
+
+            def interrupt_second_write(descriptor, value):
+                staged_descriptors.append(descriptor)
+                if len(staged_descriptors) == 2:
+                    raise interruption
+                original_write_all(descriptor, value)
+
+            def fail_selected_close(descriptor):
+                nonlocal close_failed
+                if (
+                    len(staged_descriptors) == 2
+                    and descriptor
+                    == staged_descriptors[failed_descriptor_index]
+                    and not close_failed
+                ):
+                    close_failed = True
+                    raise OSError("injected anonymous close failure")
+                return original_close(descriptor)
+
+            adapter._write_all = interrupt_second_write
+            adapter.os.close = fail_selected_close
+            try:
+                _expect_interruption(
+                    lambda: _export_with_stub(
+                        state,
+                        artifact,
+                        specification,
+                        request,
+                    ),
+                    interruption,
+                )
+            finally:
+                adapter.os.close = original_close
+                adapter._write_all = original_write_all
+                for descriptor in staged_descriptors:
+                    try:
+                        original_close(descriptor)
+                    except OSError:
+                        pass
+
+            assert len(staged_descriptors) == 2, staged_descriptors
+            assert close_failed is True
+            diagnostic = interruption.__cause__
+            assert isinstance(diagnostic, adapter.TransitionDxfExportError)
+            assert diagnostic.code == "transition-dxf-export-cleanup-failed"
+            assert diagnostic.source_code == "CleanupInterruption"
+            assert diagnostic.destination_changed is False
+            assert diagnostic.cleanup_complete is False
+            assert diagnostic.recoverable is False
+            assert isinstance(
+                diagnostic.__cause__,
+                adapter.TransitionDxfExportError,
+            )
+            assert list(output.iterdir()) == []
+
+
+def _validate_success_cleanup_baseexception():
+    class CleanupInterruption(BaseException):
+        pass
+
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        original_write = adapter._write_staged_file
+        original_close = adapter.os.close
+        staged_descriptors = []
+        close_interrupted = False
+        interruption = CleanupInterruption(
+            "interrupt normal-success anonymous cleanup"
+        )
+
+        def observe_write(
+            directory_descriptor,
+            name,
+            value,
+            staged_files,
+            operation_state,
+        ):
+            staged_file = original_write(
+                directory_descriptor,
+                name,
+                value,
+                staged_files,
+                operation_state,
+            )
+            staged_descriptors.append(staged_file[0])
+            return staged_file
+
+        def interrupt_first_staged_close(descriptor):
+            nonlocal close_interrupted
+            if (
+                len(staged_descriptors) == 2
+                and descriptor == staged_descriptors[0]
+                and not close_interrupted
+            ):
+                close_interrupted = True
+                raise interruption
+            return original_close(descriptor)
+
+        adapter._write_staged_file = observe_write
+        adapter.os.close = interrupt_first_staged_close
+        try:
+            _expect_interruption(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                ),
+                interruption,
+            )
+        finally:
+            adapter.os.close = original_close
+            adapter._write_staged_file = original_write
+
+        open_states = [
+            _descriptor_is_open(descriptor)
+            for descriptor in staged_descriptors
+        ]
+        for descriptor, is_open in zip(staged_descriptors, open_states):
+            if is_open:
+                original_close(descriptor)
+
+        assert close_interrupted is True
+        assert open_states == [True, False], open_states
+        diagnostic = interruption.__cause__
+        assert isinstance(diagnostic, adapter.TransitionDxfExportError)
+        assert diagnostic.code == "transition-dxf-export-cleanup-failed"
+        assert diagnostic.source_code == "CleanupInterruption"
+        assert diagnostic.destination_changed is True
+        assert diagnostic.cleanup_complete is False
+        assert diagnostic.recoverable is False
+        assert (output / plan.dxf_filename).is_file()
+        assert (output / plan.manifest_filename).is_file()
+        _assert_no_staging(output)
+
+
+def _validate_directory_close_failure_preserves_baseexception():
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        original_open_directory = adapter._open_output_directory
+        original_write = adapter._write_staged_file
+        original_close = adapter.os.close
+        directory_descriptors = []
+        staged_descriptors = []
+        close_failed = False
+        interruption = KeyboardInterrupt(
+            "preserve interruption through directory close failure"
+        )
+
+        def observe_directory(path, expected_identity):
+            descriptor = original_open_directory(path, expected_identity)
+            directory_descriptors.append(descriptor)
+            return descriptor
+
+        def observe_write(
+            directory_descriptor,
+            name,
+            value,
+            staged_files,
+            operation_state,
+        ):
+            staged_file = original_write(
+                directory_descriptor,
+                name,
+                value,
+                staged_files,
+                operation_state,
+            )
+            staged_descriptors.append(staged_file[0])
+            return staged_file
+
+        def interrupt_after_staging():
+            if len(staged_descriptors) == 2:
+                raise interruption
+            return False
+
+        def fail_directory_close(descriptor):
+            nonlocal close_failed
+            if (
+                directory_descriptors
+                and descriptor == directory_descriptors[0]
+                and not close_failed
+            ):
+                close_failed = True
+                raise OSError("injected directory close failure")
+            return original_close(descriptor)
+
+        adapter._open_output_directory = observe_directory
+        adapter._write_staged_file = observe_write
+        adapter.os.close = fail_directory_close
+        try:
+            _expect_interruption(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                    cancellation_requested=interrupt_after_staging,
+                ),
+                interruption,
+            )
+        finally:
+            adapter.os.close = original_close
+            adapter._write_staged_file = original_write
+            adapter._open_output_directory = original_open_directory
+
+        assert len(directory_descriptors) == 1
+        directory_open = _descriptor_is_open(directory_descriptors[0])
+        if directory_open:
+            original_close(directory_descriptors[0])
+        assert close_failed is True
+        assert directory_open is True
+        _assert_descriptors_closed(staged_descriptors)
+        diagnostic = interruption.__cause__
+        assert isinstance(diagnostic, adapter.TransitionDxfExportError)
+        assert diagnostic.code == "transition-dxf-export-cleanup-failed"
+        assert diagnostic.source_code == "KeyboardInterrupt"
+        assert diagnostic.destination_changed is False
+        assert diagnostic.cleanup_complete is False
+        assert diagnostic.recoverable is False
+        assert list(output.iterdir()) == []
+
+
+def _interrupted_export(output, interruption, *, after_addition):
+    state, specification, artifact, request = _fixture(output)
+    plan = api.prepare_transition_dxf_export(
+        state,
+        artifact,
+        specification,
+        request,
+    )
+    original_write = adapter._write_staged_file
+    staged_descriptors = []
+
+    def observe_write(
+        directory_descriptor,
+        name,
+        value,
+        staged_files,
+        operation_state,
+    ):
+        staged_file = original_write(
+            directory_descriptor,
+            name,
+            value,
+            staged_files,
+            operation_state,
+        )
+        staged_descriptors.append(staged_file[0])
+        return staged_file
+
+    def interrupt_at_boundary():
+        added = any(
+            (output / name).exists()
+            for name in (plan.dxf_filename, plan.manifest_filename)
+        )
+        if len(staged_descriptors) == 2 and added == after_addition:
+            raise interruption
+        return False
+
+    adapter._write_staged_file = observe_write
+    try:
+        _expect_interruption(
+            lambda: _export_with_stub(
+                state,
+                artifact,
+                specification,
+                request,
+                cancellation_requested=interrupt_at_boundary,
+            ),
+            interruption,
+        )
+    finally:
+        adapter._write_staged_file = original_write
+    assert len(staged_descriptors) == 2
+    _assert_descriptors_closed(staged_descriptors)
+    diagnostic = interruption.__cause__
+    assert isinstance(diagnostic, adapter.TransitionDxfExportError)
+    assert diagnostic.code == "transition-dxf-export-failed"
+    assert diagnostic.source_code == type(interruption).__name__
+    assert diagnostic.destination_changed is after_addition
+    assert diagnostic.cleanup_complete is not after_addition
+    assert diagnostic.recoverable is True
+    return state, specification, artifact, request, plan
+
+
+def _validate_surviving_host_baseexception_cleanup():
+    class HostInterruption(BaseException):
+        pass
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        for name, interruption in (
+            ("keyboard", KeyboardInterrupt("interrupt before publication")),
+            ("system-exit", SystemExit(23)),
+        ):
+            output = root / name
+            output.mkdir()
+            _interrupted_export(
+                output,
+                interruption,
+                after_addition=False,
+            )
+            assert list(output.iterdir()) == []
+            if isinstance(interruption, SystemExit):
+                assert interruption.code == 23
+
+        output = root / "post-publication"
+        output.mkdir()
+        interruption = HostInterruption("interrupt after publication")
+        state, specification, artifact, request, plan = _interrupted_export(
+            output,
+            interruption,
+            after_addition=True,
+        )
+        retained = tuple(
+            output / name
+            for name in (plan.dxf_filename, plan.manifest_filename)
+            if (output / name).exists()
+        )
+        assert len(retained) == 1
+        retained_snapshot = _path_snapshot(retained[0])
+
+        recovered = _export_with_stub(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        assert recovered.disposition == "created"
+        assert _path_snapshot(retained[0]) == retained_snapshot
+        assert (output / plan.dxf_filename).is_file()
+        assert (output / plan.manifest_filename).is_file()
+        _assert_no_staging(output)
+
+
+def _validate_uncertain_durability_baseexception():
+    class DurabilityInterruption(BaseException):
+        pass
+
+    with tempfile.TemporaryDirectory() as temporary:
+        output = pathlib.Path(temporary) / "output"
+        output.mkdir()
+        state, specification, artifact, request = _fixture(output)
+        plan = api.prepare_transition_dxf_export(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        original_link = adapter._link_file
+        interruption = DurabilityInterruption(
+            "interrupt after link before directory sync"
+        )
+
+        def interrupt_after_first_link(
+            source_directory_descriptor,
+            destination_directory_descriptor,
+            destination_name,
+        ):
+            original_link(
+                source_directory_descriptor,
+                destination_directory_descriptor,
+                destination_name,
+            )
+            if destination_name == plan.dxf_filename:
+                raise interruption
+
+        adapter._link_file = interrupt_after_first_link
+        try:
+            _expect_interruption(
+                lambda: _export_with_stub(
+                    state,
+                    artifact,
+                    specification,
+                    request,
+                ),
+                interruption,
+            )
+        finally:
+            adapter._link_file = original_link
+
+        diagnostic = interruption.__cause__
+        assert isinstance(diagnostic, adapter.TransitionDxfExportError)
+        assert diagnostic.code == "transition-dxf-export-failed"
+        assert diagnostic.source_code == "DurabilityInterruption"
+        assert diagnostic.destination_changed is True
+        assert diagnostic.cleanup_complete is False
+        assert diagnostic.recoverable is False
+        dxf_path = output / plan.dxf_filename
+        assert dxf_path.is_file()
+        assert not (output / plan.manifest_filename).exists()
+        retained_snapshot = _path_snapshot(dxf_path)
+        _assert_no_staging(output)
+
+        recovered = _export_with_stub(
+            state,
+            artifact,
+            specification,
+            request,
+        )
+        assert recovered.disposition == "created"
+        assert _path_snapshot(dxf_path) == retained_snapshot
+        assert (output / plan.manifest_filename).is_file()
         _assert_no_staging(output)
 
 
@@ -2003,6 +2514,12 @@ def validate():
     _validate_rename_after_addition_preserves_output()
     _validate_anonymous_staging_has_no_pathname_deletion()
     _validate_changed_anonymous_staging_is_discarded()
+    _validate_staging_baseexception_cleanup()
+    _validate_cleanup_failure_preserves_baseexception()
+    _validate_success_cleanup_baseexception()
+    _validate_directory_close_failure_preserves_baseexception()
+    _validate_surviving_host_baseexception_cleanup()
+    _validate_uncertain_durability_baseexception()
     print("Phase 6 transition DXF export validation passed")
 
 
