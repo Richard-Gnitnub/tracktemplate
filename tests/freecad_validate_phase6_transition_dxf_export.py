@@ -3,6 +3,7 @@
 
 import json
 import math
+import os
 import pathlib
 import sys
 import tempfile
@@ -152,6 +153,35 @@ def _assert_descriptors_closed(descriptors):
         except OSError:
             continue
         raise AssertionError("anonymous staging descriptor remained open")
+
+
+def _descriptor_is_open(descriptor):
+    try:
+        os.fstat(descriptor)
+    except OSError:
+        return False
+    return True
+
+
+def _assert_directory_lock_released(path):
+    descriptor = os.open(
+        path,
+        os.O_RDONLY
+        | os.O_DIRECTORY
+        | os.O_NOFOLLOW
+        | getattr(os, "O_CLOEXEC", 0),
+    )
+    locked = False
+    try:
+        exporter.fcntl.flock(
+            descriptor,
+            exporter.fcntl.LOCK_EX | exporter.fcntl.LOCK_NB,
+        )
+        locked = True
+    finally:
+        if locked:
+            exporter.fcntl.flock(descriptor, exporter.fcntl.LOCK_UN)
+        os.close(descriptor)
 
 
 def _validate_freecad_dxf_import(dxf_path, exact_result):
@@ -408,6 +438,142 @@ def _validate_surviving_host_interruption(
     )
     assert receipt.disposition == "created"
     assert _application_snapshot() == before
+    _assert_no_staging(output)
+
+
+def _validate_resource_acquisition_interruptions(
+    root,
+    editable,
+    state,
+    specification,
+    artifact,
+):
+    output = root / "resource-acquisition-interruption"
+    output.mkdir()
+    request = api.TransitionDxfExportRequest(
+        str(output),
+        api.DEVELOPMENT_CHECKPOINT,
+    )
+    App.setActiveDocument(str(editable.Name))
+    before = _application_snapshot()
+    original_fstat = exporter.os.fstat
+    directory_descriptors = []
+    interruption = KeyboardInterrupt(
+        "qualified directory-acquisition interruption"
+    )
+
+    def interrupt_directory_fstat(descriptor):
+        directory_descriptors.append(descriptor)
+        raise interruption
+
+    exporter.os.fstat = interrupt_directory_fstat
+    try:
+        try:
+            exporter.export_transition_dxf(
+                state,
+                artifact,
+                specification,
+                request,
+            )
+        except KeyboardInterrupt as error:
+            assert error is interruption
+        else:
+            raise AssertionError(
+                "Expected qualified directory-acquisition interruption"
+            )
+    finally:
+        exporter.os.fstat = original_fstat
+
+    assert len(directory_descriptors) == 1
+    _assert_descriptors_closed(directory_descriptors)
+    _assert_directory_lock_released(output)
+    assert list(output.iterdir()) == []
+    assert _application_snapshot() == before
+    diagnostic = interruption.__cause__
+    assert isinstance(diagnostic, exporter.TransitionDxfExportError)
+    assert diagnostic.code == "transition-dxf-export-failed"
+    assert diagnostic.source_code == "KeyboardInterrupt"
+    assert diagnostic.destination_changed is True
+    assert diagnostic.cleanup_complete is True
+    assert diagnostic.recoverable is False
+
+    receipt = exporter.export_transition_dxf(
+        state,
+        artifact,
+        specification,
+        request,
+    )
+    assert receipt.disposition == "created"
+    exact_outputs = _directory_snapshot(output)
+    assert _application_snapshot() == before
+
+    original_digest = exporter._sha256_descriptor
+    original_close = exporter.os.close
+    final_descriptors = []
+    close_interrupted = False
+    close_interruption = SystemExit(43)
+
+    def observe_final_digest(descriptor):
+        final_descriptors.append(descriptor)
+        return original_digest(descriptor)
+
+    def interrupt_final_close(descriptor):
+        nonlocal close_interrupted
+        if (
+            final_descriptors
+            and descriptor == final_descriptors[0]
+            and not close_interrupted
+        ):
+            close_interrupted = True
+            raise close_interruption
+        return original_close(descriptor)
+
+    exporter._sha256_descriptor = observe_final_digest
+    exporter.os.close = interrupt_final_close
+    try:
+        try:
+            exporter.export_transition_dxf(
+                state,
+                artifact,
+                specification,
+                request,
+            )
+        except SystemExit as error:
+            assert error is close_interruption
+            assert error.code == 43
+        else:
+            raise AssertionError(
+                "Expected qualified existing-final close interruption"
+            )
+    finally:
+        exporter.os.close = original_close
+        exporter._sha256_descriptor = original_digest
+
+    assert close_interrupted is True
+    assert len(final_descriptors) == 1
+    final_descriptor_open = _descriptor_is_open(final_descriptors[0])
+    _assert_directory_lock_released(output)
+    assert _directory_snapshot(output) == exact_outputs
+    assert _application_snapshot() == before
+    diagnostic = close_interruption.__cause__
+    assert isinstance(diagnostic, exporter.TransitionDxfExportError)
+    assert diagnostic.code == "transition-dxf-export-cleanup-failed"
+    assert diagnostic.source_code == "SystemExit"
+    assert diagnostic.destination_changed is False
+    assert diagnostic.cleanup_complete is False
+    assert diagnostic.recoverable is False
+
+    reused = exporter.export_transition_dxf(
+        state,
+        artifact,
+        specification,
+        request,
+    )
+    assert reused.disposition == "reused"
+    assert _directory_snapshot(output) == exact_outputs
+    assert _application_snapshot() == before
+    if final_descriptor_open:
+        original_close(final_descriptors[0])
     _assert_no_staging(output)
 
 
@@ -685,6 +851,13 @@ def validate():
                 artifact,
             )
             _validate_surviving_host_interruption(
+                root,
+                editable,
+                state,
+                specification,
+                artifact,
+            )
+            _validate_resource_acquisition_interruptions(
                 root,
                 editable,
                 state,
