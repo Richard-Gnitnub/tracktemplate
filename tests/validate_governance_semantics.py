@@ -748,13 +748,13 @@ def validate_current_evidence_mutations() -> None:
 
     exit3_row = table_row_containing(
         evidence,
-        "D-P6-003 selects a strict add-only, journal-free monotonic recovery "
-        "contract",
+        "bounded D-P6-003 add-only implementation and focused condition 1/3 "
+        "proof",
     )
     exit3_promoted = replace_once(
         exit3_row,
-        "Pending — D-P6-003 selects",
-        "Evidenced — D-P6-003 selects",
+        "Pending — the bounded D-P6-003",
+        "Evidenced — the bounded D-P6-003",
     )
     expect_rejected(
         "phase-evidence/exit3-prematurely-evidenced",
@@ -1084,6 +1084,71 @@ def validate_current_evidence_mutations() -> None:
         "D-P6-003 recovery-authority contract or status boundary drifted",
     )
 
+    implementation_uses_post_link_rollback = replace_once(
+        evidence,
+        "no\npost-publication rollback, journal cleanup or final-path unlink "
+        "route",
+        "a\npost-publication rollback and final-path unlink route",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-implementation-reintroduces-final-unlink",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            implementation_uses_post_link_rollback,
+        ),
+        "Phase 6 add-only recovery implementation evidence drifted",
+    )
+
+    implementation_trusts_historical_controls = replace_once(
+        evidence,
+        "Historical journals, `.new` files\nand stage directories are inert",
+        "Historical journals, `.new` files\nand stage directories are trusted",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-implementation-trusts-historical-controls",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            implementation_trusts_historical_controls,
+        ),
+        "Phase 6 add-only recovery implementation evidence drifted",
+    )
+
+    implementation_hash_tampered = replace_once(
+        evidence,
+        "6861d0565a737615ec5b242aaa8d2b3efd51b0e22aad9d93fb929489a25fd861",
+        "6861d0565a737615ec5b242aaa8d2b3efd51b0e22aad9d93fb929489a25fd860",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-implementation-output-hash-tampered",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            implementation_hash_tampered,
+        ),
+        "Phase 6 add-only recovery implementation evidence drifted",
+    )
+
+    implementation_review_closed = replace_once(
+        evidence,
+        "Condition 6 remains open",
+        "Condition 6 is closed",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-implementation-review-prematurely-closed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            implementation_review_closed,
+        ),
+        "Phase 6 add-only recovery implementation evidence drifted",
+    )
+
     exit4_row = table_row_containing(
         evidence,
         "PR #33 accounts for complete cold/warm Edit, Validate and Export cost",
@@ -1291,7 +1356,7 @@ def validate_project_plan_mutations() -> None:
 
 
 def validate_transition_export_validation_mutations() -> None:
-    """Reject promotion of current interruption checks into D-P6-003 proof."""
+    """Reject weakening or promotion of the bounded D-P6-003 proof."""
     validation = read("reference/VALIDATION.md")
     diagnostic = (
         "the transition DXF command, sentinel or recovery-evidence boundary "
@@ -1299,19 +1364,64 @@ def validate_transition_export_validation_mutations() -> None:
     )
     cases = (
         (
-            "validation/exit3-current-command-claims-automatic-recovery",
+            "validation/exit3-prebind-substitution-proof-withdrawn",
             replace_once(
                 validation,
-                "nor prove automatic cross-process recovery",
-                "and prove automatic cross-process recovery",
+                "resolve-to-bind removal and\nsubstitution",
+                "resolve-to-bind removal only",
             ),
         ),
         (
-            "validation/exit3-future-contract-claimed-by-current-command",
+            "validation/exit3-active-lock-made-recoverable",
             replace_once(
                 validation,
-                "these current commands do not prove that\nfuture contract",
-                "these current commands prove that\nfuture contract",
+                "active-lock\nfail-closed diagnostics",
+                "active-lock success diagnostics",
+            ),
+        ),
+        (
+            "validation/exit3-initial-member-substitution-proof-withdrawn",
+            replace_once(
+                validation,
+                "initial-member and post-addition substitution",
+                "post-addition substitution only",
+            ),
+        ),
+        (
+            "validation/exit3-descriptor-close-proof-withdrawn",
+            replace_once(
+                validation,
+                "observed descriptor-close\nabandonment",
+                "descriptor-close abandonment was not observed",
+            ),
+        ),
+        (
+            "validation/exit3-add-only-proof-withdrawn",
+            replace_once(
+                validation,
+                "It proves the bounded D-P6-003 strict add-only, journal-free\n"
+                "implementation",
+                "It does not prove the bounded D-P6-003 strict add-only, "
+                "journal-free\nimplementation",
+            ),
+        ),
+        (
+            "validation/exit3-published-final-mutation-authorised",
+            replace_once(
+                validation,
+                "no published final is\nremoved, rewritten or replaced by "
+                "TrackTemplate",
+                "a published final may be\nremoved, rewritten or replaced by "
+                "TrackTemplate",
+            ),
+        ),
+        (
+            "validation/exit3-command-claims-phase-acceptance",
+            replace_once(
+                validation,
+                "they supply no GUI, production-output, Phase 6 exit or "
+                "release\nacceptance",
+                "they supply Phase 6 exit and release\nacceptance",
             ),
         ),
     )

@@ -466,7 +466,7 @@ def _validate_geometry_cleanup_failure(
     assert _application_snapshot() == before
 
 
-def _validate_commit_rollback(
+def _validate_commit_monotonic_recovery(
     root,
     editable,
     state,
@@ -483,13 +483,17 @@ def _validate_commit_rollback(
     )
     App.setActiveDocument(str(editable.Name))
     before = _application_snapshot()
-    output_before = _directory_snapshot(output)
+    plan = api.prepare_transition_dxf_export(
+        state,
+        artifact,
+        specification,
+        request,
+    )
     original_link = exporter._link_file
     link_calls = 0
 
     def fail_second_link(
         source_directory_descriptor,
-        source_name,
         destination_directory_descriptor,
         destination_name,
     ):
@@ -499,7 +503,6 @@ def _validate_commit_rollback(
             raise OSError("injected qualified commit failure")
         original_link(
             source_directory_descriptor,
-            source_name,
             destination_directory_descriptor,
             destination_name,
         )
@@ -514,12 +517,48 @@ def _validate_commit_rollback(
                 request,
             ),
             "transition-dxf-export-commit-failed",
+            cleanup_complete=False,
         )
-        assert error.destination_changed is False
+        assert error.destination_changed is True
+        assert error.recoverable is True
     finally:
         exporter._link_file = original_link
     assert _application_snapshot() == before
-    assert _directory_snapshot(output) == output_before
+    assert marker.read_text(encoding="utf-8") == "must remain unchanged"
+    dxf_path = output / plan.dxf_filename
+    manifest_path = output / plan.manifest_filename
+    assert dxf_path.is_file()
+    assert not manifest_path.exists()
+    dxf_metadata = dxf_path.stat()
+    dxf_snapshot = (
+        dxf_metadata.st_dev,
+        dxf_metadata.st_ino,
+        dxf_metadata.st_mode,
+        dxf_metadata.st_size,
+        dxf_metadata.st_mtime_ns,
+        dxf_path.read_bytes(),
+    )
+    _assert_no_staging(output)
+
+    recovered = exporter.export_transition_dxf(
+        state,
+        artifact,
+        specification,
+        request,
+    )
+    assert recovered.disposition == "created"
+    observed_metadata = dxf_path.stat()
+    assert (
+        observed_metadata.st_dev,
+        observed_metadata.st_ino,
+        observed_metadata.st_mode,
+        observed_metadata.st_size,
+        observed_metadata.st_mtime_ns,
+        dxf_path.read_bytes(),
+    ) == dxf_snapshot
+    assert manifest_path.is_file()
+    assert marker.read_text(encoding="utf-8") == "must remain unchanged"
+    assert _application_snapshot() == before
     _assert_no_staging(output)
 
 
@@ -570,7 +609,7 @@ def validate():
                 specification,
                 artifact,
             )
-            _validate_commit_rollback(
+            _validate_commit_monotonic_recovery(
                 root,
                 editable,
                 state,
