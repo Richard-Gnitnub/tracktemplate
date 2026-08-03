@@ -145,6 +145,15 @@ def _assert_no_staging(path):
     )
 
 
+def _assert_descriptors_closed(descriptors):
+    for descriptor in descriptors:
+        try:
+            exporter.os.fstat(descriptor)
+        except OSError:
+            continue
+        raise AssertionError("anonymous staging descriptor remained open")
+
+
 def _validate_freecad_dxf_import(dxf_path, exact_result):
     """Import the target file in one owned document and restore the host."""
     import importDXF
@@ -319,6 +328,87 @@ def _validate_cancellation(root, editable, state, specification, artifact):
     assert observed_temporary_shape is True
     assert _application_snapshot() == before
     assert list(output.iterdir()) == []
+
+
+def _validate_surviving_host_interruption(
+    root,
+    editable,
+    state,
+    specification,
+    artifact,
+):
+    output = root / "surviving-host-interruption"
+    output.mkdir()
+    request = api.TransitionDxfExportRequest(
+        str(output),
+        api.DEVELOPMENT_CHECKPOINT,
+    )
+    App.setActiveDocument(str(editable.Name))
+    before = _application_snapshot()
+    original_write = exporter._write_staged_file
+    staged_descriptors = []
+    interruption = KeyboardInterrupt("qualified host interruption")
+
+    def observe_write(
+        directory_descriptor,
+        name,
+        value,
+        staged_files,
+        operation_state,
+    ):
+        staged_file = original_write(
+            directory_descriptor,
+            name,
+            value,
+            staged_files,
+            operation_state,
+        )
+        staged_descriptors.append(staged_file[0])
+        return staged_file
+
+    def interrupt_after_staging():
+        if len(staged_descriptors) == 2:
+            raise interruption
+        return False
+
+    exporter._write_staged_file = observe_write
+    try:
+        try:
+            exporter.export_transition_dxf(
+                state,
+                artifact,
+                specification,
+                request,
+                cancellation_requested=interrupt_after_staging,
+            )
+        except KeyboardInterrupt as error:
+            assert error is interruption
+        else:
+            raise AssertionError("Expected qualified host interruption")
+    finally:
+        exporter._write_staged_file = original_write
+
+    assert len(staged_descriptors) == 2
+    _assert_descriptors_closed(staged_descriptors)
+    assert list(output.iterdir()) == []
+    assert _application_snapshot() == before
+    diagnostic = interruption.__cause__
+    assert isinstance(diagnostic, exporter.TransitionDxfExportError)
+    assert diagnostic.code == "transition-dxf-export-failed"
+    assert diagnostic.source_code == "KeyboardInterrupt"
+    assert diagnostic.destination_changed is False
+    assert diagnostic.cleanup_complete is True
+    assert diagnostic.recoverable is True
+
+    receipt = exporter.export_transition_dxf(
+        state,
+        artifact,
+        specification,
+        request,
+    )
+    assert receipt.disposition == "created"
+    assert _application_snapshot() == before
+    _assert_no_staging(output)
 
 
 def _validate_zero_length_point_import(root, editable):
@@ -588,6 +678,13 @@ def validate():
                 )
             )
             _validate_cancellation(
+                root,
+                editable,
+                state,
+                specification,
+                artifact,
+            )
+            _validate_surviving_host_interruption(
                 root,
                 editable,
                 state,

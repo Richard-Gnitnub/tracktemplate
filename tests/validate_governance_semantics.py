@@ -1396,6 +1396,15 @@ def validate_transition_export_validation_mutations() -> None:
             ),
         ),
         (
+            "validation/exit3-surviving-host-interruption-proof-withdrawn",
+            replace_once(
+                validation,
+                "surviving-host `BaseException` propagation with chained "
+                "truthful\nretained-state diagnostics",
+                "surviving-host interruption cleanup remains unproved",
+            ),
+        ),
+        (
             "validation/exit3-add-only-proof-withdrawn",
             replace_once(
                 validation,

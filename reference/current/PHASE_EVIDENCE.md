@@ -962,6 +962,58 @@ PR-22 and QA-R03 retain their existing states, and no production, physical
 output, `project-cleared`, GUI, release, packaging or legacy-retirement
 authority changes.
 
+## B16 Entry/Exit surviving-host interruption cleanup
+
+This bounded Level 2 repair starts from protected `main` at
+`49d9a85ee3f942a801c65f1cd051a2586ffa10d8`. A fresh Exit 3 admission probe
+showed that a cancellation callback raising `KeyboardInterrupt` after both
+anonymous payloads were staged bypassed the `Exception`-only cleanup path and
+left both descriptors open in a surviving host. The retained focused
+regression failed against that source with `anonymous staging descriptor
+remained open`, classified `implementation-defect` under D-P6-003 invariant 2.
+A first independent security review then blocked retention: injected descriptor
+close failure replaced the direct interruption, and a direct interruption after
+`linkat` but before directory `fsync` could be reported recoverable. The added
+close-failure regression failed against that first reviewed state by receiving
+`TransitionDxfExportError` instead of the original `CleanupInterruption`; both
+findings were classified at the same implementation boundary.
+A second independent security review confirmed those paths but blocked
+retention because a first direct interruption during normal-success descriptor
+cleanup stopped the remaining closes, and a bound-directory close error could
+replace an already propagating interruption. Its disposable probe observed both
+anonymous descriptors still open; the retained regression reproduced
+`[True, True]` against that second reviewed state. These were again classified
+at the same resource-ownership boundary.
+
+The exporter now catches `BaseException` only at its anonymous-resource and
+bound-operation ownership scopes. Each descriptor enters the outer ownership
+map immediately after open. Cleanup attempts every observed invocation-owned
+anonymous descriptor even when one close raises a direct `BaseException`, and
+preserves the original `KeyboardInterrupt`, `SystemExit` or custom direct
+`BaseException` type and value. The completion and bound-directory cleanup
+routers also preserve an active direct interruption; failed or uncertain close
+is reported cleanup-incomplete and non-recoverable through the existing chained
+`TransitionDxfExportError`. Publication is marked durability-uncertain before
+`linkat` until the directory `fsync` returns, so interruption in that interval
+is also non-recoverable. Before publication with successful cleanup the
+diagnostic is unchanged/clean/recoverable; after a durable addition it is
+changed/not-clean/recoverable, the exact final remains untouched and a later
+invocation adds only its missing counterpart. No exception class, public ID,
+receipt, filename, output byte, schema or collision policy changes.
+
+The focused standalone validator passed with `Phase 6 transition DXF export
+validation passed`, covering interruption inside staging, between staged
+payloads, before publication, after one durable addition, through injected
+descriptor-close failure, during normal-success close iteration, through a
+bound-directory close failure and in the post-link/pre-sync interval. The
+qualified FreeCAD 1.1.1 validator passed with `Phase 6 transition DXF qualified
+FreeCAD validation passed`; the same `KeyboardInterrupt` propagated after
+descriptor cleanup, the editable host state remained exact and a later export
+succeeded. Process-kill, `os._exit` and a second asynchronous interruption
+during cleanup remain outside this surviving-host proof. This is repair
+evidence only: Exit 3 remains Pending for a fresh Level 3 panel, Phase 6 remains
+1/5 and no risk or output authority changes.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition

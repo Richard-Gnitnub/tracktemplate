@@ -888,7 +888,13 @@ def _read_staged_descriptor(descriptor, expected_snapshot, description):
     )
 
 
-def _write_staged_file(directory_descriptor, name, value):
+def _write_staged_file(
+    directory_descriptor,
+    name,
+    value,
+    staged_files,
+    operation_state,
+):
     # O_EXCL would prevent a later linkat publication of an O_TMPFILE inode.
     flags = (
         os.O_RDWR
@@ -903,6 +909,10 @@ def _write_staged_file(directory_descriptor, name, value):
             0o666,
             dir_fd=directory_descriptor,
         )
+        # Register ownership before any interruptible write or sync. The bound
+        # operation can then close this descriptor even if this helper cannot
+        # return normally.
+        staged_files[name] = (descriptor, None)
         created = os.fstat(descriptor)
         identity = (created.st_dev, created.st_ino)
         if not stat.S_ISREG(created.st_mode) or created.st_nlink != 0:
@@ -931,10 +941,29 @@ def _write_staged_file(directory_descriptor, name, value):
                 cleanup_complete=False,
                 recoverable=False,
             )
-        return descriptor, snapshot
-    except Exception as error:
-        if descriptor is not None:
-            os.close(descriptor)
+        staged_file = (descriptor, snapshot)
+        staged_files[name] = staged_file
+        return staged_file
+    except BaseException as error:
+        registered = (
+            descriptor is not None
+            and staged_files.get(name, (None, None))[0] == descriptor
+        )
+        if descriptor is not None and not registered:
+            try:
+                os.close(descriptor)
+            except OSError as close_error:
+                cleanup_diagnostic = _export_error(
+                    "transition-dxf-export-cleanup-failed",
+                    "an anonymous staging descriptor could not be closed",
+                    source_code=type(close_error).__name__,
+                    cleanup_complete=False,
+                    recoverable=False,
+                )
+                cleanup_diagnostic.__cause__ = close_error
+                operation_state["cleanup_error"] = cleanup_diagnostic
+        if not isinstance(error, Exception):
+            raise
         if isinstance(error, TransitionDxfExportError):
             raise
         raise _export_error(
@@ -947,12 +976,27 @@ def _write_staged_file(directory_descriptor, name, value):
 
 def _close_staged_files(staged_files):
     close_error = None
+    interruption = None
     for descriptor, _snapshot in staged_files.values():
         try:
             os.close(descriptor)
-        except OSError as error:
-            close_error = close_error or error
+        except BaseException as error:
+            if isinstance(error, Exception):
+                close_error = close_error or error
+            elif interruption is None:
+                interruption = error
     staged_files.clear()
+    if interruption is not None:
+        diagnostic = _export_error(
+            "transition-dxf-export-cleanup-failed",
+            "anonymous staging descriptor cleanup was interrupted",
+            source_code=type(interruption).__name__,
+            cleanup_complete=False,
+            recoverable=False,
+        )
+        if close_error is not None:
+            diagnostic.__cause__ = close_error
+        raise interruption from diagnostic
     if close_error is not None:
         raise _export_error(
             "transition-dxf-export-cleanup-failed",
@@ -963,38 +1007,97 @@ def _close_staged_files(staged_files):
         ) from close_error
 
 
+def _structured_failure(error):
+    if isinstance(error, TransitionDxfExportError):
+        return error
+    cause = getattr(error, "__cause__", None)
+    if isinstance(cause, TransitionDxfExportError):
+        return cause
+    return None
+
+
+def _cleanup_failure_diagnostic(error, message, destination_changed):
+    structured = _structured_failure(error)
+    source_code = type(error).__name__
+    if structured is not None:
+        source_code = str(
+            structured.source_code
+            or structured.code
+            or source_code
+        )
+        destination_changed = (
+            destination_changed or structured.destination_changed
+        )
+    return _export_error(
+        "transition-dxf-export-cleanup-failed",
+        message,
+        source_code=source_code,
+        destination_changed=destination_changed,
+        cleanup_complete=False,
+        recoverable=False,
+    )
+
+
+def _raise_completion_cleanup_failure(error, destination_changed):
+    diagnostic = _cleanup_failure_diagnostic(
+        error,
+        "the complete output pair was retained but anonymous descriptor "
+        "cleanup was incomplete",
+        destination_changed,
+    )
+    if isinstance(error, Exception):
+        raise diagnostic from error
+    previous_diagnostic = _structured_failure(error)
+    if previous_diagnostic is not None:
+        diagnostic.__cause__ = previous_diagnostic
+    raise error from diagnostic
+
+
+def _raise_directory_cleanup_failure(
+    primary_error,
+    close_error,
+    destination_changed,
+):
+    source_error = (
+        primary_error if primary_error is not None else close_error
+    )
+    diagnostic = _cleanup_failure_diagnostic(
+        source_error,
+        "the bound output-directory descriptor could not be closed",
+        destination_changed,
+    )
+    if primary_error is None:
+        if isinstance(close_error, Exception):
+            raise diagnostic from close_error
+        raise close_error from diagnostic
+
+    previous_diagnostic = _structured_failure(primary_error)
+    close_error.__context__ = None
+    if previous_diagnostic is not None:
+        close_error.__cause__ = previous_diagnostic
+    elif isinstance(primary_error, Exception):
+        close_error.__cause__ = primary_error
+    diagnostic.__cause__ = close_error
+    if isinstance(primary_error, Exception):
+        raise diagnostic
+    raise primary_error from diagnostic
+
+
 def _create_staged_files(
     directory_descriptor,
     values,
+    staged_files,
+    operation_state,
 ):
-    staged_files = {}
-    try:
-        for name, value in values:
-            staged_files[name] = _write_staged_file(
-                directory_descriptor,
-                name,
-                value,
-            )
-        return staged_files
-    except Exception as error:
-        try:
-            _close_staged_files(staged_files)
-        except TransitionDxfExportError as cleanup_error:
-            raise _export_error(
-                "transition-dxf-export-cleanup-failed",
-                "anonymous staging failed and descriptor cleanup was "
-                "incomplete",
-                source_code=str(
-                    getattr(error, "code", "")
-                    or type(error).__name__
-                ),
-                destination_changed=bool(
-                    getattr(error, "destination_changed", False)
-                ),
-                cleanup_complete=False,
-                recoverable=False,
-            ) from cleanup_error
-        raise
+    for name, value in values:
+        _write_staged_file(
+            directory_descriptor,
+            name,
+            value,
+            staged_files,
+            operation_state,
+        )
+    return staged_files
 
 
 def _staged_file_snapshots(staged_files, *, expected_link_count):
@@ -1073,6 +1176,15 @@ def _owned_publication_snapshots(
     owned = {}
     ambiguous = False
     for name, (descriptor, expected_snapshot) in staged_files.items():
+        if expected_snapshot is None:
+            try:
+                metadata = os.fstat(descriptor)
+            except OSError:
+                ambiguous = True
+                continue
+            if metadata.st_nlink != 0:
+                ambiguous = True
+            continue
         try:
             metadata = os.fstat(descriptor)
             snapshot = _descriptor_snapshot(
@@ -1187,7 +1299,7 @@ def _observe_failed_destination(
     }
 
 
-def _raise_bound_failure(
+def _bound_failure_diagnostic(
     error,
     directory_descriptor,
     output_directory,
@@ -1195,7 +1307,9 @@ def _raise_bound_failure(
     entries,
     initial_snapshots,
     staged_files,
+    operation_state,
 ):
+    """Close owned staging and describe the exact retained destination."""
     state = _observe_failed_destination(
         directory_descriptor,
         output_directory,
@@ -1204,11 +1318,18 @@ def _raise_bound_failure(
         initial_snapshots,
         staged_files,
     )
-    close_error = None
+    close_error = operation_state["cleanup_error"]
     try:
         _close_staged_files(staged_files)
-    except TransitionDxfExportError as cleanup_error:
-        close_error = cleanup_error
+    except BaseException as cleanup_error:
+        cleanup_diagnostic = _structured_failure(cleanup_error)
+        if cleanup_diagnostic is None:
+            cleanup_diagnostic = _cleanup_failure_diagnostic(
+                cleanup_error,
+                "anonymous staging descriptor cleanup was incomplete",
+                False,
+            )
+        close_error = close_error or cleanup_diagnostic
 
     source_error = (
         error
@@ -1228,6 +1349,7 @@ def _raise_bound_failure(
         state["recoverable"]
         and close_error is None
         and source_error.recoverable
+        and not operation_state["durability_uncertain"]
     )
     if state["ambiguous"]:
         recoverable = False
@@ -1238,27 +1360,60 @@ def _raise_bound_failure(
             or close_error.source_code
             or close_error.code
         )
-        raise _export_error(
-            "transition-dxf-export-cleanup-failed",
-            "the export failed and anonymous descriptor cleanup was "
-            "incomplete",
-            source_code=source_code,
+        return (
+            _export_error(
+                "transition-dxf-export-cleanup-failed",
+                "the export failed and anonymous descriptor cleanup was "
+                "incomplete",
+                source_code=source_code,
+                destination_changed=(
+                    state["destination_changed"]
+                    or source_error.destination_changed
+                ),
+                cleanup_complete=False,
+                recoverable=False,
+            ),
+            close_error,
+        )
+    return (
+        _copy_export_error(
+            source_error,
             destination_changed=(
                 state["destination_changed"]
                 or source_error.destination_changed
             ),
-            cleanup_complete=False,
-            recoverable=False,
-        ) from close_error
-    raise _copy_export_error(
-        source_error,
-        destination_changed=(
-            state["destination_changed"]
-            or source_error.destination_changed
+            cleanup_complete=cleanup_complete,
+            recoverable=recoverable,
         ),
-        cleanup_complete=cleanup_complete,
-        recoverable=recoverable,
-    ) from error
+        None,
+    )
+
+
+def _raise_bound_failure(
+    error,
+    directory_descriptor,
+    output_directory,
+    directory_identity,
+    entries,
+    initial_snapshots,
+    staged_files,
+    operation_state,
+):
+    diagnostic, close_error = _bound_failure_diagnostic(
+        error,
+        directory_descriptor,
+        output_directory,
+        directory_identity,
+        entries,
+        initial_snapshots,
+        staged_files,
+        operation_state,
+    )
+    if isinstance(error, Exception):
+        raise diagnostic from (close_error or error)
+    if close_error is not None:
+        diagnostic.__cause__ = close_error
+    raise error from diagnostic
 
 
 def _publish_staged_files(
@@ -1268,6 +1423,7 @@ def _publish_staged_files(
     output_directory,
     directory_identity,
     cancellation_requested,
+    operation_state,
 ):
     staged = _staged_file_snapshots(
         staged_files,
@@ -1279,6 +1435,9 @@ def _publish_staged_files(
             output_directory,
             directory_identity,
         )
+        # A control-flow interruption can arrive after linkat adds the name
+        # but before the directory sync is observed to complete.
+        operation_state["durability_uncertain"] = True
         try:
             _link_file(
                 staged_files[name][0],
@@ -1286,6 +1445,7 @@ def _publish_staged_files(
                 name,
             )
         except FileExistsError as error:
+            operation_state["durability_uncertain"] = False
             raise _export_error(
                 "transition-dxf-export-collision",
                 "an absent deterministic output appeared during "
@@ -1294,6 +1454,7 @@ def _publish_staged_files(
                 recoverable=False,
             ) from error
         except OSError as error:
+            operation_state["durability_uncertain"] = False
             if error.errno in (
                 errno.EINVAL,
                 errno.ENOSYS,
@@ -1321,6 +1482,7 @@ def _publish_staged_files(
                 source_code=type(error).__name__,
                 recoverable=False,
             ) from error
+        operation_state["durability_uncertain"] = False
         linked_snapshot = _descriptor_snapshot(
             staged_files[name][0],
             error_code="transition-dxf-export-commit-identity-failed",
@@ -1512,6 +1674,10 @@ def export_transition_dxf(
         directory_identity,
     )
     staged_files = {}
+    operation_state = {
+        "cleanup_error": None,
+        "durability_uncertain": False,
+    }
     try:
         try:
             initial_snapshots = _target_snapshots(
@@ -1636,12 +1802,14 @@ def export_transition_dxf(
                     manifest_sha256,
                     "created",
                 )
-                staged_files = _create_staged_files(
+                _create_staged_files(
                     directory_descriptor,
                     tuple(
                         (name, values[name])
                         for name, _digest in missing_entries
                     ),
+                    staged_files,
+                    operation_state,
                 )
                 observed_values = dict(values)
                 for name, _digest in missing_entries:
@@ -1687,6 +1855,7 @@ def export_transition_dxf(
                     output_directory,
                     directory_identity,
                     cancellation_requested,
+                    operation_state,
                 )
                 expected_snapshots = tuple(
                     before
@@ -1701,7 +1870,9 @@ def export_transition_dxf(
                     names,
                     expected_snapshots,
                 )
-        except Exception as error:
+        except BaseException as error:
+            # Cleanup precedes propagation; control-flow exceptions stay
+            # top-level.
             _raise_bound_failure(
                 error,
                 directory_descriptor,
@@ -1710,20 +1881,32 @@ def export_transition_dxf(
                 entries,
                 initial_snapshots,
                 staged_files,
+                operation_state,
             )
 
         try:
             _close_staged_files(staged_files)
-        except TransitionDxfExportError as error:
-            raise _export_error(
-                "transition-dxf-export-cleanup-failed",
-                "the complete output pair was retained but anonymous "
-                "descriptor cleanup was incomplete",
-                source_code=str(error.source_code or error.code),
-                destination_changed=bool(missing_entries),
-                cleanup_complete=False,
-                recoverable=False,
-            ) from error
-        return result
-    finally:
+        except BaseException as error:
+            _raise_completion_cleanup_failure(
+                error,
+                bool(missing_entries),
+            )
+    except BaseException as error:
+        try:
+            os.close(directory_descriptor)
+        except BaseException as close_error:
+            _raise_directory_cleanup_failure(
+                error,
+                close_error,
+                False,
+            )
+        raise
+    try:
         os.close(directory_descriptor)
+    except BaseException as close_error:
+        _raise_directory_cleanup_failure(
+            None,
+            close_error,
+            bool(missing_entries),
+        )
+    return result

@@ -596,6 +596,14 @@ def _validate_transition_export_validation(validation: str) -> None:
         and "non-regular-final and byte-collision refusal" in validation_flat
         and "active-lock fail-closed diagnostics" in validation_flat
         and "observed descriptor-close abandonment" in validation_flat
+        and "surviving-host `BaseException` propagation with chained "
+        "truthful retained-state diagnostics" in validation_flat
+        and "preservation of the original interruption when an anonymous "
+        "close itself fails" in validation_flat
+        and "best-effort remaining anonymous closes and non-replacing "
+        "bound-directory close diagnostics" in validation_flat
+        and "non-recoverable post-link/pre-sync durability uncertainty"
+        in validation_flat
         and "truthful retained-state diagnostics" in validation_flat
         and (
             "It proves the bounded D-P6-003 strict add-only, journal-free "
@@ -607,6 +615,7 @@ def _validate_transition_export_validation(validation: str) -> None:
         in validation_flat
         and "exact partial preservation and next-invocation completion"
         in validation_flat
+        and "surviving-host interruption cleanup" in validation_flat
         and (
             "they supply no GUI, production-output, Phase 6 exit or release "
             "acceptance"
@@ -1156,6 +1165,51 @@ def _validate_exit_conditions(
             required_implementation_clause in implementation_flat,
             "Phase 6 add-only recovery implementation evidence drifted: "
             + required_implementation_clause,
+        )
+    interruption_section = direct_section_content(
+        current_evidence,
+        "B16 Entry/Exit surviving-host interruption cleanup",
+    )
+    interruption_flat = _semantic_text(interruption_section)
+    for required_interruption_clause in (
+        "49d9a85ee3f942a801c65f1cd051a2586ffa10d8",
+        "anonymous staging descriptor remained open",
+        "implementation-defect under D-P6-003 invariant 2",
+        "first independent security review then blocked retention",
+        "TransitionDxfExportError instead of the original "
+        "CleanupInterruption",
+        "second independent security review confirmed those paths but "
+        "blocked retention",
+        "retained regression reproduced [True, True] against that second "
+        "reviewed state",
+        "preserves the original KeyboardInterrupt, SystemExit or custom "
+        "direct BaseException type and value",
+        "Each descriptor enters the outer ownership map immediately after "
+        "open",
+        "Cleanup attempts every observed invocation-owned anonymous "
+        "descriptor",
+        "completion and bound-directory cleanup routers also preserve an "
+        "active direct interruption",
+        "failed or uncertain close is reported cleanup-incomplete and "
+        "non-recoverable through the existing chained "
+        "TransitionDxfExportError",
+        "marked durability-uncertain before linkat until the directory "
+        "fsync returns",
+        "unchanged/clean/recoverable",
+        "changed/not-clean/recoverable",
+        "No exception class, public ID, receipt, filename, output byte, "
+        "schema or collision policy changes",
+        "Phase 6 transition DXF export validation passed",
+        "Phase 6 transition DXF qualified FreeCAD validation passed",
+        "Process-kill, os._exit and a second asynchronous interruption",
+        "Exit 3 remains Pending for a fresh Level 3 panel",
+        "Phase 6 remains 1/5",
+        "no risk or output authority changes",
+    ):
+        _require(
+            required_interruption_clause in interruption_flat,
+            "Phase 6 interruption cleanup evidence drifted: "
+            + required_interruption_clause,
         )
     _validate_transition_export_validation(_read(VALIDATION_PATH))
     current_section = _section(
