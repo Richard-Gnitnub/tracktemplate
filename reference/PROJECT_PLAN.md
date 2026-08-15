@@ -1,20 +1,23 @@
 # Project Plan
 
-Status: **Phase 6 current — 2/5 evidenced. Exit 2 was owner-accepted under D-P6-002 on 2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15; exits 1, 4 and 5 remain Pending.**
+Status: **Phase 6 current — 2/5 evidenced. The owner accepted Exit 2 under D-P6-002 on 2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15. Exits 1, 4, and 5 stay Pending.**
 
-This file is the project dashboard. It owns only phase status, exit-condition
-status, the live-risk summary, owner-decision summary and links to evidence.
-Implementation detail belongs in the frozen phase closeout or
-[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md); detailed current risks
-and decisions belong in the JSON registers beside the live record.
+This dashboard owns phase and exit status. It also owns live-risk summaries, owner-decision summaries, and evidence links. The canonical status, evidence, and registers are the source of the owner view. The owner view does not establish authority.
 
-The active programme is the TrackTemplate Core macro-to-Addon migration in
-[PRODUCT_VISION.md](PRODUCT_VISION.md). Migration completes only when the Addon
-is the normal route, the modular package is the sole runtime without a legacy-
-macro dependency, advertised Core parity/output is accepted, the distribution
-is reproducible and release qualification passes. The Layout Editor is
-subsequent: it does not alter Phase 6 exits. Future architecture may be recorded
-now without being implemented now.
+The active program is the TrackTemplate Core macro-to-Addon migration in [PRODUCT_VISION.md](PRODUCT_VISION.md). The migration has defined completion conditions. The Addon must be the usual route. The modular package must be the sole runtime without a legacy-macro dependency. The owner must accept the Core parity and output that the project claims. Each distribution build must give the same result. Release qualification must pass.
+
+The Layout Editor is the later program. It does not change Phase 6 exits. The project can record future architecture without current implementation.
+
+## Current owner view
+
+| Field | Current position |
+| --- | --- |
+| **Current state** | Phase 6 is 2/5 evidenced. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. Output is private-development. Project status stays `unknown`. |
+| **What changed** | [TT-DOC-001](current/PHASE_EVIDENCE.md#tt-doc-001-documentation-architecture-panel) adopts the [Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile). It makes ASD-STE100 Issue 9 the normative standard for canonical technical prose in English. It corrects DXF text that did not agree with current evidence. No phase, exit, risk, or product state changes. |
+| **What now works** | Results from a substantial cycle start with a short owner view. Canonical information and proof/provenance follow the view. The workflows apply the profile through canonical links. |
+| **Limitations/findings** | Migration occurs in bounded cycles. `ASD-STE100 Issue 9 conformance not verified` applies to the live corpus. Frozen history does not change. TrackTemplate claims no external certification or endorsement. TrackTemplate also claims no S1000D conformance or infrastructure. |
+| **Owner decision** | TT-DOC-001 is Accepted. It gives documentation-governance authority only. All other owner decisions and exclusions stay unchanged. |
+| **Next action** | This cycle ends after TT-DOC-001 integration and preservation. This decision authorizes no later project work. |
 
 ## Phase status
 
@@ -87,12 +90,9 @@ dashboard only.
 
 ## Owner decisions
 
-[history/phase-closeouts/PHASE4_GATE_DECISIONS.json](history/phase-closeouts/PHASE4_GATE_DECISIONS.json)
-owns the displayed Phase 4 decisions, and
-[history/phase-closeouts/PHASE5_GATE_DECISIONS.json](history/phase-closeouts/PHASE5_GATE_DECISIONS.json)
-owns the displayed Phase 5 decisions. The
-[current decision register](current/gate-decisions.json) owns Phase 6
-decisions.
+[history/phase-closeouts/PHASE4_GATE_DECISIONS.json](history/phase-closeouts/PHASE4_GATE_DECISIONS.json) owns the displayed Phase 4 decisions.
+[history/phase-closeouts/PHASE5_GATE_DECISIONS.json](history/phase-closeouts/PHASE5_GATE_DECISIONS.json) owns the displayed Phase 5 decisions.
+The [current decision register](current/gate-decisions.json) owns Phase 6 and current cross-phase governance decisions.
 
 | ID | Date | Status | Decision boundary |
 | --- | --- | --- | --- |
@@ -118,6 +118,7 @@ decisions.
 | D-P6-003 | 2026-08-02 | Accepted | Strict add-only, journal-free monotonic completion selected for bounded Exit 3 recovery and a later Level 2 implementation authorised; Exit 3 remains Pending and Phase 6 remains 1/5. |
 | D-P6-004 | 2026-08-15 | Accepted | Supported exporter fault model, interruption-evidence boundary and restart containment accepted without changing product source, risk disposition, Phase 6 at 1/5 or Exit 3 Pending. |
 | D-P6-005 | 2026-08-15 | Accepted | Phase 6 Exit 3 accepted only for the bounded private-development B16 Entry/Exit deterministic DXF-and-manifest route under D-P6-003 and D-P6-004; Phase 6 advances to 2/5 and all stated limitations and exclusions remain. |
+| TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 
 ## Authority and evidence links
 
@@ -130,8 +131,7 @@ decisions.
 - [Frozen Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md)
 - [Frozen Phase 4 decisions](history/phase-closeouts/PHASE4_GATE_DECISIONS.json)
 - [Frozen Phase 4 risk snapshot](history/phase-closeouts/PHASE4_RISKS.json)
-- [Engineering policy](ENGINEERING_POLICY.md)
-- [Architecture](ARCHITECTURE.md)
+- [Engineering policy and TT-DOC-001 profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile) and [Architecture](ARCHITECTURE.md)
 - [Modularisation boundaries](MODULARISATION_PLAN.md)
 - [Validation strategy](VALIDATION.md)
 - [Recovery and backup](RECOVERY_AND_BACKUP.md)

@@ -84,6 +84,64 @@ registered. It also rejects an unknown `TERM-REVIEW` marker.
 Passing cannot prove semantic correctness. Contextual railway review remains
 the authority for resolving a provisional or review-required item.
 
+## ASD-STE100 project terminology
+
+This section is the one project register for TrackTemplate technical nouns and
+technical verbs. The
+[Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+owns the ASD-STE100 Issue 9 scope and conformance rules. This register does not
+copy the official controlled general dictionary.
+
+Use these technical nouns only with their stated project meanings:
+
+| Term group | Approved technical nouns and meaning |
+| --- | --- |
+| Product and tools | **TrackTemplate**, **TrackTemplate Core**, **Layout Editor**, **FreeCAD**, **Coin**, **Python**, **Git**, **GitHub**, **Addon**, and **Workbench** are product and tool names. **Product behavior** means a product operation or result that a person can examine. **Host integration** is the product connection to FreeCAD. |
+| Authority | **Owner view**, **canonical information**, **proof/provenance**, **governance control**, **project authority**, **project owner**, and **competing owner** have the meanings in the Engineering Policy. |
+| Governance state | **Status**, **phase**, **phase exit**, **risk**, **decision**, **decision register**, and **phase evidence** have the meanings in the current records. **Finding**, **limitation**, **disposition**, **controlled meaning**, and **acceptance** also use their current-record meanings. |
+| Current state | **Current state**, **current phase**, **current evidence**, **current record**, **current owner view**, **current repository-evidence map**, and **status dashboard** are TrackTemplate status terms. |
+| Canonical authority | **Canonical owner**, **canonical authority**, **canonical record**, **canonical state**, **canonical link**, **canonical policy**, and **canonical heading** are TrackTemplate authority terms. |
+| Bounded claim | **Bounded scope**, **bounded cycle**, **bounded migration**, **bounded criterion**, **bounded decision**, **bounded condition**, and **bounded review** identify a limit in a canonical record. |
+| Exact identity | **Exact state**, **exact path**, **exact data**, and **exact result** identify a required equality or identity. **Exact check**, **exact output**, **exact Git identity**, and **exact candidate** have the same function. |
+| Documentation structure | **Documentation profile**, **canonical document**, **canonical prose**, **live document**, **frozen history**, **logical unit**, and **technical provenance** are TrackTemplate document terms. |
+| Documentation change | **Migration**, **concision**, **wording**, **controlled writing**, **human interface**, **material edit**, **documentation simplification**, **readability**, and **Learning from Experience (LFE)** are TrackTemplate change terms. |
+| Evidence detail | **Detailed technical provenance**, **detailed evidence**, **detailed proof**, and **detailed validation** identify supporting information below the canonical information. |
+| Assurance process | **Evidence**, **validation**, **validator**, **reviewer**, **workflow**, **routing**, **handoff**, **skill catalog**, **competing responsibility**, and **non-ownership boundary** are TrackTemplate assurance-process terms. |
+| Assurance result | **Conformance review**, **conformance scope**, **semantic control**, **preservation audit**, **review result**, **assessment**, and **machine-verifiable assurance** are TrackTemplate assurance-result terms. A **substantial cycle** has a result that changes project state, a formal decision, or detailed validation. |
+| Git and repository | **Repository**, **worktree**, **branch**, **commit**, **pull request**, **merge commit**, **protected main**, **SHA**, **hash**, **path**, and **continuous integration (CI)** keep their Git meanings. |
+| Release | **Packaging**, **release**, **tagging**, **licensing**, and **compatibility** keep their project meanings. |
+| Export | **Sentinel**, **DXF**, **manifest**, **schema**, **API**, and **JSON** keep their meanings from software or export specifications. |
+| Railway | **Centreline**, **plain line**, **chainage**, **station**, **turnout**, **crossover**, and **railway behavior** use the canonical railway meanings below. TrackTemplate approves the spelling **Centreline** for this subject. |
+| Standards | **ASD-STE100 Issue 9**, **Simplified Technical English (STE)**, and **S1000D** identify standards. **Technical noun**, **technical verb**, **normative standard**, **official standard**, **official conformance assessment**, and **linguistic conformance** keep their standards meanings. |
+
+Use these technical verbs only with their stated project meanings:
+
+| Technical verb | Project meaning |
+| --- | --- |
+| **Validate** | Do a named check and examine its result in the stated scope. |
+| **Reconcile** | Compare a presentation or record with its canonical authority. Correct or report a difference. |
+| **Authorize** | Give the exact authority in an explicit owner decision. |
+| **Admit** | Accept named evidence for a bounded criterion without wider authority. |
+| **Freeze** | Record one candidate and its exact content state for validation and review. |
+| **Adopt** | Make a named standard or policy the normative standard for its stated scope. |
+| **Claim** | Tell readers that a named capability, status, or assurance applies. |
+| **Own** | Be the one canonical source for a named subject. |
+| **Review** | Examine a named logical unit or candidate against stated criteria. |
+| **Preserve** | Keep accepted repository content and authority without a change. |
+| **Map** | Connect a responsibility to its canonical document or workflow owner. |
+| **Migrate** | Move content or behavior between named states or boundaries. |
+| **Report** | Record a result or limitation without authority. |
+| **Name** | Give the exact identifier or term for a project subject. |
+| **Define** | Record the exact scope, meaning, or condition in a canonical authority. |
+| **Bound** | Limit a claim, decision, task, or review to an explicit scope. |
+| **Copy**, **stage**, **commit**, **push**, **publish**, **merge**, **rebase**, and **squash** | Perform the related Git or GitHub operation. |
+| **Route** | Send a responsibility or task to its named canonical document or workflow owner. |
+
+Do not use different technical terms for the same project concept. Do not use
+a technical noun as a verb unless this register also approves the verb. Add a
+new term only when it is necessary for a TrackTemplate subject. The applicable
+Issue 9 category must permit the term. Do not change established identifiers.
+
 ## Canonical track terms
 
 - **Plain line** is railway track without switches and crossings (S&C). Use

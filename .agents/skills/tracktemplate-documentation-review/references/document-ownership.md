@@ -10,12 +10,12 @@ shortening or deleting documentation.
 | Phase and exit-condition status plus risk/decision summaries | `reference/PROJECT_PLAN.md` |
 | Strategic architecture and canonical state | `reference/ARCHITECTURE.md` |
 | Source organisation and dependency direction | `reference/MODULARISATION_PLAN.md` |
-| Proportional change, true gates and documentation lifecycle | `reference/ENGINEERING_POLICY.md` |
+| Proportional change, true gates, the TT-DOC-001 profile and Issue 9 scope, documentation lifecycle, and owner reports | `reference/ENGINEERING_POLICY.md` |
 | Validation procedures and evidence interpretation | `reference/VALIDATION.md` |
 | Testing obligations and oracle-change policy | `reference/TESTING_POLICY.md` |
 | Performance measurement | `reference/PERFORMANCE_SOP.md` |
 | Recovery, destructive actions, backup and restore | `reference/RECOVERY_AND_BACKUP.md` |
-| Railway terminology | `reference/TERMINOLOGY.md` |
+| TrackTemplate technical nouns, technical verbs, and railway terminology | `reference/TERMINOLOGY.md` |
 | Licensing and output status | `reference/LICENSING_BOUNDARIES.md` |
 | Source and evidence provenance | `reference/PROVENANCE.md` |
 | Dated QA audit findings | `reference/QUALITY_ASSURANCE.md` |

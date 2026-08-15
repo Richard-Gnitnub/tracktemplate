@@ -120,6 +120,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-P6-003",
     "D-P6-004",
     "D-P6-005",
+    "TT-DOC-001",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -263,6 +264,9 @@ EXPECTED_EXIT3_ACCEPTANCE_STRUCTURED_EXCLUSIONS = (
     EXPECTED_EXIT3_ACCEPTANCE_LIMITATIONS
     + " "
     + EXPECTED_EXIT3_ACCEPTANCE_EXCLUSIONS
+)
+EXPECTED_TT_DOC_DECISION = (
+    "Adopt the TrackTemplate Technical Documentation Profile."
 )
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
@@ -676,24 +680,103 @@ def _validate_transition_export_validation(validation: str) -> None:
 def _validate_plan_programme(plan: str) -> None:
     """Bind programme and horizon claims to the dashboard preamble."""
     preamble = direct_section_content(plan, "Project Plan", level=1)
-    expected = (
-        "The active programme is the TrackTemplate Core macro-to-Addon migration "
-        "in PRODUCT_VISION.md. Migration completes only when the Addon is the "
-        "normal route, the modular package is the sole runtime without a "
-        "legacy-macro dependency, advertised Core parity/output is accepted, "
-        "the distribution is reproducible and release qualification passes. "
-        "The Layout Editor is subsequent: it does not alter Phase 6 exits. "
-        "Future architecture may be recorded now without being implemented now."
+    diagnostic = (
+        "project plan lost its local current-programme and future-horizon "
+        "clause"
     )
-    programme_paragraph = _require_paragraph(
-        preamble,
-        expected,
-        "project plan lost its local current-programme and future-horizon clause",
+    programme_paragraph = next(
+        (
+            paragraph
+            for paragraph in _raw_paragraphs(preamble)
+            if "The active program is" in _semantic_text(paragraph)
+        ),
+        "",
     )
+    programme = _semantic_text(programme_paragraph)
+    for fragment in (
+        "active program is the TrackTemplate Core macro-to-Addon migration",
+        "migration has defined completion conditions",
+        "Addon must be the usual route",
+        "modular package must be the sole runtime",
+        "without a legacy-macro dependency",
+        "owner must accept the Core parity and output that the project claims",
+        "Each distribution build must give the same result",
+        "Release qualification must pass",
+    ):
+        _require(
+            fragment in programme,
+            diagnostic + ": " + fragment,
+        )
+    layout_paragraph = next(
+        (
+            _semantic_text(paragraph)
+            for paragraph in _raw_paragraphs(preamble)
+            if "The Layout Editor is" in _semantic_text(paragraph)
+        ),
+        "",
+    )
+    for fragment in (
+        "Layout Editor is the later program",
+        "does not change Phase 6 exits",
+        "record future architecture without current implementation",
+    ):
+        _require(
+            fragment in layout_paragraph,
+            diagnostic + ": " + fragment,
+        )
     _require_links(
         programme_paragraph,
         (("PRODUCT_VISION.md", "PRODUCT_VISION.md"),),
         "project plan Product Vision authority link or destination drifted",
+    )
+
+
+def _validate_owner_view(plan: str) -> None:
+    """Require one derived, status-consistent TT-DOC-001 owner view."""
+    section = _section(plan, "Current owner view")
+    rows: list[list[str]] = []
+    for line in section.splitlines():
+        cells = _cells(line) if line.startswith("|") else []
+        if len(cells) == 2 and cells[0] not in {"Field", "---"}:
+            rows.append(cells)
+    expected_fields = [
+        "**Current state**",
+        "**What changed**",
+        "**What now works**",
+        "**Limitations/findings**",
+        "**Owner decision**",
+        "**Next action**",
+    ]
+    _require(
+        [row[0] for row in rows] == expected_fields,
+        "project-plan owner view fields drifted",
+    )
+    owner_view = " ".join(section.split())
+    for fragment in (
+        "Phase 6 is 2/5 evidenced",
+        "The owner accepted Exits 2 and 3",
+        "Exits 1, 4, and 5 stay Pending",
+        "Project status stays `unknown`",
+        "ASD-STE100 Issue 9 the normative standard for canonical technical "
+        "prose in English",
+        "No phase, exit, risk, or product state changes",
+        "The workflows apply the profile through canonical links",
+        "ASD-STE100 Issue 9 conformance not verified` applies to the live corpus",
+        "Frozen history does not change",
+        "TT-DOC-001 is Accepted",
+        "All other owner decisions and exclusions stay unchanged",
+        "authorizes no later project work",
+    ):
+        _require(
+            fragment in owner_view,
+            "project-plan owner view lost or contradicted: " + fragment,
+        )
+    plan_preamble = direct_section_content(plan, "Project Plan", level=1)
+    _require(
+        "canonical status, evidence, and registers are the source of the owner "
+        "view. The owner view does not establish authority"
+        in _semantic_text(plan_preamble),
+        "project-plan owner view became an authority source",
     )
 
 
@@ -703,6 +786,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         headings
         == [
             "# Project Plan",
+            "## Current owner view",
             "## Phase status",
             "## Phase 6 exit conditions",
             "## Live risks",
@@ -732,6 +816,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "project plan does not route to the fixed current evidence path",
     )
     _validate_plan_programme(plan)
+    _validate_owner_view(plan)
     _require(
         "CAPABILITY_MATRIX.md" in plan,
         "project plan does not route to the capability evidence map",
@@ -793,7 +878,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
     )
     _require(
         "Phase 6 current — 2/5 evidenced" in " ".join(plan.split())
-        and "Exit 2 was owner-accepted under D-P6-002 on 2026-08-02"
+        and "owner accepted Exit 2 under D-P6-002 on 2026-08-02"
         in " ".join(plan.split())
         and "Exit 3 under D-P6-005 on 2026-08-15"
         in " ".join(plan.split()),
@@ -1345,6 +1430,162 @@ def _validate_exit_conditions(
         ],
         "D-P6-005 panel exact owner decision drifted or was relocated",
     )
+    tt_doc_heading = (
+        "TT-DOC-001 documentation-architecture panel and owner decision"
+    )
+    _require(
+        '<a id="tt-doc-001-documentation-architecture-panel"></a>\n\n## '
+        + tt_doc_heading
+        in current_evidence,
+        "TT-DOC-001 panel anchor or heading association is missing",
+    )
+    tt_doc_section = direct_section_content(current_evidence, tt_doc_heading)
+    tt_doc_flat = _semantic_text(
+        re.sub(r"^> ?", "", tt_doc_section, flags=re.MULTILINE)
+    )
+    for required_clause in (
+        "f03818d71bce06c5cfb85da84d8f3f230e08b47c",
+        "Phase 6 stays at 2/5",
+        "No risk disposition or product authority changes",
+        "reference/ENGINEERING_POLICY.md owns the documentation lifecycle and "
+        "completion reports",
+        "The panel examined all 28 skills",
+        "No new skill or competing primary responsibility is necessary",
+        "ASD-STE100 Simplified Technical English, Issue 9",
+        "2025-01-15",
+        "reference/TERMINOLOGY.md is the one project terminology owner",
+        "official Issue 9 standard",
+        "Some descriptive sentences have more than 25 words",
+        "Full Issue 9 conformance of the live corpus is not verified",
+        "Issue 9 conformance assessment for this candidate",
+        "The review examined each full logical unit in this table",
+        "The internal result for these logical units is ASD-STE100 Issue 9 "
+        "conforming",
+        "This result is a TrackTemplate conformance assessment",
+        "It is not external ASD certification, endorsement, or an official "
+        "conformance assessment",
+        "It excludes exact machine data and externally controlled information",
+        "It excludes unchanged live prose outside the named logical units",
+        "It also excludes frozen history",
+        "Two reviewers independently reviewed the exact candidate",
+        "The architecture and Issue 9 review result was PASS WITH FINDINGS",
+        "The quality review result was PASS WITH FINDINGS",
+        "No reviewer found a blocker",
+        "Issue 9 conformance is Unknown for unchanged live prose",
+        "The reviewers did not change the candidate",
+        "The same reviewers also examined previous candidate states",
+        "Proceed with bounded conditions",
+        "TT-DOC-001 — TrackTemplate Technical Documentation Profile",
+        "owner view → canonical information → proof/provenance",
+        "The owner view gives no project authority",
+        "normative standard for canonical technical prose in English in the "
+        "defined scope",
+        "All new prose in this scope must obey the applicable ASD-STE100 "
+        "Issue 9 requirements",
+        "A reviewer must use the official standard for the linguistic review",
+        "claims no S1000D conformance",
+        "claims no external ASD certification, endorsement, or official "
+        "conformance assessment",
+        "changes no phase or exit status",
+        "changes no risk disposition, product source, or product behavior",
+        "Exits 1, 4, and 5 stay Pending",
+        "Project status stays unknown",
+    ):
+        _require(
+            required_clause in tt_doc_flat,
+            "TT-DOC-001 evidence panel drifted: " + required_clause,
+        )
+    expected_conformance_scope = {
+        "AGENTS.md": ("completion-report requirement",),
+        "reference/ENGINEERING_POLICY.md": (
+            "TT-DOC-001 profile",
+            "first paragraph",
+            "completion-report section",
+        ),
+        "reference/PROJECT_PLAN.md": (
+            "preamble",
+            "current owner view",
+            "TT-DOC-001 decision row",
+            "authority links",
+        ),
+        "reference/CAPABILITY_MATRIX.md": (
+            "first evidence boundary",
+            "DXF row",
+        ),
+        "reference/TERMINOLOGY.md": (
+            "ASD-STE100 project terminology section",
+        ),
+        "reference/current/PHASE_EVIDENCE.md": (
+            "TT-DOC-001 panel",
+            "current-register paragraph",
+        ),
+        "reference/current/gate-decisions.json": (
+            "human-readable TT-DOC-001 record",
+            "Exact JSON data stays outside",
+        ),
+        "reference/LEARNING_FROM_EXPERIENCE.md": ("LFE-018 only",),
+        "reference/AGENT_WORKFLOWS.md": (
+            "TT-DOC-001 workflow-integration section",
+        ),
+        ".agents/skills/tracktemplate-change-validation/SKILL.md": (
+            "profile preparation",
+            "Issue 9 validation rules",
+            "full output section",
+        ),
+        ".agents/skills/tracktemplate-context-recovery/SKILL.md": (
+            "owner-view guidance",
+            "recovery-report introduction",
+        ),
+        ".agents/skills/tracktemplate-continue/SKILL.md": (
+            "full Owner acceptance pack section",
+        ),
+        ".agents/skills/tracktemplate-documentation-alignment/SKILL.md": (
+            "profile preparation",
+            "full report section",
+        ),
+        ".agents/skills/tracktemplate-documentation-review/SKILL.md": (
+            "full preparation",
+            "editing-rules",
+            "output sections",
+        ),
+        (
+            ".agents/skills/tracktemplate-documentation-review/references/"
+            "document-ownership.md"
+        ): ("two changed ownership rows",),
+        (
+            ".agents/skills/tracktemplate-documentation-review/references/"
+            "writing-checklist.md"
+        ): (
+            "introduction",
+            "full Ownership, Accuracy, and Concision sections",
+        ),
+        ".agents/skills/tracktemplate-quality-review/SKILL.md": (
+            "full preparation and output sections",
+        ),
+        ".agents/skills/tracktemplate-technical-lead/SKILL.md": (
+            "profile guidance in preparation and final handoff",
+        ),
+    }
+    conformance_rows = _structured_table_rows(
+        tt_doc_section,
+        ("Path", "Full logical unit"),
+        "TT-DOC-001 Issue 9 conformance scope",
+    )
+    _require(
+        set(conformance_rows) == set(expected_conformance_scope),
+        "TT-DOC-001 conformance-scope path set drifted",
+    )
+    for reviewed_path, scope_fragments in expected_conformance_scope.items():
+        scope = conformance_rows[reviewed_path][1]
+        _require(
+            all(fragment in scope for fragment in scope_fragments),
+            "TT-DOC-001 conformance scope changed: " + reviewed_path,
+        )
+    _require(
+        "[official Issue 9 standard](https://www.asd-ste100.org/assets/files/"
+        "ASD-STE100_ISSUE9.pdf)" in tt_doc_section,
+        "TT-DOC-001 conformance review lost its official Issue 9 source",
+    )
     _require(
         'id="phase-6-opening-panel"' in current_evidence
         and "Proceed with bounded conditions" in current_evidence
@@ -1645,7 +1886,7 @@ def _validate_decisions(plan: str) -> None:
             record["decided_on"]
             == (
                 "2026-08-15"
-                if decision_id in {"D-P6-004", "D-P6-005"}
+                if decision_id in {"D-P6-004", "D-P6-005", "TT-DOC-001"}
                 else (
                     "2026-08-02"
                     if decision_id in {"D-P6-002", "D-P6-003"}
@@ -1752,6 +1993,55 @@ def _validate_decisions(plan: str) -> None:
         == exit3_acceptance_panel,
         "D-P6-005 authority, exclusions or panel routing drifted",
     )
+    tt_doc_record = phase6_by_id["TT-DOC-001"]
+    tt_doc_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#tt-doc-001-documentation-architecture-panel"
+    )
+    _require(
+        tt_doc_record["decision"] == EXPECTED_TT_DOC_DECISION
+        and tt_doc_record["evidence"] == tt_doc_panel
+        and tt_doc_record["panel_record"] == tt_doc_panel,
+        "TT-DOC-001 decision or panel routing drifted",
+    )
+    tt_doc_semantic = _semantic_text(
+        str(tt_doc_record["authority"])
+        + " "
+        + str(tt_doc_record["exclusions"])
+    )
+    for fragment in (
+        "f03818d71bce06c5cfb85da84d8f3f230e08b47c",
+        "human comprehensibility as a governance control",
+        "reference/ENGINEERING_POLICY.md is the sole canonical owner",
+        "owner view → canonical information → proof/provenance",
+        "owner view gives no project authority",
+        "ASD-STE100 Simplified Technical English, Issue 9",
+        "2025-01-15",
+        "official standard is the normative external reference",
+        "All new prose in this scope must obey the applicable Issue 9 "
+        "requirements",
+        "full logical unit that contains the change must obey these "
+        "requirements",
+        "reviewer must use the official standard for the linguistic review",
+        "reference/TERMINOLOGY.md is the one owner",
+        "This decision adds no skill",
+        "Issue 9 style does not authorize a change to frozen history",
+        "ASD-STE100 Issue 9 conformance not verified applies to the live "
+        "corpus",
+        "claims no external ASD certification, endorsement, or official "
+        "conformance assessment",
+        "claims no S1000D conformance",
+        "changes no phase or exit status, accepted-exit count, risk "
+        "disposition",
+        "authorizes no S1000D XML, Common Source Database, BREX",
+        "Phase 6 stays at 2/5",
+        "Exits 1, 4, and 5 stay Pending",
+        "Project status stays unknown",
+    ):
+        _require(
+            fragment in tt_doc_semantic,
+            "TT-DOC-001 authority or exclusion drifted: " + fragment,
+        )
     current_records = document["decisions"]
     _require(
         isinstance(current_records, list),
@@ -1986,12 +2276,13 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         "current decision register" in decision_flat
-        and "owns Phase 6 decisions" in decision_flat,
-        "the current Phase 6 decision-register ownership is missing",
+        and "owns Phase 6 and current cross-phase governance decisions"
+        in decision_flat,
+        "the current decision-register ownership is missing",
     )
     plan_ids = set(
         re.findall(
-            r"^\| (D-[A-Z0-9-]+) \|",
+            r"^\| (D-[A-Z0-9-]+|TT-DOC-\d{3}) \|",
             decision_section,
             re.MULTILINE,
         )
@@ -2308,28 +2599,62 @@ def _validate_architecture_direction(architecture: str) -> None:
 def _validate_capability_matrix(matrix: str) -> None:
     """Validate accepted-source, Addon and future status in local matrix units."""
     preamble = _document_preamble(matrix, "TrackTemplate Capability Matrix")
-    _require_paragraph(
-        preamble,
+    preamble_flat = _semantic_text(preamble)
+    for fragment, diagnostic in (
         (
-            "This matrix compares the accepted legacy baseline with the modular "
-            "B16 checkpoint destined for the Addon. It was reconciled on 2026-08-02 "
-            "against accepted main at a5b6a79bf3e73e1673d440077bd65000986bb4c7, "
-            "the frozen Phase 1 inventory and Phase 5 closeout, and current Phase 6 "
-            "evidence. PR #31's private-development DXF slice is present; D-P6-002 "
-            "accepts only the bounded transient-object exit, not export failure "
-            "safety or output clearance."
+            "compares the accepted legacy baseline with the modular B16 checkpoint",
+            "capability matrix lost its local accepted-source and PR-status clause",
         ),
-        "capability matrix lost its local accepted-source and PR-status clause",
-    )
-    _require_paragraph(
-        preamble,
         (
-            "The Addon column describes the modular tracktemplate implementation, "
-            "not an installable or production-ready Addon claim. Formal phase "
-            "status remains in PROJECT_PLAN.md."
+            "TT-DOC-001 panel reconciled it on 2026-08-15",
+            "capability matrix lost its local accepted-source and PR-status clause",
         ),
-        "capability matrix lost its local Addon-status authority clause",
-    )
+        (
+            "f03818d71bce06c5cfb85da84d8f3f230e08b47c",
+            "capability matrix lost its local accepted-source and PR-status clause",
+        ),
+        (
+            "frozen Phase 1 inventory",
+            "capability matrix lost its local accepted-source and PR-status clause",
+        ),
+        (
+            "Phase 5 closeout",
+            "capability matrix lost its local accepted-source and PR-status clause",
+        ),
+        (
+            "current Phase 6 evidence",
+            "capability matrix lost its local accepted-source and PR-status clause",
+        ),
+        (
+            "D-P6-002 accepts the bounded transient-object exit",
+            "capability matrix lost its bounded decision boundary",
+        ),
+        (
+            "D-P6-005 accepts only the bounded private-development exporter "
+            "failure-safety claim",
+            "capability matrix lost its bounded decision boundary",
+        ),
+        (
+            "Neither decision grants output clearance",
+            "capability matrix lost its bounded decision boundary",
+        ),
+        (
+            "Addon column describes the modular tracktemplate implementation",
+            "capability matrix lost its local Addon-status authority clause",
+        ),
+        (
+            "not an installable or production-ready Addon claim",
+            "capability matrix lost its local Addon-status authority clause",
+        ),
+        (
+            "PROJECT_PLAN.md owns formal phase status",
+            "capability matrix lost its local Addon-status authority clause",
+        ),
+    ):
+        _require(
+            fragment in preamble_flat,
+            diagnostic + ": " + fragment,
+        )
 
     rows = _structured_table_rows(
         direct_section_content(matrix, "Matrix"),
@@ -2554,24 +2879,7 @@ def _validate_capability_matrix(matrix: str) -> None:
             "2026-07-19-b14-ordinary-track-selected-export-series.md)",
             "Partial",
         ),
-        (
-            "DXF",
-            "C — fixed plain-line selected and Generate-path output oracles",
-            "P — private-development Entry/Exit writer only",
-            "P — bounded transition intent exists",
-            "—",
-            "P — transient transition centreline",
-            (
-                "P — deterministic output and bounded recovery evidence; "
-                "failure-safe exit still Pending for Level 3 review"
-            ),
-            "—",
-            "[Workflow coverage contract](contracts/"
-            "phase1-workflow-coverage.json); [current Phase 6 evidence]"
-            "(current/PHASE_EVIDENCE.md#"
-            "b16-entry-exit-durable-dxf-recovery)",
-            "Partial",
-        ),
+        ("DXF",),
         (
             "STL",
             "C — fixed plain-line legacy output oracle",
@@ -2693,6 +3001,50 @@ def _validate_capability_matrix(matrix: str) -> None:
     )
     for expected_row in expected_rows:
         capability = expected_row[0]
+        if capability == "DXF":
+            dxf = rows[capability]
+            dxf_flat = [_semantic_text(cell) for cell in dxf]
+            for index, fragment in (
+                (1, "fixed plain-line selected and Generate-path output oracles"),
+                (2, "private-development Entry/Exit writer only"),
+                (3, "bounded transition intent exists"),
+                (5, "transient transition centreline"),
+                (6, "deterministic output"),
+                (6, "supported-model failure safety"),
+                (6, "owner-accepted under D-P6-005"),
+                (6, "bounded private-development Entry/Exit route only"),
+            ):
+                _require(
+                    fragment in dxf_flat[index],
+                    "capability matrix DXF boundary drifted: " + fragment,
+                )
+            _require(
+                dxf_flat[1].startswith("C —")
+                and dxf_flat[2].startswith("P —")
+                and dxf_flat[3].startswith("P —")
+                and dxf_flat[4] == "—"
+                and dxf_flat[5].startswith("P —")
+                and dxf_flat[6].startswith("P —")
+                and dxf_flat[7] == "—"
+                and dxf_flat[9] == "Partial",
+                "capability matrix DXF classification drifted",
+            )
+            _require_links(
+                dxf[8],
+                (
+                    (
+                        "Workflow coverage contract",
+                        "contracts/phase1-workflow-coverage.json",
+                    ),
+                    (
+                        "current Phase 6 evidence",
+                        "current/PHASE_EVIDENCE.md#"
+                        "phase-6-exit-3-supported-model-evidence-admission-panel",
+                    ),
+                ),
+                "capability matrix DXF evidence routing drifted",
+            )
+            continue
         expected_cells = [
             _semantic_markdown(cell)
             for cell in expected_row

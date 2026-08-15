@@ -31,6 +31,19 @@ requests repository-wide alignment or bounded evidence shows broader drift.
 Read `AGENTS.md`, `reference/PROJECT_PLAN.md` and the canonical owner of each
 affected subject before judging a claim.
 
+Read and apply the canonical
+[Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+when presentation for the owner, status terms, or workflow responsibility is in
+scope. Read the project technical terms in
+[`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
+The profile and terminology register own these requirements. This skill only
+finds and corrects drift.
+
+For STE-governed prose, make sure that the recorded conformance state is
+correct. Keep Issue 9 conformance unverified if a reviewer did not use the
+official standard. Keep each bounded migration finding in the record until a
+reviewer records its result.
+
 - Treat explicit current user decisions, `AGENTS.md` and canonical reference
   documents as requirement and decision authority in that order.
 - Treat source, tests, configuration, manifests, Git status and diffs as
@@ -105,11 +118,13 @@ Select only the rows relevant to the audit.
 
 ## Report
 
-Report:
+For a substantial cycle, start with the profile's owner view. Put this
+technical provenance below it:
 
-1. audit scope and controlling authorities;
-2. material findings by classification, with evidence;
-3. changes made and their canonical owners;
-4. conflicts or proposed removals requiring an owner decision;
-5. checks actually run and their results; and
-6. residual `CANNOT_VERIFY` claims or evidence still required.
+1. Audit scope and canonical authorities.
+2. Findings by class, with evidence.
+3. Changes and their canonical owners.
+4. Conflicts or proposed removals for an owner decision.
+5. Issue 9 conformance scope, review source, result, and migration findings.
+6. Checks and their results.
+7. Residual `CANNOT_VERIFY` claims or evidence that is still necessary.

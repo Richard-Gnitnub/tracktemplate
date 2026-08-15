@@ -123,6 +123,201 @@ The narrative belongs once in
 belongs in [current/gate-decisions.json](current/gate-decisions.json).
 [PROJECT_PLAN.md](PROJECT_PLAN.md) carries only a short linked decision summary.
 
+<a id="tt-doc-001-tracktemplate-technical-documentation-profile"></a>
+
+## TT-DOC-001 — TrackTemplate Technical Documentation Profile
+
+Human comprehensibility is a governance control. TrackTemplate uses this
+information order for work in a substantial cycle:
+
+> Owner view → canonical information → proof/provenance
+
+The owner view is a short presentation from canonical records. It must agree
+with those records. The owner view must never give project authority
+independently. Canonical documents contain requirements, state, and
+decisions for their named subjects. Proof/provenance includes detailed
+evidence, exact Git identities, validation results, reviews, and preservation
+results.
+
+If information occurs in more than one place, use a link to its one canonical
+owner. Do not copy policy into a dashboard, evidence record, skill, or
+report to make a competing owner. Only a Level 3 project-owner decision can
+change the scope of this profile or its controlled status meanings.
+
+### Normative controlled-writing standard
+
+TrackTemplate uses
+[ASD-STE100 Simplified Technical English, Issue 9](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf)
+as the normative controlled-writing standard for English canonical technical
+prose. The standard identity is ASD-STE100 Simplified Technical English,
+Issue 9, dated 2025-01-15. The official standard is the normative external
+reference.
+
+Public summaries, model knowledge, and automatic validators do not show
+conformance. A reviewer must use the official standard for a linguistic
+conformance review.
+Do not copy the standard or its controlled general dictionary into this
+repository.
+
+The standard applies to canonical technical prose that persons can read in:
+
+- architecture
+- engineering and governance policy
+- current phase evidence
+- decisions that use prose
+- validation and recovery instructions
+- technical procedures
+- Learning from Experience
+- documentation-profile requirements
+- human-readable explanations in canonical registers
+- substantial workflow and skill prose that gives technical instructions or
+  requirements
+
+Do not change exact machine data or externally controlled information only to
+change its language. Keep these items exact when necessary:
+
+- code
+- API and schema identifiers
+- JSON keys and machine values
+- file and directory paths
+- Git SHAs and hashes
+- commands
+- diagnostic strings and test sentinels
+- external quotations
+- standards titles and identifiers
+- machine-generated logs and evidence
+
+The text around these items must obey the applicable Issue 9 requirements. In
+the STE scope, Issue 9 vocabulary, meaning, grammar, spelling, and usage have
+priority over the usual UK-English convention of TrackTemplate. Outside this
+scope, use concise UK English.
+
+TrackTemplate uses applicable modular-information principles of ASD S1000D. It
+does not claim S1000D conformance. This profile does not authorize this S1000D
+infrastructure:
+
+- S1000D XML
+- a Common Source Database
+- BREX
+- data-module identifiers
+- publication modules
+- applicability engines
+- XML migration
+- a documentation database or service
+- a generic content-management system
+
+### Conformance terms
+
+Use these conformance terms with their exact scopes:
+
+| Term | Controlled meaning |
+| --- | --- |
+| **TT-DOC-001 conforming** | The named unit obeys all applicable TrackTemplate profile controls. New STE-governed prose and prose in a material edit must also have a recorded Issue 9 review. |
+| **ASD-STE100 Issue 9 conforming** | A reviewer examined the named unit against the official Issue 9 standard. The conformance record gives the scope, result, technical terms, and limitations. |
+| **ASD-STE100 Issue 9 conformance not verified** | No sufficient review against the official Issue 9 standard exists for the named unit. |
+| **Externally certified or endorsed** | An external body gave the named certification or endorsement. TrackTemplate does not claim this state. |
+
+A reviewer can use an automatic tool during a review. The tool cannot replace
+the linguistic review or show Issue 9 conformance.
+
+### Controlled governance meanings
+
+Use these terms consistently. Keep a qualification beside the claim it limits.
+
+| Term | Controlled meaning |
+| --- | --- |
+| **Pending** | The criterion or action does not have the necessary evidence or owner decision. Pending gives no authority. |
+| **Evidenced** | The project admitted and keeps evidence for the named bounded criterion. Evidenced does not give wider acceptance or clearance. |
+| **Accepted** | The project owner made an explicit decision. The decision applies only to its stated authority and exclusions. |
+| **Blocked** | One or more stated conditions prevent the named action or decision. |
+| **Finding** | A review or validation result must have a disposition. A finding does not change project state. |
+| **Limitation** | A stated boundary applies to evidence, capability, or assurance. A limitation is not automatically a blocker. A reader must be able to see it. |
+| **Unknown** | Evidence that the project keeps does not show the claim. Unknown does not mean accepted or rejected. |
+| **Decision required** | The evidence or recommendation is ready for the named owner. The owner decision is absent. |
+
+Keep facts, evidence, inferences, recommendations, and owner decisions
+distinct. A fact is a state that a person can examine directly. Evidence is an
+observation or result that the project keeps. An inference explains the
+evidence. A
+recommendation gives a proposed action or decision. Only an explicit owner
+decision gives Level 3 authority.
+
+Do not rename a persisted, API, schema, evidence or decision identifier for
+readability.
+
+### Controlled writing and owner view
+
+Use the applicable Issue 9 rules and the approved project terminology. Keep
+technical precision:
+
+- use one principal requirement or fact in each sentence when possible
+- use direct structures and identify the responsible actor
+- use one controlled term for one governance concept
+- place qualifications beside the claim they qualify
+- use lists when conditions can fail separately
+- do not use a vague reference when its subject is not clear
+- use canonical links instead of copied authority
+- label facts, evidence, inferences, recommendations, and owner decisions
+  distinctly
+
+For a substantial cycle, begin the result for the human owner with these
+fields:
+
+1. **Current state**
+2. **What changed**
+3. **What now works**
+4. **Limitations/findings**
+5. **Owner decision**
+6. **Next action**
+
+For a decision-relevant active-evidence entry, use this order:
+
+1. Scope and current fact
+2. Decisive evidence
+3. Limitations or findings
+4. Recommendation
+5. Explicit owner decision and exclusions
+6. Proof/provenance links
+
+Omit an item only when it does not apply. Do not put different evidence and
+authority states together to make the text shorter.
+
+The owner must be able to see from this view whether the cycle succeeded,
+the phase changed, a blocker exists, and a decision is necessary. The view must
+also show whether another action has authority. Put applicable technical
+provenance below the view. Short text must never change evidence or a
+recommendation into acceptance.
+
+### Terminology and migration boundary
+
+[TERMINOLOGY.md](TERMINOLOGY.md) is the one project owner for TrackTemplate
+technical nouns and technical verbs. Use an Issue 9 dictionary word or an
+approved project technical term. Do not make a second terminology source.
+
+These migration rules apply from the acceptance of TT-DOC-001:
+
+- All new canonical technical prose in English must obey the applicable
+  ASD-STE100 Issue 9 requirements.
+- For a material edit, review the full logical unit that contains the change.
+  Use the applicable Issue 9 requirements.
+- Review live canonical prose in bounded migration cycles.
+- Keep each non-conformance and readability finding in the record until a
+  reviewer records its result.
+- Do not change frozen history only to correct its Issue 9 style.
+- Keep detailed technical provenance and all accepted limitations.
+
+Before you add a skill or change its primary responsibility, map the
+responsibility across the full skill catalog. Add the behavior to the
+primary owner when possible. Add a skill only when one separate responsibility can
+occur repeatedly and has no owner. Record its composition and non-ownership
+boundaries.
+
+Documentation simplification does not give a skill phase, production,
+security, merge, release, acceptance, or project-owner authority. Semantic
+validators prevent changes to these meanings. They do not freeze full
+paragraphs. They do not use sentence-length checks as proof of linguistic
+conformance.
+
 ## Documentation lifecycle
 
 The live control paths are fixed:
@@ -178,7 +373,8 @@ licensing judgement or owner acceptance where those boundaries apply.
 
 ## Completion report
 
-Use this compact form:
+Use the TT-DOC-001 owner view for a substantial cycle. Keep detailed evidence
+below it. For compact technical provenance or a smaller change, use:
 
 ```text
 Changed:

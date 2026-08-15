@@ -41,20 +41,34 @@ Use one of two modes:
 ## Required preparation
 
 1. Read [`references/review-checklist.md`](references/review-checklist.md).
-2. Inspect the complete relevant diff before reaching conclusions. Include
-   connected changes, tests, documentation and generated interfaces that affect
-   the same behaviour.
-3. Inspect raw validation output and failed-test evidence before reading a
+2. Examine the full relevant diff before you record conclusions. Include
+   connected changes, tests, documentation, and generated interfaces for the
+   same behavior.
+3. Examine raw validation output and failed-test evidence before you read a
    completion summary or proposed diagnosis.
 4. Identify the affected architectural boundary and railway boundary before
-   assessing implementation quality.
+   you examine implementation quality.
 5. Read only the canonical project documents relevant to the change. Do not
    copy their policy into this skill or treat this skill as a second authority.
 
-Before judging exporter interruption probes or tests, read the canonical
+For presentation for the owner or documentation-governance changes, read the
+canonical
+[Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
+Read the project technical terms in
+[`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
+Make sure that the owner view agrees with canonical records. It must keep
+limitations and technical provenance. It must not make acceptance or wider
+authority.
+
+For an Issue 9 conformance claim, examine the recorded conformance review. Make
+sure that the reviewer used the official standard. The reviewer must review
+the full logical unit that contains the change. A validator result alone is
+not sufficient evidence.
+
+Before you review exporter interruption probes or tests, read the canonical
 [supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).
-Do not silently widen it during staff review, and report any contradiction
-between an implementation or evidence claim and the actual supported contract.
+Do not silently widen it during staff review. Report each contradiction between
+an implementation or evidence claim and the canonical supported contract.
 
 ## Review order
 
@@ -161,27 +175,31 @@ Assess the relevant change for:
 
 ## Output
 
-Report:
+For a substantial cycle, start with the profile's owner view. Put this
+staff-review proof/provenance below it:
 
 1. **Decision:** pass, pass with findings, or blocked.
-2. **Progress assessment:** actual task level, progress impact, phase-evidence
-   proportionality and any maintenance incorrectly promoted into phase work.
+2. **Progress assessment:** the applicable task level, progress effect,
+   phase-evidence proportionality, and maintenance that must not be phase work.
 3. **Specification findings:** MISSING, EXTRA and CANNOT_VERIFY findings.
-4. **Finding disposition:** every actionable finding labelled `BLOCKER`,
-   `REQUIRED_BEFORE_EXIT`, `BACKLOG` or `OPTIONAL`.
-5. **Confirmed defects:** ordered by impact, with exact paths or symbols and the
-   evidence supporting each finding.
-6. **Unnecessary complexity:** only where its lack of purpose has been established.
-7. **Behavioural risks:** including the affected architectural and railway boundaries.
-8. **Checks completed:** commands, inspections and evidence actually reviewed.
-9. **Checks still required:** especially real-GUI FreeCAD, export, performance,
-   provenance, licensing or compatibility evidence that was not available.
+4. **Finding disposition:** give each actionable finding one label:
+   `BLOCKER`, `REQUIRED_BEFORE_EXIT`, `BACKLOG` or `OPTIONAL`.
+5. **Confirmed defects:** in impact order, with exact paths or symbols and the
+   evidence for each finding.
+6. **Unnecessary complexity:** report it only when evidence shows that it has
+   no purpose.
+7. **Behavior risks:** the architectural and railway boundaries for the
+   change.
+8. **Checks completed:** commands, inspections, and evidence that the reviewer
+   examined.
+9. **Checks still required:** name unavailable real-GUI FreeCAD, export,
+   performance, provenance, licensing, or compatibility evidence.
 10. **Failed-test integrity:** classification, repair boundary, original proof
    rerun and any test/oracle authority used.
 11. **Reviewer independence:** fresh reviewer/session or disclosed same-agent
    review.
-12. **Scope:** whether unrelated files and behaviour remained unchanged.
-13. **Morale roast:** only when explicitly requested, after the factual review.
+12. **Scope:** whether unrelated files and behavior changed.
+13. **Morale roast:** only when the user requests it, after the factual review.
 
 Omit failed-test integrity when no failed test or repair is in scope. Do not
 present preferences as defects, and do not imply that an unperformed check

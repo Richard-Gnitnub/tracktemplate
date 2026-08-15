@@ -16,6 +16,7 @@ LEARNING = ROOT / "reference" / "LEARNING_FROM_EXPERIENCE.md"
 PLAN = ROOT / "reference" / "PROJECT_PLAN.md"
 AGENTS = ROOT / "AGENTS.md"
 ENGINEERING = ROOT / "reference" / "ENGINEERING_POLICY.md"
+TERMINOLOGY = ROOT / "reference" / "TERMINOLOGY.md"
 VALIDATION = ROOT / "reference" / "VALIDATION.md"
 RISKS = ROOT / "reference" / "current" / "risks.json"
 FROZEN = ROOT / "reference" / "history" / "frozen-records.json"
@@ -42,6 +43,9 @@ EXPECTED_IMMUTABLE_SOURCE_HASHES = {
     "chair_performance_and_representation.FCMacro":
         "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
 }
+LFE_001_TO_017_SHA256 = (
+    "6fe3654db8ee88566ede3c50ecddb12054399e20e78a8205eb5bb9f414f7e912"
+)
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 QA_RISK_RE = re.compile(r"^\|\s*(QA-R\d{2})\s*\|", re.MULTILINE)
 NON_AUTHORITY_GATE_REGRESSIONS = {
@@ -451,12 +455,212 @@ def validate_validation_document_boundary() -> None:
         )
 
 
+def validate_documentation_profile(
+    engineering: str,
+    plan: str,
+    learning: str,
+    terminology: str,
+) -> None:
+    """Validate the canonical TT-DOC-001 human-interface contract."""
+    heading = "## TT-DOC-001 — TrackTemplate Technical Documentation Profile"
+    require(
+        engineering.count(heading) == 1,
+        "Engineering Policy must own exactly one TT-DOC-001 profile",
+    )
+    profile = engineering.split(heading, 1)[1].split("\n## ", 1)[0]
+    profile_flat = " ".join(profile.split())
+    for fragment in (
+        "Human comprehensibility is a governance control",
+        "Owner view → canonical information → proof/provenance",
+        "must never give project authority independently",
+        "Only a Level 3 project-owner decision can change the scope",
+        "ASD-STE100 Simplified Technical English, Issue 9",
+        "2025-01-15",
+        "normative controlled-writing standard",
+        "official standard is the normative external reference",
+        "Public summaries, model knowledge, and automatic validators do not "
+        "show conformance",
+        "A reviewer must use the official standard for a linguistic "
+        "conformance review",
+        "Do not copy the standard or its controlled general dictionary",
+        "substantial workflow and skill prose",
+        "API and schema identifiers",
+        "machine-generated logs and evidence",
+        "Issue 9 vocabulary, meaning, grammar, spelling, and usage have "
+        "priority over the usual UK-English convention of TrackTemplate",
+        "does not claim S1000D conformance",
+        "TT-DOC-001 conforming",
+        "ASD-STE100 Issue 9 conforming",
+        "ASD-STE100 Issue 9 conformance not verified",
+        "Externally certified or endorsed",
+        "does not claim this state",
+        "cannot replace the linguistic review or show Issue 9 conformance",
+        "facts, evidence, inferences, recommendations, and owner decisions "
+        "distinct",
+        "Short text must never change evidence or a recommendation into "
+        "acceptance",
+        "is the one project owner for TrackTemplate technical nouns",
+        "All new canonical technical prose in English must obey the applicable "
+        "ASD-STE100 Issue 9 requirements",
+        "review the full logical unit that contains the change",
+        "Review live canonical prose in bounded migration cycles",
+        "Do not change frozen history only to correct its Issue 9 style",
+        "Add the behavior to the primary owner when possible",
+        "Documentation simplification does not give a skill phase, "
+        "production, security, merge, release, acceptance, or project-owner "
+        "authority",
+        "do not freeze full paragraphs",
+        "do not use sentence-length checks as proof of linguistic conformance",
+    ):
+        require(
+            fragment in profile_flat,
+            "TT-DOC-001 profile lacks: " + fragment,
+        )
+
+    controlled_meanings = {
+        "Pending": "Pending gives no authority",
+        "Evidenced": "does not give wider acceptance or clearance",
+        "Accepted": "decision applies only to its stated authority",
+        "Blocked": "prevent the named action or decision",
+        "Finding": "does not change project state",
+        "Limitation": "reader must be able to see it",
+        "Unknown": "does not mean accepted or rejected",
+        "Decision required": "owner decision is absent",
+    }
+    for term, meaning in controlled_meanings.items():
+        match = re.search(
+            rf"^\| \*\*{re.escape(term)}\*\* \| (.+) \|$",
+            profile,
+            re.MULTILINE,
+        )
+        require(match is not None, "TT-DOC-001 lacks controlled term: " + term)
+        require(
+            meaning in match.group(1),
+            "TT-DOC-001 meaning drifted for: " + term,
+        )
+
+    for field in (
+        "Current state",
+        "What changed",
+        "What now works",
+        "Limitations/findings",
+        "Owner decision",
+        "Next action",
+    ):
+        require(
+            f"**{field}**" in profile,
+            "TT-DOC-001 owner view lacks: " + field,
+        )
+
+    require(
+        plan.count("## Current owner view") == 1,
+        "PROJECT_PLAN must contain one derived current owner view",
+    )
+    owner_view = plan.split("## Current owner view", 1)[1].split("\n## ", 1)[0]
+    require(
+        "canonical status, evidence, and registers are the source of the owner "
+        "view"
+        in " ".join(plan.split()),
+        "PROJECT_PLAN owner view lost its derivation boundary",
+    )
+    require(
+        "Phase 6 is 2/5 evidenced" in owner_view
+        and "Exits 1, 4, and 5 stay Pending" in owner_view
+        and "No phase, exit, risk, or product state changes" in owner_view
+        and "ASD-STE100 Issue 9 conformance not verified` applies to the live "
+        "corpus" in owner_view
+        and "This decision authorizes no later project work"
+        in owner_view,
+        "PROJECT_PLAN owner view contradicts current authority",
+    )
+
+    require(
+        terminology.count("## ASD-STE100 project terminology") == 1,
+        "TERMINOLOGY must own one ASD-STE100 project-term register",
+    )
+    term_section = terminology.split(
+        "## ASD-STE100 project terminology",
+        1,
+    )[1].split("\n## ", 1)[0]
+    term_flat = " ".join(term_section.split())
+    for fragment in (
+        "one project register for TrackTemplate technical nouns and technical "
+        "verbs",
+        "does not copy the official controlled general dictionary",
+        "Owner view",
+        "canonical document",
+        "ASD-STE100 Issue 9",
+        "Validate",
+        "Reconcile",
+        "Authorize",
+        "Admit",
+        "Freeze",
+        "stage",
+        "Adopt",
+        "Claim",
+        "Own",
+        "Review",
+        "Preserve",
+        "Map",
+        "Migrate",
+        "Report",
+        "Centreline",
+        "substantial cycle",
+        "Product behavior",
+        "Do not use different technical terms for the same project concept",
+        "Do not use a technical noun as a verb unless this register also "
+        "approves the verb",
+    ):
+        require(
+            fragment in term_flat,
+            "TrackTemplate STE terminology lacks: " + fragment,
+        )
+
+    lfe_rows = [
+        line
+        for line in learning.splitlines()
+        if re.match(r"^\| LFE-\d{3} ", line)
+    ]
+    lfe_ids = [
+        re.match(r"^\| LFE-(\d{3}) ", row).group(1)
+        for row in lfe_rows
+    ]
+    require(
+        lfe_ids == [f"{value:03d}" for value in range(1, 19)],
+        "LFE ledger is not unique and append-only through LFE-018",
+    )
+    protected_prefix = "\n".join(lfe_rows[:17]) + "\n"
+    require(
+        hashlib.sha256(protected_prefix.encode("utf-8")).hexdigest()
+        == LFE_001_TO_017_SHA256,
+        "an LFE row before LFE-018 was modified",
+    )
+    lfe_018 = lfe_rows[17]
+    for fragment in (
+        "current state",
+        "limitations",
+        "decision",
+        "could not easily find the current state",
+        "TT-DOC-001 Level 3 decision",
+        "tt-doc-001-documentation-architecture-panel",
+        "Technical Documentation Profile",
+        "tt-doc-001-tracktemplate-technical-documentation-profile",
+        "short owner view",
+        "ASD-STE100 Issue 9",
+        "Migration occurs in bounded cycles",
+        "Frozen history does not change",
+        "must never give authority",
+    ):
+        require(fragment in lfe_018, "LFE-018 lacks: " + fragment)
+
+
 def main() -> None:
     quality = read(QUALITY)
     learning = read(LEARNING)
     plan = read(PLAN)
     agents = read(AGENTS)
     engineering = read(ENGINEERING)
+    terminology = read(TERMINOLOGY)
 
     for heading in (
         "# Quality Assurance",
@@ -485,6 +689,7 @@ def main() -> None:
     validate_frozen_records()
     validate_current_qa_risks(quality)
     validate_governance_controls(plan, agents, engineering)
+    validate_documentation_profile(engineering, plan, learning, terminology)
     validate_validation_document_boundary()
     for relative, expected in EXPECTED_IMMUTABLE_SOURCE_HASHES.items():
         require(

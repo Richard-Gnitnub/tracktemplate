@@ -7,13 +7,27 @@ description: Create, review, shorten or reorganise TrackTemplate Markdown docume
 
 ## Required preparation
 
-1. Read [`references/document-ownership.md`](references/document-ownership.md).
-2. Read [`references/writing-checklist.md`](references/writing-checklist.md).
-3. Classify the document before editing it: live status, architecture, plan,
-   policy, procedure, evidence, audit, historical record, contract, inventory,
-   closeout or supporting guidance.
-4. Identify the document's canonical responsibility and the canonical owner of
-   any material that falls outside it.
+1. Read the canonical
+   [Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
+2. When the Issue 9 scope applies, use the official standard that the profile
+   identifies. Review the full logical unit that contains the change.
+3. Read the project technical terms in
+   [`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
+4. Read [`references/document-ownership.md`](references/document-ownership.md).
+5. Read [`references/writing-checklist.md`](references/writing-checklist.md).
+6. Select the document class. Do this before you edit it. Use one of these
+   classes:
+   - live status
+   - architecture
+   - plan or policy
+   - procedure
+   - evidence or audit
+   - historical record
+   - contract or inventory
+   - closeout
+   - guidance
+7. Map the document responsibility. Also map information that has a different
+   canonical owner.
 
 ## Conditional canonical reading
 
@@ -43,20 +57,28 @@ Read only the documents relevant to the present change:
 
 ## Editing rules
 
-- Prefer links to canonical owners over copied explanations.
-- Put conclusions, decisions and operative requirements before supporting
-  detail.
-- Remove padding, repetition and generic summaries without removing evidence,
-  qualifications or controlled terminology.
+- Use links to canonical owners instead of copied explanations.
+- Put conclusions, decisions and operative requirements before the detail that
+  gives the evidence.
+- Use ASD-STE100 Issue 9 in the profile scope. Issue 9 requirements have
+  priority over the usual UK-English convention in this scope.
+- Use the approved project technical terms. Keep facts, evidence, limitations,
+  recommendations, and owner decisions distinct.
+- Do not claim Issue 9 conformance from a public summary, model knowledge, or
+  an automatic validator.
+- Remove repeated or unnecessary text. Keep evidence, qualifications, and
+  controlled terms.
 - Preserve frozen historical evidence and append-only records. Do not rewrite
-  them using later knowledge.
-- Check for exact wording required by validators before changing prose.
-- Avoid arbitrary word-count targets, automatic whole-repository rewrites and
-  broad mechanical cleanup.
-- Keep phase and exit-condition status in `reference/PROJECT_PLAN.md`, current
-  evidence in `reference/current/PHASE_EVIDENCE.md`, and detailed risks and
-  decisions in the JSON registers beside it.
-- Report material proposed for removal when deletion could change historical,
+  them with later knowledge.
+- Before you change prose, make sure that you know the exact wording that a
+  validator uses.
+- Do not use an arbitrary word-count target.
+- Do not use an automatic rewrite of the full repository.
+- Keep each item in its canonical owner:
+  - phase and exit-condition status in `reference/PROJECT_PLAN.md`
+  - current evidence in `reference/current/PHASE_EVIDENCE.md`
+  - risk and decision detail in the JSON registers beside it
+- Report information proposed for removal when deletion could change historical,
   legal, safety, licensing or evidential meaning.
 
 ## Decision-relevant current phase evidence
@@ -87,16 +109,20 @@ not nominate itself as the next phase-development tranche.
 
 ## Output
 
-Report:
+For a substantial cycle, start with the profile's owner view. Put this
+technical provenance below it:
 
-1. **Document classification and canonical responsibility.**
-2. **Changes made or proposed**, with the reason for each material change.
-3. **Material moved or linked**, naming its canonical owner.
-4. **Material proposed for removal that needs explicit review** because it may
-   affect historical, legal, safety, licensing or evidential meaning.
-5. **Validation completed**, including local link checks and any
-   validator-required wording reviewed.
-6. **Residual uncertainty**, including evidence or authority still needed.
+1. **Document class and canonical responsibility.**
+2. **Changes made or proposed**, with the reason for each change.
+3. **Information moved or linked**, naming its canonical owner.
+4. **Information proposed for removal.** Record why an explicit review is
+   necessary. List each possible effect on history, law, safety, licenses, or
+   evidence.
+5. **Validation completed.** Include local link checks and validator text that
+   the review examined.
+6. **Issue 9 conformance:** reviewed logical units, official
+   standard, result, approved technical terms, and limitations.
+7. **Residual uncertainty:** evidence or authority that is still necessary.
 
 Do not describe planned work as completed or headless validation as GUI
 acceptance.

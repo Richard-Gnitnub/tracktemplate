@@ -1295,6 +1295,172 @@ decision is:
 > schema; retained exact geometry; performance acceptance; legacy retirement;
 > packaging; release; risk downgrade; or later-phase authority is granted.
 
+<a id="tt-doc-001-documentation-architecture-panel"></a>
+
+## TT-DOC-001 documentation-architecture panel and owner decision
+
+This Level 3 documentation-governance panel records the owner-authorized
+TT-DOC-001 decision. The protected `main` baseline is
+`f03818d71bce06c5cfb85da84d8f3f230e08b47c`.
+
+The decision changes documentation architecture and presentation only. Phase 6
+stays at 2/5. Exits 1, 4, and 5 stay Pending. No risk disposition or product
+authority changes.
+
+**Authority and evidence reviewed:**
+
+| Question | Evidence and conclusion |
+| --- | --- |
+| Canonical owner | `reference/ENGINEERING_POLICY.md` owns the documentation lifecycle and completion reports. It is the correct owner for TT-DOC-001. |
+| Information hierarchy | The order is owner view → canonical information → proof/provenance. The owner view gives no project authority. |
+| Normative standard | The normative standard is official ASD-STE100 Simplified Technical English, Issue 9, dated 2025-01-15. It applies to canonical technical prose in English in the defined scope. |
+| Terminology owner | `reference/TERMINOLOGY.md` is the one project terminology owner. It records only necessary technical nouns and technical verbs for TrackTemplate. |
+| Controlled status | Pending, Evidenced, Accepted, Blocked, Finding, Limitation, Unknown, and Decision required keep different meanings. Persisted and machine identifiers do not change. |
+| Live documentation | `PROJECT_PLAN.md` is the current status dashboard. The change corrects stale Exit 3 text in `CAPABILITY_MATRIX.md`. Its `Partial` class does not change. |
+| Skill ownership | The panel examined all 28 skills. Seven workflows own the applicable work. No new skill or competing primary responsibility is necessary. |
+| S1000D boundary | TrackTemplate uses applicable modular-information principles. It claims no S1000D conformance and authorizes no S1000D infrastructure. |
+| Preservation baseline | The protected-main tree is `8c3ac7f340a676684b3bfec9d9aed9a3c3a708a1`. Frozen history, prior decisions, prior LFE rows, live risks, product source, schemas, APIs, and output contracts stay outside this change. |
+
+**Architecture alternatives:**
+
+| Option | Panel assessment |
+| --- | --- |
+| Keep distributed guidance without a profile | Rejected. The project does not record the human interface or controlled meanings. |
+| Add the profile to `reference/ENGINEERING_POLICY.md` | Selected. It keeps the primary owner. Workflows refer to the policy. |
+| Add `reference/DOCUMENTATION_PROFILE.md` or a similar skill | Rejected. This option divides a responsibility and increases competing-authority risk. |
+
+**Bounded Issue 9 review of current live documentation:** The review used the
+[official Issue 9 standard](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf).
+The review included the current owner dashboard, current evidence and
+registers, and the canonical policy documents. It also included agent workflow
+and skill prose.
+
+The review found these problems in live prose:
+
+- Some descriptive sentences have more than 25 words.
+- Some procedural sentences have more than 20 words or more than one
+  instruction.
+- Some prose uses semicolons, British spelling, long multi-word nouns, or
+  unapproved word forms.
+- Some prose uses passive voice when the agent is known.
+- Some evidence records contain facts, limitations, recommendations, and
+  decisions in dense logical units.
+
+These findings identify the boundary for bounded migration. They do not change
+technical meaning or project authority. They do not cause a style change in
+frozen history. Full Issue 9 conformance of the live corpus is not
+verified.
+
+**Issue 9 conformance assessment for this candidate:** The TT-DOC-001
+documentation review used the official Issue 9 standard. The review examined
+each full logical unit in this table.
+
+| Path | Full logical unit |
+| --- | --- |
+| `AGENTS.md` | The completion-report requirement. |
+| `reference/ENGINEERING_POLICY.md` | The TT-DOC-001 profile and the first paragraph of the completion-report section. |
+| `reference/PROJECT_PLAN.md` | The preamble, current owner view, TT-DOC-001 decision row, and authority links. |
+| `reference/CAPABILITY_MATRIX.md` | The first evidence boundary and the DXF row. |
+| `reference/TERMINOLOGY.md` | The ASD-STE100 project terminology section. |
+| `reference/current/PHASE_EVIDENCE.md` | This TT-DOC-001 panel and the current-register paragraph. |
+| `reference/current/gate-decisions.json` | The human-readable TT-DOC-001 record. Exact JSON data stays outside the linguistic assessment. |
+| `reference/LEARNING_FROM_EXPERIENCE.md` | LFE-018 only. |
+| `reference/AGENT_WORKFLOWS.md` | The TT-DOC-001 workflow-integration section. |
+| `.agents/skills/tracktemplate-change-validation/SKILL.md` | The added profile preparation, Issue 9 validation rules, and full output section. |
+| `.agents/skills/tracktemplate-context-recovery/SKILL.md` | The added owner-view guidance and recovery-report introduction. |
+| `.agents/skills/tracktemplate-continue/SKILL.md` | The full Owner acceptance pack section. |
+| `.agents/skills/tracktemplate-documentation-alignment/SKILL.md` | The added profile preparation and the full report section. |
+| `.agents/skills/tracktemplate-documentation-review/SKILL.md` | The full preparation, editing-rules, and output sections. |
+| `.agents/skills/tracktemplate-documentation-review/references/document-ownership.md` | The two changed ownership rows. |
+| `.agents/skills/tracktemplate-documentation-review/references/writing-checklist.md` | The introduction and the full Ownership, Accuracy, and Concision sections. |
+| `.agents/skills/tracktemplate-quality-review/SKILL.md` | The full preparation and output sections. |
+| `.agents/skills/tracktemplate-technical-lead/SKILL.md` | The added profile guidance in preparation and final handoff. |
+
+The internal result for these logical units is `ASD-STE100 Issue 9
+conforming`. The review used the project terms in the
+[terminology register](../TERMINOLOGY.md#asd-ste100-project-terminology).
+These terms include the documentation, governance, assurance, product, Git,
+export, railway, and standards terms that occur in the units.
+
+This result is a TrackTemplate conformance assessment. It is not external ASD
+certification, endorsement, or an official conformance assessment. It excludes
+exact machine data and externally controlled information. It excludes unchanged
+live prose outside the named logical units. It also excludes frozen history.
+
+**Review state:** Two reviewers independently reviewed the exact candidate.
+The architecture and Issue 9 review result was PASS WITH FINDINGS. The quality
+review result was PASS WITH FINDINGS. No reviewer found a blocker. The finding
+is that Issue 9 conformance is Unknown for unchanged live prose. The reviewers
+did not change the candidate. The same reviewers also examined previous
+candidate states.
+
+**Risk panel:**
+
+| Risk | Panel judgment | Result |
+| --- | --- | --- |
+| PR-12 — direction or task-selection drift | One canonical profile and canonical links prevent competing documents. | Medium / Mitigate / Partial. The disposition does not change. |
+| PR-22 — authority transfer without challenge | An explicit owner decision is necessary. A different reviewer must challenge the evidence independently. | High / Remove / Effective (current scope). The disposition does not change. |
+| PR-13 — repository or evidence loss | Exact-state publication and post-merge preservation controls are necessary. | Critical / Mitigate / Effective (current scope). The disposition does not change. |
+
+**Panel recommendation:** **Proceed with bounded conditions.** Keep
+`ENGINEERING_POLICY.md` as the sole owner of the canonical profile. Add no new
+profile document or skill. Keep `TERMINOLOGY.md` as the sole project
+terminology owner. Adopt Issue 9 as the normative standard for the defined
+scope. Keep phase, risk, and product state. Add only LFE-018. Do semantic
+validation. Get fresh architecture and quality reviews. Reviewers must do this
+work independently.
+
+> **TT-DOC-001 — TrackTemplate Technical Documentation Profile**
+>
+> At protected `main` `f03818d71bce06c5cfb85da84d8f3f230e08b47c`, I
+> accept human comprehensibility as a governance control.
+>
+> `reference/ENGINEERING_POLICY.md` is the sole canonical owner of the
+> TrackTemplate Technical Documentation Profile. The information order is
+> owner view → canonical information → proof/provenance. The owner view gives
+> no project authority. Detailed technical provenance stays available below
+> the canonical information.
+>
+> TrackTemplate adopts ASD-STE100 Simplified Technical English, Issue 9, dated
+> 2025-01-15. It is the normative standard for canonical technical prose in
+> English in the defined scope. The official standard is the normative external
+> reference.
+> Issue 9 language requirements have priority over the UK-English convention
+> in this scope.
+>
+> All new prose in this scope must obey the applicable ASD-STE100 Issue 9
+> requirements. For a material edit, the full logical unit that contains the
+> change must obey these requirements. A reviewer must use the official
+> standard for the linguistic review. Automatic validators do not show
+> linguistic conformance.
+>
+> `reference/TERMINOLOGY.md` is the one project terminology owner. It owns
+> the necessary technical nouns and technical verbs for TrackTemplate. It does not
+> copy the controlled general dictionary. Exact machine data and externally
+> controlled information stay unchanged when necessary.
+>
+> TrackTemplate must migrate live documentation in bounded cycles. Full Issue 9
+> conformance of the live corpus is not verified. Issue 9 style does
+> not authorize a change to frozen history.
+>
+> The workflows apply the profile by reference. This decision adds no
+> skill. It gives no skill new owner, acceptance, merge, phase, production, or
+> release authority.
+>
+> TrackTemplate uses applicable ASD S1000D information-management principles.
+> It claims no S1000D conformance and authorizes no S1000D infrastructure.
+> TrackTemplate also claims no external ASD certification, endorsement, or
+> official conformance assessment.
+>
+> This decision changes no phase or exit status. It changes no risk
+> disposition, product source, or product behavior. It changes no FreeCAD,
+> Coin, exporter, persistence, schema, API, or output behavior.
+>
+> This decision gives no production, physical-output, `project-cleared`,
+> packaging, release, or tagging authority. Phase 6 stays at 2/5. Exits 1, 4,
+> and 5 stay Pending. Output stays private-development. Project status stays
+> `unknown`.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -1322,12 +1488,12 @@ live mappings, caches, proxies, active Coin children or additional residual
 switch children to accumulate.
 
 The 24 risks present at Phase 5 closeout remain live in
-[risks.json](risks.json); D-GOV-005 updates only the control wording for PR-12,
+[risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
-D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004 and D-P6-005. Exits 2 and
-3 receive Evidenced and owner-accepted status; D-P6-003 selects recovery
-authority, D-P6-004 defines the supported fault/evidence boundary and D-P6-005
-accepts only the bounded Exit 3 claim. Every other exit, clearance, support,
-schema,
-oracle-retirement, budget, packaging, release and later-phase decision remains
-separately controlled.
+D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005 and TT-DOC-001.
+Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
+recovery authority. D-P6-004 defines the supported fault/evidence boundary.
+D-P6-005 accepts only the bounded Exit 3 claim. Every other exit, clearance,
+support, schema, oracle-retirement, budget, packaging, release, and later-phase
+decision stays separately controlled. TT-DOC-001 changes only documentation
+governance and presentation.

@@ -47,6 +47,12 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
   source data, external evidence, chair definitions, licensing, package or
   output-status changes.
 - Read `reference/AGENT_WORKFLOWS.md` when agent guidance or skill files change.
+- Read the canonical
+  [Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+  when validation changes presentation for the owner, status terms, or workflow
+  routing. Read the project technical terms in
+  [`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
+  Evidence is different from a recommendation or owner decision.
 
 For exporter interruption evidence, read the canonical
 [failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model),
@@ -67,6 +73,10 @@ before selecting proof.
   when the task changes a durable validation contract that the document owns.
 - At minimum, parse every changed Python or macro file and run the fastest
   focused test that proves the changed behaviour.
+- Use machine controls only for Issue 9 requirements that they can validate
+  accurately. Do not use a validator as proof of linguistic conformance.
+- A recorded conformance review against the official Issue 9 standard is
+  necessary for a linguistic conformance claim.
 - Run affected regression suites and the applicable FreeCAD, GUI, persistence,
   migration, export, rollback, recovery, performance, provenance or licensing
   checks.
@@ -145,18 +155,19 @@ current-phase evidence entry.
 
 ## Output
 
-Report:
+For a substantial cycle, start with the profile's owner view. Put this exact
+validation detail below it as proof/provenance:
 
-1. **Change boundary:** affected files, architecture, railway behaviour and host
+1. **Change boundary:** affected files, architecture, railway behavior and host
    integration.
-2. **Selected validation:** each applicable layer and why it is required.
+2. **Selected validation:** each applicable layer and why it is necessary.
 3. **Checks completed:** exact commands, environments, sentinels and results.
 4. **Failed-test adjudication:** for each failure, the preserved evidence,
    primary classification, canonical contract and correct repair boundary.
-5. **Checks not run:** the reason, remaining risk and required environment or
-   evidence.
-6. **Evidence interpretation:** what the completed checks prove and what they do
-   not prove.
+5. **Checks not run:** the reason, the risk that is still present, and the
+   necessary environment or evidence.
+6. **Evidence interpretation:** what the completed checks show and what they do
+   not show.
 7. **Evidence status:** complete for the selected scope, incomplete, or failed.
 8. **Next review boundary:** whether the complete change is ready for
    `$tracktemplate-quality-review`.

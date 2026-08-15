@@ -134,7 +134,7 @@
   checks, speculative abstractions and misleading claims.
 - Use the validation and quality workflows for non-trivial work; the first
   review pass is read-only and any independence limitation is disclosed.
-- Report completion under four headings only when applicable: **Changed**,
-  **Validated**, **GUI work outstanding**, and **Risks or authority changes**.
+- For substantial cycles, use the derived owner view in the [Engineering Policy](reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+  and keep technical provenance beneath it.
 - State remaining uncertainty plainly. Validation never implies a phase,
   migration, output-clearance or release decision without owner acceptance.
