@@ -121,6 +121,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-P6-004",
     "D-P6-005",
     "TT-DOC-001",
+    "TT-DOC-002",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -267,6 +268,9 @@ EXPECTED_EXIT3_ACCEPTANCE_STRUCTURED_EXCLUSIONS = (
 )
 EXPECTED_TT_DOC_DECISION = (
     "Adopt the TrackTemplate Technical Documentation Profile."
+)
+EXPECTED_TT_DOC_SPELLING_DECISION = (
+    "Correct the TT-DOC-001 UK English spelling directive."
 )
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
@@ -757,15 +761,15 @@ def _validate_owner_view(plan: str) -> None:
         "The owner accepted Exits 2 and 3",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
-        "ASD-STE100 Issue 9 the normative standard for canonical technical "
-        "prose in English",
+        "ASD-STE100 Issue 9 stays the normative standard",
+        "uses UK English spelling in its Issue 9 scope",
         "No phase, exit, risk, or product state changes",
-        "The workflows apply the profile through canonical links",
-        "ASD-STE100 Issue 9 conformance not verified` applies to the live corpus",
+        "18-unit conformance result keeps its scope",
+        "Issue 9 conformance stays Unknown for live prose outside",
         "Frozen history does not change",
-        "TT-DOC-001 is Accepted",
+        "TT-DOC-002 is Accepted",
         "All other owner decisions and exclusions stay unchanged",
-        "authorizes no later project work",
+        "authorises no later project work",
     ):
         _require(
             fragment in owner_view,
@@ -796,8 +800,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "PROJECT_PLAN.md contains an unsupported dashboard section",
     )
     _require(
-        len(plan.splitlines()) <= 140,
-        "PROJECT_PLAN.md exceeded its 140-line dashboard budget",
+        len(plan.splitlines()) <= 141,
+        "PROJECT_PLAN.md exceeded its 141-line dashboard budget",
     )
     for forbidden in (
         "### Deliverables",
@@ -1586,6 +1590,120 @@ def _validate_exit_conditions(
         "ASD-STE100_ISSUE9.pdf)" in tt_doc_section,
         "TT-DOC-001 conformance review lost its official Issue 9 source",
     )
+    spelling_heading = (
+        "TT-DOC-002 UK English spelling-directive correction panel and owner "
+        "decision"
+    )
+    _require(
+        '<a id="tt-doc-002-uk-english-spelling-correction-panel"></a>\n\n## '
+        + spelling_heading
+        in current_evidence,
+        "TT-DOC-002 panel anchor or heading association is missing",
+    )
+    spelling_section = direct_section_content(
+        current_evidence,
+        spelling_heading,
+    )
+    spelling_flat = _semantic_text(
+        re.sub(r"^> ?", "", spelling_section, flags=re.MULTILINE)
+    )
+    for required_clause in (
+        "54d5d8312429ededff83084a3bc39c8756729d19",
+        "ASD-STE100 Simplified Technical English, Issue 9",
+        "stays the normative standard",
+        "Issue 9 Rule 1.14 permits a different spelling",
+        "project owner gives the UK English spelling directive",
+        "changes spelling only",
+        "does not change vocabulary, grammar, approved meaning, part-of-speech, "
+        "technical-term, or linguistic-review requirements",
+        "reference/ENGINEERING_POLICY.md stays the one canonical owner of "
+        "TT-DOC-001",
+        "reference/TERMINOLOGY.md stays the one project owner",
+        "does not add spelling entries to that register",
+        "accepted TT-DOC-001 quotation and LFE-018 do not change",
+        "changes only the previous spelling rule",
+        "information order does not change: owner view → canonical information "
+        "→ proof/provenance",
+        "American English spelling is not necessary after this correction",
+        "18-unit conformance table keeps the same path set",
+        "original 18-unit conformance scope does not expand",
+        "internal result for these six units is ASD-STE100 Issue 9 conforming",
+        "TrackTemplate UK English spelling directive",
+        "Issue 9 conformance stays Unknown for live prose outside",
+        "ASD-STE100 review result was PASS WITH FINDINGS",
+        "candidate obeys Issue 9 with the TrackTemplate UK English spelling "
+        "directive",
+        "governance review result was PASS WITH FINDINGS",
+        "That review examined authority and preservation",
+        "No reviewer found a blocker",
+        "The reviewers did not change the candidate",
+        "The same reviewers also examined previous candidate states",
+        "The finding is that Issue 9 conformance stays Unknown for live prose "
+        "outside the logical units in the two tables",
+        "This decision changes no phase, exit, risk, or evidence acceptance",
+        "Phase 6 stays at 2/5",
+        "Exits 1, 4, and 5 stay Pending",
+        "Project status stays unknown",
+    ):
+        _require(
+            required_clause in spelling_flat,
+            "TT-DOC-002 evidence panel drifted: " + required_clause,
+        )
+    expected_spelling_scope = {
+        "reference/ENGINEERING_POLICY.md": (
+            "full TT-DOC-001 profile",
+        ),
+        "reference/PROJECT_PLAN.md": (
+            "current owner view",
+            "TT-DOC-002 decision row",
+        ),
+        "reference/current/PHASE_EVIDENCE.md": (
+            "TT-DOC-002 panel",
+            "current-register paragraph",
+        ),
+        "reference/current/gate-decisions.json": (
+            "human-readable TT-DOC-002 record",
+            "Exact JSON data stays outside",
+        ),
+        ".agents/skills/tracktemplate-documentation-review/SKILL.md": (
+            "full Editing rules section",
+        ),
+        (
+            ".agents/skills/tracktemplate-documentation-review/references/"
+            "writing-checklist.md"
+        ): ("full Concision and tone section",),
+    }
+    spelling_rows = _structured_table_rows(
+        spelling_section,
+        ("Path", "Full logical unit that changed"),
+        "TT-DOC-002 Issue 9 conformance scope",
+    )
+    _require(
+        set(spelling_rows) == set(expected_spelling_scope),
+        "TT-DOC-002 conformance-scope path set drifted",
+    )
+    for reviewed_path, scope_fragments in expected_spelling_scope.items():
+        scope = spelling_rows[reviewed_path][1]
+        _require(
+            all(fragment in scope for fragment in scope_fragments),
+            "TT-DOC-002 conformance scope changed: " + reviewed_path,
+        )
+    _require(
+        "[official Issue 9 standard](https://www.asd-ste100.org/assets/files/"
+        "ASD-STE100_ISSUE9.pdf)" in spelling_section,
+        "TT-DOC-002 conformance review lost its official Issue 9 source",
+    )
+    current_register_flat = _semantic_text(
+        direct_section_content(current_evidence, "Carried controls and exclusions")
+    )
+    for required_clause in (
+        "TT-DOC-001 and TT-DOC-002",
+        "TT-DOC-002 corrects only the spelling directive",
+    ):
+        _require(
+            required_clause in current_register_flat,
+            "current-register TT-DOC-002 wording drifted: " + required_clause,
+        )
     _require(
         'id="phase-6-opening-panel"' in current_evidence
         and "Proceed with bounded conditions" in current_evidence
@@ -1886,7 +2004,8 @@ def _validate_decisions(plan: str) -> None:
             record["decided_on"]
             == (
                 "2026-08-15"
-                if decision_id in {"D-P6-004", "D-P6-005", "TT-DOC-001"}
+                if decision_id
+                in {"D-P6-004", "D-P6-005", "TT-DOC-001", "TT-DOC-002"}
                 else (
                     "2026-08-02"
                     if decision_id in {"D-P6-002", "D-P6-003"}
@@ -2041,6 +2160,50 @@ def _validate_decisions(plan: str) -> None:
         _require(
             fragment in tt_doc_semantic,
             "TT-DOC-001 authority or exclusion drifted: " + fragment,
+        )
+    spelling_record = phase6_by_id["TT-DOC-002"]
+    spelling_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#tt-doc-002-uk-english-spelling-correction-panel"
+    )
+    _require(
+        spelling_record["decision"] == EXPECTED_TT_DOC_SPELLING_DECISION
+        and spelling_record["evidence"] == spelling_panel
+        and spelling_record["panel_record"] == spelling_panel,
+        "TT-DOC-002 decision or panel routing drifted",
+    )
+    spelling_semantic = _semantic_text(
+        str(spelling_record["authority"])
+        + " "
+        + str(spelling_record["exclusions"])
+    )
+    for fragment in (
+        "54d5d8312429ededff83084a3bc39c8756729d19",
+        "corrects the spelling directive in TT-DOC-001",
+        "ASD-STE100 Simplified Technical English, Issue 9",
+        "stays the normative controlled-writing standard",
+        "uses UK English spelling as its project spelling directive",
+        "applies the spelling option in Issue 9 Rule 1.14",
+        "changes spelling policy only",
+        "does not change Issue 9 vocabulary or grammar requirements",
+        "does not change approved meanings, parts of speech, technical noun "
+        "controls, technical verb controls",
+        "reference/ENGINEERING_POLICY.md stays the one canonical owner of "
+        "TT-DOC-001",
+        "reference/TERMINOLOGY.md stays the one project terminology owner",
+        "original 18-unit conformance scope does not expand",
+        "Issue 9 conformance stays Unknown for live prose outside",
+        "does not change the accepted TT-DOC-001 decision or LFE-018",
+        "changes only the previous spelling rule",
+        "changes no phase, exit, accepted-exit count, risk disposition, or "
+        "evidence acceptance",
+        "Phase 6 stays at 2/5",
+        "Exits 1, 4, and 5 stay Pending",
+        "Project status stays unknown",
+    ):
+        _require(
+            fragment in spelling_semantic,
+            "TT-DOC-002 authority or exclusion drifted: " + fragment,
         )
     current_records = document["decisions"]
     _require(

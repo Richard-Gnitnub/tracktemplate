@@ -13,11 +13,11 @@ The Layout Editor is the later program. It does not change Phase 6 exits. The pr
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 is 2/5 evidenced. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. Output is private-development. Project status stays `unknown`. |
-| **What changed** | [TT-DOC-001](current/PHASE_EVIDENCE.md#tt-doc-001-documentation-architecture-panel) adopts the [Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile). It makes ASD-STE100 Issue 9 the normative standard for canonical technical prose in English. It corrects DXF text that did not agree with current evidence. No phase, exit, risk, or product state changes. |
-| **What now works** | Results from a substantial cycle start with a short owner view. Canonical information and proof/provenance follow the view. The workflows apply the profile through canonical links. |
-| **Limitations/findings** | Migration occurs in bounded cycles. `ASD-STE100 Issue 9 conformance not verified` applies to the live corpus. Frozen history does not change. TrackTemplate claims no external certification or endorsement. TrackTemplate also claims no S1000D conformance or infrastructure. |
-| **Owner decision** | TT-DOC-001 is Accepted. It gives documentation-governance authority only. All other owner decisions and exclusions stay unchanged. |
-| **Next action** | This cycle ends after TT-DOC-001 integration and preservation. This decision authorizes no later project work. |
+| **What changed** | [TT-DOC-002](current/PHASE_EVIDENCE.md#tt-doc-002-uk-english-spelling-correction-panel) corrects one part of the [Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile). ASD-STE100 Issue 9 stays the normative standard. TrackTemplate now uses UK English spelling in its Issue 9 scope. No phase, exit, risk, or product state changes. |
+| **What now works** | Canonical prose uses UK English spelling. All other applicable Issue 9 vocabulary, grammar, meaning, part-of-speech, technical-term, and review controls stay unchanged. |
+| **Limitations/findings** | The 18-unit conformance result keeps its scope. The Issue 9 review examines six named logical units again. Issue 9 conformance stays Unknown for live prose outside the logical units in the previous and correction tables. Frozen history does not change. TrackTemplate claims no external certification, endorsement, or S1000D conformance. |
+| **Owner decision** | TT-DOC-002 is Accepted. It corrects spelling policy only. All other owner decisions and exclusions stay unchanged. |
+| **Next action** | This cycle ends after TT-DOC-002 integration and preservation. This decision authorises no later project work. |
 
 ## Phase status
 
@@ -119,6 +119,7 @@ The [current decision register](current/gate-decisions.json) owns Phase 6 and cu
 | D-P6-004 | 2026-08-15 | Accepted | Supported exporter fault model, interruption-evidence boundary and restart containment accepted without changing product source, risk disposition, Phase 6 at 1/5 or Exit 3 Pending. |
 | D-P6-005 | 2026-08-15 | Accepted | Phase 6 Exit 3 accepted only for the bounded private-development B16 Entry/Exit deterministic DXF-and-manifest route under D-P6-003 and D-P6-004; Phase 6 advances to 2/5 and all stated limitations and exclusions remain. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
+| TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English spelling as its project spelling directive. No other TT-DOC-001 or project authority changes. |
 
 ## Authority and evidence links
 

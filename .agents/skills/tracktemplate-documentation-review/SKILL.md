@@ -60,8 +60,8 @@ Read only the documents relevant to the present change:
 - Use links to canonical owners instead of copied explanations.
 - Put conclusions, decisions and operative requirements before the detail that
   gives the evidence.
-- Use ASD-STE100 Issue 9 in the profile scope. Issue 9 requirements have
-  priority over the usual UK-English convention in this scope.
+- Use ASD-STE100 Issue 9 in the profile scope. Use the TrackTemplate UK English
+  spelling directive in this scope. Do not change other Issue 9 requirements.
 - Use the approved project technical terms. Keep facts, evidence, limitations,
   recommendations, and owner decisions distinct.
 - Do not claim Issue 9 conformance from a public summary, model knowledge, or

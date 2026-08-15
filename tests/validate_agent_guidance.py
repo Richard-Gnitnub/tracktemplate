@@ -904,6 +904,34 @@ def validate_documentation_profile_routing(
             f"{name} duplicates the complete TT-DOC-001 policy",
         )
 
+    documentation_review = read(
+        SKILLS_ROOT / "tracktemplate-documentation-review" / "SKILL.md"
+    )
+    writing_checklist = read(
+        SKILLS_ROOT
+        / "tracktemplate-documentation-review"
+        / "references"
+        / "writing-checklist.md"
+    )
+    for path_name, guidance in (
+        ("documentation-review skill", documentation_review),
+        ("documentation writing checklist", writing_checklist),
+    ):
+        guidance_flat = semantic_text(guidance)
+        require(
+            "TrackTemplate UK English spelling directive" in guidance_flat,
+            path_name + " lost the canonical spelling directive",
+        )
+        require(
+            "Do not change other Issue 9 requirements" in guidance_flat,
+            path_name + " weakened non-spelling Issue 9 requirements",
+        )
+        require(
+            "priority over the usual UK-English convention" not in guidance_flat
+            and "UK-English convention applies outside" not in guidance_flat,
+            path_name + " restored the superseded American-only rule",
+        )
+
     continuation = read(
         SKILLS_ROOT / "tracktemplate-continue" / "SKILL.md"
     )

@@ -1461,6 +1461,119 @@ work independently.
 > and 5 stay Pending. Output stays private-development. Project status stays
 > `unknown`.
 
+<a id="tt-doc-002-uk-english-spelling-correction-panel"></a>
+
+## TT-DOC-002 UK English spelling-directive correction panel and owner decision
+
+This Level 3 panel records a spelling-only correction to TT-DOC-001. The
+protected `main` baseline is
+`54d5d8312429ededff83084a3bc39c8756729d19`.
+
+Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Output stays
+private-development. Project status stays `unknown`. This decision changes no
+risk disposition, evidence acceptance, product authority, or release authority.
+
+**Authority and evidence reviewed:**
+
+| Question | Evidence and conclusion |
+| --- | --- |
+| Normative standard | Official ASD-STE100 Simplified Technical English, Issue 9, dated 2025-01-15, stays the normative standard for the defined canonical prose. |
+| Spelling option | Issue 9 Rule 1.14 permits a different spelling when an official directive applies. The project owner gives the UK English spelling directive. |
+| Canonical owner | `reference/ENGINEERING_POLICY.md` stays the one canonical owner of TT-DOC-001. The correction changes the spelling rule in that profile. |
+| Terminology owner | `reference/TERMINOLOGY.md` stays the one project owner of technical nouns and technical verbs. The correction does not add spelling entries to that register. |
+| Assurance boundary | The directive changes spelling only. It does not change vocabulary, grammar, approved meaning, part-of-speech, technical-term, or linguistic-review requirements. |
+| Historical record | The accepted TT-DOC-001 quotation and LFE-018 do not change. TT-DOC-002 changes only the previous spelling rule. |
+| Project state | Phase, exits, risks, evidence acceptance, product, output, and release state stay unchanged. |
+
+The original TT-DOC-001 panel records the review and owner wording that applied
+before this correction. The panel keeps the UK-spelling finding from the
+previous review. UK English spelling alone does not fail the current spelling
+rule. American English spelling is not necessary after this correction.
+
+**Issue 9 review for the correction:** The documentation review used the
+[official Issue 9 standard](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf).
+The 18-unit conformance table keeps the same path set. The previous result
+applies to each unit that does not change. The review examines each full
+logical unit that changed in this table.
+
+| Path | Full logical unit that changed |
+| --- | --- |
+| `reference/ENGINEERING_POLICY.md` | The full TT-DOC-001 profile. |
+| `reference/PROJECT_PLAN.md` | The current owner view and the TT-DOC-002 decision row. |
+| `reference/current/PHASE_EVIDENCE.md` | This TT-DOC-002 panel and the current-register paragraph. |
+| `reference/current/gate-decisions.json` | The human-readable TT-DOC-002 record. Exact JSON data stays outside the linguistic assessment. |
+| `.agents/skills/tracktemplate-documentation-review/SKILL.md` | The full Editing rules section. |
+| `.agents/skills/tracktemplate-documentation-review/references/writing-checklist.md` | The full Concision and tone section. |
+
+The internal result for these six units is `ASD-STE100 Issue 9 conforming`
+with the TrackTemplate UK English spelling directive. This result is a
+TrackTemplate conformance assessment. It is not external ASD certification,
+endorsement, or an official conformance assessment. Issue 9 conformance stays
+Unknown for live prose outside the logical units in the TT-DOC-001 and
+TT-DOC-002 tables. Frozen history also stays outside this assessment.
+
+**Semantic controls:** The controls keep Issue 9 as the normative standard.
+They keep the UK English spelling directive in its scope. They reject a rule
+that makes American English spelling necessary. They reject a change to other
+Issue 9 requirements, the conformance scope, terminology ownership, or project
+authority. They do not use a whole-paragraph equality check as proof of
+linguistic conformance.
+
+**Risk panel:**
+
+| Risk | Panel judgement | Result |
+| --- | --- | --- |
+| PR-12 — direction or task-selection drift | One canonical profile prevents a second spelling-policy owner. | Medium / Mitigate / Partial. The disposition does not change. |
+| PR-22 — authority transfer without challenge | The explicit owner correction and two new exact-state reviews prevent an authority change without review. | High / Remove / Effective (current scope). The disposition does not change. |
+| PR-13 — repository or evidence loss | Exact-state publication and the post-merge preservation audit protect accepted content. | Critical / Mitigate / Effective (current scope). The disposition does not change. |
+
+**Independent review state:** Two reviewers examined the exact candidate. The
+ASD-STE100 review result was PASS WITH FINDINGS. That review found that the
+candidate obeys Issue 9 with the TrackTemplate UK English spelling directive.
+The governance review result was PASS WITH FINDINGS. That review examined
+authority and preservation. No reviewer found a blocker. The reviewers did not
+change the candidate. The same reviewers also examined previous candidate
+states. The finding is that Issue 9 conformance stays Unknown for live prose
+outside the logical units in the two tables.
+
+> **TT-DOC-002 — Correct the TT-DOC-001 UK English spelling directive**
+>
+> At protected `main` `54d5d8312429ededff83084a3bc39c8756729d19`, I
+> correct the spelling directive in TT-DOC-001.
+>
+> ASD-STE100 Simplified Technical English, Issue 9, stays the normative
+> controlled-writing standard for applicable TrackTemplate canonical prose.
+> TrackTemplate uses UK English spelling as its project spelling directive in
+> this scope. This directive applies the spelling option in Issue 9 Rule 1.14.
+>
+> This correction changes spelling policy only. It does not change Issue 9
+> vocabulary or grammar requirements. It does not change approved meanings,
+> parts of speech, technical noun controls, technical verb controls, or the
+> requirement for linguistic review.
+>
+> `reference/ENGINEERING_POLICY.md` stays the one canonical owner of TT-DOC-001.
+> `reference/TERMINOLOGY.md` stays the one project terminology owner. The
+> information order does not change: owner view → canonical information →
+> proof/provenance. Skill routing and bounded migration do not change.
+>
+> The original 18-unit conformance scope does not expand. Issue 9 conformance
+> stays Unknown for live prose outside the logical units in the TT-DOC-001 and
+> TT-DOC-002 tables.
+> This decision does not claim external certification, endorsement, or
+> an official conformance assessment.
+>
+> This decision does not change the accepted TT-DOC-001 decision or LFE-018.
+> TT-DOC-002 changes only the previous spelling rule. It does not change other
+> TT-DOC-001 authority or exclusions.
+>
+> This decision changes no phase, exit, risk, or evidence acceptance. It
+> changes no product source, product behaviour, FreeCAD behaviour, exporter
+> behaviour, persistence, schema, API, output, or release state. It gives no
+> production, physical-output, or `project-cleared` authority. It gives no
+> packaging, release, or tagging authority.
+> Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Output stays
+> private-development. Project status stays `unknown`.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -1490,10 +1603,11 @@ switch children to accumulate.
 The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
-D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005 and TT-DOC-001.
+D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001 and
+TT-DOC-002.
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.
 D-P6-005 accepts only the bounded Exit 3 claim. Every other exit, clearance,
 support, schema, oracle-retirement, budget, packaging, release, and later-phase
 decision stays separately controlled. TT-DOC-001 changes only documentation
-governance and presentation.
+governance and presentation. TT-DOC-002 corrects only the spelling directive.
