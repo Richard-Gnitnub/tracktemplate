@@ -48,6 +48,12 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
   output-status changes.
 - Read `reference/AGENT_WORKFLOWS.md` when agent guidance or skill files change.
 
+For exporter interruption evidence, read the canonical
+[failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model),
+[evidence boundary](../../../reference/VALIDATION.md#supported-exporter-interruption-evidence)
+and [operator recovery procedure](../../../reference/RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export)
+before selecting proof.
+
 ## Validation rules
 
 - Select checks according to the changed behaviour and dependency path. Do not
@@ -87,6 +93,11 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
   that diagnosis.
 - Do not describe a copied-target fixture, local comparison path, prototype,
   headless smoke or partial workflow as supported production behaviour.
+- Treat a probe outside the supported exporter failure model as research
+  evidence unless the project owner explicitly widens the contract. It is not
+  automatically a blocker, but remains one when it proves deletion, overwrite,
+  unsafe mutation, supported-workflow failure, unsafe retry or another retained
+  invariant violation.
 - Do not claim a phase, milestone, release, migration family, package or output
   is accepted or project-cleared. Those decisions remain with the structured
   current records and the project owner.

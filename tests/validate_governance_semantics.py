@@ -748,13 +748,13 @@ def validate_current_evidence_mutations() -> None:
 
     exit3_row = table_row_containing(
         evidence,
-        "bounded D-P6-003 add-only implementation and focused condition 1/3 "
-        "proof",
+        "implementation and retained evidence are present and are now judged "
+        "against the D-P6-004 supported failure model",
     )
     exit3_promoted = replace_once(
         exit3_row,
-        "Pending — the bounded D-P6-003",
-        "Evidenced — the bounded D-P6-003",
+        "Pending — implementation",
+        "Evidenced — implementation",
     )
     expect_rejected(
         "phase-evidence/exit3-prematurely-evidenced",

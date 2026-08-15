@@ -219,6 +219,33 @@ Its remaining scope and acceptance conditions are controlling; the report does
 not extend protection beyond the complete project-data scope declared by the
 owner.
 
+## Recovery after an abnormally interrupted export
+
+When an abnormal asynchronous interruption leaves descriptor or advisory-lock
+release uncertain in a surviving FreeCAD host, preserve every existing output
+member and use this supported recovery procedure:
+
+1. Do not alter or delete any existing DXF or manifest member.
+2. Close FreeCAD completely.
+3. Restart FreeCAD and reopen the project.
+4. Inspect the destination through the normal TrackTemplate workflow.
+5. Retry the export through the normal exporter.
+
+Never manually delete, rename, replace or edit a partial pair merely to
+recover. Closing FreeCAD restores the operating-system process boundary for
+process-owned descriptors and advisory locks; it does not prove that a
+destination member is regular, exact, complete or durable. The next invocation
+must independently inspect and validate destination state before reporting
+success or adding an absent exact counterpart.
+
+TrackTemplate may complete an exact partial pair only through the accepted
+[D-P6-003 add-only protocol](ARCHITECTURE.md#d-p6-003-cross-process-recovery-authority)
+within the
+[supported exporter failure model](ARCHITECTURE.md#supported-exporter-failure-model).
+Restart-based containment never grants authority to delete, overwrite,
+replace, rewrite, truncate, rename or otherwise mutate an existing output
+member.
+
 ## Incident response
 
 If files appear missing or corrupted, stop writing to the affected filesystem.

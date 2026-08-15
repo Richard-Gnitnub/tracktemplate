@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 6,
-  "updated_on": "2026-08-02",
+  "updated_on": "2026-08-15",
   "decisions": [
     {
       "id": "D-P6-001",
@@ -46,6 +46,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-3-recovery-authority-contract-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-3-recovery-authority-contract-panel"
+    },
+    {
+      "id": "D-P6-004",
+      "decided_on": "2026-08-15",
+      "status": "Accepted",
+      "decision": "Define the supported exporter failure model and evidence boundary.",
+      "authority": "At protected-main baseline `d8e2b640da412ec0aff0300cd7344e78cec0048b`, accept a defined, finite and testable supported exporter failure model covering ordinary Python exceptions, explicit application cancellation, retained expressly tested `BaseException` boundaries, accepted staging/publication/cleanup/durability failures, D-P6-003 exact-partial and exact-complete next-invocation recovery, process termination at the operating-system descriptor/advisory-lock boundary, and qualified FreeCAD import and host execution within the documented platform/filesystem profile. Deliberately exclude arbitrary asynchronous `BaseException` injection between every possible pair of bytecode instructions, at every unobservable acquisition or ownership-transfer micro-window, or repeatedly during cleanup itself. Such an excluded probe is not automatically a defect or Exit 3 blocker, but remains one when it proves a retained mandatory-invariant, supported-workflow or accepted-recovery-boundary violation. Preserve every D-P6-003 add-only, no-overwrite, exact-only, fail-closed, file-preservation and truthful-diagnostic invariant. When resource release is uncertain after abnormal asynchronous interruption, preserve output, close FreeCAD completely, restart and reopen, inspect normally and retry through the normal exporter; restart restores the process boundary but does not prove destination correctness or authorise destructive recovery. Phase 6 remains 1/5 and Exit 3 remains Pending for a fresh Level 3 evidence-admission panel against this model.",
+      "exclusions": "No product source, exporter implementation, public or stored API, schema, manifest, output byte, fixture, railway behaviour or risk disposition changes. No production, physical-output, `project-cleared`, equivalence, GUI, wider-family, persistence, retained exact-geometry, performance, legacy-retirement, packaging, release or tagging authority is granted. No helper process, subprocess exporter, service, external transaction manager, runtime dependency, generic storage framework or exporter redesign is authorised. Restart containment never permits deletion, overwrite, replacement, rename, rewrite, truncation or manual mutation of an existing output member, and this decision does not accept Exit 3.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exporter-fault-model-clarification-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exporter-fault-model-clarification-panel"
     }
   ]
 }

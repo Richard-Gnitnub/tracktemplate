@@ -26,6 +26,14 @@ assurance.
 This is an engineering review, not a penetration-test certification, legal
 opinion or authority to publish a vulnerability.
 
+For exporter interruption findings, judge reachability and impact against the
+canonical [supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model)
+and [restart boundary](../../../reference/RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export).
+Do not promote an explicitly unsupported arbitrary-bytecode micro-window into
+a blocker merely because it can be injected. Destructive mutation, unsafe path
+handling, lock or descriptor failure inside the supported model, unsafe retry,
+false recovery claims and violations of the restart boundary remain blockers.
+
 ## Threat-boundary workflow
 
 1. **Define scope.** Name the asset to protect, entry point, trust boundary,
