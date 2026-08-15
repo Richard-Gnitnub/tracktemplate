@@ -431,10 +431,11 @@ def validate_current_authority(documents: dict[str, str]) -> None:
     ids = [record["id"] for record in decisions]
     require(len(ids) == len(set(ids)), "duplicate current decision ID")
     require(
-        ids[-3:] == ["D-P6-004", "D-P6-005", "TT-DOC-001"],
-        "D-P6-004/D-P6-005 history or later TT-DOC-001 order drifted",
+        ids[-4:]
+        == ["D-P6-004", "D-P6-005", "TT-DOC-001", "TT-DOC-002"],
+        "D-P6-004/D-P6-005 or later TT-DOC decision order drifted",
     )
-    fault_model_record = decisions[-3]
+    fault_model_record = decisions[-4]
     require(
         fault_model_record["status"] == "Accepted"
         and fault_model_record["decided_on"] == "2026-08-15",
@@ -470,7 +471,7 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         == expected_fault_model_panel,
         "D-P6-004 panel routing drifted",
     )
-    acceptance_record = decisions[-2]
+    acceptance_record = decisions[-3]
     require(
         acceptance_record["status"] == "Accepted"
         and acceptance_record["decided_on"] == "2026-08-15"

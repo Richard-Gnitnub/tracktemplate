@@ -1508,6 +1508,14 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan decisions differ from the frozen registers",
     )
+    spelling_decision_row = table_row_containing(plan, "| TT-DOC-002 |")
+    expect_rejected(
+        "project-plan/tt-doc-002-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, spelling_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
 
 
 def validate_documentation_profile_mutations() -> None:
@@ -1573,14 +1581,25 @@ def validate_documentation_profile_mutations() -> None:
             "external reference",
         ),
         (
-            "tt-doc/uk-convention-given-priority",
-            "Issue 9 vocabulary, meaning, grammar, spelling, and usage have\n"
-            "priority over the usual UK-English convention of TrackTemplate",
-            "The usual UK-English convention of TrackTemplate has\n"
-            "priority over Issue 9 vocabulary, meaning, grammar, spelling, "
-            "and usage",
-            "TT-DOC-001 profile lacks: Issue 9 vocabulary, meaning, grammar, "
-            "spelling, and usage have priority",
+            "tt-doc/american-only-spelling-restored",
+            "TrackTemplate uses UK English spelling as its project spelling "
+            "directive",
+            "TrackTemplate requires American English spelling in this scope",
+            "TT-DOC-001 profile lacks: TrackTemplate uses UK English spelling "
+            "as its project spelling directive",
+        ),
+        (
+            "tt-doc/rule-1-14-option-removed",
+            "directive uses the option in Issue 9 Rule 1.14",
+            "directive conflicts with Issue 9 Rule 1.14",
+            "TT-DOC-001 profile lacks: directive uses the option in Issue 9 "
+            "Rule 1.14",
+        ),
+        (
+            "tt-doc/spelling-directive-widens-ste-change",
+            "The directive changes spelling\nonly.",
+            "The directive changes spelling and vocabulary.",
+            "TT-DOC-001 profile lacks: directive changes spelling only",
         ),
         (
             "tt-doc/checker-made-conformance-authority",
@@ -1768,6 +1787,76 @@ def validate_documentation_profile_mutations() -> None:
         ),
         "TT-DOC-001 conformance scope changed: "
         "reference/ENGINEERING_POLICY.md",
+    )
+
+    spelling_scope_widened = replace_once(
+        current_evidence,
+        "The 18-unit conformance table keeps the same path set.",
+        "The conformance result now applies to all live prose.",
+    )
+    expect_rejected(
+        "tt-doc-002/conformance-scope-widened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            spelling_scope_widened,
+        ),
+        "TT-DOC-002 evidence panel drifted: 18-unit conformance "
+        "table keeps the same path set",
+    )
+    spelling_unit_narrowed = replace_once(
+        current_evidence,
+        "| `reference/ENGINEERING_POLICY.md` | The full TT-DOC-001 "
+        "profile. |",
+        "| `reference/ENGINEERING_POLICY.md` | One sentence. |",
+    )
+    expect_rejected(
+        "tt-doc-002/conformance-logical-unit-narrowed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            spelling_unit_narrowed,
+        ),
+        "TT-DOC-002 conformance scope changed: "
+        "reference/ENGINEERING_POLICY.md",
+    )
+    spelling_only_boundary_removed = replace_once(
+        current_evidence,
+        "It does not change vocabulary, grammar, approved meaning, "
+        "part-of-speech, technical-term, or linguistic-review requirements.",
+        "It relaxes vocabulary, grammar, and technical-term requirements.",
+    )
+    expect_rejected(
+        "tt-doc-002/non-spelling-requirements-relaxed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            spelling_only_boundary_removed,
+        ),
+        "TT-DOC-002 evidence panel drifted: does not change vocabulary, "
+        "grammar, approved meaning, part-of-speech, technical-term, or "
+        "linguistic-review requirements",
+    )
+
+    spelling_review_blocker_inverted = replace_once(
+        current_evidence,
+        "The governance review result was PASS WITH FINDINGS. That review "
+        "examined\nauthority and preservation. No reviewer found a blocker.",
+        "The governance review result was PASS WITH FINDINGS. That review "
+        "examined\nauthority and preservation. One reviewer found a blocker.",
+    )
+    expect_rejected(
+        "tt-doc-002/review-blocker-inverted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            spelling_review_blocker_inverted,
+        ),
+        "TT-DOC-002 evidence panel drifted: No reviewer found a blocker",
     )
 
     terminology_owner_removed = replace_once(

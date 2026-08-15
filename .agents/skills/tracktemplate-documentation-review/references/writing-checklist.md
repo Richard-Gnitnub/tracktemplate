@@ -45,8 +45,8 @@ profile identifies. Also use the approved project terms in
 - The text has one warning for each warning scope.
 - The edit removes unnecessary words and praise of the writer.
 - The edit removes unnecessary text without an arbitrary word-count target.
-- Issue 9 spelling and usage have priority in STE-governed prose. The usual
-  UK-English convention applies outside that scope.
+- Use ASD-STE100 Issue 9 for STE prose. Use the TrackTemplate UK English
+  spelling directive in that prose. Do not change other Issue 9 requirements.
 
 ## Do not shorten when meaning would be lost
 

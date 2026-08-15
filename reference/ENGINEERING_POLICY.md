@@ -187,13 +187,16 @@ change its language. Keep these items exact when necessary:
 - standards titles and identifiers
 - machine-generated logs and evidence
 
-The text around these items must obey the applicable Issue 9 requirements. In
-the STE scope, Issue 9 vocabulary, meaning, grammar, spelling, and usage have
-priority over the usual UK-English convention of TrackTemplate. Outside this
-scope, use concise UK English.
+The text around these items must obey the applicable Issue 9 requirements.
+Applicable TrackTemplate canonical prose must obey ASD-STE100 Issue 9.
+TrackTemplate uses UK English spelling as its project spelling directive. This
+directive uses the option in Issue 9 Rule 1.14. The directive changes spelling
+only. It does not change the applicable Issue 9 vocabulary or grammar rules. It
+does not change approved meanings, parts of speech, or technical-term controls.
+Outside this scope, use concise UK English.
 
 TrackTemplate uses applicable modular-information principles of ASD S1000D. It
-does not claim S1000D conformance. This profile does not authorize this S1000D
+does not claim S1000D conformance. This profile does not authorise this S1000D
 infrastructure:
 
 - S1000D XML
@@ -307,7 +310,7 @@ These migration rules apply from the acceptance of TT-DOC-001:
 - Keep detailed technical provenance and all accepted limitations.
 
 Before you add a skill or change its primary responsibility, map the
-responsibility across the full skill catalog. Add the behavior to the
+responsibility across the full skill catalogue. Add the behaviour to the
 primary owner when possible. Add a skill only when one separate responsibility can
 occur repeatedly and has no owner. Record its composition and non-ownership
 boundaries.

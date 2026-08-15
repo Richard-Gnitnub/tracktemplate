@@ -486,8 +486,13 @@ def validate_documentation_profile(
         "substantial workflow and skill prose",
         "API and schema identifiers",
         "machine-generated logs and evidence",
-        "Issue 9 vocabulary, meaning, grammar, spelling, and usage have "
-        "priority over the usual UK-English convention of TrackTemplate",
+        "TrackTemplate uses UK English spelling as its project spelling "
+        "directive",
+        "directive uses the option in Issue 9 Rule 1.14",
+        "directive changes spelling only",
+        "does not change the applicable Issue 9 vocabulary or grammar rules",
+        "does not change approved meanings, parts of speech, or technical-term "
+        "controls",
         "does not claim S1000D conformance",
         "TT-DOC-001 conforming",
         "ASD-STE100 Issue 9 conforming",
@@ -505,7 +510,7 @@ def validate_documentation_profile(
         "review the full logical unit that contains the change",
         "Review live canonical prose in bounded migration cycles",
         "Do not change frozen history only to correct its Issue 9 style",
-        "Add the behavior to the primary owner when possible",
+        "Add the behaviour to the primary owner when possible",
         "Documentation simplification does not give a skill phase, "
         "production, security, merge, release, acceptance, or project-owner "
         "authority",
@@ -567,9 +572,11 @@ def validate_documentation_profile(
         "Phase 6 is 2/5 evidenced" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
         and "No phase, exit, risk, or product state changes" in owner_view
-        and "ASD-STE100 Issue 9 conformance not verified` applies to the live "
-        "corpus" in owner_view
-        and "This decision authorizes no later project work"
+        and "UK English spelling in its Issue 9 scope" in owner_view
+        and "18-unit conformance result keeps its scope" in owner_view
+        and "Issue 9 conformance stays Unknown for live prose outside"
+        in owner_view
+        and "This decision authorises no later project work"
         in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
