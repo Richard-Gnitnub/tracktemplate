@@ -1,18 +1,20 @@
 # TrackTemplate Capability Matrix
 
-Status: **current repository-evidence map for product planning; not phase,
-migration-family, output-clearance or release acceptance.**
+Status: **Current repository-evidence map for the product plan. It gives no
+phase, migration-family, output-clearance, or release acceptance.**
 
 This matrix compares the accepted legacy baseline with the modular B16
-checkpoint destined for the Addon. It was reconciled on 2026-08-02 against
-accepted `main` at `a5b6a79bf3e73e1673d440077bd65000986bb4c7`, the frozen
-Phase 1 inventory and Phase 5 closeout, and current Phase 6 evidence. PR #31's
-private-development DXF slice is present; D-P6-002 accepts only the bounded
-transient-object exit, not export failure safety or output clearance.
+checkpoint for the Addon. The TT-DOC-001 panel reconciled it on 2026-08-15.
+The panel used protected `main` at
+`f03818d71bce06c5cfb85da84d8f3f230e08b47c`. It also used the frozen Phase 1
+inventory, Phase 5 closeout, and current Phase 6 evidence. D-P6-002 accepts the
+bounded transient-object exit. D-P6-005 accepts only the bounded
+private-development exporter failure-safety claim. Neither decision grants
+output clearance.
 
 The Addon column describes the modular `tracktemplate` implementation, not an
-installable or production-ready Addon claim. Formal phase status remains in
-[PROJECT_PLAN.md](PROJECT_PLAN.md).
+installable or production-ready Addon claim. [PROJECT_PLAN.md](PROJECT_PLAN.md)
+owns formal phase status.
 
 ## Status vocabulary
 
@@ -47,7 +49,7 @@ is absent.
 | Platforms | P — substantial B14 source exists; the accepted inventory retains physical platform and wider-workflow gaps | A | A | A | A | A | A | [B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 workflow inventory](phase-evidence/PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory) | Partial |
 | Formation boards | P — substantial B14 source exists; no dedicated accepted formation-board migration fixture was found | A | A | A | A | A | A | [B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 inventory](phase-evidence/PHASE1_INVENTORY.md) | Partial |
 | SVG | C — fixed plain-line selected and Generate-path output oracles | A | P — bounded transition intent exists, not an SVG output contract | — | P — centreline-only exact seam | A | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [selected-export series](benchmarks/2026-07-19-b14-ordinary-track-selected-export-series.md) | Partial |
-| DXF | C — fixed plain-line selected and Generate-path output oracles | P — private-development Entry/Exit writer only | P — bounded transition intent exists | — | P — transient transition centreline | P — deterministic output and bounded recovery evidence; failure-safe exit still Pending for Level 3 review | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [current Phase 6 evidence](current/PHASE_EVIDENCE.md#b16-entry-exit-durable-dxf-recovery) | Partial |
+| DXF | C — fixed plain-line selected and Generate-path output oracles | P — private-development Entry/Exit writer only | P — bounded transition intent exists | — | P — transient transition centreline | P — deterministic output and supported-model failure safety owner-accepted under D-P6-005 for the bounded private-development Entry/Exit route only | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json) and [current Phase 6 evidence](current/PHASE_EVIDENCE.md#phase-6-exit-3-supported-model-evidence-admission-panel) | Partial |
 | STL | C — fixed plain-line legacy output oracle | A | A for solids/meshes | — | A for required production solids/meshes | A | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [create-time export series](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md) | Partial |
 | STEP | C — fixed plain-line legacy output oracle | A | A for B-rep production scope | — | A for required production B-reps | A | — | [Workflow coverage contract](contracts/phase1-workflow-coverage.json); [create-time export series](benchmarks/2026-07-19-b14-ordinary-track-create-time-export-series.md) | Partial |
 | Calibrated map or image reference layers | U | F | F | F | — | U | F | [Product vision](PRODUCT_VISION.md#subsequent-programme-tracktemplate-layout-editor); no accepted implementation fixture found | Future |

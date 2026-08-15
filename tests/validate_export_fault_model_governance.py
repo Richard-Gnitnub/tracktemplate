@@ -310,7 +310,7 @@ def validate_skill_routing(documents: dict[str, str]) -> None:
         (
             "Do not silently widen it during staff review",
             "contradiction between an implementation or evidence claim and "
-            "the actual supported contract",
+            "the canonical supported contract",
         ),
     )
 
@@ -431,10 +431,10 @@ def validate_current_authority(documents: dict[str, str]) -> None:
     ids = [record["id"] for record in decisions]
     require(len(ids) == len(set(ids)), "duplicate current decision ID")
     require(
-        ids[-2:] == ["D-P6-004", "D-P6-005"],
-        "D-P6-004/D-P6-005 decision order drifted",
+        ids[-3:] == ["D-P6-004", "D-P6-005", "TT-DOC-001"],
+        "D-P6-004/D-P6-005 history or later TT-DOC-001 order drifted",
     )
-    fault_model_record = decisions[-2]
+    fault_model_record = decisions[-3]
     require(
         fault_model_record["status"] == "Accepted"
         and fault_model_record["decided_on"] == "2026-08-15",
@@ -470,7 +470,7 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         == expected_fault_model_panel,
         "D-P6-004 panel routing drifted",
     )
-    acceptance_record = decisions[-1]
+    acceptance_record = decisions[-2]
     require(
         acceptance_record["status"] == "Accepted"
         and acceptance_record["decided_on"] == "2026-08-15"
@@ -543,8 +543,8 @@ def validate_lfe(documents: dict[str, str]) -> None:
         re.MULTILINE,
     )
     require(
-        rows == [f"{value:03d}" for value in range(1, 18)],
-        "LFE identifiers are not unique, ordered and append-only through 017",
+        rows == [f"{value:03d}" for value in range(1, 19)],
+        "LFE identifiers are not unique, ordered and append-only through 018",
     )
     row_lines = [
         line

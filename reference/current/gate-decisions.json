@@ -68,6 +68,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-3-supported-model-evidence-admission-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-3-supported-model-evidence-admission-panel"
+    },
+    {
+      "id": "TT-DOC-001",
+      "decided_on": "2026-08-15",
+      "status": "Accepted",
+      "decision": "Adopt the TrackTemplate Technical Documentation Profile.",
+      "authority": "At protected `main` `f03818d71bce06c5cfb85da84d8f3f230e08b47c`, the project owner accepts human comprehensibility as a governance control. `reference/ENGINEERING_POLICY.md` is the sole canonical owner of TT-DOC-001. The information order is owner view → canonical information → proof/provenance. The owner view gives no project authority. ASD-STE100 Simplified Technical English, Issue 9, dated 2025-01-15, is the normative standard for canonical technical prose in English in the defined scope. The official standard is the normative external reference. All new prose in this scope must obey the applicable Issue 9 requirements. For a material edit, the full logical unit that contains the change must obey these requirements. A reviewer must use the official standard for the linguistic review. `reference/TERMINOLOGY.md` is the one owner of technical nouns and technical verbs for TrackTemplate. The workflows apply the profile by canonical reference. This decision adds no skill. Migration occurs in bounded cycles. Issue 9 style does not authorize a change to frozen history.",
+      "exclusions": "ASD-STE100 Issue 9 conformance not verified applies to the live corpus. Automatic checks do not show linguistic conformance. TrackTemplate claims no external ASD certification, endorsement, or official conformance assessment. TrackTemplate claims no S1000D conformance. It authorizes no S1000D XML, Common Source Database, BREX, data-module identifier, publication module, or applicability engine. It authorizes no XML migration, documentation database, service, or generic content-management system. This decision changes no phase or exit status, accepted-exit count, risk disposition, product source, product behavior, FreeCAD behavior, or Coin behavior. It changes no exporter behavior, persistence, schema, public API, output format, or generated output. It gives no production, physical-output, `project-cleared`, packaging, release, or tagging authority. Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Output stays private-development. Project status stays `unknown`.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#tt-doc-001-documentation-architecture-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#tt-doc-001-documentation-architecture-panel"
     }
   ]
 }

@@ -272,33 +272,44 @@ invocation.
 
 ## Owner acceptance pack
 
-At the end of a successful implementation cycle, report in plain English:
+At the end of a successful implementation cycle, apply the canonical
+[Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+to the result. Use these fields:
 
-1. **Current phase outcome**
-2. **This cycle advanced**
+1. **Current state**
+2. **What changed**
 3. **What now works**
-4. **How to inspect it**
-5. **Visual evidence**
-6. **What was deliberately left unchanged**
-7. **Known limitations**
-8. **Phase-exit or risk contribution**
-9. **Validation result**
-10. **Staff-review verdict**
-11. **Draft pull request**
-12. **Owner decision required**
+4. **Limitations/findings**
+5. **Owner decision**
+6. **Next action**
 
-State separately what the agent claimed, what the repository contains, what
-the evidence validates and what an independent authority has accepted. Name the
-exact active criterion and explicitly say whether its formal status changed.
+The owner view is a presentation from canonical records. Put this technical
+provenance below it:
+
+- The exact active criterion and formal status
+- The inspection route and visual evidence
+- The behavior that did not change
+- The phase-exit or risk contribution
+- The validation and staff-review results
+- The draft pull request
+- The decision that the owner must make
+
+Record separately what the agent claimed, what the repository contains, what
+the evidence validates, and what an authority accepted independently. Name the
+exact active criterion. Say whether its formal status changed.
 
 For GUI work, include representative screenshots when available. Pixel counts,
-hashes and raw logs may support the proof but do not replace a human-readable
-visual demonstration.
+hashes, and raw logs can be part of the proof. They do not replace a
+human-readable visual demonstration.
 
-Stop for owner input only when a genuine product or user-experience choice is
-unresolved, Level 3 authority is due, formal phase/renderer/migration/output or
-release acceptance is required, visible behaviour needs owner acceptance, or a
-blocker cannot be resolved safely.
+Stop for owner input only when one of these conditions occurs:
+
+- The project owner must make a product or user-experience choice.
+- Level 3 authority is due.
+- The task requires formal phase, renderer, migration, output, or release
+  acceptance.
+- The owner must accept a change to Product behavior that users can see.
+- You cannot remove a blocker safely.
 
 ## Recovery
 

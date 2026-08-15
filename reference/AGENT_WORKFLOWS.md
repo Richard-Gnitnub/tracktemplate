@@ -97,6 +97,49 @@ MCP endpoint or script as a separate skill. Put deterministic operations in
 tested scripts and leave scope, evidence interpretation and authority decisions
 visible to the agent and project owner.
 
+## TT-DOC-001 workflow integration
+
+The canonical
+[TrackTemplate Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+owns the owner-view order, controlled status meanings, and ASD-STE100 Issue 9
+scope. [TERMINOLOGY.md](TERMINOLOGY.md#asd-ste100-project-terminology) owns the
+TrackTemplate technical terms. Skills apply these owners by reference. They do
+not become policy or terminology owners.
+
+| Workflow responsibility | Owner and boundary |
+| --- | --- |
+| Documentation structure and Issue 9 review | `tracktemplate-documentation-review` reviews the full logical unit that contains the change. It uses the official standard and applies the canonical document responsibility. |
+| Claim, status, and migration alignment | `tracktemplate-documentation-alignment` compares the presentation with canonical authority. It keeps unverified conformance and migration findings in the record. |
+| Evidence and limitation reports | `tracktemplate-change-validation` keeps exact proof below the owner view. Automatic checks do not show linguistic conformance. |
+| Staff judgment | `tracktemplate-quality-review` checks the recorded official-standard review, limitations, and authority boundaries independently. It does not duplicate validation. |
+| Cross-specialist delivery handoff | `tracktemplate-technical-lead` uses the owner view for an authorized Level 1 or Level 2 outcome only. |
+| Repository-driven cycle result | Literal `tracktemplate-continue` supplies the six-field owner view and technical provenance. Its Level 1/2 and merge limits do not change. |
+| Recovered-session result | `tracktemplate-context-recovery` makes its short report from verified authority. It keeps the exact recovery provenance. |
+
+The panel examined the full skill catalog for TT-DOC-001. Each
+separate responsibility that can occur repeatedly has one owner. Thus, the
+project adds no documentation-profile or `tracktemplate-ste100` skill.
+
+For a future workflow change, use the primary owner that is already in the
+skill catalog when possible. Add a skill only when the skill catalog finds a
+separate responsibility that can occur repeatedly and has no owner. Record the
+composition order, non-ownership, and authority exclusions. Do not keep two
+skills with competing primary responsibilities.
+
+These workflows keep their different responsibilities:
+
+- architecture review
+- chief of staff
+- explain change
+- handoff
+- publish
+- changelog
+- release readiness
+- simplify
+- task automation
+
+They get no TT-DOC-001 primary responsibility or additional authority.
+
 ## Current skill register
 
 ### `tracktemplate-architecture-review`

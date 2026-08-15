@@ -12,6 +12,7 @@ from typing import Callable
 import validate_agent_guidance as agent_guidance
 import validate_ontology as ontology
 import validate_project_progress as progress
+import validate_quality_assurance as quality_assurance
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -465,6 +466,70 @@ def validate_capability_matrix_mutations() -> None:
         "capability-matrix/addon-authority-in-unrelated-nested-glossary",
         lambda: progress._validate_capability_matrix(nested_authority),
         "capability matrix lost its local Addon-status authority clause",
+    )
+
+    d_p6_005_deleted = replace_once(
+        matrix,
+        "D-P6-005 accepts only the bounded\nprivate-development exporter "
+        "failure-safety claim.",
+        "The exporter evidence is present.",
+    )
+    expect_rejected(
+        "capability-matrix/d-p6-005-boundary-deleted",
+        lambda: progress._validate_capability_matrix(d_p6_005_deleted),
+        "capability matrix lost its bounded decision boundary",
+    )
+
+    clearance_widened = replace_once(
+        matrix,
+        "Neither decision grants\noutput clearance.",
+        "D-P6-005 grants\noutput clearance.",
+    )
+    expect_rejected(
+        "capability-matrix/d-p6-005-grants-output-clearance",
+        lambda: progress._validate_capability_matrix(clearance_widened),
+        "capability matrix lost its bounded decision boundary",
+    )
+
+    dxf_row = table_row_containing(matrix, "| DXF |")
+    dxf_safety_deleted = replace_once(
+        dxf_row,
+        "deterministic output and supported-model failure safety "
+        "owner-accepted under D-P6-005",
+        "deterministic output",
+    )
+    expect_rejected(
+        "capability-matrix/dxf-supported-safety-deleted",
+        lambda: progress._validate_capability_matrix(
+            replace_once(matrix, dxf_row, dxf_safety_deleted)
+        ),
+        "capability matrix DXF boundary drifted",
+    )
+
+    dxf_clearance_widened = replace_once(
+        dxf_row,
+        "bounded private-development Entry/Exit route only",
+        "production-cleared exporter family",
+    )
+    expect_rejected(
+        "capability-matrix/dxf-scope-widened",
+        lambda: progress._validate_capability_matrix(
+            replace_once(matrix, dxf_row, dxf_clearance_widened)
+        ),
+        "capability matrix DXF boundary drifted",
+    )
+
+    dxf_link_changed = replace_once(
+        dxf_row,
+        "#phase-6-exit-3-supported-model-evidence-admission-panel",
+        "#current-phase-6-exit-condition-disposition",
+    )
+    expect_rejected(
+        "capability-matrix/dxf-evidence-link-changed",
+        lambda: progress._validate_capability_matrix(
+            replace_once(matrix, dxf_row, dxf_link_changed)
+        ),
+        "capability matrix DXF evidence routing drifted",
     )
 
     spacing_limit = paragraph_containing(
@@ -1299,25 +1364,21 @@ def validate_current_evidence_mutations() -> None:
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
     plan = read("reference/PROJECT_PLAN.md")
-    paragraph = paragraph_containing(plan, "The active programme is")
+    paragraph = paragraph_containing(plan, "The active program is")
     diagnostic = (
         "project plan lost its local current-programme and future-horizon clause"
     )
     cases = {
         "project-plan/deleted-future-clause": replace_once(
             plan,
-            "Future architecture may be recorded\nnow without being implemented now.",
+            "The project can record future architecture without current "
+            "implementation.",
             "",
         ),
         "project-plan/semantic-inversion": replace_once(
             plan,
-            "it does not alter Phase 6 exits",
-            "it alters Phase 6 exits",
-        ),
-        "project-plan/authority-substitution": replace_once(
-            plan,
-            "[PRODUCT_VISION.md](PRODUCT_VISION.md)",
-            "[ENGINEERING_POLICY.md](ENGINEERING_POLICY.md)",
+            "It does not change Phase 6 exits",
+            "It changes Phase 6 exits",
         ),
         "project-plan/unrelated-relocation": (
             replace_once(plan, paragraph, "Programme status is recorded below.")
@@ -1332,6 +1393,17 @@ def validate_project_plan_mutations() -> None:
             lambda value=mutated: progress._validate_plan_programme(value),
             diagnostic,
         )
+
+    authority_substitution = replace_once(
+        plan,
+        "[PRODUCT_VISION.md](PRODUCT_VISION.md)",
+        "[ENGINEERING_POLICY.md](ENGINEERING_POLICY.md)",
+    )
+    expect_rejected(
+        "project-plan/authority-substitution",
+        lambda: progress._validate_plan_programme(authority_substitution),
+        "project plan Product Vision authority link or destination drifted",
+    )
 
     wrong_vision_target = replace_once(
         plan,
@@ -1427,6 +1499,292 @@ def validate_project_plan_mutations() -> None:
             replace_once(plan, acceptance_decision_row + "\n", "")
         ),
         "project-plan decisions differ from the frozen registers",
+    )
+    tt_doc_decision_row = table_row_containing(plan, "| TT-DOC-001 |")
+    expect_rejected(
+        "project-plan/tt-doc-001-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, tt_doc_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
+
+
+def validate_documentation_profile_mutations() -> None:
+    """Reject TT-DOC deletion, contradiction and authority widening."""
+    engineering = read("reference/ENGINEERING_POLICY.md")
+    plan = read("reference/PROJECT_PLAN.md")
+    learning = read("reference/LEARNING_FROM_EXPERIENCE.md")
+    terminology = read("reference/TERMINOLOGY.md")
+
+    profile_cases = (
+        (
+            "tt-doc/profile-heading-deleted",
+            "## TT-DOC-001 — TrackTemplate Technical Documentation Profile",
+            "## Removed documentation profile",
+            "Engineering Policy must own exactly one TT-DOC-001 profile",
+        ),
+        (
+            "tt-doc/owner-view-made-authoritative",
+            "must never give project authority\nindependently",
+            "can give project authority\nindependently",
+            "TT-DOC-001 profile lacks: must never give project authority "
+            "independently",
+        ),
+        (
+            "tt-doc/pending-grants-authority",
+            "Pending gives no authority.",
+            "Pending gives acceptance authority.",
+            "TT-DOC-001 meaning drifted for: Pending",
+        ),
+        (
+            "tt-doc/limitation-hidden",
+            "A reader must be able to see it.",
+            "A reader does not have to see it.",
+            "TT-DOC-001 meaning drifted for: Limitation",
+        ),
+        (
+            "tt-doc/evidence-manufactures-acceptance",
+            "Short text must never change evidence or a\nrecommendation into "
+            "acceptance",
+            "Short text can change evidence or a\nrecommendation into "
+            "acceptance",
+            "TT-DOC-001 profile lacks: Short text must never change evidence "
+            "or a recommendation into acceptance",
+        ),
+        (
+            "tt-doc/frozen-history-rewrite-authorized",
+            "Do not change frozen history only to correct its Issue 9 style.",
+            "Change frozen history to correct its Issue 9 style.",
+            "TT-DOC-001 profile lacks: Do not change frozen history only to "
+            "correct its Issue 9 style",
+        ),
+        (
+            "tt-doc/issue9-made-optional",
+            "as the normative controlled-writing standard",
+            "as optional writing inspiration",
+            "TT-DOC-001 profile lacks: normative controlled-writing standard",
+        ),
+        (
+            "tt-doc/official-reference-removed",
+            "The official standard is the normative external\nreference.",
+            "Public summaries are the normative external\nreference.",
+            "TT-DOC-001 profile lacks: official standard is the normative "
+            "external reference",
+        ),
+        (
+            "tt-doc/uk-convention-given-priority",
+            "Issue 9 vocabulary, meaning, grammar, spelling, and usage have\n"
+            "priority over the usual UK-English convention of TrackTemplate",
+            "The usual UK-English convention of TrackTemplate has\n"
+            "priority over Issue 9 vocabulary, meaning, grammar, spelling, "
+            "and usage",
+            "TT-DOC-001 profile lacks: Issue 9 vocabulary, meaning, grammar, "
+            "spelling, and usage have priority",
+        ),
+        (
+            "tt-doc/checker-made-conformance-authority",
+            "The tool cannot replace\nthe linguistic review or show Issue 9 "
+            "conformance.",
+            "The tool replaces\nthe linguistic review and proves Issue 9 "
+            "conformance.",
+            "TT-DOC-001 profile lacks: cannot replace the linguistic review "
+            "or show Issue 9 conformance",
+        ),
+        (
+            "tt-doc/material-unit-review-waived",
+            "review the full logical unit that contains the change.\n"
+            "  Use the applicable Issue 9 requirements",
+            "review only the changed words.\n"
+            "  Use the applicable Issue 9 requirements",
+            "TT-DOC-001 profile lacks: review the full logical unit that "
+            "contains the change",
+        ),
+        (
+            "tt-doc/s1000d-conformance-claimed",
+            "does not claim S1000D conformance",
+            "claims S1000D conformance",
+            "TT-DOC-001 profile lacks: does not claim S1000D conformance",
+        ),
+        (
+            "tt-doc/external-certification-claimed",
+            "TrackTemplate does not claim this state.",
+            "TrackTemplate claims this state.",
+            "TT-DOC-001 profile lacks: does not claim this state",
+        ),
+        (
+            "tt-doc/skill-owner-authority-widened",
+            "Documentation simplification does not give a skill phase, "
+            "production,\nsecurity, merge, release, acceptance, or project-owner "
+            "authority",
+            "Documentation simplification gives every skill phase, production,\n"
+            "security, merge, release, acceptance, and project-owner "
+            "authority",
+            "TT-DOC-001 profile lacks: Documentation simplification does not "
+            "give a skill phase, production, security, merge, release, "
+            "acceptance, or project-owner authority",
+        ),
+    )
+    for name, original, replacement, diagnostic in profile_cases:
+        mutated = replace_once(engineering, original, replacement)
+        expect_rejected(
+            name,
+            lambda value=mutated: quality_assurance.validate_documentation_profile(
+                value,
+                plan,
+                learning,
+                terminology,
+            ),
+            diagnostic,
+        )
+
+    owner_view_status = replace_once(
+        plan,
+        "Phase 6 is 2/5 evidenced",
+        "Phase 6 is 3/5 evidenced",
+    )
+    expect_rejected(
+        "tt-doc/owner-view-status-contradiction",
+        lambda: progress._validate_owner_view(owner_view_status),
+        "project-plan owner view lost or contradicted: Phase 6 is 2/5 "
+        "evidenced",
+    )
+    owner_view_authority = replace_once(
+        plan,
+        "The owner view does not establish authority",
+        "The owner view establishes authority",
+    )
+    expect_rejected(
+        "tt-doc/owner-view-authority-inversion",
+        lambda: progress._validate_owner_view(owner_view_authority),
+        "project-plan owner view became an authority source",
+    )
+
+    lfe_link_deleted = replace_once(
+        learning,
+        "tt-doc-001-tracktemplate-technical-documentation-profile",
+        "missing-documentation-profile",
+    )
+    expect_rejected(
+        "tt-doc/lfe-canonical-link-deleted",
+        lambda: quality_assurance.validate_documentation_profile(
+            engineering,
+            plan,
+            lfe_link_deleted,
+            terminology,
+        ),
+        "LFE-018 lacks: tt-doc-001-tracktemplate-technical-documentation-profile",
+    )
+
+    workflows = read("reference/AGENT_WORKFLOWS.md")
+    names = sorted(
+        path.name
+        for path in agent_guidance.SKILLS_ROOT.iterdir()
+        if path.is_dir()
+    )
+    overlap_default_inverted = replace_once(
+        workflows,
+        "use the primary owner that is already in the\nskill catalog",
+        "creation of a parallel skill is the default resolution",
+    )
+    expect_rejected(
+        "tt-doc/overlap-integration-inverted",
+        lambda: agent_guidance.validate_documentation_profile_routing(
+            names,
+            overlap_default_inverted,
+        ),
+        "AGENT_WORKFLOWS lost TT-DOC-001 overlap control",
+    )
+    expect_rejected(
+        "tt-doc/parallel-profile-skill-introduced",
+        lambda: agent_guidance.validate_documentation_profile_routing(
+            names + ["tracktemplate-documentation-profile"],
+            workflows,
+        ),
+        "TT-DOC-001 gained an overlapping profile or STE skill",
+    )
+    expect_rejected(
+        "tt-doc/parallel-ste100-skill-introduced",
+        lambda: agent_guidance.validate_documentation_profile_routing(
+            names + ["tracktemplate-ste100"],
+            workflows,
+        ),
+        "TT-DOC-001 gained an overlapping profile or STE skill",
+    )
+
+    phase4_closeout = read(
+        "reference/history/phase-closeouts/PHASE4_CLOSEOUT.md"
+    )
+    phase5_closeout = read(
+        "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md"
+    )
+    current_evidence = read("reference/current/PHASE_EVIDENCE.md")
+    conformance_result_removed = replace_once(
+        current_evidence,
+        "The internal result for these logical units is `ASD-STE100 Issue 9\n"
+        "conforming`.",
+        "The result for these logical units is not recorded.",
+    )
+    expect_rejected(
+        "tt-doc/conformance-result-removed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            conformance_result_removed,
+        ),
+        "TT-DOC-001 evidence panel drifted: The internal result for these "
+        "logical units is ASD-STE100 Issue 9 conforming",
+    )
+    conformance_limit_removed = replace_once(
+        current_evidence,
+        "It excludes unchanged\nlive prose outside the named logical units.",
+        "It includes all live prose.",
+    )
+    expect_rejected(
+        "tt-doc/conformance-scope-widened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            conformance_limit_removed,
+        ),
+        "TT-DOC-001 evidence panel drifted: It excludes unchanged live prose "
+        "outside the named logical units",
+    )
+    conformance_unit_narrowed = replace_once(
+        current_evidence,
+        "| `reference/ENGINEERING_POLICY.md` | The TT-DOC-001 profile and the "
+        "first paragraph of the completion-report section. |",
+        "| `reference/ENGINEERING_POLICY.md` | One sentence. |",
+    )
+    expect_rejected(
+        "tt-doc/conformance-logical-unit-narrowed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            conformance_unit_narrowed,
+        ),
+        "TT-DOC-001 conformance scope changed: "
+        "reference/ENGINEERING_POLICY.md",
+    )
+
+    terminology_owner_removed = replace_once(
+        terminology,
+        "one project register for TrackTemplate technical nouns and\n"
+        "technical verbs",
+        "a second optional register for project words",
+    )
+    expect_rejected(
+        "tt-doc/terminology-owner-removed",
+        lambda: quality_assurance.validate_documentation_profile(
+            engineering,
+            plan,
+            learning,
+            terminology_owner_removed,
+        ),
+        "TrackTemplate STE terminology lacks: one project register",
     )
 
 
@@ -1825,6 +2183,7 @@ def main() -> None:
     validate_capability_matrix_mutations()
     validate_current_evidence_mutations()
     validate_project_plan_mutations()
+    validate_documentation_profile_mutations()
     validate_transition_export_validation_mutations()
     validate_agents_mutations()
     validate_chief_mutations()

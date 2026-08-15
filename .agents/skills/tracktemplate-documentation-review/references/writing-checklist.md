@@ -1,32 +1,52 @@
 # TrackTemplate documentation writing checklist
 
-Apply the checklist after classifying the document and identifying its canonical responsibility.
+First, select the document class. Identify its canonical responsibility. Then,
+apply this checklist.
+
+Apply the canonical [Technical Documentation Profile](../../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
+For STE-governed prose, use the official ASD-STE100 Issue 9 standard that the
+profile identifies. Also use the approved project terms in
+[`reference/TERMINOLOGY.md`](../../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
 
 ## Ownership and structure
 
-- Duplicated facts have one canonical owner and other documents link to it.
-- Live status does not appear outside `/reference/PROJECT_PLAN.md` except where an explicitly named current-phase evidence document records evidence.
-- Detail has not been copied from another canonical owner.
-- Conclusions and operative requirements are not buried beneath background.
+- Duplicated facts have one canonical owner. Other documents refer to it.
+- Live status appears only in `/reference/PROJECT_PLAN.md`. A named current
+  phase-evidence document can also record evidence.
+- The document does not copy detail from another canonical owner.
+- Background does not hide conclusions or operative requirements.
 - Headings are necessary and describe distinct content.
 - Paragraphs do not cover several unrelated subjects.
-- Generic summaries do not merely repeat the next section.
+- Generic summaries do not repeat the next section.
+- The owner view for a substantial cycle agrees with canonical records.
+  Technical provenance follows it. The view does not establish project state.
 
 ## Accuracy and evidence
 
-- Claims are specific, supported and bounded by the evidence.
-- Planned work is not described as completed.
-- Headless validation is not described as GUI acceptance.
-- Historical records are not rewritten using later knowledge.
-- Exact validator-required wording remains intact where required.
-- Controlled terminology has not been removed or weakened merely for brevity.
+- Each claim has a specific scope and evidence for the claim.
+- The document does not say that the project did planned work.
+- The document does not describe headless validation as GUI acceptance.
+- The document does not rewrite historical records with later knowledge.
+- Exact validator-required wording stays intact where necessary.
+- The edit does not remove or weaken controlled terminology to make text short.
+- Pending, Evidenced, Accepted, Blocked, Finding, Limitation, Unknown and
+  Decision required are distinct in governance text.
+- The document keeps facts, evidence, inferences, recommendations, and owner
+  decisions distinct.
+- The conformance record names the full logical unit and the official
+  Issue 9 source.
+- An automatic validator result does not replace the conformance review.
+- Exact machine data and externally controlled information stay exact when
+  necessary.
 
 ## Concision and tone
 
-- Repeated introductions and conclusions have been removed.
-- Repeated warnings have been consolidated without weakening their scope.
-- Excessive adjectives, filler and self-congratulatory language have been removed.
-- Padding has been removed without imposing an arbitrary word-count target.
+- The edit removes repeated introductions and conclusions.
+- The text has one warning for each warning scope.
+- The edit removes unnecessary words and praise of the writer.
+- The edit removes unnecessary text without an arbitrary word-count target.
+- Issue 9 spelling and usage have priority in STE-governed prose. The usual
+  UK-English convention applies outside that scope.
 
 ## Do not shorten when meaning would be lost
 

@@ -34,6 +34,11 @@ second objective nor accepts a phase, renderer, migration, output or release.
 4. Recheck the live repository so an obsolete brief or earlier implementation
    assumption is not forced through after authority or source state moved.
 
+Use the canonical
+[Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+for a substantial cycle or handoff. The owner view reports the
+selected outcome. It gives this skill no Level 3 authority.
+
 ## Inspect the delivery boundary
 
 Inspect actual source, callers, tests and runtime boundaries before proposing
@@ -134,3 +139,6 @@ Stop when authority has drifted, a material architecture or contract decision
 remains unresolved, a genuine product choice is needed, the proof cannot
 observe the outcome, required infrastructure is unavailable, or repair expands
 into optional maintenance.
+
+Use the profile's owner view for a substantial completed handoff. Put the
+technical route, specialist evidence, review, and unchanged authority below it.

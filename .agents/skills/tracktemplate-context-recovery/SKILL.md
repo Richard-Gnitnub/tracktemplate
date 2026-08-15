@@ -11,6 +11,11 @@ Reconstruct only the context needed for the task from repository authority
 before acting. Preserve every load-bearing decision, identifier, failure and
 uncommitted boundary, while excluding unrelated history and duplicated policy.
 
+For a substantial cycle after recovery, apply the canonical
+[Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
+Make the owner view from the authority that this workflow examines. The view
+helps navigation. It is not project state or acceptance authority.
+
 ## Context temperatures
 
 - **Hot:** preserve the current request, exact user decisions, dirty paths,
@@ -128,7 +133,8 @@ freshness.
 
 ## Recovery report
 
-Before mutation, state concisely:
+Before a change, use short text. For a substantial cycle, use the profile's six
+owner-view fields. Then, keep this technical provenance:
 
 1. the controlling files read;
 2. the recovered accepted result and authority boundary;

@@ -15,6 +15,63 @@ SKILLS_ROOT = ROOT / ".agents" / "skills"
 WORKFLOWS = ROOT / "reference" / "AGENT_WORKFLOWS.md"
 AGENTS = ROOT / "AGENTS.md"
 PRODUCT_VISION = ROOT / "reference" / "PRODUCT_VISION.md"
+ENGINEERING_POLICY = ROOT / "reference" / "ENGINEERING_POLICY.md"
+TERMINOLOGY = ROOT / "reference" / "TERMINOLOGY.md"
+
+TT_DOC_PROFILE_LINK = (
+    "../../../reference/ENGINEERING_POLICY.md"
+    "#tt-doc-001-tracktemplate-technical-documentation-profile"
+)
+TT_DOC_SKILL_NAMES = {
+    "tracktemplate-change-validation",
+    "tracktemplate-context-recovery",
+    "tracktemplate-continue",
+    "tracktemplate-documentation-alignment",
+    "tracktemplate-documentation-review",
+    "tracktemplate-quality-review",
+    "tracktemplate-technical-lead",
+}
+TT_DOC_TERM_SKILL_NAMES = {
+    "tracktemplate-change-validation",
+    "tracktemplate-documentation-alignment",
+    "tracktemplate-documentation-review",
+    "tracktemplate-quality-review",
+}
+TT_DOC_TERMINOLOGY_LINK = (
+    "../../../reference/TERMINOLOGY.md"
+    "#asd-ste100-project-terminology"
+)
+TT_DOC_DESCRIPTION_FRAGMENTS = {
+    "tracktemplate-change-validation": (
+        "proportionate TrackTemplate validation",
+        "classify failed tests",
+    ),
+    "tracktemplate-context-recovery": (
+        "authority-ranked",
+        "loss-checked",
+    ),
+    "tracktemplate-continue": (
+        "one complete repository-driven TrackTemplate development cycle",
+        "Never use it for Level 3 acceptance",
+    ),
+    "tracktemplate-documentation-alignment": (
+        "Reconcile TrackTemplate documentation claims",
+        "current repository authority",
+    ),
+    "tracktemplate-documentation-review": (
+        "Create, review, shorten or reorganise",
+        "canonical document",
+    ),
+    "tracktemplate-quality-review": (
+        "staff-level review",
+        "read-only independent review",
+    ),
+    "tracktemplate-technical-lead": (
+        "Level 1 or Level 2 outcome",
+        "Do not use for",
+        "Level 3 decision",
+    ),
+}
 
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 REGISTER_HEADING_RE = re.compile(r"^### `([a-z0-9]+(?:-[a-z0-9]+)*)`$", re.MULTILINE)
@@ -767,6 +824,138 @@ def validate_links(documents: list[Path]) -> None:
     require(not broken, "broken agent-guidance Markdown targets:\n" + "\n".join(broken))
 
 
+def validate_documentation_profile_routing(
+    names: list[str],
+    workflows: str,
+) -> None:
+    """Keep TT-DOC-001 with one policy owner and existing workflows."""
+    engineering = read(ENGINEERING_POLICY)
+    anchor = 'id="tt-doc-001-tracktemplate-technical-documentation-profile"'
+    require(
+        engineering.count(anchor) == 1,
+        "TT-DOC-001 canonical profile anchor is missing or duplicated",
+    )
+    require(
+        not (ROOT / "reference" / "DOCUMENTATION_PROFILE.md").exists(),
+        "TT-DOC-001 gained a competing canonical document",
+    )
+    competing_names = [
+        name
+        for name in names
+        if "documentation-profile" in name or "ste100" in name
+    ]
+    require(
+        not competing_names,
+        "TT-DOC-001 gained an overlapping profile or STE skill: "
+        + ", ".join(competing_names),
+    )
+
+    normalized_workflows = semantic_text(workflows)
+    for fragment in (
+        "TT-DOC-001 workflow integration",
+        "Skills apply these owners by reference",
+        "Each separate responsibility that can occur repeatedly has one "
+        "owner",
+        "use the primary owner that is already in the skill catalog",
+        "Do not keep two skills with competing primary responsibilities",
+        "adds no documentation-profile or tracktemplate-ste100 skill",
+    ):
+        require(
+            semantic_text(fragment) in normalized_workflows,
+            "AGENT_WORKFLOWS lost TT-DOC-001 overlap control: " + fragment,
+        )
+
+    for name in sorted(TT_DOC_SKILL_NAMES):
+        skill_file = SKILLS_ROOT / name / "SKILL.md"
+        skill_text = read(skill_file)
+        require(
+            TT_DOC_PROFILE_LINK in skill_text,
+            f"{name} does not reference the canonical TT-DOC-001 owner",
+        )
+        if name in TT_DOC_TERM_SKILL_NAMES:
+            require(
+                TT_DOC_TERMINOLOGY_LINK in skill_text,
+                f"{name} does not reference the canonical project terms",
+            )
+        description = parse_frontmatter(skill_file, skill_text)["description"]
+        for fragment in TT_DOC_DESCRIPTION_FRAGMENTS[name]:
+            require(
+                fragment in description,
+                f"{name} description lost its primary responsibility: {fragment}",
+            )
+        require(
+            not (
+                all(
+                    term in skill_text
+                    for term in (
+                        "Pending",
+                        "Evidenced",
+                        "Accepted",
+                        "Blocked",
+                        "Finding",
+                        "Limitation",
+                        "Unknown",
+                        "Decision required",
+                    )
+                )
+                and "Owner view → canonical information → proof/provenance"
+                in skill_text
+            ),
+            f"{name} duplicates the complete TT-DOC-001 policy",
+        )
+
+    continuation = read(
+        SKILLS_ROOT / "tracktemplate-continue" / "SKILL.md"
+    )
+    owner_pack = direct_section_content(continuation, "Owner acceptance pack")
+    for field in (
+        "Current state",
+        "What changed",
+        "What now works",
+        "Limitations/findings",
+        "Owner decision",
+        "Next action",
+    ):
+        require(
+            f"**{field}**" in owner_pack,
+            "continue owner view lost field: " + field,
+        )
+    require(
+        "presentation from canonical records" in owner_pack
+        and "formal status" in owner_pack
+        and "validation" in owner_pack
+        and "staff-review" in owner_pack,
+        "continue owner view lost its derivation or technical provenance",
+    )
+
+    documentation_review = read(
+        SKILLS_ROOT / "tracktemplate-documentation-review" / "SKILL.md"
+    )
+    require(
+        "official standard" in documentation_review
+        and "full logical unit that contains the change" in documentation_review
+        and "Do not claim Issue 9 conformance" in documentation_review,
+        "documentation review lost its official Issue 9 assessment boundary",
+    )
+    change_validation = read(
+        SKILLS_ROOT / "tracktemplate-change-validation" / "SKILL.md"
+    )
+    require(
+        "validator as proof of linguistic conformance" in change_validation,
+        "change validation lets automation prove linguistic conformance",
+    )
+    quality_review = read(
+        SKILLS_ROOT / "tracktemplate-quality-review" / "SKILL.md"
+    )
+    quality_review_flat = semantic_text(quality_review)
+    require(
+        "reviewer used the official standard" in quality_review_flat
+        and "validator result alone is not sufficient evidence"
+        in quality_review_flat,
+        "quality review lost its Issue 9 evidence boundary",
+    )
+
+
 def main() -> None:
     require(SKILLS_ROOT.is_dir(), "missing .agents/skills directory")
 
@@ -774,7 +963,13 @@ def main() -> None:
     require(skill_directories, "no repository skills found")
 
     names: list[str] = []
-    markdown_documents: list[Path] = [AGENTS, WORKFLOWS, PRODUCT_VISION]
+    markdown_documents: list[Path] = [
+        AGENTS,
+        WORKFLOWS,
+        PRODUCT_VISION,
+        ENGINEERING_POLICY,
+        TERMINOLOGY,
+    ]
 
     for directory in skill_directories:
         skill_file = directory / "SKILL.md"
@@ -829,6 +1024,7 @@ def main() -> None:
     validate_ide_workspace_alignment_mutations(ide_skill, continuation)
     validate_continue_invocation_policy(workflows)
     validate_vision_led_workflows(workflows)
+    validate_documentation_profile_routing(names, workflows)
     registered_headings = REGISTER_HEADING_RE.findall(workflows)
     registered_paths = REGISTER_PATH_RE.findall(workflows)
     path_names = [name for _, name in registered_paths]
