@@ -758,7 +758,7 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        "Phase 6 is 2/5 evidenced",
+        "Phase 6 has 2/5 accepted exits",
         "The owner accepted Exits 2 and 3",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
@@ -850,30 +850,39 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         cells = _cells(line) if line.startswith("|") else []
         if len(cells) != 4 or not cells[0].isdigit():
             continue
-        match = re.fullmatch(r"(\d+)/(\d+) evidenced", cells[2])
+        match = re.fullmatch(
+            r"(\d+)/(\d+) (evidenced|accepted exits)",
+            cells[2],
+        )
         _require(match is not None, "invalid phase exit status: " + cells[2])
         phase = int(cells[0])
         rows[phase] = {
-            "evidenced": int(match.group(1)),
+            "count": int(match.group(1)),
             "total": int(match.group(2)),
+            "status_term": match.group(3),
             "state": cells[3],
         }
 
     _require(set(rows) == set(PHASE_TOTALS), "project phase rows must be 0 through 11")
     for phase, total in PHASE_TOTALS.items():
         _require(rows[phase]["total"] == total, "phase total drifted: {}".format(phase))
-    _require(rows[4]["evidenced"] == 6, "Phase 4 must show six evidenced exits")
+        expected_term = "accepted exits" if phase == 6 else "evidenced"
+        _require(
+            rows[phase]["status_term"] == expected_term,
+            "phase exit-status term drifted: {}".format(phase),
+        )
+    _require(rows[4]["count"] == 6, "Phase 4 must show six evidenced exits")
     _require(
         rows[4]["state"] == "Complete — accepted 2026-07-28",
         "Phase 4 must be closed with the accepted date",
     )
     _require(
-        rows[5]["evidenced"] == 4
+        rows[5]["count"] == 4
         and rows[5]["state"] == "Complete — accepted 2026-08-01",
         "Phase 5 must be closed with all four accepted exits",
     )
     _require(
-        rows[6]["evidenced"] == 2
+        rows[6]["count"] == 2
         and str(rows[6]["state"])
         == "Current — opened 2026-08-01",
         "Phase 6 must remain current at the accepted 2/5 state",
@@ -888,7 +897,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the dashboard must identify only Phase 6 as current",
     )
     _require(
-        "Phase 6 current — 2/5 evidenced" in " ".join(plan.split())
+        "Phase 6 current — 2/5 accepted exits" in " ".join(plan.split())
         and "owner accepted Exit 2 under D-P6-002 on 2026-08-02"
         in " ".join(plan.split())
         and "Exit 3 under D-P6-005 on 2026-08-15"
@@ -1054,7 +1063,8 @@ def _validate_exit_conditions(
         ).split()
     )
     _require(
-        "Current — 2/5 evidenced. Exit 2 was owner-accepted under D-P6-002 on "
+        "Current — 2/5 accepted exits. Exit 2 was owner-accepted under "
+        "D-P6-002 on "
         "2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15; exits 1, 4 and 5 "
         "remain Pending" in current_flat,
         "current record does not preserve the accepted Phase 6 2/5 state",

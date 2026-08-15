@@ -1,6 +1,6 @@
 # Project Plan
 
-Status: **Phase 6 current — 2/5 evidenced. The owner accepted Exit 2 under D-P6-002 on 2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15. Exits 1, 4, and 5 stay Pending.**
+Status: **Phase 6 current — 2/5 accepted exits. The owner accepted Exit 2 under D-P6-002 on 2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15. Exits 1, 4, and 5 stay Pending.**
 
 This dashboard owns phase and exit status. It also owns live-risk summaries, owner-decision summaries, and evidence links. The canonical status, evidence, and registers are the source of the owner view. The owner view does not establish authority.
 
@@ -12,7 +12,7 @@ The Layout Editor is the later program. It does not change Phase 6 exits. The pr
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 6 is 2/5 evidenced. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. Output is private-development. Project status stays `unknown`. |
+| **Current state** | Phase 6 has 2/5 accepted exits. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. Output is private-development. Project status stays `unknown`. |
 | **What changed** | [D-GOV-006](current/PHASE_EVIDENCE.md#freecad-1-1-3-compatibility-requalification-panel) also qualifies the exact Linux x86_64 stable Flatpak profile for FreeCAD 1.1.3. The 1.1.1 profile stays qualified. No product source or phase state changes. |
 | **What now works** | The runtime guard accepts only the two exact host profiles. The current B16 host matrix gave the specified results on 1.1.3. The 1.1.1 evidence has the same contract results. |
 | **Limitations/findings** | FreeCAD 1.1.2 and all other releases, platforms, architectures, package channels, and bundled stacks are not qualified. Phase 10 owns packaged Workbench and `package.xml` evidence. The 1.1.1 evidence and performance evidence keep their recorded host identity. FreeCAD recommends 1.1.3 for security. The 1.1.1 decision is not a security endorsement. |
@@ -29,7 +29,7 @@ The Layout Editor is the later program. It does not change Phase 6 exits. The pr
 | 3 | First parity-proven vertical slice | 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 4 | Canonical state, signatures and persistence | 6/6 evidenced | Complete — accepted 2026-07-28 |
 | 5 | Lightweight editing prototype and renderer decision | 4/4 evidenced | Complete — accepted 2026-08-01 |
-| 6 | Explicit exact-validation and export seam | 2/5 evidenced | Current — opened 2026-08-01 |
+| 6 | Explicit exact-validation and export seam | 2/5 accepted exits | Current — opened 2026-08-01 |
 | 7 | Core alignment, station and multiple-track migration | 0/4 evidenced | Not started |
 | 8 | Turnout, crossover and timbering migration | 0/4 evidenced | Not started |
 | 9 | Chair definitions, assisted assimilation, production records and export completion | 0/9 evidenced | Not started |

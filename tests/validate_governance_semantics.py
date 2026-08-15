@@ -1548,8 +1548,8 @@ def validate_project_plan_mutations() -> None:
     )
     phase6_previous = replace_once(
         phase6_row,
-        "2/5 evidenced",
-        "1/5 evidenced",
+        "2/5 accepted exits",
+        "1/5 accepted exits",
     )
     expect_rejected(
         "project-plan/phase6-count-returned-to-one",
@@ -1782,14 +1782,14 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_status = replace_once(
         plan,
-        "Phase 6 is 2/5 evidenced",
-        "Phase 6 is 3/5 evidenced",
+        "Phase 6 has 2/5 accepted exits",
+        "Phase 6 has 3/5 accepted exits",
     )
     expect_rejected(
         "tt-doc/owner-view-status-contradiction",
         lambda: progress._validate_owner_view(owner_view_status),
-        "project-plan owner view lost or contradicted: Phase 6 is 2/5 "
-        "evidenced",
+        "project-plan owner view lost or contradicted: Phase 6 has 2/5 "
+        "accepted exits",
     )
     owner_view_authority = replace_once(
         plan,

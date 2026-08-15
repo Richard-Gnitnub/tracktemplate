@@ -1,6 +1,6 @@
 # Phase 6 Explicit Exact-Validation and Export Seam Evidence
 
-Status: **Current — 2/5 evidenced. Exit 2 was owner-accepted under D-P6-002
+Status: **Current — 2/5 accepted exits. Exit 2 was owner-accepted under D-P6-002
 on 2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15; exits 1, 4 and 5
 remain Pending.**
 
