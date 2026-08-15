@@ -118,9 +118,10 @@ assert isinstance(result, dict), "current B16 transition result is missing"
 assert result.get("schema_version") == 1
 assert result.get("development_checkpoint") == "10.2A8A7B16"
 assert result.get("status") == "modular-foundation-ready"
-assert result.get("matched_profile_id") == (
-    "linux-x86_64-flatpak-freecad-1.1.1"
-)
+assert result.get("matched_profile_id") in {
+    "linux-x86_64-flatpak-freecad-1.1.1",
+    "linux-x86_64-flatpak-freecad-1.1.3",
+}
 assert result.get("calculation_routing") == "modular"
 assert result.get("legacy_comparison_route_available") is False
 assert result.get("workflow_host_loaded") is False

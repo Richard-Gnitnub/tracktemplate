@@ -110,6 +110,9 @@ Use these technical nouns only with their stated project meanings:
 | Assurance result | **Conformance review**, **conformance scope**, **semantic control**, **preservation audit**, **review result**, **assessment**, and **machine-verifiable assurance** are TrackTemplate assurance-result terms. A **substantial cycle** has a result that changes project state, a formal decision, or detailed validation. |
 | Git and repository | **Repository**, **worktree**, **branch**, **commit**, **pull request**, **merge commit**, **protected main**, **SHA**, **hash**, **path**, and **continuous integration (CI)** keep their Git meanings. |
 | Release | **Packaging**, **release**, **tagging**, **licensing**, and **compatibility** keep their project meanings. |
+| Host compatibility | A **host profile** is a named set of host and platform data. An **exact host profile** has data equal to the `exact_match` data in its contract record. A **qualified host profile** has accepted compatibility evidence and an owner decision. A **bundled stack** is the Python, Qt/PySide, OpenCASCADE, and Coin set in a host profile. A **host matrix** is the set of compatibility checks for one host profile. **Requalification** is a new compatibility assessment for a different host version. |
+| Host compatibility tools | A **runtime guard** stops a supported composition before it can change a document on a host profile that the contract does not qualify. An **evaluator** examines host data against the compatibility contract. A **runtime probe** reports evaluator results. A **launcher** starts a TrackTemplate workflow in a host. A **fixture** is a controlled test input. **Legacy ingress** is the controlled input of data from a legacy file or macro. |
+| Host compatibility authority | **Functional compatibility** is conformance to the TrackTemplate compatibility contract. It is not a security endorsement. |
 | Export | **Sentinel**, **DXF**, **manifest**, **schema**, **API**, and **JSON** keep their meanings from software or export specifications. |
 | Railway | **Centreline**, **plain line**, **chainage**, **station**, **turnout**, **crossover**, and **railway behavior** use the canonical railway meanings below. TrackTemplate approves the spelling **Centreline** for this subject. |
 | Standards | **ASD-STE100 Issue 9**, **Simplified Technical English (STE)**, and **S1000D** identify standards. **Technical noun**, **technical verb**, **normative standard**, **official standard**, **official conformance assessment**, and **linguistic conformance** keep their standards meanings. |
@@ -136,6 +139,8 @@ Use these technical verbs only with their stated project meanings:
 | **Bound** | Limit a claim, decision, task, or review to an explicit scope. |
 | **Copy**, **stage**, **commit**, **push**, **publish**, **merge**, **rebase**, and **squash** | Perform the related Git or GitHub operation. |
 | **Route** | Send a responsibility or task to its named canonical document or workflow owner. |
+| **Qualify** | Accept one exact host profile after the specified compatibility evidence and owner decision. |
+| **Requalify** | Qualify a different exact host profile against the same compatibility contract. |
 
 Do not use different technical terms for the same project concept. Do not use
 a technical noun as a verb unless this register also approves the verb. Add a

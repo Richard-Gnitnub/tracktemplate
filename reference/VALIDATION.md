@@ -88,12 +88,16 @@ These roles are current project state, not a permanent versioning scheme. Update
 
 ### 3. FreeCAD document validation
 
-- Run against a profile qualified by the Phase 1 compatibility contract. The
-  current exact profile is the Linux x86_64 stable FreeCAD 1.1.1 Flatpak with
-  bundled CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1 and Coin 4.0.8.
-- Verify object types, properties, grouping, visibility, transactions, recomputes and cleanup.
-- Confirm save/reopen behaviour when persistence changes.
-- Ensure transient validation/export objects do not leak into the editable document.
+- Use an exact host profile that the Phase 1 compatibility contract qualifies.
+  The contract qualifies only the exact Linux x86_64 stable
+  `org.freecad.FreeCAD` Flatpak profiles for FreeCAD 1.1.1 and 1.1.3. The two
+  profiles contain CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1, and
+  Coin 4.0.8. FreeCAD 1.1.2 and all other host profiles are not qualified.
+- Make sure that object types, properties, groups, visibility, transactions,
+  recomputes, and cleanup are correct.
+- Make sure that save and reopen behaviour is correct when persistence changes.
+- Make sure that transient validation or export objects do not stay in the
+  editable document.
 
 ### 4. Presentation validation
 
@@ -968,7 +972,7 @@ B16 launcher. It
 executes only the selected legacy function definitions for comparison; it does
 not import or launch either legacy macro.
 
-Phase 1 runtime and legacy-ingress compatibility checks:
+Phase 1 runtime and legacy ingress compatibility checks:
 
 ```bash
 .venv/bin/python tests/validate_phase1_compatibility.py
@@ -977,24 +981,34 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
   tools/runtime_compatibility_probe.py --pass --require-qualified
 ```
 
-The validator protects the exact B14/B15 fingerprints, active persisted-schema
-constants, initial official Addon metadata intent, standalone Python floor,
-qualified FreeCAD stack and B14/B15 ingress sets. It executes selected current
-configuration, last-input and preset migration boundaries without importing or
-launching the macro, then mutates every support class to prove unsupported
-broadening fails closed. The standalone probe should report
-`not-freecad-runtime`; the FreeCAD probe is successful evidence only when its
-`TRACKTEMPLATE_RUNTIME_PROBE=` record reports `qualified` for
-`linux-x86_64-flatpak-freecad-1.1.1`. It records no user path.
+The validator rejects a change to the exact B14/B15 fingerprints and
+persisted-schema constants. It also rejects a change to the Addon metadata
+intent, Python floor, host profiles, and B14/B15 ingress sets. It examines
+selected migration boundaries without an import or launch of a legacy macro.
+The test changes each compatibility class. It must reject each change that the
+contract does not include.
 
-The Phase 2 launcher now consumes the same authoritative evaluator through
-`tracktemplate.bootstrap`; that launcher alone does not establish document-
-migration support. Phase 4 later accepted copied-target fixture evidence for
-exactly `plain-line-spacing-matched-transition-intent`. Every additional
-advertised B14/B15 entity family must add the supported, future, versionless,
-corrupt/conflicting, failure, Undo/Redo and save/reopen cases in its owning
-later phase. A configuration JSON migration is not evidence that an older
-`.FCStd` is supported.
+The standalone probe must report `not-freecad-runtime`. The FreeCAD probe gives
+evidence only when its `TRACKTEMPLATE_RUNTIME_PROBE=` record reports
+`qualified`. The result must name one exact host profile:
+
+- `linux-x86_64-flatpak-freecad-1.1.1`
+- `linux-x86_64-flatpak-freecad-1.1.3`.
+
+An exact 1.1.1 result does not qualify 1.1.3. An exact 1.1.3 result does not
+qualify 1.1.2 or any other 1.1.x release. The probe records no user path.
+
+D-GOV-006 adds only the exact FreeCAD 1.1.3 profile. All checks in the host
+matrix gave the specified results in that runtime. The 1.1.1 evidence keeps its
+recorded host identity. Only the 1.1.1 profile has performance evidence. A
+different decision must admit performance evidence for a different host.
+
+The Phase 2 launcher uses the same evaluator through
+`tracktemplate.bootstrap`. That launcher is not evidence for
+document migration. Phase 4 accepted copied-target fixture evidence only for
+`plain-line-spacing-matched-transition-intent`. For each new B14/B15 entity
+family, the applicable phase must add its specified cases. A configuration JSON
+migration is not evidence for an `.FCStd` file from a previous version.
 
 Phase 1 licensing and manifest-control checks:
 

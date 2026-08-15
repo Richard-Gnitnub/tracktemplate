@@ -122,6 +122,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-P6-005",
     "TT-DOC-001",
     "TT-DOC-002",
+    "D-GOV-006",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -761,15 +762,21 @@ def _validate_owner_view(plan: str) -> None:
         "The owner accepted Exits 2 and 3",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
-        "ASD-STE100 Issue 9 stays the normative standard",
-        "uses UK English spelling in its Issue 9 scope",
-        "No phase, exit, risk, or product state changes",
-        "18-unit conformance result keeps its scope",
-        "Issue 9 conformance stays Unknown for live prose outside",
-        "Frozen history does not change",
-        "TT-DOC-002 is Accepted",
-        "All other owner decisions and exclusions stay unchanged",
-        "authorises no later project work",
+        "D-GOV-006",
+        "also qualifies the exact Linux x86_64 stable Flatpak profile",
+        "1.1.1 profile stays qualified",
+        "No product source or phase state changes",
+        "runtime guard accepts only the two exact host profiles",
+        "current B16 host matrix gave the specified results on 1.1.3",
+        "The 1.1.1 evidence has the same contract results",
+        "FreeCAD 1.1.2 and all other releases",
+        "Phase 10 owns packaged Workbench and `package.xml` evidence",
+        "1.1.1 evidence and performance evidence keep their recorded host "
+        "identity",
+        "FreeCAD recommends 1.1.3 for security",
+        "1.1.1 decision is not a security endorsement",
+        "D-GOV-006 is Accepted for the exact 1.1.3 profile only",
+        "Use `$tracktemplate-continue`",
     ):
         _require(
             fragment in owner_view,
@@ -800,8 +807,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "PROJECT_PLAN.md contains an unsupported dashboard section",
     )
     _require(
-        len(plan.splitlines()) <= 141,
-        "PROJECT_PLAN.md exceeded its 141-line dashboard budget",
+        len(plan.splitlines()) <= 145,
+        "PROJECT_PLAN.md exceeded its 145-line dashboard budget",
     )
     for forbidden in (
         "### Deliverables",
@@ -1693,12 +1700,229 @@ def _validate_exit_conditions(
         "ASD-STE100_ISSUE9.pdf)" in spelling_section,
         "TT-DOC-002 conformance review lost its official Issue 9 source",
     )
+    compatibility_heading = (
+        "FreeCAD 1.1.3 compatibility requalification panel and owner decision"
+    )
+    _require(
+        '<a id="freecad-1-1-3-compatibility-requalification-panel"></a>\n\n'
+        "## " + compatibility_heading in current_evidence,
+        "D-GOV-006 panel anchor or heading association is missing",
+    )
+    compatibility_section = _section(
+        current_evidence,
+        compatibility_heading,
+    )
+    compatibility_flat = _semantic_text(
+        re.sub(r"^> ?", "", compatibility_section, flags=re.MULTILINE)
+    )
+    for required_clause in (
+        "724a3b79ab5b71025041e84eac3501a457b3fb76",
+        "Phase 6 stays at 2/5",
+        "exact 1.1.1 and 1.1.3 host profiles",
+        "FreeCAD 1.1.2 and all other releases are not qualified",
+        "linux-x86_64-flatpak-freecad-1.1.3",
+        "145529fe741292ff0b3977a01195bf0247425794",
+        "CPython 3.13.14",
+        "PySide6/Qt 6.10.3",
+        "OpenCASCADE 7.8.1",
+        "SIM Coin 4.0.8",
+        "Expected host-version difference with no TrackTemplate contract "
+        "effect",
+        "benchmark-output/validation-pipeline/20260815T195204447910Z/",
+        "corrected standalone profile with 187 parsed files and 59 of 59 "
+        "results",
+        "benchmark-output/validation-pipeline/20260815T184826613031Z/",
+        "1.1.3 transition host and GUI profile",
+        "call_aQfBr45aDcefyiKCYr3AToMc",
+        "the required argument for option '--pass' is missing",
+        "result for the invocation without a --pass argument is "
+        "fixture-or-harness-defect",
+        "contract command --pass --require-qualified was not the command "
+        "with exit code 1",
+        "58bd07e3d79c706cdbb8c3cd41eb7cf2090c2d12437c197a05eb5a9945aeae69",
+        "security issues in FCStd and file handling",
+        "Each FreeCAD release before 1.1.3 has one or more of these issues",
+        "1.1.1 functional compatibility decision",
+        "not a security endorsement",
+        "panel found no TrackTemplate compatibility defect",
+        "cannot examine a packaged Workbench or Addon",
+        "Timing differences are not defects or Phase 6 Exit 4 evidence",
+        "changes no tracktemplate product module",
+        "Phase 10 package.xml intent stays at exact 1.1.1",
+        "PR-17 — persistence or migration corruption",
+        "Continue with bounded conditions",
+        "D-GOV-006 — Qualify the exact FreeCAD 1.1.3 host profile",
+        "changes compatibility authority only",
+        "Output stays private-development",
+        "Project status stays unknown",
+    ):
+        _require(
+            required_clause in compatibility_flat,
+            "D-GOV-006 evidence panel drifted: " + required_clause,
+        )
+    compatibility_qualification = _semantic_text(
+        direct_section_content(
+            compatibility_section,
+            "Qualification evidence",
+            level=3,
+        )
+    )
+    for required_clause in (
+        "initial invocation used flatpak run --command=FreeCADCmd",
+        "--pass option had no argument",
+        "the required argument for option '--pass' is missing",
+        "call_aQfBr45aDcefyiKCYr3AToMc",
+        "result for the invocation without a --pass argument is "
+        "fixture-or-harness-defect",
+        "contract command --pass --require-qualified was not the command "
+        "with exit code 1",
+        "invocation with exit code 1 did not produce a runtime record",
+        "Other runtime checks show that the installed host is the exact "
+        "1.1.3 host profile",
+        "After that, an invocation of the contract command qualified 1.1.3",
+        "diagnostic command --pass=--require-qualified gave the same result "
+        "as the contract command",
+        "does not replace the contract command",
+        "58bd07e3d79c706cdbb8c3cd41eb7cf2090c2d12437c197a05eb5a9945aeae69",
+    ):
+        _require(
+            required_clause in compatibility_qualification,
+            "D-GOV-006 qualification provenance drifted: "
+            + required_clause,
+        )
+    compatibility_host_review = _semantic_text(
+        direct_section_content(
+            compatibility_section,
+            "Official host review",
+            level=3,
+        )
+    )
+    for required_clause in (
+        "FreeCAD 1.1.3 release",
+        "security issues in FCStd and file handling",
+        "Each FreeCAD release before 1.1.3 has one or more of these issues",
+        "recommends that all users install 1.1.3",
+        "1.1.1 functional compatibility decision",
+        "not a security endorsement",
+    ):
+        _require(
+            required_clause in compatibility_host_review,
+            "D-GOV-006 official host security boundary drifted: "
+            + required_clause,
+        )
+    compatibility_issue9 = direct_section_content(
+        compatibility_section,
+        "Issue 9 review",
+        level=3,
+    )
+    for reviewed_path, scope_fragments in {
+        "reference/TERMINOLOGY.md": (
+            "three Host compatibility rows",
+            "Qualify and Requalify technical-verb rows",
+        ),
+        "reference/PROJECT_PLAN.md": (
+            "current owner view",
+            "D-GOV-006 summary",
+            "D-GOV-006 decision row",
+            "compatibility authority link",
+        ),
+        "reference/VALIDATION.md": (
+            "full FreeCAD document validation unit",
+            "Phase 1 runtime and legacy ingress compatibility unit",
+        ),
+        "reference/contracts/phase1-compatibility.json": (
+            "human-readable scope strings",
+            "security boundary",
+            "1.1.3 evidence strings",
+            "support rule",
+            "evidence-gap string",
+        ),
+        "reference/current/PHASE_EVIDENCE.md": (
+            "full D-GOV-006 panel",
+            "D-GOV-006 carried-control sentences",
+        ),
+        "reference/current/gate-decisions.json": (
+            "human-readable D-GOV-006 record",
+            "Exact JSON data stays outside",
+        ),
+    }.items():
+        _require(
+            reviewed_path in compatibility_issue9
+            and all(
+                fragment in compatibility_issue9
+                for fragment in scope_fragments
+            ),
+            "D-GOV-006 Issue 9 review scope drifted: " + reviewed_path,
+        )
+    compatibility_issue9_flat = _semantic_text(compatibility_issue9)
+    for required_clause in (
+        "official Issue 9 standard",
+        "TrackTemplate UK English spelling directive",
+        "Before the final reviews, ASD-STE100 Issue 9 conformance was not "
+        "verified",
+        "these six corrected units",
+        "final documentation review must examine this exact state",
+        "pull request and completion report must record the result",
+        "Unknown for live prose outside the TT-DOC-001, TT-DOC-002, and "
+        "D-GOV-006 tables",
+        "Frozen history also stays outside this assessment",
+    ):
+        _require(
+            required_clause in compatibility_issue9_flat,
+            "D-GOV-006 Issue 9 result or limitation drifted: "
+            + required_clause,
+        )
+    compatibility_review = _semantic_text(
+        direct_section_content(
+            compatibility_section,
+            "Review state",
+            level=3,
+        )
+    )
+    for required_clause in (
+        "initial compatibility review examined FreeCAD and the API",
+        "Its result was BLOCKED",
+        "reviewer found no host-compatibility defect",
+        "command record was not correct",
+        "security limitation and Issue 9 review were missing",
+        "initial quality review examined authority and preservation",
+        "Its result was PASS WITH FINDINGS",
+        "found no supported-scope blocker",
+        "initial quality reviewer did not have the session call",
+        "reviewers did not change the candidate",
+        "two reviewers must examine the final exact state",
+        "two final reviews must find no blocker before merge",
+        "pull request and completion report must record the two final results",
+        "panel must not change after the reviews",
+    ):
+        _require(
+            required_clause in compatibility_review,
+            "D-GOV-006 independent review state drifted: "
+            + required_clause,
+        )
+    compatibility_decision_paragraphs = _blockquote_paragraphs(
+        compatibility_section
+    )
+    _require(
+        any(
+            "This decision changes compatibility authority only" in paragraph
+            for paragraph in compatibility_decision_paragraphs
+        )
+        and any(
+            "Phase 6 stays at 2/5" in paragraph
+            and "Exits 1, 4, and 5 stay Pending" in paragraph
+            for paragraph in compatibility_decision_paragraphs
+        ),
+        "D-GOV-006 owner decision changed phase or exit authority",
+    )
     current_register_flat = _semantic_text(
         direct_section_content(current_evidence, "Carried controls and exclusions")
     )
     for required_clause in (
-        "TT-DOC-001 and TT-DOC-002",
+        "TT-DOC-001",
+        "TT-DOC-002",
         "TT-DOC-002 corrects only the spelling directive",
+        "D-GOV-006 qualifies only the exact FreeCAD 1.1.3 profile",
     ):
         _require(
             required_clause in current_register_flat,
@@ -2005,7 +2229,13 @@ def _validate_decisions(plan: str) -> None:
             == (
                 "2026-08-15"
                 if decision_id
-                in {"D-P6-004", "D-P6-005", "TT-DOC-001", "TT-DOC-002"}
+                in {
+                    "D-P6-004",
+                    "D-P6-005",
+                    "TT-DOC-001",
+                    "TT-DOC-002",
+                    "D-GOV-006",
+                }
                 else (
                     "2026-08-02"
                     if decision_id in {"D-P6-002", "D-P6-003"}
@@ -2204,6 +2434,51 @@ def _validate_decisions(plan: str) -> None:
         _require(
             fragment in spelling_semantic,
             "TT-DOC-002 authority or exclusion drifted: " + fragment,
+        )
+    compatibility_record = phase6_by_id["D-GOV-006"]
+    compatibility_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#freecad-1-1-3-compatibility-requalification-panel"
+    )
+    _require(
+        compatibility_record["decision"]
+        == "Qualify the exact FreeCAD 1.1.3 host profile."
+        and compatibility_record["evidence"] == compatibility_panel
+        and compatibility_record["panel_record"] == compatibility_panel,
+        "D-GOV-006 decision or panel routing drifted",
+    )
+    compatibility_semantic = _semantic_text(
+        str(compatibility_record["authority"])
+        + " "
+        + str(compatibility_record["exclusions"])
+    )
+    for fragment in (
+        "724a3b79ab5b71025041e84eac3501a457b3fb76",
+        "exact Linux x86_64 stable org.freecad.FreeCAD Flatpak FreeCAD 1.1.3",
+        "CPython 3.13.14",
+        "PySide6/Qt 6.10.3",
+        "OpenCASCADE 7.8.1",
+        "Coin 4.0.8",
+        "only the exact 1.1.1 and 1.1.3 host profiles",
+        "1.1.1 evidence keeps its host identity",
+        "must not use metadata that records support for 1.1.2",
+        "FreeCAD 1.1.2 and all other FreeCAD releases",
+        "security issues for all releases before 1.1.3",
+        "1.1.1 decision gives functional compatibility authority only",
+        "not a security endorsement",
+        "changes compatibility authority only",
+        "changes no product source",
+        "risk disposition, phase, or exit",
+        "Phase 6 stays at 2/5",
+        "Exits 1, 4, and 5 stay Pending",
+        "Output stays private-development",
+        "Project status stays unknown",
+        "gives no production, physical-output, project-cleared, packaging, "
+        "release, or tagging authority",
+    ):
+        _require(
+            fragment in compatibility_semantic,
+            "D-GOV-006 authority or exclusion drifted: " + fragment,
         )
     current_records = document["decisions"]
     _require(

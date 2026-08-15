@@ -240,13 +240,25 @@ def validate_closeout(data, check_repository=True):
     profiles = runtime.get("qualified_profiles") or []
     if compatibility.get("status") != (
         "phase1-policy-accepted-phase2-development-guard-implemented-"
-        "broader-qualification-not-started"
+        "two-exact-freecad-profiles-qualified"
     ):
         errors.append("compatibility contract status drifted")
-    if len(profiles) != 1 or profiles[0].get("profile_id") != (
-        "linux-x86_64-flatpak-freecad-1.1.1"
-    ) or profiles[0].get("status") != "qualified-reference-and-initial-rc-profile":
-        errors.append("qualified runtime profile set drifted")
+    actual_profiles = [
+        (profile.get("profile_id"), profile.get("status"))
+        for profile in profiles
+        if isinstance(profile, dict)
+    ]
+    if actual_profiles != [
+        (
+            "linux-x86_64-flatpak-freecad-1.1.1",
+            "qualified-reference-and-initial-rc-profile",
+        ),
+        (
+            "linux-x86_64-flatpak-freecad-1.1.3",
+            "qualified-patch-requalification-profile",
+        ),
+    ]:
+        errors.append("current qualified runtime profile set drifted")
     expected_platforms = [
         ("Linux x86_64 stable org.freecad.FreeCAD Flatpak", "qualified"),
         ("Other Linux packages or architectures", "qualification-pending"),

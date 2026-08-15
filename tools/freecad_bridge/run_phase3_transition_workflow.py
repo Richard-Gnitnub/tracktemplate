@@ -41,6 +41,10 @@ B15_MACRO = PROJECT_ROOT / (
     "model_railway_curve_template_multitrack_v10_2a8a7b15_"
     "chair_performance_and_representation.FCMacro"
 )
+QUALIFIED_PROFILE_IDS = {
+    "linux-x86_64-flatpak-freecad-1.1.1",
+    "linux-x86_64-flatpak-freecad-1.1.3",
+}
 
 
 def _close_all_documents(client):
@@ -194,8 +198,7 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
         routed = state["transition_workflow"]
         if (
             routed.get("development_checkpoint") != "10.2A8A7B16"
-            or routed.get("matched_profile_id")
-            != "linux-x86_64-flatpak-freecad-1.1.1"
+            or routed.get("matched_profile_id") not in QUALIFIED_PROFILE_IDS
             or (routed.get("routing") or {}).get("route") != args.route
             or routed.get("active_route_after_workflow") != args.route
             or routed.get("workflow_version") != "10.2A8A7B15"

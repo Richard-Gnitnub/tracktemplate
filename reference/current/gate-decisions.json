@@ -90,6 +90,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#tt-doc-002-uk-english-spelling-correction-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#tt-doc-002-uk-english-spelling-correction-panel"
+    },
+    {
+      "id": "D-GOV-006",
+      "decided_on": "2026-08-15",
+      "status": "Accepted",
+      "decision": "Qualify the exact FreeCAD 1.1.3 host profile.",
+      "authority": "At protected `main` `724a3b79ab5b71025041e84eac3501a457b3fb76`, the project owner qualifies the exact Linux x86_64 stable `org.freecad.FreeCAD` Flatpak FreeCAD 1.1.3 profile. The bundled stack contains CPython 3.13.14, PySide6/Qt 6.10.3, OpenCASCADE 7.8.1, and Coin 4.0.8. The compatibility contract names only the exact 1.1.1 and 1.1.3 host profiles. The 1.1.1 evidence keeps its host identity. The Phase 10 `package.xml` intent does not change. Phase 10 must not use metadata that records support for 1.1.2.",
+      "exclusions": "FreeCAD 1.1.2 and all other FreeCAD releases, platforms, architectures, package channels, and bundled stacks are not qualified. FreeCAD records security issues for all releases before 1.1.3. It recommends installation of 1.1.3. The 1.1.1 decision gives functional compatibility authority only. It is not a security endorsement.\n\nThis decision changes compatibility authority only. It changes no product source, railway behaviour, canonical geometry, schema, persisted identifier, API, output format, generated output, risk disposition, phase, or exit.\n\nPhase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Output stays private-development. Project status stays `unknown`. It gives no production, physical-output, `project-cleared`, packaging, release, or tagging authority.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-compatibility-requalification-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-compatibility-requalification-panel"
     }
   ]
 }

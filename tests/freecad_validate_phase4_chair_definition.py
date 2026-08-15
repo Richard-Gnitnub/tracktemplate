@@ -41,9 +41,10 @@ reopened = api.chair_definition_package_from_json(encoded, manifest_text)
 status = api.chair_definition_package_status(reopened, manifest_text)
 after = _document_state()
 
-assert qualification["compatibility_evaluation"]["matched_profile_id"] == (
-    "linux-x86_64-flatpak-freecad-1.1.1"
-)
+assert qualification["compatibility_evaluation"]["matched_profile_id"] in {
+    "linux-x86_64-flatpak-freecad-1.1.1",
+    "linux-x86_64-flatpak-freecad-1.1.3",
+}
 assert reopened == package
 assert api.chair_definition_package_to_json(reopened) == encoded
 assert status["status"] == "blocked"

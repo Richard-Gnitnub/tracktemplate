@@ -1574,6 +1574,203 @@ outside the logical units in the two tables.
 > Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Output stays
 > private-development. Project status stays `unknown`.
 
+<a id="freecad-1-1-3-compatibility-requalification-panel"></a>
+
+## FreeCAD 1.1.3 compatibility requalification panel and owner decision
+
+This Level 3 panel changes host-compatibility authority only. It uses protected
+`main` `724a3b79ab5b71025041e84eac3501a457b3fb76` as its source state. Phase 6
+stays at 2/5. Exits 1, 4, and 5 stay Pending. Output stays
+private-development. Project status stays `unknown`.
+
+### Owner view
+
+| Field | Result |
+| --- | --- |
+| Current state | The exact Linux x86_64 Flatpak FreeCAD 1.1.1 profile is qualified. The installed 1.1.3 host was not qualified before this panel. |
+| What changed | The panel also qualifies the exact host profile for FreeCAD 1.1.3. It changes no product source or product behaviour. |
+| What now works | The host matrix gave the specified results for B16 loading, persistence, migration, GUI operation, exact geometry, and DXF on 1.1.3. |
+| Limitations/findings | FreeCAD 1.1.2 and all other releases are not qualified. Only the recorded Linux x86_64 stable Flatpak bundled stack has this result. Phase 10 owns the packaged Workbench and `package.xml` evidence. FreeCAD recommends 1.1.3 for security. The 1.1.1 decision is not a security endorsement. |
+| Owner decision | D-GOV-006 is Accepted for the exact 1.1.3 profile only. |
+| Next action | Publish the exact reviewed change. Do not start a new development tranche in this cycle. |
+
+### Official host review
+
+The [FreeCAD 1.1.3 release](https://github.com/FreeCAD/FreeCAD/releases/tag/1.1.3)
+is a maintenance and security release. The FreeCAD release record gives
+changes that can have an effect on TrackTemplate. These changes include module discovery,
+FCStd handling, Python-object loading, selection, visibility, and document save
+behaviour. Thus, the panel used the host matrix in the compatibility contract.
+The patch number was not compatibility evidence.
+
+The FreeCAD release records security issues in FCStd and file handling. Each
+FreeCAD release before 1.1.3 has one or more of these issues. FreeCAD recommends
+that all users install 1.1.3. This does not remove the 1.1.1 functional
+compatibility decision. That decision is not a security endorsement.
+
+The installed host gave this exact runtime record:
+
+| Component | FreeCAD 1.1.1 host profile | FreeCAD 1.1.3 host profile | Classification |
+| --- | --- | --- | --- |
+| FreeCAD | `1.1.1`, revision `44874`, commit `0108fd4b4850cc46e625b60e53cea7a7bbe69f8d` | `1.1.3`, revision `44987`, commit `145529fe741292ff0b3977a01195bf0247425794` | Expected host-version difference with no TrackTemplate contract effect |
+| CPython | `3.13.14` | `3.13.14` | Unchanged |
+| PySide6 / Qt | `6.10.3` / `6.10.3` | `6.10.3` / `6.10.3` | Unchanged |
+| OpenCASCADE | `7.8.1` | `7.8.1` | Unchanged |
+| Coin | `SIM Coin 4.0.8` | `SIM Coin 4.0.8` | Unchanged |
+| Platform | Linux x86_64 stable `org.freecad.FreeCAD` Flatpak | Linux x86_64 stable `org.freecad.FreeCAD` Flatpak | Unchanged |
+
+### Qualification evidence
+
+The initial assessment used a temporary detached worktree. The temporary contract
+in that worktree added only the exact 1.1.3 candidate profile. The primary
+checkout did not change during that assessment. Each FreeCAD process used a new
+document or a copied fixture. Source fixture hashes did not change.
+
+| Evidence boundary | Command or runner | Result on 1.1.3 | Comparison |
+| --- | --- | --- | --- |
+| Exact host and bundled stack | `tools/runtime_compatibility_probe.py --pass --require-qualified` in FreeCADCmd | The probe qualified `linux-x86_64-flatpak-freecad-1.1.3`. | Only the exact host profile changed. The other bundled stack values did not change. |
+| B16 package and launcher loading | `tests/freecad_validate_phase2_foundation.py` | The test gave PASS and its specified sentinel. It changed no document. | The result did not change. |
+| Modular routing and legacy-host load | `tests/freecad_validate_phase3_transition_slice.py` | The test gave PASS and its specified sentinel. | The result did not change. |
+| Canonical state and recompute boundary | `tests/freecad_validate_phase4_transition_state.py` | The test gave PASS and its specified sentinel. | The result did not change. |
+| Document ownership, transactions, Undo/Redo, save/reopen, failure recovery, and cleanup | `tests/freecad_validate_phase4_transition_persistence.py` | The test gave PASS and its specified sentinel. | The result did not change. |
+| B14/B15 ingress detection and read-only family assessment | `tests/freecad_validate_phase4_legacy_document_detection.py` and `tests/freecad_validate_phase4_plain_line_transition_assessment.py` | The two tests gave PASS and their specified sentinels. | The results did not change. |
+| Accepted migration family | `tests/freecad_validate_phase4_plain_line_transition_migration.py` in FreeCADCmd and isolated real GUI | The two execution modes gave PASS and the specified sentinel. | The result did not change. |
+| Python package and chair-definition import | `tests/freecad_validate_phase4_chair_definition.py` | The test gave PASS and its specified sentinel. It changed no document. | The result did not change. |
+| Pivy/Coin, edit, ViewProvider, display, selection, and explicit activation | Phase 5 Coin/edit checks and `tools/freecad_bridge/run-phase5-transition-viewprovider` | The tests gave PASS and the specified headless and real-GUI sentinels. | Version and profile fields changed. Contract results did not change. |
+| Entry/Exit parity workflow on a qualified host | `tools/freecad_bridge/run-phase3-transition-workflows` | All four routes gave PASS. | Contract results did not change. Timings are not qualification evidence. |
+| Exact contract and transient Part lifecycle | Phase 6 exact-contract and exact-geometry FreeCADCmd checks | The two tests gave PASS and their specified sentinels. | The results did not change. |
+| Deterministic DXF, manifest, import, failure, cleanup, and D-P6-003 recovery | Phase 6 standalone and FreeCADCmd DXF checks | The two tests gave PASS and their specified sentinels. | Names, bytes, hashes, schema, identifiers, and recovery results did not change. |
+
+These raw records contain the qualification proof:
+
+- `benchmark-output/validation-pipeline/20260815T195204447910Z/` contains the
+  corrected standalone profile with 187 parsed files and 59 of 59 results.
+- `benchmark-output/validation-pipeline/20260815T184826613031Z/` contains the
+  1.1.3 transition host and GUI profile.
+- `benchmark-output/freecad113-requalification/20260815T184944Z/`
+- `benchmark-output/freecad-bridge/phase3-transition-workflow-runs/20260815T190953973316Z-series/`.
+
+An initial invocation used `flatpak run --command=FreeCADCmd
+org.freecad.FreeCAD tools/runtime_compatibility_probe.py --pass`. The `--pass`
+option had no argument. FreeCADCmd stopped with exit code 1 before the script
+started. The initial error was
+`the required argument for option '--pass' is missing`. Codex session call
+`call_aQfBr45aDcefyiKCYr3AToMc` contains the exact command and raw output.
+
+The session call also contains the working directory, exit code, and initial
+error. The invocation with exit code 1 did not produce a runtime record. Other
+runtime checks show that the installed host is the exact 1.1.3 host profile.
+The source state for the invocation with exit code 1 was the protected baseline.
+
+The result for the invocation without a `--pass` argument is
+`fixture-or-harness-defect`. The contract command `--pass --require-qualified`
+was not the command with exit code 1. After that, an invocation of the contract
+command qualified 1.1.3. The diagnostic command `--pass=--require-qualified`
+gave the same result as the contract command. It does not replace the contract
+command. The two result logs have SHA-256
+`58bd07e3d79c706cdbb8c3cd41eb7cf2090c2d12437c197a05eb5a9945aeae69`.
+
+The command correction changed no product requirement.
+
+The panel found no TrackTemplate compatibility defect. It cannot examine a
+packaged Workbench or Addon because Phase 10 does not have that evidence. It also
+cannot examine Windows, macOS, non-Flatpak Linux, other architectures,
+FreeCAD 1.1.2, other FreeCAD releases, or other bundled stacks. Timing
+differences are not defects or Phase 6 Exit 4 evidence in this cycle.
+
+### API, object-model, and preservation result
+
+The public API, schemas, identifiers, canonical railway state, persistence
+payloads, output formats, and generated bytes do not change. The runtime
+evaluator accepts a list of exact profiles. This cycle changes no
+`tracktemplate` product module. Host validators accept only the two named
+profile IDs.
+
+The 1.1.1 evidence and performance reports keep their host identity. The Phase
+10 `package.xml` intent stays at exact 1.1.1. A version range includes
+FreeCAD 1.1.2 without evidence. Phase 10 must select manifest metadata
+from its current evidence.
+
+### Issue 9 review
+
+The documentation review used the
+[official Issue 9 standard](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf)
+and the TrackTemplate UK English spelling directive. It examined each full
+logical unit in this table.
+
+| Path | Full logical unit |
+| --- | --- |
+| `reference/TERMINOLOGY.md` | The three Host compatibility rows and the Qualify and Requalify technical-verb rows. |
+| `reference/PROJECT_PLAN.md` | The current owner view, the D-GOV-006 summary, the D-GOV-006 decision row, and the compatibility authority link. |
+| `reference/VALIDATION.md` | The full FreeCAD document validation unit and the Phase 1 runtime and legacy ingress compatibility unit. |
+| `reference/contracts/phase1-compatibility.json` | The changed human-readable scope strings, security boundary, 1.1.3 evidence strings, support rule, and evidence-gap string. |
+| `reference/current/PHASE_EVIDENCE.md` | This full D-GOV-006 panel and the D-GOV-006 carried-control sentences. |
+| `reference/current/gate-decisions.json` | The human-readable D-GOV-006 record. Exact JSON data stays outside the linguistic assessment. |
+
+Before the final reviews, ASD-STE100 Issue 9 conformance was not verified for
+these six corrected units. The final documentation review must examine this
+exact state with the TrackTemplate UK English spelling directive. The pull
+request and completion report must record the result. Exact identifiers, JSON
+keys, commands, hashes, and machine values stay outside the linguistic review.
+Issue 9 conformance stays Unknown
+for live prose outside the TT-DOC-001, TT-DOC-002, and D-GOV-006 tables. Frozen
+history also stays outside this assessment.
+
+### Review state
+
+The initial compatibility review examined FreeCAD and the API. Its result was
+BLOCKED. The reviewer found no host-compatibility defect. It found that the
+command record was not correct. The security limitation and Issue 9 review were
+missing.
+
+The initial quality review examined authority and preservation. Its result was
+PASS WITH FINDINGS. It found no supported-scope blocker.
+
+The initial quality reviewer did not have the session call. The reviewers did not
+change the candidate. The two reviewers must examine the final exact state. The
+two final reviews must find no blocker before merge. The pull request and
+completion report must record the two final results. This panel must not change
+after the reviews.
+
+### Risk panel
+
+| Risk | Panel judgement | Result |
+| --- | --- | --- |
+| PR-01 — incomplete release workflow coverage | The current B16 host matrix gave the specified results. Phase 10 owns packaged Workbench and release coverage. | High / Remove / Partial. The disposition does not change. |
+| PR-17 — persistence or migration corruption | Headless and real-GUI checks examined transactions, Undo/Redo, copied targets, save/reopen, failures, and source preservation on 1.1.3. | Critical / Mitigate / Partial. The disposition does not change. |
+| PR-22 — authority transfer without independent challenge | The owner gave exact Level 3 authority. Two new read-only reviews and exact-head CI are necessary before merge. | High / Remove / Effective (current scope). The disposition does not change. |
+| PR-13 — repository or evidence loss | The cycle uses a clean baseline, bounded paths, protected-main merge, and a full post-merge preservation audit. | Critical / Mitigate / Effective (current scope). The disposition does not change. |
+
+**Panel recommendation:** **Continue with bounded conditions.** Qualify only
+the exact recorded 1.1.3 profile. Keep 1.1.1 qualified. Do not qualify 1.1.2 or
+any other host. Preserve all stated product, phase, output, risk,
+packaging, and release boundaries.
+
+> **D-GOV-006 — Qualify the exact FreeCAD 1.1.3 host profile**
+>
+> At protected `main` `724a3b79ab5b71025041e84eac3501a457b3fb76`, I
+> qualify the exact Linux x86_64 stable `org.freecad.FreeCAD` Flatpak FreeCAD
+> 1.1.3 profile. The bundled stack contains CPython 3.13.14, PySide6/Qt 6.10.3,
+> OpenCASCADE 7.8.1, and Coin 4.0.8. The compatibility contract names only the
+> exact 1.1.1 and 1.1.3 host profiles.
+>
+> FreeCAD 1.1.2 and all other FreeCAD releases, platforms, architectures,
+> package channels, and bundled stacks are not qualified. The 1.1.1 evidence
+> keeps its host identity. The Phase 10 `package.xml` intent does not change.
+> Phase 10 must not use metadata that records support for 1.1.2.
+>
+> FreeCAD records security issues for all releases before 1.1.3. It recommends
+> installation of 1.1.3. The 1.1.1 decision gives functional
+> compatibility authority only. It is not a security endorsement.
+>
+> This decision changes compatibility authority only. It changes no product
+> source, railway behaviour, canonical geometry, schema, persisted identifier,
+> API, output format, generated output, risk disposition, phase, or exit.
+>
+> Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Output stays
+> private-development. Project status stays `unknown`. It gives no production,
+> physical-output, `project-cleared`, packaging, release, or tagging authority.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -1603,11 +1800,16 @@ switch children to accumulate.
 The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
-D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001 and
-TT-DOC-002.
+D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001,
+TT-DOC-002 and D-GOV-006.
+
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.
-D-P6-005 accepts only the bounded Exit 3 claim. Every other exit, clearance,
-support, schema, oracle-retirement, budget, packaging, release, and later-phase
-decision stays separately controlled. TT-DOC-001 changes only documentation
-governance and presentation. TT-DOC-002 corrects only the spelling directive.
+D-P6-005 accepts Exit 3 only in its bounded scope.
+
+All other decisions about exits, clearance, support, schema, oracle retirement,
+budgets, packaging, releases, and subsequent phases stay separately controlled.
+TT-DOC-001 changes only documentation governance and presentation. TT-DOC-002
+corrects only the spelling directive. D-GOV-006 qualifies only the exact
+FreeCAD 1.1.3 profile and preserves all other compatibility, product, phase,
+risk, output, packaging and release boundaries.
