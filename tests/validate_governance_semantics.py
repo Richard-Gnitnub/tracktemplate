@@ -743,28 +743,75 @@ def validate_current_evidence_mutations() -> None:
             phase5_closeout,
             replace_once(evidence, exit2_row, exit2_downgraded),
         ),
-        "Phase 6 exits do not match the accepted 1/5 dispositions",
+        "Phase 6 exits do not match the accepted 2/5 dispositions",
     )
 
     exit3_row = table_row_containing(
         evidence,
-        "implementation and retained evidence are present and are now judged "
-        "against the D-P6-004 supported failure model",
+        "Evidenced and owner-accepted under D-P6-005",
     )
-    exit3_promoted = replace_once(
+    exit3_downgraded = replace_once(
         exit3_row,
-        "Pending — implementation",
-        "Evidenced — implementation",
+        "Evidenced and owner-accepted under D-P6-005",
+        "Pending",
     )
     expect_rejected(
-        "phase-evidence/exit3-prematurely-evidenced",
+        "phase-evidence/exit3-acceptance-downgraded",
         lambda: progress._validate_exit_conditions(
             plan,
             phase4_closeout,
             phase5_closeout,
-            replace_once(evidence, exit3_row, exit3_promoted),
+            replace_once(evidence, exit3_row, exit3_downgraded),
         ),
-        "Phase 6 exits do not match the accepted 1/5 dispositions",
+        "Phase 6 exits do not match the accepted 2/5 dispositions",
+    )
+
+    exit3_authority = blockquote_paragraph_containing(
+        evidence,
+        "At protected `main` `7198b05b6a4b7e4654b7d02d0bad4e5cf627a799`",
+    )
+    weakened_exit3_authority = replace_once(
+        exit3_authority,
+        "private-development DXF-and-dependency-manifest route",
+        "all production exporter routes",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-authority-widened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                exit3_authority,
+                weakened_exit3_authority,
+            ),
+        ),
+        "D-P6-005 panel exact owner decision drifted or was relocated",
+    )
+
+    exit3_limitations = blockquote_paragraph_containing(
+        evidence,
+        "published finals must never be deleted",
+    )
+    destructive_exit3_limitations = replace_once(
+        exit3_limitations,
+        "must never be deleted",
+        "may be deleted",
+    )
+    expect_rejected(
+        "phase-evidence/exit3-destructive-recovery-authorised",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                exit3_limitations,
+                destructive_exit3_limitations,
+            ),
+        ),
+        "D-P6-005 panel exact owner decision drifted or was relocated",
     )
 
     recovery_review_row = table_row_containing(
@@ -1166,7 +1213,7 @@ def validate_current_evidence_mutations() -> None:
             phase5_closeout,
             replace_once(evidence, exit4_row, exit4_promoted),
         ),
-        "Phase 6 exits do not match the accepted 1/5 dispositions",
+        "Phase 6 exits do not match the accepted 2/5 dispositions",
     )
 
     performance_promoted = replace_once(
@@ -1312,17 +1359,17 @@ def validate_project_plan_mutations() -> None:
         plan,
         "| 6 | Explicit exact-validation and export seam",
     )
-    phase6_zero = replace_once(
+    phase6_previous = replace_once(
         phase6_row,
+        "2/5 evidenced",
         "1/5 evidenced",
-        "0/5 evidenced",
     )
     expect_rejected(
-        "project-plan/phase6-count-returned-to-zero",
+        "project-plan/phase6-count-returned-to-one",
         lambda: progress._validate_plan_shape(
-            replace_once(plan, phase6_row, phase6_zero)
+            replace_once(plan, phase6_row, phase6_previous)
         ),
-        "Phase 6 must remain current at the accepted 1/5 state",
+        "Phase 6 must remain current at the accepted 2/5 state",
     )
 
     exit2_row = table_row_containing(
@@ -1345,11 +1392,39 @@ def validate_project_plan_mutations() -> None:
         "project-plan Phase 6 exit states drifted",
     )
 
+    exit3_row = table_row_containing(
+        plan,
+        "Evidenced — owner-accepted 2026-08-15",
+    )
+    exit3_pending = replace_once(
+        exit3_row,
+        "Evidenced — owner-accepted 2026-08-15",
+        "Pending",
+    )
+    expect_rejected(
+        "project-plan/exit3-returned-to-pending",
+        lambda: progress._validate_exit_conditions(
+            replace_once(plan, exit3_row, exit3_pending),
+            read("reference/history/phase-closeouts/PHASE4_CLOSEOUT.md"),
+            read("reference/history/phase-closeouts/PHASE5_CLOSEOUT.md"),
+            read("reference/current/PHASE_EVIDENCE.md"),
+        ),
+        "project-plan Phase 6 exit states drifted",
+    )
+
     recovery_decision_row = table_row_containing(plan, "| D-P6-003 |")
     expect_rejected(
         "project-plan/d-p6-003-decision-omitted",
         lambda: progress._validate_decisions(
             replace_once(plan, recovery_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
+    acceptance_decision_row = table_row_containing(plan, "| D-P6-005 |")
+    expect_rejected(
+        "project-plan/d-p6-005-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, acceptance_decision_row + "\n", "")
         ),
         "project-plan decisions differ from the frozen registers",
     )

@@ -1,7 +1,8 @@
 # Phase 6 Explicit Exact-Validation and Export Seam Evidence
 
-Status: **Current — 1/5 evidenced. Exit 2 was owner-accepted under D-P6-002
-on 2026-08-02; exits 1, 3, 4 and 5 remain Pending.**
+Status: **Current — 2/5 evidenced. Exit 2 was owner-accepted under D-P6-002
+on 2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15; exits 1, 4 and 5
+remain Pending.**
 
 Phase 5 closed at 4/4 under D-P5-003 on 2026-08-01. Its complete accepted
 evidence, decisions and risk snapshot are frozen in the
@@ -1184,17 +1185,127 @@ instruction, the resulting decision is:
 > remains Pending. The next decision is a fresh Level 3 Exit 3 evidence-
 > admission panel against this supported model.
 
+<a id="phase-6-exit-3-supported-model-evidence-admission-panel"></a>
+
+## Phase 6 Exit 3 supported-model evidence-admission panel and owner decision
+
+**Decision and exact source state:** This Level 3 evidence-admission decision
+applies to protected `main` at
+`7198b05b6a4b7e4654b7d02d0bad4e5cf627a799`. Local `main`, `origin/main` and
+live protected GitHub `main` were equal and the working tree was clean before
+the panel. PR #42, D-P6-004 and its completed preservation audit remain
+accepted governance state. The later preservation-manifest discrepancy is
+retained as reconciled evidence: the original 1,150-line manifest preceded an
+intentional directly dependent validator addendum, the retained 1,160-line
+manifest has the later hash, the sixteenth path was authorised, the merge tree
+equals the reviewed head tree and all other tracked blobs were unchanged.
+
+**Criterion, participants and independence:** The panel assessed Phase 6 Exit
+3, “Export is deterministic and failure-safe”, against D-P6-003 and D-P6-004.
+Richard is project owner, panel chair and accepting authority. Codex presented
+the retained evidence. Two fresh read-only reviewers independently covered
+architecture/API/governance and filesystem security/recovery/failure safety;
+neither implemented the exporter or exercised owner authority. Both returned
+**PROCEED TO OWNER ACCEPTANCE WITH BOUNDED CONDITIONS**. There was no dissent.
+
+**Admitted evidence:** The retained exact implementation and evidence prove
+deterministic filenames, DXF/manifest bytes and hashes, schema and identifiers;
+descriptor-relative destination access and locking; anonymous staging;
+add-only, no-overwrite publication; exact-complete reuse; exact-partial
+monotonic completion; strict fail-closed handling of mismatched, symbolic-link,
+non-regular, substituted, replayed, inconsistent or ambiguous state; and
+preservation of every existing or published final. The supported matrix covers
+ordinary exceptions, explicit cancellation, retained tested `BaseException`
+boundaries, staging, publication, cleanup and durability failures,
+process-boundary termination, next-invocation recovery and qualified FreeCAD
+import/host execution. Retained protected CI and exact-source comparisons
+support the assessed state; this panel did not generate arbitrary new fault
+injection.
+
+**Conditions and assurance limitations:** Acceptance is confined to the
+private-development B16 Entry/Exit two-file DXF-and-manifest route and the
+qualified Linux x86_64 FreeCAD 1.1.1 profile with filesystems providing the
+tested `O_TMPFILE`, descriptor-relative `linkat`, advisory-lock and
+file/directory `fsync` primitives; unsupported primitives fail closed.
+Publication is sequentially visible rather than namespace-atomic; an exact
+partial may remain and may be completed only by a later independently
+validating normal invocation. Advisory locking coordinates cooperating
+exporters. Physical-power-loss durability, wider hosts/filesystems, background
+recovery and continuously active same-UID external mutation after final
+observation are not admitted. When surviving-host descriptor or lock release
+is uncertain, operators must preserve output, close FreeCAD completely,
+restart and reopen, inspect normally and retry through the normal exporter.
+Restart grants no same-host, destructive or manual recovery authority. A
+separate raw stdout artifact for the final qualified-host run was not located;
+the exact command, environment, sentinel and successful result remain durably
+recorded, so both reviewers classified this as an auditability limitation
+rather than a supported-model evidence gap.
+
+**Unsupported boundary and retained invariants:** Arbitrary asynchronous
+injection between every bytecode instruction, every unobservable acquisition
+or ownership-transfer micro-window and repeated interruption of cleanup remain
+deliberately unsupported. Their absence is not an evidence gap, but any probe
+remains a blocker when it proves deletion, overwrite, unsafe mutation, unsafe
+retry or another retained-invariant or supported-workflow violation. D-P6-003
+remains authoritative: no existing or published final may be unlinked,
+renamed, rewritten, truncated or replaced, and restart containment never
+authorises such mutation.
+
+**Safety/risk panel and retention:** No supported-model defect, unsafe recovery
+path, material evidence gap or contradiction with D-P6-003/D-P6-004 was found.
+PR-09 remains Critical/Remove/Partial, PR-13 remains
+Critical/Mitigate/Effective within its current scope, PR-16 remains
+High/Mitigate/Partial, PR-22 remains High/Remove/Effective within its current
+scope and QA-R03 remains High/Remove/Partial. No risk state, treatment,
+effectiveness or disposition changes. This decision changes governance status
+only; no product source, test oracle, schema, manifest, output byte, identifier
+or railway behaviour changes. Retention requires proportionate governance
+validation, fresh independent acceptance review, exact-head protected CI and
+preservation-audited protected-main integration.
+
+Under the project owner's explicit 2026-08-15 authority, the resulting
+decision is:
+
+> **D-P6-005 — Accept Phase 6 Exit 3 for the bounded B16 Entry/Exit exporter**
+>
+> At protected `main` `7198b05b6a4b7e4654b7d02d0bad4e5cf627a799`, I
+> accept Phase 6 Exit 3, “Export is deterministic and failure-safe”, as
+> Evidenced and owner-accepted only for the bounded B16 Entry/Exit
+> private-development DXF-and-dependency-manifest route under D-P6-003 and
+> D-P6-004. Phase 6 advances from 1/5 to 2/5.
+>
+> This acceptance covers deterministic names, bytes, hashes, schema and
+> identifiers; descriptor-relative add-only/no-overwrite publication;
+> exact-complete reuse; exact-partial monotonic completion; supported
+> exception, cancellation, retained interruption, staging, publication,
+> cleanup, durability and process-termination evidence; qualified FreeCAD
+> import and host execution; truthful conservative diagnostics; and
+> restart-based containment with independent destination revalidation.
+>
+> It does not extend assurance to arbitrary instruction-level asynchronous
+> interruption or repeated interruption of cleanup, physical power loss,
+> unqualified hosts or filesystems, continuously active external mutation
+> after final observation, or destructive or manual recovery. Existing and
+> published finals must never be deleted, renamed, rewritten, truncated,
+> replaced or manually altered to recover.
+>
+> Output remains private-development with project status `unknown`. No Exit 1,
+> 4 or 5; production or physical-output clearance; `project-cleared` status;
+> output equivalence; GUI/operator or wider-family authority; persisted
+> schema; retained exact geometry; performance acceptance; legacy retirement;
+> packaging; release; risk downgrade; or later-phase authority is granted.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
 
-The accepted current state is 1/5 under D-P6-002:
+The accepted current state is 2/5 under D-P6-002 and D-P6-005:
 
 | Exit condition | Current disposition |
 | --- | --- |
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
-| Export is deterministic and failure-safe | Pending — implementation and retained evidence are present and are now judged against the D-P6-004 supported failure model; a fresh Level 3 Exit 3 evidence-admission review and explicit owner acceptance remain absent |
+| Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005 — bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004 with the recorded platform, recovery and assurance limitations; project status remains `unknown` |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
@@ -1213,9 +1324,10 @@ switch children to accumulate.
 The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json); D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
-D-P6-001, D-GOV-005, D-P6-002, D-P6-003 and D-P6-004. Only Exit 2 receives
-Evidenced and owner-accepted status; D-P6-003 selects recovery authority and
-D-P6-004 defines the supported fault/evidence boundary. Every other exit,
-clearance, support, schema,
+D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004 and D-P6-005. Exits 2 and
+3 receive Evidenced and owner-accepted status; D-P6-003 selects recovery
+authority, D-P6-004 defines the supported fault/evidence boundary and D-P6-005
+accepts only the bounded Exit 3 claim. Every other exit, clearance, support,
+schema,
 oracle-retirement, budget, packaging, release and later-phase decision remains
 separately controlled.
