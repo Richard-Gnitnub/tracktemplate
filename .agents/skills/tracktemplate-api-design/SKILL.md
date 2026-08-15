@@ -65,6 +65,12 @@ Specify:
 
 Resolve these before choosing syntax or framework.
 
+For an exporter contract, treat interruption, failure, cleanup, retry and
+recovery guarantees as explicit contract terms governed by the canonical
+[supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).
+An implementation test or exploratory probe must not widen that supported
+contract implicitly.
+
 ## TrackTemplate design rules
 
 - Keep `tracktemplate.api` small; consumers must not import arbitrary internals.

@@ -751,6 +751,37 @@ remain bounded to the accepted Entry/Exit slice and private-development
 `unknown` output; they supply no GUI, production-output, Phase 6 exit or release
 acceptance.
 
+#### Supported exporter interruption evidence
+
+Exporter interruption evidence is interpreted against the canonical
+[supported exporter failure model](ARCHITECTURE.md#supported-exporter-failure-model)
+and the operator procedure in
+[Recovery after an abnormally interrupted export](RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export).
+The existing Phase 6 exporter commands above remain the durable entry points;
+this section does not create a second command catalogue.
+
+Mandatory retained evidence covers ordinary exceptions, explicit application
+cancellation, the expressly retained `BaseException` boundaries, and the
+accepted staging, publication, durability, cleanup and recovery matrix. It
+must preserve every pre-existing and published final, prove conservative
+diagnostics when durability or retained state is uncertain, exercise
+exact-partial and exact-complete next-invocation handling under D-P6-003, and
+retain qualified FreeCAD import and host-execution evidence within the
+documented platform and filesystem profile. Process-termination evidence is bounded to
+the operating-system process boundary where process-owned descriptors and
+advisory locks are released; restart alone is not destination-validation
+evidence.
+
+Retained mandatory tests and exploratory disposable probes have different
+authority. A probe outside the supported model may inform future architecture,
+but arbitrary asynchronous injection at an excluded instruction-level
+micro-window does not automatically become an implementation defect or Exit 3
+blocker. It does become a blocker when it demonstrates deletion, overwrite,
+corruption, unsafe mutation, failure of a supported workflow or accepted
+recovery boundary, unsafe retry, a false diagnostic or another retained
+mandatory-invariant violation. Current tranche chronology, temporary line
+numbers and individual probe narration do not belong in this durable contract.
+
 Repository recovery and ignored-data safety controls:
 
 ```bash

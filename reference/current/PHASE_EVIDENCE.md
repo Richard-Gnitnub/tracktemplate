@@ -1061,6 +1061,129 @@ cleanup, wider host/filesystem durability, GUI/operator recovery and
 production clearance remain outside the proof. Phase 6 remains 1/5, Exit 3
 remains Pending and no risk state or authority changes.
 
+<a id="phase-6-exporter-fault-model-clarification-panel"></a>
+
+## Phase 6 exporter fault-model clarification panel and owner decision
+
+**Decision and exact source state:** This Level 3 governance cycle starts from
+protected `main` at
+`d8e2b640da412ec0aff0300cd7344e78cec0048b`. It defines the supported failure
+model against which the existing private-development B16 Entry/Exit exporter
+implementation and retained evidence may later be judged. It changes no
+product source and does not admit or accept Exit 3 evidence. Phase 6 remains
+1/5 and Exit 3 remains Pending. The next decision is a fresh Level 3 Exit 3
+evidence-admission panel against the supported model.
+
+**Participants, roles and independence:** Richard is project owner, panel chair
+and accepting authority. Codex is the governance change owner and presents the
+repository evidence. Retention requires exactly two fresh read-only reviewers
+against one frozen candidate: one owns architecture/API/governance/
+documentation challenge and one owns security/recovery/evidence-boundary
+challenge. Neither reviewer may edit the candidate or exercise owner
+acceptance authority. Any correction requires affected validation and both
+reviews again.
+
+**Evidence and contradiction check:** The panel reviewed D-P6-003 and its
+strict add-only implementation evidence, the later surviving-host descriptor
+and advisory-lock repairs, the exact current Exit 3 disposition, the export
+architecture and validation contract, the recovery policy and PR-09, PR-13,
+PR-16, PR-22 and QA-R03. Earlier independent findings exposed material
+descriptor, lock, recoverability and diagnostic defects and produced retained
+systemic repairs. Later probes increasingly targeted arbitrary asynchronous
+interruption during otherwise unobservable Python ownership-transfer
+micro-windows; they did not demonstrate deletion, overwrite, corruption or
+unsafe mutation of a published final. No ordinary exception, explicit
+cancellation point, retained tested interruption boundary or accepted recovery
+path is excluded merely to obtain Exit 3.
+
+**Options and disposition:** Continuing without a finite model leaves an
+open-ended instruction-level review loop and cannot support a decidable safety
+claim. Defining one canonical supported model with process-local cleanup,
+restart containment and retained invariant blockers is selected as the
+smallest compatible clarification. An isolated short-lived helper process is
+the future option if cleanup across every arbitrary asynchronous interruption
+boundary is later required; it is not authorised or implemented here.
+
+**Accepted ownership split:**
+
+- [Supported exporter failure model](../ARCHITECTURE.md#supported-exporter-failure-model)
+  owns supported and deliberately unsupported failures, mandatory invariants,
+  restart containment and the non-authorised helper-process option.
+- [Supported exporter interruption evidence](../VALIDATION.md#supported-exporter-interruption-evidence)
+  owns mandatory retained evidence and the boundary for exploratory probes.
+- [Recovery after an abnormally interrupted export](../RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export)
+  owns the close, restart, reopen, inspect and normal retry procedure.
+- D-P6-003 remains authoritative for strict add-only, no-overwrite monotonic
+  completion. The skills route to these owners and do not duplicate them.
+
+**Safety/risk panel:** The outcome is **Proceed with bounded conditions**.
+Deterministic files and identifiers, descriptor-relative access, add-only and
+no-overwrite publication, exact-only reuse/completion, fail-closed rejection,
+published-file preservation, conservative diagnostics, the qualified platform
+restriction and private-development `unknown` output status all remain
+mandatory. Restart containment grants no deletion or replacement authority.
+PR-09 remains Critical/Remove/Partial, PR-13 remains
+Critical/Mitigate/Effective within its current scope, PR-16 remains
+High/Mitigate/Partial, PR-22 remains High/Remove/Effective within its current
+scope and QA-R03 remains High/Remove/Partial. No risk state, treatment,
+effectiveness or disposition changes.
+
+**Governance-budget exception and retention conditions:** This task exists to
+change architecture, validation, recovery and review authority, so its
+governance record necessarily exceeds its zero product-source lines. It may be
+retained only when the final semantic controls, complete standalone profile,
+exact-head protected CI and the two specified frozen-state reviews pass with
+no blocker. Those controls do not themselves accept Exit 3.
+
+Under the authority explicitly supplied by the project owner's 2026-08-15
+instruction, the resulting decision is:
+
+> **D-P6-004 — Define the supported exporter failure model and evidence
+> boundary**
+>
+> At protected-main baseline
+> `d8e2b640da412ec0aff0300cd7344e78cec0048b`, accept the canonical supported
+> exporter failure model, corresponding interruption-evidence boundary and
+> abnormal-interruption operator recovery procedure. The supported model
+> includes ordinary Python exceptions, explicit application cancellation,
+> retained expressly tested `BaseException` boundaries, accepted staging,
+> publication, cleanup and durability failures, D-P6-003 exact-partial and
+> exact-complete next-invocation recovery, process termination at the
+> operating-system descriptor/advisory-lock boundary, and qualified FreeCAD
+> import and host execution within the documented platform/filesystem profile.
+> Arbitrary asynchronous `BaseException` injection between every possible pair
+> of bytecode instructions, at every unobservable acquisition or ownership-
+> transfer micro-window, or repeatedly during cleanup itself is deliberately
+> unsupported. Such a probe is not automatically a defect or Exit 3 blocker;
+> it remains a blocker whenever it proves a retained mandatory-invariant,
+> supported-workflow or accepted-recovery-boundary violation.
+>
+> D-P6-003 remains authoritative. Deterministic names, bytes, hashes, schemas,
+> identifiers and receipt dispositions; descriptor-relative access; add-only,
+> no-overwrite publication; exact-only reuse and monotonic completion; strict
+> fail-closed rejection; preservation of every existing or published final;
+> the prohibition on unlink, rename, rewrite, truncation or replacement;
+> conservative diagnostics; the qualified platform restriction; private-
+> development `unknown` output status; and independent evidence plus explicit
+> owner acceptance remain mandatory. When resource release is uncertain after
+> an abnormal asynchronous interruption, supported containment is to preserve
+> output, close FreeCAD completely, restart and reopen, inspect normally and
+> retry through the normal exporter. Restart restores the process boundary but
+> does not prove destination correctness or authorise destructive recovery.
+>
+> If absolute cleanup across arbitrary instruction-level interruption is later
+> required, assess an isolated short-lived export helper process through a
+> separate architecture, security, API and Level 3 decision. This decision
+> implements no helper process, subprocess exporter, service, external
+> transaction manager, dependency, storage framework or exporter redesign. It
+> changes no product source, public or stored API, schema, manifest, output
+> byte, fixture or railway behaviour; grants no production, physical-output,
+> `project-cleared`, equivalence, GUI, wider-family, persistence, exact-
+> geometry, performance, legacy-retirement, packaging, release or tagging
+> authority; and changes no risk disposition. Phase 6 remains 1/5 and Exit 3
+> remains Pending. The next decision is a fresh Level 3 Exit 3 evidence-
+> admission panel against this supported model.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -1071,7 +1194,7 @@ The accepted current state is 1/5 under D-P6-002:
 | --- | --- |
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
-| Export is deterministic and failure-safe | Pending — the bounded D-P6-003 add-only implementation and focused condition 1/3 proof are present; conditions 2, 4 and 5 retain bounded evidence, while condition 6 still requires a fresh Level 3 evidence-admission review and explicit owner acceptance |
+| Export is deterministic and failure-safe | Pending — implementation and retained evidence are present and are now judged against the D-P6-004 supported failure model; a fresh Level 3 Exit 3 evidence-admission review and explicit owner acceptance remain absent |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
@@ -1090,8 +1213,9 @@ switch children to accumulate.
 The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json); D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
-D-P6-001, D-GOV-005, D-P6-002 and D-P6-003. Only Exit 2 receives Evidenced and
-owner-accepted status; D-P6-003 selects a recovery contract and later Level 2
-boundary only. Every other exit, clearance, support, schema,
+D-P6-001, D-GOV-005, D-P6-002, D-P6-003 and D-P6-004. Only Exit 2 receives
+Evidenced and owner-accepted status; D-P6-003 selects recovery authority and
+D-P6-004 defines the supported fault/evidence boundary. Every other exit,
+clearance, support, schema,
 oracle-retirement, budget, packaging, release and later-phase decision remains
 separately controlled.

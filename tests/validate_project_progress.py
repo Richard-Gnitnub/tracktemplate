@@ -118,6 +118,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-GOV-005",
     "D-P6-002",
     "D-P6-003",
+    "D-P6-004",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -229,10 +230,10 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "limitations"
     ),
     (
-        "Pending — the bounded D-P6-003 add-only implementation and focused "
-        "condition 1/3 proof are present; conditions 2, 4 and 5 retain bounded "
-        "evidence, while condition 6 still requires a fresh Level 3 "
-        "evidence-admission review and explicit owner acceptance"
+        "Pending — implementation and retained evidence are present and are "
+        "now judged against the D-P6-004 supported failure model; a fresh "
+        "Level 3 Exit 3 evidence-admission review and explicit owner "
+        "acceptance remain absent"
     ),
     (
         "Pending — PR #33 accounts for complete cold/warm Edit, Validate and "
@@ -891,11 +892,11 @@ def _validate_exit_conditions(
         and "D-P6-003 selects strict add-only, journal-free monotonic "
         "completion" in plan_flat
         and "authorises its later bounded Level 2 implementation" in plan_flat
-        and "Exit 3 remains Pending with condition 1 unimplemented"
+        and "D-P6-004 defines the finite supported exporter fault model" in plan_flat
+        and "bounded implementation and retained evidence are present"
         in plan_flat
-        and "condition 3 unproved" in plan_flat
-        and "fresh condition 6 evidence-admission panel still required"
-        in plan_flat,
+        and "formal Exit 3 evidence admission and owner acceptance remain "
+        "absent" in plan_flat,
         "Phase 6 Exit 2 acceptance or Exit 3 contract boundary is missing",
     )
 
@@ -1491,7 +1492,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-02",
+        and current_document["updated_on"] == "2026-08-15",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -1542,9 +1543,13 @@ def _validate_decisions(plan: str) -> None:
         _require(
             record["decided_on"]
             == (
-                "2026-08-02"
-                if decision_id in {"D-P6-002", "D-P6-003"}
-                else "2026-08-01"
+                "2026-08-15"
+                if decision_id == "D-P6-004"
+                else (
+                    "2026-08-02"
+                    if decision_id in {"D-P6-002", "D-P6-003"}
+                    else "2026-08-01"
+                )
             )
             and record["status"] == "Accepted"
             and record["panel_required_under_current_policy"] is True,

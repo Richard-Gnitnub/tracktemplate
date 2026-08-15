@@ -51,6 +51,11 @@ Use one of two modes:
 5. Read only the canonical project documents relevant to the change. Do not
    copy their policy into this skill or treat this skill as a second authority.
 
+Before judging exporter interruption probes or tests, read the canonical
+[supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).
+Do not silently widen it during staff review, and report any contradiction
+between an implementation or evidence claim and the actual supported contract.
+
 ## Review order
 
 Review requirement compliance before implementation quality:

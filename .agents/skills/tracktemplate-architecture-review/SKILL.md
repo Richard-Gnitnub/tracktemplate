@@ -39,6 +39,12 @@ scope or create a parallel ADR catalogue.
 4. Inspect the implementation, callers, tests and evidence that constrain the
    choice. Treat them as evidence rather than requirement authority.
 
+For exporter interruption or recovery, read the canonical
+[supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).
+Treat widening or narrowing that model as an architecture and Level 3
+project-owner decision. Compare process-local cleanup, restart containment and
+an isolated helper-process boundary before recommending any change.
+
 ## Review workflow
 
 1. **Frame the decision.** State the exact problem, decision owner, affected

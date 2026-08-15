@@ -39,6 +39,15 @@ Diagnose without retained edits unless the user also asks for a fix.
 If a selected test failed, invoke `$tracktemplate-change-validation` before
 editing retained source, tests, fixtures or expected results.
 
+Before treating an exporter interruption report as a defect, read the
+canonical [supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model)
+and classify the report as: (1) a failure inside that model; (2) an
+operator-recovery case covered by the
+[restart procedure](../../../reference/RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export);
+or (3) a deliberately unsupported arbitrary asynchronous interruption
+micro-window. Category 3 may support later architectural research but is not
+automatically a current implementation defect or phase-exit blocker.
+
 ## Investigation workflow
 
 1. **Trace the active path.** Confirm which launcher, package module, adapter,

@@ -301,6 +301,65 @@ implementation and focused interruption/recovery proof remain a later bounded
 Level 2 tranche; Exit 3 remains Pending until a fresh Level 3
 evidence-admission decision.
 
+#### Supported exporter failure model
+
+D-P6-004 is a successor clarification to D-P6-003, not a replacement for its
+accepted recovery authority. TrackTemplate guarantees deterministic,
+add-only, no-overwrite export within this defined, finite and testable
+supported failure model. Widening or narrowing that model requires a further
+Level 3 project-owner decision.
+
+The supported model includes ordinary Python exceptions; explicit application
+cancellation points; retained and expressly tested `BaseException`
+interruption boundaries; staging, publication, cleanup and durability failures
+in the accepted exporter validation matrix; exact-partial and exact-complete
+next-invocation recovery under D-P6-003; process termination where the
+operating system closes process-owned descriptors and releases advisory locks;
+and qualified FreeCAD import and host execution within the documented Linux
+and filesystem profile.
+
+The supported model deliberately excludes arbitrary asynchronous
+`BaseException` injection between every possible pair of Python bytecode
+instructions, at every unobservable acquisition or ownership-transfer
+micro-window, or repeatedly during cleanup itself. A disposable probe in such
+an excluded micro-window is research evidence, not automatically a current
+implementation defect or Exit 3 blocker. It remains a blocker when it exposes
+deletion, overwrite, corruption, unsafe mutation, a supported-workflow
+failure, unsafe retry, a false recovery claim or another retained mandatory
+invariant violation.
+
+All existing production-integrity invariants remain mandatory: deterministic
+DXF and manifest filenames, bytes and hashes; manifest schema, contract and
+result identifiers; receipt dispositions; descriptor-relative destination
+access; add-only and no-overwrite publication; exact-complete-pair reuse only;
+exact-partial monotonic completion only; and strict rejection of mismatched,
+symbolic-link, non-regular, substituted, replayed, inconsistent or ambiguous
+destination state. TrackTemplate preserves every existing or published final
+file and never unlinks, renames, rewrites, truncates or replaces one.
+Destination or durability uncertainty fails conservatively, and
+`destination_changed`, `cleanup_complete`, `recoverable` and related
+diagnostics remain truthful. Evidence stays restricted to the qualified
+Linux/filesystem profile, output stays private-development with project status
+`unknown`, and phase acceptance still requires independent evidence plus
+explicit project-owner authority.
+
+After an abnormal asynchronous interruption, closing FreeCAD completely is the
+supported containment boundary when descriptor or advisory-lock release in the
+surviving host cannot be established. The operator then follows
+[Recovery after an abnormally interrupted export](RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export).
+Restart restores the process boundary; it does not prove destination
+correctness. The next invocation independently inspects the destination and
+may complete an exact partial pair only through the D-P6-003 add-only protocol.
+Restart containment never permits deletion, replacement, overwrite or other
+mutation of an existing output member.
+
+If a later requirement demands guaranteed cleanup across arbitrary
+asynchronous interruption at every instruction boundary, an isolated,
+short-lived export helper process is the architectural option to assess. It is
+not authorised here and would require separate architecture, security, API and
+Level 3 authority. This decision adds no helper, subprocess, service, external
+transaction manager, dependency, storage framework or exporter redesign.
+
 ## Chair-definition and procedural-geometry contract
 
 Production chair geometry will use a neutral TrackTemplateMacro definition and
