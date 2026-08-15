@@ -57,6 +57,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exporter-fault-model-clarification-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exporter-fault-model-clarification-panel"
+    },
+    {
+      "id": "D-P6-005",
+      "decided_on": "2026-08-15",
+      "status": "Accepted",
+      "decision": "Accept Phase 6 Exit 3 for the bounded B16 Entry/Exit exporter.",
+      "authority": "At protected `main` `7198b05b6a4b7e4654b7d02d0bad4e5cf627a799`, I accept Phase 6 Exit 3, “Export is deterministic and failure-safe”, as Evidenced and owner-accepted only for the bounded B16 Entry/Exit private-development DXF-and-dependency-manifest route under D-P6-003 and D-P6-004. Phase 6 advances from 1/5 to 2/5. This acceptance covers deterministic names, bytes, hashes, schema and identifiers; descriptor-relative add-only/no-overwrite publication; exact-complete reuse; exact-partial monotonic completion; supported exception, cancellation, retained interruption, staging, publication, cleanup, durability and process-termination evidence; qualified FreeCAD import and host execution; truthful conservative diagnostics; and restart-based containment with independent destination revalidation.",
+      "exclusions": "It does not extend assurance to arbitrary instruction-level asynchronous interruption or repeated interruption of cleanup, physical power loss, unqualified hosts or filesystems, continuously active external mutation after final observation, or destructive or manual recovery. Existing and published finals must never be deleted, renamed, rewritten, truncated, replaced or manually altered to recover. Output remains private-development with project status `unknown`. No Exit 1, 4 or 5; production or physical-output clearance; `project-cleared` status; output equivalence; GUI/operator or wider-family authority; persisted schema; retained exact geometry; performance acceptance; legacy retirement; packaging; release; risk downgrade; or later-phase authority is granted.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-3-supported-model-evidence-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-3-supported-model-evidence-admission-panel"
     }
   ]
 }

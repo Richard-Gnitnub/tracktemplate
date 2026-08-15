@@ -341,24 +341,26 @@ def validate_skill_routing(documents: dict[str, str]) -> None:
 
 
 def validate_current_authority(documents: dict[str, str]) -> None:
-    """Protect D-P6-004, current status and unchanged risk dispositions."""
+    """Protect D-P6-004/D-P6-005, current status and risk dispositions."""
     plan = semantic(documents["plan"])
     require(
-        "Phase 6 current — 1/5 evidenced" in plan,
-        "PROJECT_PLAN lost Phase 6 1/5 status",
+        "Phase 6 current — 2/5 evidenced" in plan,
+        "PROJECT_PLAN lost Phase 6 2/5 status",
     )
     require(
-        "Export is deterministic and failure-safe | Pending" in plan,
-        "PROJECT_PLAN silently accepted Exit 3",
+        "Export is deterministic and failure-safe | Evidenced — "
+        "owner-accepted 2026-08-15" in plan,
+        "PROJECT_PLAN lost D-P6-005 Exit 3 acceptance",
     )
     require_fragments(
         "PROJECT_PLAN exporter dashboard",
         documents["plan"],
         (
             "D-P6-004 defines the finite supported exporter fault model",
-            "bounded implementation and retained evidence are present",
-            "formal Exit 3 evidence admission and owner acceptance remain "
-            "absent",
+            "D-P6-005 accepts only the bounded private-development B16 "
+            "Entry/Exit deterministic, failure-safe DXF-and-manifest route",
+            "advances Phase 6 to 2/5",
+            "project status remains `unknown`",
         ),
     )
 
@@ -385,34 +387,64 @@ def validate_current_authority(documents: dict[str, str]) -> None:
             "next decision is a fresh Level 3 Exit 3 evidence-admission panel",
         ),
     )
+    acceptance_panel = section(
+        evidence,
+        "## Phase 6 Exit 3 supported-model evidence-admission panel and "
+        "owner decision",
+    )
+    require_fragments(
+        "D-P6-005 panel",
+        acceptance_panel,
+        (
+            "7198b05b6a4b7e4654b7d02d0bad4e5cf627a799",
+            "PROCEED TO OWNER ACCEPTANCE WITH BOUNDED CONDITIONS",
+            "There was no dissent",
+            "No supported-model defect, unsafe recovery path, material "
+            "evidence gap or contradiction with D-P6-003/D-P6-004 was found",
+            "No risk state, treatment, effectiveness or disposition changes",
+            "Phase 6 advances from 1/5 to 2/5",
+            "published finals must never be deleted, renamed, rewritten, "
+            "truncated",
+            "replaced or manually altered to recover",
+            "Output remains private-development with project status `unknown`",
+            "No Exit 1",
+            "4 or 5; production or physical-output clearance",
+        ),
+    )
     current = section(
         evidence,
         "## Current Phase 6 exit-condition disposition",
     )
     require(
-        "| Export is deterministic and failure-safe | Pending" in current,
-        "current evidence silently accepted Exit 3",
+        "| Export is deterministic and failure-safe | Evidenced and "
+        "owner-accepted under D-P6-005" in current,
+        "current evidence lost D-P6-005 Exit 3 acceptance",
     )
     require(
-        "fresh Level 3 Exit 3 evidence-admission review and explicit owner "
-        "acceptance remain absent" in semantic(current),
-        "current evidence lost the fresh Exit 3 panel boundary",
+        "The accepted current state is 2/5 under D-P6-002 and D-P6-005"
+        in semantic(current),
+        "current evidence lost the accepted Phase 6 2/5 state",
     )
 
     decision_document = json.loads(documents["decisions"])
     decisions = decision_document["decisions"]
     ids = [record["id"] for record in decisions]
     require(len(ids) == len(set(ids)), "duplicate current decision ID")
-    require(ids[-1] == "D-P6-004", "D-P6-004 is not the next live decision")
-    record = decisions[-1]
     require(
-        record["status"] == "Accepted"
-        and record["decided_on"] == "2026-08-15",
+        ids[-2:] == ["D-P6-004", "D-P6-005"],
+        "D-P6-004/D-P6-005 decision order drifted",
+    )
+    fault_model_record = decisions[-2]
+    require(
+        fault_model_record["status"] == "Accepted"
+        and fault_model_record["decided_on"] == "2026-08-15",
         "D-P6-004 status or date drifted",
     )
     require_fragments(
         "D-P6-004 structured authority",
-        record["authority"] + " " + record["exclusions"],
+        fault_model_record["authority"]
+        + " "
+        + fault_model_record["exclusions"],
         (
             "d8e2b640da412ec0aff0300cd7344e78cec0048b",
             "ordinary Python exceptions",
@@ -428,14 +460,56 @@ def validate_current_authority(documents: dict[str, str]) -> None:
             "Phase 6 remains 1/5 and Exit 3 remains Pending",
         ),
     )
-    expected_panel = (
+    expected_fault_model_panel = (
         "reference/current/PHASE_EVIDENCE.md"
         "#phase-6-exporter-fault-model-clarification-panel"
     )
     require(
-        record["evidence"] == expected_panel
-        and record["panel_record"] == expected_panel,
+        fault_model_record["evidence"] == expected_fault_model_panel
+        and fault_model_record["panel_record"]
+        == expected_fault_model_panel,
         "D-P6-004 panel routing drifted",
+    )
+    acceptance_record = decisions[-1]
+    require(
+        acceptance_record["status"] == "Accepted"
+        and acceptance_record["decided_on"] == "2026-08-15"
+        and acceptance_record["decision"]
+        == "Accept Phase 6 Exit 3 for the bounded B16 Entry/Exit exporter.",
+        "D-P6-005 status, date or decision drifted",
+    )
+    require_fragments(
+        "D-P6-005 structured authority",
+        acceptance_record["authority"]
+        + " "
+        + acceptance_record["exclusions"],
+        (
+            "7198b05b6a4b7e4654b7d02d0bad4e5cf627a799",
+            "Evidenced and owner-accepted only for the bounded B16 "
+            "Entry/Exit private-development DXF-and-dependency-manifest "
+            "route under D-P6-003 and D-P6-004",
+            "Phase 6 advances from 1/5 to 2/5",
+            "descriptor-relative add-only/no-overwrite publication",
+            "restart-based containment with independent destination "
+            "revalidation",
+            "does not extend assurance to arbitrary instruction-level "
+            "asynchronous interruption",
+            "Existing and published finals must never be deleted, renamed, "
+            "rewritten, truncated, replaced or manually altered to recover",
+            "Output remains private-development with project status `unknown`",
+            "No Exit 1, 4 or 5",
+            "risk downgrade",
+        ),
+    )
+    expected_acceptance_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-3-supported-model-evidence-admission-panel"
+    )
+    require(
+        acceptance_record["evidence"] == expected_acceptance_panel
+        and acceptance_record["panel_record"]
+        == expected_acceptance_panel,
+        "D-P6-005 panel routing drifted",
     )
 
     risks = json.loads(documents["risks"])["risks"]
@@ -562,15 +636,16 @@ def validate_mutations(documents: dict[str, str]) -> None:
         ),
         (
             "plan",
-            "Phase 6 current — 1/5 evidenced",
             "Phase 6 current — 2/5 evidenced",
+            "Phase 6 current — 3/5 evidenced",
             "Phase 6 status widening",
         ),
         (
             "evidence",
+            "| Export is deterministic and failure-safe | Evidenced and "
+            "owner-accepted under D-P6-005",
             "| Export is deterministic and failure-safe | Pending",
-            "| Export is deterministic and failure-safe | Evidenced",
-            "Exit 3 silent acceptance",
+            "Exit 3 acceptance deletion",
         ),
         (
             "tracktemplate-change-validation",
@@ -606,7 +681,13 @@ def validate_mutations(documents: dict[str, str]) -> None:
             "decisions",
             "this decision does not accept Exit 3.",
             "this decision accepts Exit 3.",
-            "structured authority widening",
+            "D-P6-004 historical authority widening",
+        ),
+        (
+            "decisions",
+            "Existing and published finals must never be deleted",
+            "Existing and published finals may be deleted",
+            "D-P6-005 destructive recovery widening",
         ),
     )
     for key, original, replacement, label in mutations:

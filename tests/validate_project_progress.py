@@ -119,6 +119,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-P6-002",
     "D-P6-003",
     "D-P6-004",
+    "D-P6-005",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -218,6 +219,51 @@ EXPECTED_EXIT3_RECOVERY_EXCLUSIONS = (
     "collision-policy value; or adding a trust service, generic storage "
     "framework or runtime dependency."
 )
+EXPECTED_EXIT3_ACCEPTANCE_DECISION = (
+    "Accept Phase 6 Exit 3 for the bounded B16 Entry/Exit exporter."
+)
+EXPECTED_EXIT3_ACCEPTANCE_SCOPE = (
+    "At protected `main` `7198b05b6a4b7e4654b7d02d0bad4e5cf627a799`, I "
+    "accept Phase 6 Exit 3, “Export is deterministic and failure-safe”, as "
+    "Evidenced and owner-accepted only for the bounded B16 Entry/Exit "
+    "private-development DXF-and-dependency-manifest route under D-P6-003 "
+    "and D-P6-004. Phase 6 advances from 1/5 to 2/5."
+)
+EXPECTED_EXIT3_ACCEPTANCE_COVERAGE = (
+    "This acceptance covers deterministic names, bytes, hashes, schema and "
+    "identifiers; descriptor-relative add-only/no-overwrite publication; "
+    "exact-complete reuse; exact-partial monotonic completion; supported "
+    "exception, cancellation, retained interruption, staging, publication, "
+    "cleanup, durability and process-termination evidence; qualified "
+    "FreeCAD import and host execution; truthful conservative diagnostics; "
+    "and restart-based containment with independent destination revalidation."
+)
+EXPECTED_EXIT3_ACCEPTANCE_LIMITATIONS = (
+    "It does not extend assurance to arbitrary instruction-level "
+    "asynchronous interruption or repeated interruption of cleanup, physical "
+    "power loss, unqualified hosts or filesystems, continuously active "
+    "external mutation after final observation, or destructive or manual "
+    "recovery. Existing and published finals must never be deleted, renamed, "
+    "rewritten, truncated, replaced or manually altered to recover."
+)
+EXPECTED_EXIT3_ACCEPTANCE_EXCLUSIONS = (
+    "Output remains private-development with project status `unknown`. No "
+    "Exit 1, 4 or 5; production or physical-output clearance; "
+    "`project-cleared` status; output equivalence; GUI/operator or "
+    "wider-family authority; persisted schema; retained exact geometry; "
+    "performance acceptance; legacy retirement; packaging; release; risk "
+    "downgrade; or later-phase authority is granted."
+)
+EXPECTED_EXIT3_ACCEPTANCE_AUTHORITY = (
+    EXPECTED_EXIT3_ACCEPTANCE_SCOPE
+    + " "
+    + EXPECTED_EXIT3_ACCEPTANCE_COVERAGE
+)
+EXPECTED_EXIT3_ACCEPTANCE_STRUCTURED_EXCLUSIONS = (
+    EXPECTED_EXIT3_ACCEPTANCE_LIMITATIONS
+    + " "
+    + EXPECTED_EXIT3_ACCEPTANCE_EXCLUSIONS
+)
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
         "Pending — exact-validation and private-development DXF evidence "
@@ -230,10 +276,10 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "limitations"
     ),
     (
-        "Pending — implementation and retained evidence are present and are "
-        "now judged against the D-P6-004 supported failure model; a fresh "
-        "Level 3 Exit 3 evidence-admission review and explicit owner "
-        "acceptance remain absent"
+        "Evidenced and owner-accepted under D-P6-005 — bounded to the "
+        "private-development B16 Entry/Exit DXF-and-manifest route under "
+        "D-P6-003 and D-P6-004 with the recorded platform, recovery and "
+        "assurance limitations; project status remains `unknown`"
     ),
     (
         "Pending — PR #33 accounts for complete cold/warm Edit, Validate and "
@@ -731,10 +777,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 5 must be closed with all four accepted exits",
     )
     _require(
-        rows[6]["evidenced"] == 1
+        rows[6]["evidenced"] == 2
         and str(rows[6]["state"])
         == "Current — opened 2026-08-01",
-        "Phase 6 must remain current at the accepted 1/5 state",
+        "Phase 6 must remain current at the accepted 2/5 state",
     )
     _require(
         [
@@ -746,10 +792,12 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the dashboard must identify only Phase 6 as current",
     )
     _require(
-        "Phase 6 current — 1/5 evidenced" in " ".join(plan.split())
+        "Phase 6 current — 2/5 evidenced" in " ".join(plan.split())
         and "Exit 2 was owner-accepted under D-P6-002 on 2026-08-02"
+        in " ".join(plan.split())
+        and "Exit 3 under D-P6-005 on 2026-08-15"
         in " ".join(plan.split()),
-        "the accepted Phase 6 1/5 status is missing",
+        "the accepted Phase 6 2/5 status is missing",
     )
     return rows
 
@@ -783,7 +831,7 @@ def _validate_exit_conditions(
     expected_plan = [
         "Pending",
         "Evidenced — owner-accepted 2026-08-02",
-        "Pending",
+        "Evidenced — owner-accepted 2026-08-15",
         "Pending",
         "Pending",
     ]
@@ -893,11 +941,12 @@ def _validate_exit_conditions(
         "completion" in plan_flat
         and "authorises its later bounded Level 2 implementation" in plan_flat
         and "D-P6-004 defines the finite supported exporter fault model" in plan_flat
-        and "bounded implementation and retained evidence are present"
+        and "D-P6-005 accepts only the bounded private-development B16 "
+        "Entry/Exit deterministic, failure-safe DXF-and-manifest route"
         in plan_flat
-        and "formal Exit 3 evidence admission and owner acceptance remain "
-        "absent" in plan_flat,
-        "Phase 6 Exit 2 acceptance or Exit 3 contract boundary is missing",
+        and "advances Phase 6 to 2/5" in plan_flat
+        and "project status remains `unknown`" in plan_flat,
+        "Phase 6 Exit 2/3 acceptance or Exit 3 contract boundary is missing",
     )
 
     current_flat = " ".join(current_evidence.split())
@@ -909,9 +958,10 @@ def _validate_exit_conditions(
         ).split()
     )
     _require(
-        "Current — 1/5 evidenced. Exit 2 was owner-accepted under D-P6-002 on "
-        "2026-08-02; exits 1, 3, 4 and 5 remain Pending" in current_flat,
-        "current record does not preserve the accepted Phase 6 1/5 state",
+        "Current — 2/5 evidenced. Exit 2 was owner-accepted under D-P6-002 on "
+        "2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15; exits 1, 4 and 5 "
+        "remain Pending" in current_flat,
+        "current record does not preserve the accepted Phase 6 2/5 state",
     )
     performance_section = _section(
         current_evidence,
@@ -1242,7 +1292,58 @@ def _validate_exit_conditions(
             ),
         ]
         and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS,
-        "Phase 6 exits do not match the accepted 1/5 dispositions",
+        "Phase 6 exits do not match the accepted 2/5 dispositions",
+    )
+    exit3_acceptance_heading = (
+        "Phase 6 Exit 3 supported-model evidence-admission panel and owner "
+        "decision"
+    )
+    _require(
+        '<a id="phase-6-exit-3-supported-model-evidence-admission-panel">'
+        "</a>\n\n## "
+        + exit3_acceptance_heading
+        in current_evidence,
+        "D-P6-005 panel anchor or heading association is missing",
+    )
+    exit3_acceptance_section = direct_section_content(
+        current_evidence,
+        exit3_acceptance_heading,
+    )
+    exit3_acceptance_flat = _semantic_text(exit3_acceptance_section)
+    for required_acceptance_clause in (
+        "7198b05b6a4b7e4654b7d02d0bad4e5cf627a799",
+        "PROCEED TO OWNER ACCEPTANCE WITH BOUNDED CONDITIONS",
+        "There was no dissent",
+        "No supported-model defect, unsafe recovery path, material evidence "
+        "gap or contradiction with D-P6-003/D-P6-004 was found",
+        "No risk state, treatment, effectiveness or disposition changes",
+        "no product source, test oracle, schema, manifest, output byte, "
+        "identifier or railway behaviour changes",
+        "fresh independent acceptance review",
+        "exact-head protected CI",
+        "preservation-audited protected-main integration",
+    ):
+        _require(
+            required_acceptance_clause in exit3_acceptance_flat,
+            "D-P6-005 evidence-admission panel drifted: "
+            + required_acceptance_clause,
+        )
+    exit3_acceptance_quoted = _blockquote_paragraphs(
+        exit3_acceptance_section
+    )
+    _require(
+        exit3_acceptance_quoted
+        == [
+            _semantic_text(
+                "D-P6-005 — Accept Phase 6 Exit 3 for the bounded B16 "
+                "Entry/Exit exporter"
+            ),
+            _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_SCOPE),
+            _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_COVERAGE),
+            _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_LIMITATIONS),
+            _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_EXCLUSIONS),
+        ],
+        "D-P6-005 panel exact owner decision drifted or was relocated",
     )
     _require(
         'id="phase-6-opening-panel"' in current_evidence
@@ -1544,7 +1645,7 @@ def _validate_decisions(plan: str) -> None:
             record["decided_on"]
             == (
                 "2026-08-15"
-                if decision_id == "D-P6-004"
+                if decision_id in {"D-P6-004", "D-P6-005"}
                 else (
                     "2026-08-02"
                     if decision_id in {"D-P6-002", "D-P6-003"}
@@ -1632,6 +1733,24 @@ def _validate_decisions(plan: str) -> None:
         and recovery_contract_record["panel_record"]
         == recovery_contract_panel,
         "D-P6-003 authority, exclusions or panel routing drifted",
+    )
+    exit3_acceptance_record = phase6_by_id["D-P6-005"]
+    exit3_acceptance_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-3-supported-model-evidence-admission-panel"
+    )
+    _require(
+        exit3_acceptance_record["decision"]
+        == EXPECTED_EXIT3_ACCEPTANCE_DECISION
+        and exit3_acceptance_record["authority"]
+        == EXPECTED_EXIT3_ACCEPTANCE_AUTHORITY
+        and exit3_acceptance_record["exclusions"]
+        == EXPECTED_EXIT3_ACCEPTANCE_STRUCTURED_EXCLUSIONS
+        and exit3_acceptance_record["evidence"]
+        == exit3_acceptance_panel
+        and exit3_acceptance_record["panel_record"]
+        == exit3_acceptance_panel,
+        "D-P6-005 authority, exclusions or panel routing drifted",
     )
     current_records = document["decisions"]
     _require(
