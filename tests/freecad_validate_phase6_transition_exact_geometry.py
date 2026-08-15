@@ -248,7 +248,7 @@ def _validate_success_and_determinism(document, artifact):
     assert receipt.closed is False
     assert receipt.maximum_abs_z_mm == 0.0
     assert receipt.geometry_signature.startswith("sha256:")
-    assert receipt.freecad_version == "1.1.1"
+    assert receipt.freecad_version in {"1.1.1", "1.1.3"}
     assert receipt.opencascade_version.startswith("7.8.1")
     assert receipt.polyline_length_mm < (
         centreline.points[-1].station_mm
@@ -443,9 +443,10 @@ def validate():
     qualification = bootstrap.require_qualified_runtime(
         ROOT / "reference" / "contracts" / "phase1-compatibility.json"
     )
-    assert qualification["compatibility_evaluation"]["matched_profile_id"] == (
-        "linux-x86_64-flatpak-freecad-1.1.1"
-    )
+    assert qualification["compatibility_evaluation"]["matched_profile_id"] in {
+        "linux-x86_64-flatpak-freecad-1.1.1",
+        "linux-x86_64-flatpak-freecad-1.1.3",
+    }
 
     document, _obj = _new_editable_document()
     collision, _collision_obj = _new_colliding_temporary_document()

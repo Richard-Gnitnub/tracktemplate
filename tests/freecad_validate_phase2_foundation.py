@@ -50,9 +50,10 @@ qualification = bootstrap.require_qualified_runtime(
 after = _document_state()
 assert before == after, "B16 foundation loading changed FreeCAD document state"
 assert api.DEVELOPMENT_CHECKPOINT == "10.2A8A7B16"
-assert qualification["compatibility_evaluation"]["matched_profile_id"] == (
-    "linux-x86_64-flatpak-freecad-1.1.1"
-)
+assert qualification["compatibility_evaluation"]["matched_profile_id"] in {
+    "linux-x86_64-flatpak-freecad-1.1.1",
+    "linux-x86_64-flatpak-freecad-1.1.3",
+}
 
 import tracktemplate.domain as domain  # noqa: E402
 

@@ -45,9 +45,10 @@ encoded = api.transition_state_to_json(analysed)
 reopened = api.transition_state_from_json(encoded)
 after = _document_state()
 
-assert qualification["compatibility_evaluation"]["matched_profile_id"] == (
-    "linux-x86_64-flatpak-freecad-1.1.1"
-)
+assert qualification["compatibility_evaluation"]["matched_profile_id"] in {
+    "linux-x86_64-flatpak-freecad-1.1.1",
+    "linux-x86_64-flatpak-freecad-1.1.3",
+}
 assert reopened == analysed
 assert api.transition_state_to_json(reopened) == encoded
 assert before == after, "canonical-state smoke changed FreeCAD document state"

@@ -31,6 +31,10 @@ MULTI_OBJECT_SENTINEL = (
 LIFECYCLE_SENTINEL = (
     "TRACKTEMPLATE_PHASE5_TRANSITION_EDITING_LIFECYCLE_GUI="
 )
+QUALIFIED_PROFILE_BY_FREECAD_VERSION = {
+    "1.1.1": "linux-x86_64-flatpak-freecad-1.1.1",
+    "1.1.3": "linux-x86_64-flatpak-freecad-1.1.3",
+}
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(TOOL_ROOT / "src"))
 
@@ -110,6 +114,18 @@ def _sentinel_payload(result, sentinel=SENTINEL):
     return json.loads(matches[0])
 
 
+def _qualified_version(payload):
+    return payload.get("freecad_version") in (
+        QUALIFIED_PROFILE_BY_FREECAD_VERSION
+    )
+
+
+def _qualified_profile(payload):
+    return QUALIFIED_PROFILE_BY_FREECAD_VERSION.get(
+        payload.get("freecad_version")
+    ) == payload.get("exact_qualified_profile")
+
+
 def _validate_lifecycle_payload(payload):
     expected_ids = [
         "SET-001/curve-track/2/transition/entry",
@@ -143,9 +159,7 @@ def _validate_lifecycle_payload(payload):
     scene_image = pathlib.Path(str(payload.get("scene_image", "")))
     editor_image = pathlib.Path(str(payload.get("editor_image", "")))
     if (
-        payload.get("freecad_version") != "1.1.1"
-        or payload.get("exact_qualified_profile")
-        != "linux-x86_64-flatpak-freecad-1.1.1"
+        not _qualified_profile(payload)
         or payload.get("attachment_count") != 2
         or payload.get("composition_boundary")
         != "tracktemplate.transition-editing-lifecycle.development.v1"
@@ -204,7 +218,7 @@ def main():
         result = execute_file(client, GUI_PROOF)
         payload = _sentinel_payload(result)
         if (
-            payload.get("freecad_version") != "1.1.1"
+            not _qualified_version(payload)
             or payload.get("document_object_count") != 1
             or payload.get("document_object_type")
             != "App::FeaturePython"
@@ -295,7 +309,7 @@ def main():
             "SET-001/curve-track/2/transition/exit",
         ]
         if (
-            multi_object_payload.get("freecad_version") != "1.1.1"
+            not _qualified_version(multi_object_payload)
             or multi_object_payload.get("workload_id")
             != (
                 "phase5-qualified-plain-line-one-secondary-track-"

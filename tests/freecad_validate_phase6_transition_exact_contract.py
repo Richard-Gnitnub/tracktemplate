@@ -51,9 +51,10 @@ def _state():
 qualification = bootstrap.require_qualified_runtime(
     ROOT / "reference" / "contracts" / "phase1-compatibility.json"
 )
-assert qualification["compatibility_evaluation"]["matched_profile_id"] == (
-    "linux-x86_64-flatpak-freecad-1.1.1"
-)
+assert qualification["compatibility_evaluation"]["matched_profile_id"] in {
+    "linux-x86_64-flatpak-freecad-1.1.1",
+    "linux-x86_64-flatpak-freecad-1.1.3",
+}
 
 before = _document_state()
 active_before = App.ActiveDocument

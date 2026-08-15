@@ -571,13 +571,14 @@ def validate_documentation_profile(
     require(
         "Phase 6 is 2/5 evidenced" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
-        and "No phase, exit, risk, or product state changes" in owner_view
-        and "UK English spelling in its Issue 9 scope" in owner_view
-        and "18-unit conformance result keeps its scope" in owner_view
-        and "Issue 9 conformance stays Unknown for live prose outside"
-        in owner_view
-        and "This decision authorises no later project work"
-        in owner_view,
+        and "D-GOV-006" in owner_view
+        and "FreeCAD 1.1.3" in owner_view
+        and "1.1.1 profile stays qualified" in owner_view
+        and "FreeCAD 1.1.2 and all other releases" in owner_view
+        and "FreeCAD recommends 1.1.3 for security" in owner_view
+        and "1.1.1 decision is not a security endorsement" in owner_view
+        and "No product source or phase state changes" in owner_view
+        and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
 
@@ -614,6 +615,22 @@ def validate_documentation_profile(
         "Centreline",
         "substantial cycle",
         "Product behavior",
+        "Host compatibility",
+        "exact host profile",
+        "`exact_match` data in its contract record",
+        "qualified host profile",
+        "bundled stack",
+        "host matrix",
+        "Requalification",
+        "runtime guard",
+        "evaluator",
+        "runtime probe",
+        "launcher",
+        "fixture",
+        "Legacy ingress",
+        "Functional compatibility",
+        "Qualify",
+        "Requalify",
         "Do not use different technical terms for the same project concept",
         "Do not use a technical noun as a verb unless this register also "
         "approves the verb",

@@ -13,11 +13,11 @@ The Layout Editor is the later program. It does not change Phase 6 exits. The pr
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 is 2/5 evidenced. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. Output is private-development. Project status stays `unknown`. |
-| **What changed** | [TT-DOC-002](current/PHASE_EVIDENCE.md#tt-doc-002-uk-english-spelling-correction-panel) corrects one part of the [Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile). ASD-STE100 Issue 9 stays the normative standard. TrackTemplate now uses UK English spelling in its Issue 9 scope. No phase, exit, risk, or product state changes. |
-| **What now works** | Canonical prose uses UK English spelling. All other applicable Issue 9 vocabulary, grammar, meaning, part-of-speech, technical-term, and review controls stay unchanged. |
-| **Limitations/findings** | The 18-unit conformance result keeps its scope. The Issue 9 review examines six named logical units again. Issue 9 conformance stays Unknown for live prose outside the logical units in the previous and correction tables. Frozen history does not change. TrackTemplate claims no external certification, endorsement, or S1000D conformance. |
-| **Owner decision** | TT-DOC-002 is Accepted. It corrects spelling policy only. All other owner decisions and exclusions stay unchanged. |
-| **Next action** | This cycle ends after TT-DOC-002 integration and preservation. This decision authorises no later project work. |
+| **What changed** | [D-GOV-006](current/PHASE_EVIDENCE.md#freecad-1-1-3-compatibility-requalification-panel) also qualifies the exact Linux x86_64 stable Flatpak profile for FreeCAD 1.1.3. The 1.1.1 profile stays qualified. No product source or phase state changes. |
+| **What now works** | The runtime guard accepts only the two exact host profiles. The current B16 host matrix gave the specified results on 1.1.3. The 1.1.1 evidence has the same contract results. |
+| **Limitations/findings** | FreeCAD 1.1.2 and all other releases, platforms, architectures, package channels, and bundled stacks are not qualified. Phase 10 owns packaged Workbench and `package.xml` evidence. The 1.1.1 evidence and performance evidence keep their recorded host identity. FreeCAD recommends 1.1.3 for security. The 1.1.1 decision is not a security endorsement. |
+| **Owner decision** | D-GOV-006 is Accepted for the exact 1.1.3 profile only. All phase, risk, output, packaging, and release exclusions stay unchanged. |
+| **Next action** | Use `$tracktemplate-continue` to select the next repository-driven outcome. |
 
 ## Phase status
 
@@ -52,6 +52,8 @@ D-P6-001 later opened Phase 6 at 0/5 for bounded exact-validation and private-de
 D-P6-002 accepts only the bounded transient-object Exit 2 and advances Phase 6 to 1/5.
 D-P6-003 selects strict add-only, journal-free monotonic completion and authorises its later bounded Level 2 implementation; D-P6-004 defines the finite supported exporter fault model, evidence boundary and restart procedure.
 D-P6-005 accepts only the bounded private-development B16 Entry/Exit deterministic, failure-safe DXF-and-manifest route under D-P6-003 and D-P6-004 and advances Phase 6 to 2/5. Production clearance, output equivalence, GUI/operator acceptance, wider exporter-family authority, persistence, retained geometry, legacy retirement, performance, packaging and release authority remain excluded; project status remains `unknown`.
+
+D-GOV-006 qualifies only the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. The decision keeps the exact 1.1.1 profile and its evidence. It does not qualify FreeCAD 1.1.2 or any other host. No phase, risk, product, output, packaging, or release state changes.
 
 ## Live risks
 
@@ -120,6 +122,7 @@ The [current decision register](current/gate-decisions.json) owns Phase 6 and cu
 | D-P6-005 | 2026-08-15 | Accepted | Phase 6 Exit 3 accepted only for the bounded private-development B16 Entry/Exit deterministic DXF-and-manifest route under D-P6-003 and D-P6-004; Phase 6 advances to 2/5 and all stated limitations and exclusions remain. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English spelling as its project spelling directive. No other TT-DOC-001 or project authority changes. |
+| D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
 
 ## Authority and evidence links
 
@@ -135,6 +138,7 @@ The [current decision register](current/gate-decisions.json) owns Phase 6 and cu
 - [Engineering policy and TT-DOC-001 profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile) and [Architecture](ARCHITECTURE.md)
 - [Modularisation boundaries](MODULARISATION_PLAN.md)
 - [Validation strategy](VALIDATION.md)
+- [Runtime and legacy ingress compatibility contract](contracts/phase1-compatibility.json)
 - [Recovery and backup](RECOVERY_AND_BACKUP.md)
 - [Licensing boundaries](LICENSING_BOUNDARIES.md)
 - [Provenance](PROVENANCE.md)

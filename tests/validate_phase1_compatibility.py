@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the Phase 1 runtime and legacy-ingress compatibility contract."""
+"""Validate the Phase 1 runtime and legacy ingress compatibility contract."""
 
 import ast
 import copy
@@ -19,7 +19,7 @@ from tools import runtime_compatibility_probe  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "76e2b6ddba3c3194a2e284770edb8366a6aa4ea98226d80662dacecf8f106bec"
+    "52ebf138a597e025ab26b085fa28ef3800c03093ed7ea7e85d3e2a9d563f8875"
 )
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",
@@ -75,19 +75,42 @@ EXPECTED_SCHEMA_ANCHORS = {
     "TURNOUT_INTEGRATION_SCHEMA_VERSION": 1,
     "TURNOUT_SCHEMA_VERSION": 1,
 }
-EXPECTED_PROFILE_MATCH = {
+EXPECTED_SHARED_PROFILE_MATCH = {
     "freecad.coin_version": "SIM Coin 4.0.8",
     "freecad.opencascade_version": "7.8.1",
     "freecad.pyside_version": "6.10.3",
     "freecad.qt_binding": "PySide6",
     "freecad.qt_version": "6.10.3",
-    "freecad.version_info": [1, 1, 1],
     "platform.flatpak_id": "org.freecad.FreeCAD",
     "platform.machine": "x86_64",
     "platform.packaging": "flatpak",
     "platform.system": "Linux",
     "python.implementation": "CPython",
     "python.version_info": [3, 13, 14],
+}
+EXPECTED_QUALIFIED_PROFILES = {
+    "linux-x86_64-flatpak-freecad-1.1.1": {
+        "status": "qualified-reference-and-initial-rc-profile",
+        "exact_match": {
+            **EXPECTED_SHARED_PROFILE_MATCH,
+            "freecad.version_info": [1, 1, 1],
+        },
+        "observed_freecad_revision": "44874 (Git)",
+        "observed_freecad_commit": (
+            "0108fd4b4850cc46e625b60e53cea7a7bbe69f8d"
+        ),
+    },
+    "linux-x86_64-flatpak-freecad-1.1.3": {
+        "status": "qualified-patch-requalification-profile",
+        "exact_match": {
+            **EXPECTED_SHARED_PROFILE_MATCH,
+            "freecad.version_info": [1, 1, 3],
+        },
+        "observed_freecad_revision": "44987 (Git)",
+        "observed_freecad_commit": (
+            "145529fe741292ff0b3977a01195bf0247425794"
+        ),
+    },
 }
 
 
@@ -169,7 +192,7 @@ def validate_contract(document):
         "recorded_on": "2026-07-20",
         "status": (
             "phase1-policy-accepted-phase2-development-guard-implemented-"
-            "broader-qualification-not-started"
+            "two-exact-freecad-profiles-qualified"
         ),
         "phase": 1,
     }
@@ -183,10 +206,23 @@ def validate_contract(document):
         "current_effect",
         "support_meaning",
         "licensing_separation",
+        "security_boundary",
     }:
         errors.append("compatibility scope fields are invalid")
     elif not all(_non_empty_text(value) for value in scope.values()):
         errors.append("compatibility scope contains empty policy text")
+    else:
+        security_boundary = scope["security_boundary"]
+        for fragment in (
+            "1.1.1 host profile has functional compatibility authority only",
+            "no security endorsement",
+            "security issues for all releases before 1.1.3",
+            "recommends that all users install 1.1.3",
+        ):
+            if fragment not in security_boundary:
+                errors.append(
+                    "compatibility security boundary drifted: " + fragment
+                )
 
     source_state = document.get("source_state")
     if not isinstance(source_state, dict) or set(source_state) != set(SOURCE_PATHS):
@@ -257,22 +293,37 @@ def validate_contract(document):
         ) != "3.12.3" or floor.get("implementation") != "CPython":
             errors.append("standalone development Python baseline drifted")
         profiles = runtime.get("qualified_profiles")
-        if not isinstance(profiles, list) or len(profiles) != 1:
-            errors.append("exactly one initial qualified profile is required")
+        if not isinstance(profiles, list):
+            errors.append("qualified profiles must be a list")
         else:
-            profile = profiles[0]
-            if profile.get("profile_id") != (
-                "linux-x86_64-flatpak-freecad-1.1.1"
-            ) or profile.get("status") != (
-                "qualified-reference-and-initial-rc-profile"
-            ):
-                errors.append("qualified profile identity/status drifted")
-            if profile.get("exact_match") != EXPECTED_PROFILE_MATCH:
-                errors.append("qualified profile exact-match stack drifted")
-            if profile.get("observed_freecad_revision") != "44874 (Git)" or profile.get(
-                "observed_freecad_commit"
-            ) != "0108fd4b4850cc46e625b60e53cea7a7bbe69f8d":
-                errors.append("qualified FreeCAD revision evidence drifted")
+            profile_ids = [
+                profile.get("profile_id")
+                for profile in profiles
+                if isinstance(profile, dict)
+            ]
+            if profile_ids != list(EXPECTED_QUALIFIED_PROFILES):
+                errors.append("exact qualified profile set or order drifted")
+            for profile in profiles:
+                if not isinstance(profile, dict):
+                    errors.append("qualified profile must be an object")
+                    continue
+                profile_id = profile.get("profile_id")
+                expected = EXPECTED_QUALIFIED_PROFILES.get(profile_id)
+                if expected is None:
+                    errors.append("unexpected qualified profile")
+                    continue
+                for field, value in expected.items():
+                    if profile.get(field) != value:
+                        errors.append(
+                            "{} {} drifted".format(profile_id, field)
+                        )
+                basis = profile.get("qualification_basis")
+                if not isinstance(basis, list) or not basis or not all(
+                    _non_empty_text(item) for item in basis
+                ):
+                    errors.append(
+                        "{} qualification basis is missing".format(profile_id)
+                    )
         matrix = runtime.get("platform_matrix")
         observed_matrix = {
             item.get("platform"): item.get("status")
@@ -408,6 +459,12 @@ def validate_contract(document):
             "probe_sentinel"
         ) != runtime_compatibility_probe.SENTINEL:
             errors.append("runtime-probe evidence pointer drifted")
+        if evidence.get("freecad_probe_command") != (
+            "flatpak run --command=FreeCADCmd org.freecad.FreeCAD "
+            "tools/runtime_compatibility_probe.py "
+            "--pass --require-qualified"
+        ):
+            errors.append("qualified runtime-probe command drifted")
         for field in (
             "probe_tool",
             "baseline",
@@ -421,6 +478,21 @@ def validate_contract(document):
             relative = evidence.get(field)
             if not _non_empty_text(relative) or not (ROOT / relative).is_file():
                 errors.append("compatibility evidence path is missing: {}".format(field))
+        requalification = evidence.get("freecad_1_1_3_requalification")
+        if not _non_empty_text(requalification):
+            errors.append("FreeCAD 1.1.3 requalification evidence is missing")
+        else:
+            relative, separator, anchor = requalification.partition("#")
+            path = ROOT / relative
+            if (
+                not separator
+                or not path.is_file()
+                or 'id="{}"'.format(anchor)
+                not in path.read_text(encoding="utf-8")
+            ):
+                errors.append(
+                    "FreeCAD 1.1.3 requalification evidence link is invalid"
+                )
         gaps = evidence.get("known_evidence_gaps")
         if not isinstance(gaps, list) or len(gaps) != 5 or not all(
             _non_empty_text(item) for item in gaps
@@ -652,28 +724,41 @@ def _qualified_record(profile):
 
 def validate_runtime_evaluator(contract):
     errors = []
-    profile = contract["runtime_baseline"]["qualified_profiles"][0]
-    record = _qualified_record(profile)
-    result = runtime_compatibility_probe.evaluate_runtime(record, contract)
-    if result != {
-        "status": "qualified",
-        "matched_profile_id": profile["profile_id"],
-        "mismatches": [],
-    }:
-        errors.append("exact reference runtime does not qualify")
-    for path, value in profile["exact_match"].items():
-        changed = copy.deepcopy(record)
-        replacement = (
-            list(value[:-1]) + [value[-1] + 1]
-            if isinstance(value, list)
-            else str(value) + "-drift"
-        )
-        _set_path(changed, path, replacement)
-        result = runtime_compatibility_probe.evaluate_runtime(changed, contract)
-        if result.get("status") != "unqualified" or not any(
-            message.startswith(path + " ") for message in result.get("mismatches", [])
-        ):
-            errors.append("runtime drift no longer fails closed for {}".format(path))
+    profiles = contract["runtime_baseline"]["qualified_profiles"]
+    for profile in profiles:
+        record = _qualified_record(profile)
+        result = runtime_compatibility_probe.evaluate_runtime(record, contract)
+        if result != {
+            "status": "qualified",
+            "matched_profile_id": profile["profile_id"],
+            "mismatches": [],
+        }:
+            errors.append(
+                "exact runtime does not qualify: " + profile["profile_id"]
+            )
+        for path, value in profile["exact_match"].items():
+            changed = copy.deepcopy(record)
+            replacement = (
+                list(value[:-1]) + [value[-1] + 1]
+                if isinstance(value, list)
+                else str(value) + "-drift"
+            )
+            _set_path(changed, path, replacement)
+            result = runtime_compatibility_probe.evaluate_runtime(
+                changed,
+                contract,
+            )
+            if result.get("status") != "unqualified" or not any(
+                message.startswith(path + " ")
+                for message in result.get("mismatches", [])
+            ):
+                errors.append(
+                    "runtime drift no longer fails closed for {} {}".format(
+                        profile["profile_id"],
+                        path,
+                    )
+                )
+    record = _qualified_record(profiles[0])
     absent = copy.deepcopy(record)
     absent["freecad"]["available"] = False
     if runtime_compatibility_probe.evaluate_runtime(absent, contract).get(
@@ -735,6 +820,12 @@ def validate_fail_closed_mutations(contract):
     changed["runtime_baseline"]["qualified_profiles"][0]["exact_match"][
         "freecad.version_info"
     ] = [1, 2, 0]
+    mutations.append(changed)
+
+    changed = copy.deepcopy(contract)
+    changed["runtime_baseline"]["qualified_profiles"][1]["exact_match"][
+        "freecad.version_info"
+    ] = [1, 1, 2]
     mutations.append(changed)
 
     changed = copy.deepcopy(contract)

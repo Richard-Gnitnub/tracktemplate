@@ -1360,6 +1360,121 @@ def validate_current_evidence_mutations() -> None:
         "D-P6-002 panel exact owner decision drifted or was relocated",
     )
 
+    compatibility_section = progress._section(
+        evidence,
+        "FreeCAD 1.1.3 compatibility requalification panel and owner decision",
+    )
+
+    freecad_scope_widened = replace_once(
+        evidence,
+        "FreeCAD 1.1.2 and all other releases are not qualified.",
+        "All FreeCAD 1.1.x releases are qualified.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-006-host-scope-widened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            freecad_scope_widened,
+        ),
+        "D-GOV-006 evidence panel drifted: FreeCAD 1.1.2 and all other "
+        "releases are not qualified",
+    )
+
+    freecad_state = blockquote_paragraph_containing(
+        compatibility_section,
+        "Phase 6 stays at 2/5",
+    )
+    freecad_phase_advanced = replace_once(
+        freecad_state,
+        "Phase 6 stays at 2/5",
+        "Phase 6 advances to 3/5",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-006-phase-authority-widened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                freecad_state,
+                freecad_phase_advanced,
+            ),
+        ),
+        "D-GOV-006 owner decision changed phase or exit authority",
+    )
+
+    security_endorsement_added = replace_once(
+        evidence,
+        "That decision is not a security endorsement.",
+        "That decision is a security endorsement.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-006-security-endorsement-added",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            security_endorsement_added,
+        ),
+        "D-GOV-006 official host security boundary drifted: not a security "
+        "endorsement",
+    )
+
+    incomplete_command_hidden = replace_once(
+        evidence,
+        "The `--pass`\noption had no argument.",
+        "The documented separated command failed.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-006-incomplete-command-hidden",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            incomplete_command_hidden,
+        ),
+        "D-GOV-006 qualification provenance drifted: --pass option had no "
+        "argument",
+    )
+
+    compatibility_conformance_widened = replace_once(
+        evidence,
+        "Issue 9 conformance stays Unknown\nfor live prose outside the "
+        "TT-DOC-001, TT-DOC-002, and D-GOV-006 tables.",
+        "Issue 9 conformance is verified\nfor all live prose.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-006-conformance-scope-widened",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            compatibility_conformance_widened,
+        ),
+        "D-GOV-006 Issue 9 result or limitation drifted: Unknown for live "
+        "prose outside the TT-DOC-001, TT-DOC-002, and D-GOV-006 tables",
+    )
+
+    compatibility_review_inverted = replace_once(
+        evidence,
+        "reviewer found no host-compatibility defect.",
+        "reviewer found a host-compatibility defect.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-006-review-defect-inverted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            compatibility_review_inverted,
+        ),
+        "D-GOV-006 independent review state drifted: reviewer found no "
+        "host-compatibility defect",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
@@ -1513,6 +1628,14 @@ def validate_project_plan_mutations() -> None:
         "project-plan/tt-doc-002-decision-omitted",
         lambda: progress._validate_decisions(
             replace_once(plan, spelling_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
+    compatibility_decision_row = table_row_containing(plan, "| D-GOV-006 |")
+    expect_rejected(
+        "project-plan/d-gov-006-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, compatibility_decision_row + "\n", "")
         ),
         "project-plan decisions differ from the frozen registers",
     )
@@ -1677,6 +1800,28 @@ def validate_documentation_profile_mutations() -> None:
         "tt-doc/owner-view-authority-inversion",
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
+    )
+
+    compatibility_terms_removed = terminology
+    for marker in (
+        "| Host compatibility |",
+        "| Host compatibility tools |",
+        "| Host compatibility authority |",
+    ):
+        compatibility_terms_removed = replace_once(
+            compatibility_terms_removed,
+            table_row_containing(compatibility_terms_removed, marker) + "\n",
+            "",
+        )
+    expect_rejected(
+        "tt-doc/d-gov-006-compatibility-terms-removed",
+        lambda: quality_assurance.validate_documentation_profile(
+            engineering,
+            plan,
+            learning,
+            compatibility_terms_removed,
+        ),
+        "TrackTemplate STE terminology lacks: Host compatibility",
     )
 
     lfe_link_deleted = replace_once(
