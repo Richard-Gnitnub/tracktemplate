@@ -569,7 +569,7 @@ def validate_documentation_profile(
         "PROJECT_PLAN owner view lost its derivation boundary",
     )
     require(
-        "Phase 6 is 2/5 evidenced" in owner_view
+        "Phase 6 has 2/5 accepted exits" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
         and "D-GOV-006" in owner_view
         and "FreeCAD 1.1.3" in owner_view
