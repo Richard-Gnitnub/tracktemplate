@@ -13,11 +13,11 @@ The Layout Editor is the later program. It does not change Phase 6 exits. The pr
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 has 2/5 accepted exits. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. Output is private-development. Project status stays `unknown`. |
-| **What changed** | [D-GOV-007](current/PHASE_EVIDENCE.md#phase-6-performance-evidence-host-boundary-panel) authorises the exact 1.1.3 profile to supply Phase 6 performance evidence. The exact 1.1.1 profile keeps that authority. |
-| **What now works** | The Phase 6 performance validator rejects a new result unless it names one of the two exact ID/version mappings. Every new schema-2 result has exact host identity. It records the ID and FreeCAD version of its exact host profile. The validator rejects a result set that contains two host profiles. |
-| **Limitations/findings** | Exit 4 stays Pending. D-GOV-007 admits no performance result and defines no value for a performance budget. It does not claim that performance became better. D-GOV-007 does not admit the rejected 1.1.3 test result as Exit 4 evidence. D-GOV-006 host and security limits do not change. |
-| **Owner decision** | D-GOV-007 is Accepted only for the two named host profiles for Phase 6 performance evidence. The phase, risk, product, output, packaging, and release exclusions do not change. |
-| **Next action** | Use `$tracktemplate-continue` to select the next repository-driven outcome. |
+| **What changed** | [D-GOV-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-performance-direction-panel) accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline. It selects zero-origin integration in the preview sampler as the performance hypothesis. It defines the comparison rule before the product change. |
+| **What now works** | A subsequent Level 2 cycle can compare 12 paired blocks on one exact host profile. Each block has one baseline sample and one candidate sample. The rule examines CPU time for Edit directly. It also examines wall time, the full journey, Validate, Export, warm reuse, resources, correctness, output, lifecycle, and cleanup. |
+| **Limitations/findings** | Exit 4 stays Pending. D-GOV-008 makes no performance optimisation and admits no Exit 4 evidence. It defines no product performance budget. It does not claim that performance became better. D-GOV-006 and D-GOV-007 host limits do not change. |
+| **Owner decision** | D-GOV-008 is Accepted only for the comparison baseline, hypothesis, rule, and bounded Level 2 authority. Phase, risk, product output, packaging, and release states do not change. |
+| **Next action** | Use `$tracktemplate-continue` to do the authorised performance optimisation at Level 2. |
 
 ## Phase status
 
@@ -56,6 +56,8 @@ D-P6-005 accepts only the bounded private-development B16 Entry/Exit determinist
 D-GOV-006 qualifies only the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. The decision keeps the exact 1.1.1 profile and its evidence. It does not qualify FreeCAD 1.1.2 or any other host. No phase, risk, product, output, packaging, or release state changes.
 
 D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles to supply candidate evidence for Phase 6 performance. A later decision can admit a result only if it comes from one of those profiles. D-GOV-007 admits no performance result and defines no budget. It accepts no phase exit and does not claim that performance became better.
+
+D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline. It selects one performance hypothesis for the preview sampler and defines the comparison rule. It authorises one performance optimisation at Level 2 but makes no product change. Exit 4 stays Pending.
 
 ## Live risks
 
@@ -126,6 +128,7 @@ The [current decision register](current/gate-decisions.json) owns Phase 6 and cu
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English spelling as its project spelling directive. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
 | D-GOV-007 | 2026-08-16 | Accepted | The project owner authorised the exact 1.1.1 and 1.1.3 host profiles to supply Phase 6 performance evidence. Exit 4 stays Pending. |
+| D-GOV-008 | 2026-08-16 | Accepted | The owner accepted the PR #50 baseline, selected the performance hypothesis for zero-origin integration, and defined the comparison rule. Exit 4 stays Pending. |
 
 ## Authority and evidence links
 

@@ -18,6 +18,7 @@ CAPABILITY_MATRIX_PATH = ROOT / "reference" / "CAPABILITY_MATRIX.md"
 ARCHITECTURE_PATH = ROOT / "reference" / "ARCHITECTURE.md"
 VALIDATION_PATH = ROOT / "reference" / "VALIDATION.md"
 PERFORMANCE_SOP_PATH = ROOT / "reference" / "PERFORMANCE_SOP.md"
+TERMINOLOGY_PATH = ROOT / "reference" / "TERMINOLOGY.md"
 CURRENT_EVIDENCE_PATH = ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
 RISKS_PATH = ROOT / "reference" / "current" / "risks.json"
 CURRENT_DECISIONS_PATH = (
@@ -125,6 +126,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "TT-DOC-002",
     "D-GOV-006",
     "D-GOV-007",
+    "D-GOV-008",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -293,11 +295,11 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations; project status remains `unknown`"
     ),
     (
-        "Pending — the 1.1.1 and 1.1.3 reports record all cold and warm costs. "
-        "Their host profiles are exact and different. Their exact states are "
-        "different. They cannot show that TrackTemplate performance became "
-        "better. No result measures one exact host profile before and after a "
-        "product change. No owner decision defines a numerical budget."
+        "Pending — D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the "
+        "comparison baseline. It selects one performance hypothesis and "
+        "defines the comparison rule. No product optimisation or comparison "
+        "result exists. No decision admits evidence for Exit 4 or defines a "
+        "product performance budget."
     ),
     (
         "Pending — B14 remains available, but whole-scope parity and retirement "
@@ -765,24 +767,25 @@ def _validate_owner_view(plan: str) -> None:
         "The owner accepted Exits 2 and 3",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
-        "D-GOV-007",
-        "authorises the exact 1.1.3 profile to supply Phase 6 performance "
-        "evidence",
-        "exact 1.1.1 profile keeps that authority",
-        "performance validator rejects a new result unless it names one of the "
-        "two exact ID/version mappings",
-        "Every new schema-2 result has exact host identity",
-        "records the ID and FreeCAD version of its exact host profile",
-        "rejects a result set that contains two host profiles",
+        "D-GOV-008",
+        "accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline",
+        "selects zero-origin integration in the preview sampler as the "
+        "performance hypothesis",
+        "defines the comparison rule before the product change",
+        "subsequent Level 2 cycle can compare 12 paired blocks on one exact "
+        "host profile",
+        "Each block has one baseline sample and one candidate sample",
+        "rule examines CPU time for Edit directly",
+        "wall time, the full journey, Validate, Export, warm reuse, resources, "
+        "correctness, output, lifecycle, and cleanup",
         "Exit 4 stays Pending",
-        "D-GOV-007 admits no performance result and defines no value for a "
-        "performance budget",
-        "does not claim that performance became better",
-        "D-GOV-007 does not admit the rejected 1.1.3 test result as Exit 4 "
+        "D-GOV-008 makes no performance optimisation and admits no Exit 4 "
         "evidence",
-        "D-GOV-006 host and security limits do not change",
-        "D-GOV-007 is Accepted only for the two named host profiles for "
-        "Phase 6 performance evidence",
+        "defines no product performance budget",
+        "does not claim that performance became better",
+        "D-GOV-006 and D-GOV-007 host limits do not change",
+        "D-GOV-008 is Accepted only for the comparison baseline, hypothesis, "
+        "rule, and bounded Level 2 authority",
         "Use `$tracktemplate-continue`",
     ):
         _require(
@@ -814,8 +817,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "PROJECT_PLAN.md contains an unsupported dashboard section",
     )
     _require(
-        len(plan.splitlines()) <= 148,
-        "PROJECT_PLAN.md exceeded its 148-line dashboard budget",
+        len(plan.splitlines()) <= 151,
+        "PROJECT_PLAN.md exceeded its 151-line dashboard budget",
     )
     for forbidden in (
         "### Deliverables",
@@ -1010,6 +1013,351 @@ def _validate_performance_host_sources(
     )
 
 
+def _validate_performance_direction_sources(
+    performance_sop: str,
+    terminology: str,
+    current_evidence: str,
+) -> None:
+    """Keep D-GOV-008 baseline, hypothesis, method, and authority bounded."""
+    heading = "Phase 6 Exit 4 comparison direction"
+    _require(
+        '<a id="phase-6-exit-4-comparison-direction"></a>\n\n## '
+        + heading in performance_sop,
+        "D-GOV-008 performance-direction anchor or heading is missing",
+    )
+    direction = _section(performance_sop, heading)
+    direction_flat = _semantic_text(direction)
+    for required_clause in (
+        "accepts the PR #50 performance series as the comparison baseline",
+        "83deda4bdb01c5c5677f568ac62625572b19c3bce313af515ba4fa6b9840298a",
+        "f370b029bb4c1ce34987dc025a741185e233df04",
+        "linux-x86_64-flatpak-freecad-1.1.3",
+        "phase6-transition-edit-validate-export-profile-v1",
+        "For each of the 31 interior stations, the API does a 240-step Simpson "
+        "integration from station zero",
+        "3.263 ms of process CPU time for each preview regeneration",
+        "profile recorded 0.144 seconds for integration and 0.163 seconds for "
+        "the preview sampler",
+        "zero-origin integration is a measured cost during Edit",
+        "One preview batch function can calculate all preview displacement "
+        "values without zero-origin integration at each interior station",
+        "must do all new calculation work during measured Edit",
+        "must add no work to Validate, Export, a warm cycle, cleanup, or an "
+        "unmeasured boundary",
+        "does not measure process launch, module import, fixture construction, "
+        "dialog opening, or document disposal at the end",
+        "must add no work to other setup or teardown that the profile does not "
+        "measure",
+        "Code inspection must show that the candidate does all new product "
+        "work during measured Edit",
+        "If inspection does not give sufficient proof, stop the cycle",
+        "result is FAIL if measured Edit does not include all new candidate "
+        "work",
+        "tracktemplate/presentation/transition_preview.py",
+        "tracktemplate/domain/alignment.py",
+        "preserve the scalar alignment API",
+        "Preview points must agree with their oracle within 1.0e-10 mm",
+        "Exact validation, DXF bytes, manifest bytes, hashes, and diagnostics "
+        "must not change",
+        "Do not add a cache that the evidence does not make necessary",
+        "Do not add a runtime dependency or a public API",
+        "must use 12 paired blocks",
+        "Use the baseline first in six blocks",
+        "Use the candidate first in the other six blocks",
+        "Preserve all raw attempts",
+        "Record the failure class before a replacement pair starts",
+        "A product defect, invariant difference, or correctness failure gives "
+        "a FAIL result and stops the cycle",
+        "replacement is possible only for the failure class "
+        "fixture-or-harness-defect or environment-or-profile-defect",
+        "attempt with this failure must give no measurement for the comparison",
+        "Record the failure class before replacement",
+        "same block and the same recorded sequence",
+        "For each numeric warm metric, calculate the median of the three "
+        "measured warm cycles in one sample",
+        "warm block value for that sample",
+        "All warm-cycle correctness results must be PASS",
+        "candidate minus baseline",
+        "paired difference for process CPU time in Edit is negative in a "
+        "minimum of 10 of the 12 blocks",
+        "median of the paired differences for Edit wall time is negative",
+        "medians of the paired differences for cold-journey CPU and wall time "
+        "are negative",
+        "The Level 2 cycle must use the no-displacement rule for Validate, "
+        "Export, cleanup, all warm block values, all resource metrics, and the "
+        "journey remainder",
+        "median of its paired differences is more than its baseline MAD",
+        "result is also FAIL if 10 or more paired differences are positive",
+        "The Level 2 cycle must use condition 4 for RSS, RSS change, high-water "
+        "RSS, and high-water RSS change in each measured stage and the full "
+        "journey",
+        "All discrete invariants must have results equal to the baseline "
+        "results",
+        "Code inspection must show that the candidate does all new product "
+        "work during measured Edit",
+        "New work in an unmeasured boundary gives FAIL",
+        "One sample cannot give a PASS result",
+        "Do not select a new rule after the project knows the candidate "
+        "results",
+        "makes no product change",
+        "does not admit the baseline or a subsequent result as Exit 4 "
+        "evidence",
+        "Exit 4 stays Pending",
+        "subsequent decision at Level 3 must admit the evidence",
+    ):
+        _require(
+            required_clause in direction_flat,
+            "D-GOV-008 performance direction drifted: " + required_clause,
+        )
+    boundary_marker = "The authorised product boundary at Level 2 is:"
+    boundary_end = "The product change must preserve the scalar alignment API."
+    _require(
+        direction.count(boundary_marker) == 1 and boundary_end in direction,
+        "D-GOV-008 authorised product boundary structure drifted",
+    )
+    boundary = direction.split(boundary_marker, 1)[1].split(boundary_end, 1)[0]
+    authorised_product_paths = set(
+        re.findall(r"`(tracktemplate/[^`]+)`", boundary)
+    )
+    _require(
+        authorised_product_paths
+        == {
+            "tracktemplate/domain/alignment.py",
+            "tracktemplate/presentation/transition_preview.py",
+        },
+        "D-GOV-008 authorised product path set drifted",
+    )
+    _require_links(
+        direction,
+        ((
+            "PR #50 performance series",
+            "benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-"
+            "pipeline-performance.md",
+        ),),
+        "D-GOV-008 baseline report link drifted",
+    )
+
+    terminology_flat = _semantic_text(terminology)
+    for required_term in (
+        "comparison baseline",
+        "performance hypothesis",
+        "comparison rule",
+        "performance optimisation",
+        "Zero-origin integration",
+        "preview sampler",
+        "preview regeneration",
+        "preview batch function",
+        "Simpson integration",
+        "interior station",
+        "endpoint calculation",
+        "unmeasured boundary",
+        "paired block",
+        "paired difference",
+        "median absolute deviation (MAD)",
+        "Measurement noise",
+        "no-displacement rule",
+        "warm block value",
+        "resource metric",
+        "High-water RSS",
+        "journey remainder",
+        "discrete invariant",
+        "Setup",
+        "Teardown",
+    ):
+        _require(
+            required_term in terminology_flat,
+            "D-GOV-008 performance terminology drifted: " + required_term,
+        )
+    for meaning_clause in (
+        "A preview batch function calculates all preview displacement values "
+        "in one function",
+        "A paired difference is the candidate value minus the baseline value "
+        "in one paired block",
+        "If an ordered sample has an odd number of values, its median is the "
+        "middle value",
+        "If an ordered sample has an even number of values, its median is the "
+        "sum of the two middle values divided by two",
+        "High-water RSS is the maximum RSS that the profiler records",
+        "A resource metric is an RSS, RSS change, high-water RSS, or high-water "
+        "RSS change in a performance record",
+        "A journey remainder is the full-journey CPU or wall time minus the "
+        "measured stage times",
+    ):
+        _require(
+            meaning_clause in terminology_flat,
+            "D-GOV-008 performance terminology meaning drifted: "
+            + meaning_clause,
+        )
+
+    panel_heading = "Phase 6 Exit 4 performance-direction panel"
+    _require(
+        '<a id="phase-6-exit-4-performance-direction-panel"></a>\n\n## '
+        + panel_heading in current_evidence,
+        "D-GOV-008 panel anchor or heading is missing",
+    )
+    panel = _section(current_evidence, panel_heading)
+    panel_flat = _semantic_text(panel)
+    for required_clause in (
+        "9169b7e7beec5cf614b8a5284db0f97367728def",
+        "Phase 6 has 2/5 accepted exits",
+        "Exit 4 is Pending",
+        "D-GOV-008 is the next decision ID",
+        "accepts this series as the comparison baseline",
+        "must collect new samples in paired blocks",
+        "block must have a baseline sample and a candidate sample",
+        "must not use the 1.1.1 report to claim that TrackTemplate performance "
+        "became better",
+        "fixture-or-harness-defect",
+        "selects a performance hypothesis for zero-origin integration in the "
+        "preview sampler",
+        "approximately 88% of the sampler time in the profile",
+        "must use 12 paired blocks",
+        "Preserve all raw attempts",
+        "product defect, invariant difference, or correctness failure gives a "
+        "FAIL result and stops the cycle",
+        "replacement is possible only for the failure class "
+        "fixture-or-harness-defect or environment-or-profile-defect",
+        "attempt with this failure must give no measurement for the comparison",
+        "warm block value for that sample",
+        "All warm-cycle correctness results must be PASS",
+        "Use the no-displacement rule for Validate, Export, cleanup, all warm "
+        "block values, all resource metrics, and the journey remainder",
+        "Use the same rule for RSS, RSS change, high-water RSS, and high-water "
+        "RSS change",
+        "result is FAIL if measured Edit does not include all new candidate "
+        "work",
+        "One sample cannot give a PASS result",
+        "defines a comparison rule and not a product budget",
+        "makes no product change",
+        "does not admit the PR #50 baseline or a subsequent result as Exit 4 "
+        "evidence",
+        "Exit 4 stays Pending",
+        "subsequent decision at Level 3 must admit the evidence",
+    ):
+        _require(
+            required_clause in panel_flat,
+            "D-GOV-008 evidence panel drifted: " + required_clause,
+        )
+
+    for risk_clause in (
+        "PR-15 — deferred cost",
+        "QA-R04 — no product performance budget",
+        "PR-22 — authority transfer",
+        "PR-13 — repository or evidence loss",
+        "all unmeasured boundaries",
+        "High / Mitigate / Partial. The disposition does not change",
+        "High / Remove / Effective (current scope). The disposition does not "
+        "change",
+        "Critical / Mitigate / Effective (current scope). The disposition "
+        "does not change",
+    ):
+        _require(
+            risk_clause in panel_flat,
+            "D-GOV-008 risk panel drifted: " + risk_clause,
+        )
+
+    for conformance_clause in (
+        "Documentation conformance",
+        "local Issue 9 source",
+        "This is the official source",
+        "TrackTemplate UK English spelling directive",
+        "reference/PERFORMANCE_SOP.md",
+        "reference/TERMINOLOGY.md",
+        "five new performance-term rows",
+        "reference/PROJECT_PLAN.md",
+        "reference/current/PHASE_EVIDENCE.md",
+        "reference/current/gate-decisions.json",
+        "Issue 9 conformance stays Unknown for other live prose",
+    ):
+        _require(
+            conformance_clause in panel_flat,
+            "D-GOV-008 conformance scope drifted: " + conformance_clause,
+        )
+
+    for review_clause in (
+        "Two reviewers who did not make the change must examine one exact "
+        "candidate",
+        "performance reviewer must examine the baseline and performance "
+        "hypothesis",
+        "reviewer must examine the comparison rule, no-displacement rule, and "
+        "unmeasured boundaries",
+        "governance reviewer must examine authority, evidence, documentation, "
+        "and preservation",
+        "two reviews must find no blocker before the project merges the "
+        "candidate",
+        "pull request and completion report must record the results",
+        "panel must not change after those reviews",
+    ):
+        _require(
+            review_clause in panel_flat,
+            "D-GOV-008 review gate drifted: " + review_clause,
+        )
+
+    decision_marker = (
+        "> **D-GOV-008 — Accept the Exit 4 comparison baseline and "
+        "performance direction**"
+    )
+    _require(
+        panel.count(decision_marker) == 1,
+        "D-GOV-008 quoted owner decision is missing or duplicated",
+    )
+    decision_quote = panel.split(decision_marker, 1)[1]
+    decision_quote_flat = _semantic_text(
+        "\n".join(
+            line[2:] if line.startswith("> ") else ""
+            for line in decision_quote.splitlines()
+            if line.startswith(">")
+        )
+    )
+    for decision_clause in (
+        "I accept the PR #50 FreeCAD 1.1.3 series as the comparison baseline",
+        "I select one performance hypothesis",
+        "I authorise a Level 2 change in the preview sampler",
+        "rule uses 12 paired blocks on the exact 1.1.3 host profile",
+        "candidate must add no work to an unmeasured boundary",
+        "Inspection must show that the candidate does all new product work "
+        "during measured Edit",
+        "product defect, invariant difference, or correctness failure gives "
+        "FAIL and stops the cycle",
+        "replacement is possible only for the failure class "
+        "fixture-or-harness-defect or environment-or-profile-defect",
+        "attempt with this failure must give no measurement for the comparison",
+        "Level 2 cycle must record the sequence before measurements start",
+        "same block and the same recorded sequence",
+        "This decision makes no product change",
+        "does not admit the PR #50 baseline or a subsequent result as Exit 4 "
+        "evidence",
+        "Exit 4 stays Pending",
+        "Phase 6 stays at 2/5 accepted exits",
+        "subsequent decision at Level 3 must admit the evidence before owner "
+        "acceptance of Exit 4",
+    ):
+        _require(
+            decision_clause in decision_quote_flat,
+            "D-GOV-008 quoted owner decision drifted: " + decision_clause,
+        )
+
+    _require_links(
+        panel,
+        (
+            (
+                "PR #50 performance series",
+                "../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-"
+                "pipeline-performance.md",
+            ),
+            (
+                "comparison-direction section",
+                "../PERFORMANCE_SOP.md#phase-6-exit-4-comparison-direction",
+            ),
+            (
+                "local Issue 9 source",
+                "../external/asd-ste100/README.md",
+            ),
+        ),
+        "D-GOV-008 panel link drifted",
+    )
+
+
 def _validate_exit_conditions(
     plan: str,
     phase4_closeout: str,
@@ -1166,6 +1514,16 @@ def _validate_exit_conditions(
         and "accepts no phase exit and does not claim that performance became "
         "better" in plan_flat,
         "D-GOV-007 performance-host summary drifted",
+    )
+    _require(
+        "D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison "
+        "baseline" in plan_flat
+        and "selects one performance hypothesis for the preview sampler and "
+        "defines the comparison rule" in plan_flat
+        and "authorises one performance optimisation at Level 2 but "
+        "makes no product change" in plan_flat
+        and "Exit 4 stays Pending" in plan_flat,
+        "D-GOV-008 performance-direction summary drifted",
     )
 
     current_flat = " ".join(current_evidence.split())
@@ -2603,7 +2961,7 @@ def _validate_decisions(plan: str) -> None:
                     "D-GOV-006",
                 }
                 else "2026-08-16"
-                if decision_id == "D-GOV-007"
+                if decision_id in {"D-GOV-007", "D-GOV-008"}
                 else (
                     "2026-08-02"
                     if decision_id in {"D-P6-002", "D-P6-003"}
@@ -2922,6 +3280,102 @@ def _validate_decisions(plan: str) -> None:
         _require(
             fragment in performance_host_semantic,
             "D-GOV-007 authority or exclusion drifted: " + fragment,
+        )
+    performance_direction_record = phase6_by_id["D-GOV-008"]
+    performance_direction_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-4-performance-direction-panel"
+    )
+    _require(
+        performance_direction_record["decision"]
+        == (
+            "Accept the Phase 6 Exit 4 comparison baseline and performance "
+            "direction."
+        )
+        and performance_direction_record["evidence"]
+        == performance_direction_panel
+        and performance_direction_record["panel_record"]
+        == performance_direction_panel,
+        "D-GOV-008 decision or panel routing drifted",
+    )
+    performance_direction_semantic = _semantic_text(
+        str(performance_direction_record["authority"])
+        + " "
+        + str(performance_direction_record["exclusions"])
+    )
+    for fragment in (
+        "9169b7e7beec5cf614b8a5284db0f97367728def",
+        "accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline",
+        "f370b029bb4c1ce34987dc025a741185e233df04",
+        "linux-x86_64-flatpak-freecad-1.1.3",
+        "phase6-transition-edit-validate-export-profile-v1",
+        "full Edit, Validate, Export, warm-reuse, correctness, lifecycle, "
+        "output, and cleanup conditions",
+        "selects one performance hypothesis",
+        "preview sampler calculates 33 stations. It does zero-origin "
+        "integration for each interior station",
+        "preview batch function can calculate all preview displacement values "
+        "without that work at each station",
+        "authorised boundary at Level 2 is the preview sampler, one preview "
+        "batch function if necessary",
+        "must preserve all stated railway, preview, canonical-state, "
+        "transaction, "
+        "persistence, exact-validation, export, diagnostic, and cleanup "
+        "invariants",
+        "rule uses 12 paired blocks on the exact 1.1.3 host profile",
+        "Six blocks use the baseline first. Six blocks use the candidate "
+        "first",
+        "paired difference for process CPU time in Edit must be negative in a "
+        "minimum of 10 blocks",
+        "medians of the paired differences for Edit wall time and cold-journey "
+        "CPU and wall time must be negative",
+        "The Level 2 cycle must use the no-displacement rule for Validate, "
+        "Export, cleanup, warm block values, resource metrics, and the journey "
+        "remainder",
+        "median of its paired differences is more than its baseline MAD",
+        "The Level 2 cycle must use the same rule for RSS, RSS change, "
+        "high-water RSS, and high-water RSS change",
+        "It must use the rule in each measured stage and the full journey",
+        "All discrete invariants must have results equal to the baseline "
+        "results",
+        "candidate must add no work to an unmeasured boundary",
+        "process launch, module import, fixture construction, dialog opening, "
+        "document disposal at the end, and other unmeasured setup or teardown",
+        "candidate does all new product work during measured Edit",
+        "product defect, invariant difference, or correctness failure gives "
+        "FAIL and stops the cycle",
+        "replacement is possible only for the failure class "
+        "fixture-or-harness-defect or environment-or-profile-defect",
+        "attempt with this failure must give no measurement for the comparison",
+        "Record the failure class before replacement",
+        "record the sequence before measurements start",
+        "same block and the same recorded sequence",
+        "authorises one performance optimisation at Level 2 for zero-origin "
+        "integration in the preview sampler",
+        "subsequent decision at Level 3 must admit the evidence before owner "
+        "acceptance of Exit 4",
+        "makes no product change",
+        "does not admit the PR #50 baseline or a subsequent result as Exit 4 "
+        "evidence",
+        "does not claim that performance became better",
+        "define a product performance budget",
+        "accept Exit 4",
+        "gives no authority for a new cache",
+        "gives no authority for changes that are not in the specified product "
+        "boundary",
+        "changes no accepted-exit count, risk disposition, compatibility "
+        "authority, product output, product schema, public API, or release "
+        "authority",
+        "Exit 4 stays Pending",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Output stays private-development",
+        "Project status stays unknown",
+        "gives no production, physical-output, project-cleared, packaging, "
+        "release, or tagging authority",
+    ):
+        _require(
+            fragment in performance_direction_semantic,
+            "D-GOV-008 authority or exclusion drifted: " + fragment,
         )
     current_records = document["decisions"]
     _require(
@@ -4100,6 +4554,11 @@ def main() -> None:
         plan,
         phase4_closeout,
         phase5_closeout,
+        current_evidence,
+    )
+    _validate_performance_direction_sources(
+        _read(PERFORMANCE_SOP_PATH),
+        _read(TERMINOLOGY_PATH),
         current_evidence,
     )
     _validate_risks(plan)
