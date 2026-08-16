@@ -835,6 +835,13 @@ Level 3 true-gate panel triggers and compact completion report in
 [ENGINEERING_POLICY.md](ENGINEERING_POLICY.md). It proves control consistency
 only; it does not close an open risk or accept a phase closure.
 
+The check also examines the
+[ASD-STE100 Issue 9 reference-source instructions](external/asd-ste100/README.md),
+their Git-exclusion boundary, and the different functions of policy and an
+external reference. Normal CI does not use the ignored PDF. A conformance
+record must report its official source. Automatic validation does not prove
+linguistic conformance.
+
 Fast development-bridge recipe contract checks:
 
 ```bash

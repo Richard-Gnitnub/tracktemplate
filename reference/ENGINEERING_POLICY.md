@@ -147,7 +147,7 @@ change the scope of this profile or its controlled status meanings.
 ### Normative controlled-writing standard
 
 TrackTemplate uses
-[ASD-STE100 Simplified Technical English, Issue 9](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf)
+[ASD-STE100 Simplified Technical English, Issue 9](external/asd-ste100/README.md)
 as the normative controlled-writing standard for English canonical technical
 prose. The standard identity is ASD-STE100 Simplified Technical English,
 Issue 9, dated 2025-01-15. The official standard is the normative external
@@ -156,6 +156,10 @@ reference.
 Public summaries, model knowledge, and automatic validators do not show
 conformance. A reviewer must use the official standard for a linguistic
 conformance review.
+Use the [official-source instructions](external/asd-ste100/README.md) to get
+the standard. Report the source that you use. Those instructions own only the
+local path and source priority. They do not own TrackTemplate documentation
+policy.
 Do not copy the standard or its controlled general dictionary into this
 repository.
 

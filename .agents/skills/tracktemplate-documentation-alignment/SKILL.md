@@ -40,8 +40,11 @@ The profile and terminology register own these requirements. This skill only
 finds and corrects drift.
 
 For STE-governed prose, make sure that the recorded conformance state is
-correct. Keep Issue 9 conformance unverified if a reviewer did not use the
-official standard. Keep each bounded migration finding in the record until a
+correct. TT-DOC-001 and TT-DOC-002 are policy authority. Use the
+[ASD-STE100 reference-source instructions](../../../reference/external/asd-ste100/README.md)
+only to get the external linguistic reference. The PDF is not repository
+policy. Keep Issue 9 conformance unverified if a reviewer did not use an
+official source. Keep each bounded migration finding in the record until a
 reviewer records its result.
 
 - Treat explicit current user decisions, `AGENTS.md` and canonical reference

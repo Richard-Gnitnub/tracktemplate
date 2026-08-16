@@ -43,7 +43,7 @@ Use one of two modes:
 1. Read [`references/review-checklist.md`](references/review-checklist.md).
 2. Examine the full relevant diff before you record conclusions. Include
    connected changes, tests, documentation, and generated interfaces for the
-   same behavior.
+   same behaviour.
 3. Examine raw validation output and failed-test evidence before you read a
    completion summary or proposed diagnosis.
 4. Identify the affected architectural boundary and railway boundary before
@@ -63,7 +63,11 @@ authority.
 For an Issue 9 conformance claim, examine the recorded conformance review. Make
 sure that the reviewer used the official standard. The reviewer must review
 the full logical unit that contains the change. A validator result alone is
-not sufficient evidence.
+not sufficient evidence. Use the
+[ASD-STE100 source instructions](../../../reference/external/asd-ste100/README.md)
+to identify the official source. Keep TrackTemplate policy different from the
+external normative reference. Keep evidence that the reviewer examined the
+named logical unit.
 
 Before you review exporter interruption probes or tests, read the canonical
 [supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).

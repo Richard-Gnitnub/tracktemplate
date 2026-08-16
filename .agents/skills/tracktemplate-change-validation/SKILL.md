@@ -77,6 +77,9 @@ before selecting proof.
   accurately. Do not use a validator as proof of linguistic conformance.
 - A recorded conformance review against the official Issue 9 standard is
   necessary for a linguistic conformance claim.
+- For such a claim, make sure that the review reports an official source from the
+  [ASD-STE100 source instructions](../../../reference/external/asd-ste100/README.md).
+  Normal repository validation does not use the ignored PDF.
 - Run affected regression suites and the applicable FreeCAD, GUI, persistence,
   migration, export, rollback, recovery, performance, provenance or licensing
   checks.

@@ -9,8 +9,12 @@ description: Create, review, shorten or reorganise TrackTemplate Markdown docume
 
 1. Read the canonical
    [Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
-2. When the Issue 9 scope applies, use the official standard that the profile
-   identifies. Review the full logical unit that contains the change.
+2. When the Issue 9 scope applies, follow the
+   [official-source instructions](../../../reference/external/asd-ste100/README.md).
+   Use the local official PDF when it is available. Otherwise, use the official
+   ASD/STEMG source when it is available. Report the official source that you
+   used. If no official source is available, do not claim conformance.
+   Review the full logical unit that contains the change.
 3. Read the project technical terms in
    [`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
 4. Read [`references/document-ownership.md`](references/document-ownership.md).

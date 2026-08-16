@@ -270,6 +270,11 @@ the failure is environmental or external, or the repair would exceed scope.
 Stop with that exact-green draft. Do not mark it ready or merge it during this
 invocation.
 
+When a cycle includes an ASD-STE100 linguistic conformance assessment, route
+it to
+[`$tracktemplate-documentation-review`](../tracktemplate-documentation-review/SKILL.md).
+Do not read the external PDF during a usual continuation cycle.
+
 ## Owner acceptance pack
 
 At the end of a successful implementation cycle, apply the canonical
