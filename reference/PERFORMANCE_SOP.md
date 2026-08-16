@@ -57,6 +57,143 @@ an exact host profile that is different. D-GOV-007 adds the exact 1.1.3 profile
 only. It admits no performance result and defines no value for a performance
 budget. It does not accept Exit 4 or claim that performance became better.
 
+<a id="phase-6-exit-4-comparison-direction"></a>
+
+## Phase 6 Exit 4 comparison direction
+
+D-GOV-008 accepts the [PR #50 performance series](benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md)
+as the comparison baseline. The baseline raw record has SHA-256
+`83deda4bdb01c5c5677f568ac62625572b19c3bce313af515ba4fa6b9840298a`.
+The evidence source state is
+`f370b029bb4c1ce34987dc025a741185e233df04`. The host profile is
+`linux-x86_64-flatpak-freecad-1.1.3`. The measurement profile is
+`phase6-transition-edit-validate-export-profile-v1`.
+
+The baseline has the selected Exit workload from `420.000` mm to `360.000`
+mm. Each new GUI process records one full cold journey. That journey has Edit,
+Validate, and Export. Each process also records one warm-up and three warm
+reuse cycles. The correctness, output, lifecycle, and cleanup conditions are
+part of the comparison baseline.
+
+The accepted source does one necessary preview regeneration during Edit. The
+preview sampler calculates 33 stations. For each station, it calculates the
+clothoid displacement with the scalar API. For each of the 31 interior
+stations, the API does a 240-step Simpson integration from station zero. The
+endpoint calculation also does an integration.
+
+A temporary profile measured 50 preview regenerations. It measured 3.263 ms
+of process CPU time for each preview regeneration. The profile recorded 0.144 seconds for
+integration and 0.163 seconds for the preview sampler. Thus, zero-origin
+integration is a measured cost during Edit. It is not all the Edit cost.
+
+### Selected performance hypothesis
+
+One preview batch function can calculate all preview displacement values
+without zero-origin integration at each interior station. This performance
+optimisation can make process CPU time for Edit lower. The candidate must do
+all new calculation work during measured Edit.
+
+The candidate must add no work to Validate, Export, a warm cycle, cleanup, or
+an unmeasured boundary. The profile does not measure process launch, module
+import, fixture construction, dialog opening, or document disposal at the end.
+The candidate must add no work to these boundaries. It must add no work to other
+setup or teardown that the profile does not measure.
+
+Code inspection must show that the candidate does all new product work during
+measured Edit. If inspection does not give sufficient proof, stop the cycle.
+The result is FAIL if measured Edit does not include all new candidate work.
+
+The authorised product boundary at Level 2 is:
+
+- `tracktemplate/presentation/transition_preview.py`
+- If necessary, one preview batch function in
+  `tracktemplate/domain/alignment.py`
+- Directly dependent tests for railway behaviour, the preview, FreeCAD GUI,
+  performance, and preservation
+- The performance report and current evidence that are directly dependent.
+
+The product change must preserve the scalar alignment API. It must preserve
+the segment count, frame, identities, source signatures, cache lifecycle, and
+Coin mapping. Preview points must agree with their oracle within `1.0e-10` mm.
+The change must preserve canonical state, transactions, Undo/Redo,
+save/reopen, and cleanup behaviour. Exact validation, DXF bytes, manifest
+bytes, hashes, and diagnostics must not change.
+
+Do not add a cache that the evidence does not make necessary. Do not add a
+runtime dependency or a public API. Change only the specified product boundary
+and directly dependent tests and evidence. Do not change railway intent, exact
+geometry, validation, export, or the measurement profile. Stop if the preview
+batch function cannot preserve the stated invariants.
+
+### Comparison rule
+
+The Level 2 cycle must use 12 paired blocks. Each block has one baseline
+sample and one candidate sample. Each sample uses a new GUI process. Use the
+baseline first in six blocks. Use the candidate first in the other six blocks.
+Record the sequence before the measurements start.
+
+Use the exact 1.1.3 host profile, measurement profile, workload, settings, and
+output scope in all samples. The baseline product blobs must equal those at
+the PR #50 source state. The candidate can have changes only
+in the authorised Level 2 boundary. Preserve all raw attempts. Record the
+failure class before a replacement pair starts.
+
+A product defect, invariant difference, or correctness failure gives a FAIL
+result and stops the cycle. A replacement is possible only for the failure
+class `fixture-or-harness-defect` or `environment-or-profile-defect`. The
+attempt with this failure must give no measurement for the comparison. Record
+the failure class before replacement. Use the same block and the same recorded
+sequence. Preserve the attempt with this failure and the replacement.
+
+For each metric, calculate candidate minus baseline in its paired block. A
+negative paired difference shows a lower candidate value. Calculate the
+baseline MAD from the 12 baseline values for that metric. Report all values,
+medians, ranges, paired differences, MAD values, absolute changes, and
+percentage changes.
+
+For each numeric warm metric, calculate the median of the three measured warm
+cycles in one sample. This median is the warm block value for that sample.
+All warm-cycle correctness results must be PASS.
+
+The comparison result is PASS only when all these conditions are true:
+
+1. The paired difference for process CPU time in Edit is negative in a minimum
+   of 10 of the 12 blocks. The median of these differences is negative.
+2. The median of the paired differences for Edit wall time is negative. This
+   condition records measurement noise in GUI wall time. It does not ignore
+   the noise.
+3. The medians of the paired differences for cold-journey CPU and wall time
+   are negative.
+4. The Level 2 cycle must use the no-displacement rule for Validate, Export,
+   cleanup, all warm block values, all resource metrics, and the journey
+   remainder. The result for a metric is FAIL if the median of its paired
+   differences is more than its baseline MAD. The result is also FAIL if 10 or
+   more paired differences are positive.
+5. The Level 2 cycle must use condition 4 for RSS, RSS change, high-water RSS,
+   and high-water RSS change in each measured stage and the full journey.
+6. All discrete invariants must have results equal to the baseline results.
+7. Canonical state, preview geometry, exact geometry, receipts, DXF, manifest,
+   hashes, diagnostics, and deterministic reuse must have unchanged results.
+8. Code inspection must show that the candidate does all new product work
+   during measured Edit. New work in an unmeasured boundary gives FAIL.
+
+One sample cannot give a PASS result. A missing condition gives a
+FAIL result. Do not select a new rule after the project knows the candidate
+results.
+Do not use the 1.1.1 report or different host profiles to claim that
+TrackTemplate performance became better.
+
+D-GOV-008 authorises only this Level 2 outcome:
+
+> Make one performance optimisation at Level 2 for zero-origin integration in
+> the preview sampler. Validate it against the accepted FreeCAD 1.1.3
+> baseline and the comparison rule.
+
+D-GOV-008 makes no product change. It does not admit the baseline or a
+subsequent result as Exit 4 evidence. It defines no product performance budget.
+Exit 4 stays Pending. A subsequent decision at Level 3 must admit the evidence
+before the owner can accept Exit 4.
+
 ## Baseline procedure
 
 1. Preserve an unchanged starting document or a reproducible input recipe.

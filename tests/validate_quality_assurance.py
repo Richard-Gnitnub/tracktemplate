@@ -580,22 +580,24 @@ def validate_documentation_profile(
     require(
         "Phase 6 has 2/5 accepted exits" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
-        and "D-GOV-007" in owner_view
-        and "exact 1.1.3 profile" in owner_view
-        and "exact 1.1.1 profile keeps that authority" in owner_view
-        and "rejects a new result unless it names one of the two exact "
-        "ID/version mappings" in owner_view
-        and "Every new schema-2 result has exact host identity" in owner_view
-        and "records the ID and FreeCAD version of its exact host profile"
+        and "D-GOV-008" in owner_view
+        and "accepts the PR #50 FreeCAD 1.1.3 series as the comparison "
+        "baseline" in owner_view
+        and "zero-origin integration in the preview sampler as the performance "
+        "hypothesis" in owner_view
+        and "defines the comparison rule before the product change"
         in owner_view
-        and "rejects a result set that contains two host profiles" in owner_view
-        and "D-GOV-007 admits no performance result and defines no value for a "
-        "performance budget" in owner_view
+        and "12 paired blocks on one exact host profile" in owner_view
+        and "Each block has one baseline sample and one candidate sample"
+        in owner_view
+        and "examines CPU time for Edit directly" in owner_view
+        and "wall time, the full journey, Validate, Export, warm reuse, "
+        "resources, correctness, output, lifecycle, and cleanup" in owner_view
+        and "D-GOV-008 makes no performance optimisation and admits no Exit 4 "
+        "evidence" in owner_view
+        and "defines no product performance budget" in owner_view
         and "does not claim that performance became better" in owner_view
-        and "D-GOV-007 does not admit the rejected 1.1.3 test result as Exit 4 "
-        "evidence"
-        in owner_view
-        and "D-GOV-006 host and security limits do not change" in owner_view
+        and "D-GOV-006 and D-GOV-007 host limits do not change" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
@@ -649,6 +651,30 @@ def validate_documentation_profile(
         "Functional compatibility",
         "Qualify",
         "Requalify",
+        "comparison baseline",
+        "performance hypothesis",
+        "comparison rule",
+        "performance optimisation",
+        "Zero-origin integration",
+        "preview sampler",
+        "preview regeneration",
+        "preview batch function",
+        "Simpson integration",
+        "interior station",
+        "endpoint calculation",
+        "unmeasured boundary",
+        "paired block",
+        "paired difference",
+        "median absolute deviation (MAD)",
+        "Measurement noise",
+        "no-displacement rule",
+        "warm block value",
+        "resource metric",
+        "High-water RSS",
+        "journey remainder",
+        "discrete invariant",
+        "Setup",
+        "Teardown",
         "Do not use different technical terms for the same project concept",
         "Do not use a technical noun as a verb unless this register also "
         "approves the verb",

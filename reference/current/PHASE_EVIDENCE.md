@@ -1974,6 +1974,264 @@ This tranche admits no evidence for
 Exit 4. It defines no performance budget. It accepts no phase exit. Phase 6
 stays at 2/5 accepted exits. Exit 4 stays Pending.
 
+<a id="phase-6-exit-4-performance-direction-panel"></a>
+
+## Phase 6 Exit 4 performance-direction panel
+
+**Source state:** The source state for this Level 3 decision is protected
+`main` `9169b7e7beec5cf614b8a5284db0f97367728def`. Phase 6 has 2/5
+accepted exits. Exit 4 is Pending. D-GOV-006 qualifies the exact FreeCAD 1.1.3
+host profile. D-GOV-007 authorises that profile as a source of candidate
+performance evidence for Phase 6.
+
+No subsequent decision defines an Exit 4 comparison rule. No subsequent
+decision selects a performance hypothesis. D-GOV-008 is the next decision
+ID.
+
+**Comparison baseline:** The
+[PR #50 performance series](../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md)
+can be the comparison baseline. Its evidence source state is
+`f370b029bb4c1ce34987dc025a741185e233df04`. Its raw `performance.json` has
+SHA-256
+`83deda4bdb01c5c5677f568ac62625572b19c3bce313af515ba4fa6b9840298a`.
+
+The baseline uses the exact
+`linux-x86_64-flatpak-freecad-1.1.3` host profile and measurement profile
+`phase6-transition-edit-validate-export-profile-v1`. It records three new GUI
+processes. Each process records one cold Edit, Validate, and Export journey.
+It also records one warm-up and three warm reuse cycles.
+
+The baseline records correctness, exact output, lifecycle, resource, and
+cleanup results. It has only three cold samples. Thus, it records the source,
+method, workload, and initial cost record. These samples do not show that
+performance became better.
+
+D-GOV-008 accepts this series as the comparison baseline. A Level 2 cycle must
+collect new samples in paired blocks. Each block must have a baseline sample
+and a candidate sample. The cycle must use the same host, method, workload,
+output scope, and correctness conditions. It must not use the 1.1.1 report to
+claim that TrackTemplate performance became better.
+
+**Edit-path finding:** The accepted Edit has one necessary preview
+regeneration. The preview sampler calculates 33 stations. For each station, it
+calculates clothoid displacement with the scalar API. For each of the 31
+interior stations, the API does a 240-step Simpson integration from station
+zero. The endpoint calculation also does an integration.
+
+A temporary profile measured 50 preview regenerations. It measured 3.263 ms
+of process CPU time for each preview regeneration. The profile recorded 0.144 seconds for
+integration and 0.163 seconds for the sampler. Thus, integration was
+approximately 88% of the sampler time in the profile. The median for process
+CPU time in PR #50 Edit is 19.653 ms.
+
+The diagnostic identifies one measured Edit cost. It does not show all the
+Edit costs. Source and diagnostic evidence give
+evidence for one performance hypothesis. One preview batch function can
+calculate all preview displacement values without zero-origin integration at
+each interior station.
+
+The initial temporary command stopped. The target code did not start. The
+temporary script did not include the repository import path. The primary
+failure class is `fixture-or-harness-defect`. The repair changed only the
+temporary probe. The same command then reported the profile result.
+
+**Selected hypothesis and Level 2 boundary:** D-GOV-008 selects a performance
+hypothesis for zero-origin integration in the preview sampler. One
+preview batch function can make this Edit-path cost lower. The candidate must
+do all new calculation work during measured Edit.
+
+The candidate must add no work to Validate, Export, a warm cycle, cleanup, or
+an unmeasured boundary. The profile does not measure process launch, module
+import, fixture construction, dialog opening, or document disposal at the end.
+The candidate must add no work to these boundaries. It must add no work to other
+setup or teardown that the profile does not measure.
+
+Code inspection must show that the candidate does all new product work during
+measured Edit. If inspection does not give sufficient proof, stop the cycle.
+The result is FAIL if measured Edit does not include all new candidate work.
+
+The Level 2 boundary includes the preview sampler and one preview batch
+function if it is necessary. It also includes directly dependent tests,
+performance evidence, and current evidence. The
+[comparison-direction section](../PERFORMANCE_SOP.md#phase-6-exit-4-comparison-direction)
+owns the full boundary and comparison rule.
+
+The change must keep the scalar alignment API, preview point oracle, segment
+count, frame, and identities. It must keep source signatures, cache lifecycle,
+and Coin mapping. It must keep canonical state, transaction, Undo/Redo,
+save/reopen, and cleanup behaviour. Exact validation, DXF, manifest, hashes,
+and diagnostics must not change.
+
+The evidence does not authorise a new cache. It does not authorise a runtime
+dependency or a public API. The Level 2 cycle must stop if it cannot keep all
+invariants. It must also stop if its full comparison result is not PASS.
+
+**Comparison rule:** The Level 2 cycle must use 12 paired blocks. Each block
+has one baseline sample and one candidate sample. Each sample uses a new GUI
+process. Six blocks use the baseline first. Six blocks use the candidate first.
+The cycle must record the sequence before measurement starts.
+
+Preserve all raw attempts. A product defect, invariant difference, or
+correctness failure gives a FAIL result and stops the cycle. A replacement is
+possible only for the failure class `fixture-or-harness-defect` or
+`environment-or-profile-defect`. The attempt with this failure must give no
+measurement for the comparison. Record the failure class before replacement.
+For the replacement, use the same block and the same recorded sequence.
+
+For each numeric warm metric, calculate the median of the three measured warm
+cycles in one sample. This median is the warm block value for that sample.
+All warm-cycle correctness results must be PASS.
+
+For each metric, a paired difference is candidate minus baseline. Process CPU
+time for Edit must have a negative difference in a minimum of 10 blocks. The
+median of these differences must be negative. The median of the paired differences for
+Edit wall time must be negative.
+
+The medians of the paired differences for cold-journey CPU and wall time must
+be negative. Use the no-displacement rule for Validate, Export, cleanup, all
+warm block values, all resource metrics, and the journey remainder. The result
+for a metric is FAIL if the median of its paired differences is more than its
+baseline MAD. The result is also FAIL if 10 or more paired differences are
+positive.
+
+Use the same rule for RSS, RSS change, high-water RSS, and high-water RSS
+change. Use it in each measured stage and the full journey. All discrete
+invariants must have results equal to the baseline results. All correctness
+and output results must stay unchanged.
+
+One sample cannot give a PASS result. A missing condition gives a
+FAIL result. The project must not select a new rule after it knows the
+candidate results.
+
+D-GOV-008 makes no product change. It does not admit the PR #50 baseline
+or a subsequent result as Exit 4 evidence. It defines no product performance
+budget and does not accept Exit 4. Exit 4 stays Pending. A subsequent decision
+at Level 3 must admit the evidence before owner acceptance of Exit 4.
+
+**Risk panel:** This Level 3 decision is `necessary-enabling` progress. It
+changes performance direction and Level 2 authority only.
+
+| Risk | Panel judgement | Result |
+| --- | --- | --- |
+| PR-15 — deferred cost | The rule examines Edit, Validate, Export, the full cold journey, warm reuse, resources, cleanup, and all unmeasured boundaries. A metric gives FAIL when the median of its paired differences is more than its baseline MAD. | High / Mitigate / Partial. The disposition does not change. |
+| QA-R04 — no product performance budget | The decision defines a comparison rule and not a product budget. Representative whole-layout capacity stays Unknown. | High / Mitigate / Partial. The disposition does not change. |
+| PR-22 — authority transfer | The owner gives the exact Level 3 authority. Two read-only reviewers must examine one exact candidate. | High / Remove / Effective (current scope). The disposition does not change. |
+| PR-13 — repository or evidence loss | Bounded paths, exact-state publication, and the post-merge audit preserve accepted content. | Critical / Mitigate / Effective (current scope). The disposition does not change. |
+
+### Documentation conformance
+
+The documentation review uses the
+[local Issue 9 source](../external/asd-ste100/README.md). This is the official
+source. The review also uses the TrackTemplate UK English spelling directive.
+It examines each full logical unit in this table.
+
+| Path | Full logical unit |
+| --- | --- |
+| `reference/PERFORMANCE_SOP.md` | The full section with the heading `Phase 6 Exit 4 comparison direction`. |
+| `reference/TERMINOLOGY.md` | The five new performance-term rows. |
+| `reference/PROJECT_PLAN.md` | The current owner view, D-GOV-008 phase summary, and D-GOV-008 decision row. |
+| `reference/current/PHASE_EVIDENCE.md` | This full D-GOV-008 panel, the changed Exit 4 disposition, and D-GOV-008 carried-control text. |
+| `reference/current/gate-decisions.json` | The human-readable D-GOV-008 record. Exact JSON data is not part of the linguistic review. |
+
+Before the conformance review, no reviewer verified ASD-STE100 Issue 9
+conformance for these changed units. The conformance review must examine the
+exact candidate. The pull request and completion report must record the
+result. Issue 9 conformance stays Unknown for other live prose.
+
+### Review state
+
+Two reviewers who did not make the change must examine one exact candidate.
+The performance reviewer must examine the baseline and performance hypothesis.
+That reviewer must examine the comparison rule, no-displacement rule, and
+unmeasured boundaries. The governance reviewer must examine authority,
+evidence, documentation, and preservation. The reviewers must not change files.
+
+The two reviews must find no blocker before the project merges the candidate.
+The pull request and completion report must record the results. This panel
+must not change after those reviews.
+
+**Panel recommendation:** **Continue with bounded conditions.** Accept the
+PR #50 series as the comparison baseline. Select the performance hypothesis
+for zero-origin integration. Define the comparison rule and authorise only the
+stated Level 2 cycle. Keep Exit 4 Pending.
+
+> **D-GOV-008 — Accept the Exit 4 comparison baseline and performance direction**
+>
+> At protected `main` `9169b7e7beec5cf614b8a5284db0f97367728def`, I
+> accept the PR #50 FreeCAD 1.1.3 series as the comparison baseline. The
+> evidence source state is `f370b029bb4c1ce34987dc025a741185e233df04`.
+> The exact host profile is
+> `linux-x86_64-flatpak-freecad-1.1.3`. The measurement profile is
+> `phase6-transition-edit-validate-export-profile-v1`.
+>
+> The baseline includes the full Edit, Validate, Export, warm-reuse,
+> correctness, lifecycle, output, and cleanup conditions. A subsequent cycle
+> at Level 2 must collect new samples in paired blocks. Each block must have a
+> baseline sample and a candidate sample. It must not use the 1.1.1 report to
+> claim that TrackTemplate performance became better.
+>
+> I select one performance hypothesis. The preview sampler calculates 33
+> stations. It does zero-origin integration for each interior station. One
+> preview batch function can calculate all preview displacement values without
+> that work at each station.
+>
+> I authorise a Level 2 change in the preview sampler. The change can add one
+> preview batch function if it is necessary. It can also change
+> directly dependent tests and evidence. It must keep all stated railway,
+> preview, canonical-state, transaction, persistence, exact-validation,
+> export, diagnostic, and cleanup invariants.
+>
+> The rule uses 12 paired blocks on the exact 1.1.3 host profile. Six blocks
+> use the baseline first. Six blocks use the candidate first. The paired
+> difference for process CPU time in Edit must be negative in a minimum of 10
+> blocks. The median of these differences must be negative.
+>
+> The medians of the paired differences for Edit wall time and cold-journey
+> CPU and wall time must be negative. Use the no-displacement rule for
+> Validate, Export, cleanup, warm block values, resource metrics, and the
+> journey remainder. The result for a metric is FAIL if the median of its
+> paired differences is more than its baseline MAD. The result is also FAIL if
+> 10 or more paired differences are positive.
+>
+> Use the no-displacement rule for RSS, RSS change, high-water RSS, and
+> high-water RSS change. Use it in each measured stage and the full journey.
+> All discrete invariants, correctness, and output results must stay unchanged.
+> All warm-cycle correctness results must be PASS.
+>
+> The candidate must add no work to an unmeasured boundary. This includes
+> process launch, module import, fixture construction, dialog opening, document
+> disposal at the end, and other unmeasured setup or teardown. Inspection must
+> show that the candidate does all new product work during measured Edit. If
+> inspection does not give sufficient proof, stop the cycle.
+>
+> A product defect, invariant difference, or correctness failure gives FAIL
+> and stops the cycle. A replacement is possible only for the failure class
+> `fixture-or-harness-defect` or `environment-or-profile-defect`. The attempt
+> with this failure must give no measurement for the comparison.
+>
+> Preserve all attempts. Record the failure class before replacement. The
+> Level 2 cycle must record the sequence before measurements start. For the
+> replacement, use the same block and the same recorded sequence.
+>
+> This decision makes no product change. It does not admit the PR #50
+> baseline or a subsequent result as Exit 4 evidence. It does not claim that
+> performance became better, define a product performance budget, or accept
+> Exit 4.
+>
+> It gives no authority for a new cache, a runtime dependency, or a public API.
+> It gives no authority for changes that are not in the specified product
+> boundary.
+> It gives no authority to change railway intent, exact validation, export,
+> output, or the measurement profile.
+>
+> Exit 4 stays Pending. Exits 1 and 5 stay Pending. Phase 6 stays at 2/5
+> accepted exits. Output stays private-development. Project status stays
+> `unknown`.
+>
+> This decision gives no production, physical-output, `project-cleared`,
+> packaging, release, or tagging authority. A subsequent decision at Level 3
+> must admit the evidence before owner acceptance of Exit 4.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -1985,7 +2243,7 @@ The accepted current state is 2/5 under D-P6-002 and D-P6-005:
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005 — bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004 with the recorded platform, recovery and assurance limitations; project status remains `unknown` |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — the 1.1.1 and 1.1.3 reports record all cold and warm costs. Their host profiles are exact and different. Their exact states are different. They cannot show that TrackTemplate performance became better. No result measures one exact host profile before and after a product change. No owner decision defines a numerical budget. |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline. It selects one performance hypothesis and defines the comparison rule. No product optimisation or comparison result exists. No decision admits evidence for Exit 4 or defines a product performance budget. |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
 ## Carried controls and exclusions
@@ -2004,7 +2262,7 @@ The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
 D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001,
-TT-DOC-002, D-GOV-006 and D-GOV-007.
+TT-DOC-002, D-GOV-006, D-GOV-007 and D-GOV-008.
 
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.
@@ -2021,3 +2279,8 @@ D-GOV-007 changes only the host rule and the directly dependent schema for
 internal performance-evidence records. It admits no performance result and
 defines no budget. It does not claim that performance became better, and it
 does not accept Exit 4.
+
+D-GOV-008 accepts the PR #50 series as the comparison baseline. It selects one
+performance hypothesis and defines the comparison rule. It authorises one Level 2
+cycle but makes no performance optimisation. It admits no Exit 4 evidence
+and does not accept Exit 4.

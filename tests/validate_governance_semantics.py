@@ -1263,12 +1263,13 @@ def validate_current_evidence_mutations() -> None:
 
     exit4_row = table_row_containing(
         evidence,
-        "the 1.1.1 and 1.1.3 reports record all cold and warm costs",
+        "D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison "
+        "baseline",
     )
     exit4_promoted = replace_once(
         exit4_row,
-        "Pending — the 1.1.1 and 1.1.3 reports",
-        "Evidenced — the 1.1.1 and 1.1.3 reports",
+        "Pending — D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series",
+        "Evidenced — D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series",
     )
     expect_rejected(
         "phase-evidence/exit4-prematurely-evidenced",
@@ -1746,6 +1747,301 @@ def validate_current_evidence_mutations() -> None:
         "VALIDATION admitted the rejected 1.1.3 test result",
     )
 
+    terminology = read("reference/TERMINOLOGY.md")
+    paired_difference_orientation_inverted = replace_once(
+        terminology,
+        "A **paired difference** is the candidate value minus the baseline "
+        "value in one paired block.",
+        "A **paired difference** is the baseline value minus the candidate "
+        "value in one paired block.",
+    )
+    expect_rejected(
+        "performance-direction/paired-difference-orientation-inverted",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            paired_difference_orientation_inverted,
+            evidence,
+        ),
+        "D-GOV-008 performance terminology meaning drifted: A paired "
+        "difference is the candidate value minus the baseline value in one "
+        "paired block",
+    )
+
+    even_median_definition_inverted = replace_once(
+        terminology,
+        "If an ordered sample has an even number of values, its median is the "
+        "sum of the two middle values divided by two.",
+        "If an ordered sample has an even number of values, its median is the "
+        "lower middle value.",
+    )
+    expect_rejected(
+        "performance-direction/even-median-lower-middle-selected",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            even_median_definition_inverted,
+            evidence,
+        ),
+        "D-GOV-008 performance terminology meaning drifted: If an ordered "
+        "sample has an even number of values, its median is the sum of the two "
+        "middle values divided by two",
+    )
+
+    high_water_definition_inverted = replace_once(
+        terminology,
+        "**High-water RSS** is the maximum RSS that the profiler records.",
+        "**High-water RSS** is the minimum RSS that the profiler records.",
+    )
+    expect_rejected(
+        "performance-direction/high-water-definition-inverted",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            high_water_definition_inverted,
+            evidence,
+        ),
+        "D-GOV-008 performance terminology meaning drifted: High-water RSS "
+        "is the maximum RSS that the profiler records",
+    )
+
+    direction_sample_count_weakened = replace_once(
+        performance_sop,
+        "The Level 2 cycle must use 12 paired blocks.",
+        "The Level 2 cycle may use one sample.",
+    )
+    expect_rejected(
+        "performance-direction/paired-sample-rule-weakened",
+        lambda: progress._validate_performance_direction_sources(
+            direction_sample_count_weakened,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 performance direction drifted: must use 12 paired blocks",
+    )
+
+    direction_product_boundary_widened = replace_once(
+        performance_sop,
+        "  `tracktemplate/domain/alignment.py`\n",
+        "  `tracktemplate/domain/alignment.py`\n"
+        "- `tracktemplate/product/preview_cache.py`\n",
+    )
+    expect_rejected(
+        "performance-direction/product-boundary-widened",
+        lambda: progress._validate_performance_direction_sources(
+            direction_product_boundary_widened,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 authorised product path set drifted",
+    )
+
+    direction_displaced_cost_allowed = replace_once(
+        performance_sop,
+        "The candidate must add no work to Validate, Export, a warm cycle, "
+        "cleanup, or\nan unmeasured boundary.",
+        "The candidate may add work to Validate, Export, a warm cycle, "
+        "cleanup, or\nan unmeasured boundary.",
+    )
+    expect_rejected(
+        "performance-direction/displaced-cost-authorised",
+        lambda: progress._validate_performance_direction_sources(
+            direction_displaced_cost_allowed,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 performance direction drifted: must add no work to "
+        "Validate, Export, a warm cycle, cleanup, or an unmeasured boundary",
+    )
+
+    direction_fixed_profile_weakened = replace_once(
+        performance_sop,
+        "If inspection does not give sufficient proof, stop the cycle.",
+        "If inspection does not give sufficient proof, change the measurement "
+        "profile.",
+    )
+    expect_rejected(
+        "performance-direction/fixed-profile-weakened",
+        lambda: progress._validate_performance_direction_sources(
+            direction_fixed_profile_weakened,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 performance direction drifted: If inspection does not give "
+        "sufficient proof, stop the cycle",
+    )
+
+    direction_warm_aggregation_removed = replace_once(
+        performance_sop,
+        "For each numeric warm metric, calculate the median of the three "
+        "measured warm\ncycles in one sample.",
+        "Select one warm cycle after the candidate results are known.",
+    )
+    expect_rejected(
+        "performance-direction/warm-aggregation-removed",
+        lambda: progress._validate_performance_direction_sources(
+            direction_warm_aggregation_removed,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 performance direction drifted: For each numeric warm "
+        "metric, calculate the median of the three measured warm cycles in "
+        "one sample",
+    )
+
+    direction_product_failure_replaced = replace_once(
+        performance_sop,
+        "A product defect, invariant difference, or correctness failure gives "
+        "a FAIL\nresult and stops the cycle.",
+        "A product defect, invariant difference, or correctness failure can "
+        "be replaced.",
+    )
+    expect_rejected(
+        "performance-direction/product-failure-replaced",
+        lambda: progress._validate_performance_direction_sources(
+            direction_product_failure_replaced,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 performance direction drifted: A product defect, invariant "
+        "difference, or correctness failure gives a FAIL result and stops the "
+        "cycle",
+    )
+
+    direction_replacement_class_weakened = replace_once(
+        performance_sop,
+        "A replacement is possible only for the failure\nclass "
+        "`fixture-or-harness-defect` or `environment-or-profile-defect`.",
+        "A replacement is possible for any failure.",
+    )
+    expect_rejected(
+        "performance-direction/replacement-class-weakened",
+        lambda: progress._validate_performance_direction_sources(
+            direction_replacement_class_weakened,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 performance direction drifted: replacement is possible "
+        "only for the failure class fixture-or-harness-defect or "
+        "environment-or-profile-defect",
+    )
+
+    direction_resource_rule_removed = replace_once(
+        performance_sop,
+        "The Level 2 cycle must use condition 4 for RSS, RSS change, high-water "
+        "RSS,\n   and high-water RSS change in each measured stage and the full "
+        "journey.",
+        "Do not compare RSS or high-water RSS.",
+    )
+    expect_rejected(
+        "performance-direction/resource-rule-removed",
+        lambda: progress._validate_performance_direction_sources(
+            direction_resource_rule_removed,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 performance direction drifted: The Level 2 cycle must use "
+        "condition 4 for RSS, RSS change, high-water RSS, and high-water RSS "
+        "change",
+    )
+
+    direction_rule_selected_after_results = replace_once(
+        performance_sop,
+        "Do not select a new rule after the project knows the candidate\n"
+        "results.",
+        "Select a new rule after the project knows the candidate\nresults.",
+    )
+    expect_rejected(
+        "performance-direction/post-result-rule-authorised",
+        lambda: progress._validate_performance_direction_sources(
+            direction_rule_selected_after_results,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-008 performance direction drifted: Do not select a new rule "
+        "after the project knows the candidate results",
+    )
+
+    direction_exit_accepted = replace_once(
+        evidence,
+        "D-GOV-008 makes no product change. It does not admit the PR #50 "
+        "baseline\nor a subsequent result as Exit 4 evidence.",
+        "D-GOV-008 makes a product change. It admits the PR #50 baseline\n"
+        "and a subsequent result as Exit 4 evidence.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-008-exit4-evidence-admitted",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            direction_exit_accepted,
+        ),
+        "D-GOV-008 evidence panel drifted: does not admit the PR #50 baseline "
+        "or a subsequent result as Exit 4 evidence",
+    )
+
+    direction_risk_panel_deleted = replace_once(
+        evidence,
+        table_row_containing(evidence, "all unmeasured boundaries") + "\n",
+        "",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-008-risk-panel-deleted",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            direction_risk_panel_deleted,
+        ),
+        "D-GOV-008 risk panel drifted: PR-15 — deferred cost",
+    )
+
+    direction_conformance_scope_narrowed = replace_once(
+        evidence,
+        table_row_containing(evidence, "human-readable D-GOV-008 record")
+        + "\n",
+        "",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-008-conformance-scope-narrowed",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            direction_conformance_scope_narrowed,
+        ),
+        "D-GOV-008 conformance scope drifted: "
+        "reference/current/gate-decisions.json",
+    )
+
+    direction_review_gate_inverted = replace_once(
+        evidence,
+        "The two reviews must find no blocker before the project merges the "
+        "candidate.",
+        "The project can merge the candidate when a review finds a blocker.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-008-review-gate-inverted",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            direction_review_gate_inverted,
+        ),
+        "D-GOV-008 review gate drifted: two reviews must find no blocker "
+        "before the project merges the candidate",
+    )
+
+    direction_owner_authority_removed = replace_once(
+        evidence,
+        "> I authorise a Level 2 change in the preview sampler.",
+        "> A reviewer authorises a Level 2 change in the preview sampler.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-008-owner-authority-removed",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            direction_owner_authority_removed,
+        ),
+        "D-GOV-008 quoted owner decision drifted: I authorise a Level 2 change "
+        "in the preview sampler",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
@@ -1918,6 +2214,21 @@ def validate_project_plan_mutations() -> None:
         "project-plan/d-gov-007-decision-omitted",
         lambda: progress._validate_decisions(
             replace_once(plan, performance_host_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
+    performance_direction_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-008 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-008-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                performance_direction_decision_row + "\n",
+                "",
+            )
         ),
         "project-plan decisions differ from the frozen registers",
     )
