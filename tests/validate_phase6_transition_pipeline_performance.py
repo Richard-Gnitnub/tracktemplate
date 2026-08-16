@@ -597,23 +597,54 @@ def validate_source_and_scope_contracts():
 
 
 def validate_evidence_links_if_present():
-    report = (
+    historical_report = (
         ROOT
         / "reference"
         / "benchmarks"
         / "2026-08-02-phase6-transition-pipeline-performance.md"
     )
-    if not report.is_file():
-        return
-    report_text = report.read_text(encoding="utf-8")
-    assert "three fresh" in report_text
-    assert "not a B14-equivalent" in report_text
-    assert "No numerical budget" in report_text
+    current_report = (
+        ROOT
+        / "reference"
+        / "benchmarks"
+        / "2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md"
+    )
+    assert historical_report.is_file()
+    assert current_report.is_file()
+
+    historical_text = historical_report.read_text(encoding="utf-8")
+    assert "three fresh" in historical_text
+    assert "not a B14-equivalent" in historical_text
+    assert "No numerical budget" in historical_text
+
+    current_text = current_report.read_text(encoding="utf-8")
+    current_flat = " ".join(current_text.split())
+    for fragment in (
+        "f370b029bb4c1ce34987dc025a741185e233df04",
+        "linux-x86_64-flatpak-freecad-1.1.3",
+        "Evidence schema: `2`",
+        "profiler started three GUI processes in isolation",
+        "measurement profile changes one selected Exit",
+        "measurement profile does not include fixture construction",
+        "correctness checks found no failure",
+        "Full journey | 142.912 (140.426–247.792)",
+        "Full reuse cycle | 10.417 (9.857–10.799)",
+        "83deda4bdb01c5c5677f568ac62625572b19c3bce313af515ba4fa6b9840298a",
+        "D-GOV-006 qualifies the exact FreeCAD 1.1.3 host profile",
+        "D-GOV-007 authorises that profile to supply candidate evidence",
+        "does not use their timing difference to claim that TrackTemplate "
+        "performance became better",
+        "does not admit the result for Exit 4",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+    ):
+        assert fragment in current_flat, fragment
 
     evidence = (
         ROOT / "reference/current/PHASE_EVIDENCE.md"
     ).read_text(encoding="utf-8")
-    assert report.name in evidence
+    assert historical_report.name in evidence
+    assert current_report.name in evidence
 
     frozen = json.loads(
         (
@@ -623,11 +654,12 @@ def validate_evidence_links_if_present():
     records = {
         record["path"]: record for record in frozen["records"]
     }
-    relative = report.relative_to(ROOT).as_posix()
-    assert records[relative]["category"] == "benchmark"
-    assert records[relative]["sha256"] == hashlib.sha256(
-        report.read_bytes()
-    ).hexdigest()
+    for report in (historical_report, current_report):
+        relative = report.relative_to(ROOT).as_posix()
+        assert records[relative]["category"] == "benchmark"
+        assert records[relative]["sha256"] == hashlib.sha256(
+            report.read_bytes()
+        ).hexdigest()
 
 
 def validate():

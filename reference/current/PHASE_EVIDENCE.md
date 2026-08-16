@@ -1929,6 +1929,51 @@ in this cycle.
 > This decision gives no production, physical-output, `project-cleared`,
 > packaging, release, or tagging authority.
 
+<a id="phase-6-performance-evidence-on-freecad-1-1-3"></a>
+
+## Performance evidence on FreeCAD 1.1.3
+
+This Level 2 tranche starts from protected-main merge
+`f370b029bb4c1ce34987dc025a741185e233df04`. It changes no product source,
+performance method, schema, compatibility contract, or output contract.
+
+The profiler used three new GUI processes on the exact
+`linux-x86_64-flatpak-freecad-1.1.3` host profile. Each process did one cold
+Edit, Validate, and Export journey. Each process then did one untimed warm-up
+and three measured reuse cycles. All samples use evidence schema 2.
+
+The full cold journey had a median of 142.912 ms (140.426–247.792). The edit
+median was 22.106 ms. The Validate median was 73.570 ms. The created Export
+median was 44.992 ms. The full warm cycle for Validate and Export had a median
+of 10.417 ms (9.857–10.799).
+
+The correctness checks found no failure in the three cold journeys or nine
+warm cycles.
+The runs kept stable mapping, compact editable objects, and one Undo unit.
+Validate and Export returned the same exact result. All processes had equal
+output hashes. The document count after cleanup was zero. The staging-entry
+count after cleanup was zero.
+
+The [full report](../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md)
+records the method, source hashes, ranges for each measurement, resource data,
+and limitations. Git ignores the raw record at
+`benchmark-output/freecad-bridge/phase6-transition-pipeline-runs/20260816T151429730281Z-profile/`.
+Its `performance.json` SHA-256 is
+`83deda4bdb01c5c5677f568ac62625572b19c3bce313af515ba4fa6b9840298a`.
+
+The 1.1.1 report uses the exact FreeCAD 1.1.1 host profile. This report uses
+the exact FreeCAD 1.1.3 host profile. The source states are different. The
+project cannot use the difference between these reports to claim that
+TrackTemplate performance became better. This schema-2 result gives evidence
+for a subsequent performance investigation on one exact host profile.
+
+This result adds evidence for subsequent decisions about PR-15 and QA-R04.
+Their risk dispositions do not change.
+
+This tranche admits no evidence for
+Exit 4. It defines no performance budget. It accepts no phase exit. Phase 6
+stays at 2/5 accepted exits. Exit 4 stays Pending.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -1940,7 +1985,7 @@ The accepted current state is 2/5 under D-P6-002 and D-P6-005:
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005 — bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004 with the recorded platform, recovery and assurance limitations; project status remains `unknown` |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-007 authorises subsequent evidence from the exact 1.1.1 or 1.1.3 profile but admits no result. PR #33 records all costs for cold and warm Edit, Validate, and Export operations. The edit range includes Phase 5 work and shows no performance change more than the usual measurement noise. Thus, this evidence is not sufficient for Exit 4. |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — the 1.1.1 and 1.1.3 reports record all cold and warm costs. Their host profiles are exact and different. Their exact states are different. They cannot show that TrackTemplate performance became better. No result measures one exact host profile before and after a product change. No owner decision defines a numerical budget. |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
 ## Carried controls and exclusions

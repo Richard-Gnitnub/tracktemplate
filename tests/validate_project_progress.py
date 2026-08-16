@@ -293,12 +293,11 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations; project status remains `unknown`"
     ),
     (
-        "Pending — D-GOV-007 authorises subsequent evidence from the exact "
-        "1.1.1 or 1.1.3 profile but admits no result. PR #33 records all costs "
-        "for cold and warm Edit, Validate, and Export operations. The edit "
-        "range includes Phase 5 work and shows no performance change more "
-        "than the usual measurement noise. Thus, this evidence is not "
-        "sufficient for Exit 4."
+        "Pending — the 1.1.1 and 1.1.3 reports record all cold and warm costs. "
+        "Their host profiles are exact and different. Their exact states are "
+        "different. They cannot show that TrackTemplate performance became "
+        "better. No result measures one exact host profile before and after a "
+        "product change. No owner decision defines a numerical budget."
     ),
     (
         "Pending — B14 remains available, but whole-scope parity and retirement "
@@ -1202,6 +1201,40 @@ def _validate_exit_conditions(
         in performance_section,
         "Phase 6 performance evidence boundary drifted",
     )
+    current_performance_heading = "Performance evidence on FreeCAD 1.1.3"
+    _require(
+        '<a id="phase-6-performance-evidence-on-freecad-1-1-3"></a>\n\n'
+        "## " + current_performance_heading in current_evidence,
+        "current FreeCAD 1.1.3 performance anchor or heading is missing",
+    )
+    current_performance = _section(
+        current_evidence,
+        current_performance_heading,
+    )
+    current_performance_flat = " ".join(current_performance.split())
+    for required_clause in (
+        "f370b029bb4c1ce34987dc025a741185e233df04",
+        "linux-x86_64-flatpak-freecad-1.1.3",
+        "All samples use evidence schema 2",
+        "full cold journey had a median of 142.912 ms",
+        "full warm cycle for Validate and Export had a median of 10.417 ms",
+        "correctness checks found no failure in the three cold journeys or "
+        "nine warm cycles",
+        "2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md",
+        "83deda4bdb01c5c5677f568ac62625572b19c3bce313af515ba4fa6b9840298a",
+        "cannot use the difference between these reports to claim that "
+        "TrackTemplate performance became better",
+        "risk dispositions do not change",
+        "admits no evidence for Exit 4",
+        "defines no performance budget",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+    ):
+        _require(
+            required_clause in current_performance_flat,
+            "current FreeCAD 1.1.3 performance evidence drifted: "
+            + required_clause,
+        )
     _require(
         "Phase 5 closeout" in current_evidence
         and "history/phase-closeouts/PHASE5_CLOSEOUT.md" in current_evidence,
