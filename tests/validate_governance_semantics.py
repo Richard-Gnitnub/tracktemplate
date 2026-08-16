@@ -1263,12 +1263,12 @@ def validate_current_evidence_mutations() -> None:
 
     exit4_row = table_row_containing(
         evidence,
-        "PR #33 records all costs for cold and warm Edit, Validate, and Export",
+        "the 1.1.1 and 1.1.3 reports record all cold and warm costs",
     )
     exit4_promoted = replace_once(
         exit4_row,
-        "Pending — D-GOV-007 authorises subsequent evidence",
-        "Evidenced — D-GOV-007 authorises subsequent evidence",
+        "Pending — the 1.1.1 and 1.1.3 reports",
+        "Evidenced — the 1.1.1 and 1.1.3 reports",
     )
     expect_rejected(
         "phase-evidence/exit4-prematurely-evidenced",
@@ -1295,6 +1295,53 @@ def validate_current_evidence_mutations() -> None:
             performance_promoted,
         ),
         "Phase 6 performance evidence boundary drifted",
+    )
+
+    current_performance = progress._section(
+        evidence,
+        "Performance evidence on FreeCAD 1.1.3",
+    )
+    cross_host_improvement_claimed = replace_once(
+        current_performance,
+        "cannot use the difference",
+        "can use the difference",
+    )
+    expect_rejected(
+        "phase-evidence/current-performance-cross-host-improvement-claimed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                current_performance,
+                cross_host_improvement_claimed,
+            ),
+        ),
+        "current FreeCAD 1.1.3 performance evidence drifted: cannot use the "
+        "difference between these reports to claim that TrackTemplate "
+        "performance became better",
+    )
+
+    current_performance_admitted = replace_once(
+        current_performance,
+        "admits no evidence for",
+        "admits evidence for",
+    )
+    expect_rejected(
+        "phase-evidence/current-performance-prematurely-admitted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                current_performance,
+                current_performance_admitted,
+            ),
+        ),
+        "current FreeCAD 1.1.3 performance evidence drifted: admits no "
+        "evidence for Exit 4",
     )
 
     transaction_condition = table_row_containing(

@@ -208,6 +208,10 @@ def validate_frozen_records() -> None:
         document["status"] == "accepted-frozen-records",
         "frozen-record status changed",
     )
+    require(
+        document["updated_on"] == "2026-08-16",
+        "frozen-record manifest update date drifted",
+    )
     records = document["records"]
     require(isinstance(records, list), "frozen records must be a list")
 
