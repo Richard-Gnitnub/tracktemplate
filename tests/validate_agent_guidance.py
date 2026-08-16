@@ -41,6 +41,9 @@ TT_DOC_TERMINOLOGY_LINK = (
     "../../../reference/TERMINOLOGY.md"
     "#asd-ste100-project-terminology"
 )
+TT_DOC_SOURCE_LINK = (
+    "../../../reference/external/asd-ste100/README.md"
+)
 TT_DOC_DESCRIPTION_FRAGMENTS = {
     "tracktemplate-change-validation": (
         "proportionate TrackTemplate validation",
@@ -960,7 +963,7 @@ def validate_documentation_profile_routing(
         SKILLS_ROOT / "tracktemplate-documentation-review" / "SKILL.md"
     )
     require(
-        "official standard" in documentation_review
+        "official source" in documentation_review
         and "full logical unit that contains the change" in documentation_review
         and "Do not claim Issue 9 conformance" in documentation_review,
         "documentation review lost its official Issue 9 assessment boundary",
@@ -982,6 +985,87 @@ def validate_documentation_profile_routing(
         in quality_review_flat,
         "quality review lost its Issue 9 evidence boundary",
     )
+
+    source_skill_names = {
+        "tracktemplate-change-validation",
+        "tracktemplate-documentation-alignment",
+        "tracktemplate-documentation-review",
+        "tracktemplate-quality-review",
+    }
+    for name in names:
+        skill_text = read(SKILLS_ROOT / name / "SKILL.md")
+        require(
+            "ASD-STE100_ISSUE9.pdf" not in skill_text,
+            name + " duplicates the canonical ASD-STE100 local path",
+        )
+        if name in source_skill_names:
+            require(
+                TT_DOC_SOURCE_LINK in skill_text,
+                name + " lost the canonical ASD-STE100 source routing",
+            )
+        else:
+            require(
+                TT_DOC_SOURCE_LINK not in skill_text,
+                name + " duplicates ASD-STE100 source resolution",
+            )
+
+    documentation_review_flat = semantic_text(documentation_review)
+    for fragment in (
+        "Use the local official PDF when it is available",
+        "Otherwise, use the official ASD/STEMG source when it is available",
+        "Report the official source that you used",
+        "If no official source is available, do not claim conformance",
+    ):
+        require(
+            fragment in documentation_review_flat,
+            "documentation review lost source-resolution behavior: " + fragment,
+        )
+
+    documentation_alignment = read(
+        SKILLS_ROOT / "tracktemplate-documentation-alignment" / "SKILL.md"
+    )
+    documentation_alignment_flat = semantic_text(documentation_alignment)
+    require(
+        "TT-DOC-001 and TT-DOC-002 are policy authority"
+        in documentation_alignment_flat
+        and "PDF is not repository policy" in documentation_alignment_flat,
+        "documentation alignment confused policy with the external PDF",
+    )
+
+    change_validation_flat = semantic_text(change_validation)
+    require(
+        "review reports an official source" in change_validation_flat
+        and "Normal repository validation does not use the ignored PDF"
+        in change_validation_flat,
+        "change validation lost its official-source or no-PDF-CI boundary",
+    )
+    require(
+        "identify the official source" in quality_review_flat
+        and "Keep TrackTemplate policy different from the external "
+        "normative reference" in quality_review_flat
+        and "Keep evidence that the reviewer examined the named logical unit"
+        in quality_review_flat,
+        "quality review lost the policy/source/assessment distinction",
+    )
+
+    routine_routes = {
+        "tracktemplate-context-recovery": (
+            "Do not read the ASD-STE100 PDF during usual recovery"
+        ),
+        "tracktemplate-continue": (
+            "Do not read the external PDF during a usual continuation cycle"
+        ),
+        "tracktemplate-technical-lead": (
+            "Do not read the external PDF during usual technical-lead work"
+        ),
+    }
+    for name, boundary in routine_routes.items():
+        skill_text = read(SKILLS_ROOT / name / "SKILL.md")
+        require(
+            "tracktemplate-documentation-review" in skill_text
+            and boundary in semantic_text(skill_text),
+            name + " lost ASD-STE100 specialist routing",
+        )
 
 
 def main() -> None:

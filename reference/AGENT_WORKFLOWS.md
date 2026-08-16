@@ -106,15 +106,21 @@ scope. [TERMINOLOGY.md](TERMINOLOGY.md#asd-ste100-project-terminology) owns the
 TrackTemplate technical terms. Skills apply these owners by reference. They do
 not become policy or terminology owners.
 
+The [ASD-STE100 Issue 9 reference-source instructions](external/asd-ste100/README.md)
+own the local path and official-source priority. They are not policy. The
+documentation-review workflow uses the official source only when it makes
+a linguistic conformance assessment. Other workflows route that assessment to
+documentation review and do not read the PDF during usual work.
+
 | Workflow responsibility | Owner and boundary |
 | --- | --- |
-| Documentation structure and Issue 9 review | `tracktemplate-documentation-review` reviews the full logical unit that contains the change. It uses the official standard and applies the canonical document responsibility. |
-| Claim, status, and migration alignment | `tracktemplate-documentation-alignment` compares the presentation with canonical authority. It keeps unverified conformance and migration findings in the record. |
-| Evidence and limitation reports | `tracktemplate-change-validation` keeps exact proof below the owner view. Automatic checks do not show linguistic conformance. |
-| Staff judgment | `tracktemplate-quality-review` checks the recorded official-standard review, limitations, and authority boundaries independently. It does not duplicate validation. |
-| Cross-specialist delivery handoff | `tracktemplate-technical-lead` uses the owner view for an authorized Level 1 or Level 2 outcome only. |
-| Repository-driven cycle result | Literal `tracktemplate-continue` supplies the six-field owner view and technical provenance. Its Level 1/2 and merge limits do not change. |
-| Recovered-session result | `tracktemplate-context-recovery` makes its short report from verified authority. It keeps the exact recovery provenance. |
+| Documentation structure and Issue 9 review | `tracktemplate-documentation-review` reviews the full logical unit that contains the change. It uses and reports the official standard source. It applies the canonical document responsibility. |
+| Claim, status, and migration alignment | `tracktemplate-documentation-alignment` compares the presentation with canonical authority. It uses the PDF as an external reference only. It keeps unverified conformance and migration findings in the record. |
+| Evidence and limitation reports | `tracktemplate-change-validation` keeps exact proof below the owner view. It makes sure the conformance record reports an official source. Automatic checks do not show linguistic conformance. |
+| Staff judgement | `tracktemplate-quality-review` keeps policy, the external standard, and the assessed logical unit different. It reviews limitations and authority boundaries independently. It does not duplicate validation. |
+| Cross-specialist delivery handoff | `tracktemplate-technical-lead` uses the owner view for an authorised Level 1 or Level 2 outcome only. It routes a necessary linguistic assessment to documentation review. |
+| Repository-driven cycle result | Literal `tracktemplate-continue` supplies the six-field owner view and technical provenance. It routes a necessary linguistic assessment to documentation review. Its Level 1/2 and merge limits do not change. |
+| Recovered-session result | `tracktemplate-context-recovery` makes its short report from verified authority. It keeps the exact recovery provenance. It routes a necessary linguistic assessment to documentation review. |
 
 The panel examined the full skill catalog for TT-DOC-001. Each
 separate responsibility that can occur repeatedly has one owner. Thus, the

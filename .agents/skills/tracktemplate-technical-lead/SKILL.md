@@ -82,6 +82,9 @@ into this skill.
 - Use `$tracktemplate-python-writing`, `$tracktemplate-debugging`,
   `$tracktemplate-performance-engineering`, `$tracktemplate-security-review`
   and `$tracktemplate-license-analysis` where their boundaries are affected.
+- Route a necessary ASD-STE100 linguistic conformance assessment to
+  [`$tracktemplate-documentation-review`](../tracktemplate-documentation-review/SKILL.md).
+  Do not read the external PDF during usual technical-lead work.
 - Use
   [`$tracktemplate-change-validation`](../tracktemplate-change-validation/SKILL.md)
   for proportionate proof, then hand the completed change and raw evidence to a

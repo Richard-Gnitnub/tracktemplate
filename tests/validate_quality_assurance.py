@@ -18,6 +18,11 @@ AGENTS = ROOT / "AGENTS.md"
 ENGINEERING = ROOT / "reference" / "ENGINEERING_POLICY.md"
 TERMINOLOGY = ROOT / "reference" / "TERMINOLOGY.md"
 VALIDATION = ROOT / "reference" / "VALIDATION.md"
+WORKFLOWS = ROOT / "reference" / "AGENT_WORKFLOWS.md"
+ASD_STE100_REFERENCE = (
+    ROOT / "reference" / "external" / "asd-ste100" / "README.md"
+)
+GITIGNORE = ROOT / ".gitignore"
 RISKS = ROOT / "reference" / "current" / "risks.json"
 FROZEN = ROOT / "reference" / "history" / "frozen-records.json"
 RECOVERY = ROOT / "reference" / "RECOVERY_AND_BACKUP.md"
@@ -687,6 +692,141 @@ def validate_documentation_profile(
         require(fragment in lfe_018, "LFE-018 lacks: " + fragment)
 
 
+def validate_asd_ste100_reference(
+    engineering: str,
+    validation: str,
+    workflows: str,
+    reference: str,
+    gitignore: str,
+) -> None:
+    """Validate the one local Issue 9 source-resolution contract."""
+    local_pdf = (
+        "reference/external/asd-ste100/ASD-STE100_ISSUE9.pdf"
+    )
+    source_owner = "external/asd-ste100/README.md"
+    reference_flat = re.sub(
+        r"\[([^\]]+)\]\([^)]+\)",
+        r"\1",
+        " ".join(reference.split()),
+    )
+    remote_targets = {
+        target
+        for target in re.findall(r"\[[^\]]+\]\(([^)]+)\)", reference)
+        if target.startswith(("http://", "https://"))
+    }
+    engineering_flat = " ".join(engineering.split())
+    validation_flat = " ".join(validation.split())
+    workflows_flat = " ".join(workflows.split())
+
+    require(
+        reference.count(local_pdf) == 1,
+        "ASD-STE100 reference instructions must define one local PDF path",
+    )
+    require(
+        local_pdf not in engineering
+        and local_pdf not in validation
+        and local_pdf not in workflows,
+        "ASD-STE100 local PDF path gained a competing canonical definition",
+    )
+    for fragment in (
+        "ASD-STE100 Simplified Technical English, Issue 9",
+        "ASD has the copyright for this external reference",
+        "Do not commit the PDF to the TrackTemplate repository",
+        "Get the official document from the ASD Simplified Technical English "
+        "Maintenance Group",
+        "Reviewers use the local file for documentation review and linguistic "
+        "conformance assessment",
+        "PDF is not necessary for TrackTemplate product execution or normal "
+        "repository CI",
+        "PDF is not a canonical TrackTemplate document",
+        "TT-DOC-001 profile",
+        "TT-DOC-002 decision",
+        "Use the local official PDF when it is available",
+        "If the local PDF is absent, use the official ASD/STEMG Issue 9 "
+        "source when network access is available",
+        "Do not use a third-party summary, search-result text, blog, or "
+        "derived guidance as normative conformance evidence",
+        "review record must report which official source the reviewer used",
+        "neither official source is available, do not claim that the prose is "
+        "ASD-STE100 Issue 9 conforming",
+    ):
+        require(
+            fragment in reference_flat,
+            "ASD-STE100 reference instructions lack: " + fragment,
+        )
+
+    official_targets = {
+        "https://www.asd-ste100.org/",
+        "https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf",
+    }
+    require(
+        remote_targets == official_targets,
+        "ASD-STE100 official ASD/STEMG source targets drifted",
+    )
+
+    ignore_rule = "/reference/external/asd-ste100/*.pdf"
+    require(
+        gitignore.splitlines().count(ignore_rule) == 1,
+        "ASD-STE100 local PDF must have one narrow Git exclusion",
+    )
+    for broad_rule in (
+        "/reference/external/",
+        "/reference/external/asd-ste100/",
+        "/reference/external/asd-ste100/*",
+    ):
+        require(
+            broad_rule not in gitignore.splitlines(),
+            "ASD-STE100 Git exclusion is too broad: " + broad_rule,
+        )
+
+    require(
+        source_owner in engineering,
+        "TT-DOC-001 profile lost the ASD-STE100 source owner link",
+    )
+    require(
+        "own only the local path and source priority" in engineering_flat
+        and "do not own TrackTemplate documentation policy" in engineering_flat,
+        "TT-DOC-001 profile confused source routing with policy authority",
+    )
+    require(
+        source_owner in validation,
+        "VALIDATION lost the ASD-STE100 source owner link",
+    )
+    require(
+        "Normal CI does not use the ignored PDF" in validation_flat
+        and "conformance record must report its official source"
+        in validation_flat
+        and "Automatic validation does not prove linguistic conformance"
+        in validation_flat,
+        "ASD-STE100 validation or CI boundary drifted",
+    )
+    require(
+        source_owner in workflows,
+        "AGENT_WORKFLOWS lost the ASD-STE100 source owner link",
+    )
+    require(
+        "documentation-review workflow uses the official source only when "
+        "it makes a linguistic conformance assessment" in workflows_flat
+        and "Other workflows route that assessment to documentation review "
+        "and do not read the PDF during usual work" in workflows_flat,
+        "ASD-STE100 workflow routing drifted",
+    )
+
+
+def validate_no_product_ste100_dependency() -> None:
+    """Keep the external linguistic reference out of product execution."""
+    product_files = sorted((ROOT / "tracktemplate").rglob("*.py"))
+    product_files.append(ROOT / "TrackTemplate.FCMacro")
+    for path in product_files:
+        text = path.read_text(encoding="utf-8")
+        require(
+            "external/asd-ste100" not in text
+            and "ASD-STE100_ISSUE9.pdf" not in text,
+            "TrackTemplate product depends on the external Issue 9 PDF: "
+            + path.relative_to(ROOT).as_posix(),
+        )
+
+
 def main() -> None:
     quality = read(QUALITY)
     learning = read(LEARNING)
@@ -694,6 +834,10 @@ def main() -> None:
     agents = read(AGENTS)
     engineering = read(ENGINEERING)
     terminology = read(TERMINOLOGY)
+    validation = read(VALIDATION)
+    workflows = read(WORKFLOWS)
+    asd_ste100_reference = read(ASD_STE100_REFERENCE)
+    gitignore = read(GITIGNORE)
 
     for heading in (
         "# Quality Assurance",
@@ -723,6 +867,14 @@ def main() -> None:
     validate_current_qa_risks(quality)
     validate_governance_controls(plan, agents, engineering)
     validate_documentation_profile(engineering, plan, learning, terminology)
+    validate_asd_ste100_reference(
+        engineering,
+        validation,
+        workflows,
+        asd_ste100_reference,
+        gitignore,
+    )
+    validate_no_product_ste100_dependency()
     validate_validation_document_boundary()
     for relative, expected in EXPECTED_IMMUTABLE_SOURCE_HASHES.items():
         require(

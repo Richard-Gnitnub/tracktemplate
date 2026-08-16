@@ -2076,6 +2076,132 @@ def validate_documentation_profile_mutations() -> None:
     )
 
     workflows = read("reference/AGENT_WORKFLOWS.md")
+    validation = read("reference/VALIDATION.md")
+    source_reference = read(
+        "reference/external/asd-ste100/README.md"
+    )
+    gitignore = read(".gitignore")
+
+    local_priority_removed = replace_once(
+        source_reference,
+        "Use the local official PDF when it is available",
+        "Use an official remote source before the local PDF",
+    )
+    expect_rejected(
+        "tt-doc/ste100-local-source-priority-removed",
+        lambda: quality_assurance.validate_asd_ste100_reference(
+            engineering,
+            validation,
+            workflows,
+            local_priority_removed,
+            gitignore,
+        ),
+        "ASD-STE100 reference instructions lack: Use the local official PDF "
+        "when it is available",
+    )
+    third_party_made_normative = replace_once(
+        source_reference,
+        "Do not use a third-party summary, search-result text, blog, or "
+        "derived\n   guidance as normative conformance evidence.",
+        "Use a third-party summary as normative conformance evidence.",
+    )
+    expect_rejected(
+        "tt-doc/ste100-third-party-source-made-normative",
+        lambda: quality_assurance.validate_asd_ste100_reference(
+            engineering,
+            validation,
+            workflows,
+            third_party_made_normative,
+            gitignore,
+        ),
+        "ASD-STE100 reference instructions lack: Do not use a third-party "
+        "summary",
+    )
+    third_party_url_substituted = replace_once(
+        source_reference,
+        "https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf",
+        "https://example.com/ASD-STE100_ISSUE9.pdf",
+    )
+    expect_rejected(
+        "tt-doc/ste100-official-url-substituted",
+        lambda: quality_assurance.validate_asd_ste100_reference(
+            engineering,
+            validation,
+            workflows,
+            third_party_url_substituted,
+            gitignore,
+        ),
+        "ASD-STE100 official ASD/STEMG source targets drifted",
+    )
+    no_source_claim_authorized = replace_once(
+        source_reference,
+        "neither official source is available, do not claim that the prose is\n"
+        "ASD-STE100 Issue 9 conforming",
+        "neither official source is available, claim that the prose is\n"
+        "ASD-STE100 Issue 9 conforming",
+    )
+    expect_rejected(
+        "tt-doc/ste100-no-source-conformance-authorized",
+        lambda: quality_assurance.validate_asd_ste100_reference(
+            engineering,
+            validation,
+            workflows,
+            no_source_claim_authorized,
+            gitignore,
+        ),
+        "ASD-STE100 reference instructions lack: neither official source is "
+        "available, do not claim",
+    )
+    pdf_made_policy_owner = replace_once(
+        source_reference,
+        "The PDF is not a canonical TrackTemplate document.",
+        "The PDF is a canonical TrackTemplate document.",
+    )
+    expect_rejected(
+        "tt-doc/ste100-pdf-made-policy-owner",
+        lambda: quality_assurance.validate_asd_ste100_reference(
+            engineering,
+            validation,
+            workflows,
+            pdf_made_policy_owner,
+            gitignore,
+        ),
+        "ASD-STE100 reference instructions lack: PDF is not a canonical "
+        "TrackTemplate document",
+    )
+    pdf_ignore_broadened = replace_once(
+        gitignore,
+        "/reference/external/asd-ste100/*.pdf",
+        "/reference/external/asd-ste100/",
+    )
+    expect_rejected(
+        "tt-doc/ste100-git-exclusion-broadened",
+        lambda: quality_assurance.validate_asd_ste100_reference(
+            engineering,
+            validation,
+            workflows,
+            source_reference,
+            pdf_ignore_broadened,
+        ),
+        "ASD-STE100 local PDF must have one narrow Git exclusion",
+    )
+    pdf_made_ci_dependency = replace_once(
+        validation,
+        "Normal CI does not use the ignored PDF.",
+        "Normal CI uses the ignored PDF.",
+    )
+    expect_rejected(
+        "tt-doc/ste100-pdf-made-ci-dependency",
+        lambda: quality_assurance.validate_asd_ste100_reference(
+            engineering,
+            pdf_made_ci_dependency,
+            workflows,
+            source_reference,
+            gitignore,
+        ),
+        "ASD-STE100 validation or CI boundary drifted",
+    )
+
     names = sorted(
         path.name
         for path in agent_guidance.SKILLS_ROOT.iterdir()
