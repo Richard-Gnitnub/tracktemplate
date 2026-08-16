@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 6,
-  "updated_on": "2026-08-15",
+  "updated_on": "2026-08-16",
   "decisions": [
     {
       "id": "D-P6-001",
@@ -101,6 +101,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-compatibility-requalification-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-compatibility-requalification-panel"
+    },
+    {
+      "id": "D-GOV-007",
+      "decided_on": "2026-08-16",
+      "status": "Accepted",
+      "decision": "Authorise the exact FreeCAD 1.1.3 profile for Phase 6 performance evidence.",
+      "authority": "At protected `main` `3f20de704a060ab37478c34b3a7cb3586a9b2220`, the project owner changes the host rule for Phase 6 performance evidence. D-GOV-007 authorises the exact `linux-x86_64-flatpak-freecad-1.1.1` profile and the exact `linux-x86_64-flatpak-freecad-1.1.3` profile to supply candidate evidence for Phase 6 performance. D-GOV-006 qualifies the 1.1.3 profile. A later decision can admit a performance result only if it comes from one of these exact host profiles.\n\nEach new schema-2 result must have exact host identity. It must record the ID and FreeCAD version of its exact host profile. The `schema_version` value identifies the structure of the internal evidence record. The `profile_id` value identifies the measurement method.\n\nThe 1.1.1 report from 2026-08-02 is a schema-1 report. It does not have a `host_profile_id` field. It records FreeCAD 1.1.1, platform data, and the qualified-runtime contract hash. These data identify the exact host profile for FreeCAD 1.1.1. D-GOV-007 keeps this report as 1.1.1 evidence.\n\nResults from different host profiles must stay in different sets. To claim that TrackTemplate performance became better, compare results from one exact host profile. A different method can compare the two host profiles only if it independently shows the effect of the host profile and the TrackTemplate effect.\n\nIf the project qualifies a subsequent host profile, this does not authorise performance evidence from that profile. A separate Level 3 decision from the owner is necessary.",
+      "exclusions": "This decision changes only the host rule and the directly dependent schema for internal performance-evidence records. It does not accept Exit 4, define a value for a performance budget, claim better performance, or admit the rejected 1.1.3 test result. It does not qualify FreeCAD 1.1.2, a subsequent release, or a version range that includes another release.\n\nIt changes no product behaviour, accepted-exit count, risk disposition, product output, product schema, public API, or release authority. Exits 1, 4, and 5 stay Pending. Phase 6 stays at 2/5 accepted exits. Output stays private-development. Project status stays `unknown`.\n\nIt gives no production, physical-output, `project-cleared`, packaging, release, or tagging authority.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-performance-evidence-host-boundary-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-performance-evidence-host-boundary-panel"
     }
   ]
 }

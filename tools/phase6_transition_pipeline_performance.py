@@ -33,6 +33,11 @@ RAW_SAMPLE_SENTINEL = (
 )
 PROFILE_SENTINEL = "TRACKTEMPLATE_PHASE6_TRANSITION_PIPELINE_PROFILE="
 PROFILE_ID = "phase6-transition-edit-validate-export-profile-v1"
+EVIDENCE_SCHEMA_VERSION = 2
+AUTHORISED_PERFORMANCE_HOSTS = {
+    "linux-x86_64-flatpak-freecad-1.1.1": "1.1.1",
+    "linux-x86_64-flatpak-freecad-1.1.3": "1.1.3",
+}
 TARGET_TRANSITION_ID = "SET-001/curve-track/2/transition/exit"
 EXACT_GEOMETRY_CONTRACT_ID = (
     "tracktemplate.freecad.transition-exact-geometry.v1"
@@ -142,12 +147,13 @@ def _assert_snapshot(snapshot, label):
         )
 
 
-def _assert_geometry_receipt(receipt, label):
+def _assert_geometry_receipt(receipt, label, freecad_version):
     if (
         not isinstance(receipt, dict)
         or receipt.get("contract_id") != EXACT_GEOMETRY_CONTRACT_ID
         or receipt.get("domain_id") != TARGET_TRANSITION_ID
         or receipt.get("frame_id") != "canonical-local-left-turn-v1"
+        or receipt.get("freecad_version") != freecad_version
         or receipt.get("length_unit") != "mm"
         or receipt.get("shape_type") != "Wire"
         or receipt.get("closed") is not False
@@ -201,10 +207,11 @@ def _assert_validation_stage(
     label,
     expected_status_before,
     expected_reuse,
+    freecad_version,
 ):
     _assert_measurement(record, label)
     receipt = record.get("geometry_receipt")
-    _assert_geometry_receipt(receipt, label)
+    _assert_geometry_receipt(receipt, label, freecad_version)
     if (
         record.get("cache_status_before") != expected_status_before
         or record.get("cache_status_after") != "current"
@@ -225,7 +232,7 @@ def _assert_validation_stage(
         )
 
 
-def _assert_export_stage(record, label, disposition):
+def _assert_export_stage(record, label, disposition, freecad_version):
     _assert_measurement(record, label)
     _assert_measurement(
         record.get("post_action_audit"),
@@ -233,7 +240,7 @@ def _assert_export_stage(record, label, disposition):
     )
     receipt = record.get("receipt")
     geometry_receipt = record.get("geometry_receipt")
-    _assert_geometry_receipt(geometry_receipt, label)
+    _assert_geometry_receipt(geometry_receipt, label, freecad_version)
     if (
         not isinstance(receipt, dict)
         or receipt.get("contract_id") != DXF_EXPORT_CONTRACT_ID
@@ -297,7 +304,7 @@ def _assert_reconciliation(parent, children, label):
         )
 
 
-def _assert_reuse_cycle(cycle, label, cold):
+def _assert_reuse_cycle(cycle, label, cold, freecad_version):
     if (
         not isinstance(cycle, dict)
         or cycle.get("document_unchanged") is not True
@@ -314,8 +321,14 @@ def _assert_reuse_cycle(cycle, label, cold):
         label + " validation",
         "current",
         True,
+        freecad_version,
     )
-    _assert_export_stage(export, label + " export", "reused")
+    _assert_export_stage(
+        export,
+        label + " export",
+        "reused",
+        freecad_version,
+    )
     _assert_reconciliation(
         cycle.get("parent"),
         (validation, export),
@@ -341,11 +354,20 @@ def _assert_reuse_cycle(cycle, label, cold):
 
 def validate_sample(sample):
     """Validate one qualified GUI sample without importing FreeCAD."""
+    host_profile_id = (
+        sample.get("host_profile_id") if isinstance(sample, dict) else None
+    )
+    freecad_version = (
+        sample.get("freecad_version") if isinstance(sample, dict) else None
+    )
     if (
         not isinstance(sample, dict)
-        or sample.get("schema_version") != 1
+        or sample.get("schema_version") != EVIDENCE_SCHEMA_VERSION
         or sample.get("profile_id") != PROFILE_ID
-        or sample.get("freecad_version") != "1.1.1"
+        or not isinstance(host_profile_id, str)
+        or host_profile_id not in AUTHORISED_PERFORMANCE_HOSTS
+        or AUTHORISED_PERFORMANCE_HOSTS.get(host_profile_id)
+        != freecad_version
     ):
         raise RuntimeError("The Phase 6 pipeline sample identity drifted.")
     fixture = sample.get("fixture")
@@ -412,8 +434,14 @@ def validate_sample(sample):
         "cold validation",
         "missing",
         False,
+        freecad_version,
     )
-    _assert_export_stage(dxf_export, "cold export", "created")
+    _assert_export_stage(
+        dxf_export,
+        "cold export",
+        "created",
+        freecad_version,
+    )
     if (
         dxf_export["receipt"]["geometry_signature"]
         != exact_validation["geometry_receipt"]["geometry_signature"]
@@ -438,6 +466,7 @@ def validate_sample(sample):
         sample.get("warmup"),
         "warm-up",
         end_to_end,
+        freecad_version,
     )
     warm = sample.get("warm")
     if not isinstance(warm, list) or len(warm) != WARM_REPETITIONS:
@@ -447,6 +476,7 @@ def validate_sample(sample):
             cycle,
             "warm {}".format(index),
             end_to_end,
+            freecad_version,
         )
 
     cleanup = sample.get("cleanup")
@@ -471,6 +501,8 @@ def validate_sample(sample):
         ],
         "manifest_sha256": dxf_export["receipt"]["manifest_sha256"],
         "mapping_digest": final["mapping_digest"],
+        "freecad_version": freecad_version,
+        "host_profile_id": host_profile_id,
     }
 
 
@@ -944,7 +976,7 @@ def main():
             "profile sets no budget, B14-equivalence or output-clearance "
             "claim."
         ),
-        "schema_version": 1,
+        "schema_version": EVIDENCE_SCHEMA_VERSION,
         "source_sha256": _source_record(),
         "started_utc": datetime.datetime.now(
             datetime.timezone.utc

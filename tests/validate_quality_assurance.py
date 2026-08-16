@@ -571,13 +571,22 @@ def validate_documentation_profile(
     require(
         "Phase 6 has 2/5 accepted exits" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
-        and "D-GOV-006" in owner_view
-        and "FreeCAD 1.1.3" in owner_view
-        and "1.1.1 profile stays qualified" in owner_view
-        and "FreeCAD 1.1.2 and all other releases" in owner_view
-        and "FreeCAD recommends 1.1.3 for security" in owner_view
-        and "1.1.1 decision is not a security endorsement" in owner_view
-        and "No product source or phase state changes" in owner_view
+        and "D-GOV-007" in owner_view
+        and "exact 1.1.3 profile" in owner_view
+        and "exact 1.1.1 profile keeps that authority" in owner_view
+        and "rejects a new result unless it names one of the two exact "
+        "ID/version mappings" in owner_view
+        and "Every new schema-2 result has exact host identity" in owner_view
+        and "records the ID and FreeCAD version of its exact host profile"
+        in owner_view
+        and "rejects a result set that contains two host profiles" in owner_view
+        and "D-GOV-007 admits no performance result and defines no value for a "
+        "performance budget" in owner_view
+        and "does not claim that performance became better" in owner_view
+        and "D-GOV-007 does not admit the rejected 1.1.3 test result as Exit 4 "
+        "evidence"
+        in owner_view
+        and "D-GOV-006 host and security limits do not change" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
