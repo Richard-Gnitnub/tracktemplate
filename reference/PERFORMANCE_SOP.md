@@ -21,6 +21,42 @@ Record:
 
 Do not use confidential file paths or user data in a committed benchmark report.
 
+<a id="phase-6-performance-host-boundary"></a>
+
+## Hosts for Phase 6 performance evidence
+
+D-GOV-007 authorises only these two exact host profiles to supply candidate
+evidence for Phase 6 performance:
+
+- `linux-x86_64-flatpak-freecad-1.1.1`
+- `linux-x86_64-flatpak-freecad-1.1.3`, as D-GOV-006 defines it.
+
+A later decision can admit a performance result only if it comes from one of
+these exact host profiles. Each new schema-2 result must have exact host
+identity. It must name the ID and FreeCAD version of the exact host profile.
+Keep results from different host profiles in different sets.
+
+The value of `profile_id` is
+`phase6-transition-edit-validate-export-profile-v1`. It identifies the
+measurement method, not the record schema. The `schema_version` value is `2`
+for new samples and performance records.
+
+The 1.1.1 report from 2026-08-02 is a schema-1 report. It does not have a
+`host_profile_id` field. It records FreeCAD 1.1.1, platform data, and the
+qualified-runtime contract hash. These data identify the exact host profile
+for FreeCAD 1.1.1. D-GOV-007 keeps this report as 1.1.1 evidence.
+
+To claim that TrackTemplate performance became better, compare results from one
+exact host profile. A different method can compare two exact profiles only if
+it independently shows the effect of the host profile and the TrackTemplate
+effect. The project must record the method and its authority.
+
+If the project qualifies a subsequent host profile, this does not authorise
+performance evidence from that profile. Only a Level 3 owner decision can add
+an exact host profile that is different. D-GOV-007 adds the exact 1.1.3 profile
+only. It admits no performance result and defines no value for a performance
+budget. It does not accept Exit 4 or claim that performance became better.
+
 ## Baseline procedure
 
 1. Preserve an unchanged starting document or a reproducible input recipe.

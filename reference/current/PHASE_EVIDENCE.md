@@ -1771,6 +1771,164 @@ packaging, and release boundaries.
 > private-development. Project status stays `unknown`. It gives no production,
 > physical-output, `project-cleared`, packaging, release, or tagging authority.
 
+<a id="phase-6-performance-evidence-host-boundary-panel"></a>
+
+## Panel and owner decision about hosts for Phase 6 performance evidence
+
+**Decision and source state:** The source state for this Level 3 decision is
+protected `main` `3f20de704a060ab37478c34b3a7cb3586a9b2220`. D-GOV-006 qualifies the
+exact `linux-x86_64-flatpak-freecad-1.1.3` host profile. The exact
+`linux-x86_64-flatpak-freecad-1.1.1` profile stays qualified. Phase 6 stays at
+2/5 accepted exits. Exit 4 stays Pending.
+
+**Authority before this decision:** The project admitted performance evidence
+from only the exact 1.1.1 profile. The previous validator rejected a result
+unless it recorded FreeCAD 1.1.1. A test command on the exact 1.1.3 profile
+completed the Edit, Validate, and Export workflow. The previous validator then
+rejected that result. The evidence file is
+`benchmark-output/freecad-bridge/phase6-transition-pipeline-runs/20260815T214842401485Z-profile/sample-01.log`.
+D-GOV-007 does not admit this test result as Exit 4 evidence.
+
+**Host rule:** D-GOV-007 changes the
+[rule for hosts in Phase 6 performance evidence](../PERFORMANCE_SOP.md#phase-6-performance-host-boundary).
+D-GOV-007 authorises only these two exact host profiles to supply candidate
+evidence for Phase 6 performance:
+
+- `linux-x86_64-flatpak-freecad-1.1.1`
+- `linux-x86_64-flatpak-freecad-1.1.3`.
+
+A later decision can admit a performance result only if it comes from one of
+these exact host profiles. Each new schema-2 result has exact host identity.
+It records the ID and FreeCAD version of its exact host profile. The validator
+rejects a result that names a different host profile or FreeCAD version. It
+also rejects a result set that contains two host profiles.
+
+If the project qualifies a subsequent host profile, this does not authorise
+performance evidence from that profile.
+
+To compare TrackTemplate performance, use one exact host profile. A different
+method can compare the two host profiles only if it independently shows the
+effect of the host profile and the TrackTemplate effect. Thus, the project cannot claim that
+TrackTemplate performance became better because the two host profiles have
+different results.
+
+**Evidence and validator change:** The
+[1.1.1 performance report](../benchmarks/2026-08-02-phase6-transition-pipeline-performance.md)
+does not have a `host_profile_id` field. It records FreeCAD 1.1.1, platform
+data, and the qualified-runtime contract hash. These data identify the exact
+host profile for FreeCAD 1.1.1. D-GOV-007 keeps this report as 1.1.1 evidence.
+
+The 1.1.1 report is a schema-1 report. New samples and performance records use
+schema 2. The `schema_version` value identifies the structure of the evidence
+record. The `profile_id` value is
+`phase6-transition-edit-validate-export-profile-v1`. It identifies the
+measurement method and not the record schema.
+
+The Phase 6 profiler records the ID of the exact host profile in each new
+sample and summary. The standalone validator has the two exact ID/version
+mappings.
+
+It rejects schema 1 and FreeCAD 1.1.2. It rejects a result unless its ID/version
+pair is one of the two mappings. It rejects a `host_profile_id` value that is
+not a string. It rejects an exact-geometry receipt that records a different
+FreeCAD version. It also rejects a result set with two host profiles.
+
+This cycle does not measure performance. It admits no performance result. It
+does not admit the test result. It defines no value for a performance budget.
+It does not claim that performance became better.
+
+It changes the schema for internal performance-evidence records from 1 to 2.
+It changes no TrackTemplate product behaviour, product output, product schema,
+public API, or set of qualified host profiles.
+
+**Risk panel:** The decision changes which host profile can supply evidence. It is
+Level 3 and `necessary-enabling` progress.
+
+| Risk | Panel judgement | Result |
+| --- | --- | --- |
+| PR-15 — deferred cost | The method must use one exact host profile and record its exact data. Thus, a host difference cannot be evidence of a TrackTemplate or deferred-cost change. | High / Mitigate / Partial. The disposition does not change. |
+| QA-R04 — no value for a performance budget | The decision defines no budget and admits no performance result. | High / Mitigate / Partial. The disposition does not change. |
+| PR-22 — authority transfer | The owner gives the exact Level 3 authority. A reviewer who did not make the change must examine it. The reviewer must not change files. | High / Remove / Effective (current scope). The disposition does not change. |
+| PR-13 — repository or evidence loss | Bounded paths, exact-state publication, and the post-merge audit preserve accepted content. | Critical / Mitigate / Effective (current scope). The disposition does not change. |
+
+### Documentation conformance
+
+The documentation review uses the
+[official Issue 9 standard](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf)
+and the TrackTemplate UK English spelling directive. It examines each full
+logical unit in this table.
+
+| Path | Full logical unit |
+| --- | --- |
+| `reference/PERFORMANCE_SOP.md` | The full section with the heading `Hosts for Phase 6 performance evidence`. |
+| `reference/VALIDATION.md` | The full compatibility unit for Phase 1 runtime and legacy ingress. |
+| `reference/PROJECT_PLAN.md` | The current owner view, the D-GOV-007 phase summary, and the D-GOV-007 decision row. |
+| `reference/current/PHASE_EVIDENCE.md` | This full D-GOV-007 panel. The scope also includes the changed Exit 4 disposition and the D-GOV-007 carried-control sentences. |
+| `reference/current/gate-decisions.json` | The human-readable D-GOV-007 record. Exact JSON data is not part of the linguistic assessment. |
+
+Before the conformance review, no reviewer verified ASD-STE100 Issue 9
+conformance for these five changed units. The conformance review must examine
+this exact candidate.
+The pull request and completion report must record the result. Exact identifiers,
+paths, commands, hashes, JSON keys, and machine values are not part of the
+linguistic review. Issue 9 conformance stays Unknown for other live prose.
+
+### Review state
+
+A reviewer who did not make this change must examine the exact candidate.
+The reviewer must not change files. The review must include the host rule for
+performance, evidence admission, authority, preservation, and the Issue 9
+assessment. It must find no blocker before the project merges the candidate.
+The pull request and completion report record the result. This panel must not
+change after the review.
+
+**Panel recommendation:** **Continue with bounded conditions.** Authorise the
+exact 1.1.3 profile for Phase 6 performance evidence. Use one exact host
+profile in each result set. Admit no performance result. Accept no phase exit
+in this cycle.
+
+> **D-GOV-007 — Authorise the exact 1.1.3 profile for Phase 6 performance evidence**
+>
+> At protected `main` `3f20de704a060ab37478c34b3a7cb3586a9b2220`, I
+> change the host rule for Phase 6 performance evidence. D-GOV-007 authorises
+> the exact `linux-x86_64-flatpak-freecad-1.1.1` profile and the exact
+> `linux-x86_64-flatpak-freecad-1.1.3` profile to supply candidate evidence for
+> Phase 6 performance. D-GOV-006 qualifies the 1.1.3 profile.
+>
+> A later decision can admit a performance result only if it comes from one of
+> these exact host profiles. Each new schema-2 result must have exact host
+> identity. It must record the ID and FreeCAD version of its exact host profile.
+>
+> The 1.1.1 report from 2026-08-02 is a schema-1 report. It does not have a
+> `host_profile_id` field. It records FreeCAD 1.1.1, platform data, and the
+> qualified-runtime contract hash. These data identify the exact host profile
+> for FreeCAD 1.1.1. D-GOV-007 keeps this report as 1.1.1 evidence.
+>
+> Results from different host profiles must stay in different sets.
+> To claim that TrackTemplate performance became better, compare results from
+> one exact host profile. A different method can compare the two host
+> profiles only if it independently shows the effect of the host profile and
+> the TrackTemplate effect.
+>
+> If the project qualifies a subsequent host profile, this does not authorise
+> performance evidence from that profile. A separate Level 3 decision from the
+> owner is necessary.
+>
+> This decision changes only the host rule for Phase 6 performance evidence.
+> It changes the schema for internal performance-evidence records to version 2.
+> It does not accept Exit 4, define a value for a performance budget, claim
+> better performance, or admit the rejected 1.1.3 test result. It does not
+> qualify FreeCAD 1.1.2, a subsequent release, or a version range that includes
+> another release.
+>
+> It changes no product behaviour, accepted-exit count, risk disposition,
+> product output, product schema, public API, or release authority. Exit 4 stays
+> Pending. Exits 1 and 5 stay Pending. Phase 6 stays at 2/5 accepted exits.
+> Output stays private-development. Project status stays `unknown`.
+>
+> This decision gives no production, physical-output, `project-cleared`,
+> packaging, release, or tagging authority.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -1782,7 +1940,7 @@ The accepted current state is 2/5 under D-P6-002 and D-P6-005:
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005 — bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004 with the recorded platform, recovery and assurance limitations; project status remains `unknown` |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — PR #33 accounts for complete cold/warm Edit, Validate and Export cost, but the edit range overlaps Phase 5 and demonstrates no improvement beyond normal measurement noise; it does not satisfy Exit 4 |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-007 authorises subsequent evidence from the exact 1.1.1 or 1.1.3 profile but admits no result. PR #33 records all costs for cold and warm Edit, Validate, and Export operations. The edit range includes Phase 5 work and shows no performance change more than the usual measurement noise. Thus, this evidence is not sufficient for Exit 4. |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
 ## Carried controls and exclusions
@@ -1801,7 +1959,7 @@ The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
 D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001,
-TT-DOC-002 and D-GOV-006.
+TT-DOC-002, D-GOV-006 and D-GOV-007.
 
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.
@@ -1813,3 +1971,8 @@ TT-DOC-001 changes only documentation governance and presentation. TT-DOC-002
 corrects only the spelling directive. D-GOV-006 qualifies only the exact
 FreeCAD 1.1.3 profile and preserves all other compatibility, product, phase,
 risk, output, packaging and release boundaries.
+
+D-GOV-007 changes only the host rule and the directly dependent schema for
+internal performance-evidence records. It admits no performance result and
+defines no budget. It does not claim that performance became better, and it
+does not accept Exit 4.

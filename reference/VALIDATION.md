@@ -1000,8 +1000,36 @@ qualify 1.1.2 or any other 1.1.x release. The probe records no user path.
 
 D-GOV-006 adds only the exact FreeCAD 1.1.3 profile. All checks in the host
 matrix gave the specified results in that runtime. The 1.1.1 evidence keeps its
-recorded host identity. Only the 1.1.1 profile has performance evidence. A
-different decision must admit performance evidence for a different host.
+recorded host identity. D-GOV-007 defines the
+[hosts for Phase 6 performance evidence](PERFORMANCE_SOP.md#phase-6-performance-host-boundary).
+D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles to supply
+candidate evidence for Phase 6 performance. A later decision can admit a performance
+result only if it comes from one of these exact host profiles.
+
+The validator examines new schema-2 results. Each result and its summary must
+record the ID and FreeCAD version of its exact host profile. One result set
+must contain one exact host profile. To compare TrackTemplate performance, use
+one exact host profile. A different method can compare host profiles only if
+it independently shows the effect of the host profile and the TrackTemplate
+effect.
+
+If the project qualifies a subsequent host profile, this does not authorise
+performance evidence from that profile. The validator rejects a new result
+unless its ID/version pair is one of the two exact mappings. It rejects schema
+1 and a `host_profile_id` value that is not a string. It rejects an exact-geometry
+receipt that records a different FreeCAD version. It also rejects a result set
+that contains two host profiles.
+
+The 1.1.1 report from 2026-08-02 is a schema-1 report. It does not have a
+`host_profile_id` field. It records FreeCAD 1.1.1, platform data, and the
+qualified-runtime contract hash. These data identify the exact host profile
+for FreeCAD 1.1.1. D-GOV-007 keeps that report as 1.1.1 evidence. The validator
+does not change the report.
+
+D-GOV-007 admits no performance result and defines no value for a performance
+budget. It does not accept Exit 4 or claim that performance became better.
+The previous 1.1.1-only validator rejected the 1.1.3 test result. D-GOV-007
+does not admit this test result as Exit 4 evidence.
 
 The Phase 2 launcher uses the same evaluator through
 `tracktemplate.bootstrap`. That launcher is not evidence for

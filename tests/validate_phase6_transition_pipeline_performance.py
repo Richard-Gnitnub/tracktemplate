@@ -67,7 +67,11 @@ def _snapshot(edited=False):
     }
 
 
-def _geometry_receipt():
+HOST_PROFILE_111 = "linux-x86_64-flatpak-freecad-1.1.1"
+HOST_PROFILE_113 = "linux-x86_64-flatpak-freecad-1.1.3"
+
+
+def _geometry_receipt(freecad_version="1.1.1"):
     return {
         "closed": False,
         "contract_id": profile.EXACT_GEOMETRY_CONTRACT_ID,
@@ -76,7 +80,7 @@ def _geometry_receipt():
         "exact_artifact_signature": _signature("a"),
         "exact_result_signature": _signature("b"),
         "frame_id": "canonical-local-left-turn-v1",
-        "freecad_version": "1.1.1",
+        "freecad_version": freecad_version,
         "geometry_signature": _signature("c"),
         "length_unit": "mm",
         "maximum_abs_z_mm": 0.0,
@@ -92,8 +96,13 @@ def _geometry_receipt():
     }
 
 
-def _validation_stage(seed, status_before, reused):
-    receipt = _geometry_receipt()
+def _validation_stage(
+    seed,
+    status_before,
+    reused,
+    freecad_version="1.1.1",
+):
+    receipt = _geometry_receipt(freecad_version)
     return {
         "artifact_reused": reused,
         "artifact_signature": receipt["exact_artifact_signature"],
@@ -128,8 +137,8 @@ def _output():
     }
 
 
-def _export_stage(seed, disposition):
-    geometry = _geometry_receipt()
+def _export_stage(seed, disposition, freecad_version="1.1.1"):
+    geometry = _geometry_receipt(freecad_version)
     output = _output()
     receipt = {
         "cleanup_complete": True,
@@ -177,9 +186,18 @@ def _parent(children, seed):
     }
 
 
-def _reuse_cycle(seed, cold_export):
-    validation = _validation_stage(seed, "current", True)
-    export = _export_stage(seed + 0.25, "reused")
+def _reuse_cycle(seed, cold_export, freecad_version="1.1.1"):
+    validation = _validation_stage(
+        seed,
+        "current",
+        True,
+        freecad_version,
+    )
+    export = _export_stage(
+        seed + 0.25,
+        "reused",
+        freecad_version,
+    )
     export["output"] = copy.deepcopy(cold_export["output"])
     export["receipt"]["dxf_filename"] = cold_export["receipt"][
         "dxf_filename"
@@ -201,7 +219,11 @@ def _reuse_cycle(seed, cold_export):
     }
 
 
-def _sample(seed):
+def _sample(
+    seed,
+    host_profile_id=HOST_PROFILE_111,
+    freecad_version="1.1.1",
+):
     edit = {
         "cache_regeneration_delta": 1,
         "cache_request_delta": 1,
@@ -210,8 +232,17 @@ def _sample(seed):
         "transition_length_mm": 360.0,
         **_measurement(seed),
     }
-    validation = _validation_stage(seed + 1.0, "missing", False)
-    export = _export_stage(seed + 2.0, "created")
+    validation = _validation_stage(
+        seed + 1.0,
+        "missing",
+        False,
+        freecad_version,
+    )
+    export = _export_stage(
+        seed + 2.0,
+        "created",
+        freecad_version,
+    )
     parent = _parent((edit, validation, export), seed + 3.0)
     return {
         "cleanup": {
@@ -243,27 +274,95 @@ def _sample(seed):
             "target_transition_id": profile.TARGET_TRANSITION_ID,
             "warm_repetitions": profile.WARM_REPETITIONS,
         },
-        "freecad_version": "1.1.1",
+        "freecad_version": freecad_version,
+        "host_profile_id": host_profile_id,
         "profile_id": profile.PROFILE_ID,
-        "schema_version": 1,
+        "schema_version": profile.EVIDENCE_SCHEMA_VERSION,
         "starting_state": "fresh isolated test state",
         "warm": [
-            _reuse_cycle(seed + 6.0 + index, export)
+            _reuse_cycle(
+                seed + 6.0 + index,
+                export,
+                freecad_version,
+            )
             for index in range(profile.WARM_REPETITIONS)
         ],
-        "warmup": _reuse_cycle(seed + 5.0, export),
+        "warmup": _reuse_cycle(
+            seed + 5.0,
+            export,
+            freecad_version,
+        ),
     }
 
 
 def validate_sample_contract():
+    assert profile.EVIDENCE_SCHEMA_VERSION == 2
+    assert profile.AUTHORISED_PERFORMANCE_HOSTS == {
+        HOST_PROFILE_111: "1.1.1",
+        HOST_PROFILE_113: "1.1.3",
+    }
     sample = _sample(0.0)
     assert profile.validate_sample(sample) == {
         "dxf_sha256": "e" * 64,
         "exact_result_signature": _signature("b"),
+        "freecad_version": "1.1.1",
         "geometry_signature": _signature("c"),
+        "host_profile_id": HOST_PROFILE_111,
         "manifest_sha256": "f" * 64,
         "mapping_digest": "b" * 64,
     }
+
+    sample_113 = _sample(
+        0.0,
+        host_profile_id=HOST_PROFILE_113,
+        freecad_version="1.1.3",
+    )
+    assert profile.validate_sample(sample_113)["host_profile_id"] == (
+        HOST_PROFILE_113
+    )
+
+    broken = copy.deepcopy(sample)
+    broken["schema_version"] = 1
+    _assert_raises_text(
+        RuntimeError,
+        "sample identity drifted",
+        lambda: profile.validate_sample(broken),
+    )
+
+    for malformed_host_profile_id in ([], {}):
+        broken = copy.deepcopy(sample)
+        broken["host_profile_id"] = malformed_host_profile_id
+        _assert_raises_text(
+            RuntimeError,
+            "sample identity drifted",
+            lambda broken=broken: profile.validate_sample(broken),
+        )
+
+    broken = copy.deepcopy(sample)
+    broken["host_profile_id"] = "linux-x86_64-flatpak-freecad-1.1.2"
+    _assert_raises_text(
+        RuntimeError,
+        "sample identity drifted",
+        lambda: profile.validate_sample(broken),
+    )
+
+    broken = copy.deepcopy(sample_113)
+    broken["freecad_version"] = "1.1.1"
+    _assert_raises_text(
+        RuntimeError,
+        "sample identity drifted",
+        lambda: profile.validate_sample(broken),
+    )
+
+    broken = copy.deepcopy(sample_113)
+    broken["end_to_end"]["exact_validation"]["geometry_receipt"][
+        "freecad_version"
+    ] = "1.1.1"
+    _assert_raises_text(
+        RuntimeError,
+        "exact-geometry receipt drifted",
+        lambda: profile.validate_sample(broken),
+    )
 
     broken = copy.deepcopy(sample)
     broken["fixture"]["budget_status"] = "accepted"
@@ -387,8 +486,29 @@ def validate_summaries():
     assert summary["validation"]["wall_ms"]["median"] == 12.0
     assert summary["warm_validation"]["wall_ms"]["count"] == 9
     assert summary["correctness"]["dxf_sha256"] == "e" * 64
+    assert summary["correctness"]["host_profile_id"] == HOST_PROFILE_111
     assert summary["correctness"]["exact_result_signature"] == _signature(
         "b"
+    )
+
+    samples_113 = [
+        _sample(
+            float(index),
+            host_profile_id=HOST_PROFILE_113,
+            freecad_version="1.1.3",
+        )
+        for index in range(profile.DEFAULT_PROCESS_REPETITIONS)
+    ]
+    assert profile.summarize_samples(samples_113)["correctness"][
+        "host_profile_id"
+    ] == HOST_PROFILE_113
+
+    mixed_samples = copy.deepcopy(samples)
+    mixed_samples[-1] = samples_113[-1]
+    _assert_raises_text(
+        RuntimeError,
+        "differs by process",
+        lambda: profile.summarize_samples(mixed_samples),
     )
 
     _assert_raises_text(
@@ -460,6 +580,9 @@ def validate_source_and_scope_contracts():
     assert "api.regenerate_transition_exact" in gui_source
     assert "exporter.export_transition_dxf" in gui_source
     assert "build_transition_exact_geometry" in gui_source
+    assert "EVIDENCE_SCHEMA_VERSION = 2" in gui_source
+    assert '"schema_version": EVIDENCE_SCHEMA_VERSION' in tool_source
+    assert '"schema_version": EVIDENCE_SCHEMA_VERSION' in gui_source
     assert "WARM_REPETITIONS = 3" in gui_source
 
     for relative in (

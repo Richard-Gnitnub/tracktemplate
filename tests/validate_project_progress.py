@@ -17,6 +17,7 @@ PRODUCT_VISION_PATH = ROOT / "reference" / "PRODUCT_VISION.md"
 CAPABILITY_MATRIX_PATH = ROOT / "reference" / "CAPABILITY_MATRIX.md"
 ARCHITECTURE_PATH = ROOT / "reference" / "ARCHITECTURE.md"
 VALIDATION_PATH = ROOT / "reference" / "VALIDATION.md"
+PERFORMANCE_SOP_PATH = ROOT / "reference" / "PERFORMANCE_SOP.md"
 CURRENT_EVIDENCE_PATH = ROOT / "reference" / "current" / "PHASE_EVIDENCE.md"
 RISKS_PATH = ROOT / "reference" / "current" / "risks.json"
 CURRENT_DECISIONS_PATH = (
@@ -123,6 +124,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "TT-DOC-001",
     "TT-DOC-002",
     "D-GOV-006",
+    "D-GOV-007",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -291,10 +293,12 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations; project status remains `unknown`"
     ),
     (
-        "Pending — PR #33 accounts for complete cold/warm Edit, Validate and "
-        "Export cost, but the edit range overlaps Phase 5 and demonstrates no "
-        "improvement beyond normal measurement noise; it does not satisfy "
-        "Exit 4"
+        "Pending — D-GOV-007 authorises subsequent evidence from the exact "
+        "1.1.1 or 1.1.3 profile but admits no result. PR #33 records all costs "
+        "for cold and warm Edit, Validate, and Export operations. The edit "
+        "range includes Phase 5 work and shows no performance change more "
+        "than the usual measurement noise. Thus, this evidence is not "
+        "sufficient for Exit 4."
     ),
     (
         "Pending — B14 remains available, but whole-scope parity and retirement "
@@ -762,20 +766,24 @@ def _validate_owner_view(plan: str) -> None:
         "The owner accepted Exits 2 and 3",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
-        "D-GOV-006",
-        "also qualifies the exact Linux x86_64 stable Flatpak profile",
-        "1.1.1 profile stays qualified",
-        "No product source or phase state changes",
-        "runtime guard accepts only the two exact host profiles",
-        "current B16 host matrix gave the specified results on 1.1.3",
-        "The 1.1.1 evidence has the same contract results",
-        "FreeCAD 1.1.2 and all other releases",
-        "Phase 10 owns packaged Workbench and `package.xml` evidence",
-        "1.1.1 evidence and performance evidence keep their recorded host "
-        "identity",
-        "FreeCAD recommends 1.1.3 for security",
-        "1.1.1 decision is not a security endorsement",
-        "D-GOV-006 is Accepted for the exact 1.1.3 profile only",
+        "D-GOV-007",
+        "authorises the exact 1.1.3 profile to supply Phase 6 performance "
+        "evidence",
+        "exact 1.1.1 profile keeps that authority",
+        "performance validator rejects a new result unless it names one of the "
+        "two exact ID/version mappings",
+        "Every new schema-2 result has exact host identity",
+        "records the ID and FreeCAD version of its exact host profile",
+        "rejects a result set that contains two host profiles",
+        "Exit 4 stays Pending",
+        "D-GOV-007 admits no performance result and defines no value for a "
+        "performance budget",
+        "does not claim that performance became better",
+        "D-GOV-007 does not admit the rejected 1.1.3 test result as Exit 4 "
+        "evidence",
+        "D-GOV-006 host and security limits do not change",
+        "D-GOV-007 is Accepted only for the two named host profiles for "
+        "Phase 6 performance evidence",
         "Use `$tracktemplate-continue`",
     ):
         _require(
@@ -807,8 +815,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "PROJECT_PLAN.md contains an unsupported dashboard section",
     )
     _require(
-        len(plan.splitlines()) <= 145,
-        "PROJECT_PLAN.md exceeded its 145-line dashboard budget",
+        len(plan.splitlines()) <= 148,
+        "PROJECT_PLAN.md exceeded its 148-line dashboard budget",
     )
     for forbidden in (
         "### Deliverables",
@@ -905,6 +913,102 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the accepted Phase 6 2/5 status is missing",
     )
     return rows
+
+
+def _validate_performance_host_sources(
+    performance_sop: str,
+    validation: str,
+) -> None:
+    """Keep the exact-host performance authority in its two owning units."""
+    performance_sop_flat = _semantic_text(performance_sop)
+    validation_flat = _semantic_text(validation)
+    for source_name, source_text in (
+        ("PERFORMANCE_SOP", performance_sop_flat),
+        ("VALIDATION", validation_flat),
+    ):
+        for required_clause in (
+            "linux-x86_64-flatpak-freecad-1.1.1",
+            "linux-x86_64-flatpak-freecad-1.1.3",
+            "authorises only",
+            "supply candidate",
+            "A later decision can admit a performance result only if it comes "
+            "from one of these exact host profiles",
+            "schema-2",
+            "1.1.1 report from 2026-08-02 is a schema-1 report",
+            "does not have a host_profile_id field",
+            "qualified-runtime contract hash",
+            "identify the exact host profile for FreeCAD 1.1.1",
+            "as 1.1.1 evidence",
+            "one exact host profile",
+            "independently shows the effect of the host profile and the "
+            "TrackTemplate effect",
+            "project qualifies a subsequent host profile, this does not "
+            "authorise performance evidence from that profile",
+            "admits no performance result",
+            "does not accept Exit 4",
+        ):
+            _require(
+                required_clause in source_text,
+                source_name + " performance host boundary drifted: "
+                + required_clause,
+            )
+        _require(
+            "do not identify the exact host profile for FreeCAD 1.1.1"
+            not in source_text,
+            source_name + " performance host boundary drifted: identify the "
+            "exact host profile for FreeCAD 1.1.1 (contradicted)",
+        )
+    _require(
+        "previous 1.1.1-only validator rejected the 1.1.3 test result"
+        in validation_flat
+        and "D-GOV-007 does not admit this test result as Exit 4 evidence"
+        in validation_flat,
+        "VALIDATION admitted the rejected 1.1.3 test result",
+    )
+    for required_clause in (
+        "profile_id",
+        "identifies the measurement method, not the record schema",
+        "schema_version value is 2",
+    ):
+        _require(
+            required_clause in performance_sop_flat,
+            "PERFORMANCE_SOP performance schema boundary drifted: "
+            + required_clause,
+        )
+    for required_clause in (
+        "validator examines new schema-2 results",
+        "rejects schema 1",
+        "host_profile_id value that is not a string",
+        "result set that contains two host profiles",
+    ):
+        _require(
+            required_clause in validation_flat,
+            "VALIDATION performance schema boundary drifted: "
+            + required_clause,
+        )
+    _require(
+        "ID and FreeCAD version of the exact host profile"
+        in performance_sop_flat,
+        "PERFORMANCE_SOP performance host boundary drifted: ID and FreeCAD "
+        "version of the exact host profile",
+    )
+    _require(
+        "ID and FreeCAD version of its exact host profile" in validation_flat,
+        "VALIDATION performance host boundary drifted: ID and FreeCAD version "
+        "of its exact host profile",
+    )
+    _require(
+        "claim that TrackTemplate performance became better, compare results "
+        "from one exact host profile" in performance_sop_flat,
+        "PERFORMANCE_SOP performance comparison drifted: compare results "
+        "from one exact host profile",
+    )
+    _require(
+        "compare TrackTemplate performance, use one exact host profile"
+        in validation_flat,
+        "VALIDATION performance comparison drifted: use one exact host "
+        "profile",
+    )
 
 
 def _validate_exit_conditions(
@@ -1052,6 +1156,17 @@ def _validate_exit_conditions(
         and "advances Phase 6 to 2/5" in plan_flat
         and "project status remains `unknown`" in plan_flat,
         "Phase 6 Exit 2/3 acceptance or Exit 3 contract boundary is missing",
+    )
+    _require(
+        "D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles"
+        in plan_flat
+        and "supply candidate evidence for Phase 6 performance" in plan_flat
+        and "later decision can admit a result only if it comes from one of "
+        "those profiles" in plan_flat
+        and "admits no performance result and defines no budget" in plan_flat
+        and "accepts no phase exit and does not claim that performance became "
+        "better" in plan_flat,
+        "D-GOV-007 performance-host summary drifted",
     )
 
     current_flat = " ".join(current_evidence.split())
@@ -1925,6 +2040,209 @@ def _validate_exit_conditions(
         ),
         "D-GOV-006 owner decision changed phase or exit authority",
     )
+    performance_host_heading = (
+        "Panel and owner decision about hosts for Phase 6 performance evidence"
+    )
+    _require(
+        '<a id="phase-6-performance-evidence-host-boundary-panel"></a>\n\n'
+        "## " + performance_host_heading in current_evidence,
+        "D-GOV-007 panel anchor or heading association is missing",
+    )
+    performance_host_section = _section(
+        current_evidence,
+        performance_host_heading,
+    )
+    performance_host_flat = _semantic_text(
+        re.sub(r"^> ?", "", performance_host_section, flags=re.MULTILINE)
+    )
+    performance_rule_flat = _semantic_text(
+        performance_host_section.split("### Documentation conformance", 1)[0]
+    )
+    for required_clause in (
+        "authorises only these two exact host profiles to supply candidate "
+        "evidence for Phase 6 performance",
+        "later decision can admit a performance result only if it comes from "
+        "one of these exact host profiles",
+        "project qualifies a subsequent host profile, this does not authorise "
+        "performance evidence from that profile",
+    ):
+        _require(
+            required_clause in performance_rule_flat,
+            "D-GOV-007 evidence panel drifted: " + required_clause,
+        )
+    for required_clause in (
+        "3f20de704a060ab37478c34b3a7cb3586a9b2220",
+        "D-GOV-006 qualifies the exact "
+        "linux-x86_64-flatpak-freecad-1.1.3 host profile",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+        "previous validator rejected a result unless it recorded FreeCAD 1.1.1",
+        "previous validator then rejected that result",
+        "20260815T214842401485Z-profile/sample-01.log",
+        "D-GOV-007 does not admit this test result as Exit 4 evidence",
+        "linux-x86_64-flatpak-freecad-1.1.1",
+        "linux-x86_64-flatpak-freecad-1.1.3",
+        "authorises only these two exact host profiles to supply candidate "
+        "evidence for Phase 6 performance",
+        "later decision can admit a performance result only if it comes from "
+        "one of these exact host profiles",
+        "Each new schema-2 result has exact host identity",
+        "records the ID and FreeCAD version of its exact host profile",
+        "rejects a result that names a different host profile or FreeCAD "
+        "version",
+        "rejects a result set that contains two host profiles",
+        "project qualifies a subsequent host profile, this does not "
+        "authorise performance evidence from that profile",
+        "compare TrackTemplate performance, use one exact host profile",
+        "independently shows the effect of the host profile and the "
+        "TrackTemplate effect",
+        "cannot claim that TrackTemplate performance became better because "
+        "the two host profiles have different results",
+        "1.1.1 performance report does not have a host_profile_id field",
+        "qualified-runtime contract hash",
+        "data identify the exact host profile for FreeCAD 1.1.1",
+        "D-GOV-007 keeps this report as 1.1.1 evidence",
+        "1.1.1 report is a schema-1 report",
+        "New samples and performance records use schema 2",
+        "schema_version value identifies the structure of the evidence record",
+        "profile_id value is phase6-transition-edit-validate-export-profile-v1",
+        "identifies the measurement method and not the record schema",
+        "standalone validator has the two exact ID/version mappings",
+        "rejects schema 1 and FreeCAD 1.1.2",
+        "rejects a result unless its ID/version pair is one of the two mappings",
+        "rejects a host_profile_id value that is not a string",
+        "rejects an exact-geometry receipt that records a different FreeCAD "
+        "version",
+        "does not measure performance",
+        "does not admit the test result",
+        "defines no value for a performance budget",
+        "changes the schema for internal performance-evidence records from 1 "
+        "to 2",
+        "changes no TrackTemplate product behaviour, product output, product "
+        "schema",
+        "PR-15 — deferred cost",
+        "host difference cannot be evidence of a TrackTemplate or "
+        "deferred-cost change",
+        "QA-R04 — no value for a performance budget",
+        "decision defines no budget and admits no performance result",
+        "Continue with bounded conditions",
+        "D-GOV-007 — Authorise the exact 1.1.3 profile for Phase 6 "
+        "performance evidence",
+        "does not accept Exit 4",
+        "separate Level 3 decision from the owner is necessary",
+        "gives no production, physical-output, project-cleared, packaging, "
+        "release, or tagging authority",
+        "Exits 1 and 5 stay Pending",
+        "Output stays private-development",
+        "Project status stays unknown",
+    ):
+        _require(
+            required_clause in performance_host_flat,
+            "D-GOV-007 evidence panel drifted: " + required_clause,
+        )
+    performance_decision_flat = " ".join(
+        _blockquote_paragraphs(performance_host_section)
+    )
+    for required_clause in (
+        "authorises the exact linux-x86_64-flatpak-freecad-1.1.1 profile and "
+        "the exact linux-x86_64-flatpak-freecad-1.1.3 profile to supply "
+        "candidate evidence",
+        "later decision can admit a performance result only if it comes from "
+        "one of these exact host profiles",
+        "Each new schema-2 result must have exact host identity",
+        "1.1.1 report from 2026-08-02 is a schema-1 report",
+        "project qualifies a subsequent host profile, this does not authorise "
+        "performance evidence from that profile",
+        "separate Level 3 decision from the owner is necessary",
+        "changes the schema for internal performance-evidence records to "
+        "version 2",
+        "does not accept Exit 4",
+        "product output, product schema",
+        "gives no production, physical-output, project-cleared, packaging, "
+        "release, or tagging authority",
+    ):
+        _require(
+            required_clause in performance_decision_flat,
+            "D-GOV-007 quoted owner decision drifted: " + required_clause,
+        )
+    performance_host_issue9 = direct_section_content(
+        performance_host_section,
+        "Documentation conformance",
+        level=3,
+    )
+    expected_performance_scope = {
+        "reference/PERFORMANCE_SOP.md": (
+            "full section with the heading `Hosts for Phase 6 performance "
+            "evidence`",
+        ),
+        "reference/VALIDATION.md": (
+            "full compatibility unit for Phase 1 runtime and legacy ingress",
+        ),
+        "reference/PROJECT_PLAN.md": (
+            "current owner view",
+            "D-GOV-007 phase summary",
+            "D-GOV-007 decision row",
+        ),
+        "reference/current/PHASE_EVIDENCE.md": (
+            "full D-GOV-007 panel",
+            "changed Exit 4 disposition",
+            "D-GOV-007 carried-control sentences",
+        ),
+        "reference/current/gate-decisions.json": (
+            "human-readable D-GOV-007 record",
+            "Exact JSON data is not part of the linguistic assessment",
+        ),
+    }
+    for reviewed_path, scope_fragments in expected_performance_scope.items():
+        _require(
+            reviewed_path in performance_host_issue9
+            and all(
+                fragment in performance_host_issue9
+                for fragment in scope_fragments
+            ),
+            "D-GOV-007 Issue 9 review scope drifted: " + reviewed_path,
+        )
+    performance_host_issue9_flat = _semantic_text(performance_host_issue9)
+    for required_clause in (
+        "official Issue 9 standard",
+        "TrackTemplate UK English spelling directive",
+        "Before the conformance review, no reviewer verified ASD-STE100 Issue 9 "
+        "conformance for these five changed units",
+        "conformance review must examine this exact candidate",
+        "pull request and completion report must record the result",
+        "machine values are not part of the linguistic review",
+        "Issue 9 conformance stays Unknown for other live prose",
+    ):
+        _require(
+            required_clause in performance_host_issue9_flat,
+            "D-GOV-007 Issue 9 result or limitation drifted: "
+            + required_clause,
+        )
+    performance_review_flat = _semantic_text(
+        direct_section_content(
+            performance_host_section,
+            "Review state",
+            level=3,
+        )
+    )
+    for required_clause in (
+        "reviewer who did not make this change must examine the exact "
+        "candidate",
+        "reviewer must not change files",
+        "host rule for performance, evidence admission, authority, "
+        "preservation, and the Issue 9 assessment",
+        "must find no blocker before the project merges the candidate",
+        "pull request and completion report record the result",
+        "panel must not change after the review",
+    ):
+        _require(
+            required_clause in performance_review_flat,
+            "D-GOV-007 independent review gate drifted: " + required_clause,
+        )
+    _validate_performance_host_sources(
+        _read(PERFORMANCE_SOP_PATH),
+        _read(VALIDATION_PATH),
+    )
     current_register_flat = _semantic_text(
         direct_section_content(current_evidence, "Carried controls and exclusions")
     )
@@ -1933,6 +2251,11 @@ def _validate_exit_conditions(
         "TT-DOC-002",
         "TT-DOC-002 corrects only the spelling directive",
         "D-GOV-006 qualifies only the exact FreeCAD 1.1.3 profile",
+        "D-GOV-007 changes only the host rule and the directly dependent "
+        "schema for internal performance-evidence records",
+        "admits no performance result and defines no budget",
+        "does not claim that performance became better",
+        "does not accept Exit 4",
     ):
         _require(
             required_clause in current_register_flat,
@@ -2186,7 +2509,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-15",
+        and current_document["updated_on"] == "2026-08-16",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -2246,6 +2569,8 @@ def _validate_decisions(plan: str) -> None:
                     "TT-DOC-002",
                     "D-GOV-006",
                 }
+                else "2026-08-16"
+                if decision_id == "D-GOV-007"
                 else (
                     "2026-08-02"
                     if decision_id in {"D-P6-002", "D-P6-003"}
@@ -2489,6 +2814,81 @@ def _validate_decisions(plan: str) -> None:
         _require(
             fragment in compatibility_semantic,
             "D-GOV-006 authority or exclusion drifted: " + fragment,
+        )
+    performance_host_record = phase6_by_id["D-GOV-007"]
+    performance_host_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-performance-evidence-host-boundary-panel"
+    )
+    _require(
+        performance_host_record["decision"]
+        == (
+            "Authorise the exact FreeCAD 1.1.3 profile for Phase 6 "
+            "performance evidence."
+        )
+        and performance_host_record["evidence"] == performance_host_panel
+        and performance_host_record["panel_record"]
+        == performance_host_panel,
+        "D-GOV-007 decision or panel routing drifted",
+    )
+    performance_host_semantic = _semantic_text(
+        str(performance_host_record["authority"])
+        + " "
+        + str(performance_host_record["exclusions"])
+    )
+    for fragment in (
+        "3f20de704a060ab37478c34b3a7cb3586a9b2220",
+        "linux-x86_64-flatpak-freecad-1.1.1",
+        "linux-x86_64-flatpak-freecad-1.1.3",
+        "D-GOV-006 qualifies",
+        "project owner changes the host rule for Phase 6 performance evidence",
+        "authorises the exact linux-x86_64-flatpak-freecad-1.1.1 profile and "
+        "the exact linux-x86_64-flatpak-freecad-1.1.3 profile to supply "
+        "candidate evidence",
+        "later decision can admit a performance result only if it comes from "
+        "one of these exact host profiles",
+        "Each new schema-2 result must have exact host identity",
+        "record the ID and FreeCAD version of its exact host profile",
+        "schema_version value identifies the structure of the internal "
+        "evidence record",
+        "profile_id value identifies the measurement method",
+        "1.1.1 report from 2026-08-02 is a schema-1 report",
+        "does not have a host_profile_id field",
+        "It records FreeCAD 1.1.1, platform data, and the qualified-runtime "
+        "contract hash",
+        "data identify the exact host profile for FreeCAD 1.1.1",
+        "D-GOV-007 keeps this report as 1.1.1 evidence",
+        "Results from different host profiles must stay in different sets",
+        "claim that TrackTemplate performance became better, compare results "
+        "from one exact host profile",
+        "different method can compare the two host profiles only if it "
+        "independently shows the effect of the host profile and the "
+        "TrackTemplate effect",
+        "project qualifies a subsequent host profile, this does not "
+        "authorise performance evidence from that profile",
+        "separate Level 3 decision from the owner is necessary",
+        "changes only the host rule and the directly dependent schema for "
+        "internal performance-evidence records",
+        "does not accept Exit 4",
+        "define a value for a performance budget",
+        "admit the rejected 1.1.3 test result",
+        "does not qualify FreeCAD 1.1.2",
+        "version range that includes another release",
+        "changes no product behaviour",
+        "accepted-exit count",
+        "risk disposition",
+        "product output",
+        "product schema",
+        "Exits 1, 4, and 5 stay Pending",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Output stays private-development",
+        "Project status stays unknown",
+        "gives no production, physical-output, project-cleared, packaging, "
+        "release, or tagging authority",
+    ):
+        _require(
+            fragment in performance_host_semantic,
+            "D-GOV-007 authority or exclusion drifted: " + fragment,
         )
     current_records = document["decisions"]
     _require(

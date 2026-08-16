@@ -1263,12 +1263,12 @@ def validate_current_evidence_mutations() -> None:
 
     exit4_row = table_row_containing(
         evidence,
-        "PR #33 accounts for complete cold/warm Edit, Validate and Export cost",
+        "PR #33 records all costs for cold and warm Edit, Validate, and Export",
     )
     exit4_promoted = replace_once(
         exit4_row,
-        "Pending — PR #33 accounts",
-        "Evidenced — PR #33 accounts",
+        "Pending — D-GOV-007 authorises subsequent evidence",
+        "Evidenced — D-GOV-007 authorises subsequent evidence",
     )
     expect_rejected(
         "phase-evidence/exit4-prematurely-evidenced",
@@ -1475,6 +1475,230 @@ def validate_current_evidence_mutations() -> None:
         "host-compatibility defect",
     )
 
+    performance_host_section = progress._section(
+        evidence,
+        "Panel and owner decision about hosts for Phase 6 performance "
+        "evidence",
+    )
+    mixed_hosts_allowed = replace_once(
+        performance_host_section,
+        "It\nalso rejects a result set that contains two host profiles.",
+        "It\nalso accepts a result set that contains two host profiles.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-007-mixed-host-results-allowed",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                performance_host_section,
+                mixed_hosts_allowed,
+            ),
+        ),
+        "D-GOV-007 evidence panel drifted: rejects a result set that "
+        "contains two host profiles",
+    )
+
+    future_host_auto_admitted = replace_once(
+        performance_host_section,
+        "If the project qualifies a subsequent host profile, this does not "
+        "authorise\nperformance evidence from that profile.",
+        "If the project qualifies a subsequent host profile, this "
+        "automatically authorises\nperformance evidence from that profile.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-007-future-host-auto-admitted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                performance_host_section,
+                future_host_auto_admitted,
+            ),
+        ),
+        "D-GOV-007 evidence panel drifted: project qualifies a subsequent "
+        "host profile, this does not authorise performance evidence from "
+        "that profile",
+    )
+
+    performance_exit_accepted = replace_once(
+        performance_host_section,
+        "It does not accept Exit 4, define a value for a performance budget",
+        "It accepts Exit 4 and defines a value for a performance budget",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-007-exit4-accepted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                performance_host_section,
+                performance_exit_accepted,
+            ),
+        ),
+        "D-GOV-007 evidence panel drifted: does not accept Exit 4",
+    )
+
+    owner_future_boundary = blockquote_paragraph_containing(
+        performance_host_section,
+        "If the project qualifies a subsequent host profile",
+    )
+    owner_future_auto_authorised = replace_once(
+        owner_future_boundary,
+        "this does not authorise",
+        "this authorises",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-007-owner-future-host-auto-authorised",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                owner_future_boundary,
+                owner_future_auto_authorised,
+            ),
+        ),
+        "D-GOV-007 quoted owner decision drifted: project qualifies a "
+        "subsequent host profile, this does not authorise performance "
+        "evidence from that profile",
+    )
+
+    owner_clearance_boundary = blockquote_paragraph_containing(
+        performance_host_section,
+        "This decision gives no production",
+    )
+    owner_clearance_added = replace_once(
+        owner_clearance_boundary,
+        "gives no production",
+        "gives production",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-007-owner-clearance-added",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            replace_once(
+                evidence,
+                performance_host_section,
+                replace_once(
+                    performance_host_section,
+                    owner_clearance_boundary,
+                    owner_clearance_added,
+                ),
+            ),
+        ),
+        "D-GOV-007 evidence panel drifted: gives no production, "
+        "physical-output, project-cleared, packaging, release, or tagging "
+        "authority",
+    )
+
+    performance_sop = read("reference/PERFORMANCE_SOP.md")
+    validation = read("reference/VALIDATION.md")
+    automatic_host_sop = replace_once(
+        performance_sop,
+        "If the project qualifies a subsequent host profile, this does not "
+        "authorise\nperformance evidence from that profile.",
+        "If the project qualifies a subsequent host profile, this authorises"
+        "\nperformance evidence from that profile.",
+    )
+    expect_rejected(
+        "performance-sop/future-host-auto-admitted",
+        lambda: progress._validate_performance_host_sources(
+            automatic_host_sop,
+            validation,
+        ),
+        "PERFORMANCE_SOP performance host boundary drifted: project qualifies "
+        "a subsequent host profile, this does not authorise performance "
+        "evidence from that profile",
+    )
+
+    cross_host_sop = replace_once(
+        performance_sop,
+        "compare results from one\nexact host profile",
+        "compare results from two\ndifferent host profiles",
+    )
+    expect_rejected(
+        "performance-sop/cross-host-product-comparison-authorised",
+        lambda: progress._validate_performance_host_sources(
+            cross_host_sop,
+            validation,
+        ),
+        "PERFORMANCE_SOP performance host boundary drifted: one exact host "
+        "profile",
+    )
+
+    host_effect_hidden = replace_once(
+        performance_sop,
+        "only if\nit independently shows the effect of the host profile and "
+        "the TrackTemplate\neffect.",
+        "without\nshowing the effect of the host profile or the TrackTemplate"
+        "\neffect.",
+    )
+    expect_rejected(
+        "performance-sop/cross-host-effect-not-separated",
+        lambda: progress._validate_performance_host_sources(
+            host_effect_hidden,
+            validation,
+        ),
+        "PERFORMANCE_SOP performance host boundary drifted: independently "
+        "shows the effect of the host profile and the TrackTemplate effect",
+    )
+
+    historical_host_identity_lost = replace_once(
+        performance_sop,
+        "These data identify the exact host profile\nfor FreeCAD 1.1.1.",
+        "These data do not identify the exact host profile\nfor FreeCAD 1.1.1.",
+    )
+    expect_rejected(
+        "performance-sop/historical-host-identity-lost",
+        lambda: progress._validate_performance_host_sources(
+            historical_host_identity_lost,
+            validation,
+        ),
+        "PERFORMANCE_SOP performance host boundary drifted: identify the exact "
+        "host profile for FreeCAD 1.1.1",
+    )
+
+    evidence_schema_downgraded = replace_once(
+        performance_sop,
+        "The `schema_version` value is `2`",
+        "The `schema_version` value is `1`",
+    )
+    expect_rejected(
+        "performance-sop/new-evidence-schema-downgraded",
+        lambda: progress._validate_performance_host_sources(
+            evidence_schema_downgraded,
+            validation,
+        ),
+        "PERFORMANCE_SOP performance schema boundary drifted: schema_version "
+        "value is 2",
+    )
+
+    diagnostic_admitted = replace_once(
+        validation,
+        "The previous 1.1.1-only validator rejected the 1.1.3 test result. "
+        "D-GOV-007\ndoes not admit this test result as Exit 4 evidence",
+        "The previous 1.1.1-only validator rejected the 1.1.3 test result. "
+        "D-GOV-007\nadmits this test result as Exit 4 evidence",
+    )
+    expect_rejected(
+        "validation/d-gov-007-diagnostic-run-admitted",
+        lambda: progress._validate_performance_host_sources(
+            performance_sop,
+            diagnostic_admitted,
+        ),
+        "VALIDATION admitted the rejected 1.1.3 test result",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
@@ -1636,6 +1860,17 @@ def validate_project_plan_mutations() -> None:
         "project-plan/d-gov-006-decision-omitted",
         lambda: progress._validate_decisions(
             replace_once(plan, compatibility_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
+    performance_host_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-007 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-007-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, performance_host_decision_row + "\n", "")
         ),
         "project-plan decisions differ from the frozen registers",
     )

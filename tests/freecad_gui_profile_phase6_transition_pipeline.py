@@ -29,6 +29,7 @@ from tracktemplate.adapters.freecad import transition_state  # noqa: E402
 
 
 PROFILE_ID = "phase6-transition-edit-validate-export-profile-v1"
+EVIDENCE_SCHEMA_VERSION = 2
 TARGET_TRANSITION_ID = "SET-001/curve-track/2/transition/exit"
 EXACT_CHORD_ERROR_MM = 0.05
 EXACT_MAXIMUM_SEGMENTS = 64
@@ -533,8 +534,11 @@ def validate(output_directory):
                 "warm_repetitions": WARM_REPETITIONS,
             },
             "freecad_version": ".".join(App.Version()[:3]),
+            "host_profile_id": qualification[
+                "compatibility_evaluation"
+            ]["matched_profile_id"],
             "profile_id": PROFILE_ID,
-            "schema_version": 1,
+            "schema_version": EVIDENCE_SCHEMA_VERSION,
             "starting_state": (
                 "fresh isolated GUI process; one accepted Entry/Exit pair; "
                 "selected Exit with its parameter editor open; empty exact "
