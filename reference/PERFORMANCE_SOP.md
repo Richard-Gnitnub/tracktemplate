@@ -25,14 +25,15 @@ Do not use confidential file paths or user data in a committed benchmark report.
 
 ## Hosts for Phase 6 performance evidence
 
-D-GOV-007 authorises only these two exact host profiles to supply candidate
-evidence for Phase 6 performance:
+D-GOV-007 and D-GOV-010 authorise only the profiles in this list to supply
+candidate evidence for Phase 6 performance:
 
 - `linux-x86_64-flatpak-freecad-1.1.1`
-- `linux-x86_64-flatpak-freecad-1.1.3`, as D-GOV-006 defines it.
+- `linux-x86_64-flatpak-freecad-1.1.3`, as D-GOV-006 defines it
+- `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`, as D-GOV-010 defines it.
 
-A later decision can admit a performance result only if it comes from one of
-these exact host profiles. Each new schema-2 result must have exact host
+A subsequent decision can admit only a performance result from one of these
+profiles. Each new schema-2 result must have exact host
 identity. It must name the ID and FreeCAD version of the exact host profile.
 Keep results from different host profiles in different sets.
 
@@ -47,15 +48,24 @@ qualified-runtime contract hash. These data identify the exact host profile
 for FreeCAD 1.1.1. D-GOV-007 keeps this report as 1.1.1 evidence.
 
 To claim that TrackTemplate performance became better, compare results from one
-exact host profile. A different method can compare two exact profiles only if
+exact host profile. A different method can compare exact profiles only if
 it independently shows the effect of the host profile and the TrackTemplate
 effect. The project must record the method and its authority.
 
 If the project qualifies a subsequent host profile, this does not authorise
 performance evidence from that profile. Only a Level 3 owner decision can add
-an exact host profile that is different. D-GOV-007 adds the exact 1.1.3 profile
-only. It admits no performance result and defines no value for a performance
-budget. It does not accept Exit 4 or claim that performance became better.
+an exact host profile that is different. D-GOV-007 adds the first exact 1.1.3
+profile.
+
+D-GOV-010 adds the exact 1.1.3 profile with CPython 3.13.13 and
+PySide6/Qt 6.11.1. The decisions admit no performance result. They define no
+value for a performance budget. They do not accept Exit 4 or claim that
+performance became better.
+
+Before the project claims that TrackTemplate performance changed on this
+profile, the D-GOV-009 investigation must record a baseline for this profile.
+For a TrackTemplate before/after comparison, do not use results from profiles
+with different exact identities.
 
 <a id="phase-6-exit-4-comparison-direction"></a>
 

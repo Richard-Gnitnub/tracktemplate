@@ -2,11 +2,11 @@
   "schema_version": 1,
   "contract_id": "tracktemplate:phase1:runtime-and-legacy-compatibility:1",
   "recorded_on": "2026-07-20",
-  "status": "phase1-policy-accepted-phase2-development-guard-implemented-two-exact-freecad-profiles-qualified",
+  "status": "phase1-policy-accepted-phase2-development-guard-implemented-three-exact-freecad-profiles-qualified",
   "phase": 1,
   "scope": {
     "release_candidate_intent": "Define the initial FreeCAD/Python support promise and the bounded B14/B15 ingress window before modular source or persistence migration starts.",
-    "current_effect": "Phase 1 accepted the compatibility policy. Phase 2 has a runtime guard. The guard accepts only the exact FreeCAD 1.1.1 and 1.1.3 host profiles. It changes no B14, B15, FCStd file, configuration, Addon package, or legacy macro behaviour. It is not the successor document detector or migrator.",
+    "current_effect": "Phase 1 accepted the compatibility policy. Phase 2 has a runtime guard. The guard accepts one exact FreeCAD 1.1.1 host profile and two exact FreeCAD 1.1.3 host profiles. It changes no B14, B15, FCStd file, configuration, Addon package, or legacy macro behaviour. The runtime guard does not examine or migrate a legacy document.",
     "support_meaning": "A release-supported workflow must pass both a qualified-runtime gate and a supported-document/schema gate before the Workbench may mutate, migrate or export.",
     "licensing_separation": "Compatibility support does not grant project-cleared output status and does not change any provenance, dependency-manifest or rights gate.",
     "security_boundary": "The 1.1.1 host profile has functional compatibility authority only. It has no security endorsement. The FreeCAD 1.1.3 release record records security issues for all releases before 1.1.3. FreeCAD recommends that all users install 1.1.3."
@@ -126,6 +126,49 @@
           "The FreeCADCmd matrix gave the specified results for loading, routing, persistence, migration, exact geometry, and DXF export.",
           "The isolated real-GUI matrix gave the specified results for migration, Entry/Exit parity, ViewProvider behaviour, and lifecycle."
         ]
+      },
+      {
+        "profile_id": "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "status": "qualified-additional-exact-host-profile",
+        "host_distribution_evidence": "The host is Linux Mint 22.3 x86_64 with the stable system org.freecad.FreeCAD Flatpak.",
+        "exact_match": {
+          "freecad.coin_version": "SIM Coin 4.0.8",
+          "freecad.opencascade_version": "7.8.1",
+          "freecad.pyside_version": "6.11.1",
+          "freecad.qt_binding": "PySide6",
+          "freecad.qt_version": "6.11.1",
+          "freecad.version_info": [
+            1,
+            1,
+            3
+          ],
+          "platform.flatpak_id": "org.freecad.FreeCAD",
+          "platform.machine": "x86_64",
+          "platform.packaging": "flatpak",
+          "platform.system": "Linux",
+          "python.implementation": "CPython",
+          "python.version_info": [
+            3,
+            13,
+            13
+          ]
+        },
+        "observed_freecad_revision": "44987 (Git)",
+        "observed_freecad_commit": "145529fe741292ff0b3977a01195bf0247425794",
+        "observed_flatpak_ref": "app/org.freecad.FreeCAD/x86_64/stable",
+        "observed_flatpak_app_commit": "fa3ef6bebc139083246bd4fb6b8baf6a032a3b5bbb0a57479cb14d52bad733ae",
+        "observed_flatpak_parent_commit": "d7a54c855bce9f4fb7b00b33d43f0ecb1908af510f9147bcc9bc32f614a6bbad",
+        "observed_flatpak_runtime": "org.kde.Platform/x86_64/6.11",
+        "observed_flatpak_sdk": "org.kde.Sdk/x86_64/6.11",
+        "observed_flatpak_origin": "flathub",
+        "observed_flatpak_collection": "org.flathub.Stable",
+        "observed_flatpak_installation": "system",
+        "qualification_basis": [
+          "D-GOV-010 qualifies this exact FreeCAD 1.1.3 host profile.",
+          "The runtime probe reported only this exact host profile.",
+          "The FreeCADCmd host matrix gave PASS results for loading, canonical state, persistence, migration, chair import, Coin, Edit, exact geometry, and DXF export.",
+          "The real-GUI host matrix gave PASS results for migration, Entry/Exit parity, ViewProvider behaviour, selection, Undo/Redo, save/reopen, failure recovery, and cleanup."
+        ]
       }
     ],
     "platform_matrix": [
@@ -146,7 +189,7 @@
         "status": "qualification-pending"
       }
     ],
-    "support_rule": "The runtime guard accepts a runtime only when its data is equal to the `exact_match` data for one qualified host profile. Only the exact 1.1.1 and 1.1.3 profiles are qualified. FreeCAD 1.1.2 is not qualified. A different host is not qualified until the host matrix gives the specified results. The project owner must then change this contract.",
+    "support_rule": "The runtime guard accepts a runtime only when its data is equal to the `exact_match` data for one qualified host profile. One exact FreeCAD 1.1.1 profile and two exact FreeCAD 1.1.3 profiles are qualified. FreeCAD 1.1.2 is not qualified. A different host is not qualified until the host matrix gives the specified results. The project owner must then change this contract.",
     "unqualified_runtime_rule": "Report every observed mismatch, preserve the document untouched and disable Track Template mutation, migration and production export; do not guess compatibility from a higher version number."
   },
   "legacy_document_window": {
@@ -304,7 +347,7 @@
     "probe_sentinel": "TRACKTEMPLATE_RUNTIME_PROBE=",
     "standalone_probe_command": ".venv/bin/python tools/runtime_compatibility_probe.py",
     "freecad_probe_command": "flatpak run --command=FreeCADCmd org.freecad.FreeCAD tools/runtime_compatibility_probe.py --pass --require-qualified",
-    "runtime_probe_observed_on": "2026-07-20",
+    "runtime_probe_observed_on": "2026-08-23",
     "baseline": "reference/phase-evidence/BASELINE.md",
     "b15_acceptance": "reference/benchmarks/2026-07-19-b14-to-b15-chair-acceptance.md",
     "plain_line_save_reopen": "reference/benchmarks/2026-07-19-b14-plain-line-edit-lifecycle-series.md",
@@ -313,9 +356,10 @@
     "phase2_foundation": "reference/phase-evidence/PHASE2_FOUNDATION.md",
     "phase2_freecad_smoke": "tests/freecad_validate_phase2_foundation.py",
     "freecad_1_1_3_requalification": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-compatibility-requalification-panel",
+    "freecad_1_1_3_py31313_qt6111_qualification": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-py31313-qt6111-qualification-panel",
     "known_evidence_gaps": [
       "No Windows, macOS, non-Flatpak Linux or other architecture is qualified yet.",
-      "Only the exact 1.1.1 and 1.1.3 profiles are qualified. FreeCAD 1.1.2 and all other releases are not qualified.",
+      "Only one exact FreeCAD 1.1.1 profile and two exact FreeCAD 1.1.3 profiles are qualified. FreeCAD 1.1.2 and all other releases are not qualified.",
       "No pre-B14 or versionless FCStd is promised as a migration source.",
       "The B14/B15 successor document detector and migrator do not exist yet.",
       "B15 save/reopen evidence is bounded to the accepted crossover chair delta; family-by-family migration fixtures remain Phase 4 work."

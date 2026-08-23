@@ -128,6 +128,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-GOV-007",
     "D-GOV-008",
     "D-GOV-009",
+    "D-GOV-010",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -301,8 +302,10 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "results and stops new product work in that direction. The two results "
         "are not improvement evidence. They are not Exit 4 evidence. No "
         "measured evidence "
-        "shows sufficient cost outside the D-GOV-008 preview-sampler boundary. "
-        "No decision defines a product performance budget or accepts Exit 4."
+        "shows sufficient cost in a measurement area that is not part of the "
+        "D-GOV-008 preview-sampler boundary. D-GOV-010 qualifies one more host "
+        "profile but admits no performance "
+        "result or budget and does not accept Exit 4."
     ),
     (
         "Pending — B14 remains available, but whole-scope parity and retirement "
@@ -770,34 +773,34 @@ def _validate_owner_view(plan: str) -> None:
         "The owner accepted Exits 2 and 3",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
-        "D-GOV-009",
-        "records the D-GOV-008 performance direction as exhausted for new "
-        "product work",
-        "D-GOV-008 stays Accepted as the authority for the first baseline, "
-        "hypothesis, rule, and Level 2 boundary",
-        "The two subsequent Level 2 results are retained negative evidence",
-        "do not tell the project to make a third preview-sampler change",
-        "bounded Level 1 baseline-attribution investigation",
-        "accepted FreeCAD 1.1.3 Edit journey",
-        "state construction, preview and sampler construction, Coin binding, "
-        "GUI processing, and the unattributed remainder",
-        "Exit 4 stays Pending",
-        "The two retained results are not improvement evidence",
-        "They are not Exit 4 evidence",
-        "Current measurements do not show sufficient cost in a measurement "
-        "area outside the D-GOV-008 preview-sampler boundary",
-        "D-GOV-009 defines no product performance budget",
-        "D-GOV-006 and D-GOV-007 host limits do not change",
-        "Do not make a third preview sampler, polynomial, approximation, "
-        "cache, or other variation of the D-GOV-008 hypothesis",
-        "subsequent Level 3 owner decision is necessary before a new Level 2 "
-        "optimisation",
-        "measured evidence for a measurement area outside the D-GOV-008 "
-        "preview-sampler boundary",
-        "In a new cycle, run one bounded Level 1 baseline-attribution "
-        "investigation",
+        "D-GOV-010",
+        "qualifies only the exact FreeCAD 1.1.3 profile with CPython 3.13.13 "
+        "and PySide6/Qt 6.11.1",
+        "D-GOV-010 preserves the previously qualified profiles and their "
+        "evidence",
+        "D-GOV-009 stays the current Exit 4 direction",
+        "runtime guard and the host matrix gave the specified results for the "
+        "profile that D-GOV-010 qualifies",
+        "three profiles in the contract can supply candidate evidence for "
+        "performance in a subsequent cycle",
+        "Each TrackTemplate before/after comparison must use one profile with "
+        "an exact identity",
+        "runtime guard does not examine the data about the Flatpak package "
+        "that the contract records",
+        "Qualification gives no authority for a performance comparison "
+        "between profiles that have different exact identities",
+        "D-GOV-010 admits no performance result",
+        "defines no performance budget and does not accept Exit 4",
+        "two D-GOV-008 results stay retained negative evidence",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "Keep the profile for FreeCAD 1.1.1 qualified",
+        "Keep the first profile for FreeCAD 1.1.3 qualified",
+        "Do not change D-GOV-009",
+        "In a new cycle, do the bounded investigation that D-GOV-009 specifies",
+        "Use the profile that D-GOV-010 qualifies",
+        "First, record a baseline for this profile",
         "Do not change product source",
-        "Do not make a performance optimisation",
+        "Do not select an optimisation candidate",
         "Do not accept Exit 4",
     ):
         _require(
@@ -829,8 +832,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "PROJECT_PLAN.md contains an unsupported dashboard section",
     )
     _require(
-        len(plan.splitlines()) <= 151,
-        "PROJECT_PLAN.md exceeded its 151-line dashboard budget",
+        len(plan.splitlines()) <= 154,
+        "PROJECT_PLAN.md exceeded its 154-line dashboard budget",
     )
     for forbidden in (
         "### Deliverables",
@@ -943,10 +946,12 @@ def _validate_performance_host_sources(
         for required_clause in (
             "linux-x86_64-flatpak-freecad-1.1.1",
             "linux-x86_64-flatpak-freecad-1.1.3",
-            "authorises only",
+            "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+            "D-GOV-010",
+            "authorise only",
             "supply candidate",
-            "A later decision can admit a performance result only if it comes "
-            "from one of these exact host profiles",
+            "A subsequent decision can admit only a performance result from "
+            "one of these profiles",
             "schema-2",
             "1.1.1 report from 2026-08-02 is a schema-1 report",
             "does not have a host_profile_id field",
@@ -958,8 +963,9 @@ def _validate_performance_host_sources(
             "TrackTemplate effect",
             "project qualifies a subsequent host profile, this does not "
             "authorise performance evidence from that profile",
-            "admits no performance result",
-            "does not accept Exit 4",
+            "admit no performance result",
+            "baseline",
+            "do not accept Exit 4",
         ):
             _require(
                 required_clause in source_text,
@@ -1614,6 +1620,174 @@ def _validate_performance_direction_sources(
             "D-GOV-009 quoted owner decision drifted: " + decision_clause,
         )
 
+    qualification_heading = (
+        "Qualification panel and owner decision for the new exact FreeCAD "
+        "1.1.3 host profile"
+    )
+    _require(
+        '<a id="freecad-1-1-3-py31313-qt6111-qualification-panel"></a>\n\n'
+        "## " + qualification_heading in current_evidence,
+        "D-GOV-010 panel anchor or heading is missing",
+    )
+    qualification_panel = _section(current_evidence, qualification_heading)
+    qualification_flat = _semantic_text(qualification_panel)
+    for required_clause in (
+        "dc750df93682b3b0fd5fdf79fa6fe94296a10697",
+        "changes no TrackTemplate product source",
+        "Phase 6 has 2/5 accepted exits",
+        "Exit 4 is Pending",
+        "Project status is unknown",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "revision 44987 (Git)",
+        "145529fe741292ff0b3977a01195bf0247425794",
+        "fa3ef6bebc139083246bd4fb6b8baf6a032a3b5bbb0a57479cb14d52bad733ae",
+        "d7a54c855bce9f4fb7b00b33d43f0ecb1908af510f9147bcc9bc32f614a6bbad",
+        "org.kde.Platform/x86_64/6.11",
+        "org.kde.Sdk/x86_64/6.11",
+        "CPython 3.13.13",
+        "PySide6 6.11.1 with Qt 6.11.1",
+        "OpenCASCADE 7.8.1",
+        "SIM Coin 4.0.8",
+        "runtime guard accepts this profile only when all of its exact_match "
+        "data are equal to the reported data",
+        "do not change the runtime guard",
+        "do not qualify a different Flatpak package",
+        "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c",
+        "probe reported only the profile that D-GOV-010 identifies and zero "
+        "mismatches",
+        "Legacy and modular results were equal for both workflows",
+        "zero open documents after cleanup",
+        "eff5df685a7b37b98cb23a2f853f186aa03a014bda0d2ac19754b8d8fa296e88",
+        "fcc98740aaaea626541d095f35d18e98a4b9bff72ce0968d71a5370e83f36865",
+        "0c06db37b9bdab8114fe600b34dd62a3beb7af1adc2edc8622fe1eff006fded3",
+        "e8bb482506b81ff0e328ffb64f3c37de820fe7a171e8247c866c2d1c38edaf77",
+        "16fa438aba7fa967a134241087239a86c14f65a03ad48ea20ef086910cb80713",
+        "fixture-or-harness-defect",
+        "a4e7168492056439f78dde745b541dc778c82879ef5b8ef3f4568683a60bd54a",
+        "d132f439fd0a1f144f2891d2789bbb0cdebe376500c1fb62508d90113cc09cca",
+        "adc996312467c3bb821f04f88024e62983418aae5b7977760a3612edb337c25b",
+        "bab8889d4e0e920bf5c72fbda11a2d925c86385e450da689dd0730aa8a831306",
+        "6df27b7a89079588dfa5ca513ba7df42a7967edfb7ddf3c2eabad1fa017a78c7",
+        "No TrackTemplate product source changes",
+        "D-GOV-006 and its exact CPython 3.13.14 and PySide6/Qt 6.10.3 "
+        "profile do not change",
+        "D-GOV-007 authority for its two named profiles does not change",
+        "D-GOV-010 authorises this profile to supply candidate evidence for "
+        "performance in a subsequent cycle",
+        "Each comparison must use one profile with an exact identity",
+        "not a TrackTemplate before/after comparison with a result from a "
+        "different exact profile",
+        "This cycle records no performance measurement, comparison, or "
+        "budget",
+        "makes no new measurement from either D-GOV-008 result",
+        "Both results are retained negative evidence",
+        "D-GOV-009 stays the current Exit 4 direction",
+        "must record a baseline for this profile",
+        "This qualification does not start that investigation",
+        "does not select an optimisation candidate and does not accept Exit "
+        "4",
+        "No risk state, treatment, severity, owner, deadline, or control "
+        "effectiveness changes",
+        "Issue 9 result for these logical units is Unknown",
+        "Continue with bounded conditions",
+    ):
+        _require(
+            required_clause in qualification_flat,
+            "D-GOV-010 evidence panel drifted: " + required_clause,
+        )
+
+    for risk_clause in (
+        "PR-01 — release workflow coverage",
+        "PR-13 — repository or evidence loss",
+        "PR-17 — persistence or migration corruption",
+        "PR-22 — authority transfer",
+        "QA-R03 — release GUI evidence",
+        "QA-R04 — no product performance budget",
+        "Critical / Mitigate / Effective (current scope)",
+        "High / Remove / Effective (current scope)",
+    ):
+        _require(
+            risk_clause in qualification_flat,
+            "D-GOV-010 risk panel drifted: " + risk_clause,
+        )
+
+    for reviewed_path in (
+        "reference/PROJECT_PLAN.md",
+        "reference/VALIDATION.md",
+        "reference/PERFORMANCE_SOP.md",
+        "reference/contracts/phase1-compatibility.json",
+        "reference/current/PHASE_EVIDENCE.md",
+        "reference/current/gate-decisions.json",
+    ):
+        _require(
+            reviewed_path in qualification_panel,
+            "D-GOV-010 documentation scope drifted: " + reviewed_path,
+        )
+
+    for review_clause in (
+        "A new reviewer did not make the change",
+        "This reviewer must examine the exact host identity",
+        "must also make sure that the change does not start D-GOV-009 "
+        "baseline attribution",
+        "must not change files",
+        "must not merge the candidate after a BLOCK review result",
+        "panel must not change after the exact-state review",
+    ):
+        _require(
+            review_clause in qualification_flat,
+            "D-GOV-010 review gate drifted: " + review_clause,
+        )
+
+    qualification_marker = (
+        "> **D-GOV-010 — Qualify the new exact FreeCAD 1.1.3 host profile**"
+    )
+    _require(
+        qualification_panel.count(qualification_marker) == 1,
+        "D-GOV-010 quoted owner decision is missing or duplicated",
+    )
+    qualification_quote = qualification_panel.split(
+        qualification_marker,
+        1,
+    )[1]
+    qualification_quote_flat = _semantic_text(
+        "\n".join(
+            line[2:] if line.startswith("> ") else ""
+            for line in qualification_quote.splitlines()
+            if line.startswith(">")
+        )
+    )
+    for decision_clause in (
+        "qualify only "
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "does not qualify all FreeCAD 1.1.3 hosts",
+        "Keep the exact FreeCAD 1.1.1 profile qualified",
+        "Keep the D-GOV-006 exact FreeCAD 1.1.3 profile qualified",
+        "D-GOV-010 authorises this profile to supply candidate evidence for "
+        "performance in a subsequent cycle",
+        "Each comparison must use one profile with an exact identity",
+        "For a TrackTemplate before/after comparison, do not use results from "
+        "profiles with different exact identities",
+        "Before the project claims that TrackTemplate performance changed on "
+        "this profile, the D-GOV-009 investigation must record a baseline for "
+        "this profile",
+        "admits no performance result",
+        "defines no performance budget",
+        "does not start baseline attribution",
+        "does not select an optimisation candidate",
+        "does not accept Exit 4",
+        "changes no product source, public API, railway mathematics, "
+        "persistence, schema, export behaviour, qualified-host criterion, "
+        "performance threshold, or evidence",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+        "Project status stays unknown",
+        "No risk disposition changes",
+    ):
+        _require(
+            decision_clause in qualification_quote_flat,
+            "D-GOV-010 quoted owner decision drifted: " + decision_clause,
+        )
+
 
 def _validate_exit_conditions(
     plan: str,
@@ -1795,6 +1969,20 @@ def _validate_exit_conditions(
         "investigation" in plan_flat
         and "Exit 4 stays Pending" in plan_flat,
         "D-GOV-009 direction summary drifted",
+    )
+    _require(
+        "D-GOV-010 qualifies only the exact FreeCAD 1.1.3 profile with "
+        "CPython 3.13.13 and PySide6/Qt 6.11.1" in plan_flat
+        and "keeps the previously qualified profiles and their evidence"
+        in plan_flat
+        and "authorises this profile to supply candidate evidence for "
+        "performance in a subsequent cycle" in plan_flat
+        and "Each comparison must use one profile with an exact identity"
+        in plan_flat
+        and "admits no performance result and does not change D-GOV-009"
+        in plan_flat
+        and "Exit 4 stays Pending" in plan_flat,
+        "D-GOV-010 host-qualification summary drifted",
     )
 
     current_flat = " ".join(current_evidence.split())
@@ -2918,6 +3106,14 @@ def _validate_exit_conditions(
         "admits no performance result and defines no budget",
         "does not claim that performance became better",
         "does not accept Exit 4",
+        "D-GOV-010 qualifies only the profile with ID "
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "two profiles that the project qualified before D-GOV-010 stay "
+        "qualified, and their evidence does not change",
+        "authorises its profile to supply candidate evidence for performance "
+        "in a subsequent cycle",
+        "Each comparison must use one profile with an exact identity",
+        "does not change D-GOV-009 or Exit 4",
     ):
         _require(
             required_clause in current_register_flat,
@@ -3223,7 +3419,7 @@ def _validate_decisions(plan: str) -> None:
             record["decided_on"]
             == (
                 "2026-08-23"
-                if decision_id == "D-GOV-009"
+                if decision_id in {"D-GOV-009", "D-GOV-010"}
                 else "2026-08-15"
                 if decision_id in {
                     "D-P6-004",
@@ -3735,6 +3931,81 @@ def _validate_decisions(plan: str) -> None:
         _require(
             fragment in direction_followup_semantic,
             "D-GOV-009 authority or exclusion drifted: " + fragment,
+        )
+    host_followup_record = phase6_by_id["D-GOV-010"]
+    host_followup_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#freecad-1-1-3-py31313-qt6111-qualification-panel"
+    )
+    _require(
+        host_followup_record["decision"]
+        == "Qualify the new exact FreeCAD 1.1.3 host profile."
+        and host_followup_record["evidence"] == host_followup_panel
+        and host_followup_record["panel_record"] == host_followup_panel,
+        "D-GOV-010 decision or panel routing drifted",
+    )
+    host_followup_semantic = _semantic_text(
+        str(host_followup_record["authority"])
+        + " "
+        + str(host_followup_record["exclusions"])
+    )
+    for fragment in (
+        "dc750df93682b3b0fd5fdf79fa6fe94296a10697",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "FreeCAD 1.1.3, revision 44987 (Git), Git commit "
+        "145529fe741292ff0b3977a01195bf0247425794",
+        "CPython 3.13.13",
+        "PySide6/Qt 6.11.1",
+        "OpenCASCADE 7.8.1",
+        "SIM Coin 4.0.8",
+        "fa3ef6bebc139083246bd4fb6b8baf6a032a3b5bbb0a57479cb14d52bad733ae",
+        "org.kde.Platform/x86_64/6.11",
+        "records the package identity and the provenance fields in the panel",
+        "qualifies the profile only from its exact_match data",
+        "does not qualify all FreeCAD 1.1.3 hosts",
+        "exact FreeCAD 1.1.1 profile stays qualified",
+        "D-GOV-006 exact FreeCAD 1.1.3 profile stays qualified",
+        "D-GOV-006 and D-GOV-007 do not change",
+        "authorises this profile to supply candidate evidence for performance "
+        "in a subsequent cycle",
+        "Each comparison must use one profile with an exact identity",
+        "For a TrackTemplate before/after comparison, do not use results from "
+        "profiles with different exact identities",
+        "Before the project claims that TrackTemplate performance changed on "
+        "this profile, the D-GOV-009 investigation must record a baseline for "
+        "this profile",
+        "admits no performance result",
+        "defines no performance budget",
+        "does not start baseline attribution",
+        "does not select an optimisation candidate",
+        "does not accept Exit 4",
+        "changes no product source",
+        "changes no public API",
+        "changes no railway mathematics",
+        "changes no persistence or schema",
+        "changes no export behaviour",
+        "changes no qualified-host criterion",
+        "changes no performance threshold",
+        "changes no evidence",
+        "Do not do the first D-GOV-008 comparison again",
+        "Do not do the second D-GOV-008 comparison again",
+        "Do not start the D-GOV-009 baseline-attribution investigation in "
+        "this cycle",
+        "Do not compare results from profiles with different exact identities "
+        "to claim a TrackTemplate improvement",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+        "Project status stays unknown",
+        "No risk disposition changes",
+        "gives no production authority",
+        "gives no physical-output authority",
+        "gives no project-cleared status",
+        "gives no packaging authority",
+        "gives no release or tagging authority",
+    ):
+        _require(
+            fragment in host_followup_semantic,
+            "D-GOV-010 authority or exclusion drifted: " + fragment,
         )
     current_records = document["decisions"]
     _require(

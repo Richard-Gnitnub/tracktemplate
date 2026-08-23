@@ -134,6 +134,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-d-gov-009-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-d-gov-009-panel"
+    },
+    {
+      "id": "D-GOV-010",
+      "decided_on": "2026-08-23",
+      "status": "Accepted",
+      "decision": "Qualify the new exact FreeCAD 1.1.3 host profile.",
+      "authority": "At protected `main` `dc750df93682b3b0fd5fdf79fa6fe94296a10697`, the project owner qualifies only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`. This profile has FreeCAD 1.1.3, revision `44987 (Git)`, Git commit `145529fe741292ff0b3977a01195bf0247425794`, and CPython 3.13.13. The profile also has PySide6/Qt 6.11.1, OpenCASCADE 7.8.1, and SIM Coin 4.0.8.\n\nThe recorded Flatpak commit is `fa3ef6bebc139083246bd4fb6b8baf6a032a3b5bbb0a57479cb14d52bad733ae`. The runtime is `org.kde.Platform/x86_64/6.11`. The compatibility contract records the package identity and the provenance fields in the panel. The runtime guard qualifies the profile only from its `exact_match` data. It does not qualify all FreeCAD 1.1.3 hosts.\n\nThe exact FreeCAD 1.1.1 profile stays qualified. The D-GOV-006 exact FreeCAD 1.1.3 profile stays qualified. Their evidence and exact host identities do not change. D-GOV-006 and D-GOV-007 do not change.\n\nD-GOV-010 authorises this profile to supply candidate evidence for performance in a subsequent cycle. Each comparison must use one profile with an exact identity. For a TrackTemplate before/after comparison, do not use results from profiles with different exact identities. Before the project claims that TrackTemplate performance changed on this profile, the D-GOV-009 investigation must record a baseline for this profile.\n\nThis decision admits no performance result. It defines no performance budget. It does not start baseline attribution. It does not select an optimisation candidate. It does not accept Exit 4.",
+      "exclusions": "This decision changes no product source. It changes no public API. It changes no railway mathematics. It changes no persistence or schema.\n\nIt changes no export behaviour. It changes no qualified-host criterion. It changes no performance threshold. It changes no evidence.\n\nDo not do the first D-GOV-008 comparison again. Do not do the second D-GOV-008 comparison again. Do not start the D-GOV-009 baseline-attribution investigation in this cycle. Do not compare results from profiles with different exact identities to claim a TrackTemplate improvement.\n\nPhase 6 stays at 2/5 accepted exits. Exit 4 stays Pending. Exits 1 and 5 stay Pending. Project status stays `unknown`. No risk disposition changes.\n\nThis decision gives no production authority. It gives no physical-output authority. It gives no `project-cleared` status. It gives no packaging authority. It gives no release or tagging authority.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-py31313-qt6111-qualification-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-py31313-qt6111-qualification-panel"
     }
   ]
 }

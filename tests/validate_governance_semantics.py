@@ -2126,6 +2126,55 @@ def validate_current_evidence_mutations() -> None:
         "is necessary before a new Level 2 optimisation",
     )
 
+    host_scope_widened = replace_once(
+        evidence,
+        "They do not qualify a different Flatpak package.",
+        "They qualify all FreeCAD 1.1.3 Flatpak packages.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-010-host-scope-widened",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            host_scope_widened,
+        ),
+        "D-GOV-010 evidence panel drifted: do not qualify a different "
+        "Flatpak package",
+    )
+
+    host_performance_admitted = replace_once(
+        evidence,
+        "This cycle records no performance\nmeasurement, comparison, or "
+        "budget.",
+        "This cycle records an accepted performance result.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-010-performance-admitted",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            host_performance_admitted,
+        ),
+        "D-GOV-010 evidence panel drifted: This cycle records no performance "
+        "measurement, comparison, or budget",
+    )
+
+    host_attribution_started = replace_once(
+        evidence,
+        "This qualification does not start that\ninvestigation.",
+        "This qualification starts that investigation.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-010-attribution-started",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            host_attribution_started,
+        ),
+        "D-GOV-010 evidence panel drifted: This qualification does not start "
+        "that investigation",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
@@ -2331,6 +2380,21 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan decisions differ from the frozen registers",
     )
+    host_followup_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-010 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-010-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                host_followup_decision_row + "\n",
+                "",
+            )
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
 
 
 def validate_documentation_profile_mutations() -> None:
@@ -2492,6 +2556,19 @@ def validate_documentation_profile_mutations() -> None:
         "tt-doc/owner-view-authority-inversion",
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
+    )
+    owner_view_cross_host = replace_once(
+        plan,
+        "Each TrackTemplate before/after comparison must use one profile with "
+        "an exact identity.",
+        "A TrackTemplate before/after comparison can use profiles with "
+        "different exact identities.",
+    )
+    expect_rejected(
+        "tt-doc/owner-view-cross-host-comparison",
+        lambda: progress._validate_owner_view(owner_view_cross_host),
+        "project-plan owner view lost or contradicted: Each TrackTemplate "
+        "before/after comparison must use one profile with an exact identity",
     )
 
     compatibility_terms_removed = terminology
