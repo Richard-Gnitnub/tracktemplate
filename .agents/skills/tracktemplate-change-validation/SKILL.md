@@ -67,6 +67,12 @@ before selecting proof.
 - Use the verified commands and evidence definitions in
   `reference/VALIDATION.md`. Do not create a second command catalogue in this
   skill.
+- For a standalone developer executable such as Ruff, use the canonical
+  [developer-tool boundary](../../../reference/VALIDATION.md#developer-tool-boundary).
+  A tool on `PATH` is not a TrackTemplate runtime dependency or a qualified
+  FreeCAD dependency. If the project owner does not authorise the installation,
+  do not install the tool during validation. If the project owner does not
+  authorise a version change, do not change the tool version during validation.
 - Follow the canonical
   [document boundary](../../../reference/VALIDATION.md#document-boundary). Do
   not edit that file merely because a test was added or run. Change it only

@@ -174,6 +174,29 @@ format-appropriate semantic metrics.
 
 Run from the repository root.
 
+### Developer-tool boundary
+
+The project virtual environment contains the Python packages for standalone
+TrackTemplate development and repository validation. `requirements-dev.txt`
+contains optional packages for local repository and agent-skill validation.
+These packages are not Addon dependencies. The project virtual environment
+and qualified FreeCAD profiles have different controls for their Python
+packages.
+
+Ruff is an optional developer validation executable. TrackTemplate has no root
+Ruff configuration, CI step or version contract. Thus, Ruff is not necessary
+for TrackTemplate validation. If Ruff is on the user `PATH`, an agent can use
+it to examine changed, non-frozen Python files. The Ruff operation must not
+change files. Report the executable path and version. The project owner must
+authorise a Ruff installation or version change. Do not change `.venv` or a
+qualified FreeCAD environment only to get Ruff. The tracked configuration or
+CI must define the repository version contract before Ruff becomes necessary.
+
+A user-level tool manager such as `uv` can supply a developer executable. The
+`uv` executable has no TrackTemplate package-management role. Do not use
+`uv init` in this repository. Do not add a root `uv.lock`. The project owner
+must authorise a package-management migration in a different task.
+
 ### Programmatic regression pipeline
 
 Use the local pipeline as the normal concise entry point for retained
