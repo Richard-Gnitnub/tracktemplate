@@ -127,6 +127,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-GOV-006",
     "D-GOV-007",
     "D-GOV-008",
+    "D-GOV-009",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -295,11 +296,13 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations; project status remains `unknown`"
     ),
     (
-        "Pending — D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the "
-        "comparison baseline. It selects one performance hypothesis and "
-        "defines the comparison rule. No product optimisation or comparison "
-        "result exists. No decision admits evidence for Exit 4 or defines a "
-        "product performance budget."
+        "Pending — D-GOV-009 keeps D-GOV-008 Accepted as the authority for "
+        "its baseline, hypothesis, and rule. It records two retained negative "
+        "results and stops new product work in that direction. The two results "
+        "are not improvement evidence. They are not Exit 4 evidence. No "
+        "measured evidence "
+        "shows sufficient cost outside the D-GOV-008 preview-sampler boundary. "
+        "No decision defines a product performance budget or accepts Exit 4."
     ),
     (
         "Pending — B14 remains available, but whole-scope parity and retirement "
@@ -767,26 +770,35 @@ def _validate_owner_view(plan: str) -> None:
         "The owner accepted Exits 2 and 3",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
-        "D-GOV-008",
-        "accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline",
-        "selects zero-origin integration in the preview sampler as the "
-        "performance hypothesis",
-        "defines the comparison rule before the product change",
-        "subsequent Level 2 cycle can compare 12 paired blocks on one exact "
-        "host profile",
-        "Each block has one baseline sample and one candidate sample",
-        "rule examines CPU time for Edit directly",
-        "wall time, the full journey, Validate, Export, warm reuse, resources, "
-        "correctness, output, lifecycle, and cleanup",
+        "D-GOV-009",
+        "records the D-GOV-008 performance direction as exhausted for new "
+        "product work",
+        "D-GOV-008 stays Accepted as the authority for the first baseline, "
+        "hypothesis, rule, and Level 2 boundary",
+        "The two subsequent Level 2 results are retained negative evidence",
+        "do not tell the project to make a third preview-sampler change",
+        "bounded Level 1 baseline-attribution investigation",
+        "accepted FreeCAD 1.1.3 Edit journey",
+        "state construction, preview and sampler construction, Coin binding, "
+        "GUI processing, and the unattributed remainder",
         "Exit 4 stays Pending",
-        "D-GOV-008 makes no performance optimisation and admits no Exit 4 "
-        "evidence",
-        "defines no product performance budget",
-        "does not claim that performance became better",
+        "The two retained results are not improvement evidence",
+        "They are not Exit 4 evidence",
+        "Current measurements do not show sufficient cost in a measurement "
+        "area outside the D-GOV-008 preview-sampler boundary",
+        "D-GOV-009 defines no product performance budget",
         "D-GOV-006 and D-GOV-007 host limits do not change",
-        "D-GOV-008 is Accepted only for the comparison baseline, hypothesis, "
-        "rule, and bounded Level 2 authority",
-        "Use `$tracktemplate-continue`",
+        "Do not make a third preview sampler, polynomial, approximation, "
+        "cache, or other variation of the D-GOV-008 hypothesis",
+        "subsequent Level 3 owner decision is necessary before a new Level 2 "
+        "optimisation",
+        "measured evidence for a measurement area outside the D-GOV-008 "
+        "preview-sampler boundary",
+        "In a new cycle, run one bounded Level 1 baseline-attribution "
+        "investigation",
+        "Do not change product source",
+        "Do not make a performance optimisation",
+        "Do not accept Exit 4",
     ):
         _require(
             fragment in owner_view,
@@ -1018,7 +1030,7 @@ def _validate_performance_direction_sources(
     terminology: str,
     current_evidence: str,
 ) -> None:
-    """Keep D-GOV-008 baseline, hypothesis, method, and authority bounded."""
+    """Keep D-GOV-008 history and D-GOV-009 bounded."""
     heading = "Phase 6 Exit 4 comparison direction"
     _require(
         '<a id="phase-6-exit-4-comparison-direction"></a>\n\n## '
@@ -1357,6 +1369,251 @@ def _validate_performance_direction_sources(
         "D-GOV-008 panel link drifted",
     )
 
+    for required_term in (
+        "retained negative evidence",
+        "exhausted performance direction",
+        "baseline-attribution investigation",
+        "measurement area",
+        "unattributed remainder",
+    ):
+        _require(
+            required_term in terminology_flat,
+            "D-GOV-009 performance terminology drifted: " + required_term,
+        )
+    for meaning_clause in (
+        "Retained negative evidence is preserved evidence from a candidate "
+        "with a FAIL comparison result or a required invariant difference",
+        "An exhausted performance direction is a performance hypothesis that "
+        "has sufficient retained negative evidence to stop new product work "
+        "in that direction",
+        "A baseline-attribution investigation measures one accepted operator "
+        "journey and reports each measurement area without a product change",
+        "An unattributed remainder is measured journey time that is not part "
+        "of a different measurement area",
+    ):
+        _require(
+            meaning_clause in terminology_flat,
+            "D-GOV-009 performance terminology meaning drifted: "
+            + meaning_clause,
+        )
+
+    followup_heading = "Phase 6 Exit 4 baseline-attribution direction"
+    _require(
+        '<a id="phase-6-exit-4-baseline-attribution-direction"></a>\n\n## '
+        + followup_heading in performance_sop,
+        "D-GOV-009 direction anchor or heading is missing",
+    )
+    followup_direction = _section(performance_sop, followup_heading)
+    followup_direction_flat = _semantic_text(followup_direction)
+    for required_clause in (
+        "D-GOV-009 records the D-GOV-008 performance direction as exhausted "
+        "for new Phase 6 Exit 4 product work",
+        "D-GOV-008 stays Accepted as the authority for its comparison "
+        "baseline, performance hypothesis, comparison rule, and first Level 2 "
+        "boundary",
+        "Preserve the two subsequent Level 2 results as retained negative "
+        "evidence",
+        "The two results are not improvement evidence",
+        "They are not Exit 4 evidence",
+        "Do not make a third preview-sampler change",
+        "new polynomial, approximation, cache, or other variation of the "
+        "D-GOV-008 hypothesis",
+        "does not show sufficient measured cost in a different measurement "
+        "area outside the D-GOV-008 preview-sampler boundary",
+        "next work is a bounded baseline-attribution investigation at Level 1",
+        "accepted FreeCAD 1.1.3 Edit journey",
+        "investigation can report a result for each of these measurement areas "
+        "if the architecture and the measurement method let it do this",
+        "Canonical-state and state-construction work",
+        "Preview and sampler construction",
+        "Coin binding or scene-graph replacement",
+        "GUI processing",
+        "unattributed remainder",
+        "Report a measurement area as Unknown if its value includes a "
+        "different measurement area",
+        "investigation is attribution only",
+        "Do not change product source",
+        "Do not make a performance optimisation",
+        "Do not select a candidate after the project knows the results",
+        "Do not change the D-GOV-008 comparison rule",
+        "Do not define a product performance budget",
+        "Do not run the first retained comparison again",
+        "Do not run the second retained comparison again",
+        "Do not accept Exit 4",
+        "subsequent Level 3 owner decision is necessary before a new Level 2 "
+        "performance optimisation",
+        "measured evidence for a measurement area outside the D-GOV-008 "
+        "preview-sampler boundary",
+        "define its comparison rule before product work starts",
+    ):
+        _require(
+            required_clause in followup_direction_flat,
+            "D-GOV-009 direction drifted: " + required_clause,
+        )
+
+    followup_panel_heading = "Phase 6 Exit 4 D-GOV-009 panel"
+    _require(
+        '<a id="phase-6-exit-4-d-gov-009-panel"></a>\n\n## '
+        + followup_panel_heading in current_evidence,
+        "D-GOV-009 panel anchor or heading is missing",
+    )
+    followup_panel = _section(current_evidence, followup_panel_heading)
+    followup_panel_flat = _semantic_text(followup_panel)
+    for required_clause in (
+        "bbc90531813415ca966131351f668256cdca838f",
+        "D-GOV-009 follows D-GOV-008",
+        "does not change D-GOV-008",
+        "does not change a retained comparison",
+        "Phase 6 has 2/5 accepted exits",
+        "Exit 4 is Pending",
+        "Project status is unknown",
+        "6e1a0c755d7872fe631332d4d1ce4330febdd81b",
+        "044244345ea65b8a5ed99548be8f2f1f9f34537eddf813dbb7f92f9c4696f936",
+        "temporary D-GOV-008 profile measured 50 preview regenerations",
+        "recorded approximately 3.263 ms of process CPU time for one "
+        "regeneration",
+        "For the 50 regenerations, it recorded 0.144 seconds of integration "
+        "process CPU time and 0.163 seconds of preview-sampling process CPU "
+        "time",
+        "Edit CPU was lower in only 9 of 12 paired blocks",
+        "Twenty-two metrics had FAIL results",
+        "no length limit and did not keep the 1.0e-10 mm preview-oracle "
+        "tolerance in the full product domain",
+        "64c167b424fefe604ada0b66deb435eaa32e924ff09c2265a3f9f9569382874b",
+        "f402ef196ef78f287357f5484b47505a31a2799c3e6b2160053b6ae927d3a110",
+        "73a236a44ce39d4ac8aace714dcac0e4c9f400bf030561718a9c77bf1301ec8b",
+        "All 24 samples had PASS validation results",
+        "Edit CPU was lower in only 5 of 12 paired blocks",
+        "paired median difference was +2.923202 ms",
+        "candidate median was approximately 10.71% higher",
+        "Ten metrics had FAIL results",
+        "The two retained results are not improvement evidence",
+        "evidence does not show sufficient cost in a measurement area outside "
+        "the D-GOV-008 preview-sampler boundary",
+        "Exit 4 stays Pending",
+        "local branch agent/phase6-exit4-preview-batch-performance contains "
+        "the first candidate",
+        "2026-08-23-phase6-exit4-simpson-polynomial-failed-comparison-01",
+        "snapshot with checksum PASS results",
+        "audit checks showed content identity",
+        "Do not change this retained state as part of D-GOV-009",
+        "Do not publish it",
+        "Do not merge it",
+        "Do not remove it",
+        "two retained negative results are sufficient to stop new product "
+        "work in the D-GOV-008 direction",
+        "Do not make a third preview sampler, polynomial, approximation, "
+        "cache, or other variation of the D-GOV-008 hypothesis",
+        "No measured evidence shows sufficient cost in a measurement area "
+        "outside the D-GOV-008 preview-sampler boundary",
+        "next action is a bounded baseline-attribution investigation at Level "
+        "1",
+        "can report a result for each of these measurement areas if the "
+        "architecture and the measurement method let it do this",
+        "investigation is attribution only",
+        "Do not start that investigation in this cycle",
+        "subsequent Level 3 owner decision is necessary before a new Level 2 "
+        "optimisation",
+        "No risk state, treatment, severity, owner, deadline, or control "
+        "effectiveness changes",
+        "exact Edit cost in each measurement area stays Unknown",
+        "internal result for the D-GOV-009 logical units is ASD-STE100 Issue 9 "
+        "conforming",
+        "This result is a TrackTemplate conformance assessment",
+        "It is not external ASD certification, endorsement, or an official "
+        "conformance assessment",
+        "It does not include exact machine data",
+        "It does not include unchanged live prose outside the named logical "
+        "units",
+        "It does not include frozen history",
+        "Issue 9 conformance stays Unknown for other live prose",
+        "Proceed with bounded conditions",
+    ):
+        _require(
+            required_clause in followup_panel_flat,
+            "D-GOV-009 evidence panel drifted: " + required_clause,
+        )
+
+    for risk_clause in (
+        "PR-12 — stale or repeated direction",
+        "PR-13 — repository or evidence loss",
+        "PR-15 — deferred cost",
+        "PR-16 — incomplete cache signature",
+        "PR-22 — authority transfer",
+        "QA-R04 — no product performance budget",
+        "Critical / Mitigate / Effective (current scope)",
+        "High / Remove / Effective (current scope)",
+    ):
+        _require(
+            risk_clause in followup_panel_flat,
+            "D-GOV-009 risk panel drifted: " + risk_clause,
+        )
+
+    for review_clause in (
+        "new read-only QA, risk, evidence, validation, and documentation "
+        "review of the exact candidate",
+        "reviewer does not make the change and must report no blocker before "
+        "merge",
+        "reviewer must also make sure that the change does not start the "
+        "baseline-attribution investigation",
+        "reviewer must make sure that the change does not admit Exit 4",
+        "project must not merge the candidate if the reviewer finds a blocker",
+        "panel must not change after the exact-candidate review",
+    ):
+        _require(
+            review_clause in followup_panel_flat,
+            "D-GOV-009 review gate drifted: " + review_clause,
+        )
+
+    followup_marker = (
+        "> **D-GOV-009 — Record the D-GOV-008 direction as exhausted and "
+        "select baseline attribution**"
+    )
+    _require(
+        followup_panel.count(followup_marker) == 1,
+        "D-GOV-009 quoted owner decision is missing or duplicated",
+    )
+    followup_quote = followup_panel.split(followup_marker, 1)[1]
+    followup_quote_flat = _semantic_text(
+        "\n".join(
+            line[2:] if line.startswith("> ") else ""
+            for line in followup_quote.splitlines()
+            if line.startswith(">")
+        )
+    )
+    for decision_clause in (
+        "D-GOV-008 stays Accepted as the authority",
+        "D-GOV-009 after D-GOV-008",
+        "Preserve the two subsequent Level 2 attempts as retained negative "
+        "evidence",
+        "The two results are not improvement evidence",
+        "They are not Exit 4 evidence",
+        "Do not make a third preview sampler, polynomial, approximation, "
+        "cache, or other variation of that hypothesis",
+        "show sufficient cost in a measurement area outside the D-GOV-008 "
+        "preview-sampler boundary",
+        "next action is a bounded Level 1 baseline-attribution "
+        "investigation",
+        "Report a result for each measurement area if the method lets the "
+        "investigation do this",
+        "investigation is attribution only",
+        "Do not start the investigation in this cycle",
+        "subsequent explicit Level 3 owner decision is necessary before a new "
+        "Level 2 optimisation",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+        "Project status stays unknown",
+        "changes no product source, public API, railway mathematics, "
+        "persistence, export behaviour, performance threshold, qualified host "
+        "profile, or retained evidence",
+        "gives no production authority, physical-output authority, "
+        "project-cleared status, packaging, release, or tagging authority",
+    ):
+        _require(
+            decision_clause in followup_quote_flat,
+            "D-GOV-009 quoted owner decision drifted: " + decision_clause,
+        )
+
 
 def _validate_exit_conditions(
     plan: str,
@@ -1524,6 +1781,20 @@ def _validate_exit_conditions(
         "makes no product change" in plan_flat
         and "Exit 4 stays Pending" in plan_flat,
         "D-GOV-008 performance-direction summary drifted",
+    )
+    _require(
+        "D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first "
+        "direction" in plan_flat
+        and "records the two subsequent Level 2 results as retained negative "
+        "evidence"
+        in plan_flat
+        and "stops new product work in that direction" in plan_flat
+        and "No measured evidence shows sufficient cost outside the D-GOV-008 "
+        "preview-sampler boundary" in plan_flat
+        and "next work is a bounded Level 1 baseline-attribution "
+        "investigation" in plan_flat
+        and "Exit 4 stays Pending" in plan_flat,
+        "D-GOV-009 direction summary drifted",
     )
 
     current_flat = " ".join(current_evidence.split())
@@ -2900,7 +3171,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-16",
+        and current_document["updated_on"] == "2026-08-23",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -2951,9 +3222,10 @@ def _validate_decisions(plan: str) -> None:
         _require(
             record["decided_on"]
             == (
-                "2026-08-15"
-                if decision_id
-                in {
+                "2026-08-23"
+                if decision_id == "D-GOV-009"
+                else "2026-08-15"
+                if decision_id in {
                     "D-P6-004",
                     "D-P6-005",
                     "TT-DOC-001",
@@ -3376,6 +3648,93 @@ def _validate_decisions(plan: str) -> None:
         _require(
             fragment in performance_direction_semantic,
             "D-GOV-008 authority or exclusion drifted: " + fragment,
+        )
+    direction_followup_record = phase6_by_id["D-GOV-009"]
+    direction_followup_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-4-d-gov-009-panel"
+    )
+    _require(
+        direction_followup_record["decision"]
+        == "Record the D-GOV-008 direction as exhausted and select baseline "
+        "attribution."
+        and direction_followup_record["evidence"] == direction_followup_panel
+        and direction_followup_record["panel_record"]
+        == direction_followup_panel,
+        "D-GOV-009 decision or panel routing drifted",
+    )
+    direction_followup_semantic = _semantic_text(
+        str(direction_followup_record["authority"])
+        + " "
+        + str(direction_followup_record["exclusions"])
+    )
+    for fragment in (
+        "bbc90531813415ca966131351f668256cdca838f",
+        "records D-GOV-009 after D-GOV-008",
+        "D-GOV-008 stays Accepted as the authority",
+        "6e1a0c755d7872fe631332d4d1ce4330febdd81b",
+        "044244345ea65b8a5ed99548be8f2f1f9f34537eddf813dbb7f92f9c4696f936",
+        "Edit CPU was lower in only 9 of 12 paired blocks",
+        "Twenty-two metrics had FAIL results",
+        "length-unbounded fast path did not keep the 1.0e-10 mm "
+        "preview-oracle tolerance in the full product domain",
+        "64c167b424fefe604ada0b66deb435eaa32e924ff09c2265a3f9f9569382874b",
+        "f402ef196ef78f287357f5484b47505a31a2799c3e6b2160053b6ae927d3a110",
+        "73a236a44ce39d4ac8aace714dcac0e4c9f400bf030561718a9c77bf1301ec8b",
+        "All 24 samples had PASS validation results",
+        "Edit CPU was lower in only 5 of 12 paired blocks",
+        "paired median difference was +2.923202 ms",
+        "candidate median was approximately 10.71% higher",
+        "Ten metrics had FAIL results",
+        "The two results are not improvement evidence",
+        "They are not Exit 4 evidence",
+        "sufficient to stop new product work in the D-GOV-008 direction",
+        "Do not make a third preview sampler, polynomial, approximation, "
+        "cache, or other variation of that hypothesis",
+        "Current measurements do not show sufficient cost in a measurement "
+        "area outside the D-GOV-008 preview-sampler boundary",
+        "next action is a bounded Level 1 baseline-attribution "
+        "investigation on the accepted FreeCAD 1.1.3 Edit journey",
+        "canonical-state and state-construction work and preview and sampler "
+        "construction",
+        "Coin binding or scene-graph replacement, GUI processing, and the "
+        "unattributed remainder",
+        "Report a result for each measurement area if the method lets the "
+        "investigation do this",
+        "investigation is attribution only",
+        "subsequent explicit Level 3 owner decision is necessary before a new "
+        "Level 2 optimisation",
+        "does not change D-GOV-008",
+        "does not change the two retained negative results",
+        "does not change a FAIL result into improvement evidence",
+        "does not change a FAIL result into Exit 4 evidence",
+        "gives no authority for a third preview sampler, polynomial, "
+        "approximation, cache, or a different variation of the exhausted "
+        "hypothesis",
+        "gives no authority for a new Level 2 optimisation",
+        "gives no authority for candidate selection after the project knows "
+        "the results",
+        "baseline-attribution investigation must not start in this cycle",
+        "Do not change product source",
+        "Do not make a performance optimisation",
+        "Do not define a product performance budget",
+        "Do not change a performance threshold",
+        "Do not run the first retained comparison again",
+        "Do not run the second retained comparison again",
+        "Do not accept Exit 4",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+        "Project status stays unknown",
+        "No risk disposition changes",
+        "changes no product source, public API, railway mathematics, "
+        "persistence, export behaviour, qualified host profile, or retained "
+        "evidence",
+        "gives no production authority, physical-output authority, "
+        "project-cleared status, packaging, release, or tagging authority",
+    ):
+        _require(
+            fragment in direction_followup_semantic,
+            "D-GOV-009 authority or exclusion drifted: " + fragment,
         )
     current_records = document["decisions"]
     _require(

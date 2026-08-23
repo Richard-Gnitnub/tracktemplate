@@ -580,23 +580,28 @@ def validate_documentation_profile(
     require(
         "Phase 6 has 2/5 accepted exits" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
-        and "D-GOV-008" in owner_view
-        and "accepts the PR #50 FreeCAD 1.1.3 series as the comparison "
-        "baseline" in owner_view
-        and "zero-origin integration in the preview sampler as the performance "
-        "hypothesis" in owner_view
-        and "defines the comparison rule before the product change"
+        and "D-GOV-009" in owner_view
+        and "D-GOV-008 performance direction as exhausted for new product "
+        "work" in owner_view
+        and "D-GOV-008 stays Accepted as the authority for the first baseline, "
+        "hypothesis, rule, and Level 2 boundary" in owner_view
+        and "The two subsequent Level 2 results are retained negative evidence"
         in owner_view
-        and "12 paired blocks on one exact host profile" in owner_view
-        and "Each block has one baseline sample and one candidate sample"
+        and "do not tell the project to make a third preview-sampler change"
         in owner_view
-        and "examines CPU time for Edit directly" in owner_view
-        and "wall time, the full journey, Validate, Export, warm reuse, "
-        "resources, correctness, output, lifecycle, and cleanup" in owner_view
-        and "D-GOV-008 makes no performance optimisation and admits no Exit 4 "
-        "evidence" in owner_view
-        and "defines no product performance budget" in owner_view
-        and "does not claim that performance became better" in owner_view
+        and "bounded Level 1 baseline-attribution investigation" in owner_view
+        and "accepted FreeCAD 1.1.3 Edit journey" in owner_view
+        and "state construction, preview and sampler construction, Coin "
+        "binding, GUI processing, and the unattributed remainder" in owner_view
+        and "The two retained results are not improvement evidence" in owner_view
+        and "They are not Exit 4 evidence" in owner_view
+        and "Current measurements do not show sufficient cost in a measurement "
+        "area outside the D-GOV-008 preview-sampler boundary" in owner_view
+        and "D-GOV-009 defines no product performance budget" in owner_view
+        and "Do not make a third preview sampler, polynomial, approximation, "
+        "cache, or other variation of the D-GOV-008 hypothesis" in owner_view
+        and "subsequent Level 3 owner decision is necessary before a new Level "
+        "2 optimisation" in owner_view
         and "D-GOV-006 and D-GOV-007 host limits do not change" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",

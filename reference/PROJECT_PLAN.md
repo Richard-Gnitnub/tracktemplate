@@ -13,12 +13,11 @@ The Layout Editor is the later program. It does not change Phase 6 exits. The pr
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 has 2/5 accepted exits. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. Output is private-development. Project status stays `unknown`. |
-| **What changed** | [D-GOV-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-performance-direction-panel) accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline. It selects zero-origin integration in the preview sampler as the performance hypothesis. It defines the comparison rule before the product change. |
-| **What now works** | A subsequent Level 2 cycle can compare 12 paired blocks on one exact host profile. Each block has one baseline sample and one candidate sample. The rule examines CPU time for Edit directly. It also examines wall time, the full journey, Validate, Export, warm reuse, resources, correctness, output, lifecycle, and cleanup. |
-| **Limitations/findings** | Exit 4 stays Pending. D-GOV-008 makes no performance optimisation and admits no Exit 4 evidence. It defines no product performance budget. It does not claim that performance became better. D-GOV-006 and D-GOV-007 host limits do not change. |
-| **Owner decision** | D-GOV-008 is Accepted only for the comparison baseline, hypothesis, rule, and bounded Level 2 authority. Phase, risk, product output, packaging, and release states do not change. |
-| **Next action** | Use `$tracktemplate-continue` to do the authorised performance optimisation at Level 2. |
-
+| **What changed** | [D-GOV-009](current/PHASE_EVIDENCE.md#phase-6-exit-4-d-gov-009-panel) records the D-GOV-008 performance direction as exhausted for new product work. D-GOV-008 stays Accepted as the authority for the first baseline, hypothesis, rule, and Level 2 boundary. The two subsequent Level 2 results are retained negative evidence. |
+| **What now works** | The current records do not tell the project to make a third preview-sampler change. A bounded Level 1 baseline-attribution investigation can measure the accepted FreeCAD 1.1.3 Edit journey. It can report a result for each measurement area: state construction, preview and sampler construction, Coin binding, GUI processing, and the unattributed remainder. |
+| **Limitations/findings** | Exit 4 stays Pending. The two retained results are not improvement evidence. They are not Exit 4 evidence. Current measurements do not show sufficient cost in a measurement area outside the D-GOV-008 preview-sampler boundary. D-GOV-009 defines no product performance budget. D-GOV-006 and D-GOV-007 host limits do not change. |
+| **Owner decision** | Do not make a third preview sampler, polynomial, approximation, cache, or other variation of the D-GOV-008 hypothesis. A subsequent Level 3 owner decision is necessary before a new Level 2 optimisation. It must use measured evidence for a measurement area outside the D-GOV-008 preview-sampler boundary. |
+| **Next action** | In a new cycle, run one bounded Level 1 baseline-attribution investigation on the accepted FreeCAD 1.1.3 Edit journey. Do not change product source. Do not make a performance optimisation. Do not accept Exit 4. |
 ## Phase status
 
 | Phase | Outcome | Exit status | State |
@@ -59,6 +58,7 @@ D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles to supply cand
 
 D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline. It selects one performance hypothesis for the preview sampler and defines the comparison rule. It authorises one performance optimisation at Level 2 but makes no product change. Exit 4 stays Pending.
 
+D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first direction. It records the two subsequent Level 2 results as retained negative evidence and stops new product work in that direction. No measured evidence shows sufficient cost outside the D-GOV-008 preview-sampler boundary. The next work is a bounded Level 1 baseline-attribution investigation. Exit 4 stays Pending.
 ## Live risks
 
 <a id="qa-audit-risk-log"></a>
@@ -129,7 +129,7 @@ The [current decision register](current/gate-decisions.json) owns Phase 6 and cu
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
 | D-GOV-007 | 2026-08-16 | Accepted | The project owner authorised the exact 1.1.1 and 1.1.3 host profiles to supply Phase 6 performance evidence. Exit 4 stays Pending. |
 | D-GOV-008 | 2026-08-16 | Accepted | The owner accepted the PR #50 baseline, selected the performance hypothesis for zero-origin integration, and defined the comparison rule. Exit 4 stays Pending. |
-
+| D-GOV-009 | 2026-08-23 | Accepted | The owner records the D-GOV-008 direction as exhausted for new product work. The decision preserves the two negative results and selects a bounded Level 1 baseline-attribution investigation as the next action. Exit 4 stays Pending. |
 ## Authority and evidence links
 
 - [Current Phase 6 evidence](current/PHASE_EVIDENCE.md)

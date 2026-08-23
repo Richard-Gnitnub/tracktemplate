@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 6,
-  "updated_on": "2026-08-16",
+  "updated_on": "2026-08-23",
   "decisions": [
     {
       "id": "D-P6-001",
@@ -123,6 +123,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-performance-direction-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-performance-direction-panel"
+    },
+    {
+      "id": "D-GOV-009",
+      "decided_on": "2026-08-23",
+      "status": "Accepted",
+      "decision": "Record the D-GOV-008 direction as exhausted and select baseline attribution.",
+      "authority": "At protected `main` `bbc90531813415ca966131351f668256cdca838f`, the project owner records D-GOV-009 after D-GOV-008. D-GOV-008 stays Accepted as the authority for the PR #50 baseline, first preview-sampler hypothesis, fixed comparison rule, and first Level 2 boundary.\n\nPreserve the two subsequent Level 2 attempts as retained negative evidence. Candidate `6e1a0c755d7872fe631332d4d1ce4330febdd81b` had a FAIL comparison result. Edit CPU was lower in only 9 of 12 paired blocks. Twenty-two metrics had FAIL results. A read-only review found that the length-unbounded fast path did not keep the `1.0e-10` mm preview-oracle tolerance in the full product domain. Its comparison has SHA-256 `044244345ea65b8a5ed99548be8f2f1f9f34537eddf813dbb7f92f9c4696f936`.\n\nThe Simpson-polynomial replacement kept supported-domain numerical equivalence and exact large-scale scalar fallback. All 24 samples had PASS validation results. Edit CPU was lower in only 5 of 12 paired blocks. The paired median difference was `+2.923202` ms. The candidate median was approximately 10.71% higher, and the fixed result was FAIL. Ten metrics had FAIL results.\n\nIts comparison has SHA-256 `64c167b424fefe604ada0b66deb435eaa32e924ff09c2265a3f9f9569382874b`. Its classification has SHA-256 `f402ef196ef78f287357f5484b47505a31a2799c3e6b2160053b6ae927d3a110`. Its source diff has SHA-256 `73a236a44ce39d4ac8aace714dcac0e4c9f400bf030561718a9c77bf1301ec8b`.\n\nThe two results are not improvement evidence. They are not Exit 4 evidence. Together they are sufficient to stop new product work in the D-GOV-008 direction. Do not make a third preview sampler, polynomial, approximation, cache, or other variation of that hypothesis. Current measurements do not show sufficient cost in a measurement area outside the D-GOV-008 preview-sampler boundary.\n\nThe next action is a bounded Level 1 baseline-attribution investigation on the accepted FreeCAD 1.1.3 Edit journey. It can report canonical-state and state-construction work and preview and sampler construction. It can also report Coin binding or scene-graph replacement, GUI processing, and the unattributed remainder. Report a result for each measurement area if the method lets the investigation do this. The investigation is attribution only.\n\nA subsequent explicit Level 3 owner decision is necessary before a new Level 2 optimisation. That decision must use measured evidence for a measurement area outside the D-GOV-008 preview-sampler boundary. It must define the bounded product boundary. It must define the comparison rule before product work starts.",
+      "exclusions": "This decision does not change D-GOV-008. It does not change the two retained negative results. It does not change a FAIL result into improvement evidence. It does not change a FAIL result into Exit 4 evidence. It gives no authority for a third preview sampler, polynomial, approximation, cache, or a different variation of the exhausted hypothesis. It gives no authority for a new Level 2 optimisation.\n\nIt gives no authority for candidate selection after the project knows the results. The baseline-attribution investigation must not start in this cycle. Do not change product source. Do not make a performance optimisation. Do not define a product performance budget. Do not change a performance threshold.\n\nDo not run the first retained comparison again. Do not run the second retained comparison again. Do not accept Exit 4.\n\nPhase 6 stays at 2/5 accepted exits. Exit 4 stays Pending. Exits 1 and 5 stay Pending. Project status stays `unknown`. No risk disposition changes.\n\nThis decision changes no product source, public API, railway mathematics, persistence, export behaviour, qualified host profile, or retained evidence. It gives no production authority, physical-output authority, `project-cleared` status, packaging, release, or tagging authority.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-d-gov-009-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-d-gov-009-panel"
     }
   ]
 }

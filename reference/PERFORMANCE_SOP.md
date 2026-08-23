@@ -194,6 +194,51 @@ subsequent result as Exit 4 evidence. It defines no product performance budget.
 Exit 4 stays Pending. A subsequent decision at Level 3 must admit the evidence
 before the owner can accept Exit 4.
 
+<a id="phase-6-exit-4-baseline-attribution-direction"></a>
+
+## Phase 6 Exit 4 baseline-attribution direction
+
+D-GOV-009 records the D-GOV-008 performance direction as exhausted for new
+Phase 6 Exit 4 product work. D-GOV-008 stays Accepted as the authority for its
+comparison baseline, performance hypothesis, comparison rule, and first Level
+2 boundary. Preserve the two subsequent Level 2 results as retained negative
+evidence. The two results are not improvement evidence. They are not Exit 4
+evidence.
+
+Do not make a third preview-sampler change. This includes a new
+polynomial, approximation, cache, or other variation of the D-GOV-008
+hypothesis. The retained evidence does not show sufficient measured cost in a
+different measurement area outside the D-GOV-008 preview-sampler boundary.
+
+The next work is a bounded baseline-attribution investigation at Level 1. Use
+the accepted FreeCAD 1.1.3 Edit journey. The investigation can report a result
+for each of these measurement areas if the architecture and the measurement
+method let it do this:
+
+1. Canonical-state and state-construction work
+2. Preview and sampler construction
+3. Coin binding or scene-graph replacement
+4. GUI processing
+5. The unattributed remainder.
+
+Record the exact host profile, source state, workload, method, measurement
+boundary, and instrumentation overhead. Report a measurement area as Unknown
+if its value includes a different measurement area.
+
+The investigation is attribution only. Do not change product source. Do not
+make a performance optimisation. Do not select a candidate after the project
+knows the results.
+
+Do not change the D-GOV-008 comparison rule. Do not define a product
+performance budget. Do not run the first retained comparison again. Do not run
+the second retained comparison again. Do not accept Exit 4.
+
+A subsequent Level 3 owner decision is necessary before a new Level 2
+performance optimisation. That decision must use measured evidence for a
+measurement area outside the D-GOV-008 preview-sampler boundary. It must select
+one bounded product boundary. It must define its comparison rule before product
+work starts.
+
 ## Baseline procedure
 
 1. Preserve an unchanged starting document or a reproducible input recipe.

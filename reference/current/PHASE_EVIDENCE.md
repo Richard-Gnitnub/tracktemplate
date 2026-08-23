@@ -2232,6 +2232,203 @@ stated Level 2 cycle. Keep Exit 4 Pending.
 > packaging, release, or tagging authority. A subsequent decision at Level 3
 > must admit the evidence before owner acceptance of Exit 4.
 
+<a id="phase-6-exit-4-d-gov-009-panel"></a>
+
+## Phase 6 Exit 4 D-GOV-009 panel
+
+This Level 3 panel records D-GOV-009 at protected `main`
+`bbc90531813415ca966131351f668256cdca838f`. D-GOV-009 follows D-GOV-008.
+It does not change D-GOV-008. It does not change a retained comparison.
+
+Phase 6 has 2/5 accepted exits. Exit 4 is Pending. Project status is `unknown`.
+
+### Participants and independence
+
+| Participant | Role | Independence |
+| --- | --- | --- |
+| TrackTemplate project owner | Is the panel chair and makes D-GOV-009 on 2026-08-23. | The owner gives authority. The owner does not accept the change. |
+| Codex change owner | Gives the exact repository state, evidence classes, risks, and bounded documentation change. | The change owner does not accept its own work. |
+| `/root/direction_alignment_review` | Gives a new read-only QA, risk, evidence, validation, and documentation review of the exact candidate. | The reviewer does not make the change and must report no blocker before merge. |
+
+### Evidence classification
+
+| Evidence class | Repository evidence | Decision use |
+| --- | --- | --- |
+| Current-cost evidence | The temporary D-GOV-008 profile measured 50 preview regenerations. It recorded approximately `3.263 ms` of process CPU time for one regeneration. For the 50 regenerations, it recorded `0.144` seconds of integration process CPU time and `0.163` seconds of preview-sampling process CPU time. | This evidence showed a cost in Edit. It did not show that the preview sampler was the main cost of the complete Edit journey. |
+| Hypothesis-selection evidence | D-GOV-008 selected repeated zero-origin integration in the preview sampler. It fixed the product boundary and comparison rule before product work. | D-GOV-008 stays Accepted as the authority for that selection. |
+| First retained negative evidence | Candidate `6e1a0c755d7872fe631332d4d1ce4330febdd81b` has a retained local branch. Its comparison has SHA-256 `044244345ea65b8a5ed99548be8f2f1f9f34537eddf813dbb7f92f9c4696f936`. | The Edit CPU paired median difference was approximately `-2.620 ms`. Edit CPU was lower in only 9 of 12 paired blocks. Twenty-two metrics had FAIL results. The review also found that the fast path had no length limit and did not keep the `1.0e-10` mm preview-oracle tolerance in the full product domain. The measured workload stayed in tolerance, but that result did not remove the domain defect. |
+| Second retained negative evidence | The replacement comparison has SHA-256 `64c167b424fefe604ada0b66deb435eaa32e924ff09c2265a3f9f9569382874b`. Its classification has SHA-256 `f402ef196ef78f287357f5484b47505a31a2799c3e6b2160053b6ae927d3a110`. Its source diff has SHA-256 `73a236a44ce39d4ac8aace714dcac0e4c9f400bf030561718a9c77bf1301ec8b`. | All 24 samples had PASS validation results. The supported-domain error was `4.547473508864641e-13` mm and the large-scale scalar fallback was exact. Edit CPU was lower in only 5 of 12 paired blocks. The paired median difference was `+2.923202` ms. The candidate median was approximately 10.71% higher. Ten metrics had FAIL results. |
+| Improvement evidence | No retained candidate has a PASS result for the fixed correctness, Edit CPU, complete-journey, and no-displacement conditions. | The two retained results are not improvement evidence. |
+| Evidence for a new Level 2 optimisation | Current measurements do not report a result for each area: state construction, preview construction, Coin binding, GUI processing, and the remainder. | The evidence does not show sufficient cost in a measurement area outside the D-GOV-008 preview-sampler boundary. |
+| Exit 4 admission evidence | The two retained comparisons do not have PASS results. No Level 3 decision admits one of the two results for Exit 4. | Exit 4 stays Pending. |
+
+The local branch `agent/phase6-exit4-preview-batch-performance` contains the
+first candidate. The second candidate is preserved in the exact source diff
+and in the snapshot with checksum PASS results
+`2026-08-23-phase6-exit4-simpson-polynomial-failed-comparison-01`. The snapshot
+also preserves the raw comparisons, classification, source files, branch refs,
+and commit objects. The preservation audit mounted the USB snapshot read-only.
+The audit checks showed content identity. The audit unmounted the snapshot.
+
+Do not change this retained state as part of D-GOV-009. Do not publish it. Do
+not merge it. Do not remove it.
+
+### Direction assessment and next action
+
+The two retained negative results are sufficient to stop new product work in
+the D-GOV-008 direction. That direction is an exhausted performance direction
+for current Phase 6 Exit 4 work. This decision does not claim that no numerical
+method can give a PASS result. It stops a third product change after
+the project knows the fixed results.
+
+Do not make a third preview sampler, polynomial, approximation, cache, or other
+variation of the D-GOV-008 hypothesis. No measured evidence shows sufficient
+cost in a measurement area outside the D-GOV-008 preview-sampler boundary.
+
+The next action is a bounded baseline-attribution investigation at Level 1. It
+can measure the accepted FreeCAD 1.1.3 Edit journey. It can report a result for
+each of these measurement areas if the architecture and the measurement method
+let it do this:
+
+1. Canonical-state and state-construction work
+2. Preview and sampler construction
+3. Coin binding or scene-graph replacement
+4. GUI processing
+5. The unattributed remainder.
+
+The investigation is attribution only. Do not change product source. Do not
+make a performance optimisation. Do not select a candidate after the project
+knows the results.
+
+Do not define a product performance budget. Do not run the first retained
+comparison again. Do not run the second retained comparison again. Do not
+accept Exit 4. Do not start that investigation in this cycle.
+
+A subsequent Level 3 owner decision is necessary before a new Level 2
+optimisation. That decision must use measured evidence for a measurement area
+outside the D-GOV-008 preview-sampler boundary. It must select one bounded
+architecture and product boundary. It must define the qualified host, baseline,
+complete-journey comparison rule, no-displacement conditions, invariants, and
+permitted files before product work starts.
+
+### Risk panel
+
+This Level 3 decision changes governance direction. This cycle makes no product
+change. Thus, the governance change is larger than the product change.
+
+| Risk | Panel judgement | Result |
+| --- | --- | --- |
+| PR-12 — stale or repeated direction | D-GOV-009 removes the instruction to repeat D-GOV-008. It gives one bounded attribution-only next action. | Medium / Mitigate / Partial. The disposition does not change. |
+| PR-13 — repository or evidence loss | Exact commits, paths, hashes, the retained branch, and the USB snapshot preserve the two negative results. Post-merge checks must make sure that the two results do not change. | Critical / Mitigate / Effective (current scope). The disposition does not change. |
+| PR-15 — deferred cost | The next investigation uses the accepted complete Edit journey and reports the unattributed remainder. It does not move product work to a different stage. | High / Mitigate / Partial. The disposition does not change. |
+| PR-16 — incomplete cache signature | D-GOV-009 gives no authority for a cache. It makes no product change. | High / Mitigate / Partial. The disposition does not change. |
+| PR-22 — authority transfer | The owner makes the exact D-GOV-009 decision. A new reviewer who did not make the change must examine the exact candidate before merge. | High / Remove / Effective (current scope). The disposition does not change. |
+| QA-R04 — no product performance budget | The decision defines no budget and admits no performance improvement or Exit 4 evidence. | High / Mitigate / Partial. The disposition does not change. |
+
+No risk state, treatment, severity, owner, deadline, or control effectiveness
+changes. There is no dissent. The exact Edit cost in each
+measurement area stays Unknown until the baseline-attribution
+investigation. A new Level 2 optimisation has no authority until the owner
+makes the subsequent decision.
+
+### Documentation conformance
+
+The documentation review uses the
+[local Issue 9 source](../external/asd-ste100/README.md). This is the official
+source. The review also uses the TrackTemplate UK English spelling directive.
+It examines each full logical unit in this table.
+
+| Path | Full logical unit |
+| --- | --- |
+| `reference/PERFORMANCE_SOP.md` | The full section with the heading `Phase 6 Exit 4 baseline-attribution direction`. |
+| `reference/TERMINOLOGY.md` | The new performance-investigation row. |
+| `reference/PROJECT_PLAN.md` | The current owner view, D-GOV-009 phase summary, and D-GOV-009 decision row. |
+| `reference/current/PHASE_EVIDENCE.md` | This full D-GOV-009 panel, the changed Exit 4 disposition, and D-GOV-009 carried-control text. |
+| `reference/current/gate-decisions.json` | The human-readable D-GOV-009 record. Exact JSON data is not part of the linguistic review. |
+
+The internal result for the D-GOV-009 logical units is `ASD-STE100 Issue 9
+conforming`. The review uses the technical nouns in the terminology register.
+
+This result is a TrackTemplate conformance assessment. It is not external ASD
+certification, endorsement, or an official conformance assessment. It does not
+include exact machine data. It does not include unchanged live prose outside
+the named logical units. It does not include frozen history. Issue 9
+conformance stays Unknown for other live prose.
+
+### Review and bounded conditions
+
+The reviewer who did not make the change must examine the evidence classes and
+the two retained negative results. The reviewer must examine preservation,
+authority, risk panel, documentation, and validation results. The reviewer must
+also make sure that the change does not start the baseline-attribution
+investigation. The reviewer must make sure that the change does not admit Exit
+4.
+
+The reviewer must not change files. The project must not merge the candidate if
+the reviewer finds a blocker. This panel must not change after the
+exact-candidate review.
+
+The Phase 6 performance owner owns the future attribution record. The project
+owner owns a subsequent Level 3 candidate-selection decision. The two conditions are
+necessary before a new Level 2 optimisation starts. The Phase 6 evidence owner must
+preserve the two retained negative results during Phase 6 and during the subsequent
+release audit.
+
+**Panel recommendation:** **Proceed with bounded conditions.** Record D-GOV-009
+after D-GOV-008. Stop new product work in the D-GOV-008 direction.
+Do not change the two negative results. Make the bounded Level 1
+baseline-attribution investigation the next action. Keep Exit 4 Pending.
+
+> **D-GOV-009 — Record the D-GOV-008 direction as exhausted and select baseline attribution**
+>
+> At protected `main` `bbc90531813415ca966131351f668256cdca838f`, I record
+> D-GOV-009 after D-GOV-008. D-GOV-008 stays Accepted as the
+> authority for the PR #50 baseline, first preview-sampler hypothesis, fixed
+> comparison rule, and first Level 2 boundary.
+>
+> Preserve the two subsequent Level 2 attempts as retained negative evidence.
+> Candidate
+> `6e1a0c755d7872fe631332d4d1ce4330febdd81b` failed the fixed comparison and
+> did not keep the preview-oracle tolerance in the full product domain. The
+> Simpson-polynomial replacement kept the supported numerical boundary and
+> exact fallback, but its fixed comparison also failed. The two results are not
+> improvement evidence. They are not Exit 4 evidence.
+>
+> The two results are sufficient to stop new product work in the D-GOV-008
+> direction. Do not make a third preview sampler, polynomial, approximation,
+> cache, or other variation of that hypothesis. Current measurements do not
+> show sufficient cost in a measurement area outside the D-GOV-008
+> preview-sampler boundary.
+>
+> The next action is a bounded Level 1 baseline-attribution
+> investigation on the accepted FreeCAD 1.1.3 Edit journey. It can report
+> canonical-state and state-construction work, preview and sampler construction,
+> Coin binding or scene-graph replacement, GUI processing, and the unattributed
+> remainder. Report a result for each measurement area if the method lets the
+> investigation do this.
+>
+> The investigation is attribution only. Do not change product source. Do not
+> make a performance optimisation. Do not select a candidate after the project
+> knows the results.
+>
+> Do not define a product performance budget. Do not run the first retained
+> comparison again. Do not run the second retained comparison again. Do not
+> accept Exit 4. Do not start the investigation in this cycle.
+>
+> A subsequent explicit Level 3 owner decision is necessary before a new Level
+> 2 optimisation. That decision must use measured evidence for a measurement
+> area outside the D-GOV-008 preview-sampler boundary. It must define the bounded
+> product boundary. It must define the comparison rule before product work
+> starts.
+>
+> Phase 6 stays at 2/5 accepted exits. Exit 4 stays Pending. Exits 1 and 5 stay
+> Pending. Project status stays `unknown`. No risk disposition changes.
+>
+> This decision changes no product source, public API, railway mathematics,
+> persistence, export behaviour, performance threshold, qualified host profile,
+> or retained evidence. It gives no production authority, physical-output
+> authority, `project-cleared` status, packaging, release, or tagging authority.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -2243,7 +2440,7 @@ The accepted current state is 2/5 under D-P6-002 and D-P6-005:
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005 — bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004 with the recorded platform, recovery and assurance limitations; project status remains `unknown` |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline. It selects one performance hypothesis and defines the comparison rule. No product optimisation or comparison result exists. No decision admits evidence for Exit 4 or defines a product performance budget. |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-009 keeps D-GOV-008 Accepted as the authority for its baseline, hypothesis, and rule. It records two retained negative results and stops new product work in that direction. The two results are not improvement evidence. They are not Exit 4 evidence. No measured evidence shows sufficient cost outside the D-GOV-008 preview-sampler boundary. No decision defines a product performance budget or accepts Exit 4. |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
 ## Carried controls and exclusions
@@ -2262,7 +2459,7 @@ The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
 D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001,
-TT-DOC-002, D-GOV-006, D-GOV-007 and D-GOV-008.
+TT-DOC-002, D-GOV-006, D-GOV-007, D-GOV-008 and D-GOV-009.
 
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.
@@ -2284,3 +2481,9 @@ D-GOV-008 accepts the PR #50 series as the comparison baseline. It selects one
 performance hypothesis and defines the comparison rule. It authorises one Level 2
 cycle but makes no performance optimisation. It admits no Exit 4 evidence
 and does not accept Exit 4.
+
+D-GOV-009 keeps D-GOV-008 Accepted as the authority for that direction. It
+records the two subsequent Level 2 results as retained negative evidence and stops new
+product work in that direction. It authorises only a bounded Level 1
+baseline-attribution investigation as the next action. It admits no improvement
+or Exit 4 evidence, defines no budget, and does not accept Exit 4.
