@@ -987,6 +987,11 @@ def _validate_structure_and_controls():
     assert "_wait_for_gui(client)" in runner_text
     assert "splash_visible" in runner_text
     assert "TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI=" in runner_text
+    assert "QUALIFIED_PROFILES_BY_FREECAD_VERSION" in runner_text
+    assert (
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1"
+        in runner_text
+    )
     assert "freecad_gui_validate_phase5_transition_coin_viewprovider.py" in (
         runner_text
     )

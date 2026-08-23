@@ -2429,6 +2429,226 @@ baseline-attribution investigation the next action. Keep Exit 4 Pending.
 > or retained evidence. It gives no production authority, physical-output
 > authority, `project-cleared` status, packaging, release, or tagging authority.
 
+<a id="freecad-1-1-3-py31313-qt6111-qualification-panel"></a>
+
+## Qualification panel and owner decision for the new exact FreeCAD 1.1.3 host profile
+
+This Level 3 panel uses protected `main`
+`dc750df93682b3b0fd5fdf79fa6fe94296a10697` as its source state. It changes
+host-compatibility authority. It also changes the related host controls. It
+changes no TrackTemplate product source. Phase 6 has 2/5 accepted exits, and
+Exit 4 is Pending. Project status is `unknown`.
+
+### Owner view
+
+| Field | Result |
+| --- | --- |
+| Current state | The exact FreeCAD 1.1.1 profile and the D-GOV-006 exact FreeCAD 1.1.3 profile are qualified. D-GOV-009 is the current Exit 4 direction. |
+| What changed | D-GOV-010 qualifies only the profile for FreeCAD 1.1.3 that has CPython 3.13.13 and PySide6/Qt 6.11.1. It preserves the previous profiles and their evidence. |
+| What now works | The runtime guard and the host matrix gave the specified results for the profile that D-GOV-010 qualifies. This profile can supply candidate evidence for performance in a subsequent cycle. Each comparison must use one profile with an exact identity. |
+| Limitations/findings | The runtime guard does not examine the data about the Flatpak package that the contract records. Qualification gives no authority for a performance comparison between profiles that have different exact identities. This cycle records no performance result. |
+| Owner decision | Accept D-GOV-010 for `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1` only. Keep the previous qualified profiles and evidence. |
+| Next action | In a new cycle, do the bounded investigation that D-GOV-009 specifies. Use the profile that D-GOV-010 qualifies. First, record a baseline for this profile. This qualification cycle does not start that investigation. |
+
+### Exact host identity and runtime-guard boundary
+
+The candidate host reported this identity:
+
+| Component | Recorded value | Contract use |
+| --- | --- | --- |
+| Operating system | Linux Mint 22.3, x86_64 | Linux and x86_64 are `exact_match` data. The Mint release is recorded provenance. |
+| FreeCAD | 1.1.3, revision `44987 (Git)`, Git commit `145529fe741292ff0b3977a01195bf0247425794` | The version is `exact_match` data. The revision and Git commit are recorded provenance. |
+| Flatpak package | `org.freecad.FreeCAD`, ref `app/org.freecad.FreeCAD/x86_64/stable` | The Flatpak ID and package type are `exact_match` data. The ref is recorded provenance. |
+| Flatpak commits | Commit `fa3ef6bebc139083246bd4fb6b8baf6a032a3b5bbb0a57479cb14d52bad733ae`, parent `d7a54c855bce9f4fb7b00b33d43f0ecb1908af510f9147bcc9bc32f614a6bbad` | Recorded provenance. |
+| Flatpak runtime and SDK | `org.kde.Platform/x86_64/6.11` and `org.kde.Sdk/x86_64/6.11` | Recorded provenance. |
+| Flatpak source | Origin `flathub`, collection `org.flathub.Stable`, system installation | Recorded provenance. |
+| Python | CPython 3.13.13 | `exact_match` data. |
+| Qt binding | PySide6 6.11.1 with Qt 6.11.1 | `exact_match` data. |
+| Geometry kernel | OpenCASCADE 7.8.1 | `exact_match` data. |
+| Scene-graph library | SIM Coin 4.0.8 | `exact_match` data. |
+
+The exact profile ID is
+`linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`. The runtime guard
+accepts this profile only when all of its `exact_match` data are equal to the
+reported data. The runtime probe does not report the Flatpak ref, commits,
+runtime, SDK, origin, collection, installation scope, Mint release, or FreeCAD revision.
+Those data preserve the package provenance. They do not change the runtime
+guard. They do not qualify a different Flatpak package.
+
+### Qualification evidence
+
+The assessment used a temporary worktree at the protected source state. Its
+temporary contract added only the profile with the new ID. Each FreeCAD command used
+a new document or a fixture copy. The source fixture SHA-256 was
+`0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c` before
+and after the real-GUI routes.
+
+| Evidence boundary | Validator or command | Result |
+| --- | --- | --- |
+| Exact runtime identity | `tools/runtime_compatibility_probe.py --pass --require-qualified` in FreeCADCmd | PASS. The probe reported only the profile that D-GOV-010 identifies and zero mismatches. |
+| Package load, modular route, canonical state, and recompute | Phase 2, Phase 3, and Phase 4 FreeCADCmd validators | PASS with all specified sentinels. |
+| Transactions, Undo/Redo, save/reopen, failure recovery, and cleanup | Phase 4 persistence validator | PASS with its specified sentinel. |
+| Legacy ingress, family assessment, migration, and chair import | Phase 4 FreeCADCmd validators | PASS with all specified sentinels. |
+| Coin scene and Edit lifecycle | Phase 5 headless validators | PASS with both specified sentinels. |
+| Display, selection, Edit, Undo/Redo, save/reopen, failure recovery, and cleanup | Phase 5 real-GUI ViewProvider command | PASS with the specified real-GUI records and zero open documents after cleanup. |
+| Plain-line and connected-straight Entry/Exit routes | Phase 3 four-route real-GUI command | PASS. Legacy and modular results were equal for both workflows. |
+| Exact contract and transient exact geometry | Phase 6 FreeCADCmd validators | PASS with both specified sentinels. |
+| Deterministic DXF, manifest, import, failure recovery, and cleanup | Phase 6 qualified DXF validator | PASS with its specified sentinel. |
+
+The preserved detailed evidence is in
+`benchmark-output/freecad113-requalification/20260823T171357Z-fa3ef6/`.
+The runtime evidence file has SHA-256
+`eff5df685a7b37b98cb23a2f853f186aa03a014bda0d2ac19754b8d8fa296e88`.
+The evidence file for the headless matrix has SHA-256
+`fcc98740aaaea626541d095f35d18e98a4b9bff72ce0968d71a5370e83f36865`.
+The evidence file for the real-GUI ViewProvider has SHA-256
+`0c06db37b9bdab8114fe600b34dd62a3beb7af1adc2edc8622fe1eff006fded3`.
+The four-route evidence file has SHA-256
+`e8bb482506b81ff0e328ffb64f3c37de820fe7a171e8247c866c2d1c38edaf77`.
+The external-file SHA-256 manifest has SHA-256
+`16fa438aba7fa967a134241087239a86c14f65a03ad48ea20ef086910cb80713`.
+
+The first migration command in the real GUI stopped before the validator. The command
+did not define `__file__`, and the validator reported a
+`NameError`. This result is `fixture-or-harness-defect`. Its evidence file has SHA-256
+`a4e7168492056439f78dde745b541dc778c82879ef5b8ef3f4568683a60bd54a`.
+The new command file defines the validator path. It has SHA-256
+`d132f439fd0a1f144f2891d2789bbb0cdebe376500c1fb62508d90113cc09cca`.
+
+The subsequent proof gave PASS and has SHA-256
+`adc996312467c3bb821f04f88024e62983418aae5b7977760a3612edb337c25b`.
+The first command gave no qualification result and changed no product file.
+
+### Preservation, architecture, and performance boundaries
+
+The assessment status has SHA-256
+`bab8889d4e0e920bf5c72fbda11a2d925c86385e450da689dd0730aa8a831306`.
+The temporary source change has SHA-256
+`6df27b7a89079588dfa5ca513ba7df42a7967edfb7ddf3c2eabad1fa017a78c7`.
+The project recorded SHA-256 for these records and the external files. It
+then removed the temporary worktree. The primary worktree stayed at the
+protected source state during the host assessment.
+
+The public API, railway state, persistence data, schemas, stored identifiers,
+output contracts, and exact output do not change. The runtime
+evaluator accepts a list of exact profiles. The host validators add one
+profile ID. The Phase 5 GUI command now maps FreeCAD 1.1.3 to the IDs
+of the two qualified profiles. No TrackTemplate product source changes.
+
+D-GOV-006 and its exact CPython 3.13.14 and PySide6/Qt 6.10.3 profile do not
+change. The exact FreeCAD 1.1.1 profile and its evidence do not change.
+D-GOV-007 authority for its two named profiles does not change.
+D-GOV-010 authorises this profile to supply candidate evidence for performance
+in a subsequent cycle. Each comparison must use one profile with an exact
+identity.
+
+The performance records for the 1.1.1 and D-GOV-006 profiles stay frozen under
+their exact provenance. A
+result from one exact profile is not a TrackTemplate before/after comparison
+with a result from a different exact profile. This cycle records no performance
+measurement, comparison, or budget. This cycle makes no new measurement from
+either D-GOV-008 result. Both results are retained negative evidence. Their
+commits, files, failure records, and hashes do not change.
+
+D-GOV-009 stays the current Exit 4 direction. Before the project claims that
+TrackTemplate performance changed on this profile, the D-GOV-009 investigation
+must record a baseline for this profile. This qualification does not start that
+investigation. It does not select an optimisation candidate and does not accept
+Exit 4.
+
+### Risk panel
+
+| Risk | Panel judgement | Result |
+| --- | --- | --- |
+| PR-01 — release workflow coverage | The host matrix gave the specified results for the current B16 boundaries. Phase 10 still owns Workbench package and release evidence. | High / Remove / Partial. The disposition does not change. |
+| PR-13 — repository or evidence loss | The source state, temporary source change, evidence files, and hashes preserve the assessment. Post-merge checks must examine them. The checks must also examine the retained negative evidence from D-GOV-008. | Critical / Mitigate / Effective (current scope). The disposition does not change. |
+| PR-17 — persistence or migration corruption | Headless and real-GUI checks examined fixture copies, transactions, Undo/Redo, save/reopen, failure recovery, and cleanup. | Critical / Mitigate / Partial. The disposition does not change. |
+| PR-22 — authority transfer | The project owner gives exact Level 3 authority. A new reviewer who did not make the change must examine the exact candidate before merge. | High / Remove / Effective (current scope). The disposition does not change. |
+| QA-R03 — release GUI evidence | The exact host has real-GUI qualification evidence. The project does not have release or Workbench package evidence. | High / Remove / Partial. The disposition does not change. |
+| QA-R04 — no product performance budget | D-GOV-010 records no performance result or budget. It keeps the rule that a comparison uses one exact host profile. It does not change D-GOV-009. | High / Mitigate / Partial. The disposition does not change. |
+
+No risk state, treatment, severity, owner, deadline, or control effectiveness
+changes.
+
+### Documentation conformance
+
+The conformance review must use the official local ASD-STE100 Issue 9
+standard and the TrackTemplate UK English spelling directive. It must examine
+each full logical unit in this table.
+
+| Path | Full logical unit |
+| --- | --- |
+| `reference/PROJECT_PLAN.md` | The current owner view, D-GOV-010 summary, and D-GOV-010 decision row. |
+| `reference/VALIDATION.md` | The Phase 1 runtime and legacy ingress compatibility unit. |
+| `reference/PERFORMANCE_SOP.md` | The full section with the heading `Hosts for Phase 6 performance evidence`. |
+| `reference/contracts/phase1-compatibility.json` | The changed human-readable status, scope, profile, qualification, support, and evidence strings. Exact JSON data is not part of the linguistic review. |
+| `reference/current/PHASE_EVIDENCE.md` | This full D-GOV-010 panel, the Exit 4 disposition addition, and the D-GOV-010 carried-control text. |
+| `reference/current/gate-decisions.json` | The human-readable D-GOV-010 record. Exact JSON data is not part of the linguistic review. |
+
+Before the conformance review, the Issue 9 result for these logical units is
+Unknown. The conformance review must examine the exact candidate. Exact identifiers,
+JSON keys, commands, hashes, and machine values are not part of the linguistic
+review. Issue 9 conformance stays Unknown for frozen history and for live prose
+that is not in the named logical units.
+
+### Review and merge conditions
+
+A new reviewer did not make the change. This reviewer must examine the exact
+host identity, host matrix, failure disposition, and preservation. The reviewer must
+examine the scope, risk panel, documentation, and validation results. The
+reviewer must also make sure that the change does not start D-GOV-009 baseline
+attribution. The reviewer must
+make sure that the change does not admit a performance result or Exit 4.
+
+The reviewer must not change files. The project must not merge the candidate
+after a BLOCK review result. This panel must not change after the exact-state
+review.
+
+**Panel recommendation:** **Continue with bounded conditions.** Qualify only the
+profile that D-GOV-010 identifies. Keep the two previous profiles qualified.
+Preserve all evidence. Keep D-GOV-009 as the current Exit 4 direction.
+Keep Exit 4 Pending.
+
+> **D-GOV-010 — Qualify the new exact FreeCAD 1.1.3 host profile**
+>
+> At protected `main` `dc750df93682b3b0fd5fdf79fa6fe94296a10697`, I
+> qualify only
+> `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`. This profile has
+> FreeCAD 1.1.3, revision `44987 (Git)`, Git commit
+> `145529fe741292ff0b3977a01195bf0247425794`, and CPython 3.13.13. The profile
+> also has PySide6/Qt 6.11.1, OpenCASCADE 7.8.1, and SIM Coin 4.0.8.
+>
+> The recorded Flatpak commit is
+> `fa3ef6bebc139083246bd4fb6b8baf6a032a3b5bbb0a57479cb14d52bad733ae`.
+> The runtime is `org.kde.Platform/x86_64/6.11`. The contract records the
+> package identity and the provenance fields in this panel. The runtime guard
+> qualifies the profile only from its `exact_match` data. It does not qualify
+> all FreeCAD 1.1.3 hosts.
+>
+> Keep the exact FreeCAD 1.1.1 profile qualified. Keep the D-GOV-006 exact
+> FreeCAD 1.1.3 profile qualified. Preserve their evidence and exact host
+> identities. Do not change D-GOV-006 or D-GOV-007.
+>
+> D-GOV-010 authorises this profile to supply candidate evidence for performance
+> in a subsequent cycle. Each comparison must use one profile with an exact
+> identity. For a TrackTemplate before/after comparison, do not use results from
+> profiles with different exact identities.
+> Before the project claims that TrackTemplate performance changed on this
+> profile, the D-GOV-009 investigation must record a baseline for this profile.
+>
+> This decision admits no performance result. It defines no performance budget.
+> It does not start baseline attribution. It does not select an optimisation
+> candidate. It does not accept Exit 4.
+>
+> This decision changes no product source, public API, railway mathematics,
+> persistence, schema, export behaviour, qualified-host criterion, performance
+> threshold, or evidence. It gives no production authority,
+> physical-output authority, `project-cleared` status, packaging, release, or
+> tagging authority.
+>
+> Phase 6 stays at 2/5 accepted exits. Exit 4 stays Pending. Exits 1 and 5 stay
+> Pending. Project status stays `unknown`. No risk disposition changes.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -2440,7 +2660,7 @@ The accepted current state is 2/5 under D-P6-002 and D-P6-005:
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005 — bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004 with the recorded platform, recovery and assurance limitations; project status remains `unknown` |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-009 keeps D-GOV-008 Accepted as the authority for its baseline, hypothesis, and rule. It records two retained negative results and stops new product work in that direction. The two results are not improvement evidence. They are not Exit 4 evidence. No measured evidence shows sufficient cost outside the D-GOV-008 preview-sampler boundary. No decision defines a product performance budget or accepts Exit 4. |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-009 keeps D-GOV-008 Accepted as the authority for its baseline, hypothesis, and rule. It records two retained negative results and stops new product work in that direction. The two results are not improvement evidence. They are not Exit 4 evidence. No measured evidence shows sufficient cost in a measurement area that is not part of the D-GOV-008 preview-sampler boundary. D-GOV-010 qualifies one more host profile but admits no performance result or budget and does not accept Exit 4. |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
 ## Carried controls and exclusions
@@ -2459,7 +2679,7 @@ The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
 D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001,
-TT-DOC-002, D-GOV-006, D-GOV-007, D-GOV-008 and D-GOV-009.
+TT-DOC-002, D-GOV-006, D-GOV-007, D-GOV-008, D-GOV-009 and D-GOV-010.
 
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.
@@ -2487,3 +2707,11 @@ records the two subsequent Level 2 results as retained negative evidence and sto
 product work in that direction. It authorises only a bounded Level 1
 baseline-attribution investigation as the next action. It admits no improvement
 or Exit 4 evidence, defines no budget, and does not accept Exit 4.
+
+D-GOV-010 qualifies only the profile with ID
+`linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`. The two profiles that
+the project qualified before D-GOV-010 stay qualified, and their evidence does
+not change. D-GOV-010 authorises its profile to supply candidate evidence for
+performance in a subsequent cycle. Each comparison must use one profile with
+an exact identity. It admits no performance result, defines no budget, and does
+not change D-GOV-009 or Exit 4.

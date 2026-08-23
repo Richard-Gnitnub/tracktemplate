@@ -69,6 +69,9 @@ def _snapshot(edited=False):
 
 HOST_PROFILE_111 = "linux-x86_64-flatpak-freecad-1.1.1"
 HOST_PROFILE_113 = "linux-x86_64-flatpak-freecad-1.1.3"
+HOST_PROFILE_113_PY31313_QT6111 = (
+    "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1"
+)
 
 
 def _geometry_receipt(freecad_version="1.1.1"):
@@ -300,6 +303,7 @@ def validate_sample_contract():
     assert profile.AUTHORISED_PERFORMANCE_HOSTS == {
         HOST_PROFILE_111: "1.1.1",
         HOST_PROFILE_113: "1.1.3",
+        HOST_PROFILE_113_PY31313_QT6111: "1.1.3",
     }
     sample = _sample(0.0)
     assert profile.validate_sample(sample) == {

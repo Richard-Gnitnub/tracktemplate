@@ -31,9 +31,12 @@ MULTI_OBJECT_SENTINEL = (
 LIFECYCLE_SENTINEL = (
     "TRACKTEMPLATE_PHASE5_TRANSITION_EDITING_LIFECYCLE_GUI="
 )
-QUALIFIED_PROFILE_BY_FREECAD_VERSION = {
-    "1.1.1": "linux-x86_64-flatpak-freecad-1.1.1",
-    "1.1.3": "linux-x86_64-flatpak-freecad-1.1.3",
+QUALIFIED_PROFILES_BY_FREECAD_VERSION = {
+    "1.1.1": {"linux-x86_64-flatpak-freecad-1.1.1"},
+    "1.1.3": {
+        "linux-x86_64-flatpak-freecad-1.1.3",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+    },
 }
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(TOOL_ROOT / "src"))
@@ -116,14 +119,17 @@ def _sentinel_payload(result, sentinel=SENTINEL):
 
 def _qualified_version(payload):
     return payload.get("freecad_version") in (
-        QUALIFIED_PROFILE_BY_FREECAD_VERSION
+        QUALIFIED_PROFILES_BY_FREECAD_VERSION
     )
 
 
 def _qualified_profile(payload):
-    return QUALIFIED_PROFILE_BY_FREECAD_VERSION.get(
-        payload.get("freecad_version")
-    ) == payload.get("exact_qualified_profile")
+    return payload.get("exact_qualified_profile") in (
+        QUALIFIED_PROFILES_BY_FREECAD_VERSION.get(
+            payload.get("freecad_version"),
+            set(),
+        )
+    )
 
 
 def _validate_lifecycle_payload(payload):

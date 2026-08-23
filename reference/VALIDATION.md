@@ -1023,18 +1023,25 @@ evidence only when its `TRACKTEMPLATE_RUNTIME_PROBE=` record reports
 `qualified`. The result must name one exact host profile:
 
 - `linux-x86_64-flatpak-freecad-1.1.1`
-- `linux-x86_64-flatpak-freecad-1.1.3`.
+- `linux-x86_64-flatpak-freecad-1.1.3`
+- `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`.
 
 An exact 1.1.1 result does not qualify 1.1.3. An exact 1.1.3 result does not
-qualify 1.1.2 or any other 1.1.x release. The probe records no user path.
+qualify 1.1.2 or any other 1.1.x release. A result for one exact 1.1.3 profile
+does not qualify the different exact 1.1.3 profile. The probe records no user
+path.
 
 D-GOV-006 adds only the exact FreeCAD 1.1.3 profile. All checks in the host
 matrix gave the specified results in that runtime. The 1.1.1 evidence keeps its
-recorded host identity. D-GOV-007 defines the
+recorded host identity. D-GOV-010 adds only the exact FreeCAD 1.1.3 profile with
+CPython 3.13.13 and PySide6/Qt 6.11.1. The host matrix gave the specified
+results in that runtime.
+
+D-GOV-007 and D-GOV-010 define the
 [hosts for Phase 6 performance evidence](PERFORMANCE_SOP.md#phase-6-performance-host-boundary).
-D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles to supply
-candidate evidence for Phase 6 performance. A later decision can admit a performance
-result only if it comes from one of these exact host profiles.
+Together, they authorise only the three profiles in the compatibility contract
+to supply candidate evidence for Phase 6 performance. A subsequent decision can
+admit only a performance result from one of these profiles.
 
 The validator examines new schema-2 results. Each result and its summary must
 record the ID and FreeCAD version of its exact host profile. One result set
@@ -1045,7 +1052,7 @@ effect.
 
 If the project qualifies a subsequent host profile, this does not authorise
 performance evidence from that profile. The validator rejects a new result
-unless its ID/version pair is one of the two exact mappings. It rejects schema
+unless its ID/version pair is one of the three exact mappings. It rejects schema
 1 and a `host_profile_id` value that is not a string. It rejects an exact-geometry
 receipt that records a different FreeCAD version. It also rejects a result set
 that contains two host profiles.
@@ -1056,8 +1063,10 @@ qualified-runtime contract hash. These data identify the exact host profile
 for FreeCAD 1.1.1. D-GOV-007 keeps that report as 1.1.1 evidence. The validator
 does not change the report.
 
-D-GOV-007 admits no performance result and defines no value for a performance
-budget. It does not accept Exit 4 or claim that performance became better.
+D-GOV-007 and D-GOV-010 admit no performance result. They define no value for a
+performance budget. They do not accept Exit 4 or claim that performance became
+better. Before the project claims that TrackTemplate performance changed on
+this profile, the D-GOV-009 investigation must record a baseline for this profile.
 The previous 1.1.1-only validator rejected the 1.1.3 test result. D-GOV-007
 does not admit this test result as Exit 4 evidence.
 

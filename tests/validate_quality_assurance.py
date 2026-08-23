@@ -580,29 +580,35 @@ def validate_documentation_profile(
     require(
         "Phase 6 has 2/5 accepted exits" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
-        and "D-GOV-009" in owner_view
-        and "D-GOV-008 performance direction as exhausted for new product "
-        "work" in owner_view
-        and "D-GOV-008 stays Accepted as the authority for the first baseline, "
-        "hypothesis, rule, and Level 2 boundary" in owner_view
-        and "The two subsequent Level 2 results are retained negative evidence"
+        and "D-GOV-010" in owner_view
+        and "qualifies only the exact FreeCAD 1.1.3 profile with CPython "
+        "3.13.13 and PySide6/Qt 6.11.1" in owner_view
+        and "D-GOV-010 preserves the previously qualified profiles and their "
+        "evidence" in owner_view
+        and "D-GOV-009 stays the current Exit 4 direction" in owner_view
+        and "runtime guard and the host matrix gave the specified results for "
+        "the profile that D-GOV-010 qualifies" in owner_view
+        and "three profiles in the contract can supply candidate evidence for "
+        "performance in a subsequent cycle" in owner_view
+        and "Each TrackTemplate before/after comparison must use one profile "
+        "with an exact identity" in owner_view
+        and "runtime guard does not examine the data about the Flatpak package "
+        "that the contract records" in owner_view
+        and "Qualification gives no authority for a performance comparison "
+        "between profiles that have different exact identities" in owner_view
+        and "D-GOV-010 admits no performance result" in owner_view
+        and "defines no performance budget and does not accept Exit 4"
         in owner_view
-        and "do not tell the project to make a third preview-sampler change"
+        and "two D-GOV-008 results stay retained negative evidence"
         in owner_view
-        and "bounded Level 1 baseline-attribution investigation" in owner_view
-        and "accepted FreeCAD 1.1.3 Edit journey" in owner_view
-        and "state construction, preview and sampler construction, Coin "
-        "binding, GUI processing, and the unattributed remainder" in owner_view
-        and "The two retained results are not improvement evidence" in owner_view
-        and "They are not Exit 4 evidence" in owner_view
-        and "Current measurements do not show sufficient cost in a measurement "
-        "area outside the D-GOV-008 preview-sampler boundary" in owner_view
-        and "D-GOV-009 defines no product performance budget" in owner_view
-        and "Do not make a third preview sampler, polynomial, approximation, "
-        "cache, or other variation of the D-GOV-008 hypothesis" in owner_view
-        and "subsequent Level 3 owner decision is necessary before a new Level "
-        "2 optimisation" in owner_view
-        and "D-GOV-006 and D-GOV-007 host limits do not change" in owner_view
+        and "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1"
+        in owner_view
+        and "Keep the profile for FreeCAD 1.1.1 qualified" in owner_view
+        and "Keep the first profile for FreeCAD 1.1.3 qualified" in owner_view
+        and "Do not change D-GOV-009" in owner_view
+        and "bounded investigation that D-GOV-009 specifies" in owner_view
+        and "Use the profile that D-GOV-010 qualifies" in owner_view
+        and "First, record a baseline for this profile" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
