@@ -1263,13 +1263,13 @@ def validate_current_evidence_mutations() -> None:
 
     exit4_row = table_row_containing(
         evidence,
-        "D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison "
-        "baseline",
+        "D-GOV-009 keeps D-GOV-008 Accepted as the authority for its "
+        "baseline, hypothesis, and rule",
     )
     exit4_promoted = replace_once(
         exit4_row,
-        "Pending — D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series",
-        "Evidenced — D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series",
+        "Pending — D-GOV-009 keeps D-GOV-008 Accepted as the authority",
+        "Evidenced — D-GOV-009 keeps D-GOV-008 Accepted as the authority",
     )
     expect_rejected(
         "phase-evidence/exit4-prematurely-evidenced",
@@ -2042,6 +2042,90 @@ def validate_current_evidence_mutations() -> None:
         "in the preview sampler",
     )
 
+    followup_reopened = replace_once(
+        performance_sop,
+        "Do not make a third preview-sampler change.",
+        "Make a third preview-sampler change.",
+    )
+    expect_rejected(
+        "performance-direction/d-gov-009-exhausted-direction-reopened",
+        lambda: progress._validate_performance_direction_sources(
+            followup_reopened,
+            terminology,
+            evidence,
+        ),
+        "D-GOV-009 direction drifted: Do not make a third preview-sampler "
+        "change",
+    )
+
+    followup_result_promoted = replace_once(
+        evidence,
+        "The two retained results are not improvement evidence.",
+        "The two retained results are improvement evidence.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-009-negative-results-promoted",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            followup_result_promoted,
+        ),
+        "D-GOV-009 evidence panel drifted: The two retained results are not "
+        "improvement evidence",
+    )
+
+    followup_alternative_claimed = replace_once(
+        evidence,
+        "No measured evidence shows sufficient\ncost in a measurement area "
+        "outside the D-GOV-008 preview-sampler boundary.",
+        "Measured evidence shows sufficient cost in a measurement area "
+        "outside the D-GOV-008 preview-sampler boundary.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-009-unevidenced-alternative-claimed",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            followup_alternative_claimed,
+        ),
+        "D-GOV-009 evidence panel drifted: No measured evidence shows "
+        "sufficient cost in a measurement area outside the D-GOV-008 "
+        "preview-sampler boundary",
+    )
+
+    followup_investigation_started = replace_once(
+        evidence,
+        "Do not start that investigation in this cycle.",
+        "Start that investigation in this cycle.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-009-investigation-started",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            followup_investigation_started,
+        ),
+        "D-GOV-009 evidence panel drifted: Do not start that investigation in "
+        "this cycle",
+    )
+
+    followup_owner_gate_removed = replace_once(
+        evidence,
+        "A subsequent Level 3 owner decision is necessary before a new Level "
+        "2\noptimisation.",
+        "No owner decision is necessary before a new Level 2 optimisation.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-009-owner-gate-removed",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            followup_owner_gate_removed,
+        ),
+        "D-GOV-009 evidence panel drifted: subsequent Level 3 owner decision "
+        "is necessary before a new Level 2 optimisation",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
@@ -2227,6 +2311,21 @@ def validate_project_plan_mutations() -> None:
             replace_once(
                 plan,
                 performance_direction_decision_row + "\n",
+                "",
+            )
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
+    direction_followup_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-009 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-009-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                direction_followup_decision_row + "\n",
                 "",
             )
         ),
