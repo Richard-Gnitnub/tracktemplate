@@ -865,6 +865,56 @@ external reference. Normal CI does not use the ignored PDF. A conformance
 record must report its official source. Automatic validation does not prove
 linguistic conformance.
 
+### ASD-STE100 retrieval assurance
+
+The retrieval contract has a source manifest and a retrieval index. The
+Technical Documentation Profile owns full applicability. The technical-term register owns technical terms.
+Validate the contract without the PDF with:
+
+```bash
+.venv/bin/python tests/validate_ste100_retrieval.py
+```
+
+When the authorised source is available at the local path, also use:
+
+```bash
+.venv/bin/python tools/ste100_lookup.py rebuild
+.venv/bin/python tools/ste100_lookup.py validate
+```
+
+The local check must fail closed when the source is missing. It must also fail
+closed when its byte size or SHA-256 identity is different from the source
+manifest. The PDF extractor file owner can be root or the current user. It must be a
+regular file. It must not be in the repository or active
+Python environment. Its group and other users must not have write access. A
+rebuild must reject all other PDF extractors. It must reject a
+source-derived index when its identity is not the identity in the source
+manifest.
+
+The derived cache must contain metadata only. It must have the same input
+identities as the source, profile, technical-term register, retrieval index,
+manifest, tool, and PDF extractor. The tool must accept the cache schema version. Source
+mode must use verified source bytes. It must use the PDF extractor identity
+that the derived cache records.
+
+Include tests for the source, derived cache, retrieval index, technical-term
+status, and each output limit.
+
+The validator must not make a linguistic conformance, certification, or
+endorsement claim. A reviewer can use a review receipt to record a review of
+full applicability. The review receipt must record that the reviewer examines
+the complete applicable requirement set. The review receipt, pre-check, derived
+cache, and selected lookup results do not show that this review occurred. They
+also do not show conformance. Source identity validation does not make a
+positive rights claim.
+
+[Technical provenance](PROVENANCE.md#asd-ste100-issue-9-reference) records the
+rights state in a different authority boundary. The
+[Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+owns full applicability and the conformance review. The
+[source and retrieval procedure](external/asd-ste100/README.md)
+owns local operation and the rebuild route.
+
 Fast development-bridge recipe contract checks:
 
 ```bash

@@ -1,6 +1,6 @@
 # ASD-STE100 Issue 9 local reference
 
-Status: **canonical local-path and official-source instructions only.**
+Status: **canonical local official source and STE lookup procedure only.**
 
 ## Local reference
 
@@ -19,9 +19,9 @@ conformance assessment. The PDF is not necessary for TrackTemplate product
 execution or normal repository CI. The PDF is not a canonical TrackTemplate document. The
 [TT-DOC-001 profile](../../ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
 and [TT-DOC-002 decision](../../current/PHASE_EVIDENCE.md#tt-doc-002-uk-english-spelling-correction-panel)
-are the TrackTemplate policy authority.
+are the TrackTemplate project authority.
 
-## Official-source priority
+## Official source sequence
 
 Use official sources in this order for an ASD-STE100 conformance review:
 
@@ -35,3 +35,132 @@ The review record must report which official source the reviewer used. If
 neither official source is available, do not claim that the prose is
 ASD-STE100 Issue 9 conforming. Work that does not need linguistic conformance
 assessment can continue.
+
+## Source identity and copyright boundary
+
+[`source-manifest.json`](source-manifest.json) records data for an exact check
+of source identity. It includes the Issue 9 filename, date, page count, byte size,
+and SHA-256 identity. It also records the source-derived index identity. Review
+a new source identity before the manifest changes. The STE lookup does not
+accept a different source as an automatic update.
+
+[`retrieval-index.json`](retrieval-index.json) contains rule identifiers, rule family
+metadata, topic tags, and source locations. It contains no complete
+source text for a writing rule or complete STE dictionary. The retrieval index
+has no authority to change full applicability. The
+[Technical Documentation Profile](../../ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
+owns full applicability.
+
+The PDF and its source material have external copyright. Keep them local. Do
+not add them to version control.
+
+The ignored `.cache/` directory contains the
+derived cache. The derived cache contains only STE dictionary metadata,
+writing rule source locations, source metadata, and technical-term status. It
+does not keep source page text, the complete STE dictionary, or complete
+extracted source text. Source mode extracts one source page from verified source bytes in memory.
+It returns only a bounded source excerpt.
+
+The source identity is proof/provenance. It does not give a licence to
+reproduce or supply ASD source material. TrackTemplate has no positive ASD
+permission or eligibility evidence. Thus, the rights state stays **unknown**.
+Do not publish the PDF, derived cache, bounded source excerpts, or extracted
+source text as TrackTemplate material.
+
+Get a professional rights review or ASD permission before a positive rights claim
+about reproduction or supply. The canonical record is
+[`PROVENANCE.md`](../../PROVENANCE.md#asd-ste100-issue-9-reference).
+
+## Local retrieval interface
+
+The local interface is [`tools/ste100_lookup.py`](../../../tools/ste100_lookup.py).
+It uses local `pdftotext` as a development tool during a rebuild. It reads the
+authorised source PDF one time. It calculates the source identity from those bytes. It
+sends only verified source bytes to the PDF extractor.
+
+It records the PDF extractor path, file owner, file mode, version, and SHA-256
+identity. It also validates the source-derived index identity. It does not add
+a TrackTemplate product runtime dependency.
+
+Rebuild and validate the ignored derived cache with:
+
+```bash
+.venv/bin/python tools/ste100_lookup.py rebuild
+.venv/bin/python tools/ste100_lookup.py validate
+.venv/bin/python tools/ste100_lookup.py status
+```
+
+Each command validates the source byte size and source identity before it uses
+derived data. A lookup query stops if the source is missing or its identity
+changes. It also stops if derived cache metadata is different. It stops if the
+source-derived index identity or cache schema version is different. Source mode
+also stops if the PDF extractor identity is different. The tool does not rebuild
+the stale cache without the rebuild command.
+
+Follow the diagnostic. Put the
+authorised PDF at the canonical path or use the `rebuild` command.
+
+Use concise lookup output:
+
+```bash
+.venv/bin/python tools/ste100_lookup.py word install
+.venv/bin/python tools/ste100_lookup.py word "plain line" --part-of-speech noun
+.venv/bin/python tools/ste100_lookup.py rule 6.3
+.venv/bin/python tools/ste100_lookup.py topic terminology
+.venv/bin/python tools/ste100_lookup.py review descriptive-prose
+```
+
+Add `--source` to a word lookup or rule lookup only when a bounded source
+excerpt is necessary. Add `--verbose` to a topic lookup query only when you must
+read all rule families for its topic tag. A query does not show the complete
+source text.
+
+Word lookup examines the TrackTemplate technical-term register first. An
+approved technical-term result gives its technical-term category and term
+meaning. Always do a contextual term review. Use `--part-of-speech` when the
+technical-term category is known. Do not approve a category mismatch. Do not
+approve a term that is missing from the technical-term register. The lookup
+then classifies recognised STE vocabulary, a dictionary-inspection candidate,
+or unresolved terminology. The tool cannot add or approve a technical noun or
+technical verb.
+[`TERMINOLOGY.md`](../../TERMINOLOGY.md#asd-ste100-project-terminology) is the
+technical-term register.
+
+## Pre-check and review receipt
+
+Use the deterministic pre-check with one content category:
+
+```bash
+.venv/bin/python tools/ste100_lookup.py precheck DOCUMENT --category descriptive
+```
+
+The pre-check reports sentence length, controlled vocabulary, technical-term
+status, and construction candidates. Each bounded result reports its total
+count, shown count, and truncation status. Add `--verbose` to return all
+deterministic findings. It is not a conformance review. No finding and no empty
+result shows conformance. A `PASS` command result also does not show conformance.
+
+After a reviewer examines the complete applicable requirement set, the tool can
+write an ignored review receipt. It uses `tmp/ste100-review-receipts/`.
+For changed prose, bind the receipt to one previous Git commit:
+
+```bash
+git show BASELINE:DOCUMENT | \
+  .venv/bin/python tools/ste100_lookup.py receipt DOCUMENT \
+    --baseline-stdin --baseline-revision BASELINE \
+    --category descriptive --full-applicability-considered
+```
+
+Use the complete commit SHA for `BASELINE`. The receipt records the canonical
+document from the previous Git commit and from the worktree. It also records
+the changed canonical prose that the pre-check examines. The receipt records
+source and profile identities, targeted retrieval, exact-content exclusions,
+technical-term status, and unresolved terminology. It is not an external
+certification or endorsement. Do not keep all review receipts for usual work.
+Keep one only when project authority makes this necessary.
+
+The usual agent route and bounded conditions for complete-source inspection are
+in the
+[TT-DOC-001 workflow](../../AGENT_WORKFLOWS.md#tt-doc-001-workflow-integration).
+Targeted retrieval changes the source text that the agent reads for this task. It does
+not narrow the applicable Issue 9 requirement set.

@@ -15,6 +15,11 @@ description: Create, review, shorten or reorganise TrackTemplate Markdown docume
    ASD/STEMG source when it is available. Report the official source that you
    used. If no official source is available, do not claim conformance.
    Review the full logical unit that contains the change.
+
+   Use the [STE lookup](../../../reference/external/asd-ste100/README.md#local-retrieval-interface)
+   before you read more source text. A lookup result selects source material to
+   read. It does not select the Issue 9 requirement set. Use the agent workflow
+   for a complete-source inspection.
 3. Read the project technical terms in
    [`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
 4. Read [`references/document-ownership.md`](references/document-ownership.md).
@@ -70,6 +75,9 @@ Read only the documents relevant to the present change:
   recommendations, and owner decisions distinct.
 - Do not claim Issue 9 conformance from a public summary, model knowledge, or
   an automatic validator.
+- Use the pre-check and STE lookup during the review. Review the complete
+  applicable requirement set. Include each applicable requirement that a
+  lookup result does not contain.
 - Remove repeated or unnecessary text. Keep evidence, qualifications, and
   controlled terms.
 - Preserve frozen historical evidence and append-only records. Do not rewrite

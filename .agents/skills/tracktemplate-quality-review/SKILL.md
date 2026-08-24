@@ -68,6 +68,10 @@ not sufficient evidence. Use the
 to identify the official source. Keep TrackTemplate policy different from the
 external normative reference. Keep evidence that the reviewer examined the
 named logical unit.
+Use the [STE lookup](../../../reference/external/asd-ste100/README.md#local-retrieval-interface)
+to read one bounded source excerpt. Make sure that the reviewer examines the complete
+applicable requirement set. Do not use a source excerpt or an empty pre-check
+as the conformance review.
 
 Before you review exporter interruption probes or tests, read the canonical
 [supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).

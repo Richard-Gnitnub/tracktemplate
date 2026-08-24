@@ -704,8 +704,8 @@ def validate_documentation_profile(
         for row in lfe_rows
     ]
     require(
-        lfe_ids == [f"{value:03d}" for value in range(1, 19)],
-        "LFE ledger is not unique and append-only through LFE-018",
+        lfe_ids == [f"{value:03d}" for value in range(1, 20)],
+        "LFE ledger is not unique and append-only through LFE-019",
     )
     protected_prefix = "\n".join(lfe_rows[:17]) + "\n"
     require(
@@ -845,10 +845,11 @@ def validate_asd_ste100_reference(
         "AGENT_WORKFLOWS lost the ASD-STE100 source owner link",
     )
     require(
-        "documentation-review workflow uses the official source only when "
-        "it makes a linguistic conformance assessment" in workflows_flat
-        and "Other workflows route that assessment to documentation review "
-        "and do not read the PDF during usual work" in workflows_flat,
+        "documentation review workflow uses the official source only for a "
+        "linguistic conformance assessment" in workflows_flat
+        and "Other workflows route that assessment to documentation review"
+        in workflows_flat
+        and "They do not read the PDF during usual work" in workflows_flat,
         "ASD-STE100 workflow routing drifted",
     )
 

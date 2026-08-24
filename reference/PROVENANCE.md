@@ -233,6 +233,43 @@ first pilot's working description is an S1 chair; its precise REA/company
 designation must be confirmed from evidence before the published package is
 named.
 
+## ASD-STE100 Issue 9 reference
+
+TrackTemplate uses the official ASD-STE100 Simplified Technical English,
+Issue 9 standard as an external reference for the accepted
+[Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
+The local reference has this technical provenance:
+
+| Item | Recorded value |
+| --- | --- |
+| Acquisition source | [ASD Simplified Technical English Maintenance Group](https://www.asd-ste100.org/) |
+| Official source | [ASD-STE100 Issue 9 PDF](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf). Publication date: 2025-01-15. |
+| Local path | `reference/external/asd-ste100/ASD-STE100_ISSUE9.pdf`. The file is ignored. Git does not contain it. |
+| Byte size | 3,316,157 bytes |
+| SHA-256 | `d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431` |
+| Copyright | External ASD material. The TrackTemplate product files with the GPL licence do not contain it. |
+| Local extraction and reproduction rights | **unknown**. TrackTemplate has no eligibility evidence or written permission evidence. |
+
+The source identity records the source that TrackTemplate used. It does not give
+permission to reproduce or supply the source. TrackTemplate makes no positive
+rights claim, certification claim, or ASD endorsement claim. Get a
+professional rights review or ASD permission before a positive claim. Get the same review
+before you reproduce or supply more ASD source material.
+
+The ignored derived cache contains only STE dictionary metadata, writing rule
+source locations, source metadata, and technical-term status. It does not keep
+source text for a source page, a complete STE dictionary, or a complete source copy. Source
+mode processes one source page from verified source bytes in memory. It returns
+one bounded source excerpt.
+
+The PDF is not a product runtime dependency or a distributable output. The
+derived cache is also not a product runtime dependency or a distributable
+output. The
+[local source and retrieval procedure](external/asd-ste100/README.md#source-identity-and-copyright-boundary)
+owns the source identity and derived cache operation. The
+[licensing rules](LICENSING_BOUNDARIES.md) control positive rights claims for
+reproduction, publication, and supply.
+
 ## Accepted repository licensing state
 
 - TrackTemplateMacro is licensed under **GPL-3.0-or-later**. The complete GPLv3

@@ -163,6 +163,23 @@ policy.
 Do not copy the standard or its controlled general dictionary into this
 repository.
 
+### Retrieval and assurance boundary
+
+The STE lookup is a retrieval optimisation only. It does not define or limit
+the applicable rule set. The applicable rule set is mandatory. The controlled
+vocabulary is also mandatory.
+
+An agent must not claim conformance because of rules in a lookup result. An
+agent must not claim conformance because the pre-check has no finding. A `PASS`
+result from automatic validation also does not show conformance. The STE lookup
+controls the source text that an agent reads for this task. It does not control the
+applicable writing rules.
+
+Use the [STE lookup workflow](external/asd-ste100/README.md#local-retrieval-interface)
+for targeted retrieval. Review the complete logical unit against the complete
+applicable requirement set. Use the official source to resolve each material
+ambiguity.
+
 The standard applies to canonical technical prose that persons can read in:
 
 - architecture
