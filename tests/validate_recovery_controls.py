@@ -26,6 +26,7 @@ LEARNING_PATH = ROOT / "reference" / "LEARNING_FROM_EXPERIENCE.md"
 PHASE_EVIDENCE_PATH = ROOT / "reference/current/PHASE_EVIDENCE.md"
 AGENTS_PATH = ROOT / "AGENTS.md"
 GITIGNORE_PATH = ROOT / ".gitignore"
+CI_WORKFLOW_PATH = ROOT / ".github/workflows/ci.yml"
 TOOL_PATH = ROOT / "tools" / "repository_safety_audit.py"
 RECOVERY_SKILL_PATHS = {
     "context": ROOT / ".agents/skills/tracktemplate-context-recovery/SKILL.md",
@@ -101,6 +102,36 @@ def _reject_recovery_contradictions(value, surface):
                 + " contradicts visible recovery state: "
                 + contradiction
             )
+
+
+def validate_ci_recovery_history(text):
+    """Require full history for exact historical recovery evidence."""
+    lines = text.splitlines()
+    checkout_lines = [
+        index
+        for index, line in enumerate(lines)
+        if line.strip().startswith("uses: actions/checkout@")
+    ]
+    if len(checkout_lines) != 1:
+        raise AssertionError("CI must define one repository checkout step")
+    start = checkout_lines[0]
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("      - name:"):
+            end = index
+            break
+    checkout_step = lines[start:end]
+    full_history = any(
+        re.fullmatch(
+            r"\s*fetch-depth:\s*['\"]?0['\"]?\s*(?:#.*)?",
+            line,
+        )
+        for line in checkout_step
+    )
+    if not full_history:
+        raise AssertionError(
+            "CI checkout must fetch full history for recovery evidence"
+        )
 
 
 def validate_safety_audit_git_commands(source):
@@ -1058,6 +1089,7 @@ def _validate_static_controls(errors):
     workflows = WORKFLOWS_PATH.read_text(encoding="utf-8")
     learning = LEARNING_PATH.read_text(encoding="utf-8")
     phase_evidence = PHASE_EVIDENCE_PATH.read_text(encoding="utf-8")
+    ci_workflow = CI_WORKFLOW_PATH.read_text(encoding="utf-8")
     skills = {
         name: path.read_text(encoding="utf-8")
         for name, path in RECOVERY_SKILL_PATHS.items()
@@ -1113,6 +1145,7 @@ def _validate_static_controls(errors):
             errors.append("ignored local-data protection marker is missing: " + marker)
 
     for check in (
+        lambda: validate_ci_recovery_history(ci_workflow),
         lambda: validate_visible_recovery_policy(policy),
         lambda: validate_visible_recovery_routing(workflows, skills),
         lambda: validate_recovery_policy_owner(_load_tracked_markdown()),
@@ -1123,6 +1156,19 @@ def _validate_static_controls(errors):
             check()
         except AssertionError as error:
             errors.append(str(error))
+
+    shallow_ci_workflow = re.sub(
+        r"(?m)^(\s*fetch-depth:\s*)0(\s*(?:#.*)?)$",
+        r"\g<1>1\g<2>",
+        ci_workflow,
+        count=1,
+    )
+    try:
+        validate_ci_recovery_history(shallow_ci_workflow)
+    except AssertionError:
+        pass
+    else:
+        errors.append("CI recovery evidence accepted a shallow checkout")
 
     try:
         validate_safety_audit_git_commands(
