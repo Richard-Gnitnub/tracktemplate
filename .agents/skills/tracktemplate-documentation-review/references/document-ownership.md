@@ -11,7 +11,7 @@ shortening or deleting documentation.
 | Strategic architecture and canonical state | `reference/ARCHITECTURE.md` |
 | Source organisation and dependency direction | `reference/MODULARISATION_PLAN.md` |
 | Proportional change, true gates, the TT-DOC-001 profile and Issue 9 scope, documentation lifecycle, and owner reports | `reference/ENGINEERING_POLICY.md` |
-| Local ASD-STE100 Issue 9 path and official-source priority | `reference/external/asd-ste100/README.md` |
+| Local ASD-STE100 Issue 9 source and STE lookup procedure | `reference/external/asd-ste100/README.md` |
 | Validation procedures and evidence interpretation | `reference/VALIDATION.md` |
 | Testing obligations and oracle-change policy | `reference/TESTING_POLICY.md` |
 | Performance measurement | `reference/PERFORMANCE_SOP.md` |

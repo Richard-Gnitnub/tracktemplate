@@ -1,0 +1,335 @@
+{
+  "applicability_statement": "The index supplies retrieval hints only. ASD-STE100 Issue 9 and the TrackTemplate application profile determine the complete applicable requirement set.",
+  "families": [
+    {
+      "content_categories": [
+        "descriptive",
+        "procedural",
+        "safety"
+      ],
+      "id": "words-and-terminology",
+      "rule_ids": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8",
+        "1.9",
+        "1.10",
+        "1.11",
+        "1.12",
+        "1.13",
+        "1.14"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-1-1 through 1-1-18",
+        "section": "Section 1"
+      },
+      "title": "Words and terminology",
+      "topic_tags": [
+        "approved-words",
+        "controlled-vocabulary",
+        "dictionary",
+        "spelling",
+        "technical-nouns",
+        "technical-verbs",
+        "terminology"
+      ]
+    },
+    {
+      "content_categories": [
+        "descriptive",
+        "procedural",
+        "safety"
+      ],
+      "id": "multi-word-nouns",
+      "rule_ids": [
+        "2.1",
+        "2.2"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-2-1 through 1-2-4",
+        "section": "Section 2"
+      },
+      "title": "Multi-word nouns",
+      "topic_tags": [
+        "compound-terms",
+        "multi-word-nouns",
+        "technical-nouns",
+        "terminology"
+      ]
+    },
+    {
+      "content_categories": [
+        "descriptive",
+        "procedural",
+        "safety"
+      ],
+      "id": "verbs",
+      "rule_ids": [
+        "3.1",
+        "3.2",
+        "3.3",
+        "3.4",
+        "3.5",
+        "3.6",
+        "3.7"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-3-1 through 1-3-10",
+        "section": "Section 3"
+      },
+      "title": "Verbs",
+      "topic_tags": [
+        "active-voice",
+        "approved-verbs",
+        "grammar",
+        "technical-verbs",
+        "verb-forms"
+      ]
+    },
+    {
+      "content_categories": [
+        "descriptive",
+        "procedural",
+        "safety"
+      ],
+      "id": "sentences",
+      "rule_ids": [
+        "4.1",
+        "4.2",
+        "4.3",
+        "4.4",
+        "4.5"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-4-1 through 1-4-10",
+        "section": "Section 4"
+      },
+      "title": "Sentences",
+      "topic_tags": [
+        "articles",
+        "clarity",
+        "connecting-words",
+        "sentence-structure",
+        "vertical-lists"
+      ]
+    },
+    {
+      "content_categories": [
+        "procedural",
+        "safety"
+      ],
+      "id": "procedural-writing",
+      "rule_ids": [
+        "5.1",
+        "5.2",
+        "5.3",
+        "5.4",
+        "5.5"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-5-1 through 1-5-8",
+        "section": "Section 5"
+      },
+      "title": "Procedural writing",
+      "topic_tags": [
+        "commands",
+        "conditions",
+        "imperative",
+        "instructions",
+        "notes",
+        "procedures",
+        "sentence-length"
+      ]
+    },
+    {
+      "content_categories": [
+        "descriptive"
+      ],
+      "id": "descriptive-writing",
+      "rule_ids": [
+        "6.1",
+        "6.2",
+        "6.3",
+        "6.4",
+        "6.5",
+        "6.6"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-6-1 through 1-6-8",
+        "section": "Section 6"
+      },
+      "title": "Descriptive writing",
+      "topic_tags": [
+        "descriptions",
+        "information-order",
+        "paragraphs",
+        "sentence-length",
+        "topics"
+      ]
+    },
+    {
+      "content_categories": [
+        "safety"
+      ],
+      "id": "safety-instructions",
+      "rule_ids": [
+        "7.1",
+        "7.2",
+        "7.3"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-7-1 through 1-7-4",
+        "section": "Section 7"
+      },
+      "title": "Safety instructions",
+      "topic_tags": [
+        "cautions",
+        "hazards",
+        "risk",
+        "safety",
+        "warnings"
+      ]
+    },
+    {
+      "content_categories": [
+        "descriptive",
+        "procedural",
+        "safety"
+      ],
+      "id": "punctuation-and-word-count",
+      "rule_ids": [
+        "8.1",
+        "8.2",
+        "8.3",
+        "8.4",
+        "8.5",
+        "8.6",
+        "8.7"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-8-1 through 1-8-8",
+        "section": "Section 8"
+      },
+      "title": "Punctuation and word count",
+      "topic_tags": [
+        "hyphens",
+        "parentheses",
+        "punctuation",
+        "sentence-length",
+        "vertical-lists",
+        "word-count"
+      ]
+    },
+    {
+      "content_categories": [
+        "descriptive",
+        "procedural",
+        "safety"
+      ],
+      "id": "writing-practices",
+      "recommendation_ids": [
+        "GR-1",
+        "GR-2",
+        "GR-3",
+        "GR-4",
+        "GR-5",
+        "GR-6",
+        "GR-7",
+        "GR-8"
+      ],
+      "rule_ids": [
+        "9.1",
+        "9.2",
+        "9.3",
+        "9.4"
+      ],
+      "source_location": {
+        "part": "Part 1",
+        "pages": "1-9-1 through 1-9-14",
+        "section": "Section 9"
+      },
+      "title": "Writing practices",
+      "topic_tags": [
+        "ambiguity",
+        "consistency",
+        "general-recommendations",
+        "inclusive-language",
+        "phrasal-verbs",
+        "pronouns",
+        "wording"
+      ]
+    }
+  ],
+  "review_categories": [
+    {
+      "id": "descriptive-prose",
+      "retrieval_priority_families": [
+        "words-and-terminology",
+        "multi-word-nouns",
+        "verbs",
+        "sentences",
+        "descriptive-writing",
+        "punctuation-and-word-count",
+        "writing-practices"
+      ]
+    },
+    {
+      "id": "procedural-prose",
+      "retrieval_priority_families": [
+        "words-and-terminology",
+        "multi-word-nouns",
+        "verbs",
+        "sentences",
+        "procedural-writing",
+        "punctuation-and-word-count",
+        "writing-practices"
+      ]
+    },
+    {
+      "id": "safety-instruction",
+      "retrieval_priority_families": [
+        "words-and-terminology",
+        "multi-word-nouns",
+        "verbs",
+        "sentences",
+        "procedural-writing",
+        "safety-instructions",
+        "punctuation-and-word-count",
+        "writing-practices"
+      ]
+    },
+    {
+      "id": "terminology",
+      "retrieval_priority_families": [
+        "words-and-terminology",
+        "multi-word-nouns",
+        "verbs",
+        "writing-practices"
+      ]
+    },
+    {
+      "id": "governance-status",
+      "retrieval_priority_families": [
+        "words-and-terminology",
+        "sentences",
+        "descriptive-writing",
+        "writing-practices"
+      ]
+    }
+  ],
+  "schema_version": 1,
+  "status": "retrieval-hints-only"
+}

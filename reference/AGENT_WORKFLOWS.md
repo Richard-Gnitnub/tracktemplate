@@ -106,18 +106,41 @@ scope. [TERMINOLOGY.md](TERMINOLOGY.md#asd-ste100-project-terminology) owns the
 TrackTemplate technical terms. Skills apply these owners by reference. They do
 not become policy or terminology owners.
 
-The [ASD-STE100 Issue 9 reference-source instructions](external/asd-ste100/README.md)
-own the local path and official-source priority. They are not policy. The
-documentation-review workflow uses the official source only when it makes
-a linguistic conformance assessment. Other workflows route that assessment to
-documentation review and do not read the PDF during usual work.
+The [ASD-STE100 Issue 9 local source and STE lookup procedure](external/asd-ste100/README.md)
+owns the local path and official source sequence. It also owns the STE lookup
+operation and rebuild route. It does not own full applicability. It does not
+own the technical-term register. The documentation review workflow uses the
+official source only for a linguistic conformance assessment. Other workflows
+route that assessment to documentation review. They do not read the PDF during
+usual work.
+
+For documentation in the STE conformance scope, use this route:
+
+1. Read the canonical Technical Documentation Profile.
+2. Read the canonical TrackTemplate technical-term register.
+3. Classify the changed canonical prose and identify the applicable rule families.
+4. Do the deterministic pre-check when it can help the review.
+5. Use targeted retrieval for writing rules, dictionary-inspection candidates, and ambiguities.
+6. Read a bounded source excerpt when the STE lookup does not give sufficient information.
+7. Review the complete logical unit against the complete applicable requirement set.
+8. Record the technical-term status. Record each unresolved finding.
+9. Get an independent review when the change level or risk makes it necessary.
+
+The selected rule families are retrieval priorities. They are not the complete
+applicable rule set. Do not start each review at the first source page and read
+to the last source page. Use complete-source inspection only for these bounded conditions:
+
+- The task is about the complete standard.
+- The task validates the retrieval architecture.
+- Targeted retrieval cannot resolve an ambiguity that the reviewer records.
+- An owner decision makes complete-source inspection necessary.
 
 | Workflow responsibility | Owner and boundary |
 | --- | --- |
-| Documentation structure and Issue 9 review | `tracktemplate-documentation-review` reviews the full logical unit that contains the change. It uses and reports the official standard source. It applies the canonical document responsibility. |
-| Claim, status, and migration alignment | `tracktemplate-documentation-alignment` compares the presentation with canonical authority. It uses the PDF as an external reference only. It keeps unverified conformance and migration findings in the record. |
-| Evidence and limitation reports | `tracktemplate-change-validation` keeps exact proof below the owner view. It makes sure the conformance record reports an official source. Automatic checks do not show linguistic conformance. |
-| Staff judgement | `tracktemplate-quality-review` keeps policy, the external standard, and the assessed logical unit different. It reviews limitations and authority boundaries independently. It does not duplicate validation. |
+| Documentation structure and Issue 9 review | `tracktemplate-documentation-review` reviews the full logical unit that contains the change. It uses the STE lookup for targeted retrieval, reports the official standard source, and uses the canonical workflow responsibility. |
+| Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. It uses the STE lookup and the PDF as external references only. It keeps unverified conformance and migration findings in the record. |
+| Evidence and limitation reports | `tracktemplate-change-validation` keeps proof/provenance below the owner view. It validates source identity and derived cache identity and a review receipt when applicable. It makes sure the conformance record reports an official source. Automatic validation does not show linguistic conformance. |
+| Independent review | `tracktemplate-quality-review` keeps canonical policy, the external standard, lookup results, and the complete logical unit different. It validates that the reviewer examines the complete applicable requirement set. Then, it gives an independent review of limitations and authority boundaries. It does not do validation again. |
 | Cross-specialist delivery handoff | `tracktemplate-technical-lead` uses the owner view for an authorised Level 1 or Level 2 outcome only. It routes a necessary linguistic assessment to documentation review. |
 | Repository-driven cycle result | Literal `tracktemplate-continue` supplies the six-field owner view and technical provenance. It routes a necessary linguistic assessment to documentation review. Its Level 1/2 and merge limits do not change. |
 | Recovered-session result | `tracktemplate-context-recovery` makes its short report from verified authority. It keeps the exact recovery provenance. It routes a necessary linguistic assessment to documentation review. |

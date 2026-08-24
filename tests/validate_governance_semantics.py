@@ -2711,8 +2711,11 @@ def validate_documentation_profile_mutations() -> None:
 
     lfe_link_deleted = replace_once(
         learning,
-        "tt-doc-001-tracktemplate-technical-documentation-profile",
-        "missing-documentation-profile",
+        "The [Technical Documentation Profile](ENGINEERING_POLICY.md#"
+        "tt-doc-001-tracktemplate-technical-documentation-profile) owns the "
+        "policy.",
+        "The [Technical Documentation Profile](missing-documentation-profile) "
+        "owns the policy.",
     )
     expect_rejected(
         "tt-doc/lfe-canonical-link-deleted",

@@ -32,6 +32,7 @@ htmlcov/
 
 # Local official standards references; tracked instructions stay visible
 /reference/external/asd-ste100/*.pdf
+/reference/external/asd-ste100/.cache/
 
 # Repository-local generated output locations
 /benchmark-output/

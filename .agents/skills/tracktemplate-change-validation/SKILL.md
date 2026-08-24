@@ -86,6 +86,11 @@ before selecting proof.
 - For such a claim, make sure that the review reports an official source from the
   [ASD-STE100 source instructions](../../../reference/external/asd-ste100/README.md).
   Normal repository validation does not use the ignored PDF.
+- When the change includes the STE lookup, use its
+  [validation and review receipt route](../../../reference/external/asd-ste100/README.md#pre-check-and-review-receipt).
+  Validate source identity and derived cache identity. Record that the reviewer
+  examines the complete applicable requirement set. Selected lookup results and
+  an empty pre-check do not show conformance.
 - Run affected regression suites and the applicable FreeCAD, GUI, persistence,
   migration, export, rollback, recovery, performance, provenance or licensing
   checks.

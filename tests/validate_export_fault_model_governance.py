@@ -546,8 +546,8 @@ def validate_lfe(documents: dict[str, str]) -> None:
         re.MULTILINE,
     )
     require(
-        rows == [f"{value:03d}" for value in range(1, 19)],
-        "LFE identifiers are not unique, ordered and append-only through 018",
+        rows == [f"{value:03d}" for value in range(1, 20)],
+        "LFE identifiers are not unique, ordered and append-only through 019",
     )
     row_lines = [
         line
