@@ -42,6 +42,9 @@ is acceptable overall; that belongs to `$tracktemplate-quality-review`.
   resource-use or optimisation claims.
 - Read `reference/RECOVERY_AND_BACKUP.md` before destructive, bulk, backup,
   restore or operator-document work.
+- Apply its
+  [visible recovery state procedure](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
+  when Git recovery state or handoff is part of the change.
 - Read `reference/TERMINOLOGY.md` when railway wording or identifiers change.
 - Read `reference/LICENSING_BOUNDARIES.md` and `reference/PROVENANCE.md` for
   source data, external evidence, chair definitions, licensing, package or
@@ -94,6 +97,9 @@ before selecting proof.
 - Run affected regression suites and the applicable FreeCAD, GUI, persistence,
   migration, export, rollback, recovery, performance, provenance or licensing
   checks.
+- For a recovery or handoff workflow change, validate the stash inventory,
+  unique content, and stash disposition controls. Also run the applicable
+  semantic control validation and preservation diff.
 - Run only checks available in the present environment. State unavailable checks
   explicitly instead of simulating or inventing their results.
 - Record the exact command, environment, result and required success sentinel

@@ -680,6 +680,24 @@ def validate_documentation_profile(
         "High-water RSS",
         "journey remainder",
         "discrete invariant",
+        "Visible recovery state",
+        "stash inventory",
+        "stash selector",
+        "stash commit SHA",
+        "stash component",
+        "unique content",
+        "Unresolved recovery state",
+        "dirty path",
+        "recovery purpose",
+        "retained stash",
+        "stash ownership",
+        "stash reconciliation",
+        "stash disposition",
+        "recovery inventory",
+        "recovery audit",
+        "preservation diff",
+        "Workspace alignment",
+        "Accepted product state",
         "Setup",
         "Teardown",
         "attribution series",
@@ -704,8 +722,8 @@ def validate_documentation_profile(
         for row in lfe_rows
     ]
     require(
-        lfe_ids == [f"{value:03d}" for value in range(1, 20)],
-        "LFE ledger is not unique and append-only through LFE-019",
+        lfe_ids == [f"{value:03d}" for value in range(1, 21)],
+        "LFE ledger is not unique and append-only through LFE-020",
     )
     protected_prefix = "\n".join(lfe_rows[:17]) + "\n"
     require(

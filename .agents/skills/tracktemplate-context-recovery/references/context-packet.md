@@ -6,6 +6,10 @@ canonical owner.
 
 ## Packet
 
+Record the branches, worktrees, and commits that contain named Git state.
+Record the stash ownership, recovery purpose, unique content result, and stash
+disposition.
+
 ```text
 Task and requested outcome:
 Exact current user decisions:

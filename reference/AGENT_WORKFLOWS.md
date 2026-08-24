@@ -52,6 +52,12 @@ document. A task that remains incomplete is reported as incomplete, with its
 working-tree state, evidence already run, unresolved decisions and next safe
 check made explicit.
 
+Apply the
+[visible recovery state procedure](RECOVERY_AND_BACKUP.md#visible-recovery-state)
+in its canonical owner to Git recovery and handoff state. A context packet gives the route to named
+Git state. It is not planned preservation. Keep the recovery gate open until
+the recovery workflow completes stash reconciliation.
+
 ## Instruction budget
 
 Codex combines repository instruction files and applies a finite default byte
@@ -729,6 +735,19 @@ $tracktemplate-handoff
 temporary packet outside the repository
     ↓
 new session: $tracktemplate-context-recovery with the packet path
+```
+
+For interrupted work or a recovery gate:
+
+```text
+inventory named branches, worktrees, commits and every stash
+    ↓
+apply the visible recovery state procedure in its canonical owner
+    ↓
+preserve unique content and obtain authority for exact disposition
+    ↓
+close the recovery gate only after ownership, purpose, preservation and
+disposition are proved and no stash stays in the inventory
 ```
 
 For an architecture decision:

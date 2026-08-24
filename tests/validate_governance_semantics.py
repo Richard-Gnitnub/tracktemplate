@@ -13,6 +13,7 @@ import validate_agent_guidance as agent_guidance
 import validate_ontology as ontology
 import validate_project_progress as progress
 import validate_quality_assurance as quality_assurance
+import validate_recovery_controls as recovery_controls
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -3125,6 +3126,464 @@ def validate_transition_export_validation_mutations() -> None:
         )
 
 
+def validate_visible_recovery_mutations() -> None:
+    """Reject hidden, destructive, durable, or competing recovery state."""
+    policy = read("reference/RECOVERY_AND_BACKUP.md")
+    workflows = read("reference/AGENT_WORKFLOWS.md")
+    phase_evidence = read("reference/current/PHASE_EVIDENCE.md")
+    skills = {
+        name: path.read_text(encoding="utf-8")
+        for name, path in recovery_controls.RECOVERY_SKILL_PATHS.items()
+    }
+    policy_cases = (
+        (
+            "recovery/planned-stash-use-permitted",
+            replace_once(
+                policy,
+                "must not use `git stash` for planned preservation,",
+                "may use `git stash` for planned preservation,",
+            ),
+            "visible recovery policy lacks: must not use git stash for planned "
+            "preservation recovery or handoff",
+        ),
+        (
+            "recovery/gate-closes-without-stash-inventory",
+            replace_once(
+                policy,
+                "- Examine the output of `git stash list`.",
+                "- Examine the active branch.",
+            ),
+            "visible recovery policy lacks: examine the output of git stash list",
+        ),
+        (
+            "recovery/retained-stash-treated-as-resolved",
+            replace_once(
+                policy,
+                "A retained stash is unresolved recovery state.",
+                "A retained stash is resolved recovery state.",
+            ),
+            "visible recovery policy lacks: a retained stash is "
+            "unresolved recovery state",
+        ),
+        (
+            "recovery/automatic-stash-deletion",
+            replace_once(
+                policy,
+                "A tool must not remove a stash only to get empty `git stash "
+                "list`\noutput.",
+                "A tool can remove a stash only to get empty `git stash "
+                "list`\noutput.",
+            ),
+            "visible recovery policy lacks: tool must not remove a stash only "
+            "to get empty git stash list output",
+        ),
+        (
+            "recovery/unique-stash-content-discarded",
+            replace_once(
+                policy,
+                "Preserve unique content that Git can contain in named Git "
+                "state. Preserve\n"
+                "  sensitive evidence and local evidence only with approved "
+                "independent\n"
+                "  preservation.",
+                "Discard unique content before inspection.",
+            ),
+            "visible recovery policy lacks: preserve unique content that git "
+            "can contain in named git state",
+        ),
+        (
+            "recovery/emergency-stash-made-durable",
+            replace_once(
+                policy,
+                "Do not use it for\nplanned preservation or handoff.",
+                "Use it as durable\nplanned preservation and handoff.",
+            ),
+            "visible recovery policy lacks: do not use it for planned "
+            "preservation or handoff",
+        ),
+        (
+            "recovery/local-evidence-admitted-to-git",
+            replace_once(
+                policy,
+                "Do not stage sensitive evidence or\n"
+                "local evidence. Do not commit sensitive evidence or local "
+                "evidence. Do not push\n"
+                "sensitive evidence or local evidence.",
+                "Stage sensitive evidence or local evidence. Commit sensitive "
+                "evidence or local evidence. Push\n"
+                "sensitive evidence or local evidence.",
+            ),
+            "visible recovery policy lacks: do not stage sensitive evidence or "
+            "local evidence",
+        ),
+        (
+            "recovery/local-evidence-admitted-to-stash",
+            replace_once(
+                policy,
+                "Do not put sensitive evidence or local evidence in a stash.",
+                "Put sensitive evidence and local evidence in a stash.",
+            ),
+            "visible recovery policy lacks: do not put sensitive evidence or "
+            "local evidence in a stash",
+        ),
+        (
+            "recovery/local-evidence-admitted-to-recovery-commit",
+            replace_once(
+                policy,
+                "If unique content is sensitive evidence or local evidence, "
+                "do not put it in a\n  recovery commit.",
+                "If unique content is sensitive evidence or local evidence, "
+                "put it in a\n  recovery commit.",
+            ),
+            "visible recovery policy lacks: unique content is sensitive "
+            "evidence or local evidence do not put it in a recovery commit",
+        ),
+        (
+            "recovery/stash-disposition-claims-object-erasure",
+            replace_once(
+                policy,
+                "It does not remove\nits Git commits, trees, or blobs.",
+                "It removes\nits Git commits, trees, and blobs.",
+            ),
+            "visible recovery policy lacks: it does not remove its git commits "
+            "trees or blobs",
+        ),
+        (
+            "recovery/object-residue-gate-closed",
+            replace_once(
+                policy,
+                "If a stash contains sensitive evidence or local evidence, "
+                "keep the recovery\ngate open.",
+                "If a stash contains sensitive evidence or local evidence, "
+                "close the recovery\ngate.",
+            ),
+            "visible recovery policy lacks: stash contains sensitive evidence "
+            "or local evidence keep the recovery gate open",
+        ),
+        (
+            "recovery/automatic-object-deletion-permitted",
+            replace_once(
+                policy,
+                "Do not\nremove Git objects automatically.",
+                "Automatically\nremove Git objects.",
+            ),
+            "visible recovery policy lacks: do not remove git objects automatically",
+        ),
+        (
+            "recovery/stash-branch-removal-uncontrolled",
+            replace_once(
+                policy,
+                "`git stash branch`,\nor other operation that removes a "
+                "stash",
+                "other operation that removes a stash",
+            ),
+            "visible recovery policy lacks: do not use drop clear overwrite "
+            "pop rewrite git stash branch or other operation that removes "
+            "a stash without a report and applicable authority",
+        ),
+        (
+            "recovery/stash-base-omitted",
+            replace_once(
+                policy,
+                "- Record the base commit SHA and base tree.",
+                "- Do not record the base commit or tree.",
+            ),
+            "visible recovery policy lacks: base commit sha and base tree",
+        ),
+        (
+            "recovery/stash-u-tree-split",
+            replace_once(
+                policy,
+                "Git keeps those files only in\nU.",
+                "Git makes a second tree for ignored files.",
+            ),
+            "visible recovery policy lacks: git keeps those files only in u",
+        ),
+        (
+            "recovery/stash-deletion-delta-omitted",
+            replace_once(
+                policy,
+                "Review each path,\n  file-mode difference, and deletion.",
+                "Review only new blobs.",
+            ),
+            "visible recovery policy lacks: review each path file mode "
+            "difference and deletion",
+        ),
+        (
+            "recovery/stash-selector-not-revalidated",
+            replace_once(
+                policy,
+                "Make\n"
+                "  sure that the stash selector identifies the same stash commit "
+                "SHA and component\n"
+                "  inventory.",
+                "Trust the current selector without another identity check.",
+            ),
+            "visible recovery policy lacks: stash selector identifies the same "
+            "stash commit sha and component inventory",
+        ),
+        (
+            "recovery/missing-purpose-treated-as-resolved",
+            replace_once(
+                policy,
+                "recovery purpose, component inventory, unique content, or "
+                "stash disposition is\nmissing or changed, fail closed.",
+                "component inventory, unique content, or stash disposition is\n"
+                "missing or changed, fail closed.",
+            ),
+            "visible recovery policy lacks: stash ownership recovery purpose "
+            "component inventory unique content or stash disposition is "
+            "missing or changed fail closed",
+        ),
+        (
+            "recovery/post-disposition-inventory-removed",
+            replace_once(
+                policy,
+                "Then, inventory the repository,\n"
+                "  stashes, and preservation state again. Record the "
+                "preservation diff.",
+                "Do not inspect the repository after disposition.",
+            ),
+            "visible recovery policy lacks: record the preservation diff",
+        ),
+    )
+    for name, mutated, diagnostic in policy_cases:
+        expect_rejected(
+            name,
+            lambda value=mutated: (
+                recovery_controls.validate_visible_recovery_policy(value)
+            ),
+            diagnostic,
+        )
+
+    audit = read("tools/repository_safety_audit.py")
+    dangerous_audit = audit + (
+        "\n\ndef dispose_stash(root):\n"
+        "    return _git(root, 'stash', 'drop', 'stash@{0}')\n"
+    )
+    expect_rejected(
+        "recovery/safety-audit-adds-stash-drop",
+        lambda: recovery_controls.validate_safety_audit_git_commands(
+            dangerous_audit
+        ),
+        "safety audit contains a non-read-only Git command",
+    )
+    exposed_audit = audit + (
+        "\n\ndef expose_stash(root):\n"
+        "    return _git(root, 'stash', 'show', '-p', 'stash@{0}')\n"
+    )
+    expect_rejected(
+        "recovery/safety-audit-exposes-stash-patch",
+        lambda: recovery_controls.validate_safety_audit_git_commands(
+            exposed_audit
+        ),
+        "safety audit contains a non-private stash command",
+    )
+    os_bypass_audit = audit + (
+        "\n\ndef dispose_stash_with_os():\n"
+        "    return os.system('git stash drop stash@{0}')\n"
+    )
+    expect_rejected(
+        "recovery/safety-audit-adds-os-system-bypass",
+        lambda: recovery_controls.validate_safety_audit_git_commands(
+            os_bypass_audit
+        ),
+        "safety audit bypasses the Git wrapper",
+    )
+    aliased_os_audit = audit + (
+        "\n\nimport os as runner_os\n"
+        "def dispose_stash_with_aliased_os():\n"
+        "    return runner_os.system('git stash drop stash@{0}')\n"
+    )
+    expect_rejected(
+        "recovery/safety-audit-adds-aliased-os-bypass",
+        lambda: recovery_controls.validate_safety_audit_git_commands(
+            aliased_os_audit
+        ),
+        "safety audit aliases process-capable modules",
+    )
+    subprocess_shell_audit = audit + (
+        "\n\ndef dispose_stash_with_getoutput():\n"
+        "    return subprocess.getoutput('git stash drop stash@{0}')\n"
+    )
+    expect_rejected(
+        "recovery/safety-audit-adds-subprocess-shell-bypass",
+        lambda: recovery_controls.validate_safety_audit_git_commands(
+            subprocess_shell_audit
+        ),
+        "safety audit bypasses the Git wrapper",
+    )
+    module_alias_audit = audit + (
+        "\n\nrunner_os = os\n"
+        "def dispose_stash_with_module_alias():\n"
+        "    return runner_os.system('git stash drop stash@{0}')\n"
+    )
+    expect_rejected(
+        "recovery/safety-audit-adds-module-alias-bypass",
+        lambda: recovery_controls.validate_safety_audit_git_commands(
+            module_alias_audit
+        ),
+        "safety audit aliases process-capable modules",
+    )
+
+    weakened_workflows = replace_once(
+        workflows,
+        "preserve unique content and obtain authority for exact disposition",
+        "preserve unique content or obtain authority for exact disposition",
+    )
+    expect_rejected(
+        "recovery/workflow-makes-preservation-or-authority-optional",
+        lambda: recovery_controls.validate_visible_recovery_routing(
+            weakened_workflows,
+            skills,
+        ),
+        "agent workflow recovery routing lacks: preserve unique content and "
+        "obtain authority for exact disposition",
+    )
+
+    missing_snapshot = replace_once(
+        phase_evidence,
+        "[2026-08-01 repository snapshot]"
+        "(../backup-records/2026-08-01-phase5-closeout-snapshot.md)",
+        "2026-08-01 repository snapshot",
+    )
+    expect_rejected(
+        "recovery/phase-evidence-loses-independent-preservation-link",
+        lambda: recovery_controls.validate_recovery_phase_evidence(
+            missing_snapshot
+        ),
+        "recovery phase evidence lacks independent-preservation linkage",
+    )
+    unique_state_reintroduced = replace_once(
+        phase_evidence,
+        "The stash had no repository information that named state or\n"
+        "approved preservation did not contain.",
+        "The stash had repository information that no preservation contained.",
+    )
+    expect_rejected(
+        "recovery/phase-evidence-overlooks-unique-state",
+        lambda: recovery_controls.validate_recovery_phase_evidence(
+            unique_state_reintroduced
+        ),
+        "recovery phase evidence lacks: stash had no repository information "
+        "that named state or approved preservation did not contain",
+    )
+    contamination_overstated = replace_once(
+        phase_evidence,
+        "Thus, current evidence\nidentifies no incident with sensitive evidence "
+        "or local evidence in this\nrepository.",
+        "Thus, current evidence identifies an unresolved incident with\n"
+        "sensitive evidence in this repository.",
+    )
+    expect_rejected(
+        "recovery/phase-evidence-invents-contamination-incident",
+        lambda: recovery_controls.validate_recovery_phase_evidence(
+            contamination_overstated
+        ),
+        "recovery phase evidence lacks: current evidence identifies no incident "
+        "with sensitive evidence or local evidence in this repository",
+    )
+    cleanup_scope_added = replace_once(
+        phase_evidence,
+        "This migration does not define a procedure to remove Git\n"
+        "objects, replace a repository, or change independent preservation.",
+        "This migration defines Git object removal and backup replacement.",
+    )
+    expect_rejected(
+        "recovery/phase-evidence-adds-object-cleanup-scope",
+        lambda: recovery_controls.validate_recovery_phase_evidence(
+            cleanup_scope_added
+        ),
+        "recovery phase evidence lacks: does not define a procedure to remove "
+        "git objects replace a repository or change independent preservation",
+    )
+    ambiguous_merge = replace_once(
+        phase_evidence,
+        "`dd768006c83b9bc26e3d2e6d6e13b2cebed40173` on `main` contained "
+        "that state.",
+        "A merge commit on `main` contained that state.",
+    )
+    expect_rejected(
+        "recovery/phase-evidence-loses-exact-merge-identity",
+        lambda: recovery_controls.validate_recovery_phase_evidence(
+            ambiguous_merge
+        ),
+        "recovery phase evidence lacks: merge commit "
+        "dd768006c83b9bc26e3d2e6d6e13b2cebed40173 on main contained that state",
+    )
+
+    accepted_recovery_state = replace_once(
+        skills["ide"],
+        "It is not\naccepted product state.",
+        "It is accepted product state.",
+    )
+    accepted_skills = dict(skills)
+    accepted_skills["ide"] = accepted_recovery_state
+    expect_rejected(
+        "recovery/recovery-worktree-made-accepted-product-state",
+        lambda: recovery_controls.validate_visible_recovery_routing(
+            workflows,
+            accepted_skills,
+        ),
+        "ide recovery routing lacks: not accepted product state",
+    )
+
+    markdown = recovery_controls._load_tracked_markdown()
+    competing = dict(markdown)
+    context_path = ".agents/skills/tracktemplate-context-recovery/SKILL.md"
+    competing[context_path] = (
+        competing[context_path]
+        + "\n## Git stash policy owner\n\n"
+        + "This skill owns policy for planned Git recovery.\n"
+    )
+    expect_rejected(
+        "recovery/skill-becomes-competing-policy-owner",
+        lambda: recovery_controls.validate_recovery_policy_owner(competing),
+        "competing recovery policy owner: " + context_path,
+    )
+
+    learning = read("reference/LEARNING_FROM_EXPERIENCE.md")
+    weakened_lfe = replace_once(
+        learning,
+        "Before a stash disposition, validate that unique content stays "
+        "available and get applicable authority.",
+        "Dispose of each stash when the work is complete.",
+    )
+    expect_rejected(
+        "recovery/lfe-reusable-rule-loses-loss-proof",
+        lambda: recovery_controls.validate_recovery_lfe(weakened_lfe),
+        "LFE-020 reusable rule lacks: validate that unique content stays "
+        "available and get applicable authority",
+    )
+    purposeless_lfe = replace_once(
+        learning,
+        "Keep the recovery gate open while a retained stash stays in the "
+        "inventory or has no stash ownership, recovery purpose, or stash "
+        "disposition.",
+        "Keep the recovery gate open while a retained stash stays in the "
+        "inventory or has no stash ownership or stash disposition.",
+    )
+    expect_rejected(
+        "recovery/lfe-reusable-rule-loses-purpose",
+        lambda: recovery_controls.validate_recovery_lfe(purposeless_lfe),
+        "LFE-020 reusable rule lacks: keep the recovery gate open while a "
+        "retained stash stays in the inventory or has no stash ownership "
+        "recovery purpose or stash disposition",
+    )
+    unlinked_lfe = replace_once(
+        learning,
+        "[recovery evidence]"
+        "(current/PHASE_EVIDENCE.md#visible-recovery-state-workflow-migration)",
+        "recovery evidence",
+    )
+    expect_rejected(
+        "recovery/lfe-loses-phase-evidence-link",
+        lambda: recovery_controls.validate_recovery_lfe(unlinked_lfe),
+        "LFE-020 lacks canonical link: current/PHASE_EVIDENCE.md"
+        "#visible-recovery-state-workflow-migration",
+    )
+
+
 def validate_agents_mutations() -> None:
     """Reject every removed or abstracted explicit AGENTS safeguard."""
     agents = read("AGENTS.md")
@@ -3433,6 +3892,7 @@ def main() -> None:
     validate_project_plan_mutations()
     validate_documentation_profile_mutations()
     validate_transition_export_validation_mutations()
+    validate_visible_recovery_mutations()
     validate_agents_mutations()
     validate_chief_mutations()
     validate_ontology_mutation()

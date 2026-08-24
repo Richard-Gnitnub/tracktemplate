@@ -48,6 +48,10 @@ available:
 - the resolved interpreter executable and `pyvenv.cfg`; and
 - whether a configured path exists and belongs to the expected project.
 
+For each stash, use Git to record the stash selector, stash commit SHA, and
+each stash component. Project owner records, not Git, supply recovery purpose and disposition
+authority. Git metadata cannot supply that authority.
+
 Treat these as operator-confirmed unless the active host environment can prove
 them directly:
 
@@ -69,6 +73,7 @@ worktree.
    roots, all worktrees, exact branch/HEAD/upstream state, cleanliness,
    ahead/behind counts, unique work, current remote `main`, open pull requests
    and merged-branch reachability.
+   Include the complete stash inventory.
 3. Identify the intended primary PyCharm project from the request and
    JetBrains project metadata. Do not silently choose a similarly named copy.
 4. Inspect project VCS roots, SDK name and resolved path, virtual-environment
@@ -76,6 +81,9 @@ worktree.
 5. Map each active implementation or pull-request branch to one named
    persistent worktree. Classify `/tmp` worktrees as disposable review state or
    as unsafe sole active state.
+Map interrupted work to its recovery branch, recovery worktree, and recovery
+commit. Stop for a retained stash. Keep the recovery gate open.
+
 6. Compare the observed arrangement with the steady-state convention below.
    Report the complete pre-change inventory before requesting any Git mutation.
 7. Stop on dirty-work ownership, unique-commit, active-use, path, interpreter or
@@ -114,6 +122,13 @@ contained in `main`. Prove containment and cleanliness through Git before any
 switch. A worktree is not disposable merely because its pull request merged;
 prove that its tip and all unique commits are contained in accepted remote
 `main`, that it is clean, not active and holds no sole operator state.
+
+Apply the
+[visible recovery state procedure](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
+Its canonical owner is the recovery policy. A recovery branch or worktree is
+visible recovery state. It is not
+accepted product state. Do not end workspace alignment while an emergency
+stash stays in the stash inventory.
 
 ## Composition with TrackTemplate continue
 

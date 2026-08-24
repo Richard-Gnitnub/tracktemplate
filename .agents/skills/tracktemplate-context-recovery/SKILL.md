@@ -54,6 +54,13 @@ includes a linguistic conformance assessment, route it to
    to expand stable product terms, not to infer live status. Inspect relevant
    source, tests, raw failures, Git status and diffs only after authority is
    established.
+Apply the
+[visible recovery state procedure](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
+in the canonical owner. Examine the branches, worktrees, and commits in named
+Git state for unfinished work or interrupted work. Examine the complete stash
+inventory. If the inventory has a retained stash or missing recovery
+information, keep the recovery gate open.
+
 8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
    excluded.
@@ -146,6 +153,8 @@ owner-view fields. Then, keep this technical provenance:
 4. the current implementation and validation state;
 5. contradictions, uncommitted work or missing evidence; and
 6. the next bounded action and check.
+
+Also record the named Git state and complete stash inventory.
 
 Do not describe incomplete work, an unaccepted diff or an unrun check as
 accepted project state.

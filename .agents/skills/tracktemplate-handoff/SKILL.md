@@ -29,6 +29,12 @@ handoff.
    completely.
 2. Read `AGENTS.md`, the applicable current-phase sections and only the
    canonical owners needed for the active task.
+Read the
+[visible recovery state procedure](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
+in the canonical owner. Apply the procedure. The context packet is not planned
+preservation. Record all unfinished work. Use named Git state when applicable
+authority is available. Examine the complete stash inventory.
+
 3. Inspect the working tree, branch, exact HEAD and upstream. When a pull
    request is applicable and live access is available, resolve its exact head,
    draft/open/merged state, mergeability and required checks.
@@ -62,6 +68,8 @@ Include later sections only when useful:
 - relevant canonical paths, risk/decision IDs and retrieval triggers;
 - open questions or claims the next session must reverify; and
 - suggested repository skills, led by `$tracktemplate-context-recovery`.
+
+Also include the complete stash inventory and stash disposition.
 
 Link to canonical owners, commits, pull requests and logs instead of copying
 their contents. Summarise background and raw output. Preserve exact user

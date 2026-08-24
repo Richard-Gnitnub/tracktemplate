@@ -2947,6 +2947,85 @@ adapter boundary. First record the new same-host baseline. Keep Exit 4 Pending.
 > authority. It gives no `project-cleared` status. It gives no packaging,
 > release, or tagging authority.
 
+<a id="visible-recovery-state-workflow-migration"></a>
+
+## Visible recovery-state workflow migration
+
+The start state for this Level 2 workflow migration is **protected main** at
+SHA `65409493d741a5606543bd437e519f8efefb8680`. It changes the recovery policy,
+agent routing, and semantic control validation only. The product and current
+state do not change.
+
+A stash with the recovery label
+`codex-temporary-project-progression-recovery` stayed after TrackTemplate put
+its work in named Git state. Merge commit
+`dd768006c83b9bc26e3d2e6d6e13b2cebed40173` on `main` contained that state. Its
+second parent is commit `6f88f5c522f089e33dc895ca00adaf1035604b0b`.
+The stash commit SHA was `3dc9e7fcb0596752bcd2bd39a2dfee2d0f31e9c0`.
+The stash topology was B/I/W/U:
+
+| Component | Commit identity | Tree identity | Reconciliation result |
+| --- | --- | --- | --- |
+| B | `397ad614cfc1764a7ca94b0705c6e448eba5b78a` | `bf9f53c37c20690572a3970a78fa56a46a26ae12` | B contains the initial tree |
+| I | `865037c60a47eb7428d0881de2c1df3aa92d67be` | `bf9f53c37c20690572a3970a78fa56a46a26ae12` | B and I have the same tree |
+| W | `3dc9e7fcb0596752bcd2bd39a2dfee2d0f31e9c0` | `cff63f011ddbe3bd7e762121b0a817fe4a5684bd` | The tree difference between B and W contained seven changed paths in Git |
+| U | `2416cd8cd81d2a38a570b45c9d871f5a0d287e92` | `5ef7ee84959ccb15c7ca20c447f3268eb488285c` | U contains four files |
+
+TrackTemplate compared each path with commit
+`6f88f5c522f089e33dc895ca00adaf1035604b0b` and merge commit
+`dd768006c83b9bc26e3d2e6d6e13b2cebed40173`. Those commits contain the workflow
+that `main` uses. The files in those commits have different bytes from some
+stash blobs.
+
+The accepted
+[2026-08-01 repository snapshot](../backup-records/2026-08-01-phase5-closeout-snapshot.md)
+includes Git. It is the approved independent preservation for each identified
+Git object. The stash had no repository information that named state or
+approved preservation did not contain. Before disposition,
+`stash@{0}` identified the same stash commit and B/I/W/U inventory. The project
+owner gave authority for that stash only. The next stash inventory was empty,
+and no other stash was changed.
+
+The recovery policy routes planned preservation and handoff to named Git
+state. An emergency stash stays temporary and keeps the recovery gate open.
+Stash reconciliation examines the B/I/W/U topology and each tree difference.
+It validates the stash selector and stash inventory again.
+It does this before a disposition with applicable authority.
+
+The inspection after disposition found no stash inventory or `refs/stash`. It
+did not change Git. Git has the B/I/W/U commits although the stash inventory is
+empty. The W tree contains seven paths for agent guidance and validation. The U
+tree contains four paths for skills and skill metadata.
+
+Named Git state contains all these paths. No current record identifies their
+content as sensitive evidence or local evidence. Thus, current evidence
+identifies no incident with sensitive evidence or local evidence in this
+repository.
+
+These Git objects stay for a future bounded `$tracktemplate-security-review`
+and recovery task. The recovery policy records that stash disposition does not
+remove Git objects. This migration does not define a procedure to remove Git
+objects, replace a repository, or change independent preservation. It gives no
+authority for automatic or destructive Git object removal.
+
+Parse validation for Python and FCMacro files gave PASS for 189 files in Git.
+The standalone CI result was PASS for 60/60 validators. The governance mutation
+result was `266/266 rejected, zero escaped`. Validation for recovery, agent
+routing, documentation review, LFE, repository QA, and the STE source and
+derived cache gave PASS.
+
+The initial independent review gave a `BLOCK` result for Level 2 evidence,
+stash commit SHA controls, Issue 9 review, and wording that makes the procedure
+fail closed. This change
+corrects each finding. New independent reviews of this change are necessary
+before publication.
+
+This migration adds one control for PR-13. The state and disposition of PR-13
+do not change. This entry does not change the canonical owner for recovery or give
+authority to remove Git state. Phase 6 stays at 2/5, and project status stays
+`unknown`. It gives no project authority and does not change the product. The
+branch for D-GOV-009 and its evidence do not change.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
