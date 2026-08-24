@@ -79,7 +79,7 @@ Do not silently widen it during staff review. Report each contradiction between
 an implementation or evidence claim and the canonical supported contract.
 
 For Git recovery or handoff work, read the
-[visible recovery state procedure](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
+[procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
 Read it in the canonical owner. Examine the complete stash inventory and unique content. Validate exact Git
 identity and stash disposition authority. Review the preservation diff. A
 recovery branch or worktree is not accepted product state.

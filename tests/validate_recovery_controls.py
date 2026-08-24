@@ -84,6 +84,25 @@ def _semantic_text(value):
     return " ".join(value.casefold().split())
 
 
+def _reject_recovery_contradictions(value, surface):
+    """Reject additive text that reverses a visible-recovery invariant."""
+    semantic = _semantic_text(value)
+    contradictions = (
+        "a retained stash is resolved recovery state",
+        "close the recovery gate while",
+        "an emergency stash is durable recovery state",
+        "use an emergency stash as planned preservation",
+        "discard unique content before preservation",
+    )
+    for contradiction in contradictions:
+        if contradiction in semantic:
+            raise AssertionError(
+                surface
+                + " contradicts visible recovery state: "
+                + contradiction
+            )
+
+
 def validate_safety_audit_git_commands(source):
     """Permit only read-only Git and stash inspection in the safety audit."""
     tree = ast.parse(source)
@@ -203,6 +222,7 @@ def validate_safety_audit_git_commands(source):
             raise AssertionError(
                 "safety audit contains a non-read-only Git command"
             )
+
 
 def _stash_tree(repository, revision):
     """Return one exact tree identity from a disposable stash fixture."""
@@ -387,12 +407,14 @@ def _section(text, heading):
 
 def validate_visible_recovery_policy(policy):
     """Keep the visible-state and emergency-stash meanings canonical."""
-    section = _semantic_text(_section(policy, "Visible recovery state"))
+    raw_section = _section(policy, "Visible recovery state")
+    _reject_recovery_contradictions(policy, "visible recovery policy")
+    section = _semantic_text(raw_section)
     fragments = (
         "must not use git stash for planned preservation recovery or handoff",
         "usual unfinished work on a feature branch and its worktree",
         "interrupted work on a recovery branch",
-        "recovery worktree when it is available",
+        "when a recovery worktree is available use it",
         "recovery commit that keeps the recovery state",
         "for local evidence use a checksum manifest",
         "checksum manifest",
@@ -404,30 +426,33 @@ def validate_visible_recovery_policy(policy):
         "use git stash only in an emergency to keep work available",
         "temporary unresolved recovery state",
         "do not use it for planned preservation or handoff",
-        "stash@{n} selector and full stash commit sha",
+        "record its stash@{n} selector",
+        "record the full sha of the stash commit",
         "do not put sensitive evidence or local evidence in a stash",
-        "when they can put such evidence in git",
+        "when include untracked u all or a can put such evidence in git",
         "use approved independent preservation directly",
         "stash contains such evidence do not stage that evidence",
         "do not commit that evidence",
         "do not push that evidence",
-        "preserve it only with the approved independent method",
+        "before the owner authorises its disposition preserve it only with the "
+        "approved independent method",
         "stash disposition removes the stash from the inventory",
-        "it does not remove its git commits trees or blobs",
+        "it does not remove its git objects",
         "git can keep those objects when the stash inventory is empty",
         "procedure does not control git object removal",
-        "do not remove git objects automatically",
-        "stash contains sensitive evidence or local evidence keep the recovery "
-        "gate open",
+        "do not use an automatic operation to remove git objects",
+        "stash contains sensitive evidence or local evidence the recovery gate "
+        "does not have a complete result",
         "stop this procedure",
-        "get project owner direction before more git work",
-        "use $tracktemplate security review before more git work",
-        "inventory the stash topology",
-        "base commit sha and base tree",
-        "index parent commit sha and index tree",
+        "before more git work get project owner direction",
+        "before more git work use $tracktemplate security review",
+        "record the stash topology",
+        "sha of the base commit record the base tree",
+        "sha of the index parent record the index tree",
         "worktree tree",
-        "optional untracked files parent commit sha and u tree",
+        "sha of the optional untracked files parent record the u tree",
         "u tree contains each untracked file",
+        "command makes a stash with all",
         "same u tree also contains each ignored file",
         "git keeps those files only in u",
         "stash has unique content that git can contain preserve it on a "
@@ -446,7 +471,8 @@ def validate_visible_recovery_policy(policy):
         "validate each path in the u tree",
         "get the applicable authority for the stash that the stash commit sha "
         "identifies",
-        "stash selector identifies the same stash commit sha and component inventory",
+        "stash selector identifies the same stash commit sha and stash inventory",
+        "if the exact git identity or a stash component changed stop",
         "complete only that stash disposition",
         "record the preservation diff",
         "do not use drop clear overwrite pop rewrite git stash branch or "
@@ -454,19 +480,24 @@ def validate_visible_recovery_policy(policy):
         "applicable authority",
         "tool must not remove a stash only to get empty git stash list output",
         "examine the output of git stash list",
-        "project owner recovery purpose stash selector and full stash commit sha",
-        "record the b i w u inventory for each retained stash",
+        "project owner recovery purpose stash selector and full sha of the "
+        "stash commit",
+        "record each b i w u component in the stash inventory for each retained "
+        "stash",
         "compare the base tree with the index tree and worktree tree",
         "review each path blob deletion and file mode",
         "review each path and blob in the u tree",
         "preserve unique content that git can contain in named git state",
         "preserve sensitive evidence and local evidence only with approved "
         "independent preservation",
-        "before the disposition make sure that the stash selector stash commit "
-        "sha and component inventory did not change",
+        "before the disposition validate that the stash selector stash commit "
+        "sha and stash inventory did not change",
         "a retained stash is unresolved recovery state",
-        "stash ownership recovery purpose component inventory unique content "
+        "recorded owner or purpose does not give the recovery gate a complete "
+        "result",
+        "stash ownership recovery purpose stash inventory unique content "
         "or stash disposition is missing or changed fail closed",
+        "recovery gate does not have a complete result",
         "completed recovery cycle has no retained stash and no unresolved "
         "finding about sensitive evidence or local evidence",
         "recovery commit is not product acceptance evidence acceptance or "
@@ -479,21 +510,29 @@ def validate_visible_recovery_policy(policy):
 
 def validate_visible_recovery_routing(workflows, skills):
     """Require concise application of the canonical owner across workflows."""
+    _reject_recovery_contradictions(
+        workflows,
+        "agent workflow recovery routing",
+    )
     workflow = _semantic_text(workflows)
     workflow_fragments = (
-        "visible recovery state procedure",
+        "procedure for visible recovery state",
         "context packet gives the route to named git state",
         "it is not planned preservation",
-        "keep the recovery gate open",
+        "do not give the recovery gate a complete result",
         "recovery workflow completes stash reconciliation",
-        "inventory named branches worktrees commits and every stash",
-        "preserve unique content and obtain authority for exact disposition",
-        "close the recovery gate only after ownership purpose preservation and "
-        "disposition are proved and no stash stays in the inventory",
+        "examine named branches worktrees commits and each stash",
+        "preserve unique content",
+        "get applicable authority for the exact disposition",
+        "review evidence for ownership purpose preservation and disposition",
+        "after the stash inventory is empty give the recovery gate a complete "
+        "result",
     )
     for fragment in workflow_fragments:
         if fragment not in workflow:
-            raise AssertionError("agent workflow recovery routing lacks: " + fragment)
+            raise AssertionError(
+                "agent workflow recovery routing lacks: " + fragment
+            )
     if "RECOVERY_AND_BACKUP.md#visible-recovery-state" not in workflows:
         raise AssertionError("agent workflow does not route to recovery policy")
 
@@ -503,25 +542,26 @@ def validate_visible_recovery_routing(workflows, skills):
             "work or interrupted work",
             "examine the complete stash inventory",
             "if the inventory has a retained stash",
-            "keep the recovery gate open",
+            "do not give the recovery gate a complete result",
         ),
         "handoff": (
             "context packet is not planned preservation",
             "complete stash inventory",
-            "use named git state when applicable authority is available",
+            "when applicable authority is available use named git state",
         ),
         "ide": (
             "complete stash inventory",
             "map interrupted work to its recovery branch recovery worktree "
             "and recovery commit",
-            "stop for a retained stash",
+            "if the stash inventory contains a retained stash stop",
             "not accepted product state",
-            "do not end workspace alignment while an emergency stash stays "
-            "in the stash inventory",
+            "while an emergency stash stays in the stash inventory do not end "
+            "workspace alignment",
         ),
         "validation": (
             "stash inventory unique content and stash disposition controls",
-            "semantic control validation and preservation diff",
+            "semantic control validation",
+            "review the preservation diff",
         ),
         "quality": (
             "complete stash inventory and unique content",
@@ -532,6 +572,7 @@ def validate_visible_recovery_routing(workflows, skills):
     }
     for name, fragments in required.items():
         text = skills[name]
+        _reject_recovery_contradictions(text, name + " recovery routing")
         semantic = _semantic_text(text)
         if "RECOVERY_AND_BACKUP.md#visible-recovery-state" not in text:
             raise AssertionError(name + " skill bypasses the recovery owner")
@@ -545,7 +586,9 @@ def validate_recovery_policy_owner(markdown):
     canonical = "reference/RECOVERY_AND_BACKUP.md"
     if canonical not in markdown:
         raise AssertionError("canonical recovery owner is missing")
-    core_rule = "must not use git stash for planned preservation recovery or handoff"
+    core_rule = (
+        "must not use git stash for planned preservation recovery or handoff"
+    )
     for path, text in markdown.items():
         if path == canonical:
             continue
@@ -563,6 +606,14 @@ def validate_recovery_policy_owner(markdown):
             )
             if hidden_state and owner_claim:
                 raise AssertionError("competing recovery policy owner: " + path)
+        competing_claims = (
+            r"\bthis (?:skill|document|workflow|file) "
+            r"(?:owns|defines) (?:the )?(?:git |stash |recovery )*policy\b",
+            r"\bthis (?:skill|document|workflow|file) is (?:the )?canonical "
+            r"(?:git |stash |recovery )*policy owner\b",
+        )
+        if any(re.search(pattern, semantic) for pattern in competing_claims):
+            raise AssertionError("competing recovery policy owner: " + path)
 
 
 def _lfe_rows(text):
@@ -587,19 +638,21 @@ def validate_recovery_lfe(text):
     if len(cells) != 4:
         raise AssertionError("LFE-020 row structure drifted")
     row = _semantic_text(rows[19])
+    _reject_recovery_contradictions(rows[19], "LFE-020")
     fragments = (
-        "stash with a recovery label stayed",
-        "merge commit on main contained its work",
-        "usual branch and worktree commands did not show the stash",
-        "stayed after tracktemplate completed the recovery cycle",
-        "initial recovery audit found the work in named git state",
-        "did not identify and reconcile the stash components or disposition",
-        "independent review",
-        "kept the recovery gate open for the retained unexplained stash",
-        "recovery evidence records the b i w u reconciliation",
-        "each git object in independent preservation",
+        "stash stayed after main contained its work",
+        "branch and worktree commands did not show its recovery label",
+        "recovery audit found all work in named git state",
+        "did not complete stash reconciliation or disposition",
+        "independent review rejected the recovery result because the stash "
+        "stayed in the stash inventory",
+        "recovery evidence records b i w u reconciliation",
+        "shows that no unique content stayed only in the stash",
+        "during independent review a command made an emergency stash by accident",
+        "it stayed in unresolved recovery state until commit 1ca5b2d contained "
+        "its work",
+        "owner authorised disposition",
         "no unique content stayed only in the stash",
-        "project owner gave authority for its disposition",
         "uses feature branches recovery branches recovery worktrees and "
         "explicit commits as named git state",
         "checksum manifest",
@@ -607,7 +660,8 @@ def validate_recovery_lfe(text):
         "emergency stash only as temporary recovery state",
         "stash inventory",
         "stash ownership recovery purpose unique content and stash disposition",
-        "cannot complete stash reconciliation or a stash stays in the inventory",
+        "cannot complete stash reconciliation or when the stash inventory "
+        "contains a stash",
         "fails closed",
     )
     for fragment in fragments:
@@ -618,11 +672,16 @@ def validate_recovery_lfe(text):
         "use visible recovery state",
         "feature branches recovery branches recovery worktrees and explicit commits",
         "use an emergency stash only as temporary recovery state",
-        "keep the recovery gate open while a retained stash stays in the "
-        "inventory or has no stash ownership recovery purpose or stash disposition",
+        "while the stash inventory contains a retained stash do not give the "
+        "recovery gate a complete result",
+        "if a retained stash has no stash ownership do not give the recovery "
+        "gate a complete result",
+        "if its recovery purpose or stash disposition is missing do not give "
+        "the recovery gate a complete result",
         "reconcile each stash",
         "preserve unique content in named git state or independent preservation",
-        "validate that unique content stays available and get applicable authority",
+        "before a stash disposition validate that unique content stays available",
+        "then get applicable authority",
     ):
         if fragment not in reusable:
             raise AssertionError("LFE-020 reusable rule lacks: " + fragment)
@@ -647,39 +706,69 @@ def validate_recovery_lfe(text):
 
 def validate_recovery_phase_evidence(text):
     """Bind the historical stash disposition to exact preservation proof."""
-    section = _section(text, "Visible recovery-state workflow migration")
+    section = _section(text, "Workflow migration for visible recovery state")
     semantic = _semantic_text(section)
     for fragment in (
         "merge commit dd768006c83b9bc26e3d2e6d6e13b2cebed40173 on main "
         "contained that state",
-        "second parent is commit 6f88f5c522f089e33dc895ca00adaf1035604b0b",
+        "parent commit 2 is 6f88f5c522f089e33dc895ca00adaf1035604b0b",
         "stash topology was b i w u",
         "b and i have the same tree",
-        "tree difference between b and w contained seven changed paths in git",
-        "u contains four files",
+        "tree difference between b and w contained 7 changed paths in git",
+        "u contains 4 files",
         "files in those commits have different bytes from some stash blobs",
         "approved independent preservation for each identified git object",
         "stash had no repository information that named state or approved "
         "preservation did not contain",
-        "stash@{0} identified the same stash commit and b i w u inventory",
+        "stash@{0} identified the same stash commit and stash inventory",
         "authority for that stash only",
-        "next stash inventory was empty and no other stash was changed",
+        "next stash inventory was empty",
+        "disposition changed no other stash",
         "inspection after disposition found no stash inventory or "
         "refs stash",
         "it did not change git",
         "git has the b i w u commits although the stash inventory is empty",
-        "w tree contains seven paths for agent guidance and validation",
-        "u tree contains four paths for skills and skill metadata",
+        "w tree contains 7 workflow and validation paths",
+        "u tree contains 4 agents skills paths",
         "named git state contains all these paths",
-        "no current record identifies their content as sensitive evidence or "
-        "local evidence",
+        "no current record identifies these git objects as sensitive evidence "
+        "or local evidence",
         "current evidence identifies no incident with sensitive evidence or "
         "local evidence in this repository",
-        "git objects stay for a future bounded $tracktemplate security review "
-        "and recovery task",
-        "does not define a procedure to remove git objects replace a repository "
-        "or change independent preservation",
-        "no authority for automatic or destructive git object removal",
+        "after this migration a recovery task must examine these git objects",
+        "recovery task must use $tracktemplate security review",
+        "does not define a procedure to remove git objects",
+        "does not define a procedure to replace a repository",
+        "does not change independent preservation",
+        "no authority for automatic removal of git objects",
+        "no authority for an operation that removes git objects",
+        "during independent review a command made an emergency stash "
+        "e52bd0409feee7dc7dce9fc853a3bed99081c948 by accident",
+        "project owner was the stash owner for this recovery cycle",
+        "recovery purpose was to preserve the exact candidate in the git index "
+        "after the review accident",
+        "stash topology was b i w with no u parent",
+        "i and w have the same tree",
+        "stash has no untracked files parent or u tree and no other file",
+        "commit 1ca5b2d12ca2a2400b86126842c988b934d16194",
+        "tree fcefb947aa1287ff3f9438ffa37081064a436093",
+        "contains all 18 paths in this change",
+        "w tree and 14 paths have the same blobs",
+        "rule 5 2 repair that the owner authorised its test changes and this "
+        "accident evidence",
+        "before disposition stash@{0} identified "
+        "e52bd0409feee7dc7dce9fc853a3bed99081c948",
+        "stash inventory did not change",
+        "only stash it had no untracked files parent",
+        "owner authority applied only to this exact stash",
+        "git stash drop stash@{0} result identified this exact sha",
+        "next stash inventory was empty",
+        "next git check found no refs stash",
+        "named branch commit did not change",
+        "named commit was local",
+        "owner instruction gave authority for this exact stash",
+        "does not show recovery if the local repository is not available before "
+        "publication",
     ):
         if fragment not in semantic:
             raise AssertionError("recovery phase evidence lacks: " + fragment)
@@ -693,6 +782,13 @@ def validate_recovery_phase_evidence(text):
         "cff63f011ddbe3bd7e762121b0a817fe4a5684bd",
         "2416cd8cd81d2a38a570b45c9d871f5a0d287e92",
         "5ef7ee84959ccb15c7ca20c447f3268eb488285c",
+        "65409493d741a5606543bd437e519f8efefb8680",
+        "184b32f6a917287caa15349226eac238ebb54557",
+        "bcc5fcca5a794d563a2a7ce9ec06732c04fff40c",
+        "6bd1b9aed0384d6007fc25e0509794fed41b5726",
+        "e52bd0409feee7dc7dce9fc853a3bed99081c948",
+        "1ca5b2d12ca2a2400b86126842c988b934d16194",
+        "fcefb947aa1287ff3f9438ffa37081064a436093",
     ):
         if identity not in section:
             raise AssertionError(

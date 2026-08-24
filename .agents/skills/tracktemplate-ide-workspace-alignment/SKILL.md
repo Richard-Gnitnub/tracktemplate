@@ -48,9 +48,10 @@ available:
 - the resolved interpreter executable and `pyvenv.cfg`; and
 - whether a configured path exists and belongs to the expected project.
 
-For each stash, use Git to record the stash selector, stash commit SHA, and
-each stash component. Project owner records, not Git, supply recovery purpose and disposition
-authority. Git metadata cannot supply that authority.
+For each stash, use Git to record the stash selector and stash commit SHA.
+Also record each stash component. Project owner records, not Git, supply the
+recovery purpose and disposition authority. Git metadata cannot supply that
+authority.
 
 Treat these as operator-confirmed unless the active host environment can prove
 them directly:
@@ -82,7 +83,8 @@ worktree.
    persistent worktree. Classify `/tmp` worktrees as disposable review state or
    as unsafe sole active state.
 Map interrupted work to its recovery branch, recovery worktree, and recovery
-commit. Stop for a retained stash. Keep the recovery gate open.
+commit. If the stash inventory contains a retained stash, stop. Do not give the
+recovery gate a complete result.
 
 6. Compare the observed arrangement with the steady-state convention below.
    Report the complete pre-change inventory before requesting any Git mutation.
@@ -123,12 +125,12 @@ switch. A worktree is not disposable merely because its pull request merged;
 prove that its tip and all unique commits are contained in accepted remote
 `main`, that it is clean, not active and holds no sole operator state.
 
-Apply the
-[visible recovery state procedure](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
+Use the
+[procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
 Its canonical owner is the recovery policy. A recovery branch or worktree is
 visible recovery state. It is not
-accepted product state. Do not end workspace alignment while an emergency
-stash stays in the stash inventory.
+accepted product state. While an emergency stash stays in the stash inventory,
+do not end workspace alignment.
 
 ## Composition with TrackTemplate continue
 

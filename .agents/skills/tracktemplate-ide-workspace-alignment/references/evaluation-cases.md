@@ -54,5 +54,6 @@ Reject or stop when a response:
 - changes `.idea` or global SDK state without explicit scope; or
 - leaves active uncommitted or unpushed work solely under `/tmp`.
 
-Also reject a result that closes recovery with a retained stash. Reject it
-when the stash inventory or stash disposition evidence is not complete.
+While the stash inventory contains a retained stash, reject a complete recovery
+result. If the stash inventory or stash disposition evidence is not complete,
+reject the result.
