@@ -2649,6 +2649,304 @@ Keep Exit 4 Pending.
 > Phase 6 stays at 2/5 accepted exits. Exit 4 stays Pending. Exits 1 and 5 stay
 > Pending. Project status stays `unknown`. No risk disposition changes.
 
+<a id="phase-6-exit-4-d-gov-011-direction-selection-panel"></a>
+
+## Phase 6 Exit 4 D-GOV-011 direction-selection panel
+
+This Level 3 panel uses protected `main`
+`bd0c87a9e1c034e538d1cda5f978d305fa0cfaa2` as its source state. D-GOV-011
+follows D-GOV-009 and D-GOV-010. It changes performance direction only. It
+changes no product source. Phase 6 has 2/5 accepted exits, and Exit 4 is
+Pending. Project status is `unknown`.
+
+### Owner view
+
+| Field | Result |
+| --- | --- |
+| Current state | D-GOV-009 records the preview-sampler direction as exhausted. D-GOV-010 qualifies the exact host for this evidence. The D-GOV-009 attribution record is completed and preserved. |
+| What changed | D-GOV-011 selects one subsequent hypothesis for the measured canonical area of Edit. The product boundary is one adapter file. |
+| What now works | The retained measurement and source assessment identify two repeated reads of the selected record. A product change can remove these reads from the measured canonical area. |
+| Limitations/findings | The attribution noise floor is `2.895891 ms`. The first quartile of the canonical area was only `0.0731425 ms` higher than that floor. The evidence does not report the cost of each operation in that area. This result is not improvement evidence or Exit 4 evidence. |
+| Owner decision | Accept D-GOV-011. Authorise one subsequent product change at Level 2 in the named adapter file. The change reads the selected record one time before the write and uses that state again. |
+| Next action | In a new cycle, first record a new same-host baseline on the D-GOV-010 host. The attribution materiality rule in D-GOV-009 must give a PASS result for the canonical area. If it does not, stop before product work. Do not start the product change in this cycle. |
+
+### Attribution-evidence preservation
+
+Before a repository change, the preservation audit examined the source state
+and the ignored evidence. The primary worktree was clean `main`. Local `main`,
+`origin/main`, and live protected `main` were equal at
+`bd0c87a9e1c034e538d1cda5f978d305fa0cfaa2`. The repository had one registered
+worktree.
+
+The 77-entry `SHA256SUMS` check had a PASS result. These retained records also
+had the specified SHA-256 results:
+
+| Retained record | SHA-256 |
+| --- | --- |
+| Pre-registered method | `8e47cb21e4aa8fe4ec1706b60d0ec1c665e3a338d626e7d99fd62e105a31ba22` |
+| Test-owned instrumentation | `196060f8d22ac3dcebec720beb77e779534d4371f1212e3da0849ee3f9826568` |
+| Attribution collector | `9695a0d279a4f1472fcfd676a310a66382a0350b05b58b70a215d31cf9f0eee9` |
+| Attribution result | `02525791c17fa5630be57608543b7c0dfa3c7254cc22c623ff79c007e0a94880` |
+| New same-host baseline | `9928501e6460b68742f441f497be602de10596e33d772a65245efa1ee2549c71` |
+| Retained baseline attempt 1 | `f706b4405db524d87bc50bfb36579482450ffa137c84546a502d66354a959d5c` |
+| Fixture-failure classification | `8414286cf783789afc5c079541438e1ff129c9e012163396842bc1607ea33aee` |
+| Checksum manifest | `52f141c5c45a9c5752d93d70aece9943e7b535bfde0804c53fc7b5d2cbad6388` |
+
+The preservation audit made a new snapshot on the accepted backup device. This
+is a different physical device. The snapshot name is
+`2026-08-23-phase6-exit4-attribution-preservation-01`. The snapshot contains
+6,519 files and 1,244 directories.
+
+Its Git HEAD is `bd0c87a9e1c034e538d1cda5f978d305fa0cfaa2`. A byte check
+found no difference between the source and snapshot in the declared backup
+scope. The 77-entry manifest had a PASS result in the snapshot. The audit
+completed all writes to the device. The operating system then stopped its
+connection to the device file system before the repository change.
+
+The snapshot does not replace the retained negative-evidence snapshots. It
+does not change an evidence file. It does not publish ignored evidence.
+
+### Measurement result and boundary
+
+The attribution record uses only
+`linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`. D-GOV-010 qualifies
+this exact host profile. The record uses clean `main`
+`bd0c87a9e1c034e538d1cda5f978d305fa0cfaa2`. The retained source hashes are
+equal to the current files at that source state.
+
+The baseline series has 10 processes. The attribution series also has 10
+processes. Each process starts FreeCAD. The accepted workload
+has one Entry/Exit pair. It edits the selected Exit from `420.000 mm` to
+`360.000 mm`. All correctness, deterministic-output, lifecycle, cleanup, and
+host-identity checks had PASS results.
+
+| Measurement area | Median for process CPU time | First quartile | Result use |
+| --- | ---: | ---: | --- |
+| Full Edit baseline | `29.571971 ms` | `21.0001125 ms` | Current-cost evidence only. |
+| Canonical state and state construction | `3.126380 ms` | `2.9690335 ms` | Direction-selection evidence. |
+| Preview and sampler construction | `1.9991765 ms` | `1.95987775 ms` | D-GOV-008 direction stays exhausted. |
+| Coin or scene-graph work | `0.3987415 ms` | `0.38801125 ms` | The attribution materiality rule gave a FAIL result. |
+| GUI processing | `20.109802 ms` | `19.804105 ms` | The TrackTemplate product boundary is Unknown. |
+| Unattributed remainder | `2.5621155 ms` | `2.40463225 ms` | The evidence identifies no architectural boundary. |
+
+The attribution noise floor is `2.895891 ms` of process CPU time. The
+first quartile of the canonical area is `0.0731425 ms` higher than that floor.
+The median of the calibrated instrumentation overhead is `0.01776712815 ms` of
+process CPU time. Its maximum is `0.0187707963 ms`. The baseline and attribution
+series are not paired.
+
+Their median differences are `-1.0994865 ms` for process CPU time
+and `+22.4718825 ms` for wall time. These values are method and noise
+information. They are not a TrackTemplate before/after comparison.
+
+The measured canonical area is the application span for
+`tracktemplate/application/transition_edit.py::edit_transition_length_mm`. It
+includes the FreeCAD transaction and property writes in
+`tracktemplate/adapters/freecad/transition_state.py`. The measurement subtracts
+the preview and ViewProvider refresh that occur in the application span. It
+does not include Coin work or the two calls for GUI processing that the method
+names.
+
+### Read-only assessment of source and architecture
+
+The assessment examined these operations in the measured canonical route:
+
+1. The application command examines the length and makes replacement intent.
+2. The application command calculates the current canonical analysis.
+3. The edit port examines the stale edit base.
+4. The store examines the current state, stable identity, and object mapping.
+5. The store makes and compares the replacement JSON payload.
+6. The FreeCAD transaction writes the canonical payload and then reads it.
+
+The accepted Entry/Exit workload has two canonical records. For its selected
+record, `apply_transition_edit` calls `read_transition_object` before the
+write. `_update` then calls `read_transition_object` for that record. The
+object-mapping scan calls it for the selected record for a third time. Each
+call examines the live object, its record envelope, its JSON payload, its
+schema, and its analysis data.
+
+The read after the write is necessary for the write check. The scan of the
+other canonical record is necessary for duplicate-identity rejection. The
+FreeCAD transaction and the property write are necessary for persistence and
+one-unit Undo/Redo. The preview refresh in that span is not part of the measured
+canonical area.
+
+The application command calculates a target offset from the new length. It
+then calculates the canonical length from that offset. A product change must
+not replace the accepted calculation with the input length. That change can
+change canonical JSON and the deterministic result. Thus, it is not an
+authorised performance hypothesis.
+
+The assessment identifies only one hypothesis from the measured cost,
+identified operation, and architecture. Keep one live read of the selected
+record before the write. Use its state for the stale-base and stable-identity
+checks. During object mapping, use the same state for the selected object. This
+removes two repeated reads of all selected-record data from the measured Edit
+route. It adds no replacement work in a different stage.
+
+The hypothesis has a different product boundary from D-GOV-008. It changes
+only the read route in the canonical FreeCAD adapter. It changes no preview
+sampler, railway calculation, polynomial, approximation, cache, Coin route, or
+GUI processing.
+
+### Product boundary and comparison rule
+
+The only permitted product file is
+`tracktemplate/adapters/freecad/transition_state.py`. Directly dependent tests
+and ignored performance evidence can change only when they are necessary for
+this hypothesis. Do not change a public API or persistence schema. Do not
+change `tracktemplate/application/transition_edit.py` or a preview, Coin, GUI,
+exact-validation, export, or railway-mathematics file.
+
+The subsequent product change must keep one live read before the write. It must
+keep the `stale-edit-base` diagnostic. It must keep duplicate-identity and
+object-mapping checks. It must keep the read after the write. It must not move
+a record read to selection, setup, teardown, preview, Coin, or GUI processing.
+
+Before product work, do the exact attribution method in D-GOV-009 again on clean
+protected main. Use only the exact D-GOV-010 host. Record a new baseline
+series of 10 processes and a new attribution series of 10 processes. The
+attribution materiality rule in D-GOV-009 must give a PASS result for the
+canonical measurement area. If it does not, stop before product work.
+
+The subsequent cycle at Level 2 must record the 12-block sequence before
+product work. Six blocks use the baseline first. Six blocks use the candidate
+first. Each sample uses a new process and the full accepted journey.
+
+The subsequent comparison uses the rule in
+[the canonical-record direction](../PERFORMANCE_SOP.md#phase-6-exit-4-canonical-record-direction).
+Process CPU time for Edit must be lower in at least 10 of 12 paired blocks. Its
+median paired difference must be negative. Edit wall time and cold-journey CPU
+and wall time must have negative median paired differences.
+
+Apply the D-GOV-008 no-displacement rule to Validate, Export, cleanup, warm
+block values, resource metrics, and the journey remainder. Apply it also to
+preview and sampler construction, Coin or scene-graph work, GUI processing,
+and the unattributed remainder. Record these measurement areas in both samples
+of each paired block. Use the same test-owned instrumentation in both samples.
+Record its overhead. A missing condition, host difference, product defect, or
+invariant difference gives FAIL.
+
+The candidate must preserve canonical state, transaction semantics, and one-unit
+Undo/Redo. It must preserve identity, mapping, preview, Coin, persistence,
+lifecycle, cleanup, exact validation, deterministic export, diagnostics, and
+failure recovery. It must add no work to an unmeasured boundary.
+
+### Risk panel
+
+This Level 3 cycle changes governance direction. It makes no product change.
+Thus, the governance change is larger than the product change.
+
+| Risk | Panel judgement | Result |
+| --- | --- | --- |
+| PR-12 — stale or repeated direction | D-GOV-011 selects one measured and bounded hypothesis. It gives no authority to divide the route into more areas or to select a different candidate. | Medium / Mitigate / Partial. The disposition does not change. |
+| PR-13 — repository or evidence loss | The checksum manifest and the new snapshot on a different physical device preserve the ignored attribution corpus before the repository change. The retained D-GOV-008 snapshots do not change. | Critical / Mitigate / Effective (current scope). The disposition does not change. |
+| PR-15 — deferred cost | The subsequent rule measures full Edit and all other areas. It gives FAIL if the candidate moves cost to a different stage or an unmeasured boundary. | High / Mitigate / Partial. The disposition does not change. |
+| PR-17 — persistence or migration corruption | The subsequent file boundary is the canonical FreeCAD adapter. The transaction, identity, save/reopen, Undo/Redo, recovery, and cleanup checks stay necessary. | Critical / Mitigate / Partial. The disposition does not change. |
+| PR-22 — authority transfer | The project owner makes D-GOV-011. A reviewer who did not make the change must examine the exact candidate before merge. | High / Remove / Effective (current scope). The disposition does not change. |
+| QA-R04 — no product performance budget | D-GOV-011 defines a comparison rule but no product performance budget. It admits no improvement or Exit 4 evidence. | High / Mitigate / Partial. The disposition does not change. |
+
+No risk state, treatment, severity, owner, deadline, or control effectiveness
+changes. The size of a subsequent improvement is Unknown. The hypothesis can
+fail the comparison of the full journey.
+
+### Documentation conformance
+
+The documentation review uses the
+[local Issue 9 source](../external/asd-ste100/README.md). This is the official
+source. The review also uses the TrackTemplate UK English spelling directive.
+It examines each full logical unit in this table.
+
+| Path | Full logical unit |
+| --- | --- |
+| `reference/PERFORMANCE_SOP.md` | The baseline-attribution section in D-GOV-009 and the canonical-record direction in D-GOV-011. |
+| `reference/TERMINOLOGY.md` | The changed canonical authority, assurance result, performance, attribution, and technical verb rows. |
+| `reference/PROJECT_PLAN.md` | The current owner view, the phase summaries for D-GOV-009 and D-GOV-011, and the D-GOV-011 decision row. |
+| `reference/current/PHASE_EVIDENCE.md` | This full D-GOV-011 panel, the changed Exit 4 disposition, and D-GOV-011 carried-control text. |
+| `reference/current/gate-decisions.json` | The human-readable D-GOV-011 record. Exact JSON data is not part of the linguistic review. |
+
+The internal result for the D-GOV-011 logical units is `ASD-STE100 Issue 9
+conforming`. The review uses the technical terms in the terminology register.
+
+This result is a TrackTemplate conformance assessment. It is not external ASD
+certification, endorsement, or an official conformance assessment. It does not
+include exact machine data. It does not include live prose that this cycle does
+not change. It does not include frozen history. Issue 9
+conformance stays Unknown for other live prose.
+
+### Review and merge conditions
+
+The reviewer who did not make the change must examine the preserved evidence,
+measurement rule, source assessment, and selected hypothesis. The reviewer must
+examine the file boundary, risk panel, documentation, and validation results.
+The reviewer must make sure that the candidate starts no product change. The
+reviewer must make sure that the candidate does not admit Exit 4.
+
+The reviewer must not change files. The project must not merge the candidate
+after a BLOCK review result. This panel must not change after the exact-state
+review.
+
+**Panel recommendation:** **Proceed with bounded conditions.** Record
+D-GOV-011. Authorise one subsequent product change at Level 2 in the specified
+adapter boundary. First record the new same-host baseline. Keep Exit 4 Pending.
+
+> **D-GOV-011 — Select one canonical-record performance hypothesis**
+>
+> At protected `main` `bd0c87a9e1c034e538d1cda5f978d305fa0cfaa2`, I
+> accept the retained attribution result in D-GOV-009 as direction-selection
+> evidence only. The exact D-GOV-010 host is
+> `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`.
+>
+> The median for process CPU time in the canonical measurement area is `3.126380 ms`.
+> Its first quartile is `2.9690335 ms`. This is only `0.0731425 ms` higher
+> than the attribution noise floor, which is `2.895891 ms`. This result
+> is not improvement evidence. It is not Exit 4 evidence.
+>
+> I select one performance hypothesis. Read the selected canonical record one
+> time before the write. Use that state for the stale-base and stable-identity
+> checks. During object mapping, use the same state for the selected object.
+> Keep the scan of other canonical records. Keep the read after the write.
+>
+> The only permitted product file is
+> `tracktemplate/adapters/freecad/transition_state.py`. Directly dependent
+> tests and ignored performance evidence can change only when they are
+> necessary for this hypothesis. Do not change a public API, persistence
+> schema, railway calculation, preview sampler, Coin route, GUI route, exact
+> validation, or export.
+>
+> Before product work, record a new ten-process baseline and ten-process
+> attribution series on the exact D-GOV-010 host. The attribution materiality
+> rule in D-GOV-009 must give a PASS result for the canonical area. If it does
+> not, stop before product work. Record the 12-block sequence before product
+> work.
+>
+> Process CPU time for Edit must be lower in at least 10 of 12 paired blocks. Its
+> median paired difference must be negative. Edit wall time and cold-journey
+> CPU and wall time must have negative median paired differences.
+>
+> Apply the D-GOV-008 no-displacement rule to all non-target stages, warm block
+> values, resource metrics, and the journey remainder. Apply it to the other
+> Edit measurement areas in D-GOV-009. The candidate must add no work to an
+> unmeasured boundary.
+>
+> Preserve canonical state and transaction semantics. Preserve one-unit
+> Undo/Redo, identity, mapping, preview, Coin, persistence, lifecycle, cleanup,
+> exact validation, deterministic export, diagnostics, and failure recovery.
+>
+> I authorise one subsequent product change at Level 2 in this boundary. Do
+> not start it in this cycle. Preserve D-GOV-008, D-GOV-009, D-GOV-010, the two
+> retained negative results, and the attribution corpus.
+>
+> This decision makes no product change. It admits no performance result. It
+> defines no product performance budget. It does not accept Exit 4.
+>
+> Phase 6 stays at 2/5 accepted exits. Exit 4 stays Pending. Exits 1 and 5 stay
+> Pending. Project status stays `unknown`. No risk disposition changes.
+>
+> This decision gives no production authority. It gives no physical-output
+> authority. It gives no `project-cleared` status. It gives no packaging,
+> release, or tagging authority.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -2660,7 +2958,7 @@ The accepted current state is 2/5 under D-P6-002 and D-P6-005:
 | The selected slice has equivalent exact validation and production output for the agreed scope | Pending — exact-validation and private-development DXF evidence exists, but agreed output equivalence and production clearance remain absent |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005 — bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004 with the recorded platform, recovery and assurance limitations; project status remains `unknown` |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-009 keeps D-GOV-008 Accepted as the authority for its baseline, hypothesis, and rule. It records two retained negative results and stops new product work in that direction. The two results are not improvement evidence. They are not Exit 4 evidence. No measured evidence shows sufficient cost in a measurement area that is not part of the D-GOV-008 preview-sampler boundary. D-GOV-010 qualifies one more host profile but admits no performance result or budget and does not accept Exit 4. |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-008 stays the authority for its baseline, hypothesis, and comparison rule. D-GOV-009 records the two results as retained negative evidence and stops work in that direction. Its attribution record gives a PASS result for the canonical area, which is only `0.0731425 ms` higher than the noise floor. D-GOV-010 qualifies the exact host for that evidence. D-GOV-011 selects one subsequent hypothesis for the canonical record and its comparison rule. It makes no product change, admits no performance result, and does not accept Exit 4. |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending — B14 remains available, but whole-scope parity and retirement authority remain absent |
 
 ## Carried controls and exclusions
@@ -2679,7 +2977,8 @@ The 24 risks present at Phase 5 closeout remain live in
 [risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
 PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
 D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001,
-TT-DOC-002, D-GOV-006, D-GOV-007, D-GOV-008, D-GOV-009 and D-GOV-010.
+TT-DOC-002, D-GOV-006, D-GOV-007, D-GOV-008, D-GOV-009, D-GOV-010 and
+D-GOV-011.
 
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.
@@ -2703,10 +3002,12 @@ cycle but makes no performance optimisation. It admits no Exit 4 evidence
 and does not accept Exit 4.
 
 D-GOV-009 keeps D-GOV-008 Accepted as the authority for that direction. It
-records the two subsequent Level 2 results as retained negative evidence and stops new
-product work in that direction. It authorises only a bounded Level 1
-baseline-attribution investigation as the next action. It admits no improvement
-or Exit 4 evidence, defines no budget, and does not accept Exit 4.
+records two subsequent results from Level 2 as retained negative evidence. It
+stops new product work in that direction. It authorised the bounded
+baseline-attribution investigation at Level 1. The project completed that
+investigation. It admits no improvement or Exit 4 evidence.
+
+It defines no budget and does not accept Exit 4.
 
 D-GOV-010 qualifies only the profile with ID
 `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`. The two profiles that
@@ -2715,3 +3016,13 @@ not change. D-GOV-010 authorises its profile to supply candidate evidence for
 performance in a subsequent cycle. Each comparison must use one profile with
 an exact identity. It admits no performance result, defines no budget, and does
 not change D-GOV-009 or Exit 4.
+
+D-GOV-011 accepts the D-GOV-009 attribution result as evidence for direction
+selection only. It selects one subsequent hypothesis at Level 2 in
+`tracktemplate/adapters/freecad/transition_state.py`. The hypothesis keeps one
+live read of the selected record before the write. It uses that state again for
+the named checks. It removes only two repeated reads.
+
+D-GOV-011 defines the new same-host baseline and comparison rule for that
+subsequent cycle. It makes no product change. It admits no performance result,
+defines no budget, and does not accept Exit 4.

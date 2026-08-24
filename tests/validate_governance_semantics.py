@@ -1263,13 +1263,13 @@ def validate_current_evidence_mutations() -> None:
 
     exit4_row = table_row_containing(
         evidence,
-        "D-GOV-009 keeps D-GOV-008 Accepted as the authority for its "
-        "baseline, hypothesis, and rule",
+        "D-GOV-011 selects one subsequent hypothesis for the canonical record "
+        "and its comparison rule",
     )
     exit4_promoted = replace_once(
         exit4_row,
-        "Pending — D-GOV-009 keeps D-GOV-008 Accepted as the authority",
-        "Evidenced — D-GOV-009 keeps D-GOV-008 Accepted as the authority",
+        "Pending — D-GOV-008 stays the authority",
+        "Evidenced — D-GOV-008 stays the authority",
     )
     expect_rejected(
         "phase-evidence/exit4-prematurely-evidenced",
@@ -2175,6 +2175,109 @@ def validate_current_evidence_mutations() -> None:
         "that investigation",
     )
 
+    selection_snapshot_removed = replace_once(
+        evidence,
+        "The snapshot contains\n6,519 files and 1,244 directories.",
+        "The snapshot content was not checked.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-011-snapshot-proof-removed",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            selection_snapshot_removed,
+        ),
+        "D-GOV-011 evidence panel drifted: snapshot contains 6,519 files "
+        "and 1,244 directories",
+    )
+
+    selection_host_gate_removed = replace_once(
+        evidence,
+        "Before product work, do the exact attribution method in D-GOV-009 "
+        "again on clean\nprotected main. Use only the exact D-GOV-010 host.",
+        "Before product work, use results from any available host.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-011-host-gate-removed",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            selection_host_gate_removed,
+        ),
+        "D-GOV-011 evidence panel drifted: do the exact attribution method in "
+        "D-GOV-009 again on clean protected main",
+    )
+
+    selection_boundary_widened = replace_once(
+        evidence,
+        "Do not\nchange `tracktemplate/application/transition_edit.py` or a "
+        "preview, Coin, GUI,\nexact-validation, export, or "
+        "railway-mathematics file.",
+        "Change any application, preview, Coin, GUI, export, or railway file.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-011-product-boundary-widened",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            selection_boundary_widened,
+        ),
+        "D-GOV-011 evidence panel drifted: Do not change "
+        "tracktemplate/application/transition_edit.py",
+    )
+
+    selection_displacement_allowed = replace_once(
+        evidence,
+        "> Edit measurement areas in D-GOV-009. The candidate must add no work "
+        "to an\n> unmeasured boundary.",
+        "> Edit measurement areas in D-GOV-009. The candidate can move work to "
+        "an\n> unmeasured boundary.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-011-displacement-allowed",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            selection_displacement_allowed,
+        ),
+        "D-GOV-011 quoted owner decision drifted: must add no work to an "
+        "unmeasured boundary",
+    )
+
+    selection_product_started = replace_once(
+        evidence,
+        "> I authorise one subsequent product change at Level 2 in this "
+        "boundary. Do\n> not start it in this cycle.",
+        "> I authorise one subsequent product change at Level 2 in this "
+        "boundary.\n> Start it in this cycle.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-011-product-started",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            selection_product_started,
+        ),
+        "D-GOV-011 quoted owner decision drifted: Do not start it in this "
+        "cycle",
+    )
+
+    selection_exit_accepted = replace_once(
+        evidence,
+        "> defines no product performance budget. It does not accept Exit 4.",
+        "> defines a product performance budget and accepts Exit 4.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-011-exit4-accepted",
+        lambda: progress._validate_performance_direction_sources(
+            performance_sop,
+            terminology,
+            selection_exit_accepted,
+        ),
+        "D-GOV-011 quoted owner decision drifted: defines no product "
+        "performance budget",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
@@ -2395,6 +2498,21 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan decisions differ from the frozen registers",
     )
+    selection_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-011 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-011-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                selection_decision_row + "\n",
+                "",
+            )
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
 
 
 def validate_documentation_profile_mutations() -> None:
@@ -2557,18 +2675,16 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
     )
-    owner_view_cross_host = replace_once(
+    owner_view_boundary_widened = replace_once(
         plan,
-        "Each TrackTemplate before/after comparison must use one profile with "
-        "an exact identity.",
-        "A TrackTemplate before/after comparison can use profiles with "
-        "different exact identities.",
+        "It bounds the product change at Level 2 to one FreeCAD adapter file.",
+        "It bounds the product change at Level 2 to all TrackTemplate product files.",
     )
     expect_rejected(
-        "tt-doc/owner-view-cross-host-comparison",
-        lambda: progress._validate_owner_view(owner_view_cross_host),
-        "project-plan owner view lost or contradicted: Each TrackTemplate "
-        "before/after comparison must use one profile with an exact identity",
+        "tt-doc/owner-view-product-boundary-widened",
+        lambda: progress._validate_owner_view(owner_view_boundary_widened),
+        "project-plan owner view lost or contradicted: bounds the product change "
+        "at Level 2 to one FreeCAD adapter file",
     )
 
     compatibility_terms_removed = terminology

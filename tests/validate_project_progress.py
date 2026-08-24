@@ -129,6 +129,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-GOV-008",
     "D-GOV-009",
     "D-GOV-010",
+    "D-GOV-011",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -297,15 +298,14 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations; project status remains `unknown`"
     ),
     (
-        "Pending — D-GOV-009 keeps D-GOV-008 Accepted as the authority for "
-        "its baseline, hypothesis, and rule. It records two retained negative "
-        "results and stops new product work in that direction. The two results "
-        "are not improvement evidence. They are not Exit 4 evidence. No "
-        "measured evidence "
-        "shows sufficient cost in a measurement area that is not part of the "
-        "D-GOV-008 preview-sampler boundary. D-GOV-010 qualifies one more host "
-        "profile but admits no performance "
-        "result or budget and does not accept Exit 4."
+        "Pending — D-GOV-008 stays the authority for its baseline, hypothesis, "
+        "and comparison rule. D-GOV-009 records the two results as retained negative "
+        "evidence and stops work in that direction. Its attribution record "
+        "gives a PASS result for the canonical area, which is only `0.0731425 ms` "
+        "higher than the noise floor. D-GOV-010 qualifies the exact host for that "
+        "evidence. D-GOV-011 selects one subsequent hypothesis for the canonical "
+        "record and its comparison rule. It makes no product change, admits no performance "
+        "result, and does not accept Exit 4."
     ),
     (
         "Pending — B14 remains available, but whole-scope parity and retirement "
@@ -773,35 +773,30 @@ def _validate_owner_view(plan: str) -> None:
         "The owner accepted Exits 2 and 3",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
-        "D-GOV-010",
-        "qualifies only the exact FreeCAD 1.1.3 profile with CPython 3.13.13 "
-        "and PySide6/Qt 6.11.1",
-        "D-GOV-010 preserves the previously qualified profiles and their "
-        "evidence",
-        "D-GOV-009 stays the current Exit 4 direction",
-        "runtime guard and the host matrix gave the specified results for the "
-        "profile that D-GOV-010 qualifies",
-        "three profiles in the contract can supply candidate evidence for "
-        "performance in a subsequent cycle",
-        "Each TrackTemplate before/after comparison must use one profile with "
-        "an exact identity",
-        "runtime guard does not examine the data about the Flatpak package "
-        "that the contract records",
-        "Qualification gives no authority for a performance comparison "
-        "between profiles that have different exact identities",
-        "D-GOV-010 admits no performance result",
-        "defines no performance budget and does not accept Exit 4",
-        "two D-GOV-008 results stay retained negative evidence",
-        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
-        "Keep the profile for FreeCAD 1.1.1 qualified",
-        "Keep the first profile for FreeCAD 1.1.3 qualified",
-        "Do not change D-GOV-009",
-        "In a new cycle, do the bounded investigation that D-GOV-009 specifies",
-        "Use the profile that D-GOV-010 qualifies",
-        "First, record a baseline for this profile",
-        "Do not change product source",
-        "Do not select an optimisation candidate",
-        "Do not accept Exit 4",
+        "D-GOV-011",
+        "selects one subsequent hypothesis for the measured canonical area of "
+        "Edit",
+        "bounds the product change at Level 2 to one FreeCAD adapter "
+        "file",
+        "D-GOV-009, D-GOV-010, and their evidence do not change",
+        "same-host attribution result in D-GOV-009 and the source assessment",
+        "two repeated reads of the selected record",
+        "without work in a different Edit stage",
+        "attribution noise floor is `2.895891 ms`",
+        "first quartile of the canonical area was only `0.0731425 ms` higher than "
+        "that floor",
+        "evidence does not report the cost of each operation in that area",
+        "selected hypothesis can fail its subsequent comparison",
+        "No result is improvement evidence or Exit 4 evidence",
+        "tracktemplate/adapters/freecad/transition_state.py",
+        "Keep one live read of the selected record before the write",
+        "necessary read after the write",
+        "Preserve all specified invariants",
+        "make the D-GOV-011 change at Level 2",
+        "record a new same-host baseline on the D-GOV-010 host",
+        "attribution materiality rule in D-GOV-009",
+        "Do not change the comparison rule",
+        "Do not accept Exit 4 without a subsequent owner decision at Level 3",
     ):
         _require(
             fragment in owner_view,
@@ -832,8 +827,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "PROJECT_PLAN.md contains an unsupported dashboard section",
     )
     _require(
-        len(plan.splitlines()) <= 154,
-        "PROJECT_PLAN.md exceeded its 154-line dashboard budget",
+        len(plan.splitlines()) <= 160,
+        "PROJECT_PLAN.md exceeded its 160-line dashboard budget",
     )
     for forbidden in (
         "### Deliverables",
@@ -1171,6 +1166,7 @@ def _validate_performance_direction_sources(
         "unmeasured boundary",
         "paired block",
         "paired difference",
+        "first quartile",
         "median absolute deviation (MAD)",
         "Measurement noise",
         "no-displacement rule",
@@ -1195,6 +1191,8 @@ def _validate_performance_direction_sources(
         "middle value",
         "If an ordered sample has an even number of values, its median is the "
         "sum of the two middle values divided by two",
+        "Python statistics.quantiles(..., method='inclusive') gives a first "
+        "quartile",
         "High-water RSS is the maximum RSS that the profiler records",
         "A resource metric is an RSS, RSS change, high-water RSS, or high-water "
         "RSS change in a performance record",
@@ -1380,6 +1378,9 @@ def _validate_performance_direction_sources(
         "exhausted performance direction",
         "baseline-attribution investigation",
         "measurement area",
+        "attribution series",
+        "attribution noise floor",
+        "attribution materiality rule",
         "unattributed remainder",
     ):
         _require(
@@ -1394,6 +1395,15 @@ def _validate_performance_direction_sources(
         "in that direction",
         "A baseline-attribution investigation measures one accepted operator "
         "journey and reports each measurement area without a product change",
+        "An attribution series is a set of process samples from that "
+        "investigation",
+        "Three values give the attribution noise floor",
+        "They are the Edit CPU MAD for the baseline, the Edit CPU MAD for "
+        "attribution, and the maximum of the calibrated instrumentation "
+        "overhead",
+        "The noise floor is the highest of these three values",
+        "The attribution materiality rule gives PASS when the first quartile "
+        "for an applicable measurement area is higher than that floor",
         "An unattributed remainder is measured journey time that is not part "
         "of a different measurement area",
     ):
@@ -1413,11 +1423,11 @@ def _validate_performance_direction_sources(
     followup_direction_flat = _semantic_text(followup_direction)
     for required_clause in (
         "D-GOV-009 records the D-GOV-008 performance direction as exhausted "
-        "for new Phase 6 Exit 4 product work",
+        "for new product work for Phase 6 Exit 4",
         "D-GOV-008 stays Accepted as the authority for its comparison "
-        "baseline, performance hypothesis, comparison rule, and first Level 2 "
-        "boundary",
-        "Preserve the two subsequent Level 2 results as retained negative "
+        "baseline, performance hypothesis, comparison rule, and first boundary "
+        "at Level 2",
+        "Preserve the two subsequent results from Level 2 as retained negative "
         "evidence",
         "The two results are not improvement evidence",
         "They are not Exit 4 evidence",
@@ -1425,36 +1435,103 @@ def _validate_performance_direction_sources(
         "new polynomial, approximation, cache, or other variation of the "
         "D-GOV-008 hypothesis",
         "does not show sufficient measured cost in a different measurement "
-        "area outside the D-GOV-008 preview-sampler boundary",
-        "next work is a bounded baseline-attribution investigation at Level 1",
-        "accepted FreeCAD 1.1.3 Edit journey",
-        "investigation can report a result for each of these measurement areas "
-        "if the architecture and the measurement method let it do this",
+        "area that is not part of the D-GOV-008 preview-sampler boundary",
+        "D-GOV-009 investigation used the accepted Edit journey on FreeCAD 1.1.3",
+        "reported these measurement areas",
+        "accepted Edit journey on FreeCAD 1.1.3",
         "Canonical-state and state-construction work",
         "Preview and sampler construction",
         "Coin binding or scene-graph replacement",
         "GUI processing",
         "unattributed remainder",
-        "Report a measurement area as Unknown if its value includes a "
-        "different measurement area",
-        "investigation is attribution only",
-        "Do not change product source",
-        "Do not make a performance optimisation",
-        "Do not select a candidate after the project knows the results",
-        "Do not change the D-GOV-008 comparison rule",
-        "Do not define a product performance budget",
-        "Do not run the first retained comparison again",
-        "Do not run the second retained comparison again",
-        "Do not accept Exit 4",
-        "subsequent Level 3 owner decision is necessary before a new Level 2 "
-        "performance optimisation",
-        "measured evidence for a measurement area outside the D-GOV-008 "
-        "preview-sampler boundary",
-        "define its comparison rule before product work starts",
+        "retained record contains the exact host profile, source state, "
+        "workload, method, measurement boundary, and instrumentation overhead",
+        "reports a measurement area as Unknown when the evidence does not show "
+        "a TrackTemplate product boundary or an architectural boundary",
+        "investigation changed no product source",
+        "made no performance optimisation",
+        "result is direction-selection evidence only",
+        "D-GOV-011 uses this result to select one different performance "
+        "hypothesis",
+        "does not change the D-GOV-008 comparison rule",
+        "does not do either retained comparison again",
+        "defines no product performance budget and does not accept Exit 4",
     ):
         _require(
             required_clause in followup_direction_flat,
             "D-GOV-009 direction drifted: " + required_clause,
+        )
+
+    canonical_heading = "Phase 6 Exit 4 canonical-record direction"
+    _require(
+        '<a id="phase-6-exit-4-canonical-record-direction"></a>\n\n## '
+        + canonical_heading in performance_sop,
+        "D-GOV-011 direction anchor or heading is missing",
+    )
+    canonical_direction = _section(performance_sop, canonical_heading)
+    canonical_direction_flat = _semantic_text(canonical_direction)
+    for required_clause in (
+        "D-GOV-011 selects one performance hypothesis in the measured canonical "
+        "area of Edit",
+        "route reads the selected canonical record three times before the write",
+        "necessary check reads it one more time after the write",
+        "remove only two repeated reads before the write",
+        "keep one live read before the write and the read after the write",
+        "tracktemplate/adapters/freecad/transition_state.py",
+        "one live state for the stale-edit-base and stable-identity checks",
+        "During object mapping, it must use the same state for the selected "
+        "object",
+        "object-mapping check must still read other canonical records",
+        "still reject a duplicate stable identity",
+        "public read and update contracts must not change",
+        "Do not add a cache",
+        "Do not move a record read to selection, setup, teardown, preview, "
+        "Coin, or GUI processing",
+        "preserve canonical state and transaction semantics",
+        "preserve one-unit Undo/Redo",
+        "persistence, lifecycle, cleanup, exact validation, deterministic "
+        "export, diagnostics, and failure recovery",
+        "do the exact attribution method in D-GOV-009 again on clean protected "
+        "main",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "new baseline series of 10 processes and a new attribution series of "
+        "10 processes",
+        "attribution materiality rule in D-GOV-009",
+        "Record the 12-block comparison sequence before a product change",
+        "six baseline-first blocks and six candidate-first blocks",
+        "new process for each sample",
+        "full accepted journey for Edit, Validate, Export, warm reuse, "
+        "correctness, lifecycle, output, and cleanup",
+        "Process CPU time for Edit is lower in at least 10 of 12 paired blocks",
+        "median paired difference is negative",
+        "median paired differences for Edit wall time and cold-journey CPU "
+        "and wall time are negative",
+        "D-GOV-008 no-displacement rule to Validate, Export, cleanup, warm "
+        "block values, resource metrics, and the journey remainder",
+        "preview and sampler construction, Coin or scene-graph work, GUI "
+        "processing, and the unattributed remainder",
+        "measurement areas in D-GOV-009 in both samples of each paired block",
+        "same test-owned instrumentation in both samples",
+        "All discrete invariants and warm-cycle correctness results are equal "
+        "to the baseline results",
+        "product change removes the two repeated reads",
+        "must add no work to an unmeasured boundary",
+        "missing condition gives FAIL",
+        "host-identity difference gives FAIL",
+        "product defect or invariant difference gives FAIL and stops the cycle",
+        "Preserve all attempts. Classify a failure before a replacement",
+        "Do not select a new rule after the project knows the candidate results",
+        "authorises one subsequent product change at Level 2 in this boundary",
+        "makes no product change",
+        "admits no performance result or Exit 4 evidence",
+        "Exit 4 stays Pending",
+        "subsequent owner decision at Level 3 is necessary before the owner can "
+        "admit a "
+        "subsequent result for Exit 4",
+    ):
+        _require(
+            required_clause in canonical_direction_flat,
+            "D-GOV-011 direction drifted: " + required_clause,
         )
 
     followup_panel_heading = "Phase 6 Exit 4 D-GOV-009 panel"
@@ -1788,6 +1865,230 @@ def _validate_performance_direction_sources(
             "D-GOV-010 quoted owner decision drifted: " + decision_clause,
         )
 
+    selection_heading = "Phase 6 Exit 4 D-GOV-011 direction-selection panel"
+    _require(
+        '<a id="phase-6-exit-4-d-gov-011-direction-selection-panel"></a>\n\n'
+        "## " + selection_heading in current_evidence,
+        "D-GOV-011 panel anchor or heading is missing",
+    )
+    selection_panel = _section(current_evidence, selection_heading)
+    selection_flat = _semantic_text(selection_panel)
+    for required_clause in (
+        "bd0c87a9e1c034e538d1cda5f978d305fa0cfaa2",
+        "D-GOV-011 follows D-GOV-009 and D-GOV-010",
+        "changes performance direction only",
+        "changes no product source",
+        "Phase 6 has 2/5 accepted exits",
+        "Exit 4 is Pending",
+        "Project status is unknown",
+        "D-GOV-009 records the preview-sampler direction as exhausted",
+        "D-GOV-010 qualifies the exact host for this evidence",
+        "D-GOV-009 attribution record is completed and preserved",
+        "attribution noise floor is 2.895891 ms",
+        "first quartile of the canonical area was only 0.0731425 ms higher than "
+        "that floor",
+        "evidence does not report the cost of each operation in that area",
+        "not improvement evidence or Exit 4 evidence",
+        "77-entry SHA256SUMS check had a PASS result",
+        "8e47cb21e4aa8fe4ec1706b60d0ec1c665e3a338d626e7d99fd62e105a31ba22",
+        "196060f8d22ac3dcebec720beb77e779534d4371f1212e3da0849ee3f9826568",
+        "9695a0d279a4f1472fcfd676a310a66382a0350b05b58b70a215d31cf9f0eee9",
+        "02525791c17fa5630be57608543b7c0dfa3c7254cc22c623ff79c007e0a94880",
+        "9928501e6460b68742f441f497be602de10596e33d772a65245efa1ee2549c71",
+        "f706b4405db524d87bc50bfb36579482450ffa137c84546a502d66354a959d5c",
+        "8414286cf783789afc5c079541438e1ff129c9e012163396842bc1607ea33aee",
+        "52f141c5c45a9c5752d93d70aece9943e7b535bfde0804c53fc7b5d2cbad6388",
+        "2026-08-23-phase6-exit4-attribution-preservation-01",
+        "snapshot contains 6,519 files and 1,244 directories",
+        "byte check found no difference between the source and snapshot",
+        "manifest had a PASS result in the snapshot",
+        "does not replace the retained negative-evidence snapshots",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "baseline series has 10 processes",
+        "attribution series also has 10 processes",
+        "Each process starts FreeCAD",
+        "All correctness, deterministic-output, lifecycle, cleanup, and "
+        "host-identity checks had PASS results",
+        "Full Edit baseline",
+        "29.571971 ms",
+        "21.0001125 ms",
+        "Canonical state and state construction",
+        "3.126380 ms",
+        "2.9690335 ms",
+        "Preview and sampler construction",
+        "1.9991765 ms",
+        "1.95987775 ms",
+        "Coin or scene-graph work",
+        "0.3987415 ms",
+        "0.38801125 ms",
+        "GUI processing",
+        "20.109802 ms",
+        "19.804105 ms",
+        "TrackTemplate product boundary is Unknown",
+        "Unattributed remainder",
+        "2.5621155 ms",
+        "2.40463225 ms",
+        "attribution noise floor is 2.895891 ms",
+        "median of the calibrated instrumentation overhead is 0.01776712815 ms",
+        "Its maximum is 0.0187707963 ms",
+        "baseline and attribution series are not paired",
+        "median differences are -1.0994865 ms for process CPU time and "
+        "+22.4718825 ms for wall time",
+        "application span for "
+        "tracktemplate/application/transition_edit.py::edit_transition_length_mm",
+        "tracktemplate/adapters/freecad/transition_state.py",
+        "measurement subtracts the preview and ViewProvider refresh that occur "
+        "in the application span",
+        "does not include Coin work or the two calls for GUI processing that "
+        "the method names",
+        "selected record, apply_transition_edit calls read_transition_object",
+        "object-mapping scan calls it for the selected record for a third time",
+        "read after the write is necessary for the write check",
+        "scan of the other canonical record is necessary for duplicate-identity "
+        "rejection",
+        "transaction and the property write are necessary for persistence and "
+        "one-unit Undo/Redo",
+        "product change must not replace the accepted calculation with the "
+        "input length",
+        "assessment identifies only one hypothesis from the measured cost, identified "
+        "operation, and architecture",
+        "Keep one live read of the selected record before the write",
+        "state for the stale-base and stable-identity checks",
+        "During object mapping, use the same state for the selected object",
+        "removes two repeated reads of all selected-record data from the measured "
+        "Edit route",
+        "hypothesis has a different product boundary from D-GOV-008",
+        "changes no preview sampler, railway calculation, polynomial, "
+        "approximation, cache, Coin route, or GUI processing",
+        "only permitted product file is "
+        "tracktemplate/adapters/freecad/transition_state.py",
+        "Do not change tracktemplate/application/transition_edit.py",
+        "do the exact attribution method in D-GOV-009 again on clean protected "
+        "main",
+        "new baseline series of 10 processes and a new attribution series "
+        "of 10 processes",
+        "attribution materiality rule in D-GOV-009",
+        "record the 12-block sequence before product work",
+        "Six blocks use the baseline first",
+        "Six blocks use the candidate first",
+        "Process CPU time for Edit must be lower in at least 10 of 12 paired "
+        "blocks",
+        "D-GOV-008 no-displacement rule to Validate, Export, cleanup, warm "
+        "block values, resource metrics, and the journey remainder",
+        "same test-owned instrumentation in both samples",
+        "must add no work to an unmeasured boundary",
+        "No risk state, treatment, severity, owner, deadline, or control "
+        "effectiveness changes",
+        "size of a subsequent improvement is Unknown",
+        "internal result for the D-GOV-011 logical units is ASD-STE100 Issue 9 "
+        "conforming",
+        "Issue 9 conformance stays Unknown for other live prose",
+        "reviewer who did not make the change must examine the preserved "
+        "evidence",
+        "reviewer must not change files",
+        "project must not merge the candidate after a BLOCK review result",
+        "panel must not change after the exact-state review",
+        "Proceed with bounded conditions",
+    ):
+        _require(
+            required_clause in selection_flat,
+            "D-GOV-011 evidence panel drifted: " + required_clause,
+        )
+
+    for reviewed_path in (
+        "reference/PERFORMANCE_SOP.md",
+        "reference/TERMINOLOGY.md",
+        "reference/PROJECT_PLAN.md",
+        "reference/current/PHASE_EVIDENCE.md",
+        "reference/current/gate-decisions.json",
+    ):
+        _require(
+            reviewed_path in selection_panel,
+            "D-GOV-011 documentation scope drifted: " + reviewed_path,
+        )
+
+    for risk_clause in (
+        "PR-12 — stale or repeated direction",
+        "PR-13 — repository or evidence loss",
+        "PR-15 — deferred cost",
+        "PR-17 — persistence or migration corruption",
+        "PR-22 — authority transfer",
+        "QA-R04 — no product performance budget",
+        "Critical / Mitigate / Effective (current scope)",
+        "High / Remove / Effective (current scope)",
+    ):
+        _require(
+            risk_clause in selection_flat,
+            "D-GOV-011 risk panel drifted: " + risk_clause,
+        )
+
+    selection_marker = (
+        "> **D-GOV-011 — Select one canonical-record performance hypothesis**"
+    )
+    _require(
+        selection_panel.count(selection_marker) == 1,
+        "D-GOV-011 quoted owner decision is missing or duplicated",
+    )
+    selection_quote = selection_panel.split(selection_marker, 1)[1]
+    selection_quote_flat = _semantic_text(
+        "\n".join(
+            line[2:] if line.startswith("> ") else ""
+            for line in selection_quote.splitlines()
+            if line.startswith(">")
+        )
+    )
+    for decision_clause in (
+        "accept the retained attribution result in D-GOV-009 as "
+        "direction-selection evidence only",
+        "exact D-GOV-010 host is "
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "median for process CPU time in the canonical measurement area is "
+        "3.126380 ms",
+        "first quartile is 2.9690335 ms",
+        "only 0.0731425 ms higher than the attribution noise floor, which is "
+        "2.895891 ms",
+        "not improvement evidence",
+        "not Exit 4 evidence",
+        "select one performance hypothesis",
+        "Read the selected canonical record one time before the write",
+        "state for the stale-base and stable-identity checks",
+        "During object mapping, use the same state for the selected object",
+        "Keep the scan of other canonical records",
+        "Keep the read after the write",
+        "only permitted product file is "
+        "tracktemplate/adapters/freecad/transition_state.py",
+        "new ten-process baseline and ten-process attribution series",
+        "attribution materiality rule in D-GOV-009",
+        "Record the 12-block sequence before product work",
+        "Process CPU time for Edit must be lower in at least 10 of 12 paired "
+        "blocks",
+        "Apply the D-GOV-008 no-displacement rule to all non-target stages",
+        "Apply it to the other Edit measurement areas in D-GOV-009",
+        "must add no work to an unmeasured boundary",
+        "Preserve canonical state and transaction semantics",
+        "Preserve one-unit Undo/Redo",
+        "authorise one subsequent product change at Level 2 in this boundary",
+        "Do not start it in this cycle",
+        "Preserve D-GOV-008, D-GOV-009, D-GOV-010, the two retained negative "
+        "results, and the attribution corpus",
+        "makes no product change",
+        "admits no performance result",
+        "defines no product performance budget",
+        "does not accept Exit 4",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+        "Project status stays unknown",
+        "No risk disposition changes",
+        "gives no production authority",
+        "gives no physical-output authority",
+        "gives no project-cleared status",
+        "gives no packaging, release, or tagging authority",
+    ):
+        _require(
+            decision_clause in selection_quote_flat,
+            "D-GOV-011 quoted owner decision drifted: " + decision_clause,
+        )
+
 
 def _validate_exit_conditions(
     plan: str,
@@ -1959,14 +2260,15 @@ def _validate_exit_conditions(
     _require(
         "D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first "
         "direction" in plan_flat
-        and "records the two subsequent Level 2 results as retained negative "
+        and "records two subsequent results from Level 2 as retained negative "
         "evidence"
         in plan_flat
         and "stops new product work in that direction" in plan_flat
-        and "No measured evidence shows sufficient cost outside the D-GOV-008 "
-        "preview-sampler boundary" in plan_flat
-        and "next work is a bounded Level 1 baseline-attribution "
-        "investigation" in plan_flat
+        and "authorised the bounded baseline-attribution investigation at Level "
+        "1" in plan_flat
+        and "project completed that investigation" in plan_flat
+        and "attribution result is direction-selection evidence only"
+        in plan_flat
         and "Exit 4 stays Pending" in plan_flat,
         "D-GOV-009 direction summary drifted",
     )
@@ -1983,6 +2285,19 @@ def _validate_exit_conditions(
         in plan_flat
         and "Exit 4 stays Pending" in plan_flat,
         "D-GOV-010 host-qualification summary drifted",
+    )
+    _require(
+        "D-GOV-011 selects one subsequent hypothesis for the read route in the "
+        "canonical FreeCAD adapter" in plan_flat
+        and "can remove only two repeated reads of the selected record"
+        in plan_flat
+        and "exact host in D-GOV-010" in plan_flat
+        and "record a new same-host baseline" in plan_flat
+        and "must not change the comparison rule" in plan_flat
+        and "makes no product change and admits no performance result"
+        in plan_flat
+        and "Exit 4 stays Pending" in plan_flat,
+        "D-GOV-011 canonical-record direction summary drifted",
     )
 
     current_flat = " ".join(current_evidence.split())
@@ -3114,6 +3429,15 @@ def _validate_exit_conditions(
         "in a subsequent cycle",
         "Each comparison must use one profile with an exact identity",
         "does not change D-GOV-009 or Exit 4",
+        "D-GOV-011 accepts the D-GOV-009 attribution result as evidence for "
+        "direction selection only",
+        "selects one subsequent hypothesis at Level 2 in "
+        "tracktemplate/adapters/freecad/transition_state.py",
+        "keeps one live read of the selected record before the write",
+        "removes only two repeated reads",
+        "defines the new same-host baseline and comparison rule",
+        "makes no product change. It admits no performance result, defines no "
+        "budget, and does not accept Exit 4",
     ):
         _require(
             required_clause in current_register_flat,
@@ -3419,7 +3743,7 @@ def _validate_decisions(plan: str) -> None:
             record["decided_on"]
             == (
                 "2026-08-23"
-                if decision_id in {"D-GOV-009", "D-GOV-010"}
+                if decision_id in {"D-GOV-009", "D-GOV-010", "D-GOV-011"}
                 else "2026-08-15"
                 if decision_id in {
                     "D-P6-004",
@@ -4006,6 +4330,97 @@ def _validate_decisions(plan: str) -> None:
         _require(
             fragment in host_followup_semantic,
             "D-GOV-010 authority or exclusion drifted: " + fragment,
+        )
+    selection_record = phase6_by_id["D-GOV-011"]
+    selection_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-4-d-gov-011-direction-selection-panel"
+    )
+    _require(
+        selection_record["decision"]
+        == "Select one canonical-record performance hypothesis."
+        and selection_record["evidence"] == selection_panel
+        and selection_record["panel_record"] == selection_panel,
+        "D-GOV-011 decision or panel routing drifted",
+    )
+    selection_semantic = _semantic_text(
+        str(selection_record["authority"])
+        + " "
+        + str(selection_record["exclusions"])
+    )
+    for fragment in (
+        "bd0c87a9e1c034e538d1cda5f978d305fa0cfaa2",
+        "retained attribution result in D-GOV-009 as evidence for direction "
+        "selection only",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "77-entry checksum manifest had a PASS result",
+        "2026-08-23-phase6-exit4-attribution-preservation-01",
+        "02525791c17fa5630be57608543b7c0dfa3c7254cc22c623ff79c007e0a94880",
+        "8e47cb21e4aa8fe4ec1706b60d0ec1c665e3a338d626e7d99fd62e105a31ba22",
+        "9928501e6460b68742f441f497be602de10596e33d772a65245efa1ee2549c71",
+        "52f141c5c45a9c5752d93d70aece9943e7b535bfde0804c53fc7b5d2cbad6388",
+        "median for process CPU time in the canonical measurement area is "
+        "3.126380 ms",
+        "first quartile is 2.9690335 ms",
+        "attribution noise floor is 2.895891 ms",
+        "first quartile is only 0.0731425 ms higher than that floor",
+        "not improvement evidence or Exit 4 evidence",
+        "application span for "
+        "tracktemplate/application/transition_edit.py::edit_transition_length_mm",
+        "transaction and property writes in "
+        "tracktemplate/adapters/freecad/transition_state.py",
+        "three reads of all selected-record data before the write",
+        "necessary check after the write reads that record one more time",
+        "Keep one live read of the selected record before the write",
+        "state for the stale-base and stable-identity checks",
+        "During object mapping, use the same state for the selected object",
+        "Keep the scan of other canonical records and the read after the write",
+        "only permitted product file is "
+        "tracktemplate/adapters/freecad/transition_state.py",
+        "do the exact attribution method in D-GOV-009 again on clean protected "
+        "main",
+        "Use the exact D-GOV-010 host",
+        "new baseline series of 10 processes",
+        "new attribution series of 10 processes",
+        "attribution materiality rule in D-GOV-009",
+        "Record the 12-block comparison sequence before product work",
+        "Six blocks must use the baseline first",
+        "Six blocks must use the candidate first",
+        "Process CPU time for Edit must be lower in at least 10 of 12 paired "
+        "blocks",
+        "D-GOV-008 no-displacement rule to Validate, Export, cleanup, warm "
+        "block values, resource metrics, and the journey remainder",
+        "other measurement areas in D-GOV-009",
+        "same test-owned instrumentation in both samples",
+        "add no work to setup, teardown, or a different unmeasured boundary",
+        "preserve canonical state and transaction semantics",
+        "preserve one-unit Undo/Redo",
+        "authorises one subsequent product change at Level 2 in this boundary",
+        "subsequent owner decision at Level 3 is necessary before admission of a "
+        "subsequent result for Exit 4",
+        "does not start the subsequent product change at Level 2",
+        "makes no product change and admits no performance result",
+        "defines no product performance budget and does not accept Exit 4",
+        "Do not select the D-GOV-008 preview-sampler direction again",
+        "Do not change either retained negative result",
+        "Do not do either retained comparison again",
+        "Preserve the D-GOV-009 attribution corpus",
+        "Do not select GUI processing while the TrackTemplate product boundary "
+        "is Unknown",
+        "Do not change the qualified host profile, performance threshold, or "
+        "D-GOV-008 comparison rule",
+        "Phase 6 stays at 2/5 accepted exits",
+        "Exit 4 stays Pending",
+        "Project status stays unknown",
+        "No risk disposition changes",
+        "gives no production authority",
+        "gives no physical-output authority",
+        "gives no project-cleared status",
+        "gives no packaging, release, or tagging authority",
+    ):
+        _require(
+            fragment in selection_semantic,
+            "D-GOV-011 authority or exclusion drifted: " + fragment,
         )
     current_records = document["decisions"]
     _require(

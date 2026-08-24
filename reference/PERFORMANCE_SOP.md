@@ -209,21 +209,20 @@ before the owner can accept Exit 4.
 ## Phase 6 Exit 4 baseline-attribution direction
 
 D-GOV-009 records the D-GOV-008 performance direction as exhausted for new
-Phase 6 Exit 4 product work. D-GOV-008 stays Accepted as the authority for its
-comparison baseline, performance hypothesis, comparison rule, and first Level
-2 boundary. Preserve the two subsequent Level 2 results as retained negative
-evidence. The two results are not improvement evidence. They are not Exit 4
-evidence.
+product work for Phase 6 Exit 4. D-GOV-008 stays Accepted as the authority for
+its comparison baseline, performance hypothesis, comparison rule, and first
+boundary at Level 2. Preserve the two subsequent results from Level 2 as
+retained negative evidence. The two results are not improvement evidence. They
+are not Exit 4 evidence.
 
 Do not make a third preview-sampler change. This includes a new
 polynomial, approximation, cache, or other variation of the D-GOV-008
 hypothesis. The retained evidence does not show sufficient measured cost in a
-different measurement area outside the D-GOV-008 preview-sampler boundary.
+different measurement area that is not part of the D-GOV-008 preview-sampler
+boundary.
 
-The next work is a bounded baseline-attribution investigation at Level 1. Use
-the accepted FreeCAD 1.1.3 Edit journey. The investigation can report a result
-for each of these measurement areas if the architecture and the measurement
-method let it do this:
+The D-GOV-009 investigation used the accepted Edit journey on FreeCAD 1.1.3. It
+reported these measurement areas:
 
 1. Canonical-state and state-construction work
 2. Preview and sampler construction
@@ -231,23 +230,87 @@ method let it do this:
 4. GUI processing
 5. The unattributed remainder.
 
-Record the exact host profile, source state, workload, method, measurement
-boundary, and instrumentation overhead. Report a measurement area as Unknown
-if its value includes a different measurement area.
+The retained record contains the exact host profile, source state, workload,
+method, measurement boundary, and instrumentation overhead. It reports a
+measurement area as Unknown when the evidence does not show a TrackTemplate
+product boundary or an architectural boundary.
 
-The investigation is attribution only. Do not change product source. Do not
-make a performance optimisation. Do not select a candidate after the project
-knows the results.
+The investigation changed no product source. It made no performance
+optimisation. Its result is direction-selection evidence only.
 
-Do not change the D-GOV-008 comparison rule. Do not define a product
-performance budget. Do not run the first retained comparison again. Do not run
-the second retained comparison again. Do not accept Exit 4.
+D-GOV-011 uses this result to select one different performance hypothesis. It
+does not change the D-GOV-008 comparison rule. It does not do either retained
+comparison again. It defines no product performance budget and does not accept
+Exit 4.
 
-A subsequent Level 3 owner decision is necessary before a new Level 2
-performance optimisation. That decision must use measured evidence for a
-measurement area outside the D-GOV-008 preview-sampler boundary. It must select
-one bounded product boundary. It must define its comparison rule before product
-work starts.
+<a id="phase-6-exit-4-canonical-record-direction"></a>
+
+## Phase 6 Exit 4 canonical-record direction
+
+D-GOV-011 selects one performance hypothesis in the measured canonical area
+of Edit. During one accepted Edit, the route reads the selected canonical record three
+times before the write. A necessary check reads it one more time after the
+write. D-GOV-011 authorises a subsequent product change at Level 2. That change
+can remove only two repeated reads before the write. It must keep one live read
+before the write and the read after the write.
+
+The permitted product path is
+`tracktemplate/adapters/freecad/transition_state.py`. The product change must
+use the one live state for the `stale-edit-base` and stable-identity checks.
+During object mapping, it must use the same state for the selected object.
+
+The object-mapping check must still read other canonical records. It must
+still reject a duplicate stable identity. The public read and update contracts
+must not change. Do not add a cache. Do not move a record read to selection,
+setup, teardown, preview, Coin, or GUI processing.
+
+The product change must preserve canonical state and transaction semantics. It
+must preserve one-unit Undo/Redo, stable identity, object mapping, preview, and
+Coin results. It must preserve persistence, lifecycle, cleanup, exact
+validation, deterministic export, diagnostics, and failure recovery.
+
+Before a product change, do the exact attribution method in D-GOV-009 again on clean
+protected main. Use only
+`linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`. Record a new baseline
+series of 10 processes and a new attribution series of 10 processes. The
+attribution materiality rule in D-GOV-009 must give a PASS result for the
+canonical measurement area. If it does not, stop before a product change.
+
+Record the 12-block comparison sequence before a product change. Use six
+baseline-first blocks and six candidate-first blocks. Use a new process for
+each sample. Use the full accepted journey for Edit, Validate, Export, warm
+reuse, correctness, lifecycle, output, and cleanup.
+
+The comparison result is PASS only when all these conditions are true:
+
+1. Process CPU time for Edit is lower in at least 10 of 12 paired blocks. The
+   median paired difference is negative.
+2. The median paired differences for Edit wall time and cold-journey CPU and
+   wall time are negative.
+3. Apply the D-GOV-008 no-displacement rule to Validate, Export, cleanup, warm
+   block values, resource metrics, and the journey remainder.
+4. Apply that rule to preview and sampler construction, Coin or scene-graph
+   work, GUI processing, and the unattributed remainder.
+5. Record the measurement areas in D-GOV-009 in both samples of each paired
+   block. Use the same test-owned instrumentation in both samples. Record its
+   overhead.
+6. All discrete invariants and warm-cycle correctness results are equal to the
+   baseline results.
+7. The results for canonical state, preview geometry, exact geometry, receipts,
+   DXF, manifest, hashes, diagnostics, and deterministic reuse equal baseline
+   results.
+8. Source inspection shows that the product change removes the two repeated
+   reads. It must add no work to an unmeasured boundary.
+
+A missing condition gives FAIL. A host-identity difference gives FAIL. A
+product defect or invariant difference gives FAIL and stops the cycle. Preserve
+all attempts. Classify a failure before a replacement. Do not select a new
+rule after the project knows the candidate results.
+
+D-GOV-011 authorises one subsequent product change at Level 2 in this boundary. It
+makes no product change. It admits no performance result or Exit 4 evidence.
+Exit 4 stays Pending. A subsequent owner decision at Level 3 is necessary before the owner
+can admit a subsequent result for Exit 4.
 
 ## Baseline procedure
 

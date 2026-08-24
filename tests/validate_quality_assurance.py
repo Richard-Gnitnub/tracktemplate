@@ -580,35 +580,30 @@ def validate_documentation_profile(
     require(
         "Phase 6 has 2/5 accepted exits" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
-        and "D-GOV-010" in owner_view
-        and "qualifies only the exact FreeCAD 1.1.3 profile with CPython "
-        "3.13.13 and PySide6/Qt 6.11.1" in owner_view
-        and "D-GOV-010 preserves the previously qualified profiles and their "
-        "evidence" in owner_view
-        and "D-GOV-009 stays the current Exit 4 direction" in owner_view
-        and "runtime guard and the host matrix gave the specified results for "
-        "the profile that D-GOV-010 qualifies" in owner_view
-        and "three profiles in the contract can supply candidate evidence for "
-        "performance in a subsequent cycle" in owner_view
-        and "Each TrackTemplate before/after comparison must use one profile "
-        "with an exact identity" in owner_view
-        and "runtime guard does not examine the data about the Flatpak package "
-        "that the contract records" in owner_view
-        and "Qualification gives no authority for a performance comparison "
-        "between profiles that have different exact identities" in owner_view
-        and "D-GOV-010 admits no performance result" in owner_view
-        and "defines no performance budget and does not accept Exit 4"
+        and "D-GOV-011" in owner_view
+        and "selects one subsequent hypothesis for the measured canonical area "
+        "of Edit" in owner_view
+        and "bounds the product change at Level 2 to one FreeCAD "
+        "adapter file"
         in owner_view
-        and "two D-GOV-008 results stay retained negative evidence"
+        and "D-GOV-009, D-GOV-010, and their evidence do not change"
         in owner_view
-        and "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1"
+        and "two repeated reads of the selected record" in owner_view
+        and "without work in a different Edit stage" in owner_view
+        and "attribution noise floor is `2.895891 ms`" in owner_view
+        and "only `0.0731425 ms` higher than that floor" in owner_view
+        and "No result is improvement evidence or Exit 4 evidence"
         in owner_view
-        and "Keep the profile for FreeCAD 1.1.1 qualified" in owner_view
-        and "Keep the first profile for FreeCAD 1.1.3 qualified" in owner_view
-        and "Do not change D-GOV-009" in owner_view
-        and "bounded investigation that D-GOV-009 specifies" in owner_view
-        and "Use the profile that D-GOV-010 qualifies" in owner_view
-        and "First, record a baseline for this profile" in owner_view
+        and "tracktemplate/adapters/freecad/transition_state.py" in owner_view
+        and "Keep one live read of the selected record before the write"
+        in owner_view
+        and "necessary read after the write" in owner_view
+        and "make the D-GOV-011 change at Level 2" in owner_view
+        and "record a new same-host baseline on the D-GOV-010 host" in owner_view
+        and "attribution materiality rule in D-GOV-009" in owner_view
+        and "Do not change the comparison rule" in owner_view
+        and "Do not accept Exit 4 without a subsequent owner decision at Level 3"
+        in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
@@ -676,6 +671,7 @@ def validate_documentation_profile(
         "unmeasured boundary",
         "paired block",
         "paired difference",
+        "first quartile",
         "median absolute deviation (MAD)",
         "Measurement noise",
         "no-displacement rule",
@@ -686,6 +682,9 @@ def validate_documentation_profile(
         "discrete invariant",
         "Setup",
         "Teardown",
+        "attribution series",
+        "attribution noise floor",
+        "attribution materiality rule",
         "Do not use different technical terms for the same project concept",
         "Do not use a technical noun as a verb unless this register also "
         "approves the verb",
