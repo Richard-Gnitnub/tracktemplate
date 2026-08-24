@@ -3014,7 +3014,7 @@ define a procedure to replace a repository. It does not change independent
 preservation. It gives no authority for automatic removal of Git objects. It
 gives no authority for an operation that removes Git objects.
 
-### Accidental review stash reconciliation
+### Stash reconciliation
 
 During independent review, a command made an emergency stash
 `e52bd0409feee7dc7dce9fc853a3bed99081c948` by accident. The project owner was
@@ -3033,9 +3033,9 @@ The stash topology was B/I/W with no U parent:
 TrackTemplate put the B/I/W state in the named worktree. Validation completed
 before commit `1ca5b2d12ca2a2400b86126842c988b934d16194`. That commit has tree
 `fcefb947aa1287ff3f9438ffa37081064a436093` and contains all 18 paths in this
-change. The W tree and 14 paths have the same blobs. These 4 paths contain the
-Rule 5.2 repair that the owner authorised, its test changes, and this accident
-evidence:
+change. Commit `1ca5b2d12ca2a2400b86126842c988b934d16194` and the W tree have
+the same blobs at 14 of the 18 paths. These 4 paths contain the Rule 5.2 repair
+that the owner authorised, its test changes, and this accident evidence:
 
 - `reference/LEARNING_FROM_EXPERIENCE.md`
 - `reference/RECOVERY_AND_BACKUP.md`

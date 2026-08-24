@@ -753,7 +753,8 @@ def validate_recovery_phase_evidence(text):
         "commit 1ca5b2d12ca2a2400b86126842c988b934d16194",
         "tree fcefb947aa1287ff3f9438ffa37081064a436093",
         "contains all 18 paths in this change",
-        "w tree and 14 paths have the same blobs",
+        "commit 1ca5b2d12ca2a2400b86126842c988b934d16194 and the w tree have "
+        "the same blobs at 14 of the 18 paths",
         "rule 5 2 repair that the owner authorised its test changes and this "
         "accident evidence",
         "before disposition stash@{0} identified "
