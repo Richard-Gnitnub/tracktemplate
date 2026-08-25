@@ -126,7 +126,7 @@ Show that accepted remote `main` contains the worktree tip. Show that it contain
 all unique commits. Make sure that the worktree has tracked cleanliness. Make
 sure that the worktree is inactive. Make sure that it holds no sole operator
 state. Then, use the canonical
-[deliberate worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+[worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
 Make a local-state inventory. Classify all ignored and other local-only state.
 A Git ignore rule gives no removal authority. Ambiguous ownership, uniqueness,
 activity, or preservation keeps the worktree registered.

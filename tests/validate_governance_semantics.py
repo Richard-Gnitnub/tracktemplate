@@ -3847,18 +3847,18 @@ def validate_visible_recovery_mutations() -> None:
         "LFE-021 reusable rule lacks: before worktree removal make a local "
         "state inventory",
     )
-    weakened_embodiment_rule = replace_once(
+    weakened_lfe_rule = replace_once(
         learning,
         "whether deterministic enforcement is proportionate, and which "
         "regression or\nsemantic mutation prevents recurrence.",
         "whether the row is concise.",
     )
     expect_rejected(
-        "lfe/embodiment-loses-regression-question",
+        "lfe/application-loses-regression-question",
         lambda: recovery_controls.validate_recovery_lfe(
-            weakened_embodiment_rule
+            weakened_lfe_rule
         ),
-        "LFE embodiment rule lacks: whether deterministic enforcement is "
+        "LFE rule lacks: whether deterministic enforcement is "
         "proportionate",
     )
 

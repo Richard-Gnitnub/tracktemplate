@@ -838,7 +838,7 @@ Then, use the condition for a clean, pushed checkpoint:
 For a proposed worktree retirement, first run the retirement audit with
 `--retirement-worktree` and no retirement plan. Record the SHA-256 and counts
 for the local-state inventory. Then, review the retirement plan against the
-canonical [deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+canonical [worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
 Run the retirement audit again with `--retirement-plan` and
 `--require-retirement-ready`. The sentinel must be
 `TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no

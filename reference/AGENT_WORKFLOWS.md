@@ -60,7 +60,7 @@ Until the recovery workflow completes stash reconciliation, do not give the
 recovery gate a complete result.
 
 Before a worktree retirement, read the
-[deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+[worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
 Context recovery makes a local-state inventory. It identifies the owner of each
 item.
 IDE/workspace alignment shows that the worktree is inactive and has no sole
@@ -767,7 +767,7 @@ review evidence for ownership, purpose, preservation and disposition
 after the stash inventory is empty, give the recovery gate a complete result
 ```
 
-For deliberate worktree retirement:
+For worktree retirement:
 
 ```text
 show accepted-history containment and tracked cleanliness

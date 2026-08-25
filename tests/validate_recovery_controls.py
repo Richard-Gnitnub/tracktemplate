@@ -670,7 +670,7 @@ def validate_visible_recovery_routing(workflows, skills):
 
 def validate_worktree_retirement_policy(policy):
     """Require loss-checked, non-force worktree retirement in its owner."""
-    section = _semantic_text(_section(policy, "Deliberate worktree retirement"))
+    section = _semantic_text(_section(policy, "Worktree retirement"))
     for fragment in (
         "merged worktree with tracked cleanliness is not automatically disposable",
         "merge can show accepted history containment for tracked work",
@@ -728,7 +728,7 @@ def validate_worktree_retirement_routing(workflows, skills):
     """Route retirement consumers to recovery ownership without duplication."""
     workflow = _semantic_text(workflows)
     for fragment in (
-        "before a worktree retirement read the deliberate worktree retirement procedure",
+        "before a worktree retirement read the worktree retirement procedure",
         "context recovery makes a local state inventory it identifies the owner of each item",
         "ide workspace alignment shows that the worktree is inactive and has no sole operator state",
         "retirement audit records the exact git and local state identities it examines the reviewed retirement plan",
@@ -742,7 +742,7 @@ def validate_worktree_retirement_routing(workflows, skills):
             raise AssertionError(
                 "agent workflow retirement routing lacks: " + fragment
             )
-    if "RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement" not in workflows:
+    if "RECOVERY_AND_BACKUP.md#worktree-retirement" not in workflows:
         raise AssertionError("agent workflow bypasses retirement policy")
 
     required = {
@@ -774,7 +774,7 @@ def validate_worktree_retirement_routing(workflows, skills):
     for name, fragments in required.items():
         value = skills[name]
         if (
-            "RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement"
+            "RECOVERY_AND_BACKUP.md#worktree-retirement"
             not in value
         ):
             raise AssertionError(name + " skill bypasses retirement policy")
@@ -916,10 +916,10 @@ def validate_recovery_lfe(text):
         raise AssertionError("LFE-021 row structure drifted")
     row = _semantic_text(rows[20])
     for fragment in (
-        "git status reported no tracked change in the merged ste100 retrieval assurance worktree",
+        "git status reported no tracked change in the merged worktree for asd ste100 issue 9 retrieval",
         "accepted main contained its branch tip",
         "144 ignored files",
-        "official asd ste100 source that stayed local",
+        "official asd ste100 issue 9 source that stayed local",
         "derived caches",
         "repeatable validation logs and caches",
         "temporary review receipts",
@@ -947,9 +947,9 @@ def validate_recovery_lfe(text):
         if fragment not in reusable:
             raise AssertionError("LFE-021 reusable rule lacks: " + fragment)
     for link in (
-        "RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement",
+        "RECOVERY_AND_BACKUP.md#worktree-retirement",
         "AGENT_WORKFLOWS.md#session-continuity",
-        "current/PHASE_EVIDENCE.md#deliberate-worktree-retirement-workflow-migration",
+        "current/PHASE_EVIDENCE.md#worktree-retirement-workflow-migration",
         "VALIDATION.md",
     ):
         if link not in rows[20]:
@@ -974,7 +974,7 @@ def validate_recovery_lfe(text):
         "ledger records the lesson it does not own the adaptation",
     ):
         if fragment not in ledger_rules:
-            raise AssertionError("LFE embodiment rule lacks: " + fragment)
+            raise AssertionError("LFE rule lacks: " + fragment)
 
 
 def validate_recovery_phase_evidence(text):
@@ -1094,10 +1094,10 @@ def validate_recovery_phase_evidence(text):
 
 
 def validate_worktree_retirement_phase_evidence(text):
-    """Bind the STE100 retirement result to exact loss and authority limits."""
+    """Bind the source-worktree result to exact loss and authority limits."""
     section = _section(
         text,
-        "Workflow migration for deliberate worktree retirement",
+        "Workflow migration for worktree retirement",
     )
     semantic = _semantic_text(section)
     for fragment in (
@@ -1105,7 +1105,7 @@ def validate_worktree_retirement_phase_evidence(text):
         "actual removal of the worktree and local branch was a destructive level 3 repository operation",
         "project owner explicitly authorised both actions",
         "project did not complete the necessary level 3 panel or structured decision before the operation",
-        "git workflow removed the merged ste100 retrieval assurance worktree and only its merged local branch",
+        "git workflow removed the merged worktree for asd ste100 issue 9 retrieval and only its merged local branch",
         "d gov 012 records the historical sequence nonconformance",
         "gives no retrospective authority",
         "accepted main at d47518083768d34cf9b41566feaf132ac4562595 contained target head 9f3b05d480971d197a57cb00f1811f6c1012f144",
@@ -1122,7 +1122,7 @@ def validate_worktree_retirement_phase_evidence(text):
         "after applicable validation gives pass and new independent reviews "
         "give accept publish one draft pull request",
         "do not merge it do not start cycle 3",
-        "pull request 56 merged the ste100 retrieval assurance branch through merge commit 65409493d741a5606543bd437e519f8efefb8680",
+        "pull request 56 merged branch agent ste100 retrieval assurance through merge commit 65409493d741a5606543bd437e519f8efefb8680",
         "upstream branch was absent",
         "git status reported no tracked change under the former retirement audit",
         "did not examine assume unchanged or skip worktree index flags",
@@ -1136,7 +1136,7 @@ def validate_worktree_retirement_phase_evidence(text):
         "rebuildable cache generated state 82 3 026 397",
         "temporary disposable state 61 1 700 317",
         "ambiguous or uniquely owned state 0 0",
-        "two ste caches six files from the ruff cache 68 python bytecode files and six repeatable validation logs",
+        "group contained two ste caches six cache files from ruff 68 python bytecode files and six repeatable validation logs",
         "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
         "ste cache rebuild validation and status gave the necessary source bound schema v2 results",
         "retirement plan had six groups and classified each item once",
@@ -1224,7 +1224,7 @@ def validate_worktree_retirement_phase_evidence(text):
         len(parents) != 2
         or parents[1] != "9f3b05d480971d197a57cb00f1811f6c1012f144"
     ):
-        raise AssertionError("STE100 merge topology drifted")
+        raise AssertionError("source-worktree merge topology drifted")
     containment = _run(
         [
             "git",
@@ -1237,7 +1237,9 @@ def validate_worktree_retirement_phase_evidence(text):
         check=False,
     )
     if containment.returncode != 0:
-        raise AssertionError("accepted main no longer contains STE100 target")
+        raise AssertionError(
+            "accepted main no longer contains the source-worktree target"
+        )
 
 
 def _load_tracked_markdown():
@@ -1472,6 +1474,62 @@ def _validate_worktree_retirement_audit(errors):
         if str(repository) in result.stdout or str(target) in result.stdout:
             errors.append("retirement CLI exposed a local worktree path")
 
+        invalid_name_marker = "private-non-utf8-name"
+        invalid_name = (
+            os.fsencode(target / "local")
+            + os.sep.encode()
+            + invalid_name_marker.encode()
+            + b"-\xff.bin"
+        )
+        descriptor = os.open(
+            invalid_name,
+            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
+            0o600,
+        )
+        os.close(descriptor)
+        try:
+            invalid_name_result = _run(
+                [
+                    sys.executable,
+                    str(TOOL_PATH),
+                    "--root",
+                    str(repository),
+                    "--retirement-worktree",
+                    str(target),
+                ],
+                cwd=repository,
+                check=False,
+            )
+        finally:
+            os.unlink(invalid_name)
+        invalid_name_output = (
+            invalid_name_result.stdout + invalid_name_result.stderr
+        )
+        invalid_name_records = [
+            line[len(safety.RETIREMENT_SENTINEL) :]
+            for line in invalid_name_result.stdout.splitlines()
+            if line.startswith(safety.RETIREMENT_SENTINEL)
+        ]
+        invalid_name_report = (
+            json.loads(invalid_name_records[0])
+            if len(invalid_name_records) == 1
+            else {}
+        )
+        if (
+            invalid_name_result.returncode != 1
+            or len(invalid_name_records) != 1
+            or invalid_name_report.get("readiness", {}).get(
+                "retirement_ready"
+            )
+            or invalid_name_report.get("findings")
+            != ["retirement-audit-error"]
+            or invalid_name_marker in invalid_name_output
+            or str(repository) in invalid_name_output
+            or str(target) in invalid_name_output
+            or "Traceback" in invalid_name_output
+        ):
+            errors.append("non-UTF-8 local filename did not fail closed")
+
         incomplete = copy.deepcopy(plan)
         incomplete["classifications"] = incomplete["classifications"][:-1]
         _write_retirement_plan(plan_path, incomplete)
@@ -1645,6 +1703,57 @@ def _validate_worktree_retirement_audit(errors):
             for item in blocked["findings"]
         ):
             errors.append("intermediate preservation symlink did not fail closed")
+
+        preservation_loop_marker = "private-preservation-loop"
+        preservation_loop = temp_root / preservation_loop_marker
+        preservation_loop.symlink_to(preservation_loop.name)
+        loop_plan = copy.deepcopy(plan)
+        loop_plan["classifications"][0]["preservation"][
+            "destination_root"
+        ] = str(preservation_loop)
+        _write_retirement_plan(plan_path, loop_plan)
+        try:
+            loop_result = _run(
+                [
+                    sys.executable,
+                    str(TOOL_PATH),
+                    "--root",
+                    str(repository),
+                    "--retirement-worktree",
+                    str(target),
+                    "--retirement-plan",
+                    str(plan_path),
+                    "--require-retirement-ready",
+                ],
+                cwd=repository,
+                check=False,
+            )
+        finally:
+            preservation_loop.unlink()
+        loop_output = loop_result.stdout + loop_result.stderr
+        loop_records = [
+            line[len(safety.RETIREMENT_SENTINEL) :]
+            for line in loop_result.stdout.splitlines()
+            if line.startswith(safety.RETIREMENT_SENTINEL)
+        ]
+        loop_report = (
+            json.loads(loop_records[0]) if len(loop_records) == 1 else {}
+        )
+        if (
+            loop_result.returncode != 1
+            or len(loop_records) != 1
+            or loop_report.get("readiness", {}).get("retirement_ready")
+            or not any(
+                item.startswith("required-preservation-not-proved:")
+                for item in loop_report.get("findings", [])
+            )
+            or preservation_loop_marker in loop_output
+            or str(repository) in loop_output
+            or str(target) in loop_output
+            or str(plan_path) in loop_output
+            or "Traceback" in loop_output
+        ):
+            errors.append("preservation symlink loop did not fail closed")
 
         duplicate_plan = json.dumps(plan, sort_keys=True)[:-1] + (
             ',"authority":' + json.dumps(plan["authority"], sort_keys=True) + "}"

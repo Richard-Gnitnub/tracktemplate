@@ -85,7 +85,7 @@ identity and stash disposition authority. Review the preservation diff. A
 recovery branch or worktree is not accepted product state.
 
 For worktree retirement, read the canonical
-[deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+[worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
 Review accepted-history containment and tracked cleanliness. Review inactivity
 and the exact local-state inventory. Review how the retirement plan classifies
 each item and names its proof owner. Review necessary preservation and

@@ -294,9 +294,9 @@ missing or changed, fail closed. The recovery gate does not have a complete
 result. A completed recovery cycle has no retained stash and no unresolved
 finding about sensitive evidence or local evidence.
 
-<a id="deliberate-worktree-retirement"></a>
+<a id="worktree-retirement"></a>
 
-## Deliberate worktree retirement
+## Worktree retirement
 
 A merged worktree with tracked cleanliness is not automatically disposable. A
 merge can show accepted-history containment for tracked work. It does not

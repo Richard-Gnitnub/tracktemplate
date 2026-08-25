@@ -4428,11 +4428,11 @@ def _validate_decisions(plan: str) -> None:
     retirement_record = phase6_by_id["D-GOV-012"]
     retirement_panel = (
         "reference/current/PHASE_EVIDENCE.md"
-        "#d-gov-012-ste100-sequence-nonconformance"
+        "#d-gov-012-worktree-sequence-nonconformance"
     )
     _require(
         retirement_record["decision"]
-        == "Record the sequence nonconformance for STE100 worktree retirement."
+        == "Record the sequence nonconformance for the completed worktree retirement."
         and retirement_record["evidence"] == retirement_panel
         and retirement_record["panel_record"] == retirement_panel
         and retirement_record["panel_required_under_current_policy"] is True,

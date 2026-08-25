@@ -100,7 +100,7 @@ before selecting proof.
   unique content, and stash disposition controls. Also do the applicable
   semantic control validation. Review the preservation diff.
 - For worktree retirement, use the canonical
-  [retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+  [retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
   Validate accepted-history containment and tracked cleanliness. Validate the
   complete local-state inventory. Make sure that the retirement plan classifies
   each item once. Make sure that ambiguous state gives a FAIL result. Validate

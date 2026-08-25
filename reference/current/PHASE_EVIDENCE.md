@@ -3075,16 +3075,16 @@ Phase 6 stays at 2/5, and project status stays `unknown`. It gives no project
 authority and does not change the product. The branch for D-GOV-009 and its
 evidence do not change.
 
-<a id="deliberate-worktree-retirement-workflow-migration"></a>
+<a id="worktree-retirement-workflow-migration"></a>
 
-## Workflow migration for deliberate worktree retirement
+## Workflow migration for worktree retirement
 
 ### Owner view
 
 | Field | Result |
 | --- | --- |
-| Current state | The Level 2 recovery/workspace migration makes worktree retirement deliberate. The actual removal of the worktree and local branch was a destructive Level 3 repository operation. The project owner explicitly authorised both actions. The project did not complete the necessary Level 3 panel or structured decision before the operation. |
-| What changed | The canonical recovery owner, context-recovery workflow, IDE/workspace workflow, retirement audit, and focused validator now make deliberate retirement necessary. The Git workflow removed the merged STE100 retrieval-assurance worktree and only its merged local branch. D-GOV-012 records the historical sequence nonconformance. It gives no retrospective authority. |
+| Current state | The Level 2 recovery/workspace migration adds controls for worktree retirement. The actual removal of the worktree and local branch was a destructive Level 3 repository operation. The project owner explicitly authorised both actions. The project did not complete the necessary Level 3 panel or structured decision before the operation. |
+| What changed | The canonical recovery owner, context-recovery workflow, IDE/workspace workflow, retirement audit, and focused validator now make the retirement procedure necessary. The Git workflow removed the merged worktree for ASD-STE100 Issue 9 retrieval and only its merged local branch. D-GOV-012 records the historical sequence nonconformance. It gives no retrospective authority. |
 | What now works | Accepted `main` at `d47518083768d34cf9b41566feaf132ac4562595` contained target HEAD `9f3b05d480971d197a57cb00f1811f6c1012f144`. The local-state inventory had 144 files. The retirement plan classified each file. Its SHA-256 was `a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`. The retirement audit examined the plan. It showed necessary preservation and returned no finding. |
 | Limitations/findings | The retirement audit examines exact evidence that the retirement plan supplies. It makes no decision about ownership, removal, branch removal, acceptance, or integration. Git ignores the retirement plan, which is not project authority. The removed target cannot supply a new local-state inventory or a new examination of Git index flags. The local-state inventory and Git status result are historical evidence. Current evidence cannot show complete historical losslessness. |
 | Owner decision | D-GOV-012 records the sequence nonconformance. It accepts the named-source preservation result. It authorises one Cycle 2 repair candidate and one draft pull request. It authorises no integration or Cycle 3 work. It changes no risk disposition. |
@@ -3092,7 +3092,7 @@ evidence do not change.
 
 ### Exact starting state and containment
 
-Pull request #56 merged the STE100 retrieval-assurance branch through merge
+Pull request #56 merged branch `agent/ste100-retrieval-assurance` through merge
 commit `65409493d741a5606543bd437e519f8efefb8680`. The worktree had attached
 local branch `agent/ste100-retrieval-assurance` at
 `9f3b05d480971d197a57cb00f1811f6c1012f144`. Its upstream branch was absent.
@@ -3120,9 +3120,9 @@ SHA-256 identity was
 
 | Type | Files | Bytes | Result and owner |
 | --- | ---: | ---: | --- |
-| Authoritative local source | 1 | 3,316,157 | The source manifest and provenance record own the official ASD-STE100 Issue 9 PDF. The canonical primary path contained an exact preserved file. |
+| Authoritative local source | 1 | 3,316,157 | The source manifest records the PDF identity. The local source procedure owns that identity and operation. The provenance record owns the rights state. The canonical primary path contained an exact preserved file. |
 | Retained evidence | 0 | 0 | No current evidence or recovery owner made retention from this worktree necessary. |
-| Rebuildable cache/generated state | 82 | 3,026,397 | The canonical owners supplied rebuild or removal proof for two STE caches, six files from the Ruff cache, 68 Python bytecode files, and six repeatable validation logs. |
+| Rebuildable cache/generated state | 82 | 3,026,397 | The canonical owners supplied proof for rebuild or removal. The group contained two STE caches, six cache files from Ruff, 68 Python bytecode files, and six repeatable validation logs. |
 | Temporary disposable state | 61 | 1,700,317 | The STE receipt owner says not to keep all usual review receipts. No tracked authority named one of these receipts for retention. |
 | Ambiguous or uniquely owned state | 0 | 0 | The retirement plan classified no item as this type. |
 
@@ -3185,7 +3185,7 @@ tracked cleanliness.
 Governance semantics rejected 287/287 mutations with zero escapes and 281
 independent protections.
 
-<a id="d-gov-012-ste100-sequence-nonconformance"></a>
+<a id="d-gov-012-worktree-sequence-nonconformance"></a>
 
 ### Decision after the Level 3 sequence nonconformance
 
@@ -3252,7 +3252,7 @@ retrospective removal or integration authority.
 
 #### Owner decision D-GOV-012
 
-**Record the sequence nonconformance for STE100 worktree retirement.**
+**Record the sequence nonconformance for the completed worktree retirement.**
 
 At protected `main` `d47518083768d34cf9b41566feaf132ac4562595` and Cycle 2
 candidate `96063e9836748bbc5755db251fa8b66564e65a28`, the project owner records
@@ -3314,11 +3314,11 @@ For filesystem inspection failures, it returns a result without a path. Focused
 regressions protect these boundaries.
 
 The documentation repair uses the canonical terminology and owner-view labels.
-The general rule for LFE embodiment stays because the project owner explicitly
+The general LFE rule stays because the project owner explicitly
 made that bounded review necessary in this cycle. No repair grants project,
 phase, product, removal, or integration authority.
 
-This workflow migration embodies LFE-021 under the canonical recovery policy.
+This workflow migration applies LFE-021 through the canonical recovery policy.
 It adds one control for PR-13 but does not change that risk's state,
 disposition, severity, treatment, or effectiveness. Earlier LFE rows stay
 unchanged. D-GOV-009 and its evidence stay unchanged. Phase 6 stays at 2/5,

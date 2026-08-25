@@ -77,13 +77,16 @@ def _git(root, *arguments, allow_failure=False):
         if name.startswith("GIT_"):
             del environment[name]
     environment["GIT_OPTIONAL_LOCKS"] = "0"
-    result = subprocess.run(
-        ["git", "-C", str(root), *arguments],
-        check=False,
-        capture_output=True,
-        env=environment,
-        text=True,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), *arguments],
+            check=False,
+            capture_output=True,
+            env=environment,
+            text=True,
+        )
+    except UnicodeDecodeError:
+        raise SafetyAuditError("read-only Git inspection failed") from None
     if result.returncode and not allow_failure:
         raise SafetyAuditError("read-only Git inspection failed")
     return result
@@ -418,10 +421,14 @@ def _preserved_entry_path(destination, relative):
 
 
 def _preservation_matches(entries, destination_root, target):
-    destination = pathlib.Path(destination_root).resolve()
+    try:
+        destination = pathlib.Path(destination_root).resolve()
+        home = pathlib.Path.home().resolve()
+    except (OSError, RuntimeError, ValueError):
+        return False
     if (
         destination == pathlib.Path(destination.anchor)
-        or destination == pathlib.Path.home().resolve()
+        or destination == home
         or destination == target
         or target in destination.parents
         or destination in target.parents

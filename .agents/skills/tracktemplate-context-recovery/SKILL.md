@@ -61,7 +61,7 @@ Git state for unfinished work or interrupted work. Examine the complete stash
 inventory. If the inventory has a retained stash or missing recovery
 information, do not give the recovery gate a complete result.
 Before a worktree retirement, use the canonical
-[deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+[worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
 Show accepted-history containment and tracked cleanliness. Make a local-state
 inventory of all ignored and other local-only files. Identify the owner and
 preservation need for each material group. A merge, tracked cleanliness, or Git
