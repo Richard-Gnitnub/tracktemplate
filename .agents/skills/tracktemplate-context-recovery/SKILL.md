@@ -162,7 +162,7 @@ owner-view fields. Then, keep this technical provenance:
 6. the next bounded action and check.
 
 Also record the named Git state and complete stash inventory. For worktree
-retirement, record the exact local-state inventory identity, classification,
+retirement, record the exact identity of the local-state inventory, classification,
 preservation proof, unresolved ownership, and worktree disposition.
 
 Do not describe incomplete work, an unaccepted diff or an unrun check as

@@ -689,7 +689,7 @@ def validate_worktree_retirement_policy(policy):
         "identify its owner record why retention is not necessary",
         "stop keep the worktree",
         "record the exact retirement authority",
-        "examine the target identity accepted history tracked cleanliness inactivity inventory identity classification and preservation again immediately before removal",
+        "immediately before removal examine the target identity accepted history tracked cleanliness inactivity inventory identity classification and preservation again",
         "keep the classification plan local",
         "accepted ref is refs remotes origin main",
         "audit is read only",
@@ -728,7 +728,8 @@ def validate_worktree_retirement_routing(workflows, skills):
         "read only safety audit records the exact git and local state identities and examines the reviewed classification plan",
         "a merge and tracked cleanliness give no disposal authority in these workflows",
         "stop when ignored or local only state has ambiguous ownership or lacks preservation proof",
-        "normal non force worktree removal then safe merged local branch removal",
+        "normal git worktree removal without force",
+        "afterwards remove only the merged local branch that is safe",
     ):
         if fragment not in workflow:
             raise AssertionError(
@@ -741,18 +742,19 @@ def validate_worktree_retirement_routing(workflows, skills):
         "context": (
             "show accepted history containment and tracked cleanliness",
             "make an inventory of all ignored and other local only files",
+            "exact identity of the local state inventory",
             "merge tracked cleanliness or git ignore rule does not make that state disposable",
             "ambiguous or uniquely owned keep the worktree and stop",
         ),
         "ide": (
-            "make an inventory of and classify all ignored and other local only state",
+            "make a local state inventory classify all ignored and other local only state",
             "git ignore rule gives no disposal authority",
             "ambiguous ownership uniqueness activity or preservation keeps the worktree registered",
         ),
         "validation": (
             "accepted history containment tracked cleanliness and the complete ignored and local only inventory",
-            "ambiguous state rejection necessary preservation normal non force removal",
-            "review the exact live preservation diff",
+            "ambiguous state rejection necessary preservation and normal removal without force",
+            "review the exact preservation diff from live state",
         ),
         "quality": (
             "exact ignored local state inventory",
@@ -906,19 +908,19 @@ def validate_recovery_lfe(text):
         raise AssertionError("LFE-021 row structure drifted")
     row = _semantic_text(rows[20])
     for fragment in (
-        "merged ste100 retrieval assurance worktree had tracked cleanliness",
+        "git status reported no tracked change in the merged ste100 retrieval assurance worktree",
         "accepted main contained its branch tip",
         "144 ignored files",
         "official local asd ste100 source",
         "derived caches",
         "repeatable validation logs and caches",
         "temporary review receipts",
-        "branch merge status and tracked cleanliness did not give removal authority",
+        "merge and git status result did not give removal authority",
         "canonical recovery policy",
         "complete ignored local state inventory",
         "ownership classification",
         "preservation proof",
-        "normal non force removal",
+        "normal removal without force",
         "post removal preservation diff",
         "read only validation control",
         "rejects incomplete overlapping changed ambiguous unsupported unpreserved or unauthorised retirement state",
@@ -928,7 +930,8 @@ def validate_recovery_lfe(text):
     reusable = _semantic_text(cells[3])
     for fragment in (
         "merged worktree with tracked cleanliness is not automatically disposable",
-        "make an inventory of and classify ignored local state before worktree removal",
+        "before worktree removal make a local state inventory",
+        "classify all ignored local state",
         "preserve authoritative or unique material",
         "discard only validated rebuildable or disposable state",
         "if ownership is uncertain stop",
@@ -1090,29 +1093,33 @@ def validate_worktree_retirement_phase_evidence(text):
     )
     semantic = _semantic_text(section)
     for fragment in (
-        "level 2 recovery workspace workflow migration",
-        "actual worktree and local branch retirement was a level 3 destructive repository operation",
-        "implementing agent did not record the necessary pre operation panel or structured decision",
+        "level 2 recovery workspace migration",
+        "actual removal of the worktree and local branch was a destructive level 3 repository operation",
+        "project owner explicitly authorised both actions",
+        "project did not complete the necessary level 3 panel or structured decision before the operation",
         "normal git workflow removed the merged ste100 retrieval assurance worktree and only its merged local branch",
+        "d gov 012 records the historical sequence nonconformance",
+        "gives no retrospective authority",
         "accepted main at d47518083768d34cf9b41566feaf132ac4562595 contained target head 9f3b05d480971d197a57cb00f1811f6c1012f144",
         "exact 144 file inventory",
         "a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044",
         "audit examines exact evidence that a local plan supplies",
-        "does not make ownership disposal removal branch removal acceptance or integration decisions",
-        "missing pre operation level 3 records are an open governance sequencing finding",
+        "makes no ownership disposal removal branch removal acceptance or integration decision",
         "removed target cannot supply a new inventory or index flag inspection",
-        "historical evidence not repeatable present state proof",
-        "normal non force removal",
-        "safe removal of only its merged local branch after removal",
-        "authorised no other worktree branch remote branch git object backup or evidence disposition",
-        "integration needs authority for that exact reviewed candidate",
-        "cycle 3 does not start from an open cycle 2 pull request",
+        "inventory and git status result are historical evidence",
+        "complete historical losslessness cannot be shown",
+        "authorises one cycle 2 repair candidate and one draft pull request",
+        "authorises no integration or cycle 3 work",
+        "after applicable validation gives pass and new independent reviews "
+        "give accept publish one draft pull request",
+        "do not merge it do not start cycle 3",
         "pull request 56 merged the ste100 retrieval assurance branch through merge commit 65409493d741a5606543bd437e519f8efefb8680",
         "upstream branch was absent",
+        "git status reported no tracked change under the former audit",
         "did not examine assume unchanged or skip worktree index flags",
-        "current evidence cannot repeat that inspection or show that the removed target had no hidden tracked bytes",
+        "current evidence cannot examine those index flags again it cannot show that all tracked bytes matched the removed index",
         "local main origin main and live github main identified d47518083768d34cf9b41566feaf132ac4562595",
-        "ide backed primary project was on main and had tracked cleanliness",
+        "git status reported no tracked change in the primary project",
         "no open editor or process used the target worktree",
         "144 ignored files and 8 042 871 bytes",
         "authoritative local source 1 3 316 157",
@@ -1124,6 +1131,7 @@ def validate_worktree_retirement_phase_evidence(text):
         "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
         "ste cache rebuild validation and status gave the necessary source bound schema v2 results",
         "six non overlapping groups",
+        "former audit's no tracked change result",
         "zero findings",
         "final complete result audit ran immediately before normal git worktree remove",
         "did not use force git stash manual relocation git worktree prune or another worktree",
@@ -1132,15 +1140,27 @@ def validate_worktree_retirement_phase_evidence(text):
         "stash inventory stayed empty and refs stash stayed absent",
         "complete ignored and non ignored inventory fixtures",
         "gave pass results for incomplete coverage overlap missing proof ambiguity inactivity authority target and accepted history identity non containment and inventory change",
-        "gave pass results for loss of tracked cleanliness non default assume unchanged and skip worktree index flags",
-        "path free filesystem failure output",
-        "disposable integration fixture gave pass results for normal non force removal preserved source and post retirement local branch order",
+        "gave pass results for loss of tracked cleanliness and non default assume unchanged and skip worktree index flags",
+        "filesystem failure output contained no path",
+        "disposable integration fixture gave pass results for normal removal without force preserved source and post retirement local branch order",
         "python and fcmacro parsing gave a pass result for 189 tracked files",
         "standalone ci profile gave a 60 60 pass result",
         "local standalone profile gave a 59 60 pass result",
         "live workstation member correctly reported that the worktree did not contain the ignored templot source archive",
         "candidate safety audit separately verified the exact necessary archive and critical assets result against the primary workspace with tracked cleanliness",
-        "governance semantics rejected 284 284 mutations with zero escapes and 278 independent protections",
+        "governance semantics rejected 287 287 mutations with zero escapes and 281 independent protections",
+        "decision after the level 3 sequence nonconformance",
+        "rejected cycle 2 candidate 96063e9836748bbc5755db251fa8b66564e65a28 with tree 5abb3004f2c29b480ebf3511c7892b8a53c73a6a",
+        "create a false prior panel this would record false chronology and false authority rejected",
+        "record a bounded decision after the operation",
+        "no rollback can supply the same removed git index",
+        "panel occurs after the operation it does not complete the missing pre operation condition",
+        "new independent reviewers must examine the final exact candidate before publication",
+        "proceed with bounded conditions record d gov 012",
+        "give no retrospective removal or integration authority",
+        "owner authorises one bounded cycle 2 repair and review cycle",
+        "keep the current technical retirement controls",
+        "correct only the mandatory documentation and evidence findings",
         "earlier lfe rows stay unchanged",
         "d gov 009 and its evidence stay unchanged",
         "phase 6 stays at 2 5 and project status stays unknown",
@@ -1153,6 +1173,17 @@ def validate_worktree_retirement_phase_evidence(text):
         if fragment not in semantic:
             raise AssertionError(
                 "worktree retirement phase evidence lacks: " + fragment
+            )
+    for prohibited in (
+        "it had tracked cleanliness",
+        "worktree had tracked cleanliness",
+        "complete historical losslessness is shown",
+        "this decision gives retrospective authority",
+        "panel occurred before the operation",
+    ):
+        if prohibited in semantic:
+            raise AssertionError(
+                "worktree retirement phase evidence overstates: " + prohibited
             )
     for identity in (
         "65409493d741a5606543bd437e519f8efefb8680",

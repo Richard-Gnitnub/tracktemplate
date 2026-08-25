@@ -817,18 +817,19 @@ Repository recovery and ignored-data safety controls:
 .venv/bin/python tests/validate_recovery_controls.py --live-workstation
 ```
 
-The audit is read-only and starts no network operation. It reports clean and
-pushed checkpoint state from local remote-tracking refs, verifies the ignored
-Templot source archive, makes an inventory of local generated-data roots, and fails closed
-when a requested backup target is absent, inside the repository or on the same
-mounted filesystem. The default validator shows deterministic control
-behaviour, including rejection of a clean fixture without the archive. The
-`--live-workstation` profile also shows the current checkout's ignored
+The audit is read-only. It starts no network operation. It reports the
+checkpoint state from local remote-tracking refs. It verifies the ignored
+Templot source archive. It makes an inventory of local generated-data roots.
+
+It fails closed for an invalid backup target. An invalid target can be absent,
+inside the repository, or on the same mounted filesystem. The default validator
+shows deterministic control behaviour. It rejects a clean fixture without the
+archive. The `--live-workstation` profile also shows the current checkout's
 archive/hash and branch/upstream boundary. Neither result claims that an
 independent backup or restore exists.
 
 Before a risky tranche, run `git fetch` explicitly when remote state might have
-changed. Then, use the clean pushed checkpoint condition:
+changed. Then, use the condition for a clean, pushed checkpoint:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py --require-checkpoint
@@ -853,25 +854,26 @@ these conditions:
 - Missing classification proof or non-identical necessary preservation
 - A substituted accepted ref, duplicate plan key, or symlinked preservation
   parent
-- Private plan data, private filesystem failure detail, or raw Git failure
-  detail in command output
+- Private plan data, private detail from a filesystem failure, or raw detail
+  from a Git failure in command output
 - An attempted mutating or force-removal command in the read-only audit.
 
-The disposable integration fixture must show normal non-force worktree
-removal. It must show that the separately preserved authoritative source stays
+The disposable integration fixture must show normal worktree removal without
+force. It must show that the separately preserved authoritative source stays
 available. It must also show that safe local-branch removal occurs only after
-worktree retirement. Before an actual removal, review the exact live
-classification and preservation diff. After removal, make sure that no unrelated
-branch, worktree, stash, or preserved file changed. These controls do not make
-a retention, disposal, or authority decision.
+worktree retirement. Before an actual removal, review the exact classification
+from live state. Review the preservation diff from exact live state. After
+removal, make sure that no unrelated branch, worktree, stash, or preserved file
+changed. These controls do not make a retention, disposal, or authority
+decision.
 
-Assess a selected or replacement external destination only with
-`--backup-target ... --require-backup-target`; backup completion and restore
-evidence stay separate recovery conditions under
-[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The first repository-scope
-copy, restore and incremental-repeat result is recorded in the linked
-2026-07-22 evidence there for the complete project-data scope that the owner
-accepted. The audit command by itself still does not show those results.
+Use `--backup-target ... --require-backup-target` only to assess a selected or
+replacement external destination. Backup completion and restore evidence stay
+separate recovery conditions under
+[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The linked 2026-07-22 evidence
+records the first copy, restore, and incremental-repeat result. That result
+covers the complete project-data scope that the owner accepted. The audit
+command by itself still does not show those results.
 
 Repository QA, documentation-link and residual-risk controls:
 

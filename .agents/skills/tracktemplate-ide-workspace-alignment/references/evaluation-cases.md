@@ -21,19 +21,20 @@ confirmation rather than merely mentioning PyCharm.
    files. Show whether it is inactive and safe to remove without loss of sole
    source or evidence state."
 
-The response must make an inventory before mutation and delegate Git operations
-to their owning workflow. It must preserve ambiguous work and ask for UI
-confirmation when the environment cannot observe the physical window.
+Before a mutation, the response must make a local-state inventory. The response
+must delegate Git operations to their owning workflow. It must preserve
+ambiguous work. If the environment cannot observe the physical window, it must
+ask for UI confirmation.
 
 ## Should not activate alone
 
-1. "Remove these merged Git branches." Route to the Git workflow; branch
+1. "Remove these merged Git branches." Route to the Git workflow. Branch
    removal is not IDE alignment authority.
 2. "Review PR #42." Route to pull-request review unless IDE/worktree alignment
    is also in scope.
 3. "Fix this Python traceback." Route to debugging and Python writing.
 4. "Choose the next Phase 6 implementation tranche." Route to programme and
-   technical selection; IDE state supplies no product priority.
+   technical selection. IDE state supplies no product priority.
 
 ## Composition cases
 
@@ -42,8 +43,9 @@ confirmation when the environment cannot observe the physical window.
 - With Git workflow: this skill identifies a stale primary project and an
   unsafe `/tmp` branch. Git shows reachability and does any authorised branch
   change or move.
-- With continue: compare before its first Git mutation and again after protected
-  `main` is synchronised, before a new branch is created.
+- With continue: before its first Git mutation, compare the workspace. After the
+  Git workflow synchronises protected `main`, compare again before branch
+  creation.
 
 ## Failure cases
 
@@ -58,7 +60,7 @@ Reject or stop when a response:
   without separate Git authority
 - Uses `recentProjects.xml` as proof of the physical focused window
 - Changes `.idea` or global SDK state without explicit scope
-- Leaves active uncommitted or unpushed work solely under `/tmp`.
+- Keeps active uncommitted or unpushed work solely under `/tmp`.
 
 While the stash inventory contains a retained stash, reject a complete recovery
 result. If the stash inventory or stash disposition evidence is not complete,

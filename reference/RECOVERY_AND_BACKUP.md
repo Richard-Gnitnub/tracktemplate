@@ -327,11 +327,11 @@ Use this procedure before each worktree retirement:
 7. If ownership, uniqueness, classification, preservation, or disposal proof is
    incomplete, classify the state as ambiguous or uniquely owned. Stop. Keep
    the worktree. Get the smallest necessary owner decision.
-8. Record the exact retirement authority. Examine the target identity, accepted
-   history, tracked cleanliness, inactivity, inventory identity, classification,
-   and preservation again immediately before removal.
+8. Record the exact retirement authority. Immediately before removal, examine
+   the target identity, accepted history, tracked cleanliness, inactivity,
+   inventory identity, classification, and preservation again.
 
-Use the read-only audit to get the exact local-state inventory identity:
+Use the read-only audit to get the exact identity of the local-state inventory:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py \

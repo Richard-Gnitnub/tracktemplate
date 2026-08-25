@@ -120,14 +120,15 @@ Temporary /tmp worktrees
 ```
 
 A primary checkout on a merged feature branch is stale even when `main`
-contains its files. Use Git to show containment and cleanliness before Git
-changes the branch. A worktree is not disposable merely because its pull request
-merged. Show that accepted remote `main` contains its tip and all unique
-commits, that it has tracked cleanliness, and that it is inactive and holds no
-sole operator state. Then, use the canonical
+contains its files. Before Git changes the branch, use Git to show containment
+and cleanliness. A merged pull request does not make its worktree disposable.
+Show that accepted remote `main` contains the worktree tip. Show that it contains
+all unique commits. Make sure that the worktree has tracked cleanliness. Make
+sure that the worktree is inactive. Make sure that it holds no sole operator
+state. Then, use the canonical
 [deliberate worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-Make an inventory of and classify all ignored and other local-only state. A Git
-ignore rule gives no disposal authority. Ambiguous ownership, uniqueness,
+Make a local-state inventory. Classify all ignored and other local-only state.
+A Git ignore rule gives no disposal authority. Ambiguous ownership, uniqueness,
 activity, or preservation keeps the worktree registered.
 
 Use the

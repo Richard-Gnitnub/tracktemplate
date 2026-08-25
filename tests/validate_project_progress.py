@@ -130,6 +130,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-GOV-009",
     "D-GOV-010",
     "D-GOV-011",
+    "D-GOV-012",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -3742,7 +3743,9 @@ def _validate_decisions(plan: str) -> None:
         _require(
             record["decided_on"]
             == (
-                "2026-08-23"
+                "2026-08-25"
+                if decision_id == "D-GOV-012"
+                else "2026-08-23"
                 if decision_id in {"D-GOV-009", "D-GOV-010", "D-GOV-011"}
                 else "2026-08-15"
                 if decision_id in {
@@ -4421,6 +4424,67 @@ def _validate_decisions(plan: str) -> None:
         _require(
             fragment in selection_semantic,
             "D-GOV-011 authority or exclusion drifted: " + fragment,
+        )
+    retirement_record = phase6_by_id["D-GOV-012"]
+    retirement_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#d-gov-012-ste100-sequence-nonconformance"
+    )
+    _require(
+        retirement_record["decision"]
+        == "Record the STE100 nonconformance with the Level 3 sequence."
+        and retirement_record["evidence"] == retirement_panel
+        and retirement_record["panel_record"] == retirement_panel
+        and retirement_record["panel_required_under_current_policy"] is True,
+        "D-GOV-012 decision or panel routing drifted",
+    )
+    retirement_semantic = _semantic_text(
+        str(retirement_record["authority"])
+        + " "
+        + str(retirement_record["exclusions"])
+    )
+    for fragment in (
+        "d47518083768d34cf9b41566feaf132ac4562595",
+        "96063e9836748bbc5755db251fa8b66564e65a28",
+        "owner explicitly authorised the completed worktree removal",
+        (
+            "did not complete the Level 3 panel or decision record before "
+            "those actions"
+        ),
+        "historical sequence nonconformance",
+        "gives no retrospective authority",
+        "9f3b05d480971d197a57cb00f1811f6c1012f144",
+        "inventory classified all 144 local files",
+        "named PDF stayed byte-identical at its canonical primary path",
+        (
+            "removed Git index is not available. Current evidence cannot show "
+            "whether it had an assume-unchanged or skip-worktree flag"
+        ),
+        "complete historical losslessness cannot be shown",
+        "one bounded Cycle 2 repair and review cycle",
+        "Keep the current technical retirement controls",
+        "Correct only the mandatory documentation and evidence findings",
+        "publish one draft pull request",
+        "Do not merge it",
+        "Do not start Cycle 3",
+        "does not create a false panel before the operation",
+        "does not claim complete historical losslessness",
+        (
+            "does not change the recorded containment, inventory, "
+            "classification, or named-source preservation evidence"
+        ),
+        "Phase 6 stays at 2/5",
+        "Project status stays unknown",
+        "D-GOV-009 and its evidence stay unchanged",
+        "No risk disposition changes",
+        (
+            "no integration, merge, Cycle 3, production, physical-output, "
+            "packaging, release, or tagging authority"
+        ),
+    ):
+        _require(
+            fragment in retirement_semantic,
+            "D-GOV-012 authority or exclusion drifted: " + fragment,
         )
     current_records = document["decisions"]
     _require(

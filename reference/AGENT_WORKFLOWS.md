@@ -776,7 +776,9 @@ stop for ambiguous or uniquely owned state
     ↓
 examine the exact read-only audit and authority again
     ↓
-normal non-force worktree removal, then safe merged local-branch removal
+use normal Git worktree removal without force
+    ↓
+afterwards, remove only the merged local branch that is safe
 ```
 
 For an architecture decision:

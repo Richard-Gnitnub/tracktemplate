@@ -2514,6 +2514,21 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan decisions differ from the frozen registers",
     )
+    retirement_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-012 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-012-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                retirement_decision_row + "\n",
+                "",
+            )
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
 
 
 def validate_documentation_profile_mutations() -> None:
@@ -3685,16 +3700,42 @@ def validate_visible_recovery_mutations() -> None:
     )
     cycle_3_started_early = replace_once(
         phase_evidence,
-        "Cycle 3 does not start from an open Cycle 2 pull request.",
-        "Cycle 3 starts from an open Cycle 2 pull request.",
+        "It authorises no integration or Cycle 3 work.",
+        "It authorises Cycle 3 work.",
     )
     expect_rejected(
         "retirement/phase-evidence-starts-cycle-3-early",
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             cycle_3_started_early
         ),
-        "worktree retirement phase evidence lacks: cycle 3 does not start "
-        "from an open cycle 2 pull request",
+        "worktree retirement phase evidence lacks: authorises no integration "
+        "or cycle 3 work",
+    )
+    historical_cleanliness_overstated = replace_once(
+        phase_evidence,
+        "Git status reported no tracked change under the former audit.",
+        "It had tracked cleanliness.",
+    )
+    expect_rejected(
+        "retirement/phase-evidence-overstates-historical-cleanliness",
+        lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
+            historical_cleanliness_overstated
+        ),
+        "worktree retirement phase evidence lacks: git status reported no "
+        "tracked change under the former audit",
+    )
+    retrospective_authority_added = replace_once(
+        phase_evidence,
+        "This\ndecision gives no retrospective authority.",
+        "This\ndecision gives retrospective authority.",
+    )
+    expect_rejected(
+        "retirement/phase-evidence-manufactures-retrospective-authority",
+        lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
+            retrospective_authority_added
+        ),
+        "worktree retirement phase evidence overstates: this decision gives "
+        "retrospective authority",
     )
 
     accepted_recovery_state = replace_once(
@@ -3791,8 +3832,8 @@ def validate_visible_recovery_mutations() -> None:
     )
     weakened_retirement_lfe = replace_once(
         learning,
-        "Make an inventory of and classify ignored local state before worktree "
-        "removal.",
+        "Before worktree removal, make a local-state inventory. Classify all "
+        "ignored local state.",
         "A clean merged worktree needs no local-state inventory.",
     )
     expect_rejected(
@@ -3800,8 +3841,8 @@ def validate_visible_recovery_mutations() -> None:
         lambda: recovery_controls.validate_recovery_lfe(
             weakened_retirement_lfe
         ),
-        "LFE-021 reusable rule lacks: make an inventory of and classify ignored "
-        "local state before worktree removal",
+        "LFE-021 reusable rule lacks: before worktree removal make a local "
+        "state inventory",
     )
     weakened_embodiment_rule = replace_once(
         learning,
