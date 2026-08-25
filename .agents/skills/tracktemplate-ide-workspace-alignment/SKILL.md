@@ -62,9 +62,10 @@ them directly:
 - the run/debug configuration selected in the UI; and
 - whether PyCharm has refreshed its VCS state after an external Git action.
 
-Do not use a run-configuration name, coverage filename, recent-file entry,
-window title, or SDK label as Git-branch evidence. Resolve it from the backing Git
-worktree.
+Do not use the name of a run configuration as branch evidence. Do not use a
+filename from a test as branch evidence. Do not use an entry that records an
+opened file as branch evidence. Do not use a PyCharm title or SDK name as branch
+evidence. Use the Git worktree to identify the branch.
 
 ## Alignment workflow
 
@@ -119,18 +120,22 @@ Temporary /tmp worktrees
     never the sole location of active, uncommitted or unpushed work
 ```
 
-A merged feature branch is stale in the primary checkout after its merge.
-Before Git changes the branch, use Git to show containment
-and cleanliness. A merged pull request does not make its worktree disposable.
-Show that accepted remote `main` contains the worktree tip. Show that it contains
-all unique commits. Make sure that the worktree has tracked cleanliness. Make
-sure that no person or process uses the worktree. Make sure that it holds no sole operator
-state. Then, use the canonical
+The primary worktree must not use a feature branch after its pull request gets
+the `MERGED` state. Before Git
+changes the branch, show accepted-history containment. Before Git changes the
+branch, show tracked cleanliness. The `MERGED` state gives no authority to
+remove its worktree.
+
+Show that the accepted commit for `origin/main` contains the worktree tip. Show
+that it contains each commit on the branch. Make sure that the worktree has
+tracked cleanliness. Make sure that no person or process uses the worktree.
+Make sure that a different location contains all IDE and user state. Then, use
+the canonical
 [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
-Make a local-state inventory. Classify all ignored and other local-only state.
-A Git ignore rule gives no removal authority. If ownership, uniqueness, or
-preservation is ambiguous, keep the worktree. If a person or process uses the
-worktree, keep it.
+Make a local-state inventory. Classify each item in the local-state inventory.
+A Git ignore rule gives no removal authority. If the plan has ambiguous or
+uniquely owned state, keep the worktree. If the preservation result is not
+complete, keep the worktree. If a person or process uses the worktree, keep it.
 
 Use the
 [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
@@ -155,16 +160,17 @@ it does not permit the skill to invent UI evidence.
 
 Report:
 
-1. The repository/common-Git roots and complete worktree map
-2. Branch, exact HEAD, upstream, cleanliness and unique-work state per worktree
-3. Remote-main and pull-request mapping plus stale merged branches
-4. Primary project path, VCS roots, interpreter/venv and run working directories
-5. Facts that files/Git show and facts that need operator confirmation
-6. Changes that the authorised Git workflow made and post-change proof
-7. Worktrees that Git shows after alignment and the cause
-8. For a retirement, the local-state inventory and how the retirement plan classifies it
-9. Evidence that no person or process uses the worktree and the post-retirement worktree map
-10. Unresolved uncertainty or cleanup that the authorised Git workflow did not show to be safe.
+1. Repository root, Git root for all worktrees, and complete worktree map
+2. Branch, exact HEAD, upstream, tracked cleanliness, and accepted-history containment for each worktree
+3. Pull requests and branch containment for `origin/main`
+4. Primary project path, VCS roots, active Python environment, and directory for each run
+5. File and Git evidence, and information that the user must supply
+6. Authority for each Git change and evidence after each change
+7. Worktree map after alignment and cause for each worktree that stays
+8. Local-state inventory and the type for each item
+9. Evidence that no person or process uses the worktree
+10. Worktree map after retirement
+11. Limitation or work without evidence that it is safe.
 
 When maintaining this skill or its routing, exercise the
 [evaluation cases](references/evaluation-cases.md) and run the repository

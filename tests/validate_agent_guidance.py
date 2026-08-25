@@ -547,9 +547,11 @@ def validate_ide_workspace_alignment_contract(
             + required_item,
         )
     required_no_inference = semantic_text(
-        "Do not use a run-configuration name, coverage filename, recent-file "
-        "entry, window title, or SDK label as Git-branch evidence. Resolve it "
-        "from the backing Git worktree."
+        "Do not use the name of a run configuration as branch evidence. Do "
+        "not use a filename from a test as branch evidence. Do not use an "
+        "entry that records an opened file as branch evidence. Do not use a "
+        "PyCharm title or SDK name as branch evidence. Use the Git worktree "
+        "to identify the branch."
     )
     require(
         required_no_inference in semantic_paragraphs(evidence),
@@ -622,8 +624,8 @@ def validate_ide_workspace_alignment_mutations(
         ("operator evidence inversion", "operator-confirmed", "file-proved"),
         (
             "non-Git branch evidence inversion",
-            "Do not use a run-configuration name",
-            "Use a run-configuration name",
+            "Do not use the name of a run configuration",
+            "Use the name of a run configuration",
         ),
         (
             "temporary-worktree safeguard deletion",

@@ -64,13 +64,13 @@ Before a worktree retirement, read the
 Context recovery makes a local-state inventory. It identifies the owner of each
 item.
 IDE/workspace alignment shows that no person or process uses the worktree. It
-also shows that the worktree has no sole operator state.
+also shows that the worktree is not the only location for user state.
 
-The retirement audit records the exact Git and local-state
-identities. It examines the reviewed retirement plan. A merge and tracked
-cleanliness give no removal authority in these workflows. When ignored or
-local-only state has ambiguous ownership or does not have preservation proof, these
-workflows stop.
+The retirement audit records the exact Git identity. It records the SHA-256 of
+the local-state inventory. It examines the retirement plan. A merge
+and tracked cleanliness give no removal authority in these workflows. If the
+plan has ambiguous or uniquely owned state, these workflows stop. If the
+preservation result is not complete, these workflows stop.
 
 ## Instruction budget
 
@@ -770,23 +770,31 @@ after the stash inventory is empty, give the recovery gate a complete result
 For worktree retirement:
 
 ```text
-show accepted-history containment and tracked cleanliness
+Show accepted-history containment
     ↓
-make a local-state inventory of ignored and other local-only state
+Show tracked cleanliness
     ↓
-classify every item
+Make a local-state inventory of all files that are not in the Git index
     ↓
-show necessary preservation or evidence that removal is safe
+Classify every item
     ↓
-stop for ambiguous or uniquely owned state
+Show necessary preservation
     ↓
-examine the exact retirement audit and authority again
+For rebuildable cache/generated state, show the rebuild result
     ↓
-use `git worktree remove` without `--force`
+For temporary disposable state, show the cause for removal
     ↓
-show that the accepted commit contains the exact local-branch tip commit
+If the plan has ambiguous or uniquely owned state, stop
     ↓
-remove only that merged local branch
+Before removal, examine the retirement audit again
+    ↓
+Before removal, examine the exact authority again
+    ↓
+Use `git worktree remove` without `--force`
+    ↓
+Show that the accepted commit contains the commit at the exact tip of the local branch
+    ↓
+Remove only that local branch for the accepted pull request
 ```
 
 For an architecture decision:

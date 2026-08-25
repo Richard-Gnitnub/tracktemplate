@@ -817,70 +817,73 @@ Repository recovery and ignored-data safety controls:
 .venv/bin/python tests/validate_recovery_controls.py --live-workstation
 ```
 
-The repository safety command is read-only. It starts no network operation. It
-reports the checkpoint state from local remote-tracking refs. It validates the
-ignored source archive for Templot. It records roots for local generated data.
-
-It fails closed when a backup target does not satisfy its conditions. The target
-can be missing, in the repository, or on the same mounted filesystem. The default validator
-shows deterministic control behaviour. It rejects a clean fixture without the
-archive. The `--live-workstation` profile also shows the current checkout's
+The audit is read-only and performs no network operation. It reports clean and
+pushed checkpoint state from local remote-tracking refs, verifies the ignored
+Templot source archive, inventories local generated-data roots and fails closed
+when a requested backup target is absent, inside the repository or on the same
+mounted filesystem. The default validator proves deterministic control
+behaviour, including rejection of a clean fixture without the archive. The
+`--live-workstation` profile additionally proves the current checkout's ignored
 archive/hash and branch/upstream boundary. Neither result claims that an
 independent backup or restore exists.
 
-Before a risky tranche, if remote state might have changed, run `git fetch`.
-Then, use the condition for a clean, pushed checkpoint:
+Before a risky tranche, fetch explicitly when remote state might have changed,
+then require a clean pushed checkpoint:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py --require-checkpoint
 ```
 
-For a proposed worktree retirement, first run the retirement audit with
-`--retirement-worktree` and no retirement plan. Record the SHA-256 and counts
-for the local-state inventory. Then, review the retirement plan against the
+Before worktree retirement, run the retirement audit with
+`--retirement-worktree` and without a retirement plan. Record the SHA-256 and
+counts for the local-state inventory. Then, review the retirement plan against the
 canonical [worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
 Run the retirement audit again with `--retirement-plan` and
 `--require-retirement-ready`. The sentinel must be
 `TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no
 finding.
 
-Each rejected fixture in the recovery validator must return a
-FAIL result. Include these states as a minimum:
+For each failure condition, the recovery validator must return a `FAIL` result.
+It must include these conditions:
 
 - A merge and tracked cleanliness without a retirement plan
-- Missing local-state inventory items or one item in more than one group
-- Ambiguous or uniquely owned local state
-- A change to the target, accepted commit, or local-state inventory
-- Loss of tracked cleanliness, an unsupported local-state type, or missing
-  evidence that no person or process uses the worktree
-- Missing authority or an `assume-unchanged` or `skip-worktree` index flag
-- A Git environment value that changes the repository or Git index
-- Missing proof for an item or non-identical necessary preservation
-- A different accepted ref, duplicate key in the retirement plan, or symlinked preservation
-  parent
-- Private data from the retirement plan
-- Private information from a filesystem error
-- Raw information from a Git error in command output
+- An inventory item that the retirement plan does not contain
+- One item in more than one type
+- Ambiguous or uniquely owned state
+- A change to the worktree, accepted commit, or local-state inventory
+- A worktree without tracked cleanliness
+- A local-state type that is not one of the 5 types
+- Missing evidence that no person or process uses the worktree
+- Missing authority or an `assume-unchanged` or `skip-worktree` value in the Git index
+- A value with a name that starts with `GIT_` and changes the repository or Git index
+- An item without an owner or result
+- A preserved file that does not have the same bytes
+- A different accepted ref or more than one key with the same name in the retirement plan
+- A symbolic link in the preservation path
+- Data from the retirement plan in command output
+- A path from a file or directory error in command output
+- Information from a Git error in command output
 - A command that changes state or uses `--force` in the retirement audit.
 
-The disposable integration fixture must use `git worktree remove` without
-`--force`. It must show that preservation kept the authoritative source
-available. It must show that Git no longer contains the worktree before branch
-removal. It must also show that the accepted commit contains the exact
-local-branch tip commit.
+The temporary integration fixture must use `git worktree remove` without
+`--force`. It must show that preservation kept the authoritative local source
+available. Before branch removal, it must show that Git does not contain the
+worktree. It must also show that the accepted commit contains the commit at the
+tip of the local branch.
 
-Before an actual removal, review how the retirement plan classifies exact live
-state. Review the preservation diff from exact live state. After removal, make
-sure that no unrelated branch, worktree, stash, or preserved file changed.
-These controls make no retention, removal, or authority decision.
+Before worktree removal, review how the retirement plan classifies the current
+local-state inventory. Before removal, review the preservation diff for that
+inventory. After removal, make sure that each other branch, worktree, stash,
+and preserved file did not change. These controls give no item disposition.
+They give no authority.
 
-Use `--backup-target ... --require-backup-target` only to examine a selected or
-replacement external destination. Evidence for a completed backup and restore
-stay as different recovery conditions in
-[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The [2026-07-22 evidence](backup-records/2026-07-22-initial-repository-backup-restore.md)
-records the first copy, restore, and incremental-repeat result. That result
-is for the complete project-data scope that the owner accepted. The repository
-safety command by itself does not show those results.
+Assess a selected or replacement external destination only with
+`--backup-target ... --require-backup-target`; backup completion and restore
+evidence remain separate recovery conditions under
+[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The first repository-scope
+copy, restore and incremental-repeat result is recorded in the linked
+2026-07-22 evidence there for the owner-confirmed complete project-data scope;
+the audit command by itself still does not prove those executed results.
 
 Repository QA, documentation-link and residual-risk controls:
 

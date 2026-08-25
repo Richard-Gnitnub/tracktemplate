@@ -50,10 +50,10 @@ includes a linguistic conformance assessment, route it to
    `reference/current/PHASE_EVIDENCE.md` and the applicable records from
    `reference/current/risks.json` or `gate-decisions.json`.
 7. Retrieve implementation evidence deterministically. Prefer exact paths,
-   identifiers and headings with `rg --files` and `rg`; use ontology concepts
-   to expand stable product terms, not as live-status evidence. Examine related
-   source, tests, raw failures, Git status and diffs only after authority is
-   established.
+   identifiers and headings with `rg --files` and `rg`. Use the ontology only
+   to expand stable product terms. Do not use the ontology as evidence
+   for current state. After you get authority, examine related source,
+   tests, failure output, Git status, and diffs.
 Use the
 [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
 in the canonical owner. Examine the branches, worktrees, and commits in named
@@ -62,11 +62,13 @@ inventory. If the inventory has a retained stash or missing recovery
 information, do not give the recovery gate a complete result.
 Before a worktree retirement, use the canonical
 [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
-Show accepted-history containment and tracked cleanliness. Make a local-state
-inventory of all ignored and other local-only files. Identify the owner and
-preservation need for each material group. A merge, tracked cleanliness, or Git
-ignore rule gives no removal authority for local state. If any state is
-ambiguous or uniquely owned, keep the worktree and stop.
+Show accepted-history containment. Show tracked cleanliness. Make a local-state
+inventory of all files that are not in the Git index. Identify the owner of each
+inventory item. Record the necessary preservation.
+
+A merge, tracked cleanliness, or Git ignore rule gives no removal authority for
+local state. If the plan has ambiguous or uniquely owned state, keep the
+worktree. If the plan has this state, stop.
 
 8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
@@ -162,9 +164,9 @@ owner-view fields. Then, keep this technical provenance:
 6. the next bounded action and check.
 
 Also record the named Git state and complete stash inventory. For worktree
-retirement, record the exact identity of the local-state inventory. Record how the
-retirement plan classifies each material group. Record preservation proof,
-unresolved ownership, and the worktree result.
+retirement, record the SHA-256 for the local-state inventory. Record the
+type for each inventory item. Record the preservation result. Record each item
+with no known owner. Record the worktree result.
 
 Do not describe incomplete work, an unaccepted diff or an unrun check as
 accepted project state.

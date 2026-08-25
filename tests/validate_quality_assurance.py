@@ -709,7 +709,7 @@ def validate_documentation_profile(
         "retirement plan",
         "retirement audit",
         "ambiguous or uniquely owned state",
-        "Put one local-state inventory item in one of the five types",
+        "Put one local-state inventory item in one of the 5 types",
         "Do not use different technical terms for the same project concept",
         "Do not use a technical noun as a verb unless this register also "
         "approves the verb",

@@ -3384,51 +3384,53 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/merge-and-cleanliness-treated-as-disposable",
             replace_once(
                 policy,
-                "A merged worktree with tracked cleanliness is not "
-                "automatically disposable.",
-                "A merged worktree with tracked cleanliness is automatically "
-                "disposable.",
+                "A merge and tracked cleanliness do not make worktree removal "
+                "safe.",
+                "A merge and tracked cleanliness make worktree removal safe.",
             ),
             (
-                "worktree retirement policy lacks: merged worktree with "
-                "tracked cleanliness is not automatically disposable"
+                "worktree retirement policy lacks: a merge and tracked "
+                "cleanliness do not make worktree removal safe"
             ),
         ),
         (
             "retirement/ignored-inventory-omitted",
             replace_once(
                 policy,
-                "Make a local-state inventory of all ignored and non-ignored "
-                "local-only\n   files.",
+                "Make a local-state inventory of all files that are not in the "
+                "Git index.",
                 "Make a local-state inventory of tracked files only.",
             ),
             (
                 "worktree retirement policy lacks: make a local state inventory "
-                "of all ignored and non ignored local only files"
+                "of all files that are not in the git index"
             ),
         ),
         (
             "retirement/preservation-proof-omitted",
             replace_once(
                 policy,
-                "Show byte-identical preservation outside the target\n"
-                "   worktree.",
-                "assume that another copy exists.",
+                "Preserve the file in a different location. Show that the two "
+                "files have\n   the same bytes.",
+                "Assume that another copy exists.",
             ),
             (
-                "worktree retirement policy lacks: show byte identical "
-                "preservation outside the target worktree"
+                "worktree retirement policy lacks: record its canonical owner "
+                "preserve the file in a different location show that the two "
+                "files have the same bytes"
             ),
         ),
         (
             "retirement/ambiguous-state-does-not-stop",
             replace_once(
                 policy,
-                "Stop.\n   Keep the worktree. Get the smallest necessary "
-                "owner decision.",
-                "Continue with removal.",
+                "If the plan has this\n   state, keep the worktree.",
+                "If the plan has this\n   state, remove the worktree.",
             ),
-            "worktree retirement policy lacks: stop keep the worktree",
+            (
+                "worktree retirement policy lacks: if the plan has this state "
+                "keep the worktree"
+            ),
         ),
         (
             "retirement/force-removal-permitted",
@@ -3443,15 +3445,15 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/branch-deleted-before-worktree",
             replace_once(
                 policy,
-                "After the\nworktree is no longer in `git worktree list`, "
-                "record the exact local-branch tip commit.",
-                "Before the\nworktree is no longer in `git worktree list`, "
-                "record the exact local-branch tip commit.",
+                "After\n`git worktree list` does not contain the worktree, "
+                "record the commit at the\nexact tip of the local branch.",
+                "Before\n`git worktree list` does not contain the worktree, "
+                "record the commit at the\nexact tip of the local branch.",
             ),
             (
-                "worktree retirement policy lacks: after the worktree is no "
-                "longer in git worktree list record the exact local branch "
-                "tip commit"
+                "worktree retirement policy lacks: after git worktree list "
+                "does not contain the worktree record the commit at the exact "
+                "tip of the local branch"
             ),
         ),
     )
@@ -3573,9 +3575,9 @@ def validate_visible_recovery_mutations() -> None:
     )
     retirement_shortcut = replace_once(
         workflows,
-        "A merge and tracked\ncleanliness give no removal authority in these "
+        "A merge\nand tracked cleanliness give no removal authority in these "
         "workflows.",
-        "A merge and tracked\ncleanliness give removal authority in these "
+        "A merge\nand tracked cleanliness give removal authority in these "
         "workflows.",
     )
     expect_rejected(
@@ -3690,8 +3692,7 @@ def validate_visible_recovery_mutations() -> None:
     )
     force_retirement_claimed = replace_once(
         phase_evidence,
-        "The\ncommand did not use `--force`, `git stash`, manual relocation,\n"
-        "`git worktree prune`, or a different worktree.",
+        "The command did\nnot use `--force` or `git stash`.",
         "The command used `--force`.",
     )
     expect_rejected(
@@ -3699,25 +3700,25 @@ def validate_visible_recovery_mutations() -> None:
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             force_retirement_claimed
         ),
-        "worktree retirement phase evidence lacks: did not use force git "
-        "stash manual relocation git worktree prune or a different worktree",
+        "worktree retirement phase evidence lacks: command did not use force "
+        "or git stash",
     )
     cycle_3_started_early = replace_once(
         phase_evidence,
-        "It authorises no integration or Cycle 3 work.",
-        "It authorises Cycle 3 work.",
+        "It gives no authority for integration or Cycle 3 work.",
+        "It gives authority for Cycle 3 work.",
     )
     expect_rejected(
         "retirement/phase-evidence-starts-cycle-3-early",
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             cycle_3_started_early
         ),
-        "worktree retirement phase evidence lacks: authorises no integration "
-        "or cycle 3 work",
+        "worktree retirement phase evidence lacks: gives no authority for "
+        "integration or cycle 3 work",
     )
     historical_cleanliness_overstated = replace_once(
         phase_evidence,
-        "The former retirement audit reported no tracked change.",
+        "The retirement audit before removal reported no tracked change.",
         "It had tracked cleanliness.",
     )
     expect_rejected(
@@ -3725,13 +3726,13 @@ def validate_visible_recovery_mutations() -> None:
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             historical_cleanliness_overstated
         ),
-        "worktree retirement phase evidence lacks: former retirement audit "
-        "reported no tracked change",
+        "worktree retirement phase evidence overstates: it had tracked "
+        "cleanliness",
     )
     retrospective_authority_added = replace_once(
         phase_evidence,
-        "This\ndecision gives no retrospective authority.",
-        "This\ndecision gives retrospective authority.",
+        "This decision gives no retrospective authority.",
+        "This decision gives retrospective authority.",
     )
     expect_rejected(
         "retirement/phase-evidence-manufactures-retrospective-authority",
@@ -3836,8 +3837,8 @@ def validate_visible_recovery_mutations() -> None:
     )
     weakened_retirement_lfe = replace_once(
         learning,
-        "Before worktree removal, make a local-state inventory. Classify all "
-        "ignored local state.",
+        "Before worktree removal, make a local-state inventory. Classify each "
+        "item that is not in the Git index.",
         "A clean merged worktree needs no local-state inventory.",
     )
     expect_rejected(
@@ -3850,17 +3851,16 @@ def validate_visible_recovery_mutations() -> None:
     )
     weakened_lfe_rule = replace_once(
         learning,
-        "Ask if\ndeterministic enforcement is proportionate. Ask which "
-        "regression or semantic\nmutation prevents recurrence.",
-        "Ask if the row is concise.",
+        "Examine\nvalidation as a control for the problem. Ask which regression "
+        "or semantic mutation\nmakes sure that the problem does not occur again.",
+        "Examine the length of the row.",
     )
     expect_rejected(
         "lfe/application-loses-regression-question",
         lambda: recovery_controls.validate_recovery_lfe(
             weakened_lfe_rule
         ),
-        "LFE rule lacks: ask if deterministic enforcement is "
-        "proportionate",
+        "LFE rule lacks: examine validation as a control for the problem",
     )
 
 

@@ -4446,7 +4446,7 @@ def _validate_decisions(plan: str) -> None:
     for fragment in (
         "d47518083768d34cf9b41566feaf132ac4562595",
         "96063e9836748bbc5755db251fa8b66564e65a28",
-        "owner authorised the completed worktree removal",
+        "owner gave authority for the completed worktree removal",
         (
             "did not complete the Level 3 panel or decision record before "
             "those operations"
@@ -4456,35 +4456,36 @@ def _validate_decisions(plan: str) -> None:
         "9f3b05d480971d197a57cb00f1811f6c1012f144",
         "retirement plan classified all 144 local files",
         "retirement audit examined that plan",
-        "named PDF stayed byte-identical at its canonical primary path",
+        "official PDF at its canonical primary path had the same bytes",
         (
-            "removed Git index is not available. Current evidence cannot show "
-            "if it had an assume-unchanged or skip-worktree flag"
+            "operation removed the Git index. Current evidence cannot show "
+            "that the Git index did not use assume-unchanged or skip-worktree"
         ),
         "Current evidence cannot show complete historical losslessness",
         "one bounded Cycle 2 repair and review cycle",
         "Keep the current controls for worktree retirement",
         "Correct only the mandatory documentation and evidence findings",
-        "publish one draft pull request",
+        "publish one pull request with Draft status",
         "Do not merge it",
         "Do not start Cycle 3",
-        "does not create a false panel before the operation",
+        "does not claim that a panel occurred before the operation",
         "does not claim complete historical losslessness",
         (
             "does not change the recorded accepted-history containment or "
             "local-state inventory"
         ),
+        "does not change the types in the plan",
         (
-            "does not change how the retirement plan classified the items or "
-            "the named-source preservation evidence"
+            "does not change evidence for preservation of the official "
+            "source with the recorded SHA-256"
         ),
         "Phase 6 stays at 2/5",
         "Project status stays unknown",
-        "D-GOV-009 and its evidence stay unchanged",
-        "No risk disposition changes",
+        "D-GOV-009 and its evidence did not change",
+        "does not change a risk disposition",
         (
-            "no integration, merge, Cycle 3, production, physical-output, "
-            "packaging, release, or tagging authority"
+            "gives no authority for integration, a merge, Cycle 3, production, "
+            "physical output, packaging, release, or tagging"
         ),
     ):
         _require(
