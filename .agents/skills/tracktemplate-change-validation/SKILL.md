@@ -101,10 +101,11 @@ before selecting proof.
   semantic control validation. Review the preservation diff.
 - For worktree retirement, use the canonical
   [retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-  Validate accepted-history containment, tracked cleanliness, and the complete
-  ignored and local-only inventory. Validate non-overlapping classification,
-  ambiguous-state rejection, necessary preservation, and normal removal without
-  force. Validate post-removal preservation and local-branch order. Review the
+  Validate accepted-history containment and tracked cleanliness. Validate the
+  complete local-state inventory. Make sure that the retirement plan classifies
+  each item once. Make sure that ambiguous state gives a FAIL result. Validate
+  necessary preservation. Validate `git worktree remove` without `--force`.
+  After removal, validate preservation and the local-branch order. Review the
   exact preservation diff from live state.
 - Run only checks available in the present environment. State unavailable checks
   explicitly instead of simulating or inventing their results.

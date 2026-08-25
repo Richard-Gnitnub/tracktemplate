@@ -3692,7 +3692,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-23",
+        and current_document["updated_on"] == "2026-08-25",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -4432,7 +4432,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         retirement_record["decision"]
-        == "Record the STE100 nonconformance with the Level 3 sequence."
+        == "Record the sequence nonconformance for STE100 worktree retirement."
         and retirement_record["evidence"] == retirement_panel
         and retirement_record["panel_record"] == retirement_panel
         and retirement_record["panel_required_under_current_policy"] is True,
@@ -4454,15 +4454,16 @@ def _validate_decisions(plan: str) -> None:
         "historical sequence nonconformance",
         "gives no retrospective authority",
         "9f3b05d480971d197a57cb00f1811f6c1012f144",
-        "inventory classified all 144 local files",
+        "retirement plan classified all 144 local files",
+        "retirement audit examined that plan",
         "named PDF stayed byte-identical at its canonical primary path",
         (
             "removed Git index is not available. Current evidence cannot show "
             "whether it had an assume-unchanged or skip-worktree flag"
         ),
-        "complete historical losslessness cannot be shown",
+        "Current evidence cannot show complete historical losslessness",
         "one bounded Cycle 2 repair and review cycle",
-        "Keep the current technical retirement controls",
+        "Keep the current controls for worktree retirement",
         "Correct only the mandatory documentation and evidence findings",
         "publish one draft pull request",
         "Do not merge it",
@@ -4470,8 +4471,12 @@ def _validate_decisions(plan: str) -> None:
         "does not create a false panel before the operation",
         "does not claim complete historical losslessness",
         (
-            "does not change the recorded containment, inventory, "
-            "classification, or named-source preservation evidence"
+            "does not change the recorded accepted-history containment or "
+            "local-state inventory"
+        ),
+        (
+            "does not change how the retirement plan classified the items or "
+            "the named-source preservation evidence"
         ),
         "Phase 6 stays at 2/5",
         "Project status stays unknown",

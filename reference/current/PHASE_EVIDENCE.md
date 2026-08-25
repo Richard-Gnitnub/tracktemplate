@@ -3084,9 +3084,9 @@ evidence do not change.
 | Field | Result |
 | --- | --- |
 | Current state | The Level 2 recovery/workspace migration makes worktree retirement deliberate. The actual removal of the worktree and local branch was a destructive Level 3 repository operation. The project owner explicitly authorised both actions. The project did not complete the necessary Level 3 panel or structured decision before the operation. |
-| What changed | The canonical recovery owner, context-recovery workflow, IDE/workspace workflow, audit, and focused validator now make deliberate retirement necessary. The normal Git workflow removed the merged STE100 retrieval-assurance worktree and only its merged local branch. D-GOV-012 records the historical sequence nonconformance. It gives no retrospective authority. |
-| What now works | Accepted `main` at `d47518083768d34cf9b41566feaf132ac4562595` contained target HEAD `9f3b05d480971d197a57cb00f1811f6c1012f144`. The read-only audit classified the exact 144-file inventory with SHA-256 `a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`, showed necessary preservation, and returned no finding. |
-| Limitations/findings | The audit examines exact evidence that a local plan supplies. It makes no ownership, disposal, removal, branch-removal, acceptance, or integration decision. Git ignores the local plan, which is not project authority. The removed target cannot supply a new inventory or index-flag inspection. The inventory and Git-status result are historical evidence. Thus, complete historical losslessness cannot be shown. |
+| What changed | The canonical recovery owner, context-recovery workflow, IDE/workspace workflow, retirement audit, and focused validator now make deliberate retirement necessary. The Git workflow removed the merged STE100 retrieval-assurance worktree and only its merged local branch. D-GOV-012 records the historical sequence nonconformance. It gives no retrospective authority. |
+| What now works | Accepted `main` at `d47518083768d34cf9b41566feaf132ac4562595` contained target HEAD `9f3b05d480971d197a57cb00f1811f6c1012f144`. The local-state inventory had 144 files. The retirement plan classified each file. Its SHA-256 was `a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`. The retirement audit examined the plan. It showed necessary preservation and returned no finding. |
+| Limitations/findings | The retirement audit examines exact evidence that the retirement plan supplies. It makes no decision about ownership, removal, branch removal, acceptance, or integration. Git ignores the retirement plan, which is not project authority. The removed target cannot supply a new local-state inventory or a new examination of Git index flags. The local-state inventory and Git status result are historical evidence. Current evidence cannot show complete historical losslessness. |
 | Owner decision | D-GOV-012 records the sequence nonconformance. It accepts the named-source preservation result. It authorises one Cycle 2 repair candidate and one draft pull request. It authorises no integration or Cycle 3 work. It changes no risk disposition. |
 | Next action | After applicable validation gives PASS and new independent reviews give ACCEPT, publish one draft pull request. Do not merge it. Do not start Cycle 3. If a mandatory blocker stays, stop. |
 
@@ -3096,14 +3096,14 @@ Pull request #56 merged the STE100 retrieval-assurance branch through merge
 commit `65409493d741a5606543bd437e519f8efefb8680`. The worktree had attached
 local branch `agent/ste100-retrieval-assurance` at
 `9f3b05d480971d197a57cb00f1811f6c1012f144`. Its upstream branch was absent.
-Git status reported no tracked change under the former audit. It reported no
-non-ignored untracked file.
+Git status reported no tracked change under the former retirement audit. It
+reported no non-ignored untracked file.
 
-The audit version that examined the target used Git status to report no tracked
-change. It did not examine `assume-unchanged` or `skip-worktree` index flags.
-Normal worktree removal removed the target index. Current evidence cannot examine
-those index flags again. It cannot show that all tracked bytes matched the
-removed index.
+The retirement audit version that examined the target used Git status. It
+reported no tracked change. It did not examine `assume-unchanged` or
+`skip-worktree` index flags. `git worktree remove` removed the target index.
+Current evidence cannot examine those index flags again. It cannot show that
+all tracked bytes matched the removed index.
 
 Immediately before retirement, local `main`, `origin/main`, and live GitHub
 `main` identified `d47518083768d34cf9b41566feaf132ac4562595`. Git showed that
@@ -3112,19 +3112,19 @@ merged with the same head and merge commit. The IDE-backed primary project was
 on `main`. Git status reported no tracked change in the primary project. No open
 editor or process used the target worktree.
 
-### Exact local-state classification
+### How the retirement plan classified local state
 
-The read-only inventory contained 144 ignored files and 8,042,871 bytes. Its
+The local-state inventory contained 144 ignored files and 8,042,871 bytes. Its
 SHA-256 identity was
 `a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`.
 
-| Classification | Files | Bytes | Result and owner |
+| Type | Files | Bytes | Result and owner |
 | --- | ---: | ---: | --- |
-| Authoritative local source | 1 | 3,316,157 | The local-source and provenance records own the official ASD-STE100 Issue 9 PDF. The canonical primary path contained an exact preserved file. |
+| Authoritative local source | 1 | 3,316,157 | The source manifest and provenance record own the official ASD-STE100 Issue 9 PDF. The canonical primary path contained an exact preserved file. |
 | Retained evidence | 0 | 0 | No current evidence or recovery owner made retention from this worktree necessary. |
-| Rebuildable cache/generated state | 82 | 3,026,397 | Two STE caches, six Ruff-cache files, 68 Python bytecode files, and six repeatable validation logs had canonical regeneration or disposal proof. |
+| Rebuildable cache/generated state | 82 | 3,026,397 | The canonical owners supplied rebuild or removal proof for two STE caches, six files from the Ruff cache, 68 Python bytecode files, and six repeatable validation logs. |
 | Temporary disposable state | 61 | 1,700,317 | The STE receipt owner says not to keep all usual review receipts. No tracked authority named one of these receipts for retention. |
-| Ambiguous or uniquely owned state | 0 | 0 | No item stayed in this classification. |
+| Ambiguous or uniquely owned state | 0 | 0 | The retirement plan classified no item as this type. |
 
 The PDF at the target and canonical primary path had byte size 3,316,157 and
 SHA-256
@@ -3134,21 +3134,24 @@ the necessary source-bound schema-v2 results. The three syntax logs were
 byte-identical PASS results. The three standalone logs were byte-identical
 60/60 PASS results. No tracked document named their timestamps.
 
-The exact local classification plan stayed under ignored temporary state. The
+The exact retirement plan stayed under ignored temporary state. The retirement
 audit did not print its path, preservation destination, or file content. The
-complete-result audit had six non-overlapping groups. It had exact target,
-accepted-history, and inventory identities. It also had the former audit's
-no-tracked-change result, inactivity, authority, byte-identical preservation,
-no unsupported type, and zero findings.
+retirement plan had six groups and classified each item once.
+
+The retirement audit had the exact target identity. It had exact identities for
+the accepted commit and local-state inventory. It also had the former retirement
+audit's result that reported no tracked change. It had inactivity and authority.
+It had byte-identical preservation, no unsupported type, and zero findings.
 
 ### Retirement and preservation result
 
-The final complete-result audit ran immediately before normal
-`git worktree remove`. The command did not use `--force`, `git stash`, manual
-relocation, `git worktree prune`, or another worktree. Git removed the target
-worktree. The post-removal inspection showed that the filesystem and registered
-worktree list did not contain the target. Only then, `git branch -d` removed the
-merged local branch at `9f3b05d480971d197a57cb00f1811f6c1012f144`.
+Immediately before `git worktree remove`, the final retirement audit ran. The
+command did not use `--force`, `git stash`, manual relocation,
+`git worktree prune`, or another worktree. Git removed the target worktree. The
+post-removal inspection showed that the filesystem and registered worktree list
+did not contain the target. The accepted commit still contained the exact
+local-branch tip `9f3b05d480971d197a57cb00f1811f6c1012f144`. Only then,
+`git branch -d` removed that merged local branch.
 
 The PDF stayed at its canonical primary path with the same byte size and
 SHA-256. Local `main`, the Cycle 2 branch, and the pull request #57
@@ -3156,25 +3159,29 @@ branch kept their exact heads. The primary, Cycle 2, and pull request #57
 worktrees stayed registered. The operation removed no remote branch. The stash
 inventory stayed empty and `refs/stash` stayed absent.
 
-The focused recovery validator gave PASS results for its read-only and complete
-ignored and non-ignored inventory fixtures. It also gave PASS results for
-incomplete coverage, overlap, missing proof, ambiguity, inactivity, authority,
-target and accepted-history identity, non-containment, and inventory change. It
-gave PASS results for loss of tracked cleanliness and non-default
-`assume-unchanged` and `skip-worktree` index flags. It also gave PASS results
-for an unsupported local-state type and a preservation mismatch. The filesystem
-failure output contained no path.
+The focused recovery validator gave a PASS result. Its valid fixtures examined
+the complete local-state inventory. Each invalid fixture returned a FAIL
+result. The invalid fixtures covered:
 
-Its disposable integration fixture gave PASS results for normal removal without
-force, preserved source, and post-retirement local-branch order. Python and
-FCMacro parsing gave a PASS result for 189 tracked files.
+- Incomplete coverage, overlap, missing proof, or ambiguous state
+- Activity, authority, target identity, the identity of the accepted commit, or an accepted-history containment mismatch
+- A changed local-state inventory or loss of tracked cleanliness
+- Non-default index flags or an alternate Git index from the environment
+- An unsupported local-state type or preservation mismatch
+- Private failure data or path output.
+
+The disposable integration fixture gave a PASS result. It used
+`git worktree remove` without `--force`. It preserved the authoritative source.
+It removed the local branch only after the worktree. Python and FCMacro parsing
+gave a PASS result for 189 tracked files.
 
 The standalone CI profile gave a 60/60 PASS result. The local standalone profile
 gave a 59/60 PASS result in the Cycle 2 worktree. Its live-workstation member
-correctly reported
-that the worktree did not contain the ignored Templot source archive. The
-candidate safety audit separately verified the exact necessary archive and
-critical-assets result against the primary workspace with tracked cleanliness.
+correctly reported that the worktree did not contain the ignored source archive
+for Templot. The repository safety command for the candidate validated the
+necessary archive. It
+also validated the `critical-assets` result against the primary workspace with
+tracked cleanliness.
 Governance semantics rejected 287/287 mutations with zero escapes and 281
 independent protections.
 
@@ -3202,21 +3209,22 @@ losslessness.
 | --- | --- |
 | Do nothing | The contradiction and sequence finding stay unresolved. Rejected. |
 | Create a false prior panel | This would record false chronology and false authority. Rejected. |
-| New worktree from accepted history | Accepted history can supply tracked files. It cannot supply the exact removed index. Rejected as an evidence repair. |
+| New worktree from accepted commit | The accepted commit can supply tracked files. It cannot supply the exact removed index. Rejected as an evidence repair. |
 | Record a bounded decision after the operation | This keeps the named-source preservation evidence. It reports the uncertainty. The owner selected it for one repair candidate and draft pull request. |
 
-The exact containment, inventory, and preservation records above are the
-evidence for this decision. It changes only current evidence, the decision
-register, the linked plan summary, and directly dependent controls. It keeps the current
-technical retirement controls. It changes no canonical recovery authority. No
-rollback can supply the same removed Git index.
+The exact accepted-history containment, local-state inventory, and preservation
+records above are the evidence for this decision. It changes only current
+evidence, the decision register, the linked project-plan summary, and directly
+dependent controls. It keeps the current controls for worktree retirement. It
+changes no canonical recovery authority. No rollback can supply the same
+removed Git index.
 
 #### Participants and independence
 
 | Role | Contribution |
 | --- | --- |
 | Project owner | The project owner made D-GOV-012 and selected the bounded result through the exact instruction on 2026-08-25. |
-| Implementing agent | The implementing agent supplied the containment, inventory, preservation, removal, and sequencing evidence. It does not accept its work. |
+| Implementing agent | The implementing agent supplied accepted-history containment, the local-state inventory, preservation, removal, and sequencing evidence. It does not accept its work. |
 | Independent quality reviewer | Accepted the technical controls in candidate `96063e9` and stopped publication until the Level 3 finding had a decision. |
 | Independent security/recovery reviewer | Accepted the reusable control and preservation result. The reviewer rejected the claim that the target had tracked cleanliness. It also rejected a claim of historical losslessness. |
 | Independent documentation reviewer | Rejected the remaining Issue 9 defects and the contradiction in the evidence wording. |
@@ -3229,13 +3237,13 @@ candidate before publication.
 
 | Risk | Panel judgement | Result |
 | --- | --- | --- |
-| PR-12 — fragmented or stale direction | One evidence section owns the detailed result. D-GOV-012 and the plan link to it. No competing policy owner is added. | Medium / Mitigate. The disposition and effectiveness do not change. |
-| PR-13 — repository or evidence loss | Accepted history contained tracked work. The named PDF has exact preservation. Historical losslessness cannot be shown because the removed index is absent. | Critical / Mitigate. The disposition and effectiveness do not change. |
+| PR-12 — fragmented or stale direction | One evidence section owns the detailed result. D-GOV-012 and the project plan link to it. The change adds no competing policy owner. | Medium / Mitigate. The disposition and effectiveness do not change. |
+| PR-13 — repository or evidence loss | The accepted commit contained tracked work. The named PDF has exact preservation. Current evidence cannot show historical losslessness because the removed index is absent. | Critical / Mitigate. The disposition and effectiveness do not change. |
 | PR-22 — authority transfer or self-acceptance | The project owner makes D-GOV-012. New independent reviews are necessary before the draft pull request. Integration has no authority. | High / Remove. The disposition and effectiveness do not change. |
 
 No risk state, severity, treatment, owner, deadline, disposition, or control
 effectiveness changes. The operation has no exact rollback for its removed Git
-index. Accepted history can supply tracked files, but it cannot supply the same
+index. The accepted commit can supply tracked files, but it cannot supply the same
 historical index.
 
 **Panel recommendation:** **Proceed with bounded conditions.** Record D-GOV-012.
@@ -3244,7 +3252,7 @@ retrospective removal or integration authority.
 
 #### Owner decision D-GOV-012
 
-**Record the STE100 nonconformance with the Level 3 sequence.**
+**Record the sequence nonconformance for STE100 worktree retirement.**
 
 At protected `main` `d47518083768d34cf9b41566feaf132ac4562595` and Cycle 2
 candidate `96063e9836748bbc5755db251fa8b66564e65a28`, the project owner records
@@ -3254,17 +3262,18 @@ did not complete the Level 3 panel or decision record before those actions. This
 decision gives no retrospective authority.
 
 Accepted `main` contained target HEAD
-`9f3b05d480971d197a57cb00f1811f6c1012f144`. The inventory classified all 144
-local files. The named PDF stayed byte-identical at its canonical primary path.
-The removed Git index is not available. Current evidence cannot show whether it
-had an `assume-unchanged` or `skip-worktree` flag. Thus, complete historical
-losslessness cannot be shown.
+`9f3b05d480971d197a57cb00f1811f6c1012f144`. The retirement plan classified all
+144 local files, and the retirement audit examined that plan. The named PDF
+stayed byte-identical at its canonical primary path. The removed Git index is not
+available. Current evidence cannot show whether it had an `assume-unchanged` or
+`skip-worktree` flag. Current evidence cannot show complete historical
+losslessness.
 
 The owner authorises one bounded Cycle 2 repair and review cycle. Keep the
-current technical retirement controls. Correct only the mandatory documentation
-and evidence findings. After exact validation and new independent reviews find
-no blocker, publish one draft pull request. Do not merge it. Do not start Cycle
-3.
+current controls for worktree retirement. Correct only the mandatory
+documentation and evidence findings. After exact validation and new independent
+reviews find no blocker, publish one draft pull request. Do not merge it. Do not
+start Cycle 3.
 
 This decision changes no product or railway behaviour. It changes no FreeCAD,
 export, schema, API, performance, release, production, or phase authority. Phase
@@ -3292,16 +3301,22 @@ Documentation review rejected the remaining Issue 9 defects. D-GOV-012
 authorises this one repair cycle.
 
 The bounded replacement rejects a substituted accepted ref, intermediate
-preservation symlinks, and duplicate JSON keys. Its Git inspection disables
-optional locks. Its command output uses stable group identifiers and does not
-return private plan names, local paths, or raw detail from a Git failure. It
-also rejects non-default index flags. For filesystem inspection failures, it
-returns a result without a path. Focused regressions protect these boundaries.
+preservation symlinks, and duplicate JSON keys. For each Git command, it removes
+all inherited Git environment values. It then disables optional locks. A direct
+regression shows that `GIT_INDEX_FILE` cannot hide flags in the registered
+worktree's Git index.
+
+Its command output uses stable group identifiers. It does not return names from
+the retirement plan, local paths, or raw detail from a Git failure. It rejects
+non-default index flags.
+
+For filesystem inspection failures, it returns a result without a path. Focused
+regressions protect these boundaries.
 
 The documentation repair uses the canonical terminology and owner-view labels.
-The general LFE embodiment rule stays because the project owner explicitly
-made that bounded review necessary in this cycle. No repair grants project, phase,
-product, removal, or integration authority.
+The general rule for LFE embodiment stays because the project owner explicitly
+made that bounded review necessary in this cycle. No repair grants project,
+phase, product, removal, or integration authority.
 
 This workflow migration embodies LFE-021 under the canonical recovery policy.
 It adds one control for PR-13 but does not change that risk's state,

@@ -86,12 +86,16 @@ recovery branch or worktree is not accepted product state.
 
 For worktree retirement, read the canonical
 [deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-Review accepted-history containment, tracked cleanliness, inactivity, and the
-exact ignored/local-state inventory. Review each classification, its proof
-owner, necessary preservation, and ambiguous-state rejection. Review removal
-authority, the non-force command, post-removal preservation, and the
-branch/worktree/stash diff. Classify an inference of disposal from a merge and
-tracked cleanliness as missing proof. It is not a retention decision.
+Review accepted-history containment and tracked cleanliness. Review inactivity
+and the exact local-state inventory. Review how the retirement plan classifies
+each item and names its proof owner. Review necessary preservation and
+the FAIL result for ambiguous state.
+
+Review removal authority and
+`git worktree remove` without `--force`. After removal, review preservation.
+Review the preservation diff for branches, worktrees, and the stash inventory.
+A merge and tracked cleanliness do not show removal authority. Report missing
+proof if a candidate makes that inference.
 
 ## Review order
 

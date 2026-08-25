@@ -3398,12 +3398,13 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/ignored-inventory-omitted",
             replace_once(
                 policy,
-                "Make an inventory of all ignored and non-ignored local-only files.",
-                "Make an inventory of tracked files only.",
+                "Make a local-state inventory of all ignored and non-ignored "
+                "local-only\n   files.",
+                "Make a local-state inventory of tracked files only.",
             ),
             (
-                "worktree retirement policy lacks: make an inventory of all "
-                "ignored and non ignored local only files"
+                "worktree retirement policy lacks: make a local state inventory "
+                "of all ignored and non ignored local only files"
             ),
         ),
         (
@@ -3423,7 +3424,7 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/ambiguous-state-does-not-stop",
             replace_once(
                 policy,
-                "Stop. Keep\n   the worktree. Get the smallest necessary "
+                "Stop.\n   Keep the worktree. Get the smallest necessary "
                 "owner decision.",
                 "Continue with removal.",
             ),
@@ -3442,12 +3443,14 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/branch-deleted-before-worktree",
             replace_once(
                 policy,
-                "After the\nworktree is absent, use `git branch -d`",
-                "Before the\nworktree is absent, use `git branch -d`",
+                "After the\nworktree is absent, record the exact local-branch "
+                "tip commit.",
+                "Before the\nworktree is absent, record the exact local-branch "
+                "tip commit.",
             ),
             (
                 "worktree retirement policy lacks: after the worktree is "
-                "absent use git branch d to remove the local branch"
+                "absent record the exact local branch tip commit"
             ),
         ),
     )
@@ -3569,9 +3572,9 @@ def validate_visible_recovery_mutations() -> None:
     )
     retirement_shortcut = replace_once(
         workflows,
-        "A merge and tracked cleanliness give no\ndisposal authority in these "
+        "A merge and tracked\ncleanliness give no removal authority in these "
         "workflows.",
-        "A merge and tracked cleanliness give disposal authority in these "
+        "A merge and tracked\ncleanliness give removal authority in these "
         "workflows.",
     )
     expect_rejected(
@@ -3581,7 +3584,7 @@ def validate_visible_recovery_mutations() -> None:
             skills,
         ),
         "agent workflow retirement routing lacks: a merge and tracked "
-        "cleanliness give no disposal authority in these workflows",
+        "cleanliness give no removal authority in these workflows",
     )
 
     missing_snapshot = replace_once(
@@ -3686,7 +3689,7 @@ def validate_visible_recovery_mutations() -> None:
     )
     force_retirement_claimed = replace_once(
         phase_evidence,
-        "The command did not use `--force`, `git stash`, manual\nrelocation, "
+        "The\ncommand did not use `--force`, `git stash`, manual relocation,\n"
         "`git worktree prune`, or another worktree.",
         "The command used `--force`.",
     )
@@ -3713,7 +3716,7 @@ def validate_visible_recovery_mutations() -> None:
     )
     historical_cleanliness_overstated = replace_once(
         phase_evidence,
-        "Git status reported no tracked change under the former audit.",
+        "Git status reported no tracked change under the former retirement audit.",
         "It had tracked cleanliness.",
     )
     expect_rejected(
@@ -3722,7 +3725,7 @@ def validate_visible_recovery_mutations() -> None:
             historical_cleanliness_overstated
         ),
         "worktree retirement phase evidence lacks: git status reported no "
-        "tracked change under the former audit",
+        "tracked change under the former retirement audit",
     )
     retrospective_authority_added = replace_once(
         phase_evidence,

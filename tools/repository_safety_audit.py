@@ -73,6 +73,9 @@ def _sha256(path):
 
 def _git(root, *arguments, allow_failure=False):
     environment = os.environ.copy()
+    for name in tuple(environment):
+        if name.startswith("GIT_"):
+            del environment[name]
     environment["GIT_OPTIONAL_LOCKS"] = "0"
     result = subprocess.run(
         ["git", "-C", str(root), *arguments],

@@ -817,9 +817,9 @@ Repository recovery and ignored-data safety controls:
 .venv/bin/python tests/validate_recovery_controls.py --live-workstation
 ```
 
-The audit is read-only. It starts no network operation. It reports the
-checkpoint state from local remote-tracking refs. It verifies the ignored
-Templot source archive. It makes an inventory of local generated-data roots.
+The repository safety command is read-only. It starts no network operation. It
+reports the checkpoint state from local remote-tracking refs. It verifies the
+ignored source archive for Templot. It records roots for local generated data.
 
 It fails closed for an invalid backup target. An invalid target can be absent,
 inside the repository, or on the same mounted filesystem. The default validator
@@ -828,52 +828,57 @@ archive. The `--live-workstation` profile also shows the current checkout's
 archive/hash and branch/upstream boundary. Neither result claims that an
 independent backup or restore exists.
 
-Before a risky tranche, run `git fetch` explicitly when remote state might have
-changed. Then, use the condition for a clean, pushed checkpoint:
+Before a risky tranche, if remote state might have changed, run `git fetch`.
+Then, use the condition for a clean, pushed checkpoint:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py --require-checkpoint
 ```
 
-For a proposed worktree retirement, first run the audit with
-`--retirement-worktree` and no plan. Record its inventory SHA-256 and counts.
-Then, review the local classification plan against the canonical
-[deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-Run the audit again with `--retirement-plan` and
+For a proposed worktree retirement, first run the retirement audit with
+`--retirement-worktree` and no retirement plan. Record the SHA-256 and counts
+for the local-state inventory. Then, review the retirement plan against the
+canonical [deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+Run the retirement audit again with `--retirement-plan` and
 `--require-retirement-ready`. The sentinel must be
 `TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no
-finding. The focused recovery validator must give a FAIL result for at least
-these conditions:
+finding.
 
-- A merge and tracked cleanliness without a classification plan
-- Incomplete or overlapping inventory coverage
+Each invalid fixture in the focused recovery validator must return a
+FAIL result. Include at least these states:
+
+- A merge and tracked cleanliness without a retirement plan
+- Incomplete or overlapping coverage of the local-state inventory
 - Ambiguous or uniquely owned local state
-- A changed target, accepted-history, or inventory identity
+- A change to the target, accepted commit, or local-state inventory
 - Loss of tracked cleanliness, an unsupported local-state type, or missing
   inactivity or authority, including an `assume-unchanged` or `skip-worktree` index flag
-- Missing classification proof or non-identical necessary preservation
-- A substituted accepted ref, duplicate plan key, or symlinked preservation
+- A Git environment value that changes the repository or Git index
+- Missing proof for an item or non-identical necessary preservation
+- A substituted accepted ref, duplicate key in the retirement plan, or symlinked preservation
   parent
-- Private plan data, private detail from a filesystem failure, or raw detail
+- Private data from the retirement plan, private detail from a filesystem failure, or raw detail
   from a Git failure in command output
-- An attempted mutating or force-removal command in the read-only audit.
+- A command that mutates state or uses force in the retirement audit.
 
-The disposable integration fixture must show normal worktree removal without
-force. It must show that the separately preserved authoritative source stays
-available. It must also show that safe local-branch removal occurs only after
-worktree retirement. Before an actual removal, review the exact classification
-from live state. Review the preservation diff from exact live state. After
-removal, make sure that no unrelated branch, worktree, stash, or preserved file
-changed. These controls do not make a retention, disposal, or authority
-decision.
+The disposable integration fixture must use `git worktree remove` without
+`--force`. It must show that the separately preserved authoritative source
+stays available. It must show that the worktree is absent before branch
+removal. It must also show that the accepted commit contains the exact
+local-branch tip commit.
+
+Before an actual removal, review how the retirement plan classifies exact live
+state. Review the preservation diff from exact live state. After removal, make
+sure that no unrelated branch, worktree, stash, or preserved file changed.
+These controls make no retention, removal, or authority decision.
 
 Use `--backup-target ... --require-backup-target` only to assess a selected or
 replacement external destination. Backup completion and restore evidence stay
 separate recovery conditions under
 [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The linked 2026-07-22 evidence
 records the first copy, restore, and incremental-repeat result. That result
-covers the complete project-data scope that the owner accepted. The audit
-command by itself still does not show those results.
+covers the complete project-data scope that the owner accepted. The repository
+safety command by itself still does not show those results.
 
 Repository QA, documentation-link and residual-risk controls:
 

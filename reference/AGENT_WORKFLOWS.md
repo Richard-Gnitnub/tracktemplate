@@ -61,12 +61,16 @@ recovery gate a complete result.
 
 Before a worktree retirement, read the
 [deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-Context recovery makes an inventory of local state and identifies its owner.
+Context recovery makes a local-state inventory. It identifies the owner of each
+item.
 IDE/workspace alignment shows that the worktree is inactive and has no sole
-operator state. The read-only safety audit records the exact Git and local-state
-identities and examines the reviewed classification plan. A merge and tracked cleanliness give no
-disposal authority in these workflows. They stop when ignored or local-only
-state has ambiguous ownership or lacks preservation proof.
+operator state.
+
+The retirement audit records the exact Git and local-state
+identities. It examines the reviewed retirement plan. A merge and tracked
+cleanliness give no removal authority in these workflows. When ignored or
+local-only state has ambiguous ownership or lacks preservation proof, these
+workflows stop.
 
 ## Instruction budget
 
@@ -768,17 +772,21 @@ For deliberate worktree retirement:
 ```text
 show accepted-history containment and tracked cleanliness
     ↓
-make an inventory of ignored and other local-only state
+make a local-state inventory of ignored and other local-only state
     ↓
-classify every item and show necessary preservation or disposal basis
+classify every item
+    ↓
+show necessary preservation or the reason to discard the item
     ↓
 stop for ambiguous or uniquely owned state
     ↓
-examine the exact read-only audit and authority again
+examine the exact retirement audit and authority again
     ↓
-use normal Git worktree removal without force
+use `git worktree remove` without `--force`
     ↓
-afterwards, remove only the merged local branch that is safe
+show that the accepted commit contains the exact local-branch tip commit
+    ↓
+remove only that merged local branch
 ```
 
 For an architecture decision:

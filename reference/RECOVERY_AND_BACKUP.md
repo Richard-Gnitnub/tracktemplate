@@ -299,20 +299,20 @@ finding about sensitive evidence or local evidence.
 ## Deliberate worktree retirement
 
 A merged worktree with tracked cleanliness is not automatically disposable. A
-merge can show that accepted history contains tracked work. It does not
+merge can show accepted-history containment for tracked work. It does not
 classify ignored files or other local-only state. Tracked cleanliness gives no
-removal authority for that state.
+removal authority for local state.
 
-Use this procedure before each worktree retirement:
+Before each worktree retirement, use this procedure:
 
 1. If the accepted remote can have changed, run `git fetch`. Record the exact
    target worktree, attached local branch, HEAD, and accepted remote-main commit.
-2. Show that accepted history contains the target HEAD and all commits on its
-   branch. Show tracked cleanliness. Make sure that the worktree is inactive
-   and has no sole unsaved IDE or operator state.
-3. Make an inventory of all ignored and non-ignored local-only files. Do not use
-   a Git ignore rule as a retention or disposal decision.
-4. Classify each inventory item as one of these types:
+2. Show accepted-history containment for the target HEAD and all branch
+   commits. Show tracked cleanliness. Make sure that the worktree is inactive.
+   Make sure that it has no sole unsaved IDE or operator state.
+3. Make a local-state inventory of all ignored and non-ignored local-only
+   files. Do not use a Git ignore rule to decide retention or removal.
+4. Classify each local-state inventory item as one of these types:
    - **Authoritative local source**
    - **Retained evidence**
    - **Rebuildable cache/generated state**
@@ -324,27 +324,31 @@ Use this procedure before each worktree retirement:
 6. For rebuildable cache/generated state, identify its owner. Record the rebuild
    or regeneration proof that gave a PASS result. For temporary disposable
    state, identify its owner. Record why retention is not necessary.
-7. If ownership, uniqueness, classification, preservation, or disposal proof is
-   incomplete, classify the state as ambiguous or uniquely owned. Stop. Keep
-   the worktree. Get the smallest necessary owner decision.
+7. If proof of ownership, uniqueness, assigned type, preservation, or removal
+   is incomplete, classify the state as ambiguous or uniquely owned. Stop.
+   Keep the worktree. Get the smallest necessary owner decision.
 8. Record the exact retirement authority. Immediately before removal, examine
-   the target identity, accepted history, tracked cleanliness, inactivity,
-   inventory identity, classification, and preservation again.
+   the target identity and accepted-history containment. Examine tracked
+   cleanliness and inactivity. Examine the identity of the local-state
+   inventory, the retirement plan, and preservation again.
 
-Use the read-only audit to get the exact identity of the local-state inventory:
+Use the retirement audit to get the exact identity of the local-state inventory:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py \
   --retirement-worktree /exact/registered/worktree
 ```
 
-Keep the classification plan local. Do not commit local paths, private evidence,
-credentials, or secrets. The plan records the target branch and HEAD, accepted
-ref and commit, and inventory SHA-256. It also records activity evidence,
-authority, complete non-overlapping classifications, proof owners,
-dispositions, and the necessary preservation destination. For this repository,
-the accepted ref is `refs/remotes/origin/main`. Then, use the complete-result
-condition:
+Keep the retirement plan local. Do not commit local paths, private evidence,
+credentials, or secrets.
+
+The retirement plan records the target branch, HEAD, accepted ref, and accepted
+commit. It records the SHA-256 of the local-state inventory. It records activity
+evidence and authority. It classifies each item once and records its proof
+owner. It also records the result and necessary preservation destination.
+
+For this repository, the accepted ref is `refs/remotes/origin/main`. Then, use
+the complete-result condition:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py \
@@ -353,26 +357,32 @@ condition:
   --require-retirement-ready
 ```
 
-The audit is read-only. It returns counts and identities, not local paths or file
-content. It does not grant removal or branch-removal authority. It fails closed
-for a changed identity, loss of tracked cleanliness, or incomplete or
-overlapping classification. It also fails closed for unsupported local state,
-ambiguous ownership, missing proof, or a preservation mismatch. It rejects an
-`assume-unchanged` or `skip-worktree` index flag. A filesystem inspection
-failure returns only a path-free failure result.
+The retirement audit is read-only. It returns counts and identities, not local
+paths or file content. It does not grant removal or branch-removal authority.
 
-Only after a complete result and exact authority, use normal
-`git worktree remove` for the resolved target. Do not use `--force`. Do not use
-`git stash`. Do not move local files only to make Git removal succeed. Normal
-Git removal can remove the target's classified ignored files. Thus, complete the
-inventory and preservation proof first.
+It fails closed for a changed identity or loss of tracked cleanliness. It also
+fails closed if the retirement plan omits an item or classifies it more than
+once. Unsupported local state, ambiguous ownership, missing proof, or a
+preservation mismatch also gives a FAIL result.
+
+The retirement audit rejects an `assume-unchanged` or `skip-worktree` index
+flag. It ignores inherited Git
+environment values that can change the repository or Git index. A filesystem
+inspection failure returns only a path-free failure result.
+
+Only after a complete result and exact authority, use `git worktree remove` for
+the resolved target. Do not use `--force`. Do not use `git stash`. Do not move
+local files only to make Git removal succeed. Git can remove ignored files that
+the retirement plan classifies. Thus, complete the local-state inventory and
+preservation proof first.
 
 After removal, examine the registered worktrees, branches, stash inventory, and
 preservation destination again. Record the preservation diff. After the
-worktree is absent, use `git branch -d` to remove the local branch only if
-accepted history still contains it. If no separate instruction gives authority,
-do not remove a remote branch. Do not run `git worktree prune` or change another
-worktree as part of this procedure.
+worktree is absent, record the exact local-branch tip commit. If the accepted
+commit contains that exact tip commit, use `git branch -d` with exact authority.
+If no separate instruction gives authority, do not remove a remote branch. Do
+not run `git worktree prune` or change another worktree as part of this
+procedure.
 
 ## Backup and restore acceptance
 

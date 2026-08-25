@@ -128,7 +128,7 @@ sure that the worktree is inactive. Make sure that it holds no sole operator
 state. Then, use the canonical
 [deliberate worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
 Make a local-state inventory. Classify all ignored and other local-only state.
-A Git ignore rule gives no disposal authority. Ambiguous ownership, uniqueness,
+A Git ignore rule gives no removal authority. Ambiguous ownership, uniqueness,
 activity, or preservation keeps the worktree registered.
 
 Use the
@@ -161,7 +161,7 @@ Report:
 5. Facts that files/Git show and facts that need operator confirmation
 6. Changes that the authorised Git workflow made and post-change proof
 7. Worktrees that stay registered and why
-8. For a retirement, ignored/local-state classification and preservation proof
+8. For a retirement, the local-state inventory and how the retirement plan classifies it
 9. Activity evidence and the post-retirement worktree map
 10. Unresolved uncertainty or unsafe cleanup that the authorised Git workflow did not do.
 

@@ -62,11 +62,11 @@ inventory. If the inventory has a retained stash or missing recovery
 information, do not give the recovery gate a complete result.
 Before a worktree retirement, use the canonical
 [deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-Show accepted-history containment and tracked cleanliness. Make an inventory of
-all ignored and other local-only files. Identify the owner and preservation need
-for each material group. A merge, tracked cleanliness, or Git ignore rule does
-not make that state disposable. If any state is ambiguous or uniquely owned,
-keep the worktree and stop.
+Show accepted-history containment and tracked cleanliness. Make a local-state
+inventory of all ignored and other local-only files. Identify the owner and
+preservation need for each material group. A merge, tracked cleanliness, or Git
+ignore rule gives no removal authority for local state. If any state is
+ambiguous or uniquely owned, keep the worktree and stop.
 
 8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
@@ -162,8 +162,9 @@ owner-view fields. Then, keep this technical provenance:
 6. the next bounded action and check.
 
 Also record the named Git state and complete stash inventory. For worktree
-retirement, record the exact identity of the local-state inventory, classification,
-preservation proof, unresolved ownership, and worktree disposition.
+retirement, record the exact identity of the local-state inventory. Record how the
+retirement plan classifies each material group. Record preservation proof,
+unresolved ownership, and the worktree result.
 
 Do not describe incomplete work, an unaccepted diff or an unrun check as
 accepted project state.

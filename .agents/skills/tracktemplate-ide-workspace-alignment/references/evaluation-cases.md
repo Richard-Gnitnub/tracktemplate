@@ -17,9 +17,8 @@ confirmation rather than merely mentioning PyCharm.
 5. "A stash with a recovery label stays after the merge commit. Before you
    report recovery, validate its stash ownership, recovery purpose, unique
    content, and stash disposition."
-6. "This merged TrackTemplate worktree has tracked cleanliness but also has ignored local
-   files. Show whether it is inactive and safe to remove without loss of sole
-   source or evidence state."
+6. "This merged TrackTemplate worktree has tracked cleanliness and ignored
+   local files. Does the recovery policy give removal authority?"
 
 Before a mutation, the response must make a local-state inventory. The response
 must delegate Git operations to their owning workflow. It must preserve
@@ -53,8 +52,9 @@ Reject or stop when a response:
 
 - Uses a run-configuration or window name as branch evidence
 - Says that a merged worktree with tracked cleanliness is disposable without
-  reachability, inactivity, complete ignored/local-state classification, and preservation
-- Uses a Git ignore rule as disposal authority or continues when local-state
+  accepted-history containment or inactivity
+- Continues without a complete local-state inventory and preservation proof
+- Uses a Git ignore rule as removal authority or continues when local-state
   ownership is ambiguous
 - Removes state, runs `git worktree prune`, changes a branch, or moves state
   without separate Git authority
