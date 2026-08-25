@@ -183,6 +183,117 @@ The audit uses local remote-tracking state and performs no network operation.
 Fetch explicitly before relying on it when another actor may have updated the
 remote.
 
+<a id="visible-recovery-state"></a>
+
+## Visible recovery state
+
+TrackTemplate workflows must not use `git stash` for planned preservation,
+recovery, or handoff. Use named Git state for planned preservation.
+
+Use this sequence:
+
+1. Keep usual unfinished work on a feature branch and its worktree.
+2. Keep interrupted work on a recovery branch.
+3. When a recovery worktree is available, use it.
+4. Make a recovery commit that keeps the recovery state.
+5. For local evidence, use a checksum manifest and the independent preservation
+   method with project authority.
+6. Use `git stash` only in an emergency to keep work available.
+
+Record the recovery purpose and project owner of named Git state. Keep it
+different from accepted `main`. A recovery commit is not product acceptance,
+evidence acceptance, or merge authority. Do not stage sensitive evidence or
+local evidence. Do not commit sensitive evidence or local evidence. Do not push
+sensitive evidence or local evidence. Keep a checksum manifest with sensitive
+paths local. Use independent preservation.
+
+An emergency stash is temporary unresolved recovery state. Do not use it for
+planned preservation or handoff. Record its `stash@{n}` selector. Record the
+full SHA of the stash commit.
+
+Do not put sensitive evidence or local evidence in a stash. When
+`--include-untracked`, `-u`, `--all`, or `-a` can put such evidence in Git, do
+not use them. Use approved independent preservation directly. If a stash
+contains such evidence, do not stage that evidence. Do not commit that
+evidence. Do not push that evidence. Before the owner authorises its
+disposition, preserve it only with the approved independent method.
+
+A stash disposition removes the stash from the inventory. It does not remove
+its Git objects. Git can keep those objects when the stash inventory is empty.
+This procedure does not control Git object removal. Do not use an automatic
+operation to remove Git objects.
+
+If a stash contains sensitive evidence or local evidence, the recovery gate
+does not have a complete result. Stop this procedure. Before more Git work, get
+project owner direction. Before more Git work, use
+`$tracktemplate-security-review`.
+
+Record the stash topology:
+
+- Record the SHA of the base commit. Record the base tree.
+- Record the SHA of the index parent. Record the index tree.
+- Record the worktree tree.
+- Record the SHA of the optional untracked-files parent. Record the U tree.
+
+The U tree contains each untracked file. When the command makes a stash with
+`--all`, the same U tree also contains each ignored file. Git keeps those files
+only in U.
+
+Complete this procedure during the same bounded cycle:
+
+- If the stash has unique content that Git can contain, preserve it on a
+  recovery branch or recovery worktree. Then, make a recovery commit. Compare
+  the base tree with the index tree and worktree tree. Review each path,
+  file-mode difference, and deletion.
+- If unique content is sensitive evidence or local evidence, do not put it in a
+  recovery commit. Compare each path and blob for that evidence with approved
+  independent preservation. Preserve it only with that method.
+- Compare each other path and blob in the U tree with the named Git state or
+  approved independent preservation.
+- If the stash has no unique content, validate each stash tree difference.
+  Validate each path in the U tree.
+- Get the applicable authority for the stash that the stash commit SHA
+  identifies.
+- Before the disposition, examine the stash inventory again. Validate that the
+  stash selector identifies the same stash commit SHA and stash inventory.
+- If the exact Git identity or a stash component changed, stop.
+- Complete only that stash disposition. Then, examine the repository, stashes,
+  and preservation state again. Record the preservation diff.
+
+Do not use `drop`, `clear`, `overwrite`, `pop`, `rewrite`, `git stash branch`,
+or other operation that removes a stash without a report and applicable
+authority. A tool must not remove a stash only to get empty `git stash list`
+output.
+
+Until you complete this check sequence, the recovery gate does not have a
+complete result:
+
+- Examine the output of `git stash list`.
+- Record the project owner, recovery purpose, stash selector, and full SHA of
+  the stash commit.
+- Record each B/I/W/U component in the stash inventory for each retained stash.
+- Compare the base tree with the index tree and worktree tree. Review each path,
+  blob, deletion, and file mode. Review each path and blob in the U tree.
+  Preserve unique content that Git can contain in named Git state. Preserve
+  sensitive evidence and local evidence only with approved independent
+  preservation.
+- Get applicable authority for this stash disposition.
+- Before the disposition, validate that the stash selector, stash commit SHA,
+  and stash inventory did not change.
+- Complete only the stash disposition. Then, examine `git stash list` again.
+  Review the preservation diff again.
+- If a stash contains sensitive evidence or local evidence, stop this
+  procedure. The recovery gate does not have a complete result. Before more Git
+  work, get project owner direction. Before more Git work, use
+  `$tracktemplate-security-review`.
+
+A retained stash is unresolved recovery state. A recorded owner or purpose
+does not give the recovery gate a complete result. If stash ownership,
+recovery purpose, stash inventory, unique content, or stash disposition is
+missing or changed, fail closed. The recovery gate does not have a complete
+result. A completed recovery cycle has no retained stash and no unresolved
+finding about sensitive evidence or local evidence.
+
 ## Backup and restore acceptance
 
 The independent backup is not ready until the project owner selects its

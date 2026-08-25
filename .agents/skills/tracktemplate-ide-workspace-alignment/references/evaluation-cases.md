@@ -14,6 +14,9 @@ confirmation rather than merely mentioning PyCharm.
    workspace safely."
 4. A literal `$tracktemplate-continue` cycle starts from an IDE-backed checkout
    with multiple registered worktrees.
+5. "A stash with a recovery label stays after the merge commit. Before you
+   report recovery, validate its stash ownership, recovery purpose, unique
+   content, and stash disposition."
 
 Require the response to inventory before mutation, delegate Git operations to
 their owning workflow, preserve ambiguous work and request UI confirmation when
@@ -50,3 +53,7 @@ Reject or stop when a response:
 - treats `recentProjects.xml` as proof of the physical focused window;
 - changes `.idea` or global SDK state without explicit scope; or
 - leaves active uncommitted or unpushed work solely under `/tmp`.
+
+While the stash inventory contains a retained stash, reject a complete recovery
+result. If the stash inventory or stash disposition evidence is not complete,
+reject the result.

@@ -652,7 +652,7 @@ def validate_lfe_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     rows = lfe_rows(text)
     identifiers = [re.match(r"\| (LFE-\d{3})", row).group(1) for row in rows]
-    expected = ["LFE-{:03d}".format(number) for number in range(1, 20)]
+    expected = ["LFE-{:03d}".format(number) for number in range(1, 21)]
     require(identifiers == expected, "LFE identifiers are not unique and sequential")
     earlier = "".join(rows[:18]).encode("utf-8")
     require(
@@ -660,7 +660,8 @@ def validate_lfe_text(text: str) -> None:
         "an earlier LFE row was modified, renumbered, or replaced",
     )
     require(text.count("| LFE-019 /") == 1, "LFE-019 must occur exactly once")
-    row = semantic_text(rows[-1])
+    lfe_019 = rows[18]
+    row = semantic_text(lfe_019)
     for fragment in (
         "large authorised source again and again",
         "too much read time and agent context",
@@ -677,7 +678,7 @@ def validate_lfe_text(text: str) -> None:
         "cannot use partial retrieval as evidence of partial conformance",
     ):
         require(fragment in row, "LFE-019 lacks: " + fragment)
-    cells = [cell.strip() for cell in rows[-1].strip().strip("|").split("|")]
+    cells = [cell.strip() for cell in lfe_019.strip().strip("|").split("|")]
     require(len(cells) == 4, "LFE-019 row structure drifted")
     reusable = semantic_text(cells[3])
     for fragment in (
@@ -703,7 +704,7 @@ def validate_lfe_text(text: str) -> None:
         "AGENT_WORKFLOWS.md#tt-doc-001-workflow-integration",
         "external/asd-ste100/README.md#local-retrieval-interface",
     ):
-        require(link in rows[-1], "LFE-019 lacks canonical link: " + link)
+        require(link in lfe_019, "LFE-019 lacks canonical link: " + link)
     require(
         "this lfe owns" not in row and "lfe-019 owns" not in row,
         "LFE-019 became a competing STE policy owner",
