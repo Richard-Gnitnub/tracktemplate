@@ -62,8 +62,8 @@ them directly:
 - the run/debug configuration selected in the UI; and
 - whether PyCharm has refreshed its VCS state after an external Git action.
 
-Never infer the Git branch from a run-configuration name, coverage filename,
-recent-file entry, window title or SDK label. Resolve it from the backing Git
+Do not use a run-configuration name, coverage filename, recent-file entry,
+window title, or SDK label as Git-branch evidence. Resolve it from the backing Git
 worktree.
 
 ## Alignment workflow
@@ -119,16 +119,16 @@ Temporary /tmp worktrees
     never the sole location of active, uncommitted or unpushed work
 ```
 
-A primary checkout on a merged feature branch is stale even when its files are
-contained in `main`. Prove containment and cleanliness through Git before any
-switch. A worktree is not disposable merely because its pull request merged;
-prove that its tip and all unique commits are contained in accepted remote
-`main`, that it has tracked cleanliness, and that it is inactive and holds no
+A primary checkout on a merged feature branch is stale even when `main`
+contains its files. Use Git to show containment and cleanliness before Git
+changes the branch. A worktree is not disposable merely because its pull request
+merged. Show that accepted remote `main` contains its tip and all unique
+commits, that it has tracked cleanliness, and that it is inactive and holds no
 sole operator state. Then, use the canonical
 [deliberate worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-Inventory and classify all ignored and other local-only state. Do not infer
-disposal from a Git ignore rule. Ambiguous ownership, uniqueness, activity, or
-preservation keeps the worktree registered.
+Make an inventory of and classify all ignored and other local-only state. A Git
+ignore rule gives no disposal authority. Ambiguous ownership, uniqueness,
+activity, or preservation keeps the worktree registered.
 
 Use the
 [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
@@ -153,16 +153,16 @@ it does not permit the skill to invent UI evidence.
 
 Report:
 
-1. the repository/common-Git roots and complete worktree map;
-2. branch, exact HEAD, upstream, cleanliness and unique-work state per worktree;
-3. remote-main and pull-request mapping plus stale merged branches;
-4. primary project path, VCS roots, interpreter/venv and run working directories;
-5. facts proved from files/Git and facts requiring operator confirmation;
-6. changes performed by the authorised Git workflow and post-change proof;
-7. every retained worktree and why it remains.
-8. For a retirement, ignored/local-state classification and preservation proof.
-9. Activity evidence and the post-retirement worktree map.
-10. Unresolved uncertainty or unsafe cleanup deliberately not performed.
+1. The repository/common-Git roots and complete worktree map
+2. Branch, exact HEAD, upstream, cleanliness and unique-work state per worktree
+3. Remote-main and pull-request mapping plus stale merged branches
+4. Primary project path, VCS roots, interpreter/venv and run working directories
+5. Facts that files/Git show and facts that need operator confirmation
+6. Changes that the authorised Git workflow made and post-change proof
+7. Worktrees that stay registered and why
+8. For a retirement, ignored/local-state classification and preservation proof
+9. Activity evidence and the post-retirement worktree map
+10. Unresolved uncertainty or unsafe cleanup that the authorised Git workflow did not do.
 
 When maintaining this skill or its routing, exercise the
 [evaluation cases](references/evaluation-cases.md) and run the repository

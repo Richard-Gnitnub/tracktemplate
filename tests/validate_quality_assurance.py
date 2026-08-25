@@ -709,6 +709,7 @@ def validate_documentation_profile(
         "retirement plan",
         "retirement audit",
         "Ambiguous or uniquely owned state",
+        "Assign one worktree-retirement inventory item to one classification",
         "Do not use different technical terms for the same project concept",
         "Do not use a technical noun as a verb unless this register also "
         "approves the verb",

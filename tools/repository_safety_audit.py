@@ -62,9 +62,12 @@ class SafetyAuditError(RuntimeError):
 
 def _sha256(path):
     digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
+    try:
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+    except OSError:
+        raise SafetyAuditError("file identity inspection failed") from None
     return digest.hexdigest()
 
 
@@ -262,21 +265,21 @@ def _local_state_entry(target, relative, git_state):
     path = target.joinpath(*pathlib.PurePosixPath(relative).parts)
     try:
         metadata = path.lstat()
-    except FileNotFoundError as error:
-        raise SafetyAuditError(
-            "local-state inventory changed during inspection"
-        ) from error
-    if stat.S_ISREG(metadata.st_mode):
-        kind = "file"
-        identity = _sha256(path)
-    elif stat.S_ISLNK(metadata.st_mode):
-        kind = "symlink"
-        identity = hashlib.sha256(
-            os.fsencode(path.readlink())
-        ).hexdigest()
-    else:
-        kind = "unsupported"
-        identity = ""
+        if stat.S_ISREG(metadata.st_mode):
+            kind = "file"
+            identity = _sha256(path)
+        elif stat.S_ISLNK(metadata.st_mode):
+            kind = "symlink"
+            identity = hashlib.sha256(
+                os.fsencode(path.readlink())
+            ).hexdigest()
+        else:
+            kind = "unsupported"
+            identity = ""
+    except SafetyAuditError:
+        raise
+    except OSError:
+        raise SafetyAuditError("local-state inspection failed") from None
     return {
         "path": relative,
         "git_state": git_state,
@@ -439,7 +442,7 @@ def _preservation_matches(entries, destination_root, target):
                 ).hexdigest()
             else:
                 return False
-        except OSError:
+        except (OSError, SafetyAuditError):
             return False
         if (
             metadata.st_size != entry["size_bytes"]
@@ -629,10 +632,27 @@ def audit_worktree_retirement(root, target, plan_path=None):
         ).stdout.splitlines()
         if line
     ]
+    index_flag_records = [
+        record
+        for record in _git(target, "ls-files", "-v", "-z").stdout.split("\0")
+        if record
+    ]
+    malformed_index_flags = any(
+        len(record) < 3 or record[1] != " "
+        for record in index_flag_records
+    )
+    if malformed_index_flags:
+        raise SafetyAuditError("Git index-flag inspection was malformed")
+    non_default_index_flag_count = sum(
+        record[0] == "S" or record[0].islower()
+        for record in index_flag_records
+    )
     inventory = _retirement_inventory(target)
     findings = []
     if tracked_entries:
         findings.append("target-tracked-state-not-clean")
+    if non_default_index_flag_count:
+        findings.append("target-index-flags-not-default")
     if record["detached"] or not record["branch"]:
         findings.append("target-branch-not-attached")
     if record["locked"]:
@@ -778,8 +798,11 @@ def audit_worktree_retirement(root, target, plan_path=None):
         "target": {
             **identity,
             "registered": True,
-            "tracked_clean": not tracked_entries,
+            "tracked_clean": (
+                not tracked_entries and not non_default_index_flag_count
+            ),
             "tracked_entry_count": len(tracked_entries),
+            "non_default_index_flag_count": non_default_index_flag_count,
             "locked": record["locked"],
             "prunable": record["prunable"],
         },
@@ -1047,7 +1070,7 @@ def main(argv=None):
                 arguments.retirement_worktree,
                 arguments.retirement_plan,
             )
-        except SafetyAuditError:
+        except (OSError, SafetyAuditError):
             report = {
                 "schema_version": 1,
                 "report_kind": "worktree-retirement",

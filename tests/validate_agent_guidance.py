@@ -547,8 +547,8 @@ def validate_ide_workspace_alignment_contract(
             + required_item,
         )
     required_no_inference = semantic_text(
-        "Never infer the Git branch from a run-configuration name, coverage "
-        "filename, recent-file entry, window title or SDK label. Resolve it "
+        "Do not use a run-configuration name, coverage filename, recent-file "
+        "entry, window title, or SDK label as Git-branch evidence. Resolve it "
         "from the backing Git worktree."
     )
     require(
@@ -620,7 +620,11 @@ def validate_ide_workspace_alignment_mutations(
     for mutation, original, replacement in (
         ("Git authority inversion", "does not grant", "grants"),
         ("operator evidence inversion", "operator-confirmed", "file-proved"),
-        ("branch inference inversion", "Never infer", "Infer"),
+        (
+            "non-Git branch evidence inversion",
+            "Do not use a run-configuration name",
+            "Use a run-configuration name",
+        ),
         (
             "temporary-worktree safeguard deletion",
             "never the sole location of active, uncommitted or unpushed work",

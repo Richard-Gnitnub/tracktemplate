@@ -3383,24 +3383,24 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/ignored-inventory-omitted",
             replace_once(
                 policy,
-                "Inventory all ignored and non-ignored local-only files.",
-                "Inventory tracked files only.",
+                "Make an inventory of all ignored and non-ignored local-only files.",
+                "Make an inventory of tracked files only.",
             ),
             (
-                "worktree retirement policy lacks: inventory all ignored and "
-                "non ignored local only files"
+                "worktree retirement policy lacks: make an inventory of all "
+                "ignored and non ignored local only files"
             ),
         ),
         (
             "retirement/preservation-proof-omitted",
             replace_once(
                 policy,
-                "Prove byte-identical preservation outside the target\n"
+                "Show byte-identical preservation outside the target\n"
                 "   worktree.",
                 "assume that another copy exists.",
             ),
             (
-                "worktree retirement policy lacks: prove byte identical "
+                "worktree retirement policy lacks: show byte identical "
                 "preservation outside the target worktree"
             ),
         ),
@@ -3408,11 +3408,11 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/ambiguous-state-does-not-stop",
             replace_once(
                 policy,
-                "Stop. Retain\n   the worktree. Get the smallest necessary "
+                "Stop. Keep\n   the worktree. Get the smallest necessary "
                 "owner decision.",
                 "Continue with removal.",
             ),
-            "worktree retirement policy lacks: stop retain the worktree",
+            "worktree retirement policy lacks: stop keep the worktree",
         ),
         (
             "retirement/force-removal-permitted",
@@ -3432,7 +3432,7 @@ def validate_visible_recovery_mutations() -> None:
             ),
             (
                 "worktree retirement policy lacks: after the worktree is "
-                "absent use git branch d"
+                "absent use git branch d to remove the local branch"
             ),
         ),
     )
@@ -3554,10 +3554,10 @@ def validate_visible_recovery_mutations() -> None:
     )
     retirement_shortcut = replace_once(
         workflows,
-        "These workflows do not infer that a merge\nand tracked cleanliness "
-        "make state disposable.",
-        "These workflows infer that a merge and tracked cleanliness make "
-        "state disposable.",
+        "A merge and tracked cleanliness give no\ndisposal authority in these "
+        "workflows.",
+        "A merge and tracked cleanliness give disposal authority in these "
+        "workflows.",
     )
     expect_rejected(
         "retirement/workflow-adds-merge-cleanliness-shortcut",
@@ -3565,8 +3565,8 @@ def validate_visible_recovery_mutations() -> None:
             retirement_shortcut,
             skills,
         ),
-        "agent workflow retirement routing lacks: do not infer that a merge "
-        "and tracked cleanliness make state disposable",
+        "agent workflow retirement routing lacks: a merge and tracked "
+        "cleanliness give no disposal authority in these workflows",
     )
 
     missing_snapshot = replace_once(
@@ -3672,7 +3672,7 @@ def validate_visible_recovery_mutations() -> None:
     force_retirement_claimed = replace_once(
         phase_evidence,
         "The command did not use `--force`, `git stash`, manual\nrelocation, "
-        "prune, or another worktree.",
+        "`git worktree prune`, or another worktree.",
         "The command used `--force`.",
     )
     expect_rejected(
@@ -3681,7 +3681,7 @@ def validate_visible_recovery_mutations() -> None:
             force_retirement_claimed
         ),
         "worktree retirement phase evidence lacks: did not use force git "
-        "stash manual relocation prune or another worktree",
+        "stash manual relocation git worktree prune or another worktree",
     )
     cycle_3_started_early = replace_once(
         phase_evidence,
@@ -3791,7 +3791,8 @@ def validate_visible_recovery_mutations() -> None:
     )
     weakened_retirement_lfe = replace_once(
         learning,
-        "Inventory and classify ignored local state before retirement.",
+        "Make an inventory of and classify ignored local state before worktree "
+        "removal.",
         "A clean merged worktree needs no local-state inventory.",
     )
     expect_rejected(
@@ -3799,8 +3800,8 @@ def validate_visible_recovery_mutations() -> None:
         lambda: recovery_controls.validate_recovery_lfe(
             weakened_retirement_lfe
         ),
-        "LFE-021 reusable rule lacks: inventory and classify ignored local "
-        "state before retirement",
+        "LFE-021 reusable rule lacks: make an inventory of and classify ignored "
+        "local state before worktree removal",
     )
     weakened_embodiment_rule = replace_once(
         learning,

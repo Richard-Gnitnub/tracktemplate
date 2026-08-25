@@ -51,7 +51,7 @@ includes a linguistic conformance assessment, route it to
    `reference/current/risks.json` or `gate-decisions.json`.
 7. Retrieve implementation evidence deterministically. Prefer exact paths,
    identifiers and headings with `rg --files` and `rg`; use ontology concepts
-   to expand stable product terms, not to infer live status. Inspect relevant
+   to expand stable product terms, not as live-status evidence. Examine relevant
    source, tests, raw failures, Git status and diffs only after authority is
    established.
 Use the
@@ -62,11 +62,11 @@ inventory. If the inventory has a retained stash or missing recovery
 information, do not give the recovery gate a complete result.
 Before a worktree retirement, use the canonical
 [deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-Prove accepted-history containment and tracked cleanliness. Inventory all
-ignored and other local-only files. Recover the owner and preservation need for
-each material group. A merge, tracked cleanliness, or Git ignore rule does not
-make that state disposable. If any state is ambiguous or uniquely owned, retain
-the worktree and stop.
+Show accepted-history containment and tracked cleanliness. Make an inventory of
+all ignored and other local-only files. Identify the owner and preservation need
+for each material group. A merge, tracked cleanliness, or Git ignore rule does
+not make that state disposable. If any state is ambiguous or uniquely owned,
+keep the worktree and stop.
 
 8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
@@ -163,7 +163,7 @@ owner-view fields. Then, keep this technical provenance:
 
 Also record the named Git state and complete stash inventory. For worktree
 retirement, record the exact local-state inventory identity, classification,
-preservation proof, unresolved ownership, and retained or completed result.
+preservation proof, unresolved ownership, and worktree disposition.
 
 Do not describe incomplete work, an unaccepted diff or an unrun check as
 accepted project state.

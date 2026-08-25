@@ -817,18 +817,18 @@ Repository recovery and ignored-data safety controls:
 .venv/bin/python tests/validate_recovery_controls.py --live-workstation
 ```
 
-The audit is read-only and performs no network operation. It reports clean and
+The audit is read-only and starts no network operation. It reports clean and
 pushed checkpoint state from local remote-tracking refs, verifies the ignored
-Templot source archive, inventories local generated-data roots and fails closed
+Templot source archive, makes an inventory of local generated-data roots, and fails closed
 when a requested backup target is absent, inside the repository or on the same
-mounted filesystem. The default validator proves deterministic control
+mounted filesystem. The default validator shows deterministic control
 behaviour, including rejection of a clean fixture without the archive. The
-`--live-workstation` profile additionally proves the current checkout's ignored
+`--live-workstation` profile also shows the current checkout's ignored
 archive/hash and branch/upstream boundary. Neither result claims that an
 independent backup or restore exists.
 
-Before a risky tranche, fetch explicitly when remote state might have changed,
-then require a clean pushed checkpoint:
+Before a risky tranche, run `git fetch` explicitly when remote state might have
+changed. Then, use the clean pushed checkpoint condition:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py --require-checkpoint
@@ -839,37 +839,39 @@ For a proposed worktree retirement, first run the audit with
 Then, review the local classification plan against the canonical
 [deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
 Run the audit again with `--retirement-plan` and
-`--require-retirement-ready`. The required sentinel is
+`--require-retirement-ready`. The sentinel must be
 `TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no
-finding. The focused recovery validator must prove at least these failures:
+finding. The focused recovery validator must give a FAIL result for at least
+these conditions:
 
-- A merge and tracked cleanliness without a classification plan.
-- Incomplete or overlapping inventory coverage.
-- Ambiguous or uniquely owned local state.
-- A changed target, accepted-history, or inventory identity.
+- A merge and tracked cleanliness without a classification plan
+- Incomplete or overlapping inventory coverage
+- Ambiguous or uniquely owned local state
+- A changed target, accepted-history, or inventory identity
 - Loss of tracked cleanliness, an unsupported local-state type, or missing
-  inactivity or authority.
-- Missing classification proof or non-identical required preservation.
+  inactivity or authority, including an `assume-unchanged` or `skip-worktree` index flag
+- Missing classification proof or non-identical necessary preservation
 - A substituted accepted ref, duplicate plan key, or symlinked preservation
-  parent.
-- Private plan data or raw Git failure detail in command output.
+  parent
+- Private plan data, private filesystem failure detail, or raw Git failure
+  detail in command output
 - An attempted mutating or force-removal command in the read-only audit.
 
-The disposable integration fixture must prove normal non-force worktree
-removal. It must prove that the separately preserved authoritative source stays
-available. It must also prove that safe local-branch deletion occurs only after
+The disposable integration fixture must show normal non-force worktree
+removal. It must show that the separately preserved authoritative source stays
+available. It must also show that safe local-branch removal occurs only after
 worktree retirement. Before an actual removal, review the exact live
-classification and preservation diff. After removal, confirm that no unrelated
+classification and preservation diff. After removal, make sure that no unrelated
 branch, worktree, stash, or preserved file changed. These controls do not make
 a retention, disposal, or authority decision.
 
 Assess a selected or replacement external destination only with
 `--backup-target ... --require-backup-target`; backup completion and restore
-evidence remain separate recovery conditions under
+evidence stay separate recovery conditions under
 [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The first repository-scope
 copy, restore and incremental-repeat result is recorded in the linked
-2026-07-22 evidence there for the owner-confirmed complete project-data scope;
-the audit command by itself still does not prove those executed results.
+2026-07-22 evidence there for the complete project-data scope that the owner
+accepted. The audit command by itself still does not show those results.
 
 Repository QA, documentation-link and residual-risk controls:
 

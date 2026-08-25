@@ -88,10 +88,10 @@ For worktree retirement, read the canonical
 [deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
 Review accepted-history containment, tracked cleanliness, inactivity, and the
 exact ignored/local-state inventory. Review each classification, its proof
-owner, required preservation, and ambiguous-state rejection. Review removal
+owner, necessary preservation, and ambiguous-state rejection. Review removal
 authority, the non-force command, post-removal preservation, and the
-branch/worktree/stash diff. Treat an inference of disposal from a merge and
-tracked cleanliness as missing proof, not as a retention decision.
+branch/worktree/stash diff. Classify an inference of disposal from a merge and
+tracked cleanliness as missing proof. It is not a retention decision.
 
 ## Review order
 

@@ -61,12 +61,13 @@ recovery gate a complete result.
 
 Before a worktree retirement, read the
 [deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
-Context recovery inventories local state and recovers its owner. IDE/workspace
-alignment proves the worktree is inactive and has no sole operator state. The
-read-only safety audit pins the exact Git and local-state identities and checks
-the reviewed classification plan. These workflows do not infer that a merge
-and tracked cleanliness make state disposable. They stop when ignored or
-local-only state has ambiguous ownership or lacks preservation proof.
+Context recovery makes an inventory of local state and identifies its owner.
+IDE/workspace alignment shows that the worktree is inactive and has no sole
+operator state. The read-only safety audit records the exact Git and local-state
+identities and examines the reviewed classification plan. A merge and tracked
+cleanliness give no disposal authority in these workflows. They stop when
+ignored or local-only state has ambiguous ownership or lacks preservation
+proof.
 
 ## Instruction budget
 
@@ -766,17 +767,17 @@ after the stash inventory is empty, give the recovery gate a complete result
 For deliberate worktree retirement:
 
 ```text
-prove accepted-history containment and tracked cleanliness
+show accepted-history containment and tracked cleanliness
     ↓
-inventory ignored and other local-only state
+make an inventory of ignored and other local-only state
     ↓
-classify every item and prove required preservation or disposal basis
+classify every item and show necessary preservation or disposal basis
     ↓
 stop for ambiguous or uniquely owned state
     ↓
-recheck the exact read-only audit and authority
+examine the exact read-only audit and authority again
     ↓
-normal non-force worktree removal, then safe merged local-branch deletion
+normal non-force worktree removal, then safe merged local-branch removal
 ```
 
 For an architecture decision:

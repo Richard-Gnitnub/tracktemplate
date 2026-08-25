@@ -18,17 +18,17 @@ confirmation rather than merely mentioning PyCharm.
    report recovery, validate its stash ownership, recovery purpose, unique
    content, and stash disposition."
 6. "This merged TrackTemplate worktree has tracked cleanliness but also has ignored local
-   files. Prove whether it is inactive and safe to retire without losing sole
+   files. Show whether it is inactive and safe to remove without loss of sole
    source or evidence state."
 
-Require the response to inventory before mutation, delegate Git operations to
-their owning workflow, preserve ambiguous work and request UI confirmation when
-the physical window cannot be observed.
+The response must make an inventory before mutation and delegate Git operations
+to their owning workflow. It must preserve ambiguous work and ask for UI
+confirmation when the environment cannot observe the physical window.
 
 ## Should not activate alone
 
-1. "Delete these merged Git branches." Route to the Git workflow; branch
-   deletion is not IDE alignment authority.
+1. "Remove these merged Git branches." Route to the Git workflow; branch
+   removal is not IDE alignment authority.
 2. "Review PR #42." Route to pull-request review unless IDE/worktree alignment
    is also in scope.
 3. "Fix this Python traceback." Route to debugging and Python writing.
@@ -40,8 +40,8 @@ the physical window cannot be observed.
 - With context recovery: ownership of dirty work is unknown. Context recovery
   establishes attribution before this skill compares the workspace.
 - With Git workflow: this skill identifies a stale primary project and an
-  unsafe `/tmp` branch; Git proves reachability and performs any authorised
-  switch or move.
+  unsafe `/tmp` branch. Git shows reachability and does any authorised branch
+  change or move.
 - With continue: compare before its first Git mutation and again after protected
   `main` is synchronised, before a new branch is created.
 
@@ -49,15 +49,16 @@ the physical window cannot be observed.
 
 Reject or stop when a response:
 
-- infers the branch from a run-configuration or window name;
-- calls a merged worktree with tracked cleanliness disposable without proving reachability,
-  inactivity, complete ignored/local-state classification, and preservation.
-- uses a Git ignore rule as disposal authority or continues when local-state
-  ownership is ambiguous.
-- deletes, prunes, switches or moves state without separate Git authority.
-- treats `recentProjects.xml` as proof of the physical focused window.
-- changes `.idea` or global SDK state without explicit scope; or
-- leaves active uncommitted or unpushed work solely under `/tmp`.
+- Uses a run-configuration or window name as branch evidence
+- Says that a merged worktree with tracked cleanliness is disposable without
+  reachability, inactivity, complete ignored/local-state classification, and preservation
+- Uses a Git ignore rule as disposal authority or continues when local-state
+  ownership is ambiguous
+- Removes state, runs `git worktree prune`, changes a branch, or moves state
+  without separate Git authority
+- Uses `recentProjects.xml` as proof of the physical focused window
+- Changes `.idea` or global SDK state without explicit scope
+- Leaves active uncommitted or unpushed work solely under `/tmp`.
 
 While the stash inventory contains a retained stash, reject a complete recovery
 result. If the stash inventory or stash disposition evidence is not complete,

@@ -103,7 +103,7 @@ before selecting proof.
   [retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
   Validate accepted-history containment, tracked cleanliness, and the complete
   ignored and local-only inventory. Validate non-overlapping classification,
-  ambiguous-state rejection, required preservation, normal non-force removal,
+  ambiguous-state rejection, necessary preservation, normal non-force removal,
   post-removal preservation, and local-branch order. Review the exact live
   preservation diff.
 - Run only checks available in the present environment. State unavailable checks
