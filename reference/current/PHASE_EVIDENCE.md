@@ -3181,11 +3181,12 @@ The bounded replacement rejects a substituted accepted ref, intermediate
 preservation symlinks, and duplicate JSON keys. Its Git inspection disables
 optional locks. Its command output uses stable group identifiers and does not
 emit private plan names, local paths, or raw Git failure detail. Focused
-regressions protect these boundaries. The documentation repair uses the
-canonical terminology and owner-view labels. The general LFE embodiment rule
-stays because the project owner explicitly required that bounded review in this
-cycle. No repair grants project, phase, product, removal, or integration
-authority.
+regressions protect these boundaries.
+
+The documentation repair uses the canonical terminology and owner-view labels.
+The general LFE embodiment rule stays because the project owner explicitly
+required that bounded review in this cycle. No repair grants project, phase,
+product, removal, or integration authority.
 
 This workflow migration embodies LFE-021 under the canonical recovery policy.
 It adds one control for PR-13 but does not change that risk's state,
