@@ -3083,12 +3083,12 @@ evidence do not change.
 
 | Field | Result |
 | --- | --- |
-| Current state | A Level 2 recovery/workspace workflow migration now makes worktree retirement deliberate. The merged STE100 retrieval-assurance worktree and only its merged local branch were retired. |
-| Evidence | Accepted `main` at `d47518083768d34cf9b41566feaf132ac4562595` contained target HEAD `9f3b05d480971d197a57cb00f1811f6c1012f144`. The read-only audit classified the exact 144-file inventory with SHA-256 `a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`, proved required preservation, and returned no finding. |
-| Limitations | The audit checks exact evidence that a local plan supplies. It does not make ownership, disposal, removal, branch-deletion, acceptance, or integration decisions. The local plan is ignored and not project authority. |
-| Blockers | None remained in this bounded retirement. The inventory had no retained-evidence item, ambiguous item, unsupported type, tracked change, or non-ignored untracked file. |
-| Decision | The project owner's exact instruction authorised normal non-force removal of this worktree and safe deletion of only its merged local branch after removal. It authorised no other worktree, branch, remote branch, Git object, backup, or evidence disposition. |
-| Next action | Freeze and independently review the separate Cycle 2 candidate, then publish it as a draft pull request if exact-green. Integration requires authority for that exact reviewed candidate. Cycle 3 does not start from an open Cycle 2 pull request. |
+| Current state | The Level 2 recovery/workspace workflow migration now makes worktree retirement deliberate. The actual worktree and local-branch retirement was a Level 3 destructive repository operation. It occurred under the project owner's exact instruction, but the required pre-operation panel and structured decision were not recorded. |
+| What changed | The canonical recovery owner, context-recovery workflow, IDE/workspace workflow, audit, and focused validator now require deliberate retirement. The merged STE100 retrieval-assurance worktree and only its merged local branch were retired. |
+| What now works | Accepted `main` at `d47518083768d34cf9b41566feaf132ac4562595` contained target HEAD `9f3b05d480971d197a57cb00f1811f6c1012f144`. The read-only audit classified the exact 144-file inventory with SHA-256 `a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`, proved required preservation, and returned no finding. |
+| Limitations/findings | The audit checks exact evidence that a local plan supplies. It does not make ownership, disposal, removal, branch-deletion, acceptance, or integration decisions. The local plan is ignored and not project authority. The missing pre-operation Level 3 records are an open governance-sequencing finding. |
+| Owner decision | The project owner's exact instruction authorised normal non-force removal of this worktree and safe deletion of only its merged local branch after removal. It authorised no other worktree, branch, remote branch, Git object, backup, or evidence disposition. |
+| Next action | Complete replacement validation and exact-candidate review. Get the smallest project-owner instruction for the open Level 3 governance-sequencing finding before publication. Integration requires authority for that exact reviewed candidate. Cycle 3 does not start from an open Cycle 2 pull request. |
 
 ### Exact starting state and containment
 
@@ -3096,13 +3096,14 @@ Pull request #56 merged the STE100 retrieval-assurance branch through merge
 commit `65409493d741a5606543bd437e519f8efefb8680`. The retained worktree had
 attached local branch `agent/ste100-retrieval-assurance` at
 `9f3b05d480971d197a57cb00f1811f6c1012f144`. Its upstream branch was absent.
-Its tracked state was clean. It had no non-ignored untracked file.
+It had tracked cleanliness. It had no non-ignored untracked file.
 
 Immediately before retirement, local `main`, `origin/main`, and live GitHub
 `main` identified `d47518083768d34cf9b41566feaf132ac4562595`. Git proved that
 this accepted commit contained the target HEAD. Pull request #56 remained
 merged with the same head and merge commit. The IDE-backed primary project was
-clean `main`. No open editor or process used the target worktree.
+on `main` and had tracked cleanliness. No open editor or process used the target
+worktree.
 
 ### Exact local-state classification
 
@@ -3151,16 +3152,40 @@ stayed empty and `refs/stash` stayed absent.
 The focused recovery validator passed its read-only and complete ignored and
 non-ignored inventory fixtures. It also passed incomplete coverage, overlap,
 missing proof, ambiguity, inactivity, authority, target and accepted-history
-identity, non-containment, inventory change, tracked-dirt, unsupported type,
-and preservation-mismatch fixtures. Its disposable integration fixture passed
-normal non-force removal, preserved-source, and post-retirement local-branch
-checks. Python and FCMacro parsing passed for 189 tracked files. The
-standalone CI profile passed 60/60. The local standalone profile passed 59/60
-in the Cycle 2 worktree. Its live-workstation member correctly reported that
-the worktree did not contain the ignored Templot source archive. The candidate
-safety audit separately verified the exact required archive and critical-assets
-result against the clean primary workspace. Governance semantics rejected
-284/284 mutations with zero escapes and 278 independent protections.
+identity, non-containment, inventory change, loss of tracked cleanliness,
+unsupported type, and preservation-mismatch fixtures. Its disposable
+integration fixture passed normal non-force removal, preserved-source, and
+post-retirement local-branch checks. Python and FCMacro parsing passed for 189
+tracked files.
+
+The standalone CI profile passed 60/60. The local standalone profile passed
+59/60 in the Cycle 2 worktree. Its live-workstation member correctly reported
+that the worktree did not contain the ignored Templot source archive. The
+candidate safety audit separately verified the exact required archive and
+critical-assets result against the primary workspace with tracked cleanliness.
+Governance semantics rejected 284/284 mutations with zero escapes and 278
+independent protections.
+
+### Independent review and bounded remediation
+
+The first frozen candidate was commit
+`5c4bc0c7ae7ed9e5395638eae36a6b90317e8839` with tree
+`04911c85fc4b30fcc2d035359b4f3fa7041850f1`. Independent quality,
+security/recovery, and documentation reviews rejected it before publication.
+They found accepted-ref substitution, a symlinked preservation-parent bypass,
+duplicate JSON keys, optional Git locks, private diagnostic output, and
+documentation-profile defects. They also found the Level 3 sequence omission
+that the owner view now reports.
+
+The bounded replacement rejects a substituted accepted ref, intermediate
+preservation symlinks, and duplicate JSON keys. Its Git inspection disables
+optional locks. Its command output uses stable group identifiers and does not
+emit private plan names, local paths, or raw Git failure detail. Focused
+regressions protect these boundaries. The documentation repair uses the
+canonical terminology and owner-view labels. The general LFE embodiment rule
+stays because the project owner explicitly required that bounded review in this
+cycle. No repair grants project, phase, product, removal, or integration
+authority.
 
 This workflow migration embodies LFE-021 under the canonical recovery policy.
 It adds one control for PR-13 but does not change that risk's state,

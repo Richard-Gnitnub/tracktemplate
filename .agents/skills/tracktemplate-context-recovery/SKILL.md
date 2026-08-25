@@ -64,7 +64,7 @@ Before a worktree retirement, use the canonical
 [deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
 Prove accepted-history containment and tracked cleanliness. Inventory all
 ignored and other local-only files. Recover the owner and preservation need for
-each material group. A merge, clean tracked status, or Git ignore rule does not
+each material group. A merge, tracked cleanliness, or Git ignore rule does not
 make that state disposable. If any state is ambiguous or uniquely owned, retain
 the worktree and stop.
 

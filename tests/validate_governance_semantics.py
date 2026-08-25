@@ -3366,16 +3366,17 @@ def validate_visible_recovery_mutations() -> None:
 
     retirement_policy_cases = (
         (
-            "retirement/merged-clean-treated-as-disposable",
+            "retirement/merge-and-cleanliness-treated-as-disposable",
             replace_once(
                 policy,
-                "A merged, tracked-clean worktree is not automatically "
+                "A merged worktree with tracked cleanliness is not "
+                "automatically disposable.",
+                "A merged worktree with tracked cleanliness is automatically "
                 "disposable.",
-                "A merged, tracked-clean worktree is automatically disposable.",
             ),
             (
-                "worktree retirement policy lacks: merged tracked clean "
-                "worktree is not automatically disposable"
+                "worktree retirement policy lacks: merged worktree with "
+                "tracked cleanliness is not automatically disposable"
             ),
         ),
         (
@@ -3394,8 +3395,8 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/preservation-proof-omitted",
             replace_once(
                 policy,
-                "prove byte-identical preservation outside the target "
-                "worktree.",
+                "Prove byte-identical preservation outside the target\n"
+                "   worktree.",
                 "assume that another copy exists.",
             ),
             (
@@ -3407,7 +3408,7 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/ambiguous-state-does-not-stop",
             replace_once(
                 policy,
-                "Stop. Retain\n   the worktree and get the smallest necessary "
+                "Stop. Retain\n   the worktree. Get the smallest necessary "
                 "owner decision.",
                 "Continue with removal.",
             ),
@@ -3426,12 +3427,12 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/branch-deleted-before-worktree",
             replace_once(
                 policy,
-                "Delete the local\nbranch only after the worktree is absent",
-                "Delete the local\nbranch before the worktree is absent",
+                "After the\nworktree is absent, use `git branch -d`",
+                "Before the\nworktree is absent, use `git branch -d`",
             ),
             (
-                "worktree retirement policy lacks: delete the local branch "
-                "only after the worktree is absent"
+                "worktree retirement policy lacks: after the worktree is "
+                "absent use git branch d"
             ),
         ),
     )
@@ -3553,19 +3554,19 @@ def validate_visible_recovery_mutations() -> None:
     )
     retirement_shortcut = replace_once(
         workflows,
-        "These workflows do not infer that merged and\ntracked-clean state is "
-        "disposable.",
-        "These workflows infer that merged and tracked-clean state is "
-        "disposable.",
+        "These workflows do not infer that a merge\nand tracked cleanliness "
+        "make state disposable.",
+        "These workflows infer that a merge and tracked cleanliness make "
+        "state disposable.",
     )
     expect_rejected(
-        "retirement/workflow-adds-merged-clean-shortcut",
+        "retirement/workflow-adds-merge-cleanliness-shortcut",
         lambda: recovery_controls.validate_worktree_retirement_routing(
             retirement_shortcut,
             skills,
         ),
-        "agent workflow retirement routing lacks: do not infer that merged "
-        "and tracked clean state is disposable",
+        "agent workflow retirement routing lacks: do not infer that a merge "
+        "and tracked cleanliness make state disposable",
     )
 
     missing_snapshot = replace_once(

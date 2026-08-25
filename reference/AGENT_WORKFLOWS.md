@@ -64,9 +64,9 @@ Before a worktree retirement, read the
 Context recovery inventories local state and recovers its owner. IDE/workspace
 alignment proves the worktree is inactive and has no sole operator state. The
 read-only safety audit pins the exact Git and local-state identities and checks
-the reviewed classification plan. These workflows do not infer that merged and
-tracked-clean state is disposable. They stop when ignored or local-only state
-has ambiguous ownership or lacks preservation proof.
+the reviewed classification plan. These workflows do not infer that a merge
+and tracked cleanliness make state disposable. They stop when ignored or
+local-only state has ambiguous ownership or lacks preservation proof.
 
 ## Instruction budget
 

@@ -123,7 +123,7 @@ A primary checkout on a merged feature branch is stale even when its files are
 contained in `main`. Prove containment and cleanliness through Git before any
 switch. A worktree is not disposable merely because its pull request merged;
 prove that its tip and all unique commits are contained in accepted remote
-`main`, that its tracked state is clean, and that it is inactive and holds no
+`main`, that it has tracked cleanliness, and that it is inactive and holds no
 sole operator state. Then, use the canonical
 [deliberate worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
 Inventory and classify all ignored and other local-only state. Do not infer

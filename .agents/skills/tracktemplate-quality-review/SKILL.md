@@ -90,8 +90,8 @@ Review accepted-history containment, tracked cleanliness, inactivity, and the
 exact ignored/local-state inventory. Review each classification, its proof
 owner, required preservation, and ambiguous-state rejection. Review removal
 authority, the non-force command, post-removal preservation, and the
-branch/worktree/stash diff. Treat `merged + clean = disposable` as a missing
-proof, not as a retention decision.
+branch/worktree/stash diff. Treat an inference of disposal from a merge and
+tracked cleanliness as missing proof, not as a retention decision.
 
 ## Review order
 

@@ -843,13 +843,16 @@ Run the audit again with `--retirement-plan` and
 `TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no
 finding. The focused recovery validator must prove at least these failures:
 
-- Merged and tracked-clean state without a classification plan.
+- A merge and tracked cleanliness without a classification plan.
 - Incomplete or overlapping inventory coverage.
 - Ambiguous or uniquely owned local state.
 - A changed target, accepted-history, or inventory identity.
-- Tracked dirt, an unsupported local-state type, or missing inactivity or
-  authority.
+- Loss of tracked cleanliness, an unsupported local-state type, or missing
+  inactivity or authority.
 - Missing classification proof or non-identical required preservation.
+- A substituted accepted ref, duplicate plan key, or symlinked preservation
+  parent.
+- Private plan data or raw Git failure detail in command output.
 - An attempted mutating or force-removal command in the read-only audit.
 
 The disposable integration fixture must prove normal non-force worktree

@@ -298,34 +298,35 @@ finding about sensitive evidence or local evidence.
 
 ## Deliberate worktree retirement
 
-A merged, tracked-clean worktree is not automatically disposable. A merge can
-prove that accepted history contains tracked work. It does not classify ignored
-files or other local-only state. A clean tracked status gives no deletion
-authority for that state.
+A merged worktree with tracked cleanliness is not automatically disposable. A
+merge can prove that accepted history contains tracked work. It does not
+classify ignored files or other local-only state. Tracked cleanliness gives no
+deletion authority for that state.
 
 Use this procedure before each worktree retirement:
 
-1. Fetch the accepted remote when it can have changed. Record the exact target
+1. If the accepted remote can have changed, fetch it. Record the exact target
    worktree, attached local branch, HEAD, and accepted remote-main commit.
 2. Prove that accepted history contains the target HEAD and all commits on its
-   branch. Prove that the tracked worktree is clean. Confirm that the worktree
-   is inactive and has no sole unsaved IDE or operator state.
+   branch. Prove tracked cleanliness. Confirm that the worktree is inactive and
+   has no sole unsaved IDE or operator state.
 3. Inventory all ignored and non-ignored local-only files. Do not use a Git
    ignore rule as a retention or disposal decision.
 4. Classify each inventory item as one of these types:
-   - **authoritative local source**;
-   - **retained evidence**;
-   - **rebuildable cache/generated state**;
-   - **temporary disposable state**; or
-   - **ambiguous or uniquely owned state**.
-5. For an authoritative local source or retained evidence, name its canonical
-   owner and prove byte-identical preservation outside the target worktree.
-6. For rebuildable cache/generated state, name the owner and record the passed
-   rebuild or regeneration proof. For temporary disposable state, name the
-   owner and the rule that makes retention unnecessary.
+   - **Authoritative local source**.
+   - **Retained evidence**.
+   - **Rebuildable cache/generated state**.
+   - **Temporary disposable state**.
+   - **Ambiguous or uniquely owned state**.
+5. For an authoritative local source or retained evidence, identify its
+   canonical owner. Prove byte-identical preservation outside the target
+   worktree.
+6. For rebuildable cache/generated state, identify its owner. Record the passed
+   rebuild or regeneration proof. For temporary disposable state, identify its
+   owner. Record the rule that makes retention unnecessary.
 7. If ownership, uniqueness, classification, preservation, or disposal proof is
    incomplete, classify the state as ambiguous or uniquely owned. Stop. Retain
-   the worktree and get the smallest necessary owner decision.
+   the worktree. Get the smallest necessary owner decision.
 8. Record the exact retirement authority. Recheck the target identity, accepted
    history, tracked cleanliness, inactivity, inventory identity, classification,
    and preservation immediately before removal.
@@ -341,7 +342,8 @@ Keep the classification plan local. Do not commit local paths, private evidence,
 credentials, or secrets. The plan pins the target branch and HEAD, accepted ref
 and commit, and inventory SHA-256. It also pins activity evidence, authority,
 complete non-overlapping classifications, proof owners, dispositions, and the
-required preservation destination. Then, require the complete result:
+required preservation destination. For this repository, the accepted ref is
+`refs/remotes/origin/main`. Then, require the complete result:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py \
@@ -352,9 +354,9 @@ required preservation destination. Then, require the complete result:
 
 The audit is read-only. It emits counts and identities, not local paths or file
 content. It does not grant removal or branch-deletion authority. It fails closed
-for a changed identity, tracked dirt, or incomplete or overlapping
-classification. It also fails closed for unsupported local state, ambiguous
-ownership, missing proof, or a preservation mismatch.
+for a changed identity, loss of tracked cleanliness, or incomplete or
+overlapping classification. It also fails closed for unsupported local state,
+ambiguous ownership, missing proof, or a preservation mismatch.
 
 Only after a complete result and exact authority, use normal
 `git worktree remove` for the resolved target. Do not use `--force`. Do not use
@@ -363,11 +365,11 @@ Git removal can remove the target's classified ignored files. Thus, complete the
 inventory and preservation proof first.
 
 After removal, inspect the registered worktrees, branches, stash inventory, and
-preservation destination again. Record the preservation diff. Delete the local
-branch only after the worktree is absent and `git branch -d` confirms that
-accepted history still contains it. Do not delete a remote branch unless a
-separate instruction gives that authority. Do not prune or alter another
-worktree as part of this procedure.
+preservation destination again. Record the preservation diff. After the
+worktree is absent, use `git branch -d` to delete the local branch only if
+accepted history still contains it. If no separate instruction gives authority,
+do not delete a remote branch. Do not prune or alter another worktree as part
+of this procedure.
 
 ## Backup and restore acceptance
 

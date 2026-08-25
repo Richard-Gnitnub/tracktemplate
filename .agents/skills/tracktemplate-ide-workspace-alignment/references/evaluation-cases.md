@@ -17,7 +17,7 @@ confirmation rather than merely mentioning PyCharm.
 5. "A stash with a recovery label stays after the merge commit. Before you
    report recovery, validate its stash ownership, recovery purpose, unique
    content, and stash disposition."
-6. "This merged TrackTemplate worktree is tracked-clean but has ignored local
+6. "This merged TrackTemplate worktree has tracked cleanliness but also has ignored local
    files. Prove whether it is inactive and safe to retire without losing sole
    source or evidence state."
 
@@ -50,7 +50,7 @@ the physical window cannot be observed.
 Reject or stop when a response:
 
 - infers the branch from a run-configuration or window name;
-- calls a clean merged worktree disposable without proving reachability,
+- calls a merged worktree with tracked cleanliness disposable without proving reachability,
   inactivity, complete ignored/local-state classification, and preservation.
 - uses a Git ignore rule as disposal authority or continues when local-state
   ownership is ambiguous.

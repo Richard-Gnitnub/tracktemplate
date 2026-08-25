@@ -12,6 +12,7 @@ import subprocess
 
 SENTINEL = "TRACKTEMPLATE_REPOSITORY_SAFETY="
 RETIREMENT_SENTINEL = "TRACKTEMPLATE_WORKTREE_RETIREMENT="
+ACCEPTED_MAIN_REF = "refs/remotes/origin/main"
 RETIREMENT_CLASSIFICATIONS = (
     "authoritative-local-source",
     "retained-evidence",
@@ -68,20 +69,17 @@ def _sha256(path):
 
 
 def _git(root, *arguments, allow_failure=False):
+    environment = os.environ.copy()
+    environment["GIT_OPTIONAL_LOCKS"] = "0"
     result = subprocess.run(
         ["git", "-C", str(root), *arguments],
         check=False,
         capture_output=True,
+        env=environment,
         text=True,
     )
     if result.returncode and not allow_failure:
-        detail = result.stderr.strip() or result.stdout.strip() or "unknown error"
-        raise SafetyAuditError(
-            "read-only Git inspection failed for {}: {}".format(
-                " ".join(arguments),
-                detail,
-            )
-        )
+        raise SafetyAuditError("read-only Git inspection failed")
     return result
 
 
@@ -312,6 +310,15 @@ def _retirement_inventory(target):
     }
 
 
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise SafetyAuditError("retirement plan contains a duplicate key")
+        result[key] = value
+    return result
+
+
 def _load_retirement_plan(plan_path, target):
     path = pathlib.Path(plan_path)
     if path.is_symlink():
@@ -322,7 +329,10 @@ def _load_retirement_plan(plan_path, target):
     if not path.is_file():
         raise SafetyAuditError("retirement plan must be one regular JSON file")
     try:
-        plan = json.loads(path.read_text(encoding="utf-8"))
+        plan = json.loads(
+            path.read_text(encoding="utf-8"),
+            object_pairs_hook=_unique_json_object,
+        )
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
         raise SafetyAuditError("retirement plan is not valid UTF-8 JSON") from error
     if not isinstance(plan, dict):
@@ -351,10 +361,8 @@ def _required_text(mapping, key, context):
 
 
 def _validated_ref(value):
-    if not re.fullmatch(r"refs/(?:heads|remotes)/[A-Za-z0-9._/-]+", value):
-        raise SafetyAuditError("accepted-history ref is not a supported ref")
-    if any(fragment in value for fragment in ("..", "//", "@{", "\\")):
-        raise SafetyAuditError("accepted-history ref is ambiguous")
+    if value != ACCEPTED_MAIN_REF:
+        raise SafetyAuditError("accepted-history ref is not accepted remote main")
     return value
 
 
@@ -389,6 +397,20 @@ def _selector_matches(relative, selector):
     return relative.startswith(value)
 
 
+def _preserved_entry_path(destination, relative):
+    parts = pathlib.PurePosixPath(relative).parts
+    parent = destination
+    for part in parts[:-1]:
+        parent /= part
+        try:
+            metadata = parent.lstat()
+        except OSError:
+            return None
+        if not stat.S_ISDIR(metadata.st_mode):
+            return None
+    return parent / parts[-1]
+
+
 def _preservation_matches(entries, destination_root, target):
     destination = pathlib.Path(destination_root).resolve()
     if (
@@ -401,20 +423,23 @@ def _preservation_matches(entries, destination_root, target):
     ):
         return False
     for entry in entries:
-        path = destination.joinpath(
-            *pathlib.PurePosixPath(entry["path"]).parts
-        )
+        path = _preserved_entry_path(destination, entry["path"])
+        if path is None:
+            return False
         try:
             metadata = path.lstat()
-        except FileNotFoundError:
+        except OSError:
             return False
-        if entry["type"] == "file" and stat.S_ISREG(metadata.st_mode):
-            identity = _sha256(path)
-        elif entry["type"] == "symlink" and stat.S_ISLNK(metadata.st_mode):
-            identity = hashlib.sha256(
-                os.fsencode(path.readlink())
-            ).hexdigest()
-        else:
+        try:
+            if entry["type"] == "file" and stat.S_ISREG(metadata.st_mode):
+                identity = _sha256(path)
+            elif entry["type"] == "symlink" and stat.S_ISLNK(metadata.st_mode):
+                identity = hashlib.sha256(
+                    os.fsencode(path.readlink())
+                ).hexdigest()
+            else:
+                return False
+        except OSError:
             return False
         if (
             metadata.st_size != entry["size_bytes"]
@@ -431,9 +456,10 @@ def _classification_state(plan, inventory, target):
     findings = []
     names = set()
     prepared = []
-    for group in groups:
+    for group_index, group in enumerate(groups, start=1):
         if not isinstance(group, dict):
             raise SafetyAuditError("each classification must be one JSON object")
+        public_name = f"group-{group_index}"
         expected_keys = {
             "name",
             "classification",
@@ -472,11 +498,12 @@ def _classification_state(plan, inventory, target):
             and proof["basis"].strip()
         )
         if not proof_ready:
-            findings.append("classification-proof-incomplete:" + name)
+            findings.append("classification-proof-incomplete:" + public_name)
         prepared.append(
             {
                 "group": group,
                 "name": name,
+                "public_name": public_name,
                 "classification": classification,
                 "selectors": selectors,
             }
@@ -538,11 +565,17 @@ def _classification_state(plan, inventory, target):
             )
             if not valid_preservation:
                 preservation_ready = False
-                findings.append("required-preservation-not-proved:" + item["name"])
+                findings.append(
+                    "required-preservation-not-proved:" + item["public_name"]
+                )
         elif item["classification"] == "ambiguous-or-uniquely-owned-state":
-            findings.append("ambiguous-or-unique-local-state:" + item["name"])
+            findings.append(
+                "ambiguous-or-unique-local-state:" + item["public_name"]
+            )
         elif group.get("disposition") != DISCARD_DISPOSITION:
-            findings.append("discard-disposition-not-explicit:" + item["name"])
+            findings.append(
+                "discard-disposition-not-explicit:" + item["public_name"]
+            )
 
     unsupported = sum(
         entry["type"] != "file" for entry in inventory["entries"]
@@ -570,6 +603,11 @@ def audit_worktree_retirement(root, target, plan_path=None):
     """Return a path-free, read-only worktree-retirement assessment."""
     root = _validate_checkout_root(root)
     target = pathlib.Path(target).resolve()
+    if target in {
+        pathlib.Path(target.anchor),
+        pathlib.Path.home().resolve(),
+    }:
+        raise SafetyAuditError("refusing to audit a broad retirement target")
     if target == root:
         raise SafetyAuditError("refusing to retire the audit checkout")
     records = [item for item in _worktree_records(root) if item["path"] == target]
@@ -1003,11 +1041,26 @@ def main(argv=None):
             "backup requirements"
         )
     if retirement_mode:
-        report = audit_worktree_retirement(
-            arguments.root,
-            arguments.retirement_worktree,
-            arguments.retirement_plan,
-        )
+        try:
+            report = audit_worktree_retirement(
+                arguments.root,
+                arguments.retirement_worktree,
+                arguments.retirement_plan,
+            )
+        except SafetyAuditError:
+            report = {
+                "schema_version": 1,
+                "report_kind": "worktree-retirement",
+                "readiness": {"retirement_ready": False},
+                "findings": ["retirement-audit-error"],
+                "requested_requirements": {"retirement_ready": False},
+            }
+            print(
+                RETIREMENT_SENTINEL
+                + json.dumps(report, sort_keys=True, separators=(",", ":")),
+                flush=True,
+            )
+            return 1
         requirement = bool(
             not arguments.require_retirement_ready
             or report["readiness"]["retirement_ready"]
