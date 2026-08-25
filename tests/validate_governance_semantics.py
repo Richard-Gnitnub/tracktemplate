@@ -3443,14 +3443,15 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/branch-deleted-before-worktree",
             replace_once(
                 policy,
-                "After the\nworktree is absent, record the exact local-branch "
-                "tip commit.",
-                "Before the\nworktree is absent, record the exact local-branch "
-                "tip commit.",
+                "After the\nworktree is no longer in `git worktree list`, "
+                "record the exact local-branch tip commit.",
+                "Before the\nworktree is no longer in `git worktree list`, "
+                "record the exact local-branch tip commit.",
             ),
             (
-                "worktree retirement policy lacks: after the worktree is "
-                "absent record the exact local branch tip commit"
+                "worktree retirement policy lacks: after the worktree is no "
+                "longer in git worktree list record the exact local branch "
+                "tip commit"
             ),
         ),
     )
@@ -3690,7 +3691,7 @@ def validate_visible_recovery_mutations() -> None:
     force_retirement_claimed = replace_once(
         phase_evidence,
         "The\ncommand did not use `--force`, `git stash`, manual relocation,\n"
-        "`git worktree prune`, or another worktree.",
+        "`git worktree prune`, or a different worktree.",
         "The command used `--force`.",
     )
     expect_rejected(
@@ -3699,7 +3700,7 @@ def validate_visible_recovery_mutations() -> None:
             force_retirement_claimed
         ),
         "worktree retirement phase evidence lacks: did not use force git "
-        "stash manual relocation git worktree prune or another worktree",
+        "stash manual relocation git worktree prune or a different worktree",
     )
     cycle_3_started_early = replace_once(
         phase_evidence,
@@ -3716,7 +3717,7 @@ def validate_visible_recovery_mutations() -> None:
     )
     historical_cleanliness_overstated = replace_once(
         phase_evidence,
-        "Git status reported no tracked change under the former retirement audit.",
+        "The former retirement audit reported no tracked change.",
         "It had tracked cleanliness.",
     )
     expect_rejected(
@@ -3724,8 +3725,8 @@ def validate_visible_recovery_mutations() -> None:
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             historical_cleanliness_overstated
         ),
-        "worktree retirement phase evidence lacks: git status reported no "
-        "tracked change under the former retirement audit",
+        "worktree retirement phase evidence lacks: former retirement audit "
+        "reported no tracked change",
     )
     retrospective_authority_added = replace_once(
         phase_evidence,
@@ -3849,16 +3850,16 @@ def validate_visible_recovery_mutations() -> None:
     )
     weakened_lfe_rule = replace_once(
         learning,
-        "whether deterministic enforcement is proportionate, and which "
-        "regression or\nsemantic mutation prevents recurrence.",
-        "whether the row is concise.",
+        "Ask if\ndeterministic enforcement is proportionate. Ask which "
+        "regression or semantic\nmutation prevents recurrence.",
+        "Ask if the row is concise.",
     )
     expect_rejected(
         "lfe/application-loses-regression-question",
         lambda: recovery_controls.validate_recovery_lfe(
             weakened_lfe_rule
         ),
-        "LFE rule lacks: whether deterministic enforcement is "
+        "LFE rule lacks: ask if deterministic enforcement is "
         "proportionate",
     )
 

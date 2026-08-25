@@ -51,7 +51,7 @@ includes a linguistic conformance assessment, route it to
    `reference/current/risks.json` or `gate-decisions.json`.
 7. Retrieve implementation evidence deterministically. Prefer exact paths,
    identifiers and headings with `rg --files` and `rg`; use ontology concepts
-   to expand stable product terms, not as live-status evidence. Examine relevant
+   to expand stable product terms, not as live-status evidence. Examine related
    source, tests, raw failures, Git status and diffs only after authority is
    established.
 Use the

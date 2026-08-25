@@ -22,7 +22,7 @@ confirmation rather than merely mentioning PyCharm.
 
 Before a mutation, the response must make a local-state inventory. The response
 must delegate Git operations to their owning workflow. It must preserve
-ambiguous work. If the environment cannot observe the physical window, it must
+ambiguous work. If the environment cannot examine the physical window, it must
 ask for UI confirmation.
 
 ## Should not activate alone
@@ -39,8 +39,8 @@ ask for UI confirmation.
 
 - With context recovery: ownership of dirty work is unknown. Context recovery
   establishes attribution before this skill compares the workspace.
-- With Git workflow: this skill identifies a stale primary project and an
-  unsafe `/tmp` branch. Git shows reachability and does any authorised branch
+- With Git workflow: this skill identifies a stale primary project and a
+  `/tmp` branch that is not safe. Git shows reachability and does any authorised branch
   change or move.
 - With continue: before its first Git mutation, compare the workspace. After the
   Git workflow synchronises protected `main`, compare again before branch
@@ -57,10 +57,10 @@ Reject or stop when a response:
 - Uses a Git ignore rule as removal authority or continues when local-state
   ownership is ambiguous
 - Removes state, runs `git worktree prune`, changes a branch, or moves state
-  without separate Git authority
-- Uses `recentProjects.xml` as proof of the physical focused window
+  without Git authority for that operation
+- Uses `recentProjects.xml` as proof of the active physical window
 - Changes `.idea` or global SDK state without explicit scope
-- Keeps active uncommitted or unpushed work solely under `/tmp`.
+- Keeps active uncommitted or unpushed work only in `/tmp`.
 
 While the stash inventory contains a retained stash, reject a complete recovery
 result. If the stash inventory or stash disposition evidence is not complete,

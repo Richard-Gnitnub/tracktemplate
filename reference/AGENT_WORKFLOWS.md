@@ -63,13 +63,13 @@ Before a worktree retirement, read the
 [worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
 Context recovery makes a local-state inventory. It identifies the owner of each
 item.
-IDE/workspace alignment shows that the worktree is inactive and has no sole
-operator state.
+IDE/workspace alignment shows that no person or process uses the worktree. It
+also shows that the worktree has no sole operator state.
 
 The retirement audit records the exact Git and local-state
 identities. It examines the reviewed retirement plan. A merge and tracked
 cleanliness give no removal authority in these workflows. When ignored or
-local-only state has ambiguous ownership or lacks preservation proof, these
+local-only state has ambiguous ownership or does not have preservation proof, these
 workflows stop.
 
 ## Instruction budget
@@ -776,7 +776,7 @@ make a local-state inventory of ignored and other local-only state
     ↓
 classify every item
     ↓
-show necessary preservation or the reason to discard the item
+show necessary preservation or evidence that removal is safe
     ↓
 stop for ambiguous or uniquely owned state
     ↓

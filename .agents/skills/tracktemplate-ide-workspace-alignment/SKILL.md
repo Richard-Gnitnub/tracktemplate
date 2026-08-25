@@ -119,17 +119,18 @@ Temporary /tmp worktrees
     never the sole location of active, uncommitted or unpushed work
 ```
 
-A primary checkout on a merged feature branch is stale even when `main`
-contains its files. Before Git changes the branch, use Git to show containment
+A merged feature branch is stale in the primary checkout after its merge.
+Before Git changes the branch, use Git to show containment
 and cleanliness. A merged pull request does not make its worktree disposable.
 Show that accepted remote `main` contains the worktree tip. Show that it contains
 all unique commits. Make sure that the worktree has tracked cleanliness. Make
-sure that the worktree is inactive. Make sure that it holds no sole operator
+sure that no person or process uses the worktree. Make sure that it holds no sole operator
 state. Then, use the canonical
 [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
 Make a local-state inventory. Classify all ignored and other local-only state.
-A Git ignore rule gives no removal authority. Ambiguous ownership, uniqueness,
-activity, or preservation keeps the worktree registered.
+A Git ignore rule gives no removal authority. If ownership, uniqueness, or
+preservation is ambiguous, keep the worktree. If a person or process uses the
+worktree, keep it.
 
 Use the
 [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
@@ -160,10 +161,10 @@ Report:
 4. Primary project path, VCS roots, interpreter/venv and run working directories
 5. Facts that files/Git show and facts that need operator confirmation
 6. Changes that the authorised Git workflow made and post-change proof
-7. Worktrees that stay registered and why
+7. Worktrees that Git shows after alignment and the cause
 8. For a retirement, the local-state inventory and how the retirement plan classifies it
-9. Activity evidence and the post-retirement worktree map
-10. Unresolved uncertainty or unsafe cleanup that the authorised Git workflow did not do.
+9. Evidence that no person or process uses the worktree and the post-retirement worktree map
+10. Unresolved uncertainty or cleanup that the authorised Git workflow did not show to be safe.
 
 When maintaining this skill or its routing, exercise the
 [evaluation cases](references/evaluation-cases.md) and run the repository

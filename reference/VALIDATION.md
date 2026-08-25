@@ -818,11 +818,11 @@ Repository recovery and ignored-data safety controls:
 ```
 
 The repository safety command is read-only. It starts no network operation. It
-reports the checkpoint state from local remote-tracking refs. It verifies the
+reports the checkpoint state from local remote-tracking refs. It validates the
 ignored source archive for Templot. It records roots for local generated data.
 
-It fails closed for an invalid backup target. An invalid target can be absent,
-inside the repository, or on the same mounted filesystem. The default validator
+It fails closed when a backup target does not satisfy its conditions. The target
+can be missing, in the repository, or on the same mounted filesystem. The default validator
 shows deterministic control behaviour. It rejects a clean fixture without the
 archive. The `--live-workstation` profile also shows the current checkout's
 archive/hash and branch/upstream boundary. Neither result claims that an
@@ -844,26 +844,28 @@ Run the retirement audit again with `--retirement-plan` and
 `TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no
 finding.
 
-Each invalid fixture in the focused recovery validator must return a
-FAIL result. Include at least these states:
+Each rejected fixture in the recovery validator must return a
+FAIL result. Include these states as a minimum:
 
 - A merge and tracked cleanliness without a retirement plan
-- Incomplete or overlapping coverage of the local-state inventory
+- Missing local-state inventory items or one item in more than one group
 - Ambiguous or uniquely owned local state
 - A change to the target, accepted commit, or local-state inventory
 - Loss of tracked cleanliness, an unsupported local-state type, or missing
-  inactivity or authority, including an `assume-unchanged` or `skip-worktree` index flag
+  evidence that no person or process uses the worktree
+- Missing authority or an `assume-unchanged` or `skip-worktree` index flag
 - A Git environment value that changes the repository or Git index
 - Missing proof for an item or non-identical necessary preservation
-- A substituted accepted ref, duplicate key in the retirement plan, or symlinked preservation
+- A different accepted ref, duplicate key in the retirement plan, or symlinked preservation
   parent
-- Private data from the retirement plan, private detail from a filesystem failure, or raw detail
-  from a Git failure in command output
-- A command that mutates state or uses force in the retirement audit.
+- Private data from the retirement plan
+- Private information from a filesystem error
+- Raw information from a Git error in command output
+- A command that changes state or uses `--force` in the retirement audit.
 
 The disposable integration fixture must use `git worktree remove` without
-`--force`. It must show that the separately preserved authoritative source
-stays available. It must show that the worktree is absent before branch
+`--force`. It must show that preservation kept the authoritative source
+available. It must show that Git no longer contains the worktree before branch
 removal. It must also show that the accepted commit contains the exact
 local-branch tip commit.
 
@@ -872,13 +874,13 @@ state. Review the preservation diff from exact live state. After removal, make
 sure that no unrelated branch, worktree, stash, or preserved file changed.
 These controls make no retention, removal, or authority decision.
 
-Use `--backup-target ... --require-backup-target` only to assess a selected or
-replacement external destination. Backup completion and restore evidence stay
-separate recovery conditions under
-[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The linked 2026-07-22 evidence
+Use `--backup-target ... --require-backup-target` only to examine a selected or
+replacement external destination. Evidence for a completed backup and restore
+stay as different recovery conditions in
+[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md). The [2026-07-22 evidence](backup-records/2026-07-22-initial-repository-backup-restore.md)
 records the first copy, restore, and incremental-repeat result. That result
-covers the complete project-data scope that the owner accepted. The repository
-safety command by itself still does not show those results.
+is for the complete project-data scope that the owner accepted. The repository
+safety command by itself does not show those results.
 
 Repository QA, documentation-link and residual-risk controls:
 

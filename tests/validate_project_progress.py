@@ -4446,10 +4446,10 @@ def _validate_decisions(plan: str) -> None:
     for fragment in (
         "d47518083768d34cf9b41566feaf132ac4562595",
         "96063e9836748bbc5755db251fa8b66564e65a28",
-        "owner explicitly authorised the completed worktree removal",
+        "owner authorised the completed worktree removal",
         (
             "did not complete the Level 3 panel or decision record before "
-            "those actions"
+            "those operations"
         ),
         "historical sequence nonconformance",
         "gives no retrospective authority",
@@ -4459,7 +4459,7 @@ def _validate_decisions(plan: str) -> None:
         "named PDF stayed byte-identical at its canonical primary path",
         (
             "removed Git index is not available. Current evidence cannot show "
-            "whether it had an assume-unchanged or skip-worktree flag"
+            "if it had an assume-unchanged or skip-worktree flag"
         ),
         "Current evidence cannot show complete historical losslessness",
         "one bounded Cycle 2 repair and review cycle",

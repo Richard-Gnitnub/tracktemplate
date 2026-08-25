@@ -103,7 +103,7 @@ before selecting proof.
   [retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
   Validate accepted-history containment and tracked cleanliness. Validate the
   complete local-state inventory. Make sure that the retirement plan classifies
-  each item once. Make sure that ambiguous state gives a FAIL result. Validate
+  each item in only one group. Make sure that ambiguous state gives a FAIL result. Validate
   necessary preservation. Validate `git worktree remove` without `--force`.
   After removal, validate preservation and the local-branch order. Review the
   exact preservation diff from live state.
