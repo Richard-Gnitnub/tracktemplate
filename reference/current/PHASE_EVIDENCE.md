@@ -3075,6 +3075,103 @@ Phase 6 stays at 2/5, and project status stays `unknown`. It gives no project
 authority and does not change the product. The branch for D-GOV-009 and its
 evidence do not change.
 
+<a id="deliberate-worktree-retirement-workflow-migration"></a>
+
+## Workflow migration for deliberate worktree retirement
+
+### Owner view
+
+| Field | Result |
+| --- | --- |
+| Current state | A Level 2 recovery/workspace workflow migration now makes worktree retirement deliberate. The merged STE100 retrieval-assurance worktree and only its merged local branch were retired. |
+| Evidence | Accepted `main` at `d47518083768d34cf9b41566feaf132ac4562595` contained target HEAD `9f3b05d480971d197a57cb00f1811f6c1012f144`. The read-only audit classified the exact 144-file inventory with SHA-256 `a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`, proved required preservation, and returned no finding. |
+| Limitations | The audit checks exact evidence that a local plan supplies. It does not make ownership, disposal, removal, branch-deletion, acceptance, or integration decisions. The local plan is ignored and not project authority. |
+| Blockers | None remained in this bounded retirement. The inventory had no retained-evidence item, ambiguous item, unsupported type, tracked change, or non-ignored untracked file. |
+| Decision | The project owner's exact instruction authorised normal non-force removal of this worktree and safe deletion of only its merged local branch after removal. It authorised no other worktree, branch, remote branch, Git object, backup, or evidence disposition. |
+| Next action | Freeze and independently review the separate Cycle 2 candidate, then publish it as a draft pull request if exact-green. Integration requires authority for that exact reviewed candidate. Cycle 3 does not start from an open Cycle 2 pull request. |
+
+### Exact starting state and containment
+
+Pull request #56 merged the STE100 retrieval-assurance branch through merge
+commit `65409493d741a5606543bd437e519f8efefb8680`. The retained worktree had
+attached local branch `agent/ste100-retrieval-assurance` at
+`9f3b05d480971d197a57cb00f1811f6c1012f144`. Its upstream branch was absent.
+Its tracked state was clean. It had no non-ignored untracked file.
+
+Immediately before retirement, local `main`, `origin/main`, and live GitHub
+`main` identified `d47518083768d34cf9b41566feaf132ac4562595`. Git proved that
+this accepted commit contained the target HEAD. Pull request #56 remained
+merged with the same head and merge commit. The IDE-backed primary project was
+clean `main`. No open editor or process used the target worktree.
+
+### Exact local-state classification
+
+The read-only inventory contained 144 ignored files and 8,042,871 bytes. Its
+SHA-256 identity was
+`a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`.
+
+| Classification | Files | Bytes | Result and owner |
+| --- | ---: | ---: | --- |
+| Authoritative local source | 1 | 3,316,157 | The official ASD-STE100 Issue 9 PDF is owned by the local-source and provenance records. An exact preserved file existed at its canonical primary path. |
+| Retained evidence | 0 | 0 | No current evidence or recovery owner required retention from this worktree. |
+| Rebuildable cache/generated state | 82 | 3,026,397 | Two STE caches, six Ruff-cache files, 68 Python bytecode files, and six repeatable validation logs had canonical regeneration or disposal proof. |
+| Temporary disposable state | 61 | 1,700,317 | The STE receipt owner says not to keep all usual review receipts. No tracked authority named one of these receipts for retention. |
+| Ambiguous or uniquely owned state | 0 | 0 | No item remained in this classification. |
+
+The PDF at the target and canonical primary path had byte size 3,316,157 and
+SHA-256
+`d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431`.
+At the preserved primary path, STE cache rebuild, validation, and status gave
+the required source-bound schema-v2 results. The three syntax logs were
+byte-identical PASS results. The three standalone logs were byte-identical
+60/60 PASS results. No tracked document named their timestamps.
+
+The exact local classification plan stayed under ignored temporary state. The
+audit did not print its path, preservation destination, or file content. The
+complete required result had six non-overlapping groups. It had exact target,
+accepted-history, and inventory identities. It also had tracked cleanliness,
+inactivity, authority, byte-identical preservation, no unsupported type, and
+zero findings.
+
+### Retirement and preservation result
+
+The final required audit ran immediately before normal
+`git worktree remove`. The command did not use `--force`, `git stash`, manual
+relocation, prune, or another worktree. Git removed the target worktree. A
+post-removal check proved that the target was absent from the filesystem and
+registered worktree list. Only then, `git branch -d` deleted the merged local
+branch at `9f3b05d480971d197a57cb00f1811f6c1012f144`.
+
+The PDF remained at its canonical primary path with the same byte size and
+SHA-256. Local `main`, the Cycle 2 branch, and the retained pull request #57
+branch kept their exact heads. The primary, Cycle 2, and pull request #57
+worktrees stayed registered. No remote branch was deleted. The stash inventory
+stayed empty and `refs/stash` stayed absent.
+
+The focused recovery validator passed its read-only and complete ignored and
+non-ignored inventory fixtures. It also passed incomplete coverage, overlap,
+missing proof, ambiguity, inactivity, authority, target and accepted-history
+identity, non-containment, inventory change, tracked-dirt, unsupported type,
+and preservation-mismatch fixtures. Its disposable integration fixture passed
+normal non-force removal, preserved-source, and post-retirement local-branch
+checks. Python and FCMacro parsing passed for 189 tracked files. The
+standalone CI profile passed 60/60. The local standalone profile passed 59/60
+in the Cycle 2 worktree. Its live-workstation member correctly reported that
+the worktree did not contain the ignored Templot source archive. The candidate
+safety audit separately verified the exact required archive and critical-assets
+result against the clean primary workspace. Governance semantics rejected
+284/284 mutations with zero escapes and 278 independent protections.
+
+This workflow migration embodies LFE-021 under the canonical recovery policy.
+It adds one control for PR-13 but does not change that risk's state,
+disposition, severity, treatment, or effectiveness. Earlier LFE rows remain
+unchanged. D-GOV-009 and its evidence remain unchanged. Phase 6 stays at 2/5,
+and project status stays `unknown`.
+
+It makes no product, railway, FreeCAD, export, schema, API, performance,
+release, production, phase-exit, output-rights, or acceptance change. It does
+not authorise Cycle 3 or integration of an unreviewed Cycle 2 candidate.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition

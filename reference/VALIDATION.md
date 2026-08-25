@@ -834,6 +834,32 @@ then require a clean pushed checkpoint:
 .venv/bin/python tools/repository_safety_audit.py --require-checkpoint
 ```
 
+For a proposed worktree retirement, first run the audit with
+`--retirement-worktree` and no plan. Record its inventory SHA-256 and counts.
+Then, review the local classification plan against the canonical
+[deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+Run the audit again with `--retirement-plan` and
+`--require-retirement-ready`. The required sentinel is
+`TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no
+finding. The focused recovery validator must prove at least these failures:
+
+- Merged and tracked-clean state without a classification plan.
+- Incomplete or overlapping inventory coverage.
+- Ambiguous or uniquely owned local state.
+- A changed target, accepted-history, or inventory identity.
+- Tracked dirt, an unsupported local-state type, or missing inactivity or
+  authority.
+- Missing classification proof or non-identical required preservation.
+- An attempted mutating or force-removal command in the read-only audit.
+
+The disposable integration fixture must prove normal non-force worktree
+removal. It must prove that the separately preserved authoritative source stays
+available. It must also prove that safe local-branch deletion occurs only after
+worktree retirement. Before an actual removal, review the exact live
+classification and preservation diff. After removal, confirm that no unrelated
+branch, worktree, stash, or preserved file changed. These controls do not make
+a retention, disposal, or authority decision.
+
 Assess a selected or replacement external destination only with
 `--backup-target ... --require-backup-target`; backup completion and restore
 evidence remain separate recovery conditions under

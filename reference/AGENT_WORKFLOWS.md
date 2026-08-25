@@ -59,6 +59,15 @@ packet gives the route to named Git state. It is not planned preservation.
 Until the recovery workflow completes stash reconciliation, do not give the
 recovery gate a complete result.
 
+Before a worktree retirement, read the
+[deliberate worktree retirement procedure](RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+Context recovery inventories local state and recovers its owner. IDE/workspace
+alignment proves the worktree is inactive and has no sole operator state. The
+read-only safety audit pins the exact Git and local-state identities and checks
+the reviewed classification plan. These workflows do not infer that merged and
+tracked-clean state is disposable. They stop when ignored or local-only state
+has ambiguous ownership or lacks preservation proof.
+
 ## Instruction budget
 
 Codex combines repository instruction files and applies a finite default byte
@@ -752,6 +761,22 @@ get applicable authority for the exact disposition
 review evidence for ownership, purpose, preservation and disposition
     ↓
 after the stash inventory is empty, give the recovery gate a complete result
+```
+
+For deliberate worktree retirement:
+
+```text
+prove accepted-history containment and tracked cleanliness
+    ↓
+inventory ignored and other local-only state
+    ↓
+classify every item and prove required preservation or disposal basis
+    ↓
+stop for ambiguous or uniquely owned state
+    ↓
+recheck the exact read-only audit and authority
+    ↓
+normal non-force worktree removal, then safe merged local-branch deletion
 ```
 
 For an architecture decision:

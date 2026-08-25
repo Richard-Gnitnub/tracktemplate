@@ -652,7 +652,7 @@ def validate_lfe_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     rows = lfe_rows(text)
     identifiers = [re.match(r"\| (LFE-\d{3})", row).group(1) for row in rows]
-    expected = ["LFE-{:03d}".format(number) for number in range(1, 21)]
+    expected = ["LFE-{:03d}".format(number) for number in range(1, 22)]
     require(identifiers == expected, "LFE identifiers are not unique and sequential")
     earlier = "".join(rows[:18]).encode("utf-8")
     require(

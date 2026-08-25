@@ -123,7 +123,12 @@ A primary checkout on a merged feature branch is stale even when its files are
 contained in `main`. Prove containment and cleanliness through Git before any
 switch. A worktree is not disposable merely because its pull request merged;
 prove that its tip and all unique commits are contained in accepted remote
-`main`, that it is clean, not active and holds no sole operator state.
+`main`, that its tracked state is clean, and that it is inactive and holds no
+sole operator state. Then, use the canonical
+[deliberate worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+Inventory and classify all ignored and other local-only state. Do not infer
+disposal from a Git ignore rule. Ambiguous ownership, uniqueness, activity, or
+preservation keeps the worktree registered.
 
 Use the
 [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
@@ -154,8 +159,10 @@ Report:
 4. primary project path, VCS roots, interpreter/venv and run working directories;
 5. facts proved from files/Git and facts requiring operator confirmation;
 6. changes performed by the authorised Git workflow and post-change proof;
-7. every retained worktree and why it remains; and
-8. unresolved uncertainty or unsafe cleanup deliberately not performed.
+7. every retained worktree and why it remains.
+8. For a retirement, ignored/local-state classification and preservation proof.
+9. Activity evidence and the post-retirement worktree map.
+10. Unresolved uncertainty or unsafe cleanup deliberately not performed.
 
 When maintaining this skill or its routing, exercise the
 [evaluation cases](references/evaluation-cases.md) and run the repository

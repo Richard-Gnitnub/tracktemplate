@@ -84,6 +84,15 @@ Read it in the canonical owner. Examine the complete stash inventory and unique 
 identity and stash disposition authority. Review the preservation diff. A
 recovery branch or worktree is not accepted product state.
 
+For worktree retirement, read the canonical
+[deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+Review accepted-history containment, tracked cleanliness, inactivity, and the
+exact ignored/local-state inventory. Review each classification, its proof
+owner, required preservation, and ambiguous-state rejection. Review removal
+authority, the non-force command, post-removal preservation, and the
+branch/worktree/stash diff. Treat `merged + clean = disposable` as a missing
+proof, not as a retention decision.
+
 ## Review order
 
 Review requirement compliance before implementation quality:

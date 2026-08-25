@@ -3364,6 +3364,86 @@ def validate_visible_recovery_mutations() -> None:
             diagnostic,
         )
 
+    retirement_policy_cases = (
+        (
+            "retirement/merged-clean-treated-as-disposable",
+            replace_once(
+                policy,
+                "A merged, tracked-clean worktree is not automatically "
+                "disposable.",
+                "A merged, tracked-clean worktree is automatically disposable.",
+            ),
+            (
+                "worktree retirement policy lacks: merged tracked clean "
+                "worktree is not automatically disposable"
+            ),
+        ),
+        (
+            "retirement/ignored-inventory-omitted",
+            replace_once(
+                policy,
+                "Inventory all ignored and non-ignored local-only files.",
+                "Inventory tracked files only.",
+            ),
+            (
+                "worktree retirement policy lacks: inventory all ignored and "
+                "non ignored local only files"
+            ),
+        ),
+        (
+            "retirement/preservation-proof-omitted",
+            replace_once(
+                policy,
+                "prove byte-identical preservation outside the target "
+                "worktree.",
+                "assume that another copy exists.",
+            ),
+            (
+                "worktree retirement policy lacks: prove byte identical "
+                "preservation outside the target worktree"
+            ),
+        ),
+        (
+            "retirement/ambiguous-state-does-not-stop",
+            replace_once(
+                policy,
+                "Stop. Retain\n   the worktree and get the smallest necessary "
+                "owner decision.",
+                "Continue with removal.",
+            ),
+            "worktree retirement policy lacks: stop retain the worktree",
+        ),
+        (
+            "retirement/force-removal-permitted",
+            replace_once(
+                policy,
+                "Do not use `--force`.",
+                "Use `--force` when ignored files remain.",
+            ),
+            "worktree retirement policy lacks: do not use force",
+        ),
+        (
+            "retirement/branch-deleted-before-worktree",
+            replace_once(
+                policy,
+                "Delete the local\nbranch only after the worktree is absent",
+                "Delete the local\nbranch before the worktree is absent",
+            ),
+            (
+                "worktree retirement policy lacks: delete the local branch "
+                "only after the worktree is absent"
+            ),
+        ),
+    )
+    for name, mutated, diagnostic in retirement_policy_cases:
+        expect_rejected(
+            name,
+            lambda value=mutated: (
+                recovery_controls.validate_worktree_retirement_policy(value)
+            ),
+            diagnostic,
+        )
+
     audit = read("tools/repository_safety_audit.py")
     dangerous_audit = audit + (
         "\n\ndef dispose_stash(root):\n"
@@ -3373,6 +3453,17 @@ def validate_visible_recovery_mutations() -> None:
         "recovery/safety-audit-adds-stash-drop",
         lambda: recovery_controls.validate_safety_audit_git_commands(
             dangerous_audit
+        ),
+        "safety audit contains a non-read-only Git command",
+    )
+    force_retirement_audit = audit + (
+        "\n\ndef force_retire(root):\n"
+        "    return _git(root, 'worktree', 'remove', '--force', '/tmp/example')\n"
+    )
+    expect_rejected(
+        "retirement/safety-audit-adds-force-removal",
+        lambda: recovery_controls.validate_safety_audit_git_commands(
+            force_retirement_audit
         ),
         "safety audit contains a non-read-only Git command",
     )
@@ -3459,6 +3550,22 @@ def validate_visible_recovery_mutations() -> None:
         ),
         "agent workflow recovery routing contradicts visible recovery state: "
         "a retained stash is resolved recovery state",
+    )
+    retirement_shortcut = replace_once(
+        workflows,
+        "These workflows do not infer that merged and\ntracked-clean state is "
+        "disposable.",
+        "These workflows infer that merged and tracked-clean state is "
+        "disposable.",
+    )
+    expect_rejected(
+        "retirement/workflow-adds-merged-clean-shortcut",
+        lambda: recovery_controls.validate_worktree_retirement_routing(
+            retirement_shortcut,
+            skills,
+        ),
+        "agent workflow retirement routing lacks: do not infer that merged "
+        "and tracked clean state is disposable",
     )
 
     missing_snapshot = replace_once(
@@ -3548,6 +3655,47 @@ def validate_visible_recovery_mutations() -> None:
         "e52bd0409feee7dc7dce9fc853a3bed99081c948 by accident",
     )
 
+    ambiguous_retirement_overlooked = replace_once(
+        phase_evidence,
+        "| Ambiguous or uniquely owned state | 0 | 0 |",
+        "| Ambiguous or uniquely owned state | 1 | 1 |",
+    )
+    expect_rejected(
+        "retirement/phase-evidence-overlooks-ambiguous-state",
+        lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
+            ambiguous_retirement_overlooked
+        ),
+        "worktree retirement phase evidence lacks: ambiguous or uniquely "
+        "owned state 0 0",
+    )
+    force_retirement_claimed = replace_once(
+        phase_evidence,
+        "The command did not use `--force`, `git stash`, manual\nrelocation, "
+        "prune, or another worktree.",
+        "The command used `--force`.",
+    )
+    expect_rejected(
+        "retirement/phase-evidence-claims-force-removal",
+        lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
+            force_retirement_claimed
+        ),
+        "worktree retirement phase evidence lacks: did not use force git "
+        "stash manual relocation prune or another worktree",
+    )
+    cycle_3_started_early = replace_once(
+        phase_evidence,
+        "Cycle 3 does not start from an open Cycle 2 pull request.",
+        "Cycle 3 starts from an open Cycle 2 pull request.",
+    )
+    expect_rejected(
+        "retirement/phase-evidence-starts-cycle-3-early",
+        lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
+            cycle_3_started_early
+        ),
+        "worktree retirement phase evidence lacks: cycle 3 does not start "
+        "from an open cycle 2 pull request",
+    )
+
     accepted_recovery_state = replace_once(
         skills["ide"],
         "It is not\naccepted product state.",
@@ -3627,16 +3775,45 @@ def validate_visible_recovery_mutations() -> None:
         "LFE-020 lacks canonical link: current/PHASE_EVIDENCE.md"
         "#visible-recovery-state-workflow-migration",
     )
-    contradictory_lfe = learning.replace(
-        " |\n\n## Using the ledger",
-        " A retained stash is resolved recovery state. |\n\n## Using the ledger",
-        1,
+    lfe_020_row = table_row_containing(learning, "| LFE-020 /")
+    contradictory_lfe = replace_once(
+        learning,
+        lfe_020_row,
+        lfe_020_row.removesuffix(" |")
+        + " A retained stash is resolved recovery state. |",
     )
     expect_rejected(
         "recovery/lfe-appends-resolved-stash-contradiction",
         lambda: recovery_controls.validate_recovery_lfe(contradictory_lfe),
         "LFE-020 contradicts visible recovery state: a retained stash is "
         "resolved recovery state",
+    )
+    weakened_retirement_lfe = replace_once(
+        learning,
+        "Inventory and classify ignored local state before retirement.",
+        "A clean merged worktree needs no local-state inventory.",
+    )
+    expect_rejected(
+        "retirement/lfe-loses-local-state-inventory",
+        lambda: recovery_controls.validate_recovery_lfe(
+            weakened_retirement_lfe
+        ),
+        "LFE-021 reusable rule lacks: inventory and classify ignored local "
+        "state before retirement",
+    )
+    weakened_embodiment_rule = replace_once(
+        learning,
+        "whether deterministic enforcement is proportionate, and which "
+        "regression or\nsemantic mutation prevents recurrence.",
+        "whether the row is concise.",
+    )
+    expect_rejected(
+        "lfe/embodiment-loses-regression-question",
+        lambda: recovery_controls.validate_recovery_lfe(
+            weakened_embodiment_rule
+        ),
+        "LFE embodiment rule lacks: whether deterministic enforcement is "
+        "proportionate",
     )
 
 

@@ -60,6 +60,13 @@ in the canonical owner. Examine the branches, worktrees, and commits in named
 Git state for unfinished work or interrupted work. Examine the complete stash
 inventory. If the inventory has a retained stash or missing recovery
 information, do not give the recovery gate a complete result.
+Before a worktree retirement, use the canonical
+[deliberate retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+Prove accepted-history containment and tracked cleanliness. Inventory all
+ignored and other local-only files. Recover the owner and preservation need for
+each material group. A merge, clean tracked status, or Git ignore rule does not
+make that state disposable. If any state is ambiguous or uniquely owned, retain
+the worktree and stop.
 
 8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
@@ -154,7 +161,9 @@ owner-view fields. Then, keep this technical provenance:
 5. contradictions, uncommitted work or missing evidence; and
 6. the next bounded action and check.
 
-Also record the named Git state and complete stash inventory.
+Also record the named Git state and complete stash inventory. For worktree
+retirement, record the exact local-state inventory identity, classification,
+preservation proof, unresolved ownership, and retained or completed result.
 
 Do not describe incomplete work, an unaccepted diff or an unrun check as
 accepted project state.

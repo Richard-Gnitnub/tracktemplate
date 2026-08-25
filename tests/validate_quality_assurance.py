@@ -703,6 +703,12 @@ def validate_documentation_profile(
         "attribution series",
         "attribution noise floor",
         "attribution materiality rule",
+        "Worktree retirement",
+        "Accepted-history containment",
+        "local-state inventory",
+        "retirement plan",
+        "retirement audit",
+        "Ambiguous or uniquely owned state",
         "Do not use different technical terms for the same project concept",
         "Do not use a technical noun as a verb unless this register also "
         "approves the verb",
@@ -722,8 +728,8 @@ def validate_documentation_profile(
         for row in lfe_rows
     ]
     require(
-        lfe_ids == [f"{value:03d}" for value in range(1, 21)],
-        "LFE ledger is not unique and append-only through LFE-020",
+        lfe_ids == [f"{value:03d}" for value in range(1, 22)],
+        "LFE ledger is not unique and append-only through LFE-021",
     )
     protected_prefix = "\n".join(lfe_rows[:17]) + "\n"
     require(

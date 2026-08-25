@@ -99,6 +99,13 @@ before selecting proof.
 - For a recovery or handoff workflow change, validate the stash inventory,
   unique content, and stash disposition controls. Also do the applicable
   semantic control validation. Review the preservation diff.
+- For worktree retirement, use the canonical
+  [retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement).
+  Validate accepted-history containment, tracked cleanliness, and the complete
+  ignored and local-only inventory. Validate non-overlapping classification,
+  ambiguous-state rejection, required preservation, normal non-force removal,
+  post-removal preservation, and local-branch order. Review the exact live
+  preservation diff.
 - Run only checks available in the present environment. State unavailable checks
   explicitly instead of simulating or inventing their results.
 - Record the exact command, environment, result and required success sentinel

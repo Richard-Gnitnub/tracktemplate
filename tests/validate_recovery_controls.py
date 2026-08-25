@@ -3,6 +3,7 @@
 
 import argparse
 import ast
+import copy
 import hashlib
 import json
 import pathlib
@@ -28,6 +29,14 @@ AGENTS_PATH = ROOT / "AGENTS.md"
 GITIGNORE_PATH = ROOT / ".gitignore"
 CI_WORKFLOW_PATH = ROOT / ".github/workflows/ci.yml"
 TOOL_PATH = ROOT / "tools" / "repository_safety_audit.py"
+CONTEXT_EVALUATION_PATH = ROOT / (
+    ".agents/skills/tracktemplate-context-recovery/references/"
+    "evaluation-cases.md"
+)
+IDE_EVALUATION_PATH = ROOT / (
+    ".agents/skills/tracktemplate-ide-workspace-alignment/references/"
+    "evaluation-cases.md"
+)
 RECOVERY_SKILL_PATHS = {
     "context": ROOT / ".agents/skills/tracktemplate-context-recovery/SKILL.md",
     "handoff": ROOT / ".agents/skills/tracktemplate-handoff/SKILL.md",
@@ -35,12 +44,19 @@ RECOVERY_SKILL_PATHS = {
     "quality": ROOT / ".agents/skills/tracktemplate-quality-review/SKILL.md",
     "validation": ROOT / ".agents/skills/tracktemplate-change-validation/SKILL.md",
 }
-LFE_001_TO_019_ROWS_SHA256 = (
-    "ad7277d073439979470951990f0e02ad75de65cdaf81b5e4e5320e2e7aaa5f28"
+LFE_001_TO_020_ROWS_SHA256 = (
+    "b072a9b4baaeb1f159def3bb5e2f0de2df460c97a08a7f6bb7ddeb91457edff5"
 )
-READ_ONLY_GIT_ACTIONS = {"rev-list", "rev-parse", "status"}
+READ_ONLY_GIT_ACTIONS = {
+    "ls-files",
+    "merge-base",
+    "rev-list",
+    "rev-parse",
+    "status",
+}
 READ_ONLY_GIT_SUBCOMMANDS = {
     "remote": {"get-url"},
+    "worktree": {"list"},
 }
 
 
@@ -202,7 +218,7 @@ def validate_safety_audit_git_commands(source):
             isinstance(node.func, ast.Attribute)
             and isinstance(node.func.value, ast.Name)
             and node.func.value.id == "os"
-            and node.func.attr != "access"
+            and node.func.attr not in {"access", "fsencode"}
         ):
             raise AssertionError("safety audit bypasses the Git wrapper")
 
@@ -612,6 +628,113 @@ def validate_visible_recovery_routing(workflows, skills):
                 raise AssertionError(name + " recovery routing lacks: " + fragment)
 
 
+def validate_worktree_retirement_policy(policy):
+    """Require loss-checked, non-force worktree retirement in its owner."""
+    section = _semantic_text(_section(policy, "Deliberate worktree retirement"))
+    for fragment in (
+        "merged tracked clean worktree is not automatically disposable",
+        "merge can prove that accepted history contains tracked work",
+        "does not classify ignored files or other local only state",
+        "clean tracked status gives no deletion authority",
+        "prove that accepted history contains the target head and all commits",
+        "prove that the tracked worktree is clean",
+        "inactive and has no sole unsaved ide or operator state",
+        "inventory all ignored and non ignored local only files",
+        "do not use a git ignore rule as a retention or disposal decision",
+        "authoritative local source",
+        "retained evidence",
+        "rebuildable cache generated state",
+        "temporary disposable state",
+        "ambiguous or uniquely owned state",
+        "prove byte identical preservation outside the target worktree",
+        "record the passed rebuild or regeneration proof",
+        "name the owner and the rule that makes retention unnecessary",
+        "stop retain the worktree",
+        "record the exact retirement authority",
+        "recheck the target identity accepted history tracked cleanliness inactivity inventory identity classification and preservation immediately before removal",
+        "keep the classification plan local",
+        "audit is read only",
+        "does not grant removal or branch deletion authority",
+        "fails closed for a changed identity tracked dirt or incomplete or overlapping classification",
+        "fails closed for unsupported local state ambiguous ownership missing proof or a preservation mismatch",
+        "normal git worktree remove",
+        "do not use force",
+        "do not use git stash",
+        "do not move local files only to make git removal succeed",
+        "normal git removal can remove the target's classified ignored files",
+        "delete the local branch only after the worktree is absent",
+        "git branch d confirms that accepted history still contains it",
+        "do not prune or alter another worktree",
+    ):
+        if fragment not in section:
+            raise AssertionError("worktree retirement policy lacks: " + fragment)
+    for option in (
+        "--retirement-worktree",
+        "--retirement-plan",
+        "--require-retirement-ready",
+    ):
+        if option not in policy:
+            raise AssertionError("worktree retirement policy lacks: " + option)
+
+
+def validate_worktree_retirement_routing(workflows, skills):
+    """Route retirement consumers to recovery ownership without duplication."""
+    workflow = _semantic_text(workflows)
+    for fragment in (
+        "before a worktree retirement read the deliberate worktree retirement procedure",
+        "context recovery inventories local state and recovers its owner",
+        "ide workspace alignment proves the worktree is inactive and has no sole operator state",
+        "read only safety audit pins the exact git and local state identities",
+        "do not infer that merged and tracked clean state is disposable",
+        "stop when ignored or local only state has ambiguous ownership or lacks preservation proof",
+        "normal non force worktree removal then safe merged local branch deletion",
+    ):
+        if fragment not in workflow:
+            raise AssertionError(
+                "agent workflow retirement routing lacks: " + fragment
+            )
+    if "RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement" not in workflows:
+        raise AssertionError("agent workflow bypasses retirement policy")
+
+    required = {
+        "context": (
+            "prove accepted history containment and tracked cleanliness",
+            "inventory all ignored and other local only files",
+            "merge clean tracked status or git ignore rule does not make that state disposable",
+            "ambiguous or uniquely owned retain the worktree and stop",
+        ),
+        "ide": (
+            "inventory and classify all ignored and other local only state",
+            "do not infer disposal from a git ignore rule",
+            "ambiguous ownership uniqueness activity or preservation keeps the worktree registered",
+        ),
+        "validation": (
+            "accepted history containment tracked cleanliness and the complete ignored and local only inventory",
+            "ambiguous state rejection required preservation normal non force removal",
+            "review the exact live preservation diff",
+        ),
+        "quality": (
+            "exact ignored local state inventory",
+            "each classification its proof owner",
+            "non force command post removal preservation",
+            "merged + clean = disposable as a missing proof",
+        ),
+    }
+    for name, fragments in required.items():
+        value = skills[name]
+        if (
+            "RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement"
+            not in value
+        ):
+            raise AssertionError(name + " skill bypasses retirement policy")
+        semantic = _semantic_text(value)
+        for fragment in fragments:
+            if fragment not in semantic:
+                raise AssertionError(
+                    name + " retirement routing lacks: " + fragment
+                )
+
+
 def validate_recovery_policy_owner(markdown):
     """Reject a second Git recovery-policy owner or copied core rule."""
     canonical = "reference/RECOVERY_AND_BACKUP.md"
@@ -654,15 +777,12 @@ def _lfe_rows(text):
 
 
 def validate_recovery_lfe(text):
-    """Protect the append-only visible-recovery lesson and its owner links."""
+    """Protect recovery lessons, frozen rows, and canonical owner links."""
     rows = _lfe_rows(text)
     identifiers = [re.match(r"\| (LFE-\d{3})", row).group(1) for row in rows]
-    expected = ["LFE-{:03d}".format(number) for number in range(1, 21)]
+    expected = ["LFE-{:03d}".format(number) for number in range(1, 22)]
     if identifiers != expected:
-        raise AssertionError("LFE identifiers are not unique through LFE-020")
-    earlier = "".join(rows[:19]).encode("utf-8")
-    if hashlib.sha256(earlier).hexdigest() != LFE_001_TO_019_ROWS_SHA256:
-        raise AssertionError("an LFE row before LFE-020 was modified")
+        raise AssertionError("LFE identifiers are not unique through LFE-021")
     if text.count("| LFE-020 /") != 1:
         raise AssertionError("LFE-020 must occur exactly once")
     cells = [cell.strip() for cell in rows[19].strip().strip("|").split("|")]
@@ -733,6 +853,76 @@ def validate_recovery_lfe(text):
             raise AssertionError(
                 "LFE-020 exceeds its historical boundary: " + prohibited
             )
+
+    earlier = "".join(rows[:20]).encode("utf-8")
+    if hashlib.sha256(earlier).hexdigest() != LFE_001_TO_020_ROWS_SHA256:
+        raise AssertionError("an LFE row before LFE-021 was modified")
+
+    if text.count("| LFE-021 /") != 1:
+        raise AssertionError("LFE-021 must occur exactly once")
+    cells = [cell.strip() for cell in rows[20].strip().strip("|").split("|")]
+    if len(cells) != 4:
+        raise AssertionError("LFE-021 row structure drifted")
+    row = _semantic_text(rows[20])
+    for fragment in (
+        "merged ste100 retrieval assurance worktree was tracked clean",
+        "accepted main contained its branch tip",
+        "144 ignored files",
+        "official local asd ste100 source",
+        "derived caches",
+        "repeatable validation logs and caches",
+        "temporary review receipts",
+        "branch merge status and tracked cleanliness did not give deletion authority",
+        "canonical recovery policy",
+        "complete ignored local state inventory",
+        "ownership classification",
+        "preservation proof",
+        "normal non force removal",
+        "post removal preservation diff",
+        "read only validation control",
+        "rejects incomplete overlapping changed ambiguous unsupported unpreserved or unauthorised retirement state",
+    ):
+        if fragment not in row:
+            raise AssertionError("LFE-021 lacks: " + fragment)
+    reusable = _semantic_text(cells[3])
+    for fragment in (
+        "merged clean worktree is not automatically disposable",
+        "inventory and classify ignored local state before retirement",
+        "preserve authoritative or unique material",
+        "discard only proven rebuildable or disposable state",
+        "stop when ownership is uncertain",
+    ):
+        if fragment not in reusable:
+            raise AssertionError("LFE-021 reusable rule lacks: " + fragment)
+    for link in (
+        "RECOVERY_AND_BACKUP.md#deliberate-worktree-retirement",
+        "AGENT_WORKFLOWS.md#session-continuity",
+        "current/PHASE_EVIDENCE.md#deliberate-worktree-retirement-workflow-migration",
+        "VALIDATION.md",
+    ):
+        if link not in rows[20]:
+            raise AssertionError("LFE-021 lacks canonical link: " + link)
+    for prohibited in (
+        "this lfe owns",
+        "lfe 021 owns",
+        "ignored means disposable",
+        "ignored means permanent evidence",
+    ):
+        if prohibited in row:
+            raise AssertionError(
+                "LFE-021 exceeds its historical boundary: " + prohibited
+            )
+
+    ledger_rules = _semantic_text(_section(text, "Ledger rules"))
+    for fragment in (
+        "which canonical owner and workflow must change",
+        "whether deterministic enforcement is proportionate",
+        "which regression or semantic mutation prevents recurrence",
+        "executable control would add more complexity than the risk that it controls record that reason",
+        "ledger records the lesson it does not own the adaptation",
+    ):
+        if fragment not in ledger_rules:
+            raise AssertionError("LFE embodiment rule lacks: " + fragment)
 
 
 def validate_recovery_phase_evidence(text):
@@ -851,6 +1041,108 @@ def validate_recovery_phase_evidence(text):
         )
 
 
+def validate_worktree_retirement_phase_evidence(text):
+    """Bind the STE100 retirement result to exact loss and authority limits."""
+    section = _section(
+        text,
+        "Workflow migration for deliberate worktree retirement",
+    )
+    semantic = _semantic_text(section)
+    for fragment in (
+        "level 2 recovery workspace workflow migration",
+        "merged ste100 retrieval assurance worktree and only its merged local branch were retired",
+        "accepted main at d47518083768d34cf9b41566feaf132ac4562595 contained target head 9f3b05d480971d197a57cb00f1811f6c1012f144",
+        "exact 144 file inventory",
+        "a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044",
+        "audit checks exact evidence that a local plan supplies",
+        "does not make ownership disposal removal branch deletion acceptance or integration decisions",
+        "no retained evidence item ambiguous item unsupported type tracked change or non ignored untracked file",
+        "normal non force removal",
+        "safe deletion of only its merged local branch after removal",
+        "authorised no other worktree branch remote branch git object backup or evidence disposition",
+        "integration requires authority for that exact reviewed candidate",
+        "cycle 3 does not start from an open cycle 2 pull request",
+        "pull request 56 merged the ste100 retrieval assurance branch through merge commit 65409493d741a5606543bd437e519f8efefb8680",
+        "upstream branch was absent",
+        "local main origin main and live github main identified d47518083768d34cf9b41566feaf132ac4562595",
+        "ide backed primary project was clean main",
+        "no open editor or process used the target worktree",
+        "144 ignored files and 8 042 871 bytes",
+        "authoritative local source 1 3 316 157",
+        "retained evidence 0 0",
+        "rebuildable cache generated state 82 3 026 397",
+        "temporary disposable state 61 1 700 317",
+        "ambiguous or uniquely owned state 0 0",
+        "two ste caches six ruff cache files 68 python bytecode files and six repeatable validation logs",
+        "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+        "ste cache rebuild validation and status gave the required source bound schema v2 results",
+        "six non overlapping groups",
+        "zero findings",
+        "final required audit ran immediately before normal git worktree remove",
+        "did not use force git stash manual relocation prune or another worktree",
+        "only then git branch d deleted the merged local branch",
+        "no remote branch was deleted",
+        "stash inventory stayed empty and refs stash stayed absent",
+        "complete ignored and non ignored inventory fixtures",
+        "missing proof ambiguity inactivity authority target and accepted history identity non containment inventory change tracked dirt unsupported type and preservation mismatch fixtures",
+        "disposable integration fixture passed normal non force removal preserved source and post retirement local branch checks",
+        "python and fcmacro parsing passed for 189 tracked files",
+        "standalone ci profile passed 60 60",
+        "local standalone profile passed 59 60",
+        "live workstation member correctly reported that the worktree did not contain the ignored templot source archive",
+        "candidate safety audit separately verified the exact required archive and critical assets result against the clean primary workspace",
+        "governance semantics rejected 284 284 mutations with zero escapes and 278 independent protections",
+        "earlier lfe rows remain unchanged",
+        "d gov 009 and its evidence remain unchanged",
+        "phase 6 stays at 2 5 and project status stays unknown",
+        "makes no product railway freecad export schema api performance release production phase exit output rights or acceptance change",
+        "does not authorise cycle 3 or integration of an unreviewed cycle 2 candidate",
+    ):
+        if fragment not in semantic:
+            raise AssertionError(
+                "worktree retirement phase evidence lacks: " + fragment
+            )
+    for identity in (
+        "65409493d741a5606543bd437e519f8efefb8680",
+        "9f3b05d480971d197a57cb00f1811f6c1012f144",
+        "d47518083768d34cf9b41566feaf132ac4562595",
+        "a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044",
+        "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+    ):
+        if identity not in section:
+            raise AssertionError(
+                "worktree retirement evidence lacks identity: " + identity
+            )
+    parents = _run(
+        [
+            "git",
+            "show",
+            "-s",
+            "--format=%P",
+            "65409493d741a5606543bd437e519f8efefb8680",
+        ],
+        cwd=ROOT,
+    ).stdout.split()
+    if (
+        len(parents) != 2
+        or parents[1] != "9f3b05d480971d197a57cb00f1811f6c1012f144"
+    ):
+        raise AssertionError("STE100 merge topology drifted")
+    containment = _run(
+        [
+            "git",
+            "merge-base",
+            "--is-ancestor",
+            "9f3b05d480971d197a57cb00f1811f6c1012f144",
+            "d47518083768d34cf9b41566feaf132ac4562595",
+        ],
+        cwd=ROOT,
+        check=False,
+    )
+    if containment.returncode != 0:
+        raise AssertionError("accepted main no longer contains STE100 target")
+
+
 def _load_tracked_markdown():
     result = _run(["git", "ls-files", "-z", "*.md"], cwd=ROOT)
     paths = [item for item in result.stdout.split("\0") if item]
@@ -892,6 +1184,408 @@ def _git_fixture(temp_root):
     _run(["git", "remote", "add", "origin", str(remote)], cwd=repository)
     _run(["git", "push", "-u", "origin", "main"], cwd=repository)
     return repository
+
+
+def _retirement_fixture(temp_root):
+    repository = _git_fixture(temp_root)
+    (repository / ".gitignore").write_text("local/\n", encoding="utf-8")
+    _run(["git", "add", ".gitignore"], cwd=repository)
+    _run(["git", "commit", "-m", "Ignore local fixture state"], cwd=repository)
+    _run(["git", "push"], cwd=repository)
+    target = temp_root / "retirement-target"
+    _run(
+        [
+            "git",
+            "worktree",
+            "add",
+            "-b",
+            "retirement/test",
+            str(target),
+            "main",
+        ],
+        cwd=repository,
+    )
+    for root in (repository, target):
+        (root / "local").mkdir()
+        (root / "local/source.bin").write_bytes(b"authoritative source\n")
+    (target / "local/cache").mkdir()
+    (target / "local/cache/derived.bin").write_bytes(b"derived\n")
+    (target / "local/temp").mkdir()
+    (target / "local/temp/receipt.json").write_text(
+        '{"temporary":true}\n',
+        encoding="utf-8",
+    )
+    return repository, target
+
+
+def _retirement_plan(repository, target):
+    inventory = safety._retirement_inventory(target.resolve())
+    accepted = _run(
+        ["git", "rev-parse", "refs/remotes/origin/main"],
+        cwd=repository,
+    ).stdout.strip()
+    return {
+        "schema_version": 1,
+        "target": {
+            "branch": "refs/heads/retirement/test",
+            "head": _run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=target,
+            ).stdout.strip(),
+        },
+        "accepted_history": {
+            "ref": "refs/remotes/origin/main",
+            "commit": accepted,
+        },
+        "inventory_sha256": inventory["sha256"],
+        "activity": {
+            "status": "inactive",
+            "evidence": "disposable fixture has no operator or IDE owner",
+        },
+        "authority": {
+            "status": "authorised",
+            "owner": "fixture test",
+            "scope": "normal non-force worktree and merged local branch removal",
+        },
+        "classifications": [
+            {
+                "name": "source",
+                "classification": "authoritative-local-source",
+                "paths": ["local/source.bin"],
+                "prefixes": [],
+                "proof": {
+                    "status": "passed",
+                    "owner": "fixture source owner",
+                    "basis": "the primary checkout has identical bytes",
+                },
+                "disposition": "preserve",
+                "preservation": {
+                    "method": "identical-relative-tree",
+                    "destination_root": str(repository),
+                },
+            },
+            {
+                "name": "cache",
+                "classification": "rebuildable-cache-generated-state",
+                "paths": [],
+                "prefixes": ["local/cache/"],
+                "proof": {
+                    "status": "passed",
+                    "owner": "fixture generator",
+                    "basis": "the fixture generator deterministically rebuilds it",
+                },
+                "disposition": "discard-by-normal-worktree-removal",
+            },
+            {
+                "name": "temporary",
+                "classification": "temporary-disposable-state",
+                "paths": [],
+                "prefixes": ["local/temp/"],
+                "proof": {
+                    "status": "passed",
+                    "owner": "fixture test",
+                    "basis": "the fixture defines this receipt as temporary",
+                },
+                "disposition": "discard-by-normal-worktree-removal",
+            },
+        ],
+    }
+
+
+def _write_retirement_plan(path, plan):
+    path.write_text(
+        json.dumps(plan, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _validate_worktree_retirement_audit(errors):
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-retirement-audit-"
+    ) as temporary:
+        temp_root = pathlib.Path(temporary)
+        repository, target = _retirement_fixture(temp_root)
+        before_repository = _run(
+            ["git", "status", "--porcelain=v1", "--ignored"],
+            cwd=repository,
+        ).stdout
+        before_target = _run(
+            ["git", "status", "--porcelain=v1", "--ignored"],
+            cwd=target,
+        ).stdout
+        untracked_path = target / "local-only.txt"
+        untracked_path.write_text("local-only fixture\n", encoding="utf-8")
+        with_untracked = safety.audit_worktree_retirement(repository, target)
+        if with_untracked["inventory"]["untracked_count"] != 1:
+            errors.append("retirement inventory omitted non-ignored local state")
+        untracked_path.unlink()
+        inventory_only = safety.audit_worktree_retirement(repository, target)
+        if inventory_only["readiness"]["retirement_ready"]:
+            errors.append("merged and tracked-clean worktree needed no plan")
+        if inventory_only["inventory"]["file_count"] != 3:
+            errors.append("retirement inventory did not include all local state")
+
+        plan = _retirement_plan(repository, target)
+        plan_path = temp_root / "retirement-plan.json"
+        _write_retirement_plan(plan_path, plan)
+        ready = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if not ready["readiness"]["retirement_ready"] or ready["findings"]:
+            errors.append("complete retirement proof did not become ready")
+        expected_counts = {
+            "authoritative-local-source": 1,
+            "rebuildable-cache-generated-state": 1,
+            "temporary-disposable-state": 1,
+        }
+        for classification, count in expected_counts.items():
+            actual = ready["classification"]["counts"][classification][
+                "file_count"
+            ]
+            if actual != count:
+                errors.append(
+                    "retirement classification count drifted: " + classification
+                )
+
+        result = _run(
+            [
+                sys.executable,
+                str(TOOL_PATH),
+                "--root",
+                str(repository),
+                "--retirement-worktree",
+                str(target),
+                "--retirement-plan",
+                str(plan_path),
+                "--require-retirement-ready",
+            ],
+            cwd=repository,
+        )
+        records = [
+            line[len(safety.RETIREMENT_SENTINEL) :]
+            for line in result.stdout.splitlines()
+            if line.startswith(safety.RETIREMENT_SENTINEL)
+        ]
+        if len(records) != 1 or not json.loads(records[0])[
+            "requested_requirements"
+        ]["retirement_ready"]:
+            errors.append("retirement CLI did not emit one passing sentinel")
+        if str(repository) in result.stdout or str(target) in result.stdout:
+            errors.append("retirement CLI exposed a local worktree path")
+
+        incomplete = copy.deepcopy(plan)
+        incomplete["classifications"] = incomplete["classifications"][:-1]
+        _write_retirement_plan(plan_path, incomplete)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "local-state-classification-incomplete" not in blocked["findings"]:
+            errors.append("unclassified local state did not fail closed")
+
+        overlapping = copy.deepcopy(plan)
+        overlapping["classifications"][1]["paths"].append(
+            "local/temp/receipt.json"
+        )
+        _write_retirement_plan(plan_path, overlapping)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "local-state-classification-overlap" not in blocked["findings"]:
+            errors.append("overlapping local-state classification did not fail")
+
+        missing_proof = copy.deepcopy(plan)
+        missing_proof["classifications"][1]["proof"]["status"] = "unproved"
+        _write_retirement_plan(plan_path, missing_proof)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if not any(
+            item.startswith("classification-proof-incomplete:")
+            for item in blocked["findings"]
+        ):
+            errors.append("missing classification proof did not fail closed")
+
+        active = copy.deepcopy(plan)
+        active["activity"]["status"] = "active"
+        _write_retirement_plan(plan_path, active)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "target-inactivity-not-confirmed" not in blocked["findings"]:
+            errors.append("active worktree did not fail retirement audit")
+
+        unauthorised = copy.deepcopy(plan)
+        unauthorised["authority"]["status"] = "not-authorised"
+        _write_retirement_plan(plan_path, unauthorised)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "retirement-authority-not-recorded" not in blocked["findings"]:
+            errors.append("missing retirement authority did not fail closed")
+
+        changed_head = copy.deepcopy(plan)
+        changed_head["target"]["head"] = "0" * 40
+        _write_retirement_plan(plan_path, changed_head)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "target-head-changed" not in blocked["findings"]:
+            errors.append("changed target identity did not fail closed")
+
+        changed_history = copy.deepcopy(plan)
+        changed_history["accepted_history"]["commit"] = "0" * 40
+        _write_retirement_plan(plan_path, changed_history)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "accepted-history-identity-changed" not in blocked["findings"]:
+            errors.append("changed accepted-history identity did not fail closed")
+
+        ambiguous = copy.deepcopy(plan)
+        ambiguous_group = ambiguous["classifications"][2]
+        ambiguous_group["classification"] = (
+            "ambiguous-or-uniquely-owned-state"
+        )
+        ambiguous_group["disposition"] = "retain-and-stop"
+        _write_retirement_plan(plan_path, ambiguous)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if not any(
+            item.startswith("ambiguous-or-unique-local-state:")
+            for item in blocked["findings"]
+        ):
+            errors.append("ambiguous local-state ownership did not fail closed")
+
+        (repository / "local/source.bin").write_bytes(b"different source\n")
+        _write_retirement_plan(plan_path, plan)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if not any(
+            item.startswith("required-preservation-not-proved:")
+            for item in blocked["findings"]
+        ):
+            errors.append("non-identical preservation did not fail closed")
+        (repository / "local/source.bin").write_bytes(b"authoritative source\n")
+
+        (target / "local/cache/new.bin").write_bytes(b"new derived state\n")
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "local-state-inventory-changed" not in blocked["findings"]:
+            errors.append("changed local-state inventory did not fail closed")
+        (target / "local/cache/new.bin").unlink()
+
+        (target / "tracked.txt").write_text("dirty\n", encoding="utf-8")
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "target-tracked-state-not-clean" not in blocked["findings"]:
+            errors.append("tracked worktree change did not fail closed")
+        (target / "tracked.txt").write_text("checkpoint\n", encoding="utf-8")
+
+        link = target / "local/unsupported-link"
+        link.symlink_to("source.bin")
+        unsupported = copy.deepcopy(plan)
+        unsupported["inventory_sha256"] = safety._retirement_inventory(
+            target
+        )["sha256"]
+        unsupported["classifications"][2]["paths"].append(
+            "local/unsupported-link"
+        )
+        _write_retirement_plan(plan_path, unsupported)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "unsupported-local-state-type" not in blocked["findings"]:
+            errors.append("unsupported local-state type did not fail closed")
+        link.unlink()
+
+        (target / "new-tracked.txt").write_text(
+            "unaccepted branch commit\n",
+            encoding="utf-8",
+        )
+        _run(["git", "add", "new-tracked.txt"], cwd=target)
+        _run(["git", "commit", "-m", "Unaccepted fixture commit"], cwd=target)
+        not_contained = copy.deepcopy(plan)
+        not_contained["target"]["head"] = _run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=target,
+        ).stdout.strip()
+        _write_retirement_plan(plan_path, not_contained)
+        blocked = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if "target-not-contained-in-accepted-history" not in blocked["findings"]:
+            errors.append("unaccepted target history did not fail closed")
+
+        after_repository = _run(
+            ["git", "status", "--porcelain=v1", "--ignored"],
+            cwd=repository,
+        ).stdout
+        after_target = _run(
+            ["git", "status", "--porcelain=v1", "--ignored"],
+            cwd=target,
+        ).stdout
+        if before_repository != after_repository or before_target != after_target:
+            errors.append("retirement audit changed repository or target state")
+
+
+def _validate_normal_retirement_fixture(errors):
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-normal-retirement-"
+    ) as temporary:
+        temp_root = pathlib.Path(temporary)
+        repository, target = _retirement_fixture(temp_root)
+        plan = _retirement_plan(repository, target)
+        plan_path = temp_root / "retirement-plan.json"
+        _write_retirement_plan(plan_path, plan)
+        report = safety.audit_worktree_retirement(
+            repository,
+            target,
+            plan_path,
+        )
+        if not report["readiness"]["retirement_ready"]:
+            errors.append("normal-retirement fixture did not pass its audit")
+            return
+        _run(["git", "worktree", "remove", str(target)], cwd=repository)
+        if target.exists():
+            errors.append("normal non-force worktree removal did not complete")
+        if not (repository / "local/source.bin").is_file():
+            errors.append("normal worktree removal lost preserved source")
+        _run(["git", "branch", "-d", "retirement/test"], cwd=repository)
+        branches = _run(["git", "branch", "--list"], cwd=repository).stdout
+        if "retirement/test" in branches:
+            errors.append("merged local branch was not retired after worktree")
 
 
 def _validate_repository_state(errors):
@@ -1095,6 +1789,8 @@ def _validate_static_controls(errors):
         for name, path in RECOVERY_SKILL_PATHS.items()
     }
     gitignore = GITIGNORE_PATH.read_text(encoding="utf-8")
+    context_evaluation = CONTEXT_EVALUATION_PATH.read_text(encoding="utf-8")
+    ide_evaluation = IDE_EVALUATION_PATH.read_text(encoding="utf-8")
     policy_flat = " ".join(policy.split())
     policy_markers = (
         "Independent project-data backup",
@@ -1143,14 +1839,27 @@ def _validate_static_controls(errors):
     ):
         if marker not in gitignore:
             errors.append("ignored local-data protection marker is missing: " + marker)
+    if "CE-10 merged worktree retirement" not in context_evaluation:
+        errors.append("context-recovery evaluation omits worktree retirement")
+    ide_evaluation_semantic = _semantic_text(ide_evaluation)
+    for marker in (
+        "tracked clean but has ignored local files",
+        "complete ignored local state classification",
+        "uses a git ignore rule as disposal authority",
+    ):
+        if marker not in ide_evaluation_semantic:
+            errors.append("IDE retirement evaluation lacks: " + marker)
 
     for check in (
         lambda: validate_ci_recovery_history(ci_workflow),
         lambda: validate_visible_recovery_policy(policy),
         lambda: validate_visible_recovery_routing(workflows, skills),
+        lambda: validate_worktree_retirement_policy(policy),
+        lambda: validate_worktree_retirement_routing(workflows, skills),
         lambda: validate_recovery_policy_owner(_load_tracked_markdown()),
         lambda: validate_recovery_lfe(learning),
         lambda: validate_recovery_phase_evidence(phase_evidence),
+        lambda: validate_worktree_retirement_phase_evidence(phase_evidence),
     ):
         try:
             check()
@@ -1178,6 +1887,12 @@ def _validate_static_controls(errors):
             "def inspect(root):\n"
             "    return _git(root, 'stash', 'list', '--format=%H')\n"
         )
+        validate_safety_audit_git_commands(
+            "def inspect(root):\n"
+            "    _git(root, 'worktree', 'list', '--porcelain', '-z')\n"
+            "    _git(root, 'ls-files', '-z', '--others')\n"
+            "    return _git(root, 'merge-base', '--is-ancestor', 'a', 'b')\n"
+        )
     except AssertionError as error:
         errors.append(str(error))
     for command in (
@@ -1189,6 +1904,9 @@ def _validate_static_controls(errors):
         "_git(root, 'update-ref', '-d', 'refs/stash')",
         "_git(root, 'remote', 'remove', 'origin')",
         "_git(root, 'worktree', 'remove', '/tmp/example')",
+        "_git(root, 'worktree', 'remove', '--force', '/tmp/example')",
+        "_git(root, 'worktree', 'prune')",
+        "_git(root, 'branch', '-d', 'example')",
         "_git(root, action, 'drop', 'stash@{0}')",
         "subprocess.run(['git', 'stash', 'drop', 'stash@{0}'])",
         "subprocess.getoutput('git stash drop stash@{0}')",
@@ -1270,6 +1988,8 @@ def validate(include_live_workstation=False):
     _validate_stash_topology(errors)
     _validate_backup_assessment(errors)
     _validate_missing_critical_asset(errors)
+    _validate_worktree_retirement_audit(errors)
+    _validate_normal_retirement_fixture(errors)
     if include_live_workstation:
         _validate_live_audit(errors)
     _validate_static_controls(errors)
