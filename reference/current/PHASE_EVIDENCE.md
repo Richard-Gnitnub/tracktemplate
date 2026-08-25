@@ -3150,10 +3150,11 @@ worktrees stayed registered. No remote branch was deleted. The stash inventory
 stayed empty and `refs/stash` stayed absent.
 
 The focused recovery validator passed its read-only and complete ignored and
-non-ignored inventory fixtures. It also passed incomplete coverage, overlap,
-missing proof, ambiguity, inactivity, authority, target and accepted-history
-identity, non-containment, inventory change, loss of tracked cleanliness,
-unsupported type, and preservation-mismatch fixtures. Its disposable
+non-ignored inventory fixtures. It also passed fixtures for incomplete coverage,
+overlap, missing proof, ambiguity, inactivity, authority, target and
+accepted-history identity, non-containment, and inventory change. It passed
+fixtures for loss of tracked cleanliness, an unsupported local-state type, and
+a preservation mismatch. Its disposable
 integration fixture passed normal non-force removal, preserved-source, and
 post-retirement local-branch checks. Python and FCMacro parsing passed for 189
 tracked files.
