@@ -1,61 +1,72 @@
 # TrackTemplate documentation writing checklist
 
-First, select the document class. Identify its canonical responsibility. Then,
-apply this checklist.
+First, identify the document class and its canonical owner. Then, use this
+checklist.
 
-Apply the canonical [Technical Documentation Profile](../../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
-For STE-governed prose, use the official ASD-STE100 Issue 9 standard that the
-profile identifies. Also use the approved project terms in
+Use the [Technical Documentation Profile](../../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
+Use ASD-STE100 Issue 9. Use the official source that the Technical Documentation
+Profile identifies. Use the technical terms in
 [`reference/TERMINOLOGY.md`](../../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
 
 ## Author-side assurance for ASD-STE100 Issue 9
 
-Apply these checks to each new logical unit. Before you freeze an exact
-candidate, also apply them to each logical unit with a material edit:
+For each logical unit with a material edit, use this procedure:
 
-- Identify the document class for the logical unit.
-- Identify the content category for the logical unit.
-- Identify the applicable rule set.
-- For each term use, identify the term use as ordinary vocabulary or a technical
-  term.
-- For each use of ordinary vocabulary, make sure that the approved meaning is
-  correct.
-- For each use of ordinary vocabulary, make sure that the approved part of
-  speech is correct.
-- For each technical term, use its registered form.
-- Use a shorter form only if the technical-term register contains it.
-- Do not add a technical term only to keep the wording.
-- Do not use a technical noun as a technical verb.
-- For each operation, identify the logical agent.
-- The logical agent must be a person, tool, or system.
-- If the logical agent is known, use the logical agent as the grammatical
-  subject.
-- Make sure that each pronoun has one clear pronoun antecedent.
-- Identify the item that has each condition.
-- Identify the item that has each result.
-- Use the identified item as the grammatical subject.
-- Examine each multi-word noun.
-- Do not use more than 3 words in each multi-word noun.
-- If a registered form has more than 3 words, use the registered form.
-- In a procedure, give one instruction in each sentence.
-- In a procedure, give one operation in each work step.
-- If the work step has simultaneous actions, the work step can contain those
-  operations.
-- If an immediate result occurs, the work step can contain the operation and
-  immediate result.
-- If a condition must be known first, put the condition before its instruction.
-- Resolve each dictionary-inspection candidate.
-- Resolve all unresolved terminology.
-- Resolve each applicable finding.
-- If unresolved terminology stays, do not freeze an exact candidate.
-- After the last wording change, review the complete logical unit against the
-  applicable rule set.
+1. Identify the document class.
+2. Identify the content category.
+3. Identify all applicable Issue 9 requirements.
+4. Identify each word as controlled vocabulary or a technical term.
+5. For controlled vocabulary, examine its approved meaning and part of speech.
+6. Examine each applicable requirement in Rule 1.
+7. Use the wording for each technical term in the technical-term register.
+8. Examine each technical term for its technical-term category.
+9. Use approved STE vocabulary when no technical term is necessary.
+10. If the controlled vocabulary does not identify the TrackTemplate item, add a technical term.
+11. Identify the person, tool, or system that does each operation.
+12. Make sure each operation has the correct person, tool, or system.
+13. For each pronoun, make sure the noun to which it refers is clear.
+14. Name the correct item for each state and result.
+15. Examine each noun group against Rule 2.
+16. In a procedure, use a different instruction for each operation.
+17. In a procedure, put each condition before its instruction.
+18. Examine sentence construction under Rules 3 through 8.
+19. Examine paragraph construction under Rules 3 through 8.
+20. Examine all other applicable Issue 9 requirements.
+21. Compare each evidence claim with its source.
+22. Record each finding and its disposition.
+23. Resolve all unresolved terminology.
+24. After the last wording change, review the complete logical unit again.
 
-Use the deterministic pre-check to find review candidates. Use the STE lookup
-to retrieve source material. These tools give no conformance review result.
-The author must examine term meaning and technical-term category. The author
-must also examine sentence grammar and the logical agent. A deterministic
-pre-check does not complete the author-side assurance.
+A deterministic pre-check can identify text for review. The STE lookup can
+give source material. The pre-check gives no conformance review result. The STE
+lookup also gives no conformance review result. The author completes the
+conformance review.
+
+### Temporary author-review worklist
+
+The worklist records only this information for the validation tool:
+
+- Exact candidate and source identity
+- Conformance scope for changed prose
+- SHA-256 for each path and logical unit
+- Applicable review categories
+- Findings and their dispositions
+- Source for each evidence claim
+- Author-side assurance result and unresolved findings
+- Read-only challenge result.
+
+For a command result, record the command invocation and working directory.
+Record the validation profile and process exit status. Record the actual result.
+Record the command-output SHA-256. If the command has a sentinel, record it.
+
+The STE lookup validates the source identity, exact candidate, conformance
+scope, and SHA-256 values. It also validates unresolved findings. It validates
+each command result against its evidence source. It does not examine prose for
+conformance.
+
+Before the author freezes the exact candidate, give the author-review worklist
+to a different documentation reviewer. Give the reviewer all changed prose.
+Get a read-only challenge. The challenge has no acceptance.
 
 ## Ownership and structure
 

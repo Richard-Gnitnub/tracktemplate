@@ -54,6 +54,14 @@ includes a linguistic conformance assessment, route it to
    to expand stable product terms, not to infer live status. Inspect relevant
    source, tests, raw failures, Git status and diffs only after authority is
    established.
+Use the
+[procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
+in the canonical owner. Examine the branches, worktrees, and commits in named
+Git state for unfinished work or interrupted work. Examine the complete stash
+inventory. If the stash inventory has a retained stash, do not give the
+recovery gate a complete result. If recovery information is missing, do not
+give the recovery gate a complete result.
+
 8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
    excluded.
@@ -64,27 +72,18 @@ includes a linguistic conformance assessment, route it to
    ownership, next safe slice and proof boundary are clear. Ask the user when a
    material decision cannot be recovered without guessing.
 
-Use the
-[procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
-in the canonical owner. Examine the branches, worktrees, and commits in named
-Git state for unfinished work or interrupted work. Examine the complete stash
-inventory. If the stash inventory has a
-retained stash, do not give the recovery gate a complete result. If recovery
-information is missing, do not give the recovery gate a complete result.
-
 ### Worktree retirement during recovery
 
 Before worktree retirement, use the
 [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
 Show accepted-history containment. Show tracked cleanliness. Make a local-state
-inventory of all files that are not in the Git index. Identify the canonical
-owner for each local-state inventory item. Identify necessary planned
-preservation.
+inventory of all files that are not in the Git index. Find the canonical owner
+for each item. Show planned preservation.
 
-A merge and tracked cleanliness give no removal authority. A Git ignore rule
-also gives no removal authority. If the retirement plan has ambiguous or
-uniquely owned state, keep the worktree. If the retirement plan has ambiguous
-or uniquely owned state, stop.
+The pull-request state `MERGED` and tracked cleanliness give no removal
+authority. A Git ignore rule also gives no removal authority. If the retirement
+plan has ambiguous or uniquely owned state, keep the worktree. If the retirement
+plan has ambiguous or uniquely owned state, stop.
 
 ## Authority-aware selection
 
@@ -162,20 +161,23 @@ freshness.
 Before a change, use short text. For a substantial cycle, use the profile's six
 owner-view fields. Then, keep this technical provenance:
 
-1. Canonical owners examined
-2. Accepted result after recovery and authority boundary
-3. Agent context, each source that the agent does not use, and the cause
+1. Canonical owners
+2. Result with acceptance and authority boundary
+3. Agent context and source material that the agent did not use
 4. Implementation evidence and validation result
-5. Dirty paths, information that does not agree, or missing evidence
-6. Next task and check
-7. Named Git state
-8. Complete stash inventory
-9. SHA-256 for the local-state inventory
-10. Local-state type for each local-state inventory item
-11. Preservation audit result
-12. Each local-state inventory item without a canonical owner
-13. Complete result from the retirement audit.
+5. Information that does not agree, dirty path, or missing evidence
+6. Next task and validation.
 
-Do not report work that is not complete as accepted project state. Do not
-report a diff without acceptance as accepted project state. Do not report a
-check that did not operate as accepted project state.
+Also record the named Git state and complete stash inventory.
+
+Do not report unfinished work as accepted project state. Do not report a diff
+without acceptance as accepted project state. If a validation tool did not
+operate, do not report a validation result as accepted project state.
+
+For worktree retirement, the agent must report:
+
+1. SHA-256 for the local-state inventory
+2. Local-state type for each item
+3. Preservation audit result
+4. Each item without a canonical owner
+5. Result from the retirement audit.

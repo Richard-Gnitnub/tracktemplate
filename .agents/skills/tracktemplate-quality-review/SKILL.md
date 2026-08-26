@@ -90,17 +90,17 @@ Examine accepted-history containment. Examine tracked cleanliness. Examine
 evidence that no person or process uses the worktree. Examine the
 local-state inventory.
 
-Examine the local-state type for each local-state inventory item. Examine the
-canonical owner for each local-state inventory item. Examine the result for each
-local-state inventory item.
-Examine necessary planned preservation. Examine the `FAIL` result for ambiguous
+For each item in the local-state inventory, examine the local-state type.
+For each item, examine the canonical owner. For each item, examine the result.
+Examine planned preservation. Examine the `FAIL` result for ambiguous
 or uniquely owned state.
 
 Examine removal authority. Examine `git worktree remove` without `--force`.
 After removal, examine the preservation audit.
 Examine the preservation diff for branches, worktrees, and the stash inventory.
-A merge and tracked cleanliness give no removal authority. If the project owner
-did not give removal authority, report this limitation.
+The pull-request state `MERGED` and tracked cleanliness give no removal
+authority. If the project owner did not give removal authority, report this
+limitation.
 
 ## Review order
 

@@ -66,28 +66,24 @@ Read only the documents relevant to the present change:
 
 ## Author-side assurance for ASD-STE100 Issue 9
 
-Use the [writing checklist](references/writing-checklist.md#author-side-assurance-for-asd-ste100-issue-9)
-for each new logical unit. Also use it for each logical unit with a material
-edit in the conformance scope.
+For each logical unit with a material edit, use the
+[writing checklist](references/writing-checklist.md#author-side-assurance-for-asd-ste100-issue-9).
+The author examines all applicable Issue 9 requirements. The author records
+findings and their dispositions in a temporary author-review worklist.
+The worklist also records each logical unit that the author reviewed. It records
+the SHA-256 for each logical unit.
 
-Before you freeze an exact candidate:
+After the last wording change, review each complete logical unit again. Resolve
+all findings. Resolve all unresolved terminology. Then, validate the worklist
+with `tools/ste100_lookup.py author-assurance`. Before the author freezes the
+exact candidate, get a read-only challenge from a different documentation
+reviewer.
 
-1. Identify each logical unit.
-2. Identify the content category for each logical unit.
-3. Complete the applicable author-side assurance for each logical unit.
-4. Resolve all unresolved terminology.
-5. If the STE dictionary contains the necessary word, use the approved word.
-6. If the STE dictionary has no word for a necessary TrackTemplate item,
-   approve a technical term.
-7. Do not approve a technical term only to keep the wording.
-8. After the last wording change, review the complete logical unit against the
-   applicable rule set.
-9. Resolve each applicable finding.
-
-The author completes this assurance before an independent review. The
-independent reviewer does not complete author-side assurance for the author.
-The author uses the deterministic pre-check and STE lookup only to help the
-review. These tools give no conformance review result.
+The STE lookup validates the source identity, exact candidate, conformance
+scope, and SHA-256 values. It does not examine prose for conformance.
+The deterministic pre-check also gives no conformance review result. The
+author completes the conformance review. The read-only challenge has no
+acceptance.
 
 ## Editing rules
 

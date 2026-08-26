@@ -41,6 +41,47 @@ MAX_EXTRACTED_PAGE_BYTES = 256 * 1024
 MAX_EXTRACTOR_ERROR_BYTES = 64 * 1024
 MAX_RECEIPT_BYTES = 512 * 1024
 MAX_RECEIPT_ITEMS = 50
+MAX_ASSURANCE_DOCUMENTS = 64
+MAX_ASSURANCE_UNITS = 512
+MAX_ASSURANCE_FINDINGS = 256
+MAX_ASSURANCE_BYTES = 2 * 1024 * 1024
+MAX_ASSURANCE_GIT_OUTPUT_BYTES = 2 * 1024 * 1024
+ASSURANCE_REVIEW_CATEGORIES = (
+    "actors-and-attribution",
+    "antecedents-and-state-ownership",
+    "controlled-vocabulary",
+    "factual-claims",
+    "instructions-and-conditions",
+    "noun-groups",
+    "other-applicable-rules",
+    "sentence-and-paragraph-construction",
+    "technical-terms",
+)
+ASSURANCE_DOCUMENT_CLASSES = {
+    "architecture",
+    "closeout",
+    "contract-or-inventory",
+    "evidence-or-audit",
+    "guidance",
+    "historical-record",
+    "live-status",
+    "plan-or-policy",
+    "procedure",
+}
+ASSURANCE_CONTENT_CATEGORIES = {"descriptive", "procedural", "safety"}
+ASSURANCE_EVIDENCE_TYPES = {
+    "command-result",
+    "governance-record",
+    "historical-operation",
+    "repository-state",
+    "source-identity",
+}
+ASSURANCE_COMMAND_PLACEHOLDERS = {
+    "as above",
+    "previous command",
+    "same command",
+    "same validator",
+}
 WORD_RE = re.compile(r"\b[A-Za-z]+(?:[-'][A-Za-z]+)*\b")
 DICTIONARY_ENTRY_RE = re.compile(
     r"^ {0,2}([A-Za-z][A-Za-z0-9' -]*?)\s+"
@@ -2420,6 +2461,1113 @@ def write_review_receipt(
     return path
 
 
+def _assurance_text(value: object, subject: str) -> str:
+    if (
+        not isinstance(value, str)
+        or not value.strip()
+        or len(value.encode("utf-8")) > 1000
+    ):
+        raise Ste100Error(
+            "author-assurance-invalid",
+            "The author-review record has invalid {}.".format(subject),
+            "Use concise UTF-8 text.",
+        )
+    return value
+
+
+def _assurance_git(
+    arguments: list[str],
+    *,
+    root: pathlib.Path,
+    accepted_codes: tuple[int, ...] = (0,),
+) -> tuple[int, bytes]:
+    environment = os.environ.copy()
+    for name in (
+        "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+        "GIT_COMMON_DIR",
+        "GIT_DIR",
+        "GIT_INDEX_FILE",
+        "GIT_OBJECT_DIRECTORY",
+        "GIT_WORK_TREE",
+    ):
+        environment.pop(name, None)
+    environment.update(
+        {
+            "GIT_OPTIONAL_LOCKS": "0",
+            "LANG": "C",
+            "LC_ALL": "C",
+        }
+    )
+    try:
+        process = subprocess.Popen(
+            ["git", "--no-pager", *arguments],
+            cwd=root,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=environment,
+        )
+    except OSError as error:
+        raise Ste100Error(
+            "author-assurance-git-failed",
+            "Git could not examine the author-review scope.",
+            "Restore the repository Git state and repeat the review.",
+        ) from error
+    assert process.stdout is not None
+    assert process.stderr is not None
+    timed_out = False
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        stdout_future = executor.submit(
+            _read_bounded_stream,
+            process.stdout,
+            MAX_ASSURANCE_GIT_OUTPUT_BYTES,
+            process,
+        )
+        stderr_future = executor.submit(
+            _read_bounded_stream,
+            process.stderr,
+            MAX_ASSURANCE_GIT_OUTPUT_BYTES,
+            process,
+        )
+        try:
+            return_code = process.wait(timeout=20)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            process.kill()
+            return_code = process.wait()
+        try:
+            stdout = stdout_future.result()
+            stderr_future.result()
+        except _SubprocessOutputLimitError as error:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+            raise Ste100Error(
+                "author-assurance-git-output-too-large",
+                "Git returned more review data than the limit.",
+                "Use one bounded documentation change.",
+            ) from error
+    if timed_out or return_code not in accepted_codes:
+        raise Ste100Error(
+            "author-assurance-git-failed",
+            "Git did not give the necessary author-review state.",
+            "Restore the repository Git state and repeat the review.",
+        )
+    return return_code, stdout
+
+
+def _assurance_repository_file(
+    path_text: str,
+    *,
+    root: pathlib.Path,
+) -> pathlib.Path:
+    pure_path = pathlib.PurePosixPath(path_text)
+    if (
+        pure_path.is_absolute()
+        or ".." in pure_path.parts
+        or str(pure_path) != path_text
+    ):
+        raise Ste100Error(
+            "author-assurance-path-invalid",
+            "The author-review record has an invalid repository path.",
+            "Use one normalized repository-relative path.",
+        )
+    candidate = root.joinpath(*pure_path.parts)
+    if candidate.is_symlink():
+        raise Ste100Error(
+            "author-assurance-path-invalid",
+            "The author-review record names a symbolic link.",
+            "Use one regular repository file.",
+        )
+    try:
+        resolved = candidate.resolve(strict=True)
+        root_resolved = root.resolve(strict=True)
+    except OSError as error:
+        raise Ste100Error(
+            "author-assurance-path-invalid",
+            "The author-review record names an unreadable file.",
+            "Restore the expected repository file.",
+        ) from error
+    if root_resolved not in resolved.parents or not resolved.is_file():
+        raise Ste100Error(
+            "author-assurance-path-invalid",
+            "The author-review record names a file outside the repository.",
+            "Use one regular repository file.",
+        )
+    return resolved
+
+
+def _assurance_local_file(path_text: str, *, root: pathlib.Path) -> pathlib.Path:
+    path = _assurance_repository_file(path_text, root=root)
+    try:
+        path.relative_to((root / "tmp").resolve(strict=True))
+    except (OSError, ValueError) as error:
+        raise Ste100Error(
+            "author-assurance-evidence-path-invalid",
+            "Temporary review evidence is outside the repository tmp directory.",
+            "Keep temporary review evidence in the repository tmp directory.",
+        ) from error
+    return path
+
+
+def _assurance_baseline(baseline_revision: str, *, root: pathlib.Path) -> None:
+    if re.fullmatch(r"[0-9a-f]{40}", baseline_revision) is None:
+        raise Ste100Error(
+            "author-assurance-baseline-invalid",
+            "The author-review baseline is not one Git commit identifier.",
+            "Use the complete lowercase baseline commit identifier.",
+        )
+    _assurance_git(
+        ["cat-file", "-e", baseline_revision + "^{commit}"],
+        root=root,
+    )
+    _assurance_git(
+        ["merge-base", "--is-ancestor", baseline_revision, "HEAD"],
+        root=root,
+    )
+
+
+def _assurance_changed_paths(
+    baseline_revision: str,
+    *,
+    root: pathlib.Path,
+    prose_only: bool,
+) -> list[str]:
+    pathspec = []
+    if prose_only:
+        pathspec = [
+            "--",
+            ":(glob)**/*.md",
+            "reference/current/gate-decisions.json",
+        ]
+    _return_code, output = _assurance_git(
+        [
+            "diff",
+            "--name-only",
+            "-z",
+            "--diff-filter=ACMRT",
+            baseline_revision,
+            *pathspec,
+        ],
+        root=root,
+    )
+    try:
+        paths = output.decode("utf-8").split("\0")
+    except UnicodeDecodeError as error:
+        raise Ste100Error(
+            "author-assurance-path-invalid",
+            "A changed repository path is not valid UTF-8.",
+            "Use valid UTF-8 paths for canonical prose.",
+        ) from error
+    return sorted(path for path in paths if path)
+
+
+def _assurance_candidate(
+    baseline_revision: str,
+    *,
+    root: pathlib.Path,
+) -> dict[str, object]:
+    changed_paths = _assurance_changed_paths(
+        baseline_revision,
+        root=root,
+        prose_only=False,
+    )
+    _return_code, binary_diff = _assurance_git(
+        [
+            "diff",
+            "--binary",
+            "--full-index",
+            "--no-ext-diff",
+            baseline_revision,
+            "--",
+        ],
+        root=root,
+    )
+    diff_sha256 = _sha256_bytes(binary_diff)
+    identity_payload = json.dumps(
+        {
+            "baseline_revision": baseline_revision,
+            "changed_paths": changed_paths,
+            "diff_sha256": diff_sha256,
+        },
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return {
+        "changed_paths": changed_paths,
+        "content_sha256": _sha256_bytes(identity_payload),
+        "diff_sha256": diff_sha256,
+    }
+
+
+def _assurance_baseline_text(
+    baseline_revision: str,
+    path_text: str,
+    *,
+    root: pathlib.Path,
+) -> str:
+    return_code, _output = _assurance_git(
+        ["cat-file", "-e", baseline_revision + ":" + path_text],
+        root=root,
+        accepted_codes=(0, 128),
+    )
+    if return_code == 128:
+        return ""
+    _return_code, payload = _assurance_git(
+        ["show", baseline_revision + ":" + path_text],
+        root=root,
+    )
+    try:
+        return payload.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise Ste100Error(
+            "author-assurance-document-invalid",
+            "A baseline prose document is not valid UTF-8.",
+            "Restore valid UTF-8 canonical prose.",
+        ) from error
+
+
+def _assurance_changed_lines(baseline_text: str, candidate_text: str) -> set[int]:
+    baseline_lines = baseline_text.splitlines()
+    candidate_lines = candidate_text.splitlines()
+    matcher = difflib.SequenceMatcher(
+        None,
+        baseline_lines,
+        candidate_lines,
+        autojunk=False,
+    )
+    changed: set[int] = set()
+    for tag, _old_start, _old_end, new_start, new_end in matcher.get_opcodes():
+        if tag in {"insert", "replace"}:
+            changed.update(range(new_start + 1, new_end + 1))
+    return changed
+
+
+def _assurance_source_identity(
+    manifest: dict[str, object],
+) -> dict[str, object]:
+    return {
+        key: manifest[key]
+        for key in (
+            "issue",
+            "page_count",
+            "publication_date",
+            "sha256",
+            "size_bytes",
+            "standard_id",
+        )
+    }
+
+
+def _assurance_sha256(value: object, subject: str) -> str:
+    if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None:
+        raise Ste100Error(
+            "author-assurance-invalid",
+            "The author-review record has an invalid {}.".format(subject),
+            "Use one lowercase SHA-256 value.",
+        )
+    return value
+
+
+def _validate_assurance_source(
+    source: object,
+    *,
+    root: pathlib.Path,
+) -> dict[str, str]:
+    if not isinstance(source, dict) or set(source) != {"path", "sha256"}:
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A factual claim has an invalid evidence source.",
+            "Record one repository path and its SHA-256.",
+        )
+    path_text = _assurance_text(source["path"], "evidence-source path")
+    expected_hash = _assurance_sha256(
+        source["sha256"],
+        "evidence-source SHA-256",
+    )
+    path = _assurance_repository_file(path_text, root=root)
+    if sha256_file(path) != expected_hash:
+        raise Ste100Error(
+            "author-assurance-candidate-changed",
+            "A factual-claim source changed after the author review.",
+            "Review the claim and make a new author-review record.",
+        )
+    return {"path": path_text, "sha256": expected_hash}
+
+
+def _validate_assurance_evidence(
+    item: object,
+    *,
+    root: pathlib.Path,
+) -> dict[str, object]:
+    if not isinstance(item, dict) or set(item) != {
+        "actual_result",
+        "claim",
+        "command",
+        "id",
+        "source",
+        "type",
+    }:
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A factual-claim record has an invalid structure.",
+            "Record the claim, result, source, and applicable command.",
+        )
+    evidence_id = _assurance_text(item["id"], "factual-claim identifier")
+    claim = _assurance_text(item["claim"], "factual claim")
+    actual_result = _assurance_text(item["actual_result"], "actual result")
+    evidence_type = item["type"]
+    if evidence_type not in ASSURANCE_EVIDENCE_TYPES:
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A factual claim has an invalid evidence type.",
+            "Use one evidence type from the author-review workflow.",
+        )
+    source = _validate_assurance_source(item["source"], root=root)
+    command = item["command"]
+    if evidence_type != "command-result":
+        if command is not None:
+            raise Ste100Error(
+                "author-assurance-evidence-invalid",
+                "A non-command claim contains command data.",
+                "Use command data only for a command result.",
+            )
+        return {
+            "actual_result": actual_result,
+            "claim": claim,
+            "command": None,
+            "id": evidence_id,
+            "source": source,
+            "type": evidence_type,
+        }
+    if not isinstance(command, dict) or set(command) != {
+        "argv",
+        "exit_status",
+        "output_sha256",
+        "output_source",
+        "profile",
+        "sentinel",
+        "working_directory",
+    }:
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A command result lacks its execution data.",
+            "Record the real command, profile, result, and raw output source.",
+        )
+    argv = command["argv"]
+    if (
+        not isinstance(argv, list)
+        or not argv
+        or len(argv) > 64
+        or any(
+            not isinstance(argument, str)
+            or not argument
+            or len(argument.encode("utf-8")) > 1000
+            for argument in argv
+        )
+        or not pathlib.Path(argv[0]).is_absolute()
+        or " ".join(argv).strip().lower() in ASSURANCE_COMMAND_PLACEHOLDERS
+    ):
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A command result does not identify the real command.",
+            "Record the absolute executable and each argument.",
+        )
+    executable = pathlib.Path(argv[0])
+    if (
+        not executable.is_file()
+        or not os.access(executable, os.X_OK)
+    ):
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A command result does not identify an available executable.",
+            "Record the real absolute executable.",
+        )
+    working_directory = _assurance_text(
+        command["working_directory"],
+        "command working directory",
+    )
+    if not pathlib.Path(working_directory).is_absolute():
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A command working directory is not absolute.",
+            "Record the real absolute working directory.",
+        )
+    working_path = pathlib.Path(working_directory)
+    if not working_path.is_dir() or working_path.is_symlink():
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A command working directory is not available.",
+            "Record the real absolute working directory.",
+        )
+    profile = _assurance_text(command["profile"], "validation profile")
+    exit_status = command["exit_status"]
+    if not isinstance(exit_status, int):
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "A command result lacks its integer exit status.",
+            "Record the actual process exit status.",
+        )
+    output_source = _assurance_text(
+        command["output_source"],
+        "raw command-output path",
+    )
+    output_path = _assurance_local_file(output_source, root=root)
+    output_sha256 = _assurance_sha256(
+        command["output_sha256"],
+        "raw command-output SHA-256",
+    )
+    if sha256_file(output_path) != output_sha256:
+        raise Ste100Error(
+            "author-assurance-candidate-changed",
+            "Raw command output changed after the author review.",
+            "Repeat the command or restore its retained output.",
+        )
+    try:
+        output_text = output_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as error:
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "Raw command output is not readable UTF-8 text.",
+            "Retain bounded UTF-8 command output.",
+        ) from error
+    sentinel = _assurance_text(command["sentinel"], "command sentinel")
+    if sentinel not in output_text or actual_result not in output_text:
+        raise Ste100Error(
+            "author-assurance-evidence-invalid",
+            "Raw command output does not contain the stated result.",
+            "Reconcile the claim with the actual command result.",
+        )
+    return {
+        "actual_result": actual_result,
+        "claim": claim,
+        "command": {
+            "argv": argv,
+            "exit_status": exit_status,
+            "output_sha256": output_sha256,
+            "output_source": output_source,
+            "profile": profile,
+            "sentinel": sentinel,
+            "working_directory": working_directory,
+        },
+        "id": evidence_id,
+        "source": source,
+        "type": evidence_type,
+    }
+
+
+def _validate_assurance_findings(
+    findings: object,
+    *,
+    start_line: int,
+    end_line: int,
+) -> list[dict[str, object]]:
+    if not isinstance(findings, list) or len(findings) > MAX_ASSURANCE_FINDINGS:
+        raise Ste100Error(
+            "author-assurance-finding-invalid",
+            "A logical unit has an invalid finding list.",
+            "Record a bounded list of real author findings.",
+        )
+    verified: list[dict[str, object]] = []
+    identifiers: set[str] = set()
+    for finding in findings:
+        if not isinstance(finding, dict) or set(finding) != {
+            "category",
+            "description",
+            "disposition",
+            "end_line",
+            "id",
+            "start_line",
+            "status",
+        }:
+            raise Ste100Error(
+                "author-assurance-finding-invalid",
+                "An author finding has an invalid structure.",
+                "Record its category, span, disposition, and status.",
+            )
+        finding_id = _assurance_text(finding["id"], "finding identifier")
+        if finding_id in identifiers:
+            raise Ste100Error(
+                "author-assurance-finding-invalid",
+                "An author finding identifier is duplicated.",
+                "Use one identifier for each finding.",
+            )
+        identifiers.add(finding_id)
+        if finding["category"] not in ASSURANCE_REVIEW_CATEGORIES:
+            raise Ste100Error(
+                "author-assurance-finding-invalid",
+                "An author finding has an invalid review category.",
+                "Use one human-review category.",
+            )
+        finding_start = finding["start_line"]
+        finding_end = finding["end_line"]
+        if (
+            not isinstance(finding_start, int)
+            or not isinstance(finding_end, int)
+            or finding_start < start_line
+            or finding_end > end_line
+            or finding_end < finding_start
+        ):
+            raise Ste100Error(
+                "author-assurance-finding-invalid",
+                "An author finding is outside its logical unit.",
+                "Bind a real finding to its current line span.",
+            )
+        if finding["status"] != "resolved":
+            raise Ste100Error(
+                "author-assurance-unresolved",
+                "An author finding is unresolved.",
+                "Resolve each finding before the candidate freeze.",
+            )
+        verified.append(
+            {
+                "category": finding["category"],
+                "description": _assurance_text(
+                    finding["description"],
+                    "finding description",
+                ),
+                "disposition": _assurance_text(
+                    finding["disposition"],
+                    "finding disposition",
+                ),
+                "end_line": finding_end,
+                "id": finding_id,
+                "start_line": finding_start,
+                "status": "resolved",
+            }
+        )
+    return verified
+
+
+def validate_author_assurance_worklist(
+    worklist: dict[str, object],
+    *,
+    root: pathlib.Path = ROOT,
+    source_manifest: dict[str, object] | None = None,
+    require_challenge: bool = False,
+) -> dict[str, object]:
+    """Validate concise traceability for one complete human Issue 9 review."""
+    if set(worklist) != {
+        "author_review",
+        "baseline_revision",
+        "candidate",
+        "documents",
+        "prefreeze_challenge",
+        "source_identity",
+        "units",
+        "unresolved_findings",
+        "worklist_schema_version",
+    } or worklist["worklist_schema_version"] != 1:
+        raise Ste100Error(
+            "author-assurance-invalid",
+            "The author-review worklist has an invalid schema.",
+            "Use concise author-review worklist schema version 1.",
+        )
+    baseline_revision = worklist["baseline_revision"]
+    if not isinstance(baseline_revision, str):
+        raise Ste100Error(
+            "author-assurance-baseline-invalid",
+            "The author-review baseline is invalid.",
+            "Use one exact Git commit identifier.",
+        )
+    _assurance_baseline(baseline_revision, root=root)
+    candidate = _assurance_candidate(baseline_revision, root=root)
+    if worklist["candidate"] != candidate:
+        raise Ste100Error(
+            "author-assurance-candidate-changed",
+            "The candidate changed after its human documentation review.",
+            "Review the changed prose and make a new author-review record.",
+        )
+    if worklist["unresolved_findings"] != []:
+        raise Ste100Error(
+            "author-assurance-unresolved",
+            "The author-review worklist has an unresolved finding.",
+            "Resolve each finding before the candidate freeze.",
+        )
+
+    manifest = source_manifest
+    if manifest is None:
+        manifest = _read_json_object(SOURCE_MANIFEST, "source-manifest")
+        validate_source_manifest(manifest)
+    source_identity = _assurance_source_identity(manifest)
+    if worklist["source_identity"] != source_identity:
+        raise Ste100Error(
+            "author-assurance-source-invalid",
+            "The author review has a different official-source identity.",
+            "Use the source identity from the canonical source manifest.",
+        )
+
+    documents = worklist["documents"]
+    if (
+        not isinstance(documents, list)
+        or not documents
+        or len(documents) > MAX_ASSURANCE_DOCUMENTS
+    ):
+        raise Ste100Error(
+            "author-assurance-scope-invalid",
+            "The human-readable document scope is invalid.",
+            "Record each changed human-readable document one time.",
+        )
+    expected_paths = _assurance_changed_paths(
+        baseline_revision,
+        root=root,
+        prose_only=True,
+    )
+    document_paths: list[str] = []
+    document_lines: dict[str, list[str]] = {}
+    changed_lines: dict[str, set[int]] = {}
+    verified_documents: list[dict[str, object]] = []
+    for identity in documents:
+        if not isinstance(identity, dict) or set(identity) != {"path", "sha256"}:
+            raise Ste100Error(
+                "author-assurance-scope-invalid",
+                "A document identity has an invalid structure.",
+                "Record one repository path and SHA-256.",
+            )
+        path_text = _assurance_text(identity["path"], "document path")
+        expected_hash = _assurance_sha256(
+            identity["sha256"],
+            "document SHA-256",
+        )
+        document_path = _assurance_repository_file(path_text, root=root)
+        document_text = _read_review_document(document_path)
+        if _sha256_bytes(document_text.encode("utf-8")) != expected_hash:
+            raise Ste100Error(
+                "author-assurance-candidate-changed",
+                "A document changed after its human documentation review.",
+                "Review its changed logical units and make a new record.",
+            )
+        document_paths.append(path_text)
+        document_lines[path_text] = document_text.splitlines(keepends=True)
+        baseline_text = _assurance_baseline_text(
+            baseline_revision,
+            path_text,
+            root=root,
+        )
+        changed_lines[path_text] = _assurance_changed_lines(
+            baseline_text,
+            document_text,
+        )
+        verified_documents.append(
+            {"path": path_text, "sha256": expected_hash}
+        )
+    if document_paths != sorted(set(document_paths)) or document_paths != expected_paths:
+        raise Ste100Error(
+            "author-assurance-scope-invalid",
+            "The author review does not contain the complete changed prose scope.",
+            "Record each changed Markdown document and the decision register.",
+        )
+
+    author_review = worklist["author_review"]
+    if not isinstance(author_review, dict) or set(author_review) != {
+        "completed_on",
+        "method",
+        "reviewer",
+        "status",
+    }:
+        raise Ste100Error(
+            "author-assurance-review-invalid",
+            "The human author-review record has an invalid structure.",
+            "Record the reviewer, date, method, and result.",
+        )
+    if (
+        author_review["status"] != "complete"
+        or author_review["method"] != "complete-human-ASD-STE100-Issue-9-review"
+    ):
+        raise Ste100Error(
+            "author-assurance-review-invalid",
+            "The required human Issue 9 review is not complete.",
+            "Complete the human review before candidate freeze.",
+        )
+    _assurance_text(author_review["reviewer"], "author reviewer")
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(author_review["completed_on"])) is None:
+        raise Ste100Error(
+            "author-assurance-review-invalid",
+            "The human author-review date is invalid.",
+            "Record the date in YYYY-MM-DD format.",
+        )
+
+    units = worklist["units"]
+    if not isinstance(units, list) or not units or len(units) > MAX_ASSURANCE_UNITS:
+        raise Ste100Error(
+            "author-assurance-unit-invalid",
+            "The logical-unit list is invalid.",
+            "Record each changed logical prose unit.",
+        )
+    previous_range: dict[str, tuple[int, int]] = {}
+    covered_lines = {path_text: set() for path_text in document_paths}
+    unit_ids: set[str] = set()
+    evidence_ids: set[str] = set()
+    verified_units: list[dict[str, object]] = []
+    for unit in units:
+        if not isinstance(unit, dict) or set(unit) != {
+            "applicable_review_categories",
+            "content_category",
+            "document_class",
+            "end_line",
+            "evidence_claims",
+            "findings",
+            "id",
+            "path",
+            "review_status",
+            "sha256",
+            "start_line",
+            "unresolved_findings",
+        }:
+            raise Ste100Error(
+                "author-assurance-unit-invalid",
+                "A logical-unit record has an invalid structure.",
+                "Use the concise author-review unit structure.",
+            )
+        unit_id = _assurance_text(unit["id"], "logical-unit identifier")
+        path_text = _assurance_text(unit["path"], "logical-unit path")
+        if unit_id in unit_ids or path_text not in document_lines:
+            raise Ste100Error(
+                "author-assurance-unit-invalid",
+                "A logical-unit identifier or path is invalid.",
+                "Use one identifier and one document-scope path.",
+            )
+        unit_ids.add(unit_id)
+        start_line = unit["start_line"]
+        end_line = unit["end_line"]
+        lines = document_lines[path_text]
+        if (
+            not isinstance(start_line, int)
+            or not isinstance(end_line, int)
+            or start_line < 1
+            or end_line < start_line
+            or end_line > len(lines)
+        ):
+            raise Ste100Error(
+                "author-assurance-unit-invalid",
+                "A logical-unit line range is invalid.",
+                "Record the complete current logical-unit range.",
+            )
+        previous = previous_range.get(path_text)
+        if previous is not None and start_line <= previous[1]:
+            raise Ste100Error(
+                "author-assurance-unit-invalid",
+                "Logical-unit records overlap or are out of order.",
+                "Record non-overlapping units in document order.",
+            )
+        previous_range[path_text] = (start_line, end_line)
+        payload = "".join(lines[start_line - 1 : end_line]).encode("utf-8")
+        if _assurance_sha256(unit["sha256"], "logical-unit SHA-256") != _sha256_bytes(payload):
+            raise Ste100Error(
+                "author-assurance-candidate-changed",
+                "A logical unit changed after its human review.",
+                "Review the unit and make a new author-review record.",
+            )
+        if unit["document_class"] not in ASSURANCE_DOCUMENT_CLASSES:
+            raise Ste100Error(
+                "author-assurance-unit-invalid",
+                "A logical unit has an invalid document class.",
+                "Use one document class from the documentation workflow.",
+            )
+        if unit["content_category"] not in ASSURANCE_CONTENT_CATEGORIES:
+            raise Ste100Error(
+                "author-assurance-unit-invalid",
+                "A logical unit has an invalid content category.",
+                "Use descriptive, procedural, or safety.",
+            )
+        categories = unit["applicable_review_categories"]
+        if (
+            not isinstance(categories, list)
+            or not categories
+            or categories != sorted(set(categories))
+            or not set(categories).issubset(ASSURANCE_REVIEW_CATEGORIES)
+        ):
+            raise Ste100Error(
+                "author-assurance-unit-invalid",
+                "A logical unit has invalid human-review categories.",
+                "Record each applicable contextual review category.",
+            )
+        if unit["review_status"] != "complete" or unit["unresolved_findings"] != []:
+            raise Ste100Error(
+                "author-assurance-unresolved",
+                "A logical unit has an incomplete review or unresolved finding.",
+                "Complete the human review and resolve each finding.",
+            )
+        findings = _validate_assurance_findings(
+            unit["findings"],
+            start_line=start_line,
+            end_line=end_line,
+        )
+        evidence = [
+            _validate_assurance_evidence(item, root=root)
+            for item in unit["evidence_claims"]
+        ] if isinstance(unit["evidence_claims"], list) else None
+        if evidence is None:
+            raise Ste100Error(
+                "author-assurance-evidence-invalid",
+                "A logical unit has an invalid factual-claim list.",
+                "Record a list of applicable factual claims.",
+            )
+        for item in evidence:
+            if item["id"] in evidence_ids:
+                raise Ste100Error(
+                    "author-assurance-evidence-invalid",
+                    "A factual-claim identifier is duplicated.",
+                    "Use one identifier for each factual claim.",
+                )
+            evidence_ids.add(str(item["id"]))
+        covered_lines[path_text].update(range(start_line, end_line + 1))
+        verified_units.append(
+            {
+                **unit,
+                "evidence_claims": evidence,
+                "findings": findings,
+            }
+        )
+    expected_order = sorted(
+        (
+            unit["path"],
+            unit["start_line"],
+            unit["end_line"],
+            unit["id"],
+        )
+        for unit in verified_units
+    )
+    actual_order = [
+        (
+            unit["path"],
+            unit["start_line"],
+            unit["end_line"],
+            unit["id"],
+        )
+        for unit in verified_units
+    ]
+    if actual_order != expected_order:
+        raise Ste100Error(
+            "author-assurance-unit-invalid",
+            "Logical-unit records are out of order.",
+            "Order them by path and line range.",
+        )
+    uncovered = {
+        path_text: sorted(
+            line_number
+            for line_number in changed_lines[path_text] - covered_lines[path_text]
+            if document_lines[path_text][line_number - 1].strip()
+        )
+        for path_text in document_paths
+        if any(
+            document_lines[path_text][line_number - 1].strip()
+            for line_number in changed_lines[path_text] - covered_lines[path_text]
+        )
+    }
+    if uncovered:
+        raise Ste100Error(
+            "author-assurance-scope-invalid",
+            "A changed prose line has no human-review logical unit.",
+            "Record the complete logical unit for each changed prose line.",
+        )
+
+    review_payload = json.dumps(
+        {
+            key: value
+            for key, value in worklist.items()
+            if key != "prefreeze_challenge"
+        },
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    review_worklist_sha256 = _sha256_bytes(review_payload)
+    challenge = worklist["prefreeze_challenge"]
+    if not isinstance(challenge, dict) or set(challenge) != {
+        "candidate_content_sha256",
+        "completed_on",
+        "review_worklist_sha256",
+        "result_sha256",
+        "result_source",
+        "reviewer",
+        "status",
+        "unresolved_findings",
+    }:
+        raise Ste100Error(
+            "author-assurance-challenge-invalid",
+            "The pre-freeze challenge record has an invalid structure.",
+            "Record a pending or completed read-only challenge.",
+        )
+    if challenge["status"] == "pending":
+        if any(
+            challenge[key] not in ("", [])
+            for key in (
+                "candidate_content_sha256",
+                "completed_on",
+                "review_worklist_sha256",
+                "result_sha256",
+                "result_source",
+                "reviewer",
+                "unresolved_findings",
+            )
+        ):
+            raise Ste100Error(
+                "author-assurance-challenge-invalid",
+                "A pending challenge contains result data.",
+                "Record challenge data only after the read-only challenge.",
+            )
+    elif challenge["status"] == "pass":
+        if challenge["candidate_content_sha256"] != candidate["content_sha256"]:
+            raise Ste100Error(
+                "author-assurance-candidate-changed",
+                "The challenge result is for a different candidate.",
+                "Repeat the read-only challenge for the current candidate.",
+            )
+        if challenge["review_worklist_sha256"] != review_worklist_sha256:
+            raise Ste100Error(
+                "author-assurance-candidate-changed",
+                "The challenge result is for different author-review evidence.",
+                "Repeat the read-only challenge for the current worklist.",
+            )
+        challenge_reviewer = _assurance_text(
+            challenge["reviewer"],
+            "challenge reviewer",
+        )
+        if challenge_reviewer.casefold() == str(author_review["reviewer"]).casefold():
+            raise Ste100Error(
+                "author-assurance-challenge-invalid",
+                "The author and challenge reviewer are not different reviewers.",
+                "Use a different documentation reviewer for the challenge.",
+            )
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(challenge["completed_on"])) is None:
+            raise Ste100Error(
+                "author-assurance-challenge-invalid",
+                "The challenge date is invalid.",
+                "Record the date in YYYY-MM-DD format.",
+            )
+        result_source = _assurance_text(
+            challenge["result_source"],
+            "challenge-result path",
+        )
+        result_path = _assurance_local_file(result_source, root=root)
+        result_sha256 = _assurance_sha256(
+            challenge["result_sha256"],
+            "challenge-result SHA-256",
+        )
+        if sha256_file(result_path) != result_sha256:
+            raise Ste100Error(
+                "author-assurance-candidate-changed",
+                "The challenge result changed after it was recorded.",
+                "Restore or repeat the read-only challenge.",
+            )
+        if challenge["unresolved_findings"] != []:
+            raise Ste100Error(
+                "author-assurance-unresolved",
+                "The pre-freeze challenge has an unresolved finding.",
+                "Resolve the isolated prose finding or stop for owner action.",
+            )
+    else:
+        raise Ste100Error(
+            "author-assurance-challenge-invalid",
+            "The required read-only challenge has no valid result.",
+            "Record pending before challenge or pass after challenge.",
+        )
+    if require_challenge and challenge["status"] != "pass":
+        raise Ste100Error(
+            "author-assurance-challenge-required",
+            "The read-only pre-freeze challenge is not complete.",
+            "Get the challenge before the candidate freeze.",
+        )
+
+    worklist_payload = json.dumps(
+        worklist,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    scope_payload = json.dumps(
+        verified_documents,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return {
+        "assurance_status": (
+            "candidate-bound-human-review-traceability-not-linguistic-conformance"
+        ),
+        "author_review": author_review,
+        "baseline_revision": baseline_revision,
+        "candidate": candidate,
+        "candidate_scope_sha256": _sha256_bytes(scope_payload),
+        "document_count": len(verified_documents),
+        "evidence_claim_count": len(evidence_ids),
+        "finding_count": sum(len(unit["findings"]) for unit in verified_units),
+        "prefreeze_challenge": challenge,
+        "review_categories": list(ASSURANCE_REVIEW_CATEGORIES),
+        "review_worklist_sha256": review_worklist_sha256,
+        "source_identity": source_identity,
+        "unit_count": len(verified_units),
+        "unresolved_findings": [],
+        "worklist_schema_version": 1,
+        "worklist_sha256": _sha256_bytes(worklist_payload),
+    }
+
+
+def write_author_assurance_receipt(
+    receipt: dict[str, object],
+    *,
+    receipt_dir: pathlib.Path = RECEIPT_DIR,
+    allowed_root: pathlib.Path | None = None,
+) -> pathlib.Path:
+    """Write or reuse one content-addressed human-review traceability receipt."""
+    if allowed_root is not None:
+        _require_output_within(receipt_dir, allowed_root, "receipt")
+    if receipt_dir.is_symlink():
+        raise Ste100Error(
+            "receipt-path-invalid",
+            "The generated receipt directory is a symbolic link.",
+            "Use the fixed repository-local receipt directory.",
+        )
+    receipt_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+    os.chmod(receipt_dir, 0o700)
+    content = json.dumps(receipt, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    payload = content.encode("utf-8")
+    if len(payload) > MAX_RECEIPT_BYTES:
+        raise Ste100Error(
+            "receipt-too-large",
+            "The generated receipt exceeds its local size limit.",
+            "Use concise human-review traceability.",
+        )
+    digest = _sha256_bytes(payload)[:12]
+    path = receipt_dir / "author-assurance-{}.json".format(digest)
+    if path.exists():
+        if (
+            path.is_symlink()
+            or path.stat().st_size != len(payload)
+            or path.read_text(encoding="utf-8") != content
+        ):
+            raise Ste100Error(
+                "receipt-path-conflict",
+                "The generated receipt path contains different content.",
+                "Inspect the existing local receipt.",
+            )
+        os.chmod(path, 0o600)
+        return path
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            stream.write(content)
+    except FileExistsError as error:
+        raise Ste100Error(
+            "receipt-path-conflict",
+            "Another process created the receipt path.",
+            "Inspect the local receipt and repeat the operation.",
+        ) from error
+    return path
+
+
+def _local_assurance_worklist(path: pathlib.Path) -> pathlib.Path:
+    _require_output_within(path, ROOT / "tmp", "author-assurance-worklist")
+    if path.is_symlink():
+        raise Ste100Error(
+            "author-assurance-worklist-path-invalid",
+            "The author-review worklist is a symbolic link.",
+            "Use one regular file in the repository tmp directory.",
+        )
+    return path
+
+
 def _emit(value: dict[str, object]) -> None:
     print(SENTINEL + json.dumps(value, ensure_ascii=False, sort_keys=True))
 
@@ -2521,6 +3669,22 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Confirm that lookup results were not treated as the complete rule set.",
     )
+    author_assurance = commands.add_parser(
+        "author-assurance",
+        help="Validate and record one candidate-bound author-review worklist.",
+    )
+    author_assurance.add_argument("worklist", type=pathlib.Path)
+    author_assurance.add_argument(
+        "--source-file",
+        type=pathlib.Path,
+        default=SOURCE_FILE,
+        help="Use the specified local official Issue 9 PDF.",
+    )
+    author_assurance.add_argument(
+        "--require-challenge",
+        action="store_true",
+        help="Require a candidate-bound PASS from the read-only challenge.",
+    )
     return parser
 
 
@@ -2537,6 +3701,53 @@ def main(argv: list[str] | None = None) -> int:
                     "dictionary_lookup_forms": len(cache["dictionary"]),
                     "source": cache["source"],
                     "status": "rebuilt-and-source-bound",
+                }
+            )
+            return 0
+
+        if arguments.command == "author-assurance":
+            worklist_path = _local_assurance_worklist(arguments.worklist)
+            worklist = _read_json_object(
+                worklist_path,
+                "author-assurance-worklist",
+                max_bytes=MAX_ASSURANCE_BYTES,
+            )
+            manifest = _read_json_object(SOURCE_MANIFEST, "source-manifest")
+            validate_source_manifest(manifest)
+            verified_source, _source_bytes = _read_verified_source(
+                arguments.source_file,
+                manifest,
+            )
+            receipt = validate_author_assurance_worklist(
+                worklist,
+                source_manifest=manifest,
+                require_challenge=arguments.require_challenge,
+            )
+            receipt["source_verification"] = {
+                "sha256": verified_source["sha256"],
+                "size_bytes": verified_source["size_bytes"],
+                "status": "verified-source-bytes",
+            }
+            path = write_author_assurance_receipt(
+                receipt,
+                allowed_root=ROOT / "tmp",
+            )
+            _emit(
+                {
+                    "candidate_scope_sha256": receipt[
+                        "candidate_scope_sha256"
+                    ],
+                    "candidate_content_sha256": receipt["candidate"][
+                        "content_sha256"
+                    ],
+                    "challenge_status": receipt["prefreeze_challenge"][
+                        "status"
+                    ],
+                    "receipt": str(path.relative_to(ROOT)),
+                    "status": "candidate-bound-author-review-recorded",
+                    "unit_count": receipt["unit_count"],
+                    "unresolved_dispositions": 0,
+                    "worklist_sha256": receipt["worklist_sha256"],
                 }
             )
             return 0

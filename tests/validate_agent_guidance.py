@@ -442,7 +442,7 @@ def validate_progress_delivery_structure() -> None:
             "Evidence boundary",
             "Alignment workflow",
             "Steady-state convention",
-            "Composition with TrackTemplate continue",
+            "Use with `$tracktemplate-continue`",
             "Report",
         },
     }
@@ -546,17 +546,21 @@ def validate_ide_workspace_alignment_contract(
             "IDE workspace alignment lost operator-only UI evidence: "
             + required_item,
         )
-    required_no_inference = semantic_text(
-        "Do not use the name of a run configuration as branch evidence. Do "
-        "not use a filename from a test as branch evidence. Do not use an "
-        "entry that records an opened file as branch evidence. Do not use a "
-        "window title or SDK name as branch evidence. Use the Git worktree "
-        "to identify the branch."
-    )
-    require(
-        required_no_inference in semantic_paragraphs(evidence),
-        "IDE workspace alignment permits non-Git branch inference",
-    )
+    no_inference = semantic_text(evidence).casefold()
+    for marker in (
+        "never infer the git branch",
+        "run-configuration name",
+        "coverage filename",
+        "recent-file entry",
+        "window title",
+        "sdk label",
+        "backing git worktree",
+    ):
+        require(
+            marker in no_inference,
+            "IDE workspace alignment permits non-Git branch inference: "
+            + marker,
+        )
 
     steady_state = semantic_text(
         direct_section_content(ide_skill, "Steady-state convention")
@@ -624,8 +628,8 @@ def validate_ide_workspace_alignment_mutations(
         ("operator evidence inversion", "operator-confirmed", "file-proved"),
         (
             "non-Git branch evidence inversion",
-            "Do not use the name of a run configuration",
-            "Use the name of a run configuration",
+            "Never infer the Git branch from a run-configuration name",
+            "Infer the Git branch from a run-configuration name",
         ),
         (
             "temporary-worktree safeguard deletion",
@@ -862,7 +866,7 @@ def validate_documentation_profile_routing(
     normalized_workflows = semantic_text(workflows)
     for fragment in (
         "TT-DOC-001 workflow integration",
-        "Skills apply these owners by reference",
+        "Authors use links from skills to these owners",
         "Each separate responsibility that can occur repeatedly has one "
         "owner",
         "use the primary owner that is already in the skill catalog",
@@ -1084,7 +1088,7 @@ def validate_issue9_author_assurance(
     writing_checklist: str,
     workflows: str,
 ) -> None:
-    """Keep the complete author-side assurance boundary for Issue 9."""
+    """Keep human Issue 9 review and machine traceability in their owners."""
     skill_section = semantic_text(
         direct_section_content(
             documentation_review,
@@ -1096,6 +1100,12 @@ def validate_issue9_author_assurance(
             writing_checklist,
             "Author-side assurance for ASD-STE100 Issue 9",
         )
+        + "\n"
+        + direct_section_content(
+            writing_checklist,
+            "Temporary author-review worklist",
+            level=3,
+        )
     ).casefold()
     workflow_section = semantic_text(
         direct_section_content(
@@ -1106,28 +1116,25 @@ def validate_issue9_author_assurance(
 
     required_skill_concepts = (
         (
-            "for each new logical unit",
-            "each logical unit with a material edit",
-            "content category",
+            "logical unit with a material edit",
+            "all applicable issue 9 requirements",
+            "temporary author-review worklist",
         ),
         (
-            "resolve all unresolved terminology",
-            "resolve each applicable finding",
-        ),
-        (
-            "ste dictionary",
-            "approved word",
-            "technical term",
-            "only to keep the wording",
-        ),
-        (
-            "review the complete logical unit",
-            "applicable rule set",
             "last wording change",
+            "complete logical unit",
+            "resolve all findings",
+            "resolve all unresolved terminology",
         ),
         (
-            "independent reviewer does not complete author-side assurance",
+            "author-assurance",
+            "read-only challenge",
+            "different documentation reviewer",
+        ),
+        (
+            "does not examine prose for conformance",
             "no conformance review result",
+            "author completes the conformance review",
         ),
     )
     for concepts in required_skill_concepts:
@@ -1138,51 +1145,24 @@ def validate_issue9_author_assurance(
         )
 
     required_checklist_concepts = (
-        ("document class", "content category", "applicable rule set"),
-        ("term use", "ordinary vocabulary", "technical term"),
-        ("ordinary vocabulary", "approved meaning", "part of speech"),
+        ("document class", "content category", "all applicable issue 9 requirements"),
+        ("controlled vocabulary", "technical term", "approved meaning", "part of speech"),
         (
-            "technical term",
-            "registered form",
-            "shorter form",
             "technical-term register",
+            "technical-term category",
+            "controlled vocabulary does not identify the tracktemplate item",
         ),
-        ("do not add a technical term", "only to keep the wording"),
-        ("technical noun", "technical verb"),
-        ("logical agent", "grammatical subject", "person, tool, or system"),
-        ("pronoun", "clear pronoun antecedent"),
-        (
-            "item that has each condition",
-            "item that has each result",
-            "identified item",
-            "grammatical subject",
-        ),
-        ("multi-word noun", "more than 3 words", "registered form"),
-        (
-            "one instruction",
-            "each sentence",
-            "one operation",
-            "each work step",
-            "simultaneous",
-            "immediate result",
-        ),
-        ("condition must be known first", "condition before its instruction"),
-        (
-            "dictionary-inspection candidate",
-            "unresolved terminology",
-            "applicable finding",
-            "do not freeze an exact candidate",
-        ),
-        (
-            "last wording change",
-            "complete logical unit",
-            "applicable rule set",
-        ),
-        (
-            "deterministic pre-check",
-            "ste lookup",
-            "no conformance review result",
-        ),
+        ("person, tool, or system", "each operation"),
+        ("each pronoun", "noun to which it refers", "state and result"),
+        ("rule 2", "noun group"),
+        ("different instruction", "condition before its instruction"),
+        ("sentence construction", "paragraph construction"),
+        ("all other applicable issue 9 requirements",),
+        ("evidence claim", "command invocation", "validation profile", "actual result"),
+        ("finding", "disposition", "unresolved terminology"),
+        ("exact candidate", "conformance scope for changed prose", "sha-256"),
+        ("read-only challenge", "no acceptance"),
+        ("does not examine prose for conformance", "author completes the conformance review"),
     )
     for concepts in required_checklist_concepts:
         require(
@@ -1191,14 +1171,22 @@ def validate_issue9_author_assurance(
             + " / ".join(concepts),
         )
 
+    required_workflow_concepts = (
+        "tracktemplate-documentation-review",
+        "logical unit with a material edit",
+        "content category",
+        "writing checklist",
+        "findings and their dispositions",
+        "resolve all findings and unresolved terminology",
+        "review each complete logical unit again",
+        "temporary author-review worklist",
+        "read-only challenge",
+        "does not give a conformance review result",
+        "deterministic pre-check is only a review aid",
+    )
     require(
-        "each new logical unit" in workflow_section
-        and "each logical unit with a material edit" in workflow_section
-        and "complete the author-side assurance method" in workflow_section
-        and "review the complete logical unit" in workflow_section
-        and "if unresolved terminology stays, do not freeze an exact candidate"
-        in workflow_section,
-        "AGENT_WORKFLOWS lost the author-side assurance gate",
+        all(concept in workflow_section for concept in required_workflow_concepts),
+        "AGENT_WORKFLOWS lost the human-review or traceability boundary",
     )
 
 

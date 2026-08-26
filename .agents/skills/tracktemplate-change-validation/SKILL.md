@@ -98,19 +98,7 @@ before selecting proof.
   checks.
 - For a recovery or handoff workflow change, validate the stash inventory,
   unique content, and stash disposition controls. Also do the applicable
-  semantic control validation. Examine the preservation diff.
-- For worktree retirement, use the
-  [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
-  Validate accepted-history containment. Validate tracked cleanliness. Validate
-  the local-state inventory.
-
-  Make sure that the retirement plan classifies each item as only one local-state type.
-  Make sure that the retirement audit returns `FAIL` for ambiguous or uniquely
-  owned state. Validate necessary planned preservation.
-
-  Validate `git worktree remove` without `--force`. After removal, examine
-  the preservation audit. Make sure that Git removes the worktree before Git
-  removes the local branch. After removal, examine the preservation diff.
+  semantic control validation. Review the preservation diff.
 - Run only checks available in the present environment. State unavailable checks
   explicitly instead of simulating or inventing their results.
 - Record the exact command, environment, result and required success sentinel
@@ -144,6 +132,19 @@ before selecting proof.
   current records and the project owner.
 - Do not change files unless the user requested implementation or validation
   fixes.
+
+### Validation for worktree retirement
+
+For worktree retirement, use the
+[worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
+Validate accepted-history containment. Validate tracked cleanliness. Validate
+the local-state inventory. Make sure each item has 1 local-state type.
+Validate planned preservation. Make sure the retirement audit returns a `FAIL`
+result for ambiguous or uniquely owned state.
+
+Validate `git worktree remove` without `--force`. Before Git removes the local
+branch, make sure Git removed the worktree. After removal, examine the
+preservation audit. After removal, examine the preservation diff.
 
 ## Failed-test adjudication
 

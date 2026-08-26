@@ -4432,7 +4432,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         retirement_record["decision"]
-        == "Record the sequence nonconformance for the completed worktree retirement."
+        == "After worktree retirement, record the sequence nonconformance."
         and retirement_record["evidence"] == retirement_panel
         and retirement_record["panel_record"] == retirement_panel
         and retirement_record["panel_required_under_current_policy"] is True,
@@ -4446,49 +4446,49 @@ def _validate_decisions(plan: str) -> None:
     for fragment in (
         "d47518083768d34cf9b41566feaf132ac4562595",
         "96063e9836748bbc5755db251fa8b66564e65a28",
-        "project owner gave removal authority for the completed worktree removal",
+        "project owner gave removal authority for the worktree removal",
         (
             "project owner also gave removal authority for local branch "
-            "agent/ste100-retrieval-assurance after worktree removal"
+            "agent/ste100-retrieval-assurance"
         ),
-        "safety/risk panel did not occur before those operations",
-        "decision register did not contain D-GOV-012 before those operations",
-        "contains the sequence nonconformance",
+        (
+            "project owner gave the branch-removal authority with this condition: "
+            "Git must remove the worktree first"
+        ),
+        "safety/risk panel did not occur before the removals",
+        "decision register did not contain D-GOV-012 before the removals",
+        "project owner recorded the sequence nonconformance",
         "gives no retrospective authority",
         "9f3b05d480971d197a57cb00f1811f6c1012f144",
-        "retirement plan contained a classification for all 144 local files",
+        "retirement plan contained a local-state type for all 144 local files",
         "retirement audit examined the retirement plan",
-        "PDF at the source path had the same bytes",
+        "PDF at the source path and the PDF in the worktree had equal bytes",
         (
-            "Git removed the Git index. A reviewer cannot show that the Git "
-            "index did not use assume-unchanged or skip-worktree"
+            "Git removed the worktree Git index. A reviewer cannot now examine "
+            "the assume-unchanged or skip-worktree values"
         ),
         "reviewer cannot show historical losslessness",
-        "one exact candidate for Cycle 2 repair",
-        "Keep the controls for worktree retirement",
-        "Correct each mandatory finding in canonical prose and evidence",
-        "After validation has a PASS result, get new independent reviews",
-        "After all independent reviewers give ACCEPT, publish one draft pull request",
-        "Do not merge it",
-        "Do not start Cycle 3",
-        "does not claim that a safety/risk panel occurred before the operation",
-        "does not claim historical losslessness",
-        (
-            "does not change the recorded accepted-history containment or "
-            "local-state inventory"
-        ),
-        "does not change the local-state types in the retirement plan",
-        (
-            "does not change the preservation audit result for the authorised "
-            "source with the recorded SHA-256"
-        ),
-        "gives no removal authority for a different worktree or branch operation",
+        "project owner gives project authority for Cycle 2",
+        "This authority is only for an exact candidate and a draft pull request",
+        "keep the worktree retirement procedure and semantic controls",
+        "correct each mandatory finding in canonical prose and evidence",
+        "After validation gives a PASS result, the implementing agent must get new independent reviews",
+        "After all reviewers give ACCEPT, the agent must publish a draft pull request",
+        "agent must not merge the pull request",
+        "agent must not start Cycle 3",
+        "project owner does not claim that the safety/risk panel occurred before removal",
+        "D-GOV-012 gives no retrospective authority",
+        "Phase evidence records the accepted-history containment result",
+        "local-state inventory, local-state types, and preservation audit result",
+        "preservation audit contains the source SHA-256",
+        "gives no removal authority for a different worktree or branch",
         "Phase 6 stays at 2/5",
         "Project status stays unknown",
-        "D-GOV-009 and its evidence did not change",
-        "does not change a risk disposition",
+        "D-GOV-009 and its evidence do not change",
+        "risk dispositions do not change",
         "gives no project authority for a merge into protected main",
-        "gives no project authority for Cycle 3, production, physical output, packaging, release, or tagging",
+        "owner gives no project authority for Cycle 3",
+        "physical output, packaging, release, or tagging",
     ):
         _require(
             fragment in retirement_semantic,
@@ -4728,8 +4728,8 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         "decision register" in decision_flat
-        and "owns the Phase 6 decisions below" in decision_flat
-        and "owns governance decisions that apply to more than one phase"
+        and "owns Phase 6" in decision_flat
+        and "owns current governance decisions for more than 1 phase"
         in decision_flat,
         "the current decision-register ownership is missing",
     )

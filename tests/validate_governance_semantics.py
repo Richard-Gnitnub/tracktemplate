@@ -2915,84 +2915,82 @@ def validate_documentation_profile_mutations() -> None:
     )
     author_assurance_cases = (
         (
-            "tt-doc/author-assurance-ordinary-vocabulary-check-removed",
-            "approved meaning",
-            "convenient meaning",
-            "ordinary vocabulary / approved meaning / part of speech",
+            "tt-doc/author-review-controlled-vocabulary-removed",
+            "controlled vocabulary",
+            "uncontrolled text",
         ),
         (
-            "tt-doc/author-assurance-registered-form-check-removed",
-            "registered form",
-            "convenient form",
-            "technical term / registered form / shorter form / "
+            "tt-doc/author-review-term-register-removed",
             "technical-term register",
+            "local glossary",
         ),
         (
-            "tt-doc/author-assurance-logical-agent-check-removed",
-            "logical agent",
-            "sentence actor",
-            "logical agent / grammatical subject / person, tool, or system",
+            "tt-doc/author-review-ordinary-vocabulary-removed",
+            "ordinary vocabulary",
+            "general wording",
         ),
         (
-            "tt-doc/author-assurance-pronoun-check-removed",
-            "pronoun antecedent",
-            "reference word",
-            "pronoun / clear pronoun antecedent",
+            "tt-doc/author-review-actor-check-removed",
+            "person, tool, or system",
+            "text",
         ),
         (
-            "tt-doc/author-assurance-state-attribution-check-removed",
-            "item that has each condition",
-            "condition",
-            "item that has each condition / item that has each result / "
-            "identified item / grammatical subject",
+            "tt-doc/author-review-antecedent-check-removed",
+            "noun to which it refers",
+            "nearby word",
         ),
         (
-            "tt-doc/author-assurance-noun-group-check-removed",
-            "multi-word noun",
-            "long term",
-            "multi-word noun / more than 3 words / registered form",
+            "tt-doc/author-review-noun-group-check-removed",
+            "noun group",
+            "word sequence",
         ),
         (
-            "tt-doc/author-assurance-procedure-action-check-removed",
-            "one instruction",
-            "related instructions",
-            "one instruction / each sentence / one operation / each work step / "
-            "simultaneous / immediate result",
+            "tt-doc/author-review-instruction-check-weakened",
+            "different instruction",
+            "same instruction",
         ),
         (
-            "tt-doc/author-assurance-condition-order-check-removed",
+            "tt-doc/author-review-condition-order-inverted",
             "condition before its instruction",
             "condition after its instruction",
-            "condition must be known first / condition before its instruction",
         ),
         (
-            "tt-doc/author-assurance-unresolved-term-freeze-authorized",
-            "do not freeze an exact candidate",
-            "freeze an exact candidate",
-            "dictionary-inspection candidate / unresolved terminology / "
-            "applicable finding / do not freeze an exact candidate",
+            "tt-doc/author-review-sentence-check-removed",
+            "sentence construction",
+            "sentence text",
         ),
         (
-            "tt-doc/author-assurance-automatic-proof-authorized",
-            "no conformance review result",
-            "a conformance review result",
-            "deterministic pre-check / ste lookup / no conformance review result",
+            "tt-doc/author-review-paragraph-check-removed",
+            "paragraph construction",
+            "paragraph text",
         ),
         (
-            "tt-doc/author-assurance-convenience-term-authorized",
-            "only to keep the wording",
-            "to keep the wording",
-            "do not add a technical term / only to keep the wording",
+            "tt-doc/author-review-full-applicability-weakened",
+            "all other applicable Issue 9 requirements",
+            "selected Issue 9 requirements",
         ),
         (
-            "tt-doc/author-assurance-finding-disposition-removed",
-            "applicable finding",
-            "listed note",
-            "dictionary-inspection candidate / unresolved terminology / "
-            "applicable finding / do not freeze an exact candidate",
+            "tt-doc/author-review-actual-result-removed",
+            "actual result",
+            "reported result",
+        ),
+        (
+            "tt-doc/author-review-unresolved-terminology-kept",
+            "Resolve all unresolved terminology",
+            "Keep unresolved terminology",
+        ),
+        (
+            "tt-doc/author-review-challenge-removed",
+            "read-only challenge",
+            "optional comment",
+        ),
+        (
+            "tt-doc/author-review-machine-proof-authorized",
+            "does not examine prose for conformance",
+            "examines prose for conformance",
         ),
     )
-    for name, old, new, concepts in author_assurance_cases:
+    for name, old, new in author_assurance_cases:
         if old not in writing_checklist:
             raise AssertionError(name + " fixture is stale")
         mutated_checklist = writing_checklist.replace(old, new)
@@ -3005,7 +3003,7 @@ def validate_documentation_profile_mutations() -> None:
                     workflows,
                 )
             ),
-            "documentation checklist lost author-side assurance: " + concepts,
+            "documentation checklist lost the human-review or traceability boundary",
         )
 
     phase4_closeout = read(

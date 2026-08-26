@@ -828,8 +828,9 @@ archive/hash and branch/upstream boundary. Neither result claims that an
 independent backup or restore exists.
 
 If you do not know the accepted commit for `origin/main`, use `git fetch`.
-Before a bounded cycle with recovery risk, make sure that the checkpoint is
-clean and pushed:
+Before a bounded cycle with recovery risk, make sure that the checkpoint has
+tracked cleanliness. Before the cycle, make sure that a branch on GitHub
+contains the checkpoint commit:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py --require-checkpoint
@@ -838,19 +839,19 @@ clean and pushed:
 Before worktree retirement, use the retirement audit with
 `--retirement-worktree` and without a retirement plan. Record the SHA-256 and
 counts for the local-state inventory in phase evidence. Examine the retirement
-plan against the
+plan with the
 [worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
 Use the retirement audit again with `--retirement-plan` and
 `--require-retirement-ready`. Make sure that the sentinel is
 `TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no
 finding.
 
-The recovery validator must give a `FAIL` result for each invalid state. It must
-include these invalid states:
+The recovery validator must give a `FAIL` result for each invalid state. The
+recovery validator must include these invalid states:
 
-- A merge and tracked cleanliness without a retirement plan
+- The pull-request state `MERGED` and tracked cleanliness without a retirement plan
 - A local-state inventory item that the retirement plan does not contain
-- One item in more than one local-state type
+- An item in 2 or more local-state types
 - Ambiguous or uniquely owned state
 - A change to the worktree, accepted commit, or local-state inventory
 - A worktree without tracked cleanliness
@@ -861,7 +862,7 @@ include these invalid states:
 - A Git command that uses an environment variable with the `GIT_` prefix to
   select a different repository or Git index
 - An item without a canonical owner or result
-- Different bytes at a location for planned preservation
+- Different bytes in the source file and copy
 - A different value for `accepted_ref`
 - A duplicate key in the retirement plan
 - A symbolic link in the path for planned preservation
@@ -869,23 +870,24 @@ include these invalid states:
 - A local path from a file-system error in command output
 - Information from a Git error in command output
 - A command in the retirement audit that changes Git state or local files
-- A command that uses `--force` in the retirement audit.
+- A retirement audit that uses a command with `--force`.
 
-The recovery validator must use a temporary repository. In that repository, the
-validator must use `git worktree remove` without `--force`. The validator must
-make sure that the authoritative local source stays available. Before branch
-removal, the validator must show that Git does not contain the worktree. Before
-branch removal, the validator must also show that the accepted commit
-contains the branch tip.
+The recovery validator must use a temporary repository. In the temporary
+repository, the validator must use `git worktree remove` without `--force`.
+The validator must make sure that the authoritative local source stays
+available. Before branch removal, the validator must show that
+`git worktree list` does not contain the worktree. Before branch removal, the
+validator must also show that the accepted commit contains the branch tip.
 
-Before worktree removal, examine how the retirement plan classifies the
-local-state inventory for the worktree. Before removal, examine the preservation
-diff for the local-state inventory. After removal, make sure that Git did not
-change a different branch.
+Before worktree removal, the validator must examine the local-state types in the
+retirement plan. Before worktree removal, the validator must examine the
+preservation diff for the local-state inventory. After worktree removal, the
+validator must show that no other branch changed.
 
-After removal, make sure that Git did not change a different worktree. After
-removal, make sure that the stash inventory did not change. After removal, make
-sure that files at each location for planned preservation did not change.
+After worktree removal, the validator must show that no other worktree changed.
+After worktree removal, the validator must show that the stash inventory did not
+change. After worktree removal, the validator must show that files at each
+location for planned preservation did not change.
 
 The retirement audit does not classify a local-state inventory item. The recovery
 validator gives no removal authority.
@@ -921,12 +923,12 @@ external reference. Normal CI does not use the ignored PDF. A conformance
 record must report its official source. Automatic validation does not prove
 linguistic conformance.
 
-### ASD-STE100 retrieval assurance
+### Validation of the retrieval contract
 
 The retrieval contract has a source manifest and a retrieval index. The
 Technical Documentation Profile owns full applicability. The technical-term
 register owns technical terms.
-Validate the contract without the PDF with:
+Validate the retrieval contract without the PDF with:
 
 ```bash
 .venv/bin/python tests/validate_ste100_retrieval.py
@@ -965,34 +967,57 @@ cache, and selected lookup results do not show that this review occurred. They
 also do not show conformance. Source identity validation does not make a
 positive rights claim.
 
-For each complete logical unit with a material edit, the author must use the
-writing checklist. The author must examine approved meaning and part of speech.
-For each term use, the author must identify the term use as ordinary vocabulary
-or a technical term. For each technical term, the author must use the registered
-form or an approved shorter form. Before the author freezes an exact candidate,
-the author must resolve all unresolved terminology. After the last wording
-change, the author must review the complete logical unit.
+For each logical unit with a material edit, the author must use the writing
+checklist. The author must examine all applicable Issue 9 requirements. The
+author completes the conformance review. A validation tool does not replace
+this review.
 
-If `tracktemplate-documentation-review` or `AGENT_WORKFLOWS.md` does not contain
-an author-side assurance item, `tests/validate_agent_guidance.py` must give a
-`FAIL` result. The test must find instructions about each logical agent and
-grammatical subject in `tracktemplate-documentation-review` and
-`AGENT_WORKFLOWS.md`. The test must find instructions about each pronoun
-antecedent in these two files. The test must find instructions about each
-condition, result, and multi-word noun in these two files.
+The author-review worklist records the exact candidate, source identity, and
+conformance scope for changed prose. It also records each logical unit that the
+author reviewed. The author records findings and their dispositions. Before the
+author freezes the exact candidate, the author must resolve each unresolved
+finding.
 
-The test must find the instruction limit for each procedure sentence. It must
-find the operation limit for each work step. It must find the necessary
-condition order. `tests/validate_governance_semantics.py` must reject removal of
-these controls. The test must also reject a claim that the deterministic
-pre-check or STE lookup gives a conformance review result.
+For an evidence claim from a command result, record the command invocation and
+working directory. Record the validation profile and process exit status.
+Record the actual result. Record the command-output SHA-256. If the command has
+a sentinel, record it.
+
+If the canonical owner does not contain each author-side assurance control, the
+validator in `tests/validate_agent_guidance.py` must give a `FAIL` result. The
+validator in `tests/validate_governance_semantics.py` must reject removal of a
+semantic control. The validator must reject a claim that a deterministic
+pre-check or STE lookup gives a conformance review.
+
+The STE lookup must reject these author-review worklists:
+
+- A worklist that identifies a different exact candidate
+- A source identity that differs from the source manifest
+- Changed prose that is not in the conformance scope
+- A logical unit with a material edit and no SHA-256
+- An unresolved author finding
+- A command result without its command invocation, validation profile, or
+  actual result
+- Command output that does not contain the actual result
+- No valid read-only challenge for the worklist and changed prose.
+
+The STE lookup validates the source identity, exact candidate, conformance
+scope, and SHA-256 values. It also validates unresolved findings, command
+results, and the read-only challenge result. It does not examine prose for
+conformance.
+
+Before the author freezes the exact candidate, a different documentation
+reviewer must complete a read-only challenge. The reviewer examines the
+author-review worklist and changed prose. If the challenge gives a `PASS`
+result, the author can start validation. The read-only challenge has no
+acceptance.
 
 [Technical provenance](PROVENANCE.md#asd-ste100-issue-9-reference) records the
 rights state in a different authority boundary. The
 [Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
 owns full applicability and the conformance review. The
 [source and retrieval procedure](external/asd-ste100/README.md)
-owns local operation and the rebuild route.
+owns the STE lookup operation and the rebuild route.
 
 Fast development-bridge recipe contract checks:
 

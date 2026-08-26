@@ -709,7 +709,7 @@ def validate_documentation_profile(
         "retirement plan",
         "retirement audit",
         "ambiguous or uniquely owned state",
-        "Put one local-state inventory item in one local-state type",
+        "Put a local-state inventory item in a local-state type",
         "Do not use different technical terms for the same project concept",
         "Do not use a technical noun as a verb unless this register also "
         "approves the verb",
@@ -871,10 +871,11 @@ def validate_asd_ste100_reference(
     )
     require(
         "documentation review workflow uses the official source only for a "
-        "linguistic conformance assessment" in workflows_flat
-        and "Other workflows route that assessment to documentation review"
-        in workflows_flat
-        and "They do not read the PDF during usual work" in workflows_flat,
+        "conformance review" in workflows_flat
+        and "Agents in other workflows route the review to documentation "
+        "review" in workflows_flat
+        and "The agents do not read the PDF during usual work"
+        in workflows_flat,
         "ASD-STE100 workflow routing drifted",
     )
 

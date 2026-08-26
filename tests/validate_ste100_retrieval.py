@@ -128,20 +128,16 @@ def validate_workflow_text(text: str) -> None:
     ordered = (
         "read the technical documentation profile",
         "read the technical-term register",
-        "identify each new logical unit and its content category",
-        "identify each logical unit with a material edit and its content category",
-        "complete the author-side assurance method",
-        "if the deterministic pre-check can help the review, use it",
-        "use targeted retrieval",
-        "if the ste lookup does not give sufficient information, read a bounded "
-        "source excerpt",
-        "after the last wording change, review the complete logical unit against "
-        "the applicable requirement set",
-        "put the technical-term status in the review receipt",
-        "put each unresolved finding in the review receipt",
-        "if unresolved terminology stays, do not freeze an exact candidate",
-        "if the change level or risk makes an independent review necessary, get "
-        "an independent review",
+        "use the tracktemplate-documentation-review skill",
+        "record each logical unit with a material edit",
+        "for each logical unit, record the content category",
+        "use the writing checklist for each logical unit",
+        "record findings and their dispositions",
+        "resolve all findings and unresolved terminology",
+        "after the last wording change, review each complete logical unit again",
+        "validate the temporary author-review worklist",
+        "before the author freezes an exact candidate, get a read-only challenge",
+        "when project authority makes it necessary, get an independent review",
     )
     position = -1
     for fragment in ordered:
@@ -152,9 +148,9 @@ def validate_workflow_text(text: str) -> None:
         )
         position = new_position
     for fragment in (
-        "selected rule families are retrieval priorities",
-        "must not use them as the complete applicable rule set",
-        "do not use complete-source inspection for each review",
+        "rule families in a lookup result are retrieval priorities",
+        "they are not the applicable rule set",
+        "use complete-source inspection only for these bounded conditions",
         "task is about the complete standard",
         "validates the retrieval architecture",
         "targeted retrieval cannot resolve an ambiguity that the reviewer records",
@@ -184,7 +180,7 @@ def validate_source_documentation(text: str) -> None:
         "query does not show the complete source text",
         "approved technical-term result gives its technical-term category and "
         "term meaning",
-        "do not approve a category mismatch",
+        "if its category differs from the register",
         "do not approve a term that is missing from the technical-term register",
         "tool cannot add or approve a technical noun or technical verb",
         "bounded result reports its total count, shown count, and truncation status",
@@ -536,8 +532,6 @@ def validate_technical_term_owner() -> None:
         "technical-term register",
         "technical-term status",
         "technical-term category",
-        "contextual term review",
-        "category mismatch",
         "unresolved terminology",
         "source efficiency",
         "retrieval optimisation",
@@ -574,10 +568,16 @@ def validate_technical_term_owner() -> None:
         (item["canonical_term"].casefold(), item["category"]): item
         for item in registrations
     }
-    require(
-        ("assurance", "noun") in by_term_and_category,
-        "the project assurance noun has no category-bound registration",
-    )
+    for convenience_noun in (
+        "condition",
+        "operation",
+        "sentence",
+    ):
+        require(
+            (convenience_noun, "noun") not in by_term_and_category,
+            "ordinary language became a project technical noun: "
+            + convenience_noun,
+        )
     for generic_verb in ("separate", "improve", "reduce"):
         require(
             (generic_verb, "verb") not in by_term_and_category,
@@ -605,7 +605,7 @@ def validate_validation_text(validation_text: str) -> None:
     validate_no_positive_assurance_claim(validation_text)
     validation = semantic_text(validation_text)
     for fragment in (
-        "validate the contract without the pdf",
+        "validate the retrieval contract without the pdf",
         "must fail closed when the source is missing",
         "byte size or sha-256 identity is different from the source manifest",
         "source-derived index when its identity is not the identity in the source "
@@ -1627,8 +1627,8 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     workflows = read(WORKFLOWS)
     validate_workflow_text(workflows)
     narrowed_workflow = workflows.replace(
-        "The author must not use\nthem as the complete applicable rule set.",
-        "The author must use them as the complete applicable rule set.",
+        "They are not the\napplicable rule set.",
+        "They are the applicable rule set.",
     )
     require(narrowed_workflow != workflows, "workflow narrowing fixture is stale")
     try:
@@ -1834,6 +1834,299 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
         raise AssertionError("competing LFE policy-owner mutation was accepted")
 
 
+
+def validate_author_review_traceability() -> None:
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        document = root / "review.md"
+        document.write_text("# Review\n\nThe author reviews the text.\n", encoding="utf-8")
+        for command in (
+            ["git", "init", "--quiet"],
+            ["git", "add", document.name],
+            [
+                "git",
+                "-c",
+                "user.name=TrackTemplate Validation",
+                "-c",
+                "user.email=validation@example.invalid",
+                "commit",
+                "--quiet",
+                "-m",
+                "baseline",
+            ],
+        ):
+            subprocess.run(command, cwd=root, check=True)
+        baseline = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        document.write_text(
+            "# Review\n\nThe author reviews all changed prose.\n",
+            encoding="utf-8",
+        )
+        output_dir = root / "tmp"
+        output_dir.mkdir()
+        output = output_dir / "validation.log"
+        output.write_text(
+            "RESULT=PASS\n",
+            encoding="utf-8",
+        )
+        source_manifest = {
+            "issue": "9",
+            "page_count": 434,
+            "publication_date": "2025-01-15",
+            "sha256": EXPECTED_SOURCE_SHA256,
+            "size_bytes": EXPECTED_SOURCE_SIZE,
+            "standard_id": "ASD-STE100",
+        }
+        document_hash = hashlib.sha256(document.read_bytes()).hexdigest()
+        unit_payload = "".join(
+            document.read_text(encoding="utf-8").splitlines(keepends=True)
+        ).encode("utf-8")
+        source = {"path": document.name, "sha256": document_hash}
+        evidence = {
+            "actual_result": "RESULT=PASS",
+            "claim": "The fixture command gave a PASS result.",
+            "command": {
+                "argv": [sys.executable, "-c", "print('RESULT=PASS')"],
+                "exit_status": 0,
+                "output_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+                "output_source": "tmp/validation.log",
+                "profile": "fixture",
+                "sentinel": "RESULT=",
+                "working_directory": str(root),
+            },
+            "id": "evidence-001",
+            "source": source,
+            "type": "command-result",
+        }
+        candidate = STE._assurance_candidate(baseline, root=root)
+        worklist = {
+            "author_review": {
+                "completed_on": "2026-08-26",
+                "method": "complete-human-ASD-STE100-Issue-9-review",
+                "reviewer": "fixture author",
+                "status": "complete",
+            },
+            "baseline_revision": baseline,
+            "candidate": candidate,
+            "documents": [source],
+            "prefreeze_challenge": {
+                "candidate_content_sha256": "",
+                "completed_on": "",
+                "review_worklist_sha256": "",
+                "result_sha256": "",
+                "result_source": "",
+                "reviewer": "",
+                "status": "pending",
+                "unresolved_findings": [],
+            },
+            "source_identity": source_manifest,
+            "units": [
+                {
+                    "applicable_review_categories": list(
+                        STE.ASSURANCE_REVIEW_CATEGORIES
+                    ),
+                    "content_category": "descriptive",
+                    "document_class": "guidance",
+                    "end_line": 3,
+                    "evidence_claims": [evidence],
+                    "findings": [
+                        {
+                            "category": "controlled-vocabulary",
+                            "description": "The first wording used an unapproved word.",
+                            "disposition": "The author used approved vocabulary.",
+                            "end_line": 3,
+                            "id": "finding-001",
+                            "start_line": 3,
+                            "status": "resolved",
+                        }
+                    ],
+                    "id": "unit-001",
+                    "path": document.name,
+                    "review_status": "complete",
+                    "sha256": hashlib.sha256(unit_payload).hexdigest(),
+                    "start_line": 1,
+                    "unresolved_findings": [],
+                }
+            ],
+            "unresolved_findings": [],
+            "worklist_schema_version": 1,
+        }
+        receipt = STE.validate_author_assurance_worklist(
+            worklist,
+            root=root,
+            source_manifest=source_manifest,
+        )
+        require(
+            receipt["assurance_status"]
+            == "candidate-bound-human-review-traceability-not-linguistic-conformance",
+            "author assurance claimed automatic linguistic conformance",
+        )
+        changed_document = copy.deepcopy(worklist)
+        document.write_text(
+            "# Review\n\nThe author changed the reviewed text.\n",
+            encoding="utf-8",
+        )
+        expect_ste_error(
+            "author-assurance-candidate-changed",
+            lambda: STE.validate_author_assurance_worklist(
+                changed_document,
+                root=root,
+                source_manifest=source_manifest,
+            ),
+        )
+        document.write_text(
+            "# Review\n\nThe author reviews all changed prose.\n",
+            encoding="utf-8",
+        )
+        omitted_scope = copy.deepcopy(worklist)
+        omitted_scope["documents"] = []
+        expect_ste_error(
+            "author-assurance-scope-invalid",
+            lambda: STE.validate_author_assurance_worklist(
+                omitted_scope,
+                root=root,
+                source_manifest=source_manifest,
+            ),
+        )
+        unresolved = copy.deepcopy(worklist)
+        unresolved["units"][0]["unresolved_findings"] = ["open finding"]
+        expect_ste_error(
+            "author-assurance-unresolved",
+            lambda: STE.validate_author_assurance_worklist(
+                unresolved,
+                root=root,
+                source_manifest=source_manifest,
+            ),
+        )
+        wrong_source = copy.deepcopy(worklist)
+        wrong_source["source_identity"]["sha256"] = "0" * 64
+        expect_ste_error(
+            "author-assurance-source-invalid",
+            lambda: STE.validate_author_assurance_worklist(
+                wrong_source,
+                root=root,
+                source_manifest=source_manifest,
+            ),
+        )
+        incomplete_review = copy.deepcopy(worklist)
+        incomplete_review["author_review"]["status"] = "incomplete"
+        expect_ste_error(
+            "author-assurance-review-invalid",
+            lambda: STE.validate_author_assurance_worklist(
+                incomplete_review,
+                root=root,
+                source_manifest=source_manifest,
+            ),
+        )
+        false_result = copy.deepcopy(worklist)
+        false_result["units"][0]["evidence_claims"][0]["actual_result"] = (
+            "RESULT=FAIL"
+        )
+        expect_ste_error(
+            "author-assurance-evidence-invalid",
+            lambda: STE.validate_author_assurance_worklist(
+                false_result,
+                root=root,
+                source_manifest=source_manifest,
+            ),
+        )
+        relative_command = copy.deepcopy(worklist)
+        relative_command["units"][0]["evidence_claims"][0]["command"]["argv"][0] = (
+            "python"
+        )
+        expect_ste_error(
+            "author-assurance-evidence-invalid",
+            lambda: STE.validate_author_assurance_worklist(
+                relative_command,
+                root=root,
+                source_manifest=source_manifest,
+            ),
+        )
+        expect_ste_error(
+            "author-assurance-challenge-required",
+            lambda: STE.validate_author_assurance_worklist(
+                worklist,
+                root=root,
+                source_manifest=source_manifest,
+                require_challenge=True,
+            ),
+        )
+        challenge_output = output_dir / "challenge.json"
+        challenge_output.write_text(
+            '{"status":"pass"}\n',
+            encoding="utf-8",
+        )
+        challenged = copy.deepcopy(worklist)
+        review_payload = json.dumps(
+            {
+                key: value
+                for key, value in challenged.items()
+                if key != "prefreeze_challenge"
+            },
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+        challenged["prefreeze_challenge"] = {
+            "candidate_content_sha256": candidate["content_sha256"],
+            "completed_on": "2026-08-26",
+            "review_worklist_sha256": hashlib.sha256(
+                review_payload
+            ).hexdigest(),
+            "result_sha256": hashlib.sha256(
+                challenge_output.read_bytes()
+            ).hexdigest(),
+            "result_source": "tmp/challenge.json",
+            "reviewer": "read-only documentation reviewer",
+            "status": "pass",
+            "unresolved_findings": [],
+        }
+        STE.validate_author_assurance_worklist(
+            challenged,
+            root=root,
+            source_manifest=source_manifest,
+            require_challenge=True,
+        )
+        stale_challenge = copy.deepcopy(challenged)
+        stale_challenge["prefreeze_challenge"]["candidate_content_sha256"] = "0" * 64
+        expect_ste_error(
+            "author-assurance-candidate-changed",
+            lambda: STE.validate_author_assurance_worklist(
+                stale_challenge,
+                root=root,
+                source_manifest=source_manifest,
+                require_challenge=True,
+            ),
+        )
+        stale_review = copy.deepcopy(challenged)
+        stale_review["author_review"]["reviewer"] = "replacement author"
+        expect_ste_error(
+            "author-assurance-candidate-changed",
+            lambda: STE.validate_author_assurance_worklist(
+                stale_review,
+                root=root,
+                source_manifest=source_manifest,
+                require_challenge=True,
+            ),
+        )
+        same_reviewer = copy.deepcopy(challenged)
+        same_reviewer["prefreeze_challenge"]["reviewer"] = "fixture author"
+        expect_ste_error(
+            "author-assurance-challenge-invalid",
+            lambda: STE.validate_author_assurance_worklist(
+                same_reviewer,
+                root=root,
+                source_manifest=source_manifest,
+                require_challenge=True,
+            ),
+        )
+
+
 def validate_live_source_resolvability() -> None:
     source_path = SOURCE_DIR / "ASD-STE100_ISSUE9.pdf"
     cache_path = SOURCE_DIR / ".cache" / "issue9-cache-v2.json"
@@ -1896,6 +2189,7 @@ def main() -> None:
     validate_technical_term_owner()
     validate_agent_and_validation_routing()
     validate_cache_and_lookup_behaviour(index)
+    validate_author_review_traceability()
     validate_live_source_resolvability()
     validate_semantic_mutations(index)
     print(SENTINEL)
