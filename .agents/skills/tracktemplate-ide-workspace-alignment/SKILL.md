@@ -64,7 +64,7 @@ them directly:
 
 Do not use the name of a run configuration as branch evidence. Do not use a
 filename from a test as branch evidence. Do not use an entry that records an
-opened file as branch evidence. Do not use a PyCharm title or SDK name as branch
+opened file as branch evidence. Do not use a window title or SDK name as branch
 evidence. Use the Git worktree to identify the branch.
 
 ## Alignment workflow
@@ -120,22 +120,22 @@ Temporary /tmp worktrees
     never the sole location of active, uncommitted or unpushed work
 ```
 
-The primary worktree must not use a feature branch after its pull request gets
-the `MERGED` state. Before Git
-changes the branch, show accepted-history containment. Before Git changes the
-branch, show tracked cleanliness. The `MERGED` state gives no authority to
-remove its worktree.
+If the pull-request state is `MERGED`, the primary worktree must not use the
+feature branch for that pull request. Before Git changes the branch,
+show accepted-history containment. Before Git changes the branch, show tracked
+cleanliness. The `MERGED` state gives no removal authority.
 
-Show that the accepted commit for `origin/main` contains the worktree tip. Show
-that it contains each commit on the branch. Make sure that the worktree has
-tracked cleanliness. Make sure that no person or process uses the worktree.
-Make sure that a different location contains all IDE and user state. Then, use
-the canonical
+Show that the accepted commit for `origin/main` contains the branch tip. Show
+that the accepted commit contains each commit on the branch. Make sure that the
+worktree has tracked cleanliness. Make sure that no person or process uses the
+worktree. Make sure that a different location contains all IDE data and user
+data. Use the
 [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
 Make a local-state inventory. Classify each item in the local-state inventory.
-A Git ignore rule gives no removal authority. If the plan has ambiguous or
-uniquely owned state, keep the worktree. If the preservation result is not
-complete, keep the worktree. If a person or process uses the worktree, keep it.
+A Git ignore rule gives no removal authority. If the retirement plan has
+ambiguous or uniquely owned state, keep the worktree. If the preservation audit
+does not give a complete result, keep the worktree. If a person or process uses
+the worktree, keep the worktree.
 
 Use the
 [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
@@ -147,30 +147,30 @@ do not end workspace alignment.
 ## Composition with TrackTemplate continue
 
 When composed by
-[`$tracktemplate-continue`](../tracktemplate-continue/SKILL.md), run the
-read-only comparison before its first checkout or worktree mutation. Let
-continue's Git authority reconcile and synchronise the repository, then repeat
-the comparison before branch creation. Do not start a new tranche until the
-primary project is a clean exact view of protected `main`, every active branch
-has a persistent location and all retained temporary worktrees are accounted
-for. An unobservable physical window requires a named operator confirmation;
-it does not permit the skill to invent UI evidence.
+[`$tracktemplate-continue`](../tracktemplate-continue/SKILL.md), complete
+workspace alignment before Continue uses Git to change a branch or worktree.
+After the Git workflow reconciles the repository, complete workspace alignment
+again. Before a new bounded cycle, make sure that the primary project uses protected
+`main` at the accepted commit. Make sure that each active branch has a
+worktree or a branch on GitHub. Report each temporary worktree that stays. If
+the agent cannot examine the active PyCharm display, tell the user to examine
+it. Do not report UI evidence that the agent cannot examine.
 
 ## Report
 
 Report:
 
-1. Repository root, Git root for all worktrees, and complete worktree map
-2. Branch, exact HEAD, upstream, tracked cleanliness, and accepted-history containment for each worktree
-3. Pull requests and branch containment for `origin/main`
-4. Primary project path, VCS roots, active Python environment, and directory for each run
+1. Repository root and worktree map with all worktrees
+2. Exact Git identity, branch on GitHub, tracked cleanliness, and accepted-history containment for each worktree
+3. Pull-request state and accepted-history containment for each branch
+4. Path of the primary worktree, VCS roots, active Python environment, and directory for each tool operation
 5. File and Git evidence, and information that the user must supply
-6. Authority for each Git change and evidence after each change
-7. Worktree map after alignment and cause for each worktree that stays
-8. Local-state inventory and the type for each item
+6. Project authority for each Git change and evidence after each change
+7. Worktree map after workspace alignment and cause for each worktree that stays
+8. Local-state inventory and the local-state type for each item
 9. Evidence that no person or process uses the worktree
-10. Worktree map after retirement
-11. Limitation or work without evidence that it is safe.
+10. Worktree map after worktree retirement
+11. Limitation or work without applicable project authority.
 
 When maintaining this skill or its routing, exercise the
 [evaluation cases](references/evaluation-cases.md) and run the repository

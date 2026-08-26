@@ -50,26 +50,10 @@ includes a linguistic conformance assessment, route it to
    `reference/current/PHASE_EVIDENCE.md` and the applicable records from
    `reference/current/risks.json` or `gate-decisions.json`.
 7. Retrieve implementation evidence deterministically. Prefer exact paths,
-   identifiers and headings with `rg --files` and `rg`. Use the ontology only
-   to expand stable product terms. Do not use the ontology as evidence
-   for current state. After you get authority, examine related source,
-   tests, failure output, Git status, and diffs.
-Use the
-[procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
-in the canonical owner. Examine the branches, worktrees, and commits in named
-Git state for unfinished work or interrupted work. Examine the complete stash
-inventory. If the inventory has a retained stash or missing recovery
-information, do not give the recovery gate a complete result.
-Before a worktree retirement, use the canonical
-[worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
-Show accepted-history containment. Show tracked cleanliness. Make a local-state
-inventory of all files that are not in the Git index. Identify the owner of each
-inventory item. Record the necessary preservation.
-
-A merge, tracked cleanliness, or Git ignore rule gives no removal authority for
-local state. If the plan has ambiguous or uniquely owned state, keep the
-worktree. If the plan has this state, stop.
-
+   identifiers and headings with `rg --files` and `rg`; use ontology concepts
+   to expand stable product terms, not to infer live status. Inspect relevant
+   source, tests, raw failures, Git status and diffs only after authority is
+   established.
 8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
    excluded.
@@ -79,6 +63,28 @@ worktree. If the plan has this state, stop.
 10. Continue only when the intended result, authority boundary, dirty-worktree
    ownership, next safe slice and proof boundary are clear. Ask the user when a
    material decision cannot be recovered without guessing.
+
+Use the
+[procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
+in the canonical owner. Examine the branches, worktrees, and commits in named
+Git state for unfinished work or interrupted work. Examine the complete stash
+inventory. If the stash inventory has a
+retained stash, do not give the recovery gate a complete result. If recovery
+information is missing, do not give the recovery gate a complete result.
+
+### Worktree retirement during recovery
+
+Before worktree retirement, use the
+[worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
+Show accepted-history containment. Show tracked cleanliness. Make a local-state
+inventory of all files that are not in the Git index. Identify the canonical
+owner for each local-state inventory item. Identify necessary planned
+preservation.
+
+A merge and tracked cleanliness give no removal authority. A Git ignore rule
+also gives no removal authority. If the retirement plan has ambiguous or
+uniquely owned state, keep the worktree. If the retirement plan has ambiguous
+or uniquely owned state, stop.
 
 ## Authority-aware selection
 
@@ -156,17 +162,20 @@ freshness.
 Before a change, use short text. For a substantial cycle, use the profile's six
 owner-view fields. Then, keep this technical provenance:
 
-1. the controlling files read;
-2. the recovered accepted result and authority boundary;
-3. the hot, warm and deliberately excluded cold context;
-4. the current implementation and validation state;
-5. contradictions, uncommitted work or missing evidence; and
-6. the next bounded action and check.
+1. Canonical owners examined
+2. Accepted result after recovery and authority boundary
+3. Agent context, each source that the agent does not use, and the cause
+4. Implementation evidence and validation result
+5. Dirty paths, information that does not agree, or missing evidence
+6. Next task and check
+7. Named Git state
+8. Complete stash inventory
+9. SHA-256 for the local-state inventory
+10. Local-state type for each local-state inventory item
+11. Preservation audit result
+12. Each local-state inventory item without a canonical owner
+13. Complete result from the retirement audit.
 
-Also record the named Git state and complete stash inventory. For worktree
-retirement, record the SHA-256 for the local-state inventory. Record the
-type for each inventory item. Record the preservation result. Record each item
-with no known owner. Record the worktree result.
-
-Do not describe incomplete work, an unaccepted diff or an unrun check as
-accepted project state.
+Do not report work that is not complete as accepted project state. Do not
+report a diff without acceptance as accepted project state. Do not report a
+check that did not operate as accepted project state.

@@ -102,8 +102,8 @@ dashboard only.
 
 ## Owner decisions
 
-[history/phase-closeouts/PHASE4_GATE_DECISIONS.json](history/phase-closeouts/PHASE4_GATE_DECISIONS.json) owns the displayed Phase 4 decisions. [history/phase-closeouts/PHASE5_GATE_DECISIONS.json](history/phase-closeouts/PHASE5_GATE_DECISIONS.json) owns the displayed Phase 5 decisions.
-The [current decision register](current/gate-decisions.json) owns Phase 6 and current cross-phase governance decisions.
+[history/phase-closeouts/PHASE4_GATE_DECISIONS.json](history/phase-closeouts/PHASE4_GATE_DECISIONS.json) owns the Phase 4 decisions below. [history/phase-closeouts/PHASE5_GATE_DECISIONS.json](history/phase-closeouts/PHASE5_GATE_DECISIONS.json) owns the Phase 5 decisions below.
+The [decision register](current/gate-decisions.json) owns the Phase 6 decisions below. It also owns governance decisions that apply to more than one phase.
 
 | ID | Date | Status | Decision boundary |
 | --- | --- | --- | --- |
@@ -137,7 +137,7 @@ The [current decision register](current/gate-decisions.json) owns Phase 6 and cu
 | D-GOV-009 | 2026-08-23 | Accepted | The owner records the D-GOV-008 direction as exhausted for new product work. The decision preserves the two negative results and selects a bounded Level 1 baseline-attribution investigation as the next action. Exit 4 stays Pending. |
 | D-GOV-010 | 2026-08-23 | Accepted | The owner qualifies only the exact FreeCAD 1.1.3 profile with CPython 3.13.13 and PySide6/Qt 6.11.1. Previous profiles stay qualified. Exit 4 stays Pending. |
 | D-GOV-011 | 2026-08-23 | Accepted | The owner selects one subsequent hypothesis for the read route in the canonical FreeCAD adapter. The decision defines the exact host, product boundary, preserved invariants, and comparison rule. Exit 4 stays Pending. |
-| D-GOV-012 | 2026-08-25 | Accepted | The [decision](current/PHASE_EVIDENCE.md#d-gov-012-worktree-sequence-nonconformance) records the sequence nonconformance for the completed worktree retirement. It accepts preservation of the official source with the recorded SHA-256. It gives authority for one Cycle 2 repair candidate and one pull request with Draft status. It gives no authority for integration. |
+| D-GOV-012 | 2026-08-25 | Accepted | The [decision](current/PHASE_EVIDENCE.md#d-gov-012-worktree-sequence-nonconformance) records the sequence nonconformance for the completed worktree retirement. It accepts the preservation audit result for the authorised source with the recorded SHA-256. It gives project authority for one exact candidate for Cycle 2 repair. It gives project authority for one draft pull request. It gives no project authority to merge into protected main. |
 
 ## Authority and evidence links
 

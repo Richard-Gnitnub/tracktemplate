@@ -628,7 +628,7 @@ def validate_visible_recovery_routing(workflows, skills):
             "branches worktrees and commits in named git state for unfinished "
             "work or interrupted work",
             "examine the complete stash inventory",
-            "if the inventory has a retained stash",
+            "if the stash inventory has a retained stash",
             "do not give the recovery gate a complete result",
         ),
         "handoff": (
@@ -648,7 +648,7 @@ def validate_visible_recovery_routing(workflows, skills):
         "validation": (
             "stash inventory unique content and stash disposition controls",
             "semantic control validation",
-            "review the preservation diff",
+            "examine the preservation diff",
         ),
         "quality": (
             "complete stash inventory and unique content",
@@ -672,88 +672,96 @@ def validate_worktree_retirement_policy(policy):
     """Require loss-checked, non-force worktree retirement in its owner."""
     section = _semantic_text(_section(policy, "Worktree retirement"))
     for fragment in (
-        "a merge and tracked cleanliness do not make worktree removal safe",
-        "merge can show accepted history containment for tracked work",
+        "a merge and tracked cleanliness give no removal authority",
+        "merge can show accepted history containment for tracked files",
         "does not classify ignored files or other local files",
-        "tracked cleanliness gives no removal authority for local state",
-        "record the worktree for removal attached local branch head and accepted "
-        "commit for origin main",
-        "show accepted history containment for the head of the worktree",
+        "put the worktree branch head and accepted commit in the retirement plan",
+        "show that the accepted commit contains the branch tip",
         "show accepted history containment for each commit on the branch",
         "show tracked cleanliness",
         "make sure that no person or process uses the worktree",
-        "make sure that a different location contains all ide and user state",
+        "different location contains all ide data and user data",
         "make a local state inventory of all files that are not in the git index",
-        "git ignore rule gives no authority to keep or remove an item",
+        "give no removal authority to a git ignore rule",
         "authoritative local source",
         "retained evidence",
         "rebuildable cache generated state",
         "temporary disposable state",
         "ambiguous or uniquely owned state",
-        "record its canonical owner preserve the file in a different location "
-        "show that the two files have the same bytes",
-        "for rebuildable cache generated state record its owner record the "
-        "rebuild result that gave pass",
-        "for temporary disposable state record its owner record the cause "
-        "for removal",
-        "if evidence for an owner or type is not complete classify the item "
+        "for authoritative local source or retained evidence identify the "
+        "canonical owner",
+        "preserve each authoritative local source in a different location",
+        "preserve each item of retained evidence in a different location",
+        "for each item that you preserve in work step 12 or 13 make sure that "
+        "the two files have the same bytes",
+        "for rebuildable cache generated state identify the canonical owner",
+        "put the applicable pass result in the retirement plan",
+        "for temporary disposable state identify the canonical owner",
+        "put the cause for removal in the retirement plan",
+        "if evidence does not identify the canonical owner or local state type "
+        "classify the item "
         "as ambiguous or uniquely owned state",
-        "if evidence for preservation or removal is not complete classify "
+        "if evidence does not show planned preservation or removal classify "
         "the item as ambiguous or uniquely owned state",
-        "if the plan has ambiguous or uniquely owned state stop",
-        "if the plan has this state keep the worktree",
-        "if the plan has this state get the minimum necessary decision "
-        "from the project owner",
-        "record the exact retirement authority",
+        "if the retirement plan has ambiguous or uniquely owned state stop",
+        "if the retirement plan has ambiguous or uniquely owned state keep the "
+        "worktree",
+        "if the retirement plan has ambiguous or uniquely owned state ask the "
+        "project owner for a bounded decision",
+        "put the removal authority in the retirement plan",
         "before removal examine the worktree branch and head again",
         "before removal examine accepted history containment again",
         "before removal examine tracked cleanliness again",
         "before removal make sure that no person or process uses the worktree",
-        "before removal examine the local state inventory sha 256 retirement "
-        "plan and preservation again",
+        "before removal examine the local state inventory sha 256 again",
+        "before removal examine the retirement plan again",
+        "before removal examine the preservation audit again",
         "keep the retirement plan local",
         "do not commit local paths do not commit local evidence",
-        "do not commit credentials or secrets",
-        "retirement plan records the branch for the worktree its head accepted "
-        "ref accepted commit and local state inventory sha 256",
-        "it classifies each item as only one type",
-        "records the owner and result for each item",
-        "records each necessary preservation location",
-        "for this repository use refs remotes origin main as the accepted ref",
-        "retirement audit does not change state",
-        "returns counts and sha 256 results",
+        "do not commit authentication data",
+        "retirement plan contains the branch for the worktree",
+        "contains head the accepted commit and the local state inventory sha 256",
+        "contains the removal authority",
+        "classifies each item as only one local state type",
+        "identifies the canonical owner and result for each item",
+        "identifies each location for planned preservation",
+        "set accepted ref to refs remotes origin main",
+        "retirement audit does not change git state or local files",
+        "returns item counts and the local state inventory sha 256",
         "does not return local paths or file data",
-        "gives no authority to remove a worktree or branch",
-        "returns fail if the worktree branch head accepted commit or "
-        "inventory sha 256 changes",
-        "if an inventory item is not in the plan the audit returns fail",
-        "if the plan classifies an item as more than one type the audit "
-        "returns fail",
-        "local state type that is not one of the 5 types",
+        "gives no removal authority",
+        "returns fail if the worktree branch head accepted commit or local "
+        "state inventory sha 256 changes",
+        "if a local state inventory item is not in the retirement plan the retirement "
+        "audit returns fail",
+        "if the retirement plan classifies an item as more than one local state "
+        "type the retirement audit returns fail",
+        "local state type that is not one of the 5 local state types",
         "ambiguous or uniquely owned state",
-        "item without an owner or result",
-        "preservation mismatch",
+        "item without a canonical owner or result",
+        "different bytes at a location for planned preservation",
         "rejects an assume unchanged or skip worktree value in the git index",
-        "removes each value with a name that starts with git",
-        "if the tool cannot examine a file or directory it returns fail "
-        "without a path",
-        "only after a complete result and exact authority use git worktree "
+        "removes each environment variable with the git prefix",
+        "if the retirement audit cannot examine a file or directory the "
+        "retirement audit returns fail without a path",
+        "after you put removal authority in the retirement plan use the "
+        "retirement audit to get a complete result",
+        "after the retirement audit gives a complete result use git worktree "
         "remove for the worktree",
         "do not use force",
         "do not use git stash",
         "do not move local files as a condition for worktree removal",
-        "because git can remove ignored files complete the local state "
-        "inventory first",
-        "before removal complete necessary preservation",
+        "before git removes ignored files complete the local state inventory",
+        "before removal complete necessary planned preservation",
         "after removal examine git worktree list branches the stash inventory "
-        "and the preservation location again",
+        "and the location for planned preservation again",
         "record the preservation diff",
         "after git worktree list does not contain the worktree record the "
-        "commit at the exact tip of the local branch",
-        "if the accepted commit contains that tip commit use git branch d "
-        "with exact authority",
+        "branch tip in phase evidence",
+        "if the accepted commit contains the recorded branch tip use git branch d "
+        "with the removal authority",
         "do not remove a branch on github",
-        "do not run git worktree prune",
+        "do not use git worktree prune",
         "do not change a different worktree as part of this procedure",
     ):
         if fragment not in section:
@@ -772,19 +780,21 @@ def validate_worktree_retirement_routing(workflows, skills):
     workflow = _semantic_text(workflows)
     for fragment in (
         "before a worktree retirement read the worktree retirement procedure",
-        "context recovery makes a local state inventory it identifies the owner of each item",
-        "ide workspace alignment shows that no person or process uses the "
-        "worktree it also shows that the worktree is not the only location "
-        "for user state",
-        "retirement audit records the exact git identity it records the sha "
+        "during recovery the implementing agent makes a local state inventory",
+        "agent identifies the canonical owner of each item",
+        "during workspace alignment the implementing agent makes sure that no "
+        "person or process uses the worktree",
+        "different location contains the user data",
+        "retirement audit returns the exact git identity it returns the sha "
         "256 of the local state inventory it examines the retirement plan",
         "a merge and tracked cleanliness give no removal authority in these workflows",
-        "if the plan has ambiguous or uniquely owned state these workflows stop",
-        "if the preservation result is not complete these workflows stop",
+        "if the retirement plan has ambiguous or uniquely owned state the "
+        "implementing agent stops",
+        "if the preservation audit does not have a complete result the "
+        "implementing agent stops",
         "use git worktree remove without force",
-        "show that the accepted commit contains the commit at the exact tip "
-        "of the local branch",
-        "remove only that local branch for the accepted pull request",
+        "show that the accepted commit contains the branch tip",
+        "use git to remove only the local branch in the retirement plan",
     ):
         if fragment not in workflow:
             raise AssertionError(
@@ -798,33 +808,43 @@ def validate_worktree_retirement_routing(workflows, skills):
             "show accepted history containment show tracked cleanliness",
             "make a local state inventory of all files that are not in the git index",
             "sha 256 for the local state inventory",
-            "merge tracked cleanliness or git ignore rule gives no removal authority for local state",
-            "if the plan has ambiguous or uniquely owned state keep the "
-            "worktree if the plan has this state stop",
+            "identify the canonical owner for each local state inventory item",
+            "a merge and tracked cleanliness give no removal authority",
+            "a git ignore rule also gives no removal authority",
+            "if the retirement plan has ambiguous or uniquely owned state keep "
+            "the worktree if the retirement plan has ambiguous or uniquely "
+            "owned state stop",
         ),
         "ide": (
             "make a local state inventory classify each item in the local "
             "state inventory",
             "git ignore rule gives no removal authority",
-            "if the plan has ambiguous or uniquely owned state keep the "
+            "if the retirement plan has ambiguous or uniquely owned state keep the "
             "worktree",
-            "if the preservation result is not complete keep the worktree",
-            "if a person or process uses the worktree keep it",
+            "if the preservation audit does not give a complete result keep the "
+            "worktree",
+            "if a person or process uses the worktree keep the worktree",
         ),
         "validation": (
             "validate accepted history containment validate tracked cleanliness",
-            "validate the complete local state inventory",
+            "validate the local state inventory",
+            "retirement plan classifies each item as only one local state type",
             "retirement audit returns fail for ambiguous or uniquely owned state",
-            "validate necessary preservation",
+            "validate necessary planned preservation",
+            "after removal examine the preservation audit",
             "validate git worktree remove without force",
-            "review the preservation diff from the current state",
+            "git removes the worktree before git removes the local branch",
+            "after removal examine the preservation diff",
         ),
         "quality": (
-            "exact local state inventory",
-            "type owner and result for each inventory item",
+            "examine the local state inventory",
+            "examine the local state type for each local state inventory item",
+            "examine the canonical owner for each local state inventory item",
+            "examine the result for each local state inventory item",
+            "examine necessary planned preservation",
             "fail result for ambiguous or uniquely owned state",
             "git worktree remove without force",
-            "merge and tracked cleanliness do not show removal authority",
+            "merge and tracked cleanliness give no removal authority",
         ),
     }
     for name, fragments in required.items():
@@ -972,41 +992,40 @@ def validate_recovery_lfe(text):
         raise AssertionError("LFE-021 row structure drifted")
     row = _semantic_text(rows[20])
     for fragment in (
-        "github had the merged state and git status reported no tracked "
-        "change in its worktree",
-        "worktree held 144 ignored files for the retrieval workflow for "
-        "asd ste100 issue 9",
-        "accepted main contained its branch tip",
-        "worktree held 144 ignored files",
-        "official source for asd ste100 issue 9 derived caches files with "
-        "validation results and temporary review receipts",
-        "validation workflow can make the result files and caches again",
+        "pull request 56 had the merged pull request state",
+        "git status command gave no tracked change in the worktree",
+        "accepted commit contained the branch tip",
+        "worktree contained 144 ignored files",
+        "authorised source derived caches files with a "
+        "validation result and temporary review receipts",
+        "ste lookup ruff python and validation tools can make the files in "
+        "rebuildable cache generated state again",
         "temporary review receipts",
-        "retirement evidence shows that the merge and git status result gave "
-        "no removal authority",
-        "canonical recovery policy",
-        "accepted history containment tracked cleanliness and a complete "
+        "phase evidence records this result the merge and git status result "
+        "gave no removal authority",
+        "recovery policy",
+        "accepted history containment tracked cleanliness and a "
         "local state inventory necessary",
-        "preservation exact authority and a preservation diff after removal "
+        "planned preservation removal authority and a preservation diff after removal "
         "necessary",
         "retirement plan must classify each item",
-        "routes context recovery and ide workspace alignment to the recovery "
+        "routes context recovery and workspace alignment to the recovery "
         "policy",
-        "git worktree remove without force",
-        "each failure condition in the validation owner returns fail",
+        "implementing agent must use git worktree remove without force",
+        "recovery validator in validation md gives a fail result for each invalid state",
     ):
         if fragment not in row:
             raise AssertionError("LFE-021 lacks: " + fragment)
     reusable = _semantic_text(cells[3])
     for fragment in (
-        "merge and tracked cleanliness do not make worktree removal safe",
+        "merge and tracked cleanliness give no removal authority",
         "before worktree removal make a local state inventory",
         "classify each item that is not in the git index",
         "preserve authoritative local source retained evidence and each item "
         "that has no other copy",
-        "after validation gives a pass result remove rebuildable cache "
-        "generated state or temporary disposable state",
-        "if the plan has ambiguous or uniquely owned state stop",
+        "after the recovery validator gives a pass result remove only files "
+        "in rebuildable cache generated state or temporary disposable state",
+        "if the retirement plan has ambiguous or uniquely owned state stop",
     ):
         if fragment not in reusable:
             raise AssertionError("LFE-021 reusable rule lacks: " + fragment)
@@ -1031,15 +1050,15 @@ def validate_recovery_lfe(text):
 
     ledger_rules = _semantic_text(_section(text, "Ledger rules"))
     for fragment in (
-        "which canonical owner and workflow must change",
-        "examine validation as a control for the problem",
-        "which regression or semantic mutation makes sure that the problem "
-        "does not occur again",
-        "if a new control adds more work than the risk makes necessary do not "
-        "add the control",
-        "record the cause in the evidence for the change",
-        "ledger records the lesson it does not own the changed rule workflow "
-        "or control",
+        "for each new lfe identify the canonical owner",
+        "identify the applicable workflow",
+        "examine the use of a semantic control",
+        "if a regression test is necessary add it",
+        "if a semantic mutation is necessary add it",
+        "if a semantic control is not necessary",
+        "record the cause in the applicable canonical owner",
+        "lfe records the applicable finding",
+        "does not become a canonical owner workflow or semantic control",
     ):
         if fragment not in ledger_rules:
             raise AssertionError("LFE rule lacks: " + fragment)
@@ -1170,175 +1189,142 @@ def validate_worktree_retirement_phase_evidence(text):
     semantic = _semantic_text(section)
     for fragment in (
         "this level 2 change adds controls for worktree retirement",
-        "worktree removal and branch removal were level 3 operations that "
-        "removed repository state",
-        "project owner gave authority for worktree removal and branch removal",
-        "project did not complete the necessary level 3 panel or decision "
-        "record before the operations",
-        "recovery policy now owns the procedure for worktree retirement",
-        "context recovery workflow ide workspace workflow retirement audit "
-        "and recovery validator now use that procedure",
-        "git workflow removed the worktree for pull request 56",
-        "removed only the local branch for that worktree",
-        "d gov 012 records the historical sequence nonconformance",
+        "worktree removal and branch removal are level 3 operations",
+        "project owner gave removal authority for the two operations",
+        "safety risk panel did not occur before the operations",
+        "decision register did not contain d gov 012 before the operations",
+        "recovery policy now owns the worktree retirement procedure",
+        "context recovery and workspace alignment use that procedure",
+        "retirement audit and recovery validator also use it",
+        "implementing agent used git to remove the worktree for pull request 56",
+        "agent then removed the local branch for that worktree",
+        "d gov 012 contains the sequence nonconformance",
         "gives no retrospective authority",
-        "accepted main at d47518083768d34cf9b41566feaf132ac4562595 "
-        "contained the head of the retired worktree "
+        "accepted commit contained the branch tip "
         "9f3b05d480971d197a57cb00f1811f6c1012f144",
-        "local state inventory had 144 files the retirement plan classified "
-        "each file",
-        "a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044",
-        "retirement audit examined the plan it showed necessary preservation "
-        "and returned no finding",
-        "retirement audit examines exact evidence that the retirement plan supplies",
-        "makes no decision about an item's canonical owner removal branch "
-        "removal acceptance or integration",
-        "retired worktree cannot supply a new local state inventory or new "
-        "evidence for assume unchanged and skip worktree values in the git index",
-        "local state inventory and git status result are historical evidence",
-        "current evidence cannot show complete historical losslessness",
-        "gives authority for one cycle 2 repair candidate and one pull "
-        "request with draft status",
-        "gives no authority for integration or cycle 3 work",
-        "after applicable validation gives pass and new independent reviews "
-        "give accept publish one pull request with draft status",
-        "do not merge it do not start cycle 3",
-        "pull request 56 had the merged state its merge commit was "
-        "65409493d741a5606543bd437e519f8efefb8680",
-        "there was no upstream branch",
-        "retirement audit before removal reported no tracked change",
-        "reported no untracked file that git did not ignore",
-        "did not examine assume unchanged or skip worktree values in the git index",
-        "git worktree remove removed the index for the worktree",
-        "current evidence cannot examine those values again it cannot show "
-        "that all tracked files had the bytes that the removed index recorded",
-        "before retirement local main origin main and live github main had "
-        "commit d47518083768d34cf9b41566feaf132ac4562595",
-        "github kept the same head merge commit and merged state for pull request 56",
-        "primary ide project was on main",
-        "git status reported no tracked change in the primary project",
-        "no open editor or process used the worktree",
+        "local state inventory contained 144 files",
+        "retirement plan contained one local state type for each file",
+        "retirement audit examined the retirement plan",
+        "retirement audit gave no finding",
+        "retirement audit cannot select a canonical owner or give removal authority",
+        "after removal the worktree cannot supply a new local state inventory",
+        "after git removed the git index a reviewer could not get new evidence "
+        "for assume unchanged or skip worktree",
+        "reviewer cannot show historical losslessness",
+        "authority for one exact candidate for cycle 2 repair",
+        "authority for one draft pull request",
+        "gives no project authority to merge into protected main or start cycle 3",
+        "pull request 56 had the merged pull request state",
+        "merge commit was 65409493d741a5606543bd437e519f8efefb8680",
+        "no branch on github had that name",
+        "retirement audit gave no tracked change",
+        "did not examine assume unchanged or skip worktree data in the git index",
+        "git removed the git index for the worktree",
+        "reviewer cannot examine that data again",
+        "cannot show that all tracked files had the bytes in the removed git index",
+        "accepted commit contained the branch tip",
+        "no person or process used the worktree",
         "144 ignored files and 8 042 871 bytes",
         "authoritative local source 1 3 316 157",
         "retained evidence 0 0",
         "rebuildable cache generated state 82 3 026 397",
         "temporary disposable state 61 1 700 317",
         "ambiguous or uniquely owned state 0 0",
-        "source manifest records the pdf sha 256",
-        "local source procedure owns that sha 256 and operation",
-        "provenance record owns the rights state",
-        "type contained 2 ste caches 6 ruff cache files 68 python "
-        "bytecode files and 6 files with validation results",
-        "ste receipt owner gives authority for removal of usual review receipts",
+        "source manifest owns the pdf sha 256",
+        "provenance md owns the rights state",
+        "python can make 68 bytecode files again",
+        "validation tools can make 6 files with a pass result again",
+        "source and retrieval procedure owns review receipts",
         "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
-        "ste cache rebuild gave the necessary schema v2 result that binds to "
-        "the source",
-        "validation and status gave their necessary schema v2 results",
-        "files with syntax results had the same bytes and pass results",
-        "files with results from standalone python had the same bytes and "
-        "60 60 pass results",
-        "retirement plan classified each item as only one type",
-        "retirement audit had the exact git identity for the worktree and accepted "
-        "commit it also had the sha 256 of the local state inventory",
-        "retirement plan had evidence that no person or process used the worktree",
-        "recorded exact authority and showed that the preserved file had the "
-        "same bytes",
-        "audit result had no finding",
-        "before git worktree remove the last retirement audit ran",
-        "command did not use force or git stash",
-        "no person moved a local file as a condition for worktree removal",
-        "command did not use git worktree prune or change a different worktree",
-        "after removal the file system did not contain the worktree the "
-        "output from git worktree list did not contain it",
-        "accepted commit contained the commit at the exact tip of the local "
-        "branch 9f3b05d480971d197a57cb00f1811f6c1012f144",
-        "after that result git branch d removed the local branch",
-        "pdf stayed at its canonical primary path with the same byte size and "
-        "sha 256",
-        "branch for pull request 57 stayed at their recorded commits",
-        "git worktree list contained the primary cycle 2 and pull request 57 "
-        "worktrees",
-        "operation removed no branch on github",
+        "retirement plan contained only one local state type for each item",
+        "retirement audit gave the exact git identity",
+        "retirement audit gave the exact git identity and local state inventory sha 256",
+        "contained the removal authority and preservation audit result",
+        "before git worktree remove the retirement audit gave its last result",
+        "removal command did not use force",
+        "implementing agent did not use git stash",
+        "did not move a local file as a condition for worktree removal",
+        "did not use git worktree prune",
+        "git removed the worktree",
+        "git worktree list did not contain the worktree",
+        "implementing agent used git branch d to remove the local branch",
+        "pdf stayed at the source path with the same byte size and sha 256",
+        "git removed no branch on github",
         "stash inventory stayed empty git had no refs stash",
-        "fixtures with pass results examined the complete local state inventory",
-        "each failure condition gave a fail result",
-        "inventory item that the retirement plan did not contain",
-        "one item in more than one type",
-        "item without an owner or result",
-        "worktree use or missing authority",
-        "worktree without tracked cleanliness",
+        "recovery validator gave a pass result",
+        "recovery validator gave a fail result for these invalid states",
         "assume unchanged or skip worktree value in the git index",
         "different git index from git index file",
-        "local state type that is not one of the 5 types",
-        "data from the retirement plan information from a git error or a "
         "local path in command output",
-        "temporary integration fixture gave a pass result",
-        "used git worktree remove without force",
-        "preserved the authoritative local source",
-        "removed the local branch only after the worktree",
-        "syntax check gave a pass result for 189 python files and fcmacro files",
-        "ci profile for standalone python gave a 60 60 pass result",
-        "local profile for standalone python gave a 59 60 pass result",
-        "result from live workstation correctly reported that the worktree "
-        "did not contain the ignored templot source file",
-        "repository safety command from the candidate validated that source "
-        "file in the primary workspace",
-        "validated the critical assets result there with tracked cleanliness",
-        "governance semantics rejected all 287 mutations the validation used "
-        "281 independent controls",
+        "recovery validator used a temporary repository",
+        "validator used git worktree remove without force",
+        "authoritative local source stayed available",
+        "removed the local branch only after worktree removal",
+        "continuous integration ci gave a 60 60 pass result",
         "decision after the level 3 sequence nonconformance",
-        "project owner gave authority for the completed worktree removal",
-        "project did not complete the necessary level 3 panel or decision "
-        "record before those operations",
-        "this record reports the historical sequence nonconformance at level 3",
-        "rejected cycle 2 candidate 96063e9836748bbc5755db251fa8b66564e65a28 "
-        "with tree 5abb3004f2c29b480ebf3511c7892b8a53c73a6a",
-        "operation removed the git index current evidence cannot show that "
-        "the git index did not use assume unchanged or skip worktree",
-        "panel with a date before the operation the project did not complete "
-        "that level 3 panel before the operation",
-        "after the operation record a bounded decision",
-        "reports the evidence limitation",
-        "no operation can supply a git index with the same bytes",
-        "panel occurs after the operation it does not complete the missing "
-        "condition before the operation",
-        "before publication new independent reviewers must examine the exact "
-        "candidate",
-        "continue with bounded conditions record d gov 012",
-        "give no retrospective removal or integration authority",
-        "owner gives authority for one bounded cycle 2 repair and review cycle",
-        "keep the current controls for worktree retirement",
-        "correct only the mandatory documentation and evidence findings",
-        "after exact validation gives pass and new independent reviews give "
-        "accept publish one pull request with draft status",
+        "project owner gave removal authority for the completed worktree removal",
+        "safety risk panel did not occur before the two operations",
+        "d gov 012 contains the sequence nonconformance",
+        "git removed the git index",
+        "project owner used protected main",
+        "project owner also used rejected exact candidate",
+        "removed git index is not available",
+        "this safety risk panel occurred after the operations",
+        "it does not supply the missing condition before the operations",
+        "before publication new independent reviewers must examine the exact candidate",
+        "continue with bounded conditions",
+        "gives no project authority to merge into protected main",
+        "keeps the controls for worktree retirement",
         "lfe 001 through lfe 020 did not change",
         "d gov 009 and its evidence did not change",
-        "phase 6 stays at 2 5 project status stays unknown",
-        "does not change product or railway behaviour",
-        "does not change freecad behaviour export schema or api contracts",
-        "gives no performance release production phase exit rights for output "
-        "or acceptance authority",
-        "gives no authority for cycle 3 or integration of a cycle 2 candidate "
-        "without review",
-        "first frozen candidate was commit 5c4bc0c7ae7ed9e5395638eae36a6b90317e8839",
-        "found that the tool accepted a different ref",
-        "symbolic link in the preservation path",
-        "more than one json key with the same name",
-        "optional git locks and command output that contained local data",
-        "necessary level 3 sequence was not complete",
-        "candidate 96063e9836748bbc5755db251fa8b66564e65a28 had tree "
-        "5abb3004f2c29b480ebf3511c7892b8a53c73a6a",
-        "before each git command the audit removes each value with a name "
-        "that starts with git",
+        "phase 6 stays at 2 5",
+        "project status stays unknown",
+        "does not change product behaviour or railway behaviour",
+        "gives no project authority for cycle 3",
+        "c98e83cc968bcc784082e9cce208a5c107764e21",
+        "documentation review rejected the same exact candidate",
+        "retirement audit now rejects a different accepted ref",
+        "symbolic link in planned preservation",
+        "duplicate key in json",
+        "before each git command the retirement audit removes each environment variable "
+        "with the git prefix",
         "sets git optional locks to 0",
-        "audit examines the worktree's git index when git index file has a "
-        "different path",
-        "does not return names from the retirement plan or local paths",
-        "does not return information from a git error",
-        "if the tool cannot examine a file or directory it returns a result "
+        "recovery validator makes sure that the retirement audit uses the "
+        "worktree git index",
+        "does not return data from the retirement plan",
+        "does not return local paths",
+        "local paths or information from a git error",
+        "if it cannot examine a file or directory it gives a fail result "
         "without a path",
-        "documentation repair uses the canonical terminology and fields in "
-        "the owner view",
+        "in its tests the recovery validator examined the local state inventory",
+        "author side assurance for exact candidate "
+        "c98e83cc968bcc784082e9cce208a5c107764e21 did not identify all findings "
+        "from contextual term review",
+        "author uses the writing checklist to identify each use of ordinary "
+        "vocabulary and each technical term",
+        "author uses the writing checklist to identify each logical agent and "
+        "each grammatical subject",
+        "for each pronoun the author identifies one clear pronoun antecedent",
+        "for each condition and result the author uses the applicable item as "
+        "the grammatical subject",
+        "author also examines multi word nouns procedure sentences work steps "
+        "and condition order",
+        "if unresolved terminology stays the author must not freeze an exact candidate",
+        "deterministic pre check is a review aid",
+        "ste lookup is a review aid",
+        "these tools give no conformance review result",
+        "after the last wording change the author must review each complete "
+        "logical unit against the applicable rule set",
+        "cycle 2 change has 16 paths with canonical prose",
+        "author examined each complete logical unit in those paths",
+        "author examined all applicable requirements in rules 1–9",
+        "author examined each term use for its approved meaning and part of speech",
+        "author identified each logical agent and grammatical subject",
+        "author identified one clear pronoun antecedent for each pronoun",
+        "author identified the item that had each condition and result",
+        "author examined each multi word noun procedure sentence work step and condition order",
+        "author found no unresolved terminology",
+        "author resolved each applicable finding for this exact candidate",
     ):
         if fragment not in semantic:
             raise AssertionError(
@@ -2444,12 +2430,12 @@ def _validate_static_controls(errors):
     ):
         if marker not in gitignore:
             errors.append("ignored local-data protection marker is missing: " + marker)
-    if "CE-10 retirement after acceptance" not in context_evaluation:
+    if "CE-10 worktree retirement after acceptance" not in context_evaluation:
         errors.append("context-recovery evaluation omits worktree retirement")
     ide_evaluation_semantic = _semantic_text(ide_evaluation)
     for marker in (
         "has tracked cleanliness and ignored local files",
-        "complete local state inventory and preservation evidence",
+        "local state inventory and evidence from the preservation audit",
         "uses a git ignore rule as removal authority",
     ):
         if marker not in ide_evaluation_semantic:

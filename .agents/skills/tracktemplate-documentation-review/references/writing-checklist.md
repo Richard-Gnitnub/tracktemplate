@@ -8,6 +8,55 @@ For STE-governed prose, use the official ASD-STE100 Issue 9 standard that the
 profile identifies. Also use the approved project terms in
 [`reference/TERMINOLOGY.md`](../../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
 
+## Author-side assurance for ASD-STE100 Issue 9
+
+Apply these checks to each new logical unit. Before you freeze an exact
+candidate, also apply them to each logical unit with a material edit:
+
+- Identify the document class for the logical unit.
+- Identify the content category for the logical unit.
+- Identify the applicable rule set.
+- For each term use, identify the term use as ordinary vocabulary or a technical
+  term.
+- For each use of ordinary vocabulary, make sure that the approved meaning is
+  correct.
+- For each use of ordinary vocabulary, make sure that the approved part of
+  speech is correct.
+- For each technical term, use its registered form.
+- Use a shorter form only if the technical-term register contains it.
+- Do not add a technical term only to keep the wording.
+- Do not use a technical noun as a technical verb.
+- For each operation, identify the logical agent.
+- The logical agent must be a person, tool, or system.
+- If the logical agent is known, use the logical agent as the grammatical
+  subject.
+- Make sure that each pronoun has one clear pronoun antecedent.
+- Identify the item that has each condition.
+- Identify the item that has each result.
+- Use the identified item as the grammatical subject.
+- Examine each multi-word noun.
+- Do not use more than 3 words in each multi-word noun.
+- If a registered form has more than 3 words, use the registered form.
+- In a procedure, give one instruction in each sentence.
+- In a procedure, give one operation in each work step.
+- If the work step has simultaneous actions, the work step can contain those
+  operations.
+- If an immediate result occurs, the work step can contain the operation and
+  immediate result.
+- If a condition must be known first, put the condition before its instruction.
+- Resolve each dictionary-inspection candidate.
+- Resolve all unresolved terminology.
+- Resolve each applicable finding.
+- If unresolved terminology stays, do not freeze an exact candidate.
+- After the last wording change, review the complete logical unit against the
+  applicable rule set.
+
+Use the deterministic pre-check to find review candidates. Use the STE lookup
+to retrieve source material. These tools give no conformance review result.
+The author must examine term meaning and technical-term category. The author
+must also examine sentence grammar and the logical agent. A deterministic
+pre-check does not complete the author-side assurance.
+
 ## Ownership and structure
 
 - Duplicated facts have one canonical owner. Other documents refer to it.

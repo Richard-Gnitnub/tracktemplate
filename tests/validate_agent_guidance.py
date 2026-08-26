@@ -550,7 +550,7 @@ def validate_ide_workspace_alignment_contract(
         "Do not use the name of a run configuration as branch evidence. Do "
         "not use a filename from a test as branch evidence. Do not use an "
         "entry that records an opened file as branch evidence. Do not use a "
-        "PyCharm title or SDK name as branch evidence. Use the Git worktree "
+        "window title or SDK name as branch evidence. Use the Git worktree "
         "to identify the branch."
     )
     require(
@@ -922,6 +922,11 @@ def validate_documentation_profile_routing(
         / "references"
         / "writing-checklist.md"
     )
+    validate_issue9_author_assurance(
+        documentation_review,
+        writing_checklist,
+        workflows,
+    )
     for path_name, guidance in (
         ("documentation-review skill", documentation_review),
         ("documentation writing checklist", writing_checklist),
@@ -1072,6 +1077,129 @@ def validate_documentation_profile_routing(
             and boundary in semantic_text(skill_text),
             name + " lost ASD-STE100 specialist routing",
         )
+
+
+def validate_issue9_author_assurance(
+    documentation_review: str,
+    writing_checklist: str,
+    workflows: str,
+) -> None:
+    """Keep the complete author-side assurance boundary for Issue 9."""
+    skill_section = semantic_text(
+        direct_section_content(
+            documentation_review,
+            "Author-side assurance for ASD-STE100 Issue 9",
+        )
+    ).casefold()
+    checklist_section = semantic_text(
+        direct_section_content(
+            writing_checklist,
+            "Author-side assurance for ASD-STE100 Issue 9",
+        )
+    ).casefold()
+    workflow_section = semantic_text(
+        direct_section_content(
+            workflows,
+            "TT-DOC-001 workflow integration",
+        )
+    ).casefold()
+
+    required_skill_concepts = (
+        (
+            "for each new logical unit",
+            "each logical unit with a material edit",
+            "content category",
+        ),
+        (
+            "resolve all unresolved terminology",
+            "resolve each applicable finding",
+        ),
+        (
+            "ste dictionary",
+            "approved word",
+            "technical term",
+            "only to keep the wording",
+        ),
+        (
+            "review the complete logical unit",
+            "applicable rule set",
+            "last wording change",
+        ),
+        (
+            "independent reviewer does not complete author-side assurance",
+            "no conformance review result",
+        ),
+    )
+    for concepts in required_skill_concepts:
+        require(
+            all(concept in skill_section for concept in concepts),
+            "documentation review lost author-side assurance: "
+            + " / ".join(concepts),
+        )
+
+    required_checklist_concepts = (
+        ("document class", "content category", "applicable rule set"),
+        ("term use", "ordinary vocabulary", "technical term"),
+        ("ordinary vocabulary", "approved meaning", "part of speech"),
+        (
+            "technical term",
+            "registered form",
+            "shorter form",
+            "technical-term register",
+        ),
+        ("do not add a technical term", "only to keep the wording"),
+        ("technical noun", "technical verb"),
+        ("logical agent", "grammatical subject", "person, tool, or system"),
+        ("pronoun", "clear pronoun antecedent"),
+        (
+            "item that has each condition",
+            "item that has each result",
+            "identified item",
+            "grammatical subject",
+        ),
+        ("multi-word noun", "more than 3 words", "registered form"),
+        (
+            "one instruction",
+            "each sentence",
+            "one operation",
+            "each work step",
+            "simultaneous",
+            "immediate result",
+        ),
+        ("condition must be known first", "condition before its instruction"),
+        (
+            "dictionary-inspection candidate",
+            "unresolved terminology",
+            "applicable finding",
+            "do not freeze an exact candidate",
+        ),
+        (
+            "last wording change",
+            "complete logical unit",
+            "applicable rule set",
+        ),
+        (
+            "deterministic pre-check",
+            "ste lookup",
+            "no conformance review result",
+        ),
+    )
+    for concepts in required_checklist_concepts:
+        require(
+            all(concept in checklist_section for concept in concepts),
+            "documentation checklist lost author-side assurance: "
+            + " / ".join(concepts),
+        )
+
+    require(
+        "each new logical unit" in workflow_section
+        and "each logical unit with a material edit" in workflow_section
+        and "complete the author-side assurance method" in workflow_section
+        and "review the complete logical unit" in workflow_section
+        and "if unresolved terminology stays, do not freeze an exact candidate"
+        in workflow_section,
+        "AGENT_WORKFLOWS lost the author-side assurance gate",
+    )
 
 
 def main() -> None:

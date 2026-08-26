@@ -84,20 +84,23 @@ Read it in the canonical owner. Examine the complete stash inventory and unique 
 identity and stash disposition authority. Review the preservation diff. A
 recovery branch or worktree is not accepted product state.
 
-For worktree retirement, read the canonical
+For worktree retirement, read the
 [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
-Review accepted-history containment. Review tracked cleanliness. Review
-evidence that no person or process uses the worktree. Review the exact
+Examine accepted-history containment. Examine tracked cleanliness. Examine
+evidence that no person or process uses the worktree. Examine the
 local-state inventory.
 
-Review the type, owner, and result for each inventory item. Review necessary
-preservation. Review the `FAIL` result for ambiguous or uniquely owned state.
+Examine the local-state type for each local-state inventory item. Examine the
+canonical owner for each local-state inventory item. Examine the result for each
+local-state inventory item.
+Examine necessary planned preservation. Examine the `FAIL` result for ambiguous
+or uniquely owned state.
 
-Review removal authority. Review `git worktree remove` without `--force`.
-After removal, review preservation.
-Review the preservation diff for branches, worktrees, and the stash inventory.
-A merge and tracked cleanliness do not show removal authority. If a candidate
-gives removal authority from that evidence, report missing evidence.
+Examine removal authority. Examine `git worktree remove` without `--force`.
+After removal, examine the preservation audit.
+Examine the preservation diff for branches, worktrees, and the stash inventory.
+A merge and tracked cleanliness give no removal authority. If the project owner
+did not give removal authority, report this limitation.
 
 ## Review order
 

@@ -4446,47 +4446,49 @@ def _validate_decisions(plan: str) -> None:
     for fragment in (
         "d47518083768d34cf9b41566feaf132ac4562595",
         "96063e9836748bbc5755db251fa8b66564e65a28",
-        "owner gave authority for the completed worktree removal",
+        "project owner gave removal authority for the completed worktree removal",
         (
-            "did not complete the Level 3 panel or decision record before "
-            "those operations"
+            "project owner also gave removal authority for local branch "
+            "agent/ste100-retrieval-assurance after worktree removal"
         ),
-        "historical sequence nonconformance",
+        "safety/risk panel did not occur before those operations",
+        "decision register did not contain D-GOV-012 before those operations",
+        "contains the sequence nonconformance",
         "gives no retrospective authority",
         "9f3b05d480971d197a57cb00f1811f6c1012f144",
-        "retirement plan classified all 144 local files",
-        "retirement audit examined that plan",
-        "official PDF at its canonical primary path had the same bytes",
+        "retirement plan contained a classification for all 144 local files",
+        "retirement audit examined the retirement plan",
+        "PDF at the source path had the same bytes",
         (
-            "operation removed the Git index. Current evidence cannot show "
-            "that the Git index did not use assume-unchanged or skip-worktree"
+            "Git removed the Git index. A reviewer cannot show that the Git "
+            "index did not use assume-unchanged or skip-worktree"
         ),
-        "Current evidence cannot show complete historical losslessness",
-        "one bounded Cycle 2 repair and review cycle",
-        "Keep the current controls for worktree retirement",
-        "Correct only the mandatory documentation and evidence findings",
-        "publish one pull request with Draft status",
+        "reviewer cannot show historical losslessness",
+        "one exact candidate for Cycle 2 repair",
+        "Keep the controls for worktree retirement",
+        "Correct each mandatory finding in canonical prose and evidence",
+        "After validation has a PASS result, get new independent reviews",
+        "After all independent reviewers give ACCEPT, publish one draft pull request",
         "Do not merge it",
         "Do not start Cycle 3",
-        "does not claim that a panel occurred before the operation",
-        "does not claim complete historical losslessness",
+        "does not claim that a safety/risk panel occurred before the operation",
+        "does not claim historical losslessness",
         (
             "does not change the recorded accepted-history containment or "
             "local-state inventory"
         ),
-        "does not change the types in the plan",
+        "does not change the local-state types in the retirement plan",
         (
-            "does not change evidence for preservation of the official "
+            "does not change the preservation audit result for the authorised "
             "source with the recorded SHA-256"
         ),
+        "gives no removal authority for a different worktree or branch operation",
         "Phase 6 stays at 2/5",
         "Project status stays unknown",
         "D-GOV-009 and its evidence did not change",
         "does not change a risk disposition",
-        (
-            "gives no authority for integration, a merge, Cycle 3, production, "
-            "physical output, packaging, release, or tagging"
-        ),
+        "gives no project authority for a merge into protected main",
+        "gives no project authority for Cycle 3, production, physical output, packaging, release, or tagging",
     ):
         _require(
             fragment in retirement_semantic,
@@ -4721,12 +4723,13 @@ def _validate_decisions(plan: str) -> None:
     _require(
         "history/phase-closeouts/PHASE5_GATE_DECISIONS.json"
         in decision_section
-        and "owns the displayed Phase 5 decisions" in decision_flat,
+        and "owns the Phase 5 decisions below" in decision_flat,
         "the frozen Phase 5 decision-register ownership is missing",
     )
     _require(
-        "current decision register" in decision_flat
-        and "owns Phase 6 and current cross-phase governance decisions"
+        "decision register" in decision_flat
+        and "owns the Phase 6 decisions below" in decision_flat
+        and "owns governance decisions that apply to more than one phase"
         in decision_flat,
         "the current decision-register ownership is missing",
     )

@@ -61,16 +61,17 @@ recovery gate a complete result.
 
 Before a worktree retirement, read the
 [worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
-Context recovery makes a local-state inventory. It identifies the owner of each
-item.
-IDE/workspace alignment shows that no person or process uses the worktree. It
-also shows that the worktree is not the only location for user state.
+During recovery, the implementing agent makes a local-state inventory. The
+agent identifies the canonical owner of each item. During workspace alignment,
+the implementing agent makes sure that no person or process uses the worktree.
+The agent also makes sure that a different location contains the user data.
 
-The retirement audit records the exact Git identity. It records the SHA-256 of
+The retirement audit returns the exact Git identity. It returns the SHA-256 of
 the local-state inventory. It examines the retirement plan. A merge
 and tracked cleanliness give no removal authority in these workflows. If the
-plan has ambiguous or uniquely owned state, these workflows stop. If the
-preservation result is not complete, these workflows stop.
+retirement plan has ambiguous or uniquely owned state, the implementing agent
+stops. If the preservation audit does not have a complete result, the
+implementing agent stops.
 
 ## Instruction budget
 
@@ -136,19 +137,32 @@ usual work.
 
 For documentation in the STE conformance scope, use this route:
 
-1. Read the canonical Technical Documentation Profile.
-2. Read the canonical TrackTemplate technical-term register.
-3. Classify the changed canonical prose and identify the applicable rule families.
-4. Do the deterministic pre-check when it can help the review.
-5. Use targeted retrieval for writing rules, dictionary-inspection candidates, and ambiguities.
-6. Read a bounded source excerpt when the STE lookup does not give sufficient information.
-7. Review the complete logical unit against the complete applicable requirement set.
-8. Record the technical-term status. Record each unresolved finding.
-9. Get an independent review when the change level or risk makes it necessary.
+1. Read the Technical Documentation Profile.
+2. Read the technical-term register.
+3. Identify each new logical unit and its content category.
+4. Identify each logical unit with a material edit and its content category.
+5. Complete the author-side assurance method in the writing checklist for each
+   logical unit.
+6. If the deterministic pre-check can help the review, use it.
+7. Use targeted retrieval for writing rules, dictionary-inspection candidates,
+   and ambiguities.
+8. If the STE lookup does not give sufficient information, read a bounded
+   source excerpt.
+9. After the last wording change, review the complete logical unit against the
+   applicable requirement set.
+10. Put the technical-term status in the review receipt.
+11. Put each unresolved finding in the review receipt.
+12. If unresolved terminology stays, do not freeze an exact candidate.
+13. If the change level or risk makes an independent review necessary, get an
+    independent review.
 
-The selected rule families are retrieval priorities. They are not the complete
-applicable rule set. Do not start each review at the first source page and read
-to the last source page. Use complete-source inspection only for these bounded conditions:
+The deterministic pre-check is a review aid. The STE lookup is a review aid.
+These tools give no conformance review result.
+
+The selected rule families are retrieval priorities. The author must not use
+them as the complete applicable rule set. Do not use complete-source inspection
+for each review. Use complete-source inspection only for these bounded
+conditions:
 
 - The task is about the complete standard.
 - The task validates the retrieval architecture.
@@ -776,25 +790,25 @@ Show tracked cleanliness
     ↓
 Make a local-state inventory of all files that are not in the Git index
     ↓
-Classify every item
+Classify each item
     ↓
-Show necessary preservation
+Show necessary planned preservation
     ↓
-For rebuildable cache/generated state, show the rebuild result
+For rebuildable cache/generated state, show the applicable `PASS` result
     ↓
 For temporary disposable state, show the cause for removal
     ↓
-If the plan has ambiguous or uniquely owned state, stop
+If the retirement plan has ambiguous or uniquely owned state, stop
     ↓
 Before removal, examine the retirement audit again
     ↓
-Before removal, examine the exact authority again
+Before removal, examine the removal authority again
     ↓
 Use `git worktree remove` without `--force`
     ↓
-Show that the accepted commit contains the commit at the exact tip of the local branch
+Show that the accepted commit contains the branch tip
     ↓
-Remove only that local branch for the accepted pull request
+Use Git to remove only the local branch in the retirement plan
 ```
 
 For an architecture decision:

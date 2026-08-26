@@ -827,55 +827,68 @@ behaviour, including rejection of a clean fixture without the archive. The
 archive/hash and branch/upstream boundary. Neither result claims that an
 independent backup or restore exists.
 
-Before a risky tranche, fetch explicitly when remote state might have changed,
-then require a clean pushed checkpoint:
+If you do not know the accepted commit for `origin/main`, use `git fetch`.
+Before a bounded cycle with recovery risk, make sure that the checkpoint is
+clean and pushed:
 
 ```bash
 .venv/bin/python tools/repository_safety_audit.py --require-checkpoint
 ```
 
-Before worktree retirement, run the retirement audit with
+Before worktree retirement, use the retirement audit with
 `--retirement-worktree` and without a retirement plan. Record the SHA-256 and
-counts for the local-state inventory. Then, review the retirement plan against the
-canonical [worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
-Run the retirement audit again with `--retirement-plan` and
-`--require-retirement-ready`. The sentinel must be
+counts for the local-state inventory in phase evidence. Examine the retirement
+plan against the
+[worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
+Use the retirement audit again with `--retirement-plan` and
+`--require-retirement-ready`. Make sure that the sentinel is
 `TRACKTEMPLATE_WORKTREE_RETIREMENT=` with `retirement_ready: true` and no
 finding.
 
-For each failure condition, the recovery validator must return a `FAIL` result.
-It must include these conditions:
+The recovery validator must give a `FAIL` result for each invalid state. It must
+include these invalid states:
 
 - A merge and tracked cleanliness without a retirement plan
-- An inventory item that the retirement plan does not contain
-- One item in more than one type
+- A local-state inventory item that the retirement plan does not contain
+- One item in more than one local-state type
 - Ambiguous or uniquely owned state
 - A change to the worktree, accepted commit, or local-state inventory
 - A worktree without tracked cleanliness
-- A local-state type that is not one of the 5 types
+- A local-state type that is not one of the 5 local-state types
 - Missing evidence that no person or process uses the worktree
-- Missing authority or an `assume-unchanged` or `skip-worktree` value in the Git index
-- A value with a name that starts with `GIT_` and changes the repository or Git index
-- An item without an owner or result
-- A preserved file that does not have the same bytes
-- A different accepted ref or more than one key with the same name in the retirement plan
-- A symbolic link in the preservation path
+- Missing removal authority
+- An `assume-unchanged` or `skip-worktree` value in the Git index
+- A Git command that uses an environment variable with the `GIT_` prefix to
+  select a different repository or Git index
+- An item without a canonical owner or result
+- Different bytes at a location for planned preservation
+- A different value for `accepted_ref`
+- A duplicate key in the retirement plan
+- A symbolic link in the path for planned preservation
 - Data from the retirement plan in command output
-- A path from a file or directory error in command output
+- A local path from a file-system error in command output
 - Information from a Git error in command output
-- A command that changes state or uses `--force` in the retirement audit.
+- A command in the retirement audit that changes Git state or local files
+- A command that uses `--force` in the retirement audit.
 
-The temporary integration fixture must use `git worktree remove` without
-`--force`. It must show that preservation kept the authoritative local source
-available. Before branch removal, it must show that Git does not contain the
-worktree. It must also show that the accepted commit contains the commit at the
-tip of the local branch.
+The recovery validator must use a temporary repository. In that repository, the
+validator must use `git worktree remove` without `--force`. The validator must
+make sure that the authoritative local source stays available. Before branch
+removal, the validator must show that Git does not contain the worktree. Before
+branch removal, the validator must also show that the accepted commit
+contains the branch tip.
 
-Before worktree removal, review how the retirement plan classifies the current
-local-state inventory. Before removal, review the preservation diff for that
-inventory. After removal, make sure that each other branch, worktree, stash,
-and preserved file did not change. These controls give no item disposition.
-They give no authority.
+Before worktree removal, examine how the retirement plan classifies the
+local-state inventory for the worktree. Before removal, examine the preservation
+diff for the local-state inventory. After removal, make sure that Git did not
+change a different branch.
+
+After removal, make sure that Git did not change a different worktree. After
+removal, make sure that the stash inventory did not change. After removal, make
+sure that files at each location for planned preservation did not change.
+
+The retirement audit does not classify a local-state inventory item. The recovery
+validator gives no removal authority.
 
 Assess a selected or replacement external destination only with
 `--backup-target ... --require-backup-target`; backup completion and restore
@@ -911,7 +924,8 @@ linguistic conformance.
 ### ASD-STE100 retrieval assurance
 
 The retrieval contract has a source manifest and a retrieval index. The
-Technical Documentation Profile owns full applicability. The technical-term register owns technical terms.
+Technical Documentation Profile owns full applicability. The technical-term
+register owns technical terms.
 Validate the contract without the PDF with:
 
 ```bash
@@ -950,6 +964,28 @@ the complete applicable requirement set. The review receipt, pre-check, derived
 cache, and selected lookup results do not show that this review occurred. They
 also do not show conformance. Source identity validation does not make a
 positive rights claim.
+
+For each complete logical unit with a material edit, the author must use the
+writing checklist. The author must examine approved meaning and part of speech.
+For each term use, the author must identify the term use as ordinary vocabulary
+or a technical term. For each technical term, the author must use the registered
+form or an approved shorter form. Before the author freezes an exact candidate,
+the author must resolve all unresolved terminology. After the last wording
+change, the author must review the complete logical unit.
+
+If `tracktemplate-documentation-review` or `AGENT_WORKFLOWS.md` does not contain
+an author-side assurance item, `tests/validate_agent_guidance.py` must give a
+`FAIL` result. The test must find instructions about each logical agent and
+grammatical subject in `tracktemplate-documentation-review` and
+`AGENT_WORKFLOWS.md`. The test must find instructions about each pronoun
+antecedent in these two files. The test must find instructions about each
+condition, result, and multi-word noun in these two files.
+
+The test must find the instruction limit for each procedure sentence. It must
+find the operation limit for each work step. It must find the necessary
+condition order. `tests/validate_governance_semantics.py` must reject removal of
+these controls. The test must also reject a claim that the deterministic
+pre-check or STE lookup gives a conformance review result.
 
 [Technical provenance](PROVENANCE.md#asd-ste100-issue-9-reference) records the
 rights state in a different authority boundary. The

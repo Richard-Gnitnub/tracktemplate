@@ -64,6 +64,31 @@ Read only the documents relevant to the present change:
 - Consult `reference/LEARNING_FROM_EXPERIENCE.md` only for lessons relevant to
   the present change.
 
+## Author-side assurance for ASD-STE100 Issue 9
+
+Use the [writing checklist](references/writing-checklist.md#author-side-assurance-for-asd-ste100-issue-9)
+for each new logical unit. Also use it for each logical unit with a material
+edit in the conformance scope.
+
+Before you freeze an exact candidate:
+
+1. Identify each logical unit.
+2. Identify the content category for each logical unit.
+3. Complete the applicable author-side assurance for each logical unit.
+4. Resolve all unresolved terminology.
+5. If the STE dictionary contains the necessary word, use the approved word.
+6. If the STE dictionary has no word for a necessary TrackTemplate item,
+   approve a technical term.
+7. Do not approve a technical term only to keep the wording.
+8. After the last wording change, review the complete logical unit against the
+   applicable rule set.
+9. Resolve each applicable finding.
+
+The author completes this assurance before an independent review. The
+independent reviewer does not complete author-side assurance for the author.
+The author uses the deterministic pre-check and STE lookup only to help the
+review. These tools give no conformance review result.
+
 ## Editing rules
 
 - Use links to canonical owners instead of copied explanations.

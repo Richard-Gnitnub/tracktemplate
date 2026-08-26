@@ -126,17 +126,22 @@ def validate_workflow_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     value = semantic_text(text)
     ordered = (
-        "read the canonical technical documentation profile",
-        "read the canonical tracktemplate technical-term register",
-        "classify the changed canonical prose and identify the applicable rule "
-        "families",
-        "do the deterministic pre-check",
+        "read the technical documentation profile",
+        "read the technical-term register",
+        "identify each new logical unit and its content category",
+        "identify each logical unit with a material edit and its content category",
+        "complete the author-side assurance method",
+        "if the deterministic pre-check can help the review, use it",
         "use targeted retrieval",
-        "read a bounded source excerpt",
-        "review the complete logical unit against the complete applicable "
-        "requirement set",
-        "record the technical-term status",
-        "get an independent review",
+        "if the ste lookup does not give sufficient information, read a bounded "
+        "source excerpt",
+        "after the last wording change, review the complete logical unit against "
+        "the applicable requirement set",
+        "put the technical-term status in the review receipt",
+        "put each unresolved finding in the review receipt",
+        "if unresolved terminology stays, do not freeze an exact candidate",
+        "if the change level or risk makes an independent review necessary, get "
+        "an independent review",
     )
     position = -1
     for fragment in ordered:
@@ -148,8 +153,8 @@ def validate_workflow_text(text: str) -> None:
         position = new_position
     for fragment in (
         "selected rule families are retrieval priorities",
-        "not the complete applicable rule set",
-        "do not start each review at the first source page",
+        "must not use them as the complete applicable rule set",
+        "do not use complete-source inspection for each review",
         "task is about the complete standard",
         "validates the retrieval architecture",
         "targeted retrieval cannot resolve an ambiguity that the reviewer records",
@@ -1622,9 +1627,10 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     workflows = read(WORKFLOWS)
     validate_workflow_text(workflows)
     narrowed_workflow = workflows.replace(
-        "They are not the complete\napplicable rule set.",
-        "They are the complete applicable rule set.",
+        "The author must not use\nthem as the complete applicable rule set.",
+        "The author must use them as the complete applicable rule set.",
     )
+    require(narrowed_workflow != workflows, "workflow narrowing fixture is stale")
     try:
         validate_workflow_text(narrowed_workflow)
     except AssertionError:

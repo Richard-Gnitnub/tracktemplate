@@ -2906,6 +2906,108 @@ def validate_documentation_profile_mutations() -> None:
         "TT-DOC-001 gained an overlapping profile or STE skill",
     )
 
+    documentation_review = read(
+        ".agents/skills/tracktemplate-documentation-review/SKILL.md"
+    )
+    writing_checklist = read(
+        ".agents/skills/tracktemplate-documentation-review/references/"
+        "writing-checklist.md"
+    )
+    author_assurance_cases = (
+        (
+            "tt-doc/author-assurance-ordinary-vocabulary-check-removed",
+            "approved meaning",
+            "convenient meaning",
+            "ordinary vocabulary / approved meaning / part of speech",
+        ),
+        (
+            "tt-doc/author-assurance-registered-form-check-removed",
+            "registered form",
+            "convenient form",
+            "technical term / registered form / shorter form / "
+            "technical-term register",
+        ),
+        (
+            "tt-doc/author-assurance-logical-agent-check-removed",
+            "logical agent",
+            "sentence actor",
+            "logical agent / grammatical subject / person, tool, or system",
+        ),
+        (
+            "tt-doc/author-assurance-pronoun-check-removed",
+            "pronoun antecedent",
+            "reference word",
+            "pronoun / clear pronoun antecedent",
+        ),
+        (
+            "tt-doc/author-assurance-state-attribution-check-removed",
+            "item that has each condition",
+            "condition",
+            "item that has each condition / item that has each result / "
+            "identified item / grammatical subject",
+        ),
+        (
+            "tt-doc/author-assurance-noun-group-check-removed",
+            "multi-word noun",
+            "long term",
+            "multi-word noun / more than 3 words / registered form",
+        ),
+        (
+            "tt-doc/author-assurance-procedure-action-check-removed",
+            "one instruction",
+            "related instructions",
+            "one instruction / each sentence / one operation / each work step / "
+            "simultaneous / immediate result",
+        ),
+        (
+            "tt-doc/author-assurance-condition-order-check-removed",
+            "condition before its instruction",
+            "condition after its instruction",
+            "condition must be known first / condition before its instruction",
+        ),
+        (
+            "tt-doc/author-assurance-unresolved-term-freeze-authorized",
+            "do not freeze an exact candidate",
+            "freeze an exact candidate",
+            "dictionary-inspection candidate / unresolved terminology / "
+            "applicable finding / do not freeze an exact candidate",
+        ),
+        (
+            "tt-doc/author-assurance-automatic-proof-authorized",
+            "no conformance review result",
+            "a conformance review result",
+            "deterministic pre-check / ste lookup / no conformance review result",
+        ),
+        (
+            "tt-doc/author-assurance-convenience-term-authorized",
+            "only to keep the wording",
+            "to keep the wording",
+            "do not add a technical term / only to keep the wording",
+        ),
+        (
+            "tt-doc/author-assurance-finding-disposition-removed",
+            "applicable finding",
+            "listed note",
+            "dictionary-inspection candidate / unresolved terminology / "
+            "applicable finding / do not freeze an exact candidate",
+        ),
+    )
+    for name, old, new, concepts in author_assurance_cases:
+        if old not in writing_checklist:
+            raise AssertionError(name + " fixture is stale")
+        mutated_checklist = writing_checklist.replace(old, new)
+        expect_rejected(
+            name,
+            lambda value=mutated_checklist: (
+                agent_guidance.validate_issue9_author_assurance(
+                    documentation_review,
+                    value,
+                    workflows,
+                )
+            ),
+            "documentation checklist lost author-side assurance: " + concepts,
+        )
+
     phase4_closeout = read(
         "reference/history/phase-closeouts/PHASE4_CLOSEOUT.md"
     )
@@ -3384,13 +3486,12 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/merge-and-cleanliness-treated-as-disposable",
             replace_once(
                 policy,
-                "A merge and tracked cleanliness do not make worktree removal "
-                "safe.",
-                "A merge and tracked cleanliness make worktree removal safe.",
+                "A merge and tracked cleanliness give no removal authority.",
+                "A merge and tracked cleanliness give removal authority.",
             ),
             (
                 "worktree retirement policy lacks: a merge and tracked "
-                "cleanliness do not make worktree removal safe"
+                "cleanliness give no removal authority"
             ),
         ),
         (
@@ -3410,26 +3511,27 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/preservation-proof-omitted",
             replace_once(
                 policy,
-                "Preserve the file in a different location. Show that the two "
-                "files have\n   the same bytes.",
+                "Preserve each authoritative local source in a different "
+                "location.",
                 "Assume that another copy exists.",
             ),
             (
-                "worktree retirement policy lacks: record its canonical owner "
-                "preserve the file in a different location show that the two "
-                "files have the same bytes"
+                "worktree retirement policy lacks: preserve each authoritative "
+                "local source in a different location"
             ),
         ),
         (
             "retirement/ambiguous-state-does-not-stop",
             replace_once(
                 policy,
-                "If the plan has this\n   state, keep the worktree.",
-                "If the plan has this\n   state, remove the worktree.",
+                "If the retirement plan has ambiguous or uniquely owned state, "
+                "keep the worktree.",
+                "If the retirement plan has ambiguous or uniquely owned state, "
+                "remove the worktree.",
             ),
             (
-                "worktree retirement policy lacks: if the plan has this state "
-                "keep the worktree"
+                "worktree retirement policy lacks: if the retirement plan has "
+                "ambiguous or uniquely owned state keep the worktree"
             ),
         ),
         (
@@ -3445,15 +3547,15 @@ def validate_visible_recovery_mutations() -> None:
             "retirement/branch-deleted-before-worktree",
             replace_once(
                 policy,
-                "After\n`git worktree list` does not contain the worktree, "
-                "record the commit at the\nexact tip of the local branch.",
-                "Before\n`git worktree list` does not contain the worktree, "
-                "record the commit at the\nexact tip of the local branch.",
+                "After `git worktree list` does not contain the worktree, "
+                "record\nthe branch tip in phase evidence.",
+                "Before `git worktree list` does not contain the worktree, "
+                "record\nthe branch tip in phase evidence.",
             ),
             (
                 "worktree retirement policy lacks: after git worktree list "
-                "does not contain the worktree record the commit at the exact "
-                "tip of the local branch"
+                "does not contain the worktree record the branch tip in phase "
+                "evidence"
             ),
         ),
     )
@@ -3692,34 +3794,39 @@ def validate_visible_recovery_mutations() -> None:
     )
     force_retirement_claimed = replace_once(
         phase_evidence,
-        "The command did\nnot use `--force` or `git stash`.",
-        "The command used `--force`.",
+        "removal command did not use `--force`",
+        "removal command used `--force`",
     )
     expect_rejected(
         "retirement/phase-evidence-claims-force-removal",
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             force_retirement_claimed
         ),
-        "worktree retirement phase evidence lacks: command did not use force "
-        "or git stash",
+        "worktree retirement phase evidence lacks: removal command did not use "
+        "force",
     )
     cycle_3_started_early = replace_once(
         phase_evidence,
-        "It gives no authority for integration or Cycle 3 work.",
-        "It gives authority for Cycle 3 work.",
+        "gives no project authority to merge into protected main or start Cycle 3",
+        "gives project authority to merge into protected main and start Cycle 3",
     )
     expect_rejected(
         "retirement/phase-evidence-starts-cycle-3-early",
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             cycle_3_started_early
         ),
-        "worktree retirement phase evidence lacks: gives no authority for "
-        "integration or cycle 3 work",
+        "worktree retirement phase evidence lacks: gives no project authority "
+        "to merge into protected main or start cycle 3",
     )
-    historical_cleanliness_overstated = replace_once(
-        phase_evidence,
-        "The retirement audit before removal reported no tracked change.",
+    historical_cleanliness_phrase = (
+        "Before removal, the retirement audit gave no tracked change."
+    )
+    if historical_cleanliness_phrase not in phase_evidence:
+        raise AssertionError("historical-cleanliness fixture is stale")
+    historical_cleanliness_overstated = phase_evidence.replace(
+        historical_cleanliness_phrase,
         "It had tracked cleanliness.",
+        1,
     )
     expect_rejected(
         "retirement/phase-evidence-overstates-historical-cleanliness",
@@ -3729,10 +3836,13 @@ def validate_visible_recovery_mutations() -> None:
         "worktree retirement phase evidence overstates: it had tracked "
         "cleanliness",
     )
-    retrospective_authority_added = replace_once(
-        phase_evidence,
-        "This decision gives no retrospective authority.",
+    retrospective_authority_phrase = "It gives no retrospective authority."
+    if retrospective_authority_phrase not in phase_evidence:
+        raise AssertionError("retrospective-authority fixture is stale")
+    retrospective_authority_added = phase_evidence.replace(
+        retrospective_authority_phrase,
         "This decision gives retrospective authority.",
+        1,
     )
     expect_rejected(
         "retirement/phase-evidence-manufactures-retrospective-authority",
@@ -3851,8 +3961,7 @@ def validate_visible_recovery_mutations() -> None:
     )
     weakened_lfe_rule = replace_once(
         learning,
-        "Examine\nvalidation as a control for the problem. Ask which regression "
-        "or semantic mutation\nmakes sure that the problem does not occur again.",
+        "Examine the use of a semantic control.",
         "Examine the length of the row.",
     )
     expect_rejected(
@@ -3860,7 +3969,7 @@ def validate_visible_recovery_mutations() -> None:
         lambda: recovery_controls.validate_recovery_lfe(
             weakened_lfe_rule
         ),
-        "LFE rule lacks: examine validation as a control for the problem",
+        "LFE rule lacks: examine the use of a semantic control",
     )
 
 
