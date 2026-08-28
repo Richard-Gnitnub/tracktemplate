@@ -442,7 +442,7 @@ def validate_progress_delivery_structure() -> None:
             "Evidence boundary",
             "Alignment workflow",
             "Steady-state convention",
-            "Composition with TrackTemplate continue",
+            "Use with `$tracktemplate-continue`",
             "Report",
         },
     }
@@ -546,15 +546,21 @@ def validate_ide_workspace_alignment_contract(
             "IDE workspace alignment lost operator-only UI evidence: "
             + required_item,
         )
-    required_no_inference = semantic_text(
-        "Never infer the Git branch from a run-configuration name, coverage "
-        "filename, recent-file entry, window title or SDK label. Resolve it "
-        "from the backing Git worktree."
-    )
-    require(
-        required_no_inference in semantic_paragraphs(evidence),
-        "IDE workspace alignment permits non-Git branch inference",
-    )
+    no_inference = semantic_text(evidence).casefold()
+    for marker in (
+        "never infer the git branch",
+        "run-configuration name",
+        "coverage filename",
+        "recent-file entry",
+        "window title",
+        "sdk label",
+        "backing git worktree",
+    ):
+        require(
+            marker in no_inference,
+            "IDE workspace alignment permits non-Git branch inference: "
+            + marker,
+        )
 
     steady_state = semantic_text(
         direct_section_content(ide_skill, "Steady-state convention")
@@ -620,7 +626,11 @@ def validate_ide_workspace_alignment_mutations(
     for mutation, original, replacement in (
         ("Git authority inversion", "does not grant", "grants"),
         ("operator evidence inversion", "operator-confirmed", "file-proved"),
-        ("branch inference inversion", "Never infer", "Infer"),
+        (
+            "non-Git branch evidence inversion",
+            "Never infer the Git branch from a run-configuration name",
+            "Infer the Git branch from a run-configuration name",
+        ),
         (
             "temporary-worktree safeguard deletion",
             "never the sole location of active, uncommitted or unpushed work",
@@ -856,7 +866,7 @@ def validate_documentation_profile_routing(
     normalized_workflows = semantic_text(workflows)
     for fragment in (
         "TT-DOC-001 workflow integration",
-        "Skills apply these owners by reference",
+        "Authors use links from skills to these owners",
         "Each separate responsibility that can occur repeatedly has one "
         "owner",
         "use the primary owner that is already in the skill catalog",
@@ -915,6 +925,11 @@ def validate_documentation_profile_routing(
         / "tracktemplate-documentation-review"
         / "references"
         / "writing-checklist.md"
+    )
+    validate_issue9_author_assurance(
+        documentation_review,
+        writing_checklist,
+        workflows,
     )
     for path_name, guidance in (
         ("documentation-review skill", documentation_review),
@@ -1066,6 +1081,114 @@ def validate_documentation_profile_routing(
             and boundary in semantic_text(skill_text),
             name + " lost ASD-STE100 specialist routing",
         )
+
+
+def validate_issue9_author_assurance(
+    documentation_review: str,
+    writing_checklist: str,
+    workflows: str,
+) -> None:
+    """Keep human Issue 9 review and machine traceability in their owners."""
+    skill_section = semantic_text(
+        direct_section_content(
+            documentation_review,
+            "Author-side assurance for ASD-STE100 Issue 9",
+        )
+    ).casefold()
+    checklist_section = semantic_text(
+        direct_section_content(
+            writing_checklist,
+            "Author-side assurance for ASD-STE100 Issue 9",
+        )
+        + "\n"
+        + direct_section_content(
+            writing_checklist,
+            "Temporary author-review worklist",
+            level=3,
+        )
+    ).casefold()
+    workflow_section = semantic_text(
+        direct_section_content(
+            workflows,
+            "TT-DOC-001 workflow integration",
+        )
+    ).casefold()
+
+    required_skill_concepts = (
+        (
+            "logical unit with a material edit",
+            "all applicable issue 9 requirements",
+            "temporary author-review worklist",
+        ),
+        (
+            "last wording change",
+            "logical unit in full",
+            "resolve all findings",
+            "resolve all unresolved terminology",
+        ),
+        (
+            "author-assurance",
+            "read-only challenge",
+            "different documentation reviewer",
+        ),
+        (
+            "does not examine prose for conformance",
+            "does not give a result from a conformance review",
+            "author completes the conformance review",
+        ),
+    )
+    for concepts in required_skill_concepts:
+        require(
+            all(concept in skill_section for concept in concepts),
+            "documentation review lost author-side assurance: "
+            + " / ".join(concepts),
+        )
+
+    required_checklist_concepts = (
+        ("document class", "content category", "all applicable issue 9 requirements"),
+        ("controlled vocabulary", "technical term", "approved meaning", "part of speech"),
+        (
+            "technical-term register",
+            "technical-term category",
+            "controlled vocabulary does not identify the tracktemplate item",
+        ),
+        ("person, tool, or system", "each operation"),
+        ("each pronoun", "noun to which it refers", "state and result"),
+        ("rule 2", "noun group"),
+        ("different instruction", "condition before its instruction"),
+        ("sentence construction", "paragraph structure"),
+        ("all other applicable issue 9 requirements",),
+        ("evidence claim", "command invocation", "validation profile", "actual result"),
+        ("finding", "disposition"),
+        ("resolve all unresolved terminology",),
+        ("exact candidate", "conformance scope for changed prose", "sha-256"),
+        ("read-only challenge", "no acceptance"),
+        ("does not examine prose for conformance", "author completes the conformance review"),
+    )
+    for concepts in required_checklist_concepts:
+        require(
+            all(concept in checklist_section for concept in concepts),
+            "documentation checklist lost author-side assurance: "
+            + " / ".join(concepts),
+        )
+
+    required_workflow_concepts = (
+        "tracktemplate-documentation-review",
+        "logical unit with a material edit",
+        "content category",
+        "writing checklist",
+        "findings and their dispositions",
+        "resolve all findings and unresolved terminology",
+        "review each logical unit in full",
+        "temporary author-review worklist",
+        "read-only challenge",
+        "does not give a result from a conformance review",
+        "deterministic pre-check is only a review aid",
+    )
+    require(
+        all(concept in workflow_section for concept in required_workflow_concepts),
+        "AGENT_WORKFLOWS lost the human-review or traceability boundary",
+    )
 
 
 def main() -> None:

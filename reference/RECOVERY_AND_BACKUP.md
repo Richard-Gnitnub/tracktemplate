@@ -294,6 +294,137 @@ missing or changed, fail closed. The recovery gate does not have a complete
 result. A completed recovery cycle has no retained stash and no unresolved
 finding about sensitive evidence or local evidence.
 
+<a id="worktree-retirement"></a>
+
+## Worktree retirement
+
+The pull-request state `MERGED` gives no removal authority. Tracked cleanliness
+gives no removal authority. Use Git to show accepted-history containment for
+tracked files. The pull-request state does not contain a local-state type for
+ignored files or other local files.
+
+Before worktree retirement, use this procedure:
+
+1. If you do not know the accepted commit for `origin/main`, use `git fetch`.
+2. Put the worktree, branch, HEAD, and accepted commit in the retirement plan.
+3. Show that the accepted commit contains the branch tip.
+4. Show accepted-history containment for each commit on the branch.
+5. Show tracked cleanliness.
+6. Make sure that no person or process uses the worktree.
+7. Make sure that a different location contains all IDE data and user data.
+8. Make a local-state inventory of all files that are not in the Git index.
+9. Do not use a Git ignore rule as removal authority.
+10. Put 1 local-state type for each item in the retirement plan:
+   - **Authoritative local source**
+   - **Retained evidence**
+   - **Rebuildable cache/generated state**
+   - **Temporary disposable state**
+   - **Ambiguous or uniquely owned state**.
+11. For authoritative local source or retained evidence, record the canonical
+    owner.
+12. For authoritative local source, preserve each item in a different location.
+13. Preserve each item of retained evidence in a different location.
+14. If the local-state type is **Authoritative local source** or **Retained
+    evidence**, record the source file and copy.
+15. Make sure that the source file and copy have the same bytes.
+16. For rebuildable cache/generated state, record the canonical owner.
+17. For rebuildable cache/generated state, put the applicable `PASS` result in
+    the retirement plan.
+18. For temporary disposable state, record the canonical owner.
+19. For temporary disposable state, put the cause for removal in the retirement
+    plan.
+20. If evidence does not contain the canonical owner or local-state type,
+    classify the item as ambiguous or uniquely owned state.
+21. If the evidence does not show planned preservation or removal, classify the
+    item as ambiguous or uniquely owned state.
+22. If the retirement plan has ambiguous or uniquely owned state, stop.
+23. If the retirement plan has ambiguous or uniquely owned state, keep the worktree.
+24. If the retirement plan has ambiguous or uniquely owned state, tell the
+    project owner that a bounded decision is necessary.
+25. Put the removal authority in the retirement plan.
+26. Before removal, examine the exact Git identity again.
+27. Before removal, examine accepted-history containment again.
+28. Before removal, examine tracked cleanliness again.
+29. Before removal, make sure that no person or process uses the worktree.
+30. Before removal, examine the local-state inventory SHA-256 again.
+31. Before removal, examine the retirement plan again.
+32. Before removal, examine the preservation audit again.
+
+Use the retirement audit. The retirement audit returns the SHA-256 of the
+local-state inventory:
+
+```bash
+.venv/bin/python tools/repository_safety_audit.py \
+  --retirement-worktree /exact/registered/worktree
+```
+
+Keep the retirement plan local. Do not commit local paths. Do not commit local
+evidence. Do not commit authentication data.
+
+The retirement plan contains the branch for the worktree. The retirement plan
+contains HEAD, the accepted commit, and the local-state inventory SHA-256. The
+retirement plan contains the removal authority. The retirement plan contains
+evidence that no person or process uses the worktree.
+
+The retirement plan does not contain more than 1 local-state type for an item.
+The retirement plan contains the canonical owner and result for each item. The
+retirement plan contains each location for planned preservation.
+
+For this repository, use `refs/remotes/origin/main` as `accepted_ref`.
+Use this command to operate the retirement audit again:
+
+```bash
+.venv/bin/python tools/repository_safety_audit.py \
+  --retirement-worktree /exact/registered/worktree \
+  --retirement-plan /exact/local/retirement-plan.json \
+  --require-retirement-ready
+```
+
+The retirement audit does not change Git state or local files. The retirement
+audit returns item counts and the local-state inventory SHA-256. The retirement
+audit does not return local paths or file data. The retirement audit gives no
+removal authority.
+
+The retirement audit returns `FAIL` if the worktree, branch, HEAD, accepted
+commit, or local-state inventory SHA-256 changes. If a local-state inventory
+item is not in the retirement plan,
+the retirement audit returns `FAIL`. If the retirement plan contains more than
+1 local-state type for an item, the retirement audit returns `FAIL`.
+
+The retirement audit also returns `FAIL` for:
+
+- A local-state type that is not one of the 5 local-state types
+- Ambiguous or uniquely owned state
+- An item without a canonical owner or result
+- Different bytes in the source file and copy.
+
+The retirement audit rejects an `assume-unchanged` or `skip-worktree` value in
+the Git index. For each Git command, the retirement audit must remove
+environment variables with the `GIT_` prefix. If the retirement audit cannot
+examine a file or directory,
+the retirement audit returns `FAIL` without a path.
+
+After the retirement plan contains removal authority, operate the retirement
+audit again. If the retirement audit gives a `FAIL` result, stop. After the
+retirement audit gives a `PASS` result, use `git worktree remove` for the
+worktree. Do not use `--force`. Do not use `git stash`. Do not move local files
+as a condition for worktree removal.
+
+Before worktree removal, make sure the local-state inventory contains all local
+files. Before removal, make sure the preservation audit gives a `PASS` result
+for each location for planned preservation.
+
+After removal, examine `git worktree list`, branches, the stash inventory, and
+the location for planned preservation again. Record the preservation diff in
+phase evidence. If `git worktree list` does not contain the worktree, record
+the local branch and branch tip in phase evidence. If the accepted commit
+contains the branch tip for this local branch, use `git branch -d` with the
+removal authority.
+
+If the project owner gives no removal authority for the branch on GitHub,
+do not remove a branch on GitHub. Do not use `git worktree prune`. During this
+procedure, do not change a different worktree.
+
 ## Backup and restore acceptance
 
 The independent backup is not ready until the project owner selects its

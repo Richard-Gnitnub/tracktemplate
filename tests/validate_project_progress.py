@@ -130,6 +130,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-GOV-009",
     "D-GOV-010",
     "D-GOV-011",
+    "D-GOV-012",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -3691,7 +3692,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-23",
+        and current_document["updated_on"] == "2026-08-25",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -3742,7 +3743,9 @@ def _validate_decisions(plan: str) -> None:
         _require(
             record["decided_on"]
             == (
-                "2026-08-23"
+                "2026-08-25"
+                if decision_id == "D-GOV-012"
+                else "2026-08-23"
                 if decision_id in {"D-GOV-009", "D-GOV-010", "D-GOV-011"}
                 else "2026-08-15"
                 if decision_id in {
@@ -4422,6 +4425,75 @@ def _validate_decisions(plan: str) -> None:
             fragment in selection_semantic,
             "D-GOV-011 authority or exclusion drifted: " + fragment,
         )
+    retirement_record = phase6_by_id["D-GOV-012"]
+    retirement_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#d-gov-012-worktree-sequence-nonconformance"
+    )
+    _require(
+        retirement_record["decision"]
+        == "After worktree retirement, record the sequence nonconformance."
+        and retirement_record["evidence"] == retirement_panel
+        and retirement_record["panel_record"] == retirement_panel
+        and retirement_record["panel_required_under_current_policy"] is True,
+        "D-GOV-012 decision or panel routing drifted",
+    )
+    retirement_semantic = _semantic_text(
+        str(retirement_record["authority"])
+        + " "
+        + str(retirement_record["exclusions"])
+    )
+    for fragment in (
+        "d47518083768d34cf9b41566feaf132ac4562595",
+        "96063e9836748bbc5755db251fa8b66564e65a28",
+        "project owner gave removal authority for the worktree removal",
+        (
+            "project owner also gave removal authority for local branch "
+            "agent/ste100-retrieval-assurance"
+        ),
+        (
+            "project owner gave the branch-removal authority with this condition: "
+            "Git must remove the worktree first"
+        ),
+        "safety/risk panel did not occur before the removals",
+        "decision register did not contain D-GOV-012 before the removals",
+        "project owner recorded the sequence nonconformance",
+        "gives no retrospective authority",
+        "9f3b05d480971d197a57cb00f1811f6c1012f144",
+        "retirement plan contained a local-state type for all 144 local files",
+        "retirement audit examined the retirement plan",
+        "PDF at the source path and the PDF in the worktree had equal bytes",
+        (
+            "Git removed the worktree Git index. A reviewer cannot now examine "
+            "the assume-unchanged or skip-worktree values"
+        ),
+        "reviewer cannot show historical losslessness",
+        "project owner gives project authority for Cycle 2",
+        "This authority is only for an exact candidate and a draft pull request",
+        "keep the worktree retirement procedure and semantic controls",
+        "correct each mandatory finding in canonical prose and evidence",
+        "After validation gives a PASS result, the implementing agent must get new independent reviews",
+        "After all reviewers give ACCEPT, the agent must publish a draft pull request",
+        "agent must not merge the pull request",
+        "agent must not start Cycle 3",
+        "project owner does not claim that the safety/risk panel occurred before removal",
+        "D-GOV-012 gives no retrospective authority",
+        "Phase evidence records the accepted-history containment result",
+        "local-state inventory, local-state types, and preservation audit result",
+        "preservation audit contains the source SHA-256",
+        "gives no removal authority for a different worktree or branch",
+        "Phase 6 stays at 2/5",
+        "Project status stays unknown",
+        "D-GOV-009 and its evidence do not change",
+        "risk dispositions do not change",
+        "gives no project authority for a merge into protected main",
+        "owner gives no project authority for Cycle 3",
+        "physical output, packaging, release, or tagging",
+    ):
+        _require(
+            fragment in retirement_semantic,
+            "D-GOV-012 authority or exclusion drifted: " + fragment,
+        )
     current_records = document["decisions"]
     _require(
         isinstance(current_records, list),
@@ -4651,12 +4723,13 @@ def _validate_decisions(plan: str) -> None:
     _require(
         "history/phase-closeouts/PHASE5_GATE_DECISIONS.json"
         in decision_section
-        and "owns the displayed Phase 5 decisions" in decision_flat,
+        and "owns the Phase 5 decisions below" in decision_flat,
         "the frozen Phase 5 decision-register ownership is missing",
     )
     _require(
-        "current decision register" in decision_flat
-        and "owns Phase 6 and current cross-phase governance decisions"
+        "decision register" in decision_flat
+        and "owns Phase 6" in decision_flat
+        and "owns current governance decisions for more than 1 phase"
         in decision_flat,
         "the current decision-register ownership is missing",
     )

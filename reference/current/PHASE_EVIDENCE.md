@@ -3075,6 +3075,234 @@ Phase 6 stays at 2/5, and project status stays `unknown`. It gives no project
 authority and does not change the product. The branch for D-GOV-009 and its
 evidence do not change.
 
+<a id="worktree-retirement-workflow-migration"></a>
+
+## Workflow migration for worktree retirement
+
+### Owner view
+
+| Owner-view field | Result |
+| --- | --- |
+| Current state | The implementing agent added the worktree retirement procedure and semantic controls at Level 2. Worktree removal and branch removal are Level 3 operations. The project owner gave removal authority for the 2 operations. The safety/risk panel did not occur before the operations. The decision register did not contain D-GOV-012 before the operations. |
+| What changed | The recovery policy owns the worktree retirement procedure. Each applicable agent must use the procedure during context recovery and workspace alignment. The retirement audit examines the retirement plan. The recovery validator examines the retirement audit result. The implementing agent used Git to remove the worktree and local branch for pull request #56. The project owner recorded the sequence nonconformance in D-GOV-012. |
+| What now works | The accepted commit contained the branch tip `9f3b05d480971d197a57cb00f1811f6c1012f144`. The local-state inventory contained 144 files. The local-state inventory SHA-256 was `a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`. The retirement plan contained 1 local-state type for each item. The retirement audit examined the retirement plan. The retirement audit gave no finding. |
+| Limitations/findings | The retirement audit cannot select a canonical owner or give removal authority. Git ignored the retirement plan. After removal, the implementing agent cannot make a new local-state inventory for the worktree. After Git removed the Git index, a reviewer could not get new evidence for `assume-unchanged` or `skip-worktree`. A reviewer cannot show historical losslessness. |
+| Owner decision | The project owner recorded the sequence nonconformance in D-GOV-012. The project owner gives no retrospective authority. The project owner accepts the preservation audit result for the authorised source. The project owner gives project authority for an exact candidate and draft pull request for Cycle 2. The project owner gives no project authority to merge into protected main. The project owner gives no project authority to start Cycle 3. |
+| Next action | After the applicable validator gives a `PASS` result, the implementing agent must get new independent reviews. After all independent reviewers give `ACCEPT`, the implementing agent must publish a draft pull request. The implementing agent must not merge the pull request. The implementing agent must not start Cycle 3. If a mandatory finding has no disposition, the implementing agent must stop. |
+
+### Evidence before worktree removal
+
+Pull request #56 had the pull-request state `MERGED`. Its merge commit was
+`65409493d741a5606543bd437e519f8efefb8680`. Local branch
+`agent/ste100-retrieval-assurance` had branch tip
+`9f3b05d480971d197a57cb00f1811f6c1012f144`.
+
+Before removal, protected `main` had accepted commit
+`d47518083768d34cf9b41566feaf132ac4562595`. Git showed that the accepted commit
+contained the branch tip. GitHub kept the pull-request state, head, and merge
+commit for pull request #56.
+
+The retirement audit used `git status`. It found no tracked change. It found no
+untracked file that a Git ignore rule did not select. The historical audit did not
+examine `assume-unchanged` or `skip-worktree` values.
+
+After the audit, Git
+removed the worktree Git index. A reviewer cannot examine these values now.
+The evidence does not show historical losslessness.
+
+No person or process used the worktree. The primary PyCharm project used the
+primary worktree on protected `main`.
+
+### Local-state inventory and preservation
+
+The local-state inventory contained 144 ignored files and 8,042,871 bytes. Its
+SHA-256 was
+`a7122a09eb5c25f02d606909b4539b35d98b882c3cf2051b7f4f9e575b1ad044`.
+
+| Local-state type | Files | Bytes | Result and canonical owner |
+| --- | ---: | ---: | --- |
+| Authoritative local source | 1 | 3,316,157 | The source manifest records the PDF identity. The source and retrieval procedure owns the source path and the STE lookup operation. PROVENANCE.md owns the rights state. |
+| Retained evidence | 0 | 0 | The retirement plan had no item in this local-state type. |
+| Rebuildable cache/generated state | 82 | 3,026,397 | The retirement plan recorded the applicable tool and a `PASS` result for each file. |
+| Temporary disposable state | 61 | 1,700,317 | The source and retrieval procedure owns temporary review receipts. The project owner gave removal authority for these files. |
+| Ambiguous or uniquely owned state | 0 | 0 | The retirement plan had no item in this local-state type. |
+
+The PDF in the worktree and the PDF at the primary source path had equal bytes.
+Each file had byte size 3,316,157 and SHA-256
+`d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431`.
+The source path was the location for planned preservation.
+
+The retirement plan had 1 local-state type for each item. It recorded the
+canonical owner and result. For planned preservation, it recorded the source
+and copy. The retirement audit examined all 144 items. It gave no finding and
+returned no local path or file data.
+
+### Removal and preservation audit
+
+No operation occurred between the last retirement audit and removal. In the
+last audit, the retirement audit examined the exact Git identity, local-state
+inventory, retirement plan, and preservation audit result again.
+
+The implementing agent used `git worktree remove` without `--force`. The
+agent did not use `git stash` or `git worktree prune`. The agent did not move
+files as a condition for removal. Git removed the worktree. After removal, the
+file system did not contain the worktree directory. The output from
+`git worktree list` did not contain the worktree.
+
+After worktree removal, the accepted commit contained the branch tip
+`9f3b05d480971d197a57cb00f1811f6c1012f144`. After Git showed this containment,
+the implementing agent used `git branch -d`. Git removed only local branch
+`agent/ste100-retrieval-assurance`.
+
+The ASD-STE100 Issue 9 PDF stayed at the primary source path. The PDF kept its
+source identity.
+The output from `git worktree list` contained the other 3 worktrees. The
+implementing agent did not remove a branch on GitHub. The `git stash list`
+command returned no stash, and Git did not contain `refs/stash`.
+
+### Validation of the retirement audit
+
+If the `accepted_ref` value is different, the retirement audit fails closed. It
+also fails closed for a duplicate JSON key or symbolic link in planned
+preservation. It also fails closed for these states:
+
+- An inventory item that the retirement plan does not contain
+- More than 1 local-state type for an item
+- An item without a canonical owner or result
+- Ambiguous or uniquely owned state
+- Evidence that a person or process uses the worktree
+- Missing removal authority
+- A change to the worktree, accepted commit, or local-state inventory
+- A worktree without tracked cleanliness
+- An `assume-unchanged` or `skip-worktree` value in the Git index
+- A `GIT_INDEX_FILE` value from the caller
+- A local-state type that is different from all 5 local-state types
+- Different bytes in the source file and copy
+- A filename with non-UTF-8 bytes
+- A symbolic link loop in a location for planned preservation
+- Local file data, Git error data, or a local path in command output.
+
+For each Git command, the retirement audit removes each environment variable
+with a `GIT_` prefix that the caller supplies. It then sets
+`GIT_OPTIONAL_LOCKS` to `0`. If file inspection fails, the retirement audit
+returns a `FAIL` result without a path.
+
+After the author froze the exact candidate
+`4803afe2325df604a51ab4276a2563cb2ee6dfad`, the implementing agent made no
+change to `tools/repository_safety_audit.py` or the regression tests for the
+tool. The independent quality reviewer and independent security/recovery reviewer
+accepted the source and tests in exact candidate
+`e3bddbae174097014fcdbc5e5b027d6aa962e88e`. The independent documentation
+reviewer rejected the canonical prose in the candidate.
+
+The record contains no command output from the `local` validation profile for
+exact candidate `e3bddbae174097014fcdbc5e5b027d6aa962e88e`. Phase evidence
+reports no result count for the candidate. For the next exact candidate, the
+implementing agent must record new evidence from a command result.
+
+<a id="d-gov-012-worktree-sequence-nonconformance"></a>
+
+### D-GOV-012 decision
+
+The project owner gave removal authority for the worktree. The owner also gave
+removal authority for local branch `agent/ste100-retrieval-assurance`. The
+project owner gave the branch-removal authority with this condition: Git must
+remove the worktree first. The safety/risk panel did
+not occur before these operations. The decision register did not contain
+D-GOV-012 before the operations.
+
+After the operations, the project owner recorded this sequence nonconformance
+in D-GOV-012. The decision gives no retrospective authority. Because Git
+removed the Git index, no evidence can show historical losslessness.
+
+#### Safety/risk panel after removal
+
+| Risk | Assessment | Result |
+| --- | --- | --- |
+| PR-12 — fragmented or stale direction | Phase evidence owns the complete result. D-GOV-012 and the project plan contain canonical links to phase evidence. | Medium / Mitigate. The disposition does not change. |
+| PR-13 — repository or evidence loss | The accepted commit contained tracked files. The ASD-STE100 Issue 9 PDF stayed at the source path. Because Git removed the Git index, the evidence cannot show all index values. | Critical / Mitigate. The disposition does not change. |
+| PR-22 — governance sequence | D-GOV-012 records the sequence nonconformance. New independent reviews are necessary before publication. | High / Remove. The disposition does not change. |
+
+The panel occurred after the operations. It gives no retrospective authority.
+
+**Panel recommendation:** **Continue with bounded conditions.**
+After removal, keep D-GOV-012 as a record. Give no retrospective authority. Before
+draft publication, get new independent reviews.
+
+#### Owner decision D-GOV-012
+
+At protected `main` `d47518083768d34cf9b41566feaf132ac4562595`, the project
+owner recorded D-GOV-012. Exact candidate
+`96063e9836748bbc5755db251fa8b66564e65a28` contained the evidence after removal.
+The owner accepted the preservation audit result for the ASD-STE100 Issue 9
+PDF.
+
+The owner gave project authority for an exact candidate in Cycle 2. The owner
+also gave project authority for a draft pull request. The owner gave no project
+authority for a merge. The owner gave no project authority for Cycle 3.
+
+Phase 6 stays at 2/5. Project status stays `unknown`. D-GOV-009 and its
+evidence do not change. The decision gives no product or railway authority. It
+gives no FreeCAD, export, schema, or API authority. It gives no performance,
+production, release, or rights authority.
+
+### Author-side assurance for ASD-STE100 Issue 9
+
+The independent documentation reviewer rejected exact candidates
+`c98e83cc968bcc784082e9cce208a5c107764e21` and
+`e3bddbae174097014fcdbc5e5b027d6aa962e88e`. The author's conformance review did
+not record all mandatory findings. The project owner then gave the validation
+tools a bounded scope. The validation tools examine the source identity, exact
+candidate, conformance scope, SHA-256 values, and unresolved findings. The
+tools also examine command results and the read-only challenge result.
+
+On 2026-08-26, the project owner narrowed the assurance workflow. The author
+completes the conformance review. The author reviews each logical unit with a
+material edit against all applicable Rules 1 through 9. The author uses the
+official PDF with SHA-256
+`d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431`.
+
+The temporary author-review worklist records the exact candidate, source
+identity, conformance scope for changed prose, and logical units that the author
+reviewed. It records findings and dispositions. It also records evidence claims
+where applicable. Before the author freezes the exact candidate, the author
+resolves each unresolved finding.
+
+The STE lookup validates the source identity, exact candidate, conformance
+scope, and SHA-256 values. If the SHA-256 in the worklist differs from the
+SHA-256 for the logical unit, the STE lookup rejects the worklist. It rejects a
+worklist that does not contain all changed prose or that contains an unresolved finding. For a
+command result, it compares the actual result with command output. It does not
+examine prose for conformance.
+
+Before the author freezes the exact candidate, a different documentation
+reviewer must complete a read-only challenge. The reviewer examines the
+author-review worklist and changed prose. The challenge has no acceptance.
+After the author freezes the exact candidate, an independent documentation
+reviewer completes a review with full applicability.
+
+`tests/validate_governance_semantics.py` rejects a change that narrows this
+assurance boundary. The author cannot use a `PASS` result from a validation tool
+as a conformance review. The author also cannot use a pre-check with no finding
+as a conformance review.
+
+The recovery policy owns the instruction that LFE-021 records. The
+implementing agent added a semantic control for PR-13. The project owner made
+no change to the risk, disposition, severity, treatment, or control
+effectiveness.
+
+The implementing agent made no change from LFE-001 to LFE-020. The
+implementing agent made no change to D-GOV-009 or D-GOV-009 evidence. Phase 6
+stays at 2/5. Project status stays `unknown`.
+
+The implementing agent made no change to product behaviour or railway
+behaviour. The implementing agent made no change to a FreeCAD operation or
+result. The implementing agent made no change to export behaviour, a schema, or
+an API. The project owner gives no project authority for product performance,
+production, release, or a phase exit. The implementing agent made no change to
+the rights state or acceptance. The project owner gives no project authority
+for Cycle 3 or a merge of an exact candidate for Cycle 2 without review.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -3101,12 +3329,16 @@ retaining any later composition that invalidates the containment or permits
 live mappings, caches, proxies, active Coin children or additional residual
 switch children to accumulate.
 
-The 24 risks present at Phase 5 closeout remain live in
-[risks.json](risks.json). D-GOV-005 updates only the control wording for PR-12,
-PR-20 and PR-22. [gate-decisions.json](gate-decisions.json) owns structured
-D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001,
+The 24 risks from the end of Phase 5 stay in
+[risks.json](risks.json). The project owner used D-GOV-005 to change only the control wording for PR-12,
+PR-20 and PR-22. The decision register at [gate-decisions.json](gate-decisions.json) owns these
+decisions: D-P6-001, D-GOV-005, D-P6-002, D-P6-003, D-P6-004, D-P6-005, TT-DOC-001,
 TT-DOC-002, D-GOV-006, D-GOV-007, D-GOV-008, D-GOV-009, D-GOV-010 and
 D-GOV-011.
+
+The D-GOV-012 decision records the sequence nonconformance in Cycle
+2. It also records project authority for an exact candidate and draft pull
+request in Cycle 2.
 
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.

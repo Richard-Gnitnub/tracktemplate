@@ -133,6 +133,19 @@ before selecting proof.
 - Do not change files unless the user requested implementation or validation
   fixes.
 
+### Validation for worktree retirement
+
+For worktree retirement, use the
+[worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
+Validate accepted-history containment. Validate tracked cleanliness. Validate
+the local-state inventory. Make sure each item has 1 local-state type.
+Validate planned preservation. Make sure the retirement audit returns a `FAIL`
+result for ambiguous or uniquely owned state.
+
+Validate `git worktree remove` without `--force`. Before Git removes the local
+branch, make sure Git removed the worktree. After removal, examine the
+preservation audit. After removal, examine the preservation diff.
+
 ## Failed-test adjudication
 
 When any selected check fails, begin with a read-only evidence pass:

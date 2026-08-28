@@ -59,6 +59,23 @@ packet gives the route to named Git state. It is not planned preservation.
 Until the recovery workflow completes stash reconciliation, do not give the
 recovery gate a complete result.
 
+Before a worktree retirement, read the
+[worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
+During recovery, the implementing agent makes a local-state inventory. The
+agent finds the canonical owner of each item. During workspace alignment,
+the implementing agent makes sure that no person or process uses the worktree.
+The agent also makes sure that a different location contains the user data.
+
+The retirement audit returns the exact Git identity. The retirement audit
+returns the SHA-256 of the local-state inventory. The retirement audit examines
+the retirement plan.
+
+The pull-request state `MERGED` gives no removal
+authority. Tracked cleanliness gives no removal authority. If the
+retirement plan has ambiguous or uniquely owned state, the implementing agent
+stops. If the preservation audit does not have a complete result, the
+implementing agent stops.
+
 ## Instruction budget
 
 Codex combines repository instruction files and applies a finite default byte
@@ -110,32 +127,40 @@ The canonical
 [TrackTemplate Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
 owns the owner-view order, controlled status meanings, and ASD-STE100 Issue 9
 scope. [TERMINOLOGY.md](TERMINOLOGY.md#asd-ste100-project-terminology) owns the
-TrackTemplate technical terms. Skills apply these owners by reference. They do
-not become policy or terminology owners.
+TrackTemplate technical terms. Authors use links from skills to these owners.
+The skills do not become policy or terminology owners.
 
-The [ASD-STE100 Issue 9 local source and STE lookup procedure](external/asd-ste100/README.md)
-owns the local path and official source sequence. It also owns the STE lookup
-operation and rebuild route. It does not own full applicability. It does not
-own the technical-term register. The documentation review workflow uses the
-official source only for a linguistic conformance assessment. Other workflows
-route that assessment to documentation review. They do not read the PDF during
-usual work.
+The [source and retrieval procedure](external/asd-ste100/README.md) owns the
+local path and official source sequence. It also owns the STE lookup operation
+and rebuild route. It does not own full applicability. It does not own the
+technical-term register. The documentation review workflow uses the official
+source only for a conformance review. Agents in other workflows route the
+review to documentation review. The agents do not read the PDF during usual
+work.
 
-For documentation in the STE conformance scope, use this route:
+For canonical prose in the conformance scope, use this route:
 
-1. Read the canonical Technical Documentation Profile.
-2. Read the canonical TrackTemplate technical-term register.
-3. Classify the changed canonical prose and identify the applicable rule families.
-4. Do the deterministic pre-check when it can help the review.
-5. Use targeted retrieval for writing rules, dictionary-inspection candidates, and ambiguities.
-6. Read a bounded source excerpt when the STE lookup does not give sufficient information.
-7. Review the complete logical unit against the complete applicable requirement set.
-8. Record the technical-term status. Record each unresolved finding.
-9. Get an independent review when the change level or risk makes it necessary.
+1. Read the Technical Documentation Profile.
+2. Read the technical-term register.
+3. Use the `tracktemplate-documentation-review` skill.
+4. Record each logical unit with a material edit.
+5. For each logical unit, record the content category.
+6. Use the writing checklist for each logical unit.
+7. Record findings and their dispositions.
+8. Resolve all findings and unresolved terminology.
+9. After the last wording change, review each logical unit in full.
+10. Validate the temporary author-review worklist.
+11. Before the author freezes an exact candidate, get a read-only challenge.
+12. When project authority makes it necessary, get an independent review.
 
-The selected rule families are retrieval priorities. They are not the complete
-applicable rule set. Do not start each review at the first source page and read
-to the last source page. Use complete-source inspection only for these bounded conditions:
+The author completes the conformance review. The STE lookup validates the
+source identity, exact candidate, conformance scope, and SHA-256 values. It also
+validates each command result against its evidence source. It does not give a
+conformance review result. A deterministic pre-check is only a review aid.
+
+Rule families in a lookup result are retrieval priorities. They are not the
+applicable rule set. Use complete-source inspection only for these bounded
+conditions:
 
 - The task is about the complete standard.
 - The task validates the retrieval architecture.
@@ -144,13 +169,13 @@ to the last source page. Use complete-source inspection only for these bounded c
 
 | Workflow responsibility | Owner and boundary |
 | --- | --- |
-| Documentation structure and Issue 9 review | `tracktemplate-documentation-review` reviews the full logical unit that contains the change. It uses the STE lookup for targeted retrieval, reports the official standard source, and uses the canonical workflow responsibility. |
+| Documentation review | A documentation reviewer uses `tracktemplate-documentation-review` to review the complete logical unit that contains the change. The reviewer uses the STE lookup for targeted retrieval. The reviewer reports the official source. The skill owns the workflow responsibility. |
 | Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. It uses the STE lookup and the PDF as external references only. It keeps unverified conformance and migration findings in the record. |
-| Evidence and limitation reports | `tracktemplate-change-validation` keeps proof/provenance below the owner view. It validates source identity and derived cache identity and a review receipt when applicable. It makes sure the conformance record reports an official source. Automatic validation does not show linguistic conformance. |
-| Independent review | `tracktemplate-quality-review` keeps canonical policy, the external standard, lookup results, and the complete logical unit different. It validates that the reviewer examines the complete applicable requirement set. Then, it gives an independent review of limitations and authority boundaries. It does not do validation again. |
-| Cross-specialist delivery handoff | `tracktemplate-technical-lead` uses the owner view for an authorised Level 1 or Level 2 outcome only. It routes a necessary linguistic assessment to documentation review. |
-| Repository-driven cycle result | Literal `tracktemplate-continue` supplies the six-field owner view and technical provenance. It routes a necessary linguistic assessment to documentation review. Its Level 1/2 and merge limits do not change. |
-| Recovered-session result | `tracktemplate-context-recovery` makes its short report from verified authority. It keeps the exact recovery provenance. It routes a necessary linguistic assessment to documentation review. |
+| Evidence and limitation reports | An implementing agent uses `tracktemplate-change-validation` to keep proof/provenance below the owner view. The agent validates source identity, derived cache identity, and a review receipt when applicable. The agent makes sure the conformance record reports an official source. A validation tool does not give a result from a conformance review. |
+| Independent review | An independent reviewer uses `tracktemplate-quality-review` to keep canonical policy, the external standard, lookup results, and the complete logical unit different. The reviewer examines all applicable requirements. Then, the reviewer gives an independent review of limitations and authority boundaries. The reviewer does not operate validation again. |
+| Handoff from `tracktemplate-technical-lead` | An implementing agent uses `tracktemplate-technical-lead` only for an authorised Level 1 or Level 2 result. If a conformance review is necessary, the agent routes the task to documentation review. |
+| Cycle result from `tracktemplate-continue` | An agent that uses `tracktemplate-continue` supplies the 6 owner-view fields and technical provenance. If a conformance review is necessary, the agent routes the task to documentation review. Project authority for Level 1/2 work and merge does not change. |
+| Result after context recovery | An agent that uses `tracktemplate-context-recovery` makes a short report from canonical authority. The agent keeps technical provenance for recovery. If a conformance review is necessary, the agent routes the task to documentation review. |
 
 The panel examined the full skill catalog for TT-DOC-001. Each
 separate responsibility that can occur repeatedly has one owner. Thus, the
@@ -752,6 +777,36 @@ get applicable authority for the exact disposition
 review evidence for ownership, purpose, preservation and disposition
     ↓
 after the stash inventory is empty, give the recovery gate a complete result
+```
+
+For worktree retirement:
+
+```text
+Show accepted-history containment
+    ↓
+Show tracked cleanliness
+    ↓
+Make a local-state inventory of all files that are not in the Git index
+    ↓
+Put the local-state type for each item in the retirement plan
+    ↓
+Show planned preservation
+    ↓
+For rebuildable cache/generated state, show the applicable `PASS` result
+    ↓
+For temporary disposable state, show the cause for removal
+    ↓
+If the retirement plan has ambiguous or uniquely owned state, stop
+    ↓
+Before removal, examine the retirement audit again
+    ↓
+Before removal, examine the removal authority again
+    ↓
+Use `git worktree remove` without `--force`
+    ↓
+Show that the accepted commit contains the branch tip
+    ↓
+Use Git to remove only the local branch in the retirement plan
 ```
 
 For an architecture decision:

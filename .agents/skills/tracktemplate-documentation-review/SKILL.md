@@ -64,6 +64,27 @@ Read only the documents relevant to the present change:
 - Consult `reference/LEARNING_FROM_EXPERIENCE.md` only for lessons relevant to
   the present change.
 
+## Author-side assurance for ASD-STE100 Issue 9
+
+For each logical unit with a material edit, use the
+[writing checklist](references/writing-checklist.md#author-side-assurance-for-asd-ste100-issue-9).
+The author examines all applicable Issue 9 requirements. The author records
+findings and their dispositions in a temporary author-review worklist.
+The worklist also records each logical unit that the author reviewed. It records
+the SHA-256 for each logical unit.
+
+After the last wording change, review each logical unit in full. Resolve
+all findings. Resolve all unresolved terminology. Then, validate the worklist
+with `tools/ste100_lookup.py author-assurance`. Before the author freezes the
+exact candidate, get a read-only challenge from a different documentation
+reviewer.
+
+The STE lookup validates the source identity, exact candidate, conformance
+scope, and SHA-256 values. It does not examine prose for conformance.
+The deterministic pre-check also does not give a result from a conformance review. The
+author completes the conformance review. The read-only challenge has no
+acceptance.
+
 ## Editing rules
 
 - Use links to canonical owners instead of copied explanations.

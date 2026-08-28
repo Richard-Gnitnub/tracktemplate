@@ -1,12 +1,72 @@
 # TrackTemplate documentation writing checklist
 
-First, select the document class. Identify its canonical responsibility. Then,
-apply this checklist.
+First, identify the document class and its canonical owner. Then, use this
+checklist.
 
-Apply the canonical [Technical Documentation Profile](../../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
-For STE-governed prose, use the official ASD-STE100 Issue 9 standard that the
-profile identifies. Also use the approved project terms in
+Use the [Technical Documentation Profile](../../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
+Use ASD-STE100 Issue 9. Use the official source that the Technical Documentation
+Profile identifies. Use the technical terms in
 [`reference/TERMINOLOGY.md`](../../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
+
+## Author-side assurance for ASD-STE100 Issue 9
+
+For each logical unit with a material edit, use this procedure:
+
+1. Identify the document class.
+2. Identify the content category.
+3. Identify all applicable Issue 9 requirements.
+4. Identify each word as controlled vocabulary or a technical term.
+5. For controlled vocabulary, examine its approved meaning and part of speech.
+6. Examine each applicable requirement in Rule 1.
+7. Use the wording for each technical term in the technical-term register.
+8. Examine each technical term for its technical-term category.
+9. When no technical term is necessary, use approved STE vocabulary.
+10. If the controlled vocabulary does not identify the TrackTemplate item, add a technical term.
+11. Identify the person, tool, or system that does each operation.
+12. Make sure each operation has the correct person, tool, or system.
+13. For each pronoun, make sure the noun to which it refers is clear.
+14. Name the correct item for each state and result.
+15. Examine each noun group against Rule 2.
+16. In a procedure, use a different instruction for each operation.
+17. In a procedure, put each condition before its instruction.
+18. Use Rules 3, 4, 5, 6, 7, and 8 to examine sentence construction.
+19. Use Rules 3, 4, 5, 6, 7, and 8 to examine paragraph structure.
+20. Examine all other applicable Issue 9 requirements.
+21. Compare each evidence claim with its source.
+22. Record each finding and its disposition.
+23. Resolve all unresolved terminology.
+24. After the last wording change, review the complete logical unit again.
+
+A deterministic pre-check can identify text for review. The STE lookup can
+give source material. The pre-check does not give a result from a conformance
+review. The STE lookup also does not give a result from a conformance review.
+The author completes the conformance review.
+
+### Temporary author-review worklist
+
+The worklist records only this information for the validation tool:
+
+- Exact candidate and source identity
+- Conformance scope for changed prose
+- SHA-256 for each path and logical unit
+- Applicable review categories
+- Findings and their dispositions
+- Source for each evidence claim
+- Author-side assurance result and unresolved findings
+- Read-only challenge result.
+
+For a command result, record the command invocation and working directory.
+Record the validation profile and process exit status. Record the actual result.
+Record the command-output SHA-256. If the command has a sentinel, record it.
+
+The STE lookup validates the source identity, exact candidate, conformance
+scope, and SHA-256 values. It also validates unresolved findings. It validates
+each command result against its evidence source. It does not examine prose for
+conformance.
+
+Before the author freezes the exact candidate, give the author-review worklist
+to a different documentation reviewer. Give the reviewer all changed prose.
+Get a read-only challenge. The challenge has no acceptance.
 
 ## Ownership and structure
 

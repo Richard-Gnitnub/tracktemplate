@@ -640,7 +640,7 @@ def validate_documentation_profile(
         "Report",
         "Centreline",
         "substantial cycle",
-        "Product behavior",
+        "Product behaviour",
         "Host compatibility",
         "exact host profile",
         "`exact_match` data in its contract record",
@@ -703,6 +703,13 @@ def validate_documentation_profile(
         "attribution series",
         "attribution noise floor",
         "attribution materiality rule",
+        "Worktree retirement",
+        "accepted-history containment",
+        "local-state inventory",
+        "retirement plan",
+        "retirement audit",
+        "ambiguous or uniquely owned state",
+        "Put a local-state inventory item in a local-state type",
         "Do not use different technical terms for the same project concept",
         "Do not use a technical noun as a verb unless this register also "
         "approves the verb",
@@ -722,8 +729,8 @@ def validate_documentation_profile(
         for row in lfe_rows
     ]
     require(
-        lfe_ids == [f"{value:03d}" for value in range(1, 21)],
-        "LFE ledger is not unique and append-only through LFE-020",
+        lfe_ids == [f"{value:03d}" for value in range(1, 22)],
+        "LFE ledger is not unique and append-only through LFE-021",
     )
     protected_prefix = "\n".join(lfe_rows[:17]) + "\n"
     require(
@@ -864,10 +871,11 @@ def validate_asd_ste100_reference(
     )
     require(
         "documentation review workflow uses the official source only for a "
-        "linguistic conformance assessment" in workflows_flat
-        and "Other workflows route that assessment to documentation review"
-        in workflows_flat
-        and "They do not read the PDF during usual work" in workflows_flat,
+        "conformance review" in workflows_flat
+        and "Agents in other workflows route the review to documentation "
+        "review" in workflows_flat
+        and "The agents do not read the PDF during usual work"
+        in workflows_flat,
         "ASD-STE100 workflow routing drifted",
     )
 

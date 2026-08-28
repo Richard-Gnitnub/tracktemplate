@@ -102,9 +102,8 @@ dashboard only.
 
 ## Owner decisions
 
-[history/phase-closeouts/PHASE4_GATE_DECISIONS.json](history/phase-closeouts/PHASE4_GATE_DECISIONS.json) owns the displayed Phase 4 decisions.
-[history/phase-closeouts/PHASE5_GATE_DECISIONS.json](history/phase-closeouts/PHASE5_GATE_DECISIONS.json) owns the displayed Phase 5 decisions.
-The [current decision register](current/gate-decisions.json) owns Phase 6 and current cross-phase governance decisions.
+The [Phase 4 decision register](history/phase-closeouts/PHASE4_GATE_DECISIONS.json) owns the Phase 4 decisions below. The [Phase 5 decision register](history/phase-closeouts/PHASE5_GATE_DECISIONS.json) owns the Phase 5 decisions below.
+The [current decision register](current/gate-decisions.json) owns Phase 6. It also owns current governance decisions for more than 1 phase.
 
 | ID | Date | Status | Decision boundary |
 | --- | --- | --- | --- |
@@ -138,6 +137,7 @@ The [current decision register](current/gate-decisions.json) owns Phase 6 and cu
 | D-GOV-009 | 2026-08-23 | Accepted | The owner records the D-GOV-008 direction as exhausted for new product work. The decision preserves the two negative results and selects a bounded Level 1 baseline-attribution investigation as the next action. Exit 4 stays Pending. |
 | D-GOV-010 | 2026-08-23 | Accepted | The owner qualifies only the exact FreeCAD 1.1.3 profile with CPython 3.13.13 and PySide6/Qt 6.11.1. Previous profiles stay qualified. Exit 4 stays Pending. |
 | D-GOV-011 | 2026-08-23 | Accepted | The owner selects one subsequent hypothesis for the read route in the canonical FreeCAD adapter. The decision defines the exact host, product boundary, preserved invariants, and comparison rule. Exit 4 stays Pending. |
+| D-GOV-012 | 2026-08-25 | Accepted | The [decision](current/PHASE_EVIDENCE.md#d-gov-012-worktree-sequence-nonconformance) records the sequence nonconformance after worktree retirement. The project owner accepts the preservation audit and its source SHA-256. The project owner gives Cycle 2 authority only for an exact candidate. The owner gives project authority for a draft pull request. The owner gives no project authority to merge into protected main. |
 
 ## Authority and evidence links
 

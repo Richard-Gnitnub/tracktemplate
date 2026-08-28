@@ -49,17 +49,18 @@ includes a linguistic conformance assessment, route it to
 6. Read only the task-relevant sections of
    `reference/current/PHASE_EVIDENCE.md` and the applicable records from
    `reference/current/risks.json` or `gate-decisions.json`.
-7. Retrieve implementation evidence deterministically. Prefer exact paths,
-   identifiers and headings with `rg --files` and `rg`; use ontology concepts
-   to expand stable product terms, not to infer live status. Inspect relevant
-   source, tests, raw failures, Git status and diffs only after authority is
-   established.
+7. Retrieve implementation evidence with a method that gives the same result
+   for the same input. Prefer exact paths, identifiers and headings with
+   `rg --files` and `rg`. Use ontology concepts to expand stable product terms,
+   not to infer live status. Only after project authority is established,
+   inspect relevant source, tests, raw failures, Git status and diffs.
 Use the
 [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
 in the canonical owner. Examine the branches, worktrees, and commits in named
 Git state for unfinished work or interrupted work. Examine the complete stash
-inventory. If the inventory has a retained stash or missing recovery
-information, do not give the recovery gate a complete result.
+inventory. If the stash inventory has a retained stash, do not give the
+recovery gate a complete result. If recovery information is missing, do not
+give the recovery gate a complete result.
 
 8. Build or verify the [context packet](references/context-packet.md). Record
    why each source was loaded and which plausible material was deliberately
@@ -70,6 +71,19 @@ information, do not give the recovery gate a complete result.
 10. Continue only when the intended result, authority boundary, dirty-worktree
    ownership, next safe slice and proof boundary are clear. Ask the user when a
    material decision cannot be recovered without guessing.
+
+### Worktree retirement during recovery
+
+Before worktree retirement, use the
+[worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
+Show accepted-history containment. Show tracked cleanliness. Make a local-state
+inventory of all files that are not in the Git index. Find the canonical owner
+for each item. Show planned preservation.
+
+The pull-request state `MERGED` and tracked cleanliness give no removal
+authority. A Git ignore rule also gives no removal authority. If the retirement
+plan has ambiguous or uniquely owned state, keep the worktree. If the retirement
+plan has ambiguous or uniquely owned state, stop.
 
 ## Authority-aware selection
 
@@ -147,14 +161,23 @@ freshness.
 Before a change, use short text. For a substantial cycle, use the profile's six
 owner-view fields. Then, keep this technical provenance:
 
-1. the controlling files read;
-2. the recovered accepted result and authority boundary;
-3. the hot, warm and deliberately excluded cold context;
-4. the current implementation and validation state;
-5. contradictions, uncommitted work or missing evidence; and
-6. the next bounded action and check.
+1. Canonical owners
+2. Result with acceptance and authority boundary
+3. Agent context and source material that the agent did not use
+4. Implementation evidence and validation result
+5. Information that does not agree, dirty path, or missing evidence
+6. Next task and validation.
 
 Also record the named Git state and complete stash inventory.
 
-Do not describe incomplete work, an unaccepted diff or an unrun check as
-accepted project state.
+Do not report unfinished work as accepted project state. Do not report a diff
+without acceptance as accepted project state. If a validation tool did not
+operate, do not report a validation result as accepted project state.
+
+For worktree retirement, the agent must report:
+
+1. SHA-256 for the local-state inventory
+2. Local-state type for each item
+3. Preservation audit result
+4. Each item without a canonical owner
+5. Result from the retirement audit.

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 6,
-  "updated_on": "2026-08-23",
+  "updated_on": "2026-08-25",
   "decisions": [
     {
       "id": "D-P6-001",
@@ -156,6 +156,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-d-gov-011-direction-selection-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-d-gov-011-direction-selection-panel"
+    },
+    {
+      "id": "D-GOV-012",
+      "decided_on": "2026-08-25",
+      "status": "Accepted",
+      "decision": "After worktree retirement, record the sequence nonconformance.",
+      "authority": "At protected `main` `d47518083768d34cf9b41566feaf132ac4562595` and exact candidate `96063e9836748bbc5755db251fa8b66564e65a28`, the project owner records D-GOV-012. The project owner gave removal authority for the worktree removal. The project owner also gave removal authority for local branch `agent/ste100-retrieval-assurance`. The project owner gave the branch-removal authority with this condition: Git must remove the worktree first.\n\nThe safety/risk panel did not occur before the removals. The decision register did not contain D-GOV-012 before the removals. After the removals, the project owner recorded the sequence nonconformance. D-GOV-012 gives no retrospective authority.\n\nThe accepted commit contained the branch tip `9f3b05d480971d197a57cb00f1811f6c1012f144`. The retirement plan contained a local-state type for all 144 local files. The retirement audit examined the retirement plan.\n\nThe PDF at the source path and the PDF in the worktree had equal bytes. Git removed the worktree Git index. A reviewer cannot now examine the `assume-unchanged` or `skip-worktree` values. A reviewer cannot show historical losslessness.\n\nThe project owner gives project authority for Cycle 2. This authority is only for an exact candidate and a draft pull request. The implementing agent must keep the worktree retirement procedure and semantic controls. The implementing agent must correct each mandatory finding in canonical prose and evidence.\n\nAfter validation gives a `PASS` result, the implementing agent must get new independent reviews. After all reviewers give `ACCEPT`, the agent must publish a draft pull request. The agent must not merge the pull request. The agent must not start Cycle 3.",
+      "exclusions": "The project owner does not claim that the safety/risk panel occurred before removal. D-GOV-012 gives no retrospective authority. A reviewer cannot show historical losslessness.\n\nPhase evidence records the accepted-history containment result, local-state inventory, local-state types, and preservation audit result. The preservation audit contains the source SHA-256. The project owner gives no removal authority for a different worktree or branch.\n\nD-GOV-012 gives no project authority to change product or railway behaviour. It gives no project authority to change FreeCAD, export, schema, API, or performance boundaries. It gives no production or release authority. It gives no authority to change the phase or a phase exit.\n\nPhase 6 stays at 2/5. Project status stays `unknown`. D-GOV-009 and its evidence do not change. The risk dispositions do not change.\n\nThe project owner gives no project authority for a merge into protected main. The owner gives no project authority for Cycle 3, physical output, packaging, release, or tagging.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-012-worktree-sequence-nonconformance",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-012-worktree-sequence-nonconformance"
     }
   ]
 }
