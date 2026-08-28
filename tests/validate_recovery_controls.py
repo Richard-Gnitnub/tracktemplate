@@ -743,8 +743,8 @@ def validate_worktree_retirement_policy(policy):
         "must remove environment variables with the git prefix",
         "if the retirement audit cannot examine a file or directory the "
         "retirement audit returns fail without a path",
-        "after the retirement plan contains removal authority use the second "
-        "retirement audit command",
+        "after the retirement plan contains removal authority operate the "
+        "retirement audit again",
         "after the retirement audit gives a pass result use git worktree remove",
         "do not use force",
         "do not use git stash",
@@ -1206,7 +1206,7 @@ def validate_worktree_retirement_phase_evidence(text):
         "pull request 56 had the pull request state merged",
         "retirement audit used git status",
         "historical audit did not examine assume unchanged or skip worktree values",
-        "evidence does not show complete historical losslessness",
+        "evidence does not show historical losslessness",
         "no person or process used the worktree",
         "144 ignored files and 8 042 871 bytes",
         "authoritative local source 1 3 316 157",
@@ -1223,7 +1223,6 @@ def validate_worktree_retirement_phase_evidence(text):
         "git worktree list did not contain the worktree",
         "implementing agent used git branch d",
         "git removed only local branch agent ste100 retrieval assurance",
-        "asd ste100 issue 9 pdf stayed at the primary source path with its source identity",
         "git did not contain refs stash",
         "git index file value from the caller",
         "filename with non utf 8 bytes",
@@ -1238,7 +1237,10 @@ def validate_worktree_retirement_phase_evidence(text):
         "project owner gives no project authority to merge into protected main",
         "project owner gives no project authority to start cycle 3",
         "validation tools examine the source identity exact candidate conformance scope",
-        "workflow makes the author responsible for the conformance review",
+        "author completes the conformance review",
+        "author reviews each logical unit with a material edit against all "
+        "applicable rules 1 through 9",
+        "author uses the official pdf with sha 256",
         "temporary author review worklist records the exact candidate",
         "ste lookup validates the source identity exact candidate conformance scope",
         "does not examine prose for conformance",
@@ -1249,6 +1251,14 @@ def validate_worktree_retirement_phase_evidence(text):
         "no change from lfe 001 to lfe 020",
         "no change to d gov 009 or d gov 009 evidence",
         "no project authority for cycle 3",
+    ):
+        if fragment not in semantic:
+            raise AssertionError(
+                "worktree retirement phase evidence lacks: " + fragment
+            )
+    for fragment in (
+        "asd ste100 issue 9 pdf stayed at the primary source path",
+        "pdf kept its source identity",
     ):
         if fragment not in semantic:
             raise AssertionError(
@@ -2359,9 +2369,9 @@ def _validate_static_controls(errors):
     ide_evaluation_semantic = _semantic_text(ide_evaluation)
     for marker in (
         "has tracked cleanliness and local files that git ignores",
-        "result contains no local state inventory",
-        "preservation audit has no result",
-        "git ignore rule gives removal authority",
+        "no local state inventory in the result",
+        "no result from the preservation audit",
+        "removal authority from a git ignore rule",
     ):
         if marker not in ide_evaluation_semantic:
             errors.append("IDE retirement evaluation lacks: " + marker)

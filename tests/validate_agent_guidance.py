@@ -1122,7 +1122,7 @@ def validate_issue9_author_assurance(
         ),
         (
             "last wording change",
-            "complete logical unit",
+            "logical unit in full",
             "resolve all findings",
             "resolve all unresolved terminology",
         ),
@@ -1133,7 +1133,7 @@ def validate_issue9_author_assurance(
         ),
         (
             "does not examine prose for conformance",
-            "no conformance review result",
+            "does not give a result from a conformance review",
             "author completes the conformance review",
         ),
     )
@@ -1156,10 +1156,11 @@ def validate_issue9_author_assurance(
         ("each pronoun", "noun to which it refers", "state and result"),
         ("rule 2", "noun group"),
         ("different instruction", "condition before its instruction"),
-        ("sentence construction", "paragraph construction"),
+        ("sentence construction", "paragraph structure"),
         ("all other applicable issue 9 requirements",),
         ("evidence claim", "command invocation", "validation profile", "actual result"),
-        ("finding", "disposition", "unresolved terminology"),
+        ("finding", "disposition"),
+        ("resolve all unresolved terminology",),
         ("exact candidate", "conformance scope for changed prose", "sha-256"),
         ("read-only challenge", "no acceptance"),
         ("does not examine prose for conformance", "author completes the conformance review"),
@@ -1178,10 +1179,10 @@ def validate_issue9_author_assurance(
         "writing checklist",
         "findings and their dispositions",
         "resolve all findings and unresolved terminology",
-        "review each complete logical unit again",
+        "review each logical unit in full",
         "temporary author-review worklist",
         "read-only challenge",
-        "does not give a conformance review result",
+        "does not give a result from a conformance review",
         "deterministic pre-check is only a review aid",
     )
     require(

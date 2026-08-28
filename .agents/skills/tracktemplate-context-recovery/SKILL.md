@@ -49,11 +49,11 @@ includes a linguistic conformance assessment, route it to
 6. Read only the task-relevant sections of
    `reference/current/PHASE_EVIDENCE.md` and the applicable records from
    `reference/current/risks.json` or `gate-decisions.json`.
-7. Retrieve implementation evidence deterministically. Prefer exact paths,
-   identifiers and headings with `rg --files` and `rg`; use ontology concepts
-   to expand stable product terms, not to infer live status. Inspect relevant
-   source, tests, raw failures, Git status and diffs only after authority is
-   established.
+7. Retrieve implementation evidence with a method that gives the same result
+   for the same input. Prefer exact paths, identifiers and headings with
+   `rg --files` and `rg`. Use ontology concepts to expand stable product terms,
+   not to infer live status. Only after project authority is established,
+   inspect relevant source, tests, raw failures, Git status and diffs.
 Use the
 [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state)
 in the canonical owner. Examine the branches, worktrees, and commits in named

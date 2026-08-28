@@ -983,8 +983,8 @@ working directory. Record the validation profile and process exit status.
 Record the actual result. Record the command-output SHA-256. If the command has
 a sentinel, record it.
 
-If the canonical owner does not contain each author-side assurance control, the
-validator in `tests/validate_agent_guidance.py` must give a `FAIL` result. The
+If the canonical owner does not contain all controls for author-side assurance,
+`tests/validate_agent_guidance.py` must give a `FAIL` result. The
 validator in `tests/validate_governance_semantics.py` must reject removal of a
 semantic control. The validator must reject a claim that a deterministic
 pre-check or STE lookup gives a conformance review.
@@ -999,7 +999,8 @@ The STE lookup must reject these author-review worklists:
 - A command result without its command invocation, validation profile, or
   actual result
 - Command output that does not contain the actual result
-- No valid read-only challenge for the worklist and changed prose.
+- A worklist that has no `PASS` result from a read-only challenge of the
+  worklist and changed prose.
 
 The STE lookup validates the source identity, exact candidate, conformance
 scope, and SHA-256 values. It also validates unresolved findings, command

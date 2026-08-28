@@ -73,7 +73,7 @@ findings and their dispositions in a temporary author-review worklist.
 The worklist also records each logical unit that the author reviewed. It records
 the SHA-256 for each logical unit.
 
-After the last wording change, review each complete logical unit again. Resolve
+After the last wording change, review each logical unit in full. Resolve
 all findings. Resolve all unresolved terminology. Then, validate the worklist
 with `tools/ste100_lookup.py author-assurance`. Before the author freezes the
 exact candidate, get a read-only challenge from a different documentation
@@ -81,7 +81,7 @@ reviewer.
 
 The STE lookup validates the source identity, exact candidate, conformance
 scope, and SHA-256 values. It does not examine prose for conformance.
-The deterministic pre-check also gives no conformance review result. The
+The deterministic pre-check also does not give a result from a conformance review. The
 author completes the conformance review. The read-only challenge has no
 acceptance.
 

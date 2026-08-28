@@ -20,7 +20,7 @@ For each logical unit with a material edit, use this procedure:
 6. Examine each applicable requirement in Rule 1.
 7. Use the wording for each technical term in the technical-term register.
 8. Examine each technical term for its technical-term category.
-9. Use approved STE vocabulary when no technical term is necessary.
+9. When no technical term is necessary, use approved STE vocabulary.
 10. If the controlled vocabulary does not identify the TrackTemplate item, add a technical term.
 11. Identify the person, tool, or system that does each operation.
 12. Make sure each operation has the correct person, tool, or system.
@@ -29,8 +29,8 @@ For each logical unit with a material edit, use this procedure:
 15. Examine each noun group against Rule 2.
 16. In a procedure, use a different instruction for each operation.
 17. In a procedure, put each condition before its instruction.
-18. Examine sentence construction under Rules 3 through 8.
-19. Examine paragraph construction under Rules 3 through 8.
+18. Use Rules 3, 4, 5, 6, 7, and 8 to examine sentence construction.
+19. Use Rules 3, 4, 5, 6, 7, and 8 to examine paragraph structure.
 20. Examine all other applicable Issue 9 requirements.
 21. Compare each evidence claim with its source.
 22. Record each finding and its disposition.
@@ -38,9 +38,9 @@ For each logical unit with a material edit, use this procedure:
 24. After the last wording change, review the complete logical unit again.
 
 A deterministic pre-check can identify text for review. The STE lookup can
-give source material. The pre-check gives no conformance review result. The STE
-lookup also gives no conformance review result. The author completes the
-conformance review.
+give source material. The pre-check does not give a result from a conformance
+review. The STE lookup also does not give a result from a conformance review.
+The author completes the conformance review.
 
 ### Temporary author-review worklist
 

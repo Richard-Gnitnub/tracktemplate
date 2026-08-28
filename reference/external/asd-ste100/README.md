@@ -117,8 +117,9 @@ source text.
 
 Word lookup examines the TrackTemplate technical-term register first. An
 approved technical-term result gives its technical-term category and term
-meaning. Always compare a technical term in the logical unit with its registered
-meaning. After you identify the technical-term category, use
+meaning. Always compare a technical term in the logical unit with the term
+meaning that the technical-term register gives. After you identify the
+technical-term category, use
 `--part-of-speech`. If its category differs from the register, do not approve
 the technical term. Do not approve a term that is missing from the
 technical-term register. The lookup then classifies recognised STE vocabulary,
@@ -171,7 +172,7 @@ Validate the author-review worklist with this command:
 .venv/bin/python tools/ste100_lookup.py author-assurance tmp/WORKLIST.json
 ```
 
-If the worktree does not contain the PDF, add `--source-file` with the absolute
+If the worktree does not contain the PDF, add `--source-file` with the full
 path of the preserved PDF.
 
 The STE lookup compares the PDF with the source manifest. It compares each
@@ -188,7 +189,7 @@ The STE lookup rejects an unresolved finding. It writes a review receipt in
 `tmp/ste100-review-receipts/`. The receipt filename contains its SHA-256. The
 author-assurance command validates the source identity, exact candidate, and
 conformance scope. It also validates SHA-256 values, unresolved findings, and
-command results. It gives no conformance review result.
+command results. It does not give a result from a conformance review.
 
 Before the author freezes the exact candidate, a different documentation
 reviewer completes a read-only challenge. If the challenge gives a `PASS`

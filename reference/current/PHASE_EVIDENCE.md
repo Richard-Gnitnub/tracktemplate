@@ -3104,7 +3104,9 @@ commit for pull request #56.
 
 The retirement audit used `git status`. It found no tracked change. It found no
 untracked file that a Git ignore rule did not select. The historical audit did not
-examine `assume-unchanged` or `skip-worktree` values. After the audit, Git
+examine `assume-unchanged` or `skip-worktree` values.
+
+After the audit, Git
 removed the worktree Git index. A reviewer cannot examine these values now.
 The evidence does not show historical losslessness.
 
@@ -3223,8 +3225,8 @@ removed the Git index, no evidence can show historical losslessness.
 
 The panel occurred after the operations. It gives no retrospective authority.
 
-**Panel recommendation:** **Continue with bounded conditions.** Keep
-D-GOV-012 as a record after removal. Give no retrospective authority. Before
+**Panel recommendation:** **Continue with bounded conditions.**
+After removal, keep D-GOV-012 as a record. Give no retrospective authority. Before
 draft publication, get new independent reviews.
 
 #### Owner decision D-GOV-012

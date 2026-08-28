@@ -148,7 +148,7 @@ For canonical prose in the conformance scope, use this route:
 6. Use the writing checklist for each logical unit.
 7. Record findings and their dispositions.
 8. Resolve all findings and unresolved terminology.
-9. After the last wording change, review each complete logical unit again.
+9. After the last wording change, review each logical unit in full.
 10. Validate the temporary author-review worklist.
 11. Before the author freezes an exact candidate, get a read-only challenge.
 12. When project authority makes it necessary, get an independent review.
@@ -171,7 +171,7 @@ conditions:
 | --- | --- |
 | Documentation review | A documentation reviewer uses `tracktemplate-documentation-review` to review the complete logical unit that contains the change. The reviewer uses the STE lookup for targeted retrieval. The reviewer reports the official source. The skill owns the workflow responsibility. |
 | Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. It uses the STE lookup and the PDF as external references only. It keeps unverified conformance and migration findings in the record. |
-| Evidence and limitation reports | An implementing agent uses `tracktemplate-change-validation` to keep proof/provenance below the owner view. The agent validates source identity, derived cache identity, and a review receipt when applicable. The agent makes sure the conformance record reports an official source. A validation tool gives no conformance review result. |
+| Evidence and limitation reports | An implementing agent uses `tracktemplate-change-validation` to keep proof/provenance below the owner view. The agent validates source identity, derived cache identity, and a review receipt when applicable. The agent makes sure the conformance record reports an official source. A validation tool does not give a result from a conformance review. |
 | Independent review | An independent reviewer uses `tracktemplate-quality-review` to keep canonical policy, the external standard, lookup results, and the complete logical unit different. The reviewer examines all applicable requirements. Then, the reviewer gives an independent review of limitations and authority boundaries. The reviewer does not operate validation again. |
 | Handoff from `tracktemplate-technical-lead` | An implementing agent uses `tracktemplate-technical-lead` only for an authorised Level 1 or Level 2 result. If a conformance review is necessary, the agent routes the task to documentation review. |
 | Cycle result from `tracktemplate-continue` | An agent that uses `tracktemplate-continue` supplies the 6 owner-view fields and technical provenance. If a conformance review is necessary, the agent routes the task to documentation review. Project authority for Level 1/2 work and merge does not change. |

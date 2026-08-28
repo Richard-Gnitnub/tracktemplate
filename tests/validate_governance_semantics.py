@@ -2918,79 +2918,111 @@ def validate_documentation_profile_mutations() -> None:
             "tt-doc/author-review-controlled-vocabulary-removed",
             "controlled vocabulary",
             "uncontrolled text",
+            "controlled vocabulary / technical term / approved meaning / "
+            "part of speech",
         ),
         (
             "tt-doc/author-review-term-register-removed",
             "technical-term register",
             "local glossary",
+            "technical-term register / technical-term category / controlled "
+            "vocabulary does not identify the tracktemplate item",
         ),
         (
             "tt-doc/author-review-ordinary-vocabulary-removed",
-            "ordinary vocabulary",
-            "general wording",
+            "controlled vocabulary does not identify the TrackTemplate item",
+            "general wording identifies the TrackTemplate item",
+            "technical-term register / technical-term category / controlled "
+            "vocabulary does not identify the tracktemplate item",
         ),
         (
             "tt-doc/author-review-actor-check-removed",
             "person, tool, or system",
             "text",
+            "person, tool, or system / each operation",
         ),
         (
             "tt-doc/author-review-antecedent-check-removed",
             "noun to which it refers",
             "nearby word",
+            "each pronoun / noun to which it refers / state and result",
         ),
         (
             "tt-doc/author-review-noun-group-check-removed",
             "noun group",
             "word sequence",
+            "rule 2 / noun group",
         ),
         (
             "tt-doc/author-review-instruction-check-weakened",
             "different instruction",
             "same instruction",
+            "different instruction / condition before its instruction",
         ),
         (
             "tt-doc/author-review-condition-order-inverted",
             "condition before its instruction",
             "condition after its instruction",
+            "different instruction / condition before its instruction",
         ),
         (
             "tt-doc/author-review-sentence-check-removed",
             "sentence construction",
             "sentence text",
+            "sentence construction / paragraph structure",
         ),
         (
             "tt-doc/author-review-paragraph-check-removed",
-            "paragraph construction",
+            "paragraph structure",
             "paragraph text",
+            "sentence construction / paragraph structure",
         ),
         (
             "tt-doc/author-review-full-applicability-weakened",
             "all other applicable Issue 9 requirements",
             "selected Issue 9 requirements",
+            "all other applicable issue 9 requirements",
         ),
         (
             "tt-doc/author-review-actual-result-removed",
             "actual result",
             "reported result",
+            "evidence claim / command invocation / validation profile / "
+            "actual result",
         ),
         (
             "tt-doc/author-review-unresolved-terminology-kept",
             "Resolve all unresolved terminology",
             "Keep unresolved terminology",
+            "resolve all unresolved terminology",
+        ),
+        (
+            "tt-doc/author-review-unresolved-terminology-removed",
+            "Resolve all unresolved terminology",
+            "",
+            "resolve all unresolved terminology",
+        ),
+        (
+            "tt-doc/author-review-unresolved-terminology-weakened",
+            "Resolve all unresolved terminology",
+            "Resolve some unresolved terminology",
+            "resolve all unresolved terminology",
         ),
         (
             "tt-doc/author-review-challenge-removed",
-            "read-only challenge",
-            "optional comment",
+            "challenge",
+            "comment",
+            "read-only challenge / no acceptance",
         ),
         (
             "tt-doc/author-review-machine-proof-authorized",
-            "does not examine prose for conformance",
-            "examines prose for conformance",
+            "does not examine prose for",
+            "examines prose for",
+            "does not examine prose for conformance / author completes the "
+            "conformance review",
         ),
     )
-    for name, old, new in author_assurance_cases:
+    for name, old, new, expected_concepts in author_assurance_cases:
         if old not in writing_checklist:
             raise AssertionError(name + " fixture is stale")
         mutated_checklist = writing_checklist.replace(old, new)
@@ -3003,7 +3035,8 @@ def validate_documentation_profile_mutations() -> None:
                     workflows,
                 )
             ),
-            "documentation checklist lost the human-review or traceability boundary",
+            "documentation checklist lost author-side assurance: "
+            + expected_concepts,
         )
 
     phase4_closeout = read(
@@ -3250,6 +3283,60 @@ def validate_visible_recovery_mutations() -> None:
         name: path.read_text(encoding="utf-8")
         for name, path in recovery_controls.RECOVERY_SKILL_PATHS.items()
     }
+
+    def mutate_section_sentence(
+        document: str,
+        heading: str,
+        markers: tuple[str, ...],
+        mutation: Callable[[str], str],
+    ) -> str:
+        """Mutate one sentence selected by meaning in one named section."""
+        section = recovery_controls._section(document, heading)
+        matches = [
+            match.group(1)
+            for match in re.finditer(
+                r"(?:\A|(?<=[.!?])\s+)(.*?[.!?])(?=\s|\Z)",
+                section,
+                re.DOTALL,
+            )
+            if all(
+                marker in recovery_controls._semantic_text(match.group(1))
+                for marker in markers
+            )
+        ]
+        if len(matches) != 1:
+            raise AssertionError(
+                "section sentence target must occur once, found {} in {}: {}"
+                .format(len(matches), heading, " / ".join(markers))
+            )
+        sentence = matches[0]
+        mutated_sentence = mutation(sentence)
+        if mutated_sentence == sentence:
+            raise AssertionError(
+                "section sentence mutation made no change in " + heading
+            )
+        mutated_section = replace_once(
+            section,
+            sentence,
+            mutated_sentence,
+        )
+        return replace_once(document, section, mutated_section)
+
+    def replace_all_in_section(
+        document: str,
+        heading: str,
+        old: str,
+        new: str,
+    ) -> str:
+        """Replace all occurrences of one exact identity in one section."""
+        section = recovery_controls._section(document, heading)
+        if old not in section:
+            raise AssertionError(
+                "section identity target is missing in " + heading + ": " + old
+            )
+        mutated_section = section.replace(old, new)
+        return replace_once(document, section, mutated_section)
+
     policy_cases = (
         (
             "recovery/planned-stash-use-permitted",
@@ -3479,18 +3566,91 @@ def validate_visible_recovery_mutations() -> None:
             diagnostic,
         )
 
+    retirement_policy_heading = "Worktree retirement"
+    merged_state_markers = (
+        "pull request state merged",
+        "gives no removal authority",
+    )
+    cleanliness_markers = (
+        "tracked cleanliness",
+        "gives no removal authority",
+    )
     retirement_policy_cases = (
         (
-            "retirement/merge-and-cleanliness-treated-as-disposable",
-            replace_once(
+            "retirement/merged-state-no-authority-deleted",
+            mutate_section_sentence(
                 policy,
-                "A merge and tracked cleanliness give no removal authority.",
-                "A merge and tracked cleanliness give removal authority.",
+                retirement_policy_heading,
+                merged_state_markers,
+                lambda _sentence: "",
             ),
-            (
-                "worktree retirement policy lacks: a merge and tracked "
-                "cleanliness give no removal authority"
+            "worktree retirement policy lacks: pull request state merged "
+            "gives no removal authority",
+        ),
+        (
+            "retirement/merged-state-no-authority-inverted",
+            mutate_section_sentence(
+                policy,
+                retirement_policy_heading,
+                merged_state_markers,
+                lambda _sentence: (
+                    "The pull-request state `MERGED` gives removal authority."
+                ),
             ),
+            "worktree retirement policy lacks: pull request state merged "
+            "gives no removal authority",
+        ),
+        (
+            "retirement/merged-state-no-authority-weakened",
+            mutate_section_sentence(
+                policy,
+                retirement_policy_heading,
+                merged_state_markers,
+                lambda _sentence: (
+                    "The pull-request state `MERGED` does not necessarily give "
+                    "removal authority."
+                ),
+            ),
+            "worktree retirement policy lacks: pull request state merged "
+            "gives no removal authority",
+        ),
+        (
+            "retirement/tracked-cleanliness-no-authority-deleted",
+            mutate_section_sentence(
+                policy,
+                retirement_policy_heading,
+                cleanliness_markers,
+                lambda _sentence: "",
+            ),
+            "worktree retirement policy lacks: tracked cleanliness gives no "
+            "removal authority",
+        ),
+        (
+            "retirement/tracked-cleanliness-no-authority-inverted",
+            mutate_section_sentence(
+                policy,
+                retirement_policy_heading,
+                cleanliness_markers,
+                lambda _sentence: (
+                    "Tracked cleanliness gives removal authority."
+                ),
+            ),
+            "worktree retirement policy lacks: tracked cleanliness gives no "
+            "removal authority",
+        ),
+        (
+            "retirement/tracked-cleanliness-no-authority-weakened",
+            mutate_section_sentence(
+                policy,
+                retirement_policy_heading,
+                cleanliness_markers,
+                lambda _sentence: (
+                    "Tracked cleanliness does not necessarily give removal "
+                    "authority."
+                ),
+            ),
+            "worktree retirement policy lacks: tracked cleanliness gives no "
+            "removal authority",
         ),
         (
             "retirement/ignored-inventory-omitted",
@@ -3507,16 +3667,17 @@ def validate_visible_recovery_mutations() -> None:
         ),
         (
             "retirement/preservation-proof-omitted",
-            replace_once(
+            mutate_section_sentence(
                 policy,
-                "Preserve each authoritative local source in a different "
-                "location.",
-                "Assume that another copy exists.",
+                retirement_policy_heading,
+                (
+                    "for authoritative local source preserve each item",
+                    "in a different location",
+                ),
+                lambda _sentence: "Assume that another copy exists.",
             ),
-            (
-                "worktree retirement policy lacks: preserve each authoritative "
-                "local source in a different location"
-            ),
+            "worktree retirement policy lacks: for authoritative local source "
+            "preserve each item in a different location",
         ),
         (
             "retirement/ambiguous-state-does-not-stop",
@@ -3543,18 +3704,20 @@ def validate_visible_recovery_mutations() -> None:
         ),
         (
             "retirement/branch-deleted-before-worktree",
-            replace_once(
+            mutate_section_sentence(
                 policy,
-                "After `git worktree list` does not contain the worktree, "
-                "record\nthe branch tip in phase evidence.",
-                "Before `git worktree list` does not contain the worktree, "
-                "record\nthe branch tip in phase evidence.",
+                retirement_policy_heading,
+                (
+                    "if git worktree list does not contain the worktree",
+                    "record the local branch and branch tip",
+                ),
+                lambda _sentence: (
+                    "Before `git worktree list` does not contain the worktree, "
+                    "record the local branch and branch tip in phase evidence."
+                ),
             ),
-            (
-                "worktree retirement policy lacks: after git worktree list "
-                "does not contain the worktree record the branch tip in phase "
-                "evidence"
-            ),
+            "worktree retirement policy lacks: if git worktree list does not "
+            "contain the worktree record the local branch and branch tip",
         ),
     )
     for name, mutated, diagnostic in retirement_policy_cases:
@@ -3673,22 +3836,45 @@ def validate_visible_recovery_mutations() -> None:
         "agent workflow recovery routing contradicts visible recovery state: "
         "a retained stash is resolved recovery state",
     )
-    retirement_shortcut = replace_once(
-        workflows,
-        "A merge\nand tracked cleanliness give no removal authority in these "
-        "workflows.",
-        "A merge\nand tracked cleanliness give removal authority in these "
-        "workflows.",
-    )
-    expect_rejected(
-        "retirement/workflow-adds-merge-cleanliness-shortcut",
-        lambda: recovery_controls.validate_worktree_retirement_routing(
-            retirement_shortcut,
-            skills,
+    workflow_retirement_cases = (
+        (
+            "retirement/workflow-adds-merged-state-shortcut",
+            mutate_section_sentence(
+                workflows,
+                "Session continuity",
+                merged_state_markers,
+                lambda _sentence: (
+                    "The pull-request state `MERGED` gives removal authority."
+                ),
+            ),
+            "agent workflow retirement routing lacks: pull request state "
+            "merged gives no removal authority",
         ),
-        "agent workflow retirement routing lacks: a merge and tracked "
-        "cleanliness give no removal authority in these workflows",
+        (
+            "retirement/workflow-adds-cleanliness-shortcut",
+            mutate_section_sentence(
+                workflows,
+                "Session continuity",
+                cleanliness_markers,
+                lambda _sentence: (
+                    "Tracked cleanliness gives removal authority."
+                ),
+            ),
+            "agent workflow retirement routing lacks: tracked cleanliness "
+            "gives no removal authority",
+        ),
     )
+    for name, mutated, diagnostic in workflow_retirement_cases:
+        expect_rejected(
+            name,
+            lambda value=mutated: (
+                recovery_controls.validate_worktree_retirement_routing(
+                    value,
+                    skills,
+                )
+            ),
+            diagnostic,
+        )
 
     missing_snapshot = replace_once(
         phase_evidence,
@@ -3791,40 +3977,47 @@ def validate_visible_recovery_mutations() -> None:
         "owned state 0 0",
     )
     force_retirement_claimed = replace_once(
-        phase_evidence,
-        "removal command did not use `--force`",
-        "removal command used `--force`",
+        mutate_section_sentence(
+            phase_evidence,
+            "Workflow migration for worktree retirement",
+            ("implementing agent used git worktree remove without force",),
+            lambda _sentence: (
+                "The implementing agent used `git worktree remove` with "
+                "`--force`."
+            ),
+        ),
+        "with `--force`.",
+        "with `--force`.",
     )
     expect_rejected(
         "retirement/phase-evidence-claims-force-removal",
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             force_retirement_claimed
         ),
-        "worktree retirement phase evidence lacks: removal command did not use "
-        "force",
+        "worktree retirement phase evidence lacks: implementing agent used "
+        "git worktree remove without force",
     )
-    cycle_3_started_early = replace_once(
+    cycle_3_started_early = mutate_section_sentence(
         phase_evidence,
-        "gives no project authority to merge into protected main or start Cycle 3",
-        "gives project authority to merge into protected main and start Cycle 3",
+        "Workflow migration for worktree retirement",
+        ("project owner gives no project authority to start cycle 3",),
+        lambda _sentence: (
+            "The project owner gives project authority to start Cycle 3."
+        ),
     )
     expect_rejected(
         "retirement/phase-evidence-starts-cycle-3-early",
         lambda: recovery_controls.validate_worktree_retirement_phase_evidence(
             cycle_3_started_early
         ),
-        "worktree retirement phase evidence lacks: gives no project authority "
-        "to merge into protected main or start cycle 3",
+        "worktree retirement phase evidence lacks: project owner gives no "
+        "project authority to start cycle 3",
     )
-    historical_cleanliness_phrase = (
-        "Before removal, the retirement audit gave no tracked change."
-    )
-    if historical_cleanliness_phrase not in phase_evidence:
-        raise AssertionError("historical-cleanliness fixture is stale")
-    historical_cleanliness_overstated = phase_evidence.replace(
-        historical_cleanliness_phrase,
-        "It had tracked cleanliness.",
-        1,
+    historical_cleanliness_overstated = mutate_section_sentence(
+        phase_evidence,
+        "Workflow migration for worktree retirement",
+        ("it found no tracked change",),
+        lambda _sentence: "It had tracked cleanliness.",
     )
     expect_rejected(
         "retirement/phase-evidence-overstates-historical-cleanliness",
@@ -3850,6 +4043,96 @@ def validate_visible_recovery_mutations() -> None:
         "worktree retirement phase evidence overstates: this decision gives "
         "retrospective authority",
     )
+
+    retirement_assurance_cases = (
+        (
+            "retirement/phase-evidence-loses-official-source-path",
+            mutate_section_sentence(
+                phase_evidence,
+                "Workflow migration for worktree retirement",
+                (
+                    "asd ste100 issue 9 pdf stayed at the primary source path",
+                ),
+                lambda _sentence: "",
+            ),
+            "worktree retirement phase evidence lacks: asd ste100 issue 9 pdf "
+            "stayed at the primary source path",
+        ),
+        (
+            "retirement/phase-evidence-inverts-source-identity",
+            mutate_section_sentence(
+                phase_evidence,
+                "Workflow migration for worktree retirement",
+                ("pdf kept its source identity",),
+                lambda _sentence: "The PDF lost its source identity.",
+            ),
+            "worktree retirement phase evidence lacks: pdf kept its source "
+            "identity",
+        ),
+        (
+            "retirement/phase-evidence-removes-author-review-duty",
+            mutate_section_sentence(
+                phase_evidence,
+                "Workflow migration for worktree retirement",
+                ("author completes the conformance review",),
+                lambda _sentence: (
+                    "The author does not complete the conformance review."
+                ),
+            ),
+            "worktree retirement phase evidence lacks: author completes the "
+            "conformance review",
+        ),
+        (
+            "retirement/phase-evidence-weakens-full-applicability",
+            mutate_section_sentence(
+                phase_evidence,
+                "Workflow migration for worktree retirement",
+                (
+                    "author reviews each logical unit with a material edit",
+                    "all applicable rules 1 through 9",
+                ),
+                lambda _sentence: (
+                    "The author reviews each logical unit with a material edit "
+                    "against selected Issue 9 rules."
+                ),
+            ),
+            "worktree retirement phase evidence lacks: author reviews each "
+            "logical unit with a material edit against all applicable rules 1 "
+            "through 9",
+        ),
+        (
+            "retirement/phase-evidence-removes-official-pdf-duty",
+            mutate_section_sentence(
+                phase_evidence,
+                "Workflow migration for worktree retirement",
+                ("author uses the official pdf with sha 256",),
+                lambda _sentence: "The author uses a local summary.",
+            ),
+            "worktree retirement phase evidence lacks: author uses the official "
+            "pdf with sha 256",
+        ),
+        (
+            "retirement/phase-evidence-loses-verified-source-sha",
+            replace_all_in_section(
+                phase_evidence,
+                "Workflow migration for worktree retirement",
+                "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+                "0000000000000000000000000000000000000000000000000000000000000000",
+            ),
+            "worktree retirement evidence lacks identity: "
+            "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+        ),
+    )
+    for name, mutated, diagnostic in retirement_assurance_cases:
+        expect_rejected(
+            name,
+            lambda value=mutated: (
+                recovery_controls.validate_worktree_retirement_phase_evidence(
+                    value
+                )
+            ),
+            diagnostic,
+        )
 
     accepted_recovery_state = replace_once(
         skills["ide"],
@@ -3943,11 +4226,16 @@ def validate_visible_recovery_mutations() -> None:
         "LFE-020 contradicts visible recovery state: a retained stash is "
         "resolved recovery state",
     )
+    lfe_021_row = table_row_containing(learning, "| LFE-021 /")
+    weakened_retirement_lfe_row = replace_once(
+        lfe_021_row,
+        "Before worktree removal, make a local-state inventory.",
+        "A clean merged worktree needs no local-state inventory.",
+    )
     weakened_retirement_lfe = replace_once(
         learning,
-        "Before worktree removal, make a local-state inventory. Classify each "
-        "item that is not in the Git index.",
-        "A clean merged worktree needs no local-state inventory.",
+        lfe_021_row,
+        weakened_retirement_lfe_row,
     )
     expect_rejected(
         "retirement/lfe-loses-local-state-inventory",
@@ -3957,17 +4245,24 @@ def validate_visible_recovery_mutations() -> None:
         "LFE-021 reusable rule lacks: before worktree removal make a local "
         "state inventory",
     )
-    weakened_lfe_rule = replace_once(
+    weakened_lfe_rule = mutate_section_sentence(
         learning,
-        "Examine the use of a semantic control.",
-        "Examine the length of the row.",
+        "Ledger rules",
+        (
+            "if a semantic control can prevent the same problem",
+            "add the semantic control",
+        ),
+        lambda _sentence: (
+            "If row length can prevent the same problem, examine row length."
+        ),
     )
     expect_rejected(
         "lfe/application-loses-regression-question",
         lambda: recovery_controls.validate_recovery_lfe(
             weakened_lfe_rule
         ),
-        "LFE rule lacks: examine the use of a semantic control",
+        "LFE rule lacks: if a semantic control can prevent the same problem "
+        "add the semantic control",
     )
 
 

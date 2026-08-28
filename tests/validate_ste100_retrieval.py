@@ -134,7 +134,7 @@ def validate_workflow_text(text: str) -> None:
         "use the writing checklist for each logical unit",
         "record findings and their dispositions",
         "resolve all findings and unresolved terminology",
-        "after the last wording change, review each complete logical unit again",
+        "after the last wording change, review each logical unit in full",
         "validate the temporary author-review worklist",
         "before the author freezes an exact candidate, get a read-only challenge",
         "when project authority makes it necessary, get an independent review",

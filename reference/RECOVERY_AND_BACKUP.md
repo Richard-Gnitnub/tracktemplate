@@ -324,8 +324,8 @@ Before worktree retirement, use this procedure:
     owner.
 12. For authoritative local source, preserve each item in a different location.
 13. Preserve each item of retained evidence in a different location.
-14. For each authoritative local source or retained evidence item, record the
-    source file and copy.
+14. If the local-state type is **Authoritative local source** or **Retained
+    evidence**, record the source file and copy.
 15. Make sure that the source file and copy have the same bytes.
 16. For rebuildable cache/generated state, record the canonical owner.
 17. For rebuildable cache/generated state, put the applicable `PASS` result in
