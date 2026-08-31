@@ -97,7 +97,7 @@ POLICY_MARKERS = (
     "`review-required`",
     "`frozen-legacy`",
     "TERM-REVIEW[<term_id>]",
-    "Do not resolve uncertainty by choosing the most plausible synonym",
+    "Do not select a synonym to resolve uncertainty",
     "tests/validate_phase1_terminology.py",
 )
 TEXT_SUFFIXES = {".py", ".json", ".md", ".xml", ".txt", ".FCMacro"}

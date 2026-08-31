@@ -100,20 +100,19 @@ def validate_policy_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     section = semantic_text(text)
     for fragment in (
-        "retrieval optimisation only",
+        "ste lookup only makes retrieval faster",
         "does not define or limit the applicable rule set",
-        "applicable rule set is mandatory",
-        "controlled vocabulary is also mandatory",
-        "must not claim conformance because of rules in a lookup result",
-        "must not claim conformance because the pre-check has no finding",
+        "all applicable writing rules and the controlled vocabulary are mandatory",
+        "must not claim conformance because of a lookup result",
+        "must not claim conformance because the deterministic pre-check has no "
+        "finding",
         "pass result from automatic validation also does not show conformance",
-        "ste lookup controls the source text that an agent reads for this task",
-        "does not control the applicable writing rules",
+        "ste lookup selects the source text that an agent reads for a task",
+        "does not select the applicable writing rules",
     ):
         require(fragment in section, "application profile lacks: " + fragment)
     require(
-        "tracktemplate uses uk english spelling as its project spelling directive"
-        in section,
+        "tracktemplate uses uk english" in section,
         "the UK English directive was lost",
     )
     require(
@@ -130,9 +129,11 @@ def validate_workflow_text(text: str) -> None:
         "read the technical-term register",
         "use the tracktemplate-documentation-review skill for the one "
         "documentation review",
-        "author the canonical prose and freeze one clean exact git candidate",
-        "derive the review scope from the last accepted document identity and git",
-        "give the frozen complete scope to one independent documentation reviewer",
+        "author the canonical prose and freeze one clean exact candidate in git",
+        "derive the frozen review scope from the last accepted document identity "
+        "and git",
+        "give the complete frozen review scope to one independent documentation "
+        "reviewer",
         "record one complete accept",
         "approved with exact corrections",
         "or blocked verdict",
@@ -150,7 +151,7 @@ def validate_workflow_text(text: str) -> None:
         position = new_position
     for fragment in (
         "rule families in a lookup result are retrieval priorities",
-        "they are not the applicable rule set",
+        "they are not the applicable requirement set",
         "use complete-source inspection only for these bounded conditions",
         "task is about the complete standard",
         "validates the retrieval architecture",
@@ -158,7 +159,7 @@ def validate_workflow_text(text: str) -> None:
         "owner decision makes complete-source inspection necessary",
         "documentation review is the only linguistic conformance review",
         "do not run a second documentation review",
-        "do not invent other prose",
+        "do not invent other canonical prose",
         "otherwise, stop for the owner",
         "detects unreviewed mutation",
         "does not give or change the linguistic verdict",
@@ -196,7 +197,8 @@ def validate_source_documentation(text: str) -> None:
         "do not keep all review receipts for usual work",
         "does not narrow the applicable issue 9 requirement set",
         "first freeze a clean git commit",
-        "derives scope from the accepted document identities and git",
+        "derives the frozen review scope from accepted document identities "
+        "and git",
         "excludes untouched legacy documents",
         "includes the complete document for a first edit",
         "only changed complete logical units after an accepted document identity",
@@ -206,12 +208,12 @@ def validate_source_documentation(text: str) -> None:
         "blocked result, stop for the owner",
         "gives no accepted-state proposal",
         "apply each exact replacement once against its verified preimage",
-        "do not invent other prose",
+        "do not invent other wording",
         "do not run a second documentation review",
         "commit the reviewed content and reference/ste-review-state.json",
         "tracktemplate ste100 final= success sentinel",
-        "proves source, candidate, scope, receipt, accepted-state, and "
-        "final-content identity",
+        "proves source identity, exact candidate identity, frozen review scope, "
+        "receipt, accepted-state, and final-content identity",
         "detects unreviewed mutation",
         "does not judge linguistic conformance",
     ):
@@ -248,7 +250,7 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
     require(
         "lookup result selects source material to read"
         in semantic_text(skills["tracktemplate-documentation-review"])
-        and "does not select the issue 9 requirement set"
+        and "does not select the applicable issue 9 requirement set"
         in semantic_text(skills["tracktemplate-documentation-review"]),
         "documentation review lets retrieval narrow applicability",
     )
@@ -272,7 +274,7 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
         "this quality review is non-linguistic" in quality_review
         and "do not repeat documentation review" in quality_review
         and "change its verdict" in quality_review
-        and "propose prose corrections" in quality_review,
+        and "propose wording corrections" in quality_review,
         "quality review reopened the documentation review verdict",
     )
 
@@ -287,6 +289,7 @@ def validate_no_positive_assurance_claim(text: str) -> None:
         "selected lookup results prove conformance",
         "selected lookup results prove compliance",
         "lookup results are the complete applicable rule set",
+        "lookup results are the complete applicable requirement set",
         "lookup result is the complete applicable rule set",
         "returned rules are the complete applicable rule set",
         "absence of findings proves conformance",
@@ -641,41 +644,47 @@ def validate_validation_text(validation_text: str) -> None:
     for fragment in (
         "validate the retrieval contract without the pdf",
         "must fail closed when the source is missing",
-        "byte size or sha-256 identity is different from the source manifest",
-        "source-derived index when its identity is not the identity in the source "
-        "manifest",
+        "byte size or sha-256 identity differs from the source manifest",
+        "must reject a source-derived index whose identity differs from the "
+        "source manifest",
         "must be a regular file",
         "must not be in the repository or active python environment",
         "group and other users must not have write access",
         "derived cache must contain metadata only",
         "source mode must use verified source bytes",
-        "must not make a linguistic conformance, certification, or endorsement claim",
-        "review receipt must record that the reviewer examines the complete "
-        "applicable requirement set",
-        "review receipt, pre-check, derived cache, and selected lookup results do "
+        "must not claim linguistic conformance, certification, or endorsement",
+        "receipt must record examination of the complete applicable requirement "
+        "set",
+        "receipt, pre-check, derived cache, and selected lookup results do "
         "not show",
         "author freezes one clean exact git candidate",
-        "derives the review scope from the last accepted document identity and git",
-        "one independent documentation reviewer returns one complete accept",
+        "derives the frozen review scope from the last accepted document identity "
+        "and git",
+        "one independent documentation reviewer returns one complete verdict for "
+        "the frozen review scope",
+        "it is accept",
         "approved with exact corrections",
-        "blocked verdict for the frozen scope",
+        "or blocked",
         "all exact replacement wording is in that review",
         "applied once against verified preimages",
         "documentation review is the only linguistic conformance review",
         "do not run a second documentation review",
         "final validation does not judge prose",
-        "official source identity, frozen candidate, git-derived scope, review "
-        "result, receipt, expected document-level state, and final content",
+        "must validate the official source identity and frozen candidate",
+        "must also validate the git-derived frozen review scope, review result, "
+        "and receipt",
+        "must validate expected document-level state and final content",
         "reject unrelated post-review mutation",
-        "do not include an untouched legacy document in the review scope",
+        "do not include an untouched legacy document in the frozen review scope",
         "complete document for the first material edit of an unreviewed legacy "
         "document",
         "only materially changed complete logical units",
         "do not include unchanged previously accepted prose",
         "accepted review state at document level",
         "do not persist sentence, paragraph, or logical-unit workflow state",
-        "remaining linguistic, semantic, identity, or scope failure returns to "
-        "the owner",
+        "a remaining linguistic, semantic, or identity failure returns to the "
+        "owner",
+        "a failure of the frozen review scope also returns to the owner",
     ):
         require(fragment in validation, "validation owner lacks: " + fragment)
     require(
@@ -1638,8 +1647,8 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     profile = read(ENGINEERING)
     validate_policy_text(profile)
     weakened_profile = profile.replace(
-        "The applicable rule set is mandatory. The controlled\n"
-        "vocabulary is also mandatory.",
+        "All applicable writing rules and the controlled vocabulary\n"
+        "are mandatory.",
         "Only returned rules are mandatory.",
     )
     try:
@@ -1683,8 +1692,8 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     workflows = read(WORKFLOWS)
     validate_workflow_text(workflows)
     narrowed_workflow = workflows.replace(
-        "They are not the\napplicable rule set.",
-        "They are the applicable rule set.",
+        "They are not the\napplicable requirement set.",
+        "They are the applicable requirement set.",
     )
     require(narrowed_workflow != workflows, "workflow narrowing fixture is stale")
     try:
@@ -1694,7 +1703,8 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     else:
         raise AssertionError("lookup-as-complete workflow mutation was accepted")
     contradictory_workflow = (
-        workflows + "\nLookup results are the complete applicable rule set.\n"
+        workflows
+        + "\nLookup results are the complete applicable requirement set.\n"
     )
     try:
         validate_workflow_text(contradictory_workflow)

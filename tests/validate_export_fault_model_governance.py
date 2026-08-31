@@ -59,7 +59,11 @@ DESCRIPTION_RULES = {
     ),
     "tracktemplate-quality-review": (
         27,
-        ("staff-level review", "source, tests and documentation", "read-only"),
+        (
+            "staff-level review",
+            "source, tests, and documentation",
+            "read-only",
+        ),
     ),
     "tracktemplate-technical-lead": (
         44,
@@ -193,18 +197,19 @@ def validate_canonical_sections(documents: dict[str, str]) -> None:
             "supported exporter failure model",
             "Recovery after an abnormally interrupted export",
             "does not create a second command catalogue",
-            "ordinary exceptions, explicit application cancellation",
-            "expressly retained `BaseException` boundaries",
-            "staging, publication, durability, cleanup and recovery matrix",
-            "preserve every pre-existing and published final",
+            "ordinary exceptions and explicit application cancellation",
+            "expressly retained `BaseException` product boundaries",
+            "staging, publication, durability, cleanup, and recovery matrix",
+            "preserve each pre-existing and published final",
             "conservative diagnostics when durability or retained state is "
             "uncertain",
-            "exact-partial and exact-complete next-invocation handling",
+            "D-P6-003 exact-partial and exact-complete handling on the next "
+            "invocation",
             "qualified FreeCAD import and host-execution evidence",
             "exploratory disposable probes have different authority",
-            "does not automatically become an implementation defect or Exit "
-            "3 blocker",
-            "retained mandatory-invariant violation",
+            "does not automatically show an implementation defect",
+            "does not automatically prevent Exit 3",
+            "another mandatory-invariant violation also prevents Exit 3",
         ),
     )
 
@@ -310,7 +315,7 @@ def validate_skill_routing(documents: dict[str, str]) -> None:
         (
             "Do not silently widen it during staff review",
             "contradiction between an implementation or evidence claim and "
-            "the canonical supported contract",
+            "the supported exporter failure model",
         ),
     )
 
@@ -348,8 +353,8 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         "PROJECT_PLAN lost Phase 6 2/5 status",
     )
     require(
-        "Export is deterministic and failure-safe | Evidenced — "
-        "owner-accepted 2026-08-15" in plan,
+        "The same export input gives the same output, and export is "
+        "failure-safe | Evidenced — owner-accepted 2026-08-15" in plan,
         "PROJECT_PLAN lost D-P6-005 Exit 3 acceptance",
     )
     require_fragments(
@@ -357,10 +362,13 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         documents["plan"],
         (
             "D-P6-004 defines the finite supported exporter fault model",
-            "D-P6-005 accepts only the bounded private-development B16 "
-            "Entry/Exit deterministic, failure-safe DXF-and-manifest route",
+            "D-P6-005 accepts only the bounded B16 Entry/Exit "
+            "DXF-and-manifest route",
+            "The route has private-development status",
+            "The same input gives the same bytes, and the route is "
+            "failure-safe under D-P6-003 and D-P6-004",
             "advances Phase 6 to 2/5",
-            "project status remains `unknown`",
+            "Project status remains `unknown`",
         ),
     )
 
@@ -377,19 +385,21 @@ def validate_current_authority(documents: dict[str, str]) -> None:
             "d8e2b640da412ec0aff0300cd7344e78cec0048b",
             "exactly two fresh read-only reviewers",
             "one frozen candidate",
-            "No ordinary exception, explicit cancellation point, retained "
-            "tested interruption boundary or accepted recovery path is "
-            "excluded merely to obtain Exit 3",
+            "No ordinary exception or explicit cancellation point is "
+            "excluded only to obtain Exit 3",
+            "No retained tested interruption condition or accepted recovery "
+            "path is excluded for that purpose",
             "Proceed with bounded conditions",
-            "No risk state, treatment, effectiveness or disposition changes",
+            "No risk state, treatment, effectiveness, or disposition changes",
             "changes no product source",
             "Phase 6 remains 1/5 and Exit 3 remains Pending",
-            "next decision is a fresh Level 3 Exit 3 evidence-admission panel",
+            "next decision is a fresh Level 3 Exit 3 panel to admit evidence "
+            "against the supported model",
         ),
     )
     acceptance_panel = section(
         evidence,
-        "## Phase 6 Exit 3 supported-model evidence-admission panel and "
+        "## Phase 6 Exit 3 supported-model panel to admit evidence and "
         "owner decision",
     )
     require_fragments(
@@ -400,15 +410,16 @@ def validate_current_authority(documents: dict[str, str]) -> None:
             "PROCEED TO OWNER ACCEPTANCE WITH BOUNDED CONDITIONS",
             "There was no dissent",
             "No supported-model defect, unsafe recovery path, material "
-            "evidence gap or contradiction with D-P6-003/D-P6-004 was found",
-            "No risk state, treatment, effectiveness or disposition changes",
+            "evidence gap, or contradiction with D-P6-003/D-P6-004 was found",
+            "No risk state, treatment, effectiveness, or disposition changes",
             "Phase 6 advances from 1/5 to 2/5",
             "published finals must never be deleted, renamed, rewritten, "
             "truncated",
             "replaced or manually altered to recover",
-            "Output remains private-development with project status `unknown`",
-            "No Exit 1",
-            "4 or 5; production or physical-output clearance",
+            "Output remains private-development with project status `unknown`. No",
+            "authority is granted for Exit 1, 4, or 5. No production or "
+            "physical-output",
+            "clearance is granted",
         ),
     )
     current = section(
@@ -451,14 +462,16 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         (
             "d8e2b640da412ec0aff0300cd7344e78cec0048b",
             "ordinary Python exceptions",
-            "retained expressly tested `BaseException` boundaries",
-            "Deliberately exclude arbitrary asynchronous",
-            "not automatically a defect or Exit 3 blocker",
-            "Preserve every D-P6-003 add-only, no-overwrite",
+            "named and tested `BaseException` cases",
+            "excludes injection of arbitrary asynchronous `BaseException` "
+            "values",
+            "An excluded probe is not automatically a problem or a finding "
+            "that prevents Exit 3",
+            "Preserve each D-P6-003 file-addition, no-overwrite",
             "close FreeCAD completely",
             "does not prove destination correctness",
-            "No product source",
-            "No helper process",
+            "changes no product source or exporter implementation",
+            "authorises no helper process",
             "does not accept Exit 3",
             "Phase 6 remains 1/5 and Exit 3 remains Pending",
         ),
@@ -488,19 +501,22 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         + acceptance_record["exclusions"],
         (
             "7198b05b6a4b7e4654b7d02d0bad4e5cf627a799",
-            "Evidenced and owner-accepted only for the bounded B16 "
-            "Entry/Exit private-development DXF-and-dependency-manifest "
-            "route under D-P6-003 and D-P6-004",
+            "The result is Evidenced and owner-accepted only for the bounded "
+            "B16 Entry/Exit route",
+            "This private-development output route produces DXF and a "
+            "dependency manifest under D-P6-003 and D-P6-004",
             "Phase 6 advances from 1/5 to 2/5",
-            "descriptor-relative add-only/no-overwrite publication",
-            "restart-based containment with independent destination "
-            "revalidation",
-            "does not extend assurance to arbitrary instruction-level "
-            "asynchronous interruption",
-            "Existing and published finals must never be deleted, renamed, "
-            "rewritten, truncated, replaced or manually altered to recover",
-            "Output remains private-development with project status `unknown`",
-            "No Exit 1, 4 or 5",
+            "Publication uses paths relative to an open directory descriptor",
+            "It can only add an absent member and never overwrites",
+            "After a process stop, start the application again and "
+            "independently validate the destination",
+            "This acceptance does not cover arbitrary interruption between "
+            "bytecode instructions",
+            "Never delete, rename, rewrite, truncate, replace, or manually "
+            "change an existing published final file",
+            "The output keeps its private-development status and project "
+            "status stays `unknown`",
+            "This decision gives no authority for Exits 1, 4, or 5",
             "risk downgrade",
         ),
     )
@@ -682,14 +698,14 @@ def validate_mutations(documents: dict[str, str]) -> None:
         ),
         (
             "decisions",
-            "this decision does not accept Exit 3.",
-            "this decision accepts Exit 3.",
+            "This decision does not accept Exit 3.",
+            "This decision accepts Exit 3.",
             "D-P6-004 historical authority widening",
         ),
         (
             "decisions",
-            "Existing and published finals must never be deleted",
-            "Existing and published finals may be deleted",
+            "Never delete, rename, rewrite, truncate, replace",
+            "May delete, rename, rewrite, truncate, replace",
             "D-P6-005 destructive recovery widening",
         ),
     )

@@ -62,7 +62,7 @@ TT_DOC_DESCRIPTION_FRAGMENTS = {
         "current repository authority",
     ),
     "tracktemplate-documentation-review": (
-        "Create, review, shorten or reorganise",
+        "Create, review, shorten, or reorganise",
         "canonical document",
     ),
     "tracktemplate-quality-review": (
@@ -223,18 +223,18 @@ def validate_chief_comparative_priority(chief: str, workflows: str) -> None:
     )
     required_workflow_clause = semantic_text(
         "Use it when the owner says progress appears stuck, circular, "
-        "maintenance/evidence-heavy or unclear, and compose it from "
-        "$tracktemplate-continue when that workflow detects its defined loop "
-        "conditions. It is a vision-informed programme orchestrator: it "
-        "reconciles programme, "
-        "phase, evidence and pull-request state; detects loops; controls task "
-        "accountability; compares the selected work with credible maintenance, "
-        "evidence, risk-reduction and other authorised alternatives; and produces "
-        "exactly one transient, advisory assignment or stop brief. Its assignment "
-        "must state Why this outranks maintenance alternatives; a highest-value "
-        "label without that comparison is insufficient. It is read-only, is not "
-        "required for every routine change and cannot implement or accept project "
-        "authority."
+        "maintenance-heavy, evidence-heavy, or unclear. "
+        "$tracktemplate-continue also composes it when that workflow detects "
+        "its defined loop conditions. It is a vision-informed programme "
+        "orchestrator. It reconciles programme, phase, evidence, and "
+        "pull-request state. It detects loops and controls task accountability. "
+        "It compares selected work with credible authorised alternatives. These "
+        "can include maintenance, evidence, and risk-reduction work. It produces "
+        "exactly one transient advisory assignment or stop brief. Its assignment "
+        "must state Why this outranks maintenance alternatives. A highest-value "
+        "label without that comparison is insufficient. It is read-only and is "
+        "not necessary for each routine change. It cannot implement work or "
+        "accept project authority."
     )
     require(
         required_workflow_clause in semantic_paragraphs(workflow_section),
@@ -719,11 +719,11 @@ def validate_continue_invocation_policy(workflows: str) -> None:
     )
     require(
         "description and its metadata permits implicit invocation. The handoff "
-        "and continue skills require their literal project-owner invocations; "
-        "publish requires either its literal invocation or delegation from an "
-        "active literal `$tracktemplate-continue` cycle."
+        "and continue skills require their literal project-owner invocations. "
+        "Publish requires its literal invocation or delegation from an active "
+        "literal `$tracktemplate-continue` cycle."
         in normalized_workflows
-        and "Does not activate TrackTemplate publish; request the literal "
+        and "Does not activate TrackTemplate publish. Request the literal "
         "`$tracktemplate-publish` invocation"
         in normalized_workflows,
         "AGENT_WORKFLOWS lost an explicit-only project-skill boundary",
@@ -749,12 +749,12 @@ def validate_continue_invocation_policy(workflows: str) -> None:
         "delegated publication can mutate final-reviewed source",
     )
     require(
-        "During an active continuation cycle, only a `BLOCKER` may return to "
-        "implementation; `REQUIRED_BEFORE_EXIT`, `BACKLOG` and `OPTIONAL` "
+        "During an active continuation cycle, only a `BLOCKER` can return to "
+        "implementation. `REQUIRED_BEFORE_EXIT`, `BACKLOG`, and `OPTIONAL` "
         "findings do not join that cycle."
         in normalized_quality_text
-        and "During an active continuation cycle, only a `BLOCKER` may return "
-        "to implementation; `REQUIRED_BEFORE_EXIT`, `BACKLOG` and `OPTIONAL` "
+        and "During an active continuation cycle, only a `BLOCKER` can return "
+        "to implementation. `REQUIRED_BEFORE_EXIT`, `BACKLOG` and `OPTIONAL` "
         "items do not join that cycle."
         in normalized_workflows,
         "non-blocking review findings can enter a continuation repair pass",
@@ -816,8 +816,8 @@ def validate_vision_led_workflows(workflows: str) -> None:
         "continue lost its vision-led selection or standing authority boundary",
     )
     require(
-        "agent task → bounded work item → finding/exit → current programme → "
-        "vision" in normalized_workflows
+        "trace the selection from agent task to bounded work item. Continue "
+        "through finding or exit, programme, and vision" in normalized_workflows
         and "claimed, present, validated and independently accepted"
         in normalized_workflows,
         "agent workflows lost assignment traceability or acceptance separation",
@@ -867,9 +867,8 @@ def validate_documentation_profile_routing(
     for fragment in (
         "TT-DOC-001 workflow integration",
         "Authors use links from skills to these owners",
-        "Each separate responsibility that can occur repeatedly has one "
-        "owner",
-        "use the primary owner that is already in the skill catalog",
+        "One owner has each separate responsibility that can occur repeatedly",
+        "use an existing primary owner when possible",
         "Do not keep two skills with competing primary responsibilities",
         "adds no documentation-profile or tracktemplate-ste100 skill",
     ):
@@ -932,17 +931,27 @@ def validate_documentation_profile_routing(
         workflows,
         engineering,
     )
-    for path_name, guidance in (
-        ("documentation-review skill", documentation_review),
-        ("documentation writing checklist", writing_checklist),
+    for path_name, guidance, spelling_clause, requirements_clause in (
+        (
+            "documentation-review skill",
+            documentation_review,
+            "TrackTemplate uses UK English in this scope",
+            "Do not change the other Issue 9 requirements",
+        ),
+        (
+            "documentation writing checklist",
+            writing_checklist,
+            "TrackTemplate uses UK English in that canonical prose",
+            "Do not change other Issue 9 requirements",
+        ),
     ):
         guidance_flat = semantic_text(guidance)
         require(
-            "TrackTemplate UK English spelling directive" in guidance_flat,
+            spelling_clause in guidance_flat,
             path_name + " lost the canonical spelling directive",
         )
         require(
-            "Do not change other Issue 9 requirements" in guidance_flat,
+            requirements_clause in guidance_flat,
             path_name + " weakened non-spelling Issue 9 requirements",
         )
         require(
@@ -1005,7 +1014,7 @@ def validate_documentation_profile_routing(
         "This quality review is non-linguistic" in quality_review_flat
         and "Do not repeat Documentation Review" in quality_review_flat
         and "change its verdict" in quality_review_flat
-        and "propose prose corrections" in quality_review_flat,
+        and "propose wording corrections" in quality_review_flat,
         "quality review reopened the one Documentation Review verdict",
     )
 
@@ -1037,7 +1046,7 @@ def validate_documentation_profile_routing(
         "Use the local official PDF when it is available",
         "Otherwise, use the official ASD/STEMG source when it is available",
         "Report the official source that you used",
-        "If no official source is available, do not claim conformance",
+        "Do not claim conformance if no official source is available",
     ):
         require(
             fragment in documentation_review_flat,
@@ -1128,36 +1137,36 @@ def validate_issue9_documentation_lifecycle(
         ),
         (
             "only linguistic conformance review",
-            "reviewer must return one complete verdict: accept, "
+            "reviewer returns one complete verdict. the verdict is accept, "
             "approved_with_exact_corrections, or blocked",
         ),
         (
             "all exact replacement wording in the same review",
-            "once, against verified preimages",
-            "do not add or change other prose",
+            "once against verified preimages",
+            "do not add or change other wording",
             "do not run a second documentation review",
         ),
         (
-            "blocked verdict produces no accepted-state proposal",
-            "returns the change to the owner",
+            "blocked verdict creates no accepted-state proposal",
+            "return the change to the owner",
         ),
         (
-            "each schema 2 result must record the complete blocker set",
-            "accept and approved_with_exact_corrections require an empty "
-            "blocker set",
-            "blocked requires a nonempty blocker set",
+            "each schema version 2 result records the complete blockers array",
+            "accept and approved_with_exact_corrections use an empty blockers "
+            "array",
+            "blocked uses a nonempty blockers array",
             "exact path",
             "frozen logical-unit identity",
             "finding",
             "formal issue 9 rule identifiers",
-            "review receipt must preserve that complete blocker set",
-            "exact candidate and scope bindings",
-            "blocked result without a recorded blocker is invalid",
+            "review receipt preserves the complete blockers array",
+            "exact candidate and frozen review scope bindings",
+            "blocked result with an empty blockers array is invalid",
         ),
         (
-            "source, candidate, scope, receipt, accepted-state, and "
-            "final-content identity",
-            "no unreviewed mutation occurred",
+            "it proves these identities: - source. - exact candidate. - frozen "
+            "review scope. - receipt. - accepted state. - final content.",
+            "no unreviewed change remains",
             "does not judge linguistic conformance",
         ),
         (
@@ -1166,8 +1175,8 @@ def validate_issue9_documentation_lifecycle(
             "complete document",
         ),
         (
-            "materially changed complete logical units",
-            "do not review unchanged previously accepted prose again",
+            "review only the complete logical units that contain those changes",
+            "do not review unchanged accepted canonical prose again",
         ),
         (
             "durable review state at document level",
@@ -1185,7 +1194,7 @@ def validate_issue9_documentation_lifecycle(
 
     required_skill_concepts = (
         (
-            "complete frozen scope",
+            "complete frozen review scope",
             "all applicable issue 9 requirements",
             "only linguistic conformance review",
         ),
@@ -1200,18 +1209,18 @@ def validate_issue9_documentation_lifecycle(
             "do not run a second documentation review",
         ),
         (
-            "complete blocker set in this review",
-            "at least one blocker",
-            "finding, exact path",
+            "complete set of blocked findings in this review",
+            "at least one finding",
+            "for each finding, give the finding wording and exact path",
             "applicable formal issue 9 rule identifiers",
-            "scope side, bounds, and sha-256 of the frozen logical unit",
-            "confirm that the blocker set is complete",
-            "empty blocker set",
+            "side, bounds, and sha-256 of the frozen logical unit",
+            "set blocker_set_complete to true",
+            "blockers array is empty",
         ),
         (
             "validates exact reviewed corrections against frozen preimages",
             "implementing agent applies those corrections once",
-            "does not examine prose for conformance",
+            "does not examine canonical prose for conformance",
             "change your verdict",
             "returns to the owner",
         ),
@@ -1225,7 +1234,12 @@ def validate_issue9_documentation_lifecycle(
 
     required_checklist_concepts = (
         ("document class", "content category", "all applicable issue 9 requirements"),
-        ("controlled vocabulary", "technical term", "approved meaning", "part of speech"),
+        (
+            "controlled vocabulary",
+            "technical term",
+            "controlled meaning",
+            "part of speech",
+        ),
         (
             "technical-term register",
             "technical-term category",
@@ -1240,14 +1254,14 @@ def validate_issue9_documentation_lifecycle(
         ("evidence claim", "source"),
         ("resolve all unresolved terminology",),
         (
-            "for each blocker",
+            "for each blocked finding",
             "exact path",
             "frozen logical-unit identity",
             "finding",
             "applicable formal issue 9 rule identifiers",
         ),
         (
-            "blocker set contains all blockers",
+            "set contains all blocked findings",
             "blocked verdict",
             "set is not empty",
         ),
@@ -1272,19 +1286,20 @@ def validate_issue9_documentation_lifecycle(
 
     required_workflow_concepts = (
         "tracktemplate-documentation-review",
-        "author the canonical prose and freeze one clean exact git candidate",
-        "derive the review scope from the last accepted document identity and git",
+        "author the canonical prose and freeze one clean exact candidate in git",
+        "derive the frozen review scope from the last accepted document identity "
+        "and git",
         "one independent documentation reviewer",
         "accept",
         "approved_with_exact_corrections",
         "blocked",
-        "blocked verdict must record a nonempty complete blocker set",
+        "blocked verdict must record a complete, nonempty blocked finding set",
         "bind each finding",
         "exact path",
         "frozen logical-unit identity",
         "formal issue 9 rule identifiers",
         "apply all exact replacement wording once against verified preimages",
-        "do not invent other prose",
+        "do not invent other canonical prose",
         "run one final deterministic validation",
         "complete only if that validation is green",
         "stop for the owner",

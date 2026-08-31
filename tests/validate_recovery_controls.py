@@ -607,7 +607,7 @@ def validate_visible_recovery_routing(workflows, skills):
         "context packet gives the route to named git state",
         "it is not planned preservation",
         "do not give the recovery gate a complete result",
-        "recovery workflow completes stash reconciliation",
+        "recovery workflow reconciles all stashes",
         "examine named branches worktrees commits and each stash",
         "preserve unique content",
         "get applicable authority for the exact disposition",
@@ -651,8 +651,8 @@ def validate_visible_recovery_routing(workflows, skills):
             "examine the preservation diff",
         ),
         "quality": (
-            "complete stash inventory and unique content",
-            "validate exact git identity and stash disposition authority",
+            "complete stash inventory and its unique state",
+            "validate the exact git identity and stash disposition authority",
             "review the preservation diff",
             "not accepted product state",
         ),
@@ -785,16 +785,16 @@ def validate_worktree_retirement_routing(workflows, skills):
         "agent finds the canonical owner of each item",
         "during workspace alignment the implementing agent makes sure that no "
         "person or process uses the worktree",
-        "different location contains the user data",
+        "different location contains person owned data",
         "retirement audit returns the exact git identity the retirement audit "
         "returns the sha 256 of the local state inventory the retirement audit "
         "examines the retirement plan",
         "pull request state merged gives no removal authority",
         "tracked cleanliness gives no removal authority",
-        "if the retirement plan has ambiguous or uniquely owned state the "
-        "implementing agent stops",
-        "if the preservation audit does not have a complete result the "
-        "implementing agent stops",
+        "the implementing agent stops if the retirement plan has ambiguous or "
+        "uniquely owned state",
+        "the agent also stops if the preservation audit does not have a "
+        "complete result",
         "use git worktree remove without force",
         "show that the accepted commit contains the branch tip",
         "use git to remove only the local branch in the retirement plan",

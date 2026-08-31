@@ -28,11 +28,11 @@ Use official sources in this order for an ASD-STE100 conformance review:
 1. Use the local official PDF when it is available at the path above.
 2. If the local PDF is absent, use the official ASD/STEMG Issue 9 source when
    network access is available.
-3. Do not use a third-party summary, search-result text, blog, or derived
-   guidance as normative conformance evidence.
+3. Do not use an external summary, text from a search engine, a blog, or
+   derived guidance as normative conformance evidence.
 
 The review record must report which official source the reviewer used. If
-neither official source is available, do not claim that the prose is
+neither official source is available, do not claim that the canonical prose is
 ASD-STE100 Issue 9 conforming. Work that does not need linguistic conformance
 assessment can continue.
 
@@ -169,33 +169,33 @@ the complete SHA for its accepted baseline:
   --baseline-revision BASELINE --author-id AUTHOR_ID
 ```
 
-The command writes a content-addressed scope file under
-`tmp/ste100-review-scopes/`. Review results use
+The command writes the frozen review scope to a file. Its filename contains
+the file SHA-256. The file is under `tmp/ste100-review-scopes/`. Review results use
 `tmp/ste100-review-results/`, and accepted-state proposals use
 `tmp/ste100-review-state-proposals/`. The command compares the source with the manifest
-and derives scope from the accepted document identities and Git. It excludes
+and derives the frozen review scope from accepted document identities and Git. It excludes
 untouched legacy documents. It includes the complete document for a first edit
 and only changed complete logical units after an accepted document identity.
 
-Give that frozen scope to one independent Documentation Reviewer. The reviewer
+Give that frozen review scope to one independent Documentation Reviewer. The reviewer
 must use the official source and return one complete `ACCEPT`,
 `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` result. For
 `APPROVED_WITH_EXACT_CORRECTIONS`, the result must contain all exact replacement
 wording.
 
 Use schema 2 for each new review-result file. Set `blocker_set_complete` to
-`true` and use `blockers` to record the complete blocker set. Use an empty list
+`true` and use `blockers` to record the complete set of `BLOCKED` findings. Use an empty list
 for `ACCEPT` and `APPROVED_WITH_EXACT_CORRECTIONS`. A `BLOCKED` result must
-contain at least one blocker. Each blocker records `finding`, the exact `path`,
+contain at least one finding. Each `blockers` item records `finding`, the exact `path`,
 the sorted unique formal Issue 9 `rule_ids`, and `unit`. The `unit` object uses
 the exact `side`, `start_byte`, `end_byte`, and `sha256` values from the frozen
-scope.
+review scope.
 
-The command verifies each blocker against the frozen scope and the applicable
-Git content. It preserves the complete blocker set in the review receipt. It
-rejects a `BLOCKED` result that contains no blocker. The frozen-scope and
+The command verifies each `blockers` item against the frozen review scope and
+the applicable Git content. It preserves the complete set in the review receipt. It
+rejects a `BLOCKED` result that contains no finding. The frozen-review-scope and
 accepted-state schemas do not change. Preserved schema 1 results and receipts
-remain immutable historical evidence; do not migrate them to schema 2.
+remain immutable historical evidence. Do not migrate them to schema 2.
 
 Record the result with:
 
@@ -206,7 +206,7 @@ Record the result with:
 For a `BLOCKED` result, stop for the owner. The command gives no accepted-state
 proposal. For `ACCEPT`, use the proposed document-level review state. For
 `APPROVED_WITH_EXACT_CORRECTIONS`, apply each exact replacement once against
-its verified preimage, and use the proposed state. Do not invent other prose.
+its verified preimage, and use the proposed state. Do not invent other wording.
 Do not run a second Documentation Review.
 
 Commit the reviewed content and `reference/ste-review-state.json`. Then run the
@@ -217,7 +217,8 @@ one final deterministic validation:
 ```
 
 Require the `TRACKTEMPLATE_STE100_FINAL=` success sentinel. This command proves
-source, candidate, scope, receipt, accepted-state, and final-content identity.
+source identity, exact candidate identity, frozen review scope, receipt,
+accepted-state, and final-content identity.
 It detects unreviewed mutation. It does not judge linguistic conformance.
 
 The usual agent route and bounded conditions for complete-source inspection are

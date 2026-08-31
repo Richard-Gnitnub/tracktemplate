@@ -339,39 +339,44 @@ def validate_governance_controls(
     require("Level 0" not in engineering, "obsolete Level 0 remains in policy")
     require("Level 0" not in agents, "obsolete Level 0 remains in AGENTS.md")
     for requirement in (
-        "Required: the relevant test, complete diff review and a concise "
-        "commit message.",
-        "relevant specialist skill, automated and applicable FreeCAD/GUI "
-        "validation, exactly one concise entry",
-        "Required: full evidence review, a safety/risk panel, an explicit "
-        "project-owner decision and a project-plan update.",
-        "Do not run a panel for Level 1 or Level 2 work.",
+        "Run the relevant test. Review the complete diff. Use a short commit "
+        "message.",
+        "Use the relevant specialist skill. Run automated validation and each "
+        "applicable FreeCAD or GUI check.",
+        "Add exactly one short entry to "
+        "[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md). Review the "
+        "complete diff.",
+        "Complete the full evidence review. Run a safety/risk panel. Get an "
+        "explicit project-owner decision. Update the project plan.",
+        "Do not run a panel for Level 1 or Level 2.",
     ):
         require(
             requirement in engineering_flat,
             "three-level requirement is missing: " + requirement,
         )
     require(
-        "A gate is a decision that transfers, expands, retires or irreversibly "
-        "changes project authority"
+        "A gate transfers, expands, retires, or irreversibly changes project "
+        "authority."
         in engineering_flat,
         "engineering policy lacks a true-gate definition",
     )
     for trigger in (
-        "phase or release closure, including beta or release-candidate "
-        "packaging",
-        "a legacy migration family or window becoming supported",
-        "retirement of an accepted oracle or rollback authority",
-        "production-output or chair-package clearance",
-        "governance, licensing or provenance authority changes",
-        "irreversible or destructive repository, data or external operations",
+        "Phase or release closure, including beta packaging or packaging for "
+        "release qualification.",
+        "Support for a legacy migration family or window.",
+        "Retirement of an accepted oracle or rollback authority.",
+        "Production-output or chair-package clearance.",
+        "A governance, licence, or provenance authority change.",
+        "An irreversible or destructive repository, data, or external "
+        "operation.",
     ):
         require(
             trigger in engineering_flat,
             "risk-panel trigger is missing: " + trigger,
         )
     require(
-        "Every Level 3 task is a true gate and requires a safety/risk panel."
+        "Every Level 3 task is a true gate. Each true gate requires a "
+        "safety/risk panel."
         in engineering_flat,
         "engineering policy does not reserve gates for Level 3",
     )
@@ -418,7 +423,7 @@ def validate_governance_controls(
 
 def validate_validation_document_boundary() -> None:
     validation = read(VALIDATION)
-    heading = "## Document boundary"
+    heading = "## Validation-document responsibility"
     require(
         validation.count(heading) == 1,
         "VALIDATION.md must contain one document-boundary section",
@@ -427,7 +432,7 @@ def validate_validation_document_boundary() -> None:
     boundary_flat = " ".join(boundary.split())
     for fragment in (
         "durable validation layers",
-        "stable runner profiles and entry points",
+        "stable runner profiles, entry points",
         "minimum change matrix",
         "does not by itself justify changing this document",
         "Level 2 or Level 3 documentation lifecycle",
@@ -479,26 +484,28 @@ def validate_documentation_profile(
     profile = engineering.split(heading, 1)[1].split("\n## ", 1)[0]
     profile_flat = " ".join(profile.split())
     for fragment in (
-        "Human comprehensibility is a governance control",
+        "Human understanding is a governance control",
         "Owner view → canonical information → proof/provenance",
-        "must never give project authority independently",
-        "Only a Level 3 project-owner decision can change the scope",
+        "must not give project authority independently",
+        "Only a Level 3 project-owner decision can change this profile. That "
+        "decision can change its bounded scope or controlled status meanings.",
         "ASD-STE100 Simplified Technical English, Issue 9",
         "2025-01-15",
-        "normative controlled-writing standard",
+        "Normative controlled-writing standard",
         "official standard is the normative external reference",
         "Public summaries, model knowledge, and automatic validators do not "
         "show conformance",
-        "A reviewer must use the official standard for a linguistic "
+        "A reviewer uses the official standard for a linguistic "
         "conformance review",
-        "Do not copy the standard or its controlled general dictionary",
-        "substantial workflow and skill prose",
+        "Do not copy the standard into this repository. Do not copy its "
+        "controlled general dictionary into this repository.",
+        "Substantial workflow and skill wording",
         "API and schema identifiers",
-        "machine-generated logs and evidence",
-        "TrackTemplate uses UK English spelling as its project spelling "
-        "directive",
-        "directive uses the option in Issue 9 Rule 1.14",
-        "directive changes spelling only",
+        "Machine-generated logs and evidence",
+        "TrackTemplate uses UK English",
+        "Rule 1.14 permits this instruction",
+        "Applicable TrackTemplate canonical technical prose must obey "
+        "ASD-STE100 Issue 9",
         "does not change the applicable Issue 9 vocabulary or grammar rules",
         "does not change approved meanings, parts of speech, or technical-term "
         "controls",
@@ -508,23 +515,24 @@ def validate_documentation_profile(
         "ASD-STE100 Issue 9 conformance not verified",
         "Externally certified or endorsed",
         "does not claim this state",
-        "cannot replace the linguistic review or show Issue 9 conformance",
-        "facts, evidence, inferences, recommendations, and owner decisions "
-        "distinct",
-        "Short text must never change evidence or a recommendation into "
+        "cannot replace the linguistic conformance review. It cannot show "
+        "Issue 9 conformance",
+        "Keep facts, evidence, inferences, recommendations, and owner decisions "
+        "separate",
+        "A short result must not change evidence or a recommendation into "
         "acceptance",
         "is the one project owner for TrackTemplate technical nouns",
-        "All new canonical technical prose in English must obey the applicable "
-        "ASD-STE100 Issue 9 requirements",
-        "review the full logical unit that contains the change",
+        "All new canonical technical prose in English must obey the applicable Issue 9 "
+        "writing rules",
+        "review the complete logical unit that contains the change",
         "Review live canonical prose in bounded migration cycles",
         "Do not change frozen history only to correct its Issue 9 style",
         "Add the behaviour to the primary owner when possible",
-        "Documentation simplification does not give a skill phase, "
-        "production, security, merge, release, acceptance, or project-owner "
-        "authority",
+        "Documentation simplification gives no security/recovery-review "
+        "authority. It gives no phase, production, merge, release, acceptance, or "
+        "project-owner authority.",
         "do not freeze full paragraphs",
-        "do not use sentence-length checks as proof of linguistic conformance",
+        "Sentence-length checks do not prove linguistic conformance",
     ):
         require(
             fragment in profile_flat,
@@ -533,11 +541,11 @@ def validate_documentation_profile(
 
     controlled_meanings = {
         "Pending": "Pending gives no authority",
-        "Evidenced": "does not give wider acceptance or clearance",
+        "Evidenced": "gives no wider acceptance or clearance",
         "Accepted": "decision applies only to its stated authority",
         "Blocked": "prevent the named action or decision",
         "Finding": "does not change project state",
-        "Limitation": "reader must be able to see it",
+        "Limitation": "reader must see it",
         "Unknown": "does not mean accepted or rejected",
         "Decision required": "owner decision is absent",
     }
@@ -572,8 +580,7 @@ def validate_documentation_profile(
     )
     owner_view = plan.split("## Current owner view", 1)[1].split("\n## ", 1)[0]
     require(
-        "canonical status, evidence, and registers are the source of the owner "
-        "view"
+        "The canonical registers and evidence are the source of this owner view"
         in " ".join(plan.split()),
         "PROJECT_PLAN owner view lost its derivation boundary",
     )
@@ -581,28 +588,28 @@ def validate_documentation_profile(
         "Phase 6 has 2/5 accepted exits" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
         and "D-GOV-011" in owner_view
-        and "selects one subsequent hypothesis for the measured canonical area "
-        "of Edit" in owner_view
-        and "bounds the product change at Level 2 to one FreeCAD "
+        and "selects one later performance hypothesis for the measured "
+        "canonical Edit area" in owner_view
+        and "limits the Level 2 product change to one FreeCAD "
         "adapter file"
         in owner_view
         and "D-GOV-009, D-GOV-010, and their evidence do not change"
         in owner_view
         and "two repeated reads of the selected record" in owner_view
-        and "without work in a different Edit stage" in owner_view
+        and "does not need work in another Edit stage" in owner_view
         and "attribution noise floor is `2.895891 ms`" in owner_view
         and "only `0.0731425 ms` higher than that floor" in owner_view
         and "No result is improvement evidence or Exit 4 evidence"
         in owner_view
         and "tracktemplate/adapters/freecad/transition_state.py" in owner_view
-        and "Keep one live read of the selected record before the write"
+        and "Keep one live read before the write"
         in owner_view
         and "necessary read after the write" in owner_view
-        and "make the D-GOV-011 change at Level 2" in owner_view
+        and "Make the D-GOV-011 Level 2 change" in owner_view
         and "record a new same-host baseline on the D-GOV-010 host" in owner_view
-        and "attribution materiality rule in D-GOV-009" in owner_view
+        and "D-GOV-009 attribution materiality rule" in owner_view
         and "Do not change the comparison rule" in owner_view
-        and "Do not accept Exit 4 without a subsequent owner decision at Level 3"
+        and "A later Level 3 owner decision is necessary to accept Exit 4"
         in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
@@ -809,10 +816,11 @@ def validate_asd_ste100_reference(
         "Use the local official PDF when it is available",
         "If the local PDF is absent, use the official ASD/STEMG Issue 9 "
         "source when network access is available",
-        "Do not use a third-party summary, search-result text, blog, or "
-        "derived guidance as normative conformance evidence",
+        "Do not use an external summary, text from a search engine, a blog, or "
+        "derived guidance as normative conformance evidence.",
         "review record must report which official source the reviewer used",
-        "neither official source is available, do not claim that the prose is "
+        "neither official source is available, do not claim that the canonical "
+        "prose is "
         "ASD-STE100 Issue 9 conforming",
     ):
         require(
@@ -849,7 +857,7 @@ def validate_asd_ste100_reference(
         "TT-DOC-001 profile lost the ASD-STE100 source owner link",
     )
     require(
-        "own only the local path and source priority" in engineering_flat
+        "instructions own the local path and source priority" in engineering_flat
         and "do not own TrackTemplate documentation policy" in engineering_flat,
         "TT-DOC-001 profile confused source routing with policy authority",
     )
@@ -874,7 +882,7 @@ def validate_asd_ste100_reference(
         "conformance review" in workflows_flat
         and "Agents in other workflows route the review to documentation "
         "review" in workflows_flat
-        and "The agents do not read the PDF during usual work"
+        and "Agents do not read the PDF during usual work"
         in workflows_flat,
         "ASD-STE100 workflow routing drifted",
     )

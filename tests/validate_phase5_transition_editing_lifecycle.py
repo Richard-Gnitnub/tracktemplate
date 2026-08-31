@@ -539,7 +539,7 @@ def _validate_structure_and_explicit_route():
         / "phase-closeouts"
         / "PHASE5_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
-    assert "explicit B16 lifecycle boundaries" in validation
+    assert "explicit B16 lifecycle product boundaries" in validation
     assert "save-time retirement and reopen reconstruction" in evidence
     assert "## Explicit B16 transition-editing lifecycle tranche" in evidence
     assert "Phase 5 remains 0/4" in evidence
