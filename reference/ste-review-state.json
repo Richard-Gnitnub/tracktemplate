@@ -1,4 +1,82 @@
 {
-  "documents": [],
+  "documents": [
+    {
+      "accepted_blob": "sha1:16723f7c4dbc944d43852ccc16dbfab17eb439c0",
+      "accepted_sha256": "sha256:2a8eb6b3931f7b5905af24b46f99f44196830c2ed6d59a0058b001ef447f18e5",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": ".agents/skills/tracktemplate-documentation-review/SKILL.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:05eaba815fdfb98990a7b69923f5f5954c59742e",
+      "accepted_sha256": "sha256:4458f48d3183790fed3b298baf3ef6237511286514970f4937ddcac7ec7952a6",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": ".agents/skills/tracktemplate-documentation-review/references/writing-checklist.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:c053877044b908137f58b5082efb7d2318ca6316",
+      "accepted_sha256": "sha256:6af3ad499d065eb360aedd984a28202ab2fad913ade2291a1acb750672d4d111",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": ".agents/skills/tracktemplate-quality-review/SKILL.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:25f23f8d6ed523ad7b3a4acb0044fbf231c98661",
+      "accepted_sha256": "sha256:84783cfc63de12942e00f288410c1f0dbb0604149a5f164e711044b50f9a7650",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": "reference/AGENT_WORKFLOWS.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:6ba82b062019734bb33bd2ea5c91dc9071a0a643",
+      "accepted_sha256": "sha256:c593a28913ef18076d6b7e3d2913fce5bbf09e263cbb373b1577441feede5ddc",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": "reference/ENGINEERING_POLICY.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:80f51fc5f1718b738cd9ae6dceee4b53c387c67c",
+      "accepted_sha256": "sha256:ee2245e2453edc4198a07504254750c1f4ac4bdaf8ff370fa2b9219c4be23200",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": "reference/PROJECT_PLAN.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:bd1f985f8544638dda0f1bc47d67ec7b9912167d",
+      "accepted_sha256": "sha256:c2ab2de5aded9613f28bad9255a89506509e40a86da166a85e6f36dedaef3a57",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": "reference/TERMINOLOGY.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:6e0feacac14558e5aed807bef7c9a7a6356e096f",
+      "accepted_sha256": "sha256:8aa327c6c94789ad502509fc4f1e583105facc382b58d4aefcbc604919118b7b",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": "reference/VALIDATION.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:ef8e3ed203e5e6fd04eaf900c91d580af7ab9b0d",
+      "accepted_sha256": "sha256:873701812b384152981ce5513718b4b302555b17dfad779f8087dc1833280bc3",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": "reference/current/PHASE_EVIDENCE.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:a580efb316b6f0544e7f77ecbd531f61db78ce52",
+      "accepted_sha256": "sha256:9e5b696d6ee74feafc904314098d108d1aed8cbacfee89a0b70696aed8d7f405",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": "reference/current/gate-decisions.json",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    },
+    {
+      "accepted_blob": "sha1:bef8586c7e113f486c08241fd01cd31da1117805",
+      "accepted_sha256": "sha256:ea566a088ac57b986e1be592f2e9430b97fa4395b203988125e3601bc9a01384",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "path": "reference/external/asd-ste100/README.md",
+      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+    }
+  ],
   "schema_version": 1
 }
