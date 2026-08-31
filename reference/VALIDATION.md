@@ -967,51 +967,42 @@ cache, and selected lookup results do not show that this review occurred. They
 also do not show conformance. Source identity validation does not make a
 positive rights claim.
 
-For each logical unit with a material edit, the author must use the writing
-checklist. The author must examine all applicable Issue 9 requirements. The
-author completes the conformance review. A validation tool does not replace
-this review.
+For each material change to canonical prose, validate the authorised lifecycle:
 
-The author-review worklist records the exact candidate, source identity, and
-conformance scope for changed prose. It also records each logical unit that the
-author reviewed. The author records findings and their dispositions. Before the
-author freezes the exact candidate, the author must resolve each unresolved
-finding.
+1. The author freezes one clean exact Git candidate.
+2. The STE lookup derives the review scope from the last accepted document
+   identity and Git.
+3. One independent Documentation Reviewer returns one complete `ACCEPT`,
+   `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` verdict for the frozen scope.
+4. For `APPROVED_WITH_EXACT_CORRECTIONS`, all exact replacement wording is in
+   that review and is applied once against verified preimages.
+5. One final deterministic validation runs after the review or correction.
 
-For an evidence claim from a command result, record the command invocation and
-working directory. Record the validation profile and process exit status.
-Record the actual result. Record the command-output SHA-256. If the command has
-a sentinel, record it.
+The Documentation Review is the only linguistic conformance review. Do not run
+a second Documentation Review. The final validation does not judge prose. It
+must validate the official source identity, frozen candidate, Git-derived
+scope, review result, receipt, expected document-level state, and final content.
+It must reject unrelated post-review mutation.
 
-If the canonical owner does not contain all controls for author-side assurance,
-`tests/validate_agent_guidance.py` must give a `FAIL` result. The
-validator in `tests/validate_governance_semantics.py` must reject removal of a
-semantic control. The validator must reject a claim that a deterministic
-pre-check or STE lookup gives a conformance review.
+Do not include an untouched legacy document in the review scope. Include the
+complete document for the first material edit of an unreviewed legacy document.
+After the document has an accepted identity, include only materially changed
+complete logical units. Do not include unchanged previously accepted prose.
+Keep accepted review state at document level; do not persist sentence,
+paragraph, or logical-unit workflow state that Git can derive.
 
-The STE lookup must reject these author-review worklists:
+`tests/validate_agent_guidance.py` must give a `FAIL` result when a canonical
+owner omits one of these controls. `tests/validate_governance_semantics.py` must
+reject removal or weakening of a semantic control. Automatic validation and a
+deterministic pre-check must not claim or change linguistic conformance.
 
-- A worklist that identifies a different exact candidate
-- A source identity that differs from the source manifest
-- Changed prose that is not in the conformance scope
-- A logical unit with a material edit and no SHA-256
-- An unresolved author finding
-- A command result without its command invocation, validation profile, or
-  actual result
-- Command output that does not contain the actual result
-- A worklist that has no `PASS` result from a read-only challenge of the
-  worklist and changed prose.
-
-The STE lookup validates the source identity, exact candidate, conformance
-scope, and SHA-256 values. It also validates unresolved findings, command
-results, and the read-only challenge result. It does not examine prose for
-conformance.
-
-Before the author freezes the exact candidate, a different documentation
-reviewer must complete a read-only challenge. The reviewer examines the
-author-review worklist and changed prose. If the challenge gives a `PASS`
-result, the author can start validation. The read-only challenge has no
-acceptance.
+`tests/validate_ste100_retrieval.py` must prove whole-document first review,
+untouched legacy exclusion, later changed-unit scope, document-level durable
+state, all three verdict routes, exact correction preimages, and final identity
+binding. A `BLOCKED` result must produce no accepted-state proposal. The final
+validator must reject source, scope, receipt, state, identity, or mutation
+drift. A remaining linguistic, semantic, identity, or scope failure returns to
+the owner.
 
 [Technical provenance](PROVENANCE.md#asd-ste100-issue-9-reference) records the
 rights state in a different authority boundary. The

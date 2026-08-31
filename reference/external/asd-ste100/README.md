@@ -161,46 +161,48 @@ technical-term status, and unresolved terminology. It is not an external
 certification or endorsement. Do not keep all review receipts for usual work.
 Keep one only when project authority makes this necessary.
 
-If canonical prose has a material edit, make a temporary author-review
-worklist in `tmp/`. Record each path and logical unit. Record the applicable
-review categories. Record findings and their dispositions. Before validation,
-resolve all findings.
-
-Validate the author-review worklist with this command:
+For a material change to canonical prose, first freeze a clean Git commit. Use
+the complete SHA for its accepted baseline:
 
 ```bash
-.venv/bin/python tools/ste100_lookup.py author-assurance tmp/WORKLIST.json
+.venv/bin/python tools/ste100_lookup.py freeze-review \
+  --baseline-revision BASELINE --author-id AUTHOR_ID
 ```
 
-If the worktree does not contain the PDF, add `--source-file` with the full
-path of the preserved PDF.
+The command writes a content-addressed scope file under
+`tmp/ste100-review-scopes/`. Review results use
+`tmp/ste100-review-results/`, and accepted-state proposals use
+`tmp/ste100-review-state-proposals/`. The command compares the source with the manifest
+and derives scope from the accepted document identities and Git. It excludes
+untouched legacy documents. It includes the complete document for a first edit
+and only changed complete logical units after an accepted document identity.
 
-The STE lookup compares the PDF with the source manifest. It compares each
-SHA-256 in the worklist with the exact candidate. It also makes sure the
-worklist contains the conformance scope for changed prose. If prose changes,
-the STE lookup rejects the previous review receipt.
-
-For an evidence claim from a command result, the worklist names the command
-invocation and validation profile. It records the actual result and command
-output. The STE lookup compares the command-output SHA-256 and actual result
-with that output.
-
-The STE lookup rejects an unresolved finding. It writes a review receipt in
-`tmp/ste100-review-receipts/`. The receipt filename contains its SHA-256. The
-author-assurance command validates the source identity, exact candidate, and
-conformance scope. It also validates SHA-256 values, unresolved findings, and
-command results. It does not give a result from a conformance review.
-
-Before the author freezes the exact candidate, a different documentation
-reviewer completes a read-only challenge. If the challenge gives a `PASS`
-result, record the challenge result. Then, use:
+Give that frozen scope to one independent Documentation Reviewer. The reviewer
+must use the official source and return one complete `ACCEPT`,
+`APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` result. For
+`APPROVED_WITH_EXACT_CORRECTIONS`, the result must contain all exact replacement
+wording. Record the result with:
 
 ```bash
-.venv/bin/python tools/ste100_lookup.py author-assurance \
-  tmp/WORKLIST.json --require-challenge
+.venv/bin/python tools/ste100_lookup.py record-review SCOPE RESULT
 ```
 
-The read-only challenge has no acceptance.
+For a `BLOCKED` result, stop for the owner. The command gives no accepted-state
+proposal. For `ACCEPT`, use the proposed document-level review state. For
+`APPROVED_WITH_EXACT_CORRECTIONS`, apply each exact replacement once against
+its verified preimage, and use the proposed state. Do not invent other prose.
+Do not run a second Documentation Review.
+
+Commit the reviewed content and `reference/ste-review-state.json`. Then run the
+one final deterministic validation:
+
+```bash
+.venv/bin/python tools/ste100_lookup.py final-validate SCOPE RECEIPT
+```
+
+Require the `TRACKTEMPLATE_STE100_FINAL=` success sentinel. This command proves
+source, candidate, scope, receipt, accepted-state, and final-content identity.
+It detects unreviewed mutation. It does not judge linguistic conformance.
 
 The usual agent route and bounded conditions for complete-source inspection are
 in the

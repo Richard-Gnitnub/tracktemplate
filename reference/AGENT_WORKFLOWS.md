@@ -142,21 +142,23 @@ For canonical prose in the conformance scope, use this route:
 
 1. Read the Technical Documentation Profile.
 2. Read the technical-term register.
-3. Use the `tracktemplate-documentation-review` skill.
-4. Record each logical unit with a material edit.
-5. For each logical unit, record the content category.
-6. Use the writing checklist for each logical unit.
-7. Record findings and their dispositions.
-8. Resolve all findings and unresolved terminology.
-9. After the last wording change, review each logical unit in full.
-10. Validate the temporary author-review worklist.
-11. Before the author freezes an exact candidate, get a read-only challenge.
-12. When project authority makes it necessary, get an independent review.
+3. Use the `tracktemplate-documentation-review` skill for the one
+   Documentation Review.
+4. Author the canonical prose and freeze one clean exact Git candidate.
+5. Derive the review scope from the last accepted document identity and Git.
+6. Give the frozen complete scope to one independent Documentation Reviewer.
+7. Record one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`
+   verdict.
+8. For `APPROVED_WITH_EXACT_CORRECTIONS`, apply all exact replacement wording
+   once against verified preimages. Do not invent other prose.
+9. Run one final deterministic validation after the review or correction.
+10. Complete only if that validation is green. Otherwise, stop for the owner.
 
-The author completes the conformance review. The STE lookup validates the
-source identity, exact candidate, conformance scope, and SHA-256 values. It also
-validates each command result against its evidence source. It does not give a
-conformance review result. A deterministic pre-check is only a review aid.
+The Documentation Review is the only linguistic conformance review. Do not run
+a second Documentation Review. The STE lookup derives scope and validates
+source, candidate, receipt, accepted-state, and final-content identity. It also
+detects unreviewed mutation. It does not give or change the linguistic verdict.
+A deterministic pre-check is only a review aid.
 
 Rule families in a lookup result are retrieval priorities. They are not the
 applicable rule set. Use complete-source inspection only for these bounded
@@ -169,10 +171,10 @@ conditions:
 
 | Workflow responsibility | Owner and boundary |
 | --- | --- |
-| Documentation review | A documentation reviewer uses `tracktemplate-documentation-review` to review the complete logical unit that contains the change. The reviewer uses the STE lookup for targeted retrieval. The reviewer reports the official source. The skill owns the workflow responsibility. |
+| Documentation review | One independent documentation reviewer uses `tracktemplate-documentation-review` to review the complete frozen scope. The reviewer uses the official source and returns one complete verdict. For `APPROVED_WITH_EXACT_CORRECTIONS`, the same review supplies all exact replacement wording. The skill owns the linguistic-review responsibility. |
 | Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. It uses the STE lookup and the PDF as external references only. It keeps unverified conformance and migration findings in the record. |
-| Evidence and limitation reports | An implementing agent uses `tracktemplate-change-validation` to keep proof/provenance below the owner view. The agent validates source identity, derived cache identity, and a review receipt when applicable. The agent makes sure the conformance record reports an official source. A validation tool does not give a result from a conformance review. |
-| Independent review | An independent reviewer uses `tracktemplate-quality-review` to keep canonical policy, the external standard, lookup results, and the complete logical unit different. The reviewer examines all applicable requirements. Then, the reviewer gives an independent review of limitations and authority boundaries. The reviewer does not operate validation again. |
+| Evidence and limitation reports | An implementing agent uses `tracktemplate-change-validation` to keep proof/provenance below the owner view. The agent validates source, scope, candidate, receipt, accepted-state, and final-content identity when applicable. A validation tool does not give or change the Documentation Review verdict. |
+| Independent review | After final deterministic validation, an independent reviewer uses `tracktemplate-quality-review` to examine implementation quality, limitations, and authority boundaries. For an Issue 9 claim, the reviewer checks the recorded Documentation Review and its bindings. This review is non-linguistic: it does not repeat Documentation Review or change its verdict. |
 | Handoff from `tracktemplate-technical-lead` | An implementing agent uses `tracktemplate-technical-lead` only for an authorised Level 1 or Level 2 result. If a conformance review is necessary, the agent routes the task to documentation review. |
 | Cycle result from `tracktemplate-continue` | An agent that uses `tracktemplate-continue` supplies the 6 owner-view fields and technical provenance. If a conformance review is necessary, the agent routes the task to documentation review. Project authority for Level 1/2 work and merge does not change. |
 | Result after context recovery | An agent that uses `tracktemplate-context-recovery` makes a short report from canonical authority. The agent keeps technical provenance for recovery. If a conformance review is necessary, the agent routes the task to documentation review. |

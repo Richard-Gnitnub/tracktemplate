@@ -926,10 +926,11 @@ def validate_documentation_profile_routing(
         / "references"
         / "writing-checklist.md"
     )
-    validate_issue9_author_assurance(
+    validate_issue9_documentation_lifecycle(
         documentation_review,
         writing_checklist,
         workflows,
+        engineering,
     )
     for path_name, guidance in (
         ("documentation-review skill", documentation_review),
@@ -999,6 +1000,13 @@ def validate_documentation_profile_routing(
         and "validator result alone is not sufficient evidence"
         in quality_review_flat,
         "quality review lost its Issue 9 evidence boundary",
+    )
+    require(
+        "This quality review is non-linguistic" in quality_review_flat
+        and "Do not repeat Documentation Review" in quality_review_flat
+        and "change its verdict" in quality_review_flat
+        and "propose prose corrections" in quality_review_flat,
+        "quality review reopened the one Documentation Review verdict",
     )
 
     source_skill_names = {
@@ -1083,30 +1091,27 @@ def validate_documentation_profile_routing(
         )
 
 
-def validate_issue9_author_assurance(
+def validate_issue9_documentation_lifecycle(
     documentation_review: str,
     writing_checklist: str,
     workflows: str,
+    engineering: str,
 ) -> None:
-    """Keep human Issue 9 review and machine traceability in their owners."""
-    skill_section = semantic_text(
+    """Keep one linguistic review and deterministic final validation."""
+    policy_section = semantic_text(
         direct_section_content(
-            documentation_review,
-            "Author-side assurance for ASD-STE100 Issue 9",
-        )
-    ).casefold()
-    checklist_section = semantic_text(
-        direct_section_content(
-            writing_checklist,
-            "Author-side assurance for ASD-STE100 Issue 9",
-        )
-        + "\n"
-        + direct_section_content(
-            writing_checklist,
-            "Temporary author-review worklist",
+            engineering,
+            "Documentation Review lifecycle",
             level=3,
         )
     ).casefold()
+    skill_section = semantic_text(
+        direct_section_content(
+            documentation_review,
+            "One Documentation Review",
+        )
+    ).casefold()
+    checklist_section = semantic_text(writing_checklist).casefold()
     workflow_section = semantic_text(
         direct_section_content(
             workflows,
@@ -1114,33 +1119,85 @@ def validate_issue9_author_assurance(
         )
     ).casefold()
 
+    required_policy_concepts = (
+        (
+            "author → freeze scope → one documentation review",
+            "optional exact reviewed",
+            "correction once",
+            "one final deterministic validation → complete or owner stop",
+        ),
+        (
+            "only linguistic conformance review",
+            "reviewer must return one complete verdict: accept, "
+            "approved_with_exact_corrections, or blocked",
+        ),
+        (
+            "all exact replacement wording in the same review",
+            "once, against verified preimages",
+            "do not add or change other prose",
+            "do not run a second documentation review",
+        ),
+        (
+            "blocked verdict produces no accepted-state proposal",
+            "returns the change to the owner",
+        ),
+        (
+            "source, candidate, scope, receipt, accepted-state, and "
+            "final-content identity",
+            "no unreviewed mutation occurred",
+            "does not judge linguistic conformance",
+        ),
+        (
+            "do not review an untouched legacy document",
+            "first material edit of an unreviewed legacy document",
+            "complete document",
+        ),
+        (
+            "materially changed complete logical units",
+            "do not review unchanged previously accepted prose again",
+        ),
+        (
+            "durable review state at document level",
+            "last accepted document identity",
+            "do not keep persistent sentence, paragraph, or logical-unit "
+            "workflow state",
+        ),
+    )
+    for concepts in required_policy_concepts:
+        require(
+            all(concept in policy_section for concept in concepts),
+            "documentation policy lost simplified lifecycle control: "
+            + " / ".join(concepts),
+        )
+
     required_skill_concepts = (
         (
-            "logical unit with a material edit",
+            "complete frozen scope",
             "all applicable issue 9 requirements",
-            "temporary author-review worklist",
+            "only linguistic conformance review",
         ),
         (
-            "last wording change",
-            "logical unit in full",
-            "resolve all findings",
-            "resolve all unresolved terminology",
+            "accept",
+            "approved_with_exact_corrections",
+            "blocked",
         ),
         (
-            "author-assurance",
-            "read-only challenge",
-            "different documentation reviewer",
+            "all exact replacement wording in this review",
+            "path, byte range, and frozen preimage",
+            "do not run a second documentation review",
         ),
         (
+            "validates exact reviewed corrections against frozen preimages",
+            "implementing agent applies those corrections once",
             "does not examine prose for conformance",
-            "does not give a result from a conformance review",
-            "author completes the conformance review",
+            "change your verdict",
+            "returns to the owner",
         ),
     )
     for concepts in required_skill_concepts:
         require(
             all(concept in skill_section for concept in concepts),
-            "documentation review lost author-side assurance: "
+            "documentation review lost simplified lifecycle control: "
             + " / ".join(concepts),
         )
 
@@ -1158,36 +1215,49 @@ def validate_issue9_author_assurance(
         ("different instruction", "condition before its instruction"),
         ("sentence construction", "paragraph structure"),
         ("all other applicable issue 9 requirements",),
-        ("evidence claim", "command invocation", "validation profile", "actual result"),
-        ("finding", "disposition"),
+        ("evidence claim", "source"),
         ("resolve all unresolved terminology",),
-        ("exact candidate", "conformance scope for changed prose", "sha-256"),
-        ("read-only challenge", "no acceptance"),
-        ("does not examine prose for conformance", "author completes the conformance review"),
+        ("complete logical unit",),
     )
     for concepts in required_checklist_concepts:
         require(
             all(concept in checklist_section for concept in concepts),
-            "documentation checklist lost author-side assurance: "
+            "documentation checklist lost linguistic-review coverage: "
             + " / ".join(concepts),
+        )
+    for retired_concept in (
+        "author-side assurance",
+        "temporary author-review worklist",
+        "read-only challenge",
+    ):
+        require(
+            retired_concept not in checklist_section,
+            "documentation checklist retained retired assurance machinery: "
+            + retired_concept,
         )
 
     required_workflow_concepts = (
         "tracktemplate-documentation-review",
-        "logical unit with a material edit",
-        "content category",
-        "writing checklist",
-        "findings and their dispositions",
-        "resolve all findings and unresolved terminology",
-        "review each logical unit in full",
-        "temporary author-review worklist",
-        "read-only challenge",
-        "does not give a result from a conformance review",
+        "author the canonical prose and freeze one clean exact git candidate",
+        "derive the review scope from the last accepted document identity and git",
+        "one independent documentation reviewer",
+        "accept",
+        "approved_with_exact_corrections",
+        "blocked",
+        "apply all exact replacement wording once against verified preimages",
+        "do not invent other prose",
+        "run one final deterministic validation",
+        "complete only if that validation is green",
+        "stop for the owner",
+        "only linguistic conformance review",
+        "do not run a second documentation review",
+        "detects unreviewed mutation",
+        "does not give or change the linguistic verdict",
         "deterministic pre-check is only a review aid",
     )
     require(
         all(concept in workflow_section for concept in required_workflow_concepts),
-        "AGENT_WORKFLOWS lost the human-review or traceability boundary",
+        "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
     )
 
 

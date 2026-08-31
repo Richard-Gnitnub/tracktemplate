@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 6,
-  "updated_on": "2026-08-25",
+  "updated_on": "2026-08-31",
   "decisions": [
     {
       "id": "D-P6-001",
@@ -167,6 +167,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-012-worktree-sequence-nonconformance",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-012-worktree-sequence-nonconformance"
+    },
+    {
+      "id": "D-GOV-015",
+      "decided_on": "2026-08-31",
+      "status": "Accepted",
+      "decision": "Adopt the simplified single-review STE lifecycle.",
+      "authority": "At the authorised protected-main baseline `54176f5ae0fea1f72743f856fd9251a53d7e1dbf`, with recovery checkpoint `ac5a7d7ae8c6bf72069b802ebe9e929faf27e789` as implementation evidence only, the project owner adopts this lifecycle: author → freeze scope → one Documentation Review → optional exact reviewed correction once → one final deterministic validation → complete or owner stop.\n\nThe Documentation Review is the only linguistic-conformance review. It returns one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` verdict. For `APPROVED_WITH_EXACT_CORRECTIONS`, the reviewer supplies all exact replacement wording in the same review. The implementing agent applies those corrections once against verified preimages, does not invent other prose, and does not run a second Documentation Review. Final deterministic validation proves source, candidate, scope, receipt, document-state, and final-content identity and the absence of unreviewed mutation. It does not independently judge linguistic conformance. A remaining linguistic, semantic, identity, or scope failure returns to the owner.\n\nUntouched legacy documents receive no review. The first material edit of an unreviewed legacy document causes one whole-document review. After the document has an accepted identity, review covers only materially changed complete logical units derived from that identity and Git diff. Unchanged previously accepted prose is not reviewed again. Durable review state stays at document level. The existing verified Issue 9 retrieval and cache architecture remains the source-reading route and does not narrow Issue 9 applicability.\n\nThe owner authorises only the minimum canonical and skill alignment, Level 3 recording, exact candidate freeze, the single Documentation Review, one exact correction application when approved, one final deterministic validation, the existing publication-policy non-linguistic independent review, and one draft pull request if exact-green. The owner gives no merge authority.",
+      "exclusions": "The recovery checkpoint is not accepted project state and does not replace the authorised protected-main baseline. This decision does not change Phase 6 or any exit. Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Project status stays `unknown`. No risk disposition changes.\n\nDo not resume D-GOV-014 or modify `aa6c506`. Do not add generic repair-authority machinery, grants, uses, completions, telemetry, ontology changes, Cycle 3 work, a second documentation-assurance framework, or a second Documentation Review. Do not reopen untouched accepted legacy prose.\n\nThis decision changes no product or railway behaviour. It gives no FreeCAD, GUI, persistence, export, schema, API, performance, production, physical-output, `project-cleared`, packaging, release, tagging, or legacy-retirement authority. It gives no authority to merge into protected main.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle"
     }
   ]
 }

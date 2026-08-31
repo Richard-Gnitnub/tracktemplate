@@ -3303,6 +3303,136 @@ production, release, or a phase exit. The implementing agent made no change to
 the rights state or acceptance. The project owner gives no project authority
 for Cycle 3 or a merge of an exact candidate for Cycle 2 without review.
 
+<a id="d-gov-015-simplified-ste-lifecycle"></a>
+
+## D-GOV-015 simplified STE lifecycle
+
+### Owner view
+
+| Field | Current result |
+| --- | --- |
+| Current state | The interrupted three-path implementation at recovery checkpoint `ac5a7d7ae8c6bf72069b802ebe9e929faf27e789` is bounded implementation evidence. Its authorised protected-main baseline is `54176f5ae0fea1f72743f856fd9251a53d7e1dbf`. The checkpoint is not accepted project state. |
+| What changed | D-GOV-015 adopts one lifecycle: author → freeze scope → one Documentation Review → optional exact reviewed correction once → one final deterministic validation → complete or owner stop. The existing Issue 9 retrieval and cache remain. |
+| What now works | Git derives whole-document first review and later changed-complete-unit scope. One review returns one of three complete verdicts. Exact corrections bind to frozen preimages. Durable state records document identities. Final validation binds source, scope, receipt, state, and final bytes and detects unreviewed mutation. |
+| Limitations/findings | The tool cannot authenticate a reviewer. Actual role separation remains necessary. One-shot ignored evidence requires independent preservation. Final validation does not judge linguistic conformance. The current backup condition must be proved before Documentation Review. |
+| Owner decision | Accept D-GOV-015. Complete only the bounded lifecycle, canonical and skill alignment, Level 3 record, one review, optional exact correction once, final deterministic validation, non-linguistic publication review, and one draft pull request if exact-green. Do not merge. |
+| Next action | Complete fail-closed development validation. Freeze and preserve one exact candidate and its scope. Run the one Documentation Review. Preserve each resulting artifact, run the one final deterministic validation, get the required non-linguistic independent review, and publish one draft pull request only if exact-green. |
+
+### Bounded implementation and evidence
+
+The exact `54176f5ae0fea1f72743f856fd9251a53d7e1dbf` to
+`ac5a7d7ae8c6bf72069b802ebe9e929faf27e789` delta changes only
+`tools/ste100_lookup.py`, `tests/validate_ste100_retrieval.py`, and
+`reference/ste-review-state.json`. The lookup file keeps 66 existing functions
+unchanged, modifies only parser and command routing, removes 17 functions for
+the retired author-worklist design, and adds 44 lifecycle-specific functions.
+The test replaces the retired worklist/challenge route with an end-to-end Git
+fixture. The durable register is an empty schema-1 document map. The exact
+three-path delta is 1,645 additions and 1,205 deletions, for net growth of 440
+lines. No generic workflow state, grants, uses, completions, telemetry, or
+ontology machinery remains.
+
+At the recovery checkpoint, tracked Python parsing passed for 189 files. The
+focused ASD-STE100 retrieval validator passed. Source/cache validation returned
+the verified-source-bound-cache sentinel. The CI standalone profile passed all
+60 validators. This evidence preceded alignment and trust-boundary hardening;
+the project must rerun it before candidate freeze.
+
+The safety/risk review found an incorrect temporary-directory instruction,
+incomplete negative trust-boundary evidence, inherited Git execution surfaces,
+and no current independent preservation result for the ignored one-shot
+artifacts. The implementation corrected the directory instruction. It resolves
+a protected system Git executable independently of inherited `PATH`, uses a
+minimal Git environment, disables replace objects, fsmonitor, hooks, external
+diff, and text conversion, and keeps bounded process output and timeout. The
+negative tests now prove rejection of self-review, tampered source, scope,
+receipt, state, and final bytes, invalid corrections, hostile Git environment,
+fsmonitor, text conversion, replacement objects, and unreviewed final mutation.
+The candidate still requires the preservation conditions before review.
+
+After alignment and trust-boundary hardening, tracked Python parsing passed for
+189 files. The focused retrieval and lifecycle validator passed. Source/cache
+validation returned the verified-source-bound-cache sentinel. The agent-guidance
+and project-progress validators passed. The governance mutation validator
+rejected all 328 mutations. The CI standalone profile passed all 60 validators.
+No FreeCAD or GUI validation applies to this governance-and-tool change.
+
+### Participants and reviewed evidence
+
+| Participant | Role and independence |
+| --- | --- |
+| `owner:tracktemplate-project-owner` | Project owner, panel chair, and decision owner. The owner supplied the exact lifecycle, baseline, checkpoint, exclusions, completion route, draft-pull-request authority, and no-merge boundary. |
+| `agent:openai-codex-primary` | Change owner and presenter. This agent recovered, corrected, aligned, and validated the candidate. It cannot independently accept its own implementation or linguistic conformance. |
+| `agent:aquinas-lifecycle-risk-panel` | QA/risk reviewer. This delegated reviewer examined the checkpoint, current implementation, tests, recovery controls, and alignment without mutation or linguistic Documentation Review. The reviewer is independent of implementation changes but shares the agent team and workspace; it is not an external organisational review. |
+
+The panel reviewed the exact protected-main baseline and recovery checkpoint,
+the three-path [lookup implementation](../../tools/ste100_lookup.py),
+[lifecycle fixture](../../tests/validate_ste100_retrieval.py), and
+[empty document-level state](../ste-review-state.json). It also reviewed the
+[Engineering Policy](../ENGINEERING_POLICY.md#true-gates-and-safetyrisk-panels),
+[validation owner](../VALIDATION.md#validation-of-the-retrieval-contract),
+[recovery policy](../RECOVERY_AND_BACKUP.md), [current risks](risks.json),
+[source and retrieval procedure](../external/asd-ste100/README.md), and the
+development-validation results in this panel.
+
+### Dissent, unknowns, and exceptions
+
+The QA/risk reviewer recorded no dissent from the bounded recommendation. The
+accepted backup device is not currently mounted, so independent preservation
+for this gate remains unknown. The tool also cannot authenticate the declared
+reviewer identity. The same-team and shared-workspace review is an independence
+limitation, not an external organisational review. There is no exception to the
+single-review lifecycle, preservation condition, owner-stop rule, Phase 6
+boundary, or hard exclusions.
+
+### Bounded conditions and accountable owners
+
+| Condition | Accountable owner | Deadline and current result |
+| --- | --- | --- |
+| Harden Git identity and add the fail-closed source, scope, receipt, state, correction, and mutation proofs. | `agent:openai-codex-primary` | Before candidate freeze — completed; focused and full development validation must remain green on the exact candidate. |
+| Commit and push the exact candidate. | `agent:openai-codex-primary` | Before Documentation Review — pending candidate freeze. |
+| Make the accepted independent backup device available. | `owner:tracktemplate-project-owner` | Before independent scope preservation and Documentation Review — pending. |
+| Preserve the frozen scope and then each review result, receipt, and accepted-state proposal on the accepted device. | `agent:openai-codex-primary` | Preserve each artifact before its next dependent operation — pending. |
+| Return the sole linguistic verdict with actual role separation and all exact wording, if applicable. | Independent Documentation Reviewer | Once, after scope preservation and before any correction — pending. |
+| Apply only exact approved corrections once, run one final deterministic validation, and return any failure to the owner. | `agent:openai-codex-primary` | After the sole Documentation Review and before publication review — pending. |
+
+### Safety and risk panel
+
+| Risk | Assessment | Result |
+| --- | --- | --- |
+| PR-12 — fragmented or stale direction | Policy, workflow, validation, terminology, source instructions, and the two directly responsible review skills align to D-GOV-015. Semantic controls must reject a return to the retired route. | Medium / Mitigate / Partial. The disposition does not change. |
+| PR-13 — repository or evidence loss | The candidate needs a pushed exact Git identity. The ignored scope, result, receipt, and proposal need current independent preservation as each exists. No accepted backup evidence after 2026-08-01 proves this gate. | Critical / Mitigate. Control effectiveness is unverified for this gate until preservation passes; the disposition does not change. |
+| PR-22 — authority transfer or self-acceptance | One independent Documentation Reviewer owns the sole linguistic verdict. A separate final review is non-linguistic. The tool compares declared author and reviewer identifiers but cannot authenticate persons. | High / Remove. Effective only with actual role separation, this panel, and the owner decision; the disposition does not change. |
+
+The safety/risk reviewer was read-only and did not conduct linguistic
+Documentation Review. The reviewer shares the agent team and workspace, so the
+review is independent from implementation mutation but is not an external
+organisational review.
+
+**Panel recommendation:** **Proceed with bounded conditions.** Before freeze,
+complete the Git hardening and negative tests and rerun development validation.
+Before Documentation Review, push the exact candidate and independently
+preserve the scope. Preserve the result, receipt, and accepted-state proposal
+before the next dependent operation. Any preservation, reviewer-separation,
+source, scope, receipt, state, semantic, Git-identity, or final-byte failure
+returns to the owner. Do not run a second Documentation Review.
+
+### Owner decision D-GOV-015
+
+On 2026-08-31, `owner:tracktemplate-project-owner` accepts the exact authority and exclusions in
+[gate-decisions.json](gate-decisions.json). The earlier author-side assurance
+section remains historical evidence of the retired route; it is not current
+operating instruction after D-GOV-015.
+
+Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Project status stays
+`unknown`. No risk disposition changes. D-GOV-015 gives no product, railway,
+FreeCAD, GUI, persistence, export, schema, API, performance, production,
+physical-output, packaging, release, tagging, legacy-retirement, or merge
+authority. It gives no authority to resume D-GOV-014, modify `aa6c506`, add
+generic repair authority, grants, uses, completions, telemetry, ontology work,
+Cycle 3, a second documentation-assurance framework, or a second Documentation
+Review.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -3339,6 +3469,11 @@ D-GOV-011.
 The D-GOV-012 decision records the sequence nonconformance in Cycle
 2. It also records project authority for an exact candidate and draft pull
 request in Cycle 2.
+
+D-GOV-015 owns the current simplified STE lifecycle. It keeps the existing
+retrieval architecture, requires one Documentation Review and one final
+deterministic validation, and gives no phase, product, merge, or Cycle 3
+authority.
 
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.

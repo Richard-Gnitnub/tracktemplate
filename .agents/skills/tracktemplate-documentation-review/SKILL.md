@@ -64,26 +64,26 @@ Read only the documents relevant to the present change:
 - Consult `reference/LEARNING_FROM_EXPERIENCE.md` only for lessons relevant to
   the present change.
 
-## Author-side assurance for ASD-STE100 Issue 9
+## One Documentation Review
 
-For each logical unit with a material edit, use the
-[writing checklist](references/writing-checklist.md#author-side-assurance-for-asd-ste100-issue-9).
-The author examines all applicable Issue 9 requirements. The author records
-findings and their dispositions in a temporary author-review worklist.
-The worklist also records each logical unit that the author reviewed. It records
-the SHA-256 for each logical unit.
+Use the [writing checklist](references/writing-checklist.md#documentation-review-for-asd-ste100-issue-9)
+for the complete frozen scope that the STE lifecycle gives you. Review that
+scope against all applicable Issue 9 requirements in the official source. This
+is the only linguistic conformance review.
 
-After the last wording change, review each logical unit in full. Resolve
-all findings. Resolve all unresolved terminology. Then, validate the worklist
-with `tools/ste100_lookup.py author-assurance`. Before the author freezes the
-exact candidate, get a read-only challenge from a different documentation
-reviewer.
+Return one complete verdict: `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or
+`BLOCKED`. For `APPROVED_WITH_EXACT_CORRECTIONS`, give all exact replacement
+wording in this review. Identify each replacement by its path, byte range, and
+frozen preimage. Do not defer wording to another reviewer or a later review.
+Do not run a second Documentation Review.
 
-The STE lookup validates the source identity, exact candidate, conformance
-scope, and SHA-256 values. It does not examine prose for conformance.
-The deterministic pre-check also does not give a result from a conformance review. The
-author completes the conformance review. The read-only challenge has no
-acceptance.
+The STE lookup validates source, candidate, scope, receipt, accepted-state, and
+final-content identity. It validates exact reviewed corrections against frozen
+preimages and derives the expected final bytes. The implementing agent applies
+those corrections once. The lookup does not examine prose for conformance or
+change your verdict. The deterministic pre-check is only a review aid. A
+remaining linguistic, semantic, identity, or scope failure returns to the
+owner.
 
 ## Editing rules
 

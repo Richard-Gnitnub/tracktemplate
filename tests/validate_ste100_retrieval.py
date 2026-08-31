@@ -128,16 +128,17 @@ def validate_workflow_text(text: str) -> None:
     ordered = (
         "read the technical documentation profile",
         "read the technical-term register",
-        "use the tracktemplate-documentation-review skill",
-        "record each logical unit with a material edit",
-        "for each logical unit, record the content category",
-        "use the writing checklist for each logical unit",
-        "record findings and their dispositions",
-        "resolve all findings and unresolved terminology",
-        "after the last wording change, review each logical unit in full",
-        "validate the temporary author-review worklist",
-        "before the author freezes an exact candidate, get a read-only challenge",
-        "when project authority makes it necessary, get an independent review",
+        "use the tracktemplate-documentation-review skill for the one "
+        "documentation review",
+        "author the canonical prose and freeze one clean exact git candidate",
+        "derive the review scope from the last accepted document identity and git",
+        "give the frozen complete scope to one independent documentation reviewer",
+        "record one complete accept",
+        "approved with exact corrections",
+        "or blocked verdict",
+        "apply all exact replacement wording once against verified preimages",
+        "run one final deterministic validation after the review or correction",
+        "complete only if that validation is green",
     )
     position = -1
     for fragment in ordered:
@@ -155,6 +156,12 @@ def validate_workflow_text(text: str) -> None:
         "validates the retrieval architecture",
         "targeted retrieval cannot resolve an ambiguity that the reviewer records",
         "owner decision makes complete-source inspection necessary",
+        "documentation review is the only linguistic conformance review",
+        "do not run a second documentation review",
+        "do not invent other prose",
+        "otherwise, stop for the owner",
+        "detects unreviewed mutation",
+        "does not give or change the linguistic verdict",
     ):
         require(fragment in value, "workflow boundary lacks: " + fragment)
 
@@ -188,6 +195,25 @@ def validate_source_documentation(text: str) -> None:
         "a pass command result also does not show conformance",
         "do not keep all review receipts for usual work",
         "does not narrow the applicable issue 9 requirement set",
+        "first freeze a clean git commit",
+        "derives scope from the accepted document identities and git",
+        "excludes untouched legacy documents",
+        "includes the complete document for a first edit",
+        "only changed complete logical units after an accepted document identity",
+        "one independent documentation reviewer",
+        "approved with exact corrections",
+        "result must contain all exact replacement wording",
+        "blocked result, stop for the owner",
+        "gives no accepted-state proposal",
+        "apply each exact replacement once against its verified preimage",
+        "do not invent other prose",
+        "do not run a second documentation review",
+        "commit the reviewed content and reference/ste-review-state.json",
+        "tracktemplate ste100 final= success sentinel",
+        "proves source, candidate, scope, receipt, accepted-state, and "
+        "final-content identity",
+        "detects unreviewed mutation",
+        "does not judge linguistic conformance",
     ):
         require(fragment in value, "source/retrieval instructions lack: " + fragment)
 
@@ -240,6 +266,14 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
         "reviewer examines the complete applicable requirement set"
         in semantic_text(skills["tracktemplate-quality-review"]),
         "quality review does not check full applicability",
+    )
+    quality_review = semantic_text(skills["tracktemplate-quality-review"])
+    require(
+        "this quality review is non-linguistic" in quality_review
+        and "do not repeat documentation review" in quality_review
+        and "change its verdict" in quality_review
+        and "propose prose corrections" in quality_review,
+        "quality review reopened the documentation review verdict",
     )
 
 
@@ -620,6 +654,28 @@ def validate_validation_text(validation_text: str) -> None:
         "applicable requirement set",
         "review receipt, pre-check, derived cache, and selected lookup results do "
         "not show",
+        "author freezes one clean exact git candidate",
+        "derives the review scope from the last accepted document identity and git",
+        "one independent documentation reviewer returns one complete accept",
+        "approved with exact corrections",
+        "blocked verdict for the frozen scope",
+        "all exact replacement wording is in that review",
+        "applied once against verified preimages",
+        "documentation review is the only linguistic conformance review",
+        "do not run a second documentation review",
+        "final validation does not judge prose",
+        "official source identity, frozen candidate, git-derived scope, review "
+        "result, receipt, expected document-level state, and final content",
+        "reject unrelated post-review mutation",
+        "do not include an untouched legacy document in the review scope",
+        "complete document for the first material edit of an unreviewed legacy "
+        "document",
+        "only materially changed complete logical units",
+        "do not include unchanged previously accepted prose",
+        "accepted review state at document level",
+        "do not persist sentence, paragraph, or logical-unit workflow state",
+        "remaining linguistic, semantic, identity, or scope failure returns to "
+        "the owner",
     ):
         require(fragment in validation, "validation owner lacks: " + fragment)
     require(
@@ -1907,6 +1963,12 @@ def validate_documentation_lifecycle() -> None:
         )
         state_path = root / "reference" / "ste-review-state.json"
         state_path.write_bytes(STE._canonical_json_bytes(STE._empty_review_state()))
+
+        def write_result(name: str, value: dict[str, object]) -> pathlib.Path:
+            path = root / "tmp" / name
+            path.write_bytes(STE._canonical_json_bytes(value))
+            return path
+
         candidate_one = commit(root, "first material edit")
         scope_path, scope_one = STE.freeze_documentation_review(
             baseline_revision=baseline,
@@ -1937,8 +1999,121 @@ def validate_documentation_lifecycle() -> None:
             "schema_version": 1,
             "scope_sha256": scope_one["scope_sha256"],
         }
-        result_one_path = root / "tmp" / "result-one.json"
-        result_one_path.write_bytes(STE._canonical_json_bytes(result_one))
+        tampered_scope = copy.deepcopy(scope_one)
+        tampered_scope["author_id"] = "tampered-author"
+        expect_ste_error(
+            "ste-review-scope-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=write_result("tampered-scope.json", tampered_scope),
+                result_path=write_result("scope-result.json", result_one),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        tampered_source = copy.deepcopy(source_manifest)
+        tampered_source["sha256"] = "0" * 64
+        expect_ste_error(
+            "ste-review-scope-changed",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("source-result.json", result_one),
+                source_manifest=tampered_source,
+                root=root,
+            ),
+        )
+        wrong_scope = copy.deepcopy(result_one)
+        wrong_scope["scope_sha256"] = "0" * 64
+        expect_ste_error(
+            "ste-review-result-scope-mismatch",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("wrong-scope.json", wrong_scope),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        wrong_source = copy.deepcopy(result_one)
+        wrong_source["issue9_source_sha256"] = "0" * 64
+        expect_ste_error(
+            "ste-review-result-source-mismatch",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("wrong-source.json", wrong_source),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        same_reviewer = copy.deepcopy(result_one)
+        same_reviewer["reviewer_id"] = "fixture-author"
+        expect_ste_error(
+            "ste-review-result-not-independent",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("same-reviewer.json", same_reviewer),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        incomplete_review = copy.deepcopy(result_one)
+        incomplete_review["full_applicability_considered"] = False
+        expect_ste_error(
+            "ste-review-result-incomplete",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "incomplete-review.json",
+                    incomplete_review,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        invalid_verdict = copy.deepcopy(result_one)
+        invalid_verdict["result"] = "REVIEW_AGAIN"
+        expect_ste_error(
+            "ste-review-result-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "invalid-verdict.json",
+                    invalid_verdict,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        accept_with_correction = copy.deepcopy(result_one)
+        accept_with_correction["corrections"] = [{}]
+        expect_ste_error(
+            "ste-review-corrections-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "accept-with-correction.json",
+                    accept_with_correction,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        approved_without_correction = copy.deepcopy(result_one)
+        approved_without_correction["result"] = (
+            "APPROVED_WITH_EXACT_CORRECTIONS"
+        )
+        expect_ste_error(
+            "ste-review-corrections-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "approved-without-correction.json",
+                    approved_without_correction,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+
+        result_one_path = write_result("result-one.json", result_one)
         receipt_one, proposal_one, _recorded_one = STE.record_documentation_review(
             scope_path=scope_path,
             result_path=result_one_path,
@@ -1946,7 +2121,46 @@ def validate_documentation_lifecycle() -> None:
             root=root,
         )
         require(proposal_one is not None, "ACCEPT did not create a state proposal")
+        tampered_receipt = load_json(receipt_one)
+        tampered_receipt["candidate_tree"] = "0" * 40
+        expect_ste_error(
+            "ste-review-receipt-invalid",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path,
+                receipt_path=write_result(
+                    "tampered-receipt.json",
+                    tampered_receipt,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        expect_ste_error(
+            "ste-final-state-mismatch",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path,
+                receipt_path=receipt_one,
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
         state_path.write_bytes(proposal_one.read_bytes())
+        untouched_bytes = untouched.read_bytes()
+        untouched.write_text(
+            "# Untouched\n\nUnreviewed post-review text.\n",
+            encoding="utf-8",
+        )
+        commit(root, "unreviewed post-review mutation")
+        expect_ste_error(
+            "ste-final-unreviewed-mutation",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path,
+                receipt_path=receipt_one,
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        untouched.write_bytes(untouched_bytes)
         accepted_one = commit(root, "accepted baseline")
         final_one = STE.validate_final_review_state(
             scope_path=scope_path,
@@ -1955,7 +2169,13 @@ def validate_documentation_lifecycle() -> None:
             root=root,
         )
         require(
-            final_one["final_revision"] == accepted_one,
+            final_one["candidate_revision"] == candidate_one
+            and final_one["final_revision"] == accepted_one
+            and final_one["issue9_source_sha256"] == EXPECTED_SOURCE_SHA256
+            and final_one["result"] == "ACCEPT"
+            and final_one["scope_sha256"] == scope_one["scope_sha256"]
+            and final_one["status"]
+            == "reviewed-state-present-and-no-unreviewed-prose-mutation",
             "final validation did not bind the exact accepted revision",
         )
         state_one = load_json(state_path)
@@ -1966,6 +2186,18 @@ def validate_documentation_lifecycle() -> None:
         require(
             "units" not in state_one["documents"][0],
             "the state register persisted logical-unit state",
+        )
+        require(
+            set(state_one["documents"][0])
+            == {
+                "accepted_blob",
+                "accepted_sha256",
+                "issue9_source",
+                "path",
+                "review_receipt",
+            }
+            and state_one["documents"][0]["path"] == "reference/guide.md",
+            "the state register is not a document-level identity record",
         )
 
         guide.write_text(
@@ -2018,8 +2250,60 @@ def validate_documentation_lifecycle() -> None:
             "schema_version": 1,
             "scope_sha256": scope_two["scope_sha256"],
         }
-        result_two_path = root / "tmp" / "result-two.json"
-        result_two_path.write_bytes(STE._canonical_json_bytes(result_two))
+        correction_outside_scope = copy.deepcopy(result_two)
+        correction_outside_scope["corrections"][0]["path"] = (
+            "reference/untouched.md"
+        )
+        expect_ste_error(
+            "ste-review-corrections-outside-scope",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_two_path,
+                result_path=write_result(
+                    "correction-outside-scope.json",
+                    correction_outside_scope,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        wrong_preimage = copy.deepcopy(result_two)
+        wrong_preimage["corrections"][0]["preimage_sha256"] = "0" * 64
+        expect_ste_error(
+            "ste-review-correction-preimage-mismatch",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_two_path,
+                result_path=write_result(
+                    "wrong-correction-preimage.json",
+                    wrong_preimage,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        overlapping_corrections = copy.deepcopy(result_two)
+        overlap_preimage = preimage[1:]
+        overlap = copy.deepcopy(overlapping_corrections["corrections"][0])
+        overlap["start_byte"] = start + 1
+        overlap["preimage"] = overlap_preimage
+        overlap["preimage_sha256"] = hashlib.sha256(
+            overlap_preimage.encode("utf-8")
+        ).hexdigest()
+        overlap["replacement"] = "other reviewed wording"
+        overlapping_corrections["corrections"].append(overlap)
+        expect_ste_error(
+            "ste-review-corrections-overlap",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_two_path,
+                result_path=write_result(
+                    "overlapping-corrections.json",
+                    overlapping_corrections,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+
+        result_two_path = write_result("result-two.json", result_two)
         receipt_two, proposal_two, _recorded_two = STE.record_documentation_review(
             scope_path=scope_two_path,
             result_path=result_two_path,
@@ -2035,7 +2319,20 @@ def validate_documentation_lifecycle() -> None:
             + b"approved wording"
             + candidate_bytes[start + len(preimage.encode("utf-8")) :]
         )
+        corrected_bytes = guide.read_bytes()
         state_path.write_bytes(proposal_two.read_bytes())
+        guide.write_bytes(corrected_bytes + b"\nUnreviewed wording.\n")
+        commit(root, "unreviewed wording after exact correction")
+        expect_ste_error(
+            "ste-final-reviewed-bytes-mismatch",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_two_path,
+                receipt_path=receipt_two,
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        guide.write_bytes(corrected_bytes)
         accepted_two = commit(root, "exact correction and state")
         final_two = STE.validate_final_review_state(
             scope_path=scope_two_path,
@@ -2099,6 +2396,146 @@ def validate_documentation_lifecycle() -> None:
             )
         )
         require(blocked_proposal is None, "BLOCKED created an accepted state proposal")
+        expect_ste_error(
+            "ste-review-blocked",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_three_path,
+                receipt_path=_blocked_receipt,
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+
+
+def validate_lifecycle_git_boundary() -> None:
+    """Reject inherited Git execution and object-interpretation controls."""
+
+    def git(root: pathlib.Path, *arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+
+    def commit(root: pathlib.Path, message: str) -> str:
+        git(root, "add", "--all")
+        git(
+            root,
+            "-c",
+            "user.name=TrackTemplate Validation",
+            "-c",
+            "user.email=validation@example.invalid",
+            "commit",
+            "--quiet",
+            "-m",
+            message,
+        )
+        return git(root, "rev-parse", "HEAD")
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        (root / "reference").mkdir()
+        guide = root / "reference" / "guide.md"
+        attributes = root / ".gitattributes"
+        attributes.write_text("*.md diff=evil\n", encoding="utf-8")
+        guide.write_text("# Guide\n\nBaseline text.\n", encoding="utf-8")
+        git(root, "init", "--quiet")
+        baseline = commit(root, "baseline")
+        guide.write_text("# Guide\n\nCandidate text.\n", encoding="utf-8")
+        candidate = commit(root, "candidate")
+        expected_identity = STE._lifecycle_candidate_identity(
+            baseline,
+            candidate,
+            root=root,
+        )
+
+        hostile = root / "hostile"
+        hostile.mkdir()
+        marker = hostile / "executed"
+        helper = hostile / "helper"
+        helper.write_text(
+            "#!/bin/sh\nprintf 'executed\\n' >> \"{}\"\nexit 1\n".format(
+                marker
+            ),
+            encoding="utf-8",
+        )
+        helper.chmod(0o700)
+        hostile_git = hostile / "git"
+        hostile_git.write_text(
+            "#!/bin/sh\nprintf 'git\\n' >> \"{}\"\nexit 99\n".format(marker),
+            encoding="utf-8",
+        )
+        hostile_git.chmod(0o700)
+        global_config = hostile / "global-config"
+        global_config.write_text(
+            "[core]\n\tfsmonitor = {}\n"
+            "[diff \"evil\"]\n\ttextconv = {}\n".format(helper, helper),
+            encoding="utf-8",
+        )
+        git(root, "config", "core.fsmonitor", str(helper))
+        git(root, "config", "diff.evil.textconv", str(helper))
+        git(root, "replace", candidate, baseline)
+
+        decoy = root / "decoy"
+        decoy.mkdir()
+        git(decoy, "init", "--quiet")
+        saved_environment = os.environ.copy()
+        try:
+            os.environ.update(
+                {
+                    "GIT_ATTR_SOURCE": baseline,
+                    "GIT_CONFIG_COUNT": "1",
+                    "GIT_CONFIG_GLOBAL": str(global_config),
+                    "GIT_CONFIG_KEY_0": "core.fsmonitor",
+                    "GIT_CONFIG_VALUE_0": str(helper),
+                    "GIT_DIR": str(decoy / ".git"),
+                    "GIT_EXTERNAL_DIFF": str(helper),
+                    "GIT_INDEX_FILE": str(decoy / "hostile-index"),
+                    "GIT_REPLACE_REF_BASE": "refs/replace/hostile/",
+                    "GIT_WORK_TREE": str(decoy),
+                    "PATH": str(hostile),
+                }
+            )
+            require(
+                STE._lifecycle_head(root=root, require_clean=True) == candidate,
+                "hostile Git state redirected the lifecycle HEAD",
+            )
+            require(
+                STE._lifecycle_candidate_identity(
+                    baseline,
+                    candidate,
+                    root=root,
+                )
+                == expected_identity,
+                "Git configuration or replacement objects changed candidate identity",
+            )
+            guide.write_text(
+                "# Guide\n\nUncommitted candidate text.\n",
+                encoding="utf-8",
+            )
+            expect_ste_error(
+                "ste-lifecycle-candidate-not-clean",
+                lambda: STE._lifecycle_head(root=root, require_clean=True),
+            )
+        finally:
+            os.environ.clear()
+            os.environ.update(saved_environment)
+        saved_default_path = os.defpath
+        try:
+            os.defpath = str(hostile)
+            expect_ste_error(
+                "ste-lifecycle-git-untrusted",
+                lambda: STE._lifecycle_head(root=root, require_clean=True),
+            )
+        finally:
+            os.defpath = saved_default_path
+        require(
+            not marker.exists(),
+            "the lifecycle executed an inherited, repository-local, fsmonitor, "
+            "or textconv helper",
+        )
 
 
 def validate_live_source_resolvability() -> None:
@@ -2164,6 +2601,7 @@ def main() -> None:
     validate_agent_and_validation_routing()
     validate_cache_and_lookup_behaviour(index)
     validate_documentation_lifecycle()
+    validate_lifecycle_git_boundary()
     validate_live_source_resolvability()
     validate_semantic_mutations(index)
     print(SENTINEL)

@@ -131,6 +131,7 @@ EXPECTED_PHASE6_DECISION_IDS = {
     "D-GOV-010",
     "D-GOV-011",
     "D-GOV-012",
+    "D-GOV-015",
 }
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
@@ -280,6 +281,70 @@ EXPECTED_TT_DOC_DECISION = (
 )
 EXPECTED_TT_DOC_SPELLING_DECISION = (
     "Correct the TT-DOC-001 UK English spelling directive."
+)
+EXPECTED_STE_LIFECYCLE_DECISION = (
+    "Adopt the simplified single-review STE lifecycle."
+)
+EXPECTED_STE_LIFECYCLE_AUTHORITY = (
+    "At the authorised protected-main baseline "
+    "`54176f5ae0fea1f72743f856fd9251a53d7e1dbf`, with recovery checkpoint "
+    "`ac5a7d7ae8c6bf72069b802ebe9e929faf27e789` as implementation evidence "
+    "only, the project owner adopts this lifecycle: author → freeze scope → "
+    "one Documentation Review → optional exact reviewed correction once → "
+    "one final deterministic validation → complete or owner stop.\n\n"
+    "The Documentation Review is the only linguistic-conformance review. It "
+    "returns one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or "
+    "`BLOCKED` verdict. For `APPROVED_WITH_EXACT_CORRECTIONS`, the reviewer "
+    "supplies all exact replacement wording in the same review. The "
+    "implementing agent applies those corrections once against verified "
+    "preimages, does not invent other prose, and does not run a second "
+    "Documentation Review. Final deterministic validation proves source, "
+    "candidate, scope, receipt, document-state, and final-content identity "
+    "and the absence of unreviewed mutation. It does not independently judge "
+    "linguistic conformance. A remaining linguistic, semantic, identity, or "
+    "scope failure returns to the owner.\n\n"
+    "Untouched legacy documents receive no review. The first material edit "
+    "of an unreviewed legacy document causes one whole-document review. After "
+    "the document has an accepted identity, review covers only materially "
+    "changed complete logical units derived from that identity and Git diff. "
+    "Unchanged previously accepted prose is not reviewed again. Durable "
+    "review state stays at document level. The existing verified Issue 9 "
+    "retrieval and cache architecture remains the source-reading route and "
+    "does not narrow Issue 9 applicability.\n\n"
+    "The owner authorises only the minimum canonical and skill alignment, "
+    "Level 3 recording, exact candidate freeze, the single Documentation "
+    "Review, one exact correction application when approved, one final "
+    "deterministic validation, the existing publication-policy non-linguistic "
+    "independent review, and one draft pull request if exact-green. The owner "
+    "gives no merge authority."
+)
+EXPECTED_STE_LIFECYCLE_EXCLUSIONS = (
+    "The recovery checkpoint is not accepted project state and does not "
+    "replace the authorised protected-main baseline. This decision does not "
+    "change Phase 6 or any exit. Phase 6 stays at 2/5. Exits 1, 4, and 5 stay "
+    "Pending. Project status stays `unknown`. No risk disposition changes.\n\n"
+    "Do not resume D-GOV-014 or modify `aa6c506`. Do not add generic "
+    "repair-authority machinery, grants, uses, completions, telemetry, "
+    "ontology changes, Cycle 3 work, a second documentation-assurance "
+    "framework, or a second Documentation Review. Do not reopen untouched "
+    "accepted legacy prose.\n\n"
+    "This decision changes no product or railway behaviour. It gives no "
+    "FreeCAD, GUI, persistence, export, schema, API, performance, production, "
+    "physical-output, `project-cleared`, packaging, release, tagging, or "
+    "legacy-retirement authority. It gives no authority to merge into "
+    "protected main."
+)
+EXPECTED_STE_LIFECYCLE_PANEL = (
+    "reference/current/PHASE_EVIDENCE.md"
+    "#d-gov-015-simplified-ste-lifecycle"
+)
+EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
+    "| D-GOV-015 | 2026-08-31 | Accepted | The "
+    "[decision](current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle) "
+    "adopts author → freeze scope → one Documentation Review → optional exact "
+    "reviewed correction once → one final deterministic validation → complete "
+    "or owner stop. Phase 6 stays at 2/5. The owner authorises one draft pull "
+    "request if exact-green and gives no merge authority. |"
 )
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
@@ -3692,7 +3757,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-25",
+        and current_document["updated_on"] == "2026-08-31",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -3743,7 +3808,9 @@ def _validate_decisions(plan: str) -> None:
         _require(
             record["decided_on"]
             == (
-                "2026-08-25"
+                "2026-08-31"
+                if decision_id == "D-GOV-015"
+                else "2026-08-25"
                 if decision_id == "D-GOV-012"
                 else "2026-08-23"
                 if decision_id in {"D-GOV-009", "D-GOV-010", "D-GOV-011"}
@@ -4494,6 +4561,20 @@ def _validate_decisions(plan: str) -> None:
             fragment in retirement_semantic,
             "D-GOV-012 authority or exclusion drifted: " + fragment,
         )
+    lifecycle_record = phase6_by_id["D-GOV-015"]
+    _require(
+        lifecycle_record["decision"] == EXPECTED_STE_LIFECYCLE_DECISION
+        and lifecycle_record["authority"] == EXPECTED_STE_LIFECYCLE_AUTHORITY
+        and lifecycle_record["exclusions"] == EXPECTED_STE_LIFECYCLE_EXCLUSIONS
+        and lifecycle_record["evidence"] == EXPECTED_STE_LIFECYCLE_PANEL
+        and lifecycle_record["panel_record"] == EXPECTED_STE_LIFECYCLE_PANEL
+        and lifecycle_record["panel_required_under_current_policy"] is True,
+        "D-GOV-015 authority, exclusions or panel routing drifted",
+    )
+    _require(
+        EXPECTED_STE_LIFECYCLE_PLAN_ROW in _section(plan, "Owner decisions"),
+        "project-plan D-GOV-015 decision row drifted",
+    )
     current_records = document["decisions"]
     _require(
         isinstance(current_records, list),
@@ -5619,6 +5700,281 @@ def _validate_current_governance_evidence(current_evidence: str) -> None:
     )
 
 
+def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
+    """Bind the D-GOV-015 panel to its exact bounded lifecycle."""
+    anchor = '<a id="d-gov-015-simplified-ste-lifecycle"></a>'
+    _require(
+        current_evidence.count(anchor) == 1,
+        "current evidence lost or duplicated the D-GOV-015 panel anchor",
+    )
+    section = _section(
+        current_evidence,
+        "D-GOV-015 simplified STE lifecycle",
+    )
+    owner_view = direct_section_content(
+        section,
+        "Owner view",
+        level=3,
+    )
+    rows = _structured_table_rows(
+        owner_view,
+        ("Field", "Current result"),
+        "D-GOV-015 owner view",
+    )
+    expected_rows = {
+        "Current state": (
+            "The interrupted three-path implementation at recovery checkpoint "
+            "`ac5a7d7ae8c6bf72069b802ebe9e929faf27e789` is bounded "
+            "implementation evidence. Its authorised protected-main baseline is "
+            "`54176f5ae0fea1f72743f856fd9251a53d7e1dbf`. The checkpoint is not "
+            "accepted project state."
+        ),
+        "What changed": (
+            "D-GOV-015 adopts one lifecycle: author → freeze scope → one "
+            "Documentation Review → optional exact reviewed correction once → "
+            "one final deterministic validation → complete or owner stop. The "
+            "existing Issue 9 retrieval and cache remain."
+        ),
+        "What now works": (
+            "Git derives whole-document first review and later "
+            "changed-complete-unit scope. One review returns one of three "
+            "complete verdicts. Exact corrections bind to frozen preimages. "
+            "Durable state records document identities. Final validation binds "
+            "source, scope, receipt, state, and final bytes and detects "
+            "unreviewed mutation."
+        ),
+        "Limitations/findings": (
+            "The tool cannot authenticate a reviewer. Actual role separation "
+            "remains necessary. One-shot ignored evidence requires independent "
+            "preservation. Final validation does not judge linguistic "
+            "conformance. The current backup condition must be proved before "
+            "Documentation Review."
+        ),
+        "Owner decision": (
+            "Accept D-GOV-015. Complete only the bounded lifecycle, canonical "
+            "and skill alignment, Level 3 record, one review, optional exact "
+            "correction once, final deterministic validation, non-linguistic "
+            "publication review, and one draft pull request if exact-green. Do "
+            "not merge."
+        ),
+        "Next action": (
+            "Complete fail-closed development validation. Freeze and preserve "
+            "one exact candidate and its scope. Run the one Documentation "
+            "Review. Preserve each resulting artifact, run the one final "
+            "deterministic validation, get the required non-linguistic "
+            "independent review, and publish one draft pull request only if "
+            "exact-green."
+        ),
+    }
+    _require(
+        set(rows) == set(expected_rows),
+        "D-GOV-015 owner-view fields drifted",
+    )
+    for label, expected in expected_rows.items():
+        _require(
+            rows[label] == [label, _semantic_markdown(expected)],
+            "D-GOV-015 owner-view row drifted: " + label,
+        )
+
+    participants = direct_section_content(
+        section,
+        "Participants and reviewed evidence",
+        level=3,
+    )
+    participant_rows = _structured_table_rows(
+        participants,
+        ("Participant", "Role and independence"),
+        "D-GOV-015 participants",
+    )
+    expected_participants = {
+        "owner:tracktemplate-project-owner": (
+            "Project owner, panel chair, and decision owner. The owner supplied "
+            "the exact lifecycle, baseline, checkpoint, exclusions, completion "
+            "route, draft-pull-request authority, and no-merge boundary."
+        ),
+        "agent:openai-codex-primary": (
+            "Change owner and presenter. This agent recovered, corrected, "
+            "aligned, and validated the candidate. It cannot independently "
+            "accept its own implementation or linguistic conformance."
+        ),
+        "agent:aquinas-lifecycle-risk-panel": (
+            "QA/risk reviewer. This delegated reviewer examined the checkpoint, "
+            "current implementation, tests, recovery controls, and alignment "
+            "without mutation or linguistic Documentation Review. The reviewer "
+            "is independent of implementation changes but shares the agent team "
+            "and workspace; it is not an external organisational review."
+        ),
+    }
+    _require(
+        set(participant_rows) == set(expected_participants),
+        "D-GOV-015 panel participants drifted",
+    )
+    for participant, expected in expected_participants.items():
+        _require(
+            participant_rows[participant]
+            == [participant, _semantic_markdown(expected)],
+            "D-GOV-015 participant role drifted: " + participant,
+        )
+    reviewed_evidence = _require_paragraph(
+        participants,
+        (
+            "The panel reviewed the exact protected-main baseline and recovery "
+            "checkpoint, the three-path lookup implementation, lifecycle fixture, "
+            "and empty document-level state. It also reviewed the Engineering "
+            "Policy, validation owner, recovery policy, current risks, source and "
+            "retrieval procedure, and the development-validation results in this "
+            "panel."
+        ),
+        "D-GOV-015 panel lost its linked evidence-reviewed record",
+    )
+    _require_links(
+        reviewed_evidence,
+        (
+            ("lookup implementation", "../../tools/ste100_lookup.py"),
+            ("lifecycle fixture", "../../tests/validate_ste100_retrieval.py"),
+            ("empty document-level state", "../ste-review-state.json"),
+            (
+                "Engineering Policy",
+                "../ENGINEERING_POLICY.md#true-gates-and-safetyrisk-panels",
+            ),
+            (
+                "validation owner",
+                "../VALIDATION.md#validation-of-the-retrieval-contract",
+            ),
+            ("recovery policy", "../RECOVERY_AND_BACKUP.md"),
+            ("current risks", "risks.json"),
+            (
+                "source and retrieval procedure",
+                "../external/asd-ste100/README.md",
+            ),
+        ),
+        "D-GOV-015 panel evidence links drifted",
+    )
+
+    dissent = direct_section_content(
+        section,
+        "Dissent, unknowns, and exceptions",
+        level=3,
+    )
+    _require_paragraph(
+        dissent,
+        (
+            "The QA/risk reviewer recorded no dissent from the bounded "
+            "recommendation. The accepted backup device is not currently "
+            "mounted, so independent preservation for this gate remains unknown. "
+            "The tool also cannot authenticate the declared reviewer identity. "
+            "The same-team and shared-workspace review is an independence "
+            "limitation, not an external organisational review. There is no "
+            "exception to the single-review lifecycle, preservation condition, "
+            "owner-stop rule, Phase 6 boundary, or hard exclusions."
+        ),
+        "D-GOV-015 panel lost dissent, unknowns, or exceptions",
+    )
+
+    conditions = direct_section_content(
+        section,
+        "Bounded conditions and accountable owners",
+        level=3,
+    )
+    condition_rows = _structured_table_rows(
+        conditions,
+        ("Condition", "Accountable owner", "Deadline and current result"),
+        "D-GOV-015 bounded conditions",
+    )
+    expected_conditions = {
+        "Harden Git identity and add the fail-closed source, scope, receipt, "
+        "state, correction, and mutation proofs.": (
+            "agent:openai-codex-primary",
+            "Before candidate freeze — completed; focused and full development "
+            "validation must remain green on the exact candidate.",
+        ),
+        "Commit and push the exact candidate.": (
+            "agent:openai-codex-primary",
+            "Before Documentation Review — pending candidate freeze.",
+        ),
+        "Make the accepted independent backup device available.": (
+            "owner:tracktemplate-project-owner",
+            "Before independent scope preservation and Documentation Review — "
+            "pending.",
+        ),
+        "Preserve the frozen scope and then each review result, receipt, and "
+        "accepted-state proposal on the accepted device.": (
+            "agent:openai-codex-primary",
+            "Preserve each artifact before its next dependent operation — pending.",
+        ),
+        "Return the sole linguistic verdict with actual role separation and all "
+        "exact wording, if applicable.": (
+            "Independent Documentation Reviewer",
+            "Once, after scope preservation and before any correction — pending.",
+        ),
+        "Apply only exact approved corrections once, run one final deterministic "
+        "validation, and return any failure to the owner.": (
+            "agent:openai-codex-primary",
+            "After the sole Documentation Review and before publication review — "
+            "pending.",
+        ),
+    }
+    _require(
+        set(condition_rows) == set(expected_conditions),
+        "D-GOV-015 bounded conditions or accountable ownership drifted",
+    )
+    for condition, (owner, deadline) in expected_conditions.items():
+        _require(
+            condition_rows[condition]
+            == [condition, _semantic_markdown(owner), _semantic_markdown(deadline)],
+            "D-GOV-015 condition owner or deadline drifted: " + condition,
+        )
+
+    panel = _semantic_text(section)
+    for fragment in (
+        "exact 54176f5ae0fea1f72743f856fd9251a53d7e1dbf to "
+        "ac5a7d7ae8c6bf72069b802ebe9e929faf27e789 delta changes only "
+        "tools/ste100_lookup.py, tests/validate_ste100_retrieval.py, and "
+        "reference/ste-review-state.json",
+        "keeps 66 existing functions unchanged",
+        "removes 17 functions for the retired author-worklist design",
+        "adds 44 lifecycle-specific functions",
+        "1,645 additions and 1,205 deletions, for net growth of 440 lines",
+        "No generic workflow state, grants, uses, completions, telemetry, or "
+        "ontology machinery remains",
+        "tracked Python parsing passed for 189 files",
+        "focused ASD-STE100 retrieval validator passed",
+        "CI standalone profile passed all 60 validators",
+        "This evidence preceded alignment and trust-boundary hardening",
+        "negative tests now prove rejection of self-review, tampered source, "
+        "scope, receipt, state, and final bytes, invalid corrections, hostile "
+        "Git environment, fsmonitor, text conversion, replacement objects, and "
+        "unreviewed final mutation",
+        "candidate still requires the preservation conditions before review",
+        "After alignment and trust-boundary hardening, tracked Python parsing "
+        "passed for 189 files",
+        "governance mutation validator rejected all 328 mutations",
+        "CI standalone profile passed all 60 validators",
+        "No FreeCAD or GUI validation applies",
+        "One independent Documentation Reviewer owns the sole linguistic verdict",
+        "separate final review is non-linguistic",
+        "Proceed with bounded conditions",
+        "Any preservation, reviewer-separation, source, scope, receipt, state, "
+        "semantic, Git-identity, or final-byte failure returns to the owner",
+        "Do not run a second Documentation Review",
+        "On 2026-08-31, owner:tracktemplate-project-owner accepts the exact "
+        "authority and exclusions",
+        "earlier author-side assurance section remains historical evidence of "
+        "the retired route",
+        "Phase 6 stays at 2/5",
+        "Exits 1, 4, and 5 stay Pending",
+        "Project status stays unknown",
+        "No risk disposition changes",
+        "no authority to resume D-GOV-014, modify aa6c506",
+        "second documentation-assurance framework, or a second Documentation "
+        "Review",
+    ):
+        _require(
+            _semantic_text(fragment) in panel,
+            "D-GOV-015 evidence panel drifted: " + fragment,
+        )
+
+
 def _validate_product_direction(current_evidence: str) -> None:
     """Require localised vision, architecture and evidence-map boundaries."""
     _validate_product_vision(_read(PRODUCT_VISION_PATH))
@@ -5681,6 +6037,7 @@ def main() -> None:
     )
     _validate_risks(plan)
     _validate_decisions(plan)
+    _validate_ste_lifecycle_panel(current_evidence)
     _validate_product_direction(current_evidence)
     _validate_fixed_paths()
     _validate_ci_workflow()

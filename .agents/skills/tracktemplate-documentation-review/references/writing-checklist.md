@@ -8,9 +8,9 @@ Use ASD-STE100 Issue 9. Use the official source that the Technical Documentation
 Profile identifies. Use the technical terms in
 [`reference/TERMINOLOGY.md`](../../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
 
-## Author-side assurance for ASD-STE100 Issue 9
+## Documentation Review for ASD-STE100 Issue 9
 
-For each logical unit with a material edit, use this procedure:
+Use this procedure for each complete logical unit in the frozen review scope:
 
 1. Identify the document class.
 2. Identify the content category.
@@ -33,40 +33,27 @@ For each logical unit with a material edit, use this procedure:
 19. Use Rules 3, 4, 5, 6, 7, and 8 to examine paragraph structure.
 20. Examine all other applicable Issue 9 requirements.
 21. Compare each evidence claim with its source.
-22. Record each finding and its disposition.
-23. Resolve all unresolved terminology.
-24. After the last wording change, review the complete logical unit again.
+22. Identify every linguistic or semantic finding.
+23. Resolve all unresolved terminology in the verdict.
+24. Examine the complete frozen logical unit before you give the verdict.
 
 A deterministic pre-check can identify text for review. The STE lookup can
 give source material. The pre-check does not give a result from a conformance
 review. The STE lookup also does not give a result from a conformance review.
-The author completes the conformance review.
+The independent Documentation Reviewer completes the conformance review. Give
+one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` verdict.
+For `APPROVED_WITH_EXACT_CORRECTIONS`, give all exact replacement wording in
+the same review. Identify each path, byte range, frozen preimage, and
+replacement. Do not defer or add wording later. Do not run a second
+Documentation Review.
 
-### Temporary author-review worklist
-
-The worklist records only this information for the validation tool:
-
-- Exact candidate and source identity
-- Conformance scope for changed prose
-- SHA-256 for each path and logical unit
-- Applicable review categories
-- Findings and their dispositions
-- Source for each evidence claim
-- Author-side assurance result and unresolved findings
-- Read-only challenge result.
-
-For a command result, record the command invocation and working directory.
-Record the validation profile and process exit status. Record the actual result.
-Record the command-output SHA-256. If the command has a sentinel, record it.
-
-The STE lookup validates the source identity, exact candidate, conformance
-scope, and SHA-256 values. It also validates unresolved findings. It validates
-each command result against its evidence source. It does not examine prose for
-conformance.
-
-Before the author freezes the exact candidate, give the author-review worklist
-to a different documentation reviewer. Give the reviewer all changed prose.
-Get a read-only challenge. The challenge has no acceptance.
+The STE lookup validates source, candidate, scope, receipt, accepted-state, and
+final-content identity. It validates exact reviewed corrections against frozen
+preimages and derives the expected final bytes. The implementing agent applies
+those corrections once. The lookup does not examine prose for conformance or
+change the verdict. After the review or correction, one final deterministic
+validation proves that no unreviewed mutation occurred. A remaining failure
+returns to the owner.
 
 ## Ownership and structure
 

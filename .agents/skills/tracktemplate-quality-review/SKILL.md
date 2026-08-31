@@ -72,6 +72,10 @@ Use the [STE lookup](../../../reference/external/asd-ste100/README.md#local-retr
 to read one bounded source excerpt. Make sure that the reviewer examines the complete
 applicable requirement set. Do not use a source excerpt or an empty pre-check
 as the conformance review.
+When the lifecycle has recorded its one Documentation Review verdict, check the
+source, scope, receipt, state, and final-content bindings only. This quality
+review is non-linguistic. Do not repeat Documentation Review, change its
+verdict, or propose prose corrections.
 
 Before you review exporter interruption probes or tests, read the canonical
 [supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).

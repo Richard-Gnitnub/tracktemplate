@@ -180,6 +180,47 @@ for targeted retrieval. Review the complete logical unit against the complete
 applicable requirement set. Use the official source to resolve each material
 ambiguity.
 
+### Documentation Review lifecycle
+
+Use this lifecycle for each material change to canonical technical prose:
+
+> author → freeze scope → one Documentation Review → optional exact reviewed
+> correction once → one final deterministic validation → complete or owner stop
+
+The author writes the candidate and freezes a clean Git commit. The STE lookup
+derives the review scope from Git. One independent Documentation Reviewer then
+reviews the complete frozen scope against all applicable Issue 9 requirements
+in the official source. This Documentation Review is the only linguistic
+conformance review.
+
+The reviewer must return one complete verdict: `ACCEPT`,
+`APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`. For
+`APPROVED_WITH_EXACT_CORRECTIONS`, the reviewer must give all exact replacement
+wording in the same review. Apply those replacements once, against verified
+preimages. Do not add or change other prose. Do not run a second Documentation
+Review. A `BLOCKED` verdict produces no accepted-state proposal and returns the
+change to the owner.
+
+After the review or the approved correction, run one final deterministic
+validation. It proves source, candidate, scope, receipt, accepted-state, and
+final-content identity. It also proves that no unreviewed mutation occurred.
+It does not judge linguistic conformance. A remaining linguistic, semantic,
+identity, or scope failure returns to the owner.
+
+Use these scope rules:
+
+- Do not review an untouched legacy document.
+- On the first material edit of an unreviewed legacy document, review the
+  complete document.
+- After a document has an accepted identity, review only materially changed
+  complete logical units that Git identifies from that identity.
+- Do not review unchanged previously accepted prose again.
+
+Keep durable review state at document level. Record the last accepted document
+identity, source identity, and review receipt. Do not keep persistent sentence,
+paragraph, or logical-unit workflow state when Git can derive that scope from
+the last accepted document identity.
+
 The standard applies to canonical technical prose that persons can read in:
 
 - architecture

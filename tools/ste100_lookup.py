@@ -2485,23 +2485,71 @@ def _lifecycle_git(
     root: pathlib.Path,
     accepted_codes: tuple[int, ...] = (0,),
 ) -> tuple[int, bytes]:
-    environment = os.environ.copy()
-    for name in (
-        "GIT_ALTERNATE_OBJECT_DIRECTORIES",
-        "GIT_COMMON_DIR",
-        "GIT_DIR",
-        "GIT_INDEX_FILE",
-        "GIT_OBJECT_DIRECTORY",
-        "GIT_WORK_TREE",
+    executable = shutil.which("git", path=os.defpath)
+    if executable is None:
+        raise Ste100Error(
+            "ste-lifecycle-git-untrusted",
+            "A trusted system Git executable is not available.",
+            "Install Git outside the repository and active Python environment.",
+        )
+    try:
+        git_path = pathlib.Path(executable).resolve(strict=True)
+        git_status = git_path.stat()
+        repository_root = root.resolve(strict=True)
+    except OSError as error:
+        raise Ste100Error(
+            "ste-lifecycle-git-untrusted",
+            "The system Git executable or repository root cannot be resolved.",
+            "Restore the trusted Git installation and repository state.",
+        ) from error
+    effective_uid = getattr(os, "geteuid", lambda: None)()
+    environment_root = pathlib.Path(sys.prefix).resolve()
+    if (
+        not stat.S_ISREG(git_status.st_mode)
+        or git_status.st_mode & (stat.S_IWGRP | stat.S_IWOTH)
+        or effective_uid is None
+        or git_status.st_uid not in {0, effective_uid}
+        or git_path == repository_root
+        or repository_root in git_path.parents
+        or (
+            sys.prefix != sys.base_prefix
+            and (
+                git_path == environment_root
+                or environment_root in git_path.parents
+            )
+        )
     ):
-        environment.pop(name, None)
-    environment.update(
-        {"GIT_OPTIONAL_LOCKS": "0", "LANG": "C", "LC_ALL": "C"}
-    )
+        raise Ste100Error(
+            "ste-lifecycle-git-untrusted",
+            "The system Git executable does not have a trusted local identity.",
+            "Use a regular Git executable owned by root or the current user outside "
+            "the repository and active Python environment.",
+        )
+    environment = {
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_NO_REPLACE_OBJECTS": "1",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "GIT_TERMINAL_PROMPT": "0",
+        "LANG": "C",
+        "LC_ALL": "C",
+    }
     try:
         process = subprocess.Popen(
-            ["git", "--no-pager", *arguments],
-            cwd=root,
+            [
+                str(git_path),
+                "--no-pager",
+                "--no-replace-objects",
+                "--work-tree=" + str(repository_root),
+                "-c",
+                "core.useReplaceRefs=false",
+                "-c",
+                "core.fsmonitor=false",
+                "-c",
+                "core.hooksPath=" + os.devnull,
+                *arguments,
+            ],
+            cwd=repository_root,
             stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -2618,6 +2666,9 @@ def _lifecycle_changed_paths(
             "diff",
             "--name-only",
             "-z",
+            "--no-ext-diff",
+            "--no-textconv",
+            "--ignore-submodules=none",
             "--no-renames",
             "--diff-filter=ACMDR",
             baseline_revision,
@@ -2652,6 +2703,8 @@ def _lifecycle_candidate_identity(
             "--binary",
             "--full-index",
             "--no-ext-diff",
+            "--no-textconv",
+            "--ignore-submodules=none",
             "--no-renames",
             baseline_revision,
             candidate_revision,

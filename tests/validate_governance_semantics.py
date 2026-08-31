@@ -2279,6 +2279,67 @@ def validate_current_evidence_mutations() -> None:
         "performance budget",
     )
 
+    lifecycle_changed_row = table_row_containing(
+        evidence,
+        "| What changed | D-GOV-015 adopts one lifecycle",
+    )
+    lifecycle_two_reviews = replace_once(
+        lifecycle_changed_row,
+        "one Documentation Review",
+        "two Documentation Reviews",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-015-second-review-authorised",
+        lambda: progress._validate_ste_lifecycle_panel(
+            replace_once(
+                evidence,
+                lifecycle_changed_row,
+                lifecycle_two_reviews,
+            )
+        ),
+        "D-GOV-015 owner-view row drifted: What changed",
+    )
+    lifecycle_result_row = table_row_containing(
+        evidence,
+        "Durable state records document identities",
+    )
+    lifecycle_unit_state = replace_once(
+        lifecycle_result_row,
+        "Durable state records document identities.",
+        "Durable state records every logical unit.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-015-persistent-unit-state-added",
+        lambda: progress._validate_ste_lifecycle_panel(
+            replace_once(
+                evidence,
+                lifecycle_result_row,
+                lifecycle_unit_state,
+            )
+        ),
+        "D-GOV-015 owner-view row drifted: What now works",
+    )
+    lifecycle_limitations_row = table_row_containing(
+        evidence,
+        "Final validation does not judge linguistic conformance",
+    )
+    lifecycle_linguistic_validation = replace_once(
+        lifecycle_limitations_row,
+        "does not judge linguistic conformance",
+        "independently judges linguistic conformance",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-015-final-validation-made-linguistic",
+        lambda: progress._validate_ste_lifecycle_panel(
+            replace_once(
+                evidence,
+                lifecycle_limitations_row,
+                lifecycle_linguistic_validation,
+            )
+        ),
+        "D-GOV-015 owner-view row drifted: Limitations/findings",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
@@ -2528,6 +2589,21 @@ def validate_project_plan_mutations() -> None:
             )
         ),
         "project-plan decisions differ from the frozen registers",
+    )
+    lifecycle_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-015 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-015-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                lifecycle_decision_row + "\n",
+                "",
+            )
+        ),
+        "project-plan D-GOV-015 decision row drifted",
     )
 
 
@@ -2913,130 +2989,221 @@ def validate_documentation_profile_mutations() -> None:
         ".agents/skills/tracktemplate-documentation-review/references/"
         "writing-checklist.md"
     )
-    author_assurance_cases = (
+    documentation_review_cases = (
         (
-            "tt-doc/author-review-controlled-vocabulary-removed",
+            "tt-doc/documentation-review-controlled-vocabulary-removed",
             "controlled vocabulary",
             "uncontrolled text",
             "controlled vocabulary / technical term / approved meaning / "
             "part of speech",
         ),
         (
-            "tt-doc/author-review-term-register-removed",
+            "tt-doc/documentation-review-term-register-removed",
             "technical-term register",
             "local glossary",
             "technical-term register / technical-term category / controlled "
             "vocabulary does not identify the tracktemplate item",
         ),
         (
-            "tt-doc/author-review-ordinary-vocabulary-removed",
+            "tt-doc/documentation-review-ordinary-vocabulary-removed",
             "controlled vocabulary does not identify the TrackTemplate item",
             "general wording identifies the TrackTemplate item",
             "technical-term register / technical-term category / controlled "
             "vocabulary does not identify the tracktemplate item",
         ),
         (
-            "tt-doc/author-review-actor-check-removed",
+            "tt-doc/documentation-review-actor-check-removed",
             "person, tool, or system",
             "text",
             "person, tool, or system / each operation",
         ),
         (
-            "tt-doc/author-review-antecedent-check-removed",
+            "tt-doc/documentation-review-antecedent-check-removed",
             "noun to which it refers",
             "nearby word",
             "each pronoun / noun to which it refers / state and result",
         ),
         (
-            "tt-doc/author-review-noun-group-check-removed",
+            "tt-doc/documentation-review-noun-group-check-removed",
             "noun group",
             "word sequence",
             "rule 2 / noun group",
         ),
         (
-            "tt-doc/author-review-instruction-check-weakened",
+            "tt-doc/documentation-review-instruction-check-weakened",
             "different instruction",
             "same instruction",
             "different instruction / condition before its instruction",
         ),
         (
-            "tt-doc/author-review-condition-order-inverted",
+            "tt-doc/documentation-review-condition-order-inverted",
             "condition before its instruction",
             "condition after its instruction",
             "different instruction / condition before its instruction",
         ),
         (
-            "tt-doc/author-review-sentence-check-removed",
+            "tt-doc/documentation-review-sentence-check-removed",
             "sentence construction",
             "sentence text",
             "sentence construction / paragraph structure",
         ),
         (
-            "tt-doc/author-review-paragraph-check-removed",
+            "tt-doc/documentation-review-paragraph-check-removed",
             "paragraph structure",
             "paragraph text",
             "sentence construction / paragraph structure",
         ),
         (
-            "tt-doc/author-review-full-applicability-weakened",
+            "tt-doc/documentation-review-full-applicability-weakened",
             "all other applicable Issue 9 requirements",
             "selected Issue 9 requirements",
             "all other applicable issue 9 requirements",
         ),
         (
-            "tt-doc/author-review-actual-result-removed",
-            "actual result",
-            "reported result",
-            "evidence claim / command invocation / validation profile / "
-            "actual result",
+            "tt-doc/documentation-review-evidence-source-removed",
+            "evidence claim",
+            "unsupported statement",
+            "evidence claim / source",
         ),
         (
-            "tt-doc/author-review-unresolved-terminology-kept",
+            "tt-doc/documentation-review-unresolved-terminology-kept",
             "Resolve all unresolved terminology",
             "Keep unresolved terminology",
             "resolve all unresolved terminology",
         ),
         (
-            "tt-doc/author-review-unresolved-terminology-removed",
+            "tt-doc/documentation-review-unresolved-terminology-removed",
             "Resolve all unresolved terminology",
             "",
             "resolve all unresolved terminology",
         ),
         (
-            "tt-doc/author-review-unresolved-terminology-weakened",
+            "tt-doc/documentation-review-unresolved-terminology-weakened",
             "Resolve all unresolved terminology",
             "Resolve some unresolved terminology",
             "resolve all unresolved terminology",
         ),
-        (
-            "tt-doc/author-review-challenge-removed",
-            "challenge",
-            "comment",
-            "read-only challenge / no acceptance",
-        ),
-        (
-            "tt-doc/author-review-machine-proof-authorized",
-            "does not examine prose for",
-            "examines prose for",
-            "does not examine prose for conformance / author completes the "
-            "conformance review",
-        ),
     )
-    for name, old, new, expected_concepts in author_assurance_cases:
+    for name, old, new, expected_concepts in documentation_review_cases:
         if old not in writing_checklist:
             raise AssertionError(name + " fixture is stale")
         mutated_checklist = writing_checklist.replace(old, new)
         expect_rejected(
             name,
             lambda value=mutated_checklist: (
-                agent_guidance.validate_issue9_author_assurance(
+                agent_guidance.validate_issue9_documentation_lifecycle(
                     documentation_review,
                     value,
                     workflows,
+                    engineering,
                 )
             ),
-            "documentation checklist lost author-side assurance: "
+            "documentation checklist lost linguistic-review coverage: "
             + expected_concepts,
+        )
+
+    lifecycle_cases = (
+        (
+            "tt-doc/lifecycle-order-weakened",
+            "policy",
+            "> author → freeze scope → one Documentation Review → optional exact reviewed\n"
+            "> correction once → one final deterministic validation → complete or owner stop",
+            "> author → Documentation Review → complete",
+            "documentation policy lost simplified lifecycle control: author → "
+            "freeze scope → one documentation review",
+        ),
+        (
+            "tt-doc/lifecycle-verdict-removed",
+            "policy",
+            "The reviewer must return one complete verdict: `ACCEPT`,\n"
+            "`APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`.",
+            "The reviewer must return `ACCEPT` or `BLOCKED`.",
+            "documentation policy lost simplified lifecycle control: only "
+            "linguistic conformance review / reviewer must return one complete "
+            "verdict: accept, approved_with_exact_corrections, or blocked",
+        ),
+        (
+            "tt-doc/lifecycle-second-review-authorised",
+            "policy",
+            "Do not run a second Documentation\nReview.",
+            "Run a second Documentation Review after a correction.",
+            "documentation policy lost simplified lifecycle control: all exact "
+            "replacement wording in the same review",
+        ),
+        (
+            "tt-doc/lifecycle-final-validation-made-linguistic",
+            "policy",
+            "It does not judge linguistic conformance.",
+            "It independently judges linguistic conformance.",
+            "documentation policy lost simplified lifecycle control: source, "
+            "candidate, scope, receipt, accepted-state, and final-content "
+            "identity",
+        ),
+        (
+            "tt-doc/lifecycle-durable-unit-state-added",
+            "policy",
+            "Keep durable review state at document level.",
+            "Keep durable review state for every logical unit.",
+            "documentation policy lost simplified lifecycle control: durable "
+            "review state at document level",
+        ),
+        (
+            "tt-doc/lifecycle-untouched-legacy-review-added",
+            "policy",
+            "Do not review an untouched legacy document.",
+            "Review every untouched legacy document.",
+            "documentation policy lost simplified lifecycle control: do not "
+            "review an untouched legacy document",
+        ),
+        (
+            "tt-doc/lifecycle-exact-wording-deferred",
+            "skill",
+            "give all exact replacement\nwording in this review",
+            "let a later reviewer supply replacement wording",
+            "documentation review lost simplified lifecycle control: all exact "
+            "replacement wording in this review",
+        ),
+        (
+            "tt-doc/lifecycle-preimage-removed",
+            "skill",
+            "path, byte range, and\nfrozen preimage",
+            "path only",
+            "documentation review lost simplified lifecycle control: all exact "
+            "replacement wording in this review",
+        ),
+        (
+            "tt-doc/lifecycle-invented-prose-authorised",
+            "workflow",
+            "Do not invent other prose.",
+            "Add other useful prose.",
+            "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
+        ),
+        (
+            "tt-doc/lifecycle-owner-stop-removed",
+            "workflow",
+            "Otherwise, stop for the owner.",
+            "Otherwise, start another Documentation Review.",
+            "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
+        ),
+    )
+    for name, owner, old, new, diagnostic in lifecycle_cases:
+        source = {
+            "policy": engineering,
+            "skill": documentation_review,
+            "workflow": workflows,
+        }[owner]
+        mutated = replace_once(source, old, new)
+        expect_rejected(
+            name,
+            lambda value=mutated, target=owner: (
+                agent_guidance.validate_issue9_documentation_lifecycle(
+                    value if target == "skill" else documentation_review,
+                    writing_checklist,
+                    value if target == "workflow" else workflows,
+                    value if target == "policy" else engineering,
+                )
+            ),
+            diagnostic,
         )
 
     phase4_closeout = read(
