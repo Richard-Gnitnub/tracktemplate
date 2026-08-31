@@ -699,7 +699,7 @@ def validate_current_evidence_mutations() -> None:
     evidence = read("reference/current/PHASE_EVIDENCE.md")
     authority = blockquote_paragraph_containing(
         evidence,
-        "Vision supplies direction, not scope",
+        "Vision supplies direction.",
     )
     authority_diagnostic = (
         "current evidence D-GOV-005 authority block drifted or gained a "
@@ -715,8 +715,9 @@ def validate_current_evidence_mutations() -> None:
             "phase-evidence/semantic-inversion",
             replace_once(
                 evidence,
-                "Vision supplies direction, not scope",
-                "Vision supplies scope, not direction",
+                "Vision supplies direction. It does not define a bounded "
+                "scope or give task\n> authority.",
+                "Vision defines the bounded scope and gives task authority.",
             ),
             authority_diagnostic,
         ),
@@ -906,7 +907,8 @@ def validate_current_evidence_mutations() -> None:
 
     recovery_transaction_row = table_row_containing(
         evidence,
-        "no independently trusted creation authority",
+        "No independently trusted creation authority supports cross-process "
+        "automatic recovery",
     )
     recovery_transaction_accepted = replace_once(
         recovery_transaction_row,
@@ -930,7 +932,7 @@ def validate_current_evidence_mutations() -> None:
 
     preexisting_controls_weakened = replace_once(
         evidence,
-        "preserved unchanged and rejected as\nunclaimable",
+        "The exporter preserves and rejects that item as unclaimable.",
         "parsed and removed when their content matches",
     )
     expect_rejected(
@@ -946,8 +948,8 @@ def validate_current_evidence_mutations() -> None:
 
     interruption_recovery_overclaimed = replace_once(
         evidence,
-        "They do not claim automatic recovery",
-        "They prove automatic recovery",
+        "The cases do not claim automatic recovery",
+        "The cases prove automatic recovery",
     )
     expect_rejected(
         "phase-evidence/exit3-interruption-recovery-overclaimed",
@@ -962,8 +964,8 @@ def validate_current_evidence_mutations() -> None:
 
     control_metadata_weakened = replace_once(
         evidence,
-        "including access time",
-        "excluding access time",
+        "They also preserve access\ntime.",
+        "They do not preserve access\ntime.",
     )
     expect_rejected(
         "phase-evidence/exit3-foreign-control-atime-omitted",
@@ -978,9 +980,8 @@ def validate_current_evidence_mutations() -> None:
 
     staging_preservation_weakened = replace_once(
         evidence,
-        "preserves the foreign directory, every\n"
-        "file, their identities, metadata and bytes",
-        "may delete the foreign directory or matching files",
+        "It also preserves every file, identity, metadata value, and byte.",
+        "It may delete files or change their identities, metadata, and bytes.",
     )
     expect_rejected(
         "phase-evidence/exit3-staging-ownership-preservation-weakened",
@@ -995,8 +996,9 @@ def validate_current_evidence_mutations() -> None:
 
     staging_creation_ownership_weakened = replace_once(
         evidence,
-        "`O_TMPFILE`, captures the device/inode identity immediately from the "
-        "descriptor\nreturned by that creation operation",
+        "creates each output in an anonymous regular staging file with "
+        "`O_TMPFILE`. It\nimmediately captures the device/inode identity from "
+        "the descriptor returned by\nthat operation",
         "a pathname-created file whose identity is first observed later",
     )
     expect_rejected(
@@ -1012,8 +1014,9 @@ def validate_current_evidence_mutations() -> None:
 
     journal_creation_ownership_weakened = replace_once(
         evidence,
-        "journal is also created anonymously and linked\nfrom its still-open "
-        "descriptor",
+        "journal is also created anonymously. Before\n"
+        "`linkat(AT_EMPTY_PATH)` commits either output file, the journal is "
+        "linked from\nits still-open descriptor",
         "journal is created at a pathname and reopened later",
     )
     expect_rejected(
@@ -1029,7 +1032,7 @@ def validate_current_evidence_mutations() -> None:
 
     staging_path_cleanup_reintroduced = replace_once(
         evidence,
-        "Normal stage cleanup is descriptor close; there is no staging "
+        "Normal stage cleanup is descriptor close. There is no staging "
         "pathname or\ndirectory removal",
         "Normal stage cleanup removes a pathname-created directory",
     )
@@ -1046,8 +1049,8 @@ def validate_current_evidence_mutations() -> None:
 
     inert_controls_trusted = replace_once(
         evidence,
-        "presence\nneither permits nor blocks final-set completion",
-        "presence\nauthorises deletion and blocks final-set completion",
+        "Their presence neither\npermits nor prevents final-set completion",
+        "Their presence authorises deletion and prevents final-set completion",
     )
     expect_rejected(
         "phase-evidence/exit3-inert-controls-given-authority",
@@ -1063,7 +1066,7 @@ def validate_current_evidence_mutations() -> None:
     equality_becomes_deletion_authority = replace_once(
         evidence,
         "Content equivalence\n"
-        "establishes compatibility for reuse or addition only; it never "
+        "establishes compatibility for reuse or addition only. It never "
         "grants\nownership, deletion or replacement authority",
         "Content equivalence establishes ownership\n"
         "and grants deletion and replacement authority",
@@ -1099,8 +1102,10 @@ def validate_current_evidence_mutations() -> None:
 
     expected_inode_delete_invented = replace_once(
         evidence,
-        "POSIX pathname deletion has no expected-inode atomic condition",
-        "POSIX pathname deletion has an expected-inode atomic condition",
+        "grant deletion\n> authority. POSIX pathname deletion has no "
+        "expected-inode atomic condition",
+        "grant deletion\n> authority. POSIX pathname deletion has an "
+        "expected-inode atomic condition",
     )
     expect_rejected(
         "phase-evidence/exit3-expected-inode-delete-invented",
@@ -1110,7 +1115,7 @@ def validate_current_evidence_mutations() -> None:
             phase5_closeout,
             expected_inode_delete_invented,
         ),
-        "D-P6-003 recovery-authority contract or status boundary drifted",
+        "D-P6-003 exact owner decision drifted or was relocated",
     )
 
     published_mutation_authorised = replace_once(
@@ -1167,8 +1172,8 @@ def validate_current_evidence_mutations() -> None:
 
     partial_completion_withdrawn = replace_once(
         evidence,
-        "an exact regular partial pair may be completed instead of rejected",
-        "an exact regular partial pair must remain unrecoverable",
+        "An exact regular partial pair may\nbe completed instead of rejected",
+        "An exact regular partial pair must remain unrecoverable",
     )
     expect_rejected(
         "phase-evidence/exit3-monotonic-completion-withdrawn",
@@ -1248,8 +1253,8 @@ def validate_current_evidence_mutations() -> None:
 
     implementation_review_closed = replace_once(
         evidence,
-        "Condition 6 remains open",
-        "Condition 6 is closed",
+        "Condition 6\nremains open",
+        "Condition 6\nis closed",
     )
     expect_rejected(
         "phase-evidence/exit3-implementation-review-prematurely-closed",
@@ -1285,8 +1290,8 @@ def validate_current_evidence_mutations() -> None:
 
     performance_promoted = replace_once(
         evidence,
-        "this evidence does not satisfy Exit 4, which remains Pending",
-        "this evidence satisfies Exit 4",
+        "This evidence does not satisfy Exit 4, which remains Pending",
+        "This evidence satisfies Exit 4",
     )
     expect_rejected(
         "phase-evidence/performance-evidence-promoted-to-exit4",
@@ -1386,8 +1391,12 @@ def validate_current_evidence_mutations() -> None:
         "D-P6-002 panel recommendation drifted",
     )
 
-    exit2_authority = blockquote_paragraph_containing(
+    exit2_section = progress._section(
         evidence,
+        "Phase 6 Exits 2 and 3 panel to admit evidence and owner decision",
+    )
+    exit2_authority = blockquote_paragraph_containing(
+        exit2_section,
         "At accepted `main` source state",
     )
     authority_removed = replace_once(evidence, exit2_authority, "")
@@ -1734,10 +1743,10 @@ def validate_current_evidence_mutations() -> None:
 
     diagnostic_admitted = replace_once(
         validation,
-        "The previous 1.1.1-only validator rejected the 1.1.3 test result. "
-        "D-GOV-007\ndoes not admit this test result as Exit 4 evidence",
-        "The previous 1.1.1-only validator rejected the 1.1.3 test result. "
-        "D-GOV-007\nadmits this test result as Exit 4 evidence",
+        "The previous 1.1.1-only validator rejected the 1.1.3 test result.\n"
+        "D-GOV-007 does not admit this test result as Exit 4 evidence",
+        "The previous 1.1.1-only validator rejected the 1.1.3 test result.\n"
+        "D-GOV-007 admits this test result as Exit 4 evidence",
     )
     expect_rejected(
         "validation/d-gov-007-diagnostic-run-admitted",
@@ -2012,9 +2021,10 @@ def validate_current_evidence_mutations() -> None:
 
     direction_review_gate_inverted = replace_once(
         evidence,
-        "The two reviews must find no blocker before the project merges the "
-        "candidate.",
-        "The project can merge the candidate when a review finds a blocker.",
+        "The two reviews must find no blocking condition before the project "
+        "merges the\ncandidate.",
+        "The project can merge the candidate when a review finds a blocking "
+        "condition.",
     )
     expect_rejected(
         "phase-evidence/d-gov-008-review-gate-inverted",
@@ -2023,8 +2033,8 @@ def validate_current_evidence_mutations() -> None:
             terminology,
             direction_review_gate_inverted,
         ),
-        "D-GOV-008 review gate drifted: two reviews must find no blocker "
-        "before the project merges the candidate",
+        "D-GOV-008 review gate drifted: The two reviews must find no blocking "
+        "condition before the project merges the candidate",
     )
 
     direction_owner_authority_removed = replace_once(
@@ -2248,9 +2258,9 @@ def validate_current_evidence_mutations() -> None:
     selection_product_started = replace_once(
         evidence,
         "> I authorise one subsequent product change at Level 2 in this "
-        "boundary. Do\n> not start it in this cycle.",
+        "adapter file. Do\n> not start it in this cycle.",
         "> I authorise one subsequent product change at Level 2 in this "
-        "boundary.\n> Start it in this cycle.",
+        "adapter file.\n> Start it in this cycle.",
     )
     expect_rejected(
         "phase-evidence/d-gov-011-product-started",
@@ -2279,25 +2289,86 @@ def validate_current_evidence_mutations() -> None:
         "performance budget",
     )
 
+    lifecycle_changed_row = table_row_containing(
+        evidence,
+        "| What changed | D-GOV-015 adopts one lifecycle",
+    )
+    lifecycle_two_reviews = replace_once(
+        lifecycle_changed_row,
+        "one Documentation Review",
+        "two Documentation Reviews",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-015-second-review-authorised",
+        lambda: progress._validate_ste_lifecycle_panel(
+            replace_once(
+                evidence,
+                lifecycle_changed_row,
+                lifecycle_two_reviews,
+            )
+        ),
+        "D-GOV-015 owner-view row drifted: What changed",
+    )
+    lifecycle_result_row = table_row_containing(
+        evidence,
+        "Durable state records document identities",
+    )
+    lifecycle_unit_state = replace_once(
+        lifecycle_result_row,
+        "Durable state records document identities.",
+        "Durable state records every logical unit.",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-015-persistent-unit-state-added",
+        lambda: progress._validate_ste_lifecycle_panel(
+            replace_once(
+                evidence,
+                lifecycle_result_row,
+                lifecycle_unit_state,
+            )
+        ),
+        "D-GOV-015 owner-view row drifted: What now works",
+    )
+    lifecycle_limitations_row = table_row_containing(
+        evidence,
+        "Final validation does not judge linguistic conformance",
+    )
+    lifecycle_linguistic_validation = replace_once(
+        lifecycle_limitations_row,
+        "does not judge linguistic conformance",
+        "independently judges linguistic conformance",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-015-final-validation-made-linguistic",
+        lambda: progress._validate_ste_lifecycle_panel(
+            replace_once(
+                evidence,
+                lifecycle_limitations_row,
+                lifecycle_linguistic_validation,
+            )
+        ),
+        "D-GOV-015 owner-view row drifted: Limitations/findings",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
     plan = read("reference/PROJECT_PLAN.md")
-    paragraph = paragraph_containing(plan, "The active program is")
+    paragraph = paragraph_containing(plan, "The active programme is")
     diagnostic = (
         "project plan lost its local current-programme and future-horizon clause"
     )
     cases = {
         "project-plan/deleted-future-clause": replace_once(
             plan,
-            "The project can record future architecture without current "
+            "The project can record its future architecture without current "
             "implementation.",
             "",
         ),
         "project-plan/semantic-inversion": replace_once(
             plan,
-            "It does not change Phase 6 exits",
-            "It changes Phase 6 exits",
+            "It does not change the Phase 6 exits",
+            "It changes the Phase 6 exits",
         ),
         "project-plan/unrelated-relocation": (
             replace_once(plan, paragraph, "Programme status is recorded below.")
@@ -2529,6 +2600,21 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan decisions differ from the frozen registers",
     )
+    lifecycle_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-015 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-015-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                lifecycle_decision_row + "\n",
+                "",
+            )
+        ),
+        "project-plan D-GOV-015 decision row drifted",
+    )
 
 
 def validate_documentation_profile_mutations() -> None:
@@ -2547,9 +2633,9 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "tt-doc/owner-view-made-authoritative",
-            "must never give project authority\nindependently",
-            "can give project authority\nindependently",
-            "TT-DOC-001 profile lacks: must never give project authority "
+            "must not give project authority independently",
+            "can give project authority independently",
+            "TT-DOC-001 profile lacks: must not give project authority "
             "independently",
         ),
         (
@@ -2560,17 +2646,17 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "tt-doc/limitation-hidden",
-            "A reader must be able to see it.",
-            "A reader does not have to see it.",
+            "The reader must see it.",
+            "The reader does not have to see it.",
             "TT-DOC-001 meaning drifted for: Limitation",
         ),
         (
             "tt-doc/evidence-manufactures-acceptance",
-            "Short text must never change evidence or a\nrecommendation into "
+            "A short result must\nnot change evidence or a recommendation into "
             "acceptance",
-            "Short text can change evidence or a\nrecommendation into "
+            "A short result can\nchange evidence or a recommendation into "
             "acceptance",
-            "TT-DOC-001 profile lacks: Short text must never change evidence "
+            "TT-DOC-001 profile lacks: A short result must not change evidence "
             "or a recommendation into acceptance",
         ),
         (
@@ -2582,54 +2668,53 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "tt-doc/issue9-made-optional",
-            "as the normative controlled-writing standard",
-            "as optional writing inspiration",
-            "TT-DOC-001 profile lacks: normative controlled-writing standard",
+            "### Normative controlled-writing standard",
+            "### Optional writing inspiration",
+            "TT-DOC-001 profile lacks: Normative controlled-writing standard",
         ),
         (
             "tt-doc/official-reference-removed",
-            "The official standard is the normative external\nreference.",
-            "Public summaries are the normative external\nreference.",
+            "The official standard is the normative\nexternal reference.",
+            "Public summaries are the normative\nexternal reference.",
             "TT-DOC-001 profile lacks: official standard is the normative "
             "external reference",
         ),
         (
             "tt-doc/american-only-spelling-restored",
-            "TrackTemplate uses UK English spelling as its project spelling "
-            "directive",
+            "TrackTemplate uses UK English.",
             "TrackTemplate requires American English spelling in this scope",
-            "TT-DOC-001 profile lacks: TrackTemplate uses UK English spelling "
-            "as its project spelling directive",
+            "TT-DOC-001 profile lacks: TrackTemplate uses UK English",
         ),
         (
             "tt-doc/rule-1-14-option-removed",
-            "directive uses the option in Issue 9 Rule 1.14",
-            "directive conflicts with Issue 9 Rule 1.14",
-            "TT-DOC-001 profile lacks: directive uses the option in Issue 9 "
-            "Rule 1.14",
+            "Rule 1.14 permits this instruction",
+            "Rule 1.14 prohibits this instruction",
+            "TT-DOC-001 profile lacks: Rule 1.14 permits this instruction",
         ),
         (
             "tt-doc/spelling-directive-widens-ste-change",
-            "The directive changes spelling\nonly.",
-            "The directive changes spelling and vocabulary.",
-            "TT-DOC-001 profile lacks: directive changes spelling only",
+            "It does not\nchange the applicable Issue 9 vocabulary or grammar "
+            "rules.",
+            "It changes\nthe applicable Issue 9 vocabulary and grammar rules.",
+            "TT-DOC-001 profile lacks: does not change the applicable Issue 9 "
+            "vocabulary or grammar rules",
         ),
         (
             "tt-doc/checker-made-conformance-authority",
-            "The tool cannot replace\nthe linguistic review or show Issue 9 "
-            "conformance.",
-            "The tool replaces\nthe linguistic review and proves Issue 9 "
-            "conformance.",
-            "TT-DOC-001 profile lacks: cannot replace the linguistic review "
-            "or show Issue 9 conformance",
+            "The tool cannot replace\nthe linguistic conformance review. It "
+            "cannot show Issue 9 conformance.",
+            "The tool replaces\nthe linguistic conformance review. It shows "
+            "Issue 9 conformance.",
+            "TT-DOC-001 profile lacks: cannot replace the linguistic "
+            "conformance review. It cannot show Issue 9 conformance",
         ),
         (
             "tt-doc/material-unit-review-waived",
-            "review the full logical unit that contains the change.\n"
-            "  Use the applicable Issue 9 requirements",
-            "review only the changed words.\n"
-            "  Use the applicable Issue 9 requirements",
-            "TT-DOC-001 profile lacks: review the full logical unit that "
+            "review the complete logical unit that contains the\n"
+            "  change.\n- Use the applicable requirement set for that review",
+            "review only the changed words.\n- Use the applicable requirement "
+            "set for that review",
+            "TT-DOC-001 profile lacks: review the complete logical unit that "
             "contains the change",
         ),
         (
@@ -2646,15 +2731,15 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "tt-doc/skill-owner-authority-widened",
-            "Documentation simplification does not give a skill phase, "
-            "production,\nsecurity, merge, release, acceptance, or project-owner "
-            "authority",
-            "Documentation simplification gives every skill phase, production,\n"
-            "security, merge, release, acceptance, and project-owner "
-            "authority",
-            "TT-DOC-001 profile lacks: Documentation simplification does not "
-            "give a skill phase, production, security, merge, release, "
+            "Documentation simplification gives no security/recovery-review "
+            "authority. It\ngives no phase, production, merge, release, "
             "acceptance, or project-owner authority",
+            "Documentation simplification gives security/recovery-review "
+            "authority. It\ngives phase, production, merge, release, acceptance, and "
+            "project-owner authority",
+            "TT-DOC-001 profile lacks: Documentation simplification gives no "
+            "security/recovery-review authority. It gives no phase, production, "
+            "merge, release, acceptance, or project-owner authority.",
         ),
     )
     for name, original, replacement, diagnostic in profile_cases:
@@ -2683,8 +2768,8 @@ def validate_documentation_profile_mutations() -> None:
     )
     owner_view_authority = replace_once(
         plan,
-        "The owner view does not establish authority",
-        "The owner view establishes authority",
+        "This view does not establish authority",
+        "This view establishes authority",
     )
     expect_rejected(
         "tt-doc/owner-view-authority-inversion",
@@ -2693,14 +2778,16 @@ def validate_documentation_profile_mutations() -> None:
     )
     owner_view_boundary_widened = replace_once(
         plan,
-        "It bounds the product change at Level 2 to one FreeCAD adapter file.",
-        "It bounds the product change at Level 2 to all TrackTemplate product files.",
+        "It limits the Level 2 product change to one FreeCAD adapter file.",
+        "It limits the Level 2 product change to all TrackTemplate product "
+        "files.",
     )
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
-        "project-plan owner view lost or contradicted: bounds the product change "
-        "at Level 2 to one FreeCAD adapter file",
+        "project-plan owner view lost or contradicted: limits the Level 2 "
+        "product change "
+        "to one FreeCAD adapter file",
     )
 
     compatibility_terms_removed = terminology
@@ -2770,9 +2857,9 @@ def validate_documentation_profile_mutations() -> None:
     )
     third_party_made_normative = replace_once(
         source_reference,
-        "Do not use a third-party summary, search-result text, blog, or "
-        "derived\n   guidance as normative conformance evidence.",
-        "Use a third-party summary as normative conformance evidence.",
+        "Do not use an external summary, text from a search engine, a blog, "
+        "or\n   derived guidance as normative conformance evidence.",
+        "Use an external summary as normative conformance evidence.",
     )
     expect_rejected(
         "tt-doc/ste100-third-party-source-made-normative",
@@ -2783,8 +2870,9 @@ def validate_documentation_profile_mutations() -> None:
             third_party_made_normative,
             gitignore,
         ),
-        "ASD-STE100 reference instructions lack: Do not use a third-party "
-        "summary",
+        "ASD-STE100 reference instructions lack: Do not use an external "
+        "summary, text from a search engine, a blog, or derived guidance as "
+        "normative conformance evidence.",
     )
     third_party_url_substituted = replace_once(
         source_reference,
@@ -2804,9 +2892,10 @@ def validate_documentation_profile_mutations() -> None:
     )
     no_source_claim_authorized = replace_once(
         source_reference,
-        "neither official source is available, do not claim that the prose is\n"
-        "ASD-STE100 Issue 9 conforming",
-        "neither official source is available, claim that the prose is\n"
+        "neither official source is available, do not claim that the "
+        "canonical prose is\nASD-STE100 Issue 9 conforming",
+        "neither official source is available, claim that the canonical prose "
+        "is\n"
         "ASD-STE100 Issue 9 conforming",
     )
     expect_rejected(
@@ -2856,8 +2945,8 @@ def validate_documentation_profile_mutations() -> None:
     )
     pdf_made_ci_dependency = replace_once(
         validation,
-        "Normal CI does not use the ignored PDF.",
-        "Normal CI uses the ignored PDF.",
+        "Normal CI does not\nuse the ignored PDF.",
+        "Normal CI uses\nthe ignored PDF.",
     )
     expect_rejected(
         "tt-doc/ste100-pdf-made-ci-dependency",
@@ -2878,7 +2967,7 @@ def validate_documentation_profile_mutations() -> None:
     )
     overlap_default_inverted = replace_once(
         workflows,
-        "use the primary owner that is already in the\nskill catalog",
+        "use an existing primary owner when possible",
         "creation of a parallel skill is the default resolution",
     )
     expect_rejected(
@@ -2913,130 +3002,274 @@ def validate_documentation_profile_mutations() -> None:
         ".agents/skills/tracktemplate-documentation-review/references/"
         "writing-checklist.md"
     )
-    author_assurance_cases = (
+    documentation_review_cases = (
         (
-            "tt-doc/author-review-controlled-vocabulary-removed",
+            "tt-doc/documentation-review-controlled-vocabulary-removed",
             "controlled vocabulary",
             "uncontrolled text",
-            "controlled vocabulary / technical term / approved meaning / "
+            "controlled vocabulary / technical term / controlled meaning / "
             "part of speech",
         ),
         (
-            "tt-doc/author-review-term-register-removed",
+            "tt-doc/documentation-review-term-register-removed",
             "technical-term register",
             "local glossary",
             "technical-term register / technical-term category / controlled "
             "vocabulary does not identify the tracktemplate item",
         ),
         (
-            "tt-doc/author-review-ordinary-vocabulary-removed",
+            "tt-doc/documentation-review-ordinary-vocabulary-removed",
             "controlled vocabulary does not identify the TrackTemplate item",
             "general wording identifies the TrackTemplate item",
             "technical-term register / technical-term category / controlled "
             "vocabulary does not identify the tracktemplate item",
         ),
         (
-            "tt-doc/author-review-actor-check-removed",
+            "tt-doc/documentation-review-actor-check-removed",
             "person, tool, or system",
             "text",
             "person, tool, or system / each operation",
         ),
         (
-            "tt-doc/author-review-antecedent-check-removed",
+            "tt-doc/documentation-review-antecedent-check-removed",
             "noun to which it refers",
             "nearby word",
             "each pronoun / noun to which it refers / state and result",
         ),
         (
-            "tt-doc/author-review-noun-group-check-removed",
+            "tt-doc/documentation-review-noun-group-check-removed",
             "noun group",
             "word sequence",
             "rule 2 / noun group",
         ),
         (
-            "tt-doc/author-review-instruction-check-weakened",
+            "tt-doc/documentation-review-instruction-check-weakened",
             "different instruction",
             "same instruction",
             "different instruction / condition before its instruction",
         ),
         (
-            "tt-doc/author-review-condition-order-inverted",
+            "tt-doc/documentation-review-condition-order-inverted",
             "condition before its instruction",
             "condition after its instruction",
             "different instruction / condition before its instruction",
         ),
         (
-            "tt-doc/author-review-sentence-check-removed",
+            "tt-doc/documentation-review-sentence-check-removed",
             "sentence construction",
             "sentence text",
             "sentence construction / paragraph structure",
         ),
         (
-            "tt-doc/author-review-paragraph-check-removed",
+            "tt-doc/documentation-review-paragraph-check-removed",
             "paragraph structure",
             "paragraph text",
             "sentence construction / paragraph structure",
         ),
         (
-            "tt-doc/author-review-full-applicability-weakened",
+            "tt-doc/documentation-review-full-applicability-weakened",
             "all other applicable Issue 9 requirements",
             "selected Issue 9 requirements",
             "all other applicable issue 9 requirements",
         ),
         (
-            "tt-doc/author-review-actual-result-removed",
-            "actual result",
-            "reported result",
-            "evidence claim / command invocation / validation profile / "
-            "actual result",
+            "tt-doc/documentation-review-evidence-source-removed",
+            "evidence claim",
+            "unsupported statement",
+            "evidence claim / source",
         ),
         (
-            "tt-doc/author-review-unresolved-terminology-kept",
+            "tt-doc/documentation-review-unresolved-terminology-kept",
             "Resolve all unresolved terminology",
             "Keep unresolved terminology",
             "resolve all unresolved terminology",
         ),
         (
-            "tt-doc/author-review-unresolved-terminology-removed",
+            "tt-doc/documentation-review-unresolved-terminology-removed",
             "Resolve all unresolved terminology",
             "",
             "resolve all unresolved terminology",
         ),
         (
-            "tt-doc/author-review-unresolved-terminology-weakened",
+            "tt-doc/documentation-review-unresolved-terminology-weakened",
             "Resolve all unresolved terminology",
             "Resolve some unresolved terminology",
             "resolve all unresolved terminology",
         ),
         (
-            "tt-doc/author-review-challenge-removed",
-            "challenge",
-            "comment",
-            "read-only challenge / no acceptance",
+            "tt-doc/documentation-review-blocker-binding-removed",
+            "For each BLOCKED finding, record its exact path and frozen "
+            "logical-unit\n    identity. Also record the finding and applicable "
+            "formal Issue 9 rule\n    identifiers.",
+            "For each BLOCKED finding, record a short note.",
+            "for each blocked finding / exact path / frozen logical-unit "
+            "identity / finding / applicable formal issue 9 rule identifiers",
         ),
         (
-            "tt-doc/author-review-machine-proof-authorized",
-            "does not examine prose for",
-            "examines prose for",
-            "does not examine prose for conformance / author completes the "
-            "conformance review",
+            "tt-doc/documentation-review-empty-blocker-set-authorised",
+            "For a `BLOCKED`\n    verdict, make sure that this set is not empty.",
+            "For a `BLOCKED`\n    verdict, an empty set is sufficient.",
+            "set contains all blocked findings / blocked verdict / set is not "
+            "empty",
         ),
     )
-    for name, old, new, expected_concepts in author_assurance_cases:
+    for name, old, new, expected_concepts in documentation_review_cases:
         if old not in writing_checklist:
             raise AssertionError(name + " fixture is stale")
         mutated_checklist = writing_checklist.replace(old, new)
         expect_rejected(
             name,
             lambda value=mutated_checklist: (
-                agent_guidance.validate_issue9_author_assurance(
+                agent_guidance.validate_issue9_documentation_lifecycle(
                     documentation_review,
                     value,
                     workflows,
+                    engineering,
                 )
             ),
-            "documentation checklist lost author-side assurance: "
+            "documentation checklist lost linguistic-review coverage: "
             + expected_concepts,
+        )
+
+    lifecycle_cases = (
+        (
+            "tt-doc/lifecycle-order-weakened",
+            "policy",
+            "> author → freeze scope → one Documentation Review → optional exact reviewed\n"
+            "> correction once → one final deterministic validation → complete or owner stop",
+            "> author → Documentation Review → complete",
+            "documentation policy lost simplified lifecycle control: author → "
+            "freeze scope → one documentation review",
+        ),
+        (
+            "tt-doc/lifecycle-verdict-removed",
+            "policy",
+            "The reviewer returns one complete verdict. The verdict is "
+            "`ACCEPT`,\n`APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`.",
+            "The reviewer returns `ACCEPT` or `BLOCKED`.",
+            "documentation policy lost simplified lifecycle control: only "
+            "linguistic conformance review / reviewer returns one complete "
+            "verdict. the verdict is accept, approved_with_exact_corrections, "
+            "or blocked",
+        ),
+        (
+            "tt-doc/lifecycle-second-review-authorised",
+            "policy",
+            "Do not run a second\nDocumentation Review.",
+            "Run a second Documentation Review after a correction.",
+            "documentation policy lost simplified lifecycle control: all exact "
+            "replacement wording in the same review",
+        ),
+        (
+            "tt-doc/lifecycle-empty-blocked-result-authorised",
+            "policy",
+            "A `BLOCKED` result with\nan empty `blockers` array is invalid.",
+            "A `BLOCKED` result with an empty `blockers` array is valid.",
+            "documentation policy lost simplified lifecycle control: each "
+            "schema version 2 result records the complete blockers array / "
+            "accept and approved_with_exact_corrections use an empty blockers "
+            "array / blocked uses a nonempty blockers array / exact path / "
+            "frozen logical-unit identity / finding / formal issue 9 rule "
+            "identifiers / review receipt preserves the complete blockers "
+            "array / exact candidate and frozen review scope bindings / "
+            "blocked result with an empty blockers array is invalid",
+        ),
+        (
+            "tt-doc/lifecycle-final-validation-made-linguistic",
+            "policy",
+            "It does not judge linguistic\nconformance.",
+            "It independently judges linguistic conformance.",
+            "documentation policy lost simplified lifecycle control: it proves "
+            "these identities: - source. - exact candidate. - frozen review "
+            "scope. - receipt. - accepted state. - final content. / no "
+            "unreviewed change remains / does not judge linguistic conformance",
+        ),
+        (
+            "tt-doc/lifecycle-durable-unit-state-added",
+            "policy",
+            "Keep durable review state at document level.",
+            "Keep durable review state for every logical unit.",
+            "documentation policy lost simplified lifecycle control: durable "
+            "review state at document level",
+        ),
+        (
+            "tt-doc/lifecycle-untouched-legacy-review-added",
+            "policy",
+            "Do not review an untouched legacy document.",
+            "Review every untouched legacy document.",
+            "documentation policy lost simplified lifecycle control: do not "
+            "review an untouched legacy document",
+        ),
+        (
+            "tt-doc/lifecycle-exact-wording-deferred",
+            "skill",
+            "give all exact replacement\nwording in this review",
+            "let a later reviewer supply replacement wording",
+            "documentation review lost simplified lifecycle control: all exact "
+            "replacement wording in this review",
+        ),
+        (
+            "tt-doc/lifecycle-preimage-removed",
+            "skill",
+            "path, byte range, and\nfrozen preimage",
+            "path only",
+            "documentation review lost simplified lifecycle control: all exact "
+            "replacement wording in this review",
+        ),
+        (
+            "tt-doc/lifecycle-blocker-set-made-partial",
+            "skill",
+            "For `BLOCKED`, give the complete set of BLOCKED findings in this "
+            "review.",
+            "For `BLOCKED`, give a sample of the BLOCKED findings.",
+            "documentation review lost simplified lifecycle control: complete "
+            "set of blocked findings in this review / at least one finding / "
+            "for each finding, give the finding wording and exact path / "
+            "applicable formal issue 9 rule identifiers / side, bounds, and "
+            "sha-256 of the frozen logical unit / set blocker_set_complete to "
+            "true / blockers array is empty",
+        ),
+        (
+            "tt-doc/lifecycle-invented-prose-authorised",
+            "workflow",
+            "Do not invent other canonical prose.",
+            "Add other useful canonical prose.",
+            "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
+        ),
+        (
+            "tt-doc/lifecycle-owner-stop-removed",
+            "workflow",
+            "Otherwise, stop for the owner.",
+            "Otherwise, start another Documentation Review.",
+            "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
+        ),
+        (
+            "tt-doc/lifecycle-empty-blocker-workflow-authorised",
+            "workflow",
+            "A `BLOCKED` verdict must record a complete, nonempty `BLOCKED`\n"
+            "   finding set.",
+            "A `BLOCKED` verdict can record an empty finding set.",
+            "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
+        ),
+    )
+    for name, owner, old, new, diagnostic in lifecycle_cases:
+        source = {
+            "policy": engineering,
+            "skill": documentation_review,
+            "workflow": workflows,
+        }[owner]
+        mutated = replace_once(source, old, new)
+        expect_rejected(
+            name,
+            lambda value=mutated, target=owner: (
+                agent_guidance.validate_issue9_documentation_lifecycle(
+                    value if target == "skill" else documentation_review,
+                    writing_checklist,
+                    value if target == "workflow" else workflows,
+                    value if target == "policy" else engineering,
+                )
+            ),
+            diagnostic,
         )
 
     phase4_closeout = read(
@@ -3152,9 +3385,11 @@ def validate_documentation_profile_mutations() -> None:
     spelling_review_blocker_inverted = replace_once(
         current_evidence,
         "The governance review result was PASS WITH FINDINGS. That review "
-        "examined\nauthority and preservation. No reviewer found a blocker.",
+        "examined\nauthority and preservation. No reviewer found a blocking "
+        "condition.",
         "The governance review result was PASS WITH FINDINGS. That review "
-        "examined\nauthority and preservation. One reviewer found a blocker.",
+        "examined\nauthority and preservation. One reviewer found a blocking "
+        "condition.",
     )
     expect_rejected(
         "tt-doc-002/review-blocker-inverted",
@@ -3164,7 +3399,8 @@ def validate_documentation_profile_mutations() -> None:
             phase5_closeout,
             spelling_review_blocker_inverted,
         ),
-        "TT-DOC-002 evidence panel drifted: No reviewer found a blocker",
+        "TT-DOC-002 evidence panel drifted: No reviewer found a blocking "
+        "condition",
     )
 
     terminology_owner_removed = replace_once(
@@ -3197,7 +3433,7 @@ def validate_transition_export_validation_mutations() -> None:
             "validation/exit3-prebind-substitution-proof-withdrawn",
             replace_once(
                 validation,
-                "resolve-to-bind removal and\nsubstitution",
+                "resolve-to-bind removal,\nand substitution",
                 "resolve-to-bind removal only",
             ),
         ),
@@ -3205,7 +3441,7 @@ def validate_transition_export_validation_mutations() -> None:
             "validation/exit3-active-lock-made-recoverable",
             replace_once(
                 validation,
-                "active-lock\nfail-closed diagnostics",
+                "Active-lock diagnostics must fail\nclosed",
                 "active-lock success diagnostics",
             ),
         ),
@@ -3221,7 +3457,7 @@ def validate_transition_export_validation_mutations() -> None:
             "validation/exit3-descriptor-close-proof-withdrawn",
             replace_once(
                 validation,
-                "observed descriptor-close\nabandonment",
+                "observed\ndescriptor-close abandonment",
                 "descriptor-close abandonment was not observed",
             ),
         ),
@@ -3229,8 +3465,8 @@ def validate_transition_export_validation_mutations() -> None:
             "validation/exit3-surviving-host-interruption-proof-withdrawn",
             replace_once(
                 validation,
-                "surviving-host `BaseException` propagation with chained "
-                "truthful\nretained-state diagnostics",
+                "propagate on a surviving host with truthful chained "
+                "`BaseException`\ndiagnostics",
                 "surviving-host interruption cleanup remains unproved",
             ),
         ),
@@ -3238,29 +3474,29 @@ def validate_transition_export_validation_mutations() -> None:
             "validation/exit3-add-only-proof-withdrawn",
             replace_once(
                 validation,
-                "It proves the bounded D-P6-003 strict add-only, journal-free\n"
-                "implementation",
-                "It does not prove the bounded D-P6-003 strict add-only, "
-                "journal-free\nimplementation",
+                "The proof covers the\nbounded D-P6-003 strict add-only, "
+                "journal-free implementation",
+                "The proof does not cover the bounded D-P6-003 strict "
+                "add-only, journal-free implementation",
             ),
         ),
         (
             "validation/exit3-published-final-mutation-authorised",
             replace_once(
                 validation,
-                "no published final is\nremoved, rewritten or replaced by "
-                "TrackTemplate",
-                "a published final may be\nremoved, rewritten or replaced by "
-                "TrackTemplate",
+                "TrackTemplate removes, rewrites, or replaces no published\n"
+                "final",
+                "TrackTemplate can remove, rewrite, or replace a published "
+                "final",
             ),
         ),
         (
             "validation/exit3-command-claims-phase-acceptance",
             replace_once(
                 validation,
-                "they supply no GUI, production-output, Phase 6 exit or "
-                "release\nacceptance",
-                "they supply Phase 6 exit and release\nacceptance",
+                "They supply no GUI,\nproduction-output, Phase 6 exit, or release "
+                "acceptance",
+                "They supply Phase 6 exit and release acceptance",
             ),
         ),
     )
@@ -4493,8 +4729,8 @@ def validate_chief_mutations() -> None:
 
     workflow_mutation = replace_once(
         workflows,
-        "compares the selected work with credible maintenance, evidence,\n"
-        "risk-reduction and other authorised alternatives;",
+        "It compares selected work with credible authorised\nalternatives. "
+        "These can include maintenance, evidence, and risk-reduction\nwork.",
         "selects an item labelled highest-value;",
     )
     expect_rejected(
@@ -4508,7 +4744,7 @@ def validate_chief_mutations() -> None:
 
     workflow_paragraph = paragraph_containing(
         workflows,
-        "It is a vision-informed programme orchestrator",
+        "vision-informed programme orchestrator",
     )
     polarity_diagnostic = (
         "Chief of Staff comparative priority became optional or unnecessary"

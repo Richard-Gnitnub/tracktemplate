@@ -230,7 +230,8 @@ def _validate_scope_and_documentation():
         in validation
     )
     assert (
-        "saved/reopened representative Entry/Exit attachment"
+        "saved/reopened representative Entry/Exit\n"
+        "attachment product boundary"
         in validation
     )
     assert (

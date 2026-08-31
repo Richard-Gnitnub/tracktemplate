@@ -28,11 +28,11 @@ Use official sources in this order for an ASD-STE100 conformance review:
 1. Use the local official PDF when it is available at the path above.
 2. If the local PDF is absent, use the official ASD/STEMG Issue 9 source when
    network access is available.
-3. Do not use a third-party summary, search-result text, blog, or derived
-   guidance as normative conformance evidence.
+3. Do not use an external summary, text from a search engine, a blog, or
+   derived guidance as normative conformance evidence.
 
 The review record must report which official source the reviewer used. If
-neither official source is available, do not claim that the prose is
+neither official source is available, do not claim that the canonical prose is
 ASD-STE100 Issue 9 conforming. Work that does not need linguistic conformance
 assessment can continue.
 
@@ -161,46 +161,65 @@ technical-term status, and unresolved terminology. It is not an external
 certification or endorsement. Do not keep all review receipts for usual work.
 Keep one only when project authority makes this necessary.
 
-If canonical prose has a material edit, make a temporary author-review
-worklist in `tmp/`. Record each path and logical unit. Record the applicable
-review categories. Record findings and their dispositions. Before validation,
-resolve all findings.
-
-Validate the author-review worklist with this command:
+For a material change to canonical prose, first freeze a clean Git commit. Use
+the complete SHA for its accepted baseline:
 
 ```bash
-.venv/bin/python tools/ste100_lookup.py author-assurance tmp/WORKLIST.json
+.venv/bin/python tools/ste100_lookup.py freeze-review \
+  --baseline-revision BASELINE --author-id AUTHOR_ID
 ```
 
-If the worktree does not contain the PDF, add `--source-file` with the full
-path of the preserved PDF.
+The command writes the frozen review scope to a file. Its filename contains
+the file SHA-256. The file is under `tmp/ste100-review-scopes/`. Review results use
+`tmp/ste100-review-results/`, and accepted-state proposals use
+`tmp/ste100-review-state-proposals/`. The command compares the source with the manifest
+and derives the frozen review scope from accepted document identities and Git. It excludes
+untouched legacy documents. It includes the complete document for a first edit
+and only changed complete logical units after an accepted document identity.
 
-The STE lookup compares the PDF with the source manifest. It compares each
-SHA-256 in the worklist with the exact candidate. It also makes sure the
-worklist contains the conformance scope for changed prose. If prose changes,
-the STE lookup rejects the previous review receipt.
+Give that frozen review scope to one independent Documentation Reviewer. The reviewer
+must use the official source and return one complete `ACCEPT`,
+`APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` result. For
+`APPROVED_WITH_EXACT_CORRECTIONS`, the result must contain all exact replacement
+wording.
 
-For an evidence claim from a command result, the worklist names the command
-invocation and validation profile. It records the actual result and command
-output. The STE lookup compares the command-output SHA-256 and actual result
-with that output.
+Use schema 2 for each new review-result file. Set `blocker_set_complete` to
+`true` and use `blockers` to record the complete set of `BLOCKED` findings. Use an empty list
+for `ACCEPT` and `APPROVED_WITH_EXACT_CORRECTIONS`. A `BLOCKED` result must
+contain at least one finding. Each `blockers` item records `finding`, the exact `path`,
+the sorted unique formal Issue 9 `rule_ids`, and `unit`. The `unit` object uses
+the exact `side`, `start_byte`, `end_byte`, and `sha256` values from the frozen
+review scope.
 
-The STE lookup rejects an unresolved finding. It writes a review receipt in
-`tmp/ste100-review-receipts/`. The receipt filename contains its SHA-256. The
-author-assurance command validates the source identity, exact candidate, and
-conformance scope. It also validates SHA-256 values, unresolved findings, and
-command results. It does not give a result from a conformance review.
+The command verifies each `blockers` item against the frozen review scope and
+the applicable Git content. It preserves the complete set in the review receipt. It
+rejects a `BLOCKED` result that contains no finding. The frozen-review-scope and
+accepted-state schemas do not change. Preserved schema 1 results and receipts
+remain immutable historical evidence. Do not migrate them to schema 2.
 
-Before the author freezes the exact candidate, a different documentation
-reviewer completes a read-only challenge. If the challenge gives a `PASS`
-result, record the challenge result. Then, use:
+Record the result with:
 
 ```bash
-.venv/bin/python tools/ste100_lookup.py author-assurance \
-  tmp/WORKLIST.json --require-challenge
+.venv/bin/python tools/ste100_lookup.py record-review SCOPE RESULT
 ```
 
-The read-only challenge has no acceptance.
+For a `BLOCKED` result, stop for the owner. The command gives no accepted-state
+proposal. For `ACCEPT`, use the proposed document-level review state. For
+`APPROVED_WITH_EXACT_CORRECTIONS`, apply each exact replacement once against
+its verified preimage, and use the proposed state. Do not invent other wording.
+Do not run a second Documentation Review.
+
+Commit the reviewed content and `reference/ste-review-state.json`. Then run the
+one final deterministic validation:
+
+```bash
+.venv/bin/python tools/ste100_lookup.py final-validate SCOPE RECEIPT
+```
+
+Require the `TRACKTEMPLATE_STE100_FINAL=` success sentinel. This command proves
+source identity, exact candidate identity, frozen review scope, receipt,
+accepted-state, and final-content identity.
+It detects unreviewed mutation. It does not judge linguistic conformance.
 
 The usual agent route and bounded conditions for complete-source inspection are
 in the

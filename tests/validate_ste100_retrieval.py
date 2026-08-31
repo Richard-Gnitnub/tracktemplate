@@ -100,20 +100,19 @@ def validate_policy_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     section = semantic_text(text)
     for fragment in (
-        "retrieval optimisation only",
+        "ste lookup only makes retrieval faster",
         "does not define or limit the applicable rule set",
-        "applicable rule set is mandatory",
-        "controlled vocabulary is also mandatory",
-        "must not claim conformance because of rules in a lookup result",
-        "must not claim conformance because the pre-check has no finding",
+        "all applicable writing rules and the controlled vocabulary are mandatory",
+        "must not claim conformance because of a lookup result",
+        "must not claim conformance because the deterministic pre-check has no "
+        "finding",
         "pass result from automatic validation also does not show conformance",
-        "ste lookup controls the source text that an agent reads for this task",
-        "does not control the applicable writing rules",
+        "ste lookup selects the source text that an agent reads for a task",
+        "does not select the applicable writing rules",
     ):
         require(fragment in section, "application profile lacks: " + fragment)
     require(
-        "tracktemplate uses uk english spelling as its project spelling directive"
-        in section,
+        "tracktemplate uses uk english" in section,
         "the UK English directive was lost",
     )
     require(
@@ -128,16 +127,19 @@ def validate_workflow_text(text: str) -> None:
     ordered = (
         "read the technical documentation profile",
         "read the technical-term register",
-        "use the tracktemplate-documentation-review skill",
-        "record each logical unit with a material edit",
-        "for each logical unit, record the content category",
-        "use the writing checklist for each logical unit",
-        "record findings and their dispositions",
-        "resolve all findings and unresolved terminology",
-        "after the last wording change, review each logical unit in full",
-        "validate the temporary author-review worklist",
-        "before the author freezes an exact candidate, get a read-only challenge",
-        "when project authority makes it necessary, get an independent review",
+        "use the tracktemplate-documentation-review skill for the one "
+        "documentation review",
+        "author the canonical prose and freeze one clean exact candidate in git",
+        "derive the frozen review scope from the last accepted document identity "
+        "and git",
+        "give the complete frozen review scope to one independent documentation "
+        "reviewer",
+        "record one complete accept",
+        "approved with exact corrections",
+        "or blocked verdict",
+        "apply all exact replacement wording once against verified preimages",
+        "run one final deterministic validation after the review or correction",
+        "complete only if that validation is green",
     )
     position = -1
     for fragment in ordered:
@@ -149,12 +151,18 @@ def validate_workflow_text(text: str) -> None:
         position = new_position
     for fragment in (
         "rule families in a lookup result are retrieval priorities",
-        "they are not the applicable rule set",
+        "they are not the applicable requirement set",
         "use complete-source inspection only for these bounded conditions",
         "task is about the complete standard",
         "validates the retrieval architecture",
         "targeted retrieval cannot resolve an ambiguity that the reviewer records",
         "owner decision makes complete-source inspection necessary",
+        "documentation review is the only linguistic conformance review",
+        "do not run a second documentation review",
+        "do not invent other canonical prose",
+        "otherwise, stop for the owner",
+        "detects unreviewed mutation",
+        "does not give or change the linguistic verdict",
     ):
         require(fragment in value, "workflow boundary lacks: " + fragment)
 
@@ -188,6 +196,26 @@ def validate_source_documentation(text: str) -> None:
         "a pass command result also does not show conformance",
         "do not keep all review receipts for usual work",
         "does not narrow the applicable issue 9 requirement set",
+        "first freeze a clean git commit",
+        "derives the frozen review scope from accepted document identities "
+        "and git",
+        "excludes untouched legacy documents",
+        "includes the complete document for a first edit",
+        "only changed complete logical units after an accepted document identity",
+        "one independent documentation reviewer",
+        "approved with exact corrections",
+        "result must contain all exact replacement wording",
+        "blocked result, stop for the owner",
+        "gives no accepted-state proposal",
+        "apply each exact replacement once against its verified preimage",
+        "do not invent other wording",
+        "do not run a second documentation review",
+        "commit the reviewed content and reference/ste-review-state.json",
+        "tracktemplate ste100 final= success sentinel",
+        "proves source identity, exact candidate identity, frozen review scope, "
+        "receipt, accepted-state, and final-content identity",
+        "detects unreviewed mutation",
+        "does not judge linguistic conformance",
     ):
         require(fragment in value, "source/retrieval instructions lack: " + fragment)
 
@@ -222,7 +250,7 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
     require(
         "lookup result selects source material to read"
         in semantic_text(skills["tracktemplate-documentation-review"])
-        and "does not select the issue 9 requirement set"
+        and "does not select the applicable issue 9 requirement set"
         in semantic_text(skills["tracktemplate-documentation-review"]),
         "documentation review lets retrieval narrow applicability",
     )
@@ -241,6 +269,14 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
         in semantic_text(skills["tracktemplate-quality-review"]),
         "quality review does not check full applicability",
     )
+    quality_review = semantic_text(skills["tracktemplate-quality-review"])
+    require(
+        "this quality review is non-linguistic" in quality_review
+        and "do not repeat documentation review" in quality_review
+        and "change its verdict" in quality_review
+        and "propose wording corrections" in quality_review,
+        "quality review reopened the documentation review verdict",
+    )
 
 
 def validate_no_positive_assurance_claim(text: str) -> None:
@@ -253,6 +289,7 @@ def validate_no_positive_assurance_claim(text: str) -> None:
         "selected lookup results prove conformance",
         "selected lookup results prove compliance",
         "lookup results are the complete applicable rule set",
+        "lookup results are the complete applicable requirement set",
         "lookup result is the complete applicable rule set",
         "returned rules are the complete applicable rule set",
         "absence of findings proves conformance",
@@ -607,19 +644,47 @@ def validate_validation_text(validation_text: str) -> None:
     for fragment in (
         "validate the retrieval contract without the pdf",
         "must fail closed when the source is missing",
-        "byte size or sha-256 identity is different from the source manifest",
-        "source-derived index when its identity is not the identity in the source "
-        "manifest",
+        "byte size or sha-256 identity differs from the source manifest",
+        "must reject a source-derived index whose identity differs from the "
+        "source manifest",
         "must be a regular file",
         "must not be in the repository or active python environment",
         "group and other users must not have write access",
         "derived cache must contain metadata only",
         "source mode must use verified source bytes",
-        "must not make a linguistic conformance, certification, or endorsement claim",
-        "review receipt must record that the reviewer examines the complete "
-        "applicable requirement set",
-        "review receipt, pre-check, derived cache, and selected lookup results do "
+        "must not claim linguistic conformance, certification, or endorsement",
+        "receipt must record examination of the complete applicable requirement "
+        "set",
+        "receipt, pre-check, derived cache, and selected lookup results do "
         "not show",
+        "author freezes one clean exact git candidate",
+        "derives the frozen review scope from the last accepted document identity "
+        "and git",
+        "one independent documentation reviewer returns one complete verdict for "
+        "the frozen review scope",
+        "it is accept",
+        "approved with exact corrections",
+        "or blocked",
+        "all exact replacement wording is in that review",
+        "applied once against verified preimages",
+        "documentation review is the only linguistic conformance review",
+        "do not run a second documentation review",
+        "final validation does not judge prose",
+        "must validate the official source identity and frozen candidate",
+        "must also validate the git-derived frozen review scope, review result, "
+        "and receipt",
+        "must validate expected document-level state and final content",
+        "reject unrelated post-review mutation",
+        "do not include an untouched legacy document in the frozen review scope",
+        "complete document for the first material edit of an unreviewed legacy "
+        "document",
+        "only materially changed complete logical units",
+        "do not include unchanged previously accepted prose",
+        "accepted review state at document level",
+        "do not persist sentence, paragraph, or logical-unit workflow state",
+        "a remaining linguistic, semantic, or identity failure returns to the "
+        "owner",
+        "a failure of the frozen review scope also returns to the owner",
     ):
         require(fragment in validation, "validation owner lacks: " + fragment)
     require(
@@ -1582,8 +1647,8 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     profile = read(ENGINEERING)
     validate_policy_text(profile)
     weakened_profile = profile.replace(
-        "The applicable rule set is mandatory. The controlled\n"
-        "vocabulary is also mandatory.",
+        "All applicable writing rules and the controlled vocabulary\n"
+        "are mandatory.",
         "Only returned rules are mandatory.",
     )
     try:
@@ -1627,8 +1692,8 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     workflows = read(WORKFLOWS)
     validate_workflow_text(workflows)
     narrowed_workflow = workflows.replace(
-        "They are not the\napplicable rule set.",
-        "They are the applicable rule set.",
+        "They are not the\napplicable requirement set.",
+        "They are the applicable requirement set.",
     )
     require(narrowed_workflow != workflows, "workflow narrowing fixture is stale")
     try:
@@ -1638,7 +1703,8 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     else:
         raise AssertionError("lookup-as-complete workflow mutation was accepted")
     contradictory_workflow = (
-        workflows + "\nLookup results are the complete applicable rule set.\n"
+        workflows
+        + "\nLookup results are the complete applicable requirement set.\n"
     )
     try:
         validate_workflow_text(contradictory_workflow)
@@ -1835,295 +1901,1000 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
 
 
 
-def validate_author_review_traceability() -> None:
-    with tempfile.TemporaryDirectory() as temporary:
-        root = pathlib.Path(temporary)
-        document = root / "review.md"
-        document.write_text("# Review\n\nThe author reviews the text.\n", encoding="utf-8")
-        for command in (
-            ["git", "init", "--quiet"],
-            ["git", "add", document.name],
-            [
-                "git",
-                "-c",
-                "user.name=TrackTemplate Validation",
-                "-c",
-                "user.email=validation@example.invalid",
-                "commit",
-                "--quiet",
-                "-m",
-                "baseline",
-            ],
-        ):
-            subprocess.run(command, cwd=root, check=True)
-        baseline = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
+def validate_documentation_lifecycle() -> None:
+    source_manifest = {
+        "issue": "9",
+        "page_count": 434,
+        "publication_date": "2025-01-15",
+        "sha256": EXPECTED_SOURCE_SHA256,
+        "size_bytes": EXPECTED_SOURCE_SIZE,
+        "standard_id": "ASD-STE100",
+    }
+
+    def git(root: pathlib.Path, *arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments],
             cwd=root,
             check=True,
             capture_output=True,
             text=True,
         ).stdout.strip()
-        document.write_text(
-            "# Review\n\nThe author reviews all changed prose.\n",
+
+    def commit(root: pathlib.Path, message: str) -> str:
+        git(root, "add", "--all")
+        git(
+            root,
+            "-c",
+            "user.name=TrackTemplate Validation",
+            "-c",
+            "user.email=validation@example.invalid",
+            "commit",
+            "--quiet",
+            "-m",
+            message,
+        )
+        return git(root, "rev-parse", "HEAD")
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        (root / "reference" / "current").mkdir(parents=True)
+        (root / "tmp").mkdir()
+        (root / ".gitignore").write_text("tmp/\n", encoding="utf-8")
+        guide = root / "reference" / "guide.md"
+        untouched = root / "reference" / "untouched.md"
+        decisions = root / "reference" / "current" / "gate-decisions.json"
+        guide.write_text(
+            "# First\n\nLegacy text.\n\n# Second\n\nUnchanged legacy text.\n",
             encoding="utf-8",
         )
-        output_dir = root / "tmp"
-        output_dir.mkdir()
-        output = output_dir / "validation.log"
-        output.write_text(
-            "RESULT=PASS\n",
-            encoding="utf-8",
-        )
-        source_manifest = {
-            "issue": "9",
-            "page_count": 434,
-            "publication_date": "2025-01-15",
-            "sha256": EXPECTED_SOURCE_SHA256,
-            "size_bytes": EXPECTED_SOURCE_SIZE,
-            "standard_id": "ASD-STE100",
-        }
-        document_hash = hashlib.sha256(document.read_bytes()).hexdigest()
-        unit_payload = "".join(
-            document.read_text(encoding="utf-8").splitlines(keepends=True)
-        ).encode("utf-8")
-        source = {"path": document.name, "sha256": document_hash}
-        evidence = {
-            "actual_result": "RESULT=PASS",
-            "claim": "The fixture command gave a PASS result.",
-            "command": {
-                "argv": [sys.executable, "-c", "print('RESULT=PASS')"],
-                "exit_status": 0,
-                "output_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
-                "output_source": "tmp/validation.log",
-                "profile": "fixture",
-                "sentinel": "RESULT=",
-                "working_directory": str(root),
-            },
-            "id": "evidence-001",
-            "source": source,
-            "type": "command-result",
-        }
-        candidate = STE._assurance_candidate(baseline, root=root)
-        worklist = {
-            "author_review": {
-                "completed_on": "2026-08-26",
-                "method": "complete-human-ASD-STE100-Issue-9-review",
-                "reviewer": "fixture author",
-                "status": "complete",
-            },
-            "baseline_revision": baseline,
-            "candidate": candidate,
-            "documents": [source],
-            "prefreeze_challenge": {
-                "candidate_content_sha256": "",
-                "completed_on": "",
-                "review_worklist_sha256": "",
-                "result_sha256": "",
-                "result_source": "",
-                "reviewer": "",
-                "status": "pending",
-                "unresolved_findings": [],
-            },
-            "source_identity": source_manifest,
-            "units": [
+        untouched.write_text("# Untouched\n\nLegacy text.\n", encoding="utf-8")
+        decisions.write_text(
+            json.dumps(
                 {
-                    "applicable_review_categories": list(
-                        STE.ASSURANCE_REVIEW_CATEGORIES
-                    ),
-                    "content_category": "descriptive",
-                    "document_class": "guidance",
-                    "end_line": 3,
-                    "evidence_claims": [evidence],
-                    "findings": [
-                        {
-                            "category": "controlled-vocabulary",
-                            "description": "The first wording used an unapproved word.",
-                            "disposition": "The author used approved vocabulary.",
-                            "end_line": 3,
-                            "id": "finding-001",
-                            "start_line": 3,
-                            "status": "resolved",
-                        }
+                    "current_phase": 6,
+                    "decisions": [
+                        {"decision": "Keep the baseline.", "id": "D-001"}
                     ],
-                    "id": "unit-001",
-                    "path": document.name,
-                    "review_status": "complete",
-                    "sha256": hashlib.sha256(unit_payload).hexdigest(),
-                    "start_line": 1,
-                    "unresolved_findings": [],
-                }
-            ],
-            "unresolved_findings": [],
-            "worklist_schema_version": 1,
-        }
-        receipt = STE.validate_author_assurance_worklist(
-            worklist,
-            root=root,
+                    "schema_version": 1,
+                    "updated_on": "2026-08-30",
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        git(root, "init", "--quiet")
+        baseline = commit(root, "legacy baseline")
+
+        guide.write_text(
+            "# First\n\nNew reviewed text.\n\n# Second\n\nUnchanged legacy text.\n",
+            encoding="utf-8",
+        )
+        state_path = root / "reference" / "ste-review-state.json"
+        state_path.write_bytes(STE._canonical_json_bytes(STE._empty_review_state()))
+
+        def write_result(name: str, value: dict[str, object]) -> pathlib.Path:
+            path = root / "tmp" / name
+            path.write_bytes(STE._canonical_json_bytes(value))
+            return path
+
+        def write_raw_result(name: str, value: bytes) -> pathlib.Path:
+            path = root / "tmp" / name
+            path.write_bytes(value)
+            return path
+
+        def blocker_for(
+            document: dict[str, object],
+            unit: dict[str, object],
+            *,
+            finding: str,
+            rule_ids: list[str],
+        ) -> dict[str, object]:
+            return {
+                "finding": finding,
+                "path": document["path"],
+                "rule_ids": rule_ids,
+                "unit": {
+                    "end_byte": unit["end_byte"],
+                    "sha256": unit["sha256"],
+                    "side": unit["side"],
+                    "start_byte": unit["start_byte"],
+                },
+            }
+
+        candidate_one = commit(root, "first material edit")
+        scope_path, scope_one = STE.freeze_documentation_review(
+            baseline_revision=baseline,
+            author_id="fixture-author",
             source_manifest=source_manifest,
+            root=root,
         )
         require(
-            receipt["assurance_status"]
-            == "candidate-bound-human-review-traceability-not-linguistic-conformance",
-            "author assurance claimed automatic linguistic conformance",
+            scope_one["candidate"]["candidate_revision"] == candidate_one,
+            "the frozen scope did not bind the exact candidate",
         )
-        changed_document = copy.deepcopy(worklist)
-        document.write_text(
-            "# Review\n\nThe author changed the reviewed text.\n",
-            encoding="utf-8",
+        document_one = scope_one["documents"][0]
+        require(
+            document_one["mode"] == "complete-document",
+            "a legacy document did not receive a complete-document scope",
         )
-        expect_ste_error(
-            "author-assurance-candidate-changed",
-            lambda: STE.validate_author_assurance_worklist(
-                changed_document,
-                root=root,
-                source_manifest=source_manifest,
-            ),
+        require(
+            all(item["path"] != "reference/untouched.md" for item in scope_one["documents"]),
+            "an untouched legacy document entered the review scope",
         )
-        document.write_text(
-            "# Review\n\nThe author reviews all changed prose.\n",
-            encoding="utf-8",
-        )
-        omitted_scope = copy.deepcopy(worklist)
-        omitted_scope["documents"] = []
-        expect_ste_error(
-            "author-assurance-scope-invalid",
-            lambda: STE.validate_author_assurance_worklist(
-                omitted_scope,
-                root=root,
-                source_manifest=source_manifest,
-            ),
-        )
-        unresolved = copy.deepcopy(worklist)
-        unresolved["units"][0]["unresolved_findings"] = ["open finding"]
-        expect_ste_error(
-            "author-assurance-unresolved",
-            lambda: STE.validate_author_assurance_worklist(
-                unresolved,
-                root=root,
-                source_manifest=source_manifest,
-            ),
-        )
-        wrong_source = copy.deepcopy(worklist)
-        wrong_source["source_identity"]["sha256"] = "0" * 64
-        expect_ste_error(
-            "author-assurance-source-invalid",
-            lambda: STE.validate_author_assurance_worklist(
-                wrong_source,
-                root=root,
-                source_manifest=source_manifest,
-            ),
-        )
-        incomplete_review = copy.deepcopy(worklist)
-        incomplete_review["author_review"]["status"] = "incomplete"
-        expect_ste_error(
-            "author-assurance-review-invalid",
-            lambda: STE.validate_author_assurance_worklist(
-                incomplete_review,
-                root=root,
-                source_manifest=source_manifest,
-            ),
-        )
-        false_result = copy.deepcopy(worklist)
-        false_result["units"][0]["evidence_claims"][0]["actual_result"] = (
-            "RESULT=FAIL"
-        )
-        expect_ste_error(
-            "author-assurance-evidence-invalid",
-            lambda: STE.validate_author_assurance_worklist(
-                false_result,
-                root=root,
-                source_manifest=source_manifest,
-            ),
-        )
-        relative_command = copy.deepcopy(worklist)
-        relative_command["units"][0]["evidence_claims"][0]["command"]["argv"][0] = (
-            "python"
-        )
-        expect_ste_error(
-            "author-assurance-evidence-invalid",
-            lambda: STE.validate_author_assurance_worklist(
-                relative_command,
-                root=root,
-                source_manifest=source_manifest,
-            ),
-        )
-        expect_ste_error(
-            "author-assurance-challenge-required",
-            lambda: STE.validate_author_assurance_worklist(
-                worklist,
-                root=root,
-                source_manifest=source_manifest,
-                require_challenge=True,
-            ),
-        )
-        challenge_output = output_dir / "challenge.json"
-        challenge_output.write_text(
-            '{"status":"pass"}\n',
-            encoding="utf-8",
-        )
-        challenged = copy.deepcopy(worklist)
-        review_payload = json.dumps(
-            {
-                key: value
-                for key, value in challenged.items()
-                if key != "prefreeze_challenge"
-            },
-            ensure_ascii=False,
-            separators=(",", ":"),
-            sort_keys=True,
-        ).encode("utf-8")
-        challenged["prefreeze_challenge"] = {
-            "candidate_content_sha256": candidate["content_sha256"],
-            "completed_on": "2026-08-26",
-            "review_worklist_sha256": hashlib.sha256(
-                review_payload
-            ).hexdigest(),
-            "result_sha256": hashlib.sha256(
-                challenge_output.read_bytes()
-            ).hexdigest(),
-            "result_source": "tmp/challenge.json",
-            "reviewer": "read-only documentation reviewer",
-            "status": "pass",
-            "unresolved_findings": [],
+        result_one = {
+            "blocker_set_complete": True,
+            "blockers": [],
+            "corrections": [],
+            "full_applicability_considered": True,
+            "independent": True,
+            "issue9_source_sha256": EXPECTED_SOURCE_SHA256,
+            "result": "ACCEPT",
+            "reviewer_id": "fixture-documentation-reviewer",
+            "schema_version": 2,
+            "scope_sha256": scope_one["scope_sha256"],
         }
-        STE.validate_author_assurance_worklist(
-            challenged,
-            root=root,
+        result_one_bytes = STE._canonical_json_bytes(result_one)
+        blockers_member = b'  "blockers": [],\n'
+        require(
+            result_one_bytes.count(blockers_member) == 1,
+            "the duplicate-result fixture cannot locate blockers",
+        )
+        duplicate_result_member = result_one_bytes.replace(
+            blockers_member,
+            b'  "blockers": [{}],\n  "blockers": [],\n',
+            1,
+        )
+        expect_ste_error(
+            "ste-lifecycle-record-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_raw_result(
+                    "duplicate-result-member.json",
+                    duplicate_result_member,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        schema_one_result = copy.deepcopy(result_one)
+        schema_one_result.pop("blocker_set_complete")
+        schema_one_result.pop("blockers")
+        schema_one_result["schema_version"] = 1
+        expect_ste_error(
+            "ste-review-result-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "schema-one-result.json",
+                    schema_one_result,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        false_blocker_attestation = copy.deepcopy(result_one)
+        false_blocker_attestation["blocker_set_complete"] = False
+        expect_ste_error(
+            "ste-review-blocker-set-incomplete",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "false-blocker-attestation.json",
+                    false_blocker_attestation,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        missing_blocker_attestation = copy.deepcopy(result_one)
+        missing_blocker_attestation.pop("blocker_set_complete")
+        expect_ste_error(
+            "ste-review-result-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "missing-blocker-attestation.json",
+                    missing_blocker_attestation,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        accept_with_blocker = copy.deepcopy(result_one)
+        accept_with_blocker["blockers"] = [
+            blocker_for(
+                document_one,
+                document_one["units"][0],
+                finding="The accepted result contains a blocker.",
+                rule_ids=["1.1"],
+            )
+        ]
+        expect_ste_error(
+            "ste-review-blockers-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "accept-with-blocker.json",
+                    accept_with_blocker,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        tampered_scope = copy.deepcopy(scope_one)
+        tampered_scope["author_id"] = "tampered-author"
+        expect_ste_error(
+            "ste-review-scope-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=write_result("tampered-scope.json", tampered_scope),
+                result_path=write_result("scope-result.json", result_one),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        tampered_source = copy.deepcopy(source_manifest)
+        tampered_source["sha256"] = "0" * 64
+        expect_ste_error(
+            "ste-review-scope-changed",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("source-result.json", result_one),
+                source_manifest=tampered_source,
+                root=root,
+            ),
+        )
+        wrong_scope = copy.deepcopy(result_one)
+        wrong_scope["scope_sha256"] = "0" * 64
+        expect_ste_error(
+            "ste-review-result-scope-mismatch",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("wrong-scope.json", wrong_scope),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        wrong_source = copy.deepcopy(result_one)
+        wrong_source["issue9_source_sha256"] = "0" * 64
+        expect_ste_error(
+            "ste-review-result-source-mismatch",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("wrong-source.json", wrong_source),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        same_reviewer = copy.deepcopy(result_one)
+        same_reviewer["reviewer_id"] = "fixture-author"
+        expect_ste_error(
+            "ste-review-result-not-independent",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("same-reviewer.json", same_reviewer),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        incomplete_review = copy.deepcopy(result_one)
+        incomplete_review["full_applicability_considered"] = False
+        expect_ste_error(
+            "ste-review-result-incomplete",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "incomplete-review.json",
+                    incomplete_review,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        invalid_verdict = copy.deepcopy(result_one)
+        invalid_verdict["result"] = "REVIEW_AGAIN"
+        expect_ste_error(
+            "ste-review-result-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "invalid-verdict.json",
+                    invalid_verdict,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        accept_with_correction = copy.deepcopy(result_one)
+        accept_with_correction["corrections"] = [{}]
+        expect_ste_error(
+            "ste-review-corrections-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "accept-with-correction.json",
+                    accept_with_correction,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        approved_without_correction = copy.deepcopy(result_one)
+        approved_without_correction["result"] = (
+            "APPROVED_WITH_EXACT_CORRECTIONS"
+        )
+        expect_ste_error(
+            "ste-review-corrections-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "approved-without-correction.json",
+                    approved_without_correction,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+
+        result_one_path = write_result("result-one.json", result_one)
+        receipt_one, proposal_one, _recorded_one = STE.record_documentation_review(
+            scope_path=scope_path,
+            result_path=result_one_path,
             source_manifest=source_manifest,
-            require_challenge=True,
+            root=root,
         )
-        stale_challenge = copy.deepcopy(challenged)
-        stale_challenge["prefreeze_challenge"]["candidate_content_sha256"] = "0" * 64
+        require(proposal_one is not None, "ACCEPT did not create a state proposal")
+        tampered_receipt = load_json(receipt_one)
+        tampered_receipt["candidate_tree"] = "0" * 40
         expect_ste_error(
-            "author-assurance-candidate-changed",
-            lambda: STE.validate_author_assurance_worklist(
-                stale_challenge,
-                root=root,
+            "ste-review-receipt-invalid",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path,
+                receipt_path=write_result(
+                    "tampered-receipt.json",
+                    tampered_receipt,
+                ),
                 source_manifest=source_manifest,
-                require_challenge=True,
+                root=root,
             ),
         )
-        stale_review = copy.deepcopy(challenged)
-        stale_review["author_review"]["reviewer"] = "replacement author"
         expect_ste_error(
-            "author-assurance-candidate-changed",
-            lambda: STE.validate_author_assurance_worklist(
-                stale_review,
-                root=root,
+            "ste-final-state-mismatch",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path,
+                receipt_path=receipt_one,
                 source_manifest=source_manifest,
-                require_challenge=True,
+                root=root,
             ),
         )
-        same_reviewer = copy.deepcopy(challenged)
-        same_reviewer["prefreeze_challenge"]["reviewer"] = "fixture author"
+        state_path.write_bytes(proposal_one.read_bytes())
+        untouched_bytes = untouched.read_bytes()
+        untouched.write_text(
+            "# Untouched\n\nUnreviewed post-review text.\n",
+            encoding="utf-8",
+        )
+        commit(root, "unreviewed post-review mutation")
         expect_ste_error(
-            "author-assurance-challenge-invalid",
-            lambda: STE.validate_author_assurance_worklist(
-                same_reviewer,
-                root=root,
+            "ste-final-unreviewed-mutation",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path,
+                receipt_path=receipt_one,
                 source_manifest=source_manifest,
-                require_challenge=True,
+                root=root,
             ),
+        )
+        untouched.write_bytes(untouched_bytes)
+        accepted_one = commit(root, "accepted baseline")
+        final_one = STE.validate_final_review_state(
+            scope_path=scope_path,
+            receipt_path=receipt_one,
+            source_manifest=source_manifest,
+            root=root,
+        )
+        require(
+            final_one["candidate_revision"] == candidate_one
+            and final_one["final_revision"] == accepted_one
+            and final_one["issue9_source_sha256"] == EXPECTED_SOURCE_SHA256
+            and final_one["result"] == "ACCEPT"
+            and final_one["scope_sha256"] == scope_one["scope_sha256"]
+            and final_one["status"]
+            == "reviewed-state-present-and-no-unreviewed-prose-mutation",
+            "final validation did not bind the exact accepted revision",
+        )
+        state_one = load_json(state_path)
+        require(
+            len(state_one["documents"]) == 1,
+            "the state register did not record the reviewed document",
+        )
+        require(
+            "units" not in state_one["documents"][0],
+            "the state register persisted logical-unit state",
+        )
+        require(
+            set(state_one["documents"][0])
+            == {
+                "accepted_blob",
+                "accepted_sha256",
+                "issue9_source",
+                "path",
+                "review_receipt",
+            }
+            and state_one["documents"][0]["path"] == "reference/guide.md",
+            "the state register is not a document-level identity record",
+        )
+
+        guide.write_text(
+            "# First\n\nNew text with bounded fault.\n\n"
+            "# Second\n\nUnchanged legacy text.\n",
+            encoding="utf-8",
+        )
+        candidate_two = commit(root, "second material edit")
+        scope_two_path, scope_two = STE.freeze_documentation_review(
+            baseline_revision=accepted_one,
+            author_id="fixture-author",
+            source_manifest=source_manifest,
+            root=root,
+        )
+        require(
+            scope_two["candidate"]["candidate_revision"] == candidate_two,
+            "the changed-unit scope did not bind the second candidate",
+        )
+        document_two = scope_two["documents"][0]
+        require(
+            document_two["mode"] == "changed-logical-units",
+            "an accepted document did not use a changed-unit scope",
+        )
+        unit_text = "\n".join(str(unit["text"]) for unit in document_two["units"])
+        require(
+            "# First" in unit_text and "# Second" not in unit_text,
+            "the changed-unit scope re-reviewed unchanged accepted prose",
+        )
+        candidate_bytes = guide.read_bytes()
+        start = candidate_bytes.index(b"bounded fault")
+        preimage = "bounded fault"
+        result_two = {
+            "blocker_set_complete": True,
+            "blockers": [],
+            "corrections": [
+                {
+                    "end_byte": start + len(preimage.encode("utf-8")),
+                    "path": "reference/guide.md",
+                    "preimage": preimage,
+                    "preimage_sha256": hashlib.sha256(
+                        preimage.encode("utf-8")
+                    ).hexdigest(),
+                    "replacement": "approved wording",
+                    "start_byte": start,
+                }
+            ],
+            "full_applicability_considered": True,
+            "independent": True,
+            "issue9_source_sha256": EXPECTED_SOURCE_SHA256,
+            "result": "APPROVED_WITH_EXACT_CORRECTIONS",
+            "reviewer_id": "fixture-documentation-reviewer",
+            "schema_version": 2,
+            "scope_sha256": scope_two["scope_sha256"],
+        }
+        approved_with_blocker = copy.deepcopy(result_two)
+        approved_with_blocker["blockers"] = [
+            blocker_for(
+                document_two,
+                document_two["units"][0],
+                finding="The correction result contains a blocker.",
+                rule_ids=["1.1"],
+            )
+        ]
+        expect_ste_error(
+            "ste-review-blockers-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_two_path,
+                result_path=write_result(
+                    "approved-with-blocker.json",
+                    approved_with_blocker,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        correction_outside_scope = copy.deepcopy(result_two)
+        correction_outside_scope["corrections"][0]["path"] = (
+            "reference/untouched.md"
+        )
+        expect_ste_error(
+            "ste-review-corrections-outside-scope",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_two_path,
+                result_path=write_result(
+                    "correction-outside-scope.json",
+                    correction_outside_scope,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        wrong_preimage = copy.deepcopy(result_two)
+        wrong_preimage["corrections"][0]["preimage_sha256"] = "0" * 64
+        expect_ste_error(
+            "ste-review-correction-preimage-mismatch",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_two_path,
+                result_path=write_result(
+                    "wrong-correction-preimage.json",
+                    wrong_preimage,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        overlapping_corrections = copy.deepcopy(result_two)
+        overlap_preimage = preimage[1:]
+        overlap = copy.deepcopy(overlapping_corrections["corrections"][0])
+        overlap["start_byte"] = start + 1
+        overlap["preimage"] = overlap_preimage
+        overlap["preimage_sha256"] = hashlib.sha256(
+            overlap_preimage.encode("utf-8")
+        ).hexdigest()
+        overlap["replacement"] = "other reviewed wording"
+        overlapping_corrections["corrections"].append(overlap)
+        expect_ste_error(
+            "ste-review-corrections-overlap",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_two_path,
+                result_path=write_result(
+                    "overlapping-corrections.json",
+                    overlapping_corrections,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+
+        result_two_path = write_result("result-two.json", result_two)
+        receipt_two, proposal_two, _recorded_two = STE.record_documentation_review(
+            scope_path=scope_two_path,
+            result_path=result_two_path,
+            source_manifest=source_manifest,
+            root=root,
+        )
+        require(
+            proposal_two is not None,
+            "an approved exact correction did not create a state proposal",
+        )
+        guide.write_bytes(
+            candidate_bytes[:start]
+            + b"approved wording"
+            + candidate_bytes[start + len(preimage.encode("utf-8")) :]
+        )
+        corrected_bytes = guide.read_bytes()
+        state_path.write_bytes(proposal_two.read_bytes())
+        guide.write_bytes(corrected_bytes + b"\nUnreviewed wording.\n")
+        commit(root, "unreviewed wording after exact correction")
+        expect_ste_error(
+            "ste-final-reviewed-bytes-mismatch",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_two_path,
+                receipt_path=receipt_two,
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        guide.write_bytes(corrected_bytes)
+        accepted_two = commit(root, "exact correction and state")
+        final_two = STE.validate_final_review_state(
+            scope_path=scope_two_path,
+            receipt_path=receipt_two,
+            source_manifest=source_manifest,
+            root=root,
+        )
+        require(
+            final_two["result"] == "APPROVED_WITH_EXACT_CORRECTIONS"
+            and final_two["final_revision"] == accepted_two,
+            "final validation did not prove the exactly corrected state",
+        )
+
+        guide.write_text(
+            "# First\n\nNew text with approved wording.\n",
+            encoding="utf-8",
+        )
+        decision_value = json.loads(decisions.read_text(encoding="utf-8"))
+        decision_value["updated_on"] = "2026-08-31"
+        decision_value["decisions"][0]["decision"] = "Use the changed decision."
+        decisions.write_text(
+            json.dumps(decision_value, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        commit(root, "deletion and register change")
+        scope_three_path, scope_three = STE.freeze_documentation_review(
+            baseline_revision=accepted_two,
+            author_id="fixture-author",
+            source_manifest=source_manifest,
+            root=root,
+        )
+        guide_scope = next(
+            item for item in scope_three["documents"] if item["path"] == "reference/guide.md"
+        )
+        require(
+            any(unit["side"] == "baseline" for unit in guide_scope["units"]),
+            "deletion-only prose did not preserve the baseline logical unit",
+        )
+        decision_scope = next(
+            item
+            for item in scope_three["documents"]
+            if item["path"] == "reference/current/gate-decisions.json"
+        )
+        require(
+            {unit["identifier"] for unit in decision_scope["units"]} == {"D-001"},
+            "canonical JSON scope did not select the complete changed object",
+        )
+
+        scope_units = [
+            (document, unit)
+            for document in scope_three["documents"]
+            for unit in document["units"]
+        ]
+        blocker_units: list[tuple[dict[str, object], dict[str, object]]] = []
+        blocker_sides: set[object] = set()
+        for document, unit in scope_units:
+            if unit["side"] not in blocker_sides:
+                blocker_units.append((document, unit))
+                blocker_sides.add(unit["side"])
+        require(
+            blocker_sides == {"baseline", "candidate"},
+            "the BLOCKED fixture does not contain both frozen unit sides",
+        )
+        ordered_blockers = [
+            blocker_for(
+                blocker_units[0][0],
+                blocker_units[0][1],
+                finding="The first frozen logical unit does not conform.",
+                rule_ids=["1.1"],
+            ),
+            blocker_for(
+                blocker_units[1][0],
+                blocker_units[1][1],
+                finding="The second frozen logical unit does not conform.",
+                rule_ids=["1.2"],
+            ),
+        ]
+        blocked = copy.deepcopy(result_two)
+        blocked["blockers"] = ordered_blockers
+        blocked["result"] = "BLOCKED"
+        blocked["corrections"] = []
+        blocked["scope_sha256"] = scope_three["scope_sha256"]
+
+        blocked_bytes = STE._canonical_json_bytes(blocked)
+        unit_member = b'      "unit": {\n        "end_byte": '
+        require(
+            blocked_bytes.count(unit_member) == len(blocked["blockers"]),
+            "the duplicate-unit fixture cannot locate frozen units",
+        )
+        duplicate_unit_member = blocked_bytes.replace(
+            unit_member,
+            b'      "unit": {\n        "end_byte": 0,\n'
+            b'        "end_byte": ',
+            1,
+        )
+        expect_ste_error(
+            "ste-lifecycle-record-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_three_path,
+                result_path=write_raw_result(
+                    "duplicate-unit-member.json",
+                    duplicate_unit_member,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+
+        def expect_invalid_blocked(
+            name: str,
+            code: str,
+            value: dict[str, object],
+        ) -> None:
+            expect_ste_error(
+                code,
+                lambda: STE.record_documentation_review(
+                    scope_path=scope_three_path,
+                    result_path=write_result(name, value),
+                    source_manifest=source_manifest,
+                    root=root,
+                ),
+            )
+
+        empty_blocked = copy.deepcopy(blocked)
+        empty_blocked["blockers"] = []
+        expect_invalid_blocked(
+            "empty-blocked.json",
+            "ste-review-blockers-invalid",
+            empty_blocked,
+        )
+        unattested_blocked = copy.deepcopy(blocked)
+        unattested_blocked["blocker_set_complete"] = False
+        expect_invalid_blocked(
+            "unattested-blocked.json",
+            "ste-review-blocker-set-incomplete",
+            unattested_blocked,
+        )
+        malformed_blocker = copy.deepcopy(blocked)
+        malformed_blocker["blockers"] = [{}]
+        expect_invalid_blocked(
+            "malformed-blocker.json",
+            "ste-review-blockers-invalid",
+            malformed_blocker,
+        )
+        blocker_outside_scope = copy.deepcopy(blocked)
+        blocker_outside_scope["blockers"][0]["path"] = (
+            "reference/untouched.md"
+        )
+        expect_invalid_blocked(
+            "blocker-outside-scope.json",
+            "ste-review-blocker-outside-scope",
+            blocker_outside_scope,
+        )
+        tampered_blocker_unit = copy.deepcopy(blocked)
+        tampered_blocker_unit["blockers"][0]["unit"]["sha256"] = "0" * 64
+        expect_invalid_blocked(
+            "tampered-blocker-unit.json",
+            "ste-review-blocker-outside-scope",
+            tampered_blocker_unit,
+        )
+        invalid_blocker_rule = copy.deepcopy(blocked)
+        invalid_blocker_rule["blockers"][0]["rule_ids"] = ["10.1"]
+        expect_invalid_blocked(
+            "invalid-blocker-rule.json",
+            "ste-review-blockers-invalid",
+            invalid_blocker_rule,
+        )
+        unsorted_blocker_rules = copy.deepcopy(blocked)
+        unsorted_blocker_rules["blockers"][0]["rule_ids"] = ["1.2", "1.1"]
+        expect_invalid_blocked(
+            "unsorted-blocker-rules.json",
+            "ste-review-blockers-invalid",
+            unsorted_blocker_rules,
+        )
+        duplicate_blocker_rules = copy.deepcopy(blocked)
+        duplicate_blocker_rules["blockers"][0]["rule_ids"] = ["1.1", "1.1"]
+        expect_invalid_blocked(
+            "duplicate-blocker-rules.json",
+            "ste-review-blockers-invalid",
+            duplicate_blocker_rules,
+        )
+        unordered_blockers = copy.deepcopy(blocked)
+        unordered_blockers["blockers"].reverse()
+        expect_invalid_blocked(
+            "unordered-blockers.json",
+            "ste-review-blockers-invalid",
+            unordered_blockers,
+        )
+        duplicate_blockers = copy.deepcopy(blocked)
+        duplicate_blockers["blockers"] = [
+            copy.deepcopy(ordered_blockers[0]),
+            copy.deepcopy(ordered_blockers[0]),
+        ]
+        expect_invalid_blocked(
+            "duplicate-blockers.json",
+            "ste-review-blockers-invalid",
+            duplicate_blockers,
+        )
+
+        blocked_path = write_result("blocked.json", blocked)
+        blocked_result_bytes = blocked_path.read_bytes()
+        _blocked_receipt, blocked_proposal, _blocked_result = (
+            STE.record_documentation_review(
+                scope_path=scope_three_path,
+                result_path=blocked_path,
+                source_manifest=source_manifest,
+                root=root,
+            )
+        )
+        blocked_receipt_value = load_json(_blocked_receipt)
+        receipt_result = {
+            key: blocked_receipt_value[key]
+            for key in blocked
+        }
+        returned_result = {
+            key: _blocked_result[key]
+            for key in blocked
+        }
+        require(
+            _blocked_receipt.read_bytes()
+            == STE._canonical_json_bytes(_blocked_result)
+            and STE._canonical_json_bytes(returned_result)
+            == blocked_result_bytes
+            and STE._canonical_json_bytes(receipt_result) == blocked_result_bytes,
+            "the BLOCKED receipt did not preserve the complete result value",
+        )
+        require(blocked_proposal is None, "BLOCKED created an accepted state proposal")
+        schema_one_receipt = copy.deepcopy(blocked_receipt_value)
+        schema_one_receipt.pop("blocker_set_complete")
+        schema_one_receipt.pop("blockers")
+        schema_one_receipt["schema_version"] = 1
+        expect_ste_error(
+            "ste-review-receipt-invalid",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_three_path,
+                receipt_path=write_result(
+                    "schema-one-blocked-receipt.json",
+                    schema_one_receipt,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        changed_blocked_receipt = copy.deepcopy(blocked_receipt_value)
+        changed_blocked_receipt["blockers"][0]["finding"] = (
+            "A changed finding that is otherwise valid."
+        )
+        changed_receipt_dir = root / "tmp" / "changed-receipt"
+        changed_receipt_dir.mkdir()
+        changed_receipt_path = changed_receipt_dir / _blocked_receipt.name
+        changed_receipt_path.write_bytes(
+            STE._canonical_json_bytes(changed_blocked_receipt)
+        )
+        expect_ste_error(
+            "ste-review-receipt-invalid",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_three_path,
+                receipt_path=changed_receipt_path,
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        tampered_blocked_receipt = copy.deepcopy(blocked_receipt_value)
+        tampered_blocked_receipt["blockers"] = []
+        expect_ste_error(
+            "ste-review-blockers-invalid",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_three_path,
+                receipt_path=write_result(
+                    "tampered-blocked-receipt.json",
+                    tampered_blocked_receipt,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        expect_ste_error(
+            "ste-review-blocked",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_three_path,
+                receipt_path=_blocked_receipt,
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+
+
+def validate_lifecycle_git_boundary() -> None:
+    """Reject inherited Git execution and object-interpretation controls."""
+
+    def git(root: pathlib.Path, *arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+
+    def commit(root: pathlib.Path, message: str) -> str:
+        git(root, "add", "--all")
+        git(
+            root,
+            "-c",
+            "user.name=TrackTemplate Validation",
+            "-c",
+            "user.email=validation@example.invalid",
+            "commit",
+            "--quiet",
+            "-m",
+            message,
+        )
+        return git(root, "rev-parse", "HEAD")
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        (root / "reference").mkdir()
+        guide = root / "reference" / "guide.md"
+        attributes = root / ".gitattributes"
+        attributes.write_text("*.md diff=evil\n", encoding="utf-8")
+        guide.write_text("# Guide\n\nBaseline text.\n", encoding="utf-8")
+        git(root, "init", "--quiet")
+        baseline = commit(root, "baseline")
+        guide.write_text("# Guide\n\nCandidate text.\n", encoding="utf-8")
+        candidate = commit(root, "candidate")
+        expected_identity = STE._lifecycle_candidate_identity(
+            baseline,
+            candidate,
+            root=root,
+        )
+
+        hostile = root / "hostile"
+        hostile.mkdir()
+        marker = hostile / "executed"
+        helper = hostile / "helper"
+        helper.write_text(
+            "#!/bin/sh\nprintf 'executed\\n' >> \"{}\"\nexit 1\n".format(
+                marker
+            ),
+            encoding="utf-8",
+        )
+        helper.chmod(0o700)
+        hostile_git = hostile / "git"
+        hostile_git.write_text(
+            "#!/bin/sh\nprintf 'git\\n' >> \"{}\"\nexit 99\n".format(marker),
+            encoding="utf-8",
+        )
+        hostile_git.chmod(0o700)
+        global_config = hostile / "global-config"
+        global_config.write_text(
+            "[core]\n\tfsmonitor = {}\n"
+            "[diff \"evil\"]\n\ttextconv = {}\n".format(helper, helper),
+            encoding="utf-8",
+        )
+        git(root, "config", "core.fsmonitor", str(helper))
+        git(root, "config", "diff.evil.textconv", str(helper))
+        git(root, "replace", candidate, baseline)
+
+        decoy = root / "decoy"
+        decoy.mkdir()
+        git(decoy, "init", "--quiet")
+        saved_environment = os.environ.copy()
+        try:
+            os.environ.update(
+                {
+                    "GIT_ATTR_SOURCE": baseline,
+                    "GIT_CONFIG_COUNT": "1",
+                    "GIT_CONFIG_GLOBAL": str(global_config),
+                    "GIT_CONFIG_KEY_0": "core.fsmonitor",
+                    "GIT_CONFIG_VALUE_0": str(helper),
+                    "GIT_DIR": str(decoy / ".git"),
+                    "GIT_EXTERNAL_DIFF": str(helper),
+                    "GIT_INDEX_FILE": str(decoy / "hostile-index"),
+                    "GIT_REPLACE_REF_BASE": "refs/replace/hostile/",
+                    "GIT_WORK_TREE": str(decoy),
+                    "PATH": str(hostile),
+                }
+            )
+            require(
+                STE._lifecycle_head(root=root, require_clean=True) == candidate,
+                "hostile Git state redirected the lifecycle HEAD",
+            )
+            require(
+                STE._lifecycle_candidate_identity(
+                    baseline,
+                    candidate,
+                    root=root,
+                )
+                == expected_identity,
+                "Git configuration or replacement objects changed candidate identity",
+            )
+            guide.write_text(
+                "# Guide\n\nUncommitted candidate text.\n",
+                encoding="utf-8",
+            )
+            expect_ste_error(
+                "ste-lifecycle-candidate-not-clean",
+                lambda: STE._lifecycle_head(root=root, require_clean=True),
+            )
+        finally:
+            os.environ.clear()
+            os.environ.update(saved_environment)
+        saved_default_path = os.defpath
+        try:
+            os.defpath = str(hostile)
+            expect_ste_error(
+                "ste-lifecycle-git-untrusted",
+                lambda: STE._lifecycle_head(root=root, require_clean=True),
+            )
+        finally:
+            os.defpath = saved_default_path
+        require(
+            not marker.exists(),
+            "the lifecycle executed an inherited, repository-local, fsmonitor, "
+            "or textconv helper",
         )
 
 
@@ -2189,7 +2960,8 @@ def main() -> None:
     validate_technical_term_owner()
     validate_agent_and_validation_routing()
     validate_cache_and_lookup_behaviour(index)
-    validate_author_review_traceability()
+    validate_documentation_lifecycle()
+    validate_lifecycle_git_boundary()
     validate_live_source_resolvability()
     validate_semantic_mutations(index)
     print(SENTINEL)

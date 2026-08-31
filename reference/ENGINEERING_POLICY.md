@@ -1,291 +1,380 @@
 # Engineering Policy
 
-Status: **canonical governance, proportional-change and delivery-control
+Status: **canonical governance, proportional-change, and delivery-control
 policy.**
 
 ## Purpose and ownership
 
-This document owns the project-wide rules for proportional change, governance
-budget, true gates, safety/risk panels, documentation lifecycle and completion
-reporting. It does not own product architecture, live phase status, validation
-commands, recovery procedure, licensing decisions or agent-skill routing.
+This document owns the project-wide rules for proportional change and the
+governance budget. It also owns true gates, safety/risk panels, the
+documentation lifecycle, and completion reports.
 
-Those subjects remain with:
+This document does not own product architecture or live phase status. It does
+not own validation commands, recovery procedures, licence decisions, or agent
+skill routing.
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) and
-  [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md);
-- [PROJECT_PLAN.md](PROJECT_PLAN.md) and the
-  [current phase records](current/);
-- [VALIDATION.md](VALIDATION.md) and [TESTING_POLICY.md](TESTING_POLICY.md);
-- [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md);
+These documents own those subjects:
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) owns product architecture.
+- [MODULARISATION_PLAN.md](MODULARISATION_PLAN.md) owns source organisation.
+- [PROJECT_PLAN.md](PROJECT_PLAN.md) owns phase status.
+- The [current phase records](current/) own current evidence and decisions.
+- [VALIDATION.md](VALIDATION.md) and [TESTING_POLICY.md](TESTING_POLICY.md) own
+  validation.
+- [RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) owns recovery procedures.
 - [LICENSING_BOUNDARIES.md](LICENSING_BOUNDARIES.md) and
-  [PROVENANCE.md](PROVENANCE.md); and
-- [AGENT_WORKFLOWS.md](AGENT_WORKFLOWS.md).
+  [PROVENANCE.md](PROVENANCE.md) own rights and lineage.
+- [AGENT_WORKFLOWS.md](AGENT_WORKFLOWS.md) owns agent skill routing.
 
 ## Three change levels
 
-Classify every task before work begins. Use the highest level reached by its
-actual behaviour or authority, not its diff size or phase association.
+Classify each task before work starts. Use the highest level that its behaviour
+or authority reaches. Diff size and phase association do not set the level.
 
 ### Level 1 — Routine
 
-Examples include a typo or wording correction, an internal refactor with no
-behaviour change, test cleanup, non-authoritative tooling and a small UI
-presentation change.
+Level 1 includes a wording correction and an internal refactor that does not
+change behaviour. It also includes test cleanup, non-authoritative tools, and a
+small UI presentation change.
 
-Required: the relevant test, complete diff review and a concise commit message.
-Do not update current phase evidence, run a risk panel or change the project
-plan unless the task genuinely changes status; if it does, reclassify it before
-retaining that change. A read-only task is Level 1, but creates no artificial
-test or commit when no repository change is retained.
+Run the relevant test. Review the complete diff. Use a short commit message.
+Do not update current phase evidence or run a risk panel. Do not change the
+project plan unless the task changes status. If status changes, reclassify the
+task before retention.
+
+A read-only task is Level 1. It does not require an artificial test or commit
+when the repository does not change.
 
 ### Level 2 — Behavioural
 
-Examples include a railway calculation change, canonical-state change,
-persistence or invalidation change, new FreeCAD object behaviour, performance
-optimisation and workflow migration within already accepted authority.
+Level 2 includes a railway calculation change and a canonical-state change. It
+also includes persistence, invalidation, FreeCAD object behaviour, performance,
+and an authorised workflow migration.
 
-Required: the relevant specialist skill, automated and applicable FreeCAD/GUI
-validation, exactly one concise entry in
-[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md), and complete diff
-review. A Level 2 task does not update the project plan or run a risk panel; a
-change that transfers authority must be reclassified as Level 3 first.
+Use the relevant specialist skill. Run automated validation and each applicable
+FreeCAD or GUI check. Add exactly one short entry to
+[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md). Review the complete
+diff.
+
+Do not update the project plan or run a risk panel for Level 2. If the change
+transfers authority, reclassify it as Level 3 before retention.
 
 ### Level 3 — Authority or release
 
-Examples include closing a phase, enabling legacy migration, retiring an
-accepted oracle, declaring an output or chair package cleared, changing
-governance or licensing authority, packaging a beta or release candidate, and
-an irreversible repository or data operation.
+Level 3 includes phase closure and an enabled legacy migration. It includes
+retirement of an accepted oracle. It also includes output clearance, chair
+package clearance, and a governance or licence authority change.
 
-Required: full evidence review, a safety/risk panel, an explicit project-owner
-decision and a project-plan update. Record the panel and decision once in the
-current evidence and structured decision register.
+Beta packaging and packaging for release qualification are Level 3. An irreversible or
+destructive repository, data, or external operation is also Level 3.
 
-The levels control governance, not technical evidence selection. For example,
-a Level 1 UI presentation change still requires any GUI check selected by
+Complete the full evidence review. Run a safety/risk panel. Get an explicit
+project-owner decision. Update the project plan.
+
+Record the panel and decision once in the current evidence. Record the decision
+once in the structured decision register.
+
+These levels control governance. They do not select technical evidence. For
+example, a Level 1 UI change can still require a GUI check from
 [VALIDATION.md](VALIDATION.md).
 
 ## Governance budget
 
-For each implementation tranche:
+For each implementation bounded cycle:
 
 > Governance changes must not exceed the implementation change unless the task
-> itself changes governance, licensing, safety or release authority.
+> changes governance, licensing, safety, or release authority.
 
-Count policy, plan, risk, decision, evidence-template and guidance changes as
-governance. Direct implementation evidence in the one current phase record is
-not an invitation to restate all repository invariants.
+Policy, plan, risk, decision, evidence-template, and guidance changes are
+governance changes. Direct implementation evidence belongs in one current
+phase record. Do not repeat repository rules in that record.
 
-When the governance side is larger, the completion report must name the
-exception and explain which authority changed. “This is the current phase” is
-not a valid exception.
+If governance changes are larger, name the exception in the completion report.
+State the authority that changed. “This is the current phase” is not a valid
+exception.
 
 ## True gates and safety/risk panels
 
-A gate is a decision that transfers, expands, retires or irreversibly changes
-project authority. A tranche label, milestone label, review packet or current
-phase association does not make work a gate.
+A gate transfers, expands, retires, or irreversibly changes project authority.
+A bounded-cycle label or milestone label does not make a gate. A review packet or
+current phase association also does not make a gate.
 
-Every Level 3 task is a true gate and requires a safety/risk panel. Level 3
-covers only:
+Every Level 3 task is a true gate. Each true gate requires a safety/risk panel.
+Level 3 contains only these changes:
 
-1. phase or release closure, including beta or release-candidate packaging;
-2. a legacy migration family or window becoming supported;
-3. retirement of an accepted oracle or rollback authority;
-4. production-output or chair-package clearance;
-5. governance, licensing or provenance authority changes; or
-6. irreversible or destructive repository, data or external operations.
+1. Phase or release closure, including beta packaging or packaging for release
+   qualification.
+2. Support for a legacy migration family or window.
+3. Retirement of an accepted oracle or rollback authority.
+4. Production-output or chair-package clearance.
+5. A governance, licence, or provenance authority change.
+6. An irreversible or destructive repository, data, or external operation.
 
-Do not run a panel for Level 1 or Level 2 work. Retiring development-only
-duplication while the accepted oracle and rollback evidence remain is not
-accepted-oracle retirement and is not a Level 3 gate.
+Do not run a panel for Level 1 or Level 2. Removal of development-only
+duplication is not retirement of an accepted oracle. The accepted oracle and
+rollback evidence must remain.
 
 The panel occurs before the authority transfer. The project owner chairs and
-decides; the change owner presents; a QA/risk reviewer challenges the evidence.
-Use a reviewer independent of implementation for Critical risk, destructive
-work, rights clearance or when the project owner requires one.
+decides. The change owner presents. A QA/risk reviewer challenges the evidence.
 
-The only outcomes are **Proceed**, **Proceed with bounded conditions**, and
-**Do not proceed**. Record:
+Use a reviewer independent of implementation for Critical risk. Also use that
+reviewer for destructive work, rights clearance, or a project-owner request.
 
-- exact decision and source state;
-- participants, roles and independence;
-- linked evidence reviewed;
-- due risks and changed control effectiveness;
-- unresolved dissent, unknowns and exceptions;
-- recommendation and bounded conditions with owners/deadlines;
-- project-owner decision and date; and
-- the resulting authority and explicit exclusions.
+The panel has only these outcomes:
 
-The narrative belongs once in
-[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md). The structured decision
-belongs in [current/gate-decisions.json](current/gate-decisions.json).
-[PROJECT_PLAN.md](PROJECT_PLAN.md) carries only a short linked decision summary.
+- **Proceed**
+- **Proceed with bounded conditions**
+- **Do not proceed**
+
+Record this information:
+
+- The exact decision and source state.
+- The participants, roles, and independence.
+- The evidence that the panel reviewed.
+- The due risks and changed control effectiveness.
+- The unresolved dissent, unknowns, and exceptions.
+- The recommendation and bounded conditions with owners and deadlines.
+- The project-owner decision and date.
+- The resulting authority and explicit exclusions.
+
+Put the narrative once in
+[current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md). Put the structured
+decision in [current/gate-decisions.json](current/gate-decisions.json).
+[PROJECT_PLAN.md](PROJECT_PLAN.md) contains only a short linked decision
+summary.
 
 <a id="tt-doc-001-tracktemplate-technical-documentation-profile"></a>
 
 ## TT-DOC-001 — TrackTemplate Technical Documentation Profile
 
-Human comprehensibility is a governance control. TrackTemplate uses this
-information order for work in a substantial cycle:
+Human understanding is a governance control. TrackTemplate uses this
+information order for a substantial cycle:
 
 > Owner view → canonical information → proof/provenance
 
 The owner view is a short presentation from canonical records. It must agree
-with those records. The owner view must never give project authority
-independently. Canonical documents contain requirements, state, and
-decisions for their named subjects. Proof/provenance includes detailed
-evidence, exact Git identities, validation results, reviews, and preservation
-results.
+with those records. It must not give project authority independently.
 
-If information occurs in more than one place, use a link to its one canonical
-owner. Do not copy policy into a dashboard, evidence record, skill, or
-report to make a competing owner. Only a Level 3 project-owner decision can
-change the scope of this profile or its controlled status meanings.
+Canonical documents contain rules, state, and decisions for their named
+subjects. Proof/provenance contains detailed evidence, exact Git identities,
+validation results, reviews, and preservation results.
+
+If information occurs in more than one place, link to its one canonical owner.
+Do not copy policy into a dashboard, evidence record, skill, or report.
+
+Only a Level 3 project-owner decision can change this profile. That decision
+can change its bounded scope or controlled status meanings.
 
 ### Normative controlled-writing standard
 
 TrackTemplate uses
 [ASD-STE100 Simplified Technical English, Issue 9](external/asd-ste100/README.md)
-as the normative controlled-writing standard for English canonical technical
-prose. The standard identity is ASD-STE100 Simplified Technical English,
-Issue 9, dated 2025-01-15. The official standard is the normative external
-reference.
+for canonical technical prose in English. Its identity is ASD-STE100 Simplified Technical
+English, Issue 9, dated 2025-01-15. The official standard is the normative
+external reference.
 
 Public summaries, model knowledge, and automatic validators do not show
-conformance. A reviewer must use the official standard for a linguistic
-conformance review.
-Use the [official-source instructions](external/asd-ste100/README.md) to get
-the standard. Report the source that you use. Those instructions own only the
-local path and source priority. They do not own TrackTemplate documentation
-policy.
-Do not copy the standard or its controlled general dictionary into this
-repository.
+conformance. A reviewer uses the official standard for a linguistic conformance
+review.
 
-### Retrieval and assurance boundary
+Use the [official-source instructions](external/asd-ste100/README.md) to get the
+standard. Report the source that you use. Those instructions own the local path
+and source priority. They do not own TrackTemplate documentation policy.
 
-The STE lookup is a retrieval optimisation only. It does not define or limit
-the applicable rule set. The applicable rule set is mandatory. The controlled
-vocabulary is also mandatory.
+Do not copy the standard into this repository. Do not copy its controlled
+general dictionary into this repository.
 
-An agent must not claim conformance because of rules in a lookup result. An
-agent must not claim conformance because the pre-check has no finding. A `PASS`
-result from automatic validation also does not show conformance. The STE lookup
-controls the source text that an agent reads for this task. It does not control the
-applicable writing rules.
+### Retrieval and assurance authority boundary
+
+The STE lookup only makes retrieval faster. It does not define or limit the
+applicable rule set. All applicable writing rules and the controlled vocabulary
+are mandatory.
+
+An agent must not claim conformance because of a lookup result. An agent must
+not claim conformance because the deterministic pre-check has no finding. A
+`PASS` result from automatic validation also does not show conformance.
+
+The STE lookup selects the source text that an agent reads for a task. It does
+not select the applicable writing rules.
 
 Use the [STE lookup workflow](external/asd-ste100/README.md#local-retrieval-interface)
-for targeted retrieval. Review the complete logical unit against the complete
-applicable requirement set. Use the official source to resolve each material
-ambiguity.
+for targeted retrieval. Review the complete logical unit against the applicable
+requirement set. Use the official source to resolve each material uncertainty.
+
+### Documentation Review lifecycle
+
+Use this lifecycle for each material change to canonical technical prose:
+
+> author → freeze scope → one Documentation Review → optional exact reviewed
+> correction once → one final deterministic validation → complete or owner stop
+
+The author writes the exact candidate and freezes a clean Git commit. The STE
+lookup derives the frozen review scope from Git.
+
+One independent Documentation Reviewer reviews the complete frozen review
+scope. The reviewer uses all applicable Issue 9 writing rules in the official
+source. This Documentation Review is the only linguistic conformance review.
+
+The reviewer returns one complete verdict. The verdict is `ACCEPT`,
+`APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`.
+
+For `APPROVED_WITH_EXACT_CORRECTIONS`, the reviewer gives all exact replacement
+wording in the same review. Apply those replacements once against verified
+preimages. Do not add or change other wording. Do not run a second
+Documentation Review.
+
+A `BLOCKED` verdict creates no accepted-state proposal. Return the change to
+the owner.
+
+Each schema version 2 result records the complete `blockers` array. The result
+confirms that the array is complete. `ACCEPT` and
+`APPROVED_WITH_EXACT_CORRECTIONS` use an empty `blockers` array. `BLOCKED` uses
+a nonempty `blockers` array.
+
+Each item in `blockers` records its exact path and frozen logical-unit identity.
+It also records the finding and applicable formal Issue 9 rule identifiers.
+
+The review receipt preserves the complete `blockers` array. It also preserves
+the exact candidate and frozen review scope bindings. A `BLOCKED` result with
+an empty `blockers` array is invalid.
+
+After the review or approved correction, run one final deterministic
+validation. It proves these identities:
+
+- Source.
+- Exact candidate.
+- Frozen review scope.
+- Receipt.
+- Accepted state.
+- Final content.
+
+It also proves that no unreviewed change remains. It does not judge linguistic
+conformance. If a failure remains, return to the owner. This includes a failure
+in wording, controlled meaning, identity, or bounded scope.
+
+Use these rules for the frozen review scope:
+
+- Do not review an untouched legacy document.
+- For the first material edit of an unreviewed legacy document, review the
+  complete document.
+- After acceptance, use the last accepted document identity to find each
+  material change.
+- Review only the complete logical units that contain those changes.
+- Do not review unchanged accepted canonical prose again.
+
+Keep durable review state at document level. Record the last accepted document
+identity, source identity, and review receipt.
+
+Do not keep persistent sentence, paragraph, or logical-unit workflow state.
+Git derives the frozen review scope from the last accepted document identity.
 
 The standard applies to canonical technical prose that persons can read in:
 
-- architecture
-- engineering and governance policy
-- current phase evidence
-- decisions that use prose
-- validation and recovery instructions
-- technical procedures
-- Learning from Experience
-- documentation-profile requirements
-- human-readable explanations in canonical registers
-- substantial workflow and skill prose that gives technical instructions or
-  requirements
+- Architecture.
+- Engineering and governance policy.
+- Current phase evidence.
+- Decisions that contain canonical prose.
+- Validation and recovery instructions.
+- Technical procedures.
+- Learning from Experience.
+- Documentation-profile rules.
+- Human-readable explanations in canonical registers.
+- Substantial workflow and skill wording that gives technical instructions.
 
 Do not change exact machine data or externally controlled information only to
-change its language. Keep these items exact when necessary:
+change its wording. Keep these items exact when necessary:
 
-- code
-- API and schema identifiers
-- JSON keys and machine values
-- file and directory paths
-- Git SHAs and hashes
-- commands
-- diagnostic strings and test sentinels
-- external quotations
-- standards titles and identifiers
-- machine-generated logs and evidence
+- Code.
+- API and schema identifiers.
+- JSON keys and machine values.
+- File and directory paths.
+- Git SHAs and hashes.
+- Commands.
+- Diagnostic strings and test sentinels.
+- External quotations.
+- Standards titles and identifiers.
+- Machine-generated logs and evidence.
 
-The text around these items must obey the applicable Issue 9 requirements.
-Applicable TrackTemplate canonical prose must obey ASD-STE100 Issue 9.
-TrackTemplate uses UK English spelling as its project spelling directive. This
-directive uses the option in Issue 9 Rule 1.14. The directive changes spelling
-only. It does not change the applicable Issue 9 vocabulary or grammar rules. It
-does not change approved meanings, parts of speech, or technical-term controls.
-Outside this scope, use concise UK English.
+Wording around these items must obey the applicable writing rules. Applicable
+TrackTemplate canonical technical prose must obey ASD-STE100 Issue 9.
+
+TrackTemplate uses UK English. Rule 1.14 permits this instruction. It does not
+change the applicable Issue 9 vocabulary or grammar rules. It does not change
+approved meanings, parts of speech, or technical-term controls.
+
+Outside this bounded scope, use short UK English.
 
 TrackTemplate uses applicable modular-information principles of ASD S1000D. It
 does not claim S1000D conformance. This profile does not authorise this S1000D
 infrastructure:
 
-- S1000D XML
-- a Common Source Database
-- BREX
-- data-module identifiers
-- publication modules
-- applicability engines
-- XML migration
-- a documentation database or service
-- a generic content-management system
+- S1000D XML.
+- A Common Source Database.
+- BREX.
+- Data-module identifiers.
+- Publication modules.
+- Applicability engines.
+- XML migration.
+- A documentation database or service.
+- A generic content-management system.
 
 ### Conformance terms
 
-Use these conformance terms with their exact scopes:
+Use these terms with their exact bounded scopes:
 
 | Term | Controlled meaning |
 | --- | --- |
-| **TT-DOC-001 conforming** | The named unit obeys all applicable TrackTemplate profile controls. New STE-governed prose and prose in a material edit must also have a recorded Issue 9 review. |
-| **ASD-STE100 Issue 9 conforming** | A reviewer examined the named unit against the official Issue 9 standard. The conformance record gives the scope, result, technical terms, and limitations. |
-| **ASD-STE100 Issue 9 conformance not verified** | No sufficient review against the official Issue 9 standard exists for the named unit. |
+| **TT-DOC-001 conforming** | The named unit obeys all TrackTemplate profile controls. New canonical technical prose and each material edit have a recorded Issue 9 review. |
+| **ASD-STE100 Issue 9 conforming** | A reviewer examined the named unit against the official Issue 9 standard. The record gives the bounded scope, result, technical terms, and limitations. |
+| **ASD-STE100 Issue 9 conformance not verified** | The named unit has no sufficient review against the official Issue 9 standard. |
 | **Externally certified or endorsed** | An external body gave the named certification or endorsement. TrackTemplate does not claim this state. |
 
 A reviewer can use an automatic tool during a review. The tool cannot replace
-the linguistic review or show Issue 9 conformance.
+the linguistic conformance review. It cannot show Issue 9 conformance.
 
 ### Controlled governance meanings
 
-Use these terms consistently. Keep a qualification beside the claim it limits.
+Use these terms consistently. Keep each qualification beside the claim that it
+limits.
 
 | Term | Controlled meaning |
 | --- | --- |
-| **Pending** | The criterion or action does not have the necessary evidence or owner decision. Pending gives no authority. |
-| **Evidenced** | The project admitted and keeps evidence for the named bounded criterion. Evidenced does not give wider acceptance or clearance. |
+| **Pending** | Necessary evidence or an owner decision is absent. Pending gives no authority. |
+| **Evidenced** | The project admitted and keeps evidence for the named bounded criterion. Evidenced gives no wider acceptance or clearance. |
 | **Accepted** | The project owner made an explicit decision. The decision applies only to its stated authority and exclusions. |
 | **Blocked** | One or more stated conditions prevent the named action or decision. |
-| **Finding** | A review or validation result must have a disposition. A finding does not change project state. |
-| **Limitation** | A stated boundary applies to evidence, capability, or assurance. A limitation is not automatically a blocker. A reader must be able to see it. |
-| **Unknown** | Evidence that the project keeps does not show the claim. Unknown does not mean accepted or rejected. |
-| **Decision required** | The evidence or recommendation is ready for the named owner. The owner decision is absent. |
+| **Finding** | A review or validation result requires a disposition. A finding does not change project state. |
+| **Limitation** | A stated limit applies to evidence, capability, or assurance. A limitation does not automatically prevent a named action or decision. The reader must see it. |
+| **Unknown** | Kept evidence does not show the claim. Unknown does not mean accepted or rejected. |
+| **Decision required** | Evidence or a recommendation is ready for the named owner. The owner decision is absent. |
 
 Keep facts, evidence, inferences, recommendations, and owner decisions
-distinct. A fact is a state that a person can examine directly. Evidence is an
-observation or result that the project keeps. An inference explains the
-evidence. A
-recommendation gives a proposed action or decision. Only an explicit owner
-decision gives Level 3 authority.
+separate:
 
-Do not rename a persisted, API, schema, evidence or decision identifier for
-readability.
+- A fact is a state that a person can examine directly.
+- Evidence is an observation or result that the project keeps.
+- An inference explains the evidence.
+- A recommendation proposes an action or decision.
+- Only an explicit owner decision gives Level 3 authority.
+
+Do not rename a persisted identifier for readability. This rule also applies to
+API, schema, evidence, and decision identifiers.
 
 ### Controlled writing and owner view
 
-Use the applicable Issue 9 rules and the approved project terminology. Keep
-technical precision:
+Use the applicable Issue 9 writing rules and approved project terminology.
+Keep technical precision:
 
-- use one principal requirement or fact in each sentence when possible
-- use direct structures and identify the responsible actor
-- use one controlled term for one governance concept
-- place qualifications beside the claim they qualify
-- use lists when conditions can fail separately
-- do not use a vague reference when its subject is not clear
-- use canonical links instead of copied authority
-- label facts, evidence, inferences, recommendations, and owner decisions
-  distinctly
+- Use one principal requirement or fact in each sentence when possible.
+- Use direct structures and identify the responsible actor.
+- Use one controlled term for one governance concept.
+- Put each qualification beside the claim that it limits.
+- Use lists when conditions can fail separately.
+- Do not use a vague reference when its subject is not clear.
+- Use canonical links instead of copied authority.
+- Identify facts, evidence, inferences, recommendations, and owner decisions.
 
-For a substantial cycle, begin the result for the human owner with these
-fields:
+For a substantial cycle, begin the result with this owner view:
 
 1. **Current state**
 2. **What changed**
@@ -294,25 +383,26 @@ fields:
 5. **Owner decision**
 6. **Next action**
 
-For a decision-relevant active-evidence entry, use this order:
+For a decision-relevant current-evidence entry, use this order:
 
-1. Scope and current fact
-2. Decisive evidence
-3. Limitations or findings
-4. Recommendation
-5. Explicit owner decision and exclusions
-6. Proof/provenance links
+1. Bounded scope and current fact.
+2. Decisive evidence.
+3. Limitations or findings.
+4. Recommendation.
+5. Explicit owner decision and exclusions.
+6. Proof/provenance links.
 
-Omit an item only when it does not apply. Do not put different evidence and
-authority states together to make the text shorter.
+Omit an item only when it does not apply. Do not combine different evidence
+and authority states to make the result shorter.
 
-The owner must be able to see from this view whether the cycle succeeded,
-the phase changed, a blocker exists, and a decision is necessary. The view must
-also show whether another action has authority. Put applicable technical
-provenance below the view. Short text must never change evidence or a
-recommendation into acceptance.
+The owner view must show whether the cycle succeeded. It must show whether the
+phase changed, the result is Blocked, or a decision is necessary. It
+must also show whether another action has authority.
 
-### Terminology and migration boundary
+Put applicable technical provenance below the owner view. A short result must
+not change evidence or a recommendation into acceptance.
+
+### Terminology and migration authority boundary
 
 [TERMINOLOGY.md](TERMINOLOGY.md) is the one project owner for TrackTemplate
 technical nouns and technical verbs. Use an Issue 9 dictionary word or an
@@ -320,85 +410,97 @@ approved project technical term. Do not make a second terminology source.
 
 These migration rules apply from the acceptance of TT-DOC-001:
 
-- All new canonical technical prose in English must obey the applicable
-  ASD-STE100 Issue 9 requirements.
-- For a material edit, review the full logical unit that contains the change.
-  Use the applicable Issue 9 requirements.
+- All new canonical technical prose in English must obey the applicable Issue 9 writing
+  rules.
+- For a material edit, review the complete logical unit that contains the
+  change.
+- Use the applicable requirement set for that review.
 - Review live canonical prose in bounded migration cycles.
-- Keep each non-conformance and readability finding in the record until a
-  reviewer records its result.
+- Keep each non-conformance or readability finding until a reviewer records
+  its result.
 - Do not change frozen history only to correct its Issue 9 style.
 - Keep detailed technical provenance and all accepted limitations.
 
-Before you add a skill or change its primary responsibility, map the
-responsibility across the full skill catalogue. Add the behaviour to the
-primary owner when possible. Add a skill only when one separate responsibility can
-occur repeatedly and has no owner. Record its composition and non-ownership
-boundaries.
+Before adding a skill, map its responsibility across the full skill catalogue.
+Do the same before changing a skill's primary responsibility.
 
-Documentation simplification does not give a skill phase, production,
-security, merge, release, acceptance, or project-owner authority. Semantic
-validators prevent changes to these meanings. They do not freeze full
-paragraphs. They do not use sentence-length checks as proof of linguistic
-conformance.
+Add the behaviour to the primary owner when possible. Add a skill only if one
+separate responsibility can occur repeatedly and has no owner. Record its
+composition and non-ownership authority boundaries.
+
+Documentation simplification gives no security/recovery-review authority. It
+gives no phase, production, merge, release, acceptance, or project-owner authority.
+
+Semantic validators protect these controlled meanings. They do not freeze full
+paragraphs. Sentence-length checks do not prove linguistic conformance.
 
 ## Documentation lifecycle
 
 The live control paths are fixed:
 
-- [PROJECT_PLAN.md](PROJECT_PLAN.md) — phase status, exit-condition status, live
-  risk summary, owner-decision summary and evidence links only;
-- [current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md) — all detailed evidence
-  for the open phase;
-- [current/risks.json](current/risks.json) — detailed live risks; and
-- [current/gate-decisions.json](current/gate-decisions.json) — structured
+- [PROJECT_PLAN.md](PROJECT_PLAN.md) contains phase status, exit status, risk
+  summaries, decision summaries, and evidence links.
+- [current/PHASE_EVIDENCE.md](current/PHASE_EVIDENCE.md) contains all detailed
+  evidence for the open phase.
+- [current/risks.json](current/risks.json) contains detailed live risks.
+- [current/gate-decisions.json](current/gate-decisions.json) contains structured
   current owner decisions.
 
-A Level 1 change updates only its implementation, relevant test and any document
-that directly owns the corrected wording; it does not update current phase
-evidence or the plan. A Level 2 change adds exactly one concise current-evidence
-entry. A Level 3 change records its full evidence review, panel and owner
-decision, updates the structured registers, and updates the project-plan
-dashboard. Change another reference document only when its owned policy,
-contract or responsibility changes.
+A Level 1 change updates its implementation and relevant test. It can also
+update a document that directly owns corrected wording. It does not update
+current phase evidence or the project plan.
+
+A Level 2 change adds exactly one short current-evidence entry.
+
+A Level 3 change records its full evidence review and panel. It records the
+owner decision and updates the structured registers. It also updates the
+project-plan dashboard.
+
+Change another reference document only when its owned policy, contract, or
+responsibility changes.
 
 At phase close:
 
-1. finish and accept the current evidence;
-2. move it to `reference/history/phase-closeouts/PHASE<N>_CLOSEOUT.md`;
-3. archive closed risk and decision records as applicable; and
-4. create clean current records for the next phase.
+1. Finish and accept the current evidence.
+2. Move it to `reference/history/phase-closeouts/PHASE<N>_CLOSEOUT.md`.
+3. Archive closed risk and decision records when applicable.
+4. Create clean current records for the next phase.
 
-Historical inventories, foundations, closeouts, dated audits and benchmark
-reports are frozen evidence. Routine alignment must not rewrite them to resemble
-the current project. Validate only their continued existence, required internal
-links, accepted hashes and accepted status. Correct a frozen record only for a
-demonstrated factual error or an explicitly accepted scope change.
+Historical inventories, foundations, closeouts, dated audits, and benchmark
+reports are frozen evidence. Routine alignment must not rewrite them to match
+the current project.
+
+Validate only their continued existence, necessary internal links, accepted
+hashes, and accepted status. Correct a frozen record only for a demonstrated
+factual error or an explicitly accepted change to a bounded scope.
 
 Physical archive moves are separate migrations because paths and accepted
-hashes may change. Until such a migration is accepted, historical records may
-remain frozen at their existing paths; see [history/README.md](history/README.md).
+hashes can change. Historical records can stay at their existing paths until
+that migration is accepted. See [history/README.md](history/README.md).
 
 ## CI and manual evidence
 
-Tracked CI owns repeatable clean-run checks for:
+Tracked CI owns these repeatable clean-run checks:
 
-- Python and macro parsing;
-- the standalone test and contract matrix;
-- dependency direction;
-- frozen-oracle and frozen-record hashes;
-- Markdown links; and
-- project-progress/current-register consistency.
+- Python and macro parsing.
+- The standalone test and contract matrix.
+- Dependency direction.
+- Frozen-oracle and frozen-record hashes.
+- Markdown links.
+- Project-progress and current-register consistency.
 
-Normal reports do not restate each automated invariant. Report the CI result or
-the equivalent local matrix once. CI does not replace qualified FreeCAD,
-real-GUI, operator workflow, exact-output, performance, backup/restore,
-licensing judgement or owner acceptance where those boundaries apply.
+Normal reports do not repeat each automated invariant. Report the CI result or
+equivalent local matrix once.
+
+CI does not replace evidence from a qualified FreeCAD host or real GUI. It does
+not replace an operator journey, exact-output evidence, or performance evidence.
+It also does not replace backup and restore evidence, licence judgement, or
+owner acceptance.
 
 ## Completion report
 
 Use the TT-DOC-001 owner view for a substantial cycle. Keep detailed evidence
-below it. For compact technical provenance or a smaller change, use:
+below it. For a smaller change, use this compact technical provenance:
 
 ```text
 Changed:
@@ -407,6 +509,6 @@ GUI work outstanding:
 Risks or authority changes:
 ```
 
-Omit empty detail, but do not hide a failed, skipped or unavailable check. The
-last field names any governance-budget exception and any owner decision still
-required.
+Omit empty detail. Do not hide a failed, skipped, or unavailable check. The
+last field records each governance-budget exception and each necessary owner
+decision.

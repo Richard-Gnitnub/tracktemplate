@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
 import re
@@ -115,46 +116,202 @@ EXPECTED_PHASE5_DECISION_IDS = {
     "D-P5-002",
     "D-P5-003",
 }
-EXPECTED_PHASE6_DECISION_IDS = {
-    "D-P6-001",
-    "D-GOV-005",
-    "D-P6-002",
-    "D-P6-003",
-    "D-P6-004",
-    "D-P6-005",
-    "TT-DOC-001",
-    "TT-DOC-002",
-    "D-GOV-006",
-    "D-GOV-007",
-    "D-GOV-008",
-    "D-GOV-009",
-    "D-GOV-010",
-    "D-GOV-011",
-    "D-GOV-012",
+# Each tuple contains the date, decision, panel route, authority digest, and
+# exclusions digest. The digests bind the complete UTF-8 register fields.
+EXPECTED_PHASE6_DECISIONS = {
+    "D-P6-001": (
+        "2026-08-01",
+        "Open Phase 6.",
+        "reference/current/PHASE_EVIDENCE.md#phase-6-opening-panel",
+        "30251ac623544df6a253373edf5c01fa174c5166a9deac0a1859d6187b411f94",
+        "5d64c15adbcf5ed432adcbb48bc24620d12a254d24f97bd3b737edc454565199",
+    ),
+    "D-GOV-005": (
+        "2026-08-01",
+        (
+            "Adopt the TrackTemplate Product Vision and an execution model "
+            "based on it."
+        ),
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#product-vision-and-execution-governance-panel"
+        ),
+        "5f374fbeb09e7f5409c5063afdac92e62ac3cf4b11c595985e74151cd5ee64f9",
+        "bf5e99281efe057f11f4ccdbbd87261344ece78ec45a4c37355175c725b3a0a3",
+    ),
+    "D-P6-002": (
+        "2026-08-02",
+        "Accept Phase 6 Exit 2 and retain Exit 3 Pending.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#phase-6-exits-2-and-3-evidence-admission-panel"
+        ),
+        "25a3ece0a3a0057f66bea805c24bea0c661d7a9b0208639cd40d7271847dc5e8",
+        "51f76d4a6339f3b28bdb11c09c8e2f56c6b079607bd831cb9a4ce4a8beb57d98",
+    ),
+    "D-P6-003": (
+        "2026-08-02",
+        "Select strict completion rules for Exit 3 recovery.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#phase-6-exit-3-recovery-authority-contract-panel"
+        ),
+        "e513389bcddb1dceaa29cf6e2c00bbcc7ecf9a3b1b9f0d734474023307e608fb",
+        "bc8bfe13e0d53f3839734e12cac312b4443593476228c7180bbda7d22e8449fa",
+    ),
+    "D-P6-004": (
+        "2026-08-15",
+        "Define the supported exporter failure model and its evidence limit.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#phase-6-exporter-fault-model-clarification-panel"
+        ),
+        "6bc24b07a9d1e5bb8c8f99eb3605a188c374d7101db2b99b279a08152b70dab5",
+        "13c36c9a504efa48b4f1ae308ce1e16c259de2a05e3988cfd06b94a15e87081a",
+    ),
+    "D-P6-005": (
+        "2026-08-15",
+        "Accept Phase 6 Exit 3 for the bounded B16 Entry/Exit exporter.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#phase-6-exit-3-supported-model-evidence-admission-panel"
+        ),
+        "52ede8d935c565028ab570dc31279b390db801b4f579f70b9a593a7ccc6952b5",
+        "88d1b941e15afd12ad36106a8c7e32db01446b46b8269746801197b0971263a7",
+    ),
+    "TT-DOC-001": (
+        "2026-08-15",
+        "Adopt the TrackTemplate Technical Documentation Profile.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#tt-doc-001-documentation-architecture-panel"
+        ),
+        "60cfd12a3941b0ef596c70229bae3ca10026b28e622907e022f951eb17b5edea",
+        "99a0e8ec8a6a4ff44cb3320741ed64d76884b2996f5024985ffe39ddce9fe0e1",
+    ),
+    "TT-DOC-002": (
+        "2026-08-15",
+        "Correct the TT-DOC-001 instruction for UK English.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#tt-doc-002-uk-english-spelling-correction-panel"
+        ),
+        "ba5f655e63fe208696e9fd03808b7e4a84b736439e24d81a2c009c95a2b62ba8",
+        "7e0289ab67901a6b3078d620e7f1f14c8b72ea0826b903cc3e6cf4676dae7cd3",
+    ),
+    "D-GOV-006": (
+        "2026-08-15",
+        "Qualify the exact FreeCAD 1.1.3 host profile.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#freecad-1-1-3-compatibility-requalification-panel"
+        ),
+        "c5255a5f08624f980d410a6cd45453e27fcad3d689b2b1fcea3c7bcfbec90f29",
+        "4ed48bdaf7b64ae2c3af23426c9ab0bcdcc38a8204a6acda38e363cbe562c41a",
+    ),
+    "D-GOV-007": (
+        "2026-08-16",
+        (
+            "Authorise the exact FreeCAD 1.1.3 profile for Phase 6 "
+            "performance evidence."
+        ),
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#phase-6-performance-evidence-host-boundary-panel"
+        ),
+        "7efed03343a5e0f5809ebe66d8a8fe8c09aea964c9fcc9d409db9a361af432e7",
+        "de60cdef93da0d1752f33bf342dfee26e5ae9fde7e043f0dfce7c4451d2f888c",
+    ),
+    "D-GOV-008": (
+        "2026-08-16",
+        (
+            "Accept the Phase 6 Exit 4 comparison baseline and performance "
+            "direction."
+        ),
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#phase-6-exit-4-performance-direction-panel"
+        ),
+        "020bb03a2ff19a9ef0e35746b45a8ae1791028aa5aeb3ea2948fdf3625131b46",
+        "26e987683368b4641eff1a0214dfddc74625635f9e5d75fd94c44d343eac2e86",
+    ),
+    "D-GOV-009": (
+        "2026-08-23",
+        (
+            "Record the D-GOV-008 direction as exhausted and select baseline "
+            "attribution."
+        ),
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#phase-6-exit-4-d-gov-009-panel"
+        ),
+        "a3772cf1a6b5fc251dae1e608440d69d0bb54601341686df0d5b493a30cb5d51",
+        "63cf152328ead842c439bf704d64cdfe987d52504991afacf33d4fd59c07e653",
+    ),
+    "D-GOV-010": (
+        "2026-08-23",
+        "Qualify the new exact FreeCAD 1.1.3 host profile.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#freecad-1-1-3-py31313-qt6111-qualification-panel"
+        ),
+        "6560bc0b5c85f626bafa3c967f793a18f9671319813f1eebcabe00ecc7117405",
+        "6ea566c0ed669a0220ec9ed12ff0739bde6a15649523855cee505161d5b248f7",
+    ),
+    "D-GOV-011": (
+        "2026-08-23",
+        "Select one canonical-record performance hypothesis.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#phase-6-exit-4-d-gov-011-direction-selection-panel"
+        ),
+        "60096e93c2464f2939a4f3f44894508c43dcd04134f98ce541f60d0ff16b4089",
+        "09c6d15c429b174f6ca68a7eddbd39de652c2b9861108ec644ed961e4ae6b0e1",
+    ),
+    "D-GOV-012": (
+        "2026-08-25",
+        "Record the sequence nonconformance after worktree retirement.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#d-gov-012-worktree-sequence-nonconformance"
+        ),
+        "5cb62e99d39efbb0653bc7b6e126ddb6b49b17135d52c5c4665edd22faafe99b",
+        "d9c5f694e0068cf39f76e755fec1a629c7b0b8bdcb69586d538c2cea6407071d",
+    ),
+    "D-GOV-015": (
+        "2026-08-31",
+        "Adopt the simplified single-review STE lifecycle.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#d-gov-015-simplified-ste-lifecycle"
+        ),
+        "81641613e133fea5946be8895d027037578b67a3ce5f048552baf21c6acf6a33",
+        "869717862c88675519f8b24b74419e33dcca25a3077272a43fa5c0e188131ad0",
+    ),
 }
+EXPECTED_PHASE6_DECISION_IDS = set(EXPECTED_PHASE6_DECISIONS)
 EXPECTED_PHASE6_AUTHORITY = (
     "At source state `35d4124c28d6be7e536a5f3773681ff0bf243283`, "
     "open Phase 6 at 0/5 for bounded exact-validation and export-seam work "
     "on the accepted B16 Entry/Exit transition slice. Separate Level 2 "
-    "tranches may establish the exact artifact/oracle and contracts, "
+    "tranches may establish the exact centreline result, oracle, and "
+    "contracts, "
     "complete stage signatures and invalidation, transient exact geometry "
-    "in disposable FreeCAD scope, private-development target-format export "
-    "with atomic staging and rollback, and complete edit/Validate/Export "
-    "performance evidence."
+    "in a disposable FreeCAD document, private-development target-format "
+    "export with atomic staging and rollback, and complete "
+    "edit/Validate/Export performance evidence."
 )
 EXPECTED_PHASE6_EXCLUSIONS = (
-    "No Phase 6 exit, production-output clearance, `project-cleared` status, "
-    "operator or migration route, whole-layout or complete B14 export port, "
-    "persisted-schema change, retained production shape, legacy-oracle "
-    "retirement, numerical performance budget, new runtime dependency, "
+    "No Phase 6 exit, production-output clearance, or `project-cleared` "
+    "status is accepted. No operator route, migration route, whole-layout "
+    "work, or complete B14 export port is accepted. No persisted-schema "
+    "change, retained production shape, or legacy-oracle retirement is "
+    "accepted. No numerical performance budget, new runtime dependency, "
     "packaging, release, or later-phase authority is accepted. Any required "
     "manifest-schema change receives separate API, licensing, validation, "
     "and owner review."
 )
-EXPECTED_EXIT2_DECISION = (
-    "Accept Phase 6 Exit 2 and retain Exit 3 Pending."
-)
-EXPECTED_EXIT2_AUTHORITY = (
+EXPECTED_EXIT2_PANEL_AUTHORITY = (
     "At accepted `main` source state "
     "`a5b6a79bf3e73e1673d440077bd65000986bb4c7`, accept Phase 6 Exit 2, "
     "“No transient production objects leak into the editable document”, as "
@@ -162,76 +319,21 @@ EXPECTED_EXIT2_AUTHORITY = (
     "transition exact-validation and export routes assessed by this panel. "
     "Phase 6 advances from 0/5 to 1/5. Exit 3 remains Pending until its six "
     "recorded required-before-exit conditions are satisfied and a fresh Level "
-    "3 evidence-admission review recommends acceptance."
+    "3 review to admit evidence recommends acceptance."
 )
-EXPECTED_EXIT2_EXCLUSIONS = (
-    "No Phase 6 exit 1, 3, 4 or 5; production or physical-output clearance; "
-    "`project-cleared` status; output equivalence; product-wide export roster; "
-    "GUI or operator workflow; persisted or retained exact geometry; "
-    "whole-B14 or whole-layout parity; legacy retirement; performance "
-    "acceptance; packaging or release authority; or risk downgrade is granted. "
-    "The export remains private-development with deliberately `unknown` "
-    "project status, and PR #33 performance evidence does not satisfy Exit 4."
+EXPECTED_EXIT2_PANEL_EXCLUSIONS_ONE = (
+    "No authority is granted for Phase 6 Exit 1, 3, 4, or 5. Production "
+    "clearance, physical-output clearance, `project-cleared` status, and "
+    "output equivalence are not granted. No product-wide export roster, GUI "
+    "workflow, or operator workflow is granted. No persisted or retained "
+    "exact geometry is granted."
 )
-EXPECTED_EXIT3_RECOVERY_DECISION = (
-    "Select strict add-only, journal-free monotonic completion for Exit 3 "
-    "recovery."
-)
-EXPECTED_EXIT3_RECOVERY_AUTHORITY = (
-    "At accepted `main` source state "
-    "`cee78cff84618c6a5be3be99714682f5822c814f`, select strict add-only, "
-    "journal-free monotonic completion as the required cross-process "
-    "recovery-authority contract for the bounded B16 Entry/Exit "
-    "DXF-and-manifest pair. A later bounded Level 2 tranche is authorised to "
-    "recompute the exact expected pair, create unpublished payloads only in "
-    "anonymous creation-bound descriptors, abandon unpublished work only by "
-    "closing those descriptors, inspect existing finals without acquiring "
-    "mutation authority, and publish only by adding an absent final pathname "
-    "without overwrite. The first successful final link permanently ends "
-    "rollback. No published final may be unlinked, renamed, rewritten, "
-    "truncated or replaced; authenticating or verifying a pathname does not "
-    "grant deletion authority, and POSIX pathname deletion has no "
-    "expected-inode atomic condition. After any post-publication failure, all "
-    "published finals are preserved, including any exact partial or complete "
-    "output pair. A later invocation may add only an absent exact counterpart, "
-    "and success may be reported only after the complete final pair is "
-    "independently revalidated as exact. Mismatch, non-regular finals, symbolic "
-    "links, collision, replay, substitution, inconsistency, ambiguity or "
-    "unsupported primitives fail closed without further mutation. Foreign or "
-    "uncertain destination state is never removed, and `cleanup_complete`, "
-    "`recoverable`, `destination_changed` and related diagnostics must describe "
-    "the state actually retained. `recoverable=True` is permitted only after "
-    "independently revalidating an exact zero-member, partial or complete "
-    "destination with safe retry or remaining add-only authority; ambiguity, "
-    "mismatch, uncertain durability or an unsupported primitive remains "
-    "non-recoverable. Any successful addition requires "
-    "`destination_changed=True`, and any surviving published final on a failed "
-    "invocation requires `cleanup_complete=False`. Identical complete-pair "
-    "reuse, deterministic filenames and bytes, manifest schema and contract "
-    "IDs, the two-file layout, no-overwrite behaviour and "
-    "`reuse-identical-or-fail` collision refusal remain unchanged; one exact "
-    "regular partial member may now be completed rather than treated as a "
-    "collision. "
-    "Phase 6 remains 1/5 and Exit 3 remains Pending until implementation, "
-    "focused interruption/recovery evidence and a fresh Level 3 "
-    "evidence-admission review."
-)
-EXPECTED_EXIT3_RECOVERY_EXCLUSIONS = (
-    "No product code is changed by this decision. It does not mark Exit 3 or "
-    "another exit `Evidenced` or owner-accepted; grant production, "
-    "physical-output, `project-cleared`, equivalence, GUI, operator, "
-    "wider-family, performance, legacy-retirement, packaging or release "
-    "authority; or change a risk state. It does not authorise "
-    "post-publication unlink, rename, rewrite, truncation, replacement or "
-    "pathname-based rollback; reading or deleting pre-existing controls; "
-    "mutation of any foreign or uncertain destination state; deriving deletion "
-    "authority from equality, metadata or pathname verification; changing "
-    "output names/bytes/schema/layout, contract/result IDs or the "
-    "collision-policy value; or adding a trust service, generic storage "
-    "framework or runtime dependency."
-)
-EXPECTED_EXIT3_ACCEPTANCE_DECISION = (
-    "Accept Phase 6 Exit 3 for the bounded B16 Entry/Exit exporter."
+EXPECTED_EXIT2_PANEL_EXCLUSIONS_TWO = (
+    "Whole-B14 parity, whole-layout parity, legacy retirement, and performance "
+    "acceptance are not granted. No packaging, release authority, or risk "
+    "downgrade is granted. The export remains private-development with "
+    "deliberately `unknown` project status. PR #33 performance evidence does "
+    "not satisfy Exit 4."
 )
 EXPECTED_EXIT3_ACCEPTANCE_SCOPE = (
     "At protected `main` `7198b05b6a4b7e4654b7d02d0bad4e5cf627a799`, I "
@@ -241,51 +343,52 @@ EXPECTED_EXIT3_ACCEPTANCE_SCOPE = (
     "and D-P6-004. Phase 6 advances from 1/5 to 2/5."
 )
 EXPECTED_EXIT3_ACCEPTANCE_COVERAGE = (
-    "This acceptance covers deterministic names, bytes, hashes, schema and "
-    "identifiers; descriptor-relative add-only/no-overwrite publication; "
-    "exact-complete reuse; exact-partial monotonic completion; supported "
-    "exception, cancellation, retained interruption, staging, publication, "
-    "cleanup, durability and process-termination evidence; qualified "
-    "FreeCAD import and host execution; truthful conservative diagnostics; "
-    "and restart-based containment with independent destination revalidation."
+    "This acceptance covers deterministic names, bytes, hashes, schema, and "
+    "identifiers. It covers descriptor-relative add-only/no-overwrite "
+    "publication. It covers exact-complete reuse and exact-partial monotonic "
+    "completion. It covers supported exception, cancellation, and retained "
+    "interruption evidence. It also covers staging, publication, cleanup, "
+    "durability, and process-termination evidence. Qualified FreeCAD import "
+    "and host execution are included."
+)
+EXPECTED_EXIT3_ACCEPTANCE_COVERAGE_CONTINUED = (
+    "Truthful conservative diagnostics are included. Restart-based "
+    "containment with independent destination revalidation is also included."
 )
 EXPECTED_EXIT3_ACCEPTANCE_LIMITATIONS = (
-    "It does not extend assurance to arbitrary instruction-level "
-    "asynchronous interruption or repeated interruption of cleanup, physical "
-    "power loss, unqualified hosts or filesystems, continuously active "
-    "external mutation after final observation, or destructive or manual "
-    "recovery. Existing and published finals must never be deleted, renamed, "
-    "rewritten, truncated, replaced or manually altered to recover."
+    "It does not extend assurance to interruption at every arbitrary "
+    "instruction. It does not extend assurance to repeated interruption of "
+    "cleanup, physical power loss, or unqualified hosts or file systems. "
+    "Continuously active external mutation after final observation is not "
+    "included. Destructive or manual recovery is not included."
+)
+EXPECTED_EXIT3_ACCEPTANCE_PRESERVATION = (
+    "Existing and published finals must never be deleted, renamed, rewritten, "
+    "truncated, replaced or manually altered to recover."
 )
 EXPECTED_EXIT3_ACCEPTANCE_EXCLUSIONS = (
     "Output remains private-development with project status `unknown`. No "
-    "Exit 1, 4 or 5; production or physical-output clearance; "
-    "`project-cleared` status; output equivalence; GUI/operator or "
-    "wider-family authority; persisted schema; retained exact geometry; "
-    "performance acceptance; legacy retirement; packaging; release; risk "
-    "downgrade; or later-phase authority is granted."
+    "authority is granted for Exit 1, 4, or 5. No production or "
+    "physical-output clearance is granted. No `project-cleared` status or "
+    "output equivalence is granted. No GUI/operator or wider-family authority "
+    "is granted. No persisted schema or retained exact geometry is granted. "
+    "No performance acceptance, legacy retirement, packaging, or release "
+    "authority is granted. No risk downgrade or later-phase authority is "
+    "granted."
 )
-EXPECTED_EXIT3_ACCEPTANCE_AUTHORITY = (
-    EXPECTED_EXIT3_ACCEPTANCE_SCOPE
-    + " "
-    + EXPECTED_EXIT3_ACCEPTANCE_COVERAGE
-)
-EXPECTED_EXIT3_ACCEPTANCE_STRUCTURED_EXCLUSIONS = (
-    EXPECTED_EXIT3_ACCEPTANCE_LIMITATIONS
-    + " "
-    + EXPECTED_EXIT3_ACCEPTANCE_EXCLUSIONS
-)
-EXPECTED_TT_DOC_DECISION = (
-    "Adopt the TrackTemplate Technical Documentation Profile."
-)
-EXPECTED_TT_DOC_SPELLING_DECISION = (
-    "Correct the TT-DOC-001 UK English spelling directive."
+EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
+    "| D-GOV-015 | 2026-08-31 | Accepted | The "
+    "[decision](current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle) "
+    "adopts author → freeze scope → one Documentation Review → optional exact "
+    "reviewed correction once → one final deterministic validation → complete "
+    "or owner stop. Phase 6 stays at 2/5. If validation is exact-green, the "
+    "owner permits one draft pull request. The owner gives no merge authority. |"
 )
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
-        "Pending — exact-validation and private-development DXF evidence "
-        "exists, but agreed output equivalence and production clearance "
-        "remain absent"
+        "Pending. Exact-validation and private-development DXF evidence "
+        "exists. Agreed output equivalence and production clearance remain "
+        "absent."
     ),
     (
         "Evidenced and owner-accepted under D-P6-002 — bounded to the accepted "
@@ -293,10 +396,10 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "limitations"
     ),
     (
-        "Evidenced and owner-accepted under D-P6-005 — bounded to the "
+        "Evidenced and owner-accepted under D-P6-005. This is bounded to the "
         "private-development B16 Entry/Exit DXF-and-manifest route under "
-        "D-P6-003 and D-P6-004 with the recorded platform, recovery and "
-        "assurance limitations; project status remains `unknown`"
+        "D-P6-003 and D-P6-004. The recorded platform, recovery, and "
+        "assurance limitations apply. Project status remains `unknown`."
     ),
     (
         "Pending — D-GOV-008 stays the authority for its baseline, hypothesis, "
@@ -309,13 +412,13 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "result, and does not accept Exit 4."
     ),
     (
-        "Pending — B14 remains available, but whole-scope parity and retirement "
-        "authority remain absent"
+        "Pending. B14 remains available. Parity for the complete accepted "
+        "work and retirement authority remain absent."
     ),
 ]
 EXPECTED_PHASE6_PERFORMANCE_DISPOSITION = (
     "Under D-P6-002, Phase 6 remains 1/5 with Exit 2 alone Evidenced and "
-    "owner-accepted; this evidence does not satisfy Exit 4, which remains "
+    "owner-accepted. This evidence does not satisfy Exit 4, which remains "
     "Pending."
 )
 EXPECTED_EXIT3_CONDITION_ROWS = {
@@ -363,7 +466,7 @@ EXPECTED_EXIT3_CONDITION_ROWS = {
         "Phase owner and independent reviewers",
         "After the preceding conditions pass",
         (
-            "Conduct a fresh Level 3 evidence-admission review before any "
+            "Conduct a fresh Level 3 review to admit evidence before any "
             "Exit 3 acceptance."
         ),
     ],
@@ -373,72 +476,45 @@ EXPECTED_EXIT3_RECOVERY_ROWS = {
         "Recoverable DXF-and-manifest transaction",
         (
             "Open technical gap — durable live-invocation controls and "
-            "in-process rollback are present, but no independently trusted "
-            "creation authority supports cross-process automatic recovery"
+            "in-process rollback are present. No independently trusted "
+            "creation authority supports cross-process automatic recovery."
         ),
     ],
     "Descriptor-relative rename and symbolic-link control": [
         "Descriptor-relative rename and symbolic-link control",
         (
             "Present — all transaction operations use the bound directory "
-            "descriptor and focused replacement proofs fail closed; not yet "
-            "admitted by a Level 3 panel"
+            "descriptor. Focused replacement proofs fail closed. A Level 3 "
+            "panel has not admitted this evidence."
         ),
     ],
     "Interruption, partial-commit and recovery proof": [
         "Interruption, partial-commit and recovery proof",
         (
-            "Open technical gap — abrupt one-link and two-link termination now "
-            "prove exact residue preservation and fail-closed rejection, not "
-            "automatic recovery"
+            "Open technical gap — abrupt one-link and two-link termination "
+            "prove exact residue preservation and fail-closed rejection. They "
+            "do not prove automatic recovery."
         ),
     ],
     "Qualified zero-length POINT import": [
         "Qualified zero-length POINT import",
         (
             "Present — qualified FreeCAD imports one exact vertex and restores "
-            "host state; not yet admitted by a Level 3 panel"
+            "host state. A Level 3 panel has not admitted this evidence."
         ),
     ],
     "Durable qualified command and sentinel": [
         "Durable qualified command and sentinel",
         (
-            "Present in reference/VALIDATION.md; not yet admitted by a Level "
-            "3 panel"
+            "Present in reference/VALIDATION.md. A Level 3 panel has not "
+            "admitted this evidence."
         ),
     ],
-    "Fresh Level 3 evidence-admission review": [
-        "Fresh Level 3 evidence-admission review",
-        "Open — required before Exit 3 can be recommended or accepted",
+    "Fresh Level 3 review to admit evidence": [
+        "Fresh Level 3 review to admit evidence",
+        "Open — required before Exit 3 can be recommended or accepted.",
     ],
 }
-EXPECTED_VISION_DECISION = (
-    "Adopt the TrackTemplate product vision and vision-led execution model."
-)
-EXPECTED_VISION_AUTHORITY = (
-    "`reference/PRODUCT_VISION.md` owns product purpose, the current "
-    "TrackTemplate Core migration, the subsequent Layout Editor horizon and "
-    "migration-completion meaning. Architecture adopts D-GOV-005-A through "
-    "D-GOV-005-G for canonical state, immutable presentation snapshots, "
-    "batched Coin presentation, the lightweight normal editing view, "
-    "on-demand exact geometry, ViewProvider-owned display modes, presentation "
-    "performance and product horizons. Work selection follows product vision, "
-    "architecture, authorised programme, active phase, current evidence, "
-    "bounded work item, delegated assignment, then independent evidence and "
-    "acceptance. The Chief of Staff and literal `$tracktemplate-continue` "
-    "workflow apply that vision-led selection, loop-prevention and "
-    "result-accountability model."
-)
-EXPECTED_VISION_EXCLUSIONS = (
-    "Product vision supplies direction, not scope. D-GOV-004 continues to own "
-    "literal continuation invocation and its one-cycle Level 1/2 execution "
-    "limit. No Phase 6 criterion or exit status changes. No shared renderer, "
-    "ViewProvider replacement, exact-geometry expansion, output, persistence, "
-    "railway calculation, map/background, connected placement, constituent "
-    "editing or layout solving is implemented or authorised. No pull request, "
-    "migration completion, output clearance, package, release or phase exit "
-    "is accepted; draft PR #31 remains separate and unaccepted."
-)
 EXPECTED_CONTINUATION_DECISION = (
     "Authorise explicit repository-driven continuation cycles."
 )
@@ -648,44 +724,52 @@ def _validate_transition_export_validation(validation: str) -> None:
             "Phase 6 transition DXF qualified FreeCAD validation passed"
         )
         in validation
-        and "exact zero-member, DXF-only, manifest-only and complete-pair states"
+        and (
+            "exact zero-member, DXF-only, manifest-only, and complete-pair "
+            "states"
+        )
         in validation_flat
-        and "inert historical controls" in validation_flat
+        and "Historical controls remain inert" in validation_flat
         and "interruption after each addition" in validation_flat
         and "next-invocation monotonic completion" in validation_flat
-        and "required directory synchronisation before complete-pair reuse"
+        and "Complete-pair reuse requires directory synchronisation"
         in validation_flat
-        and "fail-closed preservation when that synchronisation fails"
+        and "A synchronisation failure must preserve data and fail closed"
         in validation_flat
-        and "resolve-to-bind removal and substitution" in validation_flat
+        and "resolve-to-bind removal, and substitution" in validation_flat
         and "post-lock substitution" in validation_flat
         and "initial-member and post-addition substitution" in validation_flat
-        and "unsupported primitives" in validation_flat
-        and "non-regular-final and byte-collision refusal" in validation_flat
-        and "active-lock fail-closed diagnostics" in validation_flat
-        and "observed descriptor-close abandonment" in validation_flat
-        and "surviving-host `BaseException` propagation with chained "
-        "truthful retained-state diagnostics" in validation_flat
-        and "preservation of the original interruption when an anonymous "
-        "close itself fails" in validation_flat
-        and "best-effort remaining anonymous closes and non-replacing "
-        "bound-directory close diagnostics" in validation_flat
-        and "non-recoverable post-link/pre-sync durability uncertainty"
+        and "Unsupported primitives must fail closed" in validation_flat
+        and "It refuses non-regular finals and byte collisions"
         in validation_flat
-        and "truthful retained-state diagnostics" in validation_flat
+        and "Active-lock diagnostics must fail closed" in validation_flat
+        and "observed descriptor-close abandonment" in validation_flat
+        and "The original interruption must propagate on a surviving host "
+        "with truthful chained `BaseException` diagnostics" in validation_flat
+        and "It must remain the primary interruption when an anonymous close "
+        "fails" in validation_flat
+        and "Cleanup must attempt all remaining anonymous closes"
+        in validation_flat
+        and "Bound-directory close diagnostics must not replace the original "
+        "error" in validation_flat
+        and "Post-link/pre-sync durability uncertainty must remain "
+        "non-recoverable"
+        in validation_flat
+        and "All retained-state diagnostics must be truthful"
+        in validation_flat
         and (
-            "It proves the bounded D-P6-003 strict add-only, journal-free "
+            "The proof covers the bounded D-P6-003 strict add-only, "
+            "journal-free "
             "implementation"
         )
         in validation_flat
-        and "no published final is removed, rewritten or replaced by "
-        "TrackTemplate"
+        and "TrackTemplate removes, rewrites, or replaces no published final"
         in validation_flat
-        and "exact partial preservation and next-invocation completion"
+        and "exact partial preservation, and next-invocation completion"
         in validation_flat
         and "surviving-host interruption cleanup" in validation_flat
         and (
-            "they supply no GUI, production-output, Phase 6 exit or release "
+            "They supply no GUI, production-output, Phase 6 exit, or release "
             "acceptance"
         )
         in validation_flat,
@@ -705,18 +789,20 @@ def _validate_plan_programme(plan: str) -> None:
         (
             paragraph
             for paragraph in _raw_paragraphs(preamble)
-            if "The active program is" in _semantic_text(paragraph)
+            if "The active programme is" in _semantic_text(paragraph)
         ),
         "",
     )
     programme = _semantic_text(programme_paragraph)
     for fragment in (
-        "active program is the TrackTemplate Core macro-to-Addon migration",
+        "active programme is the TrackTemplate Core macro-to-Addon migration",
         "migration has defined completion conditions",
         "Addon must be the usual route",
-        "modular package must be the sole runtime",
-        "without a legacy-macro dependency",
-        "owner must accept the Core parity and output that the project claims",
+        "modular tracktemplate package must contain the one authoritative "
+        "product implementation",
+        "Addon must not use the legacy macro when the product operates",
+        "must not use the legacy macro",
+        "owner must accept the claimed Core parity and output",
         "Each distribution build must give the same result",
         "Release qualification must pass",
     ):
@@ -733,9 +819,9 @@ def _validate_plan_programme(plan: str) -> None:
         "",
     )
     for fragment in (
-        "Layout Editor is the later program",
-        "does not change Phase 6 exits",
-        "record future architecture without current implementation",
+        "Layout Editor is the later programme",
+        "does not change the Phase 6 exits",
+        "project can record its future architecture without current implementation",
     ):
         _require(
             fragment in layout_paragraph,
@@ -775,29 +861,27 @@ def _validate_owner_view(plan: str) -> None:
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
         "D-GOV-011",
-        "selects one subsequent hypothesis for the measured canonical area of "
-        "Edit",
-        "bounds the product change at Level 2 to one FreeCAD adapter "
-        "file",
+        "selects one later performance hypothesis for the measured canonical "
+        "Edit area",
+        "limits the Level 2 product change to one FreeCAD adapter file",
         "D-GOV-009, D-GOV-010, and their evidence do not change",
-        "same-host attribution result in D-GOV-009 and the source assessment",
+        "D-GOV-009 attribution result and source assessment",
         "two repeated reads of the selected record",
-        "without work in a different Edit stage",
+        "does not need work in another Edit stage",
         "attribution noise floor is `2.895891 ms`",
-        "first quartile of the canonical area was only `0.0731425 ms` higher than "
-        "that floor",
-        "evidence does not report the cost of each operation in that area",
-        "selected hypothesis can fail its subsequent comparison",
+        "first quartile was only `0.0731425 ms` higher than that floor",
+        "evidence does not report the cost of each operation",
+        "selected performance hypothesis can fail its later comparison",
         "No result is improvement evidence or Exit 4 evidence",
         "tracktemplate/adapters/freecad/transition_state.py",
-        "Keep one live read of the selected record before the write",
+        "Keep one live read before the write",
         "necessary read after the write",
         "Preserve all specified invariants",
-        "make the D-GOV-011 change at Level 2",
+        "Make the D-GOV-011 Level 2 change in a new cycle",
         "record a new same-host baseline on the D-GOV-010 host",
-        "attribution materiality rule in D-GOV-009",
+        "Apply the D-GOV-009 attribution materiality rule to the canonical area",
         "Do not change the comparison rule",
-        "Do not accept Exit 4 without a subsequent owner decision at Level 3",
+        "A later Level 3 owner decision is necessary to accept Exit 4",
     ):
         _require(
             fragment in owner_view,
@@ -805,8 +889,8 @@ def _validate_owner_view(plan: str) -> None:
         )
     plan_preamble = direct_section_content(plan, "Project Plan", level=1)
     _require(
-        "canonical status, evidence, and registers are the source of the owner "
-        "view. The owner view does not establish authority"
+        "canonical registers and evidence are the source of this owner view. "
+        "This view does not establish authority"
         in _semantic_text(plan_preamble),
         "project-plan owner view became an authority source",
     )
@@ -955,10 +1039,6 @@ def _validate_performance_host_sources(
             "identify the exact host profile for FreeCAD 1.1.1",
             "as 1.1.1 evidence",
             "one exact host profile",
-            "independently shows the effect of the host profile and the "
-            "TrackTemplate effect",
-            "project qualifies a subsequent host profile, this does not "
-            "authorise performance evidence from that profile",
             "admit no performance result",
             "baseline",
             "do not accept Exit 4",
@@ -974,6 +1054,33 @@ def _validate_performance_host_sources(
             source_name + " performance host boundary drifted: identify the "
             "exact host profile for FreeCAD 1.1.1 (contradicted)",
         )
+    _require(
+        "independently shows the effect of the host profile and the "
+        "TrackTemplate effect" in performance_sop_flat,
+        "PERFORMANCE_SOP performance host boundary drifted: independently "
+        "shows the effect of the host profile and the TrackTemplate effect",
+    )
+    _require(
+        "independently shows both effects. These are the host-profile effect "
+        "and the TrackTemplate effect" in validation_flat,
+        "VALIDATION performance host boundary drifted: independently shows "
+        "the effect of the host profile and the TrackTemplate effect",
+    )
+    _require(
+        "project qualifies a subsequent host profile, this does not "
+        "authorise performance evidence from that profile"
+        in performance_sop_flat,
+        "PERFORMANCE_SOP performance host boundary drifted: project qualifies "
+        "a subsequent host profile, this does not authorise performance "
+        "evidence from that profile",
+    )
+    _require(
+        "Qualification of a subsequent host profile does not authorise its "
+        "performance evidence" in validation_flat,
+        "VALIDATION performance host boundary drifted: project qualifies a "
+        "subsequent host profile, this does not authorise performance evidence "
+        "from that profile",
+    )
     _require(
         "previous 1.1.1-only validator rejected the 1.1.3 test result"
         in validation_flat
@@ -1020,7 +1127,7 @@ def _validate_performance_host_sources(
         "from one exact host profile",
     )
     _require(
-        "compare TrackTemplate performance, use one exact host profile"
+        "Use one exact host profile to compare TrackTemplate performance"
         in validation_flat,
         "VALIDATION performance comparison drifted: use one exact host "
         "profile",
@@ -1263,10 +1370,10 @@ def _validate_performance_direction_sources(
         "PR-13 — repository or evidence loss",
         "all unmeasured boundaries",
         "High / Mitigate / Partial. The disposition does not change",
-        "High / Remove / Effective (current scope). The disposition does not "
-        "change",
-        "Critical / Mitigate / Effective (current scope). The disposition "
-        "does not change",
+        "High / Remove / Effective for the current bounded scope. The "
+        "disposition does not change",
+        "Critical / Mitigate / Effective for the current bounded scope. The "
+        "disposition does not change",
     ):
         _require(
             risk_clause in panel_flat,
@@ -1300,8 +1407,8 @@ def _validate_performance_direction_sources(
         "unmeasured boundaries",
         "governance reviewer must examine authority, evidence, documentation, "
         "and preservation",
-        "two reviews must find no blocker before the project merges the "
-        "candidate",
+        "The two reviews must find no blocking condition before the project "
+        "merges the candidate",
         "pull request and completion report must record the results",
         "panel must not change after those reviews",
     ):
@@ -1625,8 +1732,8 @@ def _validate_performance_direction_sources(
         "PR-16 — incomplete cache signature",
         "PR-22 — authority transfer",
         "QA-R04 — no product performance budget",
-        "Critical / Mitigate / Effective (current scope)",
-        "High / Remove / Effective (current scope)",
+        "Critical / Mitigate / Effective for the current bounded scope",
+        "High / Remove / Effective for the current bounded scope",
     ):
         _require(
             risk_clause in followup_panel_flat,
@@ -1636,12 +1743,13 @@ def _validate_performance_direction_sources(
     for review_clause in (
         "new read-only QA, risk, evidence, validation, and documentation "
         "review of the exact candidate",
-        "reviewer does not make the change and must report no blocker before "
-        "merge",
+        "The reviewer who did not make the change must examine the evidence "
+        "classes and the two retained negative results",
         "reviewer must also make sure that the change does not start the "
         "baseline-attribution investigation",
         "reviewer must make sure that the change does not admit Exit 4",
-        "project must not merge the candidate if the reviewer finds a blocker",
+        "The project must not merge the candidate if the reviewer finds a "
+        "blocking condition",
         "panel must not change after the exact-candidate review",
     ):
         _require(
@@ -1674,8 +1782,8 @@ def _validate_performance_direction_sources(
         "They are not Exit 4 evidence",
         "Do not make a third preview sampler, polynomial, approximation, "
         "cache, or other variation of that hypothesis",
-        "show sufficient cost in a measurement area outside the D-GOV-008 "
-        "preview-sampler boundary",
+        "Current measurements do not show sufficient cost in a measurement "
+        "area outside the D-GOV-008 bounded preview-sampler work",
         "next action is a bounded Level 1 baseline-attribution "
         "investigation",
         "Report a result for each measurement area if the method lets the "
@@ -1781,8 +1889,8 @@ def _validate_performance_direction_sources(
         "PR-22 — authority transfer",
         "QA-R03 — release GUI evidence",
         "QA-R04 — no product performance budget",
-        "Critical / Mitigate / Effective (current scope)",
-        "High / Remove / Effective (current scope)",
+        "Critical / Mitigate / Effective for the current bounded scope",
+        "High / Remove / Effective for the current bounded scope",
     ):
         _require(
             risk_clause in qualification_flat,
@@ -2015,8 +2123,8 @@ def _validate_performance_direction_sources(
         "PR-17 — persistence or migration corruption",
         "PR-22 — authority transfer",
         "QA-R04 — no product performance budget",
-        "Critical / Mitigate / Effective (current scope)",
-        "High / Remove / Effective (current scope)",
+        "Critical / Mitigate / Effective (current bounded scope)",
+        "High / Remove / Effective (current bounded scope)",
     ):
         _require(
             risk_clause in selection_flat,
@@ -2068,7 +2176,8 @@ def _validate_performance_direction_sources(
         "must add no work to an unmeasured boundary",
         "Preserve canonical state and transaction semantics",
         "Preserve one-unit Undo/Redo",
-        "authorise one subsequent product change at Level 2 in this boundary",
+        "I authorise one subsequent product change at Level 2 in this adapter "
+        "file",
         "Do not start it in this cycle",
         "Preserve D-GOV-008, D-GOV-009, D-GOV-010, the two retained negative "
         "results, and the attribution corpus",
@@ -2208,8 +2317,8 @@ def _validate_exit_conditions(
 
     plan_flat = " ".join(plan.split())
     _require(
-        "D-P5-002 accepted Coin and the demonstrated B16 Entry/Exit editing "
-        "boundary, evidencing all four exact exits" in plan_flat,
+        "D-P5-002 accepted Coin and the demonstrated B16 Entry/Exit product "
+        "boundary. Its evidence supports all four exact exits" in plan_flat,
         "accepted Phase 5 boundary is missing",
     )
     _require(
@@ -2218,34 +2327,41 @@ def _validate_exit_conditions(
     )
     _require(
         "D-P6-001 later opened Phase 6 at 0/5" in plan_flat
-        and "bounded exact-validation and private-development export-seam "
-        "work" in plan_flat,
+        and "The authorised work was bounded exact validation and a "
+        "private-development export seam" in plan_flat,
         "Phase 6 opening boundary is missing",
     )
     _require(
         "D-P6-002 accepts only the bounded transient-object Exit 2"
         in plan_flat
         and "advances Phase 6 to 1/5" in plan_flat
-        and "D-P6-003 selects strict add-only, journal-free monotonic "
-        "completion" in plan_flat
-        and "authorises its later bounded Level 2 implementation" in plan_flat
+        and "D-P6-003 selects a strict completion method" in plan_flat
+        and "The method can add output members" in plan_flat
+        and "It cannot change or remove an existing output member" in plan_flat
+        and "It keeps no separate journal" in plan_flat
+        and "Its completion count can only increase" in plan_flat
+        and "D-P6-003 authorises a later bounded Level 2 implementation"
+        in plan_flat
         and "D-P6-004 defines the finite supported exporter fault model" in plan_flat
-        and "D-P6-005 accepts only the bounded private-development B16 "
-        "Entry/Exit deterministic, failure-safe DXF-and-manifest route"
+        and "D-P6-005 accepts only the bounded B16 Entry/Exit "
+        "DXF-and-manifest route"
+        in plan_flat
+        and "The route has private-development status" in plan_flat
+        and "The same input gives the same bytes" in plan_flat
+        and "the route is failure-safe under D-P6-003 and D-P6-004"
         in plan_flat
         and "advances Phase 6 to 2/5" in plan_flat
-        and "project status remains `unknown`" in plan_flat,
+        and "Project status remains `unknown`" in plan_flat,
         "Phase 6 Exit 2/3 acceptance or Exit 3 contract boundary is missing",
     )
     _require(
         "D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles"
         in plan_flat
-        and "supply candidate evidence for Phase 6 performance" in plan_flat
-        and "later decision can admit a result only if it comes from one of "
-        "those profiles" in plan_flat
+        and "supply Phase 6 performance evidence" in plan_flat
+        and "A later decision can Admit a result only from one of these "
+        "profiles" in plan_flat
         and "admits no performance result and defines no budget" in plan_flat
-        and "accepts no phase exit and does not claim that performance became "
-        "better" in plan_flat,
+        and "accepts no phase exit and makes no improvement claim" in plan_flat,
         "D-GOV-007 performance-host summary drifted",
     )
     _require(
@@ -2261,25 +2377,24 @@ def _validate_exit_conditions(
     _require(
         "D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first "
         "direction" in plan_flat
-        and "records two subsequent results from Level 2 as retained negative "
+        and "records two later Level 2 results as retained negative "
         "evidence"
         in plan_flat
         and "stops new product work in that direction" in plan_flat
-        and "authorised the bounded baseline-attribution investigation at Level "
-        "1" in plan_flat
-        and "project completed that investigation" in plan_flat
+        and "authorised the bounded Level 1 baseline-attribution "
+        "investigation, which is complete" in plan_flat
         and "attribution result is direction-selection evidence only"
         in plan_flat
         and "Exit 4 stays Pending" in plan_flat,
         "D-GOV-009 direction summary drifted",
     )
     _require(
-        "D-GOV-010 qualifies only the exact FreeCAD 1.1.3 profile with "
+        "D-GOV-010 qualifies only the exact FreeCAD 1.1.3 host profile with "
         "CPython 3.13.13 and PySide6/Qt 6.11.1" in plan_flat
         and "keeps the previously qualified profiles and their evidence"
         in plan_flat
-        and "authorises this profile to supply candidate evidence for "
-        "performance in a subsequent cycle" in plan_flat
+        and "authorises this profile to supply performance evidence in a "
+        "later cycle" in plan_flat
         and "Each comparison must use one profile with an exact identity"
         in plan_flat
         and "admits no performance result and does not change D-GOV-009"
@@ -2288,11 +2403,11 @@ def _validate_exit_conditions(
         "D-GOV-010 host-qualification summary drifted",
     )
     _require(
-        "D-GOV-011 selects one subsequent hypothesis for the read route in the "
-        "canonical FreeCAD adapter" in plan_flat
+        "D-GOV-011 selects one later performance hypothesis for the read route "
+        "in the canonical FreeCAD adapter" in plan_flat
         and "can remove only two repeated reads of the selected record"
         in plan_flat
-        and "exact host in D-GOV-010" in plan_flat
+        and "exact D-GOV-010 host" in plan_flat
         and "record a new same-host baseline" in plan_flat
         and "must not change the comparison rule" in plan_flat
         and "makes no product change and admits no performance result"
@@ -2310,10 +2425,9 @@ def _validate_exit_conditions(
         ).split()
     )
     _require(
-        "Current — 2/5 accepted exits. Exit 2 was owner-accepted under "
-        "D-P6-002 on "
-        "2026-08-02 and Exit 3 under D-P6-005 on 2026-08-15; exits 1, 4 and 5 "
-        "remain Pending" in current_flat,
+        "Current — 2/5 accepted exits. The owner accepted Exit 2 under "
+        "D-P6-002 on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
+        "2026-08-15. Exits 1, 4, and 5 remain Pending" in current_flat,
         "current record does not preserve the accepted Phase 6 2/5 state",
     )
     performance_section = _section(
@@ -2383,7 +2497,7 @@ def _validate_exit_conditions(
         and "versioned internal journal" in recovery_flat
         and "immediately after the first and second final links"
         in recovery_flat
-        and "automatic recovery claim is withdrawn" in recovery_flat
+        and "automatic recovery claim is therefore withdrawn" in recovery_flat
         and (
             "Phase 6 transition DXF qualified FreeCAD validation passed"
         )
@@ -2422,13 +2536,15 @@ def _validate_exit_conditions(
         and "O_TMPFILE" in staging_repair_section
         and "linkat(AT_EMPTY_PATH)" in staging_repair_section
         and "internal v2 interruption journal" in staging_repair_flat
-        and "journal is also created anonymously and linked from its "
-        "still-open descriptor" in staging_repair_flat
+        and "That journal is also created anonymously" in staging_repair_flat
+        and "journal is linked from its still-open descriptor"
+        in staging_repair_flat
         and "`.new` remains only a reserved ambiguity detector"
         in staging_repair_flat
         and "no staging pathname or directory removal"
         in staging_repair_flat
-        and "identities, metadata and bytes" in staging_repair_flat
+        and "every file, identity, metadata value, and byte"
+        in staging_repair_flat
         and "destination_changed=True" in staging_repair_section
         and "cleanup_complete=False" in staging_repair_section
         and "recoverable=False" in staging_repair_section
@@ -2441,18 +2557,18 @@ def _validate_exit_conditions(
         and "changed its access time" in staging_repair_flat
         and "descriptor-relative non-reading metadata inspection"
         in staging_repair_flat
-        and "preserved unchanged and rejected as unclaimable"
+        and "preserves and rejects that item as unclaimable"
         in staging_repair_flat
         and "matching partial DXF" in staging_repair_flat
-        and "lone v1 journal and `.new` control" in staging_repair_flat
-        and "including access time" in staging_repair_flat
+        and "lone v1 journal, and `.new` control" in staging_repair_flat
+        and "They also preserve access time" in staging_repair_flat
         and "do not claim automatic recovery" in staging_repair_flat
         and "All pre-existing transaction-control residue remains preserved"
         in staging_repair_flat
         and "remain open Exit 3 technical gaps" in staging_repair_flat
         and (
             "Phase 6 remains 1/5 with Exit 2 alone Evidenced and "
-            "owner-accepted; Exit 3 remains Pending"
+            "owner-accepted. Exit 3 remains Pending"
         )
         in staging_repair_flat,
         "Phase 6 staging-ownership repair evidence drifted",
@@ -2498,35 +2614,33 @@ def _validate_exit_conditions(
         "`cleanup_complete=False`",
         "Identical complete-pair reuse, deterministic bytes and filenames",
         "host or filesystem without every required anonymous-file",
-        "authenticating or verifying a pathname does not create authority to "
+        "Authenticating or verifying a pathname does not create authority to "
         "delete it",
         "POSIX pathname deletion has no expected-inode atomic condition",
-        "cross-process recovery means safe monotonic completion, not "
+        "Cross-process recovery means safe monotonic completion, not "
         "destructive cleanup",
-        "foreign or uncertain destination state is never removed by "
-        "TrackTemplate",
+        "TrackTemplate never removes foreign or uncertain destination state",
         "inert foreign residue",
-        "presence neither permits nor blocks final-set completion",
+        "Their presence neither permits nor prevents final-set completion",
         "Content equivalence establishes compatibility for reuse or addition "
         "only",
-        "an exact regular partial pair may be completed instead of rejected",
+        "An exact regular partial pair may be completed instead of rejected",
         "collision policy is therefore defined per final member",
-        "no accepted consumer treats exact-partial collision failure as a "
-        "required outcome",
+        "No accepted consumer requires exact-partial collision failure",
         "No material owner choice remains",
-        "automatic recovery is not present",
-        "prove pre-publication descriptor abandonment, interruption after "
-        "each addition, post-addition races and next-invocation monotonic "
-        "completion",
+        "Automatic recovery is not present",
+        "Prove pre-publication descriptor abandonment and interruption after "
+        "each addition",
+        "Prove post-addition races and next-invocation monotonic completion",
         "Phase 6 remains 1/5",
         "Exit 3 remains Pending",
-        "no risk state, treatment or effectiveness changes",
+        "No risk state, treatment, or effectiveness changes",
         "tracktemplate/adapters/export/transition_dxf.py",
         "tracktemplate/application/transition_export.py",
         "must stop without publication",
-        "freeze both export contract/result IDs",
+        "Freeze both export contract/result IDs",
         "identical output fingerprints and `created` result signatures",
-        "generic storage framework or runtime dependency",
+        "generic storage framework, or runtime dependency",
     ):
         _require(
             required_contract_clause in recovery_contract_flat,
@@ -2537,7 +2651,7 @@ def _validate_exit_conditions(
         (
             "Panel recommendation: Proceed with bounded conditions. The "
             "fresh filesystem-security and architecture/API reviewers accept "
-            "the strict add-only contract and later Level 2 boundary; the "
+            "the strict add-only contract and later bounded Level 2 work. The "
             "governance and staff-level quality review finds no status, "
             "evidence or authority contradiction. No material owner choice or "
             "dissent remains."
@@ -2554,8 +2668,76 @@ def _validate_exit_conditions(
                 "D-P6-003 — Select strict add-only, journal-free monotonic "
                 "completion for Exit 3 recovery"
             ),
-            _semantic_text(EXPECTED_EXIT3_RECOVERY_AUTHORITY),
-            _semantic_text(EXPECTED_EXIT3_RECOVERY_EXCLUSIONS),
+            _semantic_text(
+                "At accepted main source state "
+                "cee78cff84618c6a5be3be99714682f5822c814f, select strict "
+                "add-only, journal-free monotonic completion as the required "
+                "cross-process recovery-authority contract for the bounded B16 "
+                "Entry/Exit DXF-and-manifest pair. A later bounded Level 2 "
+                "tranche is authorised to recompute the exact expected pair. "
+                "It may create unpublished payloads only in anonymous "
+                "creation-bound descriptors. It may abandon unpublished work "
+                "only by closing those descriptors."
+            ),
+            _semantic_text(
+                "It may inspect existing finals without acquiring mutation "
+                "authority. It may publish only by adding an absent final "
+                "pathname without overwrite. The first successful final link "
+                "permanently ends rollback. No published final may be unlinked, "
+                "renamed, rewritten, truncated or replaced. Authenticating or "
+                "verifying a pathname does not grant deletion authority. POSIX "
+                "pathname deletion has no expected-inode atomic condition."
+            ),
+            _semantic_text(
+                "After any post-publication failure, all published finals are "
+                "preserved, including any exact partial or complete output "
+                "pair. A later invocation may add only an absent exact "
+                "counterpart. Success may be reported only after independent "
+                "revalidation shows that the complete final pair is exact. "
+                "Mismatch, non-regular finals, symbolic links, collision, "
+                "replay, substitution, inconsistency, ambiguity or unsupported "
+                "primitives fail closed without further mutation. Foreign or "
+                "uncertain destination state is never removed."
+            ),
+            _semantic_text(
+                "The cleanup_complete, recoverable, destination_changed, and "
+                "related diagnostics must describe the state actually retained. "
+                "recoverable=True is permitted only after independently "
+                "revalidating an exact zero-member, partial or complete "
+                "destination with safe retry or remaining add-only authority. "
+                "Ambiguity, mismatch, uncertain durability, or an unsupported "
+                "primitive remains non-recoverable. Any successful addition "
+                "requires destination_changed=True. Any surviving published "
+                "final on a failed invocation requires cleanup_complete=False."
+            ),
+            _semantic_text(
+                "Identical complete-pair reuse, deterministic filenames and "
+                "bytes, manifest schema and contract IDs, the two-file layout, "
+                "no-overwrite behaviour and reuse-identical-or-fail collision "
+                "refusal remain unchanged. One exact regular partial member may "
+                "now be completed rather than treated as a collision. Phase 6 "
+                "remains 1/5 and Exit 3 remains Pending until implementation, "
+                "focused interruption/recovery evidence and a fresh Level 3 "
+                "review to admit evidence."
+            ),
+            _semantic_text(
+                "No product code is changed by this decision. It does not mark "
+                "Exit 3 or another exit Evidenced or owner-accepted. It grants "
+                "no production, physical-output, project-cleared, equivalence, "
+                "GUI, operator, wider-family, performance, legacy-retirement, "
+                "packaging, or release authority. It changes no risk state."
+            ),
+            _semantic_text(
+                "It does not authorise post-publication unlink, rename, rewrite, "
+                "truncation, replacement, or pathname-based rollback. It does "
+                "not authorise reading or deleting pre-existing controls. It "
+                "does not authorise mutation of foreign or uncertain destination "
+                "state. It does not authorise deletion authority from equality, "
+                "metadata, or pathname verification. It does not authorise "
+                "output name, byte, schema, layout, contract/result ID, or "
+                "collision-policy value changes. It adds no trust service, "
+                "generic storage framework, or runtime dependency."
+            ),
         ],
         "D-P6-003 exact owner decision drifted or was relocated",
     )
@@ -2577,16 +2759,17 @@ def _validate_exit_conditions(
         "route",
         "Phase 6 transition DXF export validation passed",
         "same created result signature as fresh creation",
-        "next-invocation completion only after required directory "
+        "interruption after each addition and next-invocation completion",
+        "Completion occurs only after the required directory "
         "synchronisation",
-        "fail-closed complete-pair preservation when that synchronisation "
-        "fails",
-        "resolve-to-bind removal and substitution",
-        "post-lock, initial-member and post-addition substitution",
+        "fail-closed complete-pair preservation when synchronisation fails",
+        "resolve-to-bind removal, and substitution",
+        "Post-lock, initial-member, and post-addition substitution",
         "active-lock ambiguity",
-        "non-regular and byte-collision refusal",
-        "observed descriptor closure on pre-publication abandonment",
-        "sentinel proving no unlink, rename, replace or rmdir call",
+        "Non-regular and byte-collision refusal",
+        "observed descriptor closure during pre-publication abandonment",
+        "A sentinel proves that normal publication makes no unlink, rename, "
+        "replace, or rmdir call",
         "6861d0565a737615ec5b242aaa8d2b3efd51b0e22aad9d93fb929489a25fd861",
         "16de67625d952e9bb0c7c3f7891b30987f78d7c5878a9838999ab0909f131552",
         "7b2757bc3559013a2399df7efe6c25721288f8dad56b6cc05d93c2938c86c2b1",
@@ -2594,10 +2777,10 @@ def _validate_exit_conditions(
         "Phase 6 transition DXF qualified FreeCAD validation passed",
         "Conditions 1 and 3 now have bounded evidence",
         "Condition 6 remains open",
-        "not an Exit 3 evidence-admission or owner-acceptance decision",
+        "not a decision to admit Exit 3 evidence or give owner acceptance",
         "Phase 6 remains 1/5 with only Exit 2 Evidenced and owner-accepted",
         "Exit 3 remains Pending",
-        "PR-09, PR-13, PR-16, PR-22 and QA-R03 retain their existing states",
+        "PR-09, PR-13, PR-16, PR-22, and QA-R03 retain their existing states",
     ):
         _require(
             required_implementation_clause in implementation_flat,
@@ -2613,14 +2796,15 @@ def _validate_exit_conditions(
         "49d9a85ee3f942a801c65f1cd051a2586ffa10d8",
         "anonymous staging descriptor remained open",
         "implementation-defect under D-P6-003 invariant 2",
-        "first independent security review then blocked retention",
+        "A first independent security review then returned BLOCKED for "
+        "retention",
         "TransitionDxfExportError instead of the original "
         "CleanupInterruption",
-        "second independent security review confirmed those paths but "
-        "blocked retention",
+        "A second independent security review confirmed those paths but "
+        "returned BLOCKED for retention",
         "retained regression reproduced [True, True] against that second "
         "reviewed state",
-        "preserves the original KeyboardInterrupt, SystemExit or custom "
+        "preserves the original KeyboardInterrupt, SystemExit, or custom "
         "direct BaseException type and value",
         "Each descriptor enters the outer ownership map immediately after "
         "open",
@@ -2628,18 +2812,18 @@ def _validate_exit_conditions(
         "descriptor",
         "completion and bound-directory cleanup routers also preserve an "
         "active direct interruption",
-        "failed or uncertain close is reported cleanup-incomplete and "
-        "non-recoverable through the existing chained "
-        "TransitionDxfExportError",
-        "marked durability-uncertain before linkat until the directory "
-        "fsync returns",
-        "unchanged/clean/recoverable",
-        "changed/not-clean/recoverable",
+        "A failed or uncertain close is reported as cleanup-incomplete and "
+        "non-recoverable",
+        "The existing chained TransitionDxfExportError contains this report",
+        "Publication is marked durability-uncertain before linkat",
+        "It keeps that status until the directory fsync returns",
+        "unchanged, clean, and recoverable diagnostic",
+        "diagnostic is changed, not clean, and recoverable",
         "No exception class, public ID, receipt, filename, output byte, "
-        "schema or collision policy changes",
+        "schema, or collision policy changes",
         "Phase 6 transition DXF export validation passed",
         "Phase 6 transition DXF qualified FreeCAD validation passed",
-        "Process-kill, os._exit and a second asynchronous interruption",
+        "Process-kill, os._exit, and a second interruption",
         "Exit 3 remains Pending for a fresh Level 3 panel",
         "Phase 6 remains 1/5",
         "no risk or output authority changes",
@@ -2665,7 +2849,7 @@ def _validate_exit_conditions(
         == [
             (
                 "The selected slice has equivalent exact validation and "
-                "production output for the agreed scope"
+                "production output for the agreed bounded work"
             ),
             "No transient production objects leak into the editable document",
             "Export is deterministic and failure-safe",
@@ -2682,7 +2866,7 @@ def _validate_exit_conditions(
         "Phase 6 exits do not match the accepted 2/5 dispositions",
     )
     exit3_acceptance_heading = (
-        "Phase 6 Exit 3 supported-model evidence-admission panel and owner "
+        "Phase 6 Exit 3 supported-model panel to admit evidence and owner "
         "decision"
     )
     _require(
@@ -2702,10 +2886,10 @@ def _validate_exit_conditions(
         "PROCEED TO OWNER ACCEPTANCE WITH BOUNDED CONDITIONS",
         "There was no dissent",
         "No supported-model defect, unsafe recovery path, material evidence "
-        "gap or contradiction with D-P6-003/D-P6-004 was found",
-        "No risk state, treatment, effectiveness or disposition changes",
-        "no product source, test oracle, schema, manifest, output byte, "
-        "identifier or railway behaviour changes",
+        "gap, or contradiction with D-P6-003/D-P6-004 was found",
+        "No risk state, treatment, effectiveness, or disposition changes",
+        "No product source, test oracle, schema, manifest, output byte, "
+        "identifier, or railway behaviour changes",
         "fresh independent acceptance review",
         "exact-head protected CI",
         "preservation-audited protected-main integration",
@@ -2727,7 +2911,11 @@ def _validate_exit_conditions(
             ),
             _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_SCOPE),
             _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_COVERAGE),
+            _semantic_text(
+                EXPECTED_EXIT3_ACCEPTANCE_COVERAGE_CONTINUED
+            ),
             _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_LIMITATIONS),
+            _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_PRESERVATION),
             _semantic_text(EXPECTED_EXIT3_ACCEPTANCE_EXCLUSIONS),
         ],
         "D-P6-005 panel exact owner decision drifted or was relocated",
@@ -2772,7 +2960,7 @@ def _validate_exit_conditions(
         "Two reviewers independently reviewed the exact candidate",
         "The architecture and Issue 9 review result was PASS WITH FINDINGS",
         "The quality review result was PASS WITH FINDINGS",
-        "No reviewer found a blocker",
+        "No reviewer found a blocking condition",
         "Issue 9 conformance is Unknown for unchanged live prose",
         "The reviewers did not change the candidate",
         "The same reviewers also examined previous candidate states",
@@ -2781,15 +2969,15 @@ def _validate_exit_conditions(
         "owner view → canonical information → proof/provenance",
         "The owner view gives no project authority",
         "normative standard for canonical technical prose in English in the "
-        "defined scope",
-        "All new prose in this scope must obey the applicable ASD-STE100 "
+        "defined bounded scope",
+        "All new prose in this bounded scope must obey the applicable ASD-STE100 "
         "Issue 9 requirements",
         "A reviewer must use the official standard for the linguistic review",
         "claims no S1000D conformance",
         "claims no external ASD certification, endorsement, or official "
         "conformance assessment",
         "changes no phase or exit status",
-        "changes no risk disposition, product source, or product behavior",
+        "changes no risk disposition, product source, or product behaviour",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays unknown",
     ):
@@ -2811,7 +2999,7 @@ def _validate_exit_conditions(
             "authority links",
         ),
         "reference/CAPABILITY_MATRIX.md": (
-            "first evidence boundary",
+            "first evidence limit",
             "DXF row",
         ),
         "reference/TERMINOLOGY.md": (
@@ -2933,7 +3121,7 @@ def _validate_exit_conditions(
         "directive",
         "governance review result was PASS WITH FINDINGS",
         "That review examined authority and preservation",
-        "No reviewer found a blocker",
+        "No reviewer found a blocking condition",
         "The reviewers did not change the candidate",
         "The same reviewers also examined previous candidate states",
         "The finding is that Issue 9 conformance stays Unknown for live prose "
@@ -3122,8 +3310,8 @@ def _validate_exit_conditions(
             "Phase 1 runtime and legacy ingress compatibility unit",
         ),
         "reference/contracts/phase1-compatibility.json": (
-            "human-readable scope strings",
-            "security boundary",
+            "human-readable bounded-scope strings",
+            "security limit",
             "1.1.3 evidence strings",
             "support rule",
             "evidence-gap string",
@@ -3178,11 +3366,11 @@ def _validate_exit_conditions(
         "security limitation and Issue 9 review were missing",
         "initial quality review examined authority and preservation",
         "Its result was PASS WITH FINDINGS",
-        "found no supported-scope blocker",
+        "found no blocking condition in the supported bounded scope",
         "initial quality reviewer did not have the session call",
         "reviewers did not change the candidate",
         "two reviewers must examine the final exact state",
-        "two final reviews must find no blocker before merge",
+        "two final reviews must find no blocking condition before merge",
         "pull request and completion report must record the two final results",
         "panel must not change after the reviews",
     ):
@@ -3262,8 +3450,8 @@ def _validate_exit_conditions(
         "compare TrackTemplate performance, use one exact host profile",
         "independently shows the effect of the host profile and the "
         "TrackTemplate effect",
-        "cannot claim that TrackTemplate performance became better because "
-        "the two host profiles have different results",
+        "The different results do not show that TrackTemplate performance "
+        "became better",
         "1.1.1 performance report does not have a host_profile_id field",
         "qualified-runtime contract hash",
         "data identify the exact host profile for FreeCAD 1.1.1",
@@ -3395,9 +3583,10 @@ def _validate_exit_conditions(
         "reviewer who did not make this change must examine the exact "
         "candidate",
         "reviewer must not change files",
-        "host rule for performance, evidence admission, authority, "
+        "host rule for performance, the decision to admit evidence, authority, "
         "preservation, and the Issue 9 assessment",
-        "must find no blocker before the project merges the candidate",
+        "must find no blocking condition before the project merges the "
+        "candidate",
         "pull request and completion report record the result",
         "panel must not change after the review",
     ):
@@ -3453,7 +3642,7 @@ def _validate_exit_conditions(
         "Phase 6 opening panel or exact owner acceptance is missing",
     )
     exit2_panel_heading = (
-        "Phase 6 Exits 2 and 3 evidence-admission panel and owner decision"
+        "Phase 6 Exits 2 and 3 panel to admit evidence and owner decision"
     )
     _require(
         '<a id="phase-6-exits-2-and-3-evidence-admission-panel"></a>\n\n'
@@ -3483,8 +3672,9 @@ def _validate_exit_conditions(
             _semantic_text(
                 "D-P6-002 — Accept Phase 6 Exit 2 and retain Exit 3 Pending"
             ),
-            _semantic_text(EXPECTED_EXIT2_AUTHORITY),
-            _semantic_text(EXPECTED_EXIT2_EXCLUSIONS),
+            _semantic_text(EXPECTED_EXIT2_PANEL_AUTHORITY),
+            _semantic_text(EXPECTED_EXIT2_PANEL_EXCLUSIONS_ONE),
+            _semantic_text(EXPECTED_EXIT2_PANEL_EXCLUSIONS_TWO),
         ],
         "D-P6-002 panel exact owner decision drifted or was relocated",
     )
@@ -3692,7 +3882,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-25",
+        and current_document["updated_on"] == "2026-08-31",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -3741,29 +3931,7 @@ def _validate_decisions(plan: str) -> None:
             "duplicate current decision ID",
         )
         _require(
-            record["decided_on"]
-            == (
-                "2026-08-25"
-                if decision_id == "D-GOV-012"
-                else "2026-08-23"
-                if decision_id in {"D-GOV-009", "D-GOV-010", "D-GOV-011"}
-                else "2026-08-15"
-                if decision_id in {
-                    "D-P6-004",
-                    "D-P6-005",
-                    "TT-DOC-001",
-                    "TT-DOC-002",
-                    "D-GOV-006",
-                }
-                else "2026-08-16"
-                if decision_id in {"D-GOV-007", "D-GOV-008"}
-                else (
-                    "2026-08-02"
-                    if decision_id in {"D-P6-002", "D-P6-003"}
-                    else "2026-08-01"
-                )
-            )
-            and record["status"] == "Accepted"
+            record["status"] == "Accepted"
             and record["panel_required_under_current_policy"] is True,
             "current Level 3 decision status or panel requirement drifted",
         )
@@ -3785,715 +3953,51 @@ def _validate_decisions(plan: str) -> None:
         "current decision IDs drifted",
     )
 
-    phase6_record = phase6_by_id["D-P6-001"]
-    _require(
-        phase6_record["decision"] == "Open Phase 6."
-        and phase6_record["authority"] == EXPECTED_PHASE6_AUTHORITY
-        and phase6_record["exclusions"] == EXPECTED_PHASE6_EXCLUSIONS,
-        "D-P6-001 authority or exclusions drifted",
-    )
-    phase6_panel = (
-        "reference/current/PHASE_EVIDENCE.md#phase-6-opening-panel"
-    )
-    _require(
-        phase6_record["evidence"] == phase6_panel
-        and phase6_record["panel_required_under_current_policy"] is True
-        and phase6_record["panel_record"] == phase6_panel,
-        "D-P6-001 panel routing drifted",
-    )
+    for decision_id, expected in EXPECTED_PHASE6_DECISIONS.items():
+        (
+            expected_date,
+            expected_decision,
+            expected_panel_record,
+            expected_authority_sha256,
+            expected_exclusions_sha256,
+        ) = expected
+        record = phase6_by_id[decision_id]
+        _require(
+            record["decided_on"] == expected_date,
+            decision_id + " decision date drifted",
+        )
+        _require(
+            record["decision"] == expected_decision,
+            decision_id + " decision wording drifted",
+        )
+        _require(
+            record["evidence"] == expected_panel_record
+            and record["panel_record"] == expected_panel_record,
+            decision_id + " evidence or panel routing drifted",
+        )
+        for field in ("authority", "exclusions"):
+            value = record[field]
+            _require(
+                isinstance(value, str) and bool(value.strip()),
+                decision_id + " lacks " + field,
+            )
+            expected_digest = (
+                expected_authority_sha256
+                if field == "authority"
+                else expected_exclusions_sha256
+            )
+            actual_digest = hashlib.sha256(
+                value.encode("utf-8")
+            ).hexdigest()
+            _require(
+                actual_digest == expected_digest,
+                decision_id + " " + field + " digest drifted",
+            )
 
-    vision_record = phase6_by_id["D-GOV-005"]
-    vision_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#product-vision-and-execution-governance-panel"
-    )
     _require(
-        vision_record["decision"] == EXPECTED_VISION_DECISION
-        and vision_record["authority"] == EXPECTED_VISION_AUTHORITY
-        and vision_record["exclusions"] == EXPECTED_VISION_EXCLUSIONS
-        and vision_record["evidence"] == vision_panel
-        and vision_record["panel_record"] == vision_panel,
-        "D-GOV-005 authority, exclusions or panel routing drifted",
+        EXPECTED_STE_LIFECYCLE_PLAN_ROW in _section(plan, "Owner decisions"),
+        "project-plan D-GOV-015 decision row drifted",
     )
-    exit2_record = phase6_by_id["D-P6-002"]
-    exit2_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#phase-6-exits-2-and-3-evidence-admission-panel"
-    )
-    _require(
-        exit2_record["decision"] == EXPECTED_EXIT2_DECISION
-        and exit2_record["authority"] == EXPECTED_EXIT2_AUTHORITY
-        and exit2_record["exclusions"] == EXPECTED_EXIT2_EXCLUSIONS
-        and exit2_record["evidence"] == exit2_panel
-        and exit2_record["panel_record"] == exit2_panel,
-        "D-P6-002 authority, exclusions or panel routing drifted",
-    )
-    recovery_contract_record = phase6_by_id["D-P6-003"]
-    recovery_contract_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#phase-6-exit-3-recovery-authority-contract-panel"
-    )
-    _require(
-        recovery_contract_record["decision"]
-        == EXPECTED_EXIT3_RECOVERY_DECISION
-        and recovery_contract_record["authority"]
-        == EXPECTED_EXIT3_RECOVERY_AUTHORITY
-        and recovery_contract_record["exclusions"]
-        == EXPECTED_EXIT3_RECOVERY_EXCLUSIONS
-        and recovery_contract_record["evidence"] == recovery_contract_panel
-        and recovery_contract_record["panel_record"]
-        == recovery_contract_panel,
-        "D-P6-003 authority, exclusions or panel routing drifted",
-    )
-    exit3_acceptance_record = phase6_by_id["D-P6-005"]
-    exit3_acceptance_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#phase-6-exit-3-supported-model-evidence-admission-panel"
-    )
-    _require(
-        exit3_acceptance_record["decision"]
-        == EXPECTED_EXIT3_ACCEPTANCE_DECISION
-        and exit3_acceptance_record["authority"]
-        == EXPECTED_EXIT3_ACCEPTANCE_AUTHORITY
-        and exit3_acceptance_record["exclusions"]
-        == EXPECTED_EXIT3_ACCEPTANCE_STRUCTURED_EXCLUSIONS
-        and exit3_acceptance_record["evidence"]
-        == exit3_acceptance_panel
-        and exit3_acceptance_record["panel_record"]
-        == exit3_acceptance_panel,
-        "D-P6-005 authority, exclusions or panel routing drifted",
-    )
-    tt_doc_record = phase6_by_id["TT-DOC-001"]
-    tt_doc_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#tt-doc-001-documentation-architecture-panel"
-    )
-    _require(
-        tt_doc_record["decision"] == EXPECTED_TT_DOC_DECISION
-        and tt_doc_record["evidence"] == tt_doc_panel
-        and tt_doc_record["panel_record"] == tt_doc_panel,
-        "TT-DOC-001 decision or panel routing drifted",
-    )
-    tt_doc_semantic = _semantic_text(
-        str(tt_doc_record["authority"])
-        + " "
-        + str(tt_doc_record["exclusions"])
-    )
-    for fragment in (
-        "f03818d71bce06c5cfb85da84d8f3f230e08b47c",
-        "human comprehensibility as a governance control",
-        "reference/ENGINEERING_POLICY.md is the sole canonical owner",
-        "owner view → canonical information → proof/provenance",
-        "owner view gives no project authority",
-        "ASD-STE100 Simplified Technical English, Issue 9",
-        "2025-01-15",
-        "official standard is the normative external reference",
-        "All new prose in this scope must obey the applicable Issue 9 "
-        "requirements",
-        "full logical unit that contains the change must obey these "
-        "requirements",
-        "reviewer must use the official standard for the linguistic review",
-        "reference/TERMINOLOGY.md is the one owner",
-        "This decision adds no skill",
-        "Issue 9 style does not authorize a change to frozen history",
-        "ASD-STE100 Issue 9 conformance not verified applies to the live "
-        "corpus",
-        "claims no external ASD certification, endorsement, or official "
-        "conformance assessment",
-        "claims no S1000D conformance",
-        "changes no phase or exit status, accepted-exit count, risk "
-        "disposition",
-        "authorizes no S1000D XML, Common Source Database, BREX",
-        "Phase 6 stays at 2/5",
-        "Exits 1, 4, and 5 stay Pending",
-        "Project status stays unknown",
-    ):
-        _require(
-            fragment in tt_doc_semantic,
-            "TT-DOC-001 authority or exclusion drifted: " + fragment,
-        )
-    spelling_record = phase6_by_id["TT-DOC-002"]
-    spelling_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#tt-doc-002-uk-english-spelling-correction-panel"
-    )
-    _require(
-        spelling_record["decision"] == EXPECTED_TT_DOC_SPELLING_DECISION
-        and spelling_record["evidence"] == spelling_panel
-        and spelling_record["panel_record"] == spelling_panel,
-        "TT-DOC-002 decision or panel routing drifted",
-    )
-    spelling_semantic = _semantic_text(
-        str(spelling_record["authority"])
-        + " "
-        + str(spelling_record["exclusions"])
-    )
-    for fragment in (
-        "54d5d8312429ededff83084a3bc39c8756729d19",
-        "corrects the spelling directive in TT-DOC-001",
-        "ASD-STE100 Simplified Technical English, Issue 9",
-        "stays the normative controlled-writing standard",
-        "uses UK English spelling as its project spelling directive",
-        "applies the spelling option in Issue 9 Rule 1.14",
-        "changes spelling policy only",
-        "does not change Issue 9 vocabulary or grammar requirements",
-        "does not change approved meanings, parts of speech, technical noun "
-        "controls, technical verb controls",
-        "reference/ENGINEERING_POLICY.md stays the one canonical owner of "
-        "TT-DOC-001",
-        "reference/TERMINOLOGY.md stays the one project terminology owner",
-        "original 18-unit conformance scope does not expand",
-        "Issue 9 conformance stays Unknown for live prose outside",
-        "does not change the accepted TT-DOC-001 decision or LFE-018",
-        "changes only the previous spelling rule",
-        "changes no phase, exit, accepted-exit count, risk disposition, or "
-        "evidence acceptance",
-        "Phase 6 stays at 2/5",
-        "Exits 1, 4, and 5 stay Pending",
-        "Project status stays unknown",
-    ):
-        _require(
-            fragment in spelling_semantic,
-            "TT-DOC-002 authority or exclusion drifted: " + fragment,
-        )
-    compatibility_record = phase6_by_id["D-GOV-006"]
-    compatibility_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#freecad-1-1-3-compatibility-requalification-panel"
-    )
-    _require(
-        compatibility_record["decision"]
-        == "Qualify the exact FreeCAD 1.1.3 host profile."
-        and compatibility_record["evidence"] == compatibility_panel
-        and compatibility_record["panel_record"] == compatibility_panel,
-        "D-GOV-006 decision or panel routing drifted",
-    )
-    compatibility_semantic = _semantic_text(
-        str(compatibility_record["authority"])
-        + " "
-        + str(compatibility_record["exclusions"])
-    )
-    for fragment in (
-        "724a3b79ab5b71025041e84eac3501a457b3fb76",
-        "exact Linux x86_64 stable org.freecad.FreeCAD Flatpak FreeCAD 1.1.3",
-        "CPython 3.13.14",
-        "PySide6/Qt 6.10.3",
-        "OpenCASCADE 7.8.1",
-        "Coin 4.0.8",
-        "only the exact 1.1.1 and 1.1.3 host profiles",
-        "1.1.1 evidence keeps its host identity",
-        "must not use metadata that records support for 1.1.2",
-        "FreeCAD 1.1.2 and all other FreeCAD releases",
-        "security issues for all releases before 1.1.3",
-        "1.1.1 decision gives functional compatibility authority only",
-        "not a security endorsement",
-        "changes compatibility authority only",
-        "changes no product source",
-        "risk disposition, phase, or exit",
-        "Phase 6 stays at 2/5",
-        "Exits 1, 4, and 5 stay Pending",
-        "Output stays private-development",
-        "Project status stays unknown",
-        "gives no production, physical-output, project-cleared, packaging, "
-        "release, or tagging authority",
-    ):
-        _require(
-            fragment in compatibility_semantic,
-            "D-GOV-006 authority or exclusion drifted: " + fragment,
-        )
-    performance_host_record = phase6_by_id["D-GOV-007"]
-    performance_host_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#phase-6-performance-evidence-host-boundary-panel"
-    )
-    _require(
-        performance_host_record["decision"]
-        == (
-            "Authorise the exact FreeCAD 1.1.3 profile for Phase 6 "
-            "performance evidence."
-        )
-        and performance_host_record["evidence"] == performance_host_panel
-        and performance_host_record["panel_record"]
-        == performance_host_panel,
-        "D-GOV-007 decision or panel routing drifted",
-    )
-    performance_host_semantic = _semantic_text(
-        str(performance_host_record["authority"])
-        + " "
-        + str(performance_host_record["exclusions"])
-    )
-    for fragment in (
-        "3f20de704a060ab37478c34b3a7cb3586a9b2220",
-        "linux-x86_64-flatpak-freecad-1.1.1",
-        "linux-x86_64-flatpak-freecad-1.1.3",
-        "D-GOV-006 qualifies",
-        "project owner changes the host rule for Phase 6 performance evidence",
-        "authorises the exact linux-x86_64-flatpak-freecad-1.1.1 profile and "
-        "the exact linux-x86_64-flatpak-freecad-1.1.3 profile to supply "
-        "candidate evidence",
-        "later decision can admit a performance result only if it comes from "
-        "one of these exact host profiles",
-        "Each new schema-2 result must have exact host identity",
-        "record the ID and FreeCAD version of its exact host profile",
-        "schema_version value identifies the structure of the internal "
-        "evidence record",
-        "profile_id value identifies the measurement method",
-        "1.1.1 report from 2026-08-02 is a schema-1 report",
-        "does not have a host_profile_id field",
-        "It records FreeCAD 1.1.1, platform data, and the qualified-runtime "
-        "contract hash",
-        "data identify the exact host profile for FreeCAD 1.1.1",
-        "D-GOV-007 keeps this report as 1.1.1 evidence",
-        "Results from different host profiles must stay in different sets",
-        "claim that TrackTemplate performance became better, compare results "
-        "from one exact host profile",
-        "different method can compare the two host profiles only if it "
-        "independently shows the effect of the host profile and the "
-        "TrackTemplate effect",
-        "project qualifies a subsequent host profile, this does not "
-        "authorise performance evidence from that profile",
-        "separate Level 3 decision from the owner is necessary",
-        "changes only the host rule and the directly dependent schema for "
-        "internal performance-evidence records",
-        "does not accept Exit 4",
-        "define a value for a performance budget",
-        "admit the rejected 1.1.3 test result",
-        "does not qualify FreeCAD 1.1.2",
-        "version range that includes another release",
-        "changes no product behaviour",
-        "accepted-exit count",
-        "risk disposition",
-        "product output",
-        "product schema",
-        "Exits 1, 4, and 5 stay Pending",
-        "Phase 6 stays at 2/5 accepted exits",
-        "Output stays private-development",
-        "Project status stays unknown",
-        "gives no production, physical-output, project-cleared, packaging, "
-        "release, or tagging authority",
-    ):
-        _require(
-            fragment in performance_host_semantic,
-            "D-GOV-007 authority or exclusion drifted: " + fragment,
-        )
-    performance_direction_record = phase6_by_id["D-GOV-008"]
-    performance_direction_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#phase-6-exit-4-performance-direction-panel"
-    )
-    _require(
-        performance_direction_record["decision"]
-        == (
-            "Accept the Phase 6 Exit 4 comparison baseline and performance "
-            "direction."
-        )
-        and performance_direction_record["evidence"]
-        == performance_direction_panel
-        and performance_direction_record["panel_record"]
-        == performance_direction_panel,
-        "D-GOV-008 decision or panel routing drifted",
-    )
-    performance_direction_semantic = _semantic_text(
-        str(performance_direction_record["authority"])
-        + " "
-        + str(performance_direction_record["exclusions"])
-    )
-    for fragment in (
-        "9169b7e7beec5cf614b8a5284db0f97367728def",
-        "accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline",
-        "f370b029bb4c1ce34987dc025a741185e233df04",
-        "linux-x86_64-flatpak-freecad-1.1.3",
-        "phase6-transition-edit-validate-export-profile-v1",
-        "full Edit, Validate, Export, warm-reuse, correctness, lifecycle, "
-        "output, and cleanup conditions",
-        "selects one performance hypothesis",
-        "preview sampler calculates 33 stations. It does zero-origin "
-        "integration for each interior station",
-        "preview batch function can calculate all preview displacement values "
-        "without that work at each station",
-        "authorised boundary at Level 2 is the preview sampler, one preview "
-        "batch function if necessary",
-        "must preserve all stated railway, preview, canonical-state, "
-        "transaction, "
-        "persistence, exact-validation, export, diagnostic, and cleanup "
-        "invariants",
-        "rule uses 12 paired blocks on the exact 1.1.3 host profile",
-        "Six blocks use the baseline first. Six blocks use the candidate "
-        "first",
-        "paired difference for process CPU time in Edit must be negative in a "
-        "minimum of 10 blocks",
-        "medians of the paired differences for Edit wall time and cold-journey "
-        "CPU and wall time must be negative",
-        "The Level 2 cycle must use the no-displacement rule for Validate, "
-        "Export, cleanup, warm block values, resource metrics, and the journey "
-        "remainder",
-        "median of its paired differences is more than its baseline MAD",
-        "The Level 2 cycle must use the same rule for RSS, RSS change, "
-        "high-water RSS, and high-water RSS change",
-        "It must use the rule in each measured stage and the full journey",
-        "All discrete invariants must have results equal to the baseline "
-        "results",
-        "candidate must add no work to an unmeasured boundary",
-        "process launch, module import, fixture construction, dialog opening, "
-        "document disposal at the end, and other unmeasured setup or teardown",
-        "candidate does all new product work during measured Edit",
-        "product defect, invariant difference, or correctness failure gives "
-        "FAIL and stops the cycle",
-        "replacement is possible only for the failure class "
-        "fixture-or-harness-defect or environment-or-profile-defect",
-        "attempt with this failure must give no measurement for the comparison",
-        "Record the failure class before replacement",
-        "record the sequence before measurements start",
-        "same block and the same recorded sequence",
-        "authorises one performance optimisation at Level 2 for zero-origin "
-        "integration in the preview sampler",
-        "subsequent decision at Level 3 must admit the evidence before owner "
-        "acceptance of Exit 4",
-        "makes no product change",
-        "does not admit the PR #50 baseline or a subsequent result as Exit 4 "
-        "evidence",
-        "does not claim that performance became better",
-        "define a product performance budget",
-        "accept Exit 4",
-        "gives no authority for a new cache",
-        "gives no authority for changes that are not in the specified product "
-        "boundary",
-        "changes no accepted-exit count, risk disposition, compatibility "
-        "authority, product output, product schema, public API, or release "
-        "authority",
-        "Exit 4 stays Pending",
-        "Phase 6 stays at 2/5 accepted exits",
-        "Output stays private-development",
-        "Project status stays unknown",
-        "gives no production, physical-output, project-cleared, packaging, "
-        "release, or tagging authority",
-    ):
-        _require(
-            fragment in performance_direction_semantic,
-            "D-GOV-008 authority or exclusion drifted: " + fragment,
-        )
-    direction_followup_record = phase6_by_id["D-GOV-009"]
-    direction_followup_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#phase-6-exit-4-d-gov-009-panel"
-    )
-    _require(
-        direction_followup_record["decision"]
-        == "Record the D-GOV-008 direction as exhausted and select baseline "
-        "attribution."
-        and direction_followup_record["evidence"] == direction_followup_panel
-        and direction_followup_record["panel_record"]
-        == direction_followup_panel,
-        "D-GOV-009 decision or panel routing drifted",
-    )
-    direction_followup_semantic = _semantic_text(
-        str(direction_followup_record["authority"])
-        + " "
-        + str(direction_followup_record["exclusions"])
-    )
-    for fragment in (
-        "bbc90531813415ca966131351f668256cdca838f",
-        "records D-GOV-009 after D-GOV-008",
-        "D-GOV-008 stays Accepted as the authority",
-        "6e1a0c755d7872fe631332d4d1ce4330febdd81b",
-        "044244345ea65b8a5ed99548be8f2f1f9f34537eddf813dbb7f92f9c4696f936",
-        "Edit CPU was lower in only 9 of 12 paired blocks",
-        "Twenty-two metrics had FAIL results",
-        "length-unbounded fast path did not keep the 1.0e-10 mm "
-        "preview-oracle tolerance in the full product domain",
-        "64c167b424fefe604ada0b66deb435eaa32e924ff09c2265a3f9f9569382874b",
-        "f402ef196ef78f287357f5484b47505a31a2799c3e6b2160053b6ae927d3a110",
-        "73a236a44ce39d4ac8aace714dcac0e4c9f400bf030561718a9c77bf1301ec8b",
-        "All 24 samples had PASS validation results",
-        "Edit CPU was lower in only 5 of 12 paired blocks",
-        "paired median difference was +2.923202 ms",
-        "candidate median was approximately 10.71% higher",
-        "Ten metrics had FAIL results",
-        "The two results are not improvement evidence",
-        "They are not Exit 4 evidence",
-        "sufficient to stop new product work in the D-GOV-008 direction",
-        "Do not make a third preview sampler, polynomial, approximation, "
-        "cache, or other variation of that hypothesis",
-        "Current measurements do not show sufficient cost in a measurement "
-        "area outside the D-GOV-008 preview-sampler boundary",
-        "next action is a bounded Level 1 baseline-attribution "
-        "investigation on the accepted FreeCAD 1.1.3 Edit journey",
-        "canonical-state and state-construction work and preview and sampler "
-        "construction",
-        "Coin binding or scene-graph replacement, GUI processing, and the "
-        "unattributed remainder",
-        "Report a result for each measurement area if the method lets the "
-        "investigation do this",
-        "investigation is attribution only",
-        "subsequent explicit Level 3 owner decision is necessary before a new "
-        "Level 2 optimisation",
-        "does not change D-GOV-008",
-        "does not change the two retained negative results",
-        "does not change a FAIL result into improvement evidence",
-        "does not change a FAIL result into Exit 4 evidence",
-        "gives no authority for a third preview sampler, polynomial, "
-        "approximation, cache, or a different variation of the exhausted "
-        "hypothesis",
-        "gives no authority for a new Level 2 optimisation",
-        "gives no authority for candidate selection after the project knows "
-        "the results",
-        "baseline-attribution investigation must not start in this cycle",
-        "Do not change product source",
-        "Do not make a performance optimisation",
-        "Do not define a product performance budget",
-        "Do not change a performance threshold",
-        "Do not run the first retained comparison again",
-        "Do not run the second retained comparison again",
-        "Do not accept Exit 4",
-        "Phase 6 stays at 2/5 accepted exits",
-        "Exit 4 stays Pending",
-        "Project status stays unknown",
-        "No risk disposition changes",
-        "changes no product source, public API, railway mathematics, "
-        "persistence, export behaviour, qualified host profile, or retained "
-        "evidence",
-        "gives no production authority, physical-output authority, "
-        "project-cleared status, packaging, release, or tagging authority",
-    ):
-        _require(
-            fragment in direction_followup_semantic,
-            "D-GOV-009 authority or exclusion drifted: " + fragment,
-        )
-    host_followup_record = phase6_by_id["D-GOV-010"]
-    host_followup_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#freecad-1-1-3-py31313-qt6111-qualification-panel"
-    )
-    _require(
-        host_followup_record["decision"]
-        == "Qualify the new exact FreeCAD 1.1.3 host profile."
-        and host_followup_record["evidence"] == host_followup_panel
-        and host_followup_record["panel_record"] == host_followup_panel,
-        "D-GOV-010 decision or panel routing drifted",
-    )
-    host_followup_semantic = _semantic_text(
-        str(host_followup_record["authority"])
-        + " "
-        + str(host_followup_record["exclusions"])
-    )
-    for fragment in (
-        "dc750df93682b3b0fd5fdf79fa6fe94296a10697",
-        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
-        "FreeCAD 1.1.3, revision 44987 (Git), Git commit "
-        "145529fe741292ff0b3977a01195bf0247425794",
-        "CPython 3.13.13",
-        "PySide6/Qt 6.11.1",
-        "OpenCASCADE 7.8.1",
-        "SIM Coin 4.0.8",
-        "fa3ef6bebc139083246bd4fb6b8baf6a032a3b5bbb0a57479cb14d52bad733ae",
-        "org.kde.Platform/x86_64/6.11",
-        "records the package identity and the provenance fields in the panel",
-        "qualifies the profile only from its exact_match data",
-        "does not qualify all FreeCAD 1.1.3 hosts",
-        "exact FreeCAD 1.1.1 profile stays qualified",
-        "D-GOV-006 exact FreeCAD 1.1.3 profile stays qualified",
-        "D-GOV-006 and D-GOV-007 do not change",
-        "authorises this profile to supply candidate evidence for performance "
-        "in a subsequent cycle",
-        "Each comparison must use one profile with an exact identity",
-        "For a TrackTemplate before/after comparison, do not use results from "
-        "profiles with different exact identities",
-        "Before the project claims that TrackTemplate performance changed on "
-        "this profile, the D-GOV-009 investigation must record a baseline for "
-        "this profile",
-        "admits no performance result",
-        "defines no performance budget",
-        "does not start baseline attribution",
-        "does not select an optimisation candidate",
-        "does not accept Exit 4",
-        "changes no product source",
-        "changes no public API",
-        "changes no railway mathematics",
-        "changes no persistence or schema",
-        "changes no export behaviour",
-        "changes no qualified-host criterion",
-        "changes no performance threshold",
-        "changes no evidence",
-        "Do not do the first D-GOV-008 comparison again",
-        "Do not do the second D-GOV-008 comparison again",
-        "Do not start the D-GOV-009 baseline-attribution investigation in "
-        "this cycle",
-        "Do not compare results from profiles with different exact identities "
-        "to claim a TrackTemplate improvement",
-        "Phase 6 stays at 2/5 accepted exits",
-        "Exit 4 stays Pending",
-        "Project status stays unknown",
-        "No risk disposition changes",
-        "gives no production authority",
-        "gives no physical-output authority",
-        "gives no project-cleared status",
-        "gives no packaging authority",
-        "gives no release or tagging authority",
-    ):
-        _require(
-            fragment in host_followup_semantic,
-            "D-GOV-010 authority or exclusion drifted: " + fragment,
-        )
-    selection_record = phase6_by_id["D-GOV-011"]
-    selection_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#phase-6-exit-4-d-gov-011-direction-selection-panel"
-    )
-    _require(
-        selection_record["decision"]
-        == "Select one canonical-record performance hypothesis."
-        and selection_record["evidence"] == selection_panel
-        and selection_record["panel_record"] == selection_panel,
-        "D-GOV-011 decision or panel routing drifted",
-    )
-    selection_semantic = _semantic_text(
-        str(selection_record["authority"])
-        + " "
-        + str(selection_record["exclusions"])
-    )
-    for fragment in (
-        "bd0c87a9e1c034e538d1cda5f978d305fa0cfaa2",
-        "retained attribution result in D-GOV-009 as evidence for direction "
-        "selection only",
-        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
-        "77-entry checksum manifest had a PASS result",
-        "2026-08-23-phase6-exit4-attribution-preservation-01",
-        "02525791c17fa5630be57608543b7c0dfa3c7254cc22c623ff79c007e0a94880",
-        "8e47cb21e4aa8fe4ec1706b60d0ec1c665e3a338d626e7d99fd62e105a31ba22",
-        "9928501e6460b68742f441f497be602de10596e33d772a65245efa1ee2549c71",
-        "52f141c5c45a9c5752d93d70aece9943e7b535bfde0804c53fc7b5d2cbad6388",
-        "median for process CPU time in the canonical measurement area is "
-        "3.126380 ms",
-        "first quartile is 2.9690335 ms",
-        "attribution noise floor is 2.895891 ms",
-        "first quartile is only 0.0731425 ms higher than that floor",
-        "not improvement evidence or Exit 4 evidence",
-        "application span for "
-        "tracktemplate/application/transition_edit.py::edit_transition_length_mm",
-        "transaction and property writes in "
-        "tracktemplate/adapters/freecad/transition_state.py",
-        "three reads of all selected-record data before the write",
-        "necessary check after the write reads that record one more time",
-        "Keep one live read of the selected record before the write",
-        "state for the stale-base and stable-identity checks",
-        "During object mapping, use the same state for the selected object",
-        "Keep the scan of other canonical records and the read after the write",
-        "only permitted product file is "
-        "tracktemplate/adapters/freecad/transition_state.py",
-        "do the exact attribution method in D-GOV-009 again on clean protected "
-        "main",
-        "Use the exact D-GOV-010 host",
-        "new baseline series of 10 processes",
-        "new attribution series of 10 processes",
-        "attribution materiality rule in D-GOV-009",
-        "Record the 12-block comparison sequence before product work",
-        "Six blocks must use the baseline first",
-        "Six blocks must use the candidate first",
-        "Process CPU time for Edit must be lower in at least 10 of 12 paired "
-        "blocks",
-        "D-GOV-008 no-displacement rule to Validate, Export, cleanup, warm "
-        "block values, resource metrics, and the journey remainder",
-        "other measurement areas in D-GOV-009",
-        "same test-owned instrumentation in both samples",
-        "add no work to setup, teardown, or a different unmeasured boundary",
-        "preserve canonical state and transaction semantics",
-        "preserve one-unit Undo/Redo",
-        "authorises one subsequent product change at Level 2 in this boundary",
-        "subsequent owner decision at Level 3 is necessary before admission of a "
-        "subsequent result for Exit 4",
-        "does not start the subsequent product change at Level 2",
-        "makes no product change and admits no performance result",
-        "defines no product performance budget and does not accept Exit 4",
-        "Do not select the D-GOV-008 preview-sampler direction again",
-        "Do not change either retained negative result",
-        "Do not do either retained comparison again",
-        "Preserve the D-GOV-009 attribution corpus",
-        "Do not select GUI processing while the TrackTemplate product boundary "
-        "is Unknown",
-        "Do not change the qualified host profile, performance threshold, or "
-        "D-GOV-008 comparison rule",
-        "Phase 6 stays at 2/5 accepted exits",
-        "Exit 4 stays Pending",
-        "Project status stays unknown",
-        "No risk disposition changes",
-        "gives no production authority",
-        "gives no physical-output authority",
-        "gives no project-cleared status",
-        "gives no packaging, release, or tagging authority",
-    ):
-        _require(
-            fragment in selection_semantic,
-            "D-GOV-011 authority or exclusion drifted: " + fragment,
-        )
-    retirement_record = phase6_by_id["D-GOV-012"]
-    retirement_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
-        "#d-gov-012-worktree-sequence-nonconformance"
-    )
-    _require(
-        retirement_record["decision"]
-        == "After worktree retirement, record the sequence nonconformance."
-        and retirement_record["evidence"] == retirement_panel
-        and retirement_record["panel_record"] == retirement_panel
-        and retirement_record["panel_required_under_current_policy"] is True,
-        "D-GOV-012 decision or panel routing drifted",
-    )
-    retirement_semantic = _semantic_text(
-        str(retirement_record["authority"])
-        + " "
-        + str(retirement_record["exclusions"])
-    )
-    for fragment in (
-        "d47518083768d34cf9b41566feaf132ac4562595",
-        "96063e9836748bbc5755db251fa8b66564e65a28",
-        "project owner gave removal authority for the worktree removal",
-        (
-            "project owner also gave removal authority for local branch "
-            "agent/ste100-retrieval-assurance"
-        ),
-        (
-            "project owner gave the branch-removal authority with this condition: "
-            "Git must remove the worktree first"
-        ),
-        "safety/risk panel did not occur before the removals",
-        "decision register did not contain D-GOV-012 before the removals",
-        "project owner recorded the sequence nonconformance",
-        "gives no retrospective authority",
-        "9f3b05d480971d197a57cb00f1811f6c1012f144",
-        "retirement plan contained a local-state type for all 144 local files",
-        "retirement audit examined the retirement plan",
-        "PDF at the source path and the PDF in the worktree had equal bytes",
-        (
-            "Git removed the worktree Git index. A reviewer cannot now examine "
-            "the assume-unchanged or skip-worktree values"
-        ),
-        "reviewer cannot show historical losslessness",
-        "project owner gives project authority for Cycle 2",
-        "This authority is only for an exact candidate and a draft pull request",
-        "keep the worktree retirement procedure and semantic controls",
-        "correct each mandatory finding in canonical prose and evidence",
-        "After validation gives a PASS result, the implementing agent must get new independent reviews",
-        "After all reviewers give ACCEPT, the agent must publish a draft pull request",
-        "agent must not merge the pull request",
-        "agent must not start Cycle 3",
-        "project owner does not claim that the safety/risk panel occurred before removal",
-        "D-GOV-012 gives no retrospective authority",
-        "Phase evidence records the accepted-history containment result",
-        "local-state inventory, local-state types, and preservation audit result",
-        "preservation audit contains the source SHA-256",
-        "gives no removal authority for a different worktree or branch",
-        "Phase 6 stays at 2/5",
-        "Project status stays unknown",
-        "D-GOV-009 and its evidence do not change",
-        "risk dispositions do not change",
-        "gives no project authority for a merge into protected main",
-        "owner gives no project authority for Cycle 3",
-        "physical output, packaging, release, or tagging",
-    ):
-        _require(
-            fragment in retirement_semantic,
-            "D-GOV-012 authority or exclusion drifted: " + fragment,
-        )
     current_records = document["decisions"]
     _require(
         isinstance(current_records, list),
@@ -5576,7 +5080,7 @@ def _validate_current_governance_evidence(current_evidence: str) -> None:
             "61237508b0c1fefedcf740afd230e5e563acab3e, the merge commit for PR "
             "#30. PR #30 is therefore merged, not pending. Draft PR #31 and its "
             "bounded transition-DXF branch remain separate, unaccepted Phase 6 "
-            "implementation; this governance branch was created from accepted "
+            "implementation. This governance branch was created from accepted "
             "main and does not alter, rebase, ready or merge that work. Phase 6 "
             "remains current at 0/5, and this panel admits no new phase-exit evidence."
         ),
@@ -5602,21 +5106,299 @@ def _validate_current_governance_evidence(current_evidence: str) -> None:
             "selection and accountability model."
         ),
         _semantic_text(
-            "Vision supplies direction, not scope. D-GOV-004 continues to own "
-            "literal continuation invocation and its one-cycle Level 1/2 "
-            "execution limit. This decision changes no Phase 6 criterion or exit "
-            "status; implements no shared renderer, ViewProvider, exact-geometry "
-            "expansion, output, persistence or railway calculation; authorises no "
-            "Layout Editor feature; accepts no pull request, migration completion, "
-            "output clearance, package, release or phase exit; and leaves draft "
-            "PR #31 separate and unaccepted."
+            "Vision supplies direction. It does not define a bounded scope or "
+            "give task authority. D-GOV-004 continues to own literal "
+            "continuation invocation and its one-cycle Level 1/2 execution "
+            "limit. This decision changes no Phase 6 criterion or exit status. "
+            "It implements no shared renderer, ViewProvider, exact-geometry "
+            "expansion, output, persistence, or railway calculation. It "
+            "authorises no Layout Editor feature. It accepts no pull request, "
+            "migration completion, output clearance, package, release, or "
+            "phase exit."
         ),
+        _semantic_text("Draft PR #31 remains separate and unaccepted."),
     ]
     _require(
         quoted == expected_quoted,
         "current evidence D-GOV-005 authority block drifted or gained a "
         "competing record",
     )
+
+
+def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
+    """Bind the D-GOV-015 panel to its exact bounded lifecycle."""
+    anchor = '<a id="d-gov-015-simplified-ste-lifecycle"></a>'
+    _require(
+        current_evidence.count(anchor) == 1,
+        "current evidence lost or duplicated the D-GOV-015 panel anchor",
+    )
+    section = _section(
+        current_evidence,
+        "D-GOV-015 simplified STE lifecycle",
+    )
+    owner_view = direct_section_content(
+        section,
+        "Owner view",
+        level=3,
+    )
+    rows = _structured_table_rows(
+        owner_view,
+        ("Field", "Current result"),
+        "D-GOV-015 owner view",
+    )
+    expected_rows = {
+        "Current state": (
+            "The interrupted three-path implementation at recovery checkpoint "
+            "`ac5a7d7ae8c6bf72069b802ebe9e929faf27e789` is bounded "
+            "implementation evidence. Its authorised protected-main baseline is "
+            "`54176f5ae0fea1f72743f856fd9251a53d7e1dbf`. The checkpoint is not "
+            "accepted project state."
+        ),
+        "What changed": (
+            "D-GOV-015 adopts one lifecycle: author → freeze scope → one "
+            "Documentation Review → optional exact reviewed correction once → "
+            "one final deterministic validation → complete or owner stop. The "
+            "existing Issue 9 retrieval and cache remain."
+        ),
+        "What now works": (
+            "Git derives whole-document first review and later "
+            "changed-complete-unit scope. One review returns one of three "
+            "complete verdicts. Exact corrections bind to frozen preimages. "
+            "Durable state records document identities. Final validation binds "
+            "source, scope, receipt, state, and final bytes and detects "
+            "unreviewed mutation."
+        ),
+        "Limitations/findings": (
+            "The tool cannot authenticate a reviewer. Actual role separation "
+            "remains necessary. One-shot ignored evidence requires independent "
+            "preservation. Final validation does not judge linguistic "
+            "conformance. The current backup condition must be proved before "
+            "Documentation Review."
+        ),
+        "Owner decision": (
+            "Accept D-GOV-015. Complete only the bounded lifecycle, canonical "
+            "and skill alignment, Level 3 record, one review, and optional "
+            "exact correction once. Then complete final deterministic "
+            "validation, non-linguistic publication review, and one draft pull "
+            "request if exact-green. Do not merge."
+        ),
+        "Next action": (
+            "Complete fail-closed development validation. Freeze and preserve "
+            "one exact candidate and its scope. Run the one Documentation "
+            "Review. Preserve each resulting review file. Run the one final "
+            "deterministic validation. Get the required non-linguistic "
+            "independent review, and publish one draft pull request only if "
+            "exact-green."
+        ),
+    }
+    _require(
+        set(rows) == set(expected_rows),
+        "D-GOV-015 owner-view fields drifted",
+    )
+    for label, expected in expected_rows.items():
+        _require(
+            rows[label] == [label, _semantic_markdown(expected)],
+            "D-GOV-015 owner-view row drifted: " + label,
+        )
+
+    participants = direct_section_content(
+        section,
+        "Participants and reviewed evidence",
+        level=3,
+    )
+    participant_rows = _structured_table_rows(
+        participants,
+        ("Participant", "Role and independence"),
+        "D-GOV-015 participants",
+    )
+    expected_participants = {
+        "owner:tracktemplate-project-owner": (
+            "Project owner, panel chair, and decision owner. The owner supplied "
+            "the exact lifecycle, baseline, checkpoint, exclusions, completion "
+            "route, draft-pull-request authority, and no-merge limit."
+        ),
+        "agent:openai-codex-primary": (
+            "Change owner and presenter. This agent recovered, corrected, "
+            "aligned, and validated the candidate. It cannot independently "
+            "accept its own implementation or linguistic conformance."
+        ),
+        "agent:aquinas-lifecycle-risk-panel": (
+            "QA/risk reviewer. This delegated reviewer examined the checkpoint, "
+            "current implementation, tests, recovery controls, and alignment "
+            "without mutation or linguistic Documentation Review. The reviewer "
+            "is independent of implementation changes but shares the agent team "
+            "and workspace. It is not an external organisational review."
+        ),
+    }
+    _require(
+        set(participant_rows) == set(expected_participants),
+        "D-GOV-015 panel participants drifted",
+    )
+    for participant, expected in expected_participants.items():
+        _require(
+            participant_rows[participant]
+            == [participant, _semantic_markdown(expected)],
+            "D-GOV-015 participant role drifted: " + participant,
+        )
+    reviewed_evidence = _require_paragraph(
+        participants,
+        (
+            "The panel reviewed the exact protected-main baseline and recovery "
+            "checkpoint, the three-path lookup implementation, lifecycle fixture, "
+            "and empty document-level state. It also reviewed the Engineering "
+            "Policy, validation owner, recovery policy, current risks, source and "
+            "retrieval procedure, and the development-validation results in this "
+            "panel."
+        ),
+        "D-GOV-015 panel lost its linked evidence-reviewed record",
+    )
+    _require_links(
+        reviewed_evidence,
+        (
+            ("lookup implementation", "../../tools/ste100_lookup.py"),
+            ("lifecycle fixture", "../../tests/validate_ste100_retrieval.py"),
+            ("empty document-level state", "../ste-review-state.json"),
+            (
+                "Engineering Policy",
+                "../ENGINEERING_POLICY.md#true-gates-and-safetyrisk-panels",
+            ),
+            (
+                "validation owner",
+                "../VALIDATION.md#validation-of-the-retrieval-contract",
+            ),
+            ("recovery policy", "../RECOVERY_AND_BACKUP.md"),
+            ("current risks", "risks.json"),
+            (
+                "source and retrieval procedure",
+                "../external/asd-ste100/README.md",
+            ),
+        ),
+        "D-GOV-015 panel evidence links drifted",
+    )
+
+    dissent = direct_section_content(
+        section,
+        "Dissent, unknowns, and exceptions",
+        level=3,
+    )
+    _require_paragraph(
+        dissent,
+        (
+            "The QA/risk reviewer recorded no dissent from the bounded "
+            "recommendation. The accepted backup device is not currently "
+            "mounted, so independent preservation for this gate remains unknown. "
+            "The tool also cannot authenticate the declared reviewer identity. "
+            "The same-team and shared-workspace review is an independence "
+            "limitation, not an external organisational review. There is no "
+            "exception to the single-review lifecycle, preservation condition, "
+            "owner-stop rule, Phase 6 limit, or hard exclusions."
+        ),
+        "D-GOV-015 panel lost dissent, unknowns, or exceptions",
+    )
+
+    conditions = direct_section_content(
+        section,
+        "Bounded conditions and accountable owners",
+        level=3,
+    )
+    condition_rows = _structured_table_rows(
+        conditions,
+        ("Condition", "Accountable owner", "Deadline and current result"),
+        "D-GOV-015 bounded conditions",
+    )
+    expected_conditions = {
+        "Harden Git identity and add the fail-closed source, scope, receipt, "
+        "state, correction, and mutation proofs.": (
+            "agent:openai-codex-primary",
+            "Before candidate freeze — completed, focused and full development "
+            "validation must remain green on the exact candidate.",
+        ),
+        "Commit and push the exact candidate.": (
+            "agent:openai-codex-primary",
+            "Before Documentation Review — pending candidate freeze.",
+        ),
+        "Make the accepted independent backup device available.": (
+            "owner:tracktemplate-project-owner",
+            "Before independent scope preservation and Documentation Review — "
+            "pending.",
+        ),
+        "Preserve the frozen scope and then each review result, receipt, and "
+        "accepted-state proposal on the accepted device.": (
+            "agent:openai-codex-primary",
+            "Preserve each review file before its next dependent operation — "
+            "pending.",
+        ),
+        "Return the sole linguistic verdict with actual role separation and all "
+        "exact wording, if applicable.": (
+            "Independent Documentation Reviewer",
+            "Once, after scope preservation and before any correction — pending.",
+        ),
+        "Apply only exact approved corrections once, run one final deterministic "
+        "validation, and return any failure to the owner.": (
+            "agent:openai-codex-primary",
+            "After the sole Documentation Review and before publication review — "
+            "pending.",
+        ),
+    }
+    _require(
+        set(condition_rows) == set(expected_conditions),
+        "D-GOV-015 bounded conditions or accountable ownership drifted",
+    )
+    for condition, (owner, deadline) in expected_conditions.items():
+        _require(
+            condition_rows[condition]
+            == [condition, _semantic_markdown(owner), _semantic_markdown(deadline)],
+            "D-GOV-015 condition owner or deadline drifted: " + condition,
+        )
+
+    panel = _semantic_text(section)
+    for fragment in (
+        "exact 54176f5ae0fea1f72743f856fd9251a53d7e1dbf to "
+        "ac5a7d7ae8c6bf72069b802ebe9e929faf27e789 delta changes only "
+        "tools/ste100_lookup.py, tests/validate_ste100_retrieval.py, and "
+        "reference/ste-review-state.json",
+        "keeps 66 existing functions unchanged",
+        "removes 17 functions for the retired author-worklist design",
+        "adds 44 lifecycle-specific functions",
+        "1,645 additions and 1,205 deletions, for net growth of 440 lines",
+        "No generic workflow state, grants, uses, completions, telemetry, or "
+        "ontology machinery remains",
+        "tracked Python parsing passed for 189 files",
+        "focused ASD-STE100 retrieval validator passed",
+        "CI standalone profile passed all 60 validators",
+        "This evidence preceded alignment and trust-control hardening",
+        "The negative tests prove rejection of self-review, tampered source, "
+        "scope, receipt, state, and final bytes. They also reject invalid "
+        "corrections, a hostile Git environment, fsmonitor, text conversion, "
+        "replacement objects, and unreviewed final mutation",
+        "candidate still requires the preservation conditions before review",
+        "After alignment and trust-control hardening, tracked Python parsing "
+        "passed for 189 files",
+        "governance mutation validator rejected all 328 mutations",
+        "CI standalone profile passed all 60 validators",
+        "No FreeCAD or GUI validation applies",
+        "One independent Documentation Reviewer owns the sole linguistic verdict",
+        "separate final review is non-linguistic",
+        "Proceed with bounded conditions",
+        "Any preservation, reviewer-separation, source, scope, receipt, state, "
+        "semantic, Git-identity, or final-byte failure returns to the owner",
+        "Do not run a second Documentation Review",
+        "On 2026-08-31, owner:tracktemplate-project-owner accepts the exact "
+        "authority and exclusions",
+        "earlier author-side assurance section remains historical evidence of "
+        "the retired route",
+        "Phase 6 stays at 2/5",
+        "Exits 1, 4, and 5 stay Pending",
+        "Project status stays unknown",
+        "No risk disposition changes",
+        "no authority to resume D-GOV-014 or modify aa6c506",
+        "no authority for a second documentation-assurance framework or a "
+        "second Documentation Review",
+    ):
+        _require(
+            _semantic_text(fragment) in panel,
+            "D-GOV-015 evidence panel drifted: " + fragment,
+        )
 
 
 def _validate_product_direction(current_evidence: str) -> None:
@@ -5681,6 +5463,7 @@ def main() -> None:
     )
     _validate_risks(plan)
     _validate_decisions(plan)
+    _validate_ste_lifecycle_panel(current_evidence)
     _validate_product_direction(current_evidence)
     _validate_fixed_paths()
     _validate_ci_workflow()

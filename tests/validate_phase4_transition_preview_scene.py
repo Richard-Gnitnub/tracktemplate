@@ -417,7 +417,10 @@ def _validate_controls():
         / "phase-closeouts"
         / "PHASE4_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
-    assert "| 4 | Canonical state, signatures and persistence | 6/6 evidenced" in plan
+    assert (
+        "| 4 | Canonical state, signatures, and persistence | 6/6 evidenced"
+        in plan
+    )
     assert "## Renderer-neutral transition preview scene" in evidence
     assert "does not select or implement a renderer" in evidence
 
