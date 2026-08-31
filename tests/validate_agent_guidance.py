@@ -242,6 +242,95 @@ def validate_chief_comparative_priority(chief: str, workflows: str) -> None:
     )
 
 
+def validate_open_lead_execution(workflows: str) -> None:
+    """Protect lead accountability without freezing its presentation."""
+    section = semantic_text(
+        direct_section_content(
+            workflows,
+            "Open and accountable lead execution",
+        )
+    ).casefold()
+
+    for field in ("action", "actor", "scope", "authority", "result"):
+        require(
+            re.search(rf"\b{field}\b", section) is not None,
+            "open lead execution lost its " + field + " field",
+        )
+
+    for role in (
+        "chief of staff",
+        "technical lead",
+        "architecture review",
+        "change validation",
+        "quality review",
+        "security review",
+    ):
+        require(
+            role in section,
+            "open lead execution lost the coordinating role: " + role,
+        )
+
+    accountability_patterns = {
+        "delegation authority limit": (
+            r"delegat\w*.{0,40}(?:does not|must not|cannot|never)"
+            r".{0,40}(?:expand|widen|increase).{0,20}authority"
+        ),
+        "finding evidence limit": (
+            r"finding.{0,30}evidence.{0,40}(?:no|not|cannot|never)"
+            r".{0,20}authority"
+        ),
+        "distinct work states": (
+            r"claimed.{0,40}present.{0,40}validated.{0,60}"
+            r"independently accepted.{0,40}(?:distinct|separate)"
+        ),
+        "read-only review limit": (
+            r"read-only reviewer.{0,50}(?:does not|must not|cannot|never)"
+            r".{0,20}mutat"
+        ),
+        "scope-expansion authority": (
+            r"scope expansion.{0,30}(?:requires|needs).{0,30}authority"
+        ),
+    }
+    for label, pattern in accountability_patterns.items():
+        require(
+            re.search(pattern, section) is not None,
+            "open lead execution lost its " + label,
+        )
+
+    for event in (
+        "specialist selection",
+        "mutation authority",
+        "finding classification",
+        "technical route",
+        "validation or review handoff",
+        "candidate freeze",
+        "publication or integration transition",
+        "terminal stop or completion",
+    ):
+        require(
+            event in section,
+            "open lead execution lost its material event: " + event,
+        )
+
+    for boundary in (
+        "transient trace",
+        "owner-facing visibility only",
+        "repository authority",
+        "durable execution ledger",
+        "telemetry",
+        "phase evidence",
+        "execution-state register",
+        "second governance record",
+        "routine searches",
+        "individual test invocations",
+        "low-value worker activity",
+    ):
+        require(
+            boundary in section,
+            "open lead execution lost its transient boundary: " + boundary,
+        )
+
+
 def parse_frontmatter(path: Path, text: str) -> dict[str, str]:
     require(text.startswith("---\n"), f"{path.relative_to(ROOT)} lacks YAML frontmatter")
     parts = text.split("---\n", 2)
@@ -1383,6 +1472,7 @@ def main() -> None:
     validate_ide_workspace_alignment_mutations(ide_skill, continuation)
     validate_continue_invocation_policy(workflows)
     validate_vision_led_workflows(workflows)
+    validate_open_lead_execution(workflows)
     validate_documentation_profile_routing(names, workflows)
     registered_headings = REGISTER_HEADING_RE.findall(workflows)
     registered_paths = REGISTER_PATH_RE.findall(workflows)

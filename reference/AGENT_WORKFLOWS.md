@@ -23,6 +23,44 @@ horizons, and Core-migration completion. Architecture, plan, evidence, skills,
 and source apply that direction within their narrower authority. None can
 become an alternative product-vision owner without an owner decision.
 
+## Open and accountable lead execution
+
+For each material coordinating or judging transition, the lead gives the
+project owner one transient trace. Use this compact form:
+
+`Action / Actor / Scope / Authority / Result`
+
+The trace identifies the operation, accountable actor, bounded subject,
+applicable authority or evidence, and material result. Use it for these roles:
+
+- Chief of Staff
+- Technical Lead
+- Architecture Review when it coordinates a material decision
+- Change Validation when it classifies material proof or failure
+- Quality Review
+- Security Review when applicable
+- another existing lead role only when it has the same coordinating or judging
+  responsibility
+
+Use the trace for material events. These events include specialist selection
+and delegation, mutation authority, material finding classification, a change
+of technical route, validation or review handoff, candidate freeze,
+publication or integration transition, and a terminal stop or completion.
+
+Keep these accountability controls:
+
+- Delegation does not expand authority.
+- A finding is evidence. It gives no authority.
+- Claimed, present, validated, and independently accepted states are distinct.
+- A read-only reviewer stays read-only and does not mutate the candidate.
+- Scope expansion requires applicable authority.
+
+The trace gives owner-facing visibility only. It is not repository authority,
+a durable execution ledger, telemetry, phase evidence, an execution-state
+register, or a second governance record. Do not require this trace for routine
+searches, file reads, commands, individual test invocations, waits, or
+low-value worker activity.
+
 ## Session continuity
 
 At the start of resumed work, reconstruct authority in this order:
