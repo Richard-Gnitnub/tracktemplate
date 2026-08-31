@@ -35,7 +35,11 @@ Use this procedure for each complete logical unit in the frozen review scope:
 21. Compare each evidence claim with its source.
 22. Identify every linguistic or semantic finding.
 23. Resolve all unresolved terminology in the verdict.
-24. Examine the complete frozen logical unit before you give the verdict.
+24. For each blocker, record its exact path, frozen logical-unit identity,
+    finding, and applicable formal Issue 9 rule identifiers.
+25. Make sure that the blocker set contains all blockers. For a `BLOCKED`
+    verdict, make sure that this set is not empty.
+26. Examine the complete frozen logical unit before you give the verdict.
 
 A deterministic pre-check can identify text for review. The STE lookup can
 give source material. The pre-check does not give a result from a conformance

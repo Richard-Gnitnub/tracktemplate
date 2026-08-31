@@ -1969,6 +1969,30 @@ def validate_documentation_lifecycle() -> None:
             path.write_bytes(STE._canonical_json_bytes(value))
             return path
 
+        def write_raw_result(name: str, value: bytes) -> pathlib.Path:
+            path = root / "tmp" / name
+            path.write_bytes(value)
+            return path
+
+        def blocker_for(
+            document: dict[str, object],
+            unit: dict[str, object],
+            *,
+            finding: str,
+            rule_ids: list[str],
+        ) -> dict[str, object]:
+            return {
+                "finding": finding,
+                "path": document["path"],
+                "rule_ids": rule_ids,
+                "unit": {
+                    "end_byte": unit["end_byte"],
+                    "sha256": unit["sha256"],
+                    "side": unit["side"],
+                    "start_byte": unit["start_byte"],
+                },
+            }
+
         candidate_one = commit(root, "first material edit")
         scope_path, scope_one = STE.freeze_documentation_review(
             baseline_revision=baseline,
@@ -1990,15 +2014,105 @@ def validate_documentation_lifecycle() -> None:
             "an untouched legacy document entered the review scope",
         )
         result_one = {
+            "blocker_set_complete": True,
+            "blockers": [],
             "corrections": [],
             "full_applicability_considered": True,
             "independent": True,
             "issue9_source_sha256": EXPECTED_SOURCE_SHA256,
             "result": "ACCEPT",
             "reviewer_id": "fixture-documentation-reviewer",
-            "schema_version": 1,
+            "schema_version": 2,
             "scope_sha256": scope_one["scope_sha256"],
         }
+        result_one_bytes = STE._canonical_json_bytes(result_one)
+        blockers_member = b'  "blockers": [],\n'
+        require(
+            result_one_bytes.count(blockers_member) == 1,
+            "the duplicate-result fixture cannot locate blockers",
+        )
+        duplicate_result_member = result_one_bytes.replace(
+            blockers_member,
+            b'  "blockers": [{}],\n  "blockers": [],\n',
+            1,
+        )
+        expect_ste_error(
+            "ste-lifecycle-record-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_raw_result(
+                    "duplicate-result-member.json",
+                    duplicate_result_member,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        schema_one_result = copy.deepcopy(result_one)
+        schema_one_result.pop("blocker_set_complete")
+        schema_one_result.pop("blockers")
+        schema_one_result["schema_version"] = 1
+        expect_ste_error(
+            "ste-review-result-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "schema-one-result.json",
+                    schema_one_result,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        false_blocker_attestation = copy.deepcopy(result_one)
+        false_blocker_attestation["blocker_set_complete"] = False
+        expect_ste_error(
+            "ste-review-blocker-set-incomplete",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "false-blocker-attestation.json",
+                    false_blocker_attestation,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        missing_blocker_attestation = copy.deepcopy(result_one)
+        missing_blocker_attestation.pop("blocker_set_complete")
+        expect_ste_error(
+            "ste-review-result-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "missing-blocker-attestation.json",
+                    missing_blocker_attestation,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        accept_with_blocker = copy.deepcopy(result_one)
+        accept_with_blocker["blockers"] = [
+            blocker_for(
+                document_one,
+                document_one["units"][0],
+                finding="The accepted result contains a blocker.",
+                rule_ids=["1.1"],
+            )
+        ]
+        expect_ste_error(
+            "ste-review-blockers-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result(
+                    "accept-with-blocker.json",
+                    accept_with_blocker,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
         tampered_scope = copy.deepcopy(scope_one)
         tampered_scope["author_id"] = "tampered-author"
         expect_ste_error(
@@ -2230,6 +2344,8 @@ def validate_documentation_lifecycle() -> None:
         start = candidate_bytes.index(b"bounded fault")
         preimage = "bounded fault"
         result_two = {
+            "blocker_set_complete": True,
+            "blockers": [],
             "corrections": [
                 {
                     "end_byte": start + len(preimage.encode("utf-8")),
@@ -2247,9 +2363,30 @@ def validate_documentation_lifecycle() -> None:
             "issue9_source_sha256": EXPECTED_SOURCE_SHA256,
             "result": "APPROVED_WITH_EXACT_CORRECTIONS",
             "reviewer_id": "fixture-documentation-reviewer",
-            "schema_version": 1,
+            "schema_version": 2,
             "scope_sha256": scope_two["scope_sha256"],
         }
+        approved_with_blocker = copy.deepcopy(result_two)
+        approved_with_blocker["blockers"] = [
+            blocker_for(
+                document_two,
+                document_two["units"][0],
+                finding="The correction result contains a blocker.",
+                rule_ids=["1.1"],
+            )
+        ]
+        expect_ste_error(
+            "ste-review-blockers-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_two_path,
+                result_path=write_result(
+                    "approved-with-blocker.json",
+                    approved_with_blocker,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
         correction_outside_scope = copy.deepcopy(result_two)
         correction_outside_scope["corrections"][0]["path"] = (
             "reference/untouched.md"
@@ -2381,12 +2518,159 @@ def validate_documentation_lifecycle() -> None:
             "canonical JSON scope did not select the complete changed object",
         )
 
+        scope_units = [
+            (document, unit)
+            for document in scope_three["documents"]
+            for unit in document["units"]
+        ]
+        blocker_units: list[tuple[dict[str, object], dict[str, object]]] = []
+        blocker_sides: set[object] = set()
+        for document, unit in scope_units:
+            if unit["side"] not in blocker_sides:
+                blocker_units.append((document, unit))
+                blocker_sides.add(unit["side"])
+        require(
+            blocker_sides == {"baseline", "candidate"},
+            "the BLOCKED fixture does not contain both frozen unit sides",
+        )
+        ordered_blockers = [
+            blocker_for(
+                blocker_units[0][0],
+                blocker_units[0][1],
+                finding="The first frozen logical unit does not conform.",
+                rule_ids=["1.1"],
+            ),
+            blocker_for(
+                blocker_units[1][0],
+                blocker_units[1][1],
+                finding="The second frozen logical unit does not conform.",
+                rule_ids=["1.2"],
+            ),
+        ]
         blocked = copy.deepcopy(result_two)
+        blocked["blockers"] = ordered_blockers
         blocked["result"] = "BLOCKED"
         blocked["corrections"] = []
         blocked["scope_sha256"] = scope_three["scope_sha256"]
-        blocked_path = root / "tmp" / "blocked.json"
-        blocked_path.write_bytes(STE._canonical_json_bytes(blocked))
+
+        blocked_bytes = STE._canonical_json_bytes(blocked)
+        unit_member = b'      "unit": {\n        "end_byte": '
+        require(
+            blocked_bytes.count(unit_member) == len(blocked["blockers"]),
+            "the duplicate-unit fixture cannot locate frozen units",
+        )
+        duplicate_unit_member = blocked_bytes.replace(
+            unit_member,
+            b'      "unit": {\n        "end_byte": 0,\n'
+            b'        "end_byte": ',
+            1,
+        )
+        expect_ste_error(
+            "ste-lifecycle-record-invalid",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_three_path,
+                result_path=write_raw_result(
+                    "duplicate-unit-member.json",
+                    duplicate_unit_member,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+
+        def expect_invalid_blocked(
+            name: str,
+            code: str,
+            value: dict[str, object],
+        ) -> None:
+            expect_ste_error(
+                code,
+                lambda: STE.record_documentation_review(
+                    scope_path=scope_three_path,
+                    result_path=write_result(name, value),
+                    source_manifest=source_manifest,
+                    root=root,
+                ),
+            )
+
+        empty_blocked = copy.deepcopy(blocked)
+        empty_blocked["blockers"] = []
+        expect_invalid_blocked(
+            "empty-blocked.json",
+            "ste-review-blockers-invalid",
+            empty_blocked,
+        )
+        unattested_blocked = copy.deepcopy(blocked)
+        unattested_blocked["blocker_set_complete"] = False
+        expect_invalid_blocked(
+            "unattested-blocked.json",
+            "ste-review-blocker-set-incomplete",
+            unattested_blocked,
+        )
+        malformed_blocker = copy.deepcopy(blocked)
+        malformed_blocker["blockers"] = [{}]
+        expect_invalid_blocked(
+            "malformed-blocker.json",
+            "ste-review-blockers-invalid",
+            malformed_blocker,
+        )
+        blocker_outside_scope = copy.deepcopy(blocked)
+        blocker_outside_scope["blockers"][0]["path"] = (
+            "reference/untouched.md"
+        )
+        expect_invalid_blocked(
+            "blocker-outside-scope.json",
+            "ste-review-blocker-outside-scope",
+            blocker_outside_scope,
+        )
+        tampered_blocker_unit = copy.deepcopy(blocked)
+        tampered_blocker_unit["blockers"][0]["unit"]["sha256"] = "0" * 64
+        expect_invalid_blocked(
+            "tampered-blocker-unit.json",
+            "ste-review-blocker-outside-scope",
+            tampered_blocker_unit,
+        )
+        invalid_blocker_rule = copy.deepcopy(blocked)
+        invalid_blocker_rule["blockers"][0]["rule_ids"] = ["10.1"]
+        expect_invalid_blocked(
+            "invalid-blocker-rule.json",
+            "ste-review-blockers-invalid",
+            invalid_blocker_rule,
+        )
+        unsorted_blocker_rules = copy.deepcopy(blocked)
+        unsorted_blocker_rules["blockers"][0]["rule_ids"] = ["1.2", "1.1"]
+        expect_invalid_blocked(
+            "unsorted-blocker-rules.json",
+            "ste-review-blockers-invalid",
+            unsorted_blocker_rules,
+        )
+        duplicate_blocker_rules = copy.deepcopy(blocked)
+        duplicate_blocker_rules["blockers"][0]["rule_ids"] = ["1.1", "1.1"]
+        expect_invalid_blocked(
+            "duplicate-blocker-rules.json",
+            "ste-review-blockers-invalid",
+            duplicate_blocker_rules,
+        )
+        unordered_blockers = copy.deepcopy(blocked)
+        unordered_blockers["blockers"].reverse()
+        expect_invalid_blocked(
+            "unordered-blockers.json",
+            "ste-review-blockers-invalid",
+            unordered_blockers,
+        )
+        duplicate_blockers = copy.deepcopy(blocked)
+        duplicate_blockers["blockers"] = [
+            copy.deepcopy(ordered_blockers[0]),
+            copy.deepcopy(ordered_blockers[0]),
+        ]
+        expect_invalid_blocked(
+            "duplicate-blockers.json",
+            "ste-review-blockers-invalid",
+            duplicate_blockers,
+        )
+
+        blocked_path = write_result("blocked.json", blocked)
+        blocked_result_bytes = blocked_path.read_bytes()
         _blocked_receipt, blocked_proposal, _blocked_result = (
             STE.record_documentation_review(
                 scope_path=scope_three_path,
@@ -2395,7 +2679,73 @@ def validate_documentation_lifecycle() -> None:
                 root=root,
             )
         )
+        blocked_receipt_value = load_json(_blocked_receipt)
+        receipt_result = {
+            key: blocked_receipt_value[key]
+            for key in blocked
+        }
+        returned_result = {
+            key: _blocked_result[key]
+            for key in blocked
+        }
+        require(
+            _blocked_receipt.read_bytes()
+            == STE._canonical_json_bytes(_blocked_result)
+            and STE._canonical_json_bytes(returned_result)
+            == blocked_result_bytes
+            and STE._canonical_json_bytes(receipt_result) == blocked_result_bytes,
+            "the BLOCKED receipt did not preserve the complete result value",
+        )
         require(blocked_proposal is None, "BLOCKED created an accepted state proposal")
+        schema_one_receipt = copy.deepcopy(blocked_receipt_value)
+        schema_one_receipt.pop("blocker_set_complete")
+        schema_one_receipt.pop("blockers")
+        schema_one_receipt["schema_version"] = 1
+        expect_ste_error(
+            "ste-review-receipt-invalid",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_three_path,
+                receipt_path=write_result(
+                    "schema-one-blocked-receipt.json",
+                    schema_one_receipt,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        changed_blocked_receipt = copy.deepcopy(blocked_receipt_value)
+        changed_blocked_receipt["blockers"][0]["finding"] = (
+            "A changed finding that is otherwise valid."
+        )
+        changed_receipt_dir = root / "tmp" / "changed-receipt"
+        changed_receipt_dir.mkdir()
+        changed_receipt_path = changed_receipt_dir / _blocked_receipt.name
+        changed_receipt_path.write_bytes(
+            STE._canonical_json_bytes(changed_blocked_receipt)
+        )
+        expect_ste_error(
+            "ste-review-receipt-invalid",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_three_path,
+                receipt_path=changed_receipt_path,
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
+        tampered_blocked_receipt = copy.deepcopy(blocked_receipt_value)
+        tampered_blocked_receipt["blockers"] = []
+        expect_ste_error(
+            "ste-review-blockers-invalid",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_three_path,
+                receipt_path=write_result(
+                    "tampered-blocked-receipt.json",
+                    tampered_blocked_receipt,
+                ),
+                source_manifest=source_manifest,
+                root=root,
+            ),
+        )
         expect_ste_error(
             "ste-review-blocked",
             lambda: STE.validate_final_review_state(

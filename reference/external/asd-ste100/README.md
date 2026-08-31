@@ -181,7 +181,23 @@ Give that frozen scope to one independent Documentation Reviewer. The reviewer
 must use the official source and return one complete `ACCEPT`,
 `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` result. For
 `APPROVED_WITH_EXACT_CORRECTIONS`, the result must contain all exact replacement
-wording. Record the result with:
+wording.
+
+Use schema 2 for each new review-result file. Set `blocker_set_complete` to
+`true` and use `blockers` to record the complete blocker set. Use an empty list
+for `ACCEPT` and `APPROVED_WITH_EXACT_CORRECTIONS`. A `BLOCKED` result must
+contain at least one blocker. Each blocker records `finding`, the exact `path`,
+the sorted unique formal Issue 9 `rule_ids`, and `unit`. The `unit` object uses
+the exact `side`, `start_byte`, `end_byte`, and `sha256` values from the frozen
+scope.
+
+The command verifies each blocker against the frozen scope and the applicable
+Git content. It preserves the complete blocker set in the review receipt. It
+rejects a `BLOCKED` result that contains no blocker. The frozen-scope and
+accepted-state schemas do not change. Preserved schema 1 results and receipts
+remain immutable historical evidence; do not migrate them to schema 2.
+
+Record the result with:
 
 ```bash
 .venv/bin/python tools/ste100_lookup.py record-review SCOPE RESULT

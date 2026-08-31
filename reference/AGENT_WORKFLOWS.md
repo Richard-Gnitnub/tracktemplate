@@ -148,7 +148,9 @@ For canonical prose in the conformance scope, use this route:
 5. Derive the review scope from the last accepted document identity and Git.
 6. Give the frozen complete scope to one independent Documentation Reviewer.
 7. Record one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`
-   verdict.
+   verdict. A `BLOCKED` verdict must record a nonempty complete blocker set.
+   Bind each finding to its exact path, frozen logical-unit identity, and formal
+   Issue 9 rule identifiers.
 8. For `APPROVED_WITH_EXACT_CORRECTIONS`, apply all exact replacement wording
    once against verified preimages. Do not invent other prose.
 9. Run one final deterministic validation after the review or correction.

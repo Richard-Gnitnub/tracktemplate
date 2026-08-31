@@ -77,6 +77,12 @@ wording in this review. Identify each replacement by its path, byte range, and
 frozen preimage. Do not defer wording to another reviewer or a later review.
 Do not run a second Documentation Review.
 
+For `BLOCKED`, give the complete blocker set in this review. The set must
+contain at least one blocker. For each blocker, give the finding, exact path,
+all applicable formal Issue 9 rule identifiers, and the scope side, bounds,
+and SHA-256 of the frozen logical unit. Confirm that the blocker set is
+complete. Do not give a `BLOCKED` verdict with an empty blocker set.
+
 The STE lookup validates source, candidate, scope, receipt, accepted-state, and
 final-content identity. It validates exact reviewed corrections against frozen
 preimages and derives the expected final bytes. The implementing agent applies

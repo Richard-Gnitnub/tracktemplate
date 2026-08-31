@@ -1142,6 +1142,19 @@ def validate_issue9_documentation_lifecycle(
             "returns the change to the owner",
         ),
         (
+            "each schema 2 result must record the complete blocker set",
+            "accept and approved_with_exact_corrections require an empty "
+            "blocker set",
+            "blocked requires a nonempty blocker set",
+            "exact path",
+            "frozen logical-unit identity",
+            "finding",
+            "formal issue 9 rule identifiers",
+            "review receipt must preserve that complete blocker set",
+            "exact candidate and scope bindings",
+            "blocked result without a recorded blocker is invalid",
+        ),
+        (
             "source, candidate, scope, receipt, accepted-state, and "
             "final-content identity",
             "no unreviewed mutation occurred",
@@ -1187,6 +1200,15 @@ def validate_issue9_documentation_lifecycle(
             "do not run a second documentation review",
         ),
         (
+            "complete blocker set in this review",
+            "at least one blocker",
+            "finding, exact path",
+            "applicable formal issue 9 rule identifiers",
+            "scope side, bounds, and sha-256 of the frozen logical unit",
+            "confirm that the blocker set is complete",
+            "empty blocker set",
+        ),
+        (
             "validates exact reviewed corrections against frozen preimages",
             "implementing agent applies those corrections once",
             "does not examine prose for conformance",
@@ -1217,6 +1239,18 @@ def validate_issue9_documentation_lifecycle(
         ("all other applicable issue 9 requirements",),
         ("evidence claim", "source"),
         ("resolve all unresolved terminology",),
+        (
+            "for each blocker",
+            "exact path",
+            "frozen logical-unit identity",
+            "finding",
+            "applicable formal issue 9 rule identifiers",
+        ),
+        (
+            "blocker set contains all blockers",
+            "blocked verdict",
+            "set is not empty",
+        ),
         ("complete logical unit",),
     )
     for concepts in required_checklist_concepts:
@@ -1244,6 +1278,11 @@ def validate_issue9_documentation_lifecycle(
         "accept",
         "approved_with_exact_corrections",
         "blocked",
+        "blocked verdict must record a nonempty complete blocker set",
+        "bind each finding",
+        "exact path",
+        "frozen logical-unit identity",
+        "formal issue 9 rule identifiers",
         "apply all exact replacement wording once against verified preimages",
         "do not invent other prose",
         "run one final deterministic validation",

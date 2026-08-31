@@ -3433,6 +3433,34 @@ generic repair authority, grants, uses, completions, telemetry, ontology work,
 Cycle 3, a second documentation-assurance framework, or a second Documentation
 Review.
 
+### BLOCKED result evidence-contract correction
+
+The preserved candidate `19a8942d11b9c31703c5525ccbf047aacfbc8492` has one
+authoritative `BLOCKED` review result. The result has SHA-256
+`18a23e6a3ea398d1b0b3857f4237ffb8b3c7d4c49ddf3aea72dfd76db5a94ccc`.
+It contains no blocker record and cannot supply authoring input. The candidate,
+scope, result, receipt, and their independent copies remain unchanged.
+
+This Level 2 correction requires schema 2 for each new review result and
+receipt. Each result confirms that its blocker set is complete. A `BLOCKED`
+result records at least one blocker. Each blocker identifies its finding,
+formal Issue 9 rules, exact path, and frozen logical unit. The scope and
+review-state schemas stay at version 1. The change adds no persistent
+logical-unit workflow state and no second review mechanism.
+
+Four changed Python files passed parsing. The focused lifecycle fixture and
+the complete STE retrieval validator passed. The verified local source rebuilt
+and validated the derived cache. The agent-guidance validator passed. The
+governance validator rejected all 333 semantic mutations. The standalone
+regression profile passed both steps with their required sentinels. No FreeCAD
+or GUI validation applies to this evidence-contract correction.
+
+Automatic validation proves that the blocker list is nonempty, complete by
+reviewer attestation, bound to the frozen scope, and preserved in the receipt.
+It cannot prove that a reviewer reported a finding that the reviewer omitted.
+No prose repair starts from the deficient schema-1 result. D-GOV-015, all risk
+dispositions, Phase 6 at 2/5, and project status `unknown` do not change.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition

@@ -48,6 +48,7 @@ MAX_RECEIPT_BYTES = 512 * 1024
 MAX_RECEIPT_ITEMS = 50
 MAX_LIFECYCLE_DOCUMENTS = 64
 MAX_LIFECYCLE_UNITS = 512
+MAX_LIFECYCLE_BLOCKERS = 4096
 MAX_LIFECYCLE_BYTES = 4 * 1024 * 1024
 MAX_LIFECYCLE_GIT_OUTPUT_BYTES = 4 * 1024 * 1024
 STE_REVIEW_RESULTS = {
@@ -3407,6 +3408,20 @@ def _read_lifecycle_json(
     *,
     root: pathlib.Path,
 ) -> dict[str, object]:
+    def reject_duplicate_members(
+        pairs: list[tuple[str, object]],
+    ) -> dict[str, object]:
+        value: dict[str, object] = {}
+        for key, item in pairs:
+            if key in value:
+                raise Ste100Error(
+                    "ste-lifecycle-record-invalid",
+                    "The {} contains a duplicate JSON member.".format(subject),
+                    "Restore one unambiguous lifecycle record.",
+                )
+            value[key] = item
+        return value
+
     resolved = _lifecycle_tmp_path(path, subject, root=root)
     try:
         payload = resolved.read_bytes()
@@ -3416,8 +3431,11 @@ def _read_lifecycle_json(
                 "The {} exceeds its byte limit.".format(subject),
                 "Use one bounded lifecycle record.",
             )
-        value = json.loads(payload.decode("utf-8"))
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        value = json.loads(
+            payload.decode("utf-8"),
+            object_pairs_hook=reject_duplicate_members,
+        )
+    except (OSError, UnicodeDecodeError, ValueError, RecursionError) as error:
         raise Ste100Error(
             "ste-lifecycle-record-invalid",
             "The {} is not readable UTF-8 JSON.".format(subject),
@@ -3589,6 +3607,165 @@ def _candidate_unit_contains(
     )
 
 
+def _validate_review_blockers(
+    value: object,
+    *,
+    result: str,
+    scope: dict[str, object],
+) -> list[dict[str, object]]:
+    if not isinstance(value, list) or len(value) > MAX_LIFECYCLE_BLOCKERS:
+        raise Ste100Error(
+            "ste-review-blockers-invalid",
+            "The Documentation Review blocker list is invalid or too large.",
+            "Return one bounded complete blocker list in the same review.",
+        )
+    if result == "BLOCKED" and not value:
+        raise Ste100Error(
+            "ste-review-blockers-invalid",
+            "The BLOCKED Documentation Review result has no recorded blocker.",
+            "Record the complete blocker set in the same review.",
+        )
+    if result != "BLOCKED" and value:
+        raise Ste100Error(
+            "ste-review-blockers-invalid",
+            "A non-BLOCKED Documentation Review result contains blockers.",
+            "Use an empty blocker list for ACCEPT or APPROVED_WITH_EXACT_CORRECTIONS.",
+        )
+    documents = scope["documents"]
+    assert isinstance(documents, list)
+    frozen_units: dict[
+        tuple[str, str, int, int, str], tuple[int, int]
+    ] = {}
+    for document_position, document in enumerate(documents):
+        assert isinstance(document, dict)
+        path_text = str(document["path"])
+        units = document["units"]
+        assert isinstance(units, list)
+        for unit_position, unit in enumerate(units):
+            assert isinstance(unit, dict)
+            frozen_units[(
+                path_text,
+                str(unit["side"]),
+                int(unit["start_byte"]),
+                int(unit["end_byte"]),
+                str(unit["sha256"]),
+            )] = (
+                document_position,
+                unit_position,
+            )
+    rule_order = {
+        identifier: position
+        for position, identifier in enumerate(
+            sorted(
+                expected_rule_ids(),
+                key=lambda identifier: tuple(
+                    int(part) for part in identifier.split(".")
+                ),
+            )
+        )
+    }
+    validated: list[dict[str, object]] = []
+    previous_key: tuple[int, int, tuple[int, ...], str] | None = None
+    for blocker in value:
+        if not isinstance(blocker, dict) or set(blocker) != {
+            "finding",
+            "path",
+            "rule_ids",
+            "unit",
+        }:
+            raise Ste100Error(
+                "ste-review-blockers-invalid",
+                "One Documentation Review blocker has an invalid structure.",
+                "Record the finding, path, formal rule identifiers, and frozen unit.",
+            )
+        path_text = _lifecycle_path(blocker["path"], "blocker path")
+        finding = _lifecycle_text(blocker["finding"], "blocker finding")
+        unit = blocker["unit"]
+        if not isinstance(unit, dict) or set(unit) != {
+            "end_byte",
+            "sha256",
+            "side",
+            "start_byte",
+        }:
+            raise Ste100Error(
+                "ste-review-blockers-invalid",
+                "One Documentation Review blocker has an invalid unit identity.",
+                "Use the exact frozen logical-unit identity from the review scope.",
+            )
+        side = unit["side"]
+        start = unit["start_byte"]
+        end = unit["end_byte"]
+        if (
+            not isinstance(side, str)
+            or side not in {"baseline", "candidate"}
+            or isinstance(start, bool)
+            or isinstance(end, bool)
+            or not isinstance(start, int)
+            or not isinstance(end, int)
+            or start < 0
+            or end <= start
+        ):
+            raise Ste100Error(
+                "ste-review-blockers-invalid",
+                "One Documentation Review blocker has an invalid unit identity.",
+                "Use the exact frozen logical-unit identity from the review scope.",
+            )
+        digest = _lifecycle_sha256(unit["sha256"], "blocker unit SHA-256")
+        frozen_position = frozen_units.get(
+            (path_text, side, start, end, digest)
+        )
+        if frozen_position is None:
+            raise Ste100Error(
+                "ste-review-blocker-outside-scope",
+                "One Documentation Review blocker does not identify a frozen logical unit.",
+                "Return to the project owner; do not change the frozen review scope.",
+            )
+        rule_ids = blocker["rule_ids"]
+        if (
+            not isinstance(rule_ids, list)
+            or not rule_ids
+            or any(
+                not isinstance(identifier, str) or identifier not in rule_order
+                for identifier in rule_ids
+            )
+            or len(set(rule_ids)) != len(rule_ids)
+            or rule_ids
+            != sorted(rule_ids, key=lambda identifier: rule_order[identifier])
+        ):
+            raise Ste100Error(
+                "ste-review-blockers-invalid",
+                "One Documentation Review blocker has invalid formal rule identifiers.",
+                "Use unique formal Issue 9 rule identifiers in numeric order.",
+            )
+        order_key = (
+            frozen_position[0],
+            frozen_position[1],
+            tuple(rule_order[identifier] for identifier in rule_ids),
+            finding,
+        )
+        if previous_key is not None and order_key <= previous_key:
+            raise Ste100Error(
+                "ste-review-blockers-invalid",
+                "The Documentation Review blockers are duplicated or out of order.",
+                "Sort unique blockers by frozen unit, formal rule identifiers, and finding.",
+            )
+        previous_key = order_key
+        validated.append(
+            {
+                "finding": finding,
+                "path": path_text,
+                "rule_ids": list(rule_ids),
+                "unit": {
+                    "end_byte": end,
+                    "sha256": digest,
+                    "side": side,
+                    "start_byte": start,
+                },
+            }
+        )
+    return validated
+
+
 def _validate_review_result(
     value: object,
     *,
@@ -3596,6 +3773,8 @@ def _validate_review_result(
     root: pathlib.Path,
 ) -> dict[str, object]:
     required = {
+        "blocker_set_complete",
+        "blockers",
         "corrections",
         "full_applicability_considered",
         "independent",
@@ -3609,13 +3788,13 @@ def _validate_review_result(
         raise Ste100Error(
             "ste-review-result-invalid",
             "The Documentation Review result has an invalid structure.",
-            "Return exactly one schema-1 result for the complete frozen scope.",
+            "Return exactly one schema-2 result for the complete frozen scope.",
         )
-    if value["schema_version"] != 1:
+    if value["schema_version"] != 2:
         raise Ste100Error(
             "ste-review-result-invalid",
             "The Documentation Review result has an unsupported schema.",
-            "Use schema version 1.",
+            "Use schema version 2.",
         )
     if value["scope_sha256"] != scope["scope_sha256"]:
         raise Ste100Error(
@@ -3653,12 +3832,21 @@ def _validate_review_result(
             "Use one independent Documentation Reviewer.",
         )
     result = value["result"]
-    if result not in STE_REVIEW_RESULTS:
+    if not isinstance(result, str) or result not in STE_REVIEW_RESULTS:
         raise Ste100Error(
             "ste-review-result-invalid",
             "The Documentation Review result value is invalid.",
             "Use ACCEPT, APPROVED_WITH_EXACT_CORRECTIONS, or BLOCKED.",
         )
+    if value["blocker_set_complete"] is not True:
+        raise Ste100Error(
+            "ste-review-blocker-set-incomplete",
+            "The Documentation Review does not attest a complete blocker set.",
+            "Record all blockers from the completed review in the same result.",
+        )
+    blockers = _validate_review_blockers(
+        value["blockers"], result=str(result), scope=scope
+    )
     corrections = value["corrections"]
     if not isinstance(corrections, list) or len(corrections) > MAX_LIFECYCLE_UNITS:
         raise Ste100Error(
@@ -3792,13 +3980,15 @@ def _validate_review_result(
             }
         )
     return {
+        "blocker_set_complete": True,
+        "blockers": blockers,
         "corrections": validated,
         "full_applicability_considered": True,
         "independent": True,
         "issue9_source_sha256": str(value["issue9_source_sha256"]),
         "result": str(result),
         "reviewer_id": reviewer_id,
-        "schema_version": 1,
+        "schema_version": 2,
         "scope_sha256": str(value["scope_sha256"]),
     }
 
@@ -3957,6 +4147,8 @@ def _validated_review_receipt(
         path, "Documentation Review receipt", root=root
     )
     result_keys = {
+        "blocker_set_complete",
+        "blockers",
         "corrections",
         "full_applicability_considered",
         "independent",
@@ -3986,7 +4178,14 @@ def _validated_review_receipt(
             "The Documentation Review receipt does not match the validated result.",
             "Use the exact content-addressed receipt from record-review.",
         )
-    return receipt, _sha256_bytes(_canonical_json_bytes(receipt))
+    receipt_digest = _sha256_bytes(_canonical_json_bytes(receipt))
+    if path.name != "review-{}.json".format(receipt_digest):
+        raise Ste100Error(
+            "ste-review-receipt-invalid",
+            "The Documentation Review receipt path does not match its content.",
+            "Use the exact content-addressed receipt from record-review.",
+        )
+    return receipt, receipt_digest
 
 
 def validate_final_review_state(

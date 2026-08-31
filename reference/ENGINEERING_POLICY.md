@@ -201,6 +201,14 @@ preimages. Do not add or change other prose. Do not run a second Documentation
 Review. A `BLOCKED` verdict produces no accepted-state proposal and returns the
 change to the owner.
 
+Each schema 2 result must record the complete blocker set and must confirm that
+the set is complete. `ACCEPT` and `APPROVED_WITH_EXACT_CORRECTIONS` require an
+empty blocker set. `BLOCKED` requires a nonempty blocker set. Each blocker must
+identify its exact path, frozen logical-unit identity, finding, and applicable
+formal Issue 9 rule identifiers. The review receipt must preserve that complete
+blocker set and its exact candidate and scope bindings. A `BLOCKED` result
+without a recorded blocker is invalid.
+
 After the review or the approved correction, run one final deterministic
 validation. It proves source, candidate, scope, receipt, accepted-state, and
 final-content identity. It also proves that no unreviewed mutation occurred.

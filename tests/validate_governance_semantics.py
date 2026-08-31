@@ -3083,6 +3083,19 @@ def validate_documentation_profile_mutations() -> None:
             "Resolve some unresolved terminology",
             "resolve all unresolved terminology",
         ),
+        (
+            "tt-doc/documentation-review-blocker-binding-removed",
+            "For each blocker, record its exact path, frozen logical-unit identity,",
+            "For each blocker, record a short note,",
+            "for each blocker / exact path / frozen logical-unit identity / "
+            "finding / applicable formal issue 9 rule identifiers",
+        ),
+        (
+            "tt-doc/documentation-review-empty-blocker-set-authorised",
+            "For a `BLOCKED`\n    verdict, make sure that this set is not empty.",
+            "For a `BLOCKED`\n    verdict, an empty set is sufficient.",
+            "blocker set contains all blockers / blocked verdict / set is not empty",
+        ),
     )
     for name, old, new, expected_concepts in documentation_review_cases:
         if old not in writing_checklist:
@@ -3131,6 +3144,14 @@ def validate_documentation_profile_mutations() -> None:
             "replacement wording in the same review",
         ),
         (
+            "tt-doc/lifecycle-empty-blocked-result-authorised",
+            "policy",
+            "A `BLOCKED` result\nwithout a recorded blocker is invalid.",
+            "A `BLOCKED` result without a recorded blocker is valid.",
+            "documentation policy lost simplified lifecycle control: each schema "
+            "2 result must record the complete blocker set",
+        ),
+        (
             "tt-doc/lifecycle-final-validation-made-linguistic",
             "policy",
             "It does not judge linguistic conformance.",
@@ -3172,6 +3193,14 @@ def validate_documentation_profile_mutations() -> None:
             "replacement wording in this review",
         ),
         (
+            "tt-doc/lifecycle-blocker-set-made-partial",
+            "skill",
+            "For `BLOCKED`, give the complete blocker set in this review.",
+            "For `BLOCKED`, give a sample of the blocker set.",
+            "documentation review lost simplified lifecycle control: complete "
+            "blocker set in this review",
+        ),
+        (
             "tt-doc/lifecycle-invented-prose-authorised",
             "workflow",
             "Do not invent other prose.",
@@ -3183,6 +3212,13 @@ def validate_documentation_profile_mutations() -> None:
             "workflow",
             "Otherwise, stop for the owner.",
             "Otherwise, start another Documentation Review.",
+            "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
+        ),
+        (
+            "tt-doc/lifecycle-empty-blocker-workflow-authorised",
+            "workflow",
+            "A `BLOCKED` verdict must record a nonempty complete blocker set.",
+            "A `BLOCKED` verdict can record an empty blocker set.",
             "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
         ),
     )

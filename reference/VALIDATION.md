@@ -978,6 +978,15 @@ For each material change to canonical prose, validate the authorised lifecycle:
    that review and is applied once against verified preimages.
 5. One final deterministic validation runs after the review or correction.
 
+Each new review result must use schema 2. It must record the complete blocker
+set and confirm that the set is complete. `ACCEPT` and
+`APPROVED_WITH_EXACT_CORRECTIONS` must have an empty blocker set. `BLOCKED` must
+have a nonempty blocker set. Each blocker must bind its exact path, frozen
+logical-unit identity, finding, and formal Issue 9 rule identifiers to the
+frozen scope. The receipt must preserve the complete set and its exact candidate
+and scope bindings. Validation must reject a `BLOCKED` result with no recorded
+blocker.
+
 The Documentation Review is the only linguistic conformance review. Do not run
 a second Documentation Review. The final validation does not judge prose. It
 must validate the official source identity, frozen candidate, Git-derived
@@ -999,8 +1008,12 @@ deterministic pre-check must not claim or change linguistic conformance.
 `tests/validate_ste100_retrieval.py` must prove whole-document first review,
 untouched legacy exclusion, later changed-unit scope, document-level durable
 state, all three verdict routes, exact correction preimages, and final identity
-binding. A `BLOCKED` result must produce no accepted-state proposal. The final
-validator must reject source, scope, receipt, state, identity, or mutation
+binding. It must prove empty blocker sets for the two non-blocking verdicts. It
+must also prove a nonempty complete blocker set for `BLOCKED`, exact finding and
+frozen-unit binding, formal rule identifiers, and receipt preservation.
+A `BLOCKED` result must produce no accepted-state proposal. The validator must
+reject a missing, incomplete, empty, out-of-scope, or changed blocker set. The
+final validator must reject source, scope, receipt, state, identity, or mutation
 drift. A remaining linguistic, semantic, identity, or scope failure returns to
 the owner.
 
