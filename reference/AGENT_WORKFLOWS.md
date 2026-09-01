@@ -4,91 +4,109 @@ Status: **repository guidance. It owns only agent-skill structure and maintenanc
 
 ## Purpose
 
-This document separates five different kinds of project control:
+This document gives rules for the structure of a skill. It also gives rules to
+change that structure.
 
-| Layer | Owns | Must not own |
-| --- | --- | --- |
-| `AGENTS.md` | Short, always-on, repository-wide invariants and routing | Detailed repository history, long command catalogues, live progress, or task-specific procedure |
-| Canonical `reference/` documents | The applicable project requirement set, architecture, policy, and evidence interpretation in each named domain | Agent-product implementation details that do not change project policy |
-| `.agents/skills/*/SKILL.md` | Repeatable, task-specific workflows and review methods | Project authority, the accepted requirement set, phase status, or automatic acceptance |
-| Tests and scripts | Deterministic checks and safe automation | Subjective project decisions or unreviewed file rewriting |
-| Git history and diffs | Source-state and change evidence | The applicable requirement set, rationale, acceptance, or current project status |
+Project control comes from five items:
 
-Skills complement `AGENTS.md`. They do not replace it. A skill can link to a
-canonical document. It must not copy enough of that document to become a
-second policy owner.
+- `AGENTS.md`
+- A canonical document
+- A skill
+- A test or tool
+- A Git commit or diff.
 
-[`PRODUCT_VISION.md`](PRODUCT_VISION.md) owns product purpose, programme
-horizons, and Core-migration completion. Architecture, plan, evidence, skills,
-and source apply that direction within their narrower authority. None can
-become an alternative product-vision owner without an owner decision.
+`AGENTS.md` gives short rules for all repository work. It also gives routing.
+It does not give repository history, long command lists, current status, or a
+procedure for one task.
 
-## Workflow result for the project owner
+A canonical document owns a specified project item. It contains source
+information only when that information is necessary for the item.
 
-Use this exact workflow form:
+A skill gives a method that an agent can use again for one task. It does not
+give project authority. It does not own the requirement set, current phase,
+project status, or acceptance.
+
+A test or tool does a specified check or safe operation. It does not make a
+project decision. It must not change canonical prose without a review.
+
+A Git commit or diff gives implementation evidence. It does not own a
+requirement set, a reason, acceptance, or current project status.
+
+A skill can use a canonical link. It must not copy a canonical policy into the
+skill.
+
+[`PRODUCT_VISION.md`](PRODUCT_VISION.md) owns product purpose. It owns the
+condition to complete TrackTemplate Core. It also owns the later Layout Editor
+programme. Each other canonical document uses this information only in its
+authority boundary. It must not become a competing owner for this information
+without an owner decision.
+
+## Result for the project owner
+
+Use these exact names:
 
 `Action / Actor / Scope / Authority / Result`
 
-Keep these five names. A named workflow uses the form to give an important
-result to the project owner.
+After an operation in this section, a named workflow uses the five names to
+give its result to the project owner.
 
-Each workflow in this list uses the form:
+These names apply:
 
-- `Chief of Staff`.
-- `Technical Lead`.
-- `Architecture Review`, when it gives information for a decision that
-  connects more than one task.
-- `Change Validation`, when it gives a failure classification or a validation
-  result.
-- `Quality Review`.
-- `Security Review`, when the bounded task needs it.
-- An existing workflow with the same workflow responsibility.
+- `Chief of Staff`
+- `Technical Lead`
+- `Architecture Review`
+- `Change Validation`
+- `Quality Review`
+- `Security Review`.
 
-Use the form when a named workflow does one operation in this list:
+A workflow responsibility is one operation in this list. A named workflow with
+a specified workflow responsibility also uses the five names.
 
-- Select a specialist and give the bounded task to that specialist.
+- Select an agent for a specified skill.
+- Give the bounded task to the selected agent.
 - Authorize a change to a file.
-- Give a disposition to a finding that can change the task.
-- Change the route for the task.
+- Give a disposition to a finding that has an effect on the method, bounded
+  scope, validation, or review.
+- Change the method for the task.
 - Give an exact candidate and its PASS validation result to a reviewer.
 - Freeze an exact candidate.
-- Publish a branch, or start a merge operation.
-- Stop or complete the bounded task.
+- Publish a branch.
+- Start a merge operation.
+- Stop the bounded task.
+- Give a complete result for the bounded task.
 
 Use these governance controls:
 
-- When a workflow gives a task to a different agent, the agent gets no
-  additional project authority.
+- When a workflow gives a bounded task to an agent, project authority does not
+  increase.
 - A finding is evidence. It gives no project authority.
-- The following states are different:
-  - An agent claims the work.
-  - The work is in the repository.
-  - A validation tool gives a PASS result.
-  - The work has acceptance from an independent reviewer.
+- When an agent claims a change, that operation does not show that the file
+  contains the change.
+- When a file contains the change, that fact does not give a PASS validation
+  result.
+- When a validation tool gives a PASS result, that result does not give
+  acceptance from an independent reviewer.
 - A `read-only` reviewer does not change the candidate.
-- Do not increase the bounded scope without applicable project authority.
+- Before the bounded scope increases, the project owner must authorize the
+  increase.
 
-This information is only for the project owner during the bounded task. Do not
-keep the information after the task.
+During the bounded task, show this information only to the project owner.
+After the bounded task, do not keep the information.
 
 Do not use the information as:
 
-- Project authority.
-- Phase evidence.
-- Software measurement data.
-- A permanent record.
-- A record of task state.
-- A second governance record.
+- project authority
+- phase evidence
+- software measurement data
+- a permanent record
+- a record of task state
+- a second governance record.
 
-Do not use the form for these operations:
-
-- Search for information without a change to the bounded task.
-- Read a file.
-- Run a command.
-- Run one test command.
-- Wait.
-- Do an agent operation that does not change the bounded task or give a
-  finding.
+When an agent finds information, do not use the five names. When an agent reads
+a file, do not use the five names. When an agent runs a command, do not use the
+five names. When an agent runs one test command, do not use the five names.
+When an agent waits, do not use the five names. When an agent operation gives
+no finding and does not change the bounded task, do not use the five names.
 
 ## Session continuity
 

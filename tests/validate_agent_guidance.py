@@ -244,12 +244,17 @@ def validate_chief_comparative_priority(chief: str, workflows: str) -> None:
 
 def validate_open_lead_execution(workflows: str) -> None:
     """Protect lead accountability without freezing its presentation."""
-    section = semantic_text(
-        direct_section_content(
-            workflows,
-            "Workflow result for the project owner",
-        )
-    ).casefold()
+    syntax = "`Action / Actor / Scope / Authority / Result`"
+    matching_sections = []
+    for heading in re.findall(r"^## (.+)$", workflows, re.MULTILINE):
+        content = direct_section_content(workflows, heading)
+        if syntax in content:
+            matching_sections.append(content)
+    require(
+        len(matching_sections) == 1,
+        "open lead execution needs one direct owner of its exact syntax",
+    )
+    section = semantic_text(matching_sections[0]).casefold()
 
     for field in ("action", "actor", "scope", "authority", "result"):
         require(
@@ -272,26 +277,36 @@ def validate_open_lead_execution(workflows: str) -> None:
 
     accountability_patterns = {
         "delegation authority limit": (
-            r"gives? a task.{0,50}agent.{0,30}(?:gets?|has) no"
-            r".{0,30}(?:additional|more).{0,30}authority"
+            r"workflow.{0,30}gives? (?:a )?(?:bounded )?task.{0,30}agent"
+            r".{0,40}project authority.{0,30}(?:does not|must not|cannot|never)"
+            r".{0,20}(?:increase|expand|widen)"
         ),
         "finding evidence limit": (
             r"finding.{0,30}evidence.{0,40}(?:no|not|cannot|never)"
             r".{0,20}authority"
         ),
-        "distinct work states": (
-            r"states.{0,20}(?:different|separate).{0,80}"
-            r"claims the work.{0,80}work is in the repository.{0,80}"
-            r"validation tool.{0,40}pass result.{0,80}acceptance from"
-            r".{0,30}independent reviewer"
+        "claim is not file presence": (
+            r"agent claims? (?:a )?change.{0,50}(?:does not|must not|cannot|never)"
+            r".{0,20}show.{0,30}file.{0,20}contains? (?:the )?change"
+        ),
+        "file presence is not validation": (
+            r"file contains? (?:the )?change.{0,50}"
+            r"(?:does not|must not|cannot|never).{0,20}give.{0,30}"
+            r"pass validation result"
+        ),
+        "validation is not independent acceptance": (
+            r"validation tool.{0,30}gives? (?:a )?pass result.{0,50}"
+            r"(?:does not|must not|cannot|never).{0,20}give.{0,30}"
+            r"acceptance.{0,30}independent reviewer"
         ),
         "read-only review limit": (
             r"read-only reviewer.{0,50}(?:does not|must not|cannot|never)"
             r".{0,20}change.{0,20}candidate"
         ),
         "scope-expansion authority": (
-            r"(?:do not|must not|cannot|never).{0,20}(?:increase|expand)"
-            r".{0,20}bounded scope.{0,30}(?:without|unless).{0,30}authority"
+            r"before.{0,20}(?:bounded )?scope.{0,20}(?:increase|expand)\w*"
+            r".{0,30}project owner.{0,30}(?:must )?authoriz\w*"
+            r".{0,30}(?:increase|expansion)"
         ),
     }
     for label, pattern in accountability_patterns.items():
@@ -301,18 +316,18 @@ def validate_open_lead_execution(workflows: str) -> None:
         )
 
     event_patterns = {
-        "specialist selection and task assignment": (
-            r"select a specialist.{0,50}give.{0,30}bounded task"
-        ),
+        "agent selection": r"select an agent.{0,30}specified skill",
+        "task assignment": r"give.{0,20}bounded task.{0,30}selected agent",
         "change authority": r"authoriz\w*.{0,20}change.{0,20}file",
         "finding disposition": r"disposition.{0,30}finding",
-        "route change": r"change.{0,20}route.{0,20}task",
+        "method change": r"change.{0,20}method.{0,20}task",
         "validation or review transfer": (
             r"exact candidate.{0,50}pass validation result.{0,30}reviewer"
         ),
         "candidate freeze": r"freez\w*.{0,20}exact candidate",
         "publication or merge": r"publish.{0,30}branch.{0,40}merge operation",
-        "stop or completion": r"stop or complete.{0,30}bounded task",
+        "stop": r"stop.{0,20}bounded task",
+        "completion": r"complete result.{0,30}bounded task",
     }
     for label, pattern in event_patterns.items():
         require(
@@ -320,24 +335,92 @@ def validate_open_lead_execution(workflows: str) -> None:
             "open lead execution lost its material event: " + label,
         )
 
-    for boundary in (
-        "only for the project owner during the bounded task",
-        "do not keep the information after the task",
-        "project authority",
-        "software measurement data",
-        "phase evidence",
-        "permanent record",
-        "record of task state",
-        "second governance record",
-        "search for information without a change to the bounded task",
-        "read a file",
-        "one test command",
-        "agent operation that does not change the bounded task",
-    ):
+    boundary_patterns = {
+        "temporary owner visibility": (
+            r"during.{0,20}bounded task.{0,30}show.{0,20}information"
+            r".{0,30}project owner"
+        ),
+        "no durable record": (
+            r"after.{0,20}bounded task.{0,30}"
+            r"(?:do not|must not|cannot|never).{0,20}keep.{0,20}information"
+        ),
+        "no project authority": r"project authority",
+        "no phase evidence": r"phase evidence",
+        "no software measurement": r"software measurement data",
+        "no permanent record": r"permanent record",
+        "no task-state record": r"record of task state",
+        "no second governance record": r"second governance record",
+        "information retrieval excluded": (
+            r"agent finds information.{0,30}(?:do not|must not|cannot|never)"
+            r".{0,20}use.{0,20}five names"
+        ),
+        "file read excluded": (
+            r"agent reads? (?:a )?file.{0,30}(?:do not|must not|cannot|never)"
+            r".{0,20}use.{0,20}five names"
+        ),
+        "individual test excluded": (
+            r"agent runs? one test command.{0,30}"
+            r"(?:do not|must not|cannot|never).{0,20}use.{0,20}five names"
+        ),
+        "low-value agent operation excluded": (
+            r"agent operation.{0,30}gives? no finding.{0,30}"
+            r"(?:does not|must not|cannot|never).{0,20}change.{0,30}"
+            r"bounded task.{0,30}(?:do not|must not|cannot|never)"
+            r".{0,20}use.{0,20}five names"
+        ),
+    }
+    for label, pattern in boundary_patterns.items():
         require(
-            boundary in section,
-            "open lead execution lost its transient boundary: " + boundary,
+            re.search(pattern, section) is not None,
+            "open lead execution lost its transient boundary: " + label,
         )
+
+
+def require_open_lead_mutation_rejected(
+    workflows: str,
+    mutation: str,
+) -> None:
+    """Require one representative lead-control mutation to fail closed."""
+    try:
+        validate_open_lead_execution(workflows)
+    except AssertionError:
+        return
+    raise AssertionError("open lead execution mutation escaped: " + mutation)
+
+
+def validate_open_lead_execution_mutations(workflows: str) -> None:
+    """Exercise representative authority and evidence inversions."""
+    mutations = (
+        (
+            "delegation authority inversion",
+            r"project authority does not\s+increase",
+            "project authority increases",
+        ),
+        (
+            "independent acceptance inversion",
+            r"does not give\s+acceptance from an independent reviewer",
+            "gives acceptance from an independent reviewer",
+        ),
+        (
+            "scope-authority order inversion",
+            r"Before the bounded scope increases",
+            "After the bounded scope increases",
+        ),
+        (
+            "temporary record inversion",
+            r"After the bounded\s+task, do not keep the information\.",
+            "After the bounded task, keep the information.",
+        ),
+        (
+            "exact syntax deletion",
+            re.escape("`Action / Actor / Scope / Authority / Result`"),
+            "",
+        ),
+    )
+    for mutation, pattern, replacement in mutations:
+        changed, count = re.subn(pattern, replacement, workflows, count=1)
+        require(count == 1, "open lead mutation target drifted: " + mutation)
+        require_open_lead_mutation_rejected(changed, mutation)
 
 
 def parse_frontmatter(path: Path, text: str) -> dict[str, str]:
@@ -1482,6 +1565,7 @@ def main() -> None:
     validate_continue_invocation_policy(workflows)
     validate_vision_led_workflows(workflows)
     validate_open_lead_execution(workflows)
+    validate_open_lead_execution_mutations(workflows)
     validate_documentation_profile_routing(names, workflows)
     registered_headings = REGISTER_HEADING_RE.findall(workflows)
     registered_paths = REGISTER_PATH_RE.findall(workflows)
