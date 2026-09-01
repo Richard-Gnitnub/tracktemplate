@@ -247,7 +247,7 @@ def validate_open_lead_execution(workflows: str) -> None:
     section = semantic_text(
         direct_section_content(
             workflows,
-            "Open and accountable lead execution",
+            "Workflow result for the project owner",
         )
     ).casefold()
 
@@ -272,23 +272,26 @@ def validate_open_lead_execution(workflows: str) -> None:
 
     accountability_patterns = {
         "delegation authority limit": (
-            r"delegat\w*.{0,40}(?:does not|must not|cannot|never)"
-            r".{0,40}(?:expand|widen|increase).{0,20}authority"
+            r"gives? a task.{0,50}agent.{0,30}(?:gets?|has) no"
+            r".{0,30}(?:additional|more).{0,30}authority"
         ),
         "finding evidence limit": (
             r"finding.{0,30}evidence.{0,40}(?:no|not|cannot|never)"
             r".{0,20}authority"
         ),
         "distinct work states": (
-            r"claimed.{0,40}present.{0,40}validated.{0,60}"
-            r"independently accepted.{0,40}(?:distinct|separate)"
+            r"states.{0,20}(?:different|separate).{0,80}"
+            r"claims the work.{0,80}work is in the repository.{0,80}"
+            r"validation tool.{0,40}pass result.{0,80}acceptance from"
+            r".{0,30}independent reviewer"
         ),
         "read-only review limit": (
             r"read-only reviewer.{0,50}(?:does not|must not|cannot|never)"
-            r".{0,20}mutat"
+            r".{0,20}change.{0,20}candidate"
         ),
         "scope-expansion authority": (
-            r"scope expansion.{0,30}(?:requires|needs).{0,30}authority"
+            r"(?:do not|must not|cannot|never).{0,20}(?:increase|expand)"
+            r".{0,20}bounded scope.{0,30}(?:without|unless).{0,30}authority"
         ),
     }
     for label, pattern in accountability_patterns.items():
@@ -297,33 +300,39 @@ def validate_open_lead_execution(workflows: str) -> None:
             "open lead execution lost its " + label,
         )
 
-    for event in (
-        "specialist selection",
-        "mutation authority",
-        "finding classification",
-        "technical route",
-        "validation or review handoff",
-        "candidate freeze",
-        "publication or integration transition",
-        "terminal stop or completion",
-    ):
+    event_patterns = {
+        "specialist selection and task assignment": (
+            r"select a specialist.{0,50}give.{0,30}bounded task"
+        ),
+        "change authority": r"authoriz\w*.{0,20}change.{0,20}file",
+        "finding disposition": r"disposition.{0,30}finding",
+        "route change": r"change.{0,20}route.{0,20}task",
+        "validation or review transfer": (
+            r"exact candidate.{0,50}pass validation result.{0,30}reviewer"
+        ),
+        "candidate freeze": r"freez\w*.{0,20}exact candidate",
+        "publication or merge": r"publish.{0,30}branch.{0,40}merge operation",
+        "stop or completion": r"stop or complete.{0,30}bounded task",
+    }
+    for label, pattern in event_patterns.items():
         require(
-            event in section,
-            "open lead execution lost its material event: " + event,
+            re.search(pattern, section) is not None,
+            "open lead execution lost its material event: " + label,
         )
 
     for boundary in (
-        "transient trace",
-        "owner-facing visibility only",
-        "repository authority",
-        "durable execution ledger",
-        "telemetry",
+        "only for the project owner during the bounded task",
+        "do not keep the information after the task",
+        "project authority",
+        "software measurement data",
         "phase evidence",
-        "execution-state register",
+        "permanent record",
+        "record of task state",
         "second governance record",
-        "routine searches",
-        "individual test invocations",
-        "low-value worker activity",
+        "search for information without a change to the bounded task",
+        "read a file",
+        "one test command",
+        "agent operation that does not change the bounded task",
     ):
         require(
             boundary in section,

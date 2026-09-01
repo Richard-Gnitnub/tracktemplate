@@ -23,43 +23,72 @@ horizons, and Core-migration completion. Architecture, plan, evidence, skills,
 and source apply that direction within their narrower authority. None can
 become an alternative product-vision owner without an owner decision.
 
-## Open and accountable lead execution
+## Workflow result for the project owner
 
-For each material coordinating or judging transition, the lead gives the
-project owner one transient trace. Use this compact form:
+Use this exact workflow form:
 
 `Action / Actor / Scope / Authority / Result`
 
-The trace identifies the operation, accountable actor, bounded subject,
-applicable authority or evidence, and material result. Use it for these roles:
+Keep these five names. A named workflow uses the form to give an important
+result to the project owner.
 
-- Chief of Staff
-- Technical Lead
-- Architecture Review when it coordinates a material decision
-- Change Validation when it classifies material proof or failure
-- Quality Review
-- Security Review when applicable
-- another existing lead role only when it has the same coordinating or judging
-  responsibility
+Each workflow in this list uses the form:
 
-Use the trace for material events. These events include specialist selection
-and delegation, mutation authority, material finding classification, a change
-of technical route, validation or review handoff, candidate freeze,
-publication or integration transition, and a terminal stop or completion.
+- `Chief of Staff`.
+- `Technical Lead`.
+- `Architecture Review`, when it gives information for a decision that
+  connects more than one task.
+- `Change Validation`, when it gives a failure classification or a validation
+  result.
+- `Quality Review`.
+- `Security Review`, when the bounded task needs it.
+- An existing workflow with the same workflow responsibility.
 
-Keep these accountability controls:
+Use the form when a named workflow does one operation in this list:
 
-- Delegation does not expand authority.
-- A finding is evidence. It gives no authority.
-- Claimed, present, validated, and independently accepted states are distinct.
-- A read-only reviewer stays read-only and does not mutate the candidate.
-- Scope expansion requires applicable authority.
+- Select a specialist and give the bounded task to that specialist.
+- Authorize a change to a file.
+- Give a disposition to a finding that can change the task.
+- Change the route for the task.
+- Give an exact candidate and its PASS validation result to a reviewer.
+- Freeze an exact candidate.
+- Publish a branch, or start a merge operation.
+- Stop or complete the bounded task.
 
-The trace gives owner-facing visibility only. It is not repository authority,
-a durable execution ledger, telemetry, phase evidence, an execution-state
-register, or a second governance record. Do not require this trace for routine
-searches, file reads, commands, individual test invocations, waits, or
-low-value worker activity.
+Use these governance controls:
+
+- When a workflow gives a task to a different agent, the agent gets no
+  additional project authority.
+- A finding is evidence. It gives no project authority.
+- The following states are different:
+  - An agent claims the work.
+  - The work is in the repository.
+  - A validation tool gives a PASS result.
+  - The work has acceptance from an independent reviewer.
+- A `read-only` reviewer does not change the candidate.
+- Do not increase the bounded scope without applicable project authority.
+
+This information is only for the project owner during the bounded task. Do not
+keep the information after the task.
+
+Do not use the information as:
+
+- Project authority.
+- Phase evidence.
+- Software measurement data.
+- A permanent record.
+- A record of task state.
+- A second governance record.
+
+Do not use the form for these operations:
+
+- Search for information without a change to the bounded task.
+- Read a file.
+- Run a command.
+- Run one test command.
+- Wait.
+- Do an agent operation that does not change the bounded task or give a
+  finding.
 
 ## Session continuity
 
