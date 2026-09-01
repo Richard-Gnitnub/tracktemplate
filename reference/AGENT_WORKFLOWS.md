@@ -4,10 +4,9 @@ Status: **repository guidance. It owns only agent-skill structure and maintenanc
 
 ## Purpose
 
-This document gives rules for the structure of a skill. It also gives rules to
-change that structure.
+This document owns the structure and maintenance of each skill.
 
-Project control comes from five items:
+TrackTemplate uses five governance controls:
 
 - `AGENTS.md`
 - A canonical document
@@ -15,24 +14,23 @@ Project control comes from five items:
 - A test or tool
 - A Git commit or diff.
 
-`AGENTS.md` gives short rules for all repository work. It also gives routing.
-It does not give repository history, long command lists, current status, or a
-procedure for one task.
+`AGENTS.md` gives instructions and routing for all repository work. It does not
+give repository history, current state, or the procedure for one task.
 
 A canonical document owns a specified project item. It contains source
 information only when that information is necessary for the item.
 
-A skill gives a method that an agent can use again for one task. It does not
-give project authority. It does not own the requirement set, current phase,
-project status, or acceptance.
+A skill gives a method for one type of agent task. An agent can use the method
+again for the same type of task. A skill does not give project authority. It
+does not own the requirement set, current phase, current state, or acceptance.
 
 A test or tool does a specified check or safe operation. It does not make a
 project decision. It must not change canonical prose without a review.
 
 A Git commit or diff gives implementation evidence. It does not own a
-requirement set, a reason, acceptance, or current project status.
+requirement set, a decision, acceptance, or current state.
 
-A skill can use a canonical link. It must not copy a canonical policy into the
+A skill can use a canonical link. It must not put a canonical policy in the
 skill.
 
 [`PRODUCT_VISION.md`](PRODUCT_VISION.md) owns product purpose. It owns the
@@ -43,70 +41,90 @@ without an owner decision.
 
 ## Result for the project owner
 
-Use these exact names:
+Use this exact sequence:
 
 `Action / Actor / Scope / Authority / Result`
 
-After an operation in this section, a named workflow uses the five names to
-give its result to the project owner.
+Use the five items only in this exact sequence. Do not use the five items as
+project technical terms in other canonical prose. Use applicable TrackTemplate
+technical terms for the information in each item.
 
-These names apply:
+The five items have these meanings:
+
+- `Action` reports the material workflow responsibility or decision.
+- `Actor` names the agent or workflow responsible for the workflow
+  responsibility or decision.
+- `Scope` names the bounded scope that the workflow responsibility or decision
+  affects.
+- `Authority` names the project authority that permits the workflow
+  responsibility or decision.
+- `Result` reports the actual result or current state after the workflow
+  responsibility or decision.
+
+Six workflows use the five items for a material workflow responsibility:
 
 - `Chief of Staff`
 - `Technical Lead`
-- `Architecture Review`
-- `Change Validation`
+- `Architecture Review` for a material decision
+- `Change Validation` for a material validation result or failure classification
 - `Quality Review`
-- `Security Review`.
+- `Security Review` when applicable.
 
-A workflow responsibility is one operation in this list. A named workflow with
-a specified workflow responsibility also uses the five names.
+The material workflow responsibilities are:
 
 - Select an agent for a specified skill.
 - Give the bounded task to the selected agent.
 - Authorize a change to a file.
-- Give a disposition to a finding that has an effect on the method, bounded
-  scope, validation, or review.
-- Change the method for the task.
+- Report the disposition of a finding that changes the method, bounded scope,
+  validation, or review.
+- Change the method for the bounded task.
 - Give an exact candidate and its PASS validation result to a reviewer.
 - Freeze an exact candidate.
 - Publish a branch.
 - Start a merge operation.
 - Stop the bounded task.
-- Give a complete result for the bounded task.
+- Report the complete result for the bounded task.
+
+When a different named workflow has one of these responsibilities, it also
+uses the five items.
 
 Use these governance controls:
 
 - When a workflow gives a bounded task to an agent, project authority does not
   increase.
 - A finding is evidence. It gives no project authority.
-- When an agent claims a change, that operation does not show that the file
-  contains the change.
-- When a file contains the change, that fact does not give a PASS validation
-  result.
-- When a validation tool gives a PASS result, that result does not give
-  acceptance from an independent reviewer.
+- Five results are different:
+  - An agent claims that it changed a file.
+  - The file contains the change.
+  - A validator returns a PASS result.
+  - An independent reviewer returns a review verdict and evidence.
+  - The project owner gives acceptance.
+- Only an explicit project-owner decision gives acceptance.
 - A `read-only` reviewer does not change the candidate.
 - Before the bounded scope increases, the project owner must authorize the
   increase.
 
-During the bounded task, show this information only to the project owner.
-After the bounded task, do not keep the information.
+During the bounded task, give the information for each item only to the project
+owner. After the bounded task, do not keep this information.
 
-Do not use the information as:
+Do not use the information for an item as:
 
-- project authority
-- phase evidence
-- software measurement data
-- a permanent record
-- a record of task state
-- a second governance record.
+- Project authority
+- Phase evidence
+- Software measurement data
+- A permanent record
+- A record of the current state of the task
+- A second governance record.
 
-When an agent finds information, do not use the five names. When an agent reads
-a file, do not use the five names. When an agent runs a command, do not use the
-five names. When an agent runs one test command, do not use the five names.
-When an agent waits, do not use the five names. When an agent operation gives
-no finding and does not change the bounded task, do not use the five names.
+Do not use the five items for these routine agent operations:
+
+- Find information.
+- Read a file.
+- Start a command.
+- Start one test command.
+- Wait.
+- Do an agent operation that gives no finding and does not change the bounded
+  task.
 
 ## Session continuity
 

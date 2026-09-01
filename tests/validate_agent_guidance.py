@@ -286,18 +286,24 @@ def validate_open_lead_execution(workflows: str) -> None:
             r".{0,20}authority"
         ),
         "claim is not file presence": (
-            r"agent claims? (?:a )?change.{0,50}(?:does not|must not|cannot|never)"
-            r".{0,20}show.{0,30}file.{0,20}contains? (?:the )?change"
+            r"five results.{0,20}different.{0,80}agent claims?"
+            r".{0,40}changed a file.{0,80}file contains? (?:the )?change"
         ),
         "file presence is not validation": (
-            r"file contains? (?:the )?change.{0,50}"
-            r"(?:does not|must not|cannot|never).{0,20}give.{0,30}"
-            r"pass validation result"
+            r"five results.{0,20}different.{0,160}file contains?"
+            r" (?:the )?change.{0,80}validator returns? (?:a )?pass result"
         ),
-        "validation is not independent acceptance": (
-            r"validation tool.{0,30}gives? (?:a )?pass result.{0,50}"
-            r"(?:does not|must not|cannot|never).{0,20}give.{0,30}"
-            r"acceptance.{0,30}independent reviewer"
+        "validation is not independent review": (
+            r"five results.{0,20}different.{0,240}validator returns?"
+            r" (?:a )?pass result.{0,100}independent reviewer returns?"
+            r" (?:a )?review verdict"
+        ),
+        "review is not owner acceptance": (
+            r"five results.{0,20}different.{0,320}independent reviewer returns?"
+            r" (?:a )?review verdict.{0,100}project owner gives? acceptance"
+        ),
+        "owner acceptance authority": (
+            r"only an explicit project-owner decision gives? acceptance"
         ),
         "read-only review limit": (
             r"read-only reviewer.{0,50}(?:does not|must not|cannot|never)"
@@ -337,8 +343,8 @@ def validate_open_lead_execution(workflows: str) -> None:
 
     boundary_patterns = {
         "temporary owner visibility": (
-            r"during.{0,20}bounded task.{0,30}show.{0,20}information"
-            r".{0,30}project owner"
+            r"during.{0,20}bounded task.{0,30}give.{0,30}information"
+            r".{0,20}each item.{0,30}project owner"
         ),
         "no durable record": (
             r"after.{0,20}bounded task.{0,30}"
@@ -348,25 +354,25 @@ def validate_open_lead_execution(workflows: str) -> None:
         "no phase evidence": r"phase evidence",
         "no software measurement": r"software measurement data",
         "no permanent record": r"permanent record",
-        "no task-state record": r"record of task state",
+        "no task-state record": r"record of (?:the )?current state of (?:the )?task",
         "no second governance record": r"second governance record",
         "information retrieval excluded": (
-            r"agent finds information.{0,30}(?:do not|must not|cannot|never)"
-            r".{0,20}use.{0,20}five names"
+            r"do not use.{0,20}five items.{0,30}routine agent operations"
+            r".{0,80}find information"
         ),
         "file read excluded": (
-            r"agent reads? (?:a )?file.{0,30}(?:do not|must not|cannot|never)"
-            r".{0,20}use.{0,20}five names"
+            r"do not use.{0,20}five items.{0,30}routine agent operations"
+            r".{0,120}read a file"
         ),
         "individual test excluded": (
-            r"agent runs? one test command.{0,30}"
-            r"(?:do not|must not|cannot|never).{0,20}use.{0,20}five names"
+            r"do not use.{0,20}five items.{0,30}routine agent operations"
+            r".{0,220}start one test command"
         ),
         "low-value agent operation excluded": (
-            r"agent operation.{0,30}gives? no finding.{0,30}"
+            r"do not use.{0,20}five items.{0,30}routine agent operations"
+            r".{0,360}agent operation.{0,30}gives? no finding.{0,30}"
             r"(?:does not|must not|cannot|never).{0,20}change.{0,30}"
-            r"bounded task.{0,30}(?:do not|must not|cannot|never)"
-            r".{0,20}use.{0,20}five names"
+            r"bounded task"
         ),
     }
     for label, pattern in boundary_patterns.items():
@@ -397,9 +403,14 @@ def validate_open_lead_execution_mutations(workflows: str) -> None:
             "project authority increases",
         ),
         (
-            "independent acceptance inversion",
-            r"does not give\s+acceptance from an independent reviewer",
-            "gives acceptance from an independent reviewer",
+            "claimed and present result collapse",
+            r"Five results are different",
+            "Five results are equal",
+        ),
+        (
+            "owner acceptance transfer",
+            r"Only an explicit project-owner decision gives acceptance",
+            "An independent reviewer gives acceptance",
         ),
         (
             "scope-authority order inversion",
@@ -408,8 +419,8 @@ def validate_open_lead_execution_mutations(workflows: str) -> None:
         ),
         (
             "temporary record inversion",
-            r"After the bounded\s+task, do not keep the information\.",
-            "After the bounded task, keep the information.",
+            r"After the bounded\s+task, do not keep this information\.",
+            "After the bounded task, keep this information.",
         ),
         (
             "exact syntax deletion",
