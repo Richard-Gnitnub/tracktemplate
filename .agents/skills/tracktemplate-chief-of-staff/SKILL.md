@@ -33,6 +33,11 @@ workflow may execute the brief. Source, tests, pull requests, commits and
 findings are evidence, not requirement or acceptance authority. This skill does
 not replace architecture review, validation, quality review or engineering.
 
+When an outcome needs material technical documentation, select
+`$tracktemplate-technical-author-lead` for authoring and delivery. Keep
+Technical Lead responsibility for authoritative technical meaning. Keep
+Documentation Review read-only and independent after candidate freeze.
+
 ## Vision-led selection
 
 Perform these steps in order:

@@ -1,0 +1,4 @@
+interface:
+  display_name: "TrackTemplate Technical Author Lead"
+  short_description: "Deliver one review-ready technical document candidate"
+  default_prompt: "Use $tracktemplate-technical-author-lead to author and deliver one complete technical-documentation candidate."

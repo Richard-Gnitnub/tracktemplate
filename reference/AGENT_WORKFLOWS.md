@@ -132,28 +132,36 @@ The skills do not become policy or terminology owners.
 The [source and retrieval procedure](external/asd-ste100/README.md) owns the
 local path and official source sequence. It also owns the STE lookup operation
 and rebuild route. It does not own full applicability or the technical-term
-register. The documentation review workflow uses the official source only for
-a conformance review. Agents in other workflows route the review to
-documentation review. Agents do not read the PDF during usual work.
+register. The Technical Author Lead uses targeted STE retrieval during
+authoring. The Documentation Reviewer uses the official source for the one
+conformance review. Other workflows route material technical-documentation
+authoring to the Technical Author Lead. They route the frozen candidate to
+Documentation Review.
 
 For canonical prose in the conformance scope, use this route:
 
-1. Read the Technical Documentation Profile.
-2. Read the technical-term register.
-3. Use the `tracktemplate-documentation-review` skill for the one
-   Documentation Review.
-4. Author the canonical prose and freeze one clean exact candidate in Git.
-5. Derive the frozen review scope from the last accepted document identity and Git.
-6. Give the complete frozen review scope to one independent Documentation Reviewer.
-7. Record one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`
+1. Get the applicable technical meaning from the canonical subject owner. A
+   Technical Lead supplies that meaning when technical implementation is in
+   scope.
+2. Resolve each technical noun and technical verb in the technical-term
+   register before drafting.
+3. Read the applicable documentation policy in the Technical Documentation
+   Profile.
+4. Use targeted STE retrieval before drafting the affected logical units.
+5. Use `tracktemplate-technical-author-lead` to author and align one complete,
+   stable candidate.
+6. Freeze one clean exact candidate in Git.
+7. Derive the frozen review scope from the last accepted document identity and Git.
+8. Give the complete frozen review scope to one independent Documentation Reviewer.
+9. Record one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`
    verdict. A `BLOCKED` verdict must record a complete, nonempty `BLOCKED`
    finding set.
    Bind each finding to its exact path, frozen logical-unit identity, and formal
    Issue 9 rule identifiers.
-8. For `APPROVED_WITH_EXACT_CORRECTIONS`, apply all exact replacement wording
+10. For `APPROVED_WITH_EXACT_CORRECTIONS`, apply all exact replacement wording
    once against verified preimages. Do not invent other canonical prose.
-9. Run one final deterministic validation after the review or correction.
-10. Complete only if that validation is green. Otherwise, stop for the owner.
+11. Run one final deterministic validation after the review or correction.
+12. Complete only if that validation is green. Otherwise, stop for the owner.
 
 The Documentation Review is the only linguistic conformance review. Do not run
 a second Documentation Review. The STE lookup derives the frozen review scope.
@@ -172,17 +180,20 @@ conditions:
 
 | Workflow responsibility | Owner and authority boundary |
 | --- | --- |
-| Documentation review | One independent reviewer uses `tracktemplate-documentation-review` for the complete frozen review scope. The reviewer uses the official source and returns one complete verdict. For `APPROVED_WITH_EXACT_CORRECTIONS`, that review supplies all exact replacement wording. The skill owns linguistic-review responsibility. |
-| Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. It uses the STE lookup and PDF only as external references. It keeps unverified conformance and migration findings in the record. |
+| Technical-documentation authoring and delivery | `tracktemplate-technical-author-lead` consumes the applicable technical meaning, technical-term register, documentation policy, and targeted STE retrieval. It coordinates claim alignment and authors one complete candidate before freeze. It owns no subject meaning, terminology, policy, review verdict, validation result, or project acceptance. |
+| Documentation review | One independent reviewer uses `tracktemplate-documentation-review` for the complete frozen review scope. The reviewer uses the official source and returns one complete verdict. For `APPROVED_WITH_EXACT_CORRECTIONS`, that review supplies all exact replacement wording. The skill owns linguistic-review responsibility and no authoring responsibility. |
+| Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. It supplies findings and corrections to the Technical Author Lead when material authoring is necessary. It does not own technical meaning or the final linguistic verdict. |
 | Evidence and limitation reports | An implementing agent uses `tracktemplate-change-validation` to put proof and provenance below the owner view. When applicable, the agent validates source, frozen review scope, exact candidate, receipt, accepted state, and final-content identity. A validation tool does not give or change the Documentation Review verdict. |
 | Independent review | After final deterministic validation, an independent reviewer uses `tracktemplate-quality-review`. The reviewer examines implementation quality, limitations, and authority boundaries. For an Issue 9 claim, the reviewer checks the recorded Documentation Review and its bindings. This non-linguistic review does not repeat Documentation Review or change its verdict. |
-| Handoff from `tracktemplate-technical-lead` | An implementing agent uses `tracktemplate-technical-lead` only for an authorised Level 1 or Level 2 result. If a conformance review is necessary, the agent routes the task to documentation review. |
-| Cycle result from `tracktemplate-continue` | An agent that uses `tracktemplate-continue` supplies the 6 owner-view fields and technical provenance. If a conformance review is necessary, the agent routes the task to documentation review. Project authority for Level 1/2 work and merge does not change. |
+| Handoff from `tracktemplate-technical-lead` | An implementing agent uses `tracktemplate-technical-lead` only for an authorised Level 1 or Level 2 result. The Technical Lead supplies authoritative technical meaning. It routes material technical-documentation authoring to the Technical Author Lead. |
+| Cycle result from `tracktemplate-continue` | An agent that uses `tracktemplate-continue` supplies the 6 owner-view fields and technical provenance. It routes material technical-documentation authoring to the Technical Author Lead before candidate freeze. Project authority for Level 1/2 work and merge does not change. |
 | Result after context recovery | An agent that uses `tracktemplate-context-recovery` makes a short report from canonical authority. The agent keeps technical provenance for recovery. If a conformance review is necessary, the agent routes the task to documentation review. |
 
-The panel examined the complete skill catalogue for TT-DOC-001. One owner has
-each separate responsibility that can occur repeatedly. Thus, the project adds
-no documentation-profile or `tracktemplate-ste100` skill.
+The D-GOV-016 panel examined the complete skill catalogue. It found one
+separate repeatable responsibility without an owner: technical-documentation
+authoring and delivery. The project adds only the Technical Author Lead skill.
+It adds no documentation-profile, terminology, or `tracktemplate-ste100`
+skill.
 
 For a later workflow change, use an existing primary owner when possible. Add
 a skill only for a separate repeatable responsibility without an owner. Record
@@ -412,6 +423,18 @@ validation and a separate read-only quality review. It does not own general
 prioritisation, independent review, debugging, publication mechanics, or Level
 3 acceptance. Its composition does not replace any specialist.
 
+### `tracktemplate-technical-author-lead`
+
+Path: `.agents/skills/tracktemplate-technical-author-lead/SKILL.md`
+
+Use it for material technical-documentation authoring and delivery. It gets
+the applicable technical meaning from the canonical subject owner or Technical
+Lead. It resolves canonical terminology and reads the applicable documentation
+policy. It then uses targeted STE retrieval and authors one complete candidate
+before freeze. It can compose Documentation Alignment for claim alignment.
+It does not own technical meaning, terminology, policy, the Documentation
+Review verdict, validation, project acceptance, or publication authority.
+
 ### `tracktemplate-continue`
 
 Path: `.agents/skills/tracktemplate-continue/SKILL.md`
@@ -464,8 +487,8 @@ bounded scope.
 
 Path: `.agents/skills/tracktemplate-documentation-review/SKILL.md`
 
-Use it when creating, reviewing, shortening or reorganising TrackTemplate
-Markdown documentation, particularly where the change involves:
+Use it after the Technical Author Lead freezes one complete TrackTemplate
+technical-documentation candidate. The independent reviewer examines:
 
 - duplicated status or technical explanation
 - verbose or repetitive wording
@@ -474,9 +497,10 @@ Markdown documentation, particularly where the change involves:
 - material copied from another canonical owner
 - conclusions or the applicable requirement set buried beneath background
 - frozen evidence, licensing, provenance, or controlled wording
-- documentation that needs restructuring without changing its meaning.
+- documentation structure and preserved meaning.
 
-Use this skill while making a material documentation change.
+The reviewer returns one complete linguistic verdict. The reviewer does not
+author, shorten, reorganise, or apply changes to the candidate.
 
 ### `tracktemplate-documentation-alignment`
 
@@ -563,7 +587,7 @@ optional visual mode creates only sanitised, self-contained temporary HTML and
 does not execute production code or become validation evidence. Explanation
 does not replace validation, quality review or project-owner acceptance.
 
-All twenty-eight skills are deliberately instruction-only. They do not perform
+All twenty-nine skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
@@ -655,6 +679,10 @@ $tracktemplate-technical-lead
 ```
 
 ```text
+$tracktemplate-technical-author-lead
+```
+
+```text
 $tracktemplate-continue
 ```
 
@@ -714,6 +742,7 @@ Natural routing examples preserve these authority boundaries:
 | --- | --- |
 | “I think Phase 5 is looping. Review recent progress and identify the single highest-value next outcome.” | Chief of staff: read-only progress diagnosis and one transient brief. |
 | “Take the selected current-phase outcome and drive the smallest technically coherent vertical slice.” | Technical lead plus the applicable specialist skills. |
+| “Prepare the material canonical documentation for this technical change.” | The Technical Lead supplies technical meaning. The Technical Author Lead authors one complete candidate. One independent Documentation Reviewer returns the linguistic verdict after freeze. |
 | “PyCharm is still showing a merged branch. Reconcile it with current main without losing worktree state.” | IDE workspace alignment compares the person-facing project with Git authority. The Git workflow owns each separately authorised switch or move. |
 | `$tracktemplate-continue` | Continue owns one repository-driven integration, delivery, validation, review and draft-publication cycle. |
 | “Merge the last green pull request and continue with whatever is next.” | Does not activate continue. Request the literal `$tracktemplate-continue` invocation before using its one-cycle authority. |
@@ -835,7 +864,9 @@ $tracktemplate-architecture-review
     ↓
 $tracktemplate-api-design when a public API or stored-data contract changes
     ↓
-$tracktemplate-documentation-review for an accepted canonical update
+$tracktemplate-technical-author-lead for an accepted canonical update
+    ↓
+$tracktemplate-documentation-review after candidate freeze
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1013,7 +1044,9 @@ $tracktemplate-quality-review
 For a material documentation change:
 
 ```text
-$tracktemplate-documentation-review
+$tracktemplate-technical-author-lead
+    ↓
+$tracktemplate-documentation-review after candidate freeze
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1025,7 +1058,9 @@ For a documentation-alignment task:
 ```text
 $tracktemplate-documentation-alignment
     ↓
-$tracktemplate-documentation-review during material changes
+$tracktemplate-technical-author-lead during material changes
+    ↓
+$tracktemplate-documentation-review after candidate freeze
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1037,7 +1072,9 @@ For a bounded simplification:
 ```text
 $tracktemplate-simplify
     ↓
-$tracktemplate-python-writing or $tracktemplate-documentation-review
+$tracktemplate-python-writing or $tracktemplate-technical-author-lead
+    ↓
+$tracktemplate-documentation-review after a material documentation candidate freezes
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1049,7 +1086,9 @@ For a material changelog update:
 ```text
 $tracktemplate-changelog
     ↓
-$tracktemplate-documentation-review
+$tracktemplate-technical-author-lead
+    ↓
+$tracktemplate-documentation-review after candidate freeze
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1061,7 +1100,9 @@ For a licence, provenance or output-use assessment:
 ```text
 $tracktemplate-license-analysis
     ↓
-$tracktemplate-documentation-review when canonical records change
+$tracktemplate-technical-author-lead when canonical records change
+    ↓
+$tracktemplate-documentation-review after candidate freeze
     ↓
 $tracktemplate-change-validation
     ↓

@@ -65,6 +65,19 @@ def list_item_containing(text: str, marker: str) -> str:
     raise AssertionError("list-item mutation marker not found: " + marker)
 
 
+def numbered_item_containing(text: str, marker: str) -> str:
+    """Return one raw Markdown ordered-list item with wrapped lines."""
+    for match in re.finditer(
+        r"^\d+\. .*?(?=^\d+\. |\n\n|\Z)",
+        text,
+        re.DOTALL | re.MULTILINE,
+    ):
+        item = match.group(0).rstrip("\n")
+        if marker in item:
+            return item
+    raise AssertionError("numbered-item mutation marker not found: " + marker)
+
+
 def table_row_containing(text: str, marker: str) -> str:
     """Return one raw Markdown table row."""
     for line in text.splitlines():
@@ -2615,6 +2628,21 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan D-GOV-015 decision row drifted",
     )
+    technical_author_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-016 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-016-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                technical_author_decision_row + "\n",
+                "",
+            )
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
 
 
 def validate_documentation_profile_mutations() -> None:
@@ -4513,6 +4541,33 @@ def validate_agents_mutations() -> None:
     terminology_diagnostic = (
         "AGENTS lost or weakened its explicit terminology-surface boundary"
     )
+    author_route_item = list_item_containing(
+        agents,
+        "Route material technical-documentation authoring",
+    )
+    lookup_first_route = replace_once(
+        author_route_item,
+        "technical meaning",
+        "__TRACKTEMPLATE_TECHNICAL_MEANING__",
+    )
+    lookup_first_route = replace_once(
+        lookup_first_route,
+        "targeted STE retrieval",
+        "technical meaning",
+    )
+    lookup_first_route = replace_once(
+        lookup_first_route,
+        "__TRACKTEMPLATE_TECHNICAL_MEANING__",
+        "targeted STE retrieval",
+    )
+    expect_rejected(
+        "agents/technical-author-lookup-first",
+        lambda: agent_guidance.validate_explicit_agent_safeguards(
+            replace_once(agents, author_route_item, lookup_first_route)
+        ),
+        "AGENTS Technical Author Lead route lost or reordered its authority "
+        "inputs",
+    )
 
     for safeguard in (
         "stable identities",
@@ -4629,6 +4684,123 @@ def validate_agents_mutations() -> None:
             nested_safeguards
         ),
         safeguard_diagnostic,
+    )
+
+
+def validate_technical_author_lead_mutations() -> None:
+    """Reject authoring-order, role, and acceptance inversions."""
+    skill_paths = {
+        "technical_author": (
+            ".agents/skills/tracktemplate-technical-author-lead/SKILL.md"
+        ),
+        "technical_lead": ".agents/skills/tracktemplate-technical-lead/SKILL.md",
+        "documentation_alignment": (
+            ".agents/skills/tracktemplate-documentation-alignment/SKILL.md"
+        ),
+        "documentation_review": (
+            ".agents/skills/tracktemplate-documentation-review/SKILL.md"
+        ),
+        "chief": ".agents/skills/tracktemplate-chief-of-staff/SKILL.md",
+        "continuation": ".agents/skills/tracktemplate-continue/SKILL.md",
+    }
+    skills = {name: read(path) for name, path in skill_paths.items()}
+    workflows = read("reference/AGENT_WORKFLOWS.md")
+
+    def validate(**overrides: str) -> None:
+        values = {**skills, **overrides}
+        agent_guidance.validate_technical_author_lead_contract(
+            workflows,
+            values["technical_author"],
+            values["technical_lead"],
+            values["documentation_alignment"],
+            values["documentation_review"],
+            values["chief"],
+            values["continuation"],
+        )
+
+    technical_author = skills["technical_author"]
+    term_item = numbered_item_containing(
+        technical_author,
+        "technical-term register",
+    )
+    policy_item = numbered_item_containing(
+        technical_author,
+        "Technical Documentation Profile",
+    )
+    reordered_inputs = replace_once(technical_author, term_item, "__TERM_ITEM__")
+    reordered_inputs = replace_once(reordered_inputs, policy_item, term_item)
+    reordered_inputs = replace_once(reordered_inputs, "__TERM_ITEM__", policy_item)
+    expect_rejected(
+        "technical-author/input-authority-order-inverted",
+        lambda: validate(technical_author=reordered_inputs),
+        "Technical Author Lead input authority order drifted",
+    )
+
+    blocked_repair = replace_once(
+        technical_author,
+        "Treat `BLOCKED` as terminal for that candidate.",
+        "Treat `BLOCKED` as repair authority for that candidate.",
+    )
+    expect_rejected(
+        "technical-author/blocked-made-repair-authority",
+        lambda: validate(technical_author=blocked_repair),
+        "Technical Author Lead delivery control lost: blocked as terminal for "
+        "that candidate",
+    )
+
+    reviewer_acceptance = replace_once(
+        technical_author,
+        "Only an\n  explicit project-owner decision gives project acceptance.",
+        "An independent reviewer verdict gives project acceptance.",
+    )
+    expect_rejected(
+        "technical-author/reviewer-verdict-made-owner-acceptance",
+        lambda: validate(technical_author=reviewer_acceptance),
+        "Technical Author Lead authoring control lost: only an explicit "
+        "project-owner decision gives project acceptance",
+    )
+
+    review_authorship = replace_once(
+        skills["documentation_review"],
+        "Do not draft,\nshorten, reorganise, or apply changes to the candidate.",
+        "Draft, shorten, reorganise, and apply changes to the candidate.",
+    )
+    expect_rejected(
+        "technical-author/documentation-review-absorbs-authorship",
+        lambda: validate(documentation_review=review_authorship),
+        "Documentation Review lost Technical Author Lead routing: do not "
+        "draft, shorten, reorganise, or apply changes",
+    )
+
+    lead_authorship = replace_once(
+        skills["technical_lead"],
+        "Do not absorb technical-author\n  responsibility",
+        "Absorb technical-author\n  responsibility",
+    )
+    expect_rejected(
+        "technical-author/technical-lead-absorbs-authorship",
+        lambda: validate(technical_lead=lead_authorship),
+        "Technical Lead lost Technical Author Lead routing: do not absorb "
+        "technical-author responsibility",
+    )
+
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    current_state_row = table_row_containing(
+        evidence,
+        "terminal `BLOCKED` disposition of exact candidate",
+    )
+    advanced_phase_row = replace_once(
+        current_state_row,
+        "Phase 6 stays at 2/5",
+        "Phase 6 advances to 3/5",
+    )
+    expect_rejected(
+        "technical-author/phase-state-changed",
+        lambda: progress._validate_technical_author_lead_panel(
+            replace_once(evidence, current_state_row, advanced_phase_row)
+        ),
+        "D-GOV-016 owner-view meaning drifted: Current state / Phase 6 stays "
+        "at 2/5",
     )
 
 
@@ -4812,6 +4984,7 @@ def main() -> None:
     validate_transition_export_validation_mutations()
     validate_visible_recovery_mutations()
     validate_agents_mutations()
+    validate_technical_author_lead_mutations()
     validate_chief_mutations()
     validate_ontology_mutation()
     summary = {

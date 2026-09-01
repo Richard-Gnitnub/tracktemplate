@@ -29,6 +29,7 @@ TT_DOC_SKILL_NAMES = {
     "tracktemplate-documentation-alignment",
     "tracktemplate-documentation-review",
     "tracktemplate-quality-review",
+    "tracktemplate-technical-author-lead",
     "tracktemplate-technical-lead",
 }
 TT_DOC_TERM_SKILL_NAMES = {
@@ -36,6 +37,7 @@ TT_DOC_TERM_SKILL_NAMES = {
     "tracktemplate-documentation-alignment",
     "tracktemplate-documentation-review",
     "tracktemplate-quality-review",
+    "tracktemplate-technical-author-lead",
 }
 TT_DOC_TERMINOLOGY_LINK = (
     "../../../reference/TERMINOLOGY.md"
@@ -62,12 +64,16 @@ TT_DOC_DESCRIPTION_FRAGMENTS = {
         "current repository authority",
     ),
     "tracktemplate-documentation-review": (
-        "Create, review, shorten, or reorganise",
-        "canonical document",
+        "Independently review one complete frozen",
+        "Do not use for authorship",
     ),
     "tracktemplate-quality-review": (
         "staff-level review",
         "read-only independent review",
+    ),
+    "tracktemplate-technical-author-lead": (
+        "one complete TrackTemplate technical-documentation candidate",
+        "Do not use for technical implementation",
     ),
     "tracktemplate-technical-lead": (
         "Level 1 or Level 2 outcome",
@@ -95,6 +101,7 @@ RESOURCE_DIRECTORY_NAMES = ("assets", "references", "scripts")
 REQUIRED_SKILL_METADATA_NAMES = {
     "tracktemplate-chief-of-staff",
     "tracktemplate-ide-workspace-alignment",
+    "tracktemplate-technical-author-lead",
     "tracktemplate-technical-lead",
 }
 
@@ -146,6 +153,39 @@ def bullet_items(text: str) -> list[str]:
     return items
 
 
+def numbered_items(text: str) -> list[str]:
+    """Return Markdown ordered-list items independent of line wrapping."""
+    return [
+        semantic_text(match.group(1))
+        for match in re.finditer(
+            r"^\d+\. (.*?)(?=^\d+\. |\n\n|\Z)",
+            text,
+            re.DOTALL | re.MULTILINE,
+        )
+    ]
+
+
+def level_two_sections(text: str) -> list[str]:
+    """Return level-two section bodies without fixing their heading labels."""
+    matches = list(re.finditer(r"^## .+$", text, re.MULTILINE))
+    return [
+        text[match.end() : matches[index + 1].start()]
+        if index + 1 < len(matches)
+        else text[match.end() :]
+        for index, match in enumerate(matches)
+    ]
+
+
+def section_containing(text: str, marker: str) -> str:
+    """Return the sole level-two section that contains one stable marker."""
+    matches = [section for section in level_two_sections(text) if marker in section]
+    require(
+        len(matches) == 1,
+        "technical-author contract marker is missing or duplicated: " + marker,
+    )
+    return matches[0]
+
+
 def validate_explicit_agent_safeguards(agents: str) -> None:
     """Protect every accepted no-silent-change and terminology boundary."""
     change_items = bullet_items(
@@ -176,6 +216,39 @@ def validate_explicit_agent_safeguards(agents: str) -> None:
     require(
         expected_terminology in terminology_items,
         "AGENTS lost or weakened its explicit terminology-surface boundary",
+    )
+
+    policy_items = bullet_items(
+        direct_section_content(agents, "Canonical policy links")
+    )
+    author_routes = [
+        item.casefold()
+        for item in policy_items
+        if "technical author lead" in item.casefold()
+    ]
+    require(
+        len(author_routes) == 1,
+        "AGENTS lost or duplicated its Technical Author Lead route",
+    )
+    author_route = author_routes[0]
+    input_concepts = (
+        "technical meaning",
+        "canonical terminology",
+        "documentation policy",
+        "targeted ste retrieval",
+    )
+    positions = [author_route.find(concept) for concept in input_concepts]
+    freeze_position = author_route.find("before freeze")
+    review_position = author_route.find("one independent documentation review")
+    require(
+        "route material technical-documentation authoring and delivery through "
+        "the technical author lead" in author_route
+        and all(position >= 0 for position in positions)
+        and positions == sorted(positions)
+        and "in that order before freeze" in author_route
+        and positions[-1] < freeze_position < review_position,
+        "AGENTS Technical Author Lead route lost or reordered its authority "
+        "inputs",
     )
 
 
@@ -455,6 +528,11 @@ def validate_progress_delivery_structure() -> None:
             "tracktemplate-continue",
             "tracktemplate-publish",
             "tracktemplate-quality-review",
+            "tracktemplate-technical-author-lead",
+        },
+        "tracktemplate-technical-author-lead": {
+            "tracktemplate-documentation-alignment",
+            "tracktemplate-documentation-review",
         },
         "tracktemplate-continue": {
             "tracktemplate-change-validation",
@@ -462,6 +540,7 @@ def validate_progress_delivery_structure() -> None:
             "tracktemplate-ide-workspace-alignment",
             "tracktemplate-publish",
             "tracktemplate-quality-review",
+            "tracktemplate-technical-author-lead",
             "tracktemplate-technical-lead",
         },
         "tracktemplate-ide-workspace-alignment": {
@@ -493,6 +572,268 @@ def validate_progress_delivery_structure() -> None:
     require(
         not (skill_root / "tracktemplate-deliver-outcome").exists(),
         "continuation must not be duplicated by tracktemplate-deliver-outcome",
+    )
+
+
+def validate_technical_author_lead_contract(
+    workflows: str,
+    technical_author: str,
+    technical_lead: str,
+    documentation_alignment: str,
+    documentation_review: str,
+    chief: str,
+    continuation: str,
+) -> None:
+    """Protect Technical Author Lead ordering and role separation."""
+    author_sections = level_two_sections(technical_author)
+    require(
+        len(author_sections) >= 5,
+        "Technical Author Lead lost its bounded delivery structure",
+    )
+
+    boundary = section_containing(technical_author, "Before drafting:")
+    boundary_items = [item.casefold() for item in numbered_items(boundary)]
+
+    def item_index(*concepts: str) -> int:
+        for index, item in enumerate(boundary_items):
+            if all(concept.casefold() in item for concept in concepts):
+                return index
+        raise AssertionError(
+            "Technical Author Lead input step is missing: "
+            + " / ".join(concepts)
+        )
+
+    meaning_index = item_index("technical meaning", "canonical subject owner")
+    terminology_index = item_index("technical-term register")
+    policy_index = item_index("applicable policy", "Technical Documentation Profile")
+    require(
+        meaning_index < terminology_index < policy_index,
+        "Technical Author Lead input authority order drifted",
+    )
+    boundary_flat = semantic_text(boundary).casefold()
+    for concept in (
+        "technical noun",
+        "technical verb",
+        "term is unresolved",
+        "category is incorrect",
+        "do not draft an unresolved technical meaning",
+        "do not approve",
+        "project owner",
+    ):
+        require(
+            concept in boundary_flat,
+            "Technical Author Lead lost terminology resolution: " + concept,
+        )
+
+    preflight = section_containing(
+        technical_author,
+        "tools/ste100_lookup.py validate",
+    )
+    for command in (
+        "tools/ste100_lookup.py validate",
+        "tools/ste100_lookup.py word",
+        "tools/ste100_lookup.py review",
+        "tools/ste100_lookup.py topic",
+        "tools/ste100_lookup.py rule",
+    ):
+        require(
+            command in preflight,
+            "Technical Author Lead lost an executable STE lookup: " + command,
+        )
+    preflight_flat = semantic_text(preflight).casefold()
+    for concept in (
+        "active project python environment",
+        "before drafting",
+        "tracktemplate_ste100=",
+        "verified-source-bound-cache",
+        "each proposed project technical term",
+        "correct noun or verb category",
+        "at least one applicable review category",
+        "targeted topic or rule lookups",
+        "nonzero process result",
+        "tracktemplate_ste100_error=",
+        "unresolved terminology",
+        "category mismatch",
+        "does not narrow full applicability",
+        "conformance verdict",
+        "do not create a persistent authoring packet",
+        "second review-state record",
+    ):
+        require(
+            concept in preflight_flat,
+            "Technical Author Lead preflight lost: " + concept,
+        )
+
+    authoring = section_containing(
+        technical_author,
+        "Preserve exact identifiers",
+    )
+    authoring_flat = semantic_text(authoring).casefold()
+    for concept in (
+        "complete affected logical units",
+        "all affected canonical documents",
+        "exact identifiers",
+        "commands",
+        "paths",
+        "hashes",
+        "schema values",
+        "fixed syntax identifier",
+        "ordinary prose",
+        "canonical tracktemplate terms",
+        "review verdict",
+        "owner acceptance",
+        "only an explicit project-owner decision gives project acceptance",
+        "unrelated accepted prose",
+        "frozen history",
+        "does not show issue 9 conformance",
+    ):
+        require(
+            concept in authoring_flat,
+            "Technical Author Lead authoring control lost: " + concept,
+        )
+
+    delivery = section_containing(
+        technical_author,
+        "Review the complete diff and confirm one stable candidate",
+    )
+    delivery_flat = semantic_text(delivery).casefold()
+    for concept in (
+        "one stable candidate",
+        "complete scope",
+        "one independent",
+        "approved_with_exact_corrections",
+        "only the exact replacements",
+        "once",
+        "verified preimages",
+        "blocked as terminal for that candidate",
+        "new owner instruction",
+        "materially different lifecycle",
+        "final deterministic validation after the review or exact correction",
+        "documentation review is read-only",
+        "reviewer never mutates the candidate",
+        "finding creates no repair authority",
+        "do not run a second documentation review",
+    ):
+        require(
+            concept in delivery_flat,
+            "Technical Author Lead delivery control lost: " + concept,
+        )
+
+    author_flat = semantic_text(technical_author).casefold()
+    positions = [
+        author_flat.find("technical meaning from its canonical subject owner"),
+        author_flat.find("technical-term register"),
+        author_flat.find("applicable policy"),
+        author_flat.find("tools/ste100_lookup.py validate"),
+        author_flat.find("author the complete affected logical units"),
+        author_flat.find("freeze it only when"),
+        author_flat.find("one independent $tracktemplate-documentation-review"),
+        author_flat.find("final deterministic validation after"),
+    ]
+    require(
+        all(position >= 0 for position in positions)
+        and positions == sorted(positions),
+        "Technical Author Lead operating model order drifted",
+    )
+    require(
+        "do not present the candidate, a reviewer verdict, or a validation "
+        "result as project acceptance" in author_flat,
+        "Technical Author Lead can misstate project acceptance",
+    )
+
+    workflow_section = direct_section_content(
+        workflows,
+        "TT-DOC-001 workflow integration",
+    )
+    route_items = [item.casefold() for item in numbered_items(workflow_section)]
+    route_concepts = (
+        ("technical meaning", "canonical subject owner"),
+        ("technical noun", "technical verb", "technical-term register"),
+        ("documentation policy", "technical documentation profile"),
+        ("targeted ste retrieval", "before drafting"),
+        ("tracktemplate-technical-author-lead", "one complete", "candidate"),
+        ("freeze one clean exact candidate", "git"),
+        ("one independent documentation reviewer",),
+        ("final deterministic validation",),
+    )
+    cursor = -1
+    for concepts in route_concepts:
+        match = next(
+            (
+                index
+                for index, item in enumerate(route_items)
+                if index > cursor
+                and all(concept in item for concept in concepts)
+            ),
+            None,
+        )
+        require(
+            match is not None,
+            "technical-documentation route lost ordered step: "
+            + " / ".join(concepts),
+        )
+        cursor = match
+
+    role_texts = {
+        "Chief of Staff": semantic_text(chief).casefold(),
+        "Technical Lead": semantic_text(technical_lead).casefold(),
+        "Documentation Alignment": semantic_text(documentation_alignment).casefold(),
+        "Documentation Review": semantic_text(documentation_review).casefold(),
+        "Continue": semantic_text(continuation).casefold(),
+    }
+    required_role_concepts = {
+        "Chief of Staff": (
+            "tracktemplate-technical-author-lead",
+            "technical lead responsibility for authoritative technical meaning",
+            "documentation review read-only and independent after candidate freeze",
+        ),
+        "Technical Lead": (
+            "supply the authoritative technical meaning",
+            "route authoring and delivery",
+            "tracktemplate-technical-author-lead",
+            "do not absorb technical-author responsibility",
+        ),
+        "Documentation Alignment": (
+            "give the audit and proposed correction scope",
+            "tracktemplate-technical-author-lead",
+            "does not own the complete candidate or linguistic verdict",
+        ),
+        "Documentation Review": (
+            "one complete frozen scope from the technical author lead",
+            "do not draft, shorten, reorganise, or apply changes",
+            "does not apply it",
+            "review finding creates no repair authority",
+            "or give project acceptance",
+        ),
+        "Continue": (
+            "tracktemplate-technical-author-lead",
+            "one complete candidate before freeze",
+            "after freeze",
+            "one independent $tracktemplate-documentation-review",
+        ),
+    }
+    for role, concepts in required_role_concepts.items():
+        for concept in concepts:
+            require(
+                concept in role_texts[role],
+                role + " lost Technical Author Lead routing: " + concept,
+            )
+
+    responsibility_section = semantic_text(workflow_section).casefold()
+    require(
+        responsibility_section.count(
+            "| technical-documentation authoring and delivery |"
+        )
+        == 1
+        and "tracktemplate-technical-author-lead" in responsibility_section
+        and "no subject meaning, terminology, policy, review verdict, validation "
+        "result, or project acceptance" in responsibility_section,
+        "technical-documentation authoring gained a competing authority owner",
+    )
+    require(
+        "documentation review" in responsibility_section
+        and "no authoring responsibility" in responsibility_section,
+        "Documentation Review absorbed authoring responsibility",
     )
 
 
@@ -867,15 +1208,18 @@ def validate_documentation_profile_routing(
     for fragment in (
         "TT-DOC-001 workflow integration",
         "Authors use links from skills to these owners",
-        "One owner has each separate responsibility that can occur repeatedly",
         "use an existing primary owner when possible",
         "Do not keep two skills with competing primary responsibilities",
-        "adds no documentation-profile or tracktemplate-ste100 skill",
     ):
         require(
             semantic_text(fragment) in normalized_workflows,
             "AGENT_WORKFLOWS lost TT-DOC-001 overlap control: " + fragment,
         )
+    require(
+        [name for name in names if "technical-author" in name]
+        == ["tracktemplate-technical-author-lead"],
+        "technical-documentation authoring has a missing or competing lead skill",
+    )
 
     for name in sorted(TT_DOC_SKILL_NAMES):
         skill_file = SKILLS_ROOT / name / "SKILL.md"
@@ -1088,7 +1432,8 @@ def validate_documentation_profile_routing(
             "Do not read the external PDF during a usual continuation cycle"
         ),
         "tracktemplate-technical-lead": (
-            "Do not read the external PDF during usual technical-lead work"
+            "Do not absorb technical-author responsibility or read the external "
+            "PDF during usual technical-lead work"
         ),
     }
     for name, boundary in routine_routes.items():
@@ -1098,6 +1443,16 @@ def validate_documentation_profile_routing(
             and boundary in semantic_text(skill_text),
             name + " lost ASD-STE100 specialist routing",
         )
+
+    validate_technical_author_lead_contract(
+        workflows,
+        read(SKILLS_ROOT / "tracktemplate-technical-author-lead" / "SKILL.md"),
+        read(SKILLS_ROOT / "tracktemplate-technical-lead" / "SKILL.md"),
+        documentation_alignment,
+        documentation_review,
+        read(SKILLS_ROOT / "tracktemplate-chief-of-staff" / "SKILL.md"),
+        continuation,
+    )
 
 
 def validate_issue9_documentation_lifecycle(
@@ -1286,7 +1641,7 @@ def validate_issue9_documentation_lifecycle(
 
     required_workflow_concepts = (
         "tracktemplate-documentation-review",
-        "author the canonical prose and freeze one clean exact candidate in git",
+        "freeze one clean exact candidate in git",
         "derive the frozen review scope from the last accepted document identity "
         "and git",
         "one independent documentation reviewer",

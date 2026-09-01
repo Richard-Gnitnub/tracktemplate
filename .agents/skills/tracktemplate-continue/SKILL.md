@@ -200,6 +200,11 @@ it is needed, use every applicable specialist skill, inspect actual callers and
 tests, implement the smallest coherent vertical slice, prefer existing
 regression infrastructure and keep optional cleanup outside the tranche.
 
+When the cycle changes material technical documentation, route its technical
+meaning from the subject owner or Technical Lead to
+[`$tracktemplate-technical-author-lead`](../tracktemplate-technical-author-lead/SKILL.md).
+That lead authors and delivers one complete candidate before freeze.
+
 The delegated objective must state allowed files and task level, evidence,
 non-goals and phase criterion. After delivery, reconcile the agent's claim with
 actual changed files and exact validation. Work claimed, present, validated and
@@ -270,8 +275,9 @@ the failure is environmental or external, or the repair would exceed scope.
 Stop with that exact-green draft. Do not mark it ready or merge it during this
 invocation.
 
-When a cycle includes an ASD-STE100 linguistic conformance assessment, route
-it to
+When a cycle includes material technical documentation, use the Technical
+Author Lead before candidate freeze. After freeze, route the complete scope to
+one independent
 [`$tracktemplate-documentation-review`](../tracktemplate-documentation-review/SKILL.md).
 Do not read the external PDF during a usual continuation cycle.
 

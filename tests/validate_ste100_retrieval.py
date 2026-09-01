@@ -73,6 +73,31 @@ def semantic_text(value: str) -> str:
     return " ".join(value.casefold().split())
 
 
+def numbered_items(text: str) -> list[str]:
+    """Return semantic Markdown ordered-list items with wrapped lines."""
+    return [
+        semantic_text(match.group(1))
+        for match in re.finditer(
+            r"^\d+\. (.*?)(?=^\d+\. |\n\n|\Z)",
+            text,
+            re.DOTALL | re.MULTILINE,
+        )
+    ]
+
+
+def numbered_item_containing(text: str, marker: str) -> str:
+    """Return one raw Markdown ordered-list item for a mutation fixture."""
+    for match in re.finditer(
+        r"^\d+\. .*?(?=^\d+\. |\n\n|\Z)",
+        text,
+        re.DOTALL | re.MULTILINE,
+    ):
+        item = match.group(0).rstrip("\n")
+        if semantic_text(marker) in semantic_text(item):
+            return item
+    raise AssertionError("numbered-item mutation marker not found: " + marker)
+
+
 def load_tool():
     spec = importlib.util.spec_from_file_location("ste100_lookup", TOOL_PATH)
     require(spec is not None and spec.loader is not None, "cannot load STE tool")
@@ -124,31 +149,65 @@ def validate_policy_text(text: str) -> None:
 def validate_workflow_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     value = semantic_text(text)
+    route_items = numbered_items(text)
     ordered = (
-        "read the technical documentation profile",
-        "read the technical-term register",
-        "use the tracktemplate-documentation-review skill for the one "
-        "documentation review",
-        "author the canonical prose and freeze one clean exact candidate in git",
-        "derive the frozen review scope from the last accepted document identity "
-        "and git",
-        "give the complete frozen review scope to one independent documentation "
-        "reviewer",
-        "record one complete accept",
-        "approved with exact corrections",
-        "or blocked verdict",
-        "apply all exact replacement wording once against verified preimages",
-        "run one final deterministic validation after the review or correction",
-        "complete only if that validation is green",
+        ("applicable technical meaning", "canonical subject owner"),
+        (
+            "technical noun",
+            "technical verb",
+            "technical-term register",
+            "before drafting",
+        ),
+        ("applicable documentation policy", "technical documentation profile"),
+        ("targeted ste retrieval", "before drafting", "affected logical units"),
+        (
+            "tracktemplate-technical-author-lead",
+            "author and align",
+            "one complete",
+            "stable candidate",
+        ),
+        ("freeze one clean exact candidate", "git"),
+        (
+            "derive the frozen review scope",
+            "last accepted document identity",
+            "git",
+        ),
+        (
+            "complete frozen review scope",
+            "one independent documentation reviewer",
+        ),
+        (
+            "one complete",
+            "accept",
+            "approved with exact corrections",
+            "blocked",
+            "verdict",
+        ),
+        (
+            "approved with exact corrections",
+            "all exact replacement wording",
+            "verified preimages",
+            "do not invent other canonical prose",
+        ),
+        ("final deterministic validation", "after the review or correction"),
+        ("validation is green", "otherwise", "stop for the owner"),
     )
-    position = -1
-    for fragment in ordered:
-        new_position = value.find(fragment)
-        require(
-            new_position > position,
-            "workflow route lacks or reorders: " + fragment,
+    cursor = -1
+    for concepts in ordered:
+        match = next(
+            (
+                index
+                for index, item in enumerate(route_items)
+                if index > cursor
+                and all(concept in item for concept in concepts)
+            ),
+            None,
         )
-        position = new_position
+        require(
+            match is not None,
+            "workflow route lacks or reorders: " + " / ".join(concepts),
+        )
+        cursor = match
     for fragment in (
         "rule families in a lookup result are retrieval priorities",
         "they are not the applicable requirement set",
@@ -704,11 +763,38 @@ def validate_agent_and_validation_routing() -> None:
     agents_value = semantic_text(agents)
     for fragment in (
         "canonical prose follows the technical documentation profile",
-        "use the documentation workflow and use its ste lookup first",
         "ste lookup changes the source text that an agent reads for this task",
         "does not narrow the applicable issue 9 requirement set",
     ):
         require(fragment in agents_value, "root routing lacks: " + fragment)
+    author_routes = [
+        semantic_text(match.group(0))
+        for match in re.finditer(
+            r"^- .*?(?=^- |\n\n|\Z)",
+            agents,
+            re.DOTALL | re.MULTILINE,
+        )
+        if "Route material technical-documentation authoring" in match.group(0)
+    ]
+    require(len(author_routes) == 1, "root Technical Author Lead route drifted")
+    ordered_route = (
+        "route material technical-documentation authoring and delivery through "
+        "the technical author lead",
+        "technical meaning",
+        "canonical terminology",
+        "documentation policy",
+        "targeted ste retrieval",
+        "in that order before freeze",
+        "one independent documentation review",
+    )
+    cursor = -1
+    for concept in ordered_route:
+        position = author_routes[0].find(concept)
+        require(
+            position > cursor,
+            "root Technical Author Lead route lacks or reorders: " + concept,
+        )
+        cursor = position
     validate_validation_text(read(VALIDATION))
 
 
@@ -1712,6 +1798,32 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
         pass
     else:
         raise AssertionError("contradictory workflow addition was accepted")
+    terminology_item = numbered_item_containing(
+        workflows,
+        "technical-term register before drafting",
+    )
+    policy_item = numbered_item_containing(
+        workflows,
+        "Technical Documentation Profile",
+    )
+    inverted_route = workflows.replace(
+        terminology_item,
+        "__TRACKTEMPLATE_TERMINOLOGY_STEP__",
+        1,
+    )
+    inverted_route = inverted_route.replace(policy_item, terminology_item, 1)
+    inverted_route = inverted_route.replace(
+        "__TRACKTEMPLATE_TERMINOLOGY_STEP__",
+        policy_item,
+        1,
+    )
+    require(inverted_route != workflows, "workflow inversion fixture is stale")
+    try:
+        validate_workflow_text(inverted_route)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("workflow authority-order inversion was accepted")
 
     documents = load_tracked_markdown()
     competing_terms = dict(documents)

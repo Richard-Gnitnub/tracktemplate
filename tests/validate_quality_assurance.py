@@ -40,6 +40,20 @@ CONTINUE_SKILL = (
     / "tracktemplate-continue"
     / "SKILL.md"
 )
+CONTEXT_RECOVERY_SKILL = (
+    ROOT
+    / ".agents"
+    / "skills"
+    / "tracktemplate-context-recovery"
+    / "SKILL.md"
+)
+TECHNICAL_LEAD_SKILL = (
+    ROOT
+    / ".agents"
+    / "skills"
+    / "tracktemplate-technical-lead"
+    / "SKILL.md"
+)
 
 EXPECTED_IMMUTABLE_SOURCE_HASHES = {
     "AdvancedTurnout.FCMacro":
@@ -877,15 +891,63 @@ def validate_asd_ste100_reference(
         source_owner in workflows,
         "AGENT_WORKFLOWS lost the ASD-STE100 source owner link",
     )
-    require(
-        "documentation review workflow uses the official source only for a "
-        "conformance review" in workflows_flat
-        and "Agents in other workflows route the review to documentation "
-        "review" in workflows_flat
-        and "Agents do not read the PDF during usual work"
-        in workflows_flat,
-        "ASD-STE100 workflow routing drifted",
+    source_route = next(
+        (
+            " ".join(paragraph.casefold().split())
+            for paragraph in workflows.split("\n\n")
+            if source_owner in paragraph
+        ),
+        "",
     )
+    for concepts in (
+        (
+            "technical author lead uses targeted ste retrieval",
+            "during authoring",
+        ),
+        (
+            "documentation reviewer uses the official source",
+            "for the one conformance review",
+        ),
+        (
+            "other workflows route material technical-documentation authoring",
+            "to the technical author lead",
+        ),
+        ("they route the frozen candidate", "to documentation review"),
+    ):
+        require(
+            all(concept in source_route for concept in concepts),
+            "ASD-STE100 workflow routing drifted: " + " / ".join(concepts),
+        )
+
+    usual_non_review_routes = (
+        (
+            CONTINUE_SKILL,
+            ("do not read the external pdf", "usual continuation cycle"),
+        ),
+        (
+            CONTEXT_RECOVERY_SKILL,
+            ("do not read the asd-ste100 pdf", "usual recovery"),
+        ),
+        (
+            TECHNICAL_LEAD_SKILL,
+            (
+                "do not absorb technical-author responsibility or read the "
+                "external pdf",
+                "usual technical-lead work",
+            ),
+        ),
+        (
+            CHANGE_VALIDATION_SKILL,
+            ("normal repository validation", "does not use the ignored pdf"),
+        ),
+    )
+    for skill_path, concepts in usual_non_review_routes:
+        skill_text = " ".join(read(skill_path).casefold().split())
+        require(
+            all(concept in skill_text for concept in concepts),
+            "usual workflow lost its no-PDF boundary: "
+            + skill_path.parent.name,
+        )
 
 
 def validate_no_product_ste100_dependency() -> None:

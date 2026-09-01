@@ -3692,6 +3692,134 @@ reviewer omitted. No prose repair starts from the deficient schema-1 result.
 D-GOV-015, all risk dispositions, Phase 6 at 2/5, and project status `unknown`
 do not change.
 
+<a id="d-gov-016-technical-author-lead"></a>
+
+## D-GOV-016 Technical Author Lead
+
+### Owner view
+
+| Field | Current result |
+| --- | --- |
+| Current state | The project owner accepts the terminal `BLOCKED` disposition of exact candidate `239cc6c436a713f4815aad23c2da8d09dca4265a`. The remote branch preserves that candidate as failed first-gate evidence. Phase 6 stays at 2/5 and project status stays `unknown`. |
+| What changed | D-GOV-016 establishes the Technical Author Lead as the workflow owner for material technical-documentation authoring and delivery. It adds one skill and routes the existing lead, alignment, review, continuation, architecture, and simplification workflows. |
+| What now works | The authoring route consumes authoritative technical meaning, canonical terminology, documentation policy, and targeted STE retrieval before drafting. It produces one complete candidate before one independent Documentation Review and final deterministic validation. |
+| Limitations/findings | Executable controls prove workflow wiring and the required operation order. They do not prove author understanding, technical correctness, linguistic conformance, or project-owner acceptance. Integration requires independent Documentation Review and independent Quality Review. |
+| Owner decision | Accept D-GOV-016. Preserve `239cc6c` and its blocker evidence without repair or more review. Complete the bounded role, routing, and executable authoring control. Integrate only after every mandatory gate permits integration. |
+| Next action | Validate and freeze one exact enabling candidate. Obtain one independent Documentation Review and one independent Quality Review. Security Review is not applicable because the change introduces no executable, subprocess, network, credential, or trust boundary. Integrate through protected `main` only if exact-green. Then start the authorised Cycle 3 development-toolchain preflight. |
+
+### Bounded decision and evidence
+
+The exact protected-main baseline is
+`22f0ef511ec841de46c14e645ea1ac210256a054`. The failed candidate is
+`239cc6c436a713f4815aad23c2da8d09dca4265a`. Its preserved Documentation
+Review receipt has SHA-256
+`cf3d8ba8bb74bd1f5bcbd7bd0d46c29ba628b8f745bea1787b5dcfaf867a5bb7`.
+Its frozen review-scope file has SHA-256
+`f500fbbc78cf36e4b7323a103df5349ef7df04f45f622dc48fde6d242eb6b3cd`.
+D-GOV-016 does not change those files or their result.
+
+The independent read-only Architecture Reviewer
+`agent:technical-author-architecture-review` examined the complete skill
+catalogue. The review found a
+separate repeatable responsibility between technical meaning and independent
+Documentation Review. Existing roles did not own complete-candidate authoring
+and delivery. Route A adds one Technical Author Lead skill. It uses the
+existing canonical owners and the existing `tools/ste100_lookup.py` execution
+point. It creates no persistent authoring packet or second review-state record.
+
+The Technical Author Lead authoring preflight uses the configured project
+Python environment. It first validates the source-bound cache. It resolves
+each proposed project technical term through the technical-term register. It
+then selects the applicable prose category and performs targeted topic or rule
+retrieval. A nonzero result, `TRACKTEMPLATE_STE100_ERROR=`, unresolved term, or
+term-category mismatch stops authoring before drafting.
+
+The verified official source is ASD-STE100 Simplified Technical English,
+Issue 9, dated 2025-01-15. Its SHA-256 is
+`d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431`.
+The author used procedural-prose retrieval and targeted terminology and
+instruction topics. The lookup changes the source material that the author
+reads. It does not narrow full applicability or prove conformance.
+
+The owner-authorised role decision is Level 3. The bounded implementation
+beneath it is an authorised workflow migration at Level 2. The implementation
+changes no product source, product runtime dependency, or FreeCAD operation.
+
+Development validation parsed 189 tracked Python and FCMacro files. Focused
+agent-guidance, project-progress, quality-assurance, and STE-retrieval
+validators returned `PASS`. The STE lookup returned
+`verified-source-bound-cache` for source SHA-256
+`d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431`.
+The governance mutation validator rejected 341/341 mutations with 335
+independent protections. The standalone CI profile passed 60/60 validators.
+No FreeCAD or GUI validation applies.
+
+Three late routing-oracle failures had the `test-or-oracle-defect` failure
+class. The old expectations were coupled to obsolete routing wording. The
+repairs replaced them with narrow semantic assertions that preserve the same
+routing invariants. The original proofs then passed.
+
+### Participants and independence
+
+| Participant | Role and independence |
+| --- | --- |
+| `owner:tracktemplate-project-owner` | Project owner, panel chair, and decision owner. The owner supplied the role, operating model, boundaries, integration condition, and later Cycle 3 authority. |
+| `agent:openai-codex-primary` | Chief of Staff, change owner, and panel presenter. This agent cannot independently accept its implementation or linguistic conformance. |
+| `agent:technical-lead` | Technical route owner. This role selected Route A and supplied the bounded implementation meaning. It does not own documentation authorship or review. |
+| `agent:technical-author-architecture-review` | Independent read-only Architecture Reviewer. This reviewer examined responsibility placement, the complete skill catalogue, and Route A without mutation. |
+| `agent:technical-author-lead` | Documentation candidate author. This role consumes the named authorities and cannot give the independent linguistic verdict or project acceptance. |
+| Independent Documentation Reviewer | Pending after candidate freeze. This reviewer is read-only and returns one complete Issue 9 verdict. |
+| Independent Quality Reviewer | Pending after deterministic validation. This reviewer is read-only and does not repeat Documentation Review. |
+| Security Review | Not applicable. The change introduces no executable, subprocess, network, credential, or trust boundary. |
+
+### Safety and risk panel
+
+| Risk | Assessment | Result |
+| --- | --- | --- |
+| PR-12 — fragmented or stale direction | One new skill owns the demonstrated responsibility. Canonical policy, terminology, subject meaning, and review remain with their current owners. | Medium / Mitigate / Partial. The disposition does not change. |
+| PR-13 — repository or evidence loss | The failed candidate has an exact remote branch. Its ignored scope and receipt keep their recorded identities. The new candidate must use the normal freeze and publication controls. | Critical / Mitigate / Effective for the bounded state. The disposition does not change. |
+| PR-22 — authority transfer or self-acceptance | The Technical Author Lead cannot give the linguistic verdict or project acceptance. Documentation Review and final staff reviews remain independent and read-only. | High / Remove / Effective when all mandatory gates complete. The disposition does not change. |
+
+**Panel recommendation:** **Proceed with bounded conditions.** Add only the
+role, routing, authoring-time STE execution point, and proportionate semantic
+controls. Preserve the failed candidate and D-GOV-015. Require deterministic
+validation and independent reviews before integration.
+
+### Owner decision D-GOV-016
+
+On 2026-09-01, `owner:tracktemplate-project-owner` accepts the exact authority
+and exclusions in [gate-decisions.json](gate-decisions.json). The owner accepts
+the terminal `BLOCKED` disposition of candidate `239cc6c`. No repair, reopened
+candidate, replacement candidate, or more Documentation Review of that
+candidate has authority.
+
+The Technical Author Lead is the canonical workflow owner for material
+technical-documentation authoring and delivery. The required order is:
+
+1. Get the technical meaning.
+2. Resolve the canonical terminology.
+3. Read the applicable documentation policy.
+4. Use targeted STE retrieval.
+5. Author and align the complete candidate.
+6. Freeze the candidate.
+7. Obtain one independent Documentation Review.
+8. Run deterministic validation.
+
+Documentation Review remains read-only. Only the existing
+`APPROVED_WITH_EXACT_CORRECTIONS` verdict can supply exact correction wording
+in the same review. A finding gives no repair authority. Only an explicit
+project-owner decision gives project acceptance.
+
+The project owner permits normal protected-main integration only after every
+mandatory gate permits it. After integration and clean synchronisation, the
+owner authorises the bounded Cycle 3 development-toolchain preflight.
+
+This enabling tranche changes governance authority, so its governance records
+exceed its implementation size. The owner decision is the governance-budget
+exception. No risk disposition changes. Phase 6 stays at 2/5. Exits 1, 4, and
+5 stay Pending. The output keeps private-development status. Project status
+stays `unknown`.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition

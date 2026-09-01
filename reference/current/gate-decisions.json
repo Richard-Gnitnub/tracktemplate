@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 6,
-  "updated_on": "2026-08-31",
+  "updated_on": "2026-09-01",
   "decisions": [
     {
       "id": "D-P6-001",
@@ -178,6 +178,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle"
+    },
+    {
+      "id": "D-GOV-016",
+      "decided_on": "2026-09-01",
+      "status": "Accepted",
+      "decision": "Establish the Technical Author Lead responsibility.",
+      "authority": "At clean protected-main baseline `22f0ef511ec841de46c14e645ea1ac210256a054`, the project owner accepts the terminal `BLOCKED` disposition of exact candidate `239cc6c436a713f4815aad23c2da8d09dca4265a`. Preserve the candidate and its complete blocker evidence. Do not repair, replace, reopen, or review it again.\n\nThe project owner establishes the Technical Author Lead as the canonical workflow owner for material technical-documentation authoring and delivery. The role consumes authoritative technical meaning, the technical-term register, applicable documentation policy, and targeted STE retrieval. It authors and aligns one complete candidate before freeze. One independent Documentation Reviewer then returns one linguistic verdict. Final deterministic validation occurs after that verdict or its one exact reviewed correction.\n\nThe Technical Lead owns technical implementation and supplies authoritative technical meaning. Documentation Alignment owns claim alignment. Documentation Review remains read-only and independent from authorship. `APPROVED_WITH_EXACT_CORRECTIONS` remains the existing one-review correction route. `BLOCKED` is terminal for that candidate unless a new owner decision establishes a materially different lifecycle. A finding gives no repair authority. If all mandatory gates have PASS results, the owner authorises normal integration of this bounded enabling change through protected `main`. After clean synchronisation, the owner authorises the already bounded Cycle 3 development-toolchain preflight.",
+      "exclusions": "This decision does not replace the canonical subject owners. `reference/ENGINEERING_POLICY.md` continues to own documentation policy and TT-DOC requirements. `reference/TERMINOLOGY.md` continues to own technical nouns and technical verbs. Documentation Review continues to own the independent Issue 9 linguistic verdict. Chief of Staff continues to orchestrate leads and owner boundaries. D-GOV-015 and its controls do not change.\n\nDo not reopen PR #59, Cycle 1, Cycle 2, TT-DOC-003, TT-DOC-004, the structured-authority experiment, or exact candidate `239cc6c436a713f4815aad23c2da8d09dca4265a`. Do not add a terminology owner, policy framework, ontology, transaction system, or documentation database.\n\nThis decision changes no product or railway behaviour. It gives no FreeCAD, GUI, persistence, export, schema, API, performance, production, physical-output, packaging, release, tagging, or legacy-retirement authority. Phase 6 stays at 2/5 accepted exits. Exits 1, 4, and 5 stay Pending. The output keeps private-development status. Project status stays `unknown`. No risk disposition changes.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-016-technical-author-lead",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-016-technical-author-lead"
     }
   ]
 }

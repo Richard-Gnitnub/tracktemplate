@@ -83,7 +83,7 @@
   audit; [`reference/LEARNING_FROM_EXPERIENCE.md`](reference/LEARNING_FROM_EXPERIENCE.md)
   is an append-only lesson ledger. Neither owns live status.
 - [`reference/AGENT_WORKFLOWS.md`](reference/AGENT_WORKFLOWS.md) owns the skill catalog and routing.
-- Canonical prose follows the [Technical Documentation Profile](reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile). Use the documentation workflow and use its STE lookup first. The STE lookup changes the source text that an agent reads for this task. It does not narrow the applicable Issue 9 requirement set.
+- Canonical prose follows the [Technical Documentation Profile](reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile). Route material technical-documentation authoring and delivery through the Technical Author Lead. It consumes technical meaning, canonical terminology, documentation policy, and targeted STE retrieval in that order before freeze, then sends the candidate to one independent Documentation Review. The STE lookup changes the source text that an agent reads for this task. It does not narrow the applicable Issue 9 requirement set.
 
 ## Repository and System Safety
 

@@ -288,6 +288,16 @@ EXPECTED_PHASE6_DECISIONS = {
         "81641613e133fea5946be8895d027037578b67a3ce5f048552baf21c6acf6a33",
         "869717862c88675519f8b24b74419e33dcca25a3077272a43fa5c0e188131ad0",
     ),
+    "D-GOV-016": (
+        "2026-09-01",
+        "Establish the Technical Author Lead responsibility.",
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#d-gov-016-technical-author-lead"
+        ),
+        "a4731c4e00c9ef2d5f7328f529e3d0d891492b0128226c7abff3966f63bc2d45",
+        "3b2f1ee0ebf307d9cf7154334aa86c48781dde601345c51d9f8a08dc64ae750b",
+    ),
 }
 EXPECTED_PHASE6_DECISION_IDS = set(EXPECTED_PHASE6_DECISIONS)
 EXPECTED_PHASE6_AUTHORITY = (
@@ -3882,7 +3892,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-31",
+        and current_document["updated_on"] == "2026-09-01",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -5401,6 +5411,192 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
         )
 
 
+def _validate_technical_author_lead_panel(current_evidence: str) -> None:
+    """Protect the bounded D-GOV-016 role decision and preserved state."""
+    anchor = '<a id="d-gov-016-technical-author-lead"></a>'
+    _require(
+        current_evidence.count(anchor) == 1,
+        "current evidence lost or duplicated the D-GOV-016 panel anchor",
+    )
+    section = _section(
+        current_evidence,
+        "D-GOV-016 Technical Author Lead",
+    )
+    owner_view = direct_section_content(
+        section,
+        "Owner view",
+        level=3,
+    )
+    rows = _structured_table_rows(
+        owner_view,
+        ("Field", "Current result"),
+        "D-GOV-016 owner view",
+    )
+    expected_fields = {
+        "Current state",
+        "What changed",
+        "What now works",
+        "Limitations/findings",
+        "Owner decision",
+        "Next action",
+    }
+    _require(
+        set(rows) == expected_fields,
+        "D-GOV-016 owner-view fields drifted",
+    )
+    required_row_concepts = {
+        "Current state": (
+            "terminal BLOCKED disposition",
+            "239cc6c436a713f4815aad23c2da8d09dca4265a",
+            "failed first-gate evidence",
+            "Phase 6 stays at 2/5",
+            "project status stays unknown",
+        ),
+        "What changed": (
+            "D-GOV-016 establishes the Technical Author Lead",
+            "workflow owner",
+            "technical-documentation authoring and delivery",
+        ),
+        "What now works": (
+            "authoritative technical meaning",
+            "canonical terminology",
+            "documentation policy",
+            "targeted STE retrieval",
+            "one complete candidate",
+            "one independent Documentation Review",
+            "final deterministic validation",
+        ),
+        "Limitations/findings": (
+            "Executable controls prove workflow wiring",
+            "required operation order",
+        ),
+        "Owner decision": (
+            "Preserve 239cc6c",
+            "without repair or more review",
+            "mandatory gate permits integration",
+        ),
+        "Next action": (
+            "freeze one exact enabling candidate",
+            "one independent Documentation Review",
+            "one independent Quality Review",
+            "Security Review is not applicable",
+            "no executable, subprocess, network, credential, or trust boundary",
+            "protected main",
+            "Cycle 3 development-toolchain preflight",
+        ),
+    }
+    for label, concepts in required_row_concepts.items():
+        row = rows[label][1]
+        for concept in concepts:
+            _require(
+                _semantic_markdown(concept) in row,
+                "D-GOV-016 owner-view meaning drifted: "
+                + label
+                + " / "
+                + concept,
+            )
+
+    limitations = rows["Limitations/findings"][1].casefold()
+    limitation_sentences = re.split(r"[.!?]+", limitations)
+    unproved_results = (
+        "author understanding",
+        "technical correctness",
+        "linguistic conformance",
+        "project-owner acceptance",
+    )
+    negative_proof = re.compile(
+        r"\b(?:do(?:es)? not|cannot|can not|must not|will not)\s+prove\b"
+    )
+    _require(
+        any(
+            negative_proof.search(sentence)
+            and all(result in sentence for result in unproved_results)
+            for sentence in limitation_sentences
+        ),
+        "D-GOV-016 limitations no longer bound all unproved results",
+    )
+    positive_proof = re.compile(
+        r"(?<!not )\bprove(?:s)?\s+(?:"
+        + "|".join(re.escape(result) for result in unproved_results)
+        + r")\b"
+    )
+    _require(
+        positive_proof.search(limitations) is None,
+        "D-GOV-016 limitations assert a result that controls cannot prove",
+    )
+    _require(
+        any(
+            re.search(
+                r"\bintegration\b.*\brequires?\b.*"
+                r"\bindependent documentation review\b.*\band\b.*"
+                r"\bindependent quality review\b",
+                sentence,
+            )
+            and "not require" not in sentence
+            for sentence in limitation_sentences
+        ),
+        "D-GOV-016 integration lost either independent review",
+    )
+
+    panel = _semantic_text(section)
+    for concept in (
+        "22f0ef511ec841de46c14e645ea1ac210256a054",
+        "239cc6c436a713f4815aad23c2da8d09dca4265a",
+        "cf3d8ba8bb74bd1f5bcbd7bd0d46c29ba628b8f745bea1787b5dcfaf867a5bb7",
+        "f500fbbc78cf36e4b7323a103df5349ef7df04f45f622dc48fde6d242eb6b3cd",
+        "creates no persistent authoring packet or second review-state record",
+        "owner-authorised role decision is Level 3",
+        "bounded implementation beneath it is an authorised workflow migration "
+        "at Level 2",
+        "Documentation Review remains read-only",
+        "A finding gives no repair authority",
+        "Only an explicit project-owner decision gives project acceptance",
+        "Phase 6 stays at 2/5",
+        "Exits 1, 4, and 5 stay Pending",
+        "output keeps private-development status",
+        "Project status stays unknown",
+        "No risk disposition changes",
+    ):
+        _require(
+            _semantic_text(concept) in panel,
+            "D-GOV-016 evidence panel drifted: " + concept,
+        )
+
+    owner_decision = direct_section_content(
+        section,
+        "Owner decision D-GOV-016",
+        level=3,
+    )
+    ordered_stages = _numbered_items(owner_decision)
+    _require(
+        [number for number, _ in ordered_stages] == list(range(1, 9)),
+        "D-GOV-016 authoring and review stages are missing or reordered",
+    )
+    required_stage_concepts = (
+        ("technical meaning",),
+        ("canonical terminology",),
+        ("applicable documentation policy",),
+        ("targeted STE retrieval",),
+        ("author", "align", "complete candidate"),
+        ("freeze", "candidate"),
+        ("one independent Documentation Review",),
+        ("deterministic validation",),
+    )
+    for (number, item), concepts in zip(
+        ordered_stages,
+        required_stage_concepts,
+        strict=True,
+    ):
+        for concept in concepts:
+            _require(
+                _semantic_text(concept).casefold() in item.casefold(),
+                "D-GOV-016 authoring and review stage drifted: "
+                + str(number)
+                + " / "
+                + concept,
+            )
+
+
 def _validate_product_direction(current_evidence: str) -> None:
     """Require localised vision, architecture and evidence-map boundaries."""
     _validate_product_vision(_read(PRODUCT_VISION_PATH))
@@ -5464,6 +5660,7 @@ def main() -> None:
     _validate_risks(plan)
     _validate_decisions(plan)
     _validate_ste_lifecycle_panel(current_evidence)
+    _validate_technical_author_lead_panel(current_evidence)
     _validate_product_direction(current_evidence)
     _validate_fixed_paths()
     _validate_ci_workflow()

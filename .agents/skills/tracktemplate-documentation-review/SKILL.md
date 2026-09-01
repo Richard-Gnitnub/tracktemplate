@@ -1,9 +1,19 @@
 ---
 name: tracktemplate-documentation-review
-description: Create, review, shorten, or reorganise TrackTemplate Markdown documentation. Use for duplicated status, repetitive explanations, verbose wording, unclear document ownership, or material in the wrong canonical document.
+description: Independently review one complete frozen TrackTemplate technical-documentation candidate against ASD-STE100 Issue 9 and return one linguistic verdict. Use only after Technical Author Lead authoring and candidate freeze. Do not use for authorship, technical meaning, terminology approval, validation, or project acceptance.
 ---
 
 # TrackTemplate documentation review
+
+## Independent review boundary
+
+Review one complete frozen scope from the Technical Author Lead. Do not draft,
+shorten, reorganise, or apply changes to the candidate. Do not supply technical
+meaning, approve terminology, or give project acceptance.
+
+For `APPROVED_WITH_EXACT_CORRECTIONS`, supply all exact replacement wording in
+this one verdict. The implementing agent applies that wording once. The
+reviewer does not apply it. A review finding creates no repair authority.
 
 ## Required preparation
 
@@ -24,7 +34,7 @@ description: Create, review, shorten, or reorganise TrackTemplate Markdown docum
    [`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
 4. Read [`references/document-ownership.md`](references/document-ownership.md).
 5. Read [`references/writing-checklist.md`](references/writing-checklist.md).
-6. Select the document class. Do this before you edit it. Use one of these
+6. Select the document class. Do this before you review it. Use one of these
    classes:
    - live status
    - architecture
@@ -93,7 +103,7 @@ examine canonical prose for conformance or change your verdict. The
 deterministic pre-check is only a review aid. A remaining linguistic, semantic,
 identity, or frozen-review-scope failure returns to the owner.
 
-## Editing rules
+## Review rules
 
 - Use links to canonical owners instead of copied explanations.
 - Put conclusions, decisions, and applicable requirements before the evidence
@@ -107,12 +117,12 @@ identity, or frozen-review-scope failure returns to the owner.
 - Use the pre-check and STE lookup during the review. Review the complete
   applicable requirement set. Include each applicable requirement that a
   lookup result does not contain.
-- Remove repeated or unnecessary wording. Keep evidence, qualifications, and
-  controlled terms.
+- Identify repeated or unnecessary wording in the review verdict. Keep
+  evidence, qualifications, and controlled terms.
 - Preserve frozen historical evidence and append-only records. Do not rewrite
   them with later knowledge.
-- Before you change canonical prose, identify the exact wording that a validator
-  uses.
+- Identify the exact wording that a validator uses before you assess a
+  proposed correction.
 - Do not use an arbitrary word-count target.
 - Do not use an automatic rewrite of the full repository.
 - Keep each item in its canonical owner.
@@ -154,7 +164,8 @@ For a substantial cycle, start with the profile's owner view. Put this
 technical provenance below it:
 
 1. **Document class and canonical responsibility.**
-2. **Changes made or proposed**, with the reason for each change.
+2. **Changes reviewed or exact corrections supplied**, with the reason for
+   each exact correction.
 3. **Information moved or linked**, naming its canonical owner.
 4. **Information proposed for removal.** Record why an explicit review is
    necessary. List each possible effect on history, law, safety, licences, or

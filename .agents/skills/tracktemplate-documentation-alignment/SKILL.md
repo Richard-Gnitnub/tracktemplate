@@ -11,12 +11,18 @@ Produce an evidence-backed drift audit and make only authorised, ownership-aware
 documentation corrections. Alignment does not mean rewriting accepted
 requirements to match whatever the current code happens to do.
 
+For a material candidate, give the audit and proposed correction scope to
+`$tracktemplate-technical-author-lead`. That lead owns complete-candidate
+authoring and delivery. Documentation Alignment can make a delegated bounded
+correction, but it does not own the complete candidate or linguistic verdict.
+
 ## Responsibility boundary
 
 - Use this skill to determine which documented claims are current, stale or in
   conflict with project authority or repository evidence.
-- Use `$tracktemplate-documentation-review` while materially editing,
-  shortening or reorganising the affected Markdown.
+- Use `$tracktemplate-technical-author-lead` for material authoring,
+  shortening, or reorganisation. Use `$tracktemplate-documentation-review`
+  once, after the Technical Author Lead freezes the complete candidate.
 - Use `$tracktemplate-context-recovery` first when lost session context or an
   unfamiliar dirty worktree makes the task boundary uncertain.
 - Use the canonical ownership map in `AGENTS.md`; do not reproduce it here or

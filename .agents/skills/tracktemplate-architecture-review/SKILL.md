@@ -22,8 +22,9 @@ owner.
   FreeCAD Addon guidance.
 - Use `$tracktemplate-performance-engineering` when performance evidence drives
   the choice.
-- Use `$tracktemplate-documentation-review` when an accepted decision changes
-  canonical Markdown.
+- Use `$tracktemplate-technical-author-lead` when an accepted decision changes
+  material canonical Markdown. Give the frozen candidate to one independent
+  `$tracktemplate-documentation-review`.
 
 This skill recommends; it does not accept an architecture change, alter phase
 scope or create a parallel ADR catalogue.
