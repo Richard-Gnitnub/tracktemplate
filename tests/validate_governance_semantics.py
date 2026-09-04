@@ -2350,6 +2350,59 @@ def validate_current_evidence_mutations() -> None:
         "D-GOV-015 owner-view row drifted: Limitations/findings",
     )
 
+    tdmp_section = progress._section(
+        evidence,
+        "D-GOV-017 whole technical-document lifecycle",
+    )
+    tdmp_current_row = table_row_containing(
+        tdmp_section,
+        "candidate is not yet a controlled baseline",
+    )
+    tdmp_candidate_made_current = replace_once(
+        tdmp_current_row,
+        "candidate is not yet a controlled baseline",
+        "candidate is the current controlled baseline",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-017-draft-made-current",
+        lambda: progress._validate_tdmp_lifecycle_panel(
+            replace_once(
+                evidence,
+                tdmp_section,
+                replace_once(
+                    tdmp_section,
+                    tdmp_current_row,
+                    tdmp_candidate_made_current,
+                ),
+            )
+        ),
+        "D-GOV-017 owner view drifted: candidate is not yet a controlled baseline",
+    )
+    tdmp_authority_row = table_row_containing(
+        tdmp_section,
+        "D-GOV-015 remains authoritative",
+    )
+    tdmp_dgov015_replaced = replace_once(
+        tdmp_authority_row,
+        "D-GOV-015 remains authoritative",
+        "D-GOV-017 replaces D-GOV-015",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-017-replaces-d-gov-015",
+        lambda: progress._validate_tdmp_lifecycle_panel(
+            replace_once(
+                evidence,
+                tdmp_section,
+                replace_once(
+                    tdmp_section,
+                    tdmp_authority_row,
+                    tdmp_dgov015_replaced,
+                ),
+            )
+        ),
+        "D-GOV-017 owner view drifted: D-GOV-015 remains authoritative",
+    )
+
 
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
@@ -2615,6 +2668,21 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan D-GOV-015 decision row drifted",
     )
+    tdmp_decision_row = table_row_containing(
+        plan,
+        "| D-GOV-017 |",
+    )
+    expect_rejected(
+        "project-plan/d-gov-017-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(
+                plan,
+                tdmp_decision_row + "\n",
+                "",
+            )
+        ),
+        "project-plan D-GOV-017 decision row drifted",
+    )
 
 
 def validate_documentation_profile_mutations() -> None:
@@ -2753,6 +2821,46 @@ def validate_documentation_profile_mutations() -> None:
                 terminology,
             ),
             diagnostic,
+        )
+
+    tdmp_cases = (
+        (
+            "tdmp/d-gov-015-replaced",
+            "D-GOV-015 remains authoritative for that part.",
+            "D-GOV-017 replaces D-GOV-015 for that part.",
+        ),
+        (
+            "tdmp/technical-author-gains-subject-authority",
+            "does not become the technical authority for that\nsubject",
+            "becomes the technical authority for that\nsubject",
+        ),
+        (
+            "tdmp/second-database-authorised",
+            "Do not create a\nnew document-management database",
+            "Create a\nnew document-management database",
+        ),
+        (
+            "tdmp/unchanged-prose-periodically-reopened",
+            "Do not periodically review accepted unchanged prose",
+            "Periodically review accepted unchanged prose",
+        ),
+        (
+            "tdmp/historical-evidence-rewritten",
+            "Do not rewrite a historical record only to apply a newer "
+            "documentation\nstandard",
+            "Rewrite a historical record to apply a newer documentation\n"
+            "standard",
+        ),
+    )
+    for name, original, replacement in tdmp_cases:
+        mutated = replace_once(engineering, original, replacement)
+        expect_rejected(
+            name,
+            lambda value=mutated: quality_assurance.validate_tdmp_lifecycle(
+                value,
+                terminology,
+            ),
+            "TDMP lifecycle lost:",
         )
 
     owner_view_status = replace_once(
@@ -2993,6 +3101,43 @@ def validate_documentation_profile_mutations() -> None:
             workflows,
         ),
         "TT-DOC-001 gained an overlapping profile or STE skill",
+    )
+
+    technical_author = read(
+        ".agents/skills/tracktemplate-technical-author-lead/SKILL.md"
+    )
+    technical_author_metadata = read(
+        ".agents/skills/tracktemplate-technical-author-lead/agents/openai.yaml"
+    )
+    implicit_author_disabled = replace_once(
+        technical_author_metadata,
+        "allow_implicit_invocation: true",
+        "# allow_implicit_invocation: true\n  allow_implicit_invocation: false",
+    )
+    expect_rejected(
+        "tdmp/automatic-author-routing-disabled",
+        lambda: agent_guidance.validate_technical_author_lifecycle(
+            technical_author,
+            implicit_author_disabled,
+            workflows,
+        ),
+        "Technical Author Lead is not available for automatic routing",
+    )
+    author_acceptance_added = replace_once(
+        technical_author,
+        "The lead also does\nnot own terminology, the linguistic verdict, "
+        "the validation result, or\ncontrolled-baseline acceptance.",
+        "The lead owns terminology, the linguistic verdict, the validation "
+        "result, and controlled-baseline acceptance.",
+    )
+    expect_rejected(
+        "tdmp/technical-author-self-acceptance-added",
+        lambda: agent_guidance.validate_technical_author_lifecycle(
+            author_acceptance_added,
+            technical_author_metadata,
+            workflows,
+        ),
+        "Technical Author Lead lifecycle lost:",
     )
 
     documentation_review = read(

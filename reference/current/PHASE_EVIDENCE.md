@@ -3692,6 +3692,159 @@ reviewer omitted. No prose repair starts from the deficient schema-1 result.
 D-GOV-015, all risk dispositions, Phase 6 at 2/5, and project status `unknown`
 do not change.
 
+<a id="d-gov-017-whole-technical-document-lifecycle"></a>
+
+## D-GOV-017 whole technical-document lifecycle
+
+### Owner view
+
+| Field | Current result |
+| --- | --- |
+| Current state | The project owner supplied the complete technical-document lifecycle requirement on 2026-09-04. Protected `main` and `origin/main` were equal at `22f0ef511ec841de46c14e645ea1ac210256a054` before this new candidate. Development checks pass for the current working tree. The candidate is not yet a controlled baseline. |
+| What changed | The Engineering Policy now contains one complete Technical Documentation Management Plan. A new Technical Author Lead owns authoring, delivery, and maintenance coordination. D-GOV-015 remains authoritative for the bounded authoring, review, and final-validation part. |
+| What now works | One route now controls the complete lifecycle. It identifies and classifies the need, assigns ownership, plans and authors the information, and establishes a controlled baseline. It controls later change, supersession, retirement, and historical preservation. Existing Git, review-state, evidence, and decision records supply traceability. |
+| Limitations/findings | The draft still needs the D-GOV-015 freeze, preservation, one Documentation Review, final deterministic validation, a fresh post-validation non-linguistic quality and publication review, and acceptance before it can become a controlled baseline. Normal integration is then necessary for current repository use. The accepted backup condition is not yet proved. The Technical Author Lead has no subject, terminology, verdict, validation, acceptance, publication, supersession, retirement, deletion, or merge authority. |
+| Owner decision | Accept D-GOV-017 and establish the complete TDMP and Technical Author Lead responsibility with the stated authority boundaries. Do not create another linguistic-review lifecycle or document-management database. Keep D-GOV-015 unchanged as the narrower lifecycle authority. |
+| Next action | Freeze and preserve one exact candidate when the required Git and backup conditions can be met. Run the one Documentation Review and final deterministic validation. Then obtain a fresh post-validation non-linguistic quality and publication review. Establish a controlled baseline only after acceptance. Use normal repository integration to make it current and available. |
+
+### Need, classification, and bounded result
+
+The identified need is a material governance deficiency. The accepted policy
+controlled only the narrower D-GOV-015 authoring and review lifecycle. It did
+not define one coherent route for initiation, classification, ownership,
+planning, controlled use, maintenance, change, supersession, retirement, and
+historical preservation.
+
+The selected result is a material change to the existing canonical
+[Engineering Policy](../ENGINEERING_POLICY.md#technical-documentation-management-plan),
+which already owns technical-documentation lifecycle policy. A separate TDMP
+document would duplicate that owner. The change also adds one repeatable
+Technical Author Lead skill, aligns the terminology and central skill routing,
+and adds directly dependent semantic controls.
+
+This is Level 3 because it changes governance responsibility and controlled
+documentation authority. It is a governance-budget exception because the
+policy and evidence change is larger than the skill implementation. No product
+source or railway behaviour changes. No FreeCAD or GUI validation applies.
+
+Development validation parsed all 189 Python and macro files. The 60-test
+standalone CI profile passed. The directly dependent documentation, guidance,
+resource, retrieval, progress, quality-assurance, and governance-semantic
+checks passed. The governance-semantic check rejected all 343 inadmissible
+mutations and retained 337 independent protections. The STE cache remains
+bound to the accepted source. No FreeCAD or GUI validation applies.
+
+Acceptance evidence also requires a complete diff review and independent
+non-linguistic architecture, risk, and quality challenge. The current
+pre-freeze challenge does not replace the fresh read-only quality and
+publication review after final validation. D-GOV-015 separately controls the
+one linguistic review of the frozen candidate.
+
+### Prior candidate and preservation limit
+
+Commit `00edbb331e5972b565a9fa70b3d85aa20754bce4` and tree
+`52054d6bb857e38009f79f48d2896b4a1f6e583a` are preserved failed experimental
+evidence. Its frozen review scope has SHA-256
+`bd5375e2af7b003bf2e2dc5a5fb457a59ad7396ffa0784915859f6c26d04cfab`.
+Its schema-2 `BLOCKED` result has SHA-256
+`b525e3d9d3c55f5f685c2afe38af992181d9656c43de5b61a82971a576338c0e`
+and records 28 blocking findings. It has no accepted-state proposal.
+
+That exact candidate remains terminal under D-GOV-015. D-GOV-017 does not
+repair, extend, accept, or make it current. This candidate starts again from
+protected `main` because the project owner supplied a new whole-lifecycle
+requirement. D-GOV-016 was never current authority and is not reused.
+
+### Participants and independence
+
+| Participant | Role and independence |
+| --- | --- |
+| `owner:tracktemplate-project-owner` | Project owner, panel chair, requirement owner, and accepting authority for D-GOV-017. |
+| `agent:openai-codex-primary` | Governance change owner and Technical Author Lead for this candidate. It cannot independently accept its own prose, validation, or controlled baseline. |
+| `agent:hume-governance-design` | Read-only architecture and responsibility reviewer. The reviewer recommended the existing Engineering Policy as TDMP owner and a separate Technical Author Lead responsibility. The reviewer shares the agent team and workspace. |
+| `agent:kepler-lifecycle-gap-audit` | Read-only requirements-gap reviewer. The reviewer mapped the missing whole-lifecycle stages and confirmed the narrower D-GOV-015 boundary. The reviewer shares the agent team and workspace. |
+| `agent:meitner-validation-surface` | Read-only validation reviewer. The reviewer selected existing semantic validators and rejected a new validator or state schema. The reviewer shares the agent team and workspace. |
+| `agent:tdmp-final-quality-review` | Read-only pre-freeze QA/risk and implementation-quality reviewer. The reviewer challenged the Critical preservation risk, panel completeness, lifecycle sequence, and unrelated prose changes. The reviewer is independent of working-tree mutation and shares the agent team and workspace. |
+
+The delegated reviews are independent from working-tree mutation. They are not
+external organisational reviews. The current QA/risk review is a pre-freeze
+implementation challenge. The frozen candidate still requires one independent
+Documentation Reviewer under D-GOV-015 and one fresh read-only non-linguistic
+quality and publication review after final validation.
+
+### Safety and risk panel
+
+| Risk | Assessment | Result |
+| --- | --- | --- |
+| PR-12 — fragmented or stale direction | The Engineering Policy remains the one TDMP owner. Central routing and one Technical Author Lead skill point to that owner. Existing Git and canonical records remain the trace. | Medium / Mitigate / Partial. The disposition does not change. |
+| PR-13 — repository or evidence loss | Protected `main` preserves the accepted state, and the terminal failed candidate remains named. The new candidate and one-shot D-GOV-015 evidence still need the existing push and independent-preservation conditions. The fresh post-validation review must use the preserved exact candidate and evidence. | Critical / Mitigate. Effectiveness remains unverified for this gate until preservation passes. The disposition does not change. |
+| PR-22 — authority transfer or self-acceptance | The Technical Author Lead coordinates the lifecycle but does not receive subject, verdict, validation, acceptance, publication, supersession, retirement, deletion, or merge authority. Independent review and owner acceptance remain separate. | High / Remove. The disposition does not change. |
+
+**Panel recommendation:** **Proceed with bounded conditions.** Retain one TDMP
+in the Engineering Policy, one Technical Author Lead responsibility, and the
+existing D-GOV-015 review route. Add no document-management database, second
+linguistic review, sentence-level workflow state, product change, or phase-exit
+claim. Before a controlled baseline, complete the required freeze,
+preservation, Documentation Review, final validation, fresh post-validation
+quality and publication review, and acceptance. Then use normal repository
+integration to make that baseline current and available.
+
+### Dissent, unknowns, and exceptions
+
+The pre-freeze QA/risk reviewer found missing panel records, an omitted
+post-validation quality-review stage, and unrelated list-format changes. The
+change owner accepted the findings, added the required controls, and reverted
+the unrelated changes. No unresolved dissent remains.
+
+The exact frozen candidate, independent preservation result, Documentation
+Review verdict, final deterministic result, post-validation quality and
+publication review, controlled-baseline identity, and integration result do
+not yet exist. The accepted backup condition also remains unproved.
+
+There is no exception or waiver to D-GOV-015, independent preservation,
+required review, deterministic validation, baseline acceptance, or repository
+integration. The governance-budget exception permits only the policy,
+evidence, skill, routing, and semantic controls that implement D-GOV-017.
+
+### Bounded conditions
+
+| Condition | Accountable owner | Deadline |
+| --- | --- | --- |
+| Keep the TDMP in the Engineering Policy. Add no second policy owner, document database, or linguistic-review route. | Technical Author Lead | Before candidate freeze and throughout the lifecycle. |
+| Keep subject meaning and terminology with their applicable canonical owners. | Technical Author Lead and applicable subject or terminology owner | Before candidate freeze and throughout the lifecycle. |
+| Freeze a clean exact Git candidate, push its checkpoint when authorised, and preserve the candidate and one-shot evidence independently. | Project owner, Technical Author Lead, and independent preservation reviewer | Before Documentation Review. |
+| Run one Documentation Review and one final deterministic validation. Finish the bounded D-GOV-015 lifecycle. Then run one fresh read-only non-linguistic quality and publication review. | Independent Documentation Reviewer, Independent Quality Reviewer, and Technical Author Lead | Before controlled-baseline acceptance. |
+| Record acceptance only for the exact reviewed, validated, and quality-reviewed content. Then use normal repository integration to make it current. | Project owner and repository integration owner | Before current controlled use. |
+| Preserve the terminal failed candidate, untouched legacy prose, and required history. | Technical Author Lead | Throughout this cycle and the later lifecycle. |
+
+### Owner decision D-GOV-017
+
+On 2026-09-04, `owner:tracktemplate-project-owner` accepts the lifecycle
+requirement and authority boundaries in
+[gate-decisions.json](gate-decisions.json). The TDMP owns the complete
+technical-document lifecycle. The Technical Author Lead owns
+technical-document authoring, delivery, and maintenance coordination. The
+applicable canonical technical or governance owner continues to own the
+documented subject.
+
+D-GOV-015 remains authoritative for `author → freeze scope → one Documentation
+Review → optional exact reviewed correction once → one final deterministic
+validation → complete or owner stop`. It is the bounded authoring and review
+part of the whole lifecycle. D-GOV-017 adds no second linguistic-review route
+and does not reopen unchanged accepted prose or frozen history.
+
+After the D-GOV-015 lifecycle finishes with green final validation, one fresh
+read-only non-linguistic quality and publication review must give a passing
+result for the exact validated candidate. This result is necessary before
+controlled-baseline acceptance. The later review does not repeat Documentation
+Review or change its verdict.
+
+Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Project status stays
+`unknown`. No risk disposition changes. D-GOV-017 gives no product, railway,
+FreeCAD, GUI, persistence, export, schema, API, performance, production,
+physical-output, packaging, release, tagging, legacy-retirement, deletion, or
+merge authority.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -3735,6 +3888,11 @@ D-GOV-015 owns the current simplified STE lifecycle. It keeps the existing
 retrieval architecture, requires one Documentation Review and one final
 deterministic validation, and gives no phase, product, merge, or Cycle 3
 authority.
+
+D-GOV-017 owns the complete technical-document lifecycle and assigns the
+Technical Author Lead responsibility. It keeps D-GOV-015 as the bounded
+authoring and review authority. It creates no second review route or lifecycle
+database and changes no phase, product, risk, or merge authority.
 
 Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported fault/evidence boundary.

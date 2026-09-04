@@ -22,6 +22,10 @@ TT_DOC_PROFILE_LINK = (
     "../../../reference/ENGINEERING_POLICY.md"
     "#tt-doc-001-tracktemplate-technical-documentation-profile"
 )
+TT_DOC_TDMP_LINK = (
+    "../../../reference/ENGINEERING_POLICY.md"
+    "#technical-documentation-management-plan"
+)
 TT_DOC_SKILL_NAMES = {
     "tracktemplate-change-validation",
     "tracktemplate-context-recovery",
@@ -29,6 +33,7 @@ TT_DOC_SKILL_NAMES = {
     "tracktemplate-documentation-alignment",
     "tracktemplate-documentation-review",
     "tracktemplate-quality-review",
+    "tracktemplate-technical-author-lead",
     "tracktemplate-technical-lead",
 }
 TT_DOC_TERM_SKILL_NAMES = {
@@ -36,6 +41,7 @@ TT_DOC_TERM_SKILL_NAMES = {
     "tracktemplate-documentation-alignment",
     "tracktemplate-documentation-review",
     "tracktemplate-quality-review",
+    "tracktemplate-technical-author-lead",
 }
 TT_DOC_TERMINOLOGY_LINK = (
     "../../../reference/TERMINOLOGY.md"
@@ -62,8 +68,8 @@ TT_DOC_DESCRIPTION_FRAGMENTS = {
         "current repository authority",
     ),
     "tracktemplate-documentation-review": (
-        "Create, review, shorten, or reorganise",
-        "canonical document",
+        "Review one frozen TrackTemplate technical-document candidate",
+        "sole linguistic verdict",
     ),
     "tracktemplate-quality-review": (
         "staff-level review",
@@ -73,6 +79,11 @@ TT_DOC_DESCRIPTION_FRAGMENTS = {
         "Level 1 or Level 2 outcome",
         "Do not use for",
         "Level 3 decision",
+    ),
+    "tracktemplate-technical-author-lead": (
+        "Manage the complete TrackTemplate technical-document lifecycle",
+        "Use automatically for new or materially changed canonical "
+        "technical prose",
     ),
 }
 
@@ -95,6 +106,7 @@ RESOURCE_DIRECTORY_NAMES = ("assets", "references", "scripts")
 REQUIRED_SKILL_METADATA_NAMES = {
     "tracktemplate-chief-of-staff",
     "tracktemplate-ide-workspace-alignment",
+    "tracktemplate-technical-author-lead",
     "tracktemplate-technical-lead",
 }
 
@@ -431,6 +443,16 @@ def validate_progress_delivery_structure() -> None:
             "Compose existing specialists",
             "Boundaries",
         },
+        "tracktemplate-technical-author-lead": {
+            "Authority boundary",
+            "Identify and classify the need",
+            "Plan the document work",
+            "Use the authoring route",
+            "Control the baseline and availability",
+            "Maintain and change documents",
+            "Coordinate supersession and retirement",
+            "Handoff",
+        },
         "tracktemplate-continue": {
             "Reconstruct repository authority",
             "Select one outcome or stop",
@@ -455,6 +477,11 @@ def validate_progress_delivery_structure() -> None:
             "tracktemplate-continue",
             "tracktemplate-publish",
             "tracktemplate-quality-review",
+            "tracktemplate-technical-author-lead",
+        },
+        "tracktemplate-technical-author-lead": {
+            "tracktemplate-documentation-review",
+            "tracktemplate-quality-review",
         },
         "tracktemplate-continue": {
             "tracktemplate-change-validation",
@@ -462,6 +489,7 @@ def validate_progress_delivery_structure() -> None:
             "tracktemplate-ide-workspace-alignment",
             "tracktemplate-publish",
             "tracktemplate-quality-review",
+            "tracktemplate-technical-author-lead",
             "tracktemplate-technical-lead",
         },
         "tracktemplate-ide-workspace-alignment": {
@@ -494,6 +522,117 @@ def validate_progress_delivery_structure() -> None:
         not (skill_root / "tracktemplate-deliver-outcome").exists(),
         "continuation must not be duplicated by tracktemplate-deliver-outcome",
     )
+
+
+def validate_technical_author_lifecycle(
+    author: str,
+    metadata: str,
+    workflows: str,
+) -> None:
+    """Protect the complete TDMP route and its authority separation."""
+    author_flat = semantic_text(author.replace(">", " ")).casefold()
+    workflow_flat = semantic_text(workflows).casefold()
+
+    require(
+        TT_DOC_TDMP_LINK in author,
+        "Technical Author Lead lost the canonical TDMP owner",
+    )
+    invocation_lines = re.findall(
+        r"^\s*allow_implicit_invocation:\s*\S.*$",
+        metadata,
+        re.MULTILINE,
+    )
+    require(
+        invocation_lines == ["  allow_implicit_invocation: true"],
+        "Technical Author Lead is not available for automatic routing",
+    )
+    for concepts in (
+        (
+            "create a new technical document",
+            "make a material change",
+            "make a non-material correction",
+            "make no documentation change",
+        ),
+        (
+            "canonical status",
+            "document type",
+            "canonical owner",
+            "subject owner",
+            "issue 9 applicability",
+            "legacy status",
+            "exact-content exclusions",
+            "review, validation, and publication boundaries",
+        ),
+        (
+            "purpose and intended user",
+            "required technical meaning",
+            "applicable canonical authorities",
+            "approved terminology",
+            "document scope and change scope",
+            "expected controlled-document result",
+        ),
+        (
+            "understand once → write once → check once → improve once",
+            "freeze once → review once → validate once → finish",
+            "one complete improvement pass before freeze",
+            "one fresh read-only $tracktemplate-quality-review",
+            "non-linguistic quality and publication review",
+            "does not repeat documentation review or change its verdict",
+            "do not run a second documentation review",
+        ),
+        (
+            "has no authority over that meaning",
+            "does not own terminology",
+            "the linguistic verdict",
+            "the validation result",
+            "controlled-baseline acceptance",
+            "publication, merge, supersession, retirement, and deletion",
+        ),
+        (
+            "accepted document current and available",
+            "genuine document need",
+            "compare each proposed change with the controlled baseline",
+            "required complete logical units",
+            "accepted replacement authority",
+            "owns no required current information",
+            "historical evidence",
+        ),
+    ):
+        require(
+            all(concept in author_flat for concept in concepts),
+            "Technical Author Lead lifecycle lost: " + " / ".join(concepts),
+        )
+    require(
+        "the lead also does not own terminology, the linguistic verdict, "
+        "the validation result, or controlled-baseline acceptance" in author_flat,
+        "Technical Author Lead gained review, validation, or acceptance authority",
+    )
+
+    ordered_workflow = (
+        "route new or materially changed canonical technical prose "
+        "automatically to tracktemplate-technical-author-lead",
+        "identify the document need",
+        "classify the document",
+        "plan the purpose",
+        "technical author lead authoring lifecycle",
+        "freeze one clean exact candidate in git",
+        "one independent documentation reviewer",
+        "one final deterministic validation",
+        "finish the bounded d-gov-015 authoring and review lifecycle",
+        "one fresh read-only non-linguistic quality and publication review",
+        "establish the controlled baseline",
+        "normal repository integration",
+        "supersede or retire",
+        "preserve the required history",
+    )
+    position = -1
+    for concept in ordered_workflow:
+        new_position = workflow_flat.find(concept)
+        require(
+            new_position > position,
+            "AGENT_WORKFLOWS lost or reordered the TDMP route: " + concept,
+        )
+        position = new_position
 
 
 def validate_ide_workspace_alignment_contract(
@@ -1023,6 +1162,7 @@ def validate_documentation_profile_routing(
         "tracktemplate-documentation-alignment",
         "tracktemplate-documentation-review",
         "tracktemplate-quality-review",
+        "tracktemplate-technical-author-lead",
     }
     for name in names:
         skill_text = read(SKILLS_ROOT / name / "SKILL.md")
@@ -1093,9 +1233,11 @@ def validate_documentation_profile_routing(
     }
     for name, boundary in routine_routes.items():
         skill_text = read(SKILLS_ROOT / name / "SKILL.md")
+        skill_flat = semantic_text(skill_text)
         require(
-            "tracktemplate-documentation-review" in skill_text
-            and boundary in semantic_text(skill_text),
+            "tracktemplate-technical-author-lead" in skill_flat
+            and "Documentation Review" in skill_flat
+            and boundary in skill_flat,
             name + " lost ASD-STE100 specialist routing",
         )
 
@@ -1286,7 +1428,10 @@ def validate_issue9_documentation_lifecycle(
 
     required_workflow_concepts = (
         "tracktemplate-documentation-review",
-        "author the canonical prose and freeze one clean exact candidate in git",
+        "route new or materially changed canonical technical prose automatically "
+        "to tracktemplate-technical-author-lead",
+        "use the technical author lead authoring lifecycle",
+        "freeze one clean exact candidate in git",
         "derive the frozen review scope from the last accepted document identity "
         "and git",
         "one independent documentation reviewer",
@@ -1302,6 +1447,8 @@ def validate_issue9_documentation_lifecycle(
         "do not invent other canonical prose",
         "run one final deterministic validation",
         "complete only if that validation is green",
+        "finish the bounded d-gov-015 authoring and review lifecycle",
+        "one fresh read-only non-linguistic quality and publication review",
         "stop for the owner",
         "only linguistic conformance review",
         "do not run a second documentation review",
@@ -1375,6 +1522,20 @@ def main() -> None:
 
     workflows = read(WORKFLOWS)
     validate_progress_delivery_structure()
+    validate_technical_author_lifecycle(
+        read(
+            SKILLS_ROOT
+            / "tracktemplate-technical-author-lead"
+            / "SKILL.md"
+        ),
+        read(
+            SKILLS_ROOT
+            / "tracktemplate-technical-author-lead"
+            / "agents"
+            / "openai.yaml"
+        ),
+        workflows,
+    )
     ide_skill = read(
         SKILLS_ROOT / "tracktemplate-ide-workspace-alignment" / "SKILL.md"
     )

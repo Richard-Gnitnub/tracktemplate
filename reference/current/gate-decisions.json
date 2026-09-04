@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 6,
-  "updated_on": "2026-08-31",
+  "updated_on": "2026-09-04",
   "decisions": [
     {
       "id": "D-P6-001",
@@ -178,6 +178,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle"
+    },
+    {
+      "id": "D-GOV-017",
+      "decided_on": "2026-09-04",
+      "status": "Accepted",
+      "decision": "Establish the complete Technical Documentation Management Plan and Technical Author Lead responsibility.",
+      "authority": "At protected-main baseline `22f0ef511ec841de46c14e645ea1ac210256a054`, the project owner establishes one complete Technical Documentation Management Plan in `reference/ENGINEERING_POLICY.md`. The lifecycle identifies and classifies a technical-document need, assigns ownership, plans and authors the information, establishes and uses a controlled baseline, maintains and changes it under control, deliberately supersedes or retires it, and preserves required history.\n\nThe Technical Author Lead owns technical-document authoring, delivery, and maintenance coordination. The applicable canonical technical or governance owner continues to own the documented subject. The Technical Author Lead has no authority over subject meaning or terminology. It does not give the linguistic verdict, validation result, controlled-baseline acceptance, publication decision, supersession decision, retirement decision, deletion authority, or merge authority.\n\nD-GOV-015 remains authoritative for the bounded lifecycle `author → freeze scope → one Documentation Review → optional exact reviewed correction once → one final deterministic validation → complete or owner stop`. It is the authoring and review part of the complete lifecycle. The Documentation Review remains the only linguistic conformance review. After that lifecycle finishes with green final validation, one fresh read-only non-linguistic quality and publication review must give a passing result for the exact validated candidate. This later review does not repeat Documentation Review or change its verdict.\n\nUse Git, `reference/ste-review-state.json`, and existing evidence and decision records for controlled identities and traceability. Do not create a second document-management database or sentence-level workflow state. An accepted controlled baseline exists only after all required reviews and final deterministic validation pass and the applicable authority records acceptance of the exact content. Normal repository integration then makes that baseline current and available for repository use.\n\nUntouched legacy documents remain unchanged. On the first material change to an unreviewed legacy canonical document, apply the D-GOV-015 complete-document baseline review. After acceptance, derive later review scope from the accepted baseline and Git. Do not reopen unchanged accepted prose or frozen history without a genuine material need from the applicable change-control authority.",
+      "exclusions": "The exact working-tree implementation of D-GOV-017 is not yet a controlled baseline. It must complete the existing freeze, independent preservation, one Documentation Review, final deterministic validation, one fresh post-validation non-linguistic quality and publication review, and acceptance requirements. Normal repository integration is then necessary before current controlled use. Commit `00edbb331e5972b565a9fa70b3d85aa20754bce4` remains a terminal failed experimental candidate. D-GOV-017 does not repair, extend, accept, or make it current. D-GOV-016 is not current authority and is not reused.\n\nThis decision creates no second linguistic-review lifecycle, documentation-assurance framework, lifecycle database, or periodic re-review programme. It gives no authority to reopen accepted history because a model, reviewer, process, checker, or stylistic preference changes.\n\nPhase 6 stays at 2/5 accepted exits. Exits 1, 4, and 5 stay Pending. Project status stays `unknown`. No risk disposition changes. This decision changes no product or railway behaviour. It gives no FreeCAD, GUI, persistence, export, schema, API, performance, production, physical-output, `project-cleared`, packaging, release, tagging, legacy-retirement, deletion, or merge authority.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-017-whole-technical-document-lifecycle",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-017-whole-technical-document-lifecycle"
     }
   ]
 }

@@ -270,10 +270,12 @@ the failure is environmental or external, or the repair would exceed scope.
 Stop with that exact-green draft. Do not mark it ready or merge it during this
 invocation.
 
-When a cycle includes an ASD-STE100 linguistic conformance assessment, route
-it to
-[`$tracktemplate-documentation-review`](../tracktemplate-documentation-review/SKILL.md).
-Do not read the external PDF during a usual continuation cycle.
+When a cycle creates or materially changes canonical technical prose, route it
+to
+[`$tracktemplate-technical-author-lead`](../tracktemplate-technical-author-lead/SKILL.md).
+After candidate freeze, the Technical Author Lead routes the frozen scope to
+one Documentation Review. Do not read the external PDF during a usual
+continuation cycle.
 
 ## Owner acceptance pack
 

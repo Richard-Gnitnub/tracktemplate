@@ -1,0 +1,6 @@
+interface:
+  display_name: "TrackTemplate Technical Author Lead"
+  short_description: "Manage the complete technical-document lifecycle"
+  default_prompt: "Use $tracktemplate-technical-author-lead to manage this TrackTemplate technical-document need."
+policy:
+  allow_implicit_invocation: true

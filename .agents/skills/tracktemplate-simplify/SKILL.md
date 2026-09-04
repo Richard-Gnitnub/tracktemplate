@@ -18,7 +18,8 @@ This skill selects and controls a simplification pass. Use the established
 specialist workflow for the material being changed:
 
 - use `$tracktemplate-python-writing` for Python or FCMacro edits;
-- use `$tracktemplate-documentation-review` for Markdown edits;
+- use `$tracktemplate-technical-author-lead` for material canonical Markdown
+  edits, then use one Documentation Review after candidate freeze;
 - use `$tracktemplate-documentation-alignment` when claims or paths may drift;
 - use `$tracktemplate-change-validation` to establish and rerun the proof; and
 - use `$tracktemplate-quality-review` for the final complete-diff judgement.

@@ -37,6 +37,7 @@ SKILL_NAMES = (
     "tracktemplate-documentation-alignment",
     "tracktemplate-change-validation",
     "tracktemplate-quality-review",
+    "tracktemplate-technical-author-lead",
 )
 EXPECTED_SOURCE_SHA256 = (
     "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431"
@@ -125,11 +126,16 @@ def validate_workflow_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     value = semantic_text(text)
     ordered = (
-        "read the technical documentation profile",
-        "read the technical-term register",
-        "use the tracktemplate-documentation-review skill for the one "
-        "documentation review",
-        "author the canonical prose and freeze one clean exact candidate in git",
+        "route new or materially changed canonical technical prose "
+        "automatically to tracktemplate-technical-author-lead",
+        "identify the document need",
+        "classify the document",
+        "plan the purpose",
+        "get technical meaning from the applicable canonical subject owner",
+        "read the technical-term register and applicable documentation policy",
+        "use targeted ste retrieval before writing",
+        "use the technical author lead authoring lifecycle",
+        "freeze one clean exact candidate in git",
         "derive the frozen review scope from the last accepted document identity "
         "and git",
         "give the complete frozen review scope to one independent documentation "
@@ -140,6 +146,9 @@ def validate_workflow_text(text: str) -> None:
         "apply all exact replacement wording once against verified preimages",
         "run one final deterministic validation after the review or correction",
         "complete only if that validation is green",
+        "finish the bounded d-gov-015 authoring and review lifecycle",
+        "one fresh read-only non-linguistic quality and publication review",
+        "establish the controlled baseline",
     )
     position = -1
     for fragment in ordered:
@@ -276,6 +285,21 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
         and "change its verdict" in quality_review
         and "propose wording corrections" in quality_review,
         "quality review reopened the documentation review verdict",
+    )
+    technical_author = semantic_text(
+        skills["tracktemplate-technical-author-lead"]
+    )
+    require(
+        "use the local ste retrieval interface before writing the affected "
+        "logical units" in technical_author
+        and "deterministic pre-check results. it is not a documentation review"
+        in technical_author
+        and "one complete improvement pass before freeze" in technical_author
+        and "non-linguistic quality and publication review" in technical_author
+        and "does not repeat documentation review or change its verdict"
+        in technical_author
+        and "do not run a second documentation review" in technical_author,
+        "Technical Author Lead lost its bounded authoring and retrieval route",
     )
 
 

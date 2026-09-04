@@ -17,8 +17,10 @@ Make the owner view from the authority that this workflow examines. The view
 helps navigation. It is not project state or acceptance authority.
 
 Do not read the ASD-STE100 PDF during usual recovery. If the recovered task
-includes a linguistic conformance assessment, route it to
-[`$tracktemplate-documentation-review`](../tracktemplate-documentation-review/SKILL.md).
+creates or materially changes canonical technical prose, route it to
+[`$tracktemplate-technical-author-lead`](../tracktemplate-technical-author-lead/SKILL.md).
+After candidate freeze, the Technical Author Lead routes the frozen scope to
+one Documentation Review.
 
 ## Context temperatures
 

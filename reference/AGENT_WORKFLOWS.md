@@ -124,36 +124,59 @@ decisions visible to the agent and project owner.
 The canonical
 [TrackTemplate Technical Documentation Profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
 owns the owner-view order, controlled status meanings, and ASD-STE100 Issue 9
-conformance scope.
+conformance scope. The
+[Technical Documentation Management Plan](ENGINEERING_POLICY.md#technical-documentation-management-plan)
+owns the complete technical-document lifecycle.
 [TERMINOLOGY.md](TERMINOLOGY.md#asd-ste100-project-terminology) owns the
 TrackTemplate technical terms. Authors use links from skills to these owners.
-The skills do not become policy or terminology owners.
+The skills do not become policy, terminology, or subject owners.
 
 The [source and retrieval procedure](external/asd-ste100/README.md) owns the
 local path and official source sequence. It also owns the STE lookup operation
 and rebuild route. It does not own full applicability or the technical-term
 register. The documentation review workflow uses the official source only for
 a conformance review. Agents in other workflows route the review to
-documentation review. Agents do not read the PDF during usual work.
+documentation review. Agents do not read the PDF during usual work. The
+Technical Author Lead uses targeted retrieval before writing.
 
-For canonical prose in the conformance scope, use this route:
+Route new or materially changed canonical technical prose automatically to
+`tracktemplate-technical-author-lead`. Use this complete route:
 
-1. Read the Technical Documentation Profile.
-2. Read the technical-term register.
-3. Use the `tracktemplate-documentation-review` skill for the one
-   Documentation Review.
-4. Author the canonical prose and freeze one clean exact candidate in Git.
-5. Derive the frozen review scope from the last accepted document identity and Git.
-6. Give the complete frozen review scope to one independent Documentation Reviewer.
-7. Record one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`
+1. Identify the document need and select the required documentation result.
+2. Classify the document, owners, review, validation, and publication boundary.
+3. Plan the purpose, user, meaning, sources, terms, scope, and controlled result.
+4. Get technical meaning from the applicable canonical subject owner.
+5. Read the technical-term register and applicable documentation policy.
+6. Use targeted STE retrieval before writing the affected logical units.
+7. Use the Technical Author Lead authoring lifecycle: understand once, write
+   once, check once, and improve once.
+8. Freeze one clean exact candidate in Git.
+9. Derive the frozen review scope from the last accepted document identity and
+   Git.
+10. Give the complete frozen review scope to one independent Documentation
+    Reviewer.
+11. Record one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`
    verdict. A `BLOCKED` verdict must record a complete, nonempty `BLOCKED`
-   finding set.
-   Bind each finding to its exact path, frozen logical-unit identity, and formal
-   Issue 9 rule identifiers.
-8. For `APPROVED_WITH_EXACT_CORRECTIONS`, apply all exact replacement wording
+   finding set. Bind each finding to its exact path, frozen logical-unit
+   identity, and formal Issue 9 rule identifiers.
+12. A `BLOCKED` verdict stops the exact candidate and returns it to the owner.
+    It creates no accepted-state proposal.
+13. For `APPROVED_WITH_EXACT_CORRECTIONS`, apply all exact replacement wording
    once against verified preimages. Do not invent other canonical prose.
-9. Run one final deterministic validation after the review or correction.
-10. Complete only if that validation is green. Otherwise, stop for the owner.
+14. Run one final deterministic validation after the review or correction.
+    Complete only if that validation is green. Otherwise, stop for the owner.
+15. Finish the bounded D-GOV-015 authoring and review lifecycle.
+16. Give the exact validated candidate to one fresh read-only non-linguistic
+    quality and publication review. This review does not repeat Documentation
+    Review or change its verdict.
+17. Establish the controlled baseline only after the required reviews,
+    validation, and applicable acceptance.
+18. Use the normal repository integration to make the accepted baseline current
+    and available. Maintain it only for a genuine need, and change it from its
+    accepted baseline.
+19. Supersede or retire it only with the required evidence and authority.
+20. Preserve the required history and close the lifecycle until a genuine
+    material need reopens it.
 
 The Documentation Review is the only linguistic conformance review. Do not run
 a second Documentation Review. The STE lookup derives the frozen review scope.
@@ -172,17 +195,21 @@ conditions:
 
 | Workflow responsibility | Owner and authority boundary |
 | --- | --- |
-| Documentation review | One independent reviewer uses `tracktemplate-documentation-review` for the complete frozen review scope. The reviewer uses the official source and returns one complete verdict. For `APPROVED_WITH_EXACT_CORRECTIONS`, that review supplies all exact replacement wording. The skill owns linguistic-review responsibility. |
-| Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. It uses the STE lookup and PDF only as external references. It keeps unverified conformance and migration findings in the record. |
+| Technical-document management | The TDMP owns the complete lifecycle and its controlled meanings. It creates no second document database or review lifecycle. |
+| Technical-document authoring, delivery, and maintenance | `tracktemplate-technical-author-lead` coordinates need, classification, planning, authoring, delivery, maintenance, supersession, retirement, and preservation. It owns no subject meaning, terminology, verdict, validation result, acceptance, publication authority, or retirement decision. |
+| Documentation review | One independent reviewer uses `tracktemplate-documentation-review` for the complete frozen review scope. The reviewer returns one complete verdict. The reviewer does not author or apply changes. |
+| Subject meaning | The applicable canonical technical or governance owner supplies the required technical meaning and records its acceptance. The Technical Author Lead does not become that authority. |
+| Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. Material changes return to the Technical Author Lead before freeze. |
 | Evidence and limitation reports | An implementing agent uses `tracktemplate-change-validation` to put proof and provenance below the owner view. When applicable, the agent validates source, frozen review scope, exact candidate, receipt, accepted state, and final-content identity. A validation tool does not give or change the Documentation Review verdict. |
 | Independent review | After final deterministic validation, an independent reviewer uses `tracktemplate-quality-review`. The reviewer examines implementation quality, limitations, and authority boundaries. For an Issue 9 claim, the reviewer checks the recorded Documentation Review and its bindings. This non-linguistic review does not repeat Documentation Review or change its verdict. |
-| Handoff from `tracktemplate-technical-lead` | An implementing agent uses `tracktemplate-technical-lead` only for an authorised Level 1 or Level 2 result. If a conformance review is necessary, the agent routes the task to documentation review. |
-| Cycle result from `tracktemplate-continue` | An agent that uses `tracktemplate-continue` supplies the 6 owner-view fields and technical provenance. If a conformance review is necessary, the agent routes the task to documentation review. Project authority for Level 1/2 work and merge does not change. |
-| Result after context recovery | An agent that uses `tracktemplate-context-recovery` makes a short report from canonical authority. The agent keeps technical provenance for recovery. If a conformance review is necessary, the agent routes the task to documentation review. |
+| Handoff from another workflow | A workflow that creates or materially changes canonical technical prose routes the work to the Technical Author Lead. The frozen scope then goes to Documentation Review once. |
 
-The panel examined the complete skill catalogue for TT-DOC-001. One owner has
-each separate responsibility that can occur repeatedly. Thus, the project adds
-no documentation-profile or `tracktemplate-ste100` skill.
+The D-GOV-017 panel examined the complete skill catalogue. It found one
+separate repeatable responsibility without an owner. The Technical Author Lead
+now owns that authoring, delivery, and maintenance responsibility. The project
+adds no documentation-profile or `tracktemplate-ste100` skill.
+
+One owner has each separate responsibility that can occur repeatedly.
 
 For a later workflow change, use an existing primary owner when possible. Add
 a skill only for a separate repeatable responsibility without an owner. Record
@@ -412,6 +439,17 @@ validation and a separate read-only quality review. It does not own general
 prioritisation, independent review, debugging, publication mechanics, or Level
 3 acceptance. Its composition does not replace any specialist.
 
+### `tracktemplate-technical-author-lead`
+
+Path: `.agents/skills/tracktemplate-technical-author-lead/SKILL.md`
+
+Use it automatically for new or materially changed canonical technical prose.
+Also use it for controlled-document maintenance, supersession, retirement, and
+preservation. It coordinates the complete TDMP route from an identified need
+to a controlled result. It does not own the documented subject, terminology,
+linguistic verdict, validation result, acceptance, publication decision, or
+retirement decision.
+
 ### `tracktemplate-continue`
 
 Path: `.agents/skills/tracktemplate-continue/SKILL.md`
@@ -464,19 +502,11 @@ bounded scope.
 
 Path: `.agents/skills/tracktemplate-documentation-review/SKILL.md`
 
-Use it when creating, reviewing, shortening or reorganising TrackTemplate
-Markdown documentation, particularly where the change involves:
-
-- duplicated status or technical explanation
-- verbose or repetitive wording
-- unclear document ownership
-- live evidence, risks, or decisions recorded outside `reference/current/`
-- material copied from another canonical owner
-- conclusions or the applicable requirement set buried beneath background
-- frozen evidence, licensing, provenance, or controlled wording
-- documentation that needs restructuring without changing its meaning.
-
-Use this skill while making a material documentation change.
+Use it once for the complete frozen scope that the Technical Author Lead
+supplies. The independent reviewer checks the applicable Issue 9 requirements
+and returns one complete linguistic verdict. The reviewer does not author,
+shorten, reorganise, or apply changes. An `APPROVED_WITH_EXACT_CORRECTIONS`
+verdict supplies all exact replacement wording for one controlled application.
 
 ### `tracktemplate-documentation-alignment`
 
@@ -563,7 +593,7 @@ optional visual mode creates only sanitised, self-contained temporary HTML and
 does not execute production code or become validation evidence. Explanation
 does not replace validation, quality review or project-owner acceptance.
 
-All twenty-eight skills are deliberately instruction-only. They do not perform
+All twenty-nine skills are deliberately instruction-only. They do not perform
 automatic cleanup, assign an “AI authenticity” score, ban phrases or rewrite
 files in bulk. Those mechanisms can create false positives and remove legitimate
 FreeCAD, railway, evidential or licensing context.
@@ -652,6 +682,10 @@ $tracktemplate-chief-of-staff
 
 ```text
 $tracktemplate-technical-lead
+```
+
+```text
+$tracktemplate-technical-author-lead
 ```
 
 ```text
@@ -835,7 +869,9 @@ $tracktemplate-architecture-review
     ↓
 $tracktemplate-api-design when a public API or stored-data contract changes
     ↓
-$tracktemplate-documentation-review for an accepted canonical update
+$tracktemplate-technical-author-lead for an accepted canonical update
+    ↓
+freeze the exact candidate, then $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1013,7 +1049,11 @@ $tracktemplate-quality-review
 For a material documentation change:
 
 ```text
-$tracktemplate-documentation-review
+$tracktemplate-technical-author-lead
+    ↓
+freeze the exact candidate
+    ↓
+$tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1025,7 +1065,9 @@ For a documentation-alignment task:
 ```text
 $tracktemplate-documentation-alignment
     ↓
-$tracktemplate-documentation-review during material changes
+$tracktemplate-technical-author-lead during material changes
+    ↓
+freeze the exact candidate, then $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1037,7 +1079,10 @@ For a bounded simplification:
 ```text
 $tracktemplate-simplify
     ↓
-$tracktemplate-python-writing or $tracktemplate-documentation-review
+$tracktemplate-python-writing or $tracktemplate-technical-author-lead
+    ↓
+for canonical prose, freeze the exact candidate and use
+$tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1049,7 +1094,9 @@ For a material changelog update:
 ```text
 $tracktemplate-changelog
     ↓
-$tracktemplate-documentation-review
+$tracktemplate-technical-author-lead for a material canonical change
+    ↓
+freeze the exact candidate, then $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
@@ -1061,7 +1108,9 @@ For a licence, provenance or output-use assessment:
 ```text
 $tracktemplate-license-analysis
     ↓
-$tracktemplate-documentation-review when canonical records change
+$tracktemplate-technical-author-lead when canonical records change materially
+    ↓
+freeze the exact candidate, then $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
