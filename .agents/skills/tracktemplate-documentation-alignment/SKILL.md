@@ -94,8 +94,10 @@ repository appear consistent.
    generic memory, atlas, plan, chronicle or session-summary files.
 7. **Validate the result.** Review the complete diff, re-check every changed
    claim and link, run the repository agent-guidance validator when agent
-   guidance or a skill changed, then use the normal documentation validation
-   and quality-review sequence.
+   guidance or a skill changed, then use the Technical Author Lead route for
+   materially changed canonical prose. Its final deterministic validation ends
+   the document-review cycle. Use quality review only for a separate source or
+   test change; it cannot reopen governance-document wording or meaning.
 
 ## Targeted checks
 

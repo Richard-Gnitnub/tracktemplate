@@ -23,6 +23,13 @@ for the current bounded change:
 - classify, repair, revalidate, commit and push failures whose fixes remain
   inside the same accepted scope.
 
+The repair authority applies to source and test changes. For a governance
+document that completed its one Documentation Review, permitted adjustment and
+final deterministic validation, publication can only verify the exact final
+bytes and report CI `PASS` or `FAIL`. It cannot edit the prose, invoke another
+documentation or quality review, reinterpret meaning or start an improvement
+pass.
+
 The publication stage delegated by an explicit
 [`$tracktemplate-continue`](../tracktemplate-continue/SKILL.md) invocation is
 narrower. It is review-frozen: it authorises the branch, commit, push, draft and
@@ -50,9 +57,10 @@ boundaries.
 4. Treat the invocation as authority only for files belonging to the current
    accepted task. If unrelated or ownership-ambiguous changes are present,
    stop and ask which paths belong.
-5. Use `$tracktemplate-change-validation` and
+5. Use `$tracktemplate-change-validation` and, for source or test changes,
    `$tracktemplate-quality-review` when their evidence has not already been
-   completed for the exact source state.
+   completed for the exact source state. For governance prose, require the
+   completed finite Technical Author Lead record and do not add another review.
 6. For review-frozen delegation, record the reviewed path set and content state
    supplied by `$tracktemplate-continue`; stop if the current or staged source
    differs from it.
@@ -78,6 +86,8 @@ boundaries.
 7. Inspect required checks for the exact commit SHA. A local pass does not
    substitute for GitHub Actions.
 8. On failure, preserve the failing run, job, step and first relevant output.
+   A governance-document CI failure stops for the owner; do not change its
+   prose or invoke another review.
    In review-frozen mode, stop and return that evidence to
    `$tracktemplate-continue` without changing source or Git state. For a direct
    explicit publish invocation, classify it under `reference/TESTING_POLICY.md`,

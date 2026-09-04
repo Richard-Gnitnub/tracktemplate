@@ -89,9 +89,12 @@ into this skill.
   technical-lead work.
 - Use
   [`$tracktemplate-change-validation`](../tracktemplate-change-validation/SKILL.md)
-  for proportionate proof, then hand the completed change and raw evidence to a
-  separate read-only
+  for proportionate proof, then hand changed source and tests with their raw
+  evidence to a separate read-only
   [`$tracktemplate-quality-review`](../tracktemplate-quality-review/SKILL.md).
+  Governance prose completes its separate Technical Author Lead route after
+  one Documentation Review, any permitted adjustment and final deterministic
+  validation. Do not include that prose in another quality or wording review.
 
 Technical-lead composition does not replace any specialist skill. Name the
 selected specialist sequence and each routing reason; do not silently absorb a
@@ -127,8 +130,9 @@ When implementation is authorised directly or through an explicit
    uncertainty.
 3. Run `$tracktemplate-change-validation`, preserve every failed or unavailable
    proof and rerun the original proof after any classified repair.
-4. Hand the complete implementation and raw evidence to a separate read-only
-   `$tracktemplate-quality-review`.
+4. Hand the changed source and tests with their raw evidence to a separate
+   read-only `$tracktemplate-quality-review`. Do not route completed governance
+   prose through that review.
 5. Leave branch integration, commits, push, pull-request and merge mechanics to
    [`$tracktemplate-publish`](../tracktemplate-publish/SKILL.md) and
    `$tracktemplate-continue`.

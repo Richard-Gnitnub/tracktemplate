@@ -119,8 +119,9 @@ identity, or frozen-review-scope failure returns to the owner.
 - Use the pre-check and STE lookup during the review. Review the complete
   applicable requirement set. Include each applicable requirement that a
   lookup result does not contain.
-- Identify repeated or unnecessary wording. Keep evidence, qualifications,
-  and controlled terms in each proposed correction.
+- Report repetition only when it creates ambiguity, contradiction, or an
+  applicable rule failure. Do not propose a correction only because different
+  wording is possible or preferable.
 - Preserve frozen historical evidence and append-only records. Do not rewrite
   them with later knowledge.
 - Before you assess a correction, identify the exact wording that a validator

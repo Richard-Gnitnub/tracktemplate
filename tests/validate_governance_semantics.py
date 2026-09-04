@@ -2356,12 +2356,12 @@ def validate_current_evidence_mutations() -> None:
     )
     tdmp_current_row = table_row_containing(
         tdmp_section,
-        "candidate is not yet a controlled baseline",
+        "not yet integrated as the current controlled baseline",
     )
     tdmp_candidate_made_current = replace_once(
         tdmp_current_row,
-        "candidate is not yet a controlled baseline",
-        "candidate is the current controlled baseline",
+        "not yet integrated as the current controlled baseline",
+        "integrated as the current controlled baseline",
     )
     expect_rejected(
         "phase-evidence/d-gov-017-draft-made-current",
@@ -2376,16 +2376,19 @@ def validate_current_evidence_mutations() -> None:
                 ),
             )
         ),
-        "D-GOV-017 owner view drifted: candidate is not yet a controlled baseline",
+        "D-GOV-017 owner view drifted: not yet integrated as the current "
+        "controlled baseline",
     )
     tdmp_authority_row = table_row_containing(
         tdmp_section,
-        "D-GOV-015 remains authoritative",
+        "Keep the D-GOV-015 authoring internals and sole Documentation Review "
+        "authoritative",
     )
     tdmp_dgov015_replaced = replace_once(
         tdmp_authority_row,
-        "D-GOV-015 remains authoritative",
-        "D-GOV-017 replaces D-GOV-015",
+        "Keep the D-GOV-015 authoring internals and sole Documentation Review "
+        "authoritative",
+        "Replace the D-GOV-015 authoring internals and Documentation Review",
     )
     expect_rejected(
         "phase-evidence/d-gov-017-replaces-d-gov-015",
@@ -2400,7 +2403,8 @@ def validate_current_evidence_mutations() -> None:
                 ),
             )
         ),
-        "D-GOV-017 owner view drifted: D-GOV-015 remains authoritative",
+        "D-GOV-017 owner view drifted: Keep the D-GOV-015 authoring internals "
+        "and sole Documentation Review authoritative",
     )
 
 
@@ -2840,9 +2844,11 @@ def validate_documentation_profile_mutations() -> None:
             "Create a\nnew document-management database",
         ),
         (
-            "tdmp/unchanged-prose-periodically-reopened",
-            "Do not periodically review accepted unchanged prose",
-            "Periodically review accepted unchanged prose",
+            "tdmp/post-validation-review-added",
+            "Green final validation ends\nthe bounded D-GOV-015 lifecycle.",
+            "Green final validation ends\nthe bounded D-GOV-015 lifecycle. "
+            "After final validation, run a post-validation quality and "
+            "publication review.",
         ),
         (
             "tdmp/historical-evidence-rewritten",

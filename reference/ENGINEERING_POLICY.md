@@ -446,10 +446,9 @@ The complete technical-document lifecycle is:
 
 > identify the need → classify → assign ownership → plan → understand once →
 > write once → check once → improve once → freeze once → review once →
-> validate once → finish the D-GOV-015 lifecycle → complete the non-linguistic
-> quality and publication review → establish a controlled baseline → make
-> available → use → maintain → change under control → supersede or retire →
-> preserve required history
+> adjust once when required → validate once → finish the D-GOV-015 lifecycle →
+> establish a controlled baseline → make available → use → maintain → change
+> under control → supersede or retire → preserve required history
 
 The [Documentation Review lifecycle](#documentation-review-lifecycle) is one
 bounded part of this lifecycle. D-GOV-015 remains authoritative for that part.
@@ -569,6 +568,11 @@ Lead automatically owns this route:
 > understand once → write once → check once → improve once → freeze once →
 > review once → validate once → finish
 
+For a governance document, the project-owner shorthand for this point-in-time
+route is `write → review → adjust if required → final deterministic validation
+→ done`. Understand, check, improve, and freeze are parts of the one Technical
+Author Lead authoring pass. They do not create more independent reviews.
+
 The understand step confirms the plan, authority, meaning, and terms. The write
 step produces all affected complete logical units. The check step examines
 technical accuracy, ownership, terms, exact content, links, and deterministic
@@ -584,13 +588,14 @@ corrections once only when that verdict permits them. Then run the one final
 deterministic validation. Do not run another linguistic review.
 
 The finish step supplies the exact candidate, Documentation Review, final
-validation, limitations, and required authority. It completes the bounded
-D-GOV-015 lifecycle. It does not establish controlled-baseline acceptance.
+validation, limitations, and required authority. Green final validation ends
+the bounded D-GOV-015 lifecycle. Do not send the document to another
+documentation, quality, publication, wording, or semantic review. The finish
+step does not establish controlled-baseline acceptance.
 
-After finish, give the exact validated candidate to one fresh read-only
-non-linguistic quality and publication review. This review examines
-implementation quality, limitations, authority boundaries, and publication
-readiness. It does not repeat Documentation Review or change its verdict.
+Continuous integration can run the required deterministic checks on the final
+bytes. A CI result cannot start another Documentation Review, correction pass,
+or linguistic improvement cycle. If final validation fails, stop for the owner.
 
 A non-material correction uses proportionate review and validation. If its
 scope becomes material, reclassify it before retention and use the complete
@@ -606,7 +611,7 @@ Use existing Git and canonical records to distinguish these states:
 | **Frozen review candidate** | Git identifies the exact candidate and review scope. It is not current controlled documentation. |
 | **Reviewed** | The one Documentation Review has a recorded verdict. The verdict alone does not establish a controlled baseline. |
 | **Validated** | The applicable deterministic validation passed for the exact reviewed content. Validation alone does not establish a controlled baseline. |
-| **Accepted/controlled baseline** | The applicable authority recorded acceptance of the exact content after all required reviews and final deterministic validation. This is the comparison point for later change. |
+| **Accepted/controlled baseline** | The applicable authority recorded acceptance of the exact content after the one required Documentation Review, permitted adjustment, and final deterministic validation. This is the comparison point for later change. |
 | **Superseded** | An accepted replacement owns the current information. The earlier document is historical evidence and is not current authority. |
 | **Retired** | Evidence shows that the document owns no required current information. It is not current authority. |
 | **Frozen historical evidence** | The repository preserves dated evidence and its accepted meaning. It is not live project authority. |
@@ -618,10 +623,9 @@ record acceptance of the exact content.
 
 ### Controlled baseline
 
-Establish the controlled baseline only after the Documentation Review, final
-deterministic validation, and required post-validation non-linguistic quality
-and publication review pass. The applicable change authority must record
-acceptance of the exact document.
+Establish the controlled baseline only after the one Documentation Review,
+permitted adjustment, and final deterministic validation are complete. The
+applicable change authority must record acceptance of the exact document.
 
 Record only durable data that existing authority requires. This can include:
 
@@ -695,9 +699,7 @@ For a material change to canonical technical prose:
 2. Derive the required review scope from the accepted baseline and Git.
 3. Review only the required complete logical units after a baseline exists.
 4. Apply the one-review D-GOV-015 lifecycle.
-5. Complete the required post-validation non-linguistic quality and publication
-   review.
-6. Establish a new controlled baseline only after review, validation, and
+5. Establish a new controlled baseline only after review, validation, and
    applicable acceptance.
 
 Do not reopen unrelated accepted prose. An improvement to an assurance method
@@ -802,6 +804,13 @@ reopens the lifecycle. The management objective is finite:
 
 The objective is controlled technical information throughout its useful life.
 It is not perpetual document improvement.
+
+For a governance document, the point-in-time process is write, one review, one
+adjustment when required, final deterministic validation, and done. Do not reopen
+it during CI or after completion to improve wording, reinterpret accepted
+meaning, apply a later checker preference, or use a newer review method. A new
+cycle starts only when the applicable authority identifies a genuine material
+documentation need.
 
 ### Existing repository records
 

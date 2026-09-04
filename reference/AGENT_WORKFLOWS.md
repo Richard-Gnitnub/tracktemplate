@@ -165,17 +165,15 @@ Route new or materially changed canonical technical prose automatically to
    once against verified preimages. Do not invent other canonical prose.
 14. Run one final deterministic validation after the review or correction.
     Complete only if that validation is green. Otherwise, stop for the owner.
-15. Finish the bounded D-GOV-015 authoring and review lifecycle.
-16. Give the exact validated candidate to one fresh read-only non-linguistic
-    quality and publication review. This review does not repeat Documentation
-    Review or change its verdict.
-17. Establish the controlled baseline only after the required reviews,
-    validation, and applicable acceptance.
-18. Use the normal repository integration to make the accepted baseline current
+15. Finish the bounded D-GOV-015 authoring and review lifecycle. Do not start
+    another documentation, quality, publication, wording, or semantic review.
+16. Establish the controlled baseline only after that one review, permitted
+    adjustment, final validation, and applicable acceptance.
+17. Use the normal repository integration to make the accepted baseline current
     and available. Maintain it only for a genuine need, and change it from its
     accepted baseline.
-19. Supersede or retire it only with the required evidence and authority.
-20. Preserve the required history and close the lifecycle until a genuine
+18. Supersede or retire it only with the required evidence and authority.
+19. Preserve the required history and close the lifecycle until a genuine
     material need reopens it.
 
 The Documentation Review is the only linguistic conformance review. Do not run
@@ -183,6 +181,13 @@ a second Documentation Review. The STE lookup derives the frozen review scope.
 It validates source, exact candidate, receipt, accepted state, and final-content
 identity. It also detects unreviewed mutation. It does not give or change the
 linguistic verdict. A deterministic pre-check is only a review aid.
+
+For governance documentation, the cycle is write, one review, one permitted
+adjustment, final deterministic validation, and done. Continuous integration
+can check the final bytes. It cannot request or start another documentation
+review, wording pass, semantic reinterpretation, or improvement cycle.
+The understand, check, improve, and freeze controls are parts of the one
+Technical Author Lead authoring pass. They are not additional reviews.
 
 Rule families in a lookup result are retrieval priorities. They are not the
 applicable requirement set. Use complete-source inspection only for these bounded
@@ -201,7 +206,7 @@ conditions:
 | Subject meaning | The applicable canonical technical or governance owner supplies the required technical meaning and records its acceptance. The Technical Author Lead does not become that authority. |
 | Claim, status, and documentation alignment | `tracktemplate-documentation-alignment` compares canonical prose with canonical authority. Material changes return to the Technical Author Lead before freeze. |
 | Evidence and limitation reports | An implementing agent uses `tracktemplate-change-validation` to put proof and provenance below the owner view. When applicable, the agent validates source, frozen review scope, exact candidate, receipt, accepted state, and final-content identity. A validation tool does not give or change the Documentation Review verdict. |
-| Independent review | After final deterministic validation, an independent reviewer uses `tracktemplate-quality-review`. The reviewer examines implementation quality, limitations, and authority boundaries. For an Issue 9 claim, the reviewer checks the recorded Documentation Review and its bindings. This non-linguistic review does not repeat Documentation Review or change its verdict. |
+| Completion boundary | Final deterministic validation ends the governance-document review cycle. `tracktemplate-quality-review`, CI, publication, and integration cannot add a later document review or reopen wording or accepted meaning. |
 | Handoff from another workflow | A workflow that creates or materially changes canonical technical prose routes the work to the Technical Author Lead. The frozen scope then goes to Documentation Review once. |
 
 The D-GOV-017 panel examined the complete skill catalogue. It found one
@@ -435,7 +440,9 @@ cross-specialist implementation. Also use it when an explicit
 `$tracktemplate-continue` cycle selects such an authorised Level 1 or Level 2
 outcome. It defines the smallest
 end-to-end vertical slice. It composes the existing specialist skills through
-validation and a separate read-only quality review. It does not own general
+validation and, for source or test changes, a separate read-only quality
+review. Governance prose completes the finite Technical Author Lead route and
+does not enter that quality review. It does not own general
 prioritisation, independent review, debugging, publication mechanics, or Level
 3 acceptance. Its composition does not replace any specialist.
 
@@ -492,9 +499,11 @@ Path: `.agents/skills/tracktemplate-simplify/SKILL.md`
 
 Before using it, establish the preserved behaviour and evidence limit. Then use
 it for a bounded simplification pass over source, tests, documentation, or
-agent guidance. It removes only proven accidental complexity. It routes each material
-edit through the applicable writing, validation, and quality skills. It does
-not authorise changed railway behaviour, weaker validation, or
+agent guidance. It removes only proven accidental complexity. It routes source
+and test edits through the applicable writing, validation, and quality skills.
+It routes materially changed canonical prose through the finite Technical
+Author Lead lifecycle, which has no later quality review. It does not authorise
+changed railway behaviour, weaker validation, or
 frozen-identifier migration. It also does not authorise cleanup outside the
 bounded scope.
 
@@ -555,11 +564,13 @@ proposed or completed TrackTemplate change. It distinguishes:
 - performance measurement
 - provenance, licensing, and output-clearance product boundaries.
 
-Use this skill after implementation or a documentation change. Use it before
-the final quality review when applicable checks or evidence limits are not
-trivial. Invoke it immediately when a selected check fails so the raw
-failure is preserved and classified under `reference/TESTING_POLICY.md` before
-retained fixes.
+Use this skill after implementation or a documentation change. For governance
+documentation, this is the final deterministic check after the one review and
+permitted adjustment. It does not trigger a later quality or documentation
+review. For a source change, use it before the final quality review when
+applicable checks or evidence limits are not trivial. Invoke it immediately
+when a selected check fails so the raw failure is preserved and classified
+under `reference/TESTING_POLICY.md` before retained fixes.
 
 ### `tracktemplate-quality-review`
 
@@ -577,10 +588,11 @@ Use it to review the complete relevant diff for:
 - accidental public API, stored-state, or compatibility changes
 - performance regressions and unsupported validation claims.
 
-Use this skill as the staff-level, read-only first review. Use it before
-reporting completion of a non-trivial source or documentation change. Also use
-it after a classified failed-test repair. It judges the change using the available
-evidence. It does not replace the validation skill.
+Use this skill as the staff-level, read-only first review for source and test
+changes. Do not add it after the one Documentation Review and final validation
+of a governance document. It cannot reopen document wording or accepted
+meaning. Also use it after a classified failed-test repair. It judges the
+change using the available evidence. It does not replace the validation skill.
 
 ### `tracktemplate-explain-change`
 
@@ -752,7 +764,7 @@ Natural routing examples preserve these authority boundaries:
 | `$tracktemplate-continue` | Continue owns one repository-driven integration, delivery, validation, review and draft-publication cycle. |
 | “Merge the last green pull request and continue with whatever is next.” | Does not activate continue. Request the literal `$tracktemplate-continue` invocation before using its one-cycle authority. |
 | “Diagnose this traceback.” | Use debugging only unless later evidence authorises a fix. Neither new role activates. |
-| “Review this pull request without modifying it.” | Use read-only quality review. Technical lead does not activate. |
+| “Review this source pull request without modifying it.” | Use read-only quality review for source and tests. Technical lead does not activate. |
 | `$tracktemplate-publish` | Publish owns the bounded validation, branch, commit, draft and exact-head CI workflow. |
 | “Publish this already validated branch.” | Does not activate TrackTemplate publish. Request the literal `$tracktemplate-publish` invocation. Do not use another publication workflow. |
 
@@ -791,8 +803,11 @@ not replace post-implementation validation.
 
 ## Normal workflow order
 
-Validation determines what the evidence proves. Quality review determines
-whether the implementation and bounded scope are acceptable with that evidence.
+Validation determines what the evidence proves. For source and test changes,
+quality review determines whether the implementation and bounded scope are
+acceptable with that evidence. For governance documents, the one Documentation
+Review gives the sole review verdict and final deterministic validation ends
+the document-review cycle.
 
 For IDE workspace alignment:
 
@@ -875,7 +890,8 @@ freeze the exact candidate, then $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
-$tracktemplate-quality-review
+done for the governance document; use $tracktemplate-quality-review only for
+a separate source or test change
 ```
 
 For a source change:
@@ -997,9 +1013,10 @@ applicable specialist skills
     ↓
 $tracktemplate-change-validation
     ↓
-separate read-only $tracktemplate-quality-review
+for source or tests, separate read-only $tracktemplate-quality-review;
+for governance prose, finish its sole-review Technical Author Lead route
     ↓
-repair only a `BLOCKER` finding, with at most two passes
+repair only a source/test `BLOCKER` finding, with at most two passes
     ↓
 reconcile claimed, present, validated and independently accepted state
 against the exact phase exit
@@ -1016,7 +1033,9 @@ edit can skip technical lead. When no worthwhile authorised phase-moving
 outcome exists, continue stops on clean protected `main` before branch creation. A newly
 published draft is never marked ready or merged in the same invocation.
 Delegated publication cannot mutate the reviewed source. An exact-head CI
-`BLOCKER` finding returns to the same two-pass validation-and-review loop.
+`BLOCKER` for source or tests returns to the same two-pass validation-and-review
+loop. A governance-document CI failure stops for the owner. It cannot start a
+review, correction, reinterpretation, or wording pass.
 
 For measured performance work:
 
@@ -1057,7 +1076,7 @@ $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
-$tracktemplate-quality-review
+done
 ```
 
 For a documentation-alignment task:
@@ -1071,7 +1090,7 @@ freeze the exact candidate, then $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
-$tracktemplate-quality-review
+done
 ```
 
 For a bounded simplification:
@@ -1086,7 +1105,8 @@ $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
-$tracktemplate-quality-review
+done for canonical prose; use $tracktemplate-quality-review only for a
+separate source or test change
 ```
 
 For a material changelog update:
@@ -1100,7 +1120,7 @@ freeze the exact candidate, then $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
-$tracktemplate-quality-review
+done
 ```
 
 For a licence, provenance or output-use assessment:
@@ -1114,7 +1134,8 @@ freeze the exact candidate, then $tracktemplate-documentation-review once
     ↓
 $tracktemplate-change-validation
     ↓
-$tracktemplate-quality-review
+done for canonical prose; use $tracktemplate-quality-review only for a
+separate source or test change
 ```
 
 For a beta or exact release-candidate audit:
@@ -1131,14 +1152,14 @@ $tracktemplate-change-validation
 $tracktemplate-quality-review
 ```
 
-For a review-only request, use `$tracktemplate-quality-review`. Add
+For a source/test review-only request, use `$tracktemplate-quality-review`. Add
 `$tracktemplate-change-validation` when the review must determine whether the
 available evidence supports the change or which checks remain outstanding.
 
 ## Staff review and failed-test flow
 
-The normal source and documentation sequences above are the new-change paths.
-Their first staff-review pass is read-only. Prefer a fresh reviewer or session
+The normal source and test sequences above are the staff-review paths. Their
+first staff-review pass is read-only. Prefer a fresh reviewer or session
 when available and proportionate. Give the reviewer the request, canonical
 requirement set, complete diff, raw validation evidence, and known unperformed
 checks. Do not prime the reviewer with the intended verdict. Disclose a
@@ -1211,8 +1232,10 @@ authority. Before installing, copying or adapting one:
 5. Preserve required notices for copied or substantially adapted material.
 6. Give each admitted local skill one responsibility and remove or bound any
    overlap with an existing skill.
-7. Run the repository guidance validator and the normal documentation and
-   quality reviews.
+7. Run the repository guidance validator. For materially changed canonical
+   guidance, use its one Documentation Review, permitted adjustment and final
+   deterministic validation, then finish. Use quality review only for separate
+   executable source or test changes.
 
 Do not bulk-copy a catalogue or enable repository-writing hooks. Do not add a
 product runtime dependency only because upstream describes it as universal or

@@ -806,8 +806,8 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
     concept_groups = (
         (
             "identify the need → classify → assign ownership → plan",
-            "validate once → finish the d-gov-015 lifecycle",
-            "complete the non-linguistic quality and publication review",
+            "adjust once when required → validate once → finish the d-gov-015 "
+            "lifecycle",
             "establish a controlled baseline → make available → use",
             "change under control → supersede or retire → preserve required "
             "history",
@@ -861,9 +861,13 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
             "apply tt-doc-001, tt-doc-002, and d-gov-015 exactly throughout",
             "one independent documentation reviewer",
             "do not run another linguistic review",
-            "after finish, give the exact validated candidate to one fresh "
-            "read-only non-linguistic quality and publication review",
-            "does not repeat documentation review or change its verdict",
+            "green final validation ends the bounded d-gov-015 lifecycle",
+            "do not send the document to another documentation, quality, "
+            "publication, wording, or semantic review",
+            "continuous integration can run the required deterministic checks "
+            "on the final bytes",
+            "cannot start another documentation review, correction pass, or "
+            "linguistic improvement cycle",
         ),
         (
             "draft",
@@ -877,9 +881,9 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
             "failed experimental candidate",
         ),
         (
-            "establish the controlled baseline only after the documentation "
-            "review, final deterministic validation, and required "
-            "post-validation non-linguistic quality and publication review pass",
+            "establish the controlled baseline only after the one documentation "
+            "review, permitted adjustment, and final deterministic validation "
+            "are complete",
             "applicable change authority must record acceptance of the exact "
             "document",
             "do not add sentence, paragraph, or logical-unit workflow state",
@@ -907,8 +911,6 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
             "compare every proposed change to the accepted controlled baseline",
             "derive the required review scope from the accepted baseline and git",
             "review only the required complete logical units",
-            "complete the required post-validation non-linguistic quality and "
-            "publication review",
             "establish a new controlled baseline only after review, validation, "
             "and applicable acceptance",
             "do not reopen unrelated accepted prose",
@@ -956,6 +958,10 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
             "another model is available",
             "a later process is stronger",
             "further linguistic improvement is possible",
+            "point-in-time process is write, one review, one adjustment when required, "
+            "final deterministic validation, and done",
+            "do not reopen it during ci or after completion",
+            "genuine material documentation need",
             "not perpetual document improvement",
         ),
     )
@@ -963,6 +969,19 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
         require(
             all(concept in tdmp_flat for concept in concepts),
             "TDMP lifecycle lost: " + " / ".join(concepts),
+        )
+
+    for prohibited in (
+        "complete the non-linguistic quality and publication review",
+        "after finish, give the exact validated candidate to one fresh "
+        "read-only non-linguistic quality and publication review",
+        "post-validation non-linguistic quality and publication review",
+        "post-validation quality and publication review",
+    ):
+        require(
+            prohibited not in tdmp_flat,
+            "TDMP lifecycle lost: post-validation document review prohibited: "
+            + prohibited,
         )
 
     terminology_flat = " ".join(terminology.split()).casefold()
@@ -981,8 +1000,8 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
         "retired document",
         "failed experimental candidate",
         "technical author lead",
-        "records acceptance after all required reviews and final deterministic "
-        "validation",
+        "records acceptance after the one required documentation review, "
+        "permitted adjustment, and final deterministic validation",
         "| **author** |",
         "| **retire** |",
         "| **supersede** |",

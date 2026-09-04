@@ -190,6 +190,23 @@ def validate_explicit_agent_safeguards(agents: str) -> None:
         "AGENTS lost or weakened its explicit terminology-surface boundary",
     )
 
+    completion_items = bullet_items(
+        direct_section_content(agents, "Validation and completion")
+    )
+    expected_finite_review = semantic_text(
+        "Use the validation and quality workflows for non-trivial source and "
+        "test work; the first quality-review pass is read-only and any "
+        "independence limitation is disclosed. Canonical governance prose "
+        "follows the finite Technical Author Lead route. Its one Documentation "
+        "Review, permitted adjustment and final deterministic validation end "
+        "the document-review cycle. Quality review, CI, publication and "
+        "integration cannot reopen its wording or meaning."
+    )
+    require(
+        expected_finite_review in completion_items,
+        "AGENTS lost the finite governance-document review boundary",
+    )
+
 
 def validate_chief_comparative_priority(chief: str, workflows: str) -> None:
     """Require comparative priority in both the brief and workflow contract."""
@@ -481,7 +498,6 @@ def validate_progress_delivery_structure() -> None:
         },
         "tracktemplate-technical-author-lead": {
             "tracktemplate-documentation-review",
-            "tracktemplate-quality-review",
         },
         "tracktemplate-continue": {
             "tracktemplate-change-validation",
@@ -575,9 +591,12 @@ def validate_technical_author_lifecycle(
             "understand once → write once → check once → improve once",
             "freeze once → review once → validate once → finish",
             "one complete improvement pass before freeze",
-            "one fresh read-only $tracktemplate-quality-review",
-            "non-linguistic quality and publication review",
-            "does not repeat documentation review or change its verdict",
+            "green final validation ends this documentation cycle",
+            "do not send the document to another documentation, quality, "
+            "publication, wording, or semantic review",
+            "continuous integration can check the final bytes",
+            "cannot start another documentation review, correction pass, or "
+            "linguistic improvement cycle",
             "do not run a second documentation review",
         ),
         (
@@ -619,7 +638,8 @@ def validate_technical_author_lifecycle(
         "one independent documentation reviewer",
         "one final deterministic validation",
         "finish the bounded d-gov-015 authoring and review lifecycle",
-        "one fresh read-only non-linguistic quality and publication review",
+        "do not start another documentation, quality, publication, wording, "
+        "or semantic review",
         "establish the controlled baseline",
         "normal repository integration",
         "supersede or retire",
@@ -874,7 +894,7 @@ def validate_continue_invocation_policy(workflows: str) -> None:
         "tracktemplate-continue no longer limits repair to blockers",
     )
     require(
-        "no more than two total repair-and-review passes"
+        "no more than two total source/test repair-and-review passes"
         in normalized_skill_text
         and "another separate read-only staff review of the complete repaired "
         "source before publication"
@@ -882,10 +902,33 @@ def validate_continue_invocation_policy(workflows: str) -> None:
         "tracktemplate-continue lost its shared repair or final-review limit",
     )
     require(
+        "A governance document follows the Technical Author Lead route. After "
+        "its one Documentation Review, permitted adjustment and final "
+        "deterministic validation, that document is done."
+        in normalized_skill_text
+        and "Exact-head CI can verify its final bytes but cannot initiate "
+        "another review, correction, reinterpretation or wording pass."
+        in normalized_skill_text
+        and "For a governance-document failure, stop for the owner after "
+        "preserving the CI evidence."
+        in normalized_skill_text,
+        "tracktemplate-continue can reopen governance prose from CI",
+    )
+    require(
         "It does not delegate this skill's repair authority."
         in normalized_publish_text
         and "without changing source or Git state" in normalized_publish_text,
         "delegated publication can mutate final-reviewed source",
+    )
+    require(
+        "publication can only verify the exact final bytes and report CI "
+        "`PASS` or `FAIL`" in normalized_publish_text
+        and "It cannot edit the prose, invoke another documentation or quality "
+        "review, reinterpret meaning or start an improvement pass."
+        in normalized_publish_text
+        and "A governance-document CI failure stops for the owner"
+        in normalized_publish_text,
+        "publication can reopen a completed governance document",
     )
     require(
         "During an active continuation cycle, only a `BLOCKER` can return to "
@@ -1135,33 +1178,38 @@ def validate_documentation_profile_routing(
     change_validation = read(
         SKILLS_ROOT / "tracktemplate-change-validation" / "SKILL.md"
     )
+    change_validation_flat = semantic_text(change_validation)
     require(
         "validator as proof of linguistic conformance" in change_validation,
         "change validation lets automation prove linguistic conformance",
+    )
+    require(
+        "For governance documents, a green final deterministic validation ends "
+        "the finite Technical Author Lead route" in change_validation_flat
+        and "does not hand the prose to another reviewer"
+        in change_validation_flat,
+        "change validation can route governance prose to another review",
     )
     quality_review = read(
         SKILLS_ROOT / "tracktemplate-quality-review" / "SKILL.md"
     )
     quality_review_flat = semantic_text(quality_review)
     require(
-        "reviewer used the official standard" in quality_review_flat
-        and "validator result alone is not sufficient evidence"
-        in quality_review_flat,
-        "quality review lost its Issue 9 evidence boundary",
-    )
-    require(
-        "This quality review is non-linguistic" in quality_review_flat
-        and "Do not repeat Documentation Review" in quality_review_flat
-        and "change its verdict" in quality_review_flat
-        and "propose wording corrections" in quality_review_flat,
-        "quality review reopened the one Documentation Review verdict",
+        "This skill does not review governance-document prose at any stage"
+        in quality_review_flat
+        and "one Documentation Review, one permitted adjustment and one final "
+        "deterministic validation, then done" in quality_review_flat
+        and "cannot invoke this skill to reconsider their wording or meaning"
+        in quality_review_flat
+        and "does not examine the governance prose, repeat that review, change "
+        "its verdict or propose wording" in quality_review_flat,
+        "quality review can reopen the sole governance Documentation Review",
     )
 
     source_skill_names = {
         "tracktemplate-change-validation",
         "tracktemplate-documentation-alignment",
         "tracktemplate-documentation-review",
-        "tracktemplate-quality-review",
         "tracktemplate-technical-author-lead",
     }
     for name in names:
@@ -1212,12 +1260,9 @@ def validate_documentation_profile_routing(
         "change validation lost its official-source or no-PDF-CI boundary",
     )
     require(
-        "identify the official source" in quality_review_flat
-        and "Keep TrackTemplate policy different from the external "
-        "normative reference" in quality_review_flat
-        and "Keep evidence that the reviewer examined the named logical unit"
-        in quality_review_flat,
-        "quality review lost the policy/source/assessment distinction",
+        "For an Issue 9 conformance claim, use the Technical Author Lead and "
+        "Documentation Review route" in quality_review_flat,
+        "quality review can take the Issue 9 review role",
     )
 
     routine_routes = {
@@ -1448,7 +1493,12 @@ def validate_issue9_documentation_lifecycle(
         "run one final deterministic validation",
         "complete only if that validation is green",
         "finish the bounded d-gov-015 authoring and review lifecycle",
-        "one fresh read-only non-linguistic quality and publication review",
+        "do not start another documentation, quality, publication, wording, or "
+        "semantic review",
+        "cycle is write, one review, one permitted adjustment, final "
+        "deterministic validation, and done",
+        "cannot request or start another documentation review, wording pass, "
+        "semantic reinterpretation, or improvement cycle",
         "stop for the owner",
         "only linguistic conformance review",
         "do not run a second documentation review",

@@ -208,6 +208,12 @@ acceptance authority.
 
 ## Validate and review
 
+The quality-review and repair passes in this section apply to source and test
+changes. A governance document follows the Technical Author Lead route. After
+its one Documentation Review, permitted adjustment and final deterministic
+validation, that document is done. Exact-head CI can verify its final bytes but
+cannot initiate another review, correction, reinterpretation or wording pass.
+
 1. Invoke
    [`$tracktemplate-change-validation`](../tracktemplate-change-validation/SKILL.md),
    preserve and classify every selected failure, and run the proportionate
@@ -227,7 +233,7 @@ acceptance authority.
    `REQUIRED_BEFORE_EXIT`, `BACKLOG` or `OPTIONAL` findings in this cycle. If a
    non-blocker means the selected outcome cannot be published safely, stop and
    report it instead of reclassifying it or expanding the tranche.
-5. Permit no more than two total repair-and-review passes for the same outcome,
+5. Permit no more than two total source/test repair-and-review passes for the same outcome,
    including any later exact-head CI blocker. After each repair, rerun the
    original proof and affected final validation, then obtain another separate
    read-only staff review of the complete repaired source before publication.
@@ -266,6 +272,10 @@ inside the selected outcome. Such a repair consumes one of the same two total
 passes above and must repeat the affected final validation and another separate
 read-only staff review before publication resumes. Stop when no pass remains,
 the failure is environmental or external, or the repair would exceed scope.
+
+For a governance-document failure, stop for the owner after preserving the CI
+evidence. Do not edit its prose, invoke Documentation Review or quality review,
+or start another improvement pass from CI.
 
 Stop with that exact-green draft. Do not mark it ready or merge it during this
 invocation.

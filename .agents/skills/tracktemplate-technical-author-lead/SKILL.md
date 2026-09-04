@@ -96,19 +96,19 @@ that exact candidate. Do not run a second Documentation Review.
 
 Finish the bounded authoring and review lifecycle by supplying the exact
 candidate, Documentation Review, final validation, limitations, and required
-owner decision. Do not describe these items as project acceptance.
+owner decision. Green final validation ends this documentation cycle. Do not
+send the document to another documentation, quality, publication, wording, or
+semantic review. Do not describe these items as project acceptance.
 
-After finish, give the exact validated candidate to one fresh read-only
-[`$tracktemplate-quality-review`](../tracktemplate-quality-review/SKILL.md) for
-the non-linguistic quality and publication review. This review does not repeat
-Documentation Review or change its verdict.
+Continuous integration can check the final bytes. It cannot start another
+Documentation Review, correction pass, or linguistic improvement cycle.
 
 ## Control the baseline and availability
 
-After the required reviews and final validation pass, coordinate the
-applicable acceptance. Record only the durable identity and authority that the
-TDMP requires. Then coordinate repository integration. Do not create a second
-document-management database.
+After the one Documentation Review, permitted adjustment, and final validation
+are complete, coordinate the applicable acceptance. Record only the durable
+identity and authority that the TDMP requires. Then coordinate repository
+integration. Do not create a second document-management database.
 
 Make the accepted document current and available through its normal route.
 Confirm that a user can identify its current status, canonical owner, accepted
@@ -148,7 +148,6 @@ Report these results:
 - The planned and completed lifecycle stages.
 - The exact candidate and controlled baseline, when they exist.
 - The Documentation Review and validation results.
-- The post-validation non-linguistic quality and publication review.
 - The publication or availability result.
 - The maintenance, supersession, retirement, or preservation result.
 - Each limitation and owner decision that is still necessary.
