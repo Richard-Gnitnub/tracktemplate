@@ -13,6 +13,10 @@ Diagnose without retained edits unless the user also asks for a fix.
 
 ## Responsibility boundary
 
+- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
+  before qualified host diagnosis. Run
+  `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui`
+  before diagnosis that uses the real-GUI bridge.
 - Use `$tracktemplate-change-validation` to select evidence, preserve and
   classify a failed test, and determine what completed checks prove.
 - Use this skill to investigate causality after the failure boundary is known

@@ -67,17 +67,24 @@ before selecting proof.
 
 ## Validation rules
 
+- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage validation`
+  before repository validation. For the required Ruff check, add `--run-ruff`.
+  Stop before validation if the preflight does not pass.
+- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage documentation`
+  before STE source or extraction validation.
+- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
+  before a qualified headless FreeCAD check.
+- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui`
+  before a real-GUI bridge check.
 - Select checks according to the changed behaviour and dependency path. Do not
   run every available command merely because it exists.
 - Use the verified commands and evidence definitions in
   `reference/VALIDATION.md`. Do not create a second command catalogue in this
   skill.
-- For a standalone developer executable such as Ruff, use the canonical
-  [developer-tool boundary](../../../reference/VALIDATION.md#developer-tool-boundary).
-  A tool on `PATH` is not a TrackTemplate runtime dependency or a qualified
-  FreeCAD dependency. If the project owner does not authorise the installation,
-  do not install the tool during validation. If the project owner does not
-  authorise a version change, do not change the tool version during validation.
+- For Ruff and other development tools, use the canonical
+  [development-toolchain preflight](../../../reference/VALIDATION.md#developer-tool-boundary).
+  Do not install or change a tool during validation. Do not continue a required
+  check after its preflight gives a `FAIL` result.
 - Follow the canonical
   [document boundary](../../../reference/VALIDATION.md#document-boundary). Do
   not edit that file merely because a test was added or run. Change it only
@@ -102,8 +109,8 @@ before selecting proof.
 - For a recovery or handoff workflow change, validate the stash inventory,
   unique content, and stash disposition controls. Also do the applicable
   semantic control validation. Review the preservation diff.
-- Run only checks available in the present environment. State unavailable checks
-  explicitly instead of simulating or inventing their results.
+- Run only applicable checks after their required preflight passes. State an
+  unavailable optional check explicitly. Do not omit a required check.
 - Record the exact command, environment, result and required success sentinel
   for each executed check.
 - A zero exit status without the required success sentinel is not evidence that

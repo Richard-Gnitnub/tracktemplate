@@ -48,20 +48,23 @@ boundaries.
 
 ## Preparation
 
-1. Read `reference/PROJECT_PLAN.md`, `reference/VALIDATION.md`,
+1. Run `.venv/bin/python tools/development_toolchain_preflight.py --stage publication`
+   before the first GitHub query, fetch, branch, commit, push, or pull-request
+   action. Stop before publication if the preflight does not pass.
+2. Read `reference/PROJECT_PLAN.md`, `reference/VALIDATION.md`,
    `reference/TESTING_POLICY.md` and `reference/RECOVERY_AND_BACKUP.md`.
-2. Inspect `git status --short --branch`, the complete diff including untracked
+3. Inspect `git status --short --branch`, the complete diff including untracked
    files, current HEAD, upstream, remote URL and remote default branch.
-3. Confirm `gh` is installed and authenticated. Resolve the exact repository,
-   base branch and any existing pull request before external mutation.
-4. Treat the invocation as authority only for files belonging to the current
+4. Resolve the exact repository, base branch, and any existing pull request
+   before external mutation.
+5. Treat the invocation as authority only for files belonging to the current
    accepted task. If unrelated or ownership-ambiguous changes are present,
    stop and ask which paths belong.
-5. Use `$tracktemplate-change-validation` and, for source or test changes,
+6. Use `$tracktemplate-change-validation` and, for source or test changes,
    `$tracktemplate-quality-review` when their evidence has not already been
    completed for the exact source state. For governance prose, require the
    completed finite Technical Author Lead record and do not add another review.
-6. For review-frozen delegation, record the reviewed path set and content state
+7. For review-frozen delegation, record the reviewed path set and content state
    supplied by `$tracktemplate-continue`; stop if the current or staged source
    differs from it.
 

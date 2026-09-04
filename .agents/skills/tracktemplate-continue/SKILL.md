@@ -71,6 +71,10 @@ must never infer a branch from a run-configuration or window name.
 
 ## Verify and integrate the previous pull request
 
+Run `.venv/bin/python tools/development_toolchain_preflight.py --stage publication`
+before the first GitHub query or integration action. Stop before publication
+work if the preflight does not pass.
+
 1. Read the current dashboard sufficiently to identify the previous tranche's
    task level and authority boundary.
 2. Inspect the working tree, branch, HEAD/upstream, remote default branch and
@@ -180,6 +184,10 @@ phase-moving task exists and stop. Do not create a branch or manufacture a
 maintenance tranche merely to keep the cycle active.
 
 ## Shape and implement one vertical slice
+
+Run `.venv/bin/python tools/development_toolchain_preflight.py --stage development`
+before the first implementation mutation. Stop before implementation if the
+preflight does not pass.
 
 Create one fresh descriptive `agent/` branch only after selecting the outcome.
 Do not begin a second outcome in the same cycle.

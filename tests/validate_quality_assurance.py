@@ -736,8 +736,8 @@ def validate_documentation_profile(
         for row in lfe_rows
     ]
     require(
-        lfe_ids == [f"{value:03d}" for value in range(1, 22)],
-        "LFE ledger is not unique and append-only through LFE-021",
+        lfe_ids == [f"{value:03d}" for value in range(1, 23)],
+        "LFE ledger is not unique and append-only through LFE-022",
     )
     protected_prefix = "\n".join(lfe_rows[:17]) + "\n"
     require(

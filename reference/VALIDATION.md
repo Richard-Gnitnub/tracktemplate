@@ -188,29 +188,67 @@ Run from the repository root.
 
 <a id="developer-tool-boundary"></a>
 
-### Developer-tool separation
+### Development-toolchain preflight
 
-The project virtual environment contains the Python packages for standalone
-TrackTemplate development and repository validation. `requirements-dev.txt`
-contains optional packages for local repository and agent-skill validation.
-These packages are not Addon dependencies. The project virtual environment
-and qualified FreeCAD profiles have different controls for their Python
-packages.
+This section is the human-readable owner for the development-toolchain
+preflight. The machine declaration is
+[`development-toolchain-v1.json`](contracts/development-toolchain-v1.json).
+The declaration classifies each tool and maps it to its consuming stage. It
+also names each supported fallback and its authority.
 
-Ruff is an optional developer validation executable. TrackTemplate has no root
-Ruff configuration, CI step, or version contract. Thus, Ruff is not necessary
-for TrackTemplate validation. If Ruff is on the user `PATH`, an agent can use
-it to examine changed, non-frozen Python files. The Ruff operation must not
-change files. Report the executable path and version. The project owner must
-authorise a Ruff installation or version change. Do not change `.venv` only to
-get Ruff. Do not change a qualified FreeCAD environment only to get Ruff. The
-tracked configuration or CI must define the repository version contract before
-Ruff becomes necessary.
+`requirements-dev.txt` contains exact pins for required Python development
+packages. These packages are not Addon dependencies. Ruff is a repository
+validation package. Click is a conditional dependency of the real-GUI
+development bridge. The project virtual environment and the qualified FreeCAD
+profiles have separate package controls.
 
-A user-level tool manager such as `uv` can supply a developer executable. The
-`uv` executable has no TrackTemplate package-management role. Do not use
-`uv init` in this repository. Do not add a root `uv.lock`. The project owner
-must authorise a package-management migration in a different task.
+Run one of these commands before its dependent stage:
+
+```bash
+.venv/bin/python tools/development_toolchain_preflight.py --stage development
+.venv/bin/python tools/development_toolchain_preflight.py --stage validation --run-ruff
+.venv/bin/python tools/development_toolchain_preflight.py --stage documentation
+.venv/bin/python tools/development_toolchain_preflight.py --stage freecad
+.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui
+.venv/bin/python tools/development_toolchain_preflight.py --stage publication
+```
+
+The preflight has these stage boundaries:
+
+| Stage | Required result |
+| --- | --- |
+| `development` | Git must identify this repository. The project `.venv` must contain CPython at the development floor in the compatibility contract. |
+| `validation` | The development prerequisites, exact Python development declarations, Ruff version, and Ruff configuration must pass. `--run-ruff` then runs the fixed read-only repository check. |
+| `documentation` | The local official STE source, source-bound cache, trusted `pdftotext`, and one live source extraction must pass. |
+| `freecad` | Flatpak must start the existing runtime probe. The probe must return one exact profile that the compatibility contract qualifies. |
+| `freecad-gui` | The `freecad` requirements, exact Click declaration and system version, required shell tools, and pinned bridge commit, reviewed tree, and test set must pass. |
+| `publication` | Git and GitHub CLI must identify the expected repository. GitHub authentication, default branch, and write access must pass. |
+
+The preflight checks only the selected stage. A missing tool gives a `FAIL`
+result before the dependent operation. The preflight does not install a
+package, get a source file, change authentication, or change a host.
+
+Ruff version `0.16.4` and `ruff.toml` define the repository Ruff contract.
+Ruff uses Python 3.12 syntax and the selected `E9`, `F63`, `F7`, and `F82`
+checks. It does not use a cache or change a file. The fixed exclusion preserves
+the immutable B14 and B15 comparison sources. One injected-global probe has a
+bounded `F821` exception.
+
+The preferred Ruff executable is `.venv/bin/ruff`. If that path is absent, the
+declared fallback is an exact-version Ruff executable on the user `PATH`. The
+preflight checks its owner, mode, path, version, and configuration. If the
+preferred executable exists with a wrong version, the preflight does not use
+the fallback. A user-level tool manager can supply this executable, but it has
+no TrackTemplate package-management role.
+
+All other declared tools have no toolchain fallback. The official ASD/STEMG
+web source remains a source fallback for the independent Documentation
+Reviewer. It does not satisfy extraction-dependent authoring. The qualified
+FreeCAD profiles are exact alternatives in the existing compatibility
+contract. They are not arbitrary-version fallbacks.
+
+Do not use `uv init` in this repository. Do not add a root `uv.lock`. A package
+manager migration is a different authorised task.
 
 ### Programmatic regression pipeline
 
@@ -223,13 +261,14 @@ regressions:
 .venv/bin/python tools/run_regression_pipeline.py --profile transition-gui
 ```
 
-The default `standalone` profile parses each tracked Python and macro source.
-It runs the complete clean-checkout standalone matrix. The `transition`
-profile adds qualified headless transition persistence, Coin-scene, and
-edit-lifecycle checks. The explicit `transition-gui` profile adds the isolated
-real-GUI ViewProvider workflow. Profile names describe durable behaviour, not
-phase acceptance. Phase-prefixed test paths can change names when their
-product boundary stabilises. This does not retire their contract.
+The default `standalone` profile runs the validation preflight and Ruff first.
+It then parses each tracked Python and macro source and runs the complete
+clean-checkout standalone matrix. The `transition` profile runs the FreeCAD
+preflight before its qualified headless checks. The explicit `transition-gui`
+profile also runs the real-GUI preflight before its isolated ViewProvider
+workflow. Profile names describe durable behaviour, not phase acceptance.
+Phase-prefixed test paths can change names when their product boundary
+stabilises. This does not retire their contract.
 
 Each step requires a zero exit status and its documented success sentinel. Raw
 output stays in ignored `benchmark-output/validation-pipeline/` run

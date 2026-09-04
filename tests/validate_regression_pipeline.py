@@ -33,10 +33,12 @@ def _step_names(profile):
 
 def _validate_profiles():
     standalone = (
+        "validation-preflight-and-ruff",
         "python-syntax",
         "standalone-contracts",
     )
     transition = standalone + (
+        "freecad-preflight",
         "transition-persistence",
         "transition-coin-scene",
         "transition-edit-lifecycle",
@@ -49,6 +51,7 @@ def _validate_profiles():
     assert _step_names("standalone") == standalone
     assert _step_names("transition") == transition
     assert _step_names("transition-gui") == transition + (
+        "freecad-gui-preflight",
         "transition-viewprovider-gui",
     )
 
@@ -59,9 +62,18 @@ def _validate_profiles():
     )
     assert gui_steps[0].command == (
         "python-under-test",
+        str(ROOT / "tools" / "development_toolchain_preflight.py"),
+        "--stage",
+        "validation",
+        "--run-ruff",
+    )
+    assert gui_steps[1].command == (
+        "python-under-test",
         str(ROOT / "tools" / "validate_python_syntax.py"),
     )
-    assert gui_steps[1].command[-2:] == ("--profile", "ci")
+    assert gui_steps[2].command[-2:] == ("--profile", "ci")
+    assert gui_steps[3].command[-2:] == ("--stage", "freecad")
+    assert gui_steps[-2].command[-2:] == ("--stage", "freecad-gui")
     assert gui_steps[-1].command == (
         str(
             ROOT

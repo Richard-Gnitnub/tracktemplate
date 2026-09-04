@@ -7,7 +7,9 @@ import argparse
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import json
+import os
 import pathlib
+import shutil
 import subprocess
 import sys
 
@@ -43,6 +45,21 @@ def build_steps(
     root = pathlib.Path(root).resolve()
     steps = [
         PipelineStep(
+            "validation-preflight-and-ruff",
+            (
+                str(python_executable),
+                str(
+                    root
+                    / "tools"
+                    / "development_toolchain_preflight.py"
+                ),
+                "--stage",
+                "validation",
+                "--run-ruff",
+            ),
+            "TRACKTEMPLATE_RUFF=",
+        ),
+        PipelineStep(
             "python-syntax",
             (
                 str(python_executable),
@@ -63,14 +80,33 @@ def build_steps(
     ]
 
     if profile in ("transition", "transition-gui"):
+        system_flatpak = shutil.which("flatpak", path=os.defpath)
+        if system_flatpak:
+            system_flatpak = str(pathlib.Path(system_flatpak).resolve())
+        else:
+            system_flatpak = "flatpak"
         freecad_prefix = (
-            "flatpak",
+            system_flatpak,
             "run",
             "--command=FreeCADCmd",
             "org.freecad.FreeCAD",
         )
         steps.extend(
             (
+                PipelineStep(
+                    "freecad-preflight",
+                    (
+                        str(python_executable),
+                        str(
+                            root
+                            / "tools"
+                            / "development_toolchain_preflight.py"
+                        ),
+                        "--stage",
+                        "freecad",
+                    ),
+                    "TRACKTEMPLATE_TOOLCHAIN_PREFLIGHT=",
+                ),
                 PipelineStep(
                     "transition-persistence",
                     freecad_prefix
@@ -117,18 +153,34 @@ def build_steps(
         )
 
     if profile == "transition-gui":
-        steps.append(
-            PipelineStep(
-                "transition-viewprovider-gui",
-                (
-                    str(
-                        root
-                        / "tools"
-                        / "freecad_bridge"
-                        / "run-phase5-transition-viewprovider"
+        steps.extend(
+            (
+                PipelineStep(
+                    "freecad-gui-preflight",
+                    (
+                        str(python_executable),
+                        str(
+                            root
+                            / "tools"
+                            / "development_toolchain_preflight.py"
+                        ),
+                        "--stage",
+                        "freecad-gui",
                     ),
+                    "TRACKTEMPLATE_TOOLCHAIN_PREFLIGHT=",
                 ),
-                "TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI=",
+                PipelineStep(
+                    "transition-viewprovider-gui",
+                    (
+                        str(
+                            root
+                            / "tools"
+                            / "freecad_bridge"
+                            / "run-phase5-transition-viewprovider"
+                        ),
+                    ),
+                    "TRACKTEMPLATE_PHASE5_VIEWPROVIDER_GUI=",
+                ),
             )
         )
 

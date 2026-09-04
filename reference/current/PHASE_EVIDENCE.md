@@ -3905,6 +3905,61 @@ FreeCAD, GUI, persistence, export, schema, API, performance, production,
 physical-output, packaging, release, tagging, legacy-retirement, deletion, or
 merge authority.
 
+<a id="development-toolchain-preflight-workflow-migration"></a>
+
+## Development-toolchain preflight workflow migration
+
+This bounded Level 2 workflow migration starts from protected `main` at
+`583e1ad05d7a821fe67c4905b6569ffceca98fe0`. The
+[validation owner](../VALIDATION.md#developer-tool-boundary) remains the
+human-readable authority. One
+[machine declaration](../contracts/development-toolchain-v1.json) supplies the
+stage, tool, dependency, consumer, and fallback data. The change adds no
+general governance framework.
+
+The repository audit found that Ruff was optional and had no version or
+configuration contract. The development requirements contained only
+unconsumed optional PyYAML. Git, the project `.venv`, GitHub access, STE
+extraction, the qualified FreeCAD host, and the real-GUI bridge had distributed
+or late prerequisite checks. `requirements-dev.txt` now contains the exact
+development-only pins `click==8.1.6` and `ruff==0.16.4`. No product or Addon
+runtime dependency contains these packages.
+
+The executable preflight checks only the selected `development`, `validation`,
+`documentation`, `freecad`, `freecad-gui`, or `publication` stage. It stops
+before a required missing or incompatible prerequisite. Ruff uses the project
+`.venv` when available. Its only supported fallback is an exact-version,
+trusted user-`PATH` executable. No other toolchain tool has a fallback. The
+Continue, Change Validation, Technical Author Lead, Publish, FreeCAD, and
+regression-pipeline workflows call the applicable stage instead of copying the
+tool list.
+
+The semantic controls reject undeclared tools and fallbacks, incomplete check
+handlers, stage leakage, unpinned Python dependencies, arbitrary host profiles,
+publication without its preflight, credential material, and development
+dependencies in product imports. System executables must resolve to the same
+trusted file for the preflight and its consumer. The GUI stage also proves the
+exact pinned bridge commit, reviewed patch bytes, test allowlist, and absence
+of undeclared executable inputs before it runs checkout code.
+
+All direct stage checks passed. Two consecutive nine-step `transition-gui`
+pipelines passed in
+`benchmark-output/validation-pipeline/20260904T230300265249Z/` and
+`benchmark-output/validation-pipeline/20260904T230436075839Z/`. Each included
+the required Ruff check, parsing of 191 Python and macro files, all 61
+standalone validators, the exact qualified host, and the real-GUI proof. The
+second run left no untracked or ignored bridge file, and the next GUI preflight
+passed. Independent security and terminal source-quality reviews gave `PASS`.
+The read-only reviewers shared the agent team and workspace. They did not
+mutate the reviewed source.
+
+The preflight gives prerequisite and host-qualification evidence. It does not
+add product, railway, FreeCAD product, API, schema, export, or dependency
+behaviour. It does not install a tool. Subprocess output bounding and local
+time-of-check hardening remain backlog items. They do not reduce the required
+stage checks. Phase 6 stays at 2/5, project status stays `unknown`, and no risk
+or decision disposition changes.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition

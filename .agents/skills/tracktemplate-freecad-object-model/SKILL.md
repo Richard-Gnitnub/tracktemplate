@@ -13,6 +13,10 @@ representation remains derived.
 
 ## Responsibility boundary
 
+- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
+  before qualified host work. Run
+  `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui`
+  before work that uses the real-GUI bridge.
 - Read `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`,
   `reference/MODULARISATION_PLAN.md`, the qualified compatibility contract,
   `reference/VALIDATION.md` and `reference/TESTING_POLICY.md`.

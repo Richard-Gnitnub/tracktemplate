@@ -1,0 +1,226 @@
+{
+  "authority": "reference/VALIDATION.md#developer-tool-boundary",
+  "compatibility_contract": "reference/contracts/phase1-compatibility.json",
+  "consumers": {
+    ".agents/skills/tracktemplate-change-validation/SKILL.md": [
+      "documentation",
+      "freecad",
+      "freecad-gui",
+      "validation"
+    ],
+    ".agents/skills/tracktemplate-continue/SKILL.md": [
+      "development",
+      "publication"
+    ],
+    ".agents/skills/tracktemplate-debugging/SKILL.md": [
+      "freecad",
+      "freecad-gui"
+    ],
+    ".agents/skills/tracktemplate-freecad-object-model/SKILL.md": [
+      "freecad",
+      "freecad-gui"
+    ],
+    ".agents/skills/tracktemplate-occt-geometry/SKILL.md": [
+      "freecad",
+      "freecad-gui"
+    ],
+    ".agents/skills/tracktemplate-performance-engineering/SKILL.md": [
+      "freecad",
+      "freecad-gui"
+    ],
+    ".agents/skills/tracktemplate-publish/SKILL.md": [
+      "publication"
+    ],
+    ".agents/skills/tracktemplate-technical-author-lead/SKILL.md": [
+      "documentation"
+    ],
+    "tools/freecad_bridge/setup-freecad-cli": [
+      "freecad-gui"
+    ],
+    "tools/run_regression_pipeline.py": [
+      "freecad",
+      "freecad-gui",
+      "validation"
+    ]
+  },
+  "contract_id": "tracktemplate-development-toolchain-v1",
+  "fallbacks": {
+    "ruff-trusted-user-path": {
+      "authority": "reference/VALIDATION.md#developer-tool-boundary",
+      "check": "ruff_trusted_user_path",
+      "tool": "ruff"
+    }
+  },
+  "python_dependencies": [
+    {
+      "name": "click",
+      "pin": "8.1.6",
+      "stages": [
+        "freecad-gui"
+      ],
+      "tool": "gui_bridge_python"
+    },
+    {
+      "name": "ruff",
+      "pin": "0.16.4",
+      "stages": [
+        "validation"
+      ],
+      "tool": "ruff"
+    }
+  ],
+  "repository": {
+    "default_branch": "main",
+    "github": "Richard-Gnitnub/tracktemplate",
+    "remote": "origin"
+  },
+  "requirements_file": "requirements-dev.txt",
+  "ruff_config": "ruff.toml",
+  "schema_version": 1,
+  "stages": {
+    "development": [
+      "git",
+      "repository",
+      "project_python"
+    ],
+    "documentation": [
+      "git",
+      "repository",
+      "project_python",
+      "pdftotext",
+      "ste_source"
+    ],
+    "freecad": [
+      "git",
+      "repository",
+      "flatpak",
+      "qualified_freecad"
+    ],
+    "freecad-gui": [
+      "git",
+      "repository",
+      "flatpak",
+      "qualified_freecad",
+      "gui_shell_tools",
+      "requirements_file",
+      "gui_bridge_python",
+      "freecad_cli_checkout"
+    ],
+    "publication": [
+      "git",
+      "repository",
+      "gh",
+      "github_access"
+    ],
+    "validation": [
+      "git",
+      "repository",
+      "project_python",
+      "requirements_file",
+      "ruff"
+    ]
+  },
+  "tools": {
+    "flatpak": {
+      "authority": "reference/contracts/phase1-compatibility.json",
+      "check": "flatpak",
+      "classification": "system-executable",
+      "fallbacks": []
+    },
+    "freecad_cli_checkout": {
+      "authority": "tools/freecad_bridge/setup-freecad-cli",
+      "check": "freecad_cli_checkout",
+      "classification": "conditional-development-host",
+      "fallbacks": []
+    },
+    "gh": {
+      "authority": ".agents/skills/tracktemplate-publish/SKILL.md",
+      "check": "gh",
+      "classification": "system-executable",
+      "fallbacks": []
+    },
+    "git": {
+      "authority": "reference/VALIDATION.md#developer-tool-boundary",
+      "check": "git",
+      "classification": "system-executable",
+      "fallbacks": []
+    },
+    "github_access": {
+      "authority": ".agents/skills/tracktemplate-publish/SKILL.md",
+      "check": "github_access",
+      "classification": "external-service-access",
+      "fallbacks": []
+    },
+    "gui_bridge_python": {
+      "authority": "tools/freecad_bridge/setup-freecad-cli",
+      "check": "gui_bridge_python",
+      "classification": "conditional-development-python",
+      "fallbacks": []
+    },
+    "gui_shell_tools": {
+      "authority": "tools/freecad_bridge/run-isolated",
+      "check": "gui_shell_tools",
+      "classification": "conditional-system-executables",
+      "components": [
+        "bash",
+        "chmod",
+        "dirname",
+        "env",
+        "grep",
+        "kill",
+        "mkdir",
+        "mktemp",
+        "openssl",
+        "rm",
+        "seq",
+        "sleep",
+        "tr"
+      ],
+      "fallbacks": []
+    },
+    "pdftotext": {
+      "authority": "reference/external/asd-ste100/README.md",
+      "check": "pdftotext",
+      "classification": "system-executable",
+      "fallbacks": []
+    },
+    "project_python": {
+      "authority": "reference/contracts/phase1-compatibility.json",
+      "check": "project_python",
+      "classification": "project-interpreter",
+      "fallbacks": []
+    },
+    "qualified_freecad": {
+      "authority": "reference/contracts/phase1-compatibility.json",
+      "check": "qualified_freecad",
+      "classification": "qualified-host",
+      "fallbacks": []
+    },
+    "repository": {
+      "authority": "reference/VALIDATION.md#developer-tool-boundary",
+      "check": "repository",
+      "classification": "repository-prerequisite",
+      "fallbacks": []
+    },
+    "requirements_file": {
+      "authority": "requirements-dev.txt",
+      "check": "requirements_file",
+      "classification": "python-development-declaration",
+      "fallbacks": []
+    },
+    "ruff": {
+      "authority": "requirements-dev.txt",
+      "check": "ruff",
+      "classification": "python-development-executable",
+      "fallbacks": [
+        "ruff-trusted-user-path"
+      ]
+    },
+    "ste_source": {
+      "authority": "reference/external/asd-ste100/README.md",
+      "check": "ste_source",
+      "classification": "documentation-source-prerequisite",
+      "fallbacks": []
+    }
+  }
+}

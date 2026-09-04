@@ -1,2 +1,3 @@
-# Optional repository and agent-skill validation tools; not Addon dependencies.
-PyYAML==6.0.3
+# Required development and repository-validation packages; not Addon dependencies.
+click==8.1.6
+ruff==0.16.4

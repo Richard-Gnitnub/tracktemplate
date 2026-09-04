@@ -13,6 +13,10 @@ later validation or export boundary.
 
 ## Responsibility boundary
 
+- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
+  before a qualified host measurement. Run
+  `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui`
+  before a real-GUI bridge measurement.
 - `reference/PERFORMANCE_SOP.md` owns measurement procedure and evidence
   quality; read it before acting.
 - `$tracktemplate-debugging` owns causal isolation when an unexpected

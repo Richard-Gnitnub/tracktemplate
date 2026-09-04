@@ -119,6 +119,20 @@ MCP endpoint, or script as a separate skill. Put deterministic operations in
 tested scripts. Keep the bounded scope, evidence interpretation, and authority
 decisions visible to the agent and project owner.
 
+## Development-toolchain preflight routing
+
+The canonical
+[development-toolchain preflight](VALIDATION.md#developer-tool-boundary) owns
+the stage definitions and tool classifications. Its machine declaration maps
+each consuming workflow to `development`, `validation`, `documentation`,
+`freecad`, `freecad-gui`, or `publication`. A consuming skill runs its small
+stage hook before the dependent work. It does not copy the tool list or define
+a new fallback.
+
+If the preflight gives a `FAIL` result, stop before the dependent stage. Do not
+install the missing tool during preflight. Do not replace it with an undeclared
+tool or omit the required assurance.
+
 ## TT-DOC-001 workflow integration
 
 The canonical

@@ -77,7 +77,10 @@ Use this route for new or materially changed canonical technical prose:
 > review once → validate once → finish
 
 Get the technical meaning from its canonical owner. Resolve each technical
-term before writing. Use the
+term before writing. Run
+`.venv/bin/python tools/development_toolchain_preflight.py --stage documentation`
+before source retrieval or authoring. Stop before authoring if the preflight
+does not pass. Then use the
 [local STE retrieval interface](../../../reference/external/asd-ste100/README.md#local-retrieval-interface)
 before writing the affected logical units.
 

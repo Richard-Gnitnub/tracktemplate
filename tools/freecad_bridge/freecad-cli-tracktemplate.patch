@@ -1,10 +1,14 @@
 diff --git a/addon/FreecadCli/InitGui.py b/addon/FreecadCli/InitGui.py
-index bcbba1b..cf61eaa 100644
+index bcbba1b68dc3a92e757d38d568211183052cfc67..19ad6ef9e4ab898d1fd87b78210af0959884f36f 100644
 --- a/addon/FreecadCli/InitGui.py
 +++ b/addon/FreecadCli/InitGui.py
-@@ -1,5 +1,10 @@
+@@ -1,5 +1,14 @@
  """FreeCAD GUI initialization — auto-starts the RPC server."""
 
++import sys
++
++sys.dont_write_bytecode = True
++
 -from FreecadCli import rpc_server
 +try:
 +    from FreecadCli import rpc_server
@@ -15,7 +19,7 @@ index bcbba1b..cf61eaa 100644
 
  rpc_server.start()
 diff --git a/addon/FreecadCli/rpc_server.py b/addon/FreecadCli/rpc_server.py
-index 514afd9..1b9fabd 100644
+index 514afd90011b5eb92912dea92abe37f223b919da..1b9fabd64346f8e2e4cd38f722fdf2b12f1bf3ba 100644
 --- a/addon/FreecadCli/rpc_server.py
 +++ b/addon/FreecadCli/rpc_server.py
 @@ -1,70 +1,185 @@
@@ -234,7 +238,7 @@ index 514afd9..1b9fabd 100644
 
  def stop():
 diff --git a/src/freecad_cli/cli.py b/src/freecad_cli/cli.py
-index cf4dd4b..4b8cff0 100644
+index cf4dd4b644a511da55d55bcda033b0a4573bf9a7..4b8cff0cd8e23970c619d3af0679f9caa5fbf018 100644
 --- a/src/freecad_cli/cli.py
 +++ b/src/freecad_cli/cli.py
 @@ -1,6 +1,7 @@
@@ -376,7 +380,7 @@ index cf4dd4b..4b8cff0 100644
 
 -
 diff --git a/src/freecad_cli/client.py b/src/freecad_cli/client.py
-index c36d7da..e96c434 100644
+index c36d7da305254ae88c169c322cfcb64b61d0c7f9..e96c4349ddee42e682f4b66e1d99fd27103978df 100644
 --- a/src/freecad_cli/client.py
 +++ b/src/freecad_cli/client.py
 @@ -6,9 +6,16 @@ from freecad_cli.output import error
@@ -423,7 +427,7 @@ index c36d7da..e96c434 100644
      def get_active_document(self):
          result = self._execute("""
 diff --git a/tests/test_cli.py b/tests/test_cli.py
-index 9ce20d1..76e1587 100644
+index 9ce20d182abd75a61407590a85e26bfe82b6c32d..76e15878496676e8d674874c822af29526cd5516 100644
 --- a/tests/test_cli.py
 +++ b/tests/test_cli.py
 @@ -137,3 +137,49 @@ def test_rpc_error_propagated():
@@ -477,7 +481,7 @@ index 9ce20d1..76e1587 100644
 +        assert result.exit_code == 0
 +        mock.ping.assert_called_once_with("secret-token")
 diff --git a/tests/test_client.py b/tests/test_client.py
-index 243a974..d6f761b 100644
+index 243a974495e2e4b2d37082d4bee089881e92d25e..d6f761b1092392c11ed29be80c69ba0ac77cd442 100644
 --- a/tests/test_client.py
 +++ b/tests/test_client.py
 @@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
