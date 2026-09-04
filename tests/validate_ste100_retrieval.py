@@ -37,6 +37,10 @@ SKILL_NAMES = (
     "tracktemplate-documentation-alignment",
     "tracktemplate-change-validation",
     "tracktemplate-quality-review",
+    "tracktemplate-technical-author-lead",
+)
+SOURCE_ROUTING_SKILL_NAMES = tuple(
+    name for name in SKILL_NAMES if name != "tracktemplate-quality-review"
 )
 EXPECTED_SOURCE_SHA256 = (
     "d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431"
@@ -125,11 +129,16 @@ def validate_workflow_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     value = semantic_text(text)
     ordered = (
-        "read the technical documentation profile",
-        "read the technical-term register",
-        "use the tracktemplate-documentation-review skill for the one "
-        "documentation review",
-        "author the canonical prose and freeze one clean exact candidate in git",
+        "route new or materially changed canonical technical prose "
+        "automatically to tracktemplate-technical-author-lead",
+        "identify the document need",
+        "classify the document",
+        "plan the purpose",
+        "get technical meaning from the applicable canonical subject owner",
+        "read the technical-term register and applicable documentation policy",
+        "use targeted ste retrieval before writing",
+        "use the technical author lead authoring lifecycle",
+        "freeze one clean exact candidate in git",
         "derive the frozen review scope from the last accepted document identity "
         "and git",
         "give the complete frozen review scope to one independent documentation "
@@ -140,6 +149,10 @@ def validate_workflow_text(text: str) -> None:
         "apply all exact replacement wording once against verified preimages",
         "run one final deterministic validation after the review or correction",
         "complete only if that validation is green",
+        "finish the bounded d-gov-015 authoring and review lifecycle",
+        "do not start another documentation, quality, publication, wording, or "
+        "semantic review",
+        "establish the controlled baseline",
     )
     position = -1
     for fragment in ordered:
@@ -163,6 +176,10 @@ def validate_workflow_text(text: str) -> None:
         "otherwise, stop for the owner",
         "detects unreviewed mutation",
         "does not give or change the linguistic verdict",
+        "cycle is write, one review, one permitted adjustment, final "
+        "deterministic validation, and done",
+        "cannot request or start another documentation review, wording pass, "
+        "semantic reinterpretation, or improvement cycle",
     ):
         require(fragment in value, "workflow boundary lacks: " + fragment)
 
@@ -229,15 +246,21 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
             "tt-doc-001-tracktemplate-technical-documentation-profile" in text,
             name + " bypasses the canonical application profile",
         )
-        require(
-            "../../../reference/external/asd-ste100/README.md" in text,
-            name + " bypasses the canonical source/retrieval owner",
-        )
-        require(
-            "local-retrieval-interface" in text
-            or "pre-check-and-review-receipt" in text,
-            name + " does not route through the retrieval interface",
-        )
+        if name in SOURCE_ROUTING_SKILL_NAMES:
+            require(
+                "../../../reference/external/asd-ste100/README.md" in text,
+                name + " bypasses the canonical source/retrieval owner",
+            )
+            require(
+                "local-retrieval-interface" in text
+                or "pre-check-and-review-receipt" in text,
+                name + " does not route through the retrieval interface",
+            )
+        else:
+            require(
+                "../../../reference/external/asd-ste100/README.md" not in text,
+                name + " retained an obsolete governance-review source route",
+            )
         require(
             "ASD-STE100_ISSUE9.pdf" not in text,
             name + " duplicates the canonical local source path",
@@ -264,18 +287,44 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
         in semantic_text(skills["tracktemplate-change-validation"]),
         "change validation overstates automatic evidence",
     )
-    require(
-        "reviewer examines the complete applicable requirement set"
-        in semantic_text(skills["tracktemplate-quality-review"]),
-        "quality review does not check full applicability",
-    )
     quality_review = semantic_text(skills["tracktemplate-quality-review"])
     require(
-        "this quality review is non-linguistic" in quality_review
-        and "do not repeat documentation review" in quality_review
-        and "change its verdict" in quality_review
-        and "propose wording corrections" in quality_review,
-        "quality review reopened the documentation review verdict",
+        "this skill does not review governance-document prose at any stage"
+        in quality_review
+        and "one documentation review, one permitted adjustment and one final "
+        "deterministic validation, then done" in quality_review
+        and "cannot invoke this skill to reconsider their wording or meaning"
+        in quality_review
+        and "does not examine the governance prose, repeat that review, change "
+        "its verdict or propose wording" in quality_review,
+        "quality review can reopen the governance-document cycle",
+    )
+    change_validation = semantic_text(skills["tracktemplate-change-validation"])
+    require(
+        "for governance documents, a green final deterministic validation ends "
+        "the finite technical author lead route" in change_validation
+        and "does not hand the prose to another reviewer" in change_validation,
+        "change validation can start a later governance-document review",
+    )
+    technical_author = semantic_text(
+        skills["tracktemplate-technical-author-lead"]
+    )
+    require(
+        "use the local ste retrieval interface before writing the affected "
+        "logical units" in technical_author
+        and "deterministic pre-check results. it is not a documentation review"
+        in technical_author
+        and "one complete improvement pass before freeze" in technical_author
+        and "green final validation ends this documentation cycle"
+        in technical_author
+        and "do not send the document to another documentation, quality, "
+        "publication, wording, or semantic review" in technical_author
+        and "continuous integration can check the final bytes"
+        in technical_author
+        and "cannot start another documentation review, correction pass, or "
+        "linguistic improvement cycle" in technical_author
+        and "do not run a second documentation review" in technical_author,
+        "Technical Author Lead lost its bounded authoring and retrieval route",
     )
 
 
@@ -1812,7 +1861,10 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
     bypassed = dict(skills)
     bypassed["tracktemplate-quality-review"] = bypassed[
         "tracktemplate-quality-review"
-    ].replace("local-retrieval-interface", "removed-retrieval-route")
+    ].replace(
+        "This skill does not review governance-document prose at any stage.",
+        "This skill reviews governance-document prose at any stage.",
+    )
     try:
         validate_skill_routing(bypassed)
     except AssertionError:

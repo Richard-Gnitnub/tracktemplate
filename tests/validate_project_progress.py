@@ -285,8 +285,21 @@ EXPECTED_PHASE6_DECISIONS = {
             "reference/current/PHASE_EVIDENCE.md"
             "#d-gov-015-simplified-ste-lifecycle"
         ),
-        "81641613e133fea5946be8895d027037578b67a3ce5f048552baf21c6acf6a33",
+        "d5d8412b161b9312a8a86f5a460c62254bbcffeb925593e57ed7814159ac1e99",
         "869717862c88675519f8b24b74419e33dcca25a3077272a43fa5c0e188131ad0",
+    ),
+    "D-GOV-017": (
+        "2026-09-04",
+        (
+            "Establish the complete Technical Documentation Management Plan "
+            "and Technical Author Lead responsibility."
+        ),
+        (
+            "reference/current/PHASE_EVIDENCE.md"
+            "#d-gov-017-whole-technical-document-lifecycle"
+        ),
+        "4f312b96a27fe3cc520766bee2cabab4efbdfba8e501210e79e34115d000ffd6",
+        "96924cd013d596cc1807fe5859b1a6ca5459e7541b736d38a1674ec00e3b11d7",
     ),
 }
 EXPECTED_PHASE6_DECISION_IDS = set(EXPECTED_PHASE6_DECISIONS)
@@ -383,6 +396,18 @@ EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
     "reviewed correction once → one final deterministic validation → complete "
     "or owner stop. Phase 6 stays at 2/5. If validation is exact-green, the "
     "owner permits one draft pull request. The owner gives no merge authority. |"
+)
+EXPECTED_TDMP_PLAN_ROW = (
+    "| D-GOV-017 | 2026-09-04 | Accepted | The "
+    "[decision](current/PHASE_EVIDENCE.md#d-gov-017-whole-technical-document-"
+    "lifecycle) establishes one TDMP and the Technical Author Lead "
+    "responsibility. For governance prose, the finite route is write once under "
+    "D-GOV-015, one Documentation Review, apply its required adjustment once if "
+    "any, one final deterministic validation, then done. CI can verify final "
+    "bytes but cannot reopen review or wording. A general quality review applies "
+    "only to separately changed source or tests. The stopped additional review "
+    "returned no result and made no tracked mutation. Phase 6 stays at 2/5, and "
+    "project status stays `unknown`. |"
 )
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
@@ -3882,7 +3907,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-08-31",
+        and current_document["updated_on"] == "2026-09-04",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -3997,6 +4022,10 @@ def _validate_decisions(plan: str) -> None:
     _require(
         EXPECTED_STE_LIFECYCLE_PLAN_ROW in _section(plan, "Owner decisions"),
         "project-plan D-GOV-015 decision row drifted",
+    )
+    _require(
+        EXPECTED_TDMP_PLAN_ROW in _section(plan, "Owner decisions"),
+        "project-plan D-GOV-017 decision row drifted",
     )
     current_records = document["decisions"]
     _require(
@@ -5179,15 +5208,16 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
             "Accept D-GOV-015. Complete only the bounded lifecycle, canonical "
             "and skill alignment, Level 3 record, one review, and optional "
             "exact correction once. Then complete final deterministic "
-            "validation, non-linguistic publication review, and one draft pull "
-            "request if exact-green. Do not merge."
+            "validation and one draft pull request if exact-green. D-GOV-017 "
+            "later makes final validation terminal for governance-prose review. "
+            "Do not merge."
         ),
         "Next action": (
             "Complete fail-closed development validation. Freeze and preserve "
             "one exact candidate and its scope. Run the one Documentation "
             "Review. Preserve each resulting review file. Run the one final "
-            "deterministic validation. Get the required non-linguistic "
-            "independent review, and publish one draft pull request only if "
+            "deterministic validation. D-GOV-017 later prohibits a further "
+            "governance-prose review. Publish one draft pull request only if "
             "exact-green."
         ),
     }
@@ -5336,8 +5366,8 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
         "Apply only exact approved corrections once, run one final deterministic "
         "validation, and return any failure to the owner.": (
             "agent:openai-codex-primary",
-            "After the sole Documentation Review and before publication review — "
-            "pending.",
+            "After the sole Documentation Review — final validation ends the "
+            "governance-document review cycle under D-GOV-017.",
         ),
     }
     _require(
@@ -5378,7 +5408,7 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
         "CI standalone profile passed all 60 validators",
         "No FreeCAD or GUI validation applies",
         "One independent Documentation Reviewer owns the sole linguistic verdict",
-        "separate final review is non-linguistic",
+        "D-GOV-017 later prohibits a separate final review of governance prose",
         "Proceed with bounded conditions",
         "Any preservation, reviewer-separation, source, scope, receipt, state, "
         "semantic, Git-identity, or final-byte failure returns to the owner",
@@ -5394,10 +5424,288 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
         "no authority to resume D-GOV-014 or modify aa6c506",
         "no authority for a second documentation-assurance framework or a "
         "second Documentation Review",
+        "D-GOV-017 later supersedes only D-GOV-015's publication-policy review "
+        "clause for governance-document prose",
+        "Green final validation ends that review cycle",
+        "CI and publication can verify the final bytes but cannot reopen prose",
     ):
         _require(
             _semantic_text(fragment) in panel,
             "D-GOV-015 evidence panel drifted: " + fragment,
+        )
+
+
+def _validate_tdmp_lifecycle_panel(current_evidence: str) -> None:
+    """Bind D-GOV-017 to the whole lifecycle and its narrow authority."""
+    anchor = '<a id="d-gov-017-whole-technical-document-lifecycle"></a>'
+    _require(
+        current_evidence.count(anchor) == 1,
+        "current evidence lost or duplicated the D-GOV-017 panel anchor",
+    )
+    section = _section(
+        current_evidence,
+        "D-GOV-017 whole technical-document lifecycle",
+    )
+    owner_view = direct_section_content(section, "Owner view", level=3)
+    rows = _structured_table_rows(
+        owner_view,
+        ("Field", "Current result"),
+        "D-GOV-017 owner view",
+    )
+    _require(
+        set(rows)
+        == {
+            "Current state",
+            "What changed",
+            "What now works",
+            "Limitations/findings",
+            "Owner decision",
+            "Next action",
+        },
+        "D-GOV-017 owner-view fields drifted",
+    )
+    owner_flat = _semantic_text(owner_view)
+    for fragment in (
+        "3641e93e521b44464deb1a8b192f285c8943f6d9",
+        "project owner records the governance prose as written, reviewed, and "
+        "validated",
+        "corrected branch candidate has an exact pushed Git identity and "
+        "separate independent preservation",
+        "not yet integrated as the current controlled baseline",
+        "one point-in-time route",
+        "No later documentation, quality, publication, wording, or semantic "
+        "review applies",
+        "Continuous integration can verify the exact final bytes",
+        "Do not run another review",
+        "Keep the D-GOV-015 authoring internals and sole Documentation Review "
+        "authoritative",
+        "no subject, terminology, verdict, validation, acceptance, publication, "
+        "supersession, retirement, deletion, or merge authority",
+        "Use the normal repository integration route when separately authorised",
+    ):
+        _require(
+            fragment in owner_flat,
+            "D-GOV-017 owner view drifted: " + fragment,
+        )
+
+    participant_rows = _structured_table_rows(
+        direct_section_content(
+            section,
+            "Participants and independence",
+            level=3,
+        ),
+        ("Participant", "Role and independence"),
+        "D-GOV-017 participants",
+    )
+    _require(
+        set(participant_rows)
+        == {
+            "owner:tracktemplate-project-owner",
+            "agent:openai-codex-primary",
+            "agent:hume-governance-design",
+            "agent:kepler-lifecycle-gap-audit",
+            "agent:meitner-validation-surface",
+            "agent:tdmp-final-quality-review",
+            "A mistakenly started additional Documentation Review",
+        },
+        "D-GOV-017 participant roles drifted",
+    )
+
+    dissent = _semantic_text(
+        direct_section_content(
+            section,
+            "Dissent, unknowns, and exceptions",
+            level=3,
+        )
+    )
+    for fragment in (
+        "No unresolved dissent remains",
+        "Normal integration and the current controlled-baseline identity do not "
+        "yet exist",
+        "project owner records the required review as complete and forbids "
+        "another review",
+        "separate preservation packet identify the corrected candidate",
+        "There is no exception or waiver to D-GOV-015",
+        "governance-budget exception",
+    ):
+        _require(
+            fragment in dissent,
+            "D-GOV-017 dissent, unknown, or exception record drifted: "
+            + fragment,
+        )
+
+    conditions = _structured_table_rows(
+        direct_section_content(section, "Bounded conditions", level=3),
+        ("Condition", "Accountable owner", "Deadline"),
+        "D-GOV-017 bounded conditions",
+    )
+    expected_conditions = {
+        (
+            "Keep the TDMP in the Engineering Policy. Add no second policy "
+            "owner, document database, or linguistic-review route."
+        ): (
+            "Technical Author Lead",
+            "Before candidate freeze and throughout the lifecycle.",
+        ),
+        (
+            "Keep subject meaning and terminology with their applicable "
+            "canonical owners."
+        ): (
+            "Technical Author Lead and applicable subject or terminology owner",
+            "Before candidate freeze and throughout the lifecycle.",
+        ),
+        (
+            "Commit and push a clean corrected Git candidate and preserve its "
+            "exact bytes independently. The prior preservation packet does not "
+            "satisfy this condition for changed bytes."
+        ): (
+            "Project owner, Technical Author Lead, and independent preservation "
+            "reviewer",
+            "Before normal repository integration.",
+        ),
+        (
+            "Apply the project owner's required adjustment and run one final "
+            "deterministic validation. Green final validation ends the "
+            "governance-document review cycle. Do not run another review."
+        ): (
+            "Technical Author Lead and validation owner",
+            "Before controlled-baseline integration.",
+        ),
+        (
+            "Do not run a later documentation, quality, publication, wording, "
+            "or semantic review of the governance prose. A general quality "
+            "review can examine separately changed source or tests only."
+        ): (
+            "Technical Author Lead, validation owner, quality reviewer, and "
+            "integration owner",
+            "After the sole Documentation Review and throughout completion.",
+        ),
+        (
+            "Let CI verify the exact final bytes only. Do not let CI start a "
+            "review, correction, reinterpretation, or wording-improvement cycle."
+        ): (
+            "Validation and integration owners",
+            "During final validation and integration.",
+        ),
+        (
+            "Record acceptance only for the exact once-reviewed and finally "
+            "validated content. Then use normal repository integration to make "
+            "it current."
+        ): (
+            "Project owner and repository integration owner",
+            "Before current controlled use.",
+        ),
+        (
+            "Preserve the terminal failed candidate, untouched legacy prose, "
+            "and required history."
+        ): (
+            "Technical Author Lead",
+            "Throughout this cycle and the later lifecycle.",
+        ),
+    }
+    _require(
+        set(conditions) == set(expected_conditions),
+        "D-GOV-017 bounded conditions drifted",
+    )
+    for condition, expected_owner_and_deadline in expected_conditions.items():
+        _require(
+            tuple(conditions[condition][1:]) == expected_owner_and_deadline,
+            "D-GOV-017 condition owner or deadline drifted: " + condition,
+        )
+
+    risk_rows = _structured_table_rows(
+        direct_section_content(section, "Safety and risk panel", level=3),
+        ("Risk", "Assessment", "Result"),
+        "D-GOV-017 risk panel",
+    )
+    _require(
+        set(risk_rows)
+        == {
+            "PR-12 — fragmented or stale direction",
+            "PR-13 — repository or evidence loss",
+            "PR-22 — authority transfer or self-acceptance",
+        },
+        "D-GOV-017 risk panel changed its bounded risks",
+    )
+    for risk, disposition in (
+        (
+            "PR-12 — fragmented or stale direction",
+            "The disposition does not change.",
+        ),
+        (
+            "PR-13 — repository or evidence loss",
+            "The disposition does not change.",
+        ),
+        (
+            "PR-22 — authority transfer or self-acceptance",
+            "The disposition does not change.",
+        ),
+    ):
+        _require(
+            disposition in risk_rows[risk][2],
+            "D-GOV-017 changed a risk disposition: " + risk,
+        )
+
+    panel = _semantic_text(section)
+    for fragment in (
+        "material governance deficiency",
+        "separate TDMP document would duplicate that owner",
+        "This is Level 3",
+        "governance-budget exception",
+        "No product source or railway behaviour changes",
+        "No FreeCAD or GUI validation applies",
+        "Development validation parsed all 189 Python and macro files",
+        "The 60-test standalone CI profile passed",
+        "rejected all 343 inadmissible mutations",
+        "retained 337 independent protections",
+        "The STE cache remains bound to the accepted source",
+        "00edbb331e5972b565a9fa70b3d85aa20754bce4",
+        "52054d6bb857e38009f79f48d2896b4a1f6e583a",
+        "bd5375e2af7b003bf2e2dc5a5fb457a59ad7396ffa0784915859f6c26d04cfab",
+        "b525e3d9d3c55f5f685c2afe38af992181d9656c43de5b61a82971a576338c0e",
+        "28 blocking findings",
+        "no accepted-state proposal",
+        "D-GOV-016 was never current authority",
+        "Proceed with bounded conditions",
+        "3641e93e521b44464deb1a8b192f285c8943f6d9",
+        "c4375ba2fbb6bb7ec9653f0e17738a51251a418365aa1d0c93604b9373d66466",
+        "6b337142bbabd0b4224791bb6c6686a401d3bb1ae48aeb4933504a87d8790bfb",
+        "project owner records the required governance-prose review as complete",
+        "Complete the project owner's required adjustment, run the focused "
+        "final deterministic validation once",
+        "Green final validation ends the governance-document review cycle",
+        "Do not run another review",
+        "general quality review can apply only to separately changed source or "
+        "tests",
+        "Continuous integration can verify the exact final bytes",
+        "cannot initiate a Documentation Review, correction, semantic "
+        "reinterpretation, or wording improvement",
+        "mistakenly started additional Documentation Review was stopped before "
+        "verdict, result, or accepted-state proposal",
+        "made no tracked mutation",
+        "D-GOV-015 remains authoritative",
+        "Phase 6 stays at 2/5",
+        "Exits 1, 4, and 5 stay Pending",
+        "Project status stays unknown",
+        "No risk disposition changes",
+        "no second linguistic-review route",
+        "no product, railway, FreeCAD, GUI, persistence, export, schema, API, "
+        "performance, production, physical-output, packaging, release, tagging, "
+        "legacy-retirement, deletion, or merge authority",
+    ):
+        _require(
+            _semantic_text(fragment) in panel,
+            "D-GOV-017 evidence panel drifted: " + fragment,
+        )
+    for prohibited in (
+        "fresh post-validation non-linguistic quality and publication review",
+        "must give a passing result for the exact validated candidate",
+        "still requires one independent Documentation Reviewer under D-GOV-015",
+    ):
+        _require(
+            _semantic_text(prohibited) not in panel,
+            "D-GOV-017 reintroduced a later governance-prose review: "
+            + prohibited,
         )
 
 
@@ -5464,6 +5772,7 @@ def main() -> None:
     _validate_risks(plan)
     _validate_decisions(plan)
     _validate_ste_lifecycle_panel(current_evidence)
+    _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_product_direction(current_evidence)
     _validate_fixed_paths()
     _validate_ci_workflow()

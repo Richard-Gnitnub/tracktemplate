@@ -10,7 +10,10 @@ description: Select, run and report proportionate TrackTemplate validation and c
 This skill owns evidence selection and interpretation. Determine what the actual
 TrackTemplate change requires, report what completed checks prove and keep
 unavailable evidence visible. Do not decide whether the implementation or scope
-is acceptable overall; that belongs to `$tracktemplate-quality-review`.
+is acceptable overall; for source and test changes, that belongs to
+`$tracktemplate-quality-review`. For governance documents, a green final
+deterministic validation ends the finite Technical Author Lead route. It does
+not hand the prose to another reviewer.
 
 ## Required preparation
 
@@ -201,8 +204,9 @@ validation detail below it as proof/provenance:
 6. **Evidence interpretation:** what the completed checks show and what they do
    not show.
 7. **Evidence status:** complete for the selected scope, incomplete, or failed.
-8. **Next review boundary:** whether the complete change is ready for
-   `$tracktemplate-quality-review`.
+8. **Next boundary:** for source and test changes, whether the complete change
+   is ready for `$tracktemplate-quality-review`; for governance documents,
+   whether final validation completed the cycle or stopped for the owner.
 
 Omit failed-test adjudication when no check failed. Do not imply that an
 unavailable, unperformed or narrower check passed.

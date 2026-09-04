@@ -18,10 +18,16 @@ This skill selects and controls a simplification pass. Use the established
 specialist workflow for the material being changed:
 
 - use `$tracktemplate-python-writing` for Python or FCMacro edits;
-- use `$tracktemplate-documentation-review` for Markdown edits;
+- use `$tracktemplate-technical-author-lead` for material canonical Markdown
+  edits, then use one Documentation Review after candidate freeze;
 - use `$tracktemplate-documentation-alignment` when claims or paths may drift;
 - use `$tracktemplate-change-validation` to establish and rerun the proof; and
-- use `$tracktemplate-quality-review` for the final complete-diff judgement.
+- use `$tracktemplate-quality-review` for the final complete-diff judgement of
+  a separate source or test change.
+
+For canonical governance prose, the one Documentation Review, permitted
+adjustment and final deterministic validation finish the document-review
+cycle. Do not add a quality, publication, CI, wording or semantic review.
 
 Do not use simplification as authority to change accepted behaviour,
 architecture, railway terminology, tests, oracles, schemas, persisted names,
@@ -107,4 +113,4 @@ Report:
 5. quantitative observations only where meaningful, without treating line
    count as the success criterion;
 6. remaining GUI, persistence, export or performance evidence; and
-7. reviewer independence and final quality verdict.
+7. the applicable sole Documentation Review or source/test quality verdict.

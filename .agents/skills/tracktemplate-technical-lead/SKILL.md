@@ -82,14 +82,19 @@ into this skill.
 - Use `$tracktemplate-python-writing`, `$tracktemplate-debugging`,
   `$tracktemplate-performance-engineering`, `$tracktemplate-security-review`
   and `$tracktemplate-license-analysis` where their boundaries are affected.
-- Route a necessary ASD-STE100 linguistic conformance assessment to
-  [`$tracktemplate-documentation-review`](../tracktemplate-documentation-review/SKILL.md).
-  Do not read the external PDF during usual technical-lead work.
+- Route new or materially changed canonical technical prose to
+  [`$tracktemplate-technical-author-lead`](../tracktemplate-technical-author-lead/SKILL.md).
+  After candidate freeze, the Technical Author Lead routes the frozen scope to
+  one Documentation Review. Do not read the external PDF during usual
+  technical-lead work.
 - Use
   [`$tracktemplate-change-validation`](../tracktemplate-change-validation/SKILL.md)
-  for proportionate proof, then hand the completed change and raw evidence to a
-  separate read-only
+  for proportionate proof, then hand changed source and tests with their raw
+  evidence to a separate read-only
   [`$tracktemplate-quality-review`](../tracktemplate-quality-review/SKILL.md).
+  Governance prose completes its separate Technical Author Lead route after
+  one Documentation Review, any permitted adjustment and final deterministic
+  validation. Do not include that prose in another quality or wording review.
 
 Technical-lead composition does not replace any specialist skill. Name the
 selected specialist sequence and each routing reason; do not silently absorb a
@@ -125,8 +130,9 @@ When implementation is authorised directly or through an explicit
    uncertainty.
 3. Run `$tracktemplate-change-validation`, preserve every failed or unavailable
    proof and rerun the original proof after any classified repair.
-4. Hand the complete implementation and raw evidence to a separate read-only
-   `$tracktemplate-quality-review`.
+4. Hand the changed source and tests with their raw evidence to a separate
+   read-only `$tracktemplate-quality-review`. Do not route completed governance
+   prose through that review.
 5. Leave branch integration, commits, push, pull-request and merge mechanics to
    [`$tracktemplate-publish`](../tracktemplate-publish/SKILL.md) and
    `$tracktemplate-continue`.

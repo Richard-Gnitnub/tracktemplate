@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-quality-review
-description: Perform a staff-level review of new or changed TrackTemplate source, tests, and documentation. Include classified failed-test repairs and an optional light-hearted code roast. Use it before a completion report or for a read-only independent review. Also use it when a person asks for a review or a gentle code roast.
+description: Perform a staff-level review of new or changed TrackTemplate source and tests. Include classified failed-test repairs and an optional light-hearted code roast. Use it before a completion report or for a read-only independent review of source or tests. Also use it when a person asks for a review or a gentle code roast. Governance documents use their sole Documentation Review instead.
 ---
 
 # TrackTemplate quality review
@@ -30,10 +30,17 @@ If the person authorised fixes, finish and report the first verdict. Then, make
 a separate repair pass. Rerun the affected evidence and review the resulting
 complete diff again.
 
+This skill does not review governance-document prose at any stage. New,
+updated or lifecycled governance documents use the Technical Author Lead route:
+one Documentation Review, one permitted adjustment and one final deterministic
+validation, then done. CI, publication, integration, a later checker or a new
+review method cannot invoke this skill to reconsider their wording or meaning.
+
 Use one of two modes:
 
 - **Post-implementation review:** assess new or changed production code, tests,
-  documentation and evidence before completion.
+  connected implementation evidence and non-governance documentation before
+  completion.
 - **Failed-test repair review:** assess the preserved raw failure and the
   primary classification from `reference/TESTING_POLICY.md`. Assess the repair
   limit and the related source, test, fixture, or environment changes.
@@ -51,7 +58,7 @@ Use one of two modes:
 5. Read only the canonical project documents relevant to the change. Do not
    copy their policy into this skill or treat this skill as a second authority.
 
-For presentation for the owner or documentation-governance changes, read the
+For presentation for the owner of a source or test change, read the
 canonical
 [Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
 Read the project technical terms in
@@ -60,22 +67,11 @@ Make sure that the owner view agrees with canonical records. It must keep
 limitations and technical provenance. It must not make acceptance or wider
 authority.
 
-For an Issue 9 conformance claim, examine the recorded conformance review. Make
-sure that the reviewer used the official standard. The reviewer must review
-the full logical unit that contains the change. A validator result alone is
-not sufficient evidence. Use the
-[ASD-STE100 source instructions](../../../reference/external/asd-ste100/README.md)
-to identify the official source. Keep TrackTemplate policy different from the
-external normative reference. Keep evidence that the reviewer examined the
-named logical unit.
-Use the [STE lookup](../../../reference/external/asd-ste100/README.md#local-retrieval-interface)
-to read one bounded source excerpt. Make sure that the reviewer examines the complete
-applicable requirement set. Do not use a source excerpt or an empty pre-check
-as the conformance review.
-When the lifecycle records its one Documentation Review verdict, check only its
-source, frozen review scope, receipt, state, and final-content bindings. This
-quality review is non-linguistic. Do not repeat Documentation Review. Do not
-change its verdict or propose wording corrections.
+For an Issue 9 conformance claim, use the Technical Author Lead and
+Documentation Review route. This quality-review skill does not examine the
+governance prose, repeat that review, change its verdict or propose wording.
+It can verify source or test changes that implement deterministic review-state
+bindings, but that verification cannot reopen the document.
 
 Before you review exporter interruption probes or tests, read the canonical
 [supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).

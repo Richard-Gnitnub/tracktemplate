@@ -132,8 +132,8 @@
   operator workflows, persistence, export or visible performance.
 - Review the complete diff for unrelated changes, duplicated policy, weakened
   checks, speculative abstractions and misleading claims.
-- Use the validation and quality workflows for non-trivial work; the first
-  review pass is read-only and any independence limitation is disclosed.
+- Use the validation and quality workflows for non-trivial source and test work; the first quality-review pass is read-only and any independence limitation is disclosed.
+  Canonical governance prose follows the finite Technical Author Lead route. Its one Documentation Review, permitted adjustment and final deterministic validation end the document-review cycle. Quality review, CI, publication and integration cannot reopen its wording or meaning.
 - For substantial cycles, use the derived owner view in the [Engineering Policy](reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
   and keep technical provenance beneath it.
 - State remaining uncertainty plainly. Validation never implies a phase,

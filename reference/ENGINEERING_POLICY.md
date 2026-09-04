@@ -434,7 +434,385 @@ gives no phase, production, merge, release, acceptance, or project-owner authori
 Semantic validators protect these controlled meanings. They do not freeze full
 paragraphs. Sentence-length checks do not prove linguistic conformance.
 
-## Documentation lifecycle
+<a id="technical-documentation-management-plan"></a>
+
+## Technical Documentation Management Plan
+
+This section is the TrackTemplate Technical Documentation Management Plan
+(TDMP). It owns technical-documentation management for the complete life of a
+technical document. It does not own the technical subject in that document.
+
+The complete technical-document lifecycle is:
+
+> identify the need → classify → assign ownership → plan → understand once →
+> write once → check once → improve once → freeze once → review once →
+> adjust once when required → validate once → finish the D-GOV-015 lifecycle →
+> establish a controlled baseline → make available → use → maintain → change
+> under control → supersede or retire → preserve required history
+
+The [Documentation Review lifecycle](#documentation-review-lifecycle) is one
+bounded part of this lifecycle. D-GOV-015 remains authoritative for that part.
+It supplies the one linguistic review and the final deterministic validation.
+The TDMP does not create a second linguistic-review lifecycle.
+
+### Document need and initiation
+
+A technical-document need starts when one of these items changes or has a
+documented deficiency:
+
+- Product behaviour.
+- Architecture.
+- Engineering policy.
+- Validation or recovery requirements.
+- A project decision.
+- A technical procedure.
+- An accepted Learning from Experience adaptation.
+- Controlled technical documentation.
+
+The Technical Author Lead examines the need with the applicable subject owner.
+They select one result:
+
+- Create a new technical document.
+- Make a material change to an existing technical document.
+- Make a non-material correction.
+- Make no documentation change.
+
+Create a new document only when no existing canonical owner is correct. Put
+new information in the existing canonical owner when that owner is correct.
+Do not use routine linguistic improvement as a technical-document need.
+
+### Document classification
+
+Classify the technical document before work on its content starts. Record the
+classification in the work item or existing evidence that controls the change.
+Do not create a second document register for the classification.
+
+The classification identifies these items when they apply:
+
+- Canonical or non-canonical status.
+- Technical-document type. Use the existing document class.
+- Canonical owner.
+- Technical or governance subject owner.
+- ASD-STE100 Issue 9 applicability.
+- Legacy status and the last accepted review state.
+- Exact-content exclusions.
+- Required review and validation.
+- Repository integration or other publication boundary.
+
+The technical-document type is its existing document class. Use one of these
+classes:
+
+- Live status.
+- Architecture.
+- Plan or policy.
+- Procedure.
+- Evidence or audit.
+- Historical record.
+- Specification or inventory.
+- Closeout.
+- Guidance.
+
+The classification determines the applicable workflow.
+
+Non-canonical material follows its existing evidence, transient-work, or
+preservation route. It must link to the current canonical owner when readers
+can mistake its status. It must not present itself as current authority.
+
+A material change affects technical meaning, authority, required use,
+ownership, scope, status, evidence, or a controlled instruction. A
+non-material correction changes none of those items. Examples are a spelling
+correction, a format correction, or a repaired link with unchanged meaning.
+Use the highest applicable [change level](#three-change-levels).
+
+### Ownership and authority
+
+Every controlled technical document has one identified canonical owner. This
+TDMP owns technical-documentation management. The Technical Author Lead owns
+technical-documentation authoring, delivery, and maintenance coordination.
+
+The applicable technical or governance owner continues to own the subject.
+That owner supplies the required technical meaning and records its acceptance.
+The Technical Author Lead does not become the technical authority for that
+subject.
+
+The Documentation Reviewer owns only the one linguistic verdict. Validation
+owns only its stated result. The applicable change authority records
+controlled-baseline acceptance. These roles cannot give their own work a
+different authority unless existing authority expressly permits that result.
+
+### Documentation planning
+
+Before content work starts, the Technical Author Lead records or confirms:
+
+- Purpose.
+- Intended user or consumer.
+- Required technical meaning.
+- Applicable canonical authorities.
+- Source information.
+- Terminology.
+- Document scope.
+- Change scope.
+- ASD-STE100 Issue 9 applicability.
+- Review requirement.
+- Validation requirement.
+- Expected controlled-document result.
+
+Use the smallest documentation intervention that satisfies the identified
+need. Keep information in its canonical owner and use links to other owners.
+
+### Authoring and review
+
+For new or materially changed canonical technical prose, the Technical Author
+Lead automatically owns this route:
+
+> understand once → write once → check once → improve once → freeze once →
+> review once → validate once → finish
+
+For a governance document, the project-owner shorthand for this point-in-time
+route is `write → review → adjust if required → final deterministic validation
+→ done`. Understand, check, improve, and freeze are parts of the one Technical
+Author Lead authoring pass. They do not create more independent reviews.
+
+The understand step confirms the plan, authority, meaning, and terms. The write
+step produces all affected complete logical units. The check step examines
+technical accuracy, ownership, terms, exact content, links, and deterministic
+pre-check results. It is not a linguistic Documentation Review.
+
+The improve step applies one complete author-side correction pass before
+freeze. Apply TT-DOC-001, TT-DOC-002, and D-GOV-015 exactly throughout this
+route. The Technical Author Lead then freezes one exact candidate.
+
+One independent Documentation Reviewer examines the Git-derived frozen review
+scope. The reviewer returns the one D-GOV-015 verdict. Apply exact reviewed
+corrections once only when that verdict permits them. Then run the one final
+deterministic validation. Do not run another linguistic review.
+
+The finish step supplies the exact candidate, Documentation Review, final
+validation, limitations, and required authority. Green final validation ends
+the bounded D-GOV-015 lifecycle. Do not send the document to another
+documentation, quality, publication, wording, or semantic review. The finish
+step does not establish controlled-baseline acceptance.
+
+Continuous integration can run the required deterministic checks on the final
+bytes. A CI result cannot start another Documentation Review, correction pass,
+or linguistic improvement cycle. If final validation fails, stop for the owner.
+
+A non-material correction uses proportionate review and validation. If its
+scope becomes material, reclassify it before retention and use the complete
+route above.
+
+### Lifecycle states
+
+Use existing Git and canonical records to distinguish these states:
+
+| State | Controlled meaning |
+| --- | --- |
+| **Draft** | Content work has no frozen exact candidate. It is not current controlled documentation. |
+| **Frozen review candidate** | Git identifies the exact candidate and review scope. It is not current controlled documentation. |
+| **Reviewed** | The one Documentation Review has a recorded verdict. The verdict alone does not establish a controlled baseline. |
+| **Validated** | The applicable deterministic validation passed for the exact reviewed content. Validation alone does not establish a controlled baseline. |
+| **Accepted/controlled baseline** | The applicable authority recorded acceptance of the exact content after the one required Documentation Review, permitted adjustment, and final deterministic validation. This is the comparison point for later change. |
+| **Superseded** | An accepted replacement owns the current information. The earlier document is historical evidence and is not current authority. |
+| **Retired** | Evidence shows that the document owns no required current information. It is not current authority. |
+| **Frozen historical evidence** | The repository preserves dated evidence and its accepted meaning. It is not live project authority. |
+| **Failed experimental candidate** | The candidate did not become a current controlled baseline. Preserve its exact review receipt and accepted-state proposal status. It is not current authority. |
+
+A draft, commit, review verdict, validation result, or pull request does not
+establish an accepted/controlled baseline. The applicable authority must
+record acceptance of the exact content.
+
+### Controlled baseline
+
+Establish the controlled baseline only after the one Documentation Review,
+permitted adjustment, and final deterministic validation are complete. The
+applicable change authority must record acceptance of the exact document.
+
+Record only durable data that existing authority requires. This can include:
+
+- Document identity.
+- Accepted Git commit or blob identity.
+- Source identity.
+- Documentation Review receipt.
+- Applicable decision or adoption authority.
+
+For D-GOV-015 review scope, `reference/ste-review-state.json` records the last
+accepted document identity, source identity, and review receipt. Git and the
+existing decision and evidence records supply the other necessary trace. Do
+not add sentence, paragraph, or logical-unit workflow state. Do not create a
+new document-management database when these records are sufficient.
+
+### Publication and availability
+
+Make an accepted technical document available through its normal repository
+integration or publication route. Normal repository integration makes the
+accepted baseline current and available for repository use. The classification
+identifies that boundary. A separate external publication follows only when it
+applies and has its own authority. An author-created or author-committed
+document is not controlled for that reason alone.
+
+The normal route keeps these states separate: draft, frozen review candidate,
+reviewed, validated, accepted/controlled baseline, superseded, and retired.
+Use protected repository state and applicable canonical records to identify
+the current controlled document.
+
+### Use
+
+The controlled technical document is the applicable human-readable source for
+its stated purpose. The authority hierarchy in this TDMP and the named subject
+owners continue to apply.
+
+A user or agent must be able to identify:
+
+- Whether the document is current.
+- Its canonical owner.
+- A controlling higher authority, when one applies.
+- Its accepted baseline.
+- A material limitation that affects its use.
+
+Use the document status, canonical links, accepted Git identity, review state,
+and applicable decisions to supply this information. Keep a material
+limitation beside the claim that it limits. Do not let an obsolete document or
+a failed candidate appear to be current controlled documentation.
+
+### Maintenance
+
+The Technical Author Lead manages document maintenance. Start maintenance only
+for a genuine technical-document need. Do not start it for routine linguistic
+polishing.
+
+Do not periodically review accepted unchanged prose because another reviewer
+or model could change its wording. Keep the documentation estate aligned with
+material changes to the product, architecture, governance, and technical
+authorities. When another canonical owner makes a document stale, route the
+resulting need through this TDMP.
+
+### Change control
+
+Compare every proposed change to the accepted controlled baseline. Use Git,
+the accepted document identity, and the applicable canonical records for that
+comparison. Classify the result as material or non-material before content
+work starts.
+
+For a material change to canonical technical prose:
+
+1. Route the complete change through the Technical Author Lead.
+2. Derive the required review scope from the accepted baseline and Git.
+3. Review only the required complete logical units after a baseline exists.
+4. Apply the one-review D-GOV-015 lifecycle.
+5. Establish a new controlled baseline only after review, validation, and
+   applicable acceptance.
+
+Do not reopen unrelated accepted prose. An improvement to an assurance method
+does not give authority to reopen accepted history. A non-material correction
+uses its proportionate change level and does not become routine re-review.
+
+### Legacy technical documentation
+
+Do not retrospectively rewrite an untouched legacy document. A first material
+change can start a baseline review. If that document has no accepted
+ASD-STE100 baseline, review the complete document as D-GOV-015 requires.
+
+After acceptance, manage that document as controlled reviewed documentation.
+Git then derives only the materially changed complete logical units for a later
+review.
+
+### Supersession
+
+Supersede a controlled technical document only when an accepted replacement
+owns its required current information. Before supersession:
+
+1. Identify the replacement authority.
+2. Show that required current information was retained or deliberately
+   replaced.
+3. Update applicable references.
+4. Mark the earlier document so that it cannot appear to be current authority.
+5. Preserve its historical meaning and evidence.
+
+The applicable subject and change authorities decide supersession. The
+Technical Author Lead coordinates the document work but does not make that
+decision. Do not overwrite historical evidence to make a later replacement
+appear retrospective.
+
+### Retirement
+
+Retire a technical document only with explicit evidence that it owns no
+required current information. Before retirement, identify which result applies:
+
+- Another canonical owner received the content.
+- An accepted document superseded it.
+- The content is no longer applicable.
+- The document remains necessary as historical evidence.
+
+Record the reason and applicable authority in an existing decision, evidence,
+or Git record. Update current references and status. Retirement does not by
+itself authorise deletion. Do not delete or rewrite material whose evidential
+value depends on preservation.
+
+### Historical preservation
+
+Preserve required technical documents, decisions, reviews, accepted baselines,
+and retirement or supersession evidence under
+[RECOVERY_AND_BACKUP.md](RECOVERY_AND_BACKUP.md) and
+[history/README.md](history/README.md).
+
+A superseded or retired document can remain as historical evidence without
+remaining current authority. Clearly distinguish current canonical
+documentation, superseded documentation, retired documentation, frozen
+historical evidence, and failed experimental candidates.
+
+Do not rewrite a historical record only to apply a newer documentation
+standard. Preserve the exact meaning, status, limitations, and accepted
+identity that give the record evidential value.
+
+### Traceability
+
+Use existing evidence to answer these lifecycle questions:
+
+| Question | Existing trace |
+| --- | --- |
+| Why does the document exist? | The initiating requirement, work item, decision, or documented deficiency. |
+| Who owns it? | Its canonical owner and the applicable subject owner. |
+| What technical authority does it consume? | Its canonical links and recorded source information. |
+| What baseline is current? | The accepted Git identity and applicable review state or decision. |
+| What review applies? | The classification, TT-DOC-001, TT-DOC-002, D-GOV-015, and its review receipt. |
+| What changed? | The Git comparison with the accepted baseline. |
+| What validated the accepted state? | The named validation result and its evidence. |
+| What replaced it? | The supersession status, replacement link, and applicable decision. |
+| Why was it retired? | The retirement evidence and applicable authority. |
+
+Do not create a duplicate lifecycle record when Git or an existing canonical
+record answers the question.
+
+### Lifecycle completion and reopening
+
+A completed documentation lifecycle remains complete until a genuine material
+change creates a new technical-document need. Do not reopen a controlled
+document only because:
+
+- Another model is available.
+- Another reviewer could use different wording.
+- A later process is stronger.
+- A new checker reports a stylistic preference.
+- Further linguistic improvement is possible.
+
+Only the applicable change-control authority can identify a material need that
+reopens the lifecycle. The management objective is finite:
+
+> identify the need → create the right information → establish its acceptance
+> → maintain the controlled baseline → change it only when necessary → retire
+> it deliberately → preserve what must remain
+
+The objective is controlled technical information throughout its useful life.
+It is not perpetual document improvement.
+
+For a governance document, the point-in-time process is write, one review, one
+adjustment when required, final deterministic validation, and done. Do not reopen
+it during CI or after completion to improve wording, reinterpret accepted
+meaning, apply a later checker preference, or use a newer review method. A new
+cycle starts only when the applicable authority identifies a genuine material
+documentation need.
+
+### Existing repository records
 
 The live control paths are fixed:
 

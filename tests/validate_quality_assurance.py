@@ -764,6 +764,251 @@ def validate_documentation_profile(
         require(fragment in lfe_018, "LFE-018 lacks: " + fragment)
 
 
+def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
+    """Validate the complete technical-document lifecycle and finite control."""
+    anchor = '<a id="technical-documentation-management-plan"></a>'
+    heading = "## Technical Documentation Management Plan"
+    require(
+        engineering.count(anchor) == 1 and engineering.count(heading) == 1,
+        "Engineering Policy must own exactly one TDMP",
+    )
+    tdmp = engineering.split(heading, 1)[1].split("\n## ", 1)[0]
+    tdmp_plain = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", tdmp)
+    tdmp_plain = tdmp_plain.replace(">", " ").replace("`", "")
+    tdmp_flat = " ".join(tdmp_plain.split()).casefold()
+    required_sections = {
+        "Document need and initiation",
+        "Document classification",
+        "Ownership and authority",
+        "Documentation planning",
+        "Authoring and review",
+        "Lifecycle states",
+        "Controlled baseline",
+        "Publication and availability",
+        "Use",
+        "Maintenance",
+        "Change control",
+        "Legacy technical documentation",
+        "Supersession",
+        "Retirement",
+        "Historical preservation",
+        "Traceability",
+        "Lifecycle completion and reopening",
+        "Existing repository records",
+    }
+    headings = set(re.findall(r"^### (.+)$", tdmp, re.MULTILINE))
+    require(
+        required_sections <= headings,
+        "TDMP lacks lifecycle sections: "
+        + ", ".join(sorted(required_sections - headings)),
+    )
+
+    concept_groups = (
+        (
+            "identify the need → classify → assign ownership → plan",
+            "adjust once when required → validate once → finish the d-gov-015 "
+            "lifecycle",
+            "establish a controlled baseline → make available → use",
+            "change under control → supersede or retire → preserve required "
+            "history",
+        ),
+        (
+            "documentation review lifecycle is one bounded part",
+            "d-gov-015 remains authoritative for that part",
+            "does not create a second linguistic-review lifecycle",
+        ),
+        (
+            "create a new technical document",
+            "make a material change to an existing technical document",
+            "make a non-material correction",
+            "make no documentation change",
+            "no existing canonical owner is correct",
+        ),
+        (
+            "canonical or non-canonical status",
+            "technical-document type",
+            "canonical owner",
+            "subject owner",
+            "asd-ste100 issue 9 applicability",
+            "legacy status",
+            "exact-content exclusions",
+            "required review and validation",
+            "publication boundary",
+            "non-canonical material follows its existing evidence",
+            "must not present itself as current authority",
+        ),
+        (
+            "every controlled technical document has one identified canonical owner",
+            "technical author lead owns technical-documentation authoring, "
+            "delivery, and maintenance coordination",
+            "does not become the technical authority for that subject",
+        ),
+        (
+            "purpose",
+            "intended user or consumer",
+            "required technical meaning",
+            "applicable canonical authorities",
+            "source information",
+            "terminology",
+            "document scope",
+            "change scope",
+            "expected controlled-document result",
+            "smallest documentation intervention",
+        ),
+        (
+            "understand once → write once → check once → improve once",
+            "freeze once → review once → validate once → finish",
+            "apply tt-doc-001, tt-doc-002, and d-gov-015 exactly throughout",
+            "one independent documentation reviewer",
+            "do not run another linguistic review",
+            "green final validation ends the bounded d-gov-015 lifecycle",
+            "do not send the document to another documentation, quality, "
+            "publication, wording, or semantic review",
+            "continuous integration can run the required deterministic checks "
+            "on the final bytes",
+            "cannot start another documentation review, correction pass, or "
+            "linguistic improvement cycle",
+        ),
+        (
+            "draft",
+            "frozen review candidate",
+            "reviewed",
+            "validated",
+            "accepted/controlled baseline",
+            "superseded",
+            "retired",
+            "frozen historical evidence",
+            "failed experimental candidate",
+        ),
+        (
+            "establish the controlled baseline only after the one documentation "
+            "review, permitted adjustment, and final deterministic validation "
+            "are complete",
+            "applicable change authority must record acceptance of the exact "
+            "document",
+            "do not add sentence, paragraph, or logical-unit workflow state",
+            "do not create a new document-management database",
+        ),
+        (
+            "normal repository integration makes the accepted baseline current "
+            "and available",
+            "separate external publication follows only when it applies",
+            "author-created or author-committed document is not controlled",
+        ),
+        (
+            "whether the document is current",
+            "its canonical owner",
+            "a controlling higher authority",
+            "its accepted baseline",
+            "a material limitation",
+        ),
+        (
+            "start maintenance only for a genuine technical-document need",
+            "do not periodically review accepted unchanged prose",
+            "route the resulting need through this tdmp",
+        ),
+        (
+            "compare every proposed change to the accepted controlled baseline",
+            "derive the required review scope from the accepted baseline and git",
+            "review only the required complete logical units",
+            "establish a new controlled baseline only after review, validation, "
+            "and applicable acceptance",
+            "do not reopen unrelated accepted prose",
+            "improvement to an assurance method does not give authority",
+        ),
+        (
+            "do not retrospectively rewrite an untouched legacy document",
+            "a first material change can start a baseline review",
+            "if that document has no accepted asd-ste100 baseline",
+            "review the complete document as d-gov-015 requires",
+        ),
+        (
+            "accepted replacement owns its required current information",
+            "update applicable references",
+            "cannot appear to be current authority",
+            "do not overwrite historical evidence",
+        ),
+        (
+            "explicit evidence that it owns no required current information",
+            "retirement does not by itself authorise deletion",
+            "do not delete or rewrite material whose evidential value depends "
+            "on preservation",
+        ),
+        (
+            "current canonical documentation, superseded documentation, retired "
+            "documentation",
+            "failed experimental candidates",
+            "do not rewrite a historical record only to apply a newer "
+            "documentation standard",
+        ),
+        (
+            "why does the document exist?",
+            "who owns it?",
+            "what technical authority does it consume?",
+            "what baseline is current?",
+            "what review applies?",
+            "what changed?",
+            "what validated the accepted state?",
+            "what replaced it?",
+            "why was it retired?",
+        ),
+        (
+            "completed documentation lifecycle remains complete until a genuine "
+            "material change",
+            "another model is available",
+            "a later process is stronger",
+            "further linguistic improvement is possible",
+            "point-in-time process is write, one review, one adjustment when required, "
+            "final deterministic validation, and done",
+            "do not reopen it during ci or after completion",
+            "genuine material documentation need",
+            "not perpetual document improvement",
+        ),
+    )
+    for concepts in concept_groups:
+        require(
+            all(concept in tdmp_flat for concept in concepts),
+            "TDMP lifecycle lost: " + " / ".join(concepts),
+        )
+
+    for prohibited in (
+        "complete the non-linguistic quality and publication review",
+        "after finish, give the exact validated candidate to one fresh "
+        "read-only non-linguistic quality and publication review",
+        "post-validation non-linguistic quality and publication review",
+        "post-validation quality and publication review",
+    ):
+        require(
+            prohibited not in tdmp_flat,
+            "TDMP lifecycle lost: post-validation document review prohibited: "
+            + prohibited,
+        )
+
+    terminology_flat = " ".join(terminology.split()).casefold()
+    for term in (
+        "technical documentation management plan (tdmp)",
+        "technical document",
+        "controlled technical document",
+        "controlled baseline",
+        "lifecycle state is identifiable from git and applicable canonical records",
+        "technical-document lifecycle",
+        "document need",
+        "publication boundary",
+        "material change",
+        "non-material correction",
+        "superseded document",
+        "retired document",
+        "failed experimental candidate",
+        "technical author lead",
+        "records acceptance after the one required documentation review, "
+        "permitted adjustment, and final deterministic validation",
+        "| **author** |",
+        "| **retire** |",
+        "| **supersede** |",
+    ):
+        require(term in terminology_flat, "TDMP terminology lacks: " + term)
+
+
 def validate_asd_ste100_reference(
     engineering: str,
     validation: str,
@@ -942,6 +1187,7 @@ def main() -> None:
     validate_current_qa_risks(quality)
     validate_governance_controls(plan, agents, engineering)
     validate_documentation_profile(engineering, plan, learning, terminology)
+    validate_tdmp_lifecycle(engineering, terminology)
     validate_asd_ste100_reference(
         engineering,
         validation,

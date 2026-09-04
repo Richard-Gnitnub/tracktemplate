@@ -15,8 +15,10 @@ requirements to match whatever the current code happens to do.
 
 - Use this skill to determine which documented claims are current, stale or in
   conflict with project authority or repository evidence.
-- Use `$tracktemplate-documentation-review` while materially editing,
-  shortening or reorganising the affected Markdown.
+- Use `$tracktemplate-technical-author-lead` while materially editing,
+  shortening, or reorganising canonical technical prose. After candidate
+  freeze, the Technical Author Lead routes the frozen scope to one
+  Documentation Review.
 - Use `$tracktemplate-context-recovery` first when lost session context or an
   unfamiliar dirty worktree makes the task boundary uncertain.
 - Use the canonical ownership map in `AGENTS.md`; do not reproduce it here or
@@ -49,7 +51,8 @@ reviewer records its result.
 Use the [local retrieval interface](../../../reference/external/asd-ste100/README.md#local-retrieval-interface)
 for targeted retrieval and one lookup query. A lookup result is not the
 complete applicable rule set.
-Route the assessment of the complete logical unit to documentation review.
+After the Technical Author Lead freezes the candidate, route the assessment of
+the complete logical unit to Documentation Review.
 
 - Treat explicit current user decisions, `AGENTS.md` and canonical reference
   documents as requirement and decision authority in that order.
@@ -91,8 +94,10 @@ repository appear consistent.
    generic memory, atlas, plan, chronicle or session-summary files.
 7. **Validate the result.** Review the complete diff, re-check every changed
    claim and link, run the repository agent-guidance validator when agent
-   guidance or a skill changed, then use the normal documentation validation
-   and quality-review sequence.
+   guidance or a skill changed, then use the Technical Author Lead route for
+   materially changed canonical prose. Its final deterministic validation ends
+   the document-review cycle. Use quality review only for a separate source or
+   test change; it cannot reopen governance-document wording or meaning.
 
 ## Targeted checks
 
