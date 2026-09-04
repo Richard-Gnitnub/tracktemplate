@@ -61,8 +61,9 @@ DESCRIPTION_RULES = {
         27,
         (
             "staff-level review",
-            "source, tests, and documentation",
+            "source and tests",
             "read-only",
+            "Governance documents use their sole Documentation Review instead",
         ),
     ),
     "tracktemplate-technical-lead": (
