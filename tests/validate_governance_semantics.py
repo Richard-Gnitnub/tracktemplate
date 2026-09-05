@@ -1269,13 +1269,12 @@ def validate_current_evidence_mutations() -> None:
 
     exit4_row = table_row_containing(
         evidence,
-        "D-GOV-011 selects one subsequent hypothesis for the canonical record "
-        "and its comparison rule",
+        "The completed D-GOV-011 prerequisite gave FAIL",
     )
     exit4_promoted = replace_once(
         exit4_row,
-        "Pending — D-GOV-008 stays the authority",
-        "Evidenced — D-GOV-008 stays the authority",
+        "Pending — D-GOV-008 and D-GOV-009",
+        "Evidenced — D-GOV-008 and D-GOV-009",
     )
     expect_rejected(
         "phase-evidence/exit4-prematurely-evidenced",
@@ -1286,6 +1285,23 @@ def validate_current_evidence_mutations() -> None:
             replace_once(evidence, exit4_row, exit4_promoted),
         ),
         "Phase 6 exits do not match the accepted 2/5 dispositions",
+    )
+
+    prerequisite_promoted = replace_once(
+        evidence,
+        "unchanged D-GOV-009 attribution materiality rule gave FAIL",
+        "unchanged D-GOV-009 attribution materiality rule gave PASS",
+    )
+    expect_rejected(
+        "phase-evidence/d-gov-011-negative-prerequisite-promoted",
+        lambda: progress._validate_exit_conditions(
+            plan,
+            phase4_closeout,
+            phase5_closeout,
+            prerequisite_promoted,
+        ),
+        "D-GOV-011 prerequisite completion drifted: unchanged D-GOV-009 "
+        "attribution materiality rule gave FAIL",
     )
 
     performance_promoted = replace_once(
@@ -2948,16 +2964,27 @@ def validate_documentation_profile_mutations() -> None:
     )
     owner_view_boundary_widened = replace_once(
         plan,
-        "It limits the Level 2 product change to one FreeCAD adapter file.",
-        "It limits the Level 2 product change to all TrackTemplate product "
-        "files.",
+        "establish bounded B14/B15-to-B16 Entry/Exit centreline output "
+        "equivalence",
+        "establish complete B14 exporter and whole-layout output equivalence",
     )
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
-        "project-plan owner view lost or contradicted: limits the Level 2 "
-        "product change "
-        "to one FreeCAD adapter file",
+        "project-plan owner view lost or contradicted: In a later Level 2 "
+        "cycle, establish bounded B14/B15-to-B16 Entry/Exit",
+    )
+
+    owner_view_restarted = replace_once(
+        plan,
+        "Do not repeat the measurement or make its conditional product change.",
+        "Repeat the measurement and make the D-GOV-011 product change.",
+    )
+    expect_rejected(
+        "tt-doc/owner-view-stopped-direction-restarted",
+        lambda: progress._validate_owner_view(owner_view_restarted),
+        "project-plan owner view lost or contradicted: Do not repeat the "
+        "measurement or make its conditional product change",
     )
 
     compatibility_terms_removed = terminology

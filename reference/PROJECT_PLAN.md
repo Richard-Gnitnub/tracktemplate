@@ -13,11 +13,11 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 has 2/5 accepted exits. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | [D-GOV-011](current/PHASE_EVIDENCE.md#phase-6-exit-4-d-gov-011-direction-selection-panel) selects one later performance hypothesis for the measured canonical Edit area. It limits the Level 2 product change to one FreeCAD adapter file. D-GOV-009, D-GOV-010, and their evidence do not change. |
-| **What now works** | The D-GOV-009 attribution result and source assessment identify two repeated reads of the selected record. A later product change can remove these reads. It does not need work in another Edit stage. |
-| **Limitations/findings** | The attribution noise floor is `2.895891 ms`. The first quartile was only `0.0731425 ms` higher than that floor. The evidence does not report the cost of each operation. The selected performance hypothesis can fail its later comparison. No result is improvement evidence or Exit 4 evidence. |
-| **Owner decision** | Accept D-GOV-011. Authorise one later Level 2 product change in `tracktemplate/adapters/freecad/transition_state.py`. Keep one live read before the write. Keep the necessary read after the write. Preserve all specified invariants. |
-| **Next action** | Make the D-GOV-011 Level 2 change in a new cycle. First, record a new same-host baseline on the D-GOV-010 host. Apply the D-GOV-009 attribution materiality rule to the canonical area. Stop before product work if the result is not PASS. Do not change the comparison rule. A later Level 3 owner decision is necessary to accept Exit 4. |
+| **What changed** | The [completed D-GOV-011 prerequisite](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave a FAIL result. The owner accepted this result as retained negative evidence and stopped the product change. |
+| **What now works** | The new same-host baseline and attribution series are complete. Independent review confirmed the result. The D-GOV-011 stop condition prevented product work. |
+| **Limitations/findings** | The canonical area's first quartile was `3.057969 ms`. The attribution noise floor was `3.8645155 ms`. This result is not improvement evidence or Exit 4 evidence. Exit 1 still lacks the bounded legacy-output equivalence proof. |
+| **Owner decision** | The owner accepted the negative result on 2026-09-05. D-GOV-011, its measurement rule, and historical evidence remain unchanged. Do not repeat the measurement or make its conditional product change. No new owner decision is necessary for the selected product boundary under D-P6-001. |
+| **Next action** | In a later Level 2 cycle, establish bounded B14/B15-to-B16 Entry/Exit centreline output equivalence through exact validation and DXF export/import. This work advances Exit 1 under D-P6-001. Phase acceptance needs a separate owner decision. |
 
 ## Phase status
 
@@ -62,7 +62,7 @@ D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first direction. It
 
 D-GOV-010 qualifies only the exact FreeCAD 1.1.3 host profile with CPython 3.13.13 and PySide6/Qt 6.11.1. It keeps the previously qualified profiles and their evidence. It authorises this profile to supply performance evidence in a later cycle. Each comparison must use one profile with an exact identity. The decision admits no performance result and does not change D-GOV-009. Exit 4 stays Pending.
 
-D-GOV-011 selects one later performance hypothesis for the read route in the canonical FreeCAD adapter. It authorises a Level 2 product change. The change can remove only two repeated reads of the selected record. It must use the exact D-GOV-010 host and record a new same-host baseline. It must not change the comparison rule. D-GOV-011 makes no product change and admits no performance result. Exit 4 stays Pending.
+D-GOV-011 stays Accepted as historical authority for its conditional canonical-record performance hypothesis. The [completed prerequisite](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The original decision, measurement rule, and historical evidence remain unchanged. Exit 4 stays Pending. The next product boundary is Exit 1 centreline output equivalence under D-P6-001.
 
 ## Live risks
 

@@ -4005,6 +4005,55 @@ local changes between a check and use also stay work for later. These limits
 do not reduce the necessary checks for each `stage`. Phase 6 stays at 2/5, and
 project status stays `unknown`. No risk or decision disposition changes.
 
+<a id="d-gov-011-completed-materiality-prerequisite"></a>
+
+## D-GOV-011 completed materiality prerequisite
+
+On 2026-09-05, the D-GOV-011 prerequisite completed at protected-main source
+`1b29a1c82caf39fc329ecded3dd811fd1cd3ba24`. It used the exact D-GOV-010 profile,
+`linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`. The complete same-host
+baseline and attribution series each contained 10 samples. All 20 samples
+passed their correctness checks. Independent review confirmed the evidence.
+
+The unchanged D-GOV-009 attribution materiality rule gave FAIL, with outcome
+`B`. The canonical area's first quartile was `3.057969 ms`. The attribution
+noise floor was `3.8645155 ms`. The first quartile was `0.8065465 ms` below the
+noise floor. The result identified no eligible material measurement area.
+No product change or paired candidate comparison followed.
+
+The retained attribution corpus is
+`benchmark-output/freecad-bridge/phase6-transition-edit-attribution-runs/20260905T-dgov011-current-main/`.
+Its `result.json` SHA-256 is
+`0bcd0cc7e02c86e77fd2fd31893fe0f2c9b8476928bb01901d1c6fded6683bb8`.
+Its `FINAL_SHA256SUMS` SHA-256 is
+`6f88ab16a3948b9ddd63670c90e56a9b4257491aee64b63c64c79ba866448060`.
+All 83 listed files passed the checksum verification.
+
+The corpus preserves the failed setup attempts and their classifications.
+The incomplete baseline series is excluded from the result. The new evidence remains in ignored local
+directories. This cycle did not make an independent backup of it.
+
+On 2026-09-05, the project owner accepted the result as retained negative
+evidence. The D-GOV-011 product direction is stopped. Do not repeat the
+measurement. Do not weaken the measurement rule. Do not make the conditional
+product change. D-GOV-011 stays Accepted as historical authority.
+
+Its original panel, measurement rule, and retained evidence do not change.
+No improvement or Exit 4 evidence is
+admitted. Phase 6 stays at 2/5 accepted exits. Exit 4 stays Pending. Risks do
+not change, and project status stays `unknown`.
+
+The selected next product boundary is bounded B14/B15-to-B16 Entry/Exit
+centreline output equivalence through exact validation and DXF export/import.
+The existing exact-centreline and DXF evidence does not supply this independent
+legacy-output comparison. D-P6-001 already authorises the bounded Level 2 work
+to establish the result, oracle, and equivalence contract for Exit 1.
+No new owner decision is necessary to start that work in a later cycle.
+Production clearance, wider migration, and legacy retirement remain excluded.
+
+This Level 1 alignment changes only the live records and their directly
+dependent checks. It does not start the selected product work or accept an exit.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
@@ -4016,7 +4065,7 @@ The accepted current state is 2/5 under D-P6-002 and D-P6-005:
 | The selected slice has equivalent exact validation and production output for the agreed bounded work | Pending. Exact-validation and private-development DXF evidence exists. Agreed output equivalence and production clearance remain absent. |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005. This is bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004. The recorded platform, recovery, and assurance limitations apply. Project status remains `unknown`. |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-008 stays the authority for its baseline, hypothesis, and comparison rule. D-GOV-009 records the two results as retained negative evidence and stops work in that direction. Its attribution record gives a PASS result for the canonical area, which is only `0.0731425 ms` higher than the noise floor. D-GOV-010 qualifies the exact host for that evidence. D-GOV-011 selects one subsequent hypothesis for the canonical record and its comparison rule. It makes no product change, admits no performance result, and does not accept Exit 4. |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-008 and D-GOV-009 retain their historical authority and negative evidence. The completed D-GOV-011 prerequisite gave FAIL under the unchanged materiality rule. The owner accepted the result as retained negative evidence and stopped that product direction. D-GOV-011 and its historical evidence remain unchanged. No product change or improvement evidence followed. |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Pending. B14 remains available. Parity for the complete accepted work and retirement authority remain absent. |
 
 ## Carried controls and exclusions
@@ -4106,6 +4155,12 @@ for the named checks. It removes only two repeated reads.
 D-GOV-011 defines the new same-host baseline and comparison rule for that
 subsequent cycle. It makes no product change. It admits no performance result,
 defines no budget, and does not accept Exit 4.
+
+The [completed D-GOV-011 prerequisite](#d-gov-011-completed-materiality-prerequisite)
+gave FAIL and stopped that conditional product change. The owner accepted the
+result as retained negative evidence. Do not repeat the measurement or select
+another Exit 4 optimisation only to continue performance work. The next
+product boundary is Exit 1 centreline output equivalence under D-P6-001.
 
 <a id="d-gov-018-finite-documentation-completion"></a>
 
