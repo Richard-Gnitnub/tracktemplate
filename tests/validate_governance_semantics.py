@@ -421,9 +421,10 @@ def validate_exit4_deferral_mutations() -> None:
         ),
         (
             "budget-substituted-for-improvement",
-            "does not satisfy the improvement obligation with numerical "
-            "budgets",
-            "satisfies the improvement obligation with numerical budgets",
+            "Numerical budgets or improvement on another workload do not "
+            "give the required\nevidence for this obligation",
+            "Numerical budgets or improvement on another workload give "
+            "the required evidence for this obligation",
             "D-P6-008 architecture sequence exception drifted",
         ),
     ):
@@ -3198,8 +3199,9 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_change = table_row_containing(plan, "**What changed**")
     widened_change = replace_once(
         owner_view_change,
-        "defers the unchanged bounded Entry/Exit improvement obligation "
-        "until before Phase 10 beta acceptance",
+        "gives Exit 4 Deferred — unmet status. Its unchanged improvement "
+        "obligation for the bounded Entry/Exit scope stays mandatory before "
+        "Phase 10 beta acceptance",
         "waives the improvement obligation for every workload",
     )
     owner_view_boundary_widened = replace_once(
@@ -3208,21 +3210,22 @@ def validate_documentation_profile_mutations() -> None:
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
-        "project-plan owner view lost or contradicted: defers the unchanged "
-        "bounded Entry/Exit improvement obligation until before Phase 10 "
-        "beta acceptance",
+        "project-plan owner view lost or contradicted: gives Exit 4 Deferred "
+        "— unmet status. Its unchanged improvement obligation for the bounded "
+        "Entry/Exit scope stays mandatory before Phase 10 beta acceptance",
     )
 
     owner_view_restarted = replace_once(
         plan,
-        "Do not repeat a stopped experiment or change its measurement rule.",
+        "Do not do a stopped experiment again. Do not change its measurement "
+        "rule.",
         "Repeat a stopped experiment and change its measurement rule.",
     )
     expect_rejected(
         "tt-doc/owner-view-stopped-direction-restarted",
         lambda: progress._validate_owner_view(owner_view_restarted),
-        "project-plan owner view lost or contradicted: Do not repeat a "
-        "stopped experiment or change its measurement rule",
+        "project-plan owner view lost or contradicted: Do not do a stopped "
+        "experiment again. Do not change its measurement rule",
     )
 
     compatibility_terms_removed = terminology

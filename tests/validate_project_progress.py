@@ -484,19 +484,20 @@ EXPECTED_EXIT4_RISK_APPENDICES = {
         "Richard accepts the result after independent review."
     ),
     "deadline": (
-        "The unchanged bounded Entry/Exit obligation from Phase 6 Exit 4 is "
-        "mandatory before Phase 10 beta acceptance under D-P6-008."
+        "The unchanged obligation for the bounded Entry/Exit scope of "
+        "Phase 6 Exit 4 is mandatory before Phase 10 beta acceptance under "
+        "D-P6-008."
     ),
     "required_work": (
         "Preserve the D-P6-008 obligation, measurement rules, retained "
         "negative evidence and stopped directions. Numerical budgets or "
-        "improvement on another workload cannot satisfy the obligation. "
-        "If it stays unmet, beta acceptance is blocked."
+        "improvement on another workload do not give the required evidence "
+        "for the obligation. If it stays unmet, Richard must not accept beta."
     ),
     "closure_evidence": (
         "D-P6-008 also requires independent evidence review and Richard's "
-        "acceptance of the unchanged bounded Entry/Exit improvement "
-        "obligation before Phase 10 beta acceptance."
+        "acceptance of the unchanged improvement obligation for the bounded "
+        "Entry/Exit scope before Phase 10 beta acceptance."
     ),
 }
 EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
@@ -538,8 +539,7 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations apply. Project status remains `unknown`."
     ),
     (
-        "Deferred — unmet under D-P6-008. The unchanged bounded Entry/Exit "
-        "obligation is mandatory before Phase 10 beta acceptance. "
+        "Deferred — unmet under D-P6-008: "
         "D-GOV-008 and D-GOV-009 keep their initial authority and "
         "retained negative evidence. The completed D-GOV-011 "
         "baseline-attribution investigation gave FAIL. The attribution "
@@ -1001,8 +1001,9 @@ def _validate_owner_view(plan: str) -> None:
         "Exit 4 is Deferred — unmet",
         "output has private-development status",
         "Project status stays `unknown`",
-        "defers the unchanged bounded Entry/Exit improvement obligation "
-        "until before Phase 10 beta acceptance",
+        "gives Exit 4 Deferred — unmet status. Its unchanged improvement "
+        "obligation for the bounded Entry/Exit scope stays mandatory before "
+        "Phase 10 beta acceptance",
         "owner permits only the stated exception to the migration sequence",
         "Each subsequent development task still needs its own authority "
         "and applicable checks",
@@ -1014,12 +1015,13 @@ def _validate_owner_view(plan: str) -> None:
         "owner accepted D-P6-008 on 2026-09-05",
         "Richard keeps accountability and owns delivery until a named "
         "Phase 10 integration owner takes delivery responsibility",
-        "Independent review and Richard's acceptance must precede beta "
+        "Independent review and Richard's acceptance are mandatory before beta "
         "acceptance",
         "Bring the Phase 6 closeout recommendation to the owner with four "
         "accepted exits and one deferred, unmet obligation",
         "Phase 6 stays open. Phase 7 stays Not started",
-        "Do not repeat a stopped experiment or change its measurement rule",
+        "Do not do a stopped experiment again. Do not change its measurement "
+        "rule",
     ):
         _require(
             fragment in owner_view,
@@ -1149,7 +1151,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         in " ".join(plan.split())
         and "Exit 5 under D-P6-007 on 2026-09-05"
         in " ".join(plan.split())
-        and "D-P6-008 defers Exit 4 on 2026-09-05. Its obligation stays unmet"
+        and "D-P6-008 gives Exit 4 Deferred — unmet status on 2026-09-05"
         in " ".join(plan.split()),
         "the accepted Phase 6 4/5 status is missing",
     )
@@ -2519,8 +2521,9 @@ def _validate_exit_conditions(
     )
     _require(
         "| D-P6-008 | 2026-09-05 | Accepted | The [decision]"
-        "(current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) defers the "
-        "unchanged Exit 4 obligation until before Phase 10 beta acceptance. "
+        "(current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives Exit 4 "
+        "Deferred — unmet status. Its unchanged obligation stays mandatory "
+        "before Phase 10 beta acceptance. "
         "Phase 6 keeps four accepted exits and one deferred, unmet obligation. "
         "The owner accepts only the bounded sequencing exposure. Phase closure "
         "and Phase 7 opening need different decisions. |" in plan,
@@ -2584,7 +2587,7 @@ def _validate_exit_conditions(
         in plan_flat
         and "Current evidence identifies no materially new performance "
         "hypothesis" in plan_flat
-        and "D-P6-008 defers the unmet Exit 4 obligation and accepts no "
+        and "D-P6-008 gives Exit 4 Deferred — unmet status and accepts no "
         "improvement evidence" in plan_flat,
         "D-GOV-011 canonical-record direction summary drifted",
     )
@@ -2641,8 +2644,8 @@ def _validate_exit_conditions(
         "D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 "
         "on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
         "2026-08-15. The owner accepted Exit 5 under D-P6-007 on "
-        "2026-09-05. The owner deferred Exit 4 under D-P6-008 on "
-        "2026-09-05. Its obligation stays unmet" in current_flat,
+        "2026-09-05. Under D-P6-008, the owner gave Exit 4 Deferred — unmet "
+        "status on 2026-09-05" in current_flat,
         "current record does not preserve the accepted Phase 6 4/5 state",
     )
     performance_section = _section(
@@ -3077,7 +3080,11 @@ def _validate_exit_conditions(
                 "project-owner acceptance permit removal"
             ),
         ]
-        and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS,
+        and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS
+        and "D-P6-008 gives Exit 4 Deferred — unmet status without acceptance. "
+        "Its unchanged obligation for the bounded Entry/Exit scope is "
+        "mandatory before Phase 10 beta acceptance"
+        in _semantic_text(current_section),
         "Phase 6 exits do not match the accepted 4/5 dispositions",
     )
     exit1_heading = "Phase 6 Exit 1: panel and owner decision"
@@ -3176,7 +3183,8 @@ def _validate_exit_conditions(
         "No risk severity, state, treatment, or control effectiveness changes",
         "Richard keeps accountability and owns delivery until a named "
         "Phase 10 integration owner takes delivery responsibility",
-        "Independent evidence review and Richard's acceptance must precede "
+        "Independent evidence review and Richard's acceptance are mandatory "
+        "before "
         "Phase 10 beta acceptance",
         "No automatic extension is permitted",
         "exception applies only to migration step 6 and Stage M4 progression",
@@ -3968,7 +3976,8 @@ def _validate_exit_conditions(
         "D-P6-006 accepts the subsequent bounded Exit 1 result",
         "D-P6-007 accepts Exit 5 for continued legacy preservation",
         "Current evidence identifies no materially new performance hypothesis",
-        "D-P6-008 defers the unmet Exit 4 obligation until before Phase 10 "
+        "Under D-P6-008, the unmet Exit 4 obligation stays mandatory before "
+        "Phase 10 "
         "beta acceptance",
         "The next action is the Phase 6 closeout recommendation",
     ):
@@ -4792,8 +4801,8 @@ def _validate_exit4_sequence_deferral(
         "obligation stays mandatory before Phase 10 beta acceptance",
         "All normal per-slice correctness and performance checks still apply",
         "exception changes only the sequence",
-        "accepts no performance result and does not satisfy the improvement "
-        "obligation with numerical budgets or improvement on another workload",
+        "accepts no performance result. Numerical budgets or improvement on "
+        "another workload do not give the required evidence for this obligation",
         "Invariant 8 and all legacy-retirement conditions still apply",
         "Phase closure and subsequent phase opening need different owner "
         "decisions",
@@ -4808,10 +4817,11 @@ def _validate_exit4_sequence_deferral(
     for clause in (
         "Exit condition: the architecture produces a measured resource "
         "improvement without hiding cost or reducing validation",
-        "defers only the bounded Phase 6 Entry/Exit improvement obligation "
-        "until before Phase 10 beta acceptance",
+        "Phase 6 improvement obligation for the bounded Entry/Exit scope has "
+        "Deferred — unmet status. It stays mandatory before Phase 10 beta "
+        "acceptance",
         "subsequent Core development with its own authority",
-        "obligation stays unmet",
+        "Deferred — unmet status",
         "keeps normal per-slice checks and all legacy-retirement conditions",
         "deferral does not complete Stage M4 or authorise Stage M5 "
         "implementation",

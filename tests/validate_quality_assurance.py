@@ -588,8 +588,9 @@ def validate_documentation_profile(
         "Phase 6 has 4/5 accepted exits" in owner_view
         and "The owner accepted Exits 1, 2, 3, and 5" in owner_view
         and "Exit 4 is Deferred — unmet" in owner_view
-        and "defers the unchanged bounded Entry/Exit improvement obligation "
-        "until before Phase 10 beta acceptance" in owner_view
+        and "gives Exit 4 Deferred — unmet status. Its unchanged improvement "
+        "obligation for the bounded Entry/Exit scope stays mandatory before "
+        "Phase 10 beta acceptance" in owner_view
         and "All legacy-retirement conditions and wider exclusions still apply"
         in owner_view
         and "The owner accepts no performance result" in owner_view
@@ -599,13 +600,13 @@ def validate_documentation_profile(
         and "owner accepted D-P6-008 on 2026-09-05" in owner_view
         and "Richard keeps accountability and owns delivery until a named "
         "Phase 10 integration owner takes delivery responsibility" in owner_view
-        and "Independent review and Richard's acceptance must precede beta "
-        "acceptance" in owner_view
+        and "Independent review and Richard's acceptance are mandatory before "
+        "beta acceptance" in owner_view
         and "Bring the Phase 6 closeout recommendation to the owner with four "
         "accepted exits and one deferred, unmet obligation" in owner_view
         and "Phase 6 stays open. Phase 7 stays Not started" in owner_view
-        and "Do not repeat a stopped experiment or change its measurement rule"
-        in owner_view
+        and "Do not do a stopped experiment again. Do not change its "
+        "measurement rule" in owner_view
         and "output has private-development status" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
