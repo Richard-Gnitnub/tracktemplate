@@ -5,7 +5,7 @@ unauthorised. These are administrative holding records only.**
 
 Phase 6 closed on 2026-09-05 under
 [D-P6-009](../history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-closeout-panel).
-It retains four accepted exits and one deferred, unmet obligation.
+It keeps four accepted exits and one deferred, unmet obligation.
 Its [evidence](../history/phase-closeouts/PHASE6_CLOSEOUT.md),
 [decisions](../history/phase-closeouts/PHASE6_GATE_DECISIONS.json), and
 [risk snapshot](../history/phase-closeouts/PHASE6_RISKS.json) are frozen.
@@ -18,10 +18,10 @@ The owner accepted the completed, independently reviewed
 | --- | --- |
 | Current state | Phase 6 is closed with four accepted exits and one deferred, unmet obligation. Phase 7 stays Not started at 0/4. |
 | What changed | D-P6-009 records the owner's closeout decision. The completed records are frozen and current paths hold the unopened Phase 7 records. |
-| What now works | The closeout records preserve accepted evidence and all continuing duties. No product behaviour changes. |
-| Limitations/findings | D-P6-008 remains in full. Exit 4 is Deferred — unmet. No performance result is accepted. All risks and legacy-retirement conditions remain. |
+| What now works | The closeout records preserve accepted evidence and all existing duties. No product behaviour changes. |
+| Limitations/findings | D-P6-008 stays in full. Exit 4 is Deferred — unmet. The owner accepts no performance result. All risks and legacy-retirement conditions still apply. |
 | Owner decision | Richard accepted recovery and Phase 6 closeout, with separate authority to integrate the exact-green alignment. Phase 7 opening needs another owner decision. |
-| Next action | Present the bounded Phase 7 opening decision and first repository-evidenced product outcome together. Do not start that work before owner approval. |
+| Next action | Present the bounded Phase 7 opening decision and first product outcome from repository evidence together. Do not start that work before owner acceptance. |
 
 ## Phase 7 exit conditions — not admitted
 
@@ -41,29 +41,31 @@ and narrows no criterion to the first proposed slice.
 ## Carried authority and live risks
 
 [D-P6-008](../history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel)
-remains unchanged in full. The [current decision register](gate-decisions.json)
-retains that complete decision for its live obligation.
-The unchanged bounded Entry/Exit improvement obligation remains mandatory
+stays unchanged in full. The [current decision register](gate-decisions.json)
+keeps that complete decision for its live obligation.
+The unchanged bounded Entry/Exit improvement obligation stays mandatory
 before Phase 10 beta acceptance.
 
 Richard keeps accountability and owns delivery
 until a named Phase 10 integration owner takes delivery responsibility.
-Independent review and Richard's acceptance remain mandatory. Numerical budgets
-or improvement on another workload cannot satisfy this obligation.
-If it stays unmet, beta acceptance is blocked.
+Independent review and Richard's acceptance are mandatory. Numerical budgets
+or improvement on another workload do not give the required evidence for this obligation.
+If it stays unmet, Richard must not accept beta.
 
-All 24 records in [risks.json](risks.json) retain their Phase 6 duties and
+All 24 records in [risks.json](risks.json) keep their Phase 6 duties and
 status. PR-15 and QA-R04 stay High/Open/Mitigate/Partial.
-The continuing backup cadence applies to later valuable local evidence.
+The existing backup schedule applies to later valuable local evidence.
 Normal per-slice checks, comparison paths, invariant 8, and all retirement
-conditions remain. The sequencing exception does not complete Stage M4.
+conditions still apply. The sequencing exception does not complete Stage M4.
 D-P5-002 and the PR-14 reopen trigger remain mandatory for later composition.
 
-D-GOV-011 and its negative evidence remain preserved in the Phase 6 closeout.
-Its product direction stays stopped. Do not repeat stopped experiments or
-change their measurement rules. The bounded output remains private-development.
-Project status remains `unknown`. No phase exit, performance, production,
-legacy removal, packaging, or release acceptance is granted here.
+The Phase 6 closeout preserves D-GOV-011 and its negative evidence.
+Its product direction stays stopped. Do not repeat stopped experiments.
+Do not change their measurement rules.
+
+The bounded output stays private-development. Project status stays `unknown`.
+This record gives no phase exit, performance, production, legacy removal,
+packaging, or release acceptance.
 
 ## Preserved historical links
 

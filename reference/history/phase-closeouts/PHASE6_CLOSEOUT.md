@@ -1,7 +1,7 @@
 # Phase 6 Explicit Exact-Validation and Export Seam Evidence
 
 Status: **Closed — owner-accepted 2026-09-05 under D-P6-009.
-Four accepted exits and one deferred, unmet obligation remain.
+The closeout has four accepted exits and one deferred, unmet obligation.
 The final count is 4/5 accepted exits. The owner accepted Exit 1 under
 D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 on
 2026-08-02. The owner accepted Exit 3 under D-P6-005 on 2026-08-15.
@@ -12,7 +12,7 @@ Phase 5 closed at 4/4 under D-P5-003 on 2026-08-01. Its complete accepted
 evidence, decisions and risk snapshot are frozen in the
 [Phase 5 closeout](PHASE5_CLOSEOUT.md). This closeout preserves Phase 6 evidence and does not alter that frozen record.
 D-P6-009 below owns the final closeout disposition. Earlier status statements
-remain historical evidence of their recorded decision boundaries.
+stay historical evidence of their recorded decision boundaries.
 
 ## Opening architecture review
 
@@ -4552,7 +4552,7 @@ the task evidence.
 ## Phase 6 closeout panel and owner decision — 2026-09-05
 
 **Decision boundary:** D-P6-009 closes Phase 6 with four accepted exits and
-one deferred, unmet obligation. D-P6-008 remains unchanged in full.
+one deferred, unmet obligation. D-P6-008 stays unchanged in full.
 Phase 7 stays Not started at 0/4. Its current records are administrative
 holding records only. This Level 3 alignment uses the governance-budget
 exception because phase closeout changes authority and requires no product code.
@@ -4561,7 +4561,7 @@ The accepted source is clean protected `main`
 `8df4c6c2df9bd89d6d13a30929549b472b0c4b2d` after PR #66 integration.
 Its tree equals the tree at reviewed head
 `f557ece2bc0ad9dd54a1e6247ed39a50e67d53ee`.
-All 62 standalone validators passed for that head through GitHub Actions
+All 62 standalone validators gave PASS for that head through GitHub Actions
 app `15368` in
 [run 33979819830](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/33979819830).
 The closeout changes no product, railway, host, persistence, or output behaviour.
@@ -4570,40 +4570,43 @@ The closeout changes no product, railway, host, persistence, or output behaviour
 chair, and accepting authority. `/root` presents and records the alignment.
 `/root/alignment_review` independently reviewed the completed recovery proof.
 That reviewer also examined the closeout conditions and retained acceptance
-limits. The reviewer made no implementation change and found no unresolved
-closeout contradiction. These agents share one team and filesystem.
-This is staff independence, with no external organisational review.
+limits. The reviewer made no implementation change and found no unresolved conflict
+with the closeout authority or evidence. These agents share one team and filesystem.
+This is an independent review within one team. It is not an external review.
 
 The recommendation was **Proceed with bounded conditions**.
 There was no unresolved dissent. The panel reused the applicable exit reviews
-and the completed recovery proof. No product or performance experiment was
-repeated. No new measurement rule was introduced.
+and the completed recovery proof. The panel did not repeat a product or performance experiment.
+It did not change a measurement rule.
 
-**Full evidence disposition:** Exits 1, 2, 3, and 5 retain their exact accepted
-scope under D-P6-006, D-P6-002, D-P6-005, and D-P6-007 respectively.
+**Full evidence disposition:** The accepted scopes stay exact for Exits
+1 (D-P6-006), 2 (D-P6-002), 3 (D-P6-005), and 5 (D-P6-007).
 Exit 1 covers the agreed Entry/Exit centreline comparison with its numerical
-and transport limits. Exit 3 retains the finite D-P6-003/D-P6-004 exporter
+and transport limits. Exit 3 keeps the finite D-P6-003/D-P6-004 exporter
 fault model. Exit 5 accepts continued preservation only.
-Exit 4 stays Deferred — unmet. The retained negative results do not establish
+Exit 4 stays Deferred — unmet. The retained negative results do not show
 improvement or performance acceptance. D-GOV-011 stays stopped.
 
 The [recovery record](../../backup-records/2026-09-05-phase6-closeout-recovery.md)
-identifies the accepted snapshot, complete six-root coverage, disposable
-restore, qualified native-document open, and independent review.
-The USB was flushed and safely unmounted. The panel accepts that completed
-evidence without repeating it. The dated PR-13 coverage and currency exposure
-is resolved for the declared scope. Principal PR-13 and the continuing backup
-cadence remain unchanged. The snapshot does not include later closeout work.
+identifies the accepted snapshot and its complete six-root coverage.
+It also records the disposable restore, FCStd check in qualified FreeCAD,
+and independent review. The implementing agent flushed the USB.
+The agent then unmounted its filesystem safely.
+
+The panel accepts that completed evidence without another recovery drill.
+The result resolves the dated PR-13 coverage and currency exposure for the
+declared scope. PR-13 and the existing backup schedule stay unchanged.
+The snapshot does not include later closeout work.
 
 | Accountable owner or risk | Condition and deadline |
 | --- | --- |
 | Evidence owner | At closeout, freeze this evidence and the Phase 6 decision and risk registers. Preserve all earlier frozen records. Create only unopened Phase 7 holding records. |
-| Richard; Phase 10 integration owner | Preserve D-P6-008 in full. Richard keeps accountability and delivery until a named Phase 10 integration owner takes delivery responsibility. Independent review and Richard's acceptance are mandatory before beta acceptance. |
-| PR-15; QA-R04 | Keep High/Open/Mitigate/Partial status and all duties. The same bounded Entry/Exit improvement obligation remains mandatory. Numerical budgets or improvement on another workload cannot satisfy it. Unmet performance blocks beta acceptance. |
+| Richard; Phase 10 integration owner | Preserve D-P6-008 in full. Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Independent review and Richard's acceptance are mandatory before beta acceptance. |
+| PR-15; QA-R04 | Keep High/Open/Mitigate/Partial status and all duties. The same bounded Entry/Exit improvement obligation stays mandatory. Numerical budgets or improvement on another workload do not give the required evidence for it. If it stays unmet, Richard must not accept beta. |
 | Architecture and migration owners | Preserve normal per-slice checks, invariant 8, comparison paths, and every legacy-retirement condition. The deferral does not complete Stage M4. Later Core work needs separate authority. |
-| PR-13; recovery owner | Preserve the snapshots, raw evidence, and all worktrees. Apply the existing backup cadence to later valuable evidence. This closeout makes no new backup claim. |
+| PR-13; recovery owner | Preserve the snapshots, raw evidence, and all worktrees. Apply the existing backup schedule to later valuable evidence. This closeout makes no new backup claim. |
 | PR-17; QA-R03 | Preserve the accepted transaction, recovery, persistence, railway, GUI, and output limits. D-P5-002 and the PR-14 reopen trigger still apply to later composition. |
-| PR-09; PR-21; PR-22 | Keep private-development output and project status `unknown`. Phase, performance, production, and release acceptance remain owner decisions after independent review. |
+| PR-09; PR-21; PR-22 | Keep private-development output and project status `unknown`. Phase, performance, production, and release acceptance are owner decisions after independent review. |
 
 **Exact owner instruction — 2026-09-05:**
 
@@ -4617,23 +4620,23 @@ cadence remain unchanged. The snapshot does not include later closeout work.
 **Structured decision — D-P6-009:** Close Phase 6.
 
 **Authority:** Phase 6 is closed with four accepted exits (1, 2, 3 and 5)
-and one deferred, unmet Exit 4 obligation. The owner accepts the completed,
+and one deferred, unmet obligation for Exit 4. The owner accepts the completed,
 independently reviewed recovery evidence for the primary checkout and five
-sibling worktrees. Preserve D-P6-008 in full. Freeze the Phase 6 evidence,
-decisions and risk snapshot. Create clean fixed-path Phase 7 administrative
-holding records at 0/4, Not started, unopened and unauthorised. The owner
-separately authorises protected-main integration of the exact-green closeout
-alignment through the normal workflow.
+other worktrees. Preserve D-P6-008 in full. Freeze the Phase 6 evidence,
+decisions and risk snapshot. Create clean Phase 7 holding records at the fixed current paths.
+Keep 0/4, Not started, unopened and unauthorised status. The owner also
+authorises protected-main integration of the exact-green closeout alignment
+through the normal workflow.
 
-**Exclusions:** This decision accepts no performance result and opens no
-Phase 7. It authorises no product implementation or legacy removal. Preserve
+**Exclusions:** This decision accepts no performance result. It does not
+open Phase 7. It authorises no product implementation or legacy removal. Preserve
 all measurement rules, retained negative evidence, stopped directions,
 normal per-slice checks, comparison paths and retirement conditions. All
-risk duties remain. Output stays private-development and project status
+risk duties still apply. Output stays private-development and project status
 stays `unknown`. No output clearance, packaging or release authority changes.
 
 **Next boundary:** Complete the read-only Phase 7 opening assessment.
-Present its exact opening decision and first repository-evidenced product
-outcome together. The owner can then decide whether to authorise opening,
+Present its exact opening decision and first product outcome from repository
+evidence together. The owner can then decide whether to authorise opening,
 integration, and the start of that work. This closeout supplies none of that
 Phase 7 authority.
