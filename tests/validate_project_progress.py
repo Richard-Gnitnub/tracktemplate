@@ -1044,8 +1044,9 @@ def _validate_owner_view(plan: str) -> None:
         "validation, independent review and publication",
         "synchronise clean protected main",
         "main_circle_centre",
-        "existing B16 Generate/Replace caller",
-        "later product pull request needs separate owner integration authority",
+        "Route the B16 Generate/Replace caller",
+        "later product pull request needs another owner decision for "
+        "integration",
     ):
         _require(
             fragment in owner_view,
@@ -4310,7 +4311,7 @@ def _validate_phase7_decision_carryforward(
         ),
         (
             "exclusions",
-            "cc32b33edbd7cceeb3039d4f351efddb9e1b3e7e19dce80a6c0c20e8e5098c02",
+            "f26cb8b8e2e956c23845dea9e35736e8c33be818533774fa815c93c0d1e384b8",
         ),
     ):
         value = opening[field]
@@ -4335,9 +4336,10 @@ def _validate_phase7_opening(evidence: str) -> None:
     flat = _semantic_text(panel)
     for clause in (
         "main_circle_centre and its necessary pure helper calculation",
-        "routes the existing B16 Generate/Replace caller",
+        "must route the B16 Generate/Replace caller",
         "Before product implementation, integrate the exact-green opening "
-        "alignment and synchronise clean protected main",
+        "alignment",
+        "Before product implementation, synchronise clean protected main",
         "Preserve 0/4 and all four criteria",
         "Preserve the frozen Phase 3 three-function contract and development "
         "comparison route",
@@ -4348,9 +4350,9 @@ def _validate_phase7_opening(evidence: str) -> None:
         "the accepted scope",
         "Do not replace the task with station migration, new state or UI, "
         "a generic routing framework, or a performance investigation",
-        "Keep B14 and B15 unchanged. No legacy path is removed",
-        "later product pull request requires separate owner integration "
-        "authority",
+        "Keep B14 and B15 unchanged. Do not remove a legacy path",
+        "later product pull request needs another owner decision for "
+        "integration",
     ):
         _require(
             clause in flat,

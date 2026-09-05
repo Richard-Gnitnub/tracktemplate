@@ -600,9 +600,9 @@ def validate_documentation_profile(
         and "This alignment changes no product source" in owner_view
         and "synchronise clean protected main" in owner_view
         and "main_circle_centre" in owner_view
-        and "existing B16 Generate/Replace caller" in owner_view
-        and "later product pull request needs separate owner integration "
-        "authority" in owner_view
+        and "Route the B16 Generate/Replace caller" in owner_view
+        and "later product pull request needs another owner decision for "
+        "integration" in owner_view
         and "output has private-development status" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",

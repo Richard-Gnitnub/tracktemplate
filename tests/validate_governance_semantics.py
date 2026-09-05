@@ -653,9 +653,9 @@ def validate_phase6_closeout_mutations() -> None:
     for name, before, after, diagnostic in (
         (
             "assignment-widened",
-            "routes the existing B16\nGenerate/Replace caller",
-            "routes all station migration callers",
-            "routes the existing B16 Generate/Replace caller",
+            "must route the B16\nGenerate/Replace caller",
+            "must route all station migration callers",
+            "must route the B16 Generate/Replace caller",
         ),
         (
             "mandatory-proof-stop-waived",
@@ -666,17 +666,17 @@ def validate_phase6_closeout_mutations() -> None:
         ),
         (
             "legacy-retirement-authorised",
-            "No legacy path is removed",
-            "The legacy path is removed",
-            "Keep B14 and B15 unchanged. No legacy path is removed",
+            "Do not remove a legacy path",
+            "Remove a legacy path",
+            "Keep B14 and B15 unchanged. Do not remove a legacy path",
         ),
         (
             "product-merge-authorised",
-            "later product pull\nrequest requires separate owner integration "
-            "authority",
+            "later product pull\nrequest needs another owner decision for "
+            "integration",
             "later product pull request can merge without owner authority",
-            "later product pull request requires separate owner integration "
-            "authority",
+            "later product pull request needs another owner decision for "
+            "integration",
         ),
     ):
         expect_rejected(
