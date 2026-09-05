@@ -3,7 +3,8 @@
 Status: **Current — 4/5 accepted exits. The owner accepted Exit 1 under
 D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 on
 2026-08-02. The owner accepted Exit 3 under D-P6-005 on 2026-08-15.
-The owner accepted Exit 5 under D-P6-007 on 2026-09-05. Exit 4 stays Pending.**
+The owner accepted Exit 5 under D-P6-007 on 2026-09-05.
+The owner deferred Exit 4 under D-P6-008 on 2026-09-05. Its obligation stays unmet.**
 
 Phase 5 closed at 4/4 under D-P5-003 on 2026-08-01. Its complete accepted
 evidence, decisions and risk snapshot are frozen in the
@@ -4277,18 +4278,97 @@ Current evidence identifies no materially new performance hypothesis.
 The project selected no further product work. No owner decision is ready.
 This work-selection result changes no phase criterion or performance rule.
 
+<a id="phase-6-exit-4-deferral-panel"></a>
+
+## Phase 6 Exit 4: deferral panel and owner decision — 2026-09-05
+
+**Decision boundary:** D-P6-008 defers the unchanged bounded Entry/Exit
+improvement obligation until before Phase 10 beta acceptance.
+Phase 6 keeps four accepted exits and one deferred, unmet obligation.
+The decision changes only the migration sequence and directly dependent controls.
+This Level 3 authority change uses the governance-budget exception.
+It needs no product implementation.
+
+The source state is clean protected `main`
+`dbd3d061fb2fdd4522d769dd04c36d063cf918d9` after PR #65 integration.
+Its Git tree is equal to the reviewed PR head tree at
+`a9308b37a2d70bd489ff2496dde194d70fed995a`.
+Required validation passed for that head through GitHub Actions app `15368`.
+All 62 standalone validators passed in
+[run 33975873883](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/33975873883).
+
+**Participants and independent challenge:** Richard is the project owner and
+is responsible for the panel and acceptance. `/root` presented the recommendation.
+`/root/alignment_review` supplied independent read-only architecture and QA/risk
+challenge before the owner decision. That reviewer did not implement this alignment.
+The agents share one system and workspace. No external independent reviewer
+examined the evidence.
+
+The recommendation was **Proceed with bounded conditions**.
+The independent reviewer agreed. No dissent stays unresolved.
+
+**Evidence and choice:** The panel examined the accepted Exit 1, 2, 3, and 5
+decisions, the two failed preview comparisons, and the
+[completed D-GOV-011 prerequisite](#d-gov-011-completed-materiality-prerequisite).
+The prerequisite gave FAIL under the unchanged materiality rule.
+It identified no eligible material contributor and caused no product change.
+The result does not prove improvement, acceptable performance, or that improvement
+is impossible. The panel required no repeated experiment or new measurement.
+
+The [Core completion requirements](../PRODUCT_VISION.md#migration-completion)
+still require applicable performance evidence.
+The panel preferred deferral to an indefinite Phase 6 block with no supported
+product hypothesis. A weaker criterion would change the required result.
+More tooling, cleanup, or repeated attribution would not resolve this decision.
+PR-15 and QA-R04 already place numerical budgets at Phase 10 and repeated
+qualification at Phase 11. Numerical budgets do not satisfy the deferred obligation.
+
+**Bounded conditions and risks:** More migration could occur before the
+architecture demonstrates the required improvement. Richard accepts this bounded
+sequencing exposure. Only the PR-15 and QA-R04 duty fields change to carry
+the obligation explicitly. No risk severity, state, treatment, or control
+effectiveness changes.
+
+| Owner or risk | Condition and deadline |
+| --- | --- |
+| Richard; Phase 10 integration owner | Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Independent evidence review and Richard's acceptance must precede Phase 10 beta acceptance. An unmet obligation blocks beta acceptance. No automatic extension is permitted. |
+| PR-15, QA-R04 | Both stay High/Mitigate/Partial. The same bounded Entry/Exit obligation is mandatory. Numerical budgets or improvement on another workload cannot satisfy it. Normal per-slice checks and the Phase 11 qualification duties still apply. |
+| Architecture and migration owners | The exception applies only to migration step 6 and Stage M4 progression. Invariant 8, comparison paths, all legacy-retirement conditions, and the performance-change acceptance rules still apply. Subsequent development needs its own authority. |
+| PR-13; Richard | Keep the raw evidence and all attempts. This alignment supplies no new independent backup claim. Before Phase 6 closeout, verify backup currency and coverage of the valuable evidence in all retained worktrees under [RECOVERY_AND_BACKUP.md](../RECOVERY_AND_BACKUP.md). |
+| PR-17, QA-R03 | Keep the accepted railway, transaction, recovery, persistence, GUI, and output safeguards. This deferral accepts no wider migration or operator workflow. |
+| PR-09, PR-21, PR-22 | Output stays private-development and project status stays `unknown`. Richard supplies each acceptance after independent review. No agent receives phase, performance, production, or release acceptance authority. |
+
+**Exact owner decision — 2026-09-05:** Richard accepted the proposed deferral
+and all conditions in the Chief of Staff brief:
+
+> I approve a Level 3 deferral of Phase 6 Exit 4—“Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for”—for its existing bounded Entry/Exit scope, to a mandatory acceptance condition before the Phase 10 beta gate.
+>
+> Record four accepted exits and one deferred, unmet obligation. Do not report 5/5 acceptance. Permit only the necessary sequencing exception for separately authorised later Core development. Preserve normal per-slice checks, comparison paths and all retirement conditions.
+>
+> I accept the bounded sequencing exposure. I remain accountable for delivery through a named Phase 10 integration owner and for acceptance after independent review. Numerical budgets or improvement on another workload cannot discharge this obligation. If it remains unmet, beta acceptance is blocked.
+>
+> Preserve measurement rules, retained negative evidence and stopped directions. Authorise only the directly dependent Level 3 repository alignment. This decision accepts no performance result, closes no phase, opens no subsequent phase, authorises no product implementation or legacy removal, and changes no output or release status.
+
+Richard also authorised protected-main integration of the exact-green alignment.
+The next action is the Phase 6 closeout recommendation.
+Phase 6 stays open at 4/5 accepted exits. Exit 4 is Deferred — unmet.
+Phase 7 stays Not started. The owner accepts no performance result.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
 
 The accepted current state is 4/5 under D-P6-002, D-P6-005, D-P6-006, and D-P6-007:
 
+D-P6-008 defers Exit 4 without accepting it. Its unchanged bounded Entry/Exit
+obligation is mandatory before Phase 10 beta acceptance.
+
 | Exit condition | Current disposition |
 | --- | --- |
 | The selected slice has equivalent exact validation and production output for the agreed bounded work | Evidenced and owner-accepted under D-P6-006 for the agreed scope of the PR #63 comparison of Entry/Exit centrelines. The recorded numerical, host, and assurance limits apply. The owner gives no production clearance and accepts no wider output equivalence. |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005. This is bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004. The recorded platform, recovery, and assurance limitations apply. Project status remains `unknown`. |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-008 and D-GOV-009 keep their initial authority and retained negative evidence. The completed D-GOV-011 baseline-attribution investigation gave FAIL. The attribution materiality rule did not change. The owner accepted the result as retained negative evidence and stopped that product direction. D-GOV-011 and its initial evidence do not change. The project made no product change and admitted no improvement evidence. |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Deferred — unmet under D-P6-008. The unchanged bounded Entry/Exit obligation is mandatory before Phase 10 beta acceptance. D-GOV-008 and D-GOV-009 keep their initial authority and retained negative evidence. The completed D-GOV-011 baseline-attribution investigation gave FAIL. The attribution materiality rule did not change. The owner accepted the result as retained negative evidence and stopped that product direction. D-GOV-011 and its initial evidence do not change. The project made no product change and admitted no improvement evidence. |
 | The legacy path remains available until parity and project-owner acceptance permit removal | Evidenced and owner-accepted under D-P6-007 for continued preservation of B14, B15, and the bounded route for development comparison and recovery. All ownership and retirement conditions still apply. The owner gives no removal or wider authority. |
 
 ## Carried controls and exclusions
@@ -4311,8 +4391,11 @@ The 24 risks from the end of Phase 5 stay in
 [risks.json](risks.json). The project owner used D-GOV-005 to change only the
 control wording for PR-12, PR-20, and PR-22. The decision register at
 [gate-decisions.json](gate-decisions.json) owns D-P6-001, D-GOV-005, D-P6-002,
-D-P6-003, D-P6-004, D-P6-005, D-P6-006, D-P6-007, TT-DOC-001, and TT-DOC-002. It also owns
+D-P6-003, D-P6-004, D-P6-005, D-P6-006, D-P6-007, D-P6-008, TT-DOC-001, and TT-DOC-002. It also owns
 D-GOV-006, D-GOV-007, D-GOV-008, D-GOV-009, D-GOV-010, and D-GOV-011.
+
+D-P6-008 adds the deferred obligation to PR-15 and QA-R04.
+Their severity, state, treatment, and control effectiveness do not change.
 
 The D-GOV-012 decision records the sequence nonconformance in Cycle 2. It also
 records project authority for an exact candidate and draft pull request in
@@ -4334,6 +4417,7 @@ recovery authority. D-P6-004 defines the supported faults and limits of their
 evidence. D-P6-005 accepts Exit 3 only in its bounded scope.
 D-P6-006 accepts Exit 1 only for the agreed scope of the PR #63 centreline comparison.
 D-P6-007 accepts Exit 5 only for continued preservation of the bounded legacy route.
+D-P6-008 defers the unmet Exit 4 obligation. It accepts no performance result.
 
 All other decisions stay separately controlled. These decisions are about exits,
 clearance, support, schema, oracle retirement, budgets, packaging, releases, and
@@ -4389,7 +4473,8 @@ work. D-P6-006 accepts the subsequent bounded Exit 1 result.
 
 D-P6-007 accepts Exit 5 for continued legacy preservation.
 Current evidence identifies no materially new performance hypothesis.
-The project selected no further product work. No owner decision is ready.
+D-P6-008 defers the unmet Exit 4 obligation until before Phase 10 beta acceptance.
+The next action is the Phase 6 closeout recommendation.
 
 <a id="d-gov-018-finite-documentation-completion"></a>
 

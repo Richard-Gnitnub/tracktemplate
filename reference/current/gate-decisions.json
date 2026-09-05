@@ -92,6 +92,17 @@
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel"
     },
     {
+      "id": "D-P6-008",
+      "decided_on": "2026-09-05",
+      "status": "Accepted",
+      "decision": "Defer the unmet Phase 6 Exit 4 obligation until before Phase 10 beta acceptance.",
+      "authority": "I approve a Level 3 deferral of Phase 6 Exit 4—“Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for”—for its existing bounded Entry/Exit scope, to a mandatory acceptance condition before the Phase 10 beta gate.\n\nRecord four accepted exits and one deferred, unmet obligation. Do not report 5/5 acceptance. Permit only the necessary sequencing exception for separately authorised later Core development. Preserve normal per-slice checks, comparison paths and all retirement conditions.\n\nI accept the bounded sequencing exposure. I remain accountable for delivery through a named Phase 10 integration owner and for acceptance after independent review. Numerical budgets or improvement on another workload cannot discharge this obligation. If it remains unmet, beta acceptance is blocked.",
+      "exclusions": "Preserve measurement rules, retained negative evidence and stopped directions. Authorise only the directly dependent Level 3 repository alignment. This decision accepts no performance result, closes no phase, opens no subsequent phase, authorises no product implementation or legacy removal, and changes no output or release status.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel"
+    },
+    {
       "id": "TT-DOC-001",
       "decided_on": "2026-08-15",
       "status": "Accepted",
