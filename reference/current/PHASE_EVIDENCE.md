@@ -1,7 +1,7 @@
-# Phase 7 Core Alignment, Station and Multiple-Track Migration Holding Record
+# Phase 7 Core Alignment, Station and Multiple-Track Migration Evidence
 
-Status: **Not started — 0/4 evidenced exits. Phase 7 is unopened and
-unauthorised. These are administrative holding records only.**
+Status: **Open — 0/4 evidenced exits under D-P7-001 on 2026-09-05.
+All four exits are Pending.**
 
 Phase 6 closed on 2026-09-05 under
 [D-P6-009](../history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-closeout-panel).
@@ -16,20 +16,19 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 6 is closed with four accepted exits and one deferred, unmet obligation. Phase 7 stays Not started at 0/4. |
-| What changed | D-P6-009 records the owner's closeout decision. The completed records are frozen and current paths hold the unopened Phase 7 records. |
-| What now works | The closeout records preserve accepted evidence and all existing duties. No product behaviour changes. |
+| Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
+| What changed | D-P7-001 opens the existing Core alignment, station and multiple-track migration scope. The four criteria stay unchanged. |
+| What now works | The opening records define the authorised sequence and first task. No product behaviour changes in this alignment. |
 | Limitations/findings | D-P6-008 stays in full. Exit 4 is Deferred — unmet. The owner accepts no performance result. All risks and legacy-retirement conditions still apply. |
-| Owner decision | Richard accepted recovery and Phase 6 closeout, with separate authority to integrate the exact-green alignment. Phase 7 opening needs another owner decision. |
-| Next action | Present the bounded Phase 7 opening decision and first product outcome from repository evidence together. Do not start that work before owner acceptance. |
+| Owner decision | Richard authorised opening integration and the bounded `main_circle_centre` product task through validation, independent review and publication. |
+| Next action | Integrate the opening alignment and synchronise clean protected main. Then move the calculation into the modular package and route the existing B16 Generate/Replace caller through it. |
 
 ## Phase 7 exit conditions — not admitted
 
 These are the four original programme criteria from accepted plan revision
 `d5a3db45ab68a192e3d37f9fad5deb9f66f7de81`.
-The later dashboard retained their 0/4 count and phase outcome.
-This holding record restores their wording for navigation. It opens no phase
-and narrows no criterion to the first proposed slice.
+The closeout holding record restored their wording. D-P7-001 opens the phase
+without changing these criteria or narrowing them to the first task.
 
 | Exit condition | Status |
 | --- | --- |
@@ -66,6 +65,69 @@ Do not change their measurement rules.
 The bounded output stays private-development. Project status stays `unknown`.
 This record gives no phase exit, performance, production, legacy removal,
 packaging, or release acceptance.
+
+<a id="phase-7-opening-panel"></a>
+
+## Phase 7 opening panel
+
+Decision: **D-P7-001 — Open Phase 7.** Richard accepted the decision on
+2026-09-05. The source state is clean protected main
+`c9afb55a4caba4322b9e750397ad46d008b15100` after PR #67.
+
+Richard is the project owner and panel chair. The opening-record owner presents
+the change. The independent QA/risk reviewer is `/root/alignment_review`.
+The reviewer authored no maintained opening file. The panel recommendation is
+**Proceed with bounded conditions**. There is no unresolved dissent or material
+contradiction.
+
+The panel reviewed the four original criteria, D-P6-008 in full, the frozen
+Phase 6 closeout, all 24 live risks, and the accepted recovery record.
+It also reviewed the Chief of Staff assessment and the actual calculation,
+caller and comparison tests. The assessment has SHA-256
+`bb951a17534a199daeacc6e9334bbce6ccf1ff13d5c1dd7897c88ddd07a88d20`.
+Its product source is unchanged at this source state. The completed
+recovery evidence and applicable admission reviews are reused without another
+experiment or restore drill.
+
+The first Level 2 outcome moves `main_circle_centre` and its necessary pure
+helper calculation into the modular package. It routes the existing B16
+Generate/Replace caller through that calculation. The function has one product
+caller in inherited `run_macro`. The modular API omits it.
+`tests/validate_phase1_alignment.py` supplies the retained numerical result.
+`tests/freecad_validate_phase3_transition_slice.py` supplies downstream main
+and secondary alignment comparisons. This task advances Exits 2 and 3 and
+contributes to Exit 1. It accepts no exit and does not narrow the phase.
+
+| Accountable owner | Bounded condition and deadline |
+| --- | --- |
+| Opening-record owner | Before product implementation, integrate the exact-green opening alignment and synchronise clean protected main. Preserve 0/4 and all four criteria. |
+| Product Technical Lead | Before publication, preserve numerical operation order, units, frames, signs, tolerances, diagnostics and tuple results. Keep the calculation and actual caller route within the accepted task. |
+| Composition and QA owners | Before publication, prove complete, recoverable binding before workflow launch. Preserve the frozen Phase 3 three-function contract and development comparison route. Prove numerical parity and applicable qualified-host, GUI, history, copied-document reopen and output behaviour. Preserve the D-P5-002/PR-14 reopen trigger. |
+| Performance owners and Richard | Apply normal per-slice cold/warm regression checks to the changed path. Preserve the measurement rules and stopped directions. Give this task no D-P6-008 acceptance credit. The original obligation remains mandatory before Phase 10 beta acceptance. |
+| Recovery, provenance and migration owners | Keep existing risk duties, recovery cadence, valuable evidence, comparison paths and legacy-retirement conditions. The accepted recovery proof remains applicable. |
+
+All 24 risk records and their control effectiveness stay unchanged. PR-15 and
+QA-R04 stay High/Open/Mitigate/Partial. PR-13 and PR-17 retain their recovery
+and persistence duties. PR-18 retains its legacy-removal gate. Candidate-specific
+product validation remains outstanding. Governance changes exceed product
+changes because this Level 3 task changes phase-opening and execution authority.
+
+Stop the product task for a wider caller closure, changed railway semantics,
+or an unresolved compatibility decision. Also stop for unavailable mandatory
+proof or a repair outside the accepted scope. Do not replace the task with station migration,
+new state or UI, a generic routing framework, or a performance investigation.
+Keep B14 and B15 unchanged. No legacy path is removed. The later product pull
+request requires separate owner integration authority.
+
+### Owner decision
+
+The exact accepted owner statement is:
+
+> I open Phase 7 at 0/4 for its existing Core alignment, station and multiple-track migration scope, preserving its four exit criteria and D-P6-008 in full. I authorise the directly dependent Level 3 opening alignment and its exact-green protected-main integration. Once main is clean and synchronised, I authorise the bounded Level 2 main-circle-centre extraction and routing described in this brief through implementation, applicable validation, independent review and publication. Preserve all comparison and legacy-retirement conditions. This decision accepts no Phase 7 exit or performance result and grants no output or release clearance.
+
+The decision opens the phase at 0/4. It authorises the stated sequence and
+bounded task through publication. It accepts no phase exit or performance
+result. Output stays private-development and project status stays `unknown`.
 
 ## Preserved historical links
 

@@ -13,6 +13,17 @@
       "evidence": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel"
+    },
+    {
+      "id": "D-P7-001",
+      "decided_on": "2026-09-05",
+      "status": "Accepted",
+      "decision": "Open Phase 7.",
+      "authority": "I open Phase 7 at 0/4 for its existing Core alignment, station and multiple-track migration scope, preserving its four exit criteria and D-P6-008 in full. I authorise the directly dependent Level 3 opening alignment and its exact-green protected-main integration. Once main is clean and synchronised, I authorise the bounded Level 2 main-circle-centre extraction and routing described in this brief through implementation, applicable validation, independent review and publication. Preserve all comparison and legacy-retirement conditions. This decision accepts no Phase 7 exit or performance result and grants no output or release clearance.",
+      "exclusions": "No Phase 7 exit or performance result is accepted. No output or release clearance is granted. Preserve all comparison and legacy-retirement conditions and D-P6-008 in full. The later product pull request requires separate owner integration authority. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-7-opening-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-7-opening-panel"
     }
   ]
 }

@@ -1027,25 +1027,25 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        "Phase 6 is closed with 4/5 accepted exits",
-        "Phase 7 is Not started at 0/4",
-        "The owner accepted Exits 1, 2, 3, and 5",
-        "Exit 4 is Deferred — unmet",
+        "Phase 6 is closed with four accepted exits and one deferred, unmet "
+        "obligation",
+        "Phase 7 is Open at 0/4",
+        "All four exits are Pending",
         "output has private-development status",
         "Project status stays `unknown`",
-        "records the accepted recovery proof and Phase 6 closeout",
-        "Current paths contain unopened Phase 7 holding records",
-        "preserve the four accepted exits, D-P6-008 in full",
-        "Product source does not change",
+        "D-P7-001",
+        "first bounded product task",
+        "This alignment changes no product source",
         "All legacy-retirement conditions and wider exclusions still apply",
         "The owner accepts no performance result",
         "PR-15 and QA-R04 stay High/Mitigate/Partial",
         "D-GOV-011 stays stopped with its retained negative evidence",
-        "Richard accepted the completed recovery evidence and Phase 6 closeout",
-        "Phase 7 needs a separate opening decision",
-        "Present the bounded Phase 7 opening decision and first product "
-        "outcome from repository evidence together",
-        "Phase 7 stays unopened and unauthorised",
+        "Richard opened Phase 7 at 0/4",
+        "validation, independent review and publication",
+        "synchronise clean protected main",
+        "main_circle_centre",
+        "existing B16 Generate/Replace caller",
+        "later product pull request needs separate owner integration authority",
     ):
         _require(
             fragment in owner_view,
@@ -1167,23 +1167,28 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         [
             phase
             for phase, row in rows.items()
-            if str(row["state"]).startswith("Current")
+            if row["state"] == "Open"
+            or str(row["state"]).startswith("Current")
         ]
-        == [],
-        "the dashboard must not identify an opened current phase",
+        == [7],
+        "the dashboard must identify only Phase 7 as Open",
     )
-    for phase in range(7, 12):
+    _require(
+        rows[7]["count"] == 0 and rows[7]["state"] == "Open",
+        "Phase 7 must remain Open at zero evidenced exits",
+    )
+    for phase in range(8, 12):
         _require(
             rows[phase]["count"] == 0 and rows[phase]["state"] == "Not started",
             "Phase {} must remain unopened at zero evidenced exits".format(phase),
         )
+    preamble = direct_section_content(plan, "Project Plan", level=1)
     _require(
-        "Phase 6 closed — four accepted exits and one deferred, unmet "
-        "obligation under D-P6-009 on 2026-09-05"
-        in " ".join(plan.split())
-        and "D-P6-008 stays in full. Phase 7 is Not started at 0/4"
-        in " ".join(plan.split()),
-        "the accepted Phase 6 closeout and unopened Phase 7 status are missing",
+        "Phase 7 is Open at 0/4 under D-P7-001 on 2026-09-05"
+        in " ".join(preamble.split())
+        and "D-P6-008 stays in full"
+        in " ".join(preamble.split()),
+        "the accepted Phase 7 opening or carried D-P6-008 is missing",
     )
     return rows
 
@@ -3977,7 +3982,7 @@ def _validate_phase6_closeout(
     closeout: str,
     holding: str,
 ) -> None:
-    """Keep closure, deferred performance and unopened Phase 7 distinct."""
+    """Keep Phase 6 closure, deferred performance and Phase 7 distinct."""
     panel = _section(
         closeout, "Phase 6 closeout panel and owner decision — 2026-09-05",
     )
@@ -4005,13 +4010,13 @@ def _validate_phase6_closeout(
             "D-P6-009 panel and register differ: " + field,
         )
     _require(
-        "Not started — 0/4 evidenced exits. Phase 7 is unopened and "
-        "unauthorised. These are administrative holding records only"
+        "Open — 0/4 evidenced exits under D-P7-001 on 2026-09-05. "
+        "All four exits are Pending"
         in _semantic_text(direct_section_content(holding, (
             "Phase 7 Core Alignment, Station and Multiple-Track Migration "
-            "Holding Record"
+            "Evidence"
         ), level=1)),
-        "Phase 7 holding status gives unaccepted authority",
+        "Phase 7 status differs from its accepted opening at zero exits",
     )
     for text, heading in (
         (plan, "Phase 7 exit conditions"),
@@ -4054,7 +4059,7 @@ def _validate_phase6_closeout(
     ):
         _require(
             clause in carried,
-            "Phase 7 holding lost a continuing obligation: " + clause,
+            "Phase 7 lost a continuing obligation: " + clause,
         )
 
 
@@ -4116,7 +4121,7 @@ def _validate_risks(plan: str) -> None:
     _require(
         document["current_phase"] == 7
         and document["updated_on"] == "2026-09-05",
-        "risk register is not prepared for unopened Phase 7",
+        "risk register is not prepared for Phase 7",
     )
     _require(
         set(phase6_document) == set(document)
@@ -4127,7 +4132,7 @@ def _validate_risks(plan: str) -> None:
     )
     _require(
         document["risks"] == phase6_document["risks"],
-        "Phase 7 holding risks differ from the complete Phase 6 closeout set",
+        "Phase 7 risks differ from the complete Phase 6 closeout set",
     )
     _require(
         phase5_document["current_phase"] == 5
@@ -4268,19 +4273,89 @@ def _validate_phase7_decision_carryforward(
     document: dict[str, object],
     phase6_decisions: dict[str, dict[str, object]],
 ) -> None:
-    """Carry only the exact deferred obligation into the unopened phase."""
+    """Preserve the deferred obligation and exact bounded opening authority."""
     _require(
         set(document)
         == {"schema_version", "current_phase", "updated_on", "decisions"}
         and document["schema_version"] == 1
         and document["current_phase"] == 7
         and document["updated_on"] == "2026-09-05",
-        "current decision register is not the unopened Phase 7 holding state",
+        "current decision register is not the Phase 7 opening state",
     )
+    records = document["decisions"]
     _require(
-        document["decisions"] == [phase6_decisions["D-P6-008"]],
-        "Phase 7 holding must carry only the complete unchanged D-P6-008",
+        isinstance(records, list)
+        and len(records) == 2
+        and records[0] == phase6_decisions["D-P6-008"],
+        "Phase 7 must carry the complete unchanged D-P6-008 and one opening",
     )
+    opening = records[1]
+    panel = "reference/current/PHASE_EVIDENCE.md#phase-7-opening-panel"
+    _require(
+        isinstance(opening, dict)
+        and set(opening) == set(phase6_decisions["D-P6-008"])
+        and opening["id"] == "D-P7-001"
+        and opening["decided_on"] == "2026-09-05"
+        and opening["status"] == "Accepted"
+        and opening["decision"] == "Open Phase 7."
+        and opening["evidence"] == panel
+        and opening["panel_record"] == panel
+        and opening["panel_required_under_current_policy"] is True,
+        "D-P7-001 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        (
+            "authority",
+            "34cb61bbf51f8d8a84fffbb47af4c240f5d31592ef2f033a623ecd2cec243a14",
+        ),
+        (
+            "exclusions",
+            "cc32b33edbd7cceeb3039d4f351efddb9e1b3e7e19dce80a6c0c20e8e5098c02",
+        ),
+    ):
+        value = opening[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P7-001 " + field + " digest drifted",
+        )
+
+
+def _validate_phase7_opening(evidence: str) -> None:
+    """Bind the opening quote and first assignment to bounded authority."""
+    panel = _section(evidence, "Phase 7 opening panel")
+    opening = _load_json(CURRENT_DECISIONS_PATH)["decisions"][1]
+    _require(
+        '<a id="phase-7-opening-panel"></a>\n\n'
+        '## Phase 7 opening panel' in evidence
+        and _blockquote_paragraphs(panel)
+        == [_semantic_text(opening["authority"])],
+        "D-P7-001 exact owner instruction drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "main_circle_centre and its necessary pure helper calculation",
+        "routes the existing B16 Generate/Replace caller",
+        "Before product implementation, integrate the exact-green opening "
+        "alignment and synchronise clean protected main",
+        "Preserve 0/4 and all four criteria",
+        "Preserve the frozen Phase 3 three-function contract and development "
+        "comparison route",
+        "Give this task no D-P6-008 acceptance credit",
+        "Stop the product task for a wider caller closure, changed railway "
+        "semantics, or an unresolved compatibility decision",
+        "Also stop for unavailable mandatory proof or a repair outside "
+        "the accepted scope",
+        "Do not replace the task with station migration, new state or UI, "
+        "a generic routing framework, or a performance investigation",
+        "Keep B14 and B15 unchanged. No legacy path is removed",
+        "later product pull request requires separate owner integration "
+        "authority",
+    ):
+        _require(
+            clause in flat,
+            "D-P7-001 bounded first assignment drifted: " + clause,
+        )
 
 
 def _validate_decisions(plan: str) -> None:
@@ -4663,9 +4738,8 @@ def _validate_decisions(plan: str) -> None:
         "decision register" in decision_flat
         and "history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
         in decision_section
-        and "keeps D-P6-008 in full for its continuing obligation"
-        in decision_flat
-        and "No Phase 7 opening decision exists" in decision_flat,
+        and "keeps D-P6-008 in full and records D-P7-001"
+        in decision_flat,
         "the current decision-register ownership is missing",
     )
     plan_ids = set(
@@ -4679,8 +4753,9 @@ def _validate_decisions(plan: str) -> None:
         plan_ids
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
-        | EXPECTED_PHASE6_DECISION_IDS,
-        "project-plan decisions differ from the frozen registers",
+        | EXPECTED_PHASE6_DECISION_IDS
+        | {"D-P7-001"},
+        "project-plan decisions differ from the current and frozen registers",
     )
 
 
@@ -6339,8 +6414,8 @@ def _validate_fixed_paths() -> None:
         "old Phase 4 path does not identify the fixed current record",
     )
     _require(
-        "Phase 7 holding record" in redirect,
-        "old Phase 4 path does not identify the unopened Phase 7 record",
+        "phase evidence" in redirect,
+        "old Phase 4 path does not identify the current phase evidence",
     )
 
 
@@ -6381,6 +6456,7 @@ def main() -> None:
     _validate_phase6_closeout(
         plan, current_evidence, _read(CURRENT_EVIDENCE_PATH),
     )
+    _validate_phase7_opening(_read(CURRENT_EVIDENCE_PATH))
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_finite_documentation_completion(plan, current_evidence)

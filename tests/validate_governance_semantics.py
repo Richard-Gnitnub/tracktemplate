@@ -516,16 +516,16 @@ def validate_exit4_deferral_mutations() -> None:
 
 
 def validate_phase6_closeout_mutations() -> None:
-    """Reject acceptance inflation and authority in Phase 7 holding records."""
+    """Reject acceptance inflation and weakened carried Phase 6 authority."""
     plan = read("reference/PROJECT_PLAN.md")
     closeout = read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md")
     holding = read("reference/current/PHASE_EVIDENCE.md")
     for name, before, after, diagnostic in (
         (
-            "phase7-opened",
-            "Phase 7 is unopened and\nunauthorised",
-            "Phase 7 is opened and authorised",
-            "Phase 7 holding status gives unaccepted authority",
+            "phase7-acceptance-inflated",
+            "Open — 0/4 evidenced exits under D-P7-001",
+            "Open — 1/4 evidenced exits under D-P7-001",
+            "Phase 7 status differs from its accepted opening at zero exits",
         ),
         (
             "phase7-exit-admitted",
@@ -537,7 +537,7 @@ def validate_phase6_closeout_mutations() -> None:
             "beta-deadline-waived",
             "stays mandatory\nbefore Phase 10 beta acceptance",
             "becomes optional after Phase 10 beta acceptance",
-            "Phase 7 holding lost a continuing obligation: unchanged bounded "
+            "Phase 7 lost a continuing obligation: unchanged bounded "
             "Entry/Exit improvement obligation stays mandatory before "
             "Phase 10 beta acceptance",
         ),
@@ -547,7 +547,7 @@ def validate_phase6_closeout_mutations() -> None:
             "evidence for this obligation",
             "or improvement on another workload give the required "
             "evidence for this obligation",
-            "Phase 7 holding lost a continuing obligation: Numerical budgets "
+            "Phase 7 lost a continuing obligation: Numerical budgets "
             "or improvement on another workload do not give the required "
             "evidence for this obligation",
         ),
@@ -600,18 +600,91 @@ def validate_phase6_closeout_mutations() -> None:
     widened = copy.deepcopy(decisions)
     widened["decisions"][0]["authority"] += " The obligation is optional."
     opened = copy.deepcopy(decisions)
-    opened["decisions"].append({"id": "D-P7-001", "status": "Accepted"})
+    opened["decisions"].append({"id": "D-P7-002", "status": "Accepted"})
     for name, mutated in (
         ("current-d-p6-008-missing", missing),
         ("current-d-p6-008-weakened", widened),
-        ("current-phase7-opening-invented", opened),
+        ("current-phase7-additional-authority-invented", opened),
     ):
         expect_rejected(
             "closeout/" + name,
             lambda value=mutated: progress._validate_phase7_decision_carryforward(
                 value, frozen,
             ),
-            "Phase 7 holding must carry only the complete unchanged D-P6-008",
+            "Phase 7 must carry the complete unchanged D-P6-008 and one opening",
+        )
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        (
+            "authority", "All Core migration is authorised.",
+            "authority digest drifted",
+        ),
+        (
+            "exclusions", "Product merge is authorised.",
+            "exclusions digest drifted",
+        ),
+    ):
+        mutated = copy.deepcopy(decisions)
+        mutated["decisions"][1][field] = replacement
+        expect_rejected(
+            "opening/d-p7-001-" + field + "-changed",
+            lambda value=mutated: progress._validate_phase7_decision_carryforward(
+                value, frozen,
+            ),
+            "D-P7-001 " + diagnostic,
+        )
+    missing_opening = copy.deepcopy(decisions)
+    missing_opening["decisions"].pop()
+    expect_rejected(
+        "opening/d-p7-001-missing",
+        lambda: progress._validate_phase7_decision_carryforward(
+            missing_opening, frozen,
+        ),
+        "Phase 7 must carry the complete unchanged D-P6-008 and one opening",
+    )
+    quote = blockquote_paragraph_containing(holding, "I open Phase 7 at 0/4")
+    expect_rejected(
+        "opening/d-p7-001-quote-widened",
+        lambda: progress._validate_phase7_opening(replace_once(
+            holding, quote, quote.replace("at 0/4", "at 4/4", 1),
+        )),
+        "D-P7-001 exact owner instruction drifted or was relocated",
+    )
+    for name, before, after, diagnostic in (
+        (
+            "assignment-widened",
+            "routes the existing B16\nGenerate/Replace caller",
+            "routes all station migration callers",
+            "routes the existing B16 Generate/Replace caller",
+        ),
+        (
+            "mandatory-proof-stop-waived",
+            "Also stop for unavailable mandatory\nproof",
+            "Continue despite unavailable mandatory proof",
+            "Also stop for unavailable mandatory proof or a repair outside "
+            "the accepted scope",
+        ),
+        (
+            "legacy-retirement-authorised",
+            "No legacy path is removed",
+            "The legacy path is removed",
+            "Keep B14 and B15 unchanged. No legacy path is removed",
+        ),
+        (
+            "product-merge-authorised",
+            "later product pull\nrequest requires separate owner integration "
+            "authority",
+            "later product pull request can merge without owner authority",
+            "later product pull request requires separate owner integration "
+            "authority",
+        ),
+    ):
+        expect_rejected(
+            "opening/" + name,
+            lambda value=replace_once(holding, before, after): (
+                progress._validate_phase7_opening(value)
+            ),
+            "D-P7-001 bounded first assignment drifted: " + diagnostic,
         )
 
 
@@ -2919,7 +2992,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, recovery_decision_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     acceptance_decision_row = table_row_containing(plan, "| D-P6-005 |")
     expect_rejected(
@@ -2927,7 +3000,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, acceptance_decision_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     exit1_decision_row = table_row_containing(plan, "| D-P6-006 |")
     expect_rejected(
@@ -2935,7 +3008,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, exit1_decision_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     exit5_decision_row = table_row_containing(plan, "| D-P6-007 |")
     expect_rejected(
@@ -2943,7 +3016,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, exit5_decision_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     deferral_row = table_row_containing(plan, "| D-P6-008 |")
     expect_rejected(
@@ -2951,7 +3024,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, deferral_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     tt_doc_decision_row = table_row_containing(plan, "| TT-DOC-001 |")
     expect_rejected(
@@ -2959,7 +3032,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, tt_doc_decision_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     spelling_decision_row = table_row_containing(plan, "| TT-DOC-002 |")
     expect_rejected(
@@ -2967,7 +3040,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, spelling_decision_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     compatibility_decision_row = table_row_containing(plan, "| D-GOV-006 |")
     expect_rejected(
@@ -2975,7 +3048,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, compatibility_decision_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     performance_host_decision_row = table_row_containing(
         plan,
@@ -2986,7 +3059,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_decisions(
             replace_once(plan, performance_host_decision_row + "\n", "")
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     performance_direction_decision_row = table_row_containing(
         plan,
@@ -3001,7 +3074,7 @@ def validate_project_plan_mutations() -> None:
                 "",
             )
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     direction_followup_decision_row = table_row_containing(
         plan,
@@ -3016,7 +3089,7 @@ def validate_project_plan_mutations() -> None:
                 "",
             )
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     host_followup_decision_row = table_row_containing(
         plan,
@@ -3031,7 +3104,7 @@ def validate_project_plan_mutations() -> None:
                 "",
             )
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     selection_decision_row = table_row_containing(
         plan,
@@ -3046,7 +3119,7 @@ def validate_project_plan_mutations() -> None:
                 "",
             )
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     retirement_decision_row = table_row_containing(
         plan,
@@ -3061,7 +3134,7 @@ def validate_project_plan_mutations() -> None:
                 "",
             )
         ),
-        "project-plan decisions differ from the frozen registers",
+        "project-plan decisions differ from the current and frozen registers",
     )
     lifecycle_decision_row = table_row_containing(
         plan,
@@ -3275,16 +3348,19 @@ def validate_documentation_profile_mutations() -> None:
             "TDMP lifecycle lost:",
         )
 
-    owner_view_status = replace_once(
-        plan,
-        "Phase 6 is closed with 4/5 accepted exits",
-        "Phase 6 is closed with 5/5 accepted exits",
+    owner_view_row = table_row_containing(plan, "**Current state**")
+    inflated_view = replace_once(
+        owner_view_row,
+        "Phase 6 is closed with four accepted exits and one deferred, unmet "
+        "obligation",
+        "Phase 6 is closed with five accepted exits",
     )
+    owner_view_status = replace_once(plan, owner_view_row, inflated_view)
     expect_rejected(
         "tt-doc/owner-view-status-contradiction",
         lambda: progress._validate_owner_view(owner_view_status),
-        "project-plan owner view lost or contradicted: Phase 6 is closed with 4/5 "
-        "accepted exits",
+        "project-plan owner view lost or contradicted: Phase 6 is closed with "
+        "four accepted exits and one deferred, unmet obligation",
     )
     owner_view_authority = replace_once(
         plan,
@@ -3296,20 +3372,19 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
     )
-    owner_view_change = table_row_containing(plan, "**What now works**")
-    widened_change = replace_once(
-        owner_view_change,
-        "preserve the four accepted exits, D-P6-008 in full",
+    plan_status = paragraph_containing(plan, "Status: **Phase 7 is Open")
+    widened_status = replace_once(
+        plan_status,
+        "D-P6-008 stays in full",
         "waive the improvement obligation for every workload",
     )
     owner_view_boundary_widened = replace_once(
-        plan, owner_view_change, widened_change,
+        plan, plan_status, widened_status,
     )
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
-        lambda: progress._validate_owner_view(owner_view_boundary_widened),
-        "project-plan owner view lost or contradicted: preserve the four "
-        "accepted exits, D-P6-008 in full",
+        lambda: progress._validate_plan_shape(owner_view_boundary_widened),
+        "the accepted Phase 7 opening or carried D-P6-008 is missing",
     )
 
     owner_view_restarted = replace_once(
