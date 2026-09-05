@@ -290,7 +290,7 @@ def validate_skill_routing(documents: dict[str, str]) -> None:
             "Unless the owner explicitly widens the exporter failure model",
             "report probes outside it as research evidence",
             "not automatically a blocker",
-            "retained invariant violation",
+            "violation of an invariant that the project keeps",
         ),
     )
     require_fragments(
@@ -308,8 +308,8 @@ def validate_skill_routing(documents: dict[str, str]) -> None:
         documents["tracktemplate-debugging"],
         (
             "Put the report in one category",
-            "A failure within the supported model",
-            "An operator recovery case within the",
+            "A failure in the supported model",
+            "An operator recovery case in the",
             "An arbitrary asynchronous interruption at an unsupported instant",
             "does not automatically show an implementation defect or block "
             "a phase exit",

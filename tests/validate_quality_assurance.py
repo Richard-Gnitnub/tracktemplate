@@ -1001,7 +1001,7 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
         "failed experimental candidate",
         "technical author lead",
         "with acceptance from the applicable authority",
-        "that acceptance follows the one required documentation review, "
+        "that acceptance follows the one necessary documentation review, "
         "permitted adjustment, and final deterministic validation",
         "| **author** |",
         "| **retire** |",

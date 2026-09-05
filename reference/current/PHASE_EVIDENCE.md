@@ -3533,11 +3533,11 @@ for Cycle 3 or a merge of an exact candidate for Cycle 2 without review.
 | Field | Current result |
 | --- | --- |
 | Current state | The interrupted implementation changed three paths at checkpoint `ac5a7d7ae8c6bf72069b802ebe9e929faf27e789`. This checkpoint supplies bounded implementation evidence. Its authorised protected-main baseline is `54176f5ae0fea1f72743f856fd9251a53d7e1dbf`. The checkpoint is not accepted project state. |
-| What changed | D-GOV-015 adopts one Documentation Review lifecycle. Its sequence is author → freeze scope → one Documentation Review → optional exact reviewed correction once → one final deterministic validation → complete or owner stop. The existing Issue 9 retrieval and cache remain. |
-| What now works | Git includes the complete document in its first review. After acceptance, Git includes only changed complete logical units. One review gives one of three complete verdicts. Exact corrections use frozen preimages. The review-state register keeps document identities. Final validation checks the source, frozen review scope, receipt, state, and final bytes for unreviewed changes. |
-| Limitations/findings | The tool cannot prove that a declared reviewer identity identifies the actual reviewer. The author and reviewer must be different persons or agents. Review evidence in ignored files needs independent preservation before its next use. Final validation does not judge linguistic conformance. The current backup condition needs proof before Documentation Review. |
-| Owner decision | Accept D-GOV-015. The bounded scope contains only the lifecycle, canonical and skill alignment, and Level 3 record. It permits one review, its exact corrections once where applicable, and final deterministic validation. If the exact candidate passes all required checks, one draft pull request is permitted. D-GOV-017 later makes final validation the last operation for review of governance prose. Merge authority is excluded. |
-| Next action | Development validation that fails closed comes first. The author must freeze the exact candidate and its frozen review scope. The one Documentation Review requires independent preservation before it starts. Each resulting review file needs preservation before the next dependent operation. D-GOV-017 later prohibits another review after the one final deterministic validation. If the exact candidate passes all required checks, publish one draft pull request. |
+| What changed | D-GOV-015 adopts one Documentation Review lifecycle. Its sequence is author → freeze scope → one Documentation Review → optional exact reviewed correction once → one final deterministic validation → complete or owner stop. The existing Issue 9 retrieval and cache stay. |
+| What now works | Git includes the complete document in its first review. After acceptance, Git includes only changed complete logical units. One review gives one of three complete verdicts. Exact corrections use frozen preimages. The review-state register keeps document identities. Final validation examines the source, frozen review scope, receipt, state, and final bytes for unreviewed changes. |
+| Limitations/findings | The tool cannot prove that a declared reviewer identity identifies the reviewer who did the work. The author and reviewer must be different persons or agents. Review evidence in ignored files must have independent preservation before its next use. Final validation does not judge linguistic conformance. The current backup condition must have proof before Documentation Review. |
+| Owner decision | Accept D-GOV-015. The bounded scope contains only the lifecycle, agreement of canonical documents and skills, and Level 3 record. It authorises one review, its exact corrections once where applicable, and final deterministic validation. If all necessary checks give a `PASS` result for the exact candidate, one draft pull request is permitted. D-GOV-017 later makes final validation the last operation for review of governance prose. Merge authority is excluded. |
+| Next action | Development validation that fails closed comes first. The author must freeze the exact candidate and its frozen review scope. Before the one Documentation Review starts, independent preservation is necessary. Each resulting review file must have preservation before the next dependent operation. D-GOV-017 later prevents another review after the one final deterministic validation. If all necessary checks give a `PASS` result for the exact candidate, publish one draft pull request. |
 
 ### Bounded implementation and evidence
 
@@ -3614,31 +3614,31 @@ limit, or hard exclusions.
 
 | Condition | Accountable owner | Deadline and current result |
 | --- | --- | --- |
-| Make the Git identity controls stronger. Add tests that show invalid source, frozen review scope, receipt, state, correction, and mutation inputs fail closed. | `agent:openai-codex-primary` | Before candidate freeze — completed. Focused and complete development validation must pass on the exact candidate. |
+| Make the Git identity controls stronger. Add tests that show invalid source, frozen review scope, receipt, state, correction, and mutation inputs fail closed. | `agent:openai-codex-primary` | Before candidate freeze — completed. Both bounded and complete development validation must give a `PASS` result for the exact candidate. |
 | Commit the exact candidate. Push that commit. | `agent:openai-codex-primary` | Before Documentation Review — candidate freeze is pending. |
 | Make the accepted device for independent preservation available. | `owner:tracktemplate-project-owner` | Before independent preservation of the frozen review scope and Documentation Review — pending. |
-| Preserve the frozen review scope on the accepted device. Then preserve each review result, receipt, and proposal for accepted state. | `agent:openai-codex-primary` | Before the next operation that needs each file — preservation is pending. |
+| Preserve the frozen review scope on the accepted device. Then preserve each review result, receipt, and proposal for accepted state. | `agent:openai-codex-primary` | Before the next operation for which each file is necessary — preservation is pending. |
 | Keep the author and reviewer independent. Give the sole linguistic verdict. If exact corrections apply, give all exact replacement wording. | Independent Documentation Reviewer | Once, after preservation of the frozen review scope and before any correction — pending. |
-| Apply only the exact corrections that the review permits, once. Do one final deterministic validation. Report any failure to the owner. | `agent:openai-codex-primary` | After the sole Documentation Review. Under D-GOV-017, final validation ends review of the governance document. |
+| Apply only the exact corrections that the review authorises, once. Do one final deterministic validation. Report any failure to the owner. | `agent:openai-codex-primary` | After the sole Documentation Review. Under D-GOV-017, final validation ends review of the governance document. |
 
 ### Safety and risk panel
 
 | Risk | Assessment | Result |
 | --- | --- | --- |
 | PR-12 — fragmented or stale direction | Policy, workflow, validation, terminology, source instructions, and the two responsible review skills agree with D-GOV-015. Semantic controls must reject a return to the retired workflow. | Medium / Mitigate / Partial. The disposition does not change. |
-| PR-13 — repository or evidence loss | The exact candidate needs a pushed exact Git identity. The frozen review scope, result, receipt, and proposal are ignored files. Each needs current independent preservation when it exists. No accepted backup evidence after 2026-08-01 proves this gate. | Critical / Mitigate. Control effectiveness is unverified for this gate until preservation passes. The disposition does not change. |
-| PR-22 — authority transfer or self-acceptance | One independent Documentation Reviewer owns the sole linguistic verdict. D-GOV-017 later prohibits a separate final review of governance prose. The tool compares the declared author and reviewer identifiers. It cannot prove that those identifiers identify the actual persons. | High / Remove. Control effectiveness requires separate author and reviewer roles, this panel, and the owner decision. The disposition does not change. |
+| PR-13 — repository or evidence loss | The exact candidate must have a pushed exact Git identity. The frozen review scope, result, receipt, and proposal are ignored files. As each file becomes available, current independent preservation is necessary. No accepted backup evidence after 2026-08-01 proves this gate. | Critical / Mitigate. Control effectiveness is unverified for this gate until preservation gives a `PASS` result. The disposition does not change. |
+| PR-22 — authority transfer or self-acceptance | One independent Documentation Reviewer owns the sole linguistic verdict. D-GOV-017 later prevents a separate final review of governance prose. The tool compares the declared author and reviewer identifiers. It cannot prove that those identifiers identify the persons who did the work. | High / Remove. For control effectiveness, this panel, the owner decision, and different author and reviewer roles are necessary. The disposition does not change. |
 
 The reviewer of safety and risk did read-only work. The reviewer did not
-conduct linguistic Documentation Review. The reviewer shares the agent team
+do linguistic Documentation Review. The reviewer is in the same agent team
 and workspace. The reviewer did not change the implementation. This is not an
 external organisational review.
 
-**Panel recommendation:** **Proceed with bounded conditions.** Before freeze,
+**Panel recommendation:** **Continue with bounded conditions.** Before freeze,
 complete the stronger Git controls. Complete the negative tests. Do development
 validation again.
 
-Before Documentation Review, push the exact candidate. Independently preserve
+Before Documentation Review, push the exact candidate. Use independent preservation for
 the frozen review scope. Before the next dependent operation, preserve the
 result, receipt, and proposal for accepted state.
 
@@ -3651,7 +3651,7 @@ identity, or final bytes. Do not do a second Documentation Review.
 
 On 2026-08-31, `owner:tracktemplate-project-owner` accepts the exact authority
 and exclusions in [gate-decisions.json](gate-decisions.json). The earlier
-section about the author's assurance remains historical evidence of the retired
+section about the author's assurance stays historical evidence of the retired
 workflow. After D-GOV-015, that section is not a current instruction.
 
 Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Project status stays
@@ -3660,18 +3660,18 @@ FreeCAD, GUI, persistence, export, schema, API, or performance authority. It
 gives no production, physical-output, packaging, release, tagging,
 legacy-retirement, or merge authority.
 
-It gives no authority to resume D-GOV-014 or modify `aa6c506`. It gives no
-authority for generic repair, grants, uses, completions, telemetry, or ontology
+It gives no authority to start D-GOV-014 again or change `aa6c506`. It gives no
+authority for general repair, grants, uses, completions, telemetry, or ontology
 work. It gives no authority for Cycle 3. It gives no authority for a second
 framework for documentation assurance. It also gives no authority for a second
 Documentation Review.
 
-D-GOV-017 later supersedes only the D-GOV-015 clause that requires another
-review of governance prose during publication. The D-GOV-015 authoring
+D-GOV-017 later supersedes only the D-GOV-015 clause that makes another
+review of governance prose necessary during publication. The D-GOV-015 authoring
 controls, sole Documentation Review, permitted exact correction, and final
-deterministic validation remain authoritative. A PASS result from final validation ends that
-review cycle. CI and publication can verify the final bytes. They cannot
-reopen prose.
+deterministic validation stay authoritative. A PASS result from final validation ends that
+review cycle. CI and publication can examine the final bytes. They cannot
+start another review of prose.
 
 ### BLOCKED result evidence-contract correction
 
@@ -3680,24 +3680,24 @@ authoritative `BLOCKED` review result. The result has SHA-256
 `18a23e6a3ea398d1b0b3857f4237ffb8b3c7d4c49ddf3aea72dfd76db5a94ccc`.
 It contains no recorded finding and cannot supply input for authoring. The
 candidate, frozen review scope, result, receipt, and their independent copies
-remain unchanged.
+stay unchanged.
 
-This Level 2 correction requires schema 2 for each new review result and
-receipt. Each result confirms that its `blockers` array contains the complete
+This Level 2 correction makes schema 2 necessary for each new review result
+and receipt. Each result confirms that its `blockers` array contains the complete
 set of findings. A `BLOCKED` result records at least one finding. Each item
 identifies the finding, formal Issue 9 rules, exact path, and frozen logical
 unit. The schemas for frozen review scope and review state stay at version 1.
-The change adds no persistent workflow state for logical units and no second
+The change adds no durable workflow state for logical units and no second
 review mechanism.
 
-The check accepted all four changed Python files as valid Python. The focused lifecycle
-fixture and the complete STE retrieval validator passed. The STE lookup used
+The Python parser accepted all four changed Python files. The bounded
+lifecycle fixture and the complete STE retrieval validator gave `PASS` results. The STE lookup used
 the verified local source to rebuild the derived cache. The lookup then
 validated that cache.
 
-The agent-guidance validator passed. The governance validator rejected all 333
-semantic mutations. The standalone regression profile passed both steps with
-their required sentinels. No FreeCAD or GUI validation applies to this
+The agent-guidance validator gave a `PASS` result. The governance validator rejected all 333
+semantic mutations. Both steps of the standalone regression profile gave `PASS` results with
+their necessary sentinels. No FreeCAD or GUI validation applies to this
 correction of the evidence contract.
 
 Automatic validation proves that the `blockers` array is nonempty. It also
@@ -3715,12 +3715,12 @@ and project status stays `unknown`.
 
 | Field | Current result |
 | --- | --- |
-| Current state | The first exact candidate was pushed at `3641e93e521b44464deb1a8b192f285c8943f6d9`. Independent preservation kept that candidate and its frozen review scope. The project owner records the governance prose as written, reviewed, and validated. The owner stopped an additional review and required this correction to the completion rule. The exact candidate after correction has a pushed exact Git identity and separate independent preservation. Normal repository integration has not made it the current controlled baseline. |
-| What changed | D-GOV-017 gives each governance document one bounded cycle under the D-GOV-015 authoring controls. That cycle contains writing, one Documentation Review, its required adjustment once if any, and one final deterministic validation. The cycle then ends. No later documentation, quality, publication, wording, or semantic review applies to that governance prose. |
-| What now works | One workflow controls the complete technical-document lifecycle and has one end to review. Continuous integration can verify the exact final bytes. It cannot start a review, correction, new interpretation, or wording improvement. Existing Git state, the review-state register, evidence, and decision records give the necessary identities and history. |
-| Limitations/findings | Normal repository integration has not occurred. The current controlled baseline has no identity yet. An additional Documentation Review started in error. It stopped before a verdict, result, or proposal. It made no tracked change and gives no authority for another review. The Technical Author Lead has no subject, terminology, verdict, validation, acceptance, publication, supersession, retirement, deletion, or merge authority. |
-| Owner decision | Accept the correction that makes the cycle for a governance document finite. Keep the D-GOV-015 authoring controls and sole Documentation Review authoritative. A PASS result from final deterministic validation ends review of the governance document. A general quality review can examine only separately changed source or tests. It cannot review the governance prose after its sole review. |
-| Next action | Do not do another review. When separate authority permits repository integration, use the normal workflow to make the accepted result current. |
+| Current state | The change author pushed the first exact candidate at `3641e93e521b44464deb1a8b192f285c8943f6d9`. Independent preservation kept that candidate and its frozen review scope. The project owner records the governance prose as written, reviewed, and validated. The owner stopped another review and made this correction necessary to the completion rule. The exact candidate after correction has a pushed exact Git identity and its own independent preservation. Repository integration did not yet make it the current controlled baseline. |
+| What changed | D-GOV-017 gives each governance document one bounded cycle under the D-GOV-015 authoring controls. That cycle contains writing, one Documentation Review, one necessary adjustment, if applicable, and one final deterministic validation. The cycle then ends. No later documentation, quality, publication, wording, or semantic review applies to that governance prose. |
+| What now works | One workflow controls the complete technical-document lifecycle and has one end to review. Continuous integration can examine the exact final bytes. It cannot start a review, correction, new interpretation, or wording improvement. Existing Git state, the review-state register, evidence, and decision records give the necessary identities and history. |
+| Limitations/findings | Repository integration did not yet occur. The current controlled baseline has no identity yet. Another Documentation Review started in error. It stopped before a verdict, result, or proposal. It made no tracked change and gives no authority for another review. The Technical Author Lead has no subject, terminology, verdict, validation, acceptance, publication, supersession, retirement, deletion, or merge authority. |
+| Owner decision | Accept the correction that makes the cycle for a governance document finite. Keep the D-GOV-015 authoring controls and sole Documentation Review authoritative. A PASS result from final deterministic validation ends review of the governance document. A general quality review can examine only source or tests with their own changes. It cannot review the governance prose after its sole review. |
+| Next action | Do not do another review. When applicable authority authorises repository integration, use the usual workflow to make the accepted result current. |
 
 ### Need, classification, and bounded result
 
@@ -3733,28 +3733,28 @@ retirement.
 
 The selected result is a material change to the existing canonical
 [Engineering Policy](../ENGINEERING_POLICY.md#technical-documentation-management-plan).
-That policy already owns the technical-document lifecycle. A separate TDMP
-document would duplicate that owner. The change adds one Technical Author Lead
-skill for repeated use. It also aligns terminology and central skill routing.
+That policy already owns the technical-document lifecycle. A second TDMP
+document can copy that ownership. The change adds one Technical Author Lead
+skill for repeated use. It also makes terminology and central skill routing agree with the policy.
 It adds directly dependent semantic controls.
 
 This is Level 3 because it changes governance responsibility and authority for
 controlled documentation. The policy and evidence change is larger than the
-skill implementation. The governance budget permits this exception. No product
+skill implementation. The governance budget authorises this exception. No product
 source or railway behaviour changes. No FreeCAD or GUI validation applies.
 
-Development validation checked all 189 Python and macro files for valid Python.
-The 60-test standalone CI profile passed. The directly dependent documentation,
+Development validation used the Python parser to examine all 189 Python and macro files.
+The 60-test standalone CI profile gave a `PASS` result. The directly dependent documentation,
 guidance, resource, retrieval, progress, quality-assurance, and semantic checks
-for governance passed. The semantic check for governance rejected all 343
-inadmissible mutations. It retained 337 independent protections. The STE cache
-remains bound to the accepted source.
+for governance gave `PASS` results. The semantic check for governance rejected all 343
+mutations that the controls must reject. It kept 337 independent protections. The STE cache
+stays bound to the accepted source.
 
-Acceptance evidence also requires a complete diff review. It requires the
-completed independent challenge of architecture, risk, and quality before
-freeze. D-GOV-015 separately controls the one linguistic review of the frozen
-candidate. A general quality review applies only to separately changed source
-or tests. It cannot add a review of governance prose after the sole
+For acceptance evidence, a complete diff review is also necessary. The
+independent challenge of architecture, risk, and quality must be complete
+before freeze. D-GOV-015 controls the one linguistic review of the frozen
+candidate. A general quality review applies only to source
+or tests with their own changes. It cannot add a review of governance prose after the sole
 Documentation Review and final deterministic validation.
 
 ### First frozen-scope preservation and later correction
@@ -3767,15 +3767,16 @@ Its internal SHA-256 was
 `229c3cb5a5cc5251d51b91e7c6c218f977e3afeed30428452d02306ad588d5f7`.
 The frozen review scope contained 14 documents and 64 logical units.
 
-Independent preservation passed in
+Independent preservation gave a `PASS` result in
 `/media/richard/USB STICK/TrackTemplateMacro-backups/2026-09-04-d-gov-017-tdmp-frozen-scope-01`.
 The Git bundle with the complete history had SHA-256
 `6b337142bbabd0b4224791bb6c6686a401d3bb1ae48aeb4933504a87d8790bfb`.
-The checksum manifest check passed. The comparison between the source bytes
-and the preserved bytes passed. Git bundle verification also passed.
+The checksum manifest check gave a `PASS` result. The comparison between the source bytes
+and the preserved bytes gave a `PASS` result. Git bundle verification also
+gave a `PASS` result.
 
-The project owner's later correction changes the required governance prose.
-Thus, this packet preserves the prior exact candidate and frozen review scope.
+The project owner's later correction changes the necessary governance prose.
+Thus, this packet preserves the earlier exact candidate and frozen review scope.
 It does not identify the exact candidate after correction. It gives no authority
 for another review. The exact candidate after correction has a later Git
 identity and its own independent preservation packet. Git and that packet's
@@ -3794,47 +3795,47 @@ The result records 28 findings. It has no proposal for accepted state.
 Under D-GOV-015, work on that exact candidate cannot continue. D-GOV-017 does
 not repair, extend, accept, or make it current. This candidate starts again
 from protected `main` because the project owner supplied a new requirement for
-the complete technical-document lifecycle. D-GOV-016 was never current
-authority and is not reused.
+the complete technical-document lifecycle. D-GOV-016 was not current
+authority at any time. This candidate does not use it.
 
 ### Participants and independence
 
 | Participant | Role and independence |
 | --- | --- |
 | `owner:tracktemplate-project-owner` | Project owner and panel chair. The owner supplies the requirement and acceptance authority for D-GOV-017. |
-| `agent:openai-codex-primary` | Owner of the governance change and Technical Author Lead for this candidate. It cannot independently accept its own prose, validation, or controlled baseline. |
-| `agent:hume-governance-design` | Read-only reviewer of architecture and responsibilities. The reviewer recommended the existing Engineering Policy as TDMP owner and a separate Technical Author Lead responsibility. The reviewer shares the agent team and workspace. |
-| `agent:kepler-lifecycle-gap-audit` | Read-only reviewer of missing requirements. The reviewer identified the missing parts of the complete technical-document lifecycle and confirmed the narrower D-GOV-015 authority boundary. The reviewer shares the agent team and workspace. |
-| `agent:meitner-validation-surface` | Read-only reviewer of validation. The reviewer selected existing semantic validators. The reviewer rejected a new validator or state schema. The reviewer shares the agent team and workspace. |
-| `agent:tdmp-final-quality-review` | Read-only reviewer of QA, risk, and implementation quality before freeze. The reviewer challenged the Critical risk to preservation, panel completeness, lifecycle sequence, and unrelated prose changes. This completed challenge gives no authority to review governance prose after validation. The reviewer did not change the worktree and shares the agent team and workspace. |
-| An additional Documentation Review that started in error | The work stopped before a verdict, result, or proposal for accepted state. It made no tracked change and left no durable reviewer record. It gives no authority for an extra review. |
+| `agent:openai-codex-primary` | Owner of the governance change and Technical Author Lead for this candidate. It cannot give independent acceptance to its own prose, validation, or controlled baseline. |
+| `agent:hume-governance-design` | Read-only reviewer of architecture and responsibilities. The reviewer recommended the existing Engineering Policy as TDMP owner and a different Technical Author Lead responsibility. The reviewer is in the same agent team and workspace. |
+| `agent:kepler-lifecycle-gap-audit` | Read-only reviewer of missing requirements. The reviewer identified the missing parts of the complete technical-document lifecycle and showed the narrower D-GOV-015 authority boundary. The reviewer is in the same agent team and workspace. |
+| `agent:meitner-validation-surface` | Read-only reviewer of validation. The reviewer selected existing semantic validators. The reviewer rejected a new validator or state schema. The reviewer is in the same agent team and workspace. |
+| `agent:tdmp-final-quality-review` | Read-only reviewer of QA, risk, and implementation quality before freeze. The reviewer assessed the Critical risk to preservation, panel completeness, lifecycle sequence, and unrelated prose changes. This completed challenge gives no authority to review governance prose after validation. The reviewer did not change the worktree and is in the same agent team and workspace. |
+| Another Documentation Review that started in error | The work stopped before a verdict, result, or proposal for accepted state. It made no tracked change and left no durable reviewer record. It gives no authority for another review. |
 
 The delegated reviewers did not change the worktree. Their reviews are not
-external organisational reviews. The project owner records the required
-review of governance prose as complete. The additional review that stopped
-supplies no result and cannot restart the required review. No review of a
+external organisational reviews. The project owner records the necessary
+review of governance prose as complete. The other review that stopped
+supplies no result and cannot restart the necessary review. No review of a
 governance document follows a PASS result from final deterministic validation.
 
 ### Safety and risk panel
 
 | Risk | Assessment | Result |
 | --- | --- | --- |
-| PR-12 — fragmented or stale direction | The Engineering Policy remains the one TDMP owner. Central routing and one Technical Author Lead skill point to that owner. The completion rule prevents another review of governance prose during CI, publication, or integration. A later review method also cannot start another review. | Medium / Mitigate / Partial. The disposition does not change. |
-| PR-13 — repository or evidence loss | The prior candidate and frozen review scope have verified independent preservation. The exact candidate after correction has a pushed exact identity and separate independent preservation. No new review evidence is required or authorised. | Critical / Mitigate. The required bounded preservation passes. The disposition does not change. |
-| PR-22 — authority transfer or self-acceptance | One independent Documentation Reviewer owns the sole linguistic verdict. The additional review that started in error stopped without a verdict, result, proposal, or tracked change. The Technical Author Lead, CI, quality review, publication, and integration cannot add another review of governance prose. | High / Remove. Control effectiveness requires independent roles and the one-review limit. The disposition does not change. |
+| PR-12 — fragmented or stale direction | The Engineering Policy stays the one TDMP owner. Central routing and one Technical Author Lead skill point to that owner. The completion rule prevents another review of governance prose during CI, publication, or integration. A later review method also cannot start another review. | Medium / Mitigate / Partial. The disposition does not change. |
+| PR-13 — repository or evidence loss | The earlier candidate and frozen review scope have verified independent preservation. The exact candidate after correction has a pushed exact identity and its own independent preservation. No new review evidence is necessary or authorised. | Critical / Mitigate. The necessary bounded preservation gives a `PASS` result. The disposition does not change. |
+| PR-22 — authority transfer or self-acceptance | One independent Documentation Reviewer owns the sole linguistic verdict. The other review that started in error stopped without a verdict, result, proposal, or tracked change. The Technical Author Lead, CI, quality review, publication, and integration cannot add another review of governance prose. | High / Remove. For control effectiveness, independent roles and the one-review limit are necessary. The disposition does not change. |
 
-**Panel recommendation:** **Proceed with bounded conditions.** Retain one TDMP
-in the Engineering Policy. Retain one Technical Author Lead responsibility.
-Retain the existing D-GOV-015 workflow for review.
+**Panel recommendation:** **Continue with bounded conditions.** Keep one TDMP
+in the Engineering Policy. Keep one Technical Author Lead responsibility.
+Keep the existing D-GOV-015 workflow for review.
 
 Add no database for document management. Add no second linguistic review or
 workflow state for sentences. Make no product change or phase-exit claim.
-Complete the project owner's required adjustment. Do the focused final
+Complete the project owner's necessary adjustment. Do the bounded final
 deterministic validation once. Preserve the exact candidate after correction.
 
-A PASS result from final validation ends review of the governance document. Do not run
-another review. A general quality review can apply only to separately changed
-source or tests. Use normal repository integration to make the accepted
+A PASS result from final validation ends review of the governance document. Do not do
+another review. A general quality review can apply only to source or tests
+with their own changes. Use usual repository integration to make the accepted
 controlled baseline current and available.
 
 ### Dissent, unknowns, and exceptions
@@ -3844,21 +3845,21 @@ reviewer recommended quality and publication reviews after validation. The
 reviewer also found unrelated changes to the format of lists. The change owner
 added the records and removed the unrelated changes. The project owner then
 corrected the workflow for governance documents and removed the recommended
-later review. No unresolved dissent remains.
+later review. No unresolved dissent stays.
 
-An additional Documentation Review started in error. It stopped before a
+Another Documentation Review started in error. It stopped before a
 verdict, result, or proposal. It made no tracked change. The project owner
-records the required review as complete and forbids another review.
+records the necessary review as complete and gives no authority for another review.
 
 Git, the final deterministic result, and the separate preservation packet
-identify the exact candidate after correction. Normal repository integration
-has not occurred. The current controlled baseline has no identity yet.
+identify the exact candidate after correction. Repository integration
+did not yet occur. The current controlled baseline has no identity yet.
 
 There is no exception or waiver to D-GOV-015, independent preservation, or the
-sole required review. There is none to deterministic validation, acceptance of
-the controlled baseline, or repository integration. The additional review that
-stopped is not an exception. The exception to the governance budget permits
-only the policy, evidence, skill, routing, and semantic controls that implement
+sole necessary review. There is none to deterministic validation, acceptance of
+the controlled baseline, or repository integration. The other review that
+stopped is not an exception. The exception to the governance budget authorises
+only the policy, evidence, skill, routing, and semantic controls that apply
 D-GOV-017.
 
 ### Bounded conditions
@@ -3867,12 +3868,12 @@ D-GOV-017.
 | --- | --- | --- |
 | Keep the TDMP in the Engineering Policy. Add no second policy owner, document database, or workflow for linguistic review. | Technical Author Lead | Before candidate freeze and throughout the lifecycle. |
 | Keep subject meaning and terminology with their applicable canonical owners. | Technical Author Lead and applicable subject or terminology owner | Before candidate freeze and throughout the lifecycle. |
-| Commit a clean exact candidate after correction. Push that commit. Preserve its exact bytes independently. The prior preservation packet does not satisfy this condition for changed bytes. | Project owner, Technical Author Lead, and independent reviewer of preservation | Before normal repository integration. |
-| Apply the project owner's required adjustment. Do one final deterministic validation. A PASS result from final validation ends review of the governance document. Do not do another review. | Technical Author Lead and validation owner | Before integration of the controlled baseline. |
-| Do not do a later documentation, quality, publication, wording, or semantic review of the governance prose. A general quality review can examine only separately changed source or tests. | Technical Author Lead, validation owner, quality reviewer, and integration owner | After the sole Documentation Review and throughout completion. |
-| Let CI verify only the exact final bytes. Do not let CI start a review, correction, new interpretation, or wording improvement. | Validation and integration owners | During final validation and integration. |
-| Record acceptance only for the exact content that had its sole review and passed final validation. Then use normal repository integration to make that content current. | Project owner and repository integration owner | Before use of the current controlled technical document. |
-| Preserve the terminal failed candidate, untouched legacy prose, and required history. | Technical Author Lead | Throughout this cycle and the later lifecycle. |
+| Commit a clean exact candidate after correction. Push that commit. Use independent preservation for its exact bytes. The earlier preservation packet does not satisfy this condition for changed bytes. | Project owner, Technical Author Lead, and independent reviewer of preservation | Before usual repository integration. |
+| Apply the project owner's necessary adjustment. Do one final deterministic validation. A PASS result from final validation ends review of the governance document. Do not do another review. | Technical Author Lead and validation owner | Before integration of the controlled baseline. |
+| Do not do a later documentation, quality, publication, wording, or semantic review of the governance prose. A general quality review can examine only source or tests with their own changes. | Technical Author Lead, validation owner, quality reviewer, and integration owner | After the sole Documentation Review and throughout completion. |
+| Let CI examine only the exact final bytes. Do not let CI start a review, correction, new interpretation, or wording improvement. | Validation and integration owners | During final validation and integration. |
+| Record acceptance only for the exact content that had its sole review and a `PASS` result from final validation. Then use usual repository integration to make that content current. | Project owner and repository integration owner | Before use of the current controlled technical document. |
+| Preserve the failed candidate whose cycle is complete, untouched legacy prose, and necessary history. | Technical Author Lead | Throughout this cycle and the later lifecycle. |
 
 ### Owner decision D-GOV-017
 
@@ -3884,7 +3885,7 @@ delivery, and maintenance coordination for technical documents. The applicable
 canonical technical or governance owner continues to own the documented
 subject.
 
-D-GOV-015 remains authoritative for `author → freeze scope → one Documentation
+D-GOV-015 stays authoritative for `author → freeze scope → one Documentation
 Review → optional exact reviewed correction once → one final deterministic
 validation → complete or owner stop`. It is the bounded authoring and review
 part of the complete technical-document lifecycle. D-GOV-017 adds no second
@@ -3892,31 +3893,31 @@ workflow for linguistic review. It does not reopen unchanged accepted prose or
 frozen history.
 
 For a governance document, write once under the D-GOV-015 authoring controls.
-Do one Documentation Review. If that review requires an adjustment, apply it
-once. Do one final deterministic validation. Finish the cycle. Green final
+Do one Documentation Review. If that review makes an adjustment necessary, apply it
+once. Do one final deterministic validation. Finish the cycle. A `PASS` result from final
 validation ends the review cycle.
 
 Do not add a later documentation, quality, publication, wording, or semantic
-review. A general quality review applies only to separately changed source or
-tests. It cannot review governance prose after its sole Documentation Review.
+review. A general quality review applies only to source or
+tests with their own changes. It cannot review governance prose after its sole Documentation Review.
 
 For this correction, the project owner records the writing, review, and earlier
-validation as complete. The owner supplies the required adjustment. Do only
-the focused final deterministic checks on the adjusted bytes. Do not start
+validation as complete. The owner supplies the necessary adjustment. Do only
+the bounded final deterministic checks on the adjusted bytes. Do not start
 another Documentation Review or quality review.
 
 The accepted D-GOV-015 decision on 2026-08-31 included a non-linguistic review
-during publication. That requirement remains historical decision evidence.
+during publication. That requirement stays historical decision evidence.
 For a governance document, this later D-GOV-017 correction controls that
 requirement. It removes the later review of governance prose. It does not
 change the D-GOV-015 authoring controls, sole linguistic verdict, or final
 deterministic validation.
 
-Continuous integration can verify the exact final bytes. It cannot start a
+Continuous integration can examine the exact final bytes. It cannot start a
 Documentation Review, correction, new interpretation of meaning, or wording
-improvement. An additional Documentation Review started in error. It stopped
+improvement. Another Documentation Review started in error. It stopped
 before a verdict, result, or proposal for accepted state. It made no tracked
-change and left no durable reviewer record. It gives no authority for an extra
+change and left no durable reviewer record. It gives no authority for another
 review.
 
 Phase 6 stays at 2/5. Exits 1, 4, and 5 stay Pending. Project status stays
@@ -3931,7 +3932,7 @@ legacy-retirement, deletion, or merge authority.
 
 This bounded Level 2 workflow migration starts from protected `main` at
 `583e1ad05d7a821fe67c4905b6569ffceca98fe0`. The
-[validation owner](../VALIDATION.md#developer-tool-boundary) remains the
+[validation owner](../VALIDATION.md#developer-tool-boundary) stays the
 human-readable authority. One
 [machine declaration](../contracts/development-toolchain-v1.json) supplies the
 requirements for development tools and each workflow that uses them. It also
@@ -3948,25 +3949,24 @@ to the qualified FreeCAD host and the real-GUI bridge.
 `ruff==0.16.4` for development only. No product or Addon runtime dependency
 contains these packages.
 
-The executable development-toolchain preflight checks only the selected
+The executable development-toolchain preflight examines only the selected
 `development`, `validation`, `documentation`, `freecad`, `freecad-gui`, or
-`publication` operation. If a requirement is missing or incompatible, the
-workflow stops before that operation. Ruff uses the project `.venv` when
-available. Its only supported fallback is a trusted executable from the user's
-`PATH` with the exact required version. No other development tool has a
+`publication` operation. If a requirement is missing or not compatible, the
+workflow stops before that operation. If the project `.venv` is available, Ruff uses it. Its only supported fallback is a trusted executable from the user's
+`PATH` with the exact necessary version. No other development tool has a
 supported fallback in this declaration.
 
 The Continue, Change Validation, Technical Author Lead, Publish, FreeCAD, and
-regression-pipeline workflows call the applicable development-toolchain
-preflight. Each workflow uses that call instead of a duplicate list of tools.
+regression-pipeline workflows start the applicable development-toolchain
+preflight. Each workflow starts that preflight instead of a duplicate list of tools.
 
 The semantic controls reject these undeclared or incomplete inputs:
 
-- Undeclared tools or supported fallbacks.
-- Missing code for a required check.
-- Python dependencies without exact versions.
-- Host profiles that the contract does not permit.
-- Authentication data in retained material.
+- Undeclared tools or supported fallbacks
+- Missing code for a necessary check
+- Python dependencies without exact versions
+- Host profiles that the contract does not permit
+- Authentication data in retained material
 - Development dependencies in product imports.
 
 The controls also reject checks outside their declared `stage`. They reject
@@ -3974,24 +3974,25 @@ publication without its development-toolchain preflight.
 
 The development-toolchain preflight and its dependent workflow must use the
 same trusted file for each system executable. Before the checkout code operates, the
-`freecad-gui` operation also verifies the exact required bridge commit. It verifies reviewed patch bytes and the permitted tests. It verifies
-that no undeclared executable input exists.
+`freecad-gui` operation also examines the exact necessary bridge commit. It examines
+reviewed patch bytes and the permitted tests. It makes sure that no
+undeclared executable input exists.
 
-All direct checks of each `stage` passed. Two consecutive nine-step
-`transition-gui` pipelines passed in
+All direct checks of each `stage` gave `PASS` results. Two nine-step
+`transition-gui` pipelines, one after the other, gave `PASS` results in
 `benchmark-output/validation-pipeline/20260904T230300265249Z/` and
 `benchmark-output/validation-pipeline/20260904T230436075839Z/`. Each included
-the required Ruff check and a check of 191 Python and macro files for valid
-Python. Each included all 61 standalone validators, the exact qualified host,
+the necessary Ruff check and a Python-parser check of 191 Python and macro
+files. Each included all 61 standalone validators, the exact qualified host,
 and the real-GUI proof. The second run left no untracked or ignored bridge
-file. The next GUI development-toolchain preflight passed.
+file. The next GUI development-toolchain preflight gave a `PASS` result.
 
-The prior evidence record reports `PASS` from independent security and final
+The earlier evidence record reports `PASS` from independent security and final
 quality reviews of the changed source and tests. Those reviewers shared the
 agent team and workspace. The record states that their work was read-only and
 changed no reviewed source.
 
-The retained material found during context recovery contains only a summary of
+The material kept from context recovery contains only a summary of
 those results. It supplies no exact identity for either raw review record.
 Thus, this entry preserves the reported results with that evidence limitation.
 
@@ -3999,9 +4000,9 @@ The development-toolchain preflight gives evidence for the declared requirements
 and host qualification. It does not change product, railway, FreeCAD product,
 API, schema, export, or dependency behaviour. It does not install a tool.
 
-Limits on subprocess output remain work for later. Stronger controls against
-local changes between a check and use also remain work for later. These limits
-do not reduce the required checks for each `stage`. Phase 6 stays at 2/5, and
+Limits on subprocess output stay work for later. Stronger controls against
+local changes between a check and use also stay work for later. These limits
+do not reduce the necessary checks for each `stage`. Phase 6 stays at 2/5, and
 project status stays `unknown`. No risk or decision disposition changes.
 
 <a id="current-phase-6-exit-condition-disposition"></a>
@@ -4028,10 +4029,11 @@ can see. It accepts atomic Undo/Redo, deactivation at save, and reconstruction
 at reopen. The limitation of one empty switch child for each object applies
 only to the demonstrated work.
 
-Before you retain a later composition that invalidates that containment, reopen
-D-P5-002 and the retired PR-14 exposure. Before you permit live mappings,
-caches, or proxies to accumulate, reopen both. Do the same before you permit
-active Coin children or additional residual switch children to accumulate.
+Before you keep a later composition that invalidates that containment, reopen
+D-P5-002 and the retired PR-14 exposure. Before you let live mappings,
+caches, or proxies stay in increasing numbers, reopen both. Before you let
+active Coin children or more residual switch children stay in increasing
+numbers, reopen both.
 
 The 24 risks from the end of Phase 5 stay in
 [risks.json](risks.json). The project owner used D-GOV-005 to change only the
@@ -4045,13 +4047,13 @@ records project authority for an exact candidate and draft pull request in
 Cycle 2.
 
 D-GOV-015 owns the current Documentation Review lifecycle. It keeps the
-existing retrieval architecture. It requires one Documentation Review and one
-final deterministic validation. It gives no phase, product, merge, or Cycle 3
+existing retrieval architecture. It makes one Documentation Review and one
+final deterministic validation necessary. It gives no phase, product, merge, or Cycle 3
 authority.
 
-D-GOV-017 owns the complete technical-document lifecycle. It assigns the
+D-GOV-017 owns the complete technical-document lifecycle. It gives the
 Technical Author Lead responsibility. It keeps D-GOV-015 as the bounded
-authoring and review authority. It creates no second workflow for review or
+authoring and review authority. It makes no second workflow for review or
 database for the lifecycle. It changes no phase, product, risk, or merge
 authority.
 
@@ -4059,7 +4061,7 @@ Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported faults and limits of their
 evidence. D-P6-005 accepts Exit 3 only in its bounded scope.
 
-All other decisions stay separately controlled. These decisions concern exits,
+All other decisions stay separately controlled. These decisions are about exits,
 clearance, support, schema, oracle retirement, budgets, packaging, releases, and
 subsequent phases. TT-DOC-001 changes only documentation governance and
 presentation. TT-DOC-002 corrects only the spelling instruction.

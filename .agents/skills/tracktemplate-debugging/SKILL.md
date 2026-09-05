@@ -8,8 +8,8 @@ description: Find causes of TrackTemplate defects across standalone Python, Free
 ## Purpose
 
 Find the cause from evidence at the smallest responsible boundary. Do not
-report a possible symptom or recent diff as a confirmed cause. Without user
-authority for a fix, do not make retained edits.
+report a possible symptom or recent diff as a cause that the evidence proves. Without user
+authority for a fix, do not make edits that the project keeps.
 
 ## Responsibility boundary
 
@@ -37,8 +37,7 @@ counts, and caches.
 
 ## Establish the failure
 
-1. Read `reference/PROJECT_PLAN.md` and the canonical owner of the expected
-   behaviour. Read `reference/VALIDATION.md` and `reference/TESTING_POLICY.md`.
+1. Read `reference/PROJECT_PLAN.md` and the canonical owner of the behaviour that the requirement specifies. Read `reference/VALIDATION.md` and `reference/TESTING_POLICY.md`.
 2. Record the failure information listed below.
 3. Preserve the complete error, traceback, log, or failed assertion. Keep the
    original reproduction command and necessary sentinel exact.
@@ -49,22 +48,22 @@ counts, and caches.
 
 The failure information includes these items:
 
-- Expected and observed behaviour.
-- Exact input or operator action.
-- Environment/profile and source state.
-- Cache state and process state.
+- Behaviour that the requirement specifies and behaviour that the probe shows
+- Exact input or operator action
+- Environment/profile and source state
+- Cache state and process state
 - First observable difference.
 
-If a selected test fails, use `$tracktemplate-change-validation` before any
-retained repair. This applies to source, tests, fixtures, and expected results.
+If a selected test gives a FAIL result, use `$tracktemplate-change-validation` before any
+repair that the project keeps. This applies to source, tests, fixtures, and expected results.
 
 Before an exporter interruption becomes a defect claim, read the
 [supported exporter failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).
 Put the report in one category:
 
-1. A failure within the supported model.
-2. An operator recovery case within the
-   [restart procedure](../../../reference/RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export).
+1. A failure in the supported model
+2. An operator recovery case in the
+   [restart procedure](../../../reference/RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export)
 3. An arbitrary asynchronous interruption at an unsupported instant.
 
 Category 3 can supply architectural research evidence. It does not
@@ -74,7 +73,7 @@ automatically show an implementation defect or block a phase exit.
 
 1. **Make sure of the active path.** Identify the launcher, package module,
    adapter, compatibility route, and qualified runtime that executed.
-2. **Find the first difference.** Follow values and state backwards from the
+2. **Find the first difference.** Examine values and state in reverse order from the
    first incorrect observation. Compare them with the last correct
    observable boundary.
 3. **Record competing hypotheses.** For each hypothesis, name the predicted
@@ -82,44 +81,44 @@ automatically show an implementation defect or block a phase exit.
    disprove it.
 4. **Change one factor.** Keep other inputs, runtime, cache, and process
    boundaries fixed. Prefer instrumentation, state records, and narrow
-   function calls to retained code changes.
+   function calls to code changes that the project keeps.
 5. **Reduce the example safely.** Preserve the failure as the input or
    workflow becomes smaller. Do not remove validation, transaction, or
    recovery behaviour from the production path to simplify reproduction.
 6. **Identify the responsible boundary.** Distinguish the causes listed below.
-7. **Test the claimed cause.** Use a probe that predicts a new observation.
+7. **Do a test of the claimed cause.** Use a probe that predicts a new observation.
    A restatement of the traceback is insufficient. Record evidence that
    disproves the hypothesis. Change the hypothesis to agree with that
    evidence.
-8. **Make only authorised fixes.** Where practical, add a regression proof
-   that fails for the diagnosed cause. Make the smallest repair at the
+8. **Make only authorised fixes.** If practical, add a regression proof
+   that gives a FAIL result for the diagnosed cause. Make the smallest repair at the
    classified boundary. Do the original reproduction again. Then do the
    checks for each affected validation layer.
 
 Possible causes belong to these boundaries:
 
-- Domain calculation or application state.
-- Signatures or invalidation.
-- FreeCAD lifecycle or persistence.
-- Presentation or exact geometry.
-- Export.
-- Dependency or profile.
-- Fixture or test harness.
+- Domain calculation or application state
+- Signatures or invalidation
+- FreeCAD lifecycle or persistence
+- Presentation or exact geometry
+- Export
+- Dependency or profile
+- Fixture or test harness
 - Operator data.
 
 ## Checks for each boundary
 
-- **Standalone/domain:** Check exact units, frames, tolerances, input
+- **Standalone/domain:** Examine exact units, frames, tolerances, input
   normalisation, deterministic ordering, stable identities, and hidden
   mutable state.
-- **Cache/reuse:** Check complete signatures, invalidation, change-back, and
+- **Cache/reuse:** Examine complete signatures, invalidation, change-back, and
   process freshness. Find whether a stale result appears to be a solver
   error.
-- **FreeCAD/document:** Check the qualified profile, imports, object and
+- **FreeCAD/document:** Examine the qualified profile, imports, object and
   property identities, recompute, transactions, Undo/Redo, cleanup, and
   save/reopen.
 - **GUI/presentation:** For selection, visibility, event order, or visible
-  state, reproduce the failure in a real GUI. Headless success is
+  state, do the operation that causes the failure again in a real GUI. Headless success is
   insufficient.
 - **Persistence/migration:** Examine without changes first. Distinguish
   corrupt, unsupported, future, and ambiguous state from migration
@@ -133,33 +132,33 @@ Possible causes belong to these boundaries:
 
 ## Investigation constraints
 
-- Do not edit B14 or accepted B15 evidence to support a hypothesis.
-- Do not widen tolerances, weaken assertions, or change an oracle to support
+- Do not edit B14 or accepted B15 evidence to give evidence for a hypothesis.
+- Do not widen tolerances, weaken assertions, or change an oracle to give evidence for
   a hypothesis.
 - Do not assume that the most recent change caused the problem. Use the diff
-  or history only as evidence. History operations remain subject to
+  or history only as evidence. History operations stay subject to
   `reference/RECOVERY_AND_BACKUP.md`.
 - Do not add broad logs that expose private paths, credentials, source data,
   or large geometry payloads.
 - Unless temporary instrumentation has an accepted permanent diagnostic
   purpose, remove it.
-- If reproduction fails, record the evidence limitation. Get better observations
+- If the reproduction procedure does not show the failure, record the evidence limitation. Get better observations
   or request the missing environment. Do not invent a fix.
 - If behaviour changes under a debugger, record the difference as a possible
   timing effect. It does not prove a race. Use repeated equivalent runs and
   tracing with less effect on timing.
-- Before a proposed dependency change, check third-party defect claims with
+- Before a proposed dependency change, examine third-party defect claims with
   current official release notes or issue evidence.
 
 ## Report
 
 Report these results:
 
-1. Expected and observed behaviour, and reproduction status.
-2. Exact source, runtime, input, cache state, and process boundary.
-3. First difference and collected evidence.
-4. Tested hypotheses, including evidence against them.
-5. Confirmed cause or remaining uncertainty, with confidence.
-6. Responsible repair boundary and regression proof.
-7. Authorised fixes and repeated validation.
+1. Behaviour that the requirement specifies, behaviour that the probe shows, and reproduction status
+2. Exact source, runtime, input, cache state, and process boundary
+3. First difference and collected evidence
+4. Hypotheses with completed tests and evidence against them
+5. Cause that the evidence proves or remaining uncertainty, with confidence
+6. Responsible repair boundary and regression proof
+7. Authorised fixes and repeated validation
 8. GUI, persistence, export, or performance checks that were not done.

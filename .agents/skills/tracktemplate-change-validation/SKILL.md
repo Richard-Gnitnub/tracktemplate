@@ -1,6 +1,6 @@
 ---
 name: tracktemplate-change-validation
-description: Select and do proportionate TrackTemplate validation. Report its results. Before retained repairs, classify failed tests. Distinguish standalone, qualified FreeCAD, real-GUI, persistence, export, performance, provenance, and licensing evidence.
+description: Select proportionate TrackTemplate validation. Do the validation. Report its results. Before repairs that the project keeps, classify failed tests. Distinguish standalone, qualified FreeCAD, real-GUI, persistence, export, performance, provenance, and licensing evidence.
 ---
 
 # TrackTemplate change validation
@@ -11,9 +11,9 @@ This skill owns evidence selection and interpretation. Find the evidence
 necessary for the change. Report what completed checks prove. Report
 unavailable evidence.
 
-Do not decide whether the complete implementation or scope is acceptable.
+Do not decide whether to accept the complete implementation or scope.
 For source and tests, `$tracktemplate-quality-review` owns that assessment.
-For governance documents, green final deterministic validation completes the
+For governance documents, final deterministic validation with a PASS result completes the
 finite Technical Author Lead procedure. It does not send the prose to another
 reviewer.
 
@@ -37,10 +37,10 @@ reviewer.
 
 The regression contract includes these items:
 
-- Observable result.
-- Preserved invariants.
-- Intended behaviour change.
-- Important rejection and failure cases.
+- Observable result
+- Invariants that the change preserves
+- Intended behaviour change
+- Important rejection and failure cases
 - Evidence that can disprove success.
 
 ## Conditional canonical reading
@@ -73,8 +73,8 @@ Evidence is different from a recommendation or owner decision.
 Before evidence selection for exporter interruption, read these owners:
 
 - Canonical
-  [failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).
-- [Evidence boundary](../../../reference/VALIDATION.md#supported-exporter-interruption-evidence).
+  [failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model)
+- [Evidence boundary](../../../reference/VALIDATION.md#supported-exporter-interruption-evidence)
 - [Operator recovery procedure](../../../reference/RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export).
 
 ## Validation rules
@@ -84,13 +84,13 @@ Before repository validation, use this command:
 `.venv/bin/python tools/development_toolchain_preflight.py --stage validation`
 
 For the necessary Ruff check, add `--run-ruff`. If the development-toolchain
-preflight does not pass, stop before validation.
+preflight does not give a PASS result, stop before validation.
 
 Before STE source or extraction validation, use this command:
 
 `.venv/bin/python tools/development_toolchain_preflight.py --stage documentation`
 
-Before a qualified headless FreeCAD check, use this command:
+Before a headless check in qualified FreeCAD, use this command:
 
 `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
 
@@ -108,20 +108,19 @@ For Ruff and other development tools, use the canonical
 During validation, do not install or change a tool. After its
 development-toolchain preflight gives `FAIL`, do not continue a necessary check.
 
-Follow the canonical
+Use the canonical
 [document boundary](../../../reference/VALIDATION.md#document-boundary).
 Do not edit that file only because a test was added or done. Change it only
 for a change to its durable validation contract.
 
-At minimum, parse every changed Python or macro file. Do the fastest focused
-test that proves the changed behaviour.
+At minimum, parse every changed Python or macro file. Do the fastest test for the affected boundary that proves the changed behaviour.
 
 Use machine controls only for Issue 9 requirements that they can validate
 accurately. Do not use a validator as proof of linguistic conformance. Such
 a claim needs a recorded conformance review against the official Issue 9
 standard. For the claim, make sure that the review identifies an official source
 from the [source instructions](../../../reference/external/asd-ste100/README.md).
-Normal repository validation does not use the ignored PDF.
+Usual repository validation does not use the ignored PDF.
 
 For STE lookup changes, use the
 [validation and review receipt route](../../../reference/external/asd-ste100/README.md#pre-check-and-review-receipt).
@@ -131,31 +130,31 @@ results and an empty pre-check do not show conformance.
 
 Do affected regression suites and applicable checks for these subjects:
 
-- FreeCAD and GUI.
-- Persistence and migration.
-- Export and rollback.
-- Recovery and performance.
+- FreeCAD and GUI
+- Persistence and migration
+- Export and rollback
+- Recovery and performance
 - Provenance and licensing.
 
 For a recovery or handoff change, validate stash inventory, unique content,
 and stash disposition controls. Do the applicable semantic control
 validation. Review the preservation diff.
 
-After necessary development-toolchain preflights pass, do only applicable
+After necessary development-toolchain preflights give PASS results, do only applicable
 checks. Report each unavailable optional check explicitly. Do every
 necessary check. For each executed check, record the exact command,
 environment, result, and necessary success sentinel.
 
 A zero exit status without the necessary success sentinel does not prove that
-assertions ran. Keep standalone Python, qualified headless FreeCAD, and
-real-GUI evidence distinct. Headless evidence does not give GUI acceptance.
+the check executed its assertions. Keep standalone Python evidence, headless
+evidence from qualified FreeCAD, and real-GUI evidence separate. Headless evidence does not give GUI acceptance.
 
 For performance assessment, preserve comparable starting states, caches,
 process boundaries, and correctness assertions. Do not weaken tests, widen
 tolerances, change accepted oracles, or remove failure cases only to get
 a pass.
 
-If repeated focused repairs fail the same proof, stop local patches. Reassess
+If repeated repairs at the affected boundary give FAIL results for the same proof, stop local patches. Reassess
 the premise, affected boundary, baseline, and proposed approach. Record the
 unresolved cause. Do not suppress the failure.
 
@@ -167,23 +166,23 @@ Give it the progress question.
 
 Do not claim supported production behaviour from any of these items:
 
-- A fixture with a copied target.
-- A local comparison path or prototype.
-- A headless smoke check.
+- A fixture with a copied target
+- A local comparison path or prototype
+- A headless smoke check
 - A partial workflow.
 
 Unless the owner explicitly widens the exporter failure model, report probes
 outside it as research evidence. Such a probe is not automatically a blocker.
-It remains a blocker if it proves any retained invariant violation, including
-these cases:
+If it proves any violation of an invariant that the project keeps, it stays a blocker.
+Such violations include these cases:
 
-- Deletion or overwrite.
-- Unsafe mutation.
-- Failure in a supported workflow.
+- Deletion or overwrite
+- Unsafe mutation
+- Failure in a supported workflow
 - Unsafe retry.
 
 Do not claim acceptance or project clearance for a phase, milestone, release,
-migration family, package, or output. Those decisions remain with structured
+migration family, package, or output. Those decisions stay with structured
 current records and the project owner.
 
 Unless the user requested implementation or validation fixes, do not change
@@ -204,7 +203,7 @@ preservation audit. After removal, examine the preservation diff.
 
 ## Failed-test adjudication
 
-If a selected check fails, begin with a read-only evidence pass:
+If a selected check gives a FAIL result, start with a read-only evidence pass:
 
 1. Preserve the exact evidence listed below.
 2. Identify the observable contract and its canonical authority.
@@ -212,18 +211,18 @@ If a selected check fails, begin with a read-only evidence pass:
    introduced, pre-existing, or unresolved.
 4. Use the supported primary classification from
    `reference/TESTING_POLICY.md`.
-5. Before retained edits, record the correct repair boundary. This applies to
+5. Before edits that the project keeps, record the correct repair boundary. This applies to
    source, tests, fixtures, expected values, and environment configuration.
 
 The preserved evidence includes these items:
 
-- Exact command and environment/profile.
-- Source state and necessary sentinel.
-- Raw output.
+- Exact command and environment/profile
+- Source state and necessary sentinel
+- Raw output
 - First related traceback or assertion.
 
 Additional executions and disposable probes can collect diagnostic evidence. While the
-primary classification lacks support, do not mutate retained code or tests.
+primary classification lacks support, do not mutate code or tests that the project keeps.
 If the user authorised fixes, make the smallest repair at the classified
 boundary. Use the original exact command again. Then do the checks for each
 additionally affected layer.
@@ -234,18 +233,18 @@ does not supply that evidence. A desired successful suite does not supply it.
 
 ## Evidence recording boundary
 
-Keep raw validation and failed-test evidence complete in retained logs or
+Keep raw validation and failed-test evidence complete in logs that the project keeps or
 pull-request evidence. Include exact commands, environments, sentinels, output,
 chronology, classifications, and repeated checks after repairs. These records
-must permit an audit of the proof.
+must make an audit of the proof possible.
 
 Current phase evidence serves a different purpose. For Level 2 or Level 3
 work, an entry can be necessary in the documentation lifecycle. In that case, record
 only these items:
 
-- Concise result needed for the decision.
-- Decisive proof and contribution.
-- Material limitation.
+- Concise result needed for the decision
+- Decisive proof and contribution
+- Material limitation
 - Unchanged authority or necessary decision.
 
 Only if chronology changes the evidence conclusion, include the full failed-test
@@ -258,22 +257,22 @@ For a substantial cycle, start with the profile's owner view. Put this
 validation detail below it as proof/provenance:
 
 1. **Change boundary:** Affected files, architecture, railway behaviour, and
-   host integration.
-2. **Selected validation:** Applicable layers and the reason for each.
-3. **Checks completed:** Exact commands, environments, sentinels, and results.
+   host integration
+2. **Selected validation:** Applicable layers and the reason for each
+3. **Checks completed:** Exact commands, environments, sentinels, and results
 4. **Failed-test adjudication:** Preserved evidence, primary classification,
-   canonical contract, and correct repair boundary for each failure.
+   canonical contract, and correct repair boundary for each failure
 5. **Checks not done:** Reason, remaining risk, and necessary environment or
-   evidence.
+   evidence
 6. **Evidence interpretation:** What completed checks show and what they do
-   not show.
+   not show
 7. **Evidence status:** Complete for the selected scope, incomplete, or
-   failed.
+   failed
 8. **Next boundary:** The applicable result given below.
 
 For source and tests, report readiness for `$tracktemplate-quality-review`.
 For governance documents, report whether final validation completed the cycle
 or stopped for the owner.
 
-If no check failed, do not include failed-test adjudication. Do not imply that an
-unavailable, unperformed, or narrower check passed.
+If no check gave a FAIL result, do not include failed-test adjudication.
+Do not imply that an unavailable, unperformed, or narrower check gave a PASS result.

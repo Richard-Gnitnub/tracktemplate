@@ -133,7 +133,7 @@ def validate_workflow_text(text: str) -> None:
         "tracktemplate-technical-author-lead automatically",
         "identify the document need",
         "identify the document class",
-        "plan the purpose",
+        "make a plan for the purpose",
         "get technical meaning from the applicable canonical subject owner",
         "read the technical-term register. read the applicable documentation "
         "policy",
@@ -142,18 +142,18 @@ def validate_workflow_text(text: str) -> None:
         "freeze one clean exact candidate in git",
         "derive the frozen review scope from the last accepted document identity "
         "and git",
-        "give the complete frozen review scope to one independent documentation "
-        "reviewer",
+        "give the complete scope of the frozen review to one independent "
+        "documentation reviewer",
         "record one complete accept",
         "approved with exact corrections",
         "or blocked verdict",
         "apply all exact replacement wording once against verified preimages",
-        "after the review or correction, run one final deterministic validation",
-        "if that validation passes, complete the cycle",
+        "after the review or correction, do one final deterministic validation",
+        "if it gives a pass result, complete the cycle",
         "finish the bounded d-gov-015 authoring and review lifecycle",
         "do not start another documentation, quality, publication, wording, or "
         "semantic review",
-        "establish the controlled baseline",
+        "make the accepted content the controlled baseline",
     )
     position = -1
     for fragment in ordered:
@@ -173,14 +173,14 @@ def validate_workflow_text(text: str) -> None:
         "targeted retrieval cannot resolve an ambiguity that the reviewer records",
         "owner decision makes complete-source inspection necessary",
         "documentation review is the only linguistic conformance review",
-        "do not run a second documentation review",
+        "do not do a second documentation review",
         "do not invent other canonical prose",
-        "otherwise, stop for the owner",
-        "detects unreviewed mutation",
+        "if it does not, stop for the owner",
+        "finds unreviewed mutation",
         "does not give or change the linguistic verdict",
         "cycle is write, one review, one permitted adjustment, final "
         "deterministic validation, and done",
-        "cannot request or start another documentation review, wording pass, "
+        "cannot ask for or start another documentation review, wording pass, "
         "semantic reinterpretation, or improvement cycle",
     ):
         require(fragment in value, "workflow boundary lacks: " + fragment)
@@ -303,7 +303,8 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
     )
     change_validation = semantic_text(skills["tracktemplate-change-validation"])
     require(
-        "for governance documents, green final deterministic validation "
+        "for governance documents, final deterministic validation with a "
+        "pass result "
         "completes the finite technical author lead procedure" in change_validation
         and "does not send the prose to another reviewer" in change_validation,
         "change validation can start a later governance-document review",
@@ -318,11 +319,11 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
         in technical_author
         and "before freeze, apply one complete improvement pass"
         in technical_author
-        and "green final validation ends this documentation cycle"
+        and "final validation with a pass result ends this documentation cycle"
         in technical_author
         and "do not send the document to another documentation, quality, "
         "publication, wording, or semantic review" in technical_author
-        and "continuous integration can check the final bytes"
+        and "continuous integration can examine the final bytes"
         in technical_author
         and "cannot start another documentation review, correction pass, or "
         "linguistic improvement cycle" in technical_author

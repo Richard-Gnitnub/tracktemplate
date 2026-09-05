@@ -25,7 +25,7 @@ Before a measurement with the real-GUI bridge, use this command:
 quality. Before work starts, read it.
 
 If the cause of a regression or resource increase is unknown, use
-`$tracktemplate-debugging`. After evidence identifies the main path,
+`$tracktemplate-debugging`. After evidence identifies the primary path,
 `$tracktemplate-simplify` can control a simplification that preserves
 behaviour. `$tracktemplate-python-writing` governs source edits.
 
@@ -41,7 +41,7 @@ partial workflow does not supply evidence for the complete workflow.
    Read the applicable current evidence and performance risks.
 2. Define the comparison baseline with the items listed below.
 3. Before measurement, add assertions for correct behaviour.
-4. Where applicable, record elapsed-time distributions, CPU, memory, FreeCAD
+4. If applicable, record elapsed-time distributions, CPU, memory, FreeCAD
    object counts, recompute counts, and output parity. Do measurements again.
    Report variation.
 5. Report which editing, Validate, and Export costs the measurement includes
@@ -49,11 +49,11 @@ partial workflow does not supply evidence for the complete workflow.
 
 The comparison baseline includes these items:
 
-- Operator workflow.
-- Exact source state and runtime/profile.
-- Input document or fixture.
-- Cold or warm state.
-- Cache state and process boundary.
+- Operator workflow
+- Exact source state and runtime/profile
+- Input document or fixture
+- Cold or warm state
+- Cache state and process boundary
 - Bounded scope of the output.
 
 ## Engineering procedure
@@ -64,7 +64,7 @@ The comparison baseline includes these items:
 2. **Record one performance hypothesis.** Identify the work that will
    disappear, move, or become reusable. Name the metric that can disprove
    the performance hypothesis.
-3. **Check architecture.** Keep canonical state authoritative. Keep derived
+3. **Examine architecture.** Keep canonical state authoritative. Keep derived
    views disposable. Defer exact geometry only to an explicit boundary.
    Make sure that the cache signature and invalidation proof are complete.
 4. **Change one measured area.** Keep algorithm changes, cache changes,
@@ -76,8 +76,8 @@ The comparison baseline includes these items:
 6. **Compare equivalent states.** Use the same source inputs, environment,
    process/cache conditions, and output scope. Report medians or
    distributions. Do not report only the best run without qualification.
-7. **Check costs that moved.** Work can be deferred, cached, or moved between
-   boundaries. If so, measure the complete workflow from edit through export.
+7. **Examine costs that moved.** If you defer work, cache it, or move it between
+   boundaries, measure the complete workflow from edit through export.
 
 ## Constraints
 
@@ -96,11 +96,11 @@ The comparison baseline includes these items:
 
 Report these results:
 
-- Workflow and measurement boundary.
-- Baseline distribution and largest measured cost.
-- Tested performance hypothesis and exact change.
-- Correctness evidence.
-- Equivalent results before and after the change.
-- Costs that moved and costs that remain.
-- Measurement limitations.
+- Workflow and measurement boundary
+- Baseline distribution and largest measured cost
+- Tested performance hypothesis and exact change
+- Correctness evidence
+- Equivalent results before and after the change
+- Costs that moved and costs that stay
+- Measurement limitations
 - Budget or GUI decisions that still need project-owner acceptance.

@@ -7,14 +7,14 @@ description: Do one authorised TrackTemplate development cycle from repository e
 
 ## Purpose
 
-Use `$tracktemplate-continue` for one complete Level 1 or Level 2 cycle. Base
-its direction on the Product Vision and repository evidence. Complete one
+Use `$tracktemplate-continue` for one complete Level 1 or Level 2 cycle. Use the Product Vision and repository evidence to select
+its direction. Complete one
 previous pull request with successful necessary checks for its exact head.
-Synchronise protected `main`. Reconstruct the existing project context.
+Make protected `main` current. Get the existing project context.
 
 Then select one result:
 
-- Deliver the most valuable authorised result as one new draft pull request
+- Supply the authorised result with the most value as one new pull request in draft state
   with successful necessary CI for its exact head.
 - If no worthwhile authorised result exists, stop successfully on clean
   protected `main`.
@@ -28,7 +28,7 @@ invocation activates this skill. Acceptance, discussion, quotation, or
 description of the workflow does not activate it. A natural-language
 equivalent supplies no authority for this cycle.
 
-An unfinished item alone is insufficient. The selected result must follow the
+An unfinished item alone is insufficient. The selected result must agree with the
 current authorised programme, exact active phase criterion, and repository
 evidence. Otherwise, stop cleanly.
 
@@ -36,28 +36,28 @@ evidence. Otherwise, stop cleanly.
 
 The literal invocation authorises at most these operations:
 
-1. Verification and normal integration of one previous Level 1 or Level 2
-   pull request.
-2. Selection and implementation of one Level 1 or Level 2 result within
-   current authority, from repository evidence.
-3. Publication of one new draft pull request and monitoring of necessary CI
+1. Verification and usual integration of one previous Level 1 or Level 2
+   pull request
+2. Selection and implementation of one Level 1 or Level 2 result in
+   current authority, from repository evidence
+3. Publication of one new pull request in draft state and monitoring of necessary CI
    for its exact head.
 
 It supplies routine Git authority for the previous pull request. It delegates
 publication of the new work to
-[`$tracktemplate-publish`](../tracktemplate-publish/SKILL.md). It also permits
+[`$tracktemplate-publish`](../tracktemplate-publish/SKILL.md). It also authorises
 reversible engineering choices with a safe basis in accepted architecture and
 repository authority.
 
 The invocation does not authorise these items:
 
-- Level 3 gates, phase acceptance, or release acceptance.
-- Renderer acceptance or supported migration.
-- Production-output or chair clearance.
-- Licensing or provenance decisions.
-- Tags or releases.
-- Force push, history rewrite, or branch deletion.
-- Protection bypass or destructive operations.
+- Level 3 gates, phase acceptance, or release acceptance
+- Renderer acceptance or supported migration
+- Production-output or chair clearance
+- Licensing or provenance decisions
+- Tags or releases
+- Force push, history rewrite, or branch deletion
+- Protection bypass or destructive operations
 - Wider product scope.
 
 For an unresolved product or user-experience choice, stop for the owner. Do
@@ -77,20 +77,20 @@ Before the first checkout, branch, or worktree mutation, use
 Compare PyCharm data with authoritative Git evidence. Include these items:
 
 - Primary project, interpreter, VCS roots, and working directories in run
-  configurations.
+  configurations
 - Worktree, branch, HEAD, and pull-request evidence.
 
 Report the complete arrangement before the change. Preserve dirty, unique,
 unpushed, or active state. The IDE skill supplies no Git authority. Never
 infer a branch from a run-configuration name or window name.
 
-## Check and integrate the previous pull request
+## Examine and integrate the previous pull request
 
 Before the first GitHub query or integration action, use this command:
 
 `.venv/bin/python tools/development_toolchain_preflight.py --stage publication`
 
-If the development-toolchain preflight does not pass, stop before publication
+If the development-toolchain preflight does not give a PASS result, stop before publication
 work.
 
 1. Read enough of the current dashboard to identify the previous work's
@@ -101,8 +101,8 @@ work.
 3. Identify the previous pull request's exact head SHA, target, scope, review
    state, mergeability, and necessary checks.
 4. Make sure that all integration conditions listed below apply.
-5. If the pull request is a draft, mark it ready. Merge through the normal
-   merge-commit route. Do not delete the branch. Check the merge commit.
+5. If the pull request is a draft, mark it ready. Merge through the usual
+   merge-commit route. Do not delete the branch. Examine the merge commit.
    If a condition changes during the operation, stop.
 
 All integration conditions are mandatory:
@@ -110,8 +110,8 @@ All integration conditions are mandatory:
 - The target is protected `main`.
 - The scope contains only authorised Level 1 or Level 2 work.
 - Every necessary check succeeded for the exact head.
-- No requested change or conflict remains unresolved.
-- Normal merge needs no protection bypass.
+- No requested change or conflict stays unresolved.
+- Usual merge needs no protection bypass.
 - The local working tree is clean.
 
 If no previous pull request exists, do not merge. If it is already merged,
@@ -140,31 +140,31 @@ must do. Do not claim visible UI evidence.
 After `main` is current and before branch creation, use these sources to
 reconstruct authority for the next work:
 
-- Repository `AGENTS.md`.
+- Repository `AGENTS.md`
 - Canonical [`PRODUCT_VISION.md`](../../../reference/PRODUCT_VISION.md),
-  including the current programme and the later programme's lack of current
-  authority.
-- [`PROJECT_PLAN.md`](../../../reference/PROJECT_PLAN.md).
-- Current phase evidence, risk register, and decision register.
-- Canonical owner of the affected subject.
-- Latest related staff-review result.
+  with the current programme and the later programme's lack of current
+  authority
+- [`PROJECT_PLAN.md`](../../../reference/PROJECT_PLAN.md)
+- Current phase evidence, risk register, and decision register
+- Canonical owner of the affected subject
+- Latest related staff-review result
 - A bounded recent pull-request history, usually three to six completed
-  work items.
+  work items
 - Actual source, callers, and tests as implementation evidence.
 
 These items do not automatically authorise implementation:
 
-- A `Next bounded tranche` heading or sentence.
-- A review finding or branch name.
+- A `Next bounded tranche` heading or sentence
+- A review finding or branch name
 - A test expectation or the latest source structure.
 
 ## Select one result or stop
 
 Put each credible candidate in exactly one category:
 
-- `exit-closing`.
-- `necessary-enabling`.
-- `maintenance`.
+- `exit-closing`
+- `necessary-enabling`
+- `maintenance`
 - `governance-or-tooling`.
 
 Name the exact exit gap, accepted requirement, live risk, or blocking dependency
@@ -180,25 +180,25 @@ Trace each candidate through this sequence:
 The Product Vision informs direction. It does not independently authorise
 scope. Before delegation or branch creation, record these items:
 
-- Product result and exact active phase criterion.
-- Repository evidence for the gap.
-- Authorised change level.
-- Accepted behaviour that could regress.
-- Smallest intervention and bounded files.
-- Necessary validation and independent acceptance evidence.
-- Explicit non-goals and claims that remain excluded.
+- Product result and exact active phase criterion
+- Repository evidence for the gap
+- Authorised change level
+- Accepted behaviour that could regress
+- Smallest intervention and bounded files
+- Necessary validation and independent acceptance evidence
+- Explicit non-goals and claims that stay excluded.
 
 Before a substantial repetition, identify at least one changed condition:
 
-- New repository evidence.
-- Changed testable hypothesis.
-- Newly authorised scope or method.
-- Corrected environment or fixture.
-- Independently identified defect.
+- New repository evidence
+- Changed testable hypothesis
+- Newly authorised scope or method
+- Corrected environment or fixture
+- Independently identified defect
 - Narrower task with different evidence.
 
 Without a changed condition, stop the repetition. Report the repeated state
-and blocker. Where applicable, give investigation or governance tasks to an agent. Do
+and blocker. If applicable, give investigation or governance tasks to an agent. Do
 not report activity as progress.
 
 Under any condition below, use
@@ -213,11 +213,11 @@ Under any condition below, use
 - Another repeated cycle is suspected.
 
 A clear routine change does not always need the chief of staff. Its brief is
-transient analysis. Check it against repository authority.
+transient analysis. Examine it against repository authority.
 
 If the selected Level 1 or Level 2 result is already authorised, another
-owner restatement is unnecessary. Continue only when no unresolved product
-choice remains. If the brief identifies an unresolved choice or Level 3
+owner restatement is unnecessary. Only when no product
+choice is unresolved, continue. If the brief identifies an unresolved choice or Level 3
 boundary, stop for owner input.
 
 Successful integration followed by a clean stop is a valid result. Do not
@@ -229,9 +229,9 @@ Before the first implementation mutation, use this command:
 
 `.venv/bin/python tools/development_toolchain_preflight.py --stage development`
 
-If the development-toolchain preflight does not pass, stop before
+If the development-toolchain preflight does not give a PASS result, stop before
 implementation. Only after selection of the result, make one fresh,
-descriptive `agent/` branch. Do not begin a second result in this cycle.
+descriptive `agent/` branch. Do not start a second result in this cycle.
 
 If the selected result has any condition below, use
 [`$tracktemplate-technical-lead`](../tracktemplate-technical-lead/SKILL.md):
@@ -243,7 +243,7 @@ If the selected result has any condition below, use
   or rollback.
 - It needs a coordinated implementation procedure beyond one isolated fix.
 
-For a trivial edit within one speciality, do not invoke technical lead. In
+For a trivial edit that needs only one specialist, do not invoke technical lead. In
 all cases, use every applicable specialist skill. Examine actual callers
 and tests. Make the smallest coherent change across the affected layers.
 Prefer existing regression infrastructure. Exclude optional simplification.
@@ -257,22 +257,22 @@ the sole acceptance authority.
 ## Validate and review
 
 The quality reviews and repairs below apply to source and tests. Governance
-documents follow the Technical Author Lead procedure. The one Documentation
+documents use the Technical Author Lead procedure. The one Documentation
 Review, permitted adjustment, and final deterministic validation complete that
-procedure. CI can check final bytes. It cannot start another review,
+procedure. CI can examine final bytes. It cannot start another review,
 correction, reinterpretation, or wording pass.
 
 1. Use
    [`$tracktemplate-change-validation`](../tracktemplate-change-validation/SKILL.md).
    Preserve each selected failure. Classify each failure. Do proportionate
-   final validation. Follow the canonical
+   final validation. Use the canonical
    [validation-document boundary](../../../reference/VALIDATION.md#document-boundary).
    Only if its durable validation contract changes, include
    `reference/VALIDATION.md` in the work. For affected document or ViewProvider
    behaviour, include regression and lifecycle evidence.
 2. Give the completed change and raw evidence to a different read-only
    [`$tracktemplate-quality-review`](../tracktemplate-quality-review/SKILL.md).
-   Where the client supports it, use a fresh reviewer, sub-agent, or session.
+   If the client has this capability, use a fresh reviewer, sub-agent, or session.
    Otherwise, disclose the lack of independence.
 3. Give every actionable finding one disposition: `BLOCKER`,
    `REQUIRED_BEFORE_EXIT`, `BACKLOG`, or `OPTIONAL`.
@@ -287,11 +287,11 @@ correction, reinterpretation, or wording pass.
 
 Under any condition below, stop without another work item:
 
-- The same proof fails after two bounded repair passes.
+- The same proof gives a FAIL result after two bounded repair passes.
 - The technical premise appears incorrect.
 - Local repair no longer reduces the original uncertainty.
 - Scope exceeds the selected result.
-- A product choice remains unresolved.
+- A product choice stays unresolved.
 - The work reaches Level 3 authority.
 - Necessary infrastructure is unavailable.
 - Review identifies unresolved architectural disagreement.
@@ -300,7 +300,7 @@ Do not weaken validation to get a successful result. Do not change an
 accepted oracle for that purpose. Do not start another result for that purpose.
 
 Before publication, reconcile the evidence with the exact active exit. Do not
-turn partial implementation or a successful test into exit acceptance.
+report partial implementation or a successful test as exit acceptance.
 Preserve the explicit limits on product, programme, phase, output, and
 migration claims.
 
@@ -311,28 +311,28 @@ reviewed paths and content state. Delegate publication to
 `$tracktemplate-publish` with authority limited to that frozen state. The
 delegation includes these operations:
 
-- One intentional commit set.
-- Push of one branch.
-- Creation of one draft pull request.
+- One intentional commit set
+- Push of one branch
+- Creation of one draft pull request
 - Monitoring of necessary CI for the exact pushed head.
 
 The delegated publication workflow cannot edit source or repair CI failures.
 
-If necessary CI fails for the exact head, preserve the failure. Classify it.
+If necessary CI gives a FAIL result for the exact head, preserve the failure. Classify it.
 Return it to this workflow without source changes. It is a publication
-`BLOCKER` only when classification supports safe repair within the selected
+`BLOCKER` only when classification gives evidence for safe repair in the selected
 result.
 
 Such a repair consumes one of the same two total passes. Before publication
 continues, do affected final validation again. Get another different read-only
-staff review. If no pass remains, stop. If the cause is environmental or
+staff review. If no pass is available, stop. If the cause is environmental or
 external, stop. If repair exceeds scope, stop.
 
 For a governance-document CI failure, preserve the evidence. Then stop for
 the owner. Do not edit its prose or start another improvement pass. Do not
 invoke Documentation Review or quality review for that failure.
 
-Stop with the draft after necessary CI passes for its exact head. Do not mark
+After necessary CI gives a PASS result for its exact head, stop with the draft. Do not mark
 it ready or merge it during this invocation.
 
 For new or materially changed canonical technical prose, use
@@ -347,29 +347,29 @@ After a successful implementation cycle, apply the canonical
 [Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
 Use these owner-view fields:
 
-1. **Current state**.
-2. **What changed**.
-3. **What now works**.
-4. **Limitations/findings**.
-5. **Owner decision**.
+1. **Current state**
+2. **What changed**
+3. **What now works**
+4. **Limitations/findings**
+5. **Owner decision**
 6. **Next action**.
 
 The owner view presents canonical records. Put this technical provenance below
 it:
 
-- Exact active criterion and formal status.
-- Inspection route and visual evidence.
-- Behaviour that did not change.
-- Contribution to the phase exit or risk.
-- Validation and staff-review results.
-- Draft pull request.
+- Exact active criterion and formal status
+- Inspection route and visual evidence
+- Behaviour that did not change
+- Contribution to the phase exit or risk
+- Validation and staff-review results
+- Draft pull request
 - Decision that the owner must make.
 
 Distinguish agent claims, repository content, validated evidence, and
 independent acceptance. Name the exact active criterion. Report whether its
 formal status changed.
 
-For GUI work, include representative screenshots where available. Pixel
+For GUI work, if representative screenshots are available, include them. Pixel
 counts, hashes, and raw logs can supply proof. They do not replace a visual
 demonstration that a person can understand.
 
@@ -389,12 +389,12 @@ incomplete operation. Do not duplicate a merge, branch, commit, or pull request.
 
 Report these results:
 
-- Previous integration and merge commit.
-- Selected classification and named contribution.
-- Local validation and remote validation for the exact head.
-- Review verdict and new draft.
-- Reconciliation with the exact phase exit.
-- Preserved limits on claims.
-- Each authority boundary that remains open.
+- Previous integration and merge commit
+- Selected classification and named contribution
+- Local validation and remote validation for the exact head
+- Review verdict and new draft
+- Reconciliation with the exact phase exit
+- Preserved limits on claims
+- Each authority boundary that stays open.
 
 If the cycle stops after integration, report that it made no new work item.

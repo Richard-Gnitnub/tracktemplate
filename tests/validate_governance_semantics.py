@@ -2367,14 +2367,14 @@ def validate_current_evidence_mutations() -> None:
     )
     tdmp_current_row = table_row_containing(
         tdmp_section,
-        "Normal repository integration has not made it the current "
+        "Repository integration did not yet make it the current "
         "controlled baseline",
     )
     tdmp_candidate_made_current = replace_once(
         tdmp_current_row,
-        "Normal repository integration has not made it the current "
+        "Repository integration did not yet make it the current "
         "controlled baseline",
-        "Normal repository integration has made it the current "
+        "Repository integration made it the current "
         "controlled baseline",
     )
     expect_rejected(
@@ -2390,8 +2390,8 @@ def validate_current_evidence_mutations() -> None:
                 ),
             )
         ),
-        "D-GOV-017 owner view drifted: Normal repository integration has not "
-        "made it the current controlled baseline",
+        "D-GOV-017 owner view drifted: Repository integration did not yet "
+        "make it the current controlled baseline",
     )
     tdmp_authority_row = table_row_containing(
         tdmp_section,
@@ -3404,8 +3404,8 @@ def validate_documentation_profile_mutations() -> None:
         (
             "tt-doc/lifecycle-owner-stop-removed",
             "workflow",
-            "Otherwise, stop for the owner.",
-            "Otherwise, start another Documentation Review.",
+            "If it does not, stop for the owner.",
+            "If it does not, start another Documentation Review.",
             "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
         ),
         (

@@ -81,7 +81,8 @@ TT_DOC_DESCRIPTION_FRAGMENTS = {
         "Level 3 decision",
     ),
     "tracktemplate-technical-author-lead": (
-        "Manage the complete TrackTemplate technical-document lifecycle",
+        "Act as the Technical Author Lead for the complete TrackTemplate "
+        "technical-document lifecycle",
         "Use automatically for new or materially changed canonical "
         "technical prose",
     ),
@@ -467,7 +468,7 @@ def validate_progress_delivery_structure() -> None:
             "Procedure for the exact candidate",
             "Control the baseline and availability",
             "Maintain and change documents",
-            "Manage supersession and retirement",
+            "Supersession and retirement",
             "Handoff",
         },
         "tracktemplate-continue": {
@@ -591,10 +592,10 @@ def validate_technical_author_lifecycle(
             "understand once → write once → check once → improve once",
             "freeze once → review once → validate once → finish",
             "before freeze, apply one complete improvement pass",
-            "green final validation ends this documentation cycle",
+            "final validation with a pass result ends this documentation cycle",
             "do not send the document to another documentation, quality, "
             "publication, wording, or semantic review",
-            "continuous integration can check the final bytes",
+            "continuous integration can examine the final bytes",
             "cannot start another documentation review, correction pass, or "
             "linguistic improvement cycle",
             "do not do a second documentation review",
@@ -633,7 +634,7 @@ def validate_technical_author_lifecycle(
         "tracktemplate-technical-author-lead automatically",
         "identify the document need",
         "identify the document class",
-        "plan the purpose",
+        "make a plan for the purpose",
         "technical author lead procedure",
         "freeze one clean exact candidate in git",
         "one independent documentation reviewer",
@@ -641,10 +642,10 @@ def validate_technical_author_lifecycle(
         "finish the bounded d-gov-015 authoring and review lifecycle",
         "do not start another documentation, quality, publication, wording, "
         "or semantic review",
-        "establish the controlled baseline",
-        "normal repository integration",
+        "make the accepted content the controlled baseline",
+        "usual repository integration",
         "supersede or retire",
-        "preserve the required history",
+        "preserve the necessary history",
     )
     position = -1
     for concept in ordered_workflow:
@@ -754,7 +755,7 @@ def validate_ide_workspace_alignment_contract(
     post_sync = semantic_text(
         direct_section_content(
             continuation,
-            "Check and integrate the previous pull request",
+            "Examine and integrate the previous pull request",
         )
     )
     require(
@@ -877,12 +878,15 @@ def validate_continue_invocation_policy(workflows: str) -> None:
         "AGENT_WORKFLOWS lost the explicit continuation boundary",
     )
     require(
-        "description and its metadata permits implicit invocation. The handoff "
-        "and continue skills require their literal project-owner invocations. "
-        "Publish requires its literal invocation or delegation from an active "
-        "literal `$tracktemplate-continue` cycle."
+        "When the task clearly agrees with a skill description and its "
+        "metadata authorises implicit invocation, Codex can also select that "
+        "skill implicitly. For handoff and continue, the project owner must "
+        "use their literal invocations. For Publish, use its literal "
+        "invocation or delegation from an active literal "
+        "`$tracktemplate-continue` cycle."
         in normalized_workflows
-        and "Does not activate TrackTemplate publish. Request the literal "
+        and "This instruction does not activate TrackTemplate publish. "
+        "Get the literal "
         "`$tracktemplate-publish` invocation"
         in normalized_workflows,
         "AGENT_WORKFLOWS lost an explicit-only project-skill boundary",
@@ -902,11 +906,11 @@ def validate_continue_invocation_policy(workflows: str) -> None:
         "tracktemplate-continue lost its shared repair or final-review limit",
     )
     require(
-        "Governance documents follow the Technical Author Lead procedure. "
+        "Governance documents use the Technical Author Lead procedure. "
         "The one Documentation Review, permitted adjustment, and final "
         "deterministic validation complete that procedure."
         in normalized_skill_text
-        and "CI can check final bytes. It cannot start another review, "
+        and "CI can examine final bytes. It cannot start another review, "
         "correction, reinterpretation, or wording pass."
         in normalized_skill_text
         and "For a governance-document CI failure, preserve the evidence. "
@@ -921,7 +925,7 @@ def validate_continue_invocation_policy(workflows: str) -> None:
         "delegated publication can mutate final-reviewed source",
     )
     require(
-        "publication only verifies final bytes and reports CI "
+        "publication only examines final bytes and reports CI "
         "`PASS` or `FAIL`" in normalized_publish_text
         and "Publication cannot edit that prose or invoke another "
         "documentation or quality review. It cannot reinterpret meaning or "
@@ -999,9 +1003,9 @@ def validate_vision_led_workflows(workflows: str) -> None:
         "continue lost its vision-led selection or standing authority boundary",
     )
     require(
-        "trace the selection from agent task to bounded work item. Show which "
-        "finding or phase exit that work item addresses. Show how that "
-        "finding or phase exit supports the current programme. Connect the "
+        "show the connection from agent task to bounded work item. Show which "
+        "finding or phase exit that work item changes. Show how that "
+        "finding or phase exit advances the current programme. Connect the "
         "current programme to the product vision" in normalized_workflows
         and "claimed, present, validated and independently accepted"
         in normalized_workflows,
@@ -1052,7 +1056,7 @@ def validate_documentation_profile_routing(
     for fragment in (
         "TT-DOC-001 workflow integration",
         "Authors use links from skills to these owners",
-        "One owner has each separate responsibility that can occur repeatedly",
+        "One owner has each different responsibility that can occur repeatedly",
         "use an existing owner when possible",
         "Do not give two skills the same workflow responsibility",
         "adds no skill for the documentation profile",
@@ -1187,7 +1191,8 @@ def validate_documentation_profile_routing(
         "change validation lets automation prove linguistic conformance",
     )
     require(
-        "For governance documents, green final deterministic validation "
+        "For governance documents, final deterministic validation with a "
+        "PASS result "
         "completes the finite Technical Author Lead procedure"
         in change_validation_flat
         and "does not send the prose to another reviewer"
@@ -1259,7 +1264,7 @@ def validate_documentation_profile_routing(
     change_validation_flat = semantic_text(change_validation)
     require(
         "review identifies an official source" in change_validation_flat
-        and "Normal repository validation does not use the ignored PDF"
+        and "Usual repository validation does not use the ignored PDF"
         in change_validation_flat,
         "change validation lost its official-source or no-PDF-CI boundary",
     )
@@ -1495,19 +1500,19 @@ def validate_issue9_documentation_lifecycle(
         "formal issue 9 rule identifiers",
         "apply all exact replacement wording once against verified preimages",
         "do not invent other canonical prose",
-        "run one final deterministic validation",
-        "if that validation passes, complete the cycle",
+        "do one final deterministic validation",
+        "if it gives a pass result, complete the cycle",
         "finish the bounded d-gov-015 authoring and review lifecycle",
         "do not start another documentation, quality, publication, wording, or "
         "semantic review",
         "cycle is write, one review, one permitted adjustment, final "
         "deterministic validation, and done",
-        "cannot request or start another documentation review, wording pass, "
+        "cannot ask for or start another documentation review, wording pass, "
         "semantic reinterpretation, or improvement cycle",
         "stop for the owner",
         "only linguistic conformance review",
-        "do not run a second documentation review",
-        "detects unreviewed mutation",
+        "do not do a second documentation review",
+        "finds unreviewed mutation",
         "does not give or change the linguistic verdict",
         "deterministic pre-check is only a review aid",
     )
