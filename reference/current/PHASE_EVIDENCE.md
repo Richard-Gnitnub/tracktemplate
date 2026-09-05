@@ -4059,6 +4059,55 @@ migration, or legacy retirement.
 This Level 1 cycle changes only the live records and their directly dependent
 checks. It does not start the selected product work or accept an exit.
 
+<a id="phase6-bounded-entry-exit-output-comparison"></a>
+
+## Bounded Entry/Exit output comparison
+
+This necessary-enabling Level 2 work uses D-P6-001 authority for Exit 1. Its baseline
+is protected main at `dc6c476bf0f0c5840bb21756fee35d7208c82084`.
+It adds a [comparison method](../../tests/phase6_transition_output_equivalence.py),
+a [standalone check](../../tests/validate_phase6_transition_output_equivalence.py),
+and a [FreeCAD check](../../tests/freecad_validate_phase6_transition_output_equivalence.py).
+Product source and the B14/B15 files do not change.
+
+The checks compare equivalent output for eight specified Entry/Exit cases.
+These include the two recorded offset cases and both zero-length cases.
+The standalone check also uses a second resolution. The comparison uses
+calculations from both frozen legacy files. It examines the full ordered
+centrelines through exact geometry, DXF export, and FreeCAD import.
+It checks units, direction, shape, length, and the output manifest.
+
+The largest difference between the sampled outputs was `0.048452162565 mm`.
+The tests compare B16 coordinates with the legacy calculation at the fixed
+`1e-8 mm` numerical limit. The tests give a limit for each error from sampling,
+Simpson integration, and import. That limit is not an absolute error bound
+for every ideal curve.
+
+Standalone, qualified FreeCAD, and real-GUI checks gave PASS results.
+The FreeCAD profile was
+`linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`.
+The two recorded cases were visible after import in an isolated GUI session.
+The checks preserved the editable documents, their Undo state, and output
+bytes during the second export. The exact-contract, exact-geometry,
+and DXF regressions also gave PASS results.
+
+Initial test and harness failures stay in `tmp/exit1-validation/` in the
+named worktree `phase6-entry-exit-output-equivalence`.
+The repairs keep the calculation errors as different terms. They reject
+curved edges and close only the transaction from the test's import.
+They do not change the comparison limit or a product operation.
+Raw results and GUI captures stay local evidence.
+This cycle supplies no independent preservation for them.
+
+This result is for the specified centreline cases only. Production clearance
+and legacy retirement stay outside this work. The work does not compare all
+legacy output.
+
+The owner accepts no phase exit from this result. Phase 6 stays at 2/5 accepted
+exits. Exit 1 and Exit 4 stay Pending. Risks and project status `unknown` do not
+change. The stopped D-GOV-011 direction and its retained negative evidence
+do not change.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
