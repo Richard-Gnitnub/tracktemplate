@@ -438,14 +438,14 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations apply. Project status remains `unknown`."
     ),
     (
-        "Pending — D-GOV-008 stays the authority for its baseline, hypothesis, "
-        "and comparison rule. D-GOV-009 records the two results as retained negative "
-        "evidence and stops work in that direction. Its attribution record "
-        "gives a PASS result for the canonical area, which is only `0.0731425 ms` "
-        "higher than the noise floor. D-GOV-010 qualifies the exact host for that "
-        "evidence. D-GOV-011 selects one subsequent hypothesis for the canonical "
-        "record and its comparison rule. It makes no product change, admits no performance "
-        "result, and does not accept Exit 4."
+        "Pending — D-GOV-008 and D-GOV-009 keep their initial authority and "
+        "retained negative evidence. The completed D-GOV-011 "
+        "baseline-attribution investigation gave FAIL. The attribution "
+        "materiality rule did not change. The owner accepted the "
+        "result as retained negative evidence and stopped that product "
+        "direction. D-GOV-011 and its initial evidence do not change. "
+        "The project made no product change and admitted no improvement "
+        "evidence."
     ),
     (
         "Pending. B14 remains available. Parity for the complete accepted "
@@ -897,27 +897,28 @@ def _validate_owner_view(plan: str) -> None:
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays `unknown`",
         "D-GOV-011",
-        "selects one later performance hypothesis for the measured canonical "
-        "Edit area",
-        "limits the Level 2 product change to one FreeCAD adapter file",
-        "D-GOV-009, D-GOV-010, and their evidence do not change",
-        "D-GOV-009 attribution result and source assessment",
-        "two repeated reads of the selected record",
-        "does not need work in another Edit stage",
-        "attribution noise floor is `2.895891 ms`",
-        "first quartile was only `0.0731425 ms` higher than that floor",
-        "evidence does not report the cost of each operation",
-        "selected performance hypothesis can fail its later comparison",
-        "No result is improvement evidence or Exit 4 evidence",
-        "tracktemplate/adapters/freecad/transition_state.py",
-        "Keep one live read before the write",
-        "necessary read after the write",
-        "Preserve all specified invariants",
-        "Make the D-GOV-011 Level 2 change in a new cycle",
-        "record a new same-host baseline on the D-GOV-010 host",
-        "Apply the D-GOV-009 attribution materiality rule to the canonical area",
-        "Do not change the comparison rule",
-        "A later Level 3 owner decision is necessary to accept Exit 4",
+        "gave a FAIL result",
+        "owner accepted this result as retained negative evidence and "
+        "stopped the product change",
+        "project completed the new same-host baseline and attribution series",
+        "An independent reviewer validated the result",
+        "D-GOV-011 FAIL result prevented product work",
+        "first quartile was `3.057969 ms`",
+        "attribution noise floor was `3.8645155 ms`",
+        "not improvement evidence or Exit 4 evidence",
+        "Exit 1 has no evidence that the bounded B14/B15 and B16 outputs "
+        "are equivalent",
+        "owner accepted the FAIL result on 2026-09-05",
+        "D-GOV-011, its measurement rule, and its initial evidence do not "
+        "change",
+        "Do not do the measurement again. Do not make the product change",
+        "No new owner decision is necessary for the selected product boundary "
+        "with authority from D-P6-001",
+        "In the next Level 2 cycle, validate equivalent B14/B15 and B16 "
+        "output for the bounded Entry/Exit centrelines",
+        "Include exact validation and DXF export/import",
+        "This work is for Exit 1 with authority from D-P6-001",
+        "The owner must make a new decision before phase acceptance",
     ):
         _require(
             fragment in owner_view,
@@ -2439,18 +2440,57 @@ def _validate_exit_conditions(
         "D-GOV-010 host-qualification summary drifted",
     )
     _require(
-        "D-GOV-011 selects one later performance hypothesis for the read route "
-        "in the canonical FreeCAD adapter" in plan_flat
-        and "can remove only two repeated reads of the selected record"
+        "D-GOV-011 stays Accepted as authority for the initial performance "
+        "hypothesis and its conditions" in plan_flat
+        and "gave FAIL and stopped that product change" in plan_flat
+        and "owner accepted the result as retained negative evidence on "
+        "2026-09-05" in plan_flat
+        and "initial decision, measurement rule, and evidence do not change"
         in plan_flat
-        and "exact D-GOV-010 host" in plan_flat
-        and "record a new same-host baseline" in plan_flat
-        and "must not change the comparison rule" in plan_flat
-        and "makes no product change and admits no performance result"
-        in plan_flat
-        and "Exit 4 stays Pending" in plan_flat,
+        and "Exit 4 stays Pending" in plan_flat
+        and "next product boundary is equivalent centreline output for Exit 1 "
+        "with authority from D-P6-001" in plan_flat,
         "D-GOV-011 canonical-record direction summary drifted",
     )
+
+    completion = _semantic_text(
+        direct_section_content(
+            current_evidence,
+            "Completed baseline-attribution investigation for D-GOV-011",
+        )
+    )
+    for fragment in (
+        "1b29a1c82caf39fc329ecded3dd811fd1cd3ba24",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "each contained 10 samples",
+        "All 20 samples gave PASS results for their correctness checks",
+        "D-GOV-009 attribution materiality rule gave FAIL. That rule did "
+        "not change",
+        "first quartile was 3.057969 ms",
+        "noise floor was 3.8645155 ms",
+        "project made no product change and did not compare a candidate "
+        "with the baseline",
+        "0bcd0cc7e02c86e77fd2fd31893fe0f2c9b8476928bb01901d1c6fded6683bb8",
+        "6f88ab16a3948b9ddd63670c90e56a9b4257491aee64b63c64c79ba866448060",
+        "project owner accepted the result as retained negative evidence",
+        "owner stopped the D-GOV-011 product direction",
+        "Do not do the measurement again. Do not change the measurement rule",
+        "Do not make the product change",
+        "D-GOV-011 stays Accepted as initial authority",
+        "Phase 6 stays at 2/5 accepted exits. Exit 4 stays Pending",
+        "Risks do not change, and project status stays unknown",
+        "selected next product boundary is bounded equivalent output from "
+        "the B14/B15 and B16 Entry/Exit centrelines",
+        "work includes exact validation and DXF export/import",
+        "D-P6-001 authorises the bounded Level 2 work",
+        "No new owner decision is necessary to start that work in a "
+        "subsequent cycle",
+        "It does not start the selected product work or accept an exit",
+    ):
+        _require(
+            fragment in completion,
+            "D-GOV-011 prerequisite completion drifted: " + fragment,
+        )
 
     current_flat = " ".join(current_evidence.split())
     decision_quote_flat = " ".join(
@@ -3664,6 +3704,13 @@ def _validate_exit_conditions(
         "defines the new same-host baseline and comparison rule",
         "makes no product change. It admits no performance result, defines no "
         "budget, and does not accept Exit 4",
+        "gave FAIL and stopped the product change",
+        "owner accepted the result as retained negative evidence",
+        "Do not do the measurement again",
+        "Do not select a different Exit 4 optimisation "
+        "only to continue performance work",
+        "next product boundary is equivalent centreline output for Exit 1 "
+        "with authority from D-P6-001",
     ):
         _require(
             required_clause in current_register_flat,

@@ -588,28 +588,26 @@ def validate_documentation_profile(
         "Phase 6 has 2/5 accepted exits" in owner_view
         and "Exits 1, 4, and 5 stay Pending" in owner_view
         and "D-GOV-011" in owner_view
-        and "selects one later performance hypothesis for the measured "
-        "canonical Edit area" in owner_view
-        and "limits the Level 2 product change to one FreeCAD "
-        "adapter file"
+        and "gave a FAIL result" in owner_view
+        and "retained negative evidence and stopped the product change"
         in owner_view
-        and "D-GOV-009, D-GOV-010, and their evidence do not change"
+        and "project completed the new same-host baseline and attribution series"
         in owner_view
-        and "two repeated reads of the selected record" in owner_view
-        and "does not need work in another Edit stage" in owner_view
-        and "attribution noise floor is `2.895891 ms`" in owner_view
-        and "only `0.0731425 ms` higher than that floor" in owner_view
-        and "No result is improvement evidence or Exit 4 evidence"
+        and "An independent reviewer validated the result" in owner_view
+        and "first quartile was `3.057969 ms`" in owner_view
+        and "attribution noise floor was `3.8645155 ms`" in owner_view
+        and "not improvement evidence or Exit 4 evidence" in owner_view
+        and "D-GOV-011, its measurement rule, and its initial evidence do not "
+        "change" in owner_view
+        and "Do not do the measurement again. Do not make the product change"
         in owner_view
-        and "tracktemplate/adapters/freecad/transition_state.py" in owner_view
-        and "Keep one live read before the write"
-        in owner_view
-        and "necessary read after the write" in owner_view
-        and "Make the D-GOV-011 Level 2 change" in owner_view
-        and "record a new same-host baseline on the D-GOV-010 host" in owner_view
-        and "D-GOV-009 attribution materiality rule" in owner_view
-        and "Do not change the comparison rule" in owner_view
-        and "A later Level 3 owner decision is necessary to accept Exit 4"
+        and "No new owner decision is necessary for the selected product "
+        "boundary with authority from D-P6-001" in owner_view
+        and "In the next Level 2 cycle, validate equivalent B14/B15 and B16 "
+        "output for the bounded Entry/Exit centrelines" in owner_view
+        and "Include exact validation and DXF export/import" in owner_view
+        and "This work is for Exit 1 with authority from D-P6-001" in owner_view
+        and "The owner must make a new decision before phase acceptance"
         in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",

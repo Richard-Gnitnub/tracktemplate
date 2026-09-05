@@ -36,11 +36,13 @@
       "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
     },
     {
-      "accepted_blob": "sha1:80f51fc5f1718b738cd9ae6dceee4b53c387c67c",
-      "accepted_sha256": "sha256:ee2245e2453edc4198a07504254750c1f4ac4bdaf8ff370fa2b9219c4be23200",
+      "accepted_blob": "sha1:4a6f4f60db96a7fb456d5f39fd8f993ffed59b6f",
+      "accepted_sha256": "sha256:75ee285d5ff1357b840a2ecb0649aaa8057fd24caed3a4b8446a07f88cc87621",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
       "path": "reference/PROJECT_PLAN.md",
-      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+      "review_receipt": "sha256:d59476281e20036ad763104deee9f8902543f66bba8c6846888c8fee528aeb5e",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
       "accepted_blob": "sha1:bd1f985f8544638dda0f1bc47d67ec7b9912167d",
@@ -57,11 +59,13 @@
       "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
     },
     {
-      "accepted_blob": "sha1:ef8e3ed203e5e6fd04eaf900c91d580af7ab9b0d",
-      "accepted_sha256": "sha256:873701812b384152981ce5513718b4b302555b17dfad779f8087dc1833280bc3",
+      "accepted_blob": "sha1:2795274c4a649700f01b2f01ec0f01e2335d0fc7",
+      "accepted_sha256": "sha256:0ad3191a3aa30a5d738df3b1dd9380546614aa3363e7335b67f94d009476ed9d",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
+      "review_receipt": "sha256:d59476281e20036ad763104deee9f8902543f66bba8c6846888c8fee528aeb5e",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
       "accepted_blob": "sha1:a580efb316b6f0544e7f77ecbd531f61db78ce52",
@@ -78,5 +82,5 @@
       "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
     }
   ],
-  "schema_version": 1
+  "schema_version": 2
 }
