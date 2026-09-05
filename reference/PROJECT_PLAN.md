@@ -13,11 +13,11 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 has 3/5 accepted exits. The owner accepted Exits 1, 2, and 3. Exits 4 and 5 stay Pending. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | [D-P6-006](current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel) accepts Exit 1 for the agreed PR #63 Entry/Exit centreline comparison scope. |
+| **What changed** | [D-P6-006](current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel) accepts Exit 1 for the agreed scope of the PR #63 comparison of Entry/Exit centrelines. |
 | **What now works** | The admitted evidence compares bounded B14/B15 and B16 centrelines through exact validation, Part geometry, and DXF export/import. Product source does not change. |
-| **Limitations/findings** | The recorded numerical, host, and assurance limits apply. Production clearance and wider output equivalence remain absent. D-GOV-011 stays stopped with its retained negative evidence. Risks do not change. |
-| **Owner decision** | The owner accepted D-P6-006 on 2026-09-05. D-GOV-011, its measurement rule, and its retained evidence do not change. Do not do the measurement again. Do not make the stopped product change. |
-| **Next action** | Bring the Exit 5 legacy-preservation criterion to the owner. The retained evidence needs a separate admission decision. It gives no legacy-retirement authority. Do not add Exit 1 implementation without a material contradiction. |
+| **Limitations/findings** | The recorded numerical, host, and assurance limits apply. The owner gives no production clearance and accepts no wider output equivalence. D-GOV-011 stays stopped with its retained negative evidence. Risks do not change. |
+| **Owner decision** | The owner accepted D-P6-006 on 2026-09-05. D-GOV-011, its measurement rule, and its kept evidence do not change. Do not do the measurement again. Do not make the stopped product change. |
+| **Next action** | Bring the Exit 5 legacy-preservation condition to the owner. The kept evidence needs a different owner decision to admit it. It gives no legacy-retirement authority. Do not add Exit 1 implementation unless evidence shows that the accepted result is incorrect. |
 
 ## Phase status
 
@@ -62,7 +62,7 @@ D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first direction. It
 
 D-GOV-010 qualifies only the exact FreeCAD 1.1.3 host profile with CPython 3.13.13 and PySide6/Qt 6.11.1. It keeps the previously qualified profiles and their evidence. It authorises this profile to supply performance evidence in a later cycle. Each comparison must use one profile with an exact identity. The decision admits no performance result and does not change D-GOV-009. Exit 4 stays Pending.
 
-D-GOV-011 stays Accepted as authority for the initial performance hypothesis and its conditions. The [completed baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The initial decision, measurement rule, and evidence do not change. Exit 4 stays Pending. D-P6-006 accepts the subsequent bounded Exit 1 result. The next owner boundary is Exit 5 legacy preservation.
+D-GOV-011 stays Accepted as authority for the initial performance hypothesis and its conditions. The [completed baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The initial decision, measurement rule, and evidence do not change. Exit 4 stays Pending. D-P6-006 accepts the subsequent bounded Exit 1 result, and the next owner decision is for Exit 5 legacy preservation.
 
 ## Live risks
 
@@ -126,7 +126,7 @@ The [current decision register](current/gate-decisions.json) owns Phase 6. It al
 | D-P6-003 | 2026-08-02 | Accepted | The decision selected completion that can only add output members. It keeps no separate journal, and the completion count can only increase. It authorised a later Level 2 implementation. Exit 3 remains Pending. Phase 6 remains 1/5. |
 | D-P6-004 | 2026-08-15 | Accepted | The supported exporter fault model, interruption-evidence limit, and restart containment are accepted. Product source, risk disposition, Phase 6 at 1/5, and Exit 3 Pending do not change. |
 | D-P6-005 | 2026-08-15 | Accepted | The decision accepts Phase 6 Exit 3 only for the bounded B16 Entry/Exit DXF-and-manifest route. The route has private-development status and uses D-P6-003 and D-P6-004. Phase 6 advances to 2/5. All stated limitations and exclusions remain. |
-| D-P6-006 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel) accepts Exit 1 for the agreed PR #63 Entry/Exit centreline comparison scope. Phase 6 advances to 3/5. Exits 4 and 5 stay Pending. All stated limitations and exclusions remain. |
+| D-P6-006 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel) accepts Exit 1 for the agreed scope of the PR #63 comparison of Entry/Exit centrelines. Phase 6 advances to 3/5. Exits 4 and 5 stay Pending. All stated limitations and exclusions still apply. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English word forms in TT-DOC-001 canonical prose. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
