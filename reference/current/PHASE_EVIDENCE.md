@@ -4206,16 +4206,16 @@ that the accepted result is incorrect.
 
 <a id="phase-6-exit-5-preservation-evidence-admission-panel"></a>
 
-## Phase 6 Exit 5 preservation evidence admission panel — 2026-09-05
+## Phase 6 Exit 5: panel and owner decision — 2026-09-05
 
-**Decision boundary:** D-P6-007 accepts the existing Exit 5 preservation
+**Decision boundary:** D-P6-007 accepts the Exit 5 preservation
 condition. Its criterion is “The legacy path remains available until parity
 and project-owner acceptance permit removal”. This Level 3 authority change
 uses the governance-budget exception. It needs no product implementation.
 
 The evidence source is protected `main`
 `7d312839152e038f36619faabc9aee80ccda7137` after PR #64 integration.
-Its Git tree equals the reviewed PR head
+Its Git tree is equal to the Git tree at the reviewed PR head
 `89ab7ee6f6444456f26928fd0abf66e049df78f5`.
 The required `validation` passed through GitHub Actions app `15368` in
 [run 33973547343](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/33973547343).
@@ -4226,8 +4226,10 @@ and their directly dependent tests.
 and owner acceptance. `/root` presented the evidence.
 `/root/exit1_admission_challenge` supplied independent read-only QA/risk review
 before the owner decision. That reviewer did not implement the preserved paths.
-The agents share one system and workspace. No external independent reviewer
-examined the evidence. The recommendation was **Proceed with bounded conditions**.
+The agents share one system and workspace.
+
+No external independent reviewer examined the evidence.
+The recommendation was **Proceed with bounded conditions**.
 Each reviewer agreed with this recommendation.
 
 **Preservation evidence:** The panel verified the immutable B14 reference
@@ -4254,10 +4256,10 @@ No severity, treatment, owner, deadline, or control effectiveness changes.
 | --- | --- |
 | PR-10, PR-18 | D-P4-003 keeps the product composition modular-only. The development oracle, B15 host, and rollback evidence keep their owners and retirement conditions in the [Phase 4 closeout](../history/phase-closeouts/PHASE4_CLOSEOUT.md). Before beta, the Phase 10 integration owner must satisfy those conditions. D-P6-007 permits no removal. |
 | PR-13 | Raw proof stays local. This cycle supplies no independent preservation for it. Richard keeps responsibility for the backup schedule and preservation before subsequent use. No deletion is necessary. |
-| PR-17, QA-R03 | The source and QA owners keep the transaction, recovery, persistence, and wider GUI evidence duties for their existing deadlines. This decision accepts no wider migration or operator workflow. |
-| PR-09, PR-21 | Output stays private-development and project status stays `unknown`. The rights owners and Richard must complete the separate clearance route before a production-use claim. |
-| PR-15, QA-R04 | Exit 4 stays Pending. The performance owners keep the existing evidence and budget duties. D-GOV-011 stays stopped. Its measurement rule and retained negative evidence do not change. |
-| PR-22 | Richard supplies acceptance after independent review. This decision gives no agent authority to accept a later result. |
+| PR-17, QA-R03 | The source and QA owners keep the transaction, recovery, persistence, and wider GUI evidence duties for their recorded deadlines. This decision accepts no wider migration or operator workflow. |
+| PR-09, PR-21 | Output stays private-development and project status stays `unknown`. The rights owners and Richard must complete the clearance route before a production-use claim. |
+| PR-15, QA-R04 | Exit 4 stays Pending. The performance owners keep the recorded evidence and budget duties. D-GOV-011 stays stopped. Its measurement rule and retained negative evidence do not change. |
+| PR-22 | Richard supplies acceptance after independent review. This decision gives no agent authority to accept a subsequent result. |
 
 **Exact owner decision — 2026-09-05:** Richard accepted the Chief of Staff
 proposal and instructed the directly dependent alignment and its integration:
@@ -4266,12 +4268,13 @@ proposal and instructed the directly dependent alignment and its integration:
 
 Phase 6 advances from 3/5 to 4/5 accepted exits.
 Exits 1, 2, 3, and 5 are Evidenced and owner-accepted.
-Exit 4 stays Pending. Output stays private-development.
-Project status stays `unknown`. Risks do not change.
-Phase 6 stays open. Later phases do not start.
+Exit 4 stays Pending.
+
+Output stays private-development. Project status stays `unknown`.
+Risks do not change. Phase 6 stays open. Subsequent phases do not start.
 
 Current evidence identifies no materially new performance hypothesis.
-No further product work is selected. No owner decision is ready.
+The project selected no further product work. No owner decision is ready.
 This work-selection result changes no phase criterion or performance rule.
 
 <a id="current-phase-6-exit-condition-disposition"></a>
@@ -4286,7 +4289,7 @@ The accepted current state is 4/5 under D-P6-002, D-P6-005, D-P6-006, and D-P6-0
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005. This is bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004. The recorded platform, recovery, and assurance limitations apply. Project status remains `unknown`. |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-008 and D-GOV-009 keep their initial authority and retained negative evidence. The completed D-GOV-011 baseline-attribution investigation gave FAIL. The attribution materiality rule did not change. The owner accepted the result as retained negative evidence and stopped that product direction. D-GOV-011 and its initial evidence do not change. The project made no product change and admitted no improvement evidence. |
-| The legacy path remains available until parity and project-owner acceptance permit removal | Evidenced and owner-accepted under D-P6-007 for continued preservation of B14, B15, and the bounded development comparison and recovery route. All ownership and retirement conditions still apply. No removal or wider authority is granted. |
+| The legacy path remains available until parity and project-owner acceptance permit removal | Evidenced and owner-accepted under D-P6-007 for continued preservation of B14, B15, and the bounded route for development comparison and recovery. All ownership and retirement conditions still apply. The owner gives no removal or wider authority. |
 
 ## Carried controls and exclusions
 
@@ -4383,9 +4386,10 @@ gave FAIL and stopped the product change. The owner accepted the
 result as retained negative evidence. Do not do the measurement again.
 Do not select a different Exit 4 optimisation only to continue performance
 work. D-P6-006 accepts the subsequent bounded Exit 1 result.
+
 D-P6-007 accepts Exit 5 for continued legacy preservation.
 Current evidence identifies no materially new performance hypothesis.
-No further product work is selected. No owner decision is ready.
+The project selected no further product work. No owner decision is ready.
 
 <a id="d-gov-018-finite-documentation-completion"></a>
 

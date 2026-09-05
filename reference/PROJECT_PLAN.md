@@ -13,11 +13,11 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 has 4/5 accepted exits. The owner accepted Exits 1, 2, 3, and 5. Exit 4 stays Pending. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | [D-P6-007](current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued preservation of the legacy references and the bounded development comparison and recovery route. |
-| **What now works** | The kept evidence shows that B14, B15, and the development comparison and recovery route remain available. Product source does not change. |
+| **What changed** | [D-P6-007](current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued preservation of the legacy references and the bounded route for development comparison and recovery. |
+| **What now works** | The kept evidence shows that B14, B15, and the route for development comparison and recovery stay available. Product source does not change. |
 | **Limitations/findings** | All legacy-retirement conditions and wider exclusions still apply. The owner gives no removal authority. D-GOV-011 stays stopped with its retained negative evidence. Risks do not change. |
 | **Owner decision** | The owner accepted D-P6-007 on 2026-09-05. D-GOV-011, its measurement rule, and its kept evidence do not change. Do not do the measurement again. Do not make the stopped product change. |
-| **Next action** | No further product work is selected from current evidence. Exit 4 needs a materially new performance hypothesis with supporting evidence. No owner decision is ready. Phase 6 stays open. Later phases do not start. |
+| **Next action** | The project selected no further product work from current evidence. Exit 4 needs a materially new performance hypothesis with evidence for it. No owner decision is ready. Phase 6 stays open. Subsequent phases do not start. |
 
 ## Phase status
 
@@ -62,7 +62,7 @@ D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first direction. It
 
 D-GOV-010 qualifies only the exact FreeCAD 1.1.3 host profile with CPython 3.13.13 and PySide6/Qt 6.11.1. It keeps the previously qualified profiles and their evidence. It authorises this profile to supply performance evidence in a later cycle. Each comparison must use one profile with an exact identity. The decision admits no performance result and does not change D-GOV-009. Exit 4 stays Pending.
 
-D-GOV-011 stays Accepted as authority for the initial performance hypothesis and its conditions. The [completed baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The initial decision, measurement rule, and evidence do not change. Exit 4 stays Pending. D-P6-006 accepts the bounded Exit 1 result. D-P6-007 accepts Exit 5 for continued legacy preservation. Current evidence identifies no materially new performance hypothesis.
+D-GOV-011 stays Accepted as authority for the initial performance hypothesis and its conditions. The [completed baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The initial decision, measurement rule, and evidence do not change. Exit 4 stays Pending, and current evidence identifies no materially new performance hypothesis. D-P6-006 accepts the bounded Exit 1 result, and D-P6-007 accepts Exit 5 for continued legacy preservation.
 
 ## Live risks
 
@@ -126,7 +126,7 @@ The [Phase 4 decision register](history/phase-closeouts/PHASE4_GATE_DECISIONS.js
 | D-P6-004 | 2026-08-15 | Accepted | The supported exporter fault model, interruption-evidence limit, and restart containment are accepted. Product source, risk disposition, Phase 6 at 1/5, and Exit 3 Pending do not change. |
 | D-P6-005 | 2026-08-15 | Accepted | The decision accepts Phase 6 Exit 3 only for the bounded B16 Entry/Exit DXF-and-manifest route. The route has private-development status and uses D-P6-003 and D-P6-004. Phase 6 advances to 2/5. All stated limitations and exclusions remain. |
 | D-P6-006 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel) accepts Exit 1 for the agreed scope of the PR #63 comparison of Entry/Exit centrelines. Phase 6 advances to 3/5. Exits 4 and 5 stay Pending. All stated limitations and exclusions still apply. |
-| D-P6-007 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued legacy preservation in the bounded Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. All retirement conditions and wider exclusions still apply. No removal is authorised. |
+| D-P6-007 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued legacy preservation in the bounded Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. All retirement conditions and wider exclusions still apply. The owner authorises no removal. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English word forms in TT-DOC-001 canonical prose. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
