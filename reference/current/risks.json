@@ -167,9 +167,9 @@
       "control_effectiveness": "Partial",
       "summary": "Deferred exact geometry could move rather than remove operator-visible cost.",
       "owner": "Per-slice performance owners; Phase 10 integration owner freezes budgets. Under D-P6-008, Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Richard accepts the result after independent review.",
-      "deadline": "Measure at Phases 6-9, freeze budgets at Phase 10 and pass repeated Phase 11 qualification. The unchanged bounded Entry/Exit obligation from Phase 6 Exit 4 is mandatory before Phase 10 beta acceptance under D-P6-008.",
-      "required_work": "Measure equivalent edit-only and edit-through-export workflows with parity checks. Preserve the D-P6-008 obligation, measurement rules, retained negative evidence and stopped directions. Numerical budgets or improvement on another workload cannot satisfy the obligation. If it stays unmet, beta acceptance is blocked.",
-      "closure_evidence": "Accepted reports, numerical budgets and repeated Phase 11 passes. D-P6-008 also requires independent evidence review and Richard's acceptance of the unchanged bounded Entry/Exit improvement obligation before Phase 10 beta acceptance."
+      "deadline": "Measure at Phases 6-9, freeze budgets at Phase 10 and pass repeated Phase 11 qualification. The unchanged obligation for the bounded Entry/Exit scope of Phase 6 Exit 4 is mandatory before Phase 10 beta acceptance under D-P6-008.",
+      "required_work": "Measure equivalent edit-only and edit-through-export workflows with parity checks. Preserve the D-P6-008 obligation, measurement rules, retained negative evidence and stopped directions. Numerical budgets or improvement on another workload do not give the required evidence for the obligation. If it stays unmet, Richard must not accept beta.",
+      "closure_evidence": "Accepted reports, numerical budgets and repeated Phase 11 passes. D-P6-008 also requires independent evidence review and Richard's acceptance of the unchanged improvement obligation for the bounded Entry/Exit scope before Phase 10 beta acceptance."
     },
     {
       "id": "PR-16",
@@ -275,9 +275,9 @@
       "control_effectiveness": "Partial",
       "summary": "Complete modular edit-through-export performance and numerical budgets are not yet established.",
       "owner": "Per-slice performance owners; Phase 10 integration owner and project owner accept budgets. Under D-P6-008, Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Richard accepts the result after independent review.",
-      "deadline": "Measure at Phases 5-9, freeze budgets at Phase 10 and pass repeated Phase 11 runs. The unchanged bounded Entry/Exit obligation from Phase 6 Exit 4 is mandatory before Phase 10 beta acceptance under D-P6-008.",
-      "required_work": "Run controlled cold/warm edit-only and edit-through-export recipes with correctness checks. Preserve the D-P6-008 obligation, measurement rules, retained negative evidence and stopped directions. Numerical budgets or improvement on another workload cannot satisfy the obligation. If it stays unmet, beta acceptance is blocked.",
-      "closure_evidence": "Linked reports, accepted numerical budgets and repeated in-budget Phase 11 results. D-P6-008 also requires independent evidence review and Richard's acceptance of the unchanged bounded Entry/Exit improvement obligation before Phase 10 beta acceptance."
+      "deadline": "Measure at Phases 5-9, freeze budgets at Phase 10 and pass repeated Phase 11 runs. The unchanged obligation for the bounded Entry/Exit scope of Phase 6 Exit 4 is mandatory before Phase 10 beta acceptance under D-P6-008.",
+      "required_work": "Run controlled cold/warm edit-only and edit-through-export recipes with correctness checks. Preserve the D-P6-008 obligation, measurement rules, retained negative evidence and stopped directions. Numerical budgets or improvement on another workload do not give the required evidence for the obligation. If it stays unmet, Richard must not accept beta.",
+      "closure_evidence": "Linked reports, accepted numerical budgets and repeated in-budget Phase 11 results. D-P6-008 also requires independent evidence review and Richard's acceptance of the unchanged improvement obligation for the bounded Entry/Exit scope before Phase 10 beta acceptance."
     },
     {
       "id": "QA-R05",

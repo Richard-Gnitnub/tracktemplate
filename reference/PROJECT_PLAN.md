@@ -1,6 +1,6 @@
 # Project Plan
 
-Status: **Phase 6 current — 4/5 accepted exits. The owner accepted Exit 1 under D-P6-006 on 2026-09-05, Exit 2 under D-P6-002 on 2026-08-02, and Exit 3 under D-P6-005 on 2026-08-15. The owner accepted Exit 5 under D-P6-007 on 2026-09-05. D-P6-008 defers Exit 4 on 2026-09-05. Its obligation stays unmet.**
+Status: **Phase 6 current — 4/5 accepted exits. The owner accepted Exit 1 under D-P6-006 on 2026-09-05, Exit 2 under D-P6-002 on 2026-08-02, and Exit 3 under D-P6-005 on 2026-08-15. The owner accepted Exit 5 under D-P6-007 on 2026-09-05. D-P6-008 gives Exit 4 Deferred — unmet status on 2026-09-05.**
 
 This dashboard owns phase and exit status. It also owns summaries of live risks and owner decisions. The links identify the applicable evidence. The canonical registers and evidence are the source of this owner view. This view does not establish authority.
 
@@ -13,11 +13,11 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 has 4/5 accepted exits. The owner accepted Exits 1, 2, 3, and 5. Exit 4 is Deferred — unmet. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | [D-P6-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) defers the unchanged bounded Entry/Exit improvement obligation until before Phase 10 beta acceptance. |
+| **What changed** | [D-P6-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives Exit 4 Deferred — unmet status. Its unchanged improvement obligation for the bounded Entry/Exit scope stays mandatory before Phase 10 beta acceptance. |
 | **What now works** | The owner permits only the stated exception to the migration sequence. Each subsequent development task still needs its own authority and applicable checks. Product source does not change. |
 | **Limitations/findings** | The owner accepts no performance result. PR-15 and QA-R04 stay High/Mitigate/Partial. All legacy-retirement conditions and wider exclusions still apply. D-GOV-011 stays stopped with its retained negative evidence. |
-| **Owner decision** | The owner accepted D-P6-008 on 2026-09-05. Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Independent review and Richard's acceptance must precede beta acceptance. |
-| **Next action** | Bring the Phase 6 closeout recommendation to the owner with four accepted exits and one deferred, unmet obligation. Phase 6 stays open. Phase 7 stays Not started. Do not repeat a stopped experiment or change its measurement rule. |
+| **Owner decision** | The owner accepted D-P6-008 on 2026-09-05. Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Independent review and Richard's acceptance are mandatory before beta acceptance. |
+| **Next action** | Bring the Phase 6 closeout recommendation to the owner with four accepted exits and one deferred, unmet obligation. Phase 6 stays open. Phase 7 stays Not started. Do not do a stopped experiment again. Do not change its measurement rule. |
 
 ## Phase status
 
@@ -62,7 +62,7 @@ D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first direction. It
 
 D-GOV-010 qualifies only the exact FreeCAD 1.1.3 host profile with CPython 3.13.13 and PySide6/Qt 6.11.1. It keeps the previously qualified profiles and their evidence. It authorises this profile to supply performance evidence in a later cycle. Each comparison must use one profile with an exact identity. The decision admits no performance result and does not change D-GOV-009. Exit 4 stays Pending.
 
-D-GOV-011 stays Accepted as authority for the initial performance hypothesis and its conditions. The [completed baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The initial decision, measurement rule, and evidence do not change. Current evidence identifies no materially new performance hypothesis. D-P6-008 defers the unmet Exit 4 obligation and accepts no improvement evidence.
+D-GOV-011 stays Accepted as authority for the initial performance hypothesis and its conditions. The [completed baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The initial decision, measurement rule, and evidence do not change. Current evidence identifies no materially new performance hypothesis. D-P6-008 gives Exit 4 Deferred — unmet status and accepts no improvement evidence.
 
 ## Live risks
 
@@ -127,7 +127,7 @@ The [Phase 4 decision register](history/phase-closeouts/PHASE4_GATE_DECISIONS.js
 | D-P6-005 | 2026-08-15 | Accepted | The decision accepts Phase 6 Exit 3 only for the bounded B16 Entry/Exit DXF-and-manifest route. The route has private-development status and uses D-P6-003 and D-P6-004. Phase 6 advances to 2/5. All stated limitations and exclusions remain. |
 | D-P6-006 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel) accepts Exit 1 for the agreed scope of the PR #63 comparison of Entry/Exit centrelines. Phase 6 advances to 3/5. Exits 4 and 5 stay Pending. All stated limitations and exclusions still apply. |
 | D-P6-007 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued legacy preservation in the bounded Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. All retirement conditions and wider exclusions still apply. The owner authorises no removal. |
-| D-P6-008 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) defers the unchanged Exit 4 obligation until before Phase 10 beta acceptance. Phase 6 keeps four accepted exits and one deferred, unmet obligation. The owner accepts only the bounded sequencing exposure. Phase closure and Phase 7 opening need different decisions. |
+| D-P6-008 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives Exit 4 Deferred — unmet status. Its unchanged obligation stays mandatory before Phase 10 beta acceptance. Phase 6 keeps four accepted exits and one deferred, unmet obligation. The owner accepts only the bounded sequencing exposure. Phase closure and Phase 7 opening need different decisions. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English word forms in TT-DOC-001 canonical prose. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |

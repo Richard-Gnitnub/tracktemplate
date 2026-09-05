@@ -439,10 +439,12 @@ Exit condition: one complete capability follows the target dependency direction 
 
 Exit condition: the architecture produces a measured resource improvement without hiding cost or reducing validation.
 
-[D-P6-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) defers only
-the bounded Phase 6 Entry/Exit improvement obligation until before Phase 10
-beta acceptance. It gives an exception to the sequence from Stage M4 to
-subsequent Core development with its own authority. The obligation stays unmet.
+Under [D-P6-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel), the
+Phase 6 improvement obligation for the bounded Entry/Exit scope has
+Deferred — unmet status. It stays mandatory before Phase 10 beta acceptance.
+The decision gives an exception to the sequence from Stage M4 to subsequent
+Core development with its own authority.
+
 The [architecture exception](ARCHITECTURE.md#migration-sequence) keeps normal
 per-slice checks and all legacy-retirement conditions. This deferral does not
 complete Stage M4 or authorise Stage M5 implementation.

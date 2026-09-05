@@ -592,11 +592,11 @@ does not prevent subsequent Core development that the owner separately authorise
 The obligation stays mandatory before Phase 10 beta acceptance.
 All normal per-slice correctness and performance checks still apply.
 
-This exception changes only the sequence. It accepts no performance result
-and does not satisfy the improvement obligation with numerical budgets or
-improvement on another workload. Invariant 8 and all legacy-retirement
-conditions still apply. Phase closure and subsequent phase opening need
-different owner decisions.
+This exception changes only the sequence. It accepts no performance result.
+Numerical budgets or improvement on another workload do not give the required
+evidence for this obligation. Invariant 8 and all legacy-retirement conditions
+still apply. Phase closure and subsequent phase opening need different owner
+decisions.
 
 Do not attempt a whole-macro rewrite.
 
