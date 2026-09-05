@@ -55,7 +55,12 @@ DESCRIPTION_RULES = {
     ),
     "tracktemplate-debugging": (
         22,
-        ("Reproduce, isolate and diagnose", "regressions", "FreeCAD"),
+        (
+            "Find causes of TrackTemplate defects",
+            "unexpected behaviour",
+            "unexplained validation failures",
+            "FreeCAD",
+        ),
     ),
     "tracktemplate-quality-review": (
         27,
@@ -72,7 +77,7 @@ DESCRIPTION_RULES = {
     ),
     "tracktemplate-continue": (
         49,
-        ("`$tracktemplate-continue`", "draft pull request", "Level 3"),
+        ("`$tracktemplate-continue`", "draft with successful CI", "Level 3"),
     ),
 }
 
@@ -282,10 +287,10 @@ def validate_skill_routing(documents: dict[str, str]) -> None:
         "change-validation skill",
         documents["tracktemplate-change-validation"],
         (
-            "outside the supported exporter failure model as research "
-            "evidence",
+            "Unless the owner explicitly widens the exporter failure model",
+            "report probes outside it as research evidence",
             "not automatically a blocker",
-            "retained invariant violation",
+            "violation of an invariant that the project keeps",
         ),
     )
     require_fragments(
@@ -302,12 +307,12 @@ def validate_skill_routing(documents: dict[str, str]) -> None:
         "debugging skill",
         documents["tracktemplate-debugging"],
         (
-            "classify the report as: (1) a failure inside that model",
-            "operator-recovery case covered by the",
-            "deliberately unsupported arbitrary asynchronous interruption "
-            "micro-window",
-            "not automatically a current implementation defect or phase-exit "
-            "blocker",
+            "Put the report in one category",
+            "A failure in the supported model",
+            "An operator recovery case in the",
+            "An arbitrary asynchronous interruption at an unsupported instant",
+            "does not automatically show an implementation defect or block "
+            "a phase exit",
         ),
     )
     require_fragments(
@@ -563,8 +568,8 @@ def validate_lfe(documents: dict[str, str]) -> None:
         re.MULTILINE,
     )
     require(
-        rows == [f"{value:03d}" for value in range(1, 22)],
-        "LFE identifiers are not unique, ordered and append-only through 021",
+        rows == [f"{value:03d}" for value in range(1, 23)],
+        "LFE identifiers are not unique, ordered and append-only through 022",
     )
     row_lines = [
         line

@@ -161,8 +161,8 @@ technical-term status, and unresolved terminology. It is not an external
 certification or endorsement. Do not keep all review receipts for usual work.
 Keep one only when project authority makes this necessary.
 
-For a material change to canonical prose, first freeze a clean Git commit. Use
-the complete SHA for its accepted baseline:
+For the Git command route, first use the task's commit authority to freeze a
+clean Git commit. Use the complete SHA for its baseline:
 
 ```bash
 .venv/bin/python tools/ste100_lookup.py freeze-review \
@@ -173,17 +173,18 @@ The command writes the frozen review scope to a file. Its filename contains
 the file SHA-256. The file is under `tmp/ste100-review-scopes/`. Review results use
 `tmp/ste100-review-results/`, and accepted-state proposals use
 `tmp/ste100-review-state-proposals/`. The command compares the source with the manifest
-and derives the frozen review scope from accepted document identities and Git. It excludes
-untouched legacy documents. It includes the complete document for a first edit
-and only changed complete logical units after an accepted document identity.
+and derives the frozen review scope from document identities and Git. New
+scope schema 2 includes the complete logical units that changed in an existing
+document. This includes legacy documents. Review a new document in full.
+Unchanged legacy prose stays outside the repair scope. Preserved schema 1
+scopes keep their initial meaning.
 
 Give that frozen review scope to one independent Documentation Reviewer. The reviewer
 must use the official source and return one complete `ACCEPT`,
-`APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` result. For
-`APPROVED_WITH_EXACT_CORRECTIONS`, the result must contain all exact replacement
-wording.
+`APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` result. Give all necessary exact
+replacements in that same review. This also applies after `BLOCKED`.
 
-Use schema 2 for each new review-result file. Set `blocker_set_complete` to
+Use schema 3 for each new review-result file. Set `blocker_set_complete` to
 `true` and use `blockers` to record the complete set of `BLOCKED` findings. Use an empty list
 for `ACCEPT` and `APPROVED_WITH_EXACT_CORRECTIONS`. A `BLOCKED` result must
 contain at least one finding. Each `blockers` item records `finding`, the exact `path`,
@@ -193,9 +194,12 @@ review scope.
 
 The command verifies each `blockers` item against the frozen review scope and
 the applicable Git content. It preserves the complete set in the review receipt. It
-rejects a `BLOCKED` result that contains no finding. The frozen-review-scope and
-accepted-state schemas do not change. Preserved schema 1 results and receipts
-remain immutable historical evidence. Do not migrate them to schema 2.
+rejects a `BLOCKED` result that contains no finding. For schema 3, one set of
+exact corrections is permitted. If a technical fact or rights question prevents a
+correction, preserve the findings and refer that question to its subject owner.
+An empty correction set for `BLOCKED` gives no completion proposal.
+Preserved schema 1 and schema 2 results and receipts remain immutable
+historical evidence. Do not migrate them to schema 3.
 
 Record the result with:
 
@@ -203,14 +207,31 @@ Record the result with:
 .venv/bin/python tools/ste100_lookup.py record-review SCOPE RESULT
 ```
 
-For a `BLOCKED` result, stop for the owner. The command gives no accepted-state
-proposal. For `ACCEPT`, use the proposed document-level review state. For
-`APPROVED_WITH_EXACT_CORRECTIONS`, apply each exact replacement once against
-its verified preimage, and use the proposed state. Do not invent other wording.
-Do not run a second Documentation Review.
+For `ACCEPT`, use the proposed document state without a prose adjustment. For
+`APPROVED_WITH_EXACT_CORRECTIONS` or a `BLOCKED` result with corrections, apply
+the complete exact correction set once. Examine each preimage. Use the proposed
+state. Record the `locked` state for the content. Do not invent other wording or get another
+linguistic verdict.
 
-Commit the reviewed content and `reference/ste-review-state.json`. Then run the
-one final deterministic validation:
+New state schema 2 entries record `lifecycle_status` as `locked` and preserve
+the initial `review_result`. The existing `accepted_blob` and
+`accepted_sha256` field names identify the comparison content in the `locked` state in these
+entries. They do not claim linguistic `ACCEPT` or project acceptance. Existing
+schema 1 entries keep their initial meaning and values.
+
+The STE lookup rejects a replacement review. Before final validation completes
+the initial cycle, it rejects a new candidate for any of the same document
+paths. Keep that ignored evidence with the task. After final validation gives
+a PASS result, the STE lookup writes one immutable local completion record.
+It connects the initial receipt to the validated final commit.
+
+Before later work on the same document paths starts, its baseline must include
+that commit. This also lets work start after a completed document deletion.
+The guard gives no protection after deliberate removal of local evidence or
+in a different clone. The policy for this bounded cycle still applies.
+
+With commit authority, commit the content in the `locked` state and
+`reference/ste-review-state.json`. Then do final deterministic validation:
 
 ```bash
 .venv/bin/python tools/ste100_lookup.py final-validate SCOPE RECEIPT
@@ -218,8 +239,17 @@ one final deterministic validation:
 
 Require the `TRACKTEMPLATE_STE100_FINAL=` success sentinel. This command proves
 source identity, exact candidate identity, frozen review scope, receipt,
-accepted-state, and final-content identity.
-It detects unreviewed mutation. It does not judge linguistic conformance.
+document-state, and final-content identity. It rejects changes outside the
+candidate and its one exact correction set. It preserves the initial verdict
+and reports the completed lifecycle as a different result. It does not judge
+linguistic conformance. If a deterministic check identifies a specified defect,
+repair that defect. Do its proof again. Do not start another language review.
+
+Without commit authority, use the policy's baseline, diff, and content-hash
+freeze for the one review. Preserve the final hashes and applicable checks.
+Before you claim that the Git command route completed, do its validation for
+the exact commit. A later commit does not make another linguistic review
+necessary.
 
 The usual agent route and bounded conditions for complete-source inspection are
 in the

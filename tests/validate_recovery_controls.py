@@ -830,12 +830,12 @@ def validate_worktree_retirement_routing(workflows, skills):
         "validation": (
             "validate accepted history containment validate tracked cleanliness",
             "validate the local state inventory",
-            "each item has 1 local state type",
-            "retirement audit returns a fail result for ambiguous or uniquely owned state",
+            "each item has one local state type",
+            "retirement audit returns fail for ambiguous or uniquely owned state",
             "validate planned preservation",
             "after removal examine the preservation audit",
             "validate git worktree remove without force",
-            "before git removes the local branch make sure git removed the "
+            "before git removes the local branch make sure that git removed the "
             "worktree",
             "after removal examine the preservation diff",
         ),
@@ -910,9 +910,9 @@ def validate_recovery_lfe(text):
     """Protect recovery lessons, frozen rows, and canonical owner links."""
     rows = _lfe_rows(text)
     identifiers = [re.match(r"\| (LFE-\d{3})", row).group(1) for row in rows]
-    expected = ["LFE-{:03d}".format(number) for number in range(1, 22)]
+    expected = ["LFE-{:03d}".format(number) for number in range(1, 23)]
     if identifiers != expected:
-        raise AssertionError("LFE identifiers are not unique through LFE-021")
+        raise AssertionError("LFE identifiers are not unique through LFE-022")
     if text.count("| LFE-020 /") != 1:
         raise AssertionError("LFE-020 must occur exactly once")
     cells = [cell.strip() for cell in rows[19].strip().strip("|").split("|")]

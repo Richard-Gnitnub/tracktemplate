@@ -9,14 +9,24 @@ import sys
 PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TOOL_ROOT = PROJECT_ROOT / ".devtools" / "freecad-cli"
 EXPECTED_TEST_COUNT = 22
+TEST_FILES = (
+    "tests/test_cli.py",
+    "tests/test_client.py",
+    "tests/test_output.py",
+)
 
 if not (TOOL_ROOT / ".git").is_dir():
     raise SystemExit("Missing development checkout: {}".format(TOOL_ROOT))
 
-sys.path.insert(0, str(TOOL_ROOT / "src"))
-sys.path.insert(0, str(TOOL_ROOT))
+sys.path[:0] = [
+    str(TOOL_ROOT / "src"),
+    str(TOOL_ROOT),
+    "/usr/lib/python3/dist-packages",
+]
 
-test_files = sorted((TOOL_ROOT / "tests").glob("test_*.py"))
+test_files = [TOOL_ROOT / relative for relative in TEST_FILES]
+if any(not path.is_file() for path in test_files):
+    raise SystemExit("The exact FreeCAD GUI bridge tests are unavailable")
 namespaces = [runpy.run_path(str(path)) for path in test_files]
 tests = [
     value

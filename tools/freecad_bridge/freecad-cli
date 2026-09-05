@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+PATH=/bin:/usr/bin
+export PATH
 
 bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd "${bridge_dir}/../.." && pwd)"
@@ -20,7 +22,10 @@ if [[ ! -s "${token_file}" ]]; then
     exit 2
 fi
 
-exec env PYTHONPATH="${tool_root}/src" /usr/bin/python3 -m freecad_cli \
+exec env -i LANG=C.UTF-8 LC_ALL=C.UTF-8 \
+    /usr/bin/python3 -I -S -B -c \
+    'import runpy, sys; root = sys.argv.pop(1); sys.path[:0] = [root, "/usr/lib/python3/dist-packages"]; runpy.run_module("freecad_cli", run_name="__main__", alter_sys=True)' \
+    "${tool_root}/src" \
     --host 127.0.0.1 \
     --port "${bridge_port}" \
     --timeout "${TRACKTEMPLATE_BRIDGE_RPC_TIMEOUT:-30}" \

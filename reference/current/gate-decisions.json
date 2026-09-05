@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 6,
-  "updated_on": "2026-09-04",
+  "updated_on": "2026-09-05",
   "decisions": [
     {
       "id": "D-P6-001",
@@ -189,6 +189,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-017-whole-technical-document-lifecycle",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-017-whole-technical-document-lifecycle"
+    },
+    {
+      "id": "D-GOV-018",
+      "decided_on": "2026-09-05",
+      "status": "Accepted",
+      "decision": "Adopt one documentation review, one set of exact corrections, the locked state, and validation.",
+      "authority": "The project owner authorised this sequence: write once under ASD-STE100 Issue 9 and canonical project requirements, then review once. If necessary, apply one set of exact corrections. Record the `locked` state. Validate the result. Finish the cycle. On 2026-09-05, the owner instructed the implementing agent to continue with the bounded contract change.\n\nThe author owns all candidate documents and their checks. A BLOCKED verdict lets the implementing agent apply one set of exact corrections from the sole review. Preserve the initial verdict and receipt. Record the completed lifecycle and linguistic acceptance as different results. In existing documents, review the complete logical units that changed. Review a new document in full.\n\nDo not expand the repair into unchanged legacy prose. Reject a replacement review or candidate that starts the same cycle again.\n\nThis decision supersedes the clauses in D-GOV-015 and D-GOV-017 that stop work after BLOCKED or make review of a complete legacy document necessary. Their historical evidence stays unchanged. Keep unresolved technical facts and rights questions with their canonical subject owners. If a deterministic check identifies a specified defect, repair that defect. Do its proof again without another language review. Change only the existing policy, skills, lifecycle tool, dependent tests, and necessary decision records.",
+      "exclusions": "This decision does not accept a future implementation or claim linguistic conformance. Preserve Cycle 3 closure at 4ee0218cda5bfb2ff5e0a516a0f8d0b70bbedd0e. The new work uses that implementation baseline and does not change protected main 583e1ad05d7a821fe67c4905b6569ffceca98fe0. Phase 6 stays at 2/5 accepted exits. Exits 1, 4, and 5 stay Pending. Project status stays unknown.\n\nRisk dispositions and rights authority stay unchanged. This decision gives no product, GUI, persistence, export, performance, release, deletion, commit, publication, or merge authority. It adds no second review framework or document database.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#d-gov-018-finite-documentation-completion",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#d-gov-018-finite-documentation-completion"
     }
   ]
 }

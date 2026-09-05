@@ -1,122 +1,171 @@
 ---
 name: tracktemplate-publish
-description: Publish a bounded, reviewed TrackTemplate working-tree change by validating it, creating an agent branch, making intentional commits, pushing, opening a draft pull request and monitoring required GitHub CI. Use when the project owner explicitly invokes `$tracktemplate-publish` or when an explicit `$tracktemplate-continue` invocation delegates its new-tranche publication stage; this workflow never authorises merge, tag, release, destructive history changes or wider scope.
+description: Publish one bounded TrackTemplate change as a draft pull request. Validate the change. Commit the change. Push the commits. Monitor necessary CI. Use only after explicit `$tracktemplate-publish` invocation or publication delegation from an explicit `$tracktemplate-continue` cycle. This skill gives no merge, tag, release, destructive-history, or wider scope authority.
 ---
 
 # TrackTemplate publish
 
-## Outcome
+## Purpose
 
-Turn one accepted working-tree scope into a green draft pull request without
-repeated commit/push/PR approvals or hidden authority expansion.
+Publish one accepted scope of working-tree changes as a draft pull request
+with successful necessary CI. The invocation supplies the bounded authority
+below. Commit, push, and pull-request approvals are not necessary again.
 
 ## Invocation authority
 
-Explicit `$tracktemplate-publish` invocation authorises all of the following
-for the current bounded change:
+Explicit `$tracktemplate-publish` invocation authorises these operations for
+the current bounded change:
 
-- inspect and validate the intended working-tree scope;
-- create an `agent/<description>` branch when starting on the default branch;
-- stage only that scope and create one or more coherent commits;
-- push the branch and open or update one draft pull request;
-- monitor required CI for the exact pushed commit; and
-- classify, repair, revalidate, commit and push failures whose fixes remain
-  inside the same accepted scope.
+- Inspection and validation of the intended working-tree changes
+- Creation of an `agent/<description>` branch from the default branch
+- Git staging of only the accepted scope
+- Creation of one or more coherent commits
+- Branch push
+- Creation or update of one draft pull request
+- Monitoring of necessary CI for the exact pushed commit
+- Classification, repair, validation, commit, and push of failures in the
+  same accepted scope.
 
-The repair authority applies to source and test changes. For a governance
-document that completed its one Documentation Review, permitted adjustment and
-final deterministic validation, publication can only verify the exact final
-bytes and report CI `PASS` or `FAIL`. It cannot edit the prose, invoke another
-documentation or quality review, reinterpret meaning or start an improvement
-pass.
+Repair authority applies to source and tests. For governance documents,
+publication only examines final bytes and reports CI `PASS` or `FAIL`.
+This limit applies after the one Documentation Review, permitted adjustment,
+and final deterministic validation. Publication cannot edit that prose or
+invoke another documentation or quality review. It cannot reinterpret meaning
+or start an improvement pass.
 
-The publication stage delegated by an explicit
-[`$tracktemplate-continue`](../tracktemplate-continue/SKILL.md) invocation is
-narrower. It is review-frozen: it authorises the branch, commit, push, draft and
-exact-head monitoring actions above only for the exact source state already
-covered by that cycle's final validation and separate read-only staff review.
-It does not delegate this skill's repair authority. Return a failed required CI
-check to the continuation workflow without editing, committing or pushing a
-repair; that workflow owns its shared pass limit, revalidation and renewed
-staff review.
+Publication delegated by an explicit
+[`$tracktemplate-continue`](../tracktemplate-continue/SKILL.md) invocation has
+narrower authority. It authorises branch, commit, push, draft, and CI operations
+only for the exact source state after freeze. Before delegation, final
+validation must give a PASS result for that state in the continuation cycle.
+Before delegation, a different staff reviewer must complete a read-only
+review of that state.
+The delegation gives no repair authority to this skill.
 
-The invocation does not authorise merging, marking a draft ready, tagging,
-releasing, force pushing, rewriting history, deleting branches, weakening
-tests, changing an accepted oracle, accepting a gate or expanding product
-scope. Stop for new owner authority when a fix would cross one of those
-boundaries.
+If necessary CI gives a FAIL result during delegated publication, return the evidence to the
+continuation workflow. Do not edit, commit, or push a repair. The continuation
+workflow owns the shared pass limit, repeated validation, and renewed staff
+review.
+
+The invocation does not authorise these operations:
+
+- Merge or a change from draft to ready
+- Tag or release
+- Force push, history rewrite, or branch deletion
+- Weaker tests or changes to an accepted oracle
+- Gate acceptance or wider product scope.
+
+If a repair crosses one of these boundaries, stop for new owner authority.
 
 ## Preparation
 
-1. Read `reference/PROJECT_PLAN.md`, `reference/VALIDATION.md`,
-   `reference/TESTING_POLICY.md` and `reference/RECOVERY_AND_BACKUP.md`.
-2. Inspect `git status --short --branch`, the complete diff including untracked
-   files, current HEAD, upstream, remote URL and remote default branch.
-3. Confirm `gh` is installed and authenticated. Resolve the exact repository,
-   base branch and any existing pull request before external mutation.
-4. Treat the invocation as authority only for files belonging to the current
-   accepted task. If unrelated or ownership-ambiguous changes are present,
-   stop and ask which paths belong.
-5. Use `$tracktemplate-change-validation` and, for source or test changes,
-   `$tracktemplate-quality-review` when their evidence has not already been
-   completed for the exact source state. For governance prose, require the
-   completed finite Technical Author Lead record and do not add another review.
-6. For review-frozen delegation, record the reviewed path set and content state
-   supplied by `$tracktemplate-continue`; stop if the current or staged source
-   differs from it.
+1. Before the first publication operation, use this command:
+   `.venv/bin/python tools/development_toolchain_preflight.py --stage publication`.
+   Publication operations include GitHub queries, fetch, branch, commit,
+   push, and pull-request actions. If the development-toolchain preflight
+   does not give a PASS result, stop before publication.
+2. Read `reference/PROJECT_PLAN.md`, `reference/VALIDATION.md`,
+   `reference/TESTING_POLICY.md`, and `reference/RECOVERY_AND_BACKUP.md`.
+3. Examine `git status --short --branch`. Examine the complete diff.
+   Examine untracked files also. Examine current HEAD, upstream, remote URL,
+   and remote default branch.
+4. Before external mutation, identify the exact repository, base branch, and
+   any existing pull request.
+5. Limit invocation authority to files in the current accepted task.
+   If changes are unrelated or their ownership is ambiguous, stop.
+   Ask which paths belong to the task.
+6. If evidence is incomplete for the exact source state, use
+   `$tracktemplate-change-validation`. For source or tests, also use
+   `$tracktemplate-quality-review`. For governance prose, make sure that the
+   finite Technical Author Lead record is complete. Do not add another review.
+7. For delegated publication, record the reviewed paths and content state
+   supplied by `$tracktemplate-continue`. If current or staged source
+   differs, stop.
 
-## Publication workflow
+## Publication procedure
 
-1. Fetch remote state and verify that the intended base has not moved beyond
+1. Fetch remote state. Make sure that the intended base has not advanced beyond
    the local base. Do not silently rebase or merge a dirty tree.
-2. If on the default branch, create a descriptive `agent/<description>`
-   branch. Reuse the current non-default branch only when it belongs to this
-   task.
-3. Split distinct authority, implementation and automation slices into
-   coherent commits when that improves review. Stage explicit paths; do not
-   use broad staging when the tree contains unrelated changes.
-4. Review the staged diff and run the proportionate checks against the staged
-   source state. In review-frozen mode, verify that it exactly matches the
-   recorded final-reviewed source. Commit with concise outcome-led messages.
+2. If the current branch is the default branch, make a descriptive
+   `agent/<description>` branch. Only if a non-default branch
+   belongs to this task, use it again.
+3. If it makes review better, put separate authority, implementation, and
+   automation changes in different coherent commits. Stage explicit paths.
+   If unrelated changes exist, do not use broad staging.
+4. Review the staged diff. Do proportionate checks against the staged source
+   state. For delegated publication, make sure that it equals the recorded
+   final reviewed source. Commit with concise messages that give the result.
 5. Push with upstream tracking. Never force push.
-6. Reuse an existing pull request for the same head branch or create one draft
-   pull request targeting the resolved default branch. Its body must state:
-   what changed, why, scope exclusions, validation actually run, GUI evidence
-   still outstanding and risk or authority changes.
-7. Inspect required checks for the exact commit SHA. A local pass does not
-   substitute for GitHub Actions.
-8. On failure, preserve the failing run, job, step and first relevant output.
-   A governance-document CI failure stops for the owner; do not change its
-   prose or invoke another review.
-   In review-frozen mode, stop and return that evidence to
-   `$tracktemplate-continue` without changing source or Git state. For a direct
-   explicit publish invocation, classify it under `reference/TESTING_POLICY.md`,
-   reproduce it locally when possible, repair only the classified boundary,
-   rerun the original proof and affected profile, review the diff, commit and
-   push the bounded repair.
-9. For a direct explicit invocation, repeat monitoring until required checks
-   pass or a genuine authority, environment or external-service blocker
-   remains. For review-frozen delegation, resume only with a new exact source
-   state that the continuation workflow has revalidated and sent through
-   another separate read-only staff review within its shared pass limit.
-10. Stop with a green draft pull request. Merging requires a separate explicit
-    project-owner instruction.
+6. Use the existing pull request again for the same head branch, or make one
+   draft. Target the identified default branch. Include the information
+   listed below in the pull-request body.
+7. Examine necessary checks for the exact commit SHA. A local pass does not
+   replace GitHub Actions.
+8. If a check gives a FAIL result, preserve the failing run, job, step, and first related
+   output. Use the failure procedure below.
+9. For a direct invocation, continue monitoring until necessary checks give PASS results or
+   an authority, environment, or external-service blocker stops publication. For
+   delegated publication, use the resumption conditions below.
+10. After necessary checks give PASS results for the exact commit, stop with a draft pull
+    request. Merge needs a different explicit project-owner instruction.
+
+The pull-request body must give these items:
+
+- What changed and why
+- Excluded scope
+- Completed validation
+- GUI evidence that is still absent
+- Risk or authority changes.
+
+### Failure procedure
+
+For a governance-document CI failure, stop for the owner. Do not change its
+prose or invoke another review.
+
+For delegated publication, stop. Return the evidence to
+`$tracktemplate-continue` without source or Git changes.
+
+For a direct explicit invocation with a source/test failure, use these
+steps:
+
+1. Classify the failure under `reference/TESTING_POLICY.md`.
+2. If possible, do the operation that causes the failure again locally.
+3. Repair only the classified boundary.
+4. Do the original proof again.
+5. Do the checks in the affected validation profile again.
+6. Review the diff.
+7. Commit the bounded repair.
+8. Push the repair.
+
+### Conditions for delegated resumption
+
+Only after the continuation workflow supplies a new source state with an exact
+identity, continue delegated publication. Before it supplies that state, the
+workflow must do validation again. It must get a read-only review from another
+staff reviewer, in its shared pass limit.
 
 ## Safety and repeatability
 
-- Never use `git clean`, destructive restore/reset, force push or history
-  rewriting.
+- Never use `git clean`, destructive restore/reset, force push, or history
+  rewrite.
 - Do not commit ignored GUI evidence, operator documents, credentials, IDE
-  state, environments, caches or generated output.
-- Do not create a duplicate branch, commit or pull request when an equivalent
-  one already exists; inspect first and resume safely.
-- Do not change frozen evidence or create a phase decision merely to describe
-  publication.
-- A green check is technical evidence only. It does not accept a renderer,
-  phase exit, release or production-output authority.
+  state, environments, caches, or generated output.
+- Before creation of a branch, commit, or pull request, examine whether an equivalent
+  item exists. If one exists, continue safely without duplication.
+- Do not change frozen evidence to report publication.
+- Do not make a phase decision to report publication.
+
+A successful check is technical evidence only. It does not accept a renderer,
+phase exit, release, or production-output authority.
 
 ## Report
 
-Report the branch, commits, pull-request link and base, exact remote CI result,
-checks run locally, any classified repairs, remaining GUI evidence, scope
-exclusions and the separate authority still needed to merge.
+Report these results:
+
+- Branch and commits
+- Pull-request link and base
+- Exact remote CI result
+- Local checks and classified repairs
+- GUI evidence that stays absent
+- Excluded scope
+- Separate authority still necessary for merge.

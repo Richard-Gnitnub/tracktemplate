@@ -2291,12 +2291,12 @@ def validate_current_evidence_mutations() -> None:
 
     lifecycle_changed_row = table_row_containing(
         evidence,
-        "| What changed | D-GOV-015 adopts one lifecycle",
+        "| What changed | D-GOV-015 adopts one Documentation Review lifecycle",
     )
     lifecycle_two_reviews = replace_once(
         lifecycle_changed_row,
-        "one Documentation Review",
-        "two Documentation Reviews",
+        "→ one Documentation Review →",
+        "→ two Documentation Reviews →",
     )
     expect_rejected(
         "phase-evidence/d-gov-015-second-review-authorised",
@@ -2311,12 +2311,12 @@ def validate_current_evidence_mutations() -> None:
     )
     lifecycle_result_row = table_row_containing(
         evidence,
-        "Durable state records document identities",
+        "The review-state register keeps document identities",
     )
     lifecycle_unit_state = replace_once(
         lifecycle_result_row,
-        "Durable state records document identities.",
-        "Durable state records every logical unit.",
+        "The review-state register keeps document identities.",
+        "The review-state register keeps every logical unit.",
     )
     expect_rejected(
         "phase-evidence/d-gov-015-persistent-unit-state-added",
@@ -2354,14 +2354,28 @@ def validate_current_evidence_mutations() -> None:
         evidence,
         "D-GOV-017 whole technical-document lifecycle",
     )
+    expect_rejected(
+        "phase-evidence/d-gov-017-historical-blocked-status-erased",
+        lambda: progress._validate_tdmp_lifecycle_panel(
+            replace_once(
+                evidence,
+                "Its `BLOCKED` result uses schema 2",
+                "Its result uses schema 2",
+            )
+        ),
+        "D-GOV-017 evidence panel drifted: Its BLOCKED result uses schema 2",
+    )
     tdmp_current_row = table_row_containing(
         tdmp_section,
-        "not yet integrated as the current controlled baseline",
+        "Repository integration did not yet make it the current "
+        "controlled baseline",
     )
     tdmp_candidate_made_current = replace_once(
         tdmp_current_row,
-        "not yet integrated as the current controlled baseline",
-        "integrated as the current controlled baseline",
+        "Repository integration did not yet make it the current "
+        "controlled baseline",
+        "Repository integration made it the current "
+        "controlled baseline",
     )
     expect_rejected(
         "phase-evidence/d-gov-017-draft-made-current",
@@ -2376,19 +2390,19 @@ def validate_current_evidence_mutations() -> None:
                 ),
             )
         ),
-        "D-GOV-017 owner view drifted: not yet integrated as the current "
-        "controlled baseline",
+        "D-GOV-017 owner view drifted: Repository integration did not yet "
+        "make it the current controlled baseline",
     )
     tdmp_authority_row = table_row_containing(
         tdmp_section,
-        "Keep the D-GOV-015 authoring internals and sole Documentation Review "
+        "Keep the D-GOV-015 authoring controls and sole Documentation Review "
         "authoritative",
     )
     tdmp_dgov015_replaced = replace_once(
         tdmp_authority_row,
-        "Keep the D-GOV-015 authoring internals and sole Documentation Review "
+        "Keep the D-GOV-015 authoring controls and sole Documentation Review "
         "authoritative",
-        "Replace the D-GOV-015 authoring internals and Documentation Review",
+        "Replace the D-GOV-015 authoring controls and Documentation Review",
     )
     expect_rejected(
         "phase-evidence/d-gov-017-replaces-d-gov-015",
@@ -2403,9 +2417,51 @@ def validate_current_evidence_mutations() -> None:
                 ),
             )
         ),
-        "D-GOV-017 owner view drifted: Keep the D-GOV-015 authoring internals "
+        "D-GOV-017 owner view drifted: Keep the D-GOV-015 authoring controls "
         "and sole Documentation Review authoritative",
     )
+
+
+def validate_finite_documentation_mutations() -> None:
+    """Keep D-GOV-018 completion distinct from acceptance and re-review."""
+    plan = read("reference/PROJECT_PLAN.md")
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    for name, original, replacement in (
+        (
+            "d-gov-018/locked-completion-made-linguistic-acceptance",
+            (
+                'keeps the initial linguistic verdict and completed lifecycle '
+                'as different results'
+            ),
+            "converts the original linguistic verdict to ACCEPT at lock",
+        ),
+        (
+            "d-gov-018/replacement-review-and-cycle-restart-authorised",
+            (
+                'rejection of replacement reviews and new cycles for the same '
+                'document\npaths before the initial cycle is complete'
+            ),
+            "acceptance of replacement reviews and overlapping cycle restarts",
+        ),
+        (
+            "d-gov-018/uncommitted-final-validation-claimed",
+            (
+                'Before you claim completion of the\nGit final-validation '
+                'command, use it against committed content'
+            ),
+            "Claim completion of the Git final-validation command without "
+            "committed content",
+        ),
+    ):
+        mutated = replace_once(evidence, original, replacement)
+        expect_rejected(
+            name,
+            lambda value=mutated: (
+                progress._validate_finite_documentation_completion(plan, value)
+            ),
+            "D-GOV-018 evidence boundary drifted: "
+            + progress._semantic_text(original),
+        )
 
 
 def validate_project_plan_mutations() -> None:
@@ -2829,9 +2885,9 @@ def validate_documentation_profile_mutations() -> None:
 
     tdmp_cases = (
         (
-            "tdmp/d-gov-015-replaced",
-            "D-GOV-015 remains authoritative for that part.",
-            "D-GOV-017 replaces D-GOV-015 for that part.",
+            "tdmp/d-gov-018-sequence-authority-removed",
+            "D-GOV-018 controls that bounded cycle.",
+            "A replacement review controls that sequence.",
         ),
         (
             "tdmp/technical-author-gains-subject-authority",
@@ -2845,10 +2901,10 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "tdmp/post-validation-review-added",
-            "Green final validation ends\nthe bounded D-GOV-015 lifecycle.",
-            "Green final validation ends\nthe bounded D-GOV-015 lifecycle. "
-            "After final validation, run a post-validation quality and "
-            "publication review.",
+            "Do not send the document to another\n"
+            "documentation, quality, publication, wording, or semantic review.",
+            "After final validation, send the document to another\n"
+            "documentation, quality, publication, wording, or semantic review.",
         ),
         (
             "tdmp/historical-evidence-rewritten",
@@ -3081,7 +3137,7 @@ def validate_documentation_profile_mutations() -> None:
     )
     overlap_default_inverted = replace_once(
         workflows,
-        "use an existing primary owner when possible",
+        "use an existing owner when possible",
         "creation of a parallel skill is the default resolution",
     )
     expect_rejected(
@@ -3131,10 +3187,10 @@ def validate_documentation_profile_mutations() -> None:
     )
     author_acceptance_added = replace_once(
         technical_author,
-        "The lead also does\nnot own terminology, the linguistic verdict, "
-        "the validation result, or\ncontrolled-baseline acceptance.",
+        "The lead does not\nown terminology, the linguistic verdict, "
+        "the validation result, or acceptance\nof the controlled baseline.",
         "The lead owns terminology, the linguistic verdict, the validation "
-        "result, and controlled-baseline acceptance.",
+        "result, and acceptance of the controlled baseline.",
     )
     expect_rejected(
         "tdmp/technical-author-self-acceptance-added",
@@ -3286,11 +3342,13 @@ def validate_documentation_profile_mutations() -> None:
         (
             "tt-doc/lifecycle-order-weakened",
             "policy",
-            "> author → freeze scope → one Documentation Review → optional exact reviewed\n"
-            "> correction once → one final deterministic validation → complete or owner stop",
+            (
+                'Use this lifecycle for each material change to canonical '
+                'technical prose:\n\n> write once → review once → if necessary, '
+                'apply corrections once → record `locked` → validate → finish'
+            ),
             "> author → Documentation Review → complete",
-            "documentation policy lost simplified lifecycle control: author → "
-            "freeze scope → one documentation review",
+            "documentation policy lost simplified lifecycle control: write once",
         ),
         (
             "tt-doc/lifecycle-verdict-removed",
@@ -3306,34 +3364,42 @@ def validate_documentation_profile_mutations() -> None:
         (
             "tt-doc/lifecycle-second-review-authorised",
             "policy",
-            "Do not run a second\nDocumentation Review.",
+            'Do not add other wording or get another linguistic verdict.',
             "Run a second Documentation Review after a correction.",
-            "documentation policy lost simplified lifecycle control: all exact "
-            "replacement wording in the same review",
+            "documentation policy lost simplified lifecycle control: give all "
+            "necessary exact replacements in that same review",
         ),
         (
             "tt-doc/lifecycle-empty-blocked-result-authorised",
             "policy",
             "A `BLOCKED` result with\nan empty `blockers` array is invalid.",
             "A `BLOCKED` result with an empty `blockers` array is valid.",
-            "documentation policy lost simplified lifecycle control: each "
-            "schema version 2 result records the complete blockers array / "
-            "accept and approved_with_exact_corrections use an empty blockers "
-            "array / blocked uses a nonempty blockers array / exact path / "
-            "frozen logical-unit identity / finding / formal issue 9 rule "
-            "identifiers / review receipt preserves the complete blockers "
-            "array / exact candidate and frozen review scope bindings / "
-            "blocked result with an empty blockers array is invalid",
+            (
+                'documentation policy lost simplified lifecycle control: each '
+                'new result with schema version 3 records the full blockers '
+                'array / accept and approved_with_exact_corrections use an '
+                'empty blockers array / blocked uses a nonempty blockers array '
+                '/ exact path / frozen logical-unit identity / finding / formal'
+                ' issue 9 rule identifiers / review receipt preserves the '
+                'complete blockers array / exact candidate and frozen review '
+                'scope bindings / blocked result with an empty blockers array '
+                'is invalid'
+            ),
         ),
         (
             "tt-doc/lifecycle-final-validation-made-linguistic",
             "policy",
-            "It does not judge linguistic\nconformance.",
+            (
+                'It does not judge linguistic conformance or\nchange the review '
+                'verdict.'
+            ),
             "It independently judges linguistic conformance.",
-            "documentation policy lost simplified lifecycle control: it proves "
-            "these identities: - source. - exact candidate. - frozen review "
-            "scope. - receipt. - accepted state. - final content. / no "
-            "unreviewed change remains / does not judge linguistic conformance",
+            (
+                'documentation policy lost simplified lifecycle control: it '
+                'proves these identities: - source. - exact candidate. - frozen'
+                ' review scope. - receipt. - document state and initial review '
+                'result - final content.'
+            ),
         ),
         (
             "tt-doc/lifecycle-durable-unit-state-added",
@@ -3354,18 +3420,18 @@ def validate_documentation_profile_mutations() -> None:
         (
             "tt-doc/lifecycle-exact-wording-deferred",
             "skill",
-            "give all exact replacement\nwording in this review",
+            "Give all necessary exact\nreplacements in this review",
             "let a later reviewer supply replacement wording",
-            "documentation review lost simplified lifecycle control: all exact "
-            "replacement wording in this review",
+            "documentation review lost simplified lifecycle control: all "
+            "necessary exact replacements in this review",
         ),
         (
             "tt-doc/lifecycle-preimage-removed",
             "skill",
             "path, byte range, and\nfrozen preimage",
             "path only",
-            "documentation review lost simplified lifecycle control: all exact "
-            "replacement wording in this review",
+            "documentation review lost simplified lifecycle control: all "
+            "necessary exact replacements in this review",
         ),
         (
             "tt-doc/lifecycle-blocker-set-made-partial",
@@ -3383,22 +3449,50 @@ def validate_documentation_profile_mutations() -> None:
         (
             "tt-doc/lifecycle-invented-prose-authorised",
             "workflow",
-            "Do not invent other canonical prose.",
-            "Add other useful canonical prose.",
+            (
+                'Apply the set of exact corrections once against verified '
+                'preimages.'
+            ),
+            "Apply other useful canonical prose without verified preimages.",
             "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
         ),
         (
-            "tt-doc/lifecycle-owner-stop-removed",
+            "tt-doc/lifecycle-validation-restarts-review",
             "workflow",
-            "Otherwise, stop for the owner.",
-            "Otherwise, start another Documentation Review.",
+            'Do not repeat\n    linguistic review.',
+            "Repeat linguistic review after validation.",
             "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
+        ),
+        (
+            "tt-doc/lifecycle-blocked-completion-made-acceptance",
+            "policy",
+            (
+                'Record the completed lifecycle and\nlinguistic acceptance as '
+                'different results.'
+            ),
+            "Record lifecycle completion as linguistic acceptance.",
+            (
+                'documentation policy lost simplified lifecycle control: '
+                'blocked verdict lets the implementing agent make this one '
+                'correction set'
+            ),
+        ),
+        (
+            "tt-doc/lifecycle-replacement-candidate-restarts-cycle",
+            "policy",
+            (
+                'different filename, reviewer, or candidate to start the same '
+                'cycle again.'
+            ),
+            "candidate can reset the same cycle.",
+            "documentation policy lost simplified lifecycle control: reject "
+            "a replacement review result or a change outside that set",
         ),
         (
             "tt-doc/lifecycle-empty-blocker-workflow-authorised",
             "workflow",
-            "A `BLOCKED` verdict must record a complete, nonempty `BLOCKED`\n"
-            "   finding set.",
+            "For `BLOCKED`, record the complete finding set. The finding set\n"
+            "    must not be empty.",
             "A `BLOCKED` verdict can record an empty finding set.",
             "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
         ),
@@ -4959,6 +5053,7 @@ def main() -> None:
     validate_capability_matrix_mutations()
     validate_current_evidence_mutations()
     validate_project_plan_mutations()
+    validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()
     validate_transition_export_validation_mutations()
     validate_visible_recovery_mutations()

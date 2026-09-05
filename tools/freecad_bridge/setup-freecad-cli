@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+PATH=/bin:/usr/bin
+export PATH
 
 bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd "${bridge_dir}/../.." && pwd)"
@@ -46,5 +48,5 @@ else
 fi
 
 git -C "${tool_root}" diff --check
-exec env PYTHONPATH="/usr/lib/python3/dist-packages:${tool_root}/src:${tool_root}" \
-    /usr/bin/python3 "${bridge_dir}/test_freecad_cli_checkout.py"
+cd "${project_root}"
+exec .venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui

@@ -11,9 +11,10 @@ Review the complete frozen scope that the Technical Author Lead supplies. Do
 not author, shorten, reorganise, or apply changes to the candidate. Do not
 supply technical meaning, approve terminology, or give project acceptance.
 
-For `APPROVED_WITH_EXACT_CORRECTIONS`, give all exact replacement wording in
-this one verdict. The implementing agent applies that wording once. The
-reviewer does not apply it. A finding creates no repair authority.
+For `APPROVED_WITH_EXACT_CORRECTIONS` or `BLOCKED`, give all necessary exact
+replacements in this one verdict. The implementing agent applies the complete
+set once with the authority for the current task. The reviewer does not apply it.
+Keep an unresolved technical fact or rights question with its subject owner.
 
 ## Required preparation
 
@@ -85,10 +86,16 @@ requirements in the official source. This is the only linguistic conformance
 review.
 
 Return one complete verdict: `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or
-`BLOCKED`. For `APPROVED_WITH_EXACT_CORRECTIONS`, give all exact replacement
-wording in this review. Identify each replacement by path, byte range, and
+`BLOCKED`. The verdict describes the draft from the author. Give all necessary exact
+replacements in this review, also after `BLOCKED`. Identify each
+replacement by path, byte range, and
 frozen preimage. Do not defer wording to another reviewer or a later review.
 Do not run a second Documentation Review.
+
+Do not use a replacement candidate to start the same cycle again. Review only
+the complete logical units with changes in an existing document. Review a new
+document in full. Keep unchanged legacy prose out
+of the repair scope.
 
 For `BLOCKED`, give the complete set of BLOCKED findings in this review. The
 set must contain at least one finding. For each finding, give the finding
@@ -98,12 +105,21 @@ Give the side, bounds, and SHA-256 of the frozen logical unit. Set
 `blockers` array is empty.
 
 The STE lookup validates source, exact candidate, frozen review scope, receipt,
-accepted state, and final-content identity. It validates exact reviewed
+document state, and final-content identity. It validates exact reviewed
 corrections against frozen preimages. It also derives the expected final bytes.
-The implementing agent applies those corrections once. The lookup does not
+
+The implementing agent applies those corrections once. Then the agent
+records the `locked` state for the final content. The lookup does not
 examine canonical prose for conformance or change your verdict. The
-deterministic pre-check is only a review aid. A remaining linguistic, semantic,
-identity, or frozen-review-scope failure returns to the owner.
+deterministic pre-check is only a review aid.
+
+Preserve the initial verdict and receipt. Record lifecycle completion in the
+`locked` state independently from linguistic acceptance. After a `BLOCKED`
+verdict, another review is not necessary. The one adjustment is permitted.
+
+An unresolved question about a fact stays with its subject owner.
+For an objective validation defect, a specified repair and the same proof are
+necessary. Do not start another language review for either case.
 
 ## Review rules
 

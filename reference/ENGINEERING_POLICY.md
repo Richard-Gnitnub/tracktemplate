@@ -205,11 +205,19 @@ requirement set. Use the official source to resolve each material uncertainty.
 
 Use this lifecycle for each material change to canonical technical prose:
 
-> author → freeze scope → one Documentation Review → optional exact reviewed
-> correction once → one final deterministic validation → complete or owner stop
+> write once → review once → if necessary, apply corrections once → record `locked` → validate → finish
 
-The author writes the exact candidate and freezes a clean Git commit. The STE
-lookup derives the frozen review scope from Git.
+The author owns the exact candidate. Before you write, identify the controlled
+meaning, canonical owners, approved terms, and bounded scope. Use the verified
+STE source. During authoring, examine the full diff, links, exact content, and
+applicable tests. Connect the handoff evidence to the candidate bytes. These
+checks are part of authoring. They are not more review stages.
+
+Before the one Documentation Review, freeze the exact candidate and scope.
+If the task gives commit authority, use a clean Git commit. If it gives no
+commit authority, preserve the baseline, full diff, and content hashes for
+the review. A later commit must preserve those reviewed bytes. Git identities
+are necessary for the STE command route. That route gives no commit authority.
 
 One independent Documentation Reviewer reviews the complete frozen review
 scope. The reviewer uses all applicable Issue 9 writing rules in the official
@@ -218,18 +226,28 @@ source. This Documentation Review is the only linguistic conformance review.
 The reviewer returns one complete verdict. The verdict is `ACCEPT`,
 `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`.
 
-For `APPROVED_WITH_EXACT_CORRECTIONS`, the reviewer gives all exact replacement
-wording in the same review. Apply those replacements once against verified
-preimages. Do not add or change other wording. Do not run a second
-Documentation Review.
+The verdict describes the candidate draft. For either
+`APPROVED_WITH_EXACT_CORRECTIONS` or `BLOCKED`, give all necessary exact
+replacements in that same review. Each finding must identify its location,
+applicable requirement, and correction or unresolved technical fact. A wording
+preference alone is not a finding. Apply the set of exact corrections once
+against verified preimages. Then record the `locked` state for the final
+content. Do not add other wording or get another linguistic verdict.
 
-A `BLOCKED` verdict creates no accepted-state proposal. Return the change to
-the owner.
+A `BLOCKED` verdict lets the implementing agent make this one correction set.
+Preserve the initial verdict and receipt. Record the completed lifecycle and
+linguistic acceptance as different results. If a technical fact or rights
+question prevents a correction, keep that question with its canonical subject
+owner. Do not invent the answer. Do not start another language review.
 
-Each schema version 2 result records the complete `blockers` array. The result
-confirms that the array is complete. `ACCEPT` and
+If that question prevents a full set of corrections, record no corrections.
+Make no completion proposal.
+
+Each new result with schema version 3 records the full `blockers` array. The
+result confirms that the array is complete. `ACCEPT` and
 `APPROVED_WITH_EXACT_CORRECTIONS` use an empty `blockers` array. `BLOCKED` uses
-a nonempty `blockers` array.
+a nonempty `blockers` array and can include exact corrections. Preserve schema
+1 and schema 2 historical results and receipts without migration.
 
 Each item in `blockers` records its exact path and frozen logical-unit identity.
 It also records the finding and applicable formal Issue 9 rule identifiers.
@@ -238,35 +256,53 @@ The review receipt preserves the complete `blockers` array. It also preserves
 the exact candidate and frozen review scope bindings. A `BLOCKED` result with
 an empty `blockers` array is invalid.
 
-After the review or approved correction, run one final deterministic
-validation. It proves these identities:
+After the one adjustment, or after `ACCEPT` when no adjustment is necessary,
+record the `locked` state for the content. Do final deterministic validation.
+It proves these identities:
 
 - Source.
 - Exact candidate.
 - Frozen review scope.
 - Receipt.
-- Accepted state.
+- Document state and initial review result
 - Final content.
 
-It also proves that no unreviewed change remains. It does not judge linguistic
-conformance. If a failure remains, return to the owner. This includes a failure
-in wording, controlled meaning, identity, or bounded scope.
+It also proves that the content contains only the frozen candidate and its
+one set of exact corrections. It does not judge linguistic conformance or
+change the review verdict. If a deterministic check gives a `FAIL` result for
+a specified defect, repair that defect. Do the same proof again. Do not start
+another linguistic review.
+
+A change to controlled meaning must have the authority of its canonical
+subject owner. A check with a `FAIL` result gives no such authority. A
+validation result cannot hide an unresolved question about a fact.
+
+The review receipt identifies one set of exact corrections for one cycle.
+Reject a replacement review result or a change outside that set. Do not use
+a different filename, reviewer, or candidate to start the same cycle again.
+After final validation, CI and publication can examine the final bytes. They
+cannot start another review of wording or meaning.
 
 Use these rules for the frozen review scope:
 
 - Do not review an untouched legacy document.
-- For the first material edit of an unreviewed legacy document, review the
-  complete document.
-- After acceptance, use the last accepted document identity to find each
-  material change.
+- For an existing document, use the supplied Git baseline to find each
+  material change. An older review-state identity must not expand this scope.
 - Review only the complete logical units that contain those changes.
-- Do not review unchanged accepted canonical prose again.
+- Review a new document in full.
+- Do not review unchanged legacy or accepted canonical prose again.
 
-Keep durable review state at document level. Record the last accepted document
-identity, source identity, and review receipt.
+Keep durable review state at document level. New entries with schema 2 record
+the document identity, source identity, receipt, initial review result, and
+`locked` lifecycle status. That document identity is a comparison point for
+later work. It is not a claim that the document received linguistic `ACCEPT`
+or project acceptance. Keep the meanings of existing schema 1 entries unchanged.
 
 Do not keep persistent sentence, paragraph, or logical-unit workflow state.
-Git derives the frozen review scope from the last accepted document identity.
+Git derives the frozen review scope from the document identity and baseline.
+These D-GOV-018 rules supersede the terminal `BLOCKED` and complete legacy
+document review clauses of D-GOV-015 and D-GOV-017. Their historical evidence
+does not change.
 
 The standard applies to canonical technical prose that persons can read in:
 
@@ -444,14 +480,13 @@ technical document. It does not own the technical subject in that document.
 
 The complete technical-document lifecycle is:
 
-> identify the need → classify → assign ownership → plan → understand once →
-> write once → check once → improve once → freeze once → review once →
-> adjust once when required → validate once → finish the D-GOV-015 lifecycle →
+> identify the need → classify → assign ownership → plan → write once →
+> review once → if necessary, apply corrections once → record `locked` → validate → finish →
 > establish a controlled baseline → make available → use → maintain → change
 > under control → supersede or retire → preserve required history
 
 The [Documentation Review lifecycle](#documentation-review-lifecycle) is one
-bounded part of this lifecycle. D-GOV-015 remains authoritative for that part.
+bounded part of this lifecycle. D-GOV-018 controls that bounded cycle.
 It supplies the one linguistic review and the final deterministic validation.
 The TDMP does not create a second linguistic-review lifecycle.
 
@@ -565,12 +600,11 @@ need. Keep information in its canonical owner and use links to other owners.
 For new or materially changed canonical technical prose, the Technical Author
 Lead automatically owns this route:
 
-> understand once → write once → check once → improve once → freeze once →
-> review once → validate once → finish
+> write once → review once → if necessary, apply corrections once → record `locked` → validate → finish
 
 For a governance document, the project-owner shorthand for this point-in-time
-route is `write → review → adjust if required → final deterministic validation
-→ done`. Understand, check, improve, and freeze are parts of the one Technical
+route is `write → review → if necessary, apply corrections → record locked → validate → done`.
+Understand, check, improve, and freeze are parts of the one Technical
 Author Lead authoring pass. They do not create more independent reviews.
 
 The understand step confirms the plan, authority, meaning, and terms. The write
@@ -578,24 +612,26 @@ step produces all affected complete logical units. The check step examines
 technical accuracy, ownership, terms, exact content, links, and deterministic
 pre-check results. It is not a linguistic Documentation Review.
 
-The improve step applies one complete author-side correction pass before
-freeze. Apply TT-DOC-001, TT-DOC-002, and D-GOV-015 exactly throughout this
-route. The Technical Author Lead then freezes one exact candidate.
+Before handoff, the author must correct all candidate documents together.
+When an assertion changes with the prose, keep each technical safeguard.
+If a changed assertion could accept an incorrect result, use a negative test.
+Apply TT-DOC-001, TT-DOC-002, and D-GOV-018. Then freeze one exact candidate.
 
 One independent Documentation Reviewer examines the Git-derived frozen review
-scope. The reviewer returns the one D-GOV-015 verdict. Apply exact reviewed
-corrections once only when that verdict permits them. Then run the one final
-deterministic validation. Do not run another linguistic review.
+scope. The reviewer returns one verdict and all exact corrections. Apply that
+set once. This also applies after `BLOCKED`. Record the `locked` state for the
+content. Do final deterministic validation. Do not do another linguistic review.
 
 The finish step supplies the exact candidate, Documentation Review, final
 validation, limitations, and required authority. Green final validation ends
-the bounded D-GOV-015 lifecycle. Do not send the document to another
+the bounded D-GOV-018 lifecycle. Do not send the document to another
 documentation, quality, publication, wording, or semantic review. The finish
 step does not establish controlled-baseline acceptance.
 
 Continuous integration can run the required deterministic checks on the final
 bytes. A CI result cannot start another Documentation Review, correction pass,
-or linguistic improvement cycle. If final validation fails, stop for the owner.
+or linguistic improvement cycle. Repair a defect that deterministic validation identifies at the boundary
+that caused it. Keep unresolved technical facts with their subject owner.
 
 A non-material correction uses proportionate review and validation. If its
 scope becomes material, reclassify it before retention and use the complete
@@ -608,8 +644,9 @@ Use existing Git and canonical records to distinguish these states:
 | State | Controlled meaning |
 | --- | --- |
 | **Draft** | Content work has no frozen exact candidate. It is not current controlled documentation. |
-| **Frozen review candidate** | Git identifies the exact candidate and review scope. It is not current controlled documentation. |
+| **Frozen review candidate** | The authorised freeze record identifies the exact candidate and review scope. For the Git command route, Git supplies that record. Without commit authority, the baseline, diff, and content hashes supply it. The candidate is not current controlled documentation. |
 | **Reviewed** | The one Documentation Review has a recorded verdict. The verdict alone does not establish a controlled baseline. |
+| **Locked** | The candidate and its one set of exact corrections identify the final content. The initial review result stays unchanged. This state gives no linguistic or project acceptance. |
 | **Validated** | The applicable deterministic validation passed for the exact reviewed content. Validation alone does not establish a controlled baseline. |
 | **Accepted/controlled baseline** | The applicable authority recorded acceptance of the exact content after the one required Documentation Review, permitted adjustment, and final deterministic validation. This is the comparison point for later change. |
 | **Superseded** | An accepted replacement owns the current information. The earlier document is historical evidence and is not current authority. |
@@ -635,8 +672,9 @@ Record only durable data that existing authority requires. This can include:
 - Documentation Review receipt.
 - Applicable decision or adoption authority.
 
-For D-GOV-015 review scope, `reference/ste-review-state.json` records the last
-accepted document identity, source identity, and review receipt. Git and the
+For D-GOV-018 review scope, `reference/ste-review-state.json` records the document
+identity, source identity, review receipt, initial verdict, and `locked` status.
+Earlier schema 1 entries keep their accepted-baseline meaning. Git and the
 existing decision and evidence records supply the other necessary trace. Do
 not add sentence, paragraph, or logical-unit workflow state. Do not create a
 new document-management database when these records are sufficient.
@@ -696,9 +734,9 @@ work starts.
 For a material change to canonical technical prose:
 
 1. Route the complete change through the Technical Author Lead.
-2. Derive the required review scope from the accepted baseline and Git.
-3. Review only the required complete logical units after a baseline exists.
-4. Apply the one-review D-GOV-015 lifecycle.
+2. Use the supplied Git baseline to identify the necessary review scope.
+3. Review only the complete logical units that contain the material changes.
+4. Apply the one-review D-GOV-018 lifecycle.
 5. Establish a new controlled baseline only after review, validation, and
    applicable acceptance.
 
@@ -708,13 +746,13 @@ uses its proportionate change level and does not become routine re-review.
 
 ### Legacy technical documentation
 
-Do not retrospectively rewrite an untouched legacy document. A first material
-change can start a baseline review. If that document has no accepted
-ASD-STE100 baseline, review the complete document as D-GOV-015 requires.
+Do not retrospectively rewrite an untouched legacy document. For a material
+change, compare the document with the supplied Git baseline. Review only the
+complete logical units that contain the changes. Do not include closed work in the repair scope because an older review-state
+identity differs.
 
-After acceptance, manage that document as controlled reviewed documentation.
-Git then derives only the materially changed complete logical units for a later
-review.
+Keep unchanged legacy prose and frozen historical evidence unchanged. A
+bounded review does not give a conformance result for the complete document.
 
 ### Supersession
 
@@ -774,7 +812,7 @@ Use existing evidence to answer these lifecycle questions:
 | Who owns it? | Its canonical owner and the applicable subject owner. |
 | What technical authority does it consume? | Its canonical links and recorded source information. |
 | What baseline is current? | The accepted Git identity and applicable review state or decision. |
-| What review applies? | The classification, TT-DOC-001, TT-DOC-002, D-GOV-015, and its review receipt. |
+| What review applies? | The classification, TT-DOC-001, TT-DOC-002, D-GOV-018, and its review receipt. |
 | What changed? | The Git comparison with the accepted baseline. |
 | What validated the accepted state? | The named validation result and its evidence. |
 | What replaced it? | The supersession status, replacement link, and applicable decision. |

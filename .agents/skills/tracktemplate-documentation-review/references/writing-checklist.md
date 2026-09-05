@@ -21,7 +21,8 @@ Use this procedure for each complete logical unit in the frozen review scope:
 7. Use the wording for each technical term in the technical-term register.
 8. Examine each technical term for its technical-term category.
 9. When no technical term is necessary, use approved STE vocabulary.
-10. If the controlled vocabulary does not identify the TrackTemplate item, add a technical term.
+10. If the controlled vocabulary does not identify the TrackTemplate item,
+    report the missing technical term to its canonical owner. Do not approve it.
 11. Identify the person, tool, or system that does each operation.
 12. Make sure each operation has the correct person, tool, or system.
 13. For each pronoun, make sure the noun to which it refers is clear.
@@ -47,18 +48,27 @@ give source material. The pre-check does not give a result from a conformance
 review. The STE lookup also does not give a result from a conformance review.
 The independent Documentation Reviewer completes the conformance review. Give
 one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED` verdict.
-For `APPROVED_WITH_EXACT_CORRECTIONS`, give all exact replacement wording in
-the same review. Identify each path, byte range, frozen preimage, and
+For `APPROVED_WITH_EXACT_CORRECTIONS` or `BLOCKED`, give all necessary exact
+replacements in the same review. Identify each path, byte range, preimage, and
 replacement. Do not defer or add wording later. Do not run a second
 Documentation Review.
 
 The STE lookup validates source, exact candidate, frozen review scope, receipt,
-accepted state, and final-content identity. It validates exact reviewed
+document state, and final-content identity. It validates exact reviewed
 corrections against frozen preimages and derives the expected final bytes. The
-implementing agent applies those corrections once. The lookup does not examine
-canonical prose for conformance or change the verdict. After the review or
-correction, one final deterministic validation proves that no unreviewed
-mutation occurred. A remaining failure returns to the owner.
+implementing agent applies those corrections once. Then the agent records
+the `locked` state for the content.
+The lookup does not examine
+canonical prose for conformance or change the verdict.
+
+After the review or correction, final deterministic validation examines the
+content in the `locked` state. The content must be equal to the candidate with
+its one correction set. Preserve the initial verdict. After a `BLOCKED`
+result, one adjustment is permitted without another review.
+
+Keep unresolved technical facts with their canonical subject owners. Repair
+an objective validation defect. Then do the same proof again. Do not start
+another language review. Do not include unchanged legacy prose in the repair.
 
 ## Ownership and structure
 

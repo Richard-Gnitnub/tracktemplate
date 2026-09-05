@@ -1,0 +1,14 @@
+required-version = "==0.16.4"
+target-version = "py312"
+line-length = 79
+extend-include = ["*.FCMacro"]
+extend-exclude = [
+    "AdvancedTurnout.FCMacro",
+    "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+]
+
+[lint]
+select = ["E9", "F63", "F7", "F82"]
+
+[lint.per-file-ignores]
+"tools/freecad_bridge/probes/finish_phase3_transition_workflow.py" = ["F821"]

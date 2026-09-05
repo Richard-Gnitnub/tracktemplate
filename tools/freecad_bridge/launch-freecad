@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+PATH=/bin:/usr/bin
+export PATH
 
 bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd "${bridge_dir}/../.." && pwd)"
@@ -41,6 +43,8 @@ exec flatpak run \
     --env="FREECAD_USER_HOME=${profile_dir}/user-home" \
     --env="FREECAD_USER_DATA=${profile_dir}/user-data" \
     --env="FREECAD_USER_TEMP=${temp_dir}" \
+    --env="PYTHONDONTWRITEBYTECODE=1" \
+    --env="PYTHONPYCACHEPREFIX=${temp_dir}/python-cache" \
     --env="TRACKTEMPLATE_REPO=${project_root}" \
     --env="XDG_CACHE_HOME=${profile_dir}/xdg-cache" \
     --env="XDG_CONFIG_HOME=${profile_dir}/xdg-config" \

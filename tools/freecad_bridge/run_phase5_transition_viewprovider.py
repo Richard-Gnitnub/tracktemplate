@@ -40,6 +40,7 @@ QUALIFIED_PROFILES_BY_FREECAD_VERSION = {
 }
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(TOOL_ROOT / "src"))
+sys.path.append("/usr/lib/python3/dist-packages")
 
 from freecad_cli.client import FreeCADClient  # noqa: E402
 from tools.freecad_bridge.orchestration import (  # noqa: E402

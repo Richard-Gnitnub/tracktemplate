@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+PATH=/bin:/usr/bin
+export PATH
 
 bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd "${bridge_dir}/../.." && pwd)"
@@ -18,6 +20,9 @@ fi
 
 mkdir -p "${state_dir}"
 isolated_temp_dir="$(mktemp -d "${state_dir}/isolated-temp.XXXXXX")"
+PYTHONDONTWRITEBYTECODE=1
+PYTHONPYCACHEPREFIX="${isolated_temp_dir}/python-cache"
+export PYTHONDONTWRITEBYTECODE PYTHONPYCACHEPREFIX
 : >"${instance_file}"
 TRACKTEMPLATE_BRIDGE_INSTANCE_FILE="${instance_file}" \
 TRACKTEMPLATE_BRIDGE_TEMP_DIR="${isolated_temp_dir}" \
