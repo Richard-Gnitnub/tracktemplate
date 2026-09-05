@@ -8,7 +8,7 @@ Under D-P6-008, the owner gave Exit 4 Deferred — unmet status on 2026-09-05.**
 
 Phase 5 closed at 4/4 under D-P5-003 on 2026-08-01. Its complete accepted
 evidence, decisions and risk snapshot are frozen in the
-[Phase 5 closeout](../history/phase-closeouts/PHASE5_CLOSEOUT.md). This fixed
+[Phase 5 closeout](PHASE5_CLOSEOUT.md). This fixed
 live path owns current Phase 6 evidence and does not alter that frozen record.
 
 ## Opening architecture review
@@ -50,14 +50,14 @@ challenge, so those two review roles were not independent. This was an
 engineering control review, not professional legal advice.
 
 **Evidence reviewed:** The panel reviewed the
-[project dashboard](../PROJECT_PLAN.md), the 24 live risks in
-[risks.json](risks.json), the frozen
-[Phase 5 handoff](../history/phase-closeouts/PHASE5_CLOSEOUT.md), and the
+[project dashboard](../../PROJECT_PLAN.md), the 24 live risks in
+[risks.json](PHASE6_RISKS.json), the frozen
+[Phase 5 handoff](PHASE5_CLOSEOUT.md), and the
 accepted
-[exact-geometry and export architecture](../ARCHITECTURE.md#5-exact-geometry-adapter).
+[exact-geometry and export architecture](../../ARCHITECTURE.md#5-exact-geometry-adapter).
 The panel also reviewed the
-[validation boundary](../VALIDATION.md#5-exact-geometry-and-export-validation),
-the [generated-output controls](../LICENSING_BOUNDARIES.md#generated-output-policy),
+[validation boundary](../../VALIDATION.md#5-exact-geometry-and-export-validation),
+the [generated-output controls](../../LICENSING_BOUNDARIES.md#generated-output-policy),
 and the B16 Entry/Exit transition source and tests. It reviewed the
 characterised B14 create-time export failure. At the exact source state, the
 local standalone CI
@@ -387,7 +387,7 @@ staging entry. Each produced the same 1,426-byte DXF and 6,829-byte
 The raw and sanitised
 method, hashes, individual values, failed-proof classifications and limits are
 in the
-[performance report](../benchmarks/2026-08-02-phase6-transition-pipeline-performance.md).
+[performance report](../../benchmarks/2026-08-02-phase6-transition-pipeline-performance.md).
 
 Retained validation compiled the changed Python. It passed the focused profiler
 contract and all 58 standalone validators. The qualified exact-contract,
@@ -577,7 +577,7 @@ the existing non-zero `LWPOLYLINE`, isolation, cancellation, and injected
 rollback checks, FreeCAD imported the zero-length `POINT`. It became one vertex
 at the exact bounded coordinate. The import changed no editable document,
 active document, or Undo/Redo history. The stable command and sentinel are now owned by
-[`VALIDATION.md`](../VALIDATION.md#verified-commands-and-ci).
+[`VALIDATION.md`](../../VALIDATION.md#verified-commands-and-ci).
 
 | Exit 3 required-before-exit condition | Present evidence after this tranche |
 | --- | --- |
@@ -732,12 +732,12 @@ still requires operator confirmation because it cannot be observed from the
 agent sandbox.
 
 The new instruction-only
-[`tracktemplate-ide-workspace-alignment`](../../.agents/skills/tracktemplate-ide-workspace-alignment/SKILL.md)
+[`tracktemplate-ide-workspace-alignment`](../../../.agents/skills/tracktemplate-ide-workspace-alignment/SKILL.md)
 skill separates file-backed IDE comparison from Git authority and operator-only
 UI evidence. `$tracktemplate-continue` composes it before Git mutation and
 again after protected-main synchronisation. The agent-guidance validator
 fails closed on the new metadata, structure, and composition links.
-[LFE-016](../LEARNING_FROM_EXPERIENCE.md) records the reusable lesson.
+[LFE-016](../../LEARNING_FROM_EXPERIENCE.md) records the reusable lesson.
 
 The skill-structure check, tracked Python/FCMacro parsing, focused agent-
 guidance and resource-routing checks all passed. Project-progress control,
@@ -1277,12 +1277,12 @@ authorised or implemented here.
 
 **Accepted ownership split:**
 
-- [Supported exporter failure model](../ARCHITECTURE.md#supported-exporter-failure-model)
+- [Supported exporter failure model](../../ARCHITECTURE.md#supported-exporter-failure-model)
   owns supported and deliberately unsupported failures, mandatory invariants,
   restart containment and the non-authorised helper-process option.
-- [Supported exporter interruption evidence](../VALIDATION.md#supported-exporter-interruption-evidence)
+- [Supported exporter interruption evidence](../../VALIDATION.md#supported-exporter-interruption-evidence)
   owns mandatory retained evidence and the limit for exploratory probes.
-- [Recovery after an abnormally interrupted export](../RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export)
+- [Recovery after an abnormally interrupted export](../../RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export)
   owns the close, restart, reopen, inspect and normal retry procedure.
 - D-P6-003 remains authoritative for strict add-only, no-overwrite monotonic
   completion. The skills route to these owners and do not duplicate them.
@@ -1592,7 +1592,7 @@ each full logical unit in this table.
 
 The internal result for these logical units is `ASD-STE100 Issue 9
 conforming`. The review used the project terms in the
-[terminology register](../TERMINOLOGY.md#asd-ste100-project-terminology).
+[terminology register](../../TERMINOLOGY.md#asd-ste100-project-terminology).
 These terms include the documentation, governance, assurance, product, Git,
 export, railway, and standards terms that occur in the units.
 
@@ -2011,7 +2011,7 @@ rejected that result. The evidence file is
 D-GOV-007 does not admit this test result as Exit 4 evidence.
 
 **Host rule:** D-GOV-007 changes the
-[rule for hosts in Phase 6 performance evidence](../PERFORMANCE_SOP.md#phase-6-performance-host-boundary).
+[rule for hosts in Phase 6 performance evidence](../../PERFORMANCE_SOP.md#phase-6-performance-host-boundary).
 D-GOV-007 authorises only these two exact host profiles to supply candidate
 evidence for Phase 6 performance:
 
@@ -2033,7 +2033,7 @@ effect of the host profile and the TrackTemplate effect. The different results
 do not show that TrackTemplate performance became better.
 
 **Evidence and validator change:** The
-[1.1.1 performance report](../benchmarks/2026-08-02-phase6-transition-pipeline-performance.md)
+[1.1.1 performance report](../../benchmarks/2026-08-02-phase6-transition-pipeline-performance.md)
 does not have a `host_profile_id` field. It records FreeCAD 1.1.1, platform
 data, and the qualified-runtime contract hash. These data identify the exact
 host profile for FreeCAD 1.1.1. D-GOV-007 keeps this report as 1.1.1 evidence.
@@ -2175,7 +2175,7 @@ Validate and Export returned the same exact result. All processes had equal
 output hashes. The document count after cleanup was zero. The staging-entry
 count after cleanup was zero.
 
-The [full report](../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md)
+The [full report](../../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md)
 records the method, source hashes, ranges for each measurement, resource data,
 and limitations. Git ignores the raw record at
 `benchmark-output/freecad-bridge/phase6-transition-pipeline-runs/20260816T151429730281Z-profile/`.
@@ -2210,7 +2210,7 @@ decision selects a performance hypothesis. D-GOV-008 is the next decision
 ID.
 
 **Comparison baseline:** The
-[PR #50 performance series](../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md)
+[PR #50 performance series](../../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-pipeline-performance.md)
 can be the comparison baseline. Its evidence source state is
 `f370b029bb4c1ce34987dc025a741185e233df04`. Its raw `performance.json` has
 SHA-256
@@ -2274,7 +2274,7 @@ The result is FAIL if measured Edit does not include all new candidate work.
 The bounded Level 2 work includes the preview sampler and one preview batch
 function if it is necessary. It also includes directly dependent tests,
 performance evidence, and current evidence. The
-[comparison-direction section](../PERFORMANCE_SOP.md#phase-6-exit-4-comparison-direction)
+[comparison-direction section](../../PERFORMANCE_SOP.md#phase-6-exit-4-comparison-direction)
 owns the full bounded work and comparison rule.
 
 The change must keep the scalar alignment API, preview point oracle, segment
@@ -2342,7 +2342,7 @@ changes performance direction and Level 2 authority only.
 ### Documentation conformance
 
 The documentation review uses the
-[local Issue 9 source](../external/asd-ste100/README.md). This is the official
+[local Issue 9 source](../../external/asd-ste100/README.md). This is the official
 source. The review also uses the TrackTemplate UK English spelling directive.
 It examines each full logical unit in this table.
 
@@ -2555,7 +2555,7 @@ makes the subsequent decision.
 ### Documentation conformance
 
 The documentation review uses the
-[local Issue 9 source](../external/asd-ste100/README.md). This is the official
+[local Issue 9 source](../../external/asd-ste100/README.md). This is the official
 source. The review also uses the TrackTemplate UK English spelling directive.
 It examines each full logical unit in this table.
 
@@ -3037,7 +3037,7 @@ product work. Six blocks use the baseline first. Six blocks use the candidate
 first. Each sample uses a new process and the full accepted journey.
 
 The subsequent comparison uses the rule in
-[the canonical-record direction](../PERFORMANCE_SOP.md#phase-6-exit-4-canonical-record-direction).
+[the canonical-record direction](../../PERFORMANCE_SOP.md#phase-6-exit-4-canonical-record-direction).
 Process CPU time for Edit must be lower in at least 10 of 12 paired blocks. Its
 median paired difference must be negative. Edit wall time and cold-journey CPU
 and wall time must have negative median paired differences.
@@ -3076,7 +3076,7 @@ fail the comparison of the full journey.
 ### Documentation conformance
 
 The documentation review uses the
-[local Issue 9 source](../external/asd-ste100/README.md). This is the official
+[local Issue 9 source](../../external/asd-ste100/README.md). This is the official
 source. The review also uses the TrackTemplate UK English spelling directive.
 It examines each full logical unit in this table.
 
@@ -3201,7 +3201,7 @@ that `main` uses. The files in those commits have different bytes from some
 stash blobs.
 
 The accepted
-[2026-08-01 repository snapshot](../backup-records/2026-08-01-phase5-closeout-snapshot.md)
+[2026-08-01 repository snapshot](../../backup-records/2026-08-01-phase5-closeout-snapshot.md)
 includes Git. It is the approved independent preservation for each identified
 Git object. The stash had no repository information that named state or
 approved preservation did not contain.
@@ -3593,13 +3593,13 @@ No FreeCAD or GUI validation applies to this governance-and-tool change.
 | `agent:aquinas-lifecycle-risk-panel` | QA/risk reviewer. This delegated reviewer examined the checkpoint, current implementation, tests, recovery controls, and alignment without mutation or linguistic Documentation Review. The reviewer is independent of implementation changes but shares the agent team and workspace. It is not an external organisational review. |
 
 The panel reviewed the exact protected-main baseline and recovery checkpoint,
-the three-path [lookup implementation](../../tools/ste100_lookup.py),
-[lifecycle fixture](../../tests/validate_ste100_retrieval.py), and
-[empty document-level state](../ste-review-state.json). It also reviewed the
-[Engineering Policy](../ENGINEERING_POLICY.md#true-gates-and-safetyrisk-panels),
-[validation owner](../VALIDATION.md#validation-of-the-retrieval-contract),
-[recovery policy](../RECOVERY_AND_BACKUP.md), [current risks](risks.json),
-[source and retrieval procedure](../external/asd-ste100/README.md), and the
+the three-path [lookup implementation](../../../tools/ste100_lookup.py),
+[lifecycle fixture](../../../tests/validate_ste100_retrieval.py), and
+[empty document-level state](../../ste-review-state.json). It also reviewed the
+[Engineering Policy](../../ENGINEERING_POLICY.md#true-gates-and-safetyrisk-panels),
+[validation owner](../../VALIDATION.md#validation-of-the-retrieval-contract),
+[recovery policy](../../RECOVERY_AND_BACKUP.md), [current risks](PHASE6_RISKS.json),
+[source and retrieval procedure](../../external/asd-ste100/README.md), and the
 development-validation results in this panel.
 
 ### Dissent, unknowns, and exceptions
@@ -3652,7 +3652,7 @@ identity, or final bytes. Do not do a second Documentation Review.
 ### Owner decision D-GOV-015
 
 On 2026-08-31, `owner:tracktemplate-project-owner` accepts the exact authority
-and exclusions in [gate-decisions.json](gate-decisions.json). The earlier
+and exclusions in [gate-decisions.json](PHASE6_GATE_DECISIONS.json). The earlier
 section about the author's assurance stays historical evidence of the retired
 workflow. After D-GOV-015, that section is not a current instruction.
 
@@ -3734,7 +3734,7 @@ ownership, planning, controlled use, maintenance, change, supersession, and
 retirement.
 
 The selected result is a material change to the existing canonical
-[Engineering Policy](../ENGINEERING_POLICY.md#technical-documentation-management-plan).
+[Engineering Policy](../../ENGINEERING_POLICY.md#technical-documentation-management-plan).
 That policy already owns the technical-document lifecycle. A second TDMP
 document can copy that ownership. The change adds one Technical Author Lead
 skill for repeated use. It also makes terminology and central skill routing agree with the policy.
@@ -3881,7 +3881,7 @@ D-GOV-017.
 
 On 2026-09-04, `owner:tracktemplate-project-owner` accepts the lifecycle
 requirement and authority boundaries in
-[gate-decisions.json](gate-decisions.json). The TDMP owns the complete
+[gate-decisions.json](PHASE6_GATE_DECISIONS.json). The TDMP owns the complete
 technical-document lifecycle. The Technical Author Lead owns authoring,
 delivery, and maintenance coordination for technical documents. The applicable
 canonical technical or governance owner continues to own the documented
@@ -3934,9 +3934,9 @@ legacy-retirement, deletion, or merge authority.
 
 This bounded Level 2 workflow migration starts from protected `main` at
 `583e1ad05d7a821fe67c4905b6569ffceca98fe0`. The
-[validation owner](../VALIDATION.md#developer-tool-boundary) stays the
+[validation owner](../../VALIDATION.md#developer-tool-boundary) stays the
 human-readable authority. One
-[machine declaration](../contracts/development-toolchain-v1.json) supplies the
+[machine declaration](../../contracts/development-toolchain-v1.json) supplies the
 requirements for development tools and each workflow that uses them. It also
 supplies the `stage`, dependency, and supported fallback data. The change adds
 no general framework for governance.
@@ -4067,9 +4067,9 @@ checks. It does not start the selected product work or accept an exit.
 
 This necessary-enabling Level 2 work uses D-P6-001 authority for Exit 1. Its baseline
 is protected main at `dc6c476bf0f0c5840bb21756fee35d7208c82084`.
-It adds a [comparison method](../../tests/phase6_transition_output_equivalence.py),
-a [standalone check](../../tests/validate_phase6_transition_output_equivalence.py),
-and a [FreeCAD check](../../tests/freecad_validate_phase6_transition_output_equivalence.py).
+It adds a [comparison method](../../../tests/phase6_transition_output_equivalence.py),
+a [standalone check](../../../tests/validate_phase6_transition_output_equivalence.py),
+and a [FreeCAD check](../../../tests/freecad_validate_phase6_transition_output_equivalence.py).
 Product source and the B14/B15 files do not change.
 
 The checks compare equivalent output for eight specified Entry/Exit cases.
@@ -4175,7 +4175,7 @@ No severity, treatment, owner, deadline, or control effectiveness changes.
 
 | Risk | Controls and conditions that still apply |
 | --- | --- |
-| PR-09, PR-21 | Output stays private-development with project status `unknown`. Before a production-use claim, the rights owners and Richard must complete the clearance route in [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md). Technical comparison gives no such clearance. |
+| PR-09, PR-21 | Output stays private-development with project status `unknown`. Before a production-use claim, the rights owners and Richard must complete the clearance route in [LICENSING_BOUNDARIES.md](../../LICENSING_BOUNDARIES.md). Technical comparison gives no such clearance. |
 | PR-13 | Raw proof and GUI captures stay local. This cycle supplies no independent preservation for them. Richard keeps responsibility for the backup schedule and preservation before subsequent use. No file deletion or operator-document mutation is necessary. |
 | PR-15, QA-R04 | The measured journey and its exact host limits do not change. The performance owners must satisfy the Exit 4 condition before performance acceptance. D-GOV-011 stays stopped. |
 | PR-16, PR-17 | The accepted signature, editable-document, transaction, and recovery controls do not change. The source owners must preserve them in each subsequent change. This decision gives no wider persistence or migration authority. |
@@ -4255,7 +4255,7 @@ No severity, treatment, owner, deadline, or control effectiveness changes.
 
 | Risk | Controls and conditions that still apply |
 | --- | --- |
-| PR-10, PR-18 | D-P4-003 keeps the product composition modular-only. The development oracle, B15 host, and rollback evidence keep their owners and retirement conditions in the [Phase 4 closeout](../history/phase-closeouts/PHASE4_CLOSEOUT.md). Before beta, the Phase 10 integration owner must satisfy those conditions. D-P6-007 permits no removal. |
+| PR-10, PR-18 | D-P4-003 keeps the product composition modular-only. The development oracle, B15 host, and rollback evidence keep their owners and retirement conditions in the [Phase 4 closeout](PHASE4_CLOSEOUT.md). Before beta, the Phase 10 integration owner must satisfy those conditions. D-P6-007 permits no removal. |
 | PR-13 | Raw proof stays local. This cycle supplies no independent preservation for it. Richard keeps responsibility for the backup schedule and preservation before subsequent use. No deletion is necessary. |
 | PR-17, QA-R03 | The source and QA owners keep the transaction, recovery, persistence, and wider GUI evidence duties for their recorded deadlines. This decision accepts no wider migration or operator workflow. |
 | PR-09, PR-21 | Output stays private-development and project status stays `unknown`. The rights owners and Richard must complete the clearance route before a production-use claim. |
@@ -4317,7 +4317,7 @@ The result does not prove improvement, acceptable performance, or that improveme
 is impossible. The panel required no new measurement.
 It did not require the project to do an experiment again.
 
-The [Core completion requirements](../PRODUCT_VISION.md#migration-completion)
+The [Core completion requirements](../../PRODUCT_VISION.md#migration-completion)
 still require applicable performance evidence. The panel selected the deferral.
 The alternative was to keep Phase 6 open with no supported product hypothesis.
 A weaker criterion would change the required result. The panel did not need
@@ -4338,7 +4338,7 @@ effectiveness changes.
 | Richard; Phase 10 integration owner | Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Independent evidence review and Richard's acceptance are mandatory before Phase 10 beta acceptance. If the obligation stays unmet, Richard must not accept beta. No automatic extension is permitted. |
 | PR-15, QA-R04 | Both stay High/Mitigate/Partial. The same bounded Entry/Exit obligation is mandatory. Numerical budgets or improvement on another workload do not give the required evidence for it. Normal per-slice checks and the Phase 11 qualification duties still apply. |
 | Architecture and migration owners | The exception applies only to migration step 6 and Stage M4 progression. Invariant 8, comparison paths, all legacy-retirement conditions, and the performance-change acceptance rules still apply. Subsequent development needs its own authority. |
-| PR-13; Richard | Keep the raw evidence and all attempts. This alignment supplies no new independent backup claim. Before Phase 6 closeout, verify backup currency and coverage of the valuable evidence in all retained worktrees under [RECOVERY_AND_BACKUP.md](../RECOVERY_AND_BACKUP.md). |
+| PR-13; Richard | Keep the raw evidence and all attempts. This alignment supplies no new independent backup claim. Before Phase 6 closeout, verify backup currency and coverage of the valuable evidence in all retained worktrees under [RECOVERY_AND_BACKUP.md](../../RECOVERY_AND_BACKUP.md). |
 | PR-17, QA-R03 | Keep the accepted railway, transaction, recovery, persistence, GUI, and output safeguards. This deferral accepts no wider migration or operator workflow. |
 | PR-09, PR-21, PR-22 | Output stays private-development and project status stays `unknown`. Richard supplies each acceptance after independent review. No agent receives phase, performance, production, or release acceptance authority. |
 
@@ -4394,9 +4394,9 @@ active Coin children or more residual switch children stay in increasing
 numbers, reopen both.
 
 The 24 risks from the end of Phase 5 stay in
-[risks.json](risks.json). The project owner used D-GOV-005 to change only the
+[risks.json](PHASE6_RISKS.json). The project owner used D-GOV-005 to change only the
 control wording for PR-12, PR-20, and PR-22. The decision register at
-[gate-decisions.json](gate-decisions.json) owns D-P6-001, D-GOV-005, D-P6-002,
+[gate-decisions.json](PHASE6_GATE_DECISIONS.json) owns D-P6-001, D-GOV-005, D-P6-002,
 D-P6-003, D-P6-004, D-P6-005, D-P6-006, D-P6-007, D-P6-008, TT-DOC-001, and TT-DOC-002. It also owns
 D-GOV-006, D-GOV-007, D-GOV-008, D-GOV-009, D-GOV-010, and D-GOV-011.
 
