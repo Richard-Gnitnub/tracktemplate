@@ -1269,7 +1269,7 @@ def validate_current_evidence_mutations() -> None:
 
     exit4_row = table_row_containing(
         evidence,
-        "The completed D-GOV-011 prerequisite gave FAIL",
+        "The completed D-GOV-011 baseline-attribution investigation gave FAIL",
     )
     exit4_promoted = replace_once(
         exit4_row,
@@ -1289,8 +1289,8 @@ def validate_current_evidence_mutations() -> None:
 
     prerequisite_promoted = replace_once(
         evidence,
-        "unchanged D-GOV-009 attribution materiality rule gave FAIL",
-        "unchanged D-GOV-009 attribution materiality rule gave PASS",
+        "The D-GOV-009 attribution materiality rule gave FAIL.",
+        "The D-GOV-009 attribution materiality rule gave PASS.",
     )
     expect_rejected(
         "phase-evidence/d-gov-011-negative-prerequisite-promoted",
@@ -1300,7 +1300,7 @@ def validate_current_evidence_mutations() -> None:
             phase5_closeout,
             prerequisite_promoted,
         ),
-        "D-GOV-011 prerequisite completion drifted: unchanged D-GOV-009 "
+        "D-GOV-011 prerequisite completion drifted: D-GOV-009 "
         "attribution materiality rule gave FAIL",
     )
 
@@ -2964,27 +2964,28 @@ def validate_documentation_profile_mutations() -> None:
     )
     owner_view_boundary_widened = replace_once(
         plan,
-        "establish bounded B14/B15-to-B16 Entry/Exit centreline output "
-        "equivalence",
-        "establish complete B14 exporter and whole-layout output equivalence",
+        "validate equivalent B14/B15 and B16 output for the bounded "
+        "Entry/Exit centrelines",
+        "validate equivalent output from the complete B14 exporter and "
+        "whole-layout product",
     )
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
-        "project-plan owner view lost or contradicted: In a later Level 2 "
-        "cycle, establish bounded B14/B15-to-B16 Entry/Exit",
+        "project-plan owner view lost or contradicted: In the next Level 2 "
+        "cycle, validate equivalent B14/B15 and B16",
     )
 
     owner_view_restarted = replace_once(
         plan,
-        "Do not repeat the measurement or make its conditional product change.",
+        "Do not do the measurement again. Do not make the product change.",
         "Repeat the measurement and make the D-GOV-011 product change.",
     )
     expect_rejected(
         "tt-doc/owner-view-stopped-direction-restarted",
         lambda: progress._validate_owner_view(owner_view_restarted),
-        "project-plan owner view lost or contradicted: Do not repeat the "
-        "measurement or make its conditional product change",
+        "project-plan owner view lost or contradicted: Do not do the "
+        "measurement again. Do not make the product change",
     )
 
     compatibility_terms_removed = terminology

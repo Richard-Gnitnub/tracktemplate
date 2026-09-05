@@ -438,12 +438,14 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations apply. Project status remains `unknown`."
     ),
     (
-        "Pending — D-GOV-008 and D-GOV-009 retain their historical authority "
-        "and negative evidence. The completed D-GOV-011 prerequisite gave "
-        "FAIL under the unchanged materiality rule. The owner accepted the "
+        "Pending — D-GOV-008 and D-GOV-009 keep their initial authority and "
+        "retained negative evidence. The completed D-GOV-011 "
+        "baseline-attribution investigation gave FAIL. The attribution "
+        "materiality rule did not change. The owner accepted the "
         "result as retained negative evidence and stopped that product "
-        "direction. D-GOV-011 and its historical evidence remain unchanged. "
-        "No product change or improvement evidence followed."
+        "direction. D-GOV-011 and its initial evidence do not change. "
+        "The project made no product change and admitted no improvement "
+        "evidence."
     ),
     (
         "Pending. B14 remains available. Parity for the complete accepted "
@@ -898,24 +900,25 @@ def _validate_owner_view(plan: str) -> None:
         "gave a FAIL result",
         "owner accepted this result as retained negative evidence and "
         "stopped the product change",
-        "same-host baseline and attribution series are complete",
-        "Independent review confirmed the result",
-        "D-GOV-011 stop condition prevented product work",
+        "project completed the new same-host baseline and attribution series",
+        "An independent reviewer validated the result",
+        "D-GOV-011 FAIL result prevented product work",
         "first quartile was `3.057969 ms`",
         "attribution noise floor was `3.8645155 ms`",
         "not improvement evidence or Exit 4 evidence",
-        "Exit 1 still lacks the bounded legacy-output equivalence proof",
-        "owner accepted the negative result on 2026-09-05",
-        "D-GOV-011, its measurement rule, and historical evidence remain "
-        "unchanged",
-        "Do not repeat the measurement or make its conditional product change",
+        "Exit 1 has no evidence that the bounded B14/B15 and B16 outputs "
+        "are equivalent",
+        "owner accepted the FAIL result on 2026-09-05",
+        "D-GOV-011, its measurement rule, and its initial evidence do not "
+        "change",
+        "Do not do the measurement again. Do not make the product change",
         "No new owner decision is necessary for the selected product boundary "
-        "under D-P6-001",
-        "In a later Level 2 cycle, establish bounded B14/B15-to-B16 Entry/Exit "
-        "centreline output equivalence through exact validation and DXF "
-        "export/import",
-        "This work advances Exit 1 under D-P6-001",
-        "Phase acceptance needs a separate owner decision",
+        "with authority from D-P6-001",
+        "In the next Level 2 cycle, validate equivalent B14/B15 and B16 "
+        "output for the bounded Entry/Exit centrelines",
+        "Include exact validation and DXF export/import",
+        "This work is for Exit 1 with authority from D-P6-001",
+        "The owner must make a new decision before phase acceptance",
     ):
         _require(
             fragment in owner_view,
@@ -2437,44 +2440,51 @@ def _validate_exit_conditions(
         "D-GOV-010 host-qualification summary drifted",
     )
     _require(
-        "D-GOV-011 stays Accepted as historical authority for its conditional "
-        "canonical-record performance hypothesis" in plan_flat
+        "D-GOV-011 stays Accepted as authority for the initial performance "
+        "hypothesis and its conditions" in plan_flat
         and "gave FAIL and stopped that product change" in plan_flat
         and "owner accepted the result as retained negative evidence on "
         "2026-09-05" in plan_flat
-        and "original decision, measurement rule, and historical evidence "
-        "remain unchanged" in plan_flat
+        and "initial decision, measurement rule, and evidence do not change"
+        in plan_flat
         and "Exit 4 stays Pending" in plan_flat
-        and "next product boundary is Exit 1 centreline output equivalence "
-        "under D-P6-001" in plan_flat,
+        and "next product boundary is equivalent centreline output for Exit 1 "
+        "with authority from D-P6-001" in plan_flat,
         "D-GOV-011 canonical-record direction summary drifted",
     )
 
-    completion = _semantic_text(direct_section_content(
-        current_evidence, "D-GOV-011 completed materiality prerequisite"
-    ))
+    completion = _semantic_text(
+        direct_section_content(
+            current_evidence,
+            "Completed baseline-attribution investigation for D-GOV-011",
+        )
+    )
     for fragment in (
         "1b29a1c82caf39fc329ecded3dd811fd1cd3ba24",
         "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
         "each contained 10 samples",
-        "All 20 samples passed their correctness checks",
-        "unchanged D-GOV-009 attribution materiality rule gave FAIL",
+        "All 20 samples gave PASS results for their correctness checks",
+        "D-GOV-009 attribution materiality rule gave FAIL. That rule did "
+        "not change",
         "first quartile was 3.057969 ms",
         "noise floor was 3.8645155 ms",
-        "No product change or paired candidate comparison followed",
+        "project made no product change and did not compare a candidate "
+        "with the baseline",
         "0bcd0cc7e02c86e77fd2fd31893fe0f2c9b8476928bb01901d1c6fded6683bb8",
         "6f88ab16a3948b9ddd63670c90e56a9b4257491aee64b63c64c79ba866448060",
         "project owner accepted the result as retained negative evidence",
-        "D-GOV-011 product direction is stopped",
-        "Do not make the conditional product change",
-        "D-GOV-011 stays Accepted as historical authority",
+        "owner stopped the D-GOV-011 product direction",
+        "Do not do the measurement again. Do not change the measurement rule",
+        "Do not make the product change",
+        "D-GOV-011 stays Accepted as initial authority",
         "Phase 6 stays at 2/5 accepted exits. Exit 4 stays Pending",
         "Risks do not change, and project status stays unknown",
-        "selected next product boundary is bounded B14/B15-to-B16 Entry/Exit "
-        "centreline output equivalence through exact validation and DXF "
-        "export/import",
-        "D-P6-001 already authorises the bounded Level 2 work",
-        "No new owner decision is necessary to start that work in a later cycle",
+        "selected next product boundary is bounded equivalent output from "
+        "the B14/B15 and B16 Entry/Exit centrelines",
+        "work includes exact validation and DXF export/import",
+        "D-P6-001 authorises the bounded Level 2 work",
+        "No new owner decision is necessary to start that work in a "
+        "subsequent cycle",
         "It does not start the selected product work or accept an exit",
     ):
         _require(
@@ -3694,12 +3704,13 @@ def _validate_exit_conditions(
         "defines the new same-host baseline and comparison rule",
         "makes no product change. It admits no performance result, defines no "
         "budget, and does not accept Exit 4",
-        "gave FAIL and stopped that conditional product change",
+        "gave FAIL and stopped the product change",
         "owner accepted the result as retained negative evidence",
-        "Do not repeat the measurement or select another Exit 4 optimisation "
+        "Do not do the measurement again",
+        "Do not select a different Exit 4 optimisation "
         "only to continue performance work",
-        "next product boundary is Exit 1 centreline output equivalence "
-        "under D-P6-001",
+        "next product boundary is equivalent centreline output for Exit 1 "
+        "with authority from D-P6-001",
     ):
         _require(
             required_clause in current_register_flat,

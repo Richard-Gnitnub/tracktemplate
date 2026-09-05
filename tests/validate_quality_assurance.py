@@ -591,23 +591,24 @@ def validate_documentation_profile(
         and "gave a FAIL result" in owner_view
         and "retained negative evidence and stopped the product change"
         in owner_view
-        and "same-host baseline and attribution series are complete"
+        and "project completed the new same-host baseline and attribution series"
         in owner_view
-        and "Independent review confirmed the result" in owner_view
+        and "An independent reviewer validated the result" in owner_view
         and "first quartile was `3.057969 ms`" in owner_view
         and "attribution noise floor was `3.8645155 ms`" in owner_view
         and "not improvement evidence or Exit 4 evidence" in owner_view
-        and "D-GOV-011, its measurement rule, and historical evidence remain "
-        "unchanged" in owner_view
-        and "Do not repeat the measurement or make its conditional product "
+        and "D-GOV-011, its measurement rule, and its initial evidence do not "
         "change" in owner_view
+        and "Do not do the measurement again. Do not make the product change"
+        in owner_view
         and "No new owner decision is necessary for the selected product "
-        "boundary under D-P6-001" in owner_view
-        and "In a later Level 2 cycle, establish bounded B14/B15-to-B16 "
-        "Entry/Exit centreline output equivalence through exact validation "
-        "and DXF export/import" in owner_view
-        and "This work advances Exit 1 under D-P6-001" in owner_view
-        and "Phase acceptance needs a separate owner decision" in owner_view
+        "boundary with authority from D-P6-001" in owner_view
+        and "In the next Level 2 cycle, validate equivalent B14/B15 and B16 "
+        "output for the bounded Entry/Exit centrelines" in owner_view
+        and "Include exact validation and DXF export/import" in owner_view
+        and "This work is for Exit 1 with authority from D-P6-001" in owner_view
+        and "The owner must make a new decision before phase acceptance"
+        in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
