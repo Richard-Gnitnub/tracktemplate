@@ -585,29 +585,29 @@ def validate_documentation_profile(
         "PROJECT_PLAN owner view lost its derivation boundary",
     )
     require(
-        "Phase 6 has 3/5 accepted exits" in owner_view
-        and "The owner accepted Exits 1, 2, and 3" in owner_view
-        and "Exits 4 and 5 stay Pending" in owner_view
-        and "accepts Exit 1 for the agreed scope of the PR #63 comparison of "
-        "Entry/Exit centrelines" in owner_view
-        and "recorded numerical, host, and assurance limits apply" in owner_view
-        and "The owner gives no production clearance and accepts no wider "
-        "output equivalence" in owner_view
+        "Phase 6 has 4/5 accepted exits" in owner_view
+        and "The owner accepted Exits 1, 2, 3, and 5" in owner_view
+        and "Exit 4 stays Pending" in owner_view
+        and "accepts Exit 5 for continued preservation of the legacy "
+        "references and the bounded development comparison and recovery route"
+        in owner_view
+        and "All legacy-retirement conditions and wider exclusions still apply"
+        in owner_view
+        and "The owner gives no removal authority" in owner_view
         and "D-GOV-011 stays stopped with its retained negative evidence"
         in owner_view
         and "Risks do not change" in owner_view
-        and "owner accepted D-P6-006 on 2026-09-05" in owner_view
+        and "owner accepted D-P6-007 on 2026-09-05" in owner_view
         and "D-GOV-011, its measurement rule, and its kept evidence do not "
         "change" in owner_view
         and "Do not do the measurement again. Do not make the stopped "
         "product change" in owner_view
-        and "Bring the Exit 5 legacy-preservation condition to the owner"
+        and "No further product work is selected from current evidence"
         in owner_view
-        and "kept evidence needs a different owner decision to admit it"
-        in owner_view
-        and "gives no legacy-retirement authority" in owner_view
-        and "Do not add Exit 1 implementation unless evidence shows that the "
-        "accepted result is incorrect" in owner_view
+        and "Exit 4 needs a materially new performance hypothesis with "
+        "supporting evidence" in owner_view
+        and "No owner decision is ready" in owner_view
+        and "Phase 6 stays open. Later phases do not start" in owner_view
         and "output has private-development status" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",

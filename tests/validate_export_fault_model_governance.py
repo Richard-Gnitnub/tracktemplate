@@ -355,8 +355,8 @@ def validate_current_authority(documents: dict[str, str]) -> None:
     """Protect D-P6-004/D-P6-005, current status and risk dispositions."""
     plan = semantic(documents["plan"])
     require(
-        "Phase 6 current — 3/5 accepted exits" in plan,
-        "PROJECT_PLAN lost Phase 6 3/5 status",
+        "Phase 6 current — 4/5 accepted exits" in plan,
+        "PROJECT_PLAN lost Phase 6 4/5 status",
     )
     require(
         "The same export input gives the same output, and export is "
@@ -438,9 +438,10 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         "current evidence lost D-P6-005 Exit 3 acceptance",
     )
     require(
-        "The accepted current state is 3/5 under D-P6-002, D-P6-005, and D-P6-006"
+        "The accepted current state is 4/5 under D-P6-002, D-P6-005, "
+        "D-P6-006, and D-P6-007"
         in semantic(current),
-        "current evidence lost the accepted Phase 6 3/5 state",
+        "current evidence lost the accepted Phase 6 4/5 state",
     )
 
     decision_document = json.loads(documents["decisions"])
@@ -449,9 +450,13 @@ def validate_current_authority(documents: dict[str, str]) -> None:
     require(len(ids) == len(set(ids)), "duplicate current decision ID")
     fault_model_index = ids.index("D-P6-004")
     require(
-        ids[fault_model_index:fault_model_index + 5]
-        == ["D-P6-004", "D-P6-005", "D-P6-006", "TT-DOC-001", "TT-DOC-002"],
-        "D-P6-004/D-P6-005/D-P6-006 or later TT-DOC decision order drifted",
+        ids[fault_model_index:fault_model_index + 6]
+        == [
+            "D-P6-004", "D-P6-005", "D-P6-006", "D-P6-007",
+            "TT-DOC-001", "TT-DOC-002",
+        ],
+        "D-P6-004/D-P6-005/D-P6-006/D-P6-007 or later TT-DOC decision "
+        "order drifted",
     )
     decisions_by_id = {record["id"]: record for record in decisions}
     fault_model_record = decisions_by_id["D-P6-004"]
@@ -661,8 +666,8 @@ def validate_mutations(documents: dict[str, str]) -> None:
         ),
         (
             "plan",
-            "Phase 6 current — 3/5 accepted exits",
             "Phase 6 current — 4/5 accepted exits",
+            "Phase 6 current — 5/5 accepted exits",
             "Phase 6 status widening",
         ),
         (

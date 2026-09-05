@@ -81,6 +81,17 @@
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel"
     },
     {
+      "id": "D-P6-007",
+      "decided_on": "2026-09-05",
+      "status": "Accepted",
+      "decision": "Accept Phase 6 Exit 5 for bounded legacy preservation.",
+      "authority": "Accept Phase 6 Exit 5 as Evidenced and owner-accepted for continued preservation of the immutable B14 reference, byte-identical B15 behavioural reference, and the retained development-only legacy comparison/recovery route for the bounded Entry/Exit slice. Preserve D-P4-003's modular-only product composition and all existing ownership and retirement conditions.",
+      "exclusions": "This decision permits no macro, oracle, host, rollback-evidence or legacy-path removal. It grants no wider parity, migration, production clearance, performance or release authority.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel"
+    },
+    {
       "id": "TT-DOC-001",
       "decided_on": "2026-08-15",
       "status": "Accepted",

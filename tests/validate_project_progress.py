@@ -188,6 +188,14 @@ EXPECTED_PHASE6_DECISIONS = {
         "1f6448d96c0e976e446fef6faaf83f030f54435d54711e7c89b00fd3ab7f4290",
         "177d9e71e772e982766aac17175103591ef793324abaf9dc58310c8e7671ecf6",
     ),
+    "D-P6-007": (
+        "2026-09-05",
+        "Accept Phase 6 Exit 5 for bounded legacy preservation.",
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-5-preservation-evidence-admission-panel",
+        "bf243cda021a835703ee691dcb0095d5c800d356c52f1d5147a10fddb367fef9",
+        "b2e53e328e4216868c116c886c1e23bd0423a43f3543ce683bc27fe1111619ec",
+    ),
     "TT-DOC-001": (
         "2026-08-15",
         "Adopt the TrackTemplate Technical Documentation Profile.",
@@ -427,6 +435,19 @@ EXPECTED_EXIT1_ACCEPTANCE_EXCLUSIONS = (
     "retirement is granted. Risks and the stopped D-GOV-011 direction remain "
     "unchanged."
 )
+EXPECTED_EXIT5_ACCEPTANCE_AUTHORITY = (
+    "Accept Phase 6 Exit 5 as Evidenced and owner-accepted for continued "
+    "preservation of the immutable B14 reference, byte-identical B15 "
+    "behavioural reference, and the retained development-only legacy "
+    "comparison/recovery route for the bounded Entry/Exit slice. Preserve "
+    "D-P4-003's modular-only product composition and all existing ownership "
+    "and retirement conditions."
+)
+EXPECTED_EXIT5_ACCEPTANCE_EXCLUSIONS = (
+    "This decision permits no macro, oracle, host, rollback-evidence or "
+    "legacy-path removal. It grants no wider parity, migration, production "
+    "clearance, performance or release authority."
+)
 EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
     "| D-GOV-015 | 2026-08-31 | Accepted | The "
     "[decision](current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle) "
@@ -476,8 +497,10 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "evidence."
     ),
     (
-        "Pending. B14 remains available. Parity for the complete accepted "
-        "work and retirement authority remain absent."
+        "Evidenced and owner-accepted under D-P6-007 for continued "
+        "preservation of B14, B15, and the bounded development comparison "
+        "and recovery route. All ownership and retirement conditions still "
+        "apply. No removal or wider authority is granted."
     ),
 ]
 EXPECTED_PHASE6_PERFORMANCE_DISPOSITION = (
@@ -920,31 +943,30 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        "Phase 6 has 3/5 accepted exits",
-        "The owner accepted Exits 1, 2, and 3",
-        "Exits 4 and 5 stay Pending",
+        "Phase 6 has 4/5 accepted exits",
+        "The owner accepted Exits 1, 2, 3, and 5",
+        "Exit 4 stays Pending",
         "output has private-development status",
         "Project status stays `unknown`",
-        "accepts Exit 1 for the agreed scope of the PR #63 comparison of "
-        "Entry/Exit centrelines",
-        "admitted evidence compares bounded B14/B15 and B16 centrelines "
-        "through exact validation, Part geometry, and DXF export/import",
+        "accepts Exit 5 for continued preservation of the legacy references "
+        "and the bounded development comparison and recovery route",
+        "kept evidence shows that B14, B15, and the development comparison "
+        "and recovery route remain available",
         "Product source does not change",
-        "recorded numerical, host, and assurance limits apply",
-        "The owner gives no production clearance and accepts no wider "
-        "output equivalence",
+        "All legacy-retirement conditions and wider exclusions still apply",
+        "The owner gives no removal authority",
         "D-GOV-011 stays stopped with its retained negative evidence",
         "Risks do not change",
-        "owner accepted D-P6-006 on 2026-09-05",
+        "owner accepted D-P6-007 on 2026-09-05",
         "D-GOV-011, its measurement rule, and its kept evidence do not "
         "change",
         "Do not do the measurement again. Do not make the stopped "
         "product change",
-        "Bring the Exit 5 legacy-preservation condition to the owner",
-        "kept evidence needs a different owner decision to admit it",
-        "gives no legacy-retirement authority",
-        "Do not add Exit 1 implementation unless evidence shows that the "
-        "accepted result is incorrect",
+        "No further product work is selected from current evidence",
+        "Exit 4 needs a materially new performance hypothesis with "
+        "supporting evidence",
+        "No owner decision is ready",
+        "Phase 6 stays open. Later phases do not start",
     ):
         _require(
             fragment in owner_view,
@@ -1050,10 +1072,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 5 must be closed with all four accepted exits",
     )
     _require(
-        rows[6]["count"] == 3
+        rows[6]["count"] == 4
         and str(rows[6]["state"])
         == "Current — opened 2026-08-01",
-        "Phase 6 must remain current at the accepted 3/5 state",
+        "Phase 6 must remain current at the accepted 4/5 state",
     )
     _require(
         [
@@ -1065,14 +1087,16 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the dashboard must identify only Phase 6 as current",
     )
     _require(
-        "Phase 6 current — 3/5 accepted exits" in " ".join(plan.split())
+        "Phase 6 current — 4/5 accepted exits" in " ".join(plan.split())
         and "owner accepted Exit 1 under D-P6-006 on 2026-09-05"
         in " ".join(plan.split())
         and "Exit 2 under D-P6-002 on 2026-08-02"
         in " ".join(plan.split())
         and "Exit 3 under D-P6-005 on 2026-08-15"
+        in " ".join(plan.split())
+        and "Exit 5 under D-P6-007 on 2026-09-05"
         in " ".join(plan.split()),
-        "the accepted Phase 6 3/5 status is missing",
+        "the accepted Phase 6 4/5 status is missing",
     )
     return rows
 
@@ -2296,7 +2320,7 @@ def _validate_exit_conditions(
         "Evidenced — owner-accepted 2026-08-02",
         "Evidenced — owner-accepted 2026-08-15",
         "Pending",
-        "Pending",
+        "Evidenced — owner-accepted 2026-09-05",
     ]
     expected_phase4 = [
         "Evidenced",
@@ -2429,6 +2453,16 @@ def _validate_exit_conditions(
         "D-P6-006 bounded Exit 1 acceptance decision row drifted",
     )
     _require(
+        "| D-P6-007 | 2026-09-05 | Accepted | The [decision]"
+        "(current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-5-preservation-evidence-admission-panel) "
+        "accepts Exit 5 for continued legacy preservation in the bounded "
+        "Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. "
+        "All retirement conditions and wider exclusions still apply. "
+        "No removal is authorised. |" in plan,
+        "D-P6-007 bounded Exit 5 acceptance decision row drifted",
+    )
+    _require(
         "D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles"
         in plan_flat
         and "supply Phase 6 performance evidence" in plan_flat
@@ -2485,8 +2519,11 @@ def _validate_exit_conditions(
         and "initial decision, measurement rule, and evidence do not change"
         in plan_flat
         and "Exit 4 stays Pending" in plan_flat
-        and "D-P6-006 accepts the subsequent bounded Exit 1 result" in plan_flat
-        and "next owner decision is for Exit 5 legacy preservation" in plan_flat,
+        and "D-P6-006 accepts the bounded Exit 1 result" in plan_flat
+        and "D-P6-007 accepts Exit 5 for continued legacy preservation"
+        in plan_flat
+        and "Current evidence identifies no materially new performance "
+        "hypothesis" in plan_flat,
         "D-GOV-011 canonical-record direction summary drifted",
     )
 
@@ -2538,11 +2575,12 @@ def _validate_exit_conditions(
         ).split()
     )
     _require(
-        "Current — 3/5 accepted exits. The owner accepted Exit 1 under "
+        "Current — 4/5 accepted exits. The owner accepted Exit 1 under "
         "D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 "
         "on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
-        "2026-08-15. Exits 4 and 5 stay Pending" in current_flat,
-        "current record does not preserve the accepted Phase 6 3/5 state",
+        "2026-08-15. The owner accepted Exit 5 under D-P6-007 on "
+        "2026-09-05. Exit 4 stays Pending" in current_flat,
+        "current record does not preserve the accepted Phase 6 4/5 state",
     )
     performance_section = _section(
         current_evidence,
@@ -2977,7 +3015,7 @@ def _validate_exit_conditions(
             ),
         ]
         and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS,
-        "Phase 6 exits do not match the accepted 3/5 dispositions",
+        "Phase 6 exits do not match the accepted 4/5 dispositions",
     )
     exit1_heading = "Phase 6 Exit 1: panel and owner decision"
     _require(
@@ -3014,6 +3052,43 @@ def _validate_exit_conditions(
             _semantic_text(EXPECTED_EXIT1_ACCEPTANCE_EXCLUSIONS),
         ],
         "D-P6-006 panel exact owner decision drifted or was relocated",
+    )
+    exit5_heading = (
+        "Phase 6 Exit 5 preservation evidence admission panel — 2026-09-05"
+    )
+    _require(
+        '<a id="phase-6-exit-5-preservation-evidence-admission-panel">'
+        "</a>\n\n## " + exit5_heading in current_evidence,
+        "D-P6-007 panel anchor or heading association is missing",
+    )
+    exit5_section = direct_section_content(current_evidence, exit5_heading)
+    exit5_flat = _semantic_text(exit5_section)
+    for fragment in (
+        "7d312839152e038f36619faabc9aee80ccda7137",
+        "89ab7ee6f6444456f26928fd0abf66e049df78f5",
+        "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+        "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+        "independent read-only QA/risk review before the owner decision",
+        "Proceed with bounded conditions",
+        "tools/phase3_transition_pilot.py",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "No severity, treatment, owner, deadline, or control effectiveness "
+        "changes",
+        "Current evidence identifies no materially new performance hypothesis",
+        "No further product work is selected. No owner decision is ready",
+    ):
+        _require(
+            fragment in exit5_flat,
+            "D-P6-007 preservation panel drifted: " + fragment,
+        )
+    _require(
+        _blockquote_paragraphs(exit5_section) == [
+            _semantic_text(
+                EXPECTED_EXIT5_ACCEPTANCE_AUTHORITY + " "
+                + EXPECTED_EXIT5_ACCEPTANCE_EXCLUSIONS
+            ),
+        ],
+        "D-P6-007 panel exact owner decision drifted or was relocated",
     )
     exit3_acceptance_heading = (
         "Phase 6 Exit 3 supported-model panel to admit evidence and owner "
@@ -3784,7 +3859,9 @@ def _validate_exit_conditions(
         "Do not select a different Exit 4 optimisation "
         "only to continue performance work",
         "D-P6-006 accepts the subsequent bounded Exit 1 result",
-        "next owner decision is for Exit 5 legacy preservation",
+        "D-P6-007 accepts Exit 5 for continued legacy preservation",
+        "Current evidence identifies no materially new performance hypothesis",
+        "No further product work is selected. No owner decision is ready",
     ):
         _require(
             required_clause in current_register_flat,
