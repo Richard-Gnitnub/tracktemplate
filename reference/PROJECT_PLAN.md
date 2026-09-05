@@ -1,6 +1,6 @@
 # Project Plan
 
-Status: **Phase 6 closed — four accepted exits and one deferred, unmet obligation under D-P6-009 on 2026-09-05. D-P6-008 stays in full. Phase 7 is Not started at 0/4.**
+Status: **Phase 7 is Open at 0/4 under D-P7-001 on 2026-09-05. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. D-P6-008 stays in full.**
 
 This dashboard owns phase and exit status. It also owns summaries of live risks and owner decisions. The links identify the applicable evidence. The canonical registers and evidence are the source of this owner view. This view does not establish authority.
 
@@ -12,12 +12,12 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 6 is closed with 4/5 accepted exits. Phase 7 is Not started at 0/4. The owner accepted Exits 1, 2, 3, and 5. Exit 4 is Deferred — unmet. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | [D-P6-009](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-closeout-panel) records the accepted recovery proof and Phase 6 closeout. Its evidence and registers are frozen. Current paths contain unopened Phase 7 holding records. |
-| **What now works** | The records preserve the four accepted exits, D-P6-008 in full, and all existing duties. Product source does not change. |
+| **Current state** | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. The output has private-development status. Project status stays `unknown`. |
+| **What changed** | [D-P7-001](current/PHASE_EVIDENCE.md#phase-7-opening-panel) opens the current Core alignment, station and multiple-track migration scope. The owner authorises opening integration and the first bounded product task. |
+| **What now works** | The opening records define the authorised sequence and first task. This alignment changes no product source. |
 | **Limitations/findings** | The owner accepts no performance result. PR-15 and QA-R04 stay High/Mitigate/Partial. All legacy-retirement conditions and wider exclusions still apply. D-GOV-011 stays stopped with its retained negative evidence. |
-| **Owner decision** | Richard accepted the completed recovery evidence and Phase 6 closeout. He also authorised protected-main integration of this exact-green alignment. Phase 7 needs a separate opening decision. |
-| **Next action** | Present the bounded Phase 7 opening decision and first product outcome from repository evidence together. The next owner decision can authorise opening, integration, and the first task. Phase 7 stays unopened and unauthorised. |
+| **Owner decision** | Richard opened Phase 7 at 0/4. He authorised integration of the exact-green opening alignment, then the bounded product task through validation, independent review and publication. |
+| **Next action** | Integrate the opening alignment. Then synchronise clean protected main. Move `main_circle_centre` into the modular package. Route the B16 Generate/Replace caller through it. The later product pull request needs another owner decision for integration. |
 
 ## Phase status
 
@@ -30,7 +30,7 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | 4 | Canonical state, signatures, and persistence | 6/6 evidenced | Complete — accepted 2026-07-28 |
 | 5 | Lightweight editing prototype and renderer decision | 4/4 evidenced | Complete — accepted 2026-08-01 |
 | 6 | Explicit exact-validation and export seam | 4/5 accepted exits; one deferred, unmet obligation | Complete — accepted 2026-09-05 |
-| 7 | Core alignment, station and multiple-track migration | 0/4 evidenced | Not started |
+| 7 | Core alignment, station and multiple-track migration | 0/4 evidenced | Open |
 | 8 | Turnout, crossover and timbering migration | 0/4 evidenced | Not started |
 | 9 | Chair definitions, assisted assimilation, production records and export completion | 0/9 evidenced | Not started |
 | 10 | Workbench integration, launcher reduction and beta Addon packaging | 0/5 evidenced | Not started |
@@ -52,7 +52,7 @@ D-P6-008 stays in full, and normal per-slice checks stay mandatory. The unchange
 
 ## Phase 7 exit conditions
 
-Phase 7 stays Not started at 0/4. The holding record restores these original criteria from accepted plan revision `d5a3db45ab68a192e3d37f9fad5deb9f66f7de81`. It opens no phase and changes no criterion.
+Phase 7 is Open at 0/4 under D-P7-001. These four original criteria from accepted plan revision `d5a3db45ab68a192e3d37f9fad5deb9f66f7de81` stay unchanged. The first task does not narrow the phase.
 
 | Exit condition | Status | Evidence |
 | --- | --- | --- |
@@ -62,7 +62,6 @@ Phase 7 stays Not started at 0/4. The holding record restores these original cri
 | Legacy core-layout paths have either been safely retired or have a documented blocker and removal gate. | Pending | No Phase 7 admission |
 
 ## Live risks
-
 <a id="qa-audit-risk-log"></a>
 
 [current/risks.json](current/risks.json) owns treatment, accountable owner, deadline, required work and objective closure evidence. This table is a dashboard only.
@@ -96,7 +95,7 @@ Phase 7 stays Not started at 0/4. The holding record restores these original cri
 
 ## Owner decisions
 
-The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full for its continuing obligation. No Phase 7 opening decision exists.
+The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full and records D-P7-001.
 
 | ID | Date | Status | Decision limit |
 | --- | --- | --- | --- |
@@ -126,6 +125,7 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-P6-007 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued legacy preservation in the bounded Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. All retirement conditions and wider exclusions still apply. The owner authorises no removal. |
 | D-P6-008 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel) gives Exit 4 Deferred — unmet status. Its unchanged obligation stays mandatory before Phase 10 beta acceptance. Phase 6 keeps four accepted exits and one deferred, unmet obligation. The owner accepts only the bounded sequencing exposure. Phase closure and Phase 7 opening need different decisions. |
 | D-P6-009 | 2026-09-05 | Accepted | Phase 6 closed with four accepted exits and one deferred, unmet obligation. The owner accepts the completed recovery proof. D-P6-008 stays in full. Phase 7 stays unopened at 0/4. The owner also authorises exact-green closeout integration. |
+| D-P7-001 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-7-opening-panel) opens Phase 7 at 0/4 with its four criteria unchanged. It authorises opening integration and the bounded `main_circle_centre` product task through publication. D-P6-008 stays in full. The decision accepts no exit or performance result. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English word forms in TT-DOC-001 canonical prose. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
@@ -140,7 +140,7 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-GOV-018 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-018-finite-documentation-completion) authorises one set of exact corrections after the sole review. This includes a `BLOCKED` verdict. Record the `locked` state for the content. Validate it. Finish the cycle. Preserve the initial verdict. Review only complete logical units that changed. Do not expand the repair into unchanged legacy prose. Phase 6 stays at 2/5. |
 ## Authority and evidence links
 
-- [Current Phase 7 holding record](current/PHASE_EVIDENCE.md)
+- [Current Phase 7 evidence](current/PHASE_EVIDENCE.md)
 - [Frozen Phase 6 closeout](history/phase-closeouts/PHASE6_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE6_RISKS.json)
 - [Accepted Phase 6 recovery record](backup-records/2026-09-05-phase6-closeout-recovery.md)
 - [Canonical product vision](PRODUCT_VISION.md)

@@ -585,23 +585,24 @@ def validate_documentation_profile(
         "PROJECT_PLAN owner view lost its derivation boundary",
     )
     require(
-        "Phase 6 is closed with 4/5 accepted exits" in owner_view
-        and "Phase 7 is Not started at 0/4" in owner_view
-        and "The owner accepted Exits 1, 2, 3, and 5" in owner_view
-        and "Exit 4 is Deferred — unmet" in owner_view
-        and "preserve the four accepted exits, D-P6-008 in full" in owner_view
+        "Phase 6 is closed with four accepted exits and one deferred, unmet "
+        "obligation" in owner_view
+        and "Phase 7 is Open at 0/4" in owner_view
+        and "All four exits are Pending" in owner_view
         and "All legacy-retirement conditions and wider exclusions still apply"
         in owner_view
         and "The owner accepts no performance result" in owner_view
         and "PR-15 and QA-R04 stay High/Mitigate/Partial" in owner_view
         and "D-GOV-011 stays stopped with its retained negative evidence"
         in owner_view
-        and "Richard accepted the completed recovery evidence and Phase 6 "
-        "closeout" in owner_view
-        and "Phase 7 needs a separate opening decision" in owner_view
-        and "Present the bounded Phase 7 opening decision and first product "
-        "outcome from repository evidence together" in owner_view
-        and "Phase 7 stays unopened and unauthorised" in owner_view
+        and "Richard opened Phase 7 at 0/4" in owner_view
+        and "first bounded product task" in owner_view
+        and "This alignment changes no product source" in owner_view
+        and "synchronise clean protected main" in owner_view
+        and "main_circle_centre" in owner_view
+        and "Route the B16 Generate/Replace caller" in owner_view
+        and "later product pull request needs another owner decision for "
+        "integration" in owner_view
         and "output has private-development status" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
