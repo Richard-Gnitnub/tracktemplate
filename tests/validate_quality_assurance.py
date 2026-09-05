@@ -589,8 +589,8 @@ def validate_documentation_profile(
         and "The owner accepted Exits 1, 2, 3, and 5" in owner_view
         and "Exit 4 stays Pending" in owner_view
         and "accepts Exit 5 for continued preservation of the legacy "
-        "references and the bounded development comparison and recovery route"
-        in owner_view
+        "references and the bounded route for development comparison and "
+        "recovery" in owner_view
         and "All legacy-retirement conditions and wider exclusions still apply"
         in owner_view
         and "The owner gives no removal authority" in owner_view
@@ -602,12 +602,12 @@ def validate_documentation_profile(
         "change" in owner_view
         and "Do not do the measurement again. Do not make the stopped "
         "product change" in owner_view
-        and "No further product work is selected from current evidence"
-        in owner_view
+        and "The project selected no further product work from current "
+        "evidence" in owner_view
         and "Exit 4 needs a materially new performance hypothesis with "
-        "supporting evidence" in owner_view
+        "evidence for it" in owner_view
         and "No owner decision is ready" in owner_view
-        and "Phase 6 stays open. Later phases do not start" in owner_view
+        and "Phase 6 stays open. Subsequent phases do not start" in owner_view
         and "output has private-development status" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",

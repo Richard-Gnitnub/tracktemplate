@@ -498,9 +498,9 @@ EXPECTED_PHASE6_DISPOSITIONS = [
     ),
     (
         "Evidenced and owner-accepted under D-P6-007 for continued "
-        "preservation of B14, B15, and the bounded development comparison "
-        "and recovery route. All ownership and retirement conditions still "
-        "apply. No removal or wider authority is granted."
+        "preservation of B14, B15, and the bounded route for development "
+        "comparison and recovery. All ownership and retirement conditions "
+        "still apply. The owner gives no removal or wider authority."
     ),
 ]
 EXPECTED_PHASE6_PERFORMANCE_DISPOSITION = (
@@ -949,9 +949,9 @@ def _validate_owner_view(plan: str) -> None:
         "output has private-development status",
         "Project status stays `unknown`",
         "accepts Exit 5 for continued preservation of the legacy references "
-        "and the bounded development comparison and recovery route",
-        "kept evidence shows that B14, B15, and the development comparison "
-        "and recovery route remain available",
+        "and the bounded route for development comparison and recovery",
+        "kept evidence shows that B14, B15, and the route for development "
+        "comparison and recovery stay available",
         "Product source does not change",
         "All legacy-retirement conditions and wider exclusions still apply",
         "The owner gives no removal authority",
@@ -962,11 +962,11 @@ def _validate_owner_view(plan: str) -> None:
         "change",
         "Do not do the measurement again. Do not make the stopped "
         "product change",
-        "No further product work is selected from current evidence",
-        "Exit 4 needs a materially new performance hypothesis with "
-        "supporting evidence",
+        "The project selected no further product work from current evidence",
+        "Exit 4 needs a materially new performance hypothesis with evidence "
+        "for it",
         "No owner decision is ready",
-        "Phase 6 stays open. Later phases do not start",
+        "Phase 6 stays open. Subsequent phases do not start",
     ):
         _require(
             fragment in owner_view,
@@ -2459,7 +2459,7 @@ def _validate_exit_conditions(
         "accepts Exit 5 for continued legacy preservation in the bounded "
         "Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. "
         "All retirement conditions and wider exclusions still apply. "
-        "No removal is authorised. |" in plan,
+        "The owner authorises no removal. |" in plan,
         "D-P6-007 bounded Exit 5 acceptance decision row drifted",
     )
     _require(
@@ -2522,7 +2522,7 @@ def _validate_exit_conditions(
         and "D-P6-006 accepts the bounded Exit 1 result" in plan_flat
         and "D-P6-007 accepts Exit 5 for continued legacy preservation"
         in plan_flat
-        and "Current evidence identifies no materially new performance "
+        and "current evidence identifies no materially new performance "
         "hypothesis" in plan_flat,
         "D-GOV-011 canonical-record direction summary drifted",
     )
@@ -3054,7 +3054,7 @@ def _validate_exit_conditions(
         "D-P6-006 panel exact owner decision drifted or was relocated",
     )
     exit5_heading = (
-        "Phase 6 Exit 5 preservation evidence admission panel — 2026-09-05"
+        "Phase 6 Exit 5: panel and owner decision — 2026-09-05"
     )
     _require(
         '<a id="phase-6-exit-5-preservation-evidence-admission-panel">'
@@ -3075,7 +3075,8 @@ def _validate_exit_conditions(
         "No severity, treatment, owner, deadline, or control effectiveness "
         "changes",
         "Current evidence identifies no materially new performance hypothesis",
-        "No further product work is selected. No owner decision is ready",
+        "The project selected no further product work. No owner decision "
+        "is ready",
     ):
         _require(
             fragment in exit5_flat,
@@ -3861,7 +3862,8 @@ def _validate_exit_conditions(
         "D-P6-006 accepts the subsequent bounded Exit 1 result",
         "D-P6-007 accepts Exit 5 for continued legacy preservation",
         "Current evidence identifies no materially new performance hypothesis",
-        "No further product work is selected. No owner decision is ready",
+        "The project selected no further product work. No owner decision "
+        "is ready",
     ):
         _require(
             required_clause in current_register_flat,

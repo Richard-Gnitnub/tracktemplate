@@ -3078,7 +3078,7 @@ def validate_documentation_profile_mutations() -> None:
     widened_change = replace_once(
         owner_view_change,
         "accepts Exit 5 for continued preservation of the legacy references "
-        "and the bounded development comparison and recovery route",
+        "and the bounded route for development comparison and recovery",
         "accepts Exit 5 for removal of every legacy reference and route",
     )
     owner_view_boundary_widened = replace_once(
@@ -3089,7 +3089,7 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
         "project-plan owner view lost or contradicted: accepts Exit 5 for "
         "continued preservation of the legacy references and the bounded "
-        "development comparison and recovery route",
+        "route for development comparison and recovery",
     )
 
     owner_view_restarted = replace_once(
