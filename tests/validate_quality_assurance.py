@@ -599,9 +599,9 @@ def validate_documentation_profile(
         and "Richard accepted the completed recovery evidence and Phase 6 "
         "closeout" in owner_view
         and "Phase 7 needs a separate opening decision" in owner_view
-        and "Present the bounded Phase 7 opening decision and first "
-        "repository-evidenced product outcome together" in owner_view
-        and "Phase 7 remains unopened and unauthorised" in owner_view
+        and "Present the bounded Phase 7 opening decision and first product "
+        "outcome from repository evidence together" in owner_view
+        and "Phase 7 stays unopened and unauthorised" in owner_view
         and "output has private-development status" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",

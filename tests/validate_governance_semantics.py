@@ -535,18 +535,21 @@ def validate_phase6_closeout_mutations() -> None:
         ),
         (
             "beta-deadline-waived",
-            "remains mandatory\nbefore Phase 10 beta acceptance",
+            "stays mandatory\nbefore Phase 10 beta acceptance",
             "becomes optional after Phase 10 beta acceptance",
             "Phase 7 holding lost a continuing obligation: unchanged bounded "
-            "Entry/Exit improvement obligation remains mandatory before "
+            "Entry/Exit improvement obligation stays mandatory before "
             "Phase 10 beta acceptance",
         ),
         (
             "budgets-substitute-for-improvement",
-            "or improvement on another workload cannot satisfy this obligation",
-            "or improvement on another workload can satisfy this obligation",
+            "or improvement on another workload do not give the required "
+            "evidence for this obligation",
+            "or improvement on another workload give the required "
+            "evidence for this obligation",
             "Phase 7 holding lost a continuing obligation: Numerical budgets "
-            "or improvement on another workload cannot satisfy this obligation",
+            "or improvement on another workload do not give the required "
+            "evidence for this obligation",
         ),
     ):
         expect_rejected(
@@ -576,10 +579,10 @@ def validate_phase6_closeout_mutations() -> None:
             plan,
             replace_once(
                 closeout,
-                "**Exclusions:** This decision accepts no performance result "
-                "and opens no\nPhase 7",
-                "**Exclusions:** This decision accepts no performance result "
-                "and opens\nPhase 7",
+                "**Exclusions:** This decision accepts no performance result. "
+                "It does not\nopen Phase 7",
+                "**Exclusions:** This decision accepts no performance result. "
+                "It does\nopen Phase 7",
             ),
             holding,
         ),

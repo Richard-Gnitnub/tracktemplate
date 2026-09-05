@@ -233,8 +233,8 @@ EXPECTED_PHASE6_DECISIONS = {
         "Close Phase 6.",
         "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
         "#phase-6-closeout-panel",
-        "2674faf1e6d96e65901dbd39550b2d3baac47aadf6112fda86ebb0c789f68981",
-        "62c3014b10bf95e2396196c686d0700df573818f5fb8e843fbeeb03241b5e9a9",
+        "cedb7c30d9809238382c2c14accdf6afdf5eb7e05f8c2bc01e79f1a823350fa8",
+        "e9c5f9db188bfeeb2b2e3e7dc9171cbc534aa2bde9c954e436c0fe19239694d7",
     ),
     "TT-DOC-001": (
         "2026-08-15",
@@ -1043,9 +1043,9 @@ def _validate_owner_view(plan: str) -> None:
         "D-GOV-011 stays stopped with its retained negative evidence",
         "Richard accepted the completed recovery evidence and Phase 6 closeout",
         "Phase 7 needs a separate opening decision",
-        "Present the bounded Phase 7 opening decision and first "
-        "repository-evidenced product outcome together",
-        "Phase 7 remains unopened and unauthorised",
+        "Present the bounded Phase 7 opening decision and first product "
+        "outcome from repository evidence together",
+        "Phase 7 stays unopened and unauthorised",
     ):
         _require(
             fragment in owner_view,
@@ -1181,7 +1181,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 6 closed — four accepted exits and one deferred, unmet "
         "obligation under D-P6-009 on 2026-09-05"
         in " ".join(plan.split())
-        and "D-P6-008 remains in full. Phase 7 is Not started at 0/4"
+        and "D-P6-008 stays in full. Phase 7 is Not started at 0/4"
         in " ".join(plan.split()),
         "the accepted Phase 6 closeout and unopened Phase 7 status are missing",
     )
@@ -2569,7 +2569,8 @@ def _validate_exit_conditions(
     )
     _require(
         "Closed — owner-accepted 2026-09-05 under D-P6-009. "
-        "Four accepted exits and one deferred, unmet obligation remain. "
+        "The closeout has four accepted exits and one deferred, unmet "
+        "obligation. "
         "The final count is 4/5 accepted exits. The owner accepted Exit 1 under "
         "D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 "
         "on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
@@ -4033,22 +4034,23 @@ def _validate_phase6_closeout(
         _section(holding, "Carried authority and live risks")
     )
     for clause in (
-        "remains unchanged in full",
-        "unchanged bounded Entry/Exit improvement obligation remains "
+        "stays unchanged in full",
+        "unchanged bounded Entry/Exit improvement obligation stays "
         "mandatory before Phase 10 beta acceptance",
         "Richard keeps accountability and owns delivery until a named "
         "Phase 10 integration owner takes delivery responsibility",
-        "Independent review and Richard's acceptance remain mandatory",
-        "Numerical budgets or improvement on another workload cannot "
-        "satisfy this obligation",
-        "If it stays unmet, beta acceptance is blocked",
+        "Independent review and Richard's acceptance are mandatory",
+        "Numerical budgets or improvement on another workload do not "
+        "give the required evidence for this obligation",
+        "If it stays unmet, Richard must not accept beta",
         "Normal per-slice checks, comparison paths, invariant 8, and all "
-        "retirement conditions remain",
-        "D-GOV-011 and its negative evidence remain preserved",
+        "retirement conditions still apply",
+        "Phase 6 closeout preserves D-GOV-011 and its negative evidence",
         "Its product direction stays stopped",
-        "Do not repeat stopped experiments or change their measurement rules",
-        "bounded output remains private-development",
-        "Project status remains unknown",
+        "Do not repeat stopped experiments. Do not change their measurement "
+        "rules",
+        "bounded output stays private-development",
+        "Project status stays unknown",
     ):
         _require(
             clause in carried,
@@ -4661,7 +4663,7 @@ def _validate_decisions(plan: str) -> None:
         "decision register" in decision_flat
         and "history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
         in decision_section
-        and "carries D-P6-008 in full for its continuing obligation"
+        and "keeps D-P6-008 in full for its continuing obligation"
         in decision_flat
         and "No Phase 7 opening decision exists" in decision_flat,
         "the current decision-register ownership is missing",
