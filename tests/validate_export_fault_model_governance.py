@@ -357,7 +357,9 @@ def validate_current_authority(documents: dict[str, str]) -> None:
     """Protect D-P6-004/D-P6-005, current status and risk dispositions."""
     plan = semantic(documents["plan"])
     require(
-        "Phase 6 is closed with 4/5 accepted exits" in plan,
+        "| 6 | Explicit exact-validation and export seam | 4/5 accepted exits; "
+        "one deferred, unmet obligation | Complete — accepted 2026-09-05 |"
+        in plan,
         "PROJECT_PLAN lost Phase 6 4/5 status",
     )
     require(
@@ -653,8 +655,8 @@ def validate_mutations(documents: dict[str, str]) -> None:
         ),
         (
             "plan",
-            "Phase 6 is closed with 4/5 accepted exits",
-            "Phase 6 is closed with 5/5 accepted exits",
+            "| 6 | Explicit exact-validation and export seam | 4/5",
+            "| 6 | Explicit exact-validation and export seam | 5/5",
             "Phase 6 status widening",
         ),
         (
