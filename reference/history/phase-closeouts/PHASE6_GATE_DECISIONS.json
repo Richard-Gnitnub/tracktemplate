@@ -233,6 +233,17 @@
       "evidence": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-018-finite-documentation-completion",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-018-finite-documentation-completion"
+    },
+    {
+      "id": "D-P6-009",
+      "decided_on": "2026-09-05",
+      "status": "Accepted",
+      "decision": "Close Phase 6.",
+      "authority": "Phase 6 is closed with four accepted exits (1, 2, 3 and 5) and one deferred, unmet Exit 4 obligation. The owner accepts the completed, independently reviewed recovery evidence for the primary checkout and five sibling worktrees. Preserve D-P6-008 in full. Freeze the Phase 6 evidence, decisions and risk snapshot. Create clean fixed-path Phase 7 administrative holding records at 0/4, Not started, unopened and unauthorised. The owner separately authorises protected-main integration of the exact-green closeout alignment through the normal workflow.",
+      "exclusions": "This decision accepts no performance result and opens no Phase 7. It authorises no product implementation or legacy removal. Preserve all measurement rules, retained negative evidence, stopped directions, normal per-slice checks, comparison paths and retirement conditions. All risk duties remain. Output stays private-development and project status stays `unknown`. No output clearance, packaging or release authority changes.",
+      "evidence": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-closeout-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-closeout-panel"
     }
   ]
 }

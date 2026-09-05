@@ -209,7 +209,7 @@ def validate_frozen_records() -> None:
         "frozen-record status changed",
     )
     require(
-        document["updated_on"] == "2026-08-16",
+        document["updated_on"] == "2026-09-05",
         "frozen-record manifest update date drifted",
     )
     records = document["records"]
@@ -585,28 +585,23 @@ def validate_documentation_profile(
         "PROJECT_PLAN owner view lost its derivation boundary",
     )
     require(
-        "Phase 6 has 4/5 accepted exits" in owner_view
+        "Phase 6 is closed with 4/5 accepted exits" in owner_view
+        and "Phase 7 is Not started at 0/4" in owner_view
         and "The owner accepted Exits 1, 2, 3, and 5" in owner_view
         and "Exit 4 is Deferred — unmet" in owner_view
-        and "gives Exit 4 Deferred — unmet status. Its unchanged improvement "
-        "obligation for the bounded Entry/Exit scope stays mandatory before "
-        "Phase 10 beta acceptance" in owner_view
+        and "preserve the four accepted exits, D-P6-008 in full" in owner_view
         and "All legacy-retirement conditions and wider exclusions still apply"
         in owner_view
         and "The owner accepts no performance result" in owner_view
         and "PR-15 and QA-R04 stay High/Mitigate/Partial" in owner_view
         and "D-GOV-011 stays stopped with its retained negative evidence"
         in owner_view
-        and "owner accepted D-P6-008 on 2026-09-05" in owner_view
-        and "Richard keeps accountability and owns delivery until a named "
-        "Phase 10 integration owner takes delivery responsibility" in owner_view
-        and "Independent review and Richard's acceptance are mandatory before "
-        "beta acceptance" in owner_view
-        and "Bring the Phase 6 closeout recommendation to the owner with four "
-        "accepted exits and one deferred, unmet obligation" in owner_view
-        and "Phase 6 stays open. Phase 7 stays Not started" in owner_view
-        and "Do not do a stopped experiment again. Do not change its "
-        "measurement rule" in owner_view
+        and "Richard accepted the completed recovery evidence and Phase 6 "
+        "closeout" in owner_view
+        and "Phase 7 needs a separate opening decision" in owner_view
+        and "Present the bounded Phase 7 opening decision and first "
+        "repository-evidenced product outcome together" in owner_view
+        and "Phase 7 remains unopened and unauthorised" in owner_view
         and "output has private-development status" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
