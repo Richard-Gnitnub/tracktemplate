@@ -13,11 +13,11 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 6 has 2/5 accepted exits. The owner accepted Exits 2 and 3. Exits 1, 4, and 5 stay Pending. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | The [completed D-GOV-011 prerequisite](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave a FAIL result. The owner accepted this result as retained negative evidence and stopped the product change. |
-| **What now works** | The new same-host baseline and attribution series are complete. Independent review confirmed the result. The D-GOV-011 stop condition prevented product work. |
-| **Limitations/findings** | The canonical area's first quartile was `3.057969 ms`. The attribution noise floor was `3.8645155 ms`. This result is not improvement evidence or Exit 4 evidence. Exit 1 still lacks the bounded legacy-output equivalence proof. |
-| **Owner decision** | The owner accepted the negative result on 2026-09-05. D-GOV-011, its measurement rule, and historical evidence remain unchanged. Do not repeat the measurement or make its conditional product change. No new owner decision is necessary for the selected product boundary under D-P6-001. |
-| **Next action** | In a later Level 2 cycle, establish bounded B14/B15-to-B16 Entry/Exit centreline output equivalence through exact validation and DXF export/import. This work advances Exit 1 under D-P6-001. Phase acceptance needs a separate owner decision. |
+| **What changed** | The [completed D-GOV-011 baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave a FAIL result. The owner accepted this result as retained negative evidence and stopped the product change. |
+| **What now works** | The project completed the new same-host baseline and attribution series. An independent reviewer validated the result. The D-GOV-011 FAIL result prevented product work. |
+| **Limitations/findings** | The canonical area's first quartile was `3.057969 ms`. The attribution noise floor was `3.8645155 ms`. This result is not improvement evidence or Exit 4 evidence. Exit 1 has no evidence that the bounded B14/B15 and B16 outputs are equivalent. |
+| **Owner decision** | The owner accepted the FAIL result on 2026-09-05. D-GOV-011, its measurement rule, and its initial evidence do not change. Do not do the measurement again. Do not make the product change. No new owner decision is necessary for the selected product boundary with authority from D-P6-001. |
+| **Next action** | In the next Level 2 cycle, validate equivalent B14/B15 and B16 output for the bounded Entry/Exit centrelines. Include exact validation and DXF export/import. This work is for Exit 1 with authority from D-P6-001. The owner must make a new decision before phase acceptance. |
 
 ## Phase status
 
@@ -62,7 +62,7 @@ D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first direction. It
 
 D-GOV-010 qualifies only the exact FreeCAD 1.1.3 host profile with CPython 3.13.13 and PySide6/Qt 6.11.1. It keeps the previously qualified profiles and their evidence. It authorises this profile to supply performance evidence in a later cycle. Each comparison must use one profile with an exact identity. The decision admits no performance result and does not change D-GOV-009. Exit 4 stays Pending.
 
-D-GOV-011 stays Accepted as historical authority for its conditional canonical-record performance hypothesis. The [completed prerequisite](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The original decision, measurement rule, and historical evidence remain unchanged. Exit 4 stays Pending. The next product boundary is Exit 1 centreline output equivalence under D-P6-001.
+D-GOV-011 stays Accepted as authority for the initial performance hypothesis and its conditions. The [completed baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The initial decision, measurement rule, and evidence do not change. Exit 4 stays Pending. The next product boundary is equivalent centreline output for Exit 1 with authority from D-P6-001.
 
 ## Live risks
 
