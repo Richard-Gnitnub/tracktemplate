@@ -449,10 +449,10 @@ EXPECTED_TDMP_PLAN_ROW = (
 )
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
-        "Evidenced and owner-accepted under D-P6-006 for the agreed PR #63 "
-        "Entry/Exit centreline comparison scope. The recorded numerical, "
-        "host, and assurance limits apply. Production clearance and wider "
-        "output equivalence remain absent."
+        "Evidenced and owner-accepted under D-P6-006 for the agreed scope of "
+        "the PR #63 comparison of Entry/Exit centrelines. The recorded "
+        "numerical, host, and assurance limits apply. The owner gives no "
+        "production clearance and accepts no wider output equivalence."
     ),
     (
         "Evidenced and owner-accepted under D-P6-002 — bounded to the accepted "
@@ -925,24 +925,26 @@ def _validate_owner_view(plan: str) -> None:
         "Exits 4 and 5 stay Pending",
         "output has private-development status",
         "Project status stays `unknown`",
-        "accepts Exit 1 for the agreed PR #63 Entry/Exit centreline "
-        "comparison scope",
+        "accepts Exit 1 for the agreed scope of the PR #63 comparison of "
+        "Entry/Exit centrelines",
         "admitted evidence compares bounded B14/B15 and B16 centrelines "
         "through exact validation, Part geometry, and DXF export/import",
         "Product source does not change",
         "recorded numerical, host, and assurance limits apply",
-        "Production clearance and wider output equivalence remain absent",
+        "The owner gives no production clearance and accepts no wider "
+        "output equivalence",
         "D-GOV-011 stays stopped with its retained negative evidence",
         "Risks do not change",
         "owner accepted D-P6-006 on 2026-09-05",
-        "D-GOV-011, its measurement rule, and its retained evidence do not "
+        "D-GOV-011, its measurement rule, and its kept evidence do not "
         "change",
         "Do not do the measurement again. Do not make the stopped "
         "product change",
-        "Bring the Exit 5 legacy-preservation criterion to the owner",
-        "retained evidence needs a separate admission decision",
+        "Bring the Exit 5 legacy-preservation condition to the owner",
+        "kept evidence needs a different owner decision to admit it",
         "gives no legacy-retirement authority",
-        "Do not add Exit 1 implementation without a material contradiction",
+        "Do not add Exit 1 implementation unless evidence shows that the "
+        "accepted result is incorrect",
     ):
         _require(
             fragment in owner_view,
@@ -2421,9 +2423,9 @@ def _validate_exit_conditions(
         "| D-P6-006 | 2026-09-05 | Accepted | The [decision]"
         "(current/PHASE_EVIDENCE.md"
         "#phase-6-exit-1-bounded-output-evidence-admission-panel) "
-        "accepts Exit 1 for the agreed PR #63 Entry/Exit centreline "
-        "comparison scope. Phase 6 advances to 3/5. Exits 4 and 5 stay "
-        "Pending. All stated limitations and exclusions remain. |" in plan,
+        "accepts Exit 1 for the agreed scope of the PR #63 comparison of "
+        "Entry/Exit centrelines. Phase 6 advances to 3/5. Exits 4 and 5 stay "
+        "Pending. All stated limitations and exclusions still apply. |" in plan,
         "D-P6-006 bounded Exit 1 acceptance decision row drifted",
     )
     _require(
@@ -2484,7 +2486,7 @@ def _validate_exit_conditions(
         in plan_flat
         and "Exit 4 stays Pending" in plan_flat
         and "D-P6-006 accepts the subsequent bounded Exit 1 result" in plan_flat
-        and "next owner boundary is Exit 5 legacy preservation" in plan_flat,
+        and "next owner decision is for Exit 5 legacy preservation" in plan_flat,
         "D-GOV-011 canonical-record direction summary drifted",
     )
 
@@ -2539,7 +2541,7 @@ def _validate_exit_conditions(
         "Current — 3/5 accepted exits. The owner accepted Exit 1 under "
         "D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 "
         "on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
-        "2026-08-15. Exits 4 and 5 remain Pending" in current_flat,
+        "2026-08-15. Exits 4 and 5 stay Pending" in current_flat,
         "current record does not preserve the accepted Phase 6 3/5 state",
     )
     performance_section = _section(
@@ -2977,10 +2979,7 @@ def _validate_exit_conditions(
         and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS,
         "Phase 6 exits do not match the accepted 3/5 dispositions",
     )
-    exit1_heading = (
-        "Phase 6 Exit 1 bounded output panel to admit evidence and owner "
-        "decision"
-    )
+    exit1_heading = "Phase 6 Exit 1: panel and owner decision"
     _require(
         '<a id="phase-6-exit-1-bounded-output-evidence-admission-panel">'
         "</a>\n\n## " + exit1_heading in current_evidence,
@@ -2996,13 +2995,13 @@ def _validate_exit_conditions(
         "eight named Entry/Exit centreline cases in PR #63 and the "
         "additional standalone resolution check",
         "fixed numerical comparison limit is 1e-8 mm",
-        "Sampling, integration, and import errors keep their separate limits",
+        "Sampling, integration, and import errors each have a different limit",
         "does not give an absolute error bound for every ideal curve",
         "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
         "No severity, treatment, owner, deadline, or control effectiveness "
         "changes",
-        "D-GOV-011 remains FAIL retained negative evidence",
-        "panel required no repeated measurement",
+        "D-GOV-011 stays FAIL retained negative evidence",
+        "panel did not require another measurement",
     ):
         _require(
             fragment in exit1_flat,
@@ -3785,7 +3784,7 @@ def _validate_exit_conditions(
         "Do not select a different Exit 4 optimisation "
         "only to continue performance work",
         "D-P6-006 accepts the subsequent bounded Exit 1 result",
-        "next owner boundary is Exit 5 legacy preservation",
+        "next owner decision is for Exit 5 legacy preservation",
     ):
         _require(
             required_clause in current_register_flat,

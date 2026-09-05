@@ -3025,8 +3025,8 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_change = table_row_containing(plan, "**What changed**")
     widened_change = replace_once(
         owner_view_change,
-        "accepts Exit 1 for the agreed PR #63 Entry/Exit centreline "
-        "comparison scope",
+        "accepts Exit 1 for the agreed scope of the PR #63 comparison of "
+        "Entry/Exit centrelines",
         "accepts Exit 1 for every legacy output and the whole-layout product",
     )
     owner_view_boundary_widened = replace_once(
@@ -3036,7 +3036,7 @@ def validate_documentation_profile_mutations() -> None:
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
         "project-plan owner view lost or contradicted: accepts Exit 1 for "
-        "the agreed PR #63 Entry/Exit centreline comparison scope",
+        "the agreed scope of the PR #63 comparison of Entry/Exit centrelines",
     )
 
     owner_view_restarted = replace_once(
