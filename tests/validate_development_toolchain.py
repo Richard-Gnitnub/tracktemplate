@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import tomllib
+from unittest import mock
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -660,17 +661,29 @@ def _validate_consumers(contract):
     assert pipeline.index('"freecad-gui-preflight"') < pipeline.index(
         '"transition-viewprovider-gui"'
     )
-    transition_steps = pipeline_module.build_steps(
-        "transition",
-        root=ROOT,
-        python_executable="python-under-test",
-    )
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-pipeline-flatpak-"
+    ) as temporary:
+        flatpak = pathlib.Path(temporary) / "flatpak"
+        flatpak.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+        flatpak.chmod(stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        with mock.patch.object(
+            pipeline_module.shutil, "which", return_value=str(flatpak)
+        ) as which:
+            transition_steps = pipeline_module.build_steps(
+                "transition",
+                root=ROOT,
+                python_executable="python-under-test",
+            )
+        which.assert_called_once_with("flatpak", path=os.defpath)
+        expected_flatpak = str(flatpak.resolve())
     freecad_command = next(
         step.command
         for step in transition_steps
         if step.name == "transition-persistence"
     )
     assert pathlib.Path(freecad_command[0]).is_absolute()
+    assert freecad_command[0] == expected_flatpak
 
     for relative in (
         "tools/freecad_bridge/freecad-cli",
