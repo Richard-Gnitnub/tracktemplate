@@ -296,11 +296,23 @@ def _validate_exact_host(contract):
 
 
 def _validate_system_tool_resolution(contract):
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-system-tools-"
+    ) as temporary:
+        executable_directory = pathlib.Path(temporary)
+        for name in ("git", "flatpak", "gh"):
+            executable = executable_directory / name
+            executable.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+            executable.chmod(stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+        _check_system_tool_resolution(contract, executable_directory)
+
+
+def _check_system_tool_resolution(contract, executable_directory):
     observed_paths = []
 
     def which(name, path=None):
         observed_paths.append((name, path))
-        return "/usr/bin/{}".format(name)
+        return str(executable_directory / name)
 
     versions = {
         "flatpak": "Flatpak 1.14.6\n",
@@ -349,7 +361,7 @@ def _validate_system_tool_resolution(contract):
             assert name == "git"
             if path == "/attacker/bin":
                 return str(attacker)
-            return "/usr/bin/git"
+            return str(executable_directory / "git")
 
         context = preflight.Context(
             root=ROOT,
