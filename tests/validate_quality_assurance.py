@@ -448,7 +448,7 @@ def validate_validation_document_boundary() -> None:
     change_validation = read(CHANGE_VALIDATION_SKILL)
     for fragment in (
         boundary_link,
-        "merely because a test was added or run",
+        "only because a test was added or done",
         "durable validation contract",
     ):
         require(
@@ -460,7 +460,7 @@ def validate_validation_document_boundary() -> None:
     for fragment in (
         boundary_link,
         "`reference/VALIDATION.md`",
-        "routine tranche",
+        "Only if its durable validation contract changes, include",
         "durable validation contract",
     ):
         require(
@@ -1000,7 +1000,8 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
         "retired document",
         "failed experimental candidate",
         "technical author lead",
-        "records acceptance after the one required documentation review, "
+        "with acceptance from the applicable authority",
+        "that acceptance follows the one required documentation review, "
         "permitted adjustment, and final deterministic validation",
         "| **author** |",
         "| **retire** |",
@@ -1123,7 +1124,7 @@ def validate_asd_ste100_reference(
         "AGENT_WORKFLOWS lost the ASD-STE100 source owner link",
     )
     require(
-        "documentation review workflow uses the official source only for a "
+        "documentation review workflow uses only the official source for a "
         "conformance review" in workflows_flat
         and "Agents in other workflows route the review to documentation "
         "review" in workflows_flat

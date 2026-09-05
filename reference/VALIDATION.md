@@ -193,8 +193,8 @@ Run from the repository root.
 This section is the human-readable owner for the development-toolchain
 preflight. The machine declaration is
 [`development-toolchain-v1.json`](contracts/development-toolchain-v1.json).
-The declaration classifies each tool and maps it to its consuming stage. It
-also names each supported fallback and its authority.
+The declaration gives the type of each tool and the workflow operations that
+need it. It also names each supported fallback and its project authority.
 
 `requirements-dev.txt` contains exact pins for required Python development
 packages. These packages are not Addon dependencies. Ruff is a repository
@@ -202,7 +202,7 @@ validation package. Click is a conditional dependency of the real-GUI
 development bridge. The project virtual environment and the qualified FreeCAD
 profiles have separate package controls.
 
-Run one of these commands before its dependent stage:
+Before the dependent workflow operation, use the applicable command:
 
 ```bash
 .venv/bin/python tools/development_toolchain_preflight.py --stage development
@@ -213,20 +213,21 @@ Run one of these commands before its dependent stage:
 .venv/bin/python tools/development_toolchain_preflight.py --stage publication
 ```
 
-The preflight has these stage boundaries:
+The development-toolchain preflight has these requirements for each operation:
 
-| Stage | Required result |
+| Operation | Required result |
 | --- | --- |
 | `development` | Git must identify this repository. The project `.venv` must contain CPython at the development floor in the compatibility contract. |
-| `validation` | The development prerequisites, exact Python development declarations, Ruff version, and Ruff configuration must pass. `--run-ruff` then runs the fixed read-only repository check. |
-| `documentation` | The local official STE source, source-bound cache, trusted `pdftotext`, and one live source extraction must pass. |
+| `validation` | The `development` requirements must pass. The exact Python package declarations, Ruff version, and Ruff configuration must pass. With `--run-ruff`, the tool then does the fixed repository check. This check changes no file. |
+| `documentation` | The local official STE source and derived cache must pass. The `pdftotext` executable must pass the file owner and file mode checks. One live extraction from the source must pass. |
 | `freecad` | Flatpak must start the existing runtime probe. The probe must return one exact profile that the compatibility contract qualifies. |
 | `freecad-gui` | The `freecad` requirements, exact Click declaration and system version, required shell tools, and pinned bridge commit, reviewed tree, and test set must pass. |
 | `publication` | Git and GitHub CLI must identify the expected repository. GitHub authentication, default branch, and write access must pass. |
 
-The preflight checks only the selected stage. A missing tool gives a `FAIL`
-result before the dependent operation. The preflight does not install a
-package, get a source file, change authentication, or change a host.
+The development-toolchain preflight checks only the selected operation. A
+missing tool gives a `FAIL` result before the dependent operation. The
+development-toolchain preflight does not install a package or get a source
+file. It does not change authentication data or a host.
 
 Ruff version `0.16.4` and `ruff.toml` define the repository Ruff contract.
 Ruff uses Python 3.12 syntax and the selected `E9`, `F63`, `F7`, and `F82`
@@ -235,17 +236,18 @@ the immutable B14 and B15 comparison sources. One injected-global probe has a
 bounded `F821` exception.
 
 The preferred Ruff executable is `.venv/bin/ruff`. If that path is absent, the
-declared fallback is an exact-version Ruff executable on the user `PATH`. The
-preflight checks its owner, mode, path, version, and configuration. If the
-preferred executable exists with a wrong version, the preflight does not use
-the fallback. A user-level tool manager can supply this executable, but it has
-no TrackTemplate package-management role.
+supported fallback is a Ruff executable on the user `PATH` with the exact
+required version. The development-toolchain preflight checks its file owner,
+file mode, path, version, and configuration. If the preferred executable has
+a wrong version, the development-toolchain preflight does not use the supported
+fallback. A tool manager for the user can supply this executable. This manager
+has no responsibility for TrackTemplate packages.
 
-All other declared tools have no toolchain fallback. The official ASD/STEMG
-web source remains a source fallback for the independent Documentation
-Reviewer. It does not satisfy extraction-dependent authoring. The qualified
-FreeCAD profiles are exact alternatives in the existing compatibility
-contract. They are not arbitrary-version fallbacks.
+All other declared tools have no supported fallback. The official ASD/STEMG
+web source remains an alternative source for the independent Documentation
+Reviewer. It does not satisfy authoring requirements that need local
+extraction. The qualified FreeCAD profiles are exact alternatives in the
+existing compatibility contract. Other versions do not have this qualification.
 
 Do not use `uv init` in this repository. Do not add a root `uv.lock`. A package
 manager migration is a different authorised task.
@@ -261,20 +263,23 @@ regressions:
 .venv/bin/python tools/run_regression_pipeline.py --profile transition-gui
 ```
 
-The default `standalone` profile runs the validation preflight and Ruff first.
-It then parses each tracked Python and macro source and runs the complete
-clean-checkout standalone matrix. The `transition` profile runs the FreeCAD
-preflight before its qualified headless checks. The explicit `transition-gui`
-profile also runs the real-GUI preflight before its isolated ViewProvider
-workflow. Profile names describe durable behaviour, not phase acceptance.
-Phase-prefixed test paths can change names when their product boundary
-stabilises. This does not retire their contract.
+The default `standalone` profile first uses the development-toolchain preflight
+for `validation` and Ruff. It then checks each tracked Python and macro source
+with `ast.parse`. It executes the complete standalone matrix for a clean
+checkout. Before its qualified headless checks, the `transition` profile uses
+the development-toolchain preflight for `freecad`.
+
+Before its isolated ViewProvider workflow, the explicit `transition-gui`
+profile also uses the development-toolchain preflight for `freecad-gui`.
+Profile names describe continuing behaviour, not phase acceptance. Test paths
+with a phase prefix can change names when their product boundary is stable.
+This does not end the test contract.
 
 Each step requires a zero exit status and its documented success sentinel. Raw
 output stays in ignored `benchmark-output/validation-pipeline/` run
 directories. The terminal emits only step results and
-`TRACKTEMPLATE_REGRESSION_PIPELINE=`. The pipeline stops before later,
-more-expensive layers after a failed prerequisite. The standalone runner still
+`TRACKTEMPLATE_REGRESSION_PIPELINE=`. If a required check fails, the pipeline
+stops before later layers with a higher cost. The standalone runner still
 completes each standalone validator. Thus, one log shows all observed
 failures.
 
@@ -283,7 +288,8 @@ CI. The GUI profile remains explicit. It does not establish screenshot hashes,
 numerical timing gates, or a mandatory GUI-host workflow.
 
 The tracked [standalone CI workflow](../.github/workflows/ci.yml) runs on
-pushes to `main` and pull requests. It parses each tracked Python/macro source.
+pushes to `main` and pull requests. It checks each tracked Python and macro
+source with `ast.parse`.
 Then it runs each `tests/validate_*.py` check through the complete-run
 standalone runner. The runner continues after a failed validator. Its
 structured summary shows all observed failures from one run.
@@ -302,7 +308,7 @@ workstation-only archive, hash, branch, and upstream evidence. Neither profile
 replaces selected FreeCAD, GUI, backup/restore, output, or owner-decision
 evidence.
 
-Run the same source parser locally when diagnosing a syntax failure:
+For diagnosis of a Python source error, use the same local source check:
 
 ```bash
 .venv/bin/python tools/validate_python_syntax.py
@@ -401,10 +407,14 @@ modular-only host loader is a clean, lazy compatibility dependency.
 The FreeCAD test executes the current B16 default. It must not load the 2.3 MB
 B15 host or mutate a document. It rejects the retired legacy argument before
 host loading. It reproduces accepted all-caller parity through the
-development-only oracle. Then it loads a separate product session. All three
+development-only oracle.
+
+Then it loads a separate product session. All three
 bindings must use the modular API without a comparison route. It must print
 `Phase 3 transition routing FreeCAD smoke test passed`. This smoke launches no
-operator dialog. The immutable B14/B15 workflow evidence remains the accepted
+operator dialog.
+
+The immutable B14/B15 workflow evidence remains the accepted
 GUI oracle. Do not rewrite the independent Phase 2 loading smoke.
 
 Phase 4 transition canonical-state foundation:
@@ -420,7 +430,9 @@ round-trip for bounded reads. It owns complete transition-analysis signatures,
 cold/reuse/change-back, label-only reuse, and numerical invalidation. It also
 owns stable identity, stale or corrupt derived-result recovery, and fail-closed
 input cases. The product boundary for application dependencies is also part of
-this contract. The qualified-FreeCAD smoke proves only runtime/type
+this contract.
+
+The qualified-FreeCAD smoke proves only runtime/type
 compatibility.
 It proves the same exact JSON round-trip and zero document mutation. It does
 not prove FreeCAD properties, transactions, Undo/Redo, or FCStd save/reopen.
@@ -436,11 +448,14 @@ flatpak run --command=FreeCADCmd org.freecad.FreeCAD \
 The standalone check protects the concrete-adapter dependency direction and
 property/type contract. It also protects the qualified-write product boundary
 and the bounded scope of the disposable fixture. It does not import FreeCAD.
+
 The FreeCAD test uses only newly created disposable documents and a temporary
 FCStd. It proves exact canonical save/reopen and stable identity independent
 of name, label, or order. It proves one-command create/update history and
 create/update Undo/Redo. It covers no-op history, preflight rejection, and
-injected post-write rollback. It also covers stale or corrupt derived results,
+injected post-write rollback.
+
+It also covers stale or corrupt derived results,
 foreign-object preservation, and rejection of unqualified runtime evidence.
 Its success sentinel is
 `Phase 4 transition FreeCAD persistence validation passed`.
@@ -457,12 +472,16 @@ The standalone matrix proves deterministic B14-only, B15-only, and accepted
 mixed-window reporting. It proves foreign-object exclusion and
 inspection-only results for versionless or future data. Malformed or
 conflicting data must fail closed. The matrix also proves exact contract
-gating, isolated import, and zero outer-detector write authority. The FreeCAD
+gating, isolated import, and zero outer-detector write authority.
+
+The FreeCAD
 test uses only newly created disposable documents and a temporary FCStd. It
 proves zero mutation during inspection. It also proves an identical mixed
 report after save, close, and reopen. Its success sentinel is
 `Phase 4 legacy document FreeCAD detection validation passed`. This is only
-outer-ingress evidence. The detector remains inspection-only when one exact
+outer-ingress evidence.
+
+The detector remains inspection-only when one exact
 family is separately qualified. It cannot advertise a complete document as a
 supported migration source.
 
@@ -480,10 +499,14 @@ plain-line transition slice. It requires complete typed settings. Stable
 identities come from template-set identity, persisted semantic track ordinal,
 and end. The matrix replays the canonical solver exactly. It rejects partial,
 unsupported, corrupt, or ambiguous input. It retains zero write, migration,
-or production authority. The FreeCAD check opens the reproducible ignored B14
+or production authority.
+
+The FreeCAD check opens the reproducible ignored B14
 base fixture as read-only. It obtains the two exact canonical candidates and
 compares document, property, and history snapshots. The source FCStd hash must
-stay unchanged. Its sentinel is
+stay unchanged.
+
+Its sentinel is
 `Phase 4 plain-line transition FreeCAD assessment passed`. This read-only
 assessment does not authorise a copied-target write or advertise family
 support. The registry and fixture below own those separate controls.
@@ -499,11 +522,14 @@ This isolated fixture starts B14, B15-only, and expected mixed targets as
 physical copies of disposable source FCStd files. The host-independent
 operation requires exact family-level source and target assessments. Then it
 calls the injected qualified FreeCAD writer one time. The writer creates both
-canonical transition records in one batch transaction. The fixture requires
+canonical transition records in one batch transaction.
+
+The fixture requires
 one-step Undo/Redo and duplicate preflight with no history. It requires exact
 canonical and legacy persistence through target save/reopen. It also requires
 source-byte preservation and complete abort after an injected second-payload
 failure. The original reproduced B14 fixture hash must remain unchanged.
+
 `SUPPORTED_MIGRATION_FAMILIES` must contain exactly
 `plain-line-spacing-matched-transition-intent`. Migration support must be true
 only for that family. Production-output authority must remain false. Its
@@ -512,8 +538,8 @@ sentinel is
 proves the exact contract for the fixture-only family. It does not qualify a
 complete document or authorise a Workbench/operator migration path.
 
-Exercise the same persistence and rollback fixture inside an isolated real-GUI
-process, with the GUI-host product boundary asserted, using:
+Use the same persistence and rollback fixture in an isolated real-GUI process.
+The following command also checks the GUI host boundary:
 
 ```bash
 tools/freecad_bridge/run-isolated \
@@ -540,12 +566,16 @@ The standalone validator owns chair-package schema v1 and the explicitly
 non-prototype synthetic fixture. It owns the deterministic signed round-trip,
 exact source quantities, canonical decimal quantities, and unit conversion.
 It also owns the fixed chair-local frame and all datum, component, procedure,
-and rail-interface references. Manufacturing separation, lineage coverage,
+and rail-interface references.
+
+Manufacturing separation, lineage coverage,
 acceptance, and external dependency-manifest linkage are included. The
 missing, corrupt, unsupported, and ambiguous cases form the failure matrix.
 The synthetic manifest must pass the existing strict project-clearance
 validator. The test then proves that Phase 9 production admission blocks
-geometry, document, and filesystem mutation. The qualified-FreeCAD test proves
+geometry, document, and filesystem mutation.
+
+The qualified-FreeCAD test proves
 only bundled-Python compatibility. It proves the same exact package round-trip
 and zero document mutation. Its sentinel is
 `Phase 4 chair-definition FreeCAD compatibility validation passed`. Neither
@@ -563,7 +593,9 @@ fresh isolated GUI processes use the complete legacy and modular routes. The
 test requires exact route-independent workflow contracts and preserved route
 bindings. It also requires undo/redo, save/reopen, isolated preference
 restoration, and source non-mutation. It covers the plain-line invalid-input
-and transaction-abort recovery paths. It records raw timing observations. It
+and transaction-abort recovery paths.
+
+It records raw timing observations. It
 is not the contracted calculation or workflow performance profile.
 
 Current Phase 3 contracted performance profile:
@@ -577,7 +609,9 @@ This performs nine same-process repetitions per route for the complete frozen
 202-case calculation grid. Then it performs three fresh isolated FreeCAD GUI
 repetitions per workflow and route. It alternates route order and retains exact
 workflow parity. It records medians, ranges, CPU, end-minus-start RSS, and
-object deltas. The 12-process GUI profile is checkpoint evidence, not a fast
+object deltas.
+
+The 12-process GUI profile is checkpoint evidence, not a fast
 test. Its timings do not establish an interaction budget or an optimisation
 claim. Raw paths, FCStd files, and JSON remain ignored. A sanitised committed
 performance report stays under `reference/benchmarks/`.
@@ -592,12 +626,16 @@ Retained Phase 5 bounded Coin resource profile:
 The fast standard-library validator protects the fixed 32-object fixture and
 the three-process minimum. It protects cold and warm measurement fields,
 stable identity, and scene counts. It also protects cache reuse, zero-`Shape`,
-and cleanup contracts without importing FreeCAD. The profiler runs three fresh
+and cleanup contracts without importing FreeCAD.
+
+The profiler runs three fresh
 isolated qualified FreeCAD GUI processes. Each process constructs 32 logical
 objects and preview layers. It performs one untimed warm-up and three measured
 unchanged refreshes. It records wall time, process CPU, explicit recompute
 duration, and end-minus-start RSS. It also records actual Coin-layer counts,
-active-node counts, and individual samples. Correctness invariants are gates.
+active-node counts, and individual samples.
+
+Correctness invariants are gates.
 Timings remain descriptive and establish no representative workload, capacity,
 or numerical budget. Raw JSON and logs remain ignored. The sanitised result
 and limitations are in
@@ -614,7 +652,9 @@ The fast standard-library validator protects five declared scale points and a
 three-fresh-process minimum. It protects host-independent result validation.
 It also protects exact object, layer, node, mapping, edit-isolation, Undo, and
 cleanup invariants. The explicit non-acceptance condition remains. The
-validator imports neither FreeCAD nor Qt. The profiler repeats the qualified
+validator imports neither FreeCAD nor Qt.
+
+The profiler repeats the qualified
 Entry/Exit family unit at 1, 2, 4, 8, and 16 sets. This gives 2–32 logical
 objects. A test-only view grid makes repeated local-frame previews separately
 hittable. It does not change canonical state or product placement.
@@ -623,7 +663,9 @@ At each scale, three fresh isolated qualified GUI processes run. Each process
 performs one real Qt pointer selection and opens the transient parameter
 editor. It enters one length through real keyboard and button input. It
 verifies one selected-only edit and one Undo. Then it disposes each cache,
-proxy, and document. It records cold, selection, dialog, edit, Undo, and
+proxy, and document.
+
+It records cold, selection, dialog, edit, Undo, and
 cleanup measurements. Each measurement includes wall time, CPU, and
 end-minus-start RSS. Correctness invariants are gates. Values remain
 descriptive and accept no capacity, interaction budget, renderer, or
@@ -642,7 +684,9 @@ The standalone parameter-editor validator proves the internal length command
 and fail-closed selection controller. It also proves the accepted UI
 dependency direction without importing Qt or FreeCAD. The multi-object
 validator fixes the workload rationale. It protects the real-GUI proof and
-runner. The representative product boundary is the smallest complete qualified
+runner.
+
+The representative product boundary is the smallest complete qualified
 plain-line transition family. One secondary track produces one canonical Entry
 record and one canonical Exit record. Distinct deterministic transition
 lengths make the two development previews pointer-disambiguable. They are not
@@ -651,17 +695,25 @@ product defaults.
 The existing isolated ViewProvider runner first retains the one-object
 lifecycle and save/reopen proof. Then it exercises the two-object workload in
 the same qualified real-GUI process. The process starts from a new empty
-document. A real Qt mouse click must select the red Exit preview. It must
+document.
+
+A real Qt mouse click must select the red Exit preview. It must
 resolve the stable domain identity. A modeless dialog must have the FreeCAD
 main window as its parent. It must show that identity and the current
-transition length. Real Qt keyboard input and an Apply-button click must route
+transition length.
+
+Real Qt keyboard input and an Apply-button click must route
 one length edit through the internal application command. Undo, Redo, an
 injected refresh failure, and a cleared-selection attempt must have only the
 intended results. The Entry state and cache must remain untouched. Applying the
-unchanged displayed value must create no history. The failure must remain
+unchanged displayed value must create no history.
+
+The failure must remain
 visibly diagnostic. The no-selection attempt must change neither state,
 history, nor cache counters. Selected and edited dialog captures remain for
-visual inspection. Each state must retain two compact `App::FeaturePython`
+visual inspection.
+
+Each state must retain two compact `App::FeaturePython`
 objects and two Coin layers. It must retain 14 active selectable-scene nodes,
 zero `Shape` properties, and identical stable selection mappings. The runner
 requires the inner
@@ -694,30 +746,43 @@ The ViewProvider checks cover the explicitly invoked
 `TransitionCoinDocumentAttachmentFixture`. The host-independent proof uses two
 records supplied out of order. It refreshes only one retained cache. On
 disposal, it restores both original default proxies. After an injected
-second-object attach failure, it clears each live binding and cache. The
+second-object attach failure, it clears each live binding and cache.
+
+The
 isolated real-GUI proof saves and reopens one canonical record. It confirms
 that no transient attachment marker persisted. It injects and recovers from a
-Coin attach failure. Then it invokes document attachment one time. The proof
+Coin attach failure.
+
+Then it invokes document attachment one time. The proof
 requires a new cache and ViewProvider with an equivalent preview. It requires
 a reused no-op refresh and visible rendering. Disposal must clear derived
-state and restore the host proxy. Canonical JSON, property lists, object count,
+state and restore the host proxy.
+
+Canonical JSON, property lists, object count,
 and history must remain unchanged.
 
 The same runner then proves the saved/reopened representative Entry/Exit
 attachment product boundary. First, it disposes the two manual editing
 fixtures and caches. It saves only the two canonical `App::FeaturePython`
 records. It closes and reopens the FCStd. Then it invokes document attachment
-explicitly. The attachment must enumerate Entry then Exit by stable identity.
+explicitly.
+
+The attachment must enumerate Entry then Exit by stable identity.
 It must rebuild two new equivalent caches and Coin layers. It must preserve
 both pre-save selection mappings. It deliberately discards Entry's cache as an
 observable sibling trap. An unchanged Exit refresh must then reuse its cache.
+
 Entry's cache must remain missing. Its bound source signature, selection root,
 and mapping must remain unchanged. The attachment must retain two objects, two
-logical layers, and 14 active selectable-scene nodes. It must retain zero
+logical layers, and 14 active selectable-scene nodes.
+
+It must retain zero
 `Shape` properties and have zero attachment history delta. Batch disposal must
 clear both caches and selection roots. It must restore both original host
 proxies. Reopened canonical JSON, property lists, object count, and history
-must remain unchanged. The known empty-switch-child limitation applies
+must remain unchanged.
+
+The known empty-switch-child limitation applies
 independently to both disposed records.
 
 The attachment remains an internal, injected lower product boundary. It is
@@ -725,13 +790,19 @@ absent from `tracktemplate.api` and package initialisation. The standalone lifec
 also protects the explicit `TrackTemplate.FCMacro`
 `activate_transition_editing()` route. The macro's normal
 `FOUNDATION_RESULT = run_macro()` path remains unchanged. It imports no host,
-Coin, or Qt module unless that function is called. Activation must attach a
+Coin, or Qt module unless that function is called.
+
+Activation must attach a
 non-empty stable-ID set one time. It must reject active duplication and reuse
 one transient editor. It must clear only the target document's selection. It
-must retry partial attachment and observer cleanup. It must retire without
-reactivation. Composition-level fault injection must prove recoverable
+must retry partial attachment and observer cleanup. It must stop permanently
+without reactivation.
+
+Composition-level fault injection must prove recoverable
 observer-registration rollback. Failed observer removal must retain the same
-observer for a successful retry. The check also protects the versioned
+observer for a successful retry.
+
+The check also protects the versioned
 development contract. It keeps the coordinator in the host-independent UI
 layer.
 
@@ -741,14 +812,20 @@ orchestration loop. On the qualified Entry/Exit document, the explicit macro
 route must attach both transitions one time. Canonical JSON, built-in property
 lists, history, `Shape` count, and captured public `DisplayMode` state must not
 change. The route must reject a concurrent invocation and expose the existing
-editor. It must preserve one edit with Undo/Redo. Only successful explicit
+editor. It must preserve one edit with Undo/Redo.
+
+Only successful explicit
 activation registers the transient document observer. A save must invoke
-FreeCAD's `slotStartSaveDocument`. Before serialisation, it must retire the
+FreeCAD's `slotStartSaveDocument`. Before serialisation, it must stop the
 lifecycle and remove the observer. It must clear the target selection without
 clearing a selected sibling document. It must clear caches, proxies, and active
-Coin children. It must persist no transient marker. After close/reopen, another
+Coin children.
+
+It must persist no transient marker. After close/reopen, another
 explicit activation must reconstruct new scene nodes. It must reconstruct the
-original owner-visible Exit state. Explicit deactivation must retire that
+original owner-visible Exit state.
+
+Explicit deactivation must stop that
 rebuilt lifecycle before direct document close. The bounded composition adds
 no automatic close or permanent loading policy. The inner sentinel is
 `TRACKTEMPLATE_PHASE5_TRANSITION_EDITING_LIFECYCLE_GUI=`. The outer runner
@@ -759,7 +836,9 @@ operation. Disposal restores the original public display-mode enumeration and
 switch selection. It clears each retained mapping and cache, but leaves one
 named empty switch child. The lifecycle confines that residual to one child
 per object. It rejects same-document reactivation without adding a second
-child. Document close/reopen removes it. The checks require this documented
+child.
+
+Document close/reopen removes it. The checks require this documented
 bounded limitation. They must not describe disposal as complete view-state
 restoration. D-P5-002 accepts it only for the demonstrated Entry/Exit product
 boundary recorded in the
@@ -779,8 +858,11 @@ The standalone proof covers the explicit caller-owned chord-error tolerance
 and segment ceiling. It covers the canonical local left-turn frame, units,
 and deterministic station ordering. It covers the conservative Euler-curvature
 interpolation bound and independent high-precision Fresnel-series coordinates.
+
 It also covers zero-length and fail-closed resolution cases. Signed-result
-reuse, change, change-back, and failure atomicity are included. The qualified
+reuse, change, change-back, and failure atomicity are included.
+
+The qualified
 FreeCAD smoke proves that the additive public contract runs in the accepted
 host profile. It creates no document, object, property, or Undo/Redo change.
 Its sentinel is
@@ -799,12 +881,16 @@ This qualified-host proof constructs the verified exact centreline as one open
 `Part` wire. For zero length, it constructs one vertex. One `Part::Feature` in
 a hidden temporary document contains the geometry. The proof checks ordered
 coordinates, bounds, polyline length, topology, and planarity. It also checks
-kernel validity and deterministic signed neutral measurements. Success,
+kernel validity and deterministic signed neutral measurements.
+
+Success,
 explicit application cancellation, a failure in the cancellation check, and
 injected Part-build failure
 must all close the temporary document. Each case must restore the prior active
 document. The editable document, its properties, and Undo/Redo history must
-remain unchanged. Its sentinel is
+remain unchanged.
+
+Its sentinel is
 `Phase 6 transition transient exact geometry validation passed`. No
 `Part.Shape` crosses the adapter. No file is written. The result supplies no
 GUI, target-format, production-clearance, or Phase 6 exit acceptance.
@@ -821,29 +907,43 @@ The standalone proof covers deterministic DXF and dependency-manifest bytes.
 It covers descriptor-relative destination control, resolve-to-bind removal,
 and substitution. It covers post-lock substitution, directory-rename races,
 and symbolic-link races. Anonymous creation-bound staging and observed
-descriptor-close abandonment are included. The original interruption must
+descriptor-close abandonment are included.
+
+The original interruption must
 propagate on a surviving host with truthful chained `BaseException`
 diagnostics. It must remain the primary interruption when an anonymous close
 fails. Cleanup must attempt all remaining anonymous closes. Bound-directory
-close diagnostics must not replace the original error. Post-link/pre-sync
+close diagnostics must not replace the original error.
+
+Post-link/pre-sync
 durability uncertainty must remain non-recoverable. The proof covers exact
 zero-member, DXF-only, manifest-only, and complete-pair states. Historical
 controls remain inert. It covers interruption after each addition and
-next-invocation monotonic completion. Complete-pair reuse requires directory
+next-invocation monotonic completion.
+
+Complete-pair reuse requires directory
 synchronisation. A synchronisation failure must preserve data and fail closed.
 The proof covers explicit application cancellation and injected failure after one
-addition. It covers initial-member and post-addition substitution. Unsupported
+addition. It covers initial-member and post-addition substitution.
+
+Unsupported
 primitives must fail closed. It covers complete exact-set reuse. It refuses
 non-regular finals and byte collisions. Active-lock diagnostics must fail
-closed. All retained-state diagnostics must be truthful. The proof covers the
+closed. All retained-state diagnostics must be truthful.
+
+The proof covers the
 bounded D-P6-003 strict add-only, journal-free implementation. It grants no
 deletion authority. TrackTemplate removes, rewrites, or replaces no published
-final. The standalone sentinel is
+final.
+
+The standalone sentinel is
 `Phase 6 transition DXF export validation passed`. The qualified FreeCAD proof
 imports both the non-zero `LWPOLYLINE` and zero-length `POINT`, and repeats
 document isolation and explicit application cancellation. It covers injected
 second-addition failure, exact partial preservation, and next-invocation
-completion. It also covers surviving-host interruption cleanup. Its required
+completion. It also covers surviving-host interruption cleanup.
+
+Its required
 sentinel is
 `Phase 6 transition DXF qualified FreeCAD validation passed`. These commands
 remain bounded to the accepted Entry/Exit slice. Output remains

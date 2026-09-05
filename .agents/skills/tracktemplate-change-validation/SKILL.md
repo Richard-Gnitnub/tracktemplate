@@ -1,219 +1,279 @@
 ---
 name: tracktemplate-change-validation
-description: Select, run and report proportionate TrackTemplate validation and classify failed tests before retained fixes, distinguishing standalone, qualified FreeCAD, real-GUI, persistence, export, performance, provenance and licensing evidence.
+description: Select and do proportionate TrackTemplate validation. Report its results. Before retained repairs, classify failed tests. Distinguish standalone, qualified FreeCAD, real-GUI, persistence, export, performance, provenance, and licensing evidence.
 ---
 
 # TrackTemplate change validation
 
 ## Purpose
 
-This skill owns evidence selection and interpretation. Determine what the actual
-TrackTemplate change requires, report what completed checks prove and keep
-unavailable evidence visible. Do not decide whether the implementation or scope
-is acceptable overall; for source and test changes, that belongs to
-`$tracktemplate-quality-review`. For governance documents, a green final
-deterministic validation ends the finite Technical Author Lead route. It does
-not hand the prose to another reviewer.
+This skill owns evidence selection and interpretation. Find the evidence
+necessary for the change. Report what completed checks prove. Report
+unavailable evidence.
 
-## Required preparation
+Do not decide whether the complete implementation or scope is acceptable.
+For source and tests, `$tracktemplate-quality-review` owns that assessment.
+For governance documents, green final deterministic validation completes the
+finite Technical Author Lead procedure. It does not send the prose to another
+reviewer.
+
+## Necessary preparation
 
 1. Read [`references/validation-checklist.md`](references/validation-checklist.md).
-2. Inspect the complete relevant diff, including connected source, tests,
-   documentation, schemas, fixtures and generated interfaces.
-3. Identify the affected architectural boundary, railway boundary and
-   FreeCAD/host-integration boundary.
-4. Read `reference/PROJECT_PLAN.md` for the current phase and applicable
-   exit-condition status. Read `reference/current/PHASE_EVIDENCE.md` and the
-   current JSON registers when detailed evidence, risks or decisions matter.
-5. Read `reference/VALIDATION.md` for the applicable validation layers and
-   verified commands.
-6. Read `reference/TESTING_POLICY.md` for testing obligations and oracle-change
-   rules.
-7. Read only the additional canonical documents required by the change.
-8. For a proposed non-trivial behaviour change, define the regression contract
-   before implementation: the observable outcome, preserved invariants,
-   intended behaviour change, important rejection or failure cases, and the
-   evidence that could disprove success.
+2. Examine the complete related diff. Include connected source, tests,
+   documentation, schemas, fixtures, and generated interfaces.
+3. Identify affected architecture, railway, and FreeCAD/host integration
+   boundaries.
+4. Read `reference/PROJECT_PLAN.md` for current phase and phase-exit status.
+   For detailed evidence, risks, or decisions, read
+   `reference/current/PHASE_EVIDENCE.md` and its current JSON registers.
+5. Read `reference/VALIDATION.md` for applicable validation layers and verified
+   commands.
+6. Read `reference/TESTING_POLICY.md` for test requirements and rules for
+   changes to oracles.
+7. Read only additional canonical documents necessary for the change.
+8. Before a non-trivial behaviour change, define the regression contract.
+   Include the contract items listed below.
+
+The regression contract includes these items:
+
+- Observable result.
+- Preserved invariants.
+- Intended behaviour change.
+- Important rejection and failure cases.
+- Evidence that can disprove success.
 
 ## Conditional canonical reading
 
-- Read `reference/ARCHITECTURE.md` for canonical-state, display, persistence,
-  export or product-boundary changes.
-- Read `reference/MODULARISATION_PLAN.md` for source-boundary, dependency or
-  extraction changes.
-- Read `reference/PERFORMANCE_SOP.md` before making or assessing timing,
-  resource-use or optimisation claims.
-- Read `reference/RECOVERY_AND_BACKUP.md` before destructive, bulk, backup,
-  restore or operator-document work.
-- When Git recovery state or handoff is part of the change, use the
-  [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
-- Read `reference/TERMINOLOGY.md` when railway wording or identifiers change.
-- Read `reference/LICENSING_BOUNDARIES.md` and `reference/PROVENANCE.md` for
-  source data, external evidence, chair definitions, licensing, package or
-  output-status changes.
-- Read `reference/AGENT_WORKFLOWS.md` when agent guidance or skill files change.
-- Read the canonical
-  [Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
-  when validation changes presentation for the owner, status terms, or workflow
-  routing. Read the project technical terms in
-  [`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
-  Evidence is different from a recommendation or owner decision.
+For the changes below, read the specified owner:
 
-For exporter interruption evidence, read the canonical
-[failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model),
-[evidence boundary](../../../reference/VALIDATION.md#supported-exporter-interruption-evidence)
-and [operator recovery procedure](../../../reference/RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export)
-before selecting proof.
+- For canonical state, display, persistence, export, or product boundaries,
+  read `reference/ARCHITECTURE.md`.
+- For source boundaries, dependencies, or extraction, read
+  `reference/MODULARISATION_PLAN.md`.
+- Before claims about timing, resource use, or improvements to performance,
+  read `reference/PERFORMANCE_SOP.md`.
+- Before destructive, bulk, backup, restore, or operator-document work, read
+  `reference/RECOVERY_AND_BACKUP.md`.
+- For Git recovery state or handoff, use the
+  [procedure for visible recovery state](../../../reference/RECOVERY_AND_BACKUP.md#visible-recovery-state).
+- For railway wording or identifiers, read `reference/TERMINOLOGY.md`.
+- For source data, external evidence, chair definitions, licences, packages,
+  or output status, read `reference/LICENSING_BOUNDARIES.md` and
+  `reference/PROVENANCE.md`.
+- For agent guidance or skill files, read `reference/AGENT_WORKFLOWS.md`.
+
+If validation changes the owner presentation, status terms, or routing, read
+the canonical
+[Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile).
+Read the project technical terms in
+[`reference/TERMINOLOGY.md`](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology).
+Evidence is different from a recommendation or owner decision.
+
+Before evidence selection for exporter interruption, read these owners:
+
+- Canonical
+  [failure model](../../../reference/ARCHITECTURE.md#supported-exporter-failure-model).
+- [Evidence boundary](../../../reference/VALIDATION.md#supported-exporter-interruption-evidence).
+- [Operator recovery procedure](../../../reference/RECOVERY_AND_BACKUP.md#recovery-after-an-abnormally-interrupted-export).
 
 ## Validation rules
 
-- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage validation`
-  before repository validation. For the required Ruff check, add `--run-ruff`.
-  Stop before validation if the preflight does not pass.
-- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage documentation`
-  before STE source or extraction validation.
-- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
-  before a qualified headless FreeCAD check.
-- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui`
-  before a real-GUI bridge check.
-- Select checks according to the changed behaviour and dependency path. Do not
-  run every available command merely because it exists.
-- Use the verified commands and evidence definitions in
-  `reference/VALIDATION.md`. Do not create a second command catalogue in this
-  skill.
-- For Ruff and other development tools, use the canonical
-  [development-toolchain preflight](../../../reference/VALIDATION.md#developer-tool-boundary).
-  Do not install or change a tool during validation. Do not continue a required
-  check after its preflight gives a `FAIL` result.
-- Follow the canonical
-  [document boundary](../../../reference/VALIDATION.md#document-boundary). Do
-  not edit that file merely because a test was added or run. Change it only
-  when the task changes a durable validation contract that the document owns.
-- At minimum, parse every changed Python or macro file and run the fastest
-  focused test that proves the changed behaviour.
-- Use machine controls only for Issue 9 requirements that they can validate
-  accurately. Do not use a validator as proof of linguistic conformance.
-- A recorded conformance review against the official Issue 9 standard is
-  necessary for a linguistic conformance claim.
-- For such a claim, make sure that the review reports an official source from the
-  [ASD-STE100 source instructions](../../../reference/external/asd-ste100/README.md).
-  Normal repository validation does not use the ignored PDF.
-- When the change includes the STE lookup, use its
-  [validation and review receipt route](../../../reference/external/asd-ste100/README.md#pre-check-and-review-receipt).
-  Validate source identity and derived cache identity. Record that the reviewer
-  examines the complete applicable requirement set. Selected lookup results and
-  an empty pre-check do not show conformance.
-- Run affected regression suites and the applicable FreeCAD, GUI, persistence,
-  migration, export, rollback, recovery, performance, provenance or licensing
-  checks.
-- For a recovery or handoff workflow change, validate the stash inventory,
-  unique content, and stash disposition controls. Also do the applicable
-  semantic control validation. Review the preservation diff.
-- Run only applicable checks after their required preflight passes. State an
-  unavailable optional check explicitly. Do not omit a required check.
-- Record the exact command, environment, result and required success sentinel
-  for each executed check.
-- A zero exit status without the required success sentinel is not evidence that
-  assertions ran.
-- Keep standalone Python, qualified headless FreeCAD and real-GUI evidence
-  distinct. Headless evidence does not become GUI acceptance.
-- Preserve comparable starting states, cache conditions, process boundaries and
-  correctness assertions when assessing performance.
-- Do not weaken tests, widen tolerances, change accepted oracles or remove
-  failure cases merely to obtain a pass.
-- When repeated focused fixes fail against the same proof, stop applying local
-  patches and reassess the premise, affected boundary, baseline and proposed
-  approach. Record the unresolved cause rather than suppressing the failure.
-- When repeated fixture, harness or oracle repairs do not reduce the original
-  product or exit uncertainty, stop instead of creating another local tranche
-  and route the progress question to
-  [`$tracktemplate-chief-of-staff`](../tracktemplate-chief-of-staff/SKILL.md)
-  when the owner or an active `$tracktemplate-continue` cycle has authorised
-  that diagnosis.
-- Do not describe a copied-target fixture, local comparison path, prototype,
-  headless smoke or partial workflow as supported production behaviour.
-- Treat a probe outside the supported exporter failure model as research
-  evidence unless the project owner explicitly widens the contract. It is not
-  automatically a blocker, but remains one when it proves deletion, overwrite,
-  unsafe mutation, supported-workflow failure, unsafe retry or another retained
-  invariant violation.
-- Do not claim a phase, milestone, release, migration family, package or output
-  is accepted or project-cleared. Those decisions remain with the structured
-  current records and the project owner.
-- Do not change files unless the user requested implementation or validation
-  fixes.
+Before repository validation, use this command:
+
+`.venv/bin/python tools/development_toolchain_preflight.py --stage validation`
+
+For the necessary Ruff check, add `--run-ruff`. If the development-toolchain
+preflight does not pass, stop before validation.
+
+Before STE source or extraction validation, use this command:
+
+`.venv/bin/python tools/development_toolchain_preflight.py --stage documentation`
+
+Before a qualified headless FreeCAD check, use this command:
+
+`.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
+
+Before a real-GUI bridge check, use this command:
+
+`.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui`
+
+Select checks from the changed behaviour and dependency path. Do not use every
+available command only because it exists. Use verified commands and evidence
+definitions in `reference/VALIDATION.md`. Do not make another command
+catalogue here.
+
+For Ruff and other development tools, use the canonical
+[development-toolchain preflight](../../../reference/VALIDATION.md#developer-tool-boundary).
+During validation, do not install or change a tool. After its
+development-toolchain preflight gives `FAIL`, do not continue a necessary check.
+
+Follow the canonical
+[document boundary](../../../reference/VALIDATION.md#document-boundary).
+Do not edit that file only because a test was added or done. Change it only
+for a change to its durable validation contract.
+
+At minimum, parse every changed Python or macro file. Do the fastest focused
+test that proves the changed behaviour.
+
+Use machine controls only for Issue 9 requirements that they can validate
+accurately. Do not use a validator as proof of linguistic conformance. Such
+a claim needs a recorded conformance review against the official Issue 9
+standard. For the claim, make sure that the review identifies an official source
+from the [source instructions](../../../reference/external/asd-ste100/README.md).
+Normal repository validation does not use the ignored PDF.
+
+For STE lookup changes, use the
+[validation and review receipt route](../../../reference/external/asd-ste100/README.md#pre-check-and-review-receipt).
+Validate source identity and derived cache identity. Record the reviewer's
+examination of the complete applicable requirement set. Selected lookup
+results and an empty pre-check do not show conformance.
+
+Do affected regression suites and applicable checks for these subjects:
+
+- FreeCAD and GUI.
+- Persistence and migration.
+- Export and rollback.
+- Recovery and performance.
+- Provenance and licensing.
+
+For a recovery or handoff change, validate stash inventory, unique content,
+and stash disposition controls. Do the applicable semantic control
+validation. Review the preservation diff.
+
+After necessary development-toolchain preflights pass, do only applicable
+checks. Report each unavailable optional check explicitly. Do every
+necessary check. For each executed check, record the exact command,
+environment, result, and necessary success sentinel.
+
+A zero exit status without the necessary success sentinel does not prove that
+assertions ran. Keep standalone Python, qualified headless FreeCAD, and
+real-GUI evidence distinct. Headless evidence does not give GUI acceptance.
+
+For performance assessment, preserve comparable starting states, caches,
+process boundaries, and correctness assertions. Do not weaken tests, widen
+tolerances, change accepted oracles, or remove failure cases only to get
+a pass.
+
+If repeated focused repairs fail the same proof, stop local patches. Reassess
+the premise, affected boundary, baseline, and proposed approach. Record the
+unresolved cause. Do not suppress the failure.
+
+If repeated fixture, harness, or oracle repairs do not reduce the original
+product or exit uncertainty, stop. Do not make another local work item.
+If the owner or an active `$tracktemplate-continue` cycle authorised diagnosis,
+use [`$tracktemplate-chief-of-staff`](../tracktemplate-chief-of-staff/SKILL.md).
+Give it the progress question.
+
+Do not claim supported production behaviour from any of these items:
+
+- A fixture with a copied target.
+- A local comparison path or prototype.
+- A headless smoke check.
+- A partial workflow.
+
+Unless the owner explicitly widens the exporter failure model, report probes
+outside it as research evidence. Such a probe is not automatically a blocker.
+It remains a blocker if it proves any retained invariant violation, including
+these cases:
+
+- Deletion or overwrite.
+- Unsafe mutation.
+- Failure in a supported workflow.
+- Unsafe retry.
+
+Do not claim acceptance or project clearance for a phase, milestone, release,
+migration family, package, or output. Those decisions remain with structured
+current records and the project owner.
+
+Unless the user requested implementation or validation fixes, do not change
+files.
 
 ### Validation for worktree retirement
 
 For worktree retirement, use the
 [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
 Validate accepted-history containment. Validate tracked cleanliness. Validate
-the local-state inventory. Make sure each item has 1 local-state type.
-Validate planned preservation. Make sure the retirement audit returns a `FAIL`
-result for ambiguous or uniquely owned state.
+the local-state inventory. Make sure that each item has one local-state type.
+Validate planned preservation. Make sure that the retirement audit returns `FAIL`
+for ambiguous or uniquely owned state.
 
 Validate `git worktree remove` without `--force`. Before Git removes the local
-branch, make sure Git removed the worktree. After removal, examine the
+branch, make sure that Git removed the worktree. After removal, examine the
 preservation audit. After removal, examine the preservation diff.
 
 ## Failed-test adjudication
 
-When any selected check fails, begin with a read-only evidence pass:
+If a selected check fails, begin with a read-only evidence pass:
 
-1. preserve the exact command, environment/profile, source state, required
-   sentinel, raw output and first relevant traceback or assertion;
-2. identify the observable contract and its canonical authority;
-3. compare with the known baseline and determine whether the failure is
-   introduced, pre-existing or unresolved;
-4. assign the supported primary classification defined by
-   `reference/TESTING_POLICY.md`; and
-5. state the correct repair boundary before editing retained source, tests,
-   fixtures, expected values or environment configuration.
+1. Preserve the exact evidence listed below.
+2. Identify the observable contract and its canonical authority.
+3. Compare the failure with the known baseline. Find whether it is
+   introduced, pre-existing, or unresolved.
+4. Use the supported primary classification from
+   `reference/TESTING_POLICY.md`.
+5. Before retained edits, record the correct repair boundary. This applies to
+   source, tests, fixtures, expected values, and environment configuration.
 
-Repeat runs and disposable probes may gather diagnostic evidence. Do not mutate
-retained code or tests while the primary classification remains unsupported.
+The preserved evidence includes these items:
+
+- Exact command and environment/profile.
+- Source state and necessary sentinel.
+- Raw output.
+- First related traceback or assertion.
+
+Additional executions and disposable probes can collect diagnostic evidence. While the
+primary classification lacks support, do not mutate retained code or tests.
 If the user authorised fixes, make the smallest repair at the classified
-boundary, rerun the original exact command, then run every additionally affected
-layer.
+boundary. Use the original exact command again. Then do the checks for each
+additionally affected layer.
 
-Changing a test or oracle still requires the canonical change control in
-`reference/TESTING_POLICY.md`. A test failure, an implementation preference or
-the desire for a green suite is not that evidence.
+A test or oracle change still needs the change control in
+`reference/TESTING_POLICY.md`. A test failure or implementation preference
+does not supply that evidence. A desired successful suite does not supply it.
 
 ## Evidence recording boundary
 
-Keep raw validation and failed-test evidence complete in retained logs or pull-
-request evidence. That record includes the exact commands, environments,
-sentinels, output, chronology, classifications and repair reruns needed to audit
-the proof.
+Keep raw validation and failed-test evidence complete in retained logs or
+pull-request evidence. Include exact commands, environments, sentinels, output,
+chronology, classifications, and repeated checks after repairs. These records
+must permit an audit of the proof.
 
-Current phase evidence has a different purpose. When the task is Level 2 or
-Level 3 and its documentation lifecycle calls for an entry, provide only the
-concise, decision-relevant result, decisive proof, contribution, material
-limitation and unchanged authority or required decision. Do not copy the full
-failed-test chronology into phase evidence unless the chronology itself changes
-the evidential conclusion. Level 1 validation or maintenance does not create a
-current-phase evidence entry.
+Current phase evidence serves a different purpose. For Level 2 or Level 3
+work, an entry can be necessary in the documentation lifecycle. In that case, record
+only these items:
+
+- Concise result needed for the decision.
+- Decisive proof and contribution.
+- Material limitation.
+- Unchanged authority or necessary decision.
+
+Only if chronology changes the evidence conclusion, include the full failed-test
+chronology in phase evidence. Level 1 validation or maintenance does not make
+a current-phase evidence entry.
 
 ## Output
 
-For a substantial cycle, start with the profile's owner view. Put this exact
+For a substantial cycle, start with the profile's owner view. Put this
 validation detail below it as proof/provenance:
 
-1. **Change boundary:** affected files, architecture, railway behavior and host
-   integration.
-2. **Selected validation:** each applicable layer and why it is necessary.
-3. **Checks completed:** exact commands, environments, sentinels and results.
-4. **Failed-test adjudication:** for each failure, the preserved evidence,
-   primary classification, canonical contract and correct repair boundary.
-5. **Checks not run:** the reason, the risk that is still present, and the
-   necessary environment or evidence.
-6. **Evidence interpretation:** what the completed checks show and what they do
+1. **Change boundary:** Affected files, architecture, railway behaviour, and
+   host integration.
+2. **Selected validation:** Applicable layers and the reason for each.
+3. **Checks completed:** Exact commands, environments, sentinels, and results.
+4. **Failed-test adjudication:** Preserved evidence, primary classification,
+   canonical contract, and correct repair boundary for each failure.
+5. **Checks not done:** Reason, remaining risk, and necessary environment or
+   evidence.
+6. **Evidence interpretation:** What completed checks show and what they do
    not show.
-7. **Evidence status:** complete for the selected scope, incomplete, or failed.
-8. **Next boundary:** for source and test changes, whether the complete change
-   is ready for `$tracktemplate-quality-review`; for governance documents,
-   whether final validation completed the cycle or stopped for the owner.
+7. **Evidence status:** Complete for the selected scope, incomplete, or
+   failed.
+8. **Next boundary:** The applicable result given below.
 
-Omit failed-test adjudication when no check failed. Do not imply that an
-unavailable, unperformed or narrower check passed.
+For source and tests, report readiness for `$tracktemplate-quality-review`.
+For governance documents, report whether final validation completed the cycle
+or stopped for the owner.
+
+If no check failed, do not include failed-test adjudication. Do not imply that an
+unavailable, unperformed, or narrower check passed.

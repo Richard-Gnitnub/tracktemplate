@@ -631,9 +631,10 @@ def _validate_consumers(contract):
     publish = (
         ROOT / ".agents" / "skills" / "tracktemplate-publish" / "SKILL.md"
     ).read_text(encoding="utf-8")
+    publish = " ".join(publish.split())
     publish_preflight = publish.index("--stage publication")
     assert publish_preflight < publish.index("Fetch remote state")
-    assert publish_preflight < publish.index("create a descriptive `agent/")
+    assert publish_preflight < publish.index("make a descriptive `agent/")
 
     pipeline = (
         ROOT / "tools" / "run_regression_pipeline.py"

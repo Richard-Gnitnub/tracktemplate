@@ -1,36 +1,53 @@
 ---
 name: tracktemplate-freecad-object-model
-description: Design, implement or review TrackTemplate mappings between canonical railway records and FreeCAD document objects, properties, FeaturePython proxies and ViewProviders. Use for object creation, recompute, transactions, persistence, save/reopen, migration, Undo/Redo, selection mapping or App/Gui lifecycle changes.
+description: Design, make, or review TrackTemplate object mappings in FreeCAD. Use for properties, proxies, ViewProviders, recompute, transactions, persistence, save/reopen, migration, Undo/Redo, selection, or App/Gui changes.
 ---
 
 # TrackTemplate FreeCAD object model
 
-## Outcome
+## Purpose
 
-Create a compact, versioned and recoverable FreeCAD object mapping whose
-document state reconstructs canonical railway intent and whose GUI
-representation remains derived.
+Make a compact, versioned object mapping that permits recovery. Its document
+state must reconstruct canonical railway intent. Its GUI representation must
+remain derived.
 
 ## Responsibility boundary
 
-- Run `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
-  before qualified host work. Run
-  `.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui`
-  before work that uses the real-GUI bridge.
-- Read `reference/PROJECT_PLAN.md`, `reference/ARCHITECTURE.md`,
-  `reference/MODULARISATION_PLAN.md`, the qualified compatibility contract,
-  `reference/VALIDATION.md` and `reference/TESTING_POLICY.md`.
-- Use `$tracktemplate-freecad-addon-research` to retrieve current first-party
-  guidance for FeaturePython objects, properties, proxies, serialization,
-  ViewProviders and lifecycle callbacks. Qualify every runtime-specific claim
-  against the supported FreeCAD profile.
-- Use `$tracktemplate-api-design` before changing stored properties, payloads,
-  schema versions, commands or compatibility contracts.
-- Use `$tracktemplate-python-writing` for implementation and
-  `$tracktemplate-occt-geometry` for exact `Part` shape construction.
+Before qualified host work, use this command:
 
-This skill owns the adapter workflow, not canonical railway calculations,
-presentation policy, migration acceptance or FreeCAD upstream behaviour.
+`.venv/bin/python tools/development_toolchain_preflight.py --stage freecad`
+
+Before work with the real-GUI bridge, use this command:
+
+`.venv/bin/python tools/development_toolchain_preflight.py --stage freecad-gui`
+
+Read these authorities:
+
+- `reference/PROJECT_PLAN.md`.
+- `reference/ARCHITECTURE.md`.
+- `reference/MODULARISATION_PLAN.md`.
+- The qualified compatibility contract.
+- `reference/VALIDATION.md`.
+- `reference/TESTING_POLICY.md`.
+
+For current official guidance, use `$tracktemplate-freecad-addon-research`.
+Include FeaturePython objects, properties, proxies, serialization,
+ViewProviders, and lifecycle callbacks. Check each claim about runtime
+behaviour against the supported FreeCAD profile.
+
+Before changes to the following items, use `$tracktemplate-api-design`:
+
+- Stored properties and payloads.
+- Schema versions.
+- Commands.
+- Compatibility contracts.
+
+For implementation, use `$tracktemplate-python-writing`. For exact `Part`
+shapes, use `$tracktemplate-occt-geometry`.
+
+This skill owns the workflow for the adapter. It does not own canonical
+railway calculations, presentation policy, migration acceptance, or FreeCAD
+behaviour.
 
 ## Mapping contract
 
@@ -44,63 +61,87 @@ small logical FreeCAD document object
 ViewProvider / Coin presentation
 ```
 
-For each field, state its owner, type, units, frame, default, validation,
-serialization form, schema version, migration rule and invalidation effect.
-Identify which information is canonical, persisted compatibility state,
-reconstructible derived state or GUI-only state.
+For each field, record these items:
 
-Never use an object label, generated object name, `Shape`, Coin node, cache or
-display property as independent railway truth.
+- Owner and type.
+- Units and frame.
+- Default and validation.
+- Serialization form and schema version.
+- Migration rule.
+- Effect on invalidation.
 
-## Object-lifecycle workflow
+Identify canonical information, persisted compatibility state, derived state
+that can be reconstructed, and state that only the GUI uses. Never use a
+derived item as independent railway truth. Such items include labels,
+generated object names, `Shape`, Coin nodes, caches, and display properties.
 
-1. **Research the qualified API.** Record official sources, revision where
-   material and the supported FreeCAD/Python profile. Remember that an FCStd
-   file stores object state but not the addon's Python implementation.
-2. **Choose the narrow backing type.** Justify `App::FeaturePython`,
-   `Part::FeaturePython` or another supported type from the object's persistent
-   responsibility. Do not select a shape-owning type merely for convenient
+## Object lifecycle procedure
+
+1. **Check the qualified API.** Record official sources and material revisions.
+   Record the supported FreeCAD/Python profile. An FCStd file stores object
+   state. It does not store the Addon's Python implementation.
+2. **Select the object type.** Justify `App::FeaturePython`,
+   `Part::FeaturePython`, or another supported type from its persistence
+   responsibility. Do not select a type that owns shapes only for convenient
    display.
-3. **Design stable persistence.** Use typed properties or a validated versioned
-   payload. Preserve import paths or provide explicit compatibility shims when
-   proxy classes move. Reject unknown, future, corrupt or conflicting state
-   before mutation.
-4. **Control callbacks and recompute.** Define initialization, property-change,
-   restore and recompute behaviour. Guard partial initialization, re-entrancy,
-   recursive writes and recompute storms. Keep `execute()` deterministic and
-   free of dialogs or hidden transactions.
-5. **Own mutations transactionally.** Put create, edit, migrate and delete
-   operations behind application commands with explicit validation, transaction
-   boundaries, rollback and clean-up. Prove Undo/Redo and failure recovery.
-6. **Separate App and Gui.** Core modules and document reconstruction must work
-   without `FreeCADGui`. ViewProviders own derived visibility, display modes,
-   Coin nodes and stable visual-to-domain selection mapping.
-7. **Bound object granularity.** Persistent object counts should scale with
-   logical assemblies and layers, not rail segments, timbers, chairs, markers
-   or generated export fragments.
-8. **Prove persistence.** Test new creation, property edit, recompute,
-   save/close/reopen, proxy restoration, copied-target migration, invalid or
-   future schema rejection, Undo/Redo and aborted mutation in the qualified
-   host. Add real-GUI evidence for display, selection or editing behaviour.
+3. **Design persistence.** Use typed properties or a validated, versioned
+   payload. If proxy classes move, preserve import paths or supply explicit
+   compatibility shims. Before mutation, reject unknown, future, corrupt, or
+   conflicting state.
+4. **Control callbacks and recompute.** Define initialization, property
+   changes, restore, and recompute behaviour. Prevent failures from partial
+   initialization, re-entrancy, recursive writes, and excessive recompute.
+   Keep `execute()` deterministic. Do not put dialogs or hidden transactions
+   in `execute()`.
+5. **Use transactions for mutations.** Put creation, edit, migration, and deletion
+   operations behind application commands. Give each command explicit
+   validation, transaction boundaries, rollback, and cleanup. Prove Undo/Redo
+   and failure recovery.
+6. **Separate App and Gui.** Core modules and document reconstruction must
+   work without `FreeCADGui`. ViewProviders own derived visibility, display
+   modes, and Coin nodes. They also own stable mappings from visual selections
+   to domain identities.
+7. **Limit object counts.** Persistent object counts should follow logical
+   assemblies and layers. They should not follow individual rail segments,
+   timbers, chairs, markers, or generated export fragments.
+8. **Prove persistence.** In the qualified host, test all applicable operations
+   in the list below. For display, selection, or editing behaviour, add
+   real-GUI evidence.
 
-## Guardrails
+The persistence tests include these operations:
+
+- New creation, property edit, and recompute.
+- Save, close, and reopen.
+- Proxy restoration.
+- Migration of copied targets.
+- Rejection of invalid or future schemas.
+- Undo/Redo.
+- Aborted mutation.
+
+## Constraints
 
 - Do not embed executable code or untrusted dynamic imports in persisted data.
-- Do not infer canonical identity from FreeCAD topology names, object order,
-  labels or transient pointers.
-- Do not mutate an operator's only document during automation.
-- Do not rely on `onChanged()` callback order during property construction
-  without qualified evidence and explicit guards.
-- Do not save derived exact shapes merely to avoid deterministic regeneration
-  unless the accepted architecture explicitly requires a retained production
-  object.
-- Do not treat a successful headless reopen as GUI, selection or Undo/Redo
-  acceptance.
+- Do not infer canonical identity from topology names, object order, labels,
+  or transient pointers.
+- During automation, do not mutate an operator's only document.
+- Without qualified evidence and explicit guards, do not rely on `onChanged()`
+  callback order during property construction.
+- Without an explicit architecture requirement for a retained production
+  object, do not save derived exact shapes to avoid regeneration.
+- Do not claim GUI, selection, or Undo/Redo acceptance from a successful
+  headless reopen.
 
 ## Report
 
-Report the mapping and object type, canonical versus derived fields, schema and
-migration strategy, proxy/import compatibility, callback and recompute model,
-transaction and rollback behaviour, object-count effect, App/Gui separation,
-validation completed and every qualified-host, real-GUI or owner decision still
-outstanding.
+Report these results:
+
+- Object mapping and object type.
+- Canonical fields and derived fields.
+- Schema and migration strategy.
+- Proxy and import compatibility.
+- Callback and recompute behaviour.
+- Transactions, rollback, and object counts.
+- App/Gui separation.
+- Completed validation.
+- Necessary qualified-host evidence, real-GUI evidence, and owner decisions
+  that are still absent.

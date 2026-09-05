@@ -2291,12 +2291,12 @@ def validate_current_evidence_mutations() -> None:
 
     lifecycle_changed_row = table_row_containing(
         evidence,
-        "| What changed | D-GOV-015 adopts one lifecycle",
+        "| What changed | D-GOV-015 adopts one Documentation Review lifecycle",
     )
     lifecycle_two_reviews = replace_once(
         lifecycle_changed_row,
-        "one Documentation Review",
-        "two Documentation Reviews",
+        "→ one Documentation Review →",
+        "→ two Documentation Reviews →",
     )
     expect_rejected(
         "phase-evidence/d-gov-015-second-review-authorised",
@@ -2311,12 +2311,12 @@ def validate_current_evidence_mutations() -> None:
     )
     lifecycle_result_row = table_row_containing(
         evidence,
-        "Durable state records document identities",
+        "The review-state register keeps document identities",
     )
     lifecycle_unit_state = replace_once(
         lifecycle_result_row,
-        "Durable state records document identities.",
-        "Durable state records every logical unit.",
+        "The review-state register keeps document identities.",
+        "The review-state register keeps every logical unit.",
     )
     expect_rejected(
         "phase-evidence/d-gov-015-persistent-unit-state-added",
@@ -2354,14 +2354,28 @@ def validate_current_evidence_mutations() -> None:
         evidence,
         "D-GOV-017 whole technical-document lifecycle",
     )
+    expect_rejected(
+        "phase-evidence/d-gov-017-historical-blocked-status-erased",
+        lambda: progress._validate_tdmp_lifecycle_panel(
+            replace_once(
+                evidence,
+                "Its `BLOCKED` result uses schema 2",
+                "Its result uses schema 2",
+            )
+        ),
+        "D-GOV-017 evidence panel drifted: Its BLOCKED result uses schema 2",
+    )
     tdmp_current_row = table_row_containing(
         tdmp_section,
-        "not yet integrated as the current controlled baseline",
+        "Normal repository integration has not made it the current "
+        "controlled baseline",
     )
     tdmp_candidate_made_current = replace_once(
         tdmp_current_row,
-        "not yet integrated as the current controlled baseline",
-        "integrated as the current controlled baseline",
+        "Normal repository integration has not made it the current "
+        "controlled baseline",
+        "Normal repository integration has made it the current "
+        "controlled baseline",
     )
     expect_rejected(
         "phase-evidence/d-gov-017-draft-made-current",
@@ -2376,19 +2390,19 @@ def validate_current_evidence_mutations() -> None:
                 ),
             )
         ),
-        "D-GOV-017 owner view drifted: not yet integrated as the current "
-        "controlled baseline",
+        "D-GOV-017 owner view drifted: Normal repository integration has not "
+        "made it the current controlled baseline",
     )
     tdmp_authority_row = table_row_containing(
         tdmp_section,
-        "Keep the D-GOV-015 authoring internals and sole Documentation Review "
+        "Keep the D-GOV-015 authoring controls and sole Documentation Review "
         "authoritative",
     )
     tdmp_dgov015_replaced = replace_once(
         tdmp_authority_row,
-        "Keep the D-GOV-015 authoring internals and sole Documentation Review "
+        "Keep the D-GOV-015 authoring controls and sole Documentation Review "
         "authoritative",
-        "Replace the D-GOV-015 authoring internals and Documentation Review",
+        "Replace the D-GOV-015 authoring controls and Documentation Review",
     )
     expect_rejected(
         "phase-evidence/d-gov-017-replaces-d-gov-015",
@@ -2403,7 +2417,7 @@ def validate_current_evidence_mutations() -> None:
                 ),
             )
         ),
-        "D-GOV-017 owner view drifted: Keep the D-GOV-015 authoring internals "
+        "D-GOV-017 owner view drifted: Keep the D-GOV-015 authoring controls "
         "and sole Documentation Review authoritative",
     )
 
@@ -3081,7 +3095,7 @@ def validate_documentation_profile_mutations() -> None:
     )
     overlap_default_inverted = replace_once(
         workflows,
-        "use an existing primary owner when possible",
+        "use an existing owner when possible",
         "creation of a parallel skill is the default resolution",
     )
     expect_rejected(
@@ -3131,10 +3145,10 @@ def validate_documentation_profile_mutations() -> None:
     )
     author_acceptance_added = replace_once(
         technical_author,
-        "The lead also does\nnot own terminology, the linguistic verdict, "
-        "the validation result, or\ncontrolled-baseline acceptance.",
+        "The lead does not\nown terminology, the linguistic verdict, "
+        "the validation result, or acceptance\nof the controlled baseline.",
         "The lead owns terminology, the linguistic verdict, the validation "
-        "result, and controlled-baseline acceptance.",
+        "result, and acceptance of the controlled baseline.",
     )
     expect_rejected(
         "tdmp/technical-author-self-acceptance-added",
@@ -3397,8 +3411,8 @@ def validate_documentation_profile_mutations() -> None:
         (
             "tt-doc/lifecycle-empty-blocker-workflow-authorised",
             "workflow",
-            "A `BLOCKED` verdict must record a complete, nonempty `BLOCKED`\n"
-            "   finding set.",
+            "For `BLOCKED`, record the complete finding set. The finding set\n"
+            "    must not be empty.",
             "A `BLOCKED` verdict can record an empty finding set.",
             "AGENT_WORKFLOWS lost the simplified documentation lifecycle",
         ),

@@ -1330,7 +1330,7 @@ def _validate_performance_direction_sources(
         "A resource metric is an RSS, RSS change, high-water RSS, or high-water "
         "RSS change in a performance record",
         "A journey remainder is the full-journey CPU or wall time minus the "
-        "measured stage times",
+        "measured operation times",
     ):
         _require(
             meaning_clause in terminology_flat,
@@ -3629,23 +3629,23 @@ def _validate_exit_conditions(
     for required_clause in (
         "TT-DOC-001",
         "TT-DOC-002",
-        "TT-DOC-002 corrects only the spelling directive",
+        "TT-DOC-002 corrects only the spelling instruction",
         "D-GOV-006 qualifies only the exact FreeCAD 1.1.3 profile",
         "D-GOV-007 changes only the host rule and the directly dependent "
-        "schema for internal performance-evidence records",
+        "schema for internal records of performance evidence",
         "admits no performance result and defines no budget",
         "does not claim that performance became better",
         "does not accept Exit 4",
         "D-GOV-010 qualifies only the profile with ID "
         "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
         "two profiles that the project qualified before D-GOV-010 stay "
-        "qualified, and their evidence does not change",
+        "qualified. Their evidence does not change",
         "authorises its profile to supply candidate evidence for performance "
         "in a subsequent cycle",
         "Each comparison must use one profile with an exact identity",
         "does not change D-GOV-009 or Exit 4",
-        "D-GOV-011 accepts the D-GOV-009 attribution result as evidence for "
-        "direction selection only",
+        "D-GOV-011 accepts the D-GOV-009 attribution result as "
+        "direction-selection evidence only",
         "selects one subsequent hypothesis at Level 2 in "
         "tracktemplate/adapters/freecad/transition_state.py",
         "keeps one live read of the selected record before the write",
@@ -5177,48 +5177,56 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
     )
     expected_rows = {
         "Current state": (
-            "The interrupted three-path implementation at recovery checkpoint "
-            "`ac5a7d7ae8c6bf72069b802ebe9e929faf27e789` is bounded "
-            "implementation evidence. Its authorised protected-main baseline is "
-            "`54176f5ae0fea1f72743f856fd9251a53d7e1dbf`. The checkpoint is not "
-            "accepted project state."
+            "The interrupted implementation changed three paths at "
+            "checkpoint `ac5a7d7ae8c6bf72069b802ebe9e929faf27e789`. This "
+            "checkpoint supplies bounded implementation evidence. Its "
+            "authorised protected-main baseline is "
+            "`54176f5ae0fea1f72743f856fd9251a53d7e1dbf`. The checkpoint is "
+            "not accepted project state."
         ),
         "What changed": (
-            "D-GOV-015 adopts one lifecycle: author → freeze scope → one "
-            "Documentation Review → optional exact reviewed correction once → "
-            "one final deterministic validation → complete or owner stop. The "
-            "existing Issue 9 retrieval and cache remain."
+            "D-GOV-015 adopts one Documentation Review lifecycle. Its "
+            "sequence is author → freeze scope → one Documentation Review → "
+            "optional exact reviewed correction once → one final "
+            "deterministic validation → complete or owner stop. The existing "
+            "Issue 9 retrieval and cache remain."
         ),
         "What now works": (
-            "Git derives whole-document first review and later "
-            "changed-complete-unit scope. One review returns one of three "
-            "complete verdicts. Exact corrections bind to frozen preimages. "
-            "Durable state records document identities. Final validation binds "
-            "source, scope, receipt, state, and final bytes and detects "
-            "unreviewed mutation."
+            "Git includes the complete document in its first review. After "
+            "acceptance, Git includes only changed complete logical units. "
+            "One review gives one of three complete verdicts. Exact "
+            "corrections use frozen preimages. The review-state register "
+            "keeps document identities. Final validation checks the source, "
+            "frozen review scope, receipt, state, and final bytes for "
+            "unreviewed changes."
         ),
         "Limitations/findings": (
-            "The tool cannot authenticate a reviewer. Actual role separation "
-            "remains necessary. One-shot ignored evidence requires independent "
-            "preservation. Final validation does not judge linguistic "
-            "conformance. The current backup condition must be proved before "
-            "Documentation Review."
+            "The tool cannot prove that a declared reviewer identity "
+            "identifies the actual reviewer. The author and reviewer must be "
+            "different persons or agents. Review evidence in ignored files "
+            "needs independent preservation before its next use. Final "
+            "validation does not judge linguistic conformance. The current "
+            "backup condition needs proof before Documentation Review."
         ),
         "Owner decision": (
-            "Accept D-GOV-015. Complete only the bounded lifecycle, canonical "
-            "and skill alignment, Level 3 record, one review, and optional "
-            "exact correction once. Then complete final deterministic "
-            "validation and one draft pull request if exact-green. D-GOV-017 "
-            "later makes final validation terminal for governance-prose review. "
-            "Do not merge."
+            "Accept D-GOV-015. The bounded scope contains only the "
+            "lifecycle, canonical and skill alignment, and Level 3 record. "
+            "It permits one review, its exact corrections once where "
+            "applicable, and final deterministic validation. If the exact "
+            "candidate passes all required checks, one draft pull request is "
+            "permitted. D-GOV-017 later makes final validation the last "
+            "operation for review of governance prose. Merge authority is "
+            "excluded."
         ),
         "Next action": (
-            "Complete fail-closed development validation. Freeze and preserve "
-            "one exact candidate and its scope. Run the one Documentation "
-            "Review. Preserve each resulting review file. Run the one final "
-            "deterministic validation. D-GOV-017 later prohibits a further "
-            "governance-prose review. Publish one draft pull request only if "
-            "exact-green."
+            "Development validation that fails closed comes first. The "
+            "author must freeze the exact candidate and its frozen review "
+            "scope. The one Documentation Review requires independent "
+            "preservation before it starts. Each resulting review file needs "
+            "preservation before the next dependent operation. D-GOV-017 "
+            "later prohibits another review after the one final "
+            "deterministic validation. If the exact candidate passes all "
+            "required checks, publish one draft pull request."
         ),
     }
     _require(
@@ -5337,37 +5345,55 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
         "D-GOV-015 bounded conditions",
     )
     expected_conditions = {
-        "Harden Git identity and add the fail-closed source, scope, receipt, "
-        "state, correction, and mutation proofs.": (
+        (
+            "Make the Git identity controls stronger. Add tests that show "
+            "invalid source, frozen review scope, receipt, state, "
+            "correction, and mutation inputs fail closed."
+        ): (
             "agent:openai-codex-primary",
-            "Before candidate freeze — completed, focused and full development "
-            "validation must remain green on the exact candidate.",
+            "Before candidate freeze — completed. Focused and complete "
+            "development validation must pass on the exact candidate.",
         ),
-        "Commit and push the exact candidate.": (
+        (
+            "Commit the exact candidate. Push that commit."
+        ): (
             "agent:openai-codex-primary",
-            "Before Documentation Review — pending candidate freeze.",
+            "Before Documentation Review — candidate freeze is pending.",
         ),
-        "Make the accepted independent backup device available.": (
+        (
+            "Make the accepted device for independent preservation "
+            "available."
+        ): (
             "owner:tracktemplate-project-owner",
-            "Before independent scope preservation and Documentation Review — "
-            "pending.",
+            "Before independent preservation of the frozen review scope "
+            "and Documentation Review — pending.",
         ),
-        "Preserve the frozen scope and then each review result, receipt, and "
-        "accepted-state proposal on the accepted device.": (
+        (
+            "Preserve the frozen review scope on the accepted device. Then "
+            "preserve each review result, receipt, and proposal for accepted "
+            "state."
+        ): (
             "agent:openai-codex-primary",
-            "Preserve each review file before its next dependent operation — "
-            "pending.",
+            "Before the next operation that needs each file — "
+            "preservation is pending.",
         ),
-        "Return the sole linguistic verdict with actual role separation and all "
-        "exact wording, if applicable.": (
+        (
+            "Keep the author and reviewer independent. Give the sole "
+            "linguistic verdict. If exact corrections apply, give all exact "
+            "replacement wording."
+        ): (
             "Independent Documentation Reviewer",
-            "Once, after scope preservation and before any correction — pending.",
+            "Once, after preservation of the frozen review scope and "
+            "before any correction — pending.",
         ),
-        "Apply only exact approved corrections once, run one final deterministic "
-        "validation, and return any failure to the owner.": (
+        (
+            "Apply only the exact corrections that the review permits, once. "
+            "Do one final deterministic validation. Report any failure to "
+            "the owner."
+        ): (
             "agent:openai-codex-primary",
-            "After the sole Documentation Review — final validation ends the "
-            "governance-document review cycle under D-GOV-017.",
+            "After the sole Documentation Review. Under D-GOV-017, final "
+            "validation ends review of the governance document.",
         ),
     }
     _require(
@@ -5410,24 +5436,28 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
         "One independent Documentation Reviewer owns the sole linguistic verdict",
         "D-GOV-017 later prohibits a separate final review of governance prose",
         "Proceed with bounded conditions",
-        "Any preservation, reviewer-separation, source, scope, receipt, state, "
-        "semantic, Git-identity, or final-byte failure returns to the owner",
-        "Do not run a second Documentation Review",
+        "Report a preservation failure to the owner. Do the same if the "
+        "author and reviewer are not independent. Report any source, frozen "
+        "review scope, receipt, or state failure to the owner. Do the same "
+        "for a failure in controlled meaning, exact Git identity, or final "
+        "bytes",
+        "Do not do a second Documentation Review",
         "On 2026-08-31, owner:tracktemplate-project-owner accepts the exact "
         "authority and exclusions",
-        "earlier author-side assurance section remains historical evidence of "
-        "the retired route",
+        "earlier section about the author's assurance remains historical "
+        "evidence of the retired workflow",
         "Phase 6 stays at 2/5",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays unknown",
         "No risk disposition changes",
         "no authority to resume D-GOV-014 or modify aa6c506",
-        "no authority for a second documentation-assurance framework or a "
-        "second Documentation Review",
-        "D-GOV-017 later supersedes only D-GOV-015's publication-policy review "
-        "clause for governance-document prose",
-        "Green final validation ends that review cycle",
-        "CI and publication can verify the final bytes but cannot reopen prose",
+        "no authority for a second framework for documentation assurance. It "
+        "also gives no authority for a second Documentation Review",
+        "D-GOV-017 later supersedes only the D-GOV-015 clause that requires "
+        "another review of governance prose during publication",
+        "A PASS result from final validation ends that review cycle",
+        "CI and publication can verify the final bytes. They cannot reopen "
+        "prose",
     ):
         _require(
             _semantic_text(fragment) in panel,
@@ -5469,19 +5499,21 @@ def _validate_tdmp_lifecycle_panel(current_evidence: str) -> None:
         "3641e93e521b44464deb1a8b192f285c8943f6d9",
         "project owner records the governance prose as written, reviewed, and "
         "validated",
-        "corrected branch candidate has an exact pushed Git identity and "
-        "separate independent preservation",
-        "not yet integrated as the current controlled baseline",
-        "one point-in-time route",
+        "exact candidate after correction has a pushed exact Git identity "
+        "and separate independent preservation",
+        "Normal repository integration has not made it the current "
+        "controlled baseline",
+        "one bounded cycle under the D-GOV-015 authoring controls",
         "No later documentation, quality, publication, wording, or semantic "
         "review applies",
         "Continuous integration can verify the exact final bytes",
-        "Do not run another review",
-        "Keep the D-GOV-015 authoring internals and sole Documentation Review "
+        "Do not do another review",
+        "Keep the D-GOV-015 authoring controls and sole Documentation Review "
         "authoritative",
         "no subject, terminology, verdict, validation, acceptance, publication, "
         "supersession, retirement, deletion, or merge authority",
-        "Use the normal repository integration route when separately authorised",
+        "When separate authority permits repository integration, use the "
+        "normal workflow",
     ):
         _require(
             fragment in owner_flat,
@@ -5506,7 +5538,7 @@ def _validate_tdmp_lifecycle_panel(current_evidence: str) -> None:
             "agent:kepler-lifecycle-gap-audit",
             "agent:meitner-validation-surface",
             "agent:tdmp-final-quality-review",
-            "A mistakenly started additional Documentation Review",
+            "An additional Documentation Review that started in error",
         },
         "D-GOV-017 participant roles drifted",
     )
@@ -5520,13 +5552,14 @@ def _validate_tdmp_lifecycle_panel(current_evidence: str) -> None:
     )
     for fragment in (
         "No unresolved dissent remains",
-        "Normal integration and the current controlled-baseline identity do not "
-        "yet exist",
+        "Normal repository integration has not occurred. The current "
+        "controlled baseline has no identity yet",
         "project owner records the required review as complete and forbids "
         "another review",
-        "separate preservation packet identify the corrected candidate",
+        "separate preservation packet identify the exact candidate after "
+        "correction",
         "There is no exception or waiver to D-GOV-015",
-        "governance-budget exception",
+        "exception to the governance budget",
     ):
         _require(
             fragment in dissent,
@@ -5542,7 +5575,7 @@ def _validate_tdmp_lifecycle_panel(current_evidence: str) -> None:
     expected_conditions = {
         (
             "Keep the TDMP in the Engineering Policy. Add no second policy "
-            "owner, document database, or linguistic-review route."
+            "owner, document database, or workflow for linguistic review."
         ): (
             "Technical Author Lead",
             "Before candidate freeze and throughout the lifecycle.",
@@ -5551,49 +5584,53 @@ def _validate_tdmp_lifecycle_panel(current_evidence: str) -> None:
             "Keep subject meaning and terminology with their applicable "
             "canonical owners."
         ): (
-            "Technical Author Lead and applicable subject or terminology owner",
+            "Technical Author Lead and applicable subject or terminology "
+            "owner",
             "Before candidate freeze and throughout the lifecycle.",
         ),
         (
-            "Commit and push a clean corrected Git candidate and preserve its "
-            "exact bytes independently. The prior preservation packet does not "
-            "satisfy this condition for changed bytes."
+            "Commit a clean exact candidate after correction. Push that "
+            "commit. Preserve its exact bytes independently. The prior "
+            "preservation packet does not satisfy this condition for changed "
+            "bytes."
         ): (
-            "Project owner, Technical Author Lead, and independent preservation "
-            "reviewer",
+            "Project owner, Technical Author Lead, and independent "
+            "reviewer of preservation",
             "Before normal repository integration.",
         ),
         (
-            "Apply the project owner's required adjustment and run one final "
-            "deterministic validation. Green final validation ends the "
-            "governance-document review cycle. Do not run another review."
+            "Apply the project owner's required adjustment. Do one final "
+            "deterministic validation. A PASS result from final validation "
+            "ends review of the governance document. Do not do another "
+            "review."
         ): (
             "Technical Author Lead and validation owner",
-            "Before controlled-baseline integration.",
+            "Before integration of the controlled baseline.",
         ),
         (
-            "Do not run a later documentation, quality, publication, wording, "
+            "Do not do a later documentation, quality, publication, wording, "
             "or semantic review of the governance prose. A general quality "
-            "review can examine separately changed source or tests only."
+            "review can examine only separately changed source or tests."
         ): (
-            "Technical Author Lead, validation owner, quality reviewer, and "
-            "integration owner",
-            "After the sole Documentation Review and throughout completion.",
+            "Technical Author Lead, validation owner, quality reviewer, "
+            "and integration owner",
+            "After the sole Documentation Review and throughout "
+            "completion.",
         ),
         (
-            "Let CI verify the exact final bytes only. Do not let CI start a "
-            "review, correction, reinterpretation, or wording-improvement cycle."
+            "Let CI verify only the exact final bytes. Do not let CI start a "
+            "review, correction, new interpretation, or wording improvement."
         ): (
             "Validation and integration owners",
             "During final validation and integration.",
         ),
         (
-            "Record acceptance only for the exact once-reviewed and finally "
-            "validated content. Then use normal repository integration to make "
-            "it current."
+            "Record acceptance only for the exact content that had its sole "
+            "review and passed final validation. Then use normal repository "
+            "integration to make that content current."
         ): (
             "Project owner and repository integration owner",
-            "Before current controlled use.",
+            "Before use of the current controlled technical document.",
         ),
         (
             "Preserve the terminal failed candidate, untouched legacy prose, "
@@ -5651,10 +5688,11 @@ def _validate_tdmp_lifecycle_panel(current_evidence: str) -> None:
         "material governance deficiency",
         "separate TDMP document would duplicate that owner",
         "This is Level 3",
-        "governance-budget exception",
+        "governance budget permits this exception",
         "No product source or railway behaviour changes",
         "No FreeCAD or GUI validation applies",
-        "Development validation parsed all 189 Python and macro files",
+        "Development validation checked all 189 Python and macro files for "
+        "valid Python",
         "The 60-test standalone CI profile passed",
         "rejected all 343 inadmissible mutations",
         "retained 337 independent protections",
@@ -5663,35 +5701,39 @@ def _validate_tdmp_lifecycle_panel(current_evidence: str) -> None:
         "52054d6bb857e38009f79f48d2896b4a1f6e583a",
         "bd5375e2af7b003bf2e2dc5a5fb457a59ad7396ffa0784915859f6c26d04cfab",
         "b525e3d9d3c55f5f685c2afe38af992181d9656c43de5b61a82971a576338c0e",
-        "28 blocking findings",
-        "no accepted-state proposal",
+        "Its BLOCKED result uses schema 2",
+        "28 findings",
+        "no proposal for accepted state",
         "D-GOV-016 was never current authority",
         "Proceed with bounded conditions",
         "3641e93e521b44464deb1a8b192f285c8943f6d9",
         "c4375ba2fbb6bb7ec9653f0e17738a51251a418365aa1d0c93604b9373d66466",
         "6b337142bbabd0b4224791bb6c6686a401d3bb1ae48aeb4933504a87d8790bfb",
-        "project owner records the required governance-prose review as complete",
-        "Complete the project owner's required adjustment, run the focused "
+        "project owner records the required review of governance prose as "
+        "complete",
+        "Complete the project owner's required adjustment. Do the focused "
         "final deterministic validation once",
-        "Green final validation ends the governance-document review cycle",
-        "Do not run another review",
+        "A PASS result from final validation ends review of the governance "
+        "document",
+        "Do not do another review",
         "general quality review can apply only to separately changed source or "
         "tests",
         "Continuous integration can verify the exact final bytes",
-        "cannot initiate a Documentation Review, correction, semantic "
-        "reinterpretation, or wording improvement",
-        "mistakenly started additional Documentation Review was stopped before "
-        "verdict, result, or accepted-state proposal",
-        "made no tracked mutation",
+        "cannot start a Documentation Review, correction, new interpretation "
+        "of meaning, or wording improvement",
+        "An additional Documentation Review started in error. It stopped "
+        "before a verdict, result, or proposal for accepted state",
+        "made no tracked change",
         "D-GOV-015 remains authoritative",
         "Phase 6 stays at 2/5",
         "Exits 1, 4, and 5 stay Pending",
         "Project status stays unknown",
         "No risk disposition changes",
-        "no second linguistic-review route",
-        "no product, railway, FreeCAD, GUI, persistence, export, schema, API, "
-        "performance, production, physical-output, packaging, release, tagging, "
-        "legacy-retirement, deletion, or merge authority",
+        "no second workflow for linguistic review",
+        "no product, railway, FreeCAD, GUI, persistence, export, schema, "
+        "API, or performance authority. It gives no production, "
+        "physical-output, packaging, release, tagging, legacy-retirement, "
+        "deletion, or merge authority",
     ):
         _require(
             _semantic_text(fragment) in panel,

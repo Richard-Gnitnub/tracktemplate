@@ -129,15 +129,16 @@ def validate_workflow_text(text: str) -> None:
     validate_no_positive_assurance_claim(text)
     value = semantic_text(text)
     ordered = (
-        "route new or materially changed canonical technical prose "
-        "automatically to tracktemplate-technical-author-lead",
+        "for new or materially changed canonical technical prose, use "
+        "tracktemplate-technical-author-lead automatically",
         "identify the document need",
-        "classify the document",
+        "identify the document class",
         "plan the purpose",
         "get technical meaning from the applicable canonical subject owner",
-        "read the technical-term register and applicable documentation policy",
-        "use targeted ste retrieval before writing",
-        "use the technical author lead authoring lifecycle",
+        "read the technical-term register. read the applicable documentation "
+        "policy",
+        "before you write the affected logical units, use targeted retrieval",
+        "use the technical author lead procedure",
         "freeze one clean exact candidate in git",
         "derive the frozen review scope from the last accepted document identity "
         "and git",
@@ -147,8 +148,8 @@ def validate_workflow_text(text: str) -> None:
         "approved with exact corrections",
         "or blocked verdict",
         "apply all exact replacement wording once against verified preimages",
-        "run one final deterministic validation after the review or correction",
-        "complete only if that validation is green",
+        "after the review or correction, run one final deterministic validation",
+        "if that validation passes, complete the cycle",
         "finish the bounded d-gov-015 authoring and review lifecycle",
         "do not start another documentation, quality, publication, wording, or "
         "semantic review",
@@ -165,7 +166,8 @@ def validate_workflow_text(text: str) -> None:
     for fragment in (
         "rule families in a lookup result are retrieval priorities",
         "they are not the applicable requirement set",
-        "use complete-source inspection only for these bounded conditions",
+        "complete-source inspection is permitted only when one of these "
+        "conditions applies",
         "task is about the complete standard",
         "validates the retrieval architecture",
         "targeted retrieval cannot resolve an ambiguity that the reviewer records",
@@ -301,20 +303,21 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
     )
     change_validation = semantic_text(skills["tracktemplate-change-validation"])
     require(
-        "for governance documents, a green final deterministic validation ends "
-        "the finite technical author lead route" in change_validation
-        and "does not hand the prose to another reviewer" in change_validation,
+        "for governance documents, green final deterministic validation "
+        "completes the finite technical author lead procedure" in change_validation
+        and "does not send the prose to another reviewer" in change_validation,
         "change validation can start a later governance-document review",
     )
     technical_author = semantic_text(
         skills["tracktemplate-technical-author-lead"]
     )
     require(
-        "use the local ste retrieval interface before writing the affected "
-        "logical units" in technical_author
+        "before you author affected logical units, use the local ste retrieval "
+        "interface" in technical_author
         and "deterministic pre-check results. it is not a documentation review"
         in technical_author
-        and "one complete improvement pass before freeze" in technical_author
+        and "before freeze, apply one complete improvement pass"
+        in technical_author
         and "green final validation ends this documentation cycle"
         in technical_author
         and "do not send the document to another documentation, quality, "
@@ -323,7 +326,7 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
         in technical_author
         and "cannot start another documentation review, correction pass, or "
         "linguistic improvement cycle" in technical_author
-        and "do not run a second documentation review" in technical_author,
+        and "do not do a second documentation review" in technical_author,
         "Technical Author Lead lost its bounded authoring and retrieval route",
     )
 

@@ -1,18 +1,19 @@
 ---
 name: tracktemplate-technical-author-lead
-description: Manage the complete TrackTemplate technical-document lifecycle. Use automatically for new or materially changed canonical technical prose and controlled document maintenance.
+description: Manage the complete TrackTemplate technical-document lifecycle. Use automatically for new or materially changed canonical technical prose and maintenance of controlled technical documents.
 ---
 
 # TrackTemplate Technical Author Lead
 
 ## Purpose
 
-Act as the Technical Author Lead. Coordinate one technical document through its
-complete lifecycle. Keep the work finite and based on a genuine document need.
+Act as the Technical Author Lead. Manage one technical document through its
+complete technical-document lifecycle. Keep the work finite and based on a
+document need.
 
 The canonical
 [Technical Documentation Management Plan](../../../reference/ENGINEERING_POLICY.md#technical-documentation-management-plan)
-owns the lifecycle. The
+owns the technical-document lifecycle. The
 [Technical Documentation Profile](../../../reference/ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
 owns controlled writing. The
 [technical-term register](../../../reference/TERMINOLOGY.md#asd-ste100-project-terminology)
@@ -22,122 +23,138 @@ owns technical terms.
 
 The Technical Author Lead owns these workflow responsibilities:
 
-- Identify and classify the document need.
-- Plan the documentation work.
-- Author and deliver the complete candidate.
-- Coordinate controlled-document maintenance.
-- Coordinate supersession, retirement, and preservation work.
+- Identification and classification of the document need.
+- Planning of documentation work.
+- Authoring and delivery of the complete candidate.
+- Coordination of maintenance for controlled technical documents.
+- Coordination of supersession, retirement, and preservation.
 
-The applicable technical or governance owner owns the subject meaning. The
-Technical Author Lead has no authority over that meaning. The lead also does
-not own terminology, the linguistic verdict, the validation result, or
-controlled-baseline acceptance.
+The applicable technical or governance owner owns the controlled meaning. The
+Technical Author Lead has no authority over that controlled meaning. The lead does not
+own terminology, the linguistic verdict, the validation result, or acceptance
+of the controlled baseline.
 
-Publication, merge, supersession, retirement, and deletion need their
-applicable authority. This skill does not supply that authority.
+Publication, merge, supersession, retirement, and deletion need their applicable
+authority. This skill does not supply that authority.
 
-## Identify and classify the need
+## Identify the need and document class
 
-First, compare the need with the current controlled documentation. Select one
+First, compare the need with current controlled documentation. Select one
 result:
 
-- Create a new technical document.
+- Make a new technical document.
 - Make a material change to an existing technical document.
 - Make a non-material correction.
 - Make no documentation change.
 
-Use an existing canonical owner when it is the correct location. Do not create
+If an existing canonical owner is the correct location, use it. Do not make
 a new document for information that already has an owner.
 
-Record the classification items that apply. Include canonical status,
-document type, canonical owner, and subject owner. Include Issue 9
-applicability, legacy status, the last accepted review state, and exact-content
-exclusions. Also include the review, validation, and publication boundaries.
+Record the classification items that apply:
+
+- Canonical status and document type.
+- Canonical owner and subject owner.
+- Issue 9 applicability.
+- Legacy status and last accepted review state.
+- Exact-content exclusions.
+- Review, validation, and publication boundaries.
 
 ## Plan the document work
 
-Before authoring, confirm these items:
+Before you author the candidate, make sure of these items:
 
-- The purpose and intended user.
-- The required technical meaning and its owner.
-- The applicable canonical authorities and source information.
-- The approved terminology.
-- The document scope and change scope.
-- The Issue 9, review, and validation requirements.
-- The expected controlled-document result.
+- Purpose and intended user.
+- Necessary controlled meaning and its owner.
+- Applicable canonical authorities and source information.
+- Approved terminology.
+- Bounded scope of the document and the change.
+- Issue 9, review, and validation requirements.
+- Expected result for the controlled technical document.
 
 Use the smallest intervention that satisfies the need. Preserve unrelated
 accepted prose and frozen historical evidence.
 
-## Use the authoring route
+## Procedure for the exact candidate
 
-Use this route for new or materially changed canonical technical prose:
+For new or materially changed canonical technical prose, use this sequence:
 
 > understand once → write once → check once → improve once → freeze once →
 > review once → validate once → finish
 
-Get the technical meaning from its canonical owner. Resolve each technical
-term before writing. Run
+Get the controlled meaning from its canonical owner. Before you author the
+candidate, resolve each technical term. Before source retrieval or candidate
+work, use this command:
+
 `.venv/bin/python tools/development_toolchain_preflight.py --stage documentation`
-before source retrieval or authoring. Stop before authoring if the preflight
-does not pass. Then use the
-[local STE retrieval interface](../../../reference/external/asd-ste100/README.md#local-retrieval-interface)
-before writing the affected logical units.
+
+If the development-toolchain preflight does not pass, stop before you author
+the candidate. Before you author affected logical units, use the
+[local STE retrieval interface](../../../reference/external/asd-ste100/README.md#local-retrieval-interface).
 
 The check step examines meaning, ownership, terminology, exact content, links,
 and deterministic pre-check results. It is not a Documentation Review. Apply
-TT-DOC-001, TT-DOC-002, and D-GOV-015 exactly throughout the authoring route.
-Apply one complete improvement pass before freeze.
+TT-DOC-001, TT-DOC-002, and D-GOV-015 exactly during the procedure.
+Before freeze, apply one complete improvement pass.
 
-Freeze one clean exact candidate only when the enclosing workflow has Git
-authority. After freeze, use one independent
+Only with Git authority from the enclosing workflow, freeze one clean exact
+candidate. After freeze, use one independent
 [`$tracktemplate-documentation-review`](../tracktemplate-documentation-review/SKILL.md).
 
-Apply exact reviewed corrections once only when the verdict permits them. Then
-run one final deterministic validation. A `BLOCKED` verdict is terminal for
-that exact candidate. Do not run a second Documentation Review.
+Only if the verdict permits exact corrections, apply them one time. Then do one
+final deterministic validation. A `BLOCKED` verdict is terminal for that exact
+candidate. Do not do a second Documentation Review.
 
-Finish the bounded authoring and review lifecycle by supplying the exact
-candidate, Documentation Review, final validation, limitations, and required
-owner decision. Green final validation ends this documentation cycle. Do not
-send the document to another documentation, quality, publication, wording, or
-semantic review. Do not describe these items as project acceptance.
+To finish the work within the frozen review scope, supply these results:
+
+- Exact candidate.
+- Documentation Review.
+- Final validation.
+- Limitations.
+- Necessary owner decision.
+
+Green final validation ends this documentation cycle. Do not send the document
+to another documentation, quality, publication, wording, or semantic review.
+Do not report these results as project acceptance.
 
 Continuous integration can check the final bytes. It cannot start another
 Documentation Review, correction pass, or linguistic improvement cycle.
 
 ## Control the baseline and availability
 
-After the one Documentation Review, permitted adjustment, and final validation
-are complete, coordinate the applicable acceptance. Record only the durable
-identity and authority that the TDMP requires. Then coordinate repository
-integration. Do not create a second document-management database.
+After the Documentation Review, permitted adjustment, and final validation,
+manage the applicable acceptance procedure. Record only the durable identity
+and authority specified by the TDMP. Then manage repository integration. Do
+not make a second database for document management.
 
 Make the accepted document current and available through its normal route.
-Confirm that a user can identify its current status, canonical owner, accepted
-baseline, and material limitations.
+Make sure that a user can identify these items:
+
+- Current status.
+- Canonical owner.
+- Accepted baseline.
+- Material limitations.
 
 ## Maintain and change documents
 
-Start maintenance only for a genuine document need. Do not periodically reopen
+Start maintenance only for a document need. Do not periodically reopen
 accepted unchanged prose for linguistic improvement.
 
-Compare each proposed change with the controlled baseline. Route a material
-change through the complete authoring route. Limit its review to the required
+Compare each proposed change with the controlled baseline. For a material
+change, use the complete procedure above. Limit its review to the necessary
 complete logical units that Git derives.
 
 For a non-material correction, use the applicable change level and validation.
-Reclassify the change if its meaning or authority becomes material.
+If the meaning or authority becomes material, reclassify the change.
 
-## Coordinate supersession and retirement
+## Manage supersession and retirement
 
-Before supersession, identify the accepted replacement authority. Show that
-required current information was retained or deliberately replaced. Update
-references and prevent the earlier document from appearing current.
+Before supersession, identify the accepted replacement authority. Show which
+necessary current information was retained or deliberately replaced. Update
+references. Prevent the earlier document from appearing current.
 
-Before retirement, get evidence that the document owns no required current
+Before retirement, get evidence that the document owns no necessary current
 information. Record where its information went or why it no longer applies.
-Keep historical evidence when required.
+Where necessary, keep historical evidence.
 
 The applicable subject and change authorities make these decisions. Preserve
 the old document's historical meaning. Retirement does not authorise deletion.
@@ -146,14 +163,14 @@ the old document's historical meaning. Retirement does not authorise deletion.
 
 Report these results:
 
-- The document need and selected result.
-- The classification, owners, scope, and source information.
-- The planned and completed lifecycle stages.
-- The exact candidate and controlled baseline, when they exist.
-- The Documentation Review and validation results.
-- The publication or availability result.
-- The maintenance, supersession, retirement, or preservation result.
+- Document need and selected result.
+- Classification, owners, bounded scope, and source information.
+- Planned and completed steps of the technical-document lifecycle.
+- Exact candidate and controlled baseline, where they exist.
+- Documentation Review and validation results.
+- Publication or availability result.
+- Maintenance, supersession, retirement, or preservation result.
 - Each limitation and owner decision that is still necessary.
 
-Do not reopen a complete lifecycle without a genuine material need from the
-applicable change-control authority.
+Without a material need from the applicable change-control authority,
+do not reopen a complete technical-document lifecycle.

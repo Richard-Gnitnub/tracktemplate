@@ -830,12 +830,12 @@ def validate_worktree_retirement_routing(workflows, skills):
         "validation": (
             "validate accepted history containment validate tracked cleanliness",
             "validate the local state inventory",
-            "each item has 1 local state type",
-            "retirement audit returns a fail result for ambiguous or uniquely owned state",
+            "each item has one local state type",
+            "retirement audit returns fail for ambiguous or uniquely owned state",
             "validate planned preservation",
             "after removal examine the preservation audit",
             "validate git worktree remove without force",
-            "before git removes the local branch make sure git removed the "
+            "before git removes the local branch make sure that git removed the "
             "worktree",
             "after removal examine the preservation diff",
         ),
