@@ -585,30 +585,30 @@ def validate_documentation_profile(
         "PROJECT_PLAN owner view lost its derivation boundary",
     )
     require(
-        "Phase 6 has 2/5 accepted exits" in owner_view
-        and "Exits 1, 4, and 5 stay Pending" in owner_view
-        and "D-GOV-011" in owner_view
-        and "gave a FAIL result" in owner_view
-        and "retained negative evidence and stopped the product change"
+        "Phase 6 has 3/5 accepted exits" in owner_view
+        and "The owner accepted Exits 1, 2, and 3" in owner_view
+        and "Exits 4 and 5 stay Pending" in owner_view
+        and "accepts Exit 1 for the agreed scope of the PR #63 comparison of "
+        "Entry/Exit centrelines" in owner_view
+        and "recorded numerical, host, and assurance limits apply" in owner_view
+        and "The owner gives no production clearance and accepts no wider "
+        "output equivalence" in owner_view
+        and "D-GOV-011 stays stopped with its retained negative evidence"
         in owner_view
-        and "project completed the new same-host baseline and attribution series"
-        in owner_view
-        and "An independent reviewer validated the result" in owner_view
-        and "first quartile was `3.057969 ms`" in owner_view
-        and "attribution noise floor was `3.8645155 ms`" in owner_view
-        and "not improvement evidence or Exit 4 evidence" in owner_view
-        and "D-GOV-011, its measurement rule, and its initial evidence do not "
+        and "Risks do not change" in owner_view
+        and "owner accepted D-P6-006 on 2026-09-05" in owner_view
+        and "D-GOV-011, its measurement rule, and its kept evidence do not "
         "change" in owner_view
-        and "Do not do the measurement again. Do not make the product change"
+        and "Do not do the measurement again. Do not make the stopped "
+        "product change" in owner_view
+        and "Bring the Exit 5 legacy-preservation condition to the owner"
         in owner_view
-        and "No new owner decision is necessary for the selected product "
-        "boundary with authority from D-P6-001" in owner_view
-        and "In the next Level 2 cycle, validate equivalent B14/B15 and B16 "
-        "output for the bounded Entry/Exit centrelines" in owner_view
-        and "Include exact validation and DXF export/import" in owner_view
-        and "This work is for Exit 1 with authority from D-P6-001" in owner_view
-        and "The owner must make a new decision before phase acceptance"
+        and "kept evidence needs a different owner decision to admit it"
         in owner_view
+        and "gives no legacy-retirement authority" in owner_view
+        and "Do not add Exit 1 implementation unless evidence shows that the "
+        "accepted result is incorrect" in owner_view
+        and "output has private-development status" in owner_view
         and "Project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
