@@ -70,6 +70,17 @@
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-3-supported-model-evidence-admission-panel"
     },
     {
+      "id": "D-P6-006",
+      "decided_on": "2026-09-05",
+      "status": "Accepted",
+      "decision": "Accept Phase 6 Exit 1 for the agreed bounded Entry/Exit centreline comparison scope.",
+      "authority": "At protected main `e1ab8a9fdbde29d5e0fe953ff678b33d9a55e3d7`, I agree the PR #63 centreline comparison profile as the agreed bounded scope of Phase 6 Exit 1.\n\nI accept Exit 1 as Evidenced and owner-accepted for its retained exact-validation, Part geometry and DXF export/import evidence, subject to the recorded numerical, host and assurance limits. Phase 6 advances from **2/5 to 3/5**.",
+      "exclusions": "Output stays private-development and project status stays `unknown`. Exits 4 and 5 remain Pending. No production-use clearance, wider output equivalence, operator-route acceptance, performance acceptance or legacy retirement is granted. Risks and the stopped D-GOV-011 direction remain unchanged.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel"
+    },
+    {
       "id": "TT-DOC-001",
       "decided_on": "2026-08-15",
       "status": "Accepted",

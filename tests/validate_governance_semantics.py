@@ -810,7 +810,7 @@ def validate_current_evidence_mutations() -> None:
             phase5_closeout,
             replace_once(evidence, exit2_row, exit2_downgraded),
         ),
-        "Phase 6 exits do not match the accepted 2/5 dispositions",
+        "Phase 6 exits do not match the accepted 3/5 dispositions",
     )
 
     exit3_row = table_row_containing(
@@ -830,8 +830,60 @@ def validate_current_evidence_mutations() -> None:
             phase5_closeout,
             replace_once(evidence, exit3_row, exit3_downgraded),
         ),
-        "Phase 6 exits do not match the accepted 2/5 dispositions",
+        "Phase 6 exits do not match the accepted 3/5 dispositions",
     )
+
+    for name, marker, before, after in (
+        (
+            "exit1-acceptance-downgraded",
+            "Evidenced and owner-accepted under D-P6-006",
+            "Evidenced and owner-accepted under D-P6-006",
+            "Pending",
+        ),
+        (
+            "exit5-prematurely-evidenced",
+            "Pending. B14 remains available",
+            "Pending. B14 remains available",
+            "Evidenced. B14 remains available",
+        ),
+    ):
+        row = table_row_containing(evidence, marker)
+        changed_row = replace_once(row, before, after)
+        expect_rejected(
+            "phase-evidence/" + name,
+            lambda value=replace_once(evidence, row, changed_row): (
+                progress._validate_exit_conditions(
+                    plan, phase4_closeout, phase5_closeout, value,
+                )
+            ),
+            "Phase 6 exits do not match the accepted 3/5 dispositions",
+        )
+
+    for name, marker, before, after in (
+        (
+            "exit1-agreed-scope-widened",
+            "At protected main `e1ab8a9fdbde29d5e0fe953ff678b33d9a55e3d7`",
+            "the PR #63 centreline comparison profile",
+            "all legacy production outputs",
+        ),
+        (
+            "exit1-production-clearance-granted",
+            "> Output stays private-development and project status",
+            "No production-use clearance, wider output equivalence",
+            "Production-use clearance and wider output equivalence",
+        ),
+    ):
+        quote = blockquote_paragraph_containing(evidence, marker)
+        changed_quote = replace_once(quote, before, after)
+        expect_rejected(
+            "phase-evidence/" + name,
+            lambda value=replace_once(evidence, quote, changed_quote): (
+                progress._validate_exit_conditions(
+                    plan, phase4_closeout, phase5_closeout, value,
+                )
+            ),
+            "D-P6-006 panel exact owner decision drifted or was relocated",
+        )
 
     exit3_authority = blockquote_paragraph_containing(
         evidence,
@@ -1284,7 +1336,7 @@ def validate_current_evidence_mutations() -> None:
             phase5_closeout,
             replace_once(evidence, exit4_row, exit4_promoted),
         ),
-        "Phase 6 exits do not match the accepted 2/5 dispositions",
+        "Phase 6 exits do not match the accepted 3/5 dispositions",
     )
 
     prerequisite_promoted = replace_once(
@@ -2552,7 +2604,7 @@ def validate_project_plan_mutations() -> None:
     )
     phase6_previous = replace_once(
         phase6_row,
-        "2/5 accepted exits",
+        "3/5 accepted exits",
         "1/5 accepted exits",
     )
     expect_rejected(
@@ -2560,7 +2612,7 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_plan_shape(
             replace_once(plan, phase6_row, phase6_previous)
         ),
-        "Phase 6 must remain current at the accepted 2/5 state",
+        "Phase 6 must remain current at the accepted 3/5 state",
     )
 
     exit2_row = table_row_containing(
@@ -2616,6 +2668,14 @@ def validate_project_plan_mutations() -> None:
         "project-plan/d-p6-005-decision-omitted",
         lambda: progress._validate_decisions(
             replace_once(plan, acceptance_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
+    exit1_decision_row = table_row_containing(plan, "| D-P6-006 |")
+    expect_rejected(
+        "project-plan/d-p6-006-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, exit1_decision_row + "\n", "")
         ),
         "project-plan decisions differ from the frozen registers",
     )
@@ -2943,13 +3003,13 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_status = replace_once(
         plan,
-        "Phase 6 has 2/5 accepted exits",
         "Phase 6 has 3/5 accepted exits",
+        "Phase 6 has 4/5 accepted exits",
     )
     expect_rejected(
         "tt-doc/owner-view-status-contradiction",
         lambda: progress._validate_owner_view(owner_view_status),
-        "project-plan owner view lost or contradicted: Phase 6 has 2/5 "
+        "project-plan owner view lost or contradicted: Phase 6 has 3/5 "
         "accepted exits",
     )
     owner_view_authority = replace_once(
@@ -2962,30 +3022,34 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
     )
+    owner_view_change = table_row_containing(plan, "**What changed**")
+    widened_change = replace_once(
+        owner_view_change,
+        "accepts Exit 1 for the agreed PR #63 Entry/Exit centreline "
+        "comparison scope",
+        "accepts Exit 1 for every legacy output and the whole-layout product",
+    )
     owner_view_boundary_widened = replace_once(
-        plan,
-        "validate equivalent B14/B15 and B16 output for the bounded "
-        "Entry/Exit centrelines",
-        "validate equivalent output from the complete B14 exporter and "
-        "whole-layout product",
+        plan, owner_view_change, widened_change,
     )
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
-        "project-plan owner view lost or contradicted: In the next Level 2 "
-        "cycle, validate equivalent B14/B15 and B16",
+        "project-plan owner view lost or contradicted: accepts Exit 1 for "
+        "the agreed PR #63 Entry/Exit centreline comparison scope",
     )
 
     owner_view_restarted = replace_once(
         plan,
-        "Do not do the measurement again. Do not make the product change.",
+        "Do not do the measurement again. Do not make the stopped "
+        "product change.",
         "Repeat the measurement and make the D-GOV-011 product change.",
     )
     expect_rejected(
         "tt-doc/owner-view-stopped-direction-restarted",
         lambda: progress._validate_owner_view(owner_view_restarted),
         "project-plan owner view lost or contradicted: Do not do the "
-        "measurement again. Do not make the product change",
+        "measurement again. Do not make the stopped product change",
     )
 
     compatibility_terms_removed = terminology

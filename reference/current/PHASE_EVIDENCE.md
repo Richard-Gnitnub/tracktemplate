@@ -1,8 +1,9 @@
 # Phase 6 Explicit Exact-Validation and Export Seam Evidence
 
-Status: **Current — 2/5 accepted exits. The owner accepted Exit 2 under
-D-P6-002 on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on
-2026-08-15. Exits 1, 4, and 5 remain Pending.**
+Status: **Current — 3/5 accepted exits. The owner accepted Exit 1 under
+D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 on
+2026-08-02. The owner accepted Exit 3 under D-P6-005 on 2026-08-15.
+Exits 4 and 5 remain Pending.**
 
 Phase 5 closed at 4/4 under D-P5-003 on 2026-08-01. Its complete accepted
 evidence, decisions and risk snapshot are frozen in the
@@ -4108,15 +4109,104 @@ exits. Exit 1 and Exit 4 stay Pending. Risks and project status `unknown` do not
 change. The stopped D-GOV-011 direction and its retained negative evidence
 do not change.
 
+<a id="phase-6-exit-1-bounded-output-evidence-admission-panel"></a>
+
+## Phase 6 Exit 1 bounded output panel to admit evidence and owner decision
+
+**Decision and exact source state:** D-P6-006 applies to protected main at
+`e1ab8a9fdbde29d5e0fe953ff678b33d9a55e3d7`, which integrated
+[PR #63](https://github.com/Richard-Gnitnub/tracktemplate/pull/63).
+The clean local and remote main states were equal. Their tree equals the
+reviewed PR head `bec649dff77c3889e186980c0bd3190f5a8c85b5`.
+Required `validation` passed for that exact head through GitHub Actions app
+`15368` in [run 33968649817](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/33968649817).
+
+This Level 3 decision admits evidence for the agreed bounded scope of Exit 1.
+Its exact criterion is “The selected slice has equivalent exact validation
+and production output for the agreed bounded scope”. This authority change
+uses the governance-budget exception. It needs no product implementation.
+
+**Participants and independence:** Richard is project owner, panel chair,
+and accepting authority. `/root` presented the evidence.
+`/root/exit1_admission_challenge` supplied independent read-only QA/risk review
+before the owner decision. That reviewer did not implement PR #63.
+The agents share one system and workspace. The review has no external
+organisational independence. The recommendation was **Proceed with bounded
+conditions**. No dissent remains.
+
+**Evidence and limits:** The panel examined the
+[bounded comparison record](#phase6-bounded-entry-exit-output-comparison),
+its three executable proof files, and its retained validation record.
+The record is `tmp/exit1-validation/validation-record.md` in the named
+`phase6-entry-exit-output-equivalence` worktree.
+The panel verified the hashes in `FINAL_SOURCE_EVIDENCE_SHA256SUMS` there.
+The independent source review gave PASS. Standalone, qualified FreeCAD,
+and real-GUI checks each supplied their required success sentinel.
+
+The accepted comparison covers the eight named Entry/Exit centreline cases
+in PR #63 and the additional standalone resolution check.
+It compares the frozen B14/B15 calculations with B16 exact validation,
+ordered Part geometry, DXF output, and FreeCAD import.
+The fixed numerical comparison limit is `1e-8 mm`.
+Sampling, integration, and import errors keep their separate limits.
+The largest sampled-output difference was `0.048452162565 mm`.
+This result does not give an absolute error bound for every ideal curve.
+Host evidence applies only to
+`linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`.
+The two GUI captures support the specified imported cases. They do not
+supply operator-route acceptance or comparison of every legacy output.
+
+The opening performance condition already has retained evidence.
+PR #33 and PR #50 measured complete Edit, Validate, and Export journeys
+and warm reuse with correctness checks. D-GOV-008 accepts the PR #50 baseline.
+The completed D-GOV-011 series supplies later observations on one exact host.
+Product source for the measured journey did not change from PR #50 to PR #63.
+These measurements do not prove improvement or performance for all eight
+comparison cases. D-GOV-011 remains FAIL retained negative evidence.
+The panel required no repeated measurement.
+
+**Risks and bounded conditions:** The panel examined the current risk register.
+No severity, treatment, owner, deadline, or control effectiveness changes.
+
+| Risk | Retained control and condition |
+| --- | --- |
+| PR-09, PR-21 | Output stays private-development with project status `unknown`. Before a production-use claim, the rights owners and Richard must complete the separate clearance route in [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md). Technical comparison gives no such clearance. |
+| PR-13 | Raw proof and GUI captures remain local. This cycle supplies no independent preservation for them. Richard keeps responsibility for the existing backup cadence and preservation before later use. No file deletion or operator-document mutation is necessary. |
+| PR-15, QA-R04 | The measured journey and its exact host limits remain. The performance owners must satisfy the separate Exit 4 condition before performance acceptance. D-GOV-011 stays stopped. |
+| PR-16, PR-17 | The accepted signature, editable-document, transaction, and recovery controls remain. The source owners must preserve them in each subsequent change. This decision expands no persistence or migration scope. |
+| PR-22, QA-R03 | Richard supplies acceptance after independent challenge. The QA owners retain the wider GUI and release evidence gaps for their existing deadlines. The bounded GUI comparison gives no wider workflow acceptance. |
+
+The manifest remains structurally valid with project status `unknown`.
+The panel treats technical output comparison and production-use clearance
+as separate decisions under the existing licensing policy.
+The limits above remain conditions of this acceptance. They are not new
+Phase 6 criteria. Initial failed tests, their classified repairs, and all
+D-GOV-011 evidence remain historically accurate.
+
+**Exact owner decision — 2026-09-05:** Richard accepted D-P6-006 exactly as
+proposed and instructed the directly dependent repository alignment:
+
+> At protected main `e1ab8a9fdbde29d5e0fe953ff678b33d9a55e3d7`, I agree the PR #63 centreline comparison profile as the agreed bounded scope of Phase 6 Exit 1.
+>
+> I accept Exit 1 as Evidenced and owner-accepted for its retained exact-validation, Part geometry and DXF export/import evidence, subject to the recorded numerical, host and assurance limits. Phase 6 advances from **2/5 to 3/5**.
+>
+> Output stays private-development and project status stays `unknown`. Exits 4 and 5 remain Pending. No production-use clearance, wider output equivalence, operator-route acceptance, performance acceptance or legacy retirement is granted. Risks and the stopped D-GOV-011 direction remain unchanged.
+
+The current state is 3/5 accepted exits. Exits 1, 2, and 3 are Evidenced and
+owner-accepted. Exits 4 and 5 stay Pending. The next owner boundary is the
+Exit 5 legacy-preservation criterion. Its retained evidence needs a separate
+admission decision. No further Exit 1 implementation is
+necessary unless the alignment exposes a material contradiction.
+
 <a id="current-phase-6-exit-condition-disposition"></a>
 
 ## Current Phase 6 exit-condition disposition
 
-The accepted current state is 2/5 under D-P6-002 and D-P6-005:
+The accepted current state is 3/5 under D-P6-002, D-P6-005, and D-P6-006:
 
 | Exit condition | Current disposition |
 | --- | --- |
-| The selected slice has equivalent exact validation and production output for the agreed bounded work | Pending. Exact-validation and private-development DXF evidence exists. Agreed output equivalence and production clearance remain absent. |
+| The selected slice has equivalent exact validation and production output for the agreed bounded work | Evidenced and owner-accepted under D-P6-006 for the agreed PR #63 Entry/Exit centreline comparison scope. The recorded numerical, host, and assurance limits apply. Production clearance and wider output equivalence remain absent. |
 | No transient production objects leak into the editable document | Evidenced and owner-accepted under D-P6-002 — bounded to the accepted B16 Entry/Exit exact-validation and export routes with the recorded limitations |
 | Export is deterministic and failure-safe | Evidenced and owner-accepted under D-P6-005. This is bounded to the private-development B16 Entry/Exit DXF-and-manifest route under D-P6-003 and D-P6-004. The recorded platform, recovery, and assurance limitations apply. Project status remains `unknown`. |
 | Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Pending — D-GOV-008 and D-GOV-009 keep their initial authority and retained negative evidence. The completed D-GOV-011 baseline-attribution investigation gave FAIL. The attribution materiality rule did not change. The owner accepted the result as retained negative evidence and stopped that product direction. D-GOV-011 and its initial evidence do not change. The project made no product change and admitted no improvement evidence. |
@@ -4142,7 +4232,7 @@ The 24 risks from the end of Phase 5 stay in
 [risks.json](risks.json). The project owner used D-GOV-005 to change only the
 control wording for PR-12, PR-20, and PR-22. The decision register at
 [gate-decisions.json](gate-decisions.json) owns D-P6-001, D-GOV-005, D-P6-002,
-D-P6-003, D-P6-004, D-P6-005, TT-DOC-001, and TT-DOC-002. It also owns
+D-P6-003, D-P6-004, D-P6-005, D-P6-006, TT-DOC-001, and TT-DOC-002. It also owns
 D-GOV-006, D-GOV-007, D-GOV-008, D-GOV-009, D-GOV-010, and D-GOV-011.
 
 The D-GOV-012 decision records the sequence nonconformance in Cycle 2. It also
@@ -4160,9 +4250,10 @@ authoring and review authority. It makes no second workflow for review or
 database for the lifecycle. It changes no phase, product, risk, or merge
 authority.
 
-Exits 2 and 3 have Evidenced and owner-accepted status. D-P6-003 selects
+Exits 1, 2, and 3 have Evidenced and owner-accepted status. D-P6-003 selects
 recovery authority. D-P6-004 defines the supported faults and limits of their
 evidence. D-P6-005 accepts Exit 3 only in its bounded scope.
+D-P6-006 accepts Exit 1 only for the agreed PR #63 centreline comparison scope.
 
 All other decisions stay separately controlled. These decisions are about exits,
 clearance, support, schema, oracle retirement, budgets, packaging, releases, and
@@ -4214,8 +4305,8 @@ The [completed D-GOV-011 baseline-attribution investigation](#d-gov-011-complete
 gave FAIL and stopped the product change. The owner accepted the
 result as retained negative evidence. Do not do the measurement again.
 Do not select a different Exit 4 optimisation only to continue performance
-work. The next product boundary is equivalent centreline output for Exit 1
-with authority from D-P6-001.
+work. D-P6-006 accepts the subsequent bounded Exit 1 result.
+The next owner boundary is Exit 5 legacy preservation.
 
 <a id="d-gov-018-finite-documentation-completion"></a>
 

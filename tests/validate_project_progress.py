@@ -179,6 +179,15 @@ EXPECTED_PHASE6_DECISIONS = {
         "52ede8d935c565028ab570dc31279b390db801b4f579f70b9a593a7ccc6952b5",
         "88d1b941e15afd12ad36106a8c7e32db01446b46b8269746801197b0971263a7",
     ),
+    "D-P6-006": (
+        "2026-09-05",
+        "Accept Phase 6 Exit 1 for the agreed bounded Entry/Exit "
+        "centreline comparison scope.",
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-1-bounded-output-evidence-admission-panel",
+        "1f6448d96c0e976e446fef6faaf83f030f54435d54711e7c89b00fd3ab7f4290",
+        "177d9e71e772e982766aac17175103591ef793324abaf9dc58310c8e7671ecf6",
+    ),
     "TT-DOC-001": (
         "2026-08-15",
         "Adopt the TrackTemplate Technical Documentation Profile.",
@@ -400,6 +409,24 @@ EXPECTED_EXIT3_ACCEPTANCE_EXCLUSIONS = (
     "authority is granted. No risk downgrade or later-phase authority is "
     "granted."
 )
+EXPECTED_EXIT1_ACCEPTANCE_SCOPE = (
+    "At protected main `e1ab8a9fdbde29d5e0fe953ff678b33d9a55e3d7`, I agree "
+    "the PR #63 centreline comparison profile as the agreed bounded scope "
+    "of Phase 6 Exit 1."
+)
+EXPECTED_EXIT1_ACCEPTANCE_AUTHORITY = (
+    "I accept Exit 1 as Evidenced and owner-accepted for its retained "
+    "exact-validation, Part geometry and DXF export/import evidence, subject "
+    "to the recorded numerical, host and assurance limits. Phase 6 advances "
+    "from **2/5 to 3/5**."
+)
+EXPECTED_EXIT1_ACCEPTANCE_EXCLUSIONS = (
+    "Output stays private-development and project status stays `unknown`. "
+    "Exits 4 and 5 remain Pending. No production-use clearance, wider output "
+    "equivalence, operator-route acceptance, performance acceptance or legacy "
+    "retirement is granted. Risks and the stopped D-GOV-011 direction remain "
+    "unchanged."
+)
 EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
     "| D-GOV-015 | 2026-08-31 | Accepted | The "
     "[decision](current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle) "
@@ -422,9 +449,10 @@ EXPECTED_TDMP_PLAN_ROW = (
 )
 EXPECTED_PHASE6_DISPOSITIONS = [
     (
-        "Pending. Exact-validation and private-development DXF evidence "
-        "exists. Agreed output equivalence and production clearance remain "
-        "absent."
+        "Evidenced and owner-accepted under D-P6-006 for the agreed PR #63 "
+        "Entry/Exit centreline comparison scope. The recorded numerical, "
+        "host, and assurance limits apply. Production clearance and wider "
+        "output equivalence remain absent."
     ),
     (
         "Evidenced and owner-accepted under D-P6-002 — bounded to the accepted "
@@ -892,33 +920,29 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        "Phase 6 has 2/5 accepted exits",
-        "The owner accepted Exits 2 and 3",
-        "Exits 1, 4, and 5 stay Pending",
+        "Phase 6 has 3/5 accepted exits",
+        "The owner accepted Exits 1, 2, and 3",
+        "Exits 4 and 5 stay Pending",
+        "output has private-development status",
         "Project status stays `unknown`",
-        "D-GOV-011",
-        "gave a FAIL result",
-        "owner accepted this result as retained negative evidence and "
-        "stopped the product change",
-        "project completed the new same-host baseline and attribution series",
-        "An independent reviewer validated the result",
-        "D-GOV-011 FAIL result prevented product work",
-        "first quartile was `3.057969 ms`",
-        "attribution noise floor was `3.8645155 ms`",
-        "not improvement evidence or Exit 4 evidence",
-        "Exit 1 has no evidence that the bounded B14/B15 and B16 outputs "
-        "are equivalent",
-        "owner accepted the FAIL result on 2026-09-05",
-        "D-GOV-011, its measurement rule, and its initial evidence do not "
+        "accepts Exit 1 for the agreed PR #63 Entry/Exit centreline "
+        "comparison scope",
+        "admitted evidence compares bounded B14/B15 and B16 centrelines "
+        "through exact validation, Part geometry, and DXF export/import",
+        "Product source does not change",
+        "recorded numerical, host, and assurance limits apply",
+        "Production clearance and wider output equivalence remain absent",
+        "D-GOV-011 stays stopped with its retained negative evidence",
+        "Risks do not change",
+        "owner accepted D-P6-006 on 2026-09-05",
+        "D-GOV-011, its measurement rule, and its retained evidence do not "
         "change",
-        "Do not do the measurement again. Do not make the product change",
-        "No new owner decision is necessary for the selected product boundary "
-        "with authority from D-P6-001",
-        "In the next Level 2 cycle, validate equivalent B14/B15 and B16 "
-        "output for the bounded Entry/Exit centrelines",
-        "Include exact validation and DXF export/import",
-        "This work is for Exit 1 with authority from D-P6-001",
-        "The owner must make a new decision before phase acceptance",
+        "Do not do the measurement again. Do not make the stopped "
+        "product change",
+        "Bring the Exit 5 legacy-preservation criterion to the owner",
+        "retained evidence needs a separate admission decision",
+        "gives no legacy-retirement authority",
+        "Do not add Exit 1 implementation without a material contradiction",
     ):
         _require(
             fragment in owner_view,
@@ -1024,10 +1048,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 5 must be closed with all four accepted exits",
     )
     _require(
-        rows[6]["count"] == 2
+        rows[6]["count"] == 3
         and str(rows[6]["state"])
         == "Current — opened 2026-08-01",
-        "Phase 6 must remain current at the accepted 2/5 state",
+        "Phase 6 must remain current at the accepted 3/5 state",
     )
     _require(
         [
@@ -1039,12 +1063,14 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the dashboard must identify only Phase 6 as current",
     )
     _require(
-        "Phase 6 current — 2/5 accepted exits" in " ".join(plan.split())
-        and "owner accepted Exit 2 under D-P6-002 on 2026-08-02"
+        "Phase 6 current — 3/5 accepted exits" in " ".join(plan.split())
+        and "owner accepted Exit 1 under D-P6-006 on 2026-09-05"
+        in " ".join(plan.split())
+        and "Exit 2 under D-P6-002 on 2026-08-02"
         in " ".join(plan.split())
         and "Exit 3 under D-P6-005 on 2026-08-15"
         in " ".join(plan.split()),
-        "the accepted Phase 6 2/5 status is missing",
+        "the accepted Phase 6 3/5 status is missing",
     )
     return rows
 
@@ -2264,7 +2290,7 @@ def _validate_exit_conditions(
         phase4_states.append(cells[1].split(":", 1)[0])
 
     expected_plan = [
-        "Pending",
+        "Evidenced — owner-accepted 2026-09-05",
         "Evidenced — owner-accepted 2026-08-02",
         "Evidenced — owner-accepted 2026-08-15",
         "Pending",
@@ -2392,6 +2418,15 @@ def _validate_exit_conditions(
         "Phase 6 Exit 2/3 acceptance or Exit 3 contract boundary is missing",
     )
     _require(
+        "| D-P6-006 | 2026-09-05 | Accepted | The [decision]"
+        "(current/PHASE_EVIDENCE.md"
+        "#phase-6-exit-1-bounded-output-evidence-admission-panel) "
+        "accepts Exit 1 for the agreed PR #63 Entry/Exit centreline "
+        "comparison scope. Phase 6 advances to 3/5. Exits 4 and 5 stay "
+        "Pending. All stated limitations and exclusions remain. |" in plan,
+        "D-P6-006 bounded Exit 1 acceptance decision row drifted",
+    )
+    _require(
         "D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles"
         in plan_flat
         and "supply Phase 6 performance evidence" in plan_flat
@@ -2448,8 +2483,8 @@ def _validate_exit_conditions(
         and "initial decision, measurement rule, and evidence do not change"
         in plan_flat
         and "Exit 4 stays Pending" in plan_flat
-        and "next product boundary is equivalent centreline output for Exit 1 "
-        "with authority from D-P6-001" in plan_flat,
+        and "D-P6-006 accepts the subsequent bounded Exit 1 result" in plan_flat
+        and "next owner boundary is Exit 5 legacy preservation" in plan_flat,
         "D-GOV-011 canonical-record direction summary drifted",
     )
 
@@ -2501,10 +2536,11 @@ def _validate_exit_conditions(
         ).split()
     )
     _require(
-        "Current — 2/5 accepted exits. The owner accepted Exit 2 under "
-        "D-P6-002 on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
-        "2026-08-15. Exits 1, 4, and 5 remain Pending" in current_flat,
-        "current record does not preserve the accepted Phase 6 2/5 state",
+        "Current — 3/5 accepted exits. The owner accepted Exit 1 under "
+        "D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 "
+        "on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
+        "2026-08-15. Exits 4 and 5 remain Pending" in current_flat,
+        "current record does not preserve the accepted Phase 6 3/5 state",
     )
     performance_section = _section(
         current_evidence,
@@ -2939,7 +2975,46 @@ def _validate_exit_conditions(
             ),
         ]
         and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS,
-        "Phase 6 exits do not match the accepted 2/5 dispositions",
+        "Phase 6 exits do not match the accepted 3/5 dispositions",
+    )
+    exit1_heading = (
+        "Phase 6 Exit 1 bounded output panel to admit evidence and owner "
+        "decision"
+    )
+    _require(
+        '<a id="phase-6-exit-1-bounded-output-evidence-admission-panel">'
+        "</a>\n\n## " + exit1_heading in current_evidence,
+        "D-P6-006 panel anchor or heading association is missing",
+    )
+    exit1_section = direct_section_content(current_evidence, exit1_heading)
+    exit1_flat = _semantic_text(exit1_section)
+    for fragment in (
+        "e1ab8a9fdbde29d5e0fe953ff678b33d9a55e3d7",
+        "bec649dff77c3889e186980c0bd3190f5a8c85b5",
+        "independent read-only QA/risk review before the owner decision",
+        "Proceed with bounded conditions",
+        "eight named Entry/Exit centreline cases in PR #63 and the "
+        "additional standalone resolution check",
+        "fixed numerical comparison limit is 1e-8 mm",
+        "Sampling, integration, and import errors keep their separate limits",
+        "does not give an absolute error bound for every ideal curve",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+        "No severity, treatment, owner, deadline, or control effectiveness "
+        "changes",
+        "D-GOV-011 remains FAIL retained negative evidence",
+        "panel required no repeated measurement",
+    ):
+        _require(
+            fragment in exit1_flat,
+            "D-P6-006 evidence-admission panel drifted: " + fragment,
+        )
+    _require(
+        _blockquote_paragraphs(exit1_section) == [
+            _semantic_text(EXPECTED_EXIT1_ACCEPTANCE_SCOPE),
+            _semantic_text(EXPECTED_EXIT1_ACCEPTANCE_AUTHORITY),
+            _semantic_text(EXPECTED_EXIT1_ACCEPTANCE_EXCLUSIONS),
+        ],
+        "D-P6-006 panel exact owner decision drifted or was relocated",
     )
     exit3_acceptance_heading = (
         "Phase 6 Exit 3 supported-model panel to admit evidence and owner "
@@ -3709,8 +3784,8 @@ def _validate_exit_conditions(
         "Do not do the measurement again",
         "Do not select a different Exit 4 optimisation "
         "only to continue performance work",
-        "next product boundary is equivalent centreline output for Exit 1 "
-        "with authority from D-P6-001",
+        "D-P6-006 accepts the subsequent bounded Exit 1 result",
+        "next owner boundary is Exit 5 legacy preservation",
     ):
         _require(
             required_clause in current_register_flat,
