@@ -401,6 +401,120 @@ def validate_architecture_mutations() -> None:
         )
 
 
+def validate_exit4_deferral_mutations() -> None:
+    """Reject waived duties, substitute proof, and wider deferral authority."""
+    architecture = read("reference/ARCHITECTURE.md")
+    modularisation = read("reference/MODULARISATION_PLAN.md")
+    for name, before, after, diagnostic in (
+        (
+            "retirement-invariant-weakened",
+            "until each replacement proves output equivalence and a measured "
+            "resource improvement",
+            "until each replacement proves output equivalence",
+            "D-P6-008 changed architecture invariant 8",
+        ),
+        (
+            "beta-deadline-waived",
+            "obligation stays mandatory before Phase 10 beta acceptance",
+            "obligation becomes optional after Phase 10 beta acceptance",
+            "D-P6-008 architecture sequence exception drifted",
+        ),
+        (
+            "budget-substituted-for-improvement",
+            "Numerical budgets or improvement on another workload do not "
+            "give the required\nevidence for this obligation",
+            "Numerical budgets or improvement on another workload give "
+            "the required evidence for this obligation",
+            "D-P6-008 architecture sequence exception drifted",
+        ),
+    ):
+        expect_rejected(
+            "deferral/" + name,
+            lambda value=replace_once(architecture, before, after): (
+                progress._validate_exit4_sequence_deferral(
+                    value, modularisation,
+                )
+            ),
+            diagnostic,
+        )
+    expect_rejected(
+        "deferral/stage-m5-automatically-authorised",
+        lambda: progress._validate_exit4_sequence_deferral(
+            architecture,
+            replace_once(
+                modularisation,
+                "does not\ncomplete Stage M4 or authorise Stage M5 "
+                "implementation",
+                "completes Stage M4 and authorises Stage M5 implementation",
+            ),
+        ),
+        "D-P6-008 Stage M4 sequence exception drifted",
+    )
+
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    plan = read("reference/PROJECT_PLAN.md")
+    phase4 = read("reference/history/phase-closeouts/PHASE4_CLOSEOUT.md")
+    phase5 = read("reference/history/phase-closeouts/PHASE5_CLOSEOUT.md")
+    for name, marker, before, after in (
+        (
+            "different-workload-substituted",
+            "I approve a Level 3 deferral of Phase 6 Exit 4",
+            "its existing bounded Entry/Exit scope",
+            "a different and easier workload",
+        ),
+        (
+            "legacy-removal-authorised",
+            "Preserve measurement rules, retained negative evidence",
+            "authorises no product implementation or legacy removal",
+            "authorises product implementation and legacy removal",
+        ),
+        (
+            "measurement-rule-replaced",
+            "Preserve measurement rules, retained negative evidence",
+            "Preserve measurement rules",
+            "Replace measurement rules",
+        ),
+    ):
+        quote = blockquote_paragraph_containing(evidence, marker)
+        changed_quote = replace_once(quote, before, after)
+        expect_rejected(
+            "deferral/" + name,
+            lambda value=replace_once(evidence, quote, changed_quote): (
+                progress._validate_exit_conditions(
+                    plan, phase4, phase5, value,
+                )
+            ),
+            "D-P6-008 panel exact owner decision drifted or was relocated",
+        )
+
+    risks = json.loads(read("reference/current/risks.json"))["risks"]
+    frozen_risks = json.loads(read(
+        "reference/history/phase-closeouts/PHASE5_RISKS.json"
+    ))["risks"]
+    for risk_id, field, before, after in (
+        ("PR-15", "deadline", "mandatory before", "optional after"),
+        (
+            "QA-R04", "owner", "Richard keeps accountability",
+            "No owner is accountable",
+        ),
+        (
+            "PR-15", "control_effectiveness", "Partial",
+            "Effective (current scope)",
+        ),
+    ):
+        record = next(risk for risk in risks if risk["id"] == risk_id)
+        frozen = next(risk for risk in frozen_risks if risk["id"] == risk_id)
+        changed = dict(record)
+        changed[field] = replace_once(record[field], before, after)
+        expect_rejected(
+            "deferral/risk-" + risk_id + "-" + field,
+            lambda value=changed, previous=frozen: (
+                progress._validate_exit4_deferral_risk(value, previous)
+            ),
+            "D-P6-008 performance risk drifted: " + risk_id + "/" + field,
+        )
+
+
 def validate_capability_matrix_mutations() -> None:
     """Keep legacy, Addon and future meanings in their owning units."""
     matrix = read("reference/CAPABILITY_MATRIX.md")
@@ -1356,8 +1470,8 @@ def validate_current_evidence_mutations() -> None:
     )
     exit4_promoted = replace_once(
         exit4_row,
-        "Pending — D-GOV-008 and D-GOV-009",
-        "Evidenced — D-GOV-008 and D-GOV-009",
+        "Deferred — unmet under D-P6-008",
+        "Evidenced and owner-accepted under D-P6-008",
     )
     expect_rejected(
         "phase-evidence/exit4-prematurely-evidenced",
@@ -2731,6 +2845,14 @@ def validate_project_plan_mutations() -> None:
         ),
         "project-plan decisions differ from the frozen registers",
     )
+    deferral_row = table_row_containing(plan, "| D-P6-008 |")
+    expect_rejected(
+        "project-plan/d-p6-008-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, deferral_row + "\n", "")
+        ),
+        "project-plan decisions differ from the frozen registers",
+    )
     tt_doc_decision_row = table_row_containing(plan, "| TT-DOC-001 |")
     expect_rejected(
         "project-plan/tt-doc-001-decision-omitted",
@@ -3077,9 +3199,10 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_change = table_row_containing(plan, "**What changed**")
     widened_change = replace_once(
         owner_view_change,
-        "accepts Exit 5 for continued preservation of the legacy references "
-        "and the bounded route for development comparison and recovery",
-        "accepts Exit 5 for removal of every legacy reference and route",
+        "gives Exit 4 Deferred — unmet status. Its unchanged improvement "
+        "obligation for the bounded Entry/Exit scope stays mandatory before "
+        "Phase 10 beta acceptance",
+        "waives the improvement obligation for every workload",
     )
     owner_view_boundary_widened = replace_once(
         plan, owner_view_change, widened_change,
@@ -3087,22 +3210,22 @@ def validate_documentation_profile_mutations() -> None:
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
-        "project-plan owner view lost or contradicted: accepts Exit 5 for "
-        "continued preservation of the legacy references and the bounded "
-        "route for development comparison and recovery",
+        "project-plan owner view lost or contradicted: gives Exit 4 Deferred "
+        "— unmet status. Its unchanged improvement obligation for the bounded "
+        "Entry/Exit scope stays mandatory before Phase 10 beta acceptance",
     )
 
     owner_view_restarted = replace_once(
         plan,
-        "Do not do the measurement again. Do not make the stopped "
-        "product change.",
-        "Repeat the measurement and make the D-GOV-011 product change.",
+        "Do not do a stopped experiment again. Do not change its measurement "
+        "rule.",
+        "Repeat a stopped experiment and change its measurement rule.",
     )
     expect_rejected(
         "tt-doc/owner-view-stopped-direction-restarted",
         lambda: progress._validate_owner_view(owner_view_restarted),
-        "project-plan owner view lost or contradicted: Do not do the "
-        "measurement again. Do not make the stopped product change",
+        "project-plan owner view lost or contradicted: Do not do a stopped "
+        "experiment again. Do not change its measurement rule",
     )
 
     compatibility_terms_removed = terminology
@@ -5197,6 +5320,7 @@ def main() -> None:
     validate_architecture_mutations()
     validate_capability_matrix_mutations()
     validate_current_evidence_mutations()
+    validate_exit4_deferral_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()

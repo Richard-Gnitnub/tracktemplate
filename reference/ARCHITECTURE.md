@@ -586,6 +586,18 @@ join this sequence without separate Level 3 authority.
 6. **Migrate by entity family:** expand only after correctness and performance checks pass for the previous slice.
 7. **Retire legacy paths:** remove a legacy path only after representative parity evidence and user acceptance.
 
+[D-P6-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives one
+bounded exception to step 6. The unmet Phase 6 Entry/Exit improvement obligation
+does not prevent subsequent Core development that the owner separately authorises.
+The obligation stays mandatory before Phase 10 beta acceptance.
+All normal per-slice correctness and performance checks still apply.
+
+This exception changes only the sequence. It accepts no performance result.
+Numerical budgets or improvement on another workload do not give the required
+evidence for this obligation. Invariant 8 and all legacy-retirement conditions
+still apply. Phase closure and subsequent phase opening need different owner
+decisions.
+
 Do not attempt a whole-macro rewrite.
 
 ## Source organisation direction

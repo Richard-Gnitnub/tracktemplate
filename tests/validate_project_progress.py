@@ -17,6 +17,7 @@ PLAN_PATH = ROOT / "reference" / "PROJECT_PLAN.md"
 PRODUCT_VISION_PATH = ROOT / "reference" / "PRODUCT_VISION.md"
 CAPABILITY_MATRIX_PATH = ROOT / "reference" / "CAPABILITY_MATRIX.md"
 ARCHITECTURE_PATH = ROOT / "reference" / "ARCHITECTURE.md"
+MODULARISATION_PATH = ROOT / "reference" / "MODULARISATION_PLAN.md"
 VALIDATION_PATH = ROOT / "reference" / "VALIDATION.md"
 PERFORMANCE_SOP_PATH = ROOT / "reference" / "PERFORMANCE_SOP.md"
 TERMINOLOGY_PATH = ROOT / "reference" / "TERMINOLOGY.md"
@@ -195,6 +196,14 @@ EXPECTED_PHASE6_DECISIONS = {
         "#phase-6-exit-5-preservation-evidence-admission-panel",
         "bf243cda021a835703ee691dcb0095d5c800d356c52f1d5147a10fddb367fef9",
         "b2e53e328e4216868c116c886c1e23bd0423a43f3543ce683bc27fe1111619ec",
+    ),
+    "D-P6-008": (
+        "2026-09-05",
+        "Defer the unmet Phase 6 Exit 4 obligation until before Phase 10 "
+        "beta acceptance.",
+        "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel",
+        "5002dbe0a37e083325116bc2e9b8ba934a1c50d42794220a391d6b2fd4bb42a3",
+        "4bcb11b6dca8a3562e23fc97baa1730f81af7473f1fac7f912f2f20c13a55fe9",
     ),
     "TT-DOC-001": (
         "2026-08-15",
@@ -448,6 +457,49 @@ EXPECTED_EXIT5_ACCEPTANCE_EXCLUSIONS = (
     "legacy-path removal. It grants no wider parity, migration, production "
     "clearance, performance or release authority."
 )
+EXPECTED_EXIT4_DEFERRAL_QUOTE = (
+    "I approve a Level 3 deferral of Phase 6 Exit 4—“Editing resource use "
+    "improves beyond normal noise, with complete end-to-end cost accounted "
+    "for”—for its existing bounded Entry/Exit scope, to a mandatory acceptance "
+    "condition before the Phase 10 beta gate.",
+    "Record four accepted exits and one deferred, unmet obligation. Do not "
+    "report 5/5 acceptance. Permit only the necessary sequencing exception "
+    "for separately authorised later Core development. Preserve normal "
+    "per-slice checks, comparison paths and all retirement conditions.",
+    "I accept the bounded sequencing exposure. I remain accountable for "
+    "delivery through a named Phase 10 integration owner and for acceptance "
+    "after independent review. Numerical budgets or improvement on another "
+    "workload cannot discharge this obligation. If it remains unmet, beta "
+    "acceptance is blocked.",
+    "Preserve measurement rules, retained negative evidence and stopped "
+    "directions. Authorise only the directly dependent Level 3 repository "
+    "alignment. This decision accepts no performance result, closes no phase, "
+    "opens no subsequent phase, authorises no product implementation or "
+    "legacy removal, and changes no output or release status.",
+)
+EXPECTED_EXIT4_RISK_APPENDICES = {
+    "owner": (
+        "Under D-P6-008, Richard keeps accountability and owns delivery until "
+        "a named Phase 10 integration owner takes delivery responsibility. "
+        "Richard accepts the result after independent review."
+    ),
+    "deadline": (
+        "The unchanged obligation for the bounded Entry/Exit scope of "
+        "Phase 6 Exit 4 is mandatory before Phase 10 beta acceptance under "
+        "D-P6-008."
+    ),
+    "required_work": (
+        "Preserve the D-P6-008 obligation, measurement rules, retained "
+        "negative evidence and stopped directions. Numerical budgets or "
+        "improvement on another workload do not give the required evidence "
+        "for the obligation. If it stays unmet, Richard must not accept beta."
+    ),
+    "closure_evidence": (
+        "D-P6-008 also requires independent evidence review and Richard's "
+        "acceptance of the unchanged improvement obligation for the bounded "
+        "Entry/Exit scope before Phase 10 beta acceptance."
+    ),
+}
 EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
     "| D-GOV-015 | 2026-08-31 | Accepted | The "
     "[decision](current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle) "
@@ -487,7 +539,8 @@ EXPECTED_PHASE6_DISPOSITIONS = [
         "assurance limitations apply. Project status remains `unknown`."
     ),
     (
-        "Pending — D-GOV-008 and D-GOV-009 keep their initial authority and "
+        "Deferred — unmet under D-P6-008: "
+        "D-GOV-008 and D-GOV-009 keep their initial authority and "
         "retained negative evidence. The completed D-GOV-011 "
         "baseline-attribution investigation gave FAIL. The attribution "
         "materiality rule did not change. The owner accepted the "
@@ -945,28 +998,30 @@ def _validate_owner_view(plan: str) -> None:
     for fragment in (
         "Phase 6 has 4/5 accepted exits",
         "The owner accepted Exits 1, 2, 3, and 5",
-        "Exit 4 stays Pending",
+        "Exit 4 is Deferred — unmet",
         "output has private-development status",
         "Project status stays `unknown`",
-        "accepts Exit 5 for continued preservation of the legacy references "
-        "and the bounded route for development comparison and recovery",
-        "kept evidence shows that B14, B15, and the route for development "
-        "comparison and recovery stay available",
+        "gives Exit 4 Deferred — unmet status. Its unchanged improvement "
+        "obligation for the bounded Entry/Exit scope stays mandatory before "
+        "Phase 10 beta acceptance",
+        "owner permits only the stated exception to the migration sequence",
+        "Each subsequent development task still needs its own authority "
+        "and applicable checks",
         "Product source does not change",
         "All legacy-retirement conditions and wider exclusions still apply",
-        "The owner gives no removal authority",
+        "The owner accepts no performance result",
+        "PR-15 and QA-R04 stay High/Mitigate/Partial",
         "D-GOV-011 stays stopped with its retained negative evidence",
-        "Risks do not change",
-        "owner accepted D-P6-007 on 2026-09-05",
-        "D-GOV-011, its measurement rule, and its kept evidence do not "
-        "change",
-        "Do not do the measurement again. Do not make the stopped "
-        "product change",
-        "The project selected no further product work from current evidence",
-        "Exit 4 needs a materially new performance hypothesis with evidence "
-        "for it",
-        "No owner decision is ready",
-        "Phase 6 stays open. Subsequent phases do not start",
+        "owner accepted D-P6-008 on 2026-09-05",
+        "Richard keeps accountability and owns delivery until a named "
+        "Phase 10 integration owner takes delivery responsibility",
+        "Independent review and Richard's acceptance are mandatory before beta "
+        "acceptance",
+        "Bring the Phase 6 closeout recommendation to the owner with four "
+        "accepted exits and one deferred, unmet obligation",
+        "Phase 6 stays open. Phase 7 stays Not started",
+        "Do not do a stopped experiment again. Do not change its measurement "
+        "rule",
     ):
         _require(
             fragment in owner_view,
@@ -1095,6 +1150,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         and "Exit 3 under D-P6-005 on 2026-08-15"
         in " ".join(plan.split())
         and "Exit 5 under D-P6-007 on 2026-09-05"
+        in " ".join(plan.split())
+        and "D-P6-008 gives Exit 4 Deferred — unmet status on 2026-09-05"
         in " ".join(plan.split()),
         "the accepted Phase 6 4/5 status is missing",
     )
@@ -2319,7 +2376,7 @@ def _validate_exit_conditions(
         "Evidenced — owner-accepted 2026-09-05",
         "Evidenced — owner-accepted 2026-08-02",
         "Evidenced — owner-accepted 2026-08-15",
-        "Pending",
+        "Deferred — unmet",
         "Evidenced — owner-accepted 2026-09-05",
     ]
     expected_phase4 = [
@@ -2463,6 +2520,16 @@ def _validate_exit_conditions(
         "D-P6-007 bounded Exit 5 acceptance decision row drifted",
     )
     _require(
+        "| D-P6-008 | 2026-09-05 | Accepted | The [decision]"
+        "(current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives Exit 4 "
+        "Deferred — unmet status. Its unchanged obligation stays mandatory "
+        "before Phase 10 beta acceptance. "
+        "Phase 6 keeps four accepted exits and one deferred, unmet obligation. "
+        "The owner accepts only the bounded sequencing exposure. Phase closure "
+        "and Phase 7 opening need different decisions. |" in plan,
+        "D-P6-008 bounded deferral decision row drifted",
+    )
+    _require(
         "D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles"
         in plan_flat
         and "supply Phase 6 performance evidence" in plan_flat
@@ -2518,12 +2585,10 @@ def _validate_exit_conditions(
         "2026-09-05" in plan_flat
         and "initial decision, measurement rule, and evidence do not change"
         in plan_flat
-        and "Exit 4 stays Pending" in plan_flat
-        and "D-P6-006 accepts the bounded Exit 1 result" in plan_flat
-        and "D-P6-007 accepts Exit 5 for continued legacy preservation"
-        in plan_flat
-        and "current evidence identifies no materially new performance "
-        "hypothesis" in plan_flat,
+        and "Current evidence identifies no materially new performance "
+        "hypothesis" in plan_flat
+        and "D-P6-008 gives Exit 4 Deferred — unmet status and accepts no "
+        "improvement evidence" in plan_flat,
         "D-GOV-011 canonical-record direction summary drifted",
     )
 
@@ -2579,7 +2644,8 @@ def _validate_exit_conditions(
         "D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 "
         "on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
         "2026-08-15. The owner accepted Exit 5 under D-P6-007 on "
-        "2026-09-05. Exit 4 stays Pending" in current_flat,
+        "2026-09-05. Under D-P6-008, the owner gave Exit 4 Deferred — unmet "
+        "status on 2026-09-05" in current_flat,
         "current record does not preserve the accepted Phase 6 4/5 state",
     )
     performance_section = _section(
@@ -3014,7 +3080,11 @@ def _validate_exit_conditions(
                 "project-owner acceptance permit removal"
             ),
         ]
-        and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS,
+        and [row[1] for row in current_rows] == EXPECTED_PHASE6_DISPOSITIONS
+        and "D-P6-008 gives Exit 4 Deferred — unmet status without acceptance. "
+        "Its unchanged obligation for the bounded Entry/Exit scope is "
+        "mandatory before Phase 10 beta acceptance"
+        in _semantic_text(current_section),
         "Phase 6 exits do not match the accepted 4/5 dispositions",
     )
     exit1_heading = "Phase 6 Exit 1: panel and owner decision"
@@ -3090,6 +3160,50 @@ def _validate_exit_conditions(
             ),
         ],
         "D-P6-007 panel exact owner decision drifted or was relocated",
+    )
+    deferral_heading = (
+        "Phase 6 Exit 4: deferral panel and owner decision — 2026-09-05"
+    )
+    _require(
+        '<a id="phase-6-exit-4-deferral-panel"></a>\n\n## '
+        + deferral_heading in current_evidence,
+        "D-P6-008 panel anchor or heading association is missing",
+    )
+    deferral_section = direct_section_content(
+        current_evidence, deferral_heading,
+    )
+    deferral_flat = _semantic_text(deferral_section)
+    for clause in (
+        "dbd3d061fb2fdd4522d769dd04c36d063cf918d9",
+        "a9308b37a2d70bd489ff2496dde194d70fed995a",
+        "independent read-only architecture and QA/risk challenge before "
+        "the owner decision",
+        "Proceed with bounded conditions",
+        "prerequisite gave FAIL under the unchanged materiality rule",
+        "No risk severity, state, treatment, or control effectiveness changes",
+        "Richard keeps accountability and owns delivery until a named "
+        "Phase 10 integration owner takes delivery responsibility",
+        "Independent evidence review and Richard's acceptance are mandatory "
+        "before "
+        "Phase 10 beta acceptance",
+        "No automatic extension is permitted",
+        "exception applies only to migration step 6 and Stage M4 progression",
+        "Before Phase 6 closeout, verify backup currency and coverage of "
+        "the valuable evidence in all retained worktrees",
+        "Phase 6 stays open at 4/5 accepted exits. Exit 4 is Deferred — unmet",
+        "Phase 7 stays Not started. The owner accepts no performance result",
+    ):
+        _require(
+            clause in deferral_flat,
+            "D-P6-008 deferral panel drifted: " + clause,
+        )
+    _require(
+        _blockquote_paragraphs(deferral_section)
+        == [
+            _semantic_text(paragraph)
+            for paragraph in EXPECTED_EXIT4_DEFERRAL_QUOTE
+        ],
+        "D-P6-008 panel exact owner decision drifted or was relocated",
     )
     exit3_acceptance_heading = (
         "Phase 6 Exit 3 supported-model panel to admit evidence and owner "
@@ -3862,8 +3976,10 @@ def _validate_exit_conditions(
         "D-P6-006 accepts the subsequent bounded Exit 1 result",
         "D-P6-007 accepts Exit 5 for continued legacy preservation",
         "Current evidence identifies no materially new performance hypothesis",
-        "The project selected no further product work. No owner decision "
-        "is ready",
+        "Under D-P6-008, the unmet Exit 4 obligation stays mandatory before "
+        "Phase 10 "
+        "beta acceptance",
+        "The next action is the Phase 6 closeout recommendation",
     ):
         _require(
             required_clause in current_register_flat,
@@ -3934,6 +4050,24 @@ def _load_json(path: pathlib.Path) -> dict[str, object]:
     return value
 
 
+def _validate_exit4_deferral_risk(
+    record: dict[str, object],
+    frozen: dict[str, object],
+) -> None:
+    """Permit only the four D-P6-008 duty appends to each frozen risk."""
+    _require(set(record) == set(frozen), "D-P6-008 risk fields drifted")
+    for field, previous in frozen.items():
+        appendix = EXPECTED_EXIT4_RISK_APPENDICES.get(field)
+        expected = (
+            previous if appendix is None else str(previous) + " " + appendix
+        )
+        _require(
+            record[field] == expected,
+            "D-P6-008 performance risk drifted: " + str(record["id"])
+            + "/" + field,
+        )
+
+
 def _validate_risks(plan: str) -> None:
     document = _load_json(RISKS_PATH)
     phase5_document = _load_json(PHASE5_RISKS_PATH)
@@ -3963,7 +4097,7 @@ def _validate_risks(plan: str) -> None:
     )
     _require(
         document["current_phase"] == 6
-        and document["updated_on"] == "2026-08-01",
+        and document["updated_on"] == "2026-09-05",
         "risk register is not prepared for current Phase 6",
     )
     _require(
@@ -4041,6 +4175,9 @@ def _validate_risks(plan: str) -> None:
     }
     for risk_id, record in by_id.items():
         frozen = phase5_by_id[risk_id]
+        if risk_id in {"PR-15", "QA-R04"}:
+            _validate_exit4_deferral_risk(record, frozen)
+            continue
         if risk_id not in governance_risks:
             _require(
                 record == frozen,
@@ -4639,6 +4776,60 @@ def _validate_product_vision(vision: str) -> None:
         ),
         "Product Vision lost its migration-completion boundary",
     )
+
+
+def _validate_exit4_sequence_deferral(
+    architecture: str,
+    modularisation: str,
+) -> None:
+    """Keep D-P6-008 a bounded sequence exception with unmet duties."""
+    _require(
+        "8. **Migration is incremental.** The existing implementation remains "
+        "the comparison path until each replacement proves output equivalence "
+        "and a measured resource improvement." in architecture,
+        "D-P6-008 changed architecture invariant 8",
+    )
+    sequence = _semantic_text(direct_section_content(
+        architecture, "Migration sequence",
+    ))
+    for clause in (
+        "expand only after correctness and performance checks pass for the "
+        "previous slice",
+        "bounded exception to step 6",
+        "does not prevent subsequent Core development that the owner "
+        "separately authorises",
+        "obligation stays mandatory before Phase 10 beta acceptance",
+        "All normal per-slice correctness and performance checks still apply",
+        "exception changes only the sequence",
+        "accepts no performance result. Numerical budgets or improvement on "
+        "another workload do not give the required evidence for this obligation",
+        "Invariant 8 and all legacy-retirement conditions still apply",
+        "Phase closure and subsequent phase opening need different owner "
+        "decisions",
+    ):
+        _require(
+            clause in sequence,
+            "D-P6-008 architecture sequence exception drifted: " + clause,
+        )
+    stage = _semantic_text(direct_section_content(
+        modularisation, "Stage M4: deferred geometry seam", level=3,
+    ))
+    for clause in (
+        "Exit condition: the architecture produces a measured resource "
+        "improvement without hiding cost or reducing validation",
+        "Phase 6 improvement obligation for the bounded Entry/Exit scope has "
+        "Deferred — unmet status. It stays mandatory before Phase 10 beta "
+        "acceptance",
+        "subsequent Core development with its own authority",
+        "Deferred — unmet status",
+        "keeps normal per-slice checks and all legacy-retirement conditions",
+        "deferral does not complete Stage M4 or authorise Stage M5 "
+        "implementation",
+    ):
+        _require(
+            clause in stage,
+            "D-P6-008 Stage M4 sequence exception drifted: " + clause,
+        )
 
 
 def _validate_architecture_direction(architecture: str) -> None:
@@ -5999,6 +6190,9 @@ def _validate_product_direction(current_evidence: str) -> None:
     """Require localised vision, architecture and evidence-map boundaries."""
     _validate_product_vision(_read(PRODUCT_VISION_PATH))
     _validate_architecture_direction(_read(ARCHITECTURE_PATH))
+    _validate_exit4_sequence_deferral(
+        _read(ARCHITECTURE_PATH), _read(MODULARISATION_PATH),
+    )
     _validate_capability_matrix(_read(CAPABILITY_MATRIX_PATH))
     _validate_current_governance_evidence(current_evidence)
 

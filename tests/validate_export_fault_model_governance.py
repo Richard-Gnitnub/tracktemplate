@@ -450,12 +450,12 @@ def validate_current_authority(documents: dict[str, str]) -> None:
     require(len(ids) == len(set(ids)), "duplicate current decision ID")
     fault_model_index = ids.index("D-P6-004")
     require(
-        ids[fault_model_index:fault_model_index + 6]
+        ids[fault_model_index:fault_model_index + 7]
         == [
             "D-P6-004", "D-P6-005", "D-P6-006", "D-P6-007",
-            "TT-DOC-001", "TT-DOC-002",
+            "D-P6-008", "TT-DOC-001", "TT-DOC-002",
         ],
-        "D-P6-004/D-P6-005/D-P6-006/D-P6-007 or later TT-DOC decision "
+        "D-P6-004/D-P6-005/D-P6-006/D-P6-007/D-P6-008 or later TT-DOC decision "
         "order drifted",
     )
     decisions_by_id = {record["id"]: record for record in decisions}
