@@ -586,7 +586,7 @@ join this sequence without separate Level 3 authority.
 6. **Migrate by entity family:** expand only after correctness and performance checks pass for the previous slice.
 7. **Retire legacy paths:** remove a legacy path only after representative parity evidence and user acceptance.
 
-[D-P6-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives one
+[D-P6-008](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel) gives one
 bounded exception to step 6. The unmet Phase 6 Entry/Exit improvement obligation
 does not prevent subsequent Core development that the owner separately authorises.
 The obligation stays mandatory before Phase 10 beta acceptance.

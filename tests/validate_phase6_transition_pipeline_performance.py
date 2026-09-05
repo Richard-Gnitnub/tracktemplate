@@ -645,7 +645,7 @@ def validate_evidence_links_if_present():
         assert fragment in current_flat, fragment
 
     evidence = (
-        ROOT / "reference/current/PHASE_EVIDENCE.md"
+        ROOT / "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
     ).read_text(encoding="utf-8")
     assert historical_report.name in evidence
     assert current_report.name in evidence

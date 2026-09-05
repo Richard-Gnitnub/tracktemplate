@@ -451,7 +451,7 @@ def validate_exit4_deferral_mutations() -> None:
         "D-P6-008 Stage M4 sequence exception drifted",
     )
 
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md")
     plan = read("reference/PROJECT_PLAN.md")
     phase4 = read("reference/history/phase-closeouts/PHASE4_CLOSEOUT.md")
     phase5 = read("reference/history/phase-closeouts/PHASE5_CLOSEOUT.md")
@@ -512,6 +512,106 @@ def validate_exit4_deferral_mutations() -> None:
                 progress._validate_exit4_deferral_risk(value, previous)
             ),
             "D-P6-008 performance risk drifted: " + risk_id + "/" + field,
+        )
+
+
+def validate_phase6_closeout_mutations() -> None:
+    """Reject acceptance inflation and authority in Phase 7 holding records."""
+    plan = read("reference/PROJECT_PLAN.md")
+    closeout = read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md")
+    holding = read("reference/current/PHASE_EVIDENCE.md")
+    for name, before, after, diagnostic in (
+        (
+            "phase7-opened",
+            "Phase 7 is unopened and\nunauthorised",
+            "Phase 7 is opened and authorised",
+            "Phase 7 holding status gives unaccepted authority",
+        ),
+        (
+            "phase7-exit-admitted",
+            progress.EXPECTED_PHASE7_EXIT_CONDITIONS[0] + " | Pending",
+            progress.EXPECTED_PHASE7_EXIT_CONDITIONS[0] + " | Evidenced",
+            "Phase 7 original criteria or Pending dispositions drifted",
+        ),
+        (
+            "beta-deadline-waived",
+            "stays mandatory\nbefore Phase 10 beta acceptance",
+            "becomes optional after Phase 10 beta acceptance",
+            "Phase 7 holding lost a continuing obligation: unchanged bounded "
+            "Entry/Exit improvement obligation stays mandatory before "
+            "Phase 10 beta acceptance",
+        ),
+        (
+            "budgets-substitute-for-improvement",
+            "or improvement on another workload do not give the required "
+            "evidence for this obligation",
+            "or improvement on another workload give the required "
+            "evidence for this obligation",
+            "Phase 7 holding lost a continuing obligation: Numerical budgets "
+            "or improvement on another workload do not give the required "
+            "evidence for this obligation",
+        ),
+    ):
+        expect_rejected(
+            "closeout/" + name,
+            lambda value=replace_once(holding, before, after): (
+                progress._validate_phase6_closeout(plan, closeout, value)
+            ),
+            diagnostic,
+        )
+    quote = blockquote_paragraph_containing(
+        closeout, "As TrackTemplate project owner, I accept the completed,",
+    )
+    expect_rejected(
+        "closeout/d-p6-009-five-exits-accepted",
+        lambda: progress._validate_phase6_closeout(
+            plan,
+            replace_once(closeout, quote, quote.replace(
+                "four accepted", "five accepted", 1,
+            )),
+            holding,
+        ),
+        "D-P6-009 exact owner instruction drifted or was relocated",
+    )
+    expect_rejected(
+        "closeout/d-p6-009-opens-phase7",
+        lambda: progress._validate_phase6_closeout(
+            plan,
+            replace_once(
+                closeout,
+                "**Exclusions:** This decision accepts no performance result. "
+                "It does not\nopen Phase 7",
+                "**Exclusions:** This decision accepts no performance result. "
+                "It does\nopen Phase 7",
+            ),
+            holding,
+        ),
+        "D-P6-009 panel and register differ: exclusions",
+    )
+    decisions = json.loads(read("reference/current/gate-decisions.json"))
+    frozen = {
+        record["id"]: record
+        for record in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    missing = copy.deepcopy(decisions)
+    missing["decisions"] = []
+    widened = copy.deepcopy(decisions)
+    widened["decisions"][0]["authority"] += " The obligation is optional."
+    opened = copy.deepcopy(decisions)
+    opened["decisions"].append({"id": "D-P7-001", "status": "Accepted"})
+    for name, mutated in (
+        ("current-d-p6-008-missing", missing),
+        ("current-d-p6-008-weakened", widened),
+        ("current-phase7-opening-invented", opened),
+    ):
+        expect_rejected(
+            "closeout/" + name,
+            lambda value=mutated: progress._validate_phase7_decision_carryforward(
+                value, frozen,
+            ),
+            "Phase 7 holding must carry only the complete unchanged D-P6-008",
         )
 
 
@@ -810,7 +910,7 @@ def validate_capability_matrix_mutations() -> None:
 
 def validate_current_evidence_mutations() -> None:
     """Keep current PR/phase state and decision authority inside the panel."""
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md")
     authority = blockquote_paragraph_containing(
         evidence,
         "Vision supplies direction.",
@@ -2638,7 +2738,7 @@ def validate_current_evidence_mutations() -> None:
 def validate_finite_documentation_mutations() -> None:
     """Keep D-GOV-018 completion distinct from acceptance and re-review."""
     plan = read("reference/PROJECT_PLAN.md")
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md")
     for name, original, replacement in (
         (
             "d-gov-018/locked-completion-made-linguistic-acceptance",
@@ -2757,20 +2857,20 @@ def validate_project_plan_mutations() -> None:
         lambda: progress._validate_plan_shape(
             replace_once(plan, phase6_row, phase6_previous)
         ),
-        "Phase 6 must remain current at the accepted 4/5 state",
+        "Phase 6 must remain closed at four accepted and one deferred exit",
     )
 
     phase6_closed = replace_once(
         phase6_row,
-        "Current — opened 2026-08-01",
         "Complete — accepted 2026-09-05",
+        "Current — opened 2026-08-01",
     )
     expect_rejected(
-        "project-plan/phase6-prematurely-closed",
+        "project-plan/phase6-closeout-reversed",
         lambda: progress._validate_plan_shape(
             replace_once(plan, phase6_row, phase6_closed)
         ),
-        "Phase 6 must remain current at the accepted 4/5 state",
+        "Phase 6 must remain closed at four accepted and one deferred exit",
     )
 
     exit2_row = table_row_containing(
@@ -2788,7 +2888,7 @@ def validate_project_plan_mutations() -> None:
             replace_once(plan, exit2_row, exit2_pending),
             read("reference/history/phase-closeouts/PHASE4_CLOSEOUT.md"),
             read("reference/history/phase-closeouts/PHASE5_CLOSEOUT.md"),
-            read("reference/current/PHASE_EVIDENCE.md"),
+            read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"),
         ),
         "project-plan Phase 6 exit states drifted",
     )
@@ -2808,7 +2908,7 @@ def validate_project_plan_mutations() -> None:
             replace_once(plan, exit3_row, exit3_pending),
             read("reference/history/phase-closeouts/PHASE4_CLOSEOUT.md"),
             read("reference/history/phase-closeouts/PHASE5_CLOSEOUT.md"),
-            read("reference/current/PHASE_EVIDENCE.md"),
+            read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"),
         ),
         "project-plan Phase 6 exit states drifted",
     )
@@ -3177,13 +3277,13 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_status = replace_once(
         plan,
-        "Phase 6 has 4/5 accepted exits",
-        "Phase 6 has 5/5 accepted exits",
+        "Phase 6 is closed with 4/5 accepted exits",
+        "Phase 6 is closed with 5/5 accepted exits",
     )
     expect_rejected(
         "tt-doc/owner-view-status-contradiction",
         lambda: progress._validate_owner_view(owner_view_status),
-        "project-plan owner view lost or contradicted: Phase 6 has 4/5 "
+        "project-plan owner view lost or contradicted: Phase 6 is closed with 4/5 "
         "accepted exits",
     )
     owner_view_authority = replace_once(
@@ -3196,13 +3296,11 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
     )
-    owner_view_change = table_row_containing(plan, "**What changed**")
+    owner_view_change = table_row_containing(plan, "**What now works**")
     widened_change = replace_once(
         owner_view_change,
-        "gives Exit 4 Deferred — unmet status. Its unchanged improvement "
-        "obligation for the bounded Entry/Exit scope stays mandatory before "
-        "Phase 10 beta acceptance",
-        "waives the improvement obligation for every workload",
+        "preserve the four accepted exits, D-P6-008 in full",
+        "waive the improvement obligation for every workload",
     )
     owner_view_boundary_widened = replace_once(
         plan, owner_view_change, widened_change,
@@ -3210,22 +3308,20 @@ def validate_documentation_profile_mutations() -> None:
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_owner_view(owner_view_boundary_widened),
-        "project-plan owner view lost or contradicted: gives Exit 4 Deferred "
-        "— unmet status. Its unchanged improvement obligation for the bounded "
-        "Entry/Exit scope stays mandatory before Phase 10 beta acceptance",
+        "project-plan owner view lost or contradicted: preserve the four "
+        "accepted exits, D-P6-008 in full",
     )
 
     owner_view_restarted = replace_once(
         plan,
-        "Do not do a stopped experiment again. Do not change its measurement "
-        "rule.",
-        "Repeat a stopped experiment and change its measurement rule.",
+        "D-GOV-011 stays stopped with its retained negative evidence",
+        "Repeat D-GOV-011 and change its measurement rule",
     )
     expect_rejected(
         "tt-doc/owner-view-stopped-direction-restarted",
         lambda: progress._validate_owner_view(owner_view_restarted),
-        "project-plan owner view lost or contradicted: Do not do a stopped "
-        "experiment again. Do not change its measurement rule",
+        "project-plan owner view lost or contradicted: D-GOV-011 stays "
+        "stopped with its retained negative evidence",
     )
 
     compatibility_terms_removed = terminology
@@ -3791,7 +3887,7 @@ def validate_documentation_profile_mutations() -> None:
     phase5_closeout = read(
         "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md"
     )
-    current_evidence = read("reference/current/PHASE_EVIDENCE.md")
+    current_evidence = read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md")
     conformance_result_removed = replace_once(
         current_evidence,
         "The internal result for these logical units is `ASD-STE100 Issue 9\n"
@@ -4027,7 +4123,7 @@ def validate_visible_recovery_mutations() -> None:
     """Reject hidden, destructive, durable, or competing recovery state."""
     policy = read("reference/RECOVERY_AND_BACKUP.md")
     workflows = read("reference/AGENT_WORKFLOWS.md")
-    phase_evidence = read("reference/current/PHASE_EVIDENCE.md")
+    phase_evidence = read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md")
     skills = {
         name: path.read_text(encoding="utf-8")
         for name, path in recovery_controls.RECOVERY_SKILL_PATHS.items()
@@ -4628,7 +4724,7 @@ def validate_visible_recovery_mutations() -> None:
     missing_snapshot = replace_once(
         phase_evidence,
         "[2026-08-01 repository snapshot]"
-        "(../backup-records/2026-08-01-phase5-closeout-snapshot.md)",
+        "(../../backup-records/2026-08-01-phase5-closeout-snapshot.md)",
         "2026-08-01 repository snapshot",
     )
     expect_rejected(
@@ -5321,6 +5417,7 @@ def main() -> None:
     validate_capability_matrix_mutations()
     validate_current_evidence_mutations()
     validate_exit4_deferral_mutations()
+    validate_phase6_closeout_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()

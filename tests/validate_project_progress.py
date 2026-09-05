@@ -68,6 +68,19 @@ PHASE5_DECISIONS_PATH = (
     / "phase-closeouts"
     / "PHASE5_GATE_DECISIONS.json"
 )
+PHASE6_CLOSEOUT_PATH = (
+    ROOT / "reference" / "history" / "phase-closeouts" / "PHASE6_CLOSEOUT.md"
+)
+PHASE6_RISKS_PATH = (
+    ROOT / "reference" / "history" / "phase-closeouts" / "PHASE6_RISKS.json"
+)
+PHASE6_DECISIONS_PATH = (
+    ROOT
+    / "reference"
+    / "history"
+    / "phase-closeouts"
+    / "PHASE6_GATE_DECISIONS.json"
+)
 REDIRECT_PATH = (
     ROOT / "reference" / "phase-evidence" / "PHASE4_CANONICAL_STATE.md"
 )
@@ -87,6 +100,16 @@ PHASE_TOTALS = {
     10: 5,
     11: 7,
 }
+EXPECTED_PHASE7_EXIT_CONDITIONS = (
+    "Core layouts can be created, edited, saved, reopened, validated, and "
+    "exported through modular paths.",
+    "Accepted B14/B15 geometry, station mapping, identities, ordering, and "
+    "metadata remain equivalent.",
+    "Domain calculations for this family have no FreeCAD/Qt dependency or "
+    "reverse adapter import.",
+    "Legacy core-layout paths have either been safely retired or have a "
+    "documented blocker and removal gate.",
+)
 EXPECTED_RISK_IDS = {
     *{
         "PR-{:02d}".format(value)
@@ -123,7 +146,7 @@ EXPECTED_PHASE6_DECISIONS = {
     "D-P6-001": (
         "2026-08-01",
         "Open Phase 6.",
-        "reference/current/PHASE_EVIDENCE.md#phase-6-opening-panel",
+        "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-opening-panel",
         "30251ac623544df6a253373edf5c01fa174c5166a9deac0a1859d6187b411f94",
         "5d64c15adbcf5ed432adcbb48bc24620d12a254d24f97bd3b737edc454565199",
     ),
@@ -134,7 +157,7 @@ EXPECTED_PHASE6_DECISIONS = {
             "based on it."
         ),
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#product-vision-and-execution-governance-panel"
         ),
         "5f374fbeb09e7f5409c5063afdac92e62ac3cf4b11c595985e74151cd5ee64f9",
@@ -144,7 +167,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-02",
         "Accept Phase 6 Exit 2 and retain Exit 3 Pending.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#phase-6-exits-2-and-3-evidence-admission-panel"
         ),
         "25a3ece0a3a0057f66bea805c24bea0c661d7a9b0208639cd40d7271847dc5e8",
@@ -154,7 +177,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-02",
         "Select strict completion rules for Exit 3 recovery.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#phase-6-exit-3-recovery-authority-contract-panel"
         ),
         "e513389bcddb1dceaa29cf6e2c00bbcc7ecf9a3b1b9f0d734474023307e608fb",
@@ -164,7 +187,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-15",
         "Define the supported exporter failure model and its evidence limit.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#phase-6-exporter-fault-model-clarification-panel"
         ),
         "6bc24b07a9d1e5bb8c8f99eb3605a188c374d7101db2b99b279a08152b70dab5",
@@ -174,7 +197,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-15",
         "Accept Phase 6 Exit 3 for the bounded B16 Entry/Exit exporter.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#phase-6-exit-3-supported-model-evidence-admission-panel"
         ),
         "52ede8d935c565028ab570dc31279b390db801b4f579f70b9a593a7ccc6952b5",
@@ -184,7 +207,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-09-05",
         "Accept Phase 6 Exit 1 for the agreed bounded Entry/Exit "
         "centreline comparison scope.",
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
         "#phase-6-exit-1-bounded-output-evidence-admission-panel",
         "1f6448d96c0e976e446fef6faaf83f030f54435d54711e7c89b00fd3ab7f4290",
         "177d9e71e772e982766aac17175103591ef793324abaf9dc58310c8e7671ecf6",
@@ -192,7 +215,7 @@ EXPECTED_PHASE6_DECISIONS = {
     "D-P6-007": (
         "2026-09-05",
         "Accept Phase 6 Exit 5 for bounded legacy preservation.",
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
         "#phase-6-exit-5-preservation-evidence-admission-panel",
         "bf243cda021a835703ee691dcb0095d5c800d356c52f1d5147a10fddb367fef9",
         "b2e53e328e4216868c116c886c1e23bd0423a43f3543ce683bc27fe1111619ec",
@@ -201,15 +224,23 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-09-05",
         "Defer the unmet Phase 6 Exit 4 obligation until before Phase 10 "
         "beta acceptance.",
-        "reference/current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel",
+        "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel",
         "5002dbe0a37e083325116bc2e9b8ba934a1c50d42794220a391d6b2fd4bb42a3",
         "4bcb11b6dca8a3562e23fc97baa1730f81af7473f1fac7f912f2f20c13a55fe9",
+    ),
+    "D-P6-009": (
+        "2026-09-05",
+        "Close Phase 6.",
+        "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
+        "#phase-6-closeout-panel",
+        "cedb7c30d9809238382c2c14accdf6afdf5eb7e05f8c2bc01e79f1a823350fa8",
+        "e9c5f9db188bfeeb2b2e3e7dc9171cbc534aa2bde9c954e436c0fe19239694d7",
     ),
     "TT-DOC-001": (
         "2026-08-15",
         "Adopt the TrackTemplate Technical Documentation Profile.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#tt-doc-001-documentation-architecture-panel"
         ),
         "60cfd12a3941b0ef596c70229bae3ca10026b28e622907e022f951eb17b5edea",
@@ -219,7 +250,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-15",
         "Correct the TT-DOC-001 instruction for UK English.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#tt-doc-002-uk-english-spelling-correction-panel"
         ),
         "ba5f655e63fe208696e9fd03808b7e4a84b736439e24d81a2c009c95a2b62ba8",
@@ -229,7 +260,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-15",
         "Qualify the exact FreeCAD 1.1.3 host profile.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#freecad-1-1-3-compatibility-requalification-panel"
         ),
         "c5255a5f08624f980d410a6cd45453e27fcad3d689b2b1fcea3c7bcfbec90f29",
@@ -242,7 +273,7 @@ EXPECTED_PHASE6_DECISIONS = {
             "performance evidence."
         ),
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#phase-6-performance-evidence-host-boundary-panel"
         ),
         "7efed03343a5e0f5809ebe66d8a8fe8c09aea964c9fcc9d409db9a361af432e7",
@@ -255,7 +286,7 @@ EXPECTED_PHASE6_DECISIONS = {
             "direction."
         ),
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#phase-6-exit-4-performance-direction-panel"
         ),
         "020bb03a2ff19a9ef0e35746b45a8ae1791028aa5aeb3ea2948fdf3625131b46",
@@ -268,7 +299,7 @@ EXPECTED_PHASE6_DECISIONS = {
             "attribution."
         ),
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#phase-6-exit-4-d-gov-009-panel"
         ),
         "a3772cf1a6b5fc251dae1e608440d69d0bb54601341686df0d5b493a30cb5d51",
@@ -278,7 +309,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-23",
         "Qualify the new exact FreeCAD 1.1.3 host profile.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#freecad-1-1-3-py31313-qt6111-qualification-panel"
         ),
         "6560bc0b5c85f626bafa3c967f793a18f9671319813f1eebcabe00ecc7117405",
@@ -288,7 +319,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-23",
         "Select one canonical-record performance hypothesis.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#phase-6-exit-4-d-gov-011-direction-selection-panel"
         ),
         "60096e93c2464f2939a4f3f44894508c43dcd04134f98ce541f60d0ff16b4089",
@@ -298,7 +329,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-25",
         "Record the sequence nonconformance after worktree retirement.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#d-gov-012-worktree-sequence-nonconformance"
         ),
         "5cb62e99d39efbb0653bc7b6e126ddb6b49b17135d52c5c4665edd22faafe99b",
@@ -308,7 +339,7 @@ EXPECTED_PHASE6_DECISIONS = {
         "2026-08-31",
         "Adopt the simplified single-review STE lifecycle.",
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#d-gov-015-simplified-ste-lifecycle"
         ),
         "d5d8412b161b9312a8a86f5a460c62254bbcffeb925593e57ed7814159ac1e99",
@@ -321,7 +352,7 @@ EXPECTED_PHASE6_DECISIONS = {
             "and Technical Author Lead responsibility."
         ),
         (
-            "reference/current/PHASE_EVIDENCE.md"
+            "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
             "#d-gov-017-whole-technical-document-lifecycle"
         ),
         "4f312b96a27fe3cc520766bee2cabab4efbdfba8e501210e79e34115d000ffd6",
@@ -333,7 +364,7 @@ EXPECTED_PHASE6_DECISIONS = {
             'Adopt one documentation review, one set of exact corrections, the '
             'locked state, and validation.'
         ),
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
         "#d-gov-018-finite-documentation-completion",
         'c31761007ac55ca883cf54ca84dd065955322e8849cddc6330f12f6d44f84a32',
         '444b8aa0d26b67cd6c33e30d2b7b57c9288a2bb6866d8b6c05dc71e02ef01c4d',
@@ -502,7 +533,7 @@ EXPECTED_EXIT4_RISK_APPENDICES = {
 }
 EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
     "| D-GOV-015 | 2026-08-31 | Accepted | The "
-    "[decision](current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle) "
+    "[decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-015-simplified-ste-lifecycle) "
     "adopts author → freeze scope → one Documentation Review → optional exact "
     "reviewed correction once → one final deterministic validation → complete "
     "or owner stop. Phase 6 stays at 2/5. If validation is exact-green, the "
@@ -510,7 +541,7 @@ EXPECTED_STE_LIFECYCLE_PLAN_ROW = (
 )
 EXPECTED_TDMP_PLAN_ROW = (
     "| D-GOV-017 | 2026-09-04 | Accepted | The "
-    "[decision](current/PHASE_EVIDENCE.md#d-gov-017-whole-technical-document-"
+    "[decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-017-whole-technical-document-"
     "lifecycle) establishes one TDMP and the Technical Author Lead "
     "responsibility. For governance prose, the finite route is write once under "
     "D-GOV-015, one Documentation Review, apply its required adjustment once if "
@@ -996,32 +1027,25 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        "Phase 6 has 4/5 accepted exits",
+        "Phase 6 is closed with 4/5 accepted exits",
+        "Phase 7 is Not started at 0/4",
         "The owner accepted Exits 1, 2, 3, and 5",
         "Exit 4 is Deferred — unmet",
         "output has private-development status",
         "Project status stays `unknown`",
-        "gives Exit 4 Deferred — unmet status. Its unchanged improvement "
-        "obligation for the bounded Entry/Exit scope stays mandatory before "
-        "Phase 10 beta acceptance",
-        "owner permits only the stated exception to the migration sequence",
-        "Each subsequent development task still needs its own authority "
-        "and applicable checks",
+        "records the accepted recovery proof and Phase 6 closeout",
+        "Current paths contain unopened Phase 7 holding records",
+        "preserve the four accepted exits, D-P6-008 in full",
         "Product source does not change",
         "All legacy-retirement conditions and wider exclusions still apply",
         "The owner accepts no performance result",
         "PR-15 and QA-R04 stay High/Mitigate/Partial",
         "D-GOV-011 stays stopped with its retained negative evidence",
-        "owner accepted D-P6-008 on 2026-09-05",
-        "Richard keeps accountability and owns delivery until a named "
-        "Phase 10 integration owner takes delivery responsibility",
-        "Independent review and Richard's acceptance are mandatory before beta "
-        "acceptance",
-        "Bring the Phase 6 closeout recommendation to the owner with four "
-        "accepted exits and one deferred, unmet obligation",
-        "Phase 6 stays open. Phase 7 stays Not started",
-        "Do not do a stopped experiment again. Do not change its measurement "
-        "rule",
+        "Richard accepted the completed recovery evidence and Phase 6 closeout",
+        "Phase 7 needs a separate opening decision",
+        "Present the bounded Phase 7 opening decision and first product "
+        "outcome from repository evidence together",
+        "Phase 7 stays unopened and unauthorised",
     ):
         _require(
             fragment in owner_view,
@@ -1045,6 +1069,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
             "## Current owner view",
             "## Phase status",
             "## Phase 6 exit conditions",
+            "## Phase 7 exit conditions",
             "## Live risks",
             "## Owner decisions",
             "## Authority and evidence links",
@@ -1096,7 +1121,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         if len(cells) != 4 or not cells[0].isdigit():
             continue
         match = re.fullmatch(
-            r"(\d+)/(\d+) (evidenced|accepted exits)",
+            r"(\d+)/(\d+) (evidenced|accepted exits)"
+            r"(; one deferred, unmet obligation)?",
             cells[2],
         )
         _require(match is not None, "invalid phase exit status: " + cells[2])
@@ -1105,6 +1131,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
             "count": int(match.group(1)),
             "total": int(match.group(2)),
             "status_term": match.group(3),
+            "deferred_obligation": bool(match.group(4)),
             "state": cells[3],
         }
 
@@ -1115,6 +1142,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         _require(
             rows[phase]["status_term"] == expected_term,
             "phase exit-status term drifted: {}".format(phase),
+        )
+        _require(
+            rows[phase]["deferred_obligation"] == (phase == 6),
+            "phase deferred-obligation status drifted: {}".format(phase),
         )
     _require(rows[4]["count"] == 6, "Phase 4 must show six evidenced exits")
     _require(
@@ -1129,8 +1160,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
     _require(
         rows[6]["count"] == 4
         and str(rows[6]["state"])
-        == "Current — opened 2026-08-01",
-        "Phase 6 must remain current at the accepted 4/5 state",
+        == "Complete — accepted 2026-09-05",
+        "Phase 6 must remain closed at four accepted and one deferred exit",
     )
     _require(
         [
@@ -1138,22 +1169,21 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
             for phase, row in rows.items()
             if str(row["state"]).startswith("Current")
         ]
-        == [6],
-        "the dashboard must identify only Phase 6 as current",
+        == [],
+        "the dashboard must not identify an opened current phase",
     )
+    for phase in range(7, 12):
+        _require(
+            rows[phase]["count"] == 0 and rows[phase]["state"] == "Not started",
+            "Phase {} must remain unopened at zero evidenced exits".format(phase),
+        )
     _require(
-        "Phase 6 current — 4/5 accepted exits" in " ".join(plan.split())
-        and "owner accepted Exit 1 under D-P6-006 on 2026-09-05"
+        "Phase 6 closed — four accepted exits and one deferred, unmet "
+        "obligation under D-P6-009 on 2026-09-05"
         in " ".join(plan.split())
-        and "Exit 2 under D-P6-002 on 2026-08-02"
-        in " ".join(plan.split())
-        and "Exit 3 under D-P6-005 on 2026-08-15"
-        in " ".join(plan.split())
-        and "Exit 5 under D-P6-007 on 2026-09-05"
-        in " ".join(plan.split())
-        and "D-P6-008 gives Exit 4 Deferred — unmet status on 2026-09-05"
+        and "D-P6-008 stays in full. Phase 7 is Not started at 0/4"
         in " ".join(plan.split()),
-        "the accepted Phase 6 4/5 status is missing",
+        "the accepted Phase 6 closeout and unopened Phase 7 status are missing",
     )
     return rows
 
@@ -1612,16 +1642,16 @@ def _validate_performance_direction_sources(
         (
             (
                 "PR #50 performance series",
-                "../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-"
+                "../../benchmarks/2026-08-16-phase6-freecad-1.1.3-transition-"
                 "pipeline-performance.md",
             ),
             (
                 "comparison-direction section",
-                "../PERFORMANCE_SOP.md#phase-6-exit-4-comparison-direction",
+                "../../PERFORMANCE_SOP.md#phase-6-exit-4-comparison-direction",
             ),
             (
                 "local Issue 9 source",
-                "../external/asd-ste100/README.md",
+                "../../external/asd-ste100/README.md",
             ),
         ),
         "D-GOV-008 panel link drifted",
@@ -2461,48 +2491,9 @@ def _validate_exit_conditions(
         "Phase 5 closeout backup condition is missing",
     )
 
-    plan_flat = " ".join(plan.split())
-    _require(
-        "D-P5-002 accepted Coin and the demonstrated B16 Entry/Exit product "
-        "boundary. Its evidence supports all four exact exits" in plan_flat,
-        "accepted Phase 5 boundary is missing",
-    )
-    _require(
-        "D-P5-003 closed Phase 5 without opening Phase 6" in plan_flat,
-        "Phase 5 closeout boundary is missing",
-    )
-    _require(
-        "D-P6-001 later opened Phase 6 at 0/5" in plan_flat
-        and "The authorised work was bounded exact validation and a "
-        "private-development export seam" in plan_flat,
-        "Phase 6 opening boundary is missing",
-    )
-    _require(
-        "D-P6-002 accepts only the bounded transient-object Exit 2"
-        in plan_flat
-        and "advances Phase 6 to 1/5" in plan_flat
-        and "D-P6-003 selects a strict completion method" in plan_flat
-        and "The method can add output members" in plan_flat
-        and "It cannot change or remove an existing output member" in plan_flat
-        and "It keeps no separate journal" in plan_flat
-        and "Its completion count can only increase" in plan_flat
-        and "D-P6-003 authorises a later bounded Level 2 implementation"
-        in plan_flat
-        and "D-P6-004 defines the finite supported exporter fault model" in plan_flat
-        and "D-P6-005 accepts only the bounded B16 Entry/Exit "
-        "DXF-and-manifest route"
-        in plan_flat
-        and "The route has private-development status" in plan_flat
-        and "The same input gives the same bytes" in plan_flat
-        and "the route is failure-safe under D-P6-003 and D-P6-004"
-        in plan_flat
-        and "advances Phase 6 to 2/5" in plan_flat
-        and "Project status remains `unknown`" in plan_flat,
-        "Phase 6 Exit 2/3 acceptance or Exit 3 contract boundary is missing",
-    )
     _require(
         "| D-P6-006 | 2026-09-05 | Accepted | The [decision]"
-        "(current/PHASE_EVIDENCE.md"
+        "(history/phase-closeouts/PHASE6_CLOSEOUT.md"
         "#phase-6-exit-1-bounded-output-evidence-admission-panel) "
         "accepts Exit 1 for the agreed scope of the PR #63 comparison of "
         "Entry/Exit centrelines. Phase 6 advances to 3/5. Exits 4 and 5 stay "
@@ -2511,7 +2502,7 @@ def _validate_exit_conditions(
     )
     _require(
         "| D-P6-007 | 2026-09-05 | Accepted | The [decision]"
-        "(current/PHASE_EVIDENCE.md"
+        "(history/phase-closeouts/PHASE6_CLOSEOUT.md"
         "#phase-6-exit-5-preservation-evidence-admission-panel) "
         "accepts Exit 5 for continued legacy preservation in the bounded "
         "Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. "
@@ -2521,7 +2512,7 @@ def _validate_exit_conditions(
     )
     _require(
         "| D-P6-008 | 2026-09-05 | Accepted | The [decision]"
-        "(current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives Exit 4 "
+        "(history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel) gives Exit 4 "
         "Deferred — unmet status. Its unchanged obligation stays mandatory "
         "before Phase 10 beta acceptance. "
         "Phase 6 keeps four accepted exits and one deferred, unmet obligation. "
@@ -2529,69 +2520,6 @@ def _validate_exit_conditions(
         "and Phase 7 opening need different decisions. |" in plan,
         "D-P6-008 bounded deferral decision row drifted",
     )
-    _require(
-        "D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles"
-        in plan_flat
-        and "supply Phase 6 performance evidence" in plan_flat
-        and "A later decision can Admit a result only from one of these "
-        "profiles" in plan_flat
-        and "admits no performance result and defines no budget" in plan_flat
-        and "accepts no phase exit and makes no improvement claim" in plan_flat,
-        "D-GOV-007 performance-host summary drifted",
-    )
-    _require(
-        "D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison "
-        "baseline" in plan_flat
-        and "selects one performance hypothesis for the preview sampler and "
-        "defines the comparison rule" in plan_flat
-        and "authorises one performance optimisation at Level 2 but "
-        "makes no product change" in plan_flat
-        and "Exit 4 stays Pending" in plan_flat,
-        "D-GOV-008 performance-direction summary drifted",
-    )
-    _require(
-        "D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first "
-        "direction" in plan_flat
-        and "records two later Level 2 results as retained negative "
-        "evidence"
-        in plan_flat
-        and "stops new product work in that direction" in plan_flat
-        and "authorised the bounded Level 1 baseline-attribution "
-        "investigation, which is complete" in plan_flat
-        and "attribution result is direction-selection evidence only"
-        in plan_flat
-        and "Exit 4 stays Pending" in plan_flat,
-        "D-GOV-009 direction summary drifted",
-    )
-    _require(
-        "D-GOV-010 qualifies only the exact FreeCAD 1.1.3 host profile with "
-        "CPython 3.13.13 and PySide6/Qt 6.11.1" in plan_flat
-        and "keeps the previously qualified profiles and their evidence"
-        in plan_flat
-        and "authorises this profile to supply performance evidence in a "
-        "later cycle" in plan_flat
-        and "Each comparison must use one profile with an exact identity"
-        in plan_flat
-        and "admits no performance result and does not change D-GOV-009"
-        in plan_flat
-        and "Exit 4 stays Pending" in plan_flat,
-        "D-GOV-010 host-qualification summary drifted",
-    )
-    _require(
-        "D-GOV-011 stays Accepted as authority for the initial performance "
-        "hypothesis and its conditions" in plan_flat
-        and "gave FAIL and stopped that product change" in plan_flat
-        and "owner accepted the result as retained negative evidence on "
-        "2026-09-05" in plan_flat
-        and "initial decision, measurement rule, and evidence do not change"
-        in plan_flat
-        and "Current evidence identifies no materially new performance "
-        "hypothesis" in plan_flat
-        and "D-P6-008 gives Exit 4 Deferred — unmet status and accepts no "
-        "improvement evidence" in plan_flat,
-        "D-GOV-011 canonical-record direction summary drifted",
-    )
-
     completion = _semantic_text(
         direct_section_content(
             current_evidence,
@@ -2640,13 +2568,16 @@ def _validate_exit_conditions(
         ).split()
     )
     _require(
-        "Current — 4/5 accepted exits. The owner accepted Exit 1 under "
+        "Closed — owner-accepted 2026-09-05 under D-P6-009. "
+        "The closeout has four accepted exits and one deferred, unmet "
+        "obligation. "
+        "The final count is 4/5 accepted exits. The owner accepted Exit 1 under "
         "D-P6-006 on 2026-09-05. The owner accepted Exit 2 under D-P6-002 "
         "on 2026-08-02. The owner accepted Exit 3 under D-P6-005 on "
         "2026-08-15. The owner accepted Exit 5 under D-P6-007 on "
         "2026-09-05. Under D-P6-008, the owner gave Exit 4 Deferred — unmet "
         "status on 2026-09-05" in current_flat,
-        "current record does not preserve the accepted Phase 6 4/5 state",
+        "frozen record does not preserve the accepted Phase 6 closeout state",
     )
     performance_section = _section(
         current_evidence,
@@ -2660,7 +2591,7 @@ def _validate_exit_conditions(
         in performance_flat
         and EXPECTED_PHASE6_PERFORMANCE_DISPOSITION in performance_flat
         and (
-            "../benchmarks/"
+            "../../benchmarks/"
             "2026-08-02-phase6-transition-pipeline-performance.md"
         )
         in performance_section,
@@ -2702,7 +2633,7 @@ def _validate_exit_conditions(
         )
     _require(
         "Phase 5 closeout" in current_evidence
-        and "history/phase-closeouts/PHASE5_CLOSEOUT.md" in current_evidence,
+        and "(PHASE5_CLOSEOUT.md)" in current_evidence,
         "current Phase 6 record does not link its frozen predecessor",
     )
     recovery_section = _section(
@@ -4041,6 +3972,92 @@ def _validate_exit_conditions(
     )
 
 
+def _validate_phase6_closeout(
+    plan: str,
+    closeout: str,
+    holding: str,
+) -> None:
+    """Keep closure, deferred performance and unopened Phase 7 distinct."""
+    panel = _section(
+        closeout, "Phase 6 closeout panel and owner decision — 2026-09-05",
+    )
+    _require(
+        '<a id="phase-6-closeout-panel"></a>' in closeout
+        and _blockquote_paragraphs(panel) == [
+            "As TrackTemplate project owner, I accept the completed, "
+            "independently reviewed recovery evidence and approve Phase 6 "
+            "closeout with four accepted exits and one deferred, unmet "
+            "obligation. Preserve D-P6-008 in full.",
+            "Complete the directly dependent closeout alignment. I separately "
+            "authorise protected-main integration of the resulting "
+            "exact-green change.",
+        ],
+        "D-P6-009 exact owner instruction drifted or was relocated",
+    )
+    decision = next(
+        record
+        for record in _load_json(PHASE6_DECISIONS_PATH)["decisions"]
+        if record["id"] == "D-P6-009"
+    )
+    for field in ("authority", "exclusions"):
+        _require(
+            _semantic_text(str(decision[field])) in _semantic_text(panel),
+            "D-P6-009 panel and register differ: " + field,
+        )
+    _require(
+        "Not started — 0/4 evidenced exits. Phase 7 is unopened and "
+        "unauthorised. These are administrative holding records only"
+        in _semantic_text(direct_section_content(holding, (
+            "Phase 7 Core Alignment, Station and Multiple-Track Migration "
+            "Holding Record"
+        ), level=1)),
+        "Phase 7 holding status gives unaccepted authority",
+    )
+    for text, heading in (
+        (plan, "Phase 7 exit conditions"),
+        (holding, "Phase 7 exit conditions — not admitted"),
+    ):
+        rows = [
+            _cells(line)[:2]
+            for line in _section(text, heading).splitlines()
+            if line.startswith("|")
+            and _cells(line)[0] not in {"Exit condition", "---"}
+        ]
+        _require(
+            rows == [
+                [criterion, "Pending"]
+                for criterion in EXPECTED_PHASE7_EXIT_CONDITIONS
+            ],
+            "Phase 7 original criteria or Pending dispositions drifted",
+        )
+    carried = _semantic_text(
+        _section(holding, "Carried authority and live risks")
+    )
+    for clause in (
+        "stays unchanged in full",
+        "unchanged bounded Entry/Exit improvement obligation stays "
+        "mandatory before Phase 10 beta acceptance",
+        "Richard keeps accountability and owns delivery until a named "
+        "Phase 10 integration owner takes delivery responsibility",
+        "Independent review and Richard's acceptance are mandatory",
+        "Numerical budgets or improvement on another workload do not "
+        "give the required evidence for this obligation",
+        "If it stays unmet, Richard must not accept beta",
+        "Normal per-slice checks, comparison paths, invariant 8, and all "
+        "retirement conditions still apply",
+        "Phase 6 closeout preserves D-GOV-011 and its negative evidence",
+        "Its product direction stays stopped",
+        "Do not repeat stopped experiments. Do not change their measurement "
+        "rules",
+        "bounded output stays private-development",
+        "Project status stays unknown",
+    ):
+        _require(
+            clause in carried,
+            "Phase 7 holding lost a continuing obligation: " + clause,
+        )
+
+
 def _load_json(path: pathlib.Path) -> dict[str, object]:
     try:
         value = json.loads(_read(path))
@@ -4070,6 +4087,7 @@ def _validate_exit4_deferral_risk(
 
 def _validate_risks(plan: str) -> None:
     document = _load_json(RISKS_PATH)
+    phase6_document = _load_json(PHASE6_RISKS_PATH)
     phase5_document = _load_json(PHASE5_RISKS_PATH)
     phase4_document = _load_json(PHASE4_RISKS_PATH)
     _require(
@@ -4096,9 +4114,20 @@ def _validate_risks(plan: str) -> None:
         "unsupported frozen risk-register schema",
     )
     _require(
-        document["current_phase"] == 6
+        document["current_phase"] == 7
         and document["updated_on"] == "2026-09-05",
-        "risk register is not prepared for current Phase 6",
+        "risk register is not prepared for unopened Phase 7",
+    )
+    _require(
+        set(phase6_document) == set(document)
+        and phase6_document["schema_version"] == 1
+        and phase6_document["current_phase"] == 6
+        and phase6_document["updated_on"] == "2026-09-05",
+        "frozen risk snapshot is not the Phase 6 closeout state",
+    )
+    _require(
+        document["risks"] == phase6_document["risks"],
+        "Phase 7 holding risks differ from the complete Phase 6 closeout set",
     )
     _require(
         phase5_document["current_phase"] == 5
@@ -4235,8 +4264,27 @@ def _validate_risks(plan: str) -> None:
     )
 
 
+def _validate_phase7_decision_carryforward(
+    document: dict[str, object],
+    phase6_decisions: dict[str, dict[str, object]],
+) -> None:
+    """Carry only the exact deferred obligation into the unopened phase."""
+    _require(
+        set(document)
+        == {"schema_version", "current_phase", "updated_on", "decisions"}
+        and document["schema_version"] == 1
+        and document["current_phase"] == 7
+        and document["updated_on"] == "2026-09-05",
+        "current decision register is not the unopened Phase 7 holding state",
+    )
+    _require(
+        document["decisions"] == [phase6_decisions["D-P6-008"]],
+        "Phase 7 holding must carry only the complete unchanged D-P6-008",
+    )
+
+
 def _validate_decisions(plan: str) -> None:
-    current_document = _load_json(CURRENT_DECISIONS_PATH)
+    current_document = _load_json(PHASE6_DECISIONS_PATH)
     document = _load_json(PHASE5_DECISIONS_PATH)
     phase4_document = _load_json(PHASE4_DECISIONS_PATH)
     expected_document_fields = {
@@ -4366,6 +4414,10 @@ def _validate_decisions(plan: str) -> None:
                 actual_digest == expected_digest,
                 decision_id + " " + field + " digest drifted",
             )
+
+    _validate_phase7_decision_carryforward(
+        _load_json(CURRENT_DECISIONS_PATH), phase6_by_id,
+    )
 
     _require(
         EXPECTED_STE_LIFECYCLE_PLAN_ROW in _section(plan, "Owner decisions"),
@@ -4604,14 +4656,16 @@ def _validate_decisions(plan: str) -> None:
     _require(
         "history/phase-closeouts/PHASE5_GATE_DECISIONS.json"
         in decision_section
-        and "owns the Phase 5 decisions below" in decision_flat,
+        and "registers own their historical decisions below" in decision_flat,
         "the frozen Phase 5 decision-register ownership is missing",
     )
     _require(
         "decision register" in decision_flat
-        and "owns Phase 6" in decision_flat
-        and "owns current governance decisions for more than 1 phase"
-        in decision_flat,
+        and "history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        in decision_section
+        and "keeps D-P6-008 in full for its continuing obligation"
+        in decision_flat
+        and "No Phase 7 opening decision exists" in decision_flat,
         "the current decision-register ownership is missing",
     )
     plan_ids = set(
@@ -5010,7 +5064,7 @@ def _validate_capability_matrix(matrix: str) -> None:
             "capability matrix lost its local accepted-source and PR-status clause",
         ),
         (
-            "current Phase 6 evidence",
+            "Phase 6 evidence",
             "capability matrix lost its local accepted-source and PR-status clause",
         ),
         (
@@ -5087,8 +5141,8 @@ def _validate_capability_matrix(matrix: str) -> None:
             "P — transition records only",
             "[Phase 1 workflow contract](contracts/"
             "phase1-workflow-coverage.json); [Phase 5 closeout](history/"
-            "phase-closeouts/PHASE5_CLOSEOUT.md); [Phase 6 evidence](current/"
-            "PHASE_EVIDENCE.md)",
+            "phase-closeouts/PHASE5_CLOSEOUT.md); [Phase 6 evidence](history/phase-closeouts/"
+            "PHASE6_CLOSEOUT.md)",
             "Partial",
         ),
         (
@@ -5102,7 +5156,7 @@ def _validate_capability_matrix(matrix: str) -> None:
             "C — bounded transition records",
             "[Transition pilot](contracts/phase1-transition-pilot.json); "
             "[Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md); "
-            "[Phase 6 evidence](current/PHASE_EVIDENCE.md)",
+            "[Phase 6 evidence](history/phase-closeouts/PHASE6_CLOSEOUT.md)",
             "Partial",
         ),
         (
@@ -5149,7 +5203,7 @@ def _validate_capability_matrix(matrix: str) -> None:
             "exact-family-support-enablement); [Phase 5 closeout](history/"
             "phase-closeouts/PHASE5_CLOSEOUT.md#"
             "representative-multi-object-selection-and-edit-tranche); "
-            "[Phase 6 evidence](current/PHASE_EVIDENCE.md#"
+            "[Phase 6 evidence](history/phase-closeouts/PHASE6_CLOSEOUT.md#"
             "phase-6-exits-2-and-3-evidence-admission-panel)",
             "Partial",
         ),
@@ -5425,8 +5479,8 @@ def _validate_capability_matrix(matrix: str) -> None:
                         "contracts/phase1-workflow-coverage.json",
                     ),
                     (
-                        "current Phase 6 evidence",
-                        "current/PHASE_EVIDENCE.md#"
+                        "frozen Phase 6 evidence",
+                        "history/phase-closeouts/PHASE6_CLOSEOUT.md#"
                         "phase-6-exit-3-supported-model-evidence-admission-panel",
                     ),
                 ),
@@ -5704,22 +5758,22 @@ def _validate_ste_lifecycle_panel(current_evidence: str) -> None:
     _require_links(
         reviewed_evidence,
         (
-            ("lookup implementation", "../../tools/ste100_lookup.py"),
-            ("lifecycle fixture", "../../tests/validate_ste100_retrieval.py"),
-            ("empty document-level state", "../ste-review-state.json"),
+            ("lookup implementation", "../../../tools/ste100_lookup.py"),
+            ("lifecycle fixture", "../../../tests/validate_ste100_retrieval.py"),
+            ("empty document-level state", "../../ste-review-state.json"),
             (
                 "Engineering Policy",
-                "../ENGINEERING_POLICY.md#true-gates-and-safetyrisk-panels",
+                "../../ENGINEERING_POLICY.md#true-gates-and-safetyrisk-panels",
             ),
             (
                 "validation owner",
-                "../VALIDATION.md#validation-of-the-retrieval-contract",
+                "../../VALIDATION.md#validation-of-the-retrieval-contract",
             ),
-            ("recovery policy", "../RECOVERY_AND_BACKUP.md"),
-            ("current risks", "risks.json"),
+            ("recovery policy", "../../RECOVERY_AND_BACKUP.md"),
+            ("current risks", "PHASE6_RISKS.json"),
             (
                 "source and retrieval procedure",
-                "../external/asd-ste100/README.md",
+                "../../external/asd-ste100/README.md",
             ),
         ),
         "D-GOV-015 panel evidence links drifted",
@@ -6243,7 +6297,7 @@ def _validate_finite_documentation_completion(
     _require(len(rows) == 1, "D-GOV-018 plan row is missing or duplicated")
     row = _semantic_text(rows[0])
     _require(
-        "current/PHASE_EVIDENCE.md#d-gov-018-finite-documentation-completion"
+        "history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-018-finite-documentation-completion"
         in rows[0],
         "D-GOV-018 plan evidence link drifted",
     )
@@ -6285,8 +6339,8 @@ def _validate_fixed_paths() -> None:
         "old Phase 4 path does not identify the fixed current record",
     )
     _require(
-        "Phase 6 evidence record" in redirect,
-        "old Phase 4 path does not identify the current Phase 6 record",
+        "Phase 7 holding record" in redirect,
+        "old Phase 4 path does not identify the unopened Phase 7 record",
     )
 
 
@@ -6307,7 +6361,7 @@ def _validate_ci_workflow() -> None:
 
 def main() -> None:
     plan = _read(PLAN_PATH)
-    current_evidence = _read(CURRENT_EVIDENCE_PATH)
+    current_evidence = _read(PHASE6_CLOSEOUT_PATH)
     phase4_closeout = _read(PHASE4_CLOSEOUT_PATH)
     phase5_closeout = _read(PHASE5_CLOSEOUT_PATH)
     _validate_plan_shape(plan)
@@ -6324,6 +6378,9 @@ def main() -> None:
     )
     _validate_risks(plan)
     _validate_decisions(plan)
+    _validate_phase6_closeout(
+        plan, current_evidence, _read(CURRENT_EVIDENCE_PATH),
+    )
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_finite_documentation_completion(plan, current_evidence)

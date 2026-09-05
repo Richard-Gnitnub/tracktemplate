@@ -15,9 +15,11 @@ PATHS = {
     "architecture": ROOT / "reference" / "ARCHITECTURE.md",
     "validation": ROOT / "reference" / "VALIDATION.md",
     "recovery": ROOT / "reference" / "RECOVERY_AND_BACKUP.md",
-    "evidence": ROOT / "reference" / "current" / "PHASE_EVIDENCE.md",
+    "evidence": (
+        ROOT / "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
+    ),
     "decisions": (
-        ROOT / "reference" / "current" / "gate-decisions.json"
+        ROOT / "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
     ),
     "risks": ROOT / "reference" / "current" / "risks.json",
     "plan": ROOT / "reference" / "PROJECT_PLAN.md",
@@ -355,7 +357,7 @@ def validate_current_authority(documents: dict[str, str]) -> None:
     """Protect D-P6-004/D-P6-005, current status and risk dispositions."""
     plan = semantic(documents["plan"])
     require(
-        "Phase 6 current — 4/5 accepted exits" in plan,
+        "Phase 6 is closed with 4/5 accepted exits" in plan,
         "PROJECT_PLAN lost Phase 6 4/5 status",
     )
     require(
@@ -363,21 +365,6 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         "failure-safe | Evidenced — owner-accepted 2026-08-15" in plan,
         "PROJECT_PLAN lost D-P6-005 Exit 3 acceptance",
     )
-    require_fragments(
-        "PROJECT_PLAN exporter dashboard",
-        documents["plan"],
-        (
-            "D-P6-004 defines the finite supported exporter fault model",
-            "D-P6-005 accepts only the bounded B16 Entry/Exit "
-            "DXF-and-manifest route",
-            "The route has private-development status",
-            "The same input gives the same bytes, and the route is "
-            "failure-safe under D-P6-003 and D-P6-004",
-            "advances Phase 6 to 2/5",
-            "Project status remains `unknown`",
-        ),
-    )
-
     evidence = documents["evidence"]
     panel = section(
         evidence,
@@ -488,7 +475,7 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         ),
     )
     expected_fault_model_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
         "#phase-6-exporter-fault-model-clarification-panel"
     )
     require(
@@ -532,7 +519,7 @@ def validate_current_authority(documents: dict[str, str]) -> None:
         ),
     )
     expected_acceptance_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
         "#phase-6-exit-3-supported-model-evidence-admission-panel"
     )
     require(
@@ -666,8 +653,8 @@ def validate_mutations(documents: dict[str, str]) -> None:
         ),
         (
             "plan",
-            "Phase 6 current — 4/5 accepted exits",
-            "Phase 6 current — 5/5 accepted exits",
+            "Phase 6 is closed with 4/5 accepted exits",
+            "Phase 6 is closed with 5/5 accepted exits",
             "Phase 6 status widening",
         ),
         (

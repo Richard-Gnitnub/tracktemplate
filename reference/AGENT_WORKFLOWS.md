@@ -514,7 +514,7 @@ descriptions do not supply its authority. Its metadata therefore retains
 `allow_implicit_invocation: false`. The accepted standing authority boundary is
 recorded by
 [D-GOV-004](history/phase-closeouts/PHASE5_CLOSEOUT.md#repository-driven-continuation-authority-panel).
-[D-GOV-005](current/PHASE_EVIDENCE.md#product-vision-and-execution-governance-panel)
+[D-GOV-005](history/phase-closeouts/PHASE6_CLOSEOUT.md#product-vision-and-execution-governance-panel)
 adds vision-led selection and result accountability without changing that
 invocation or Level 1/2 execution authority.
 

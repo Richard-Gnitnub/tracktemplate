@@ -28,7 +28,9 @@ VALIDATION_PATH = ROOT / "reference" / "VALIDATION.md"
 PROJECT_PLAN_PATH = ROOT / "reference" / "PROJECT_PLAN.md"
 WORKFLOWS_PATH = ROOT / "reference" / "AGENT_WORKFLOWS.md"
 LEARNING_PATH = ROOT / "reference" / "LEARNING_FROM_EXPERIENCE.md"
-PHASE_EVIDENCE_PATH = ROOT / "reference/current/PHASE_EVIDENCE.md"
+PHASE_EVIDENCE_PATH = (
+    ROOT / "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md"
+)
 AGENTS_PATH = ROOT / "AGENTS.md"
 GITIGNORE_PATH = ROOT / ".gitignore"
 CI_WORKFLOW_PATH = ROOT / ".github/workflows/ci.yml"

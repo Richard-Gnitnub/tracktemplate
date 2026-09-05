@@ -18,7 +18,7 @@ Reviewers use the local file for documentation review and linguistic
 conformance assessment. The PDF is not necessary for TrackTemplate product
 execution or normal repository CI. The PDF is not a canonical TrackTemplate document. The
 [TT-DOC-001 profile](../../ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile)
-and [TT-DOC-002 decision](../../current/PHASE_EVIDENCE.md#tt-doc-002-uk-english-spelling-correction-panel)
+and [TT-DOC-002 decision](../../history/phase-closeouts/PHASE6_CLOSEOUT.md#tt-doc-002-uk-english-spelling-correction-panel)
 are the TrackTemplate project authority.
 
 ## Official source sequence

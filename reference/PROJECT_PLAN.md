@@ -1,6 +1,6 @@
 # Project Plan
 
-Status: **Phase 6 current — 4/5 accepted exits. The owner accepted Exit 1 under D-P6-006 on 2026-09-05, Exit 2 under D-P6-002 on 2026-08-02, and Exit 3 under D-P6-005 on 2026-08-15. The owner accepted Exit 5 under D-P6-007 on 2026-09-05. D-P6-008 gives Exit 4 Deferred — unmet status on 2026-09-05.**
+Status: **Phase 6 closed — four accepted exits and one deferred, unmet obligation under D-P6-009 on 2026-09-05. D-P6-008 stays in full. Phase 7 is Not started at 0/4.**
 
 This dashboard owns phase and exit status. It also owns summaries of live risks and owner decisions. The links identify the applicable evidence. The canonical registers and evidence are the source of this owner view. This view does not establish authority.
 
@@ -12,12 +12,12 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 6 has 4/5 accepted exits. The owner accepted Exits 1, 2, 3, and 5. Exit 4 is Deferred — unmet. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | [D-P6-008](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives Exit 4 Deferred — unmet status. Its unchanged improvement obligation for the bounded Entry/Exit scope stays mandatory before Phase 10 beta acceptance. |
-| **What now works** | The owner permits only the stated exception to the migration sequence. Each subsequent development task still needs its own authority and applicable checks. Product source does not change. |
+| **Current state** | Phase 6 is closed with 4/5 accepted exits. Phase 7 is Not started at 0/4. The owner accepted Exits 1, 2, 3, and 5. Exit 4 is Deferred — unmet. The output has private-development status. Project status stays `unknown`. |
+| **What changed** | [D-P6-009](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-closeout-panel) records the accepted recovery proof and Phase 6 closeout. Its evidence and registers are frozen. Current paths contain unopened Phase 7 holding records. |
+| **What now works** | The records preserve the four accepted exits, D-P6-008 in full, and all existing duties. Product source does not change. |
 | **Limitations/findings** | The owner accepts no performance result. PR-15 and QA-R04 stay High/Mitigate/Partial. All legacy-retirement conditions and wider exclusions still apply. D-GOV-011 stays stopped with its retained negative evidence. |
-| **Owner decision** | The owner accepted D-P6-008 on 2026-09-05. Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Independent review and Richard's acceptance are mandatory before beta acceptance. |
-| **Next action** | Bring the Phase 6 closeout recommendation to the owner with four accepted exits and one deferred, unmet obligation. Phase 6 stays open. Phase 7 stays Not started. Do not do a stopped experiment again. Do not change its measurement rule. |
+| **Owner decision** | Richard accepted the completed recovery evidence and Phase 6 closeout. He also authorised protected-main integration of this exact-green alignment. Phase 7 needs a separate opening decision. |
+| **Next action** | Present the bounded Phase 7 opening decision and first product outcome from repository evidence together. The next owner decision can authorise opening, integration, and the first task. Phase 7 stays unopened and unauthorised. |
 
 ## Phase status
 
@@ -29,7 +29,7 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | 3 | First parity-proven vertical slice | 5/5 evidenced | Complete — accepted 2026-07-22 |
 | 4 | Canonical state, signatures, and persistence | 6/6 evidenced | Complete — accepted 2026-07-28 |
 | 5 | Lightweight editing prototype and renderer decision | 4/4 evidenced | Complete — accepted 2026-08-01 |
-| 6 | Explicit exact-validation and export seam | 4/5 accepted exits | Current — opened 2026-08-01 |
+| 6 | Explicit exact-validation and export seam | 4/5 accepted exits; one deferred, unmet obligation | Complete — accepted 2026-09-05 |
 | 7 | Core alignment, station and multiple-track migration | 0/4 evidenced | Not started |
 | 8 | Turnout, crossover and timbering migration | 0/4 evidenced | Not started |
 | 9 | Chair definitions, assisted assimilation, production records and export completion | 0/9 evidenced | Not started |
@@ -40,29 +40,26 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Exit condition | Status | Evidence |
 | --- | --- | --- |
-| The selected slice has equivalent exact validation and production output for the agreed bounded scope | Evidenced — owner-accepted 2026-09-05 | [D-P6-006 panel and decision](current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel) |
-| No transient production objects leak into the editable document | Evidenced — owner-accepted 2026-08-02 | [D-P6-002 panel and decision](current/PHASE_EVIDENCE.md#phase-6-exits-2-and-3-evidence-admission-panel) |
-| The same export input gives the same output, and export is failure-safe | Evidenced — owner-accepted 2026-08-15 | [D-P6-005 decision](current/PHASE_EVIDENCE.md#phase-6-exit-3-supported-model-evidence-admission-panel) |
-| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Deferred — unmet | [D-P6-008 panel and decision](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) |
-| The legacy path remains available until parity and project-owner acceptance permit removal | Evidenced — owner-accepted 2026-09-05 | [D-P6-007 panel and decision](current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel) |
+| The selected slice has equivalent exact validation and production output for the agreed bounded scope | Evidenced — owner-accepted 2026-09-05 | [D-P6-006 panel and decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-1-bounded-output-evidence-admission-panel) |
+| No transient production objects leak into the editable document | Evidenced — owner-accepted 2026-08-02 | [D-P6-002 panel and decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exits-2-and-3-evidence-admission-panel) |
+| The same export input gives the same output, and export is failure-safe | Evidenced — owner-accepted 2026-08-15 | [D-P6-005 decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-3-supported-model-evidence-admission-panel) |
+| Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for | Deferred — unmet | [D-P6-008 panel and decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel) |
+| The legacy path remains available until parity and project-owner acceptance permit removal | Evidenced — owner-accepted 2026-09-05 | [D-P6-007 panel and decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-5-preservation-evidence-admission-panel) |
 
-D-P5-002 accepted Coin and the demonstrated B16 Entry/Exit product boundary. Its evidence supports all four exact exits. D-P5-003 closed Phase 5 without opening Phase 6. D-P6-001 later opened Phase 6 at 0/5. The authorised work was bounded exact validation and a private-development export seam.
+D-P6-009 closes Phase 6 without opening Phase 7. The owner accepted the completed independent recovery proof. The accepted Phase 6 decisions, bounded output limits, stopped directions, and negative evidence remain in the frozen closeout. All risks and legacy-retirement conditions still apply. Project status stays `unknown` and output stays private-development.
 
-D-P6-002 accepts only the bounded transient-object Exit 2. It advances Phase 6 to 1/5. D-P6-003 selects a strict completion method. The method can add output members. It cannot change or remove an existing output member. It keeps no separate journal. Its completion count can only increase. D-P6-003 authorises a later bounded Level 2 implementation. D-P6-004 defines the finite supported exporter fault model, evidence limit, and restart procedure.
+D-P6-008 stays in full, and normal per-slice checks stay mandatory. The unchanged improvement obligation for the bounded Entry/Exit scope is mandatory before Phase 10 beta acceptance. Richard keeps accountability and owns delivery until a named Phase 10 integration owner takes delivery responsibility. Independent review and Richard's acceptance are mandatory. Numerical budgets or improvement on another workload do not give the required evidence for this obligation. If it stays unmet, Richard must not accept beta.
 
-D-P6-005 accepts only the bounded B16 Entry/Exit DXF-and-manifest route. The route has private-development status. The same input gives the same bytes, and the route is failure-safe under D-P6-003 and D-P6-004. The decision advances Phase 6 to 2/5. It excludes production clearance and output equivalence. It also excludes GUI acceptance, wider exporter-family authority, persistence, retained geometry, legacy retirement, performance, packaging, and release authority. Project status remains `unknown`.
+## Phase 7 exit conditions
 
-D-GOV-006 qualifies only the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. The decision keeps the exact 1.1.1 profile and its evidence. It does not qualify FreeCAD 1.1.2 or any other host. No phase, risk, product, output, packaging, or release state changes.
+Phase 7 stays Not started at 0/4. The holding record restores these original criteria from accepted plan revision `d5a3db45ab68a192e3d37f9fad5deb9f66f7de81`. It opens no phase and changes no criterion.
 
-D-GOV-007 authorises only the exact 1.1.1 and 1.1.3 host profiles to supply Phase 6 performance evidence. A later decision can Admit a result only from one of these profiles. D-GOV-007 admits no performance result and defines no budget. It accepts no phase exit and makes no improvement claim.
-
-D-GOV-008 accepts the PR #50 FreeCAD 1.1.3 series as the comparison baseline. It selects one performance hypothesis for the preview sampler and defines the comparison rule. It authorises one performance optimisation at Level 2 but makes no product change. Exit 4 stays Pending.
-
-D-GOV-009 keeps D-GOV-008 Accepted as the authority for that first direction. It records two later Level 2 results as retained negative evidence. It stops new product work in that direction. It authorised the bounded Level 1 baseline-attribution investigation, which is complete. The attribution result is direction-selection evidence only. Exit 4 stays Pending.
-
-D-GOV-010 qualifies only the exact FreeCAD 1.1.3 host profile with CPython 3.13.13 and PySide6/Qt 6.11.1. It keeps the previously qualified profiles and their evidence. It authorises this profile to supply performance evidence in a later cycle. Each comparison must use one profile with an exact identity. The decision admits no performance result and does not change D-GOV-009. Exit 4 stays Pending.
-
-D-GOV-011 stays Accepted as authority for the initial performance hypothesis and its conditions. The [completed baseline-attribution investigation](current/PHASE_EVIDENCE.md#d-gov-011-completed-materiality-prerequisite) gave FAIL and stopped that product change. The owner accepted the result as retained negative evidence on 2026-09-05. The initial decision, measurement rule, and evidence do not change. Current evidence identifies no materially new performance hypothesis. D-P6-008 gives Exit 4 Deferred — unmet status and accepts no improvement evidence.
+| Exit condition | Status | Evidence |
+| --- | --- | --- |
+| Core layouts can be created, edited, saved, reopened, validated, and exported through modular paths. | Pending | No Phase 7 admission |
+| Accepted B14/B15 geometry, station mapping, identities, ordering, and metadata remain equivalent. | Pending | No Phase 7 admission |
+| Domain calculations for this family have no FreeCAD/Qt dependency or reverse adapter import. | Pending | No Phase 7 admission |
+| Legacy core-layout paths have either been safely retired or have a documented blocker and removal gate. | Pending | No Phase 7 admission |
 
 ## Live risks
 
@@ -99,7 +96,7 @@ D-GOV-011 stays Accepted as authority for the initial performance hypothesis and
 
 ## Owner decisions
 
-The [Phase 4 decision register](history/phase-closeouts/PHASE4_GATE_DECISIONS.json) owns the Phase 4 decisions below. The [Phase 5 decision register](history/phase-closeouts/PHASE5_GATE_DECISIONS.json) owns the Phase 5 decisions below. The [current decision register](current/gate-decisions.json) owns Phase 6. It also owns current governance decisions for more than 1 phase.
+The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full for its continuing obligation. No Phase 7 opening decision exists.
 
 | ID | Date | Status | Decision limit |
 | --- | --- | --- | --- |
@@ -125,9 +122,10 @@ The [Phase 4 decision register](history/phase-closeouts/PHASE4_GATE_DECISIONS.js
 | D-P6-003 | 2026-08-02 | Accepted | The decision selected completion that can only add output members. It keeps no separate journal, and the completion count can only increase. It authorised a later Level 2 implementation. Exit 3 remains Pending. Phase 6 remains 1/5. |
 | D-P6-004 | 2026-08-15 | Accepted | The supported exporter fault model, interruption-evidence limit, and restart containment are accepted. Product source, risk disposition, Phase 6 at 1/5, and Exit 3 Pending do not change. |
 | D-P6-005 | 2026-08-15 | Accepted | The decision accepts Phase 6 Exit 3 only for the bounded B16 Entry/Exit DXF-and-manifest route. The route has private-development status and uses D-P6-003 and D-P6-004. Phase 6 advances to 2/5. All stated limitations and exclusions remain. |
-| D-P6-006 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-1-bounded-output-evidence-admission-panel) accepts Exit 1 for the agreed scope of the PR #63 comparison of Entry/Exit centrelines. Phase 6 advances to 3/5. Exits 4 and 5 stay Pending. All stated limitations and exclusions still apply. |
-| D-P6-007 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued legacy preservation in the bounded Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. All retirement conditions and wider exclusions still apply. The owner authorises no removal. |
-| D-P6-008 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-6-exit-4-deferral-panel) gives Exit 4 Deferred — unmet status. Its unchanged obligation stays mandatory before Phase 10 beta acceptance. Phase 6 keeps four accepted exits and one deferred, unmet obligation. The owner accepts only the bounded sequencing exposure. Phase closure and Phase 7 opening need different decisions. |
+| D-P6-006 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-1-bounded-output-evidence-admission-panel) accepts Exit 1 for the agreed scope of the PR #63 comparison of Entry/Exit centrelines. Phase 6 advances to 3/5. Exits 4 and 5 stay Pending. All stated limitations and exclusions still apply. |
+| D-P6-007 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued legacy preservation in the bounded Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. All retirement conditions and wider exclusions still apply. The owner authorises no removal. |
+| D-P6-008 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel) gives Exit 4 Deferred — unmet status. Its unchanged obligation stays mandatory before Phase 10 beta acceptance. Phase 6 keeps four accepted exits and one deferred, unmet obligation. The owner accepts only the bounded sequencing exposure. Phase closure and Phase 7 opening need different decisions. |
+| D-P6-009 | 2026-09-05 | Accepted | Phase 6 closed with four accepted exits and one deferred, unmet obligation. The owner accepts the completed recovery proof. D-P6-008 stays in full. Phase 7 stays unopened at 0/4. The owner also authorises exact-green closeout integration. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English word forms in TT-DOC-001 canonical prose. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
@@ -136,13 +134,15 @@ The [Phase 4 decision register](history/phase-closeouts/PHASE4_GATE_DECISIONS.js
 | D-GOV-009 | 2026-08-23 | Accepted | The owner records the D-GOV-008 direction as exhausted for new product work. The decision preserves two negative results. It selects a bounded Level 1 baseline-attribution investigation as the next action. Exit 4 stays Pending. |
 | D-GOV-010 | 2026-08-23 | Accepted | The owner qualifies only the exact FreeCAD 1.1.3 profile with CPython 3.13.13 and PySide6/Qt 6.11.1. Previous profiles stay qualified. Exit 4 stays Pending. |
 | D-GOV-011 | 2026-08-23 | Accepted | The owner selects one later performance hypothesis for the read route in the canonical FreeCAD adapter. The decision defines the exact host, product boundary, preserved invariants, and comparison rule. Exit 4 stays Pending. |
-| D-GOV-012 | 2026-08-25 | Accepted | The [decision](current/PHASE_EVIDENCE.md#d-gov-012-worktree-sequence-nonconformance) records sequence nonconformance after worktree retirement. The owner accepts the preservation audit and its source SHA-256. Cycle 2 authority applies only to an exact candidate. The owner permits a draft pull request but not a merge into protected main. |
-| D-GOV-015 | 2026-08-31 | Accepted | The [decision](current/PHASE_EVIDENCE.md#d-gov-015-simplified-ste-lifecycle) adopts author → freeze scope → one Documentation Review → optional exact reviewed correction once → one final deterministic validation → complete or owner stop. Phase 6 stays at 2/5. If validation is exact-green, the owner permits one draft pull request. The owner gives no merge authority. |
-| D-GOV-017 | 2026-09-04 | Accepted | The [decision](current/PHASE_EVIDENCE.md#d-gov-017-whole-technical-document-lifecycle) establishes one TDMP and the Technical Author Lead responsibility. For governance prose, the finite route is write once under D-GOV-015, one Documentation Review, apply its required adjustment once if any, one final deterministic validation, then done. CI can verify final bytes but cannot reopen review or wording. A general quality review applies only to separately changed source or tests. The stopped additional review returned no result and made no tracked mutation. Phase 6 stays at 2/5, and project status stays `unknown`. |
-| D-GOV-018 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#d-gov-018-finite-documentation-completion) authorises one set of exact corrections after the sole review. This includes a `BLOCKED` verdict. Record the `locked` state for the content. Validate it. Finish the cycle. Preserve the initial verdict. Review only complete logical units that changed. Do not expand the repair into unchanged legacy prose. Phase 6 stays at 2/5. |
+| D-GOV-012 | 2026-08-25 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-012-worktree-sequence-nonconformance) records sequence nonconformance after worktree retirement. The owner accepts the preservation audit and its source SHA-256. Cycle 2 authority applies only to an exact candidate. The owner permits a draft pull request but not a merge into protected main. |
+| D-GOV-015 | 2026-08-31 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-015-simplified-ste-lifecycle) adopts author → freeze scope → one Documentation Review → optional exact reviewed correction once → one final deterministic validation → complete or owner stop. Phase 6 stays at 2/5. If validation is exact-green, the owner permits one draft pull request. The owner gives no merge authority. |
+| D-GOV-017 | 2026-09-04 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-017-whole-technical-document-lifecycle) establishes one TDMP and the Technical Author Lead responsibility. For governance prose, the finite route is write once under D-GOV-015, one Documentation Review, apply its required adjustment once if any, one final deterministic validation, then done. CI can verify final bytes but cannot reopen review or wording. A general quality review applies only to separately changed source or tests. The stopped additional review returned no result and made no tracked mutation. Phase 6 stays at 2/5, and project status stays `unknown`. |
+| D-GOV-018 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-018-finite-documentation-completion) authorises one set of exact corrections after the sole review. This includes a `BLOCKED` verdict. Record the `locked` state for the content. Validate it. Finish the cycle. Preserve the initial verdict. Review only complete logical units that changed. Do not expand the repair into unchanged legacy prose. Phase 6 stays at 2/5. |
 ## Authority and evidence links
 
-- [Current Phase 6 evidence](current/PHASE_EVIDENCE.md)
+- [Current Phase 7 holding record](current/PHASE_EVIDENCE.md)
+- [Frozen Phase 6 closeout](history/phase-closeouts/PHASE6_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE6_RISKS.json)
+- [Accepted Phase 6 recovery record](backup-records/2026-09-05-phase6-closeout-recovery.md)
 - [Canonical product vision](PRODUCT_VISION.md)
 - [Capability evidence matrix](CAPABILITY_MATRIX.md)
 - [Frozen Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md)
