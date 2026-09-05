@@ -13,11 +13,11 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | Field | Current position |
 | --- | --- |
 | **Current state** | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | [D-P7-001](current/PHASE_EVIDENCE.md#phase-7-opening-panel) opens the existing Core alignment, station and multiple-track migration scope. The owner authorises opening integration and the first bounded product task. |
+| **What changed** | [D-P7-001](current/PHASE_EVIDENCE.md#phase-7-opening-panel) opens the current Core alignment, station and multiple-track migration scope. The owner authorises opening integration and the first bounded product task. |
 | **What now works** | The opening records define the authorised sequence and first task. This alignment changes no product source. |
 | **Limitations/findings** | The owner accepts no performance result. PR-15 and QA-R04 stay High/Mitigate/Partial. All legacy-retirement conditions and wider exclusions still apply. D-GOV-011 stays stopped with its retained negative evidence. |
 | **Owner decision** | Richard opened Phase 7 at 0/4. He authorised integration of the exact-green opening alignment, then the bounded product task through validation, independent review and publication. |
-| **Next action** | Integrate the opening alignment and synchronise clean protected main. Then move `main_circle_centre` into the modular package and route the existing B16 Generate/Replace caller through it. The later product pull request needs separate owner integration authority. |
+| **Next action** | Integrate the opening alignment. Then synchronise clean protected main. Move `main_circle_centre` into the modular package. Route the B16 Generate/Replace caller through it. The later product pull request needs another owner decision for integration. |
 
 ## Phase status
 
@@ -125,7 +125,7 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-P6-007 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-5-preservation-evidence-admission-panel) accepts Exit 5 for continued legacy preservation in the bounded Entry/Exit slice. Phase 6 advances to 4/5. Exit 4 stays Pending. All retirement conditions and wider exclusions still apply. The owner authorises no removal. |
 | D-P6-008 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel) gives Exit 4 Deferred — unmet status. Its unchanged obligation stays mandatory before Phase 10 beta acceptance. Phase 6 keeps four accepted exits and one deferred, unmet obligation. The owner accepts only the bounded sequencing exposure. Phase closure and Phase 7 opening need different decisions. |
 | D-P6-009 | 2026-09-05 | Accepted | Phase 6 closed with four accepted exits and one deferred, unmet obligation. The owner accepts the completed recovery proof. D-P6-008 stays in full. Phase 7 stays unopened at 0/4. The owner also authorises exact-green closeout integration. |
-| D-P7-001 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-7-opening-panel) opens Phase 7 at 0/4 with its four criteria unchanged. It authorises opening integration and the bounded `main_circle_centre` product task through publication. D-P6-008 stays in full. No exit or performance result is accepted. |
+| D-P7-001 | 2026-09-05 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-7-opening-panel) opens Phase 7 at 0/4 with its four criteria unchanged. It authorises opening integration and the bounded `main_circle_centre` product task through publication. D-P6-008 stays in full. The decision accepts no exit or performance result. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English word forms in TT-DOC-001 canonical prose. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
