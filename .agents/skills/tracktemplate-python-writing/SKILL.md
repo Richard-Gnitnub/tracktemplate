@@ -102,6 +102,15 @@ identifier merely to improve style.
 5. Inspect the complete diff for accidental formatting spread, renamed
    interfaces, altered strings and behavioural drift.
 
+Before source review, examine the complete assembled submission with the
+content from all agents. Connect the relevant checks to that candidate
+version. Report the exact changed files, preserved behaviour, test results,
+and unresolved facts.
+
+When a test assertion changes, preserve each technical safeguard. If the
+changed assertion could accept an incorrect result, use a negative case.
+These responsibilities are part of writing. They add no approval stage.
+
 If the repository later adopts a formatter or linter configuration, treat that
 configuration as the executable local style contract. Do not run a write-mode
 formatter across unrelated, legacy or frozen files without explicit scope and

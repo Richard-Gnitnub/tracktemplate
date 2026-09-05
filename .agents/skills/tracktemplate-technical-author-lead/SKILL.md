@@ -78,8 +78,7 @@ accepted prose and frozen historical evidence.
 
 For new or materially changed canonical technical prose, use this sequence:
 
-> understand once → write once → check once → improve once → freeze once →
-> review once → validate once → finish
+> write once → review once → adjust once if necessary → record the `locked` state → validate → finish
 
 Get the controlled meaning from its canonical owner. Before you author the
 candidate, resolve each technical term. Before source retrieval or candidate
@@ -91,18 +90,34 @@ If the development-toolchain preflight does not give a PASS result, stop before 
 the candidate. Before you author affected logical units, use the
 [local STE retrieval interface](../../../reference/external/asd-ste100/README.md#local-retrieval-interface).
 
-The check step examines meaning, ownership, terminology, exact content, links,
-and deterministic pre-check results. It is not a Documentation Review. Apply
-TT-DOC-001, TT-DOC-002, and D-GOV-015 exactly during the procedure.
-Before freeze, apply one complete improvement pass.
+Writing includes the necessary checks and corrections before handoff. Examine
+the complete assembled diff, meaning, ownership, terms, exact content, links,
+and applicable tests. Examine the content from all agents together.
+When an assertion changes with the prose, preserve technical safeguards. If a
+changed assertion could accept an incorrect result, use a negative test.
 
-Only with Git authority from the enclosing workflow, freeze one clean exact
-candidate. After freeze, use one independent
+These checks are not another Documentation Review or approval stage. Apply
+TT-DOC-001, TT-DOC-002, and D-GOV-018.
+
+Before review, freeze one exact candidate and the complete logical units with
+changes. Do not include unchanged legacy prose in the change. When the current
+task gives commit authority, use a clean Git commit. Otherwise, preserve the
+baseline, complete diff, and content hashes. Connect the handoff checks to
+the bytes for that candidate. After freeze, use one independent
 [`$tracktemplate-documentation-review`](../tracktemplate-documentation-review/SKILL.md).
 
-Only if the verdict authorises exact corrections, apply them one time. Then do one
-final deterministic validation. A `BLOCKED` verdict is terminal for that exact
-candidate. Do not do a second Documentation Review.
+Apply the complete set of exact corrections once, also after `BLOCKED`. Then
+record the `locked` state for the final content. Do deterministic validation.
+Preserve the initial review verdict and receipt. A result in the `locked`
+state does not become linguistic `ACCEPT`.
+
+Do not do a second Documentation Review. Do not use a replacement candidate to
+start the same cycle again.
+
+If a technical fact or rights question prevents a correction, keep it with
+its canonical subject owner. Do not invent the answer. For an objective
+validation defect, a specified repair and the same proof are necessary.
+Do not start another language review for that defect. Use the canonical lifecycle for these limits.
 
 To finish the work in the frozen review scope, supply these results:
 

@@ -589,16 +589,25 @@ def validate_technical_author_lifecycle(
             "expected result for the controlled technical document",
         ),
         (
-            "understand once → write once → check once → improve once",
-            "freeze once → review once → validate once → finish",
-            "before freeze, apply one complete improvement pass",
+            (
+                'write once → review once → adjust once if necessary → record '
+                'the locked state → validate → finish'
+            ),
+            'examine the content from all agents together',
+            (
+                'apply the complete set of exact corrections once, also after '
+                'blocked'
+            ),
+            'preserve the initial review verdict and receipt',
+            'a result in the locked state does not become linguistic accept',
             "final validation with a pass result ends this documentation cycle",
             "do not send the document to another documentation, quality, "
             "publication, wording, or semantic review",
             "continuous integration can examine the final bytes",
             "cannot start another documentation review, correction pass, or "
             "linguistic improvement cycle",
-            "do not do a second documentation review",
+            'do not do a second documentation review',
+            'replacement candidate to start the same cycle again',
         ),
         (
             "has no authority over that controlled meaning",
@@ -635,11 +644,13 @@ def validate_technical_author_lifecycle(
         "identify the document need",
         "identify the document class",
         "make a plan for the purpose",
-        "technical author lead procedure",
-        "freeze one clean exact candidate in git",
+        'write all candidate documents once',
+        "freeze one exact candidate",
         "one independent documentation reviewer",
-        "one final deterministic validation",
-        "finish the bounded d-gov-015 authoring and review lifecycle",
+        'apply the set of exact corrections once against verified preimages',
+        'record the locked state for the final content',
+        'do final deterministic validation',
+        "finish the bounded d-gov-018 authoring and review lifecycle",
         "do not start another documentation, quality, publication, wording, "
         "or semantic review",
         "make the accepted content the controlled baseline",
@@ -1326,10 +1337,10 @@ def validate_issue9_documentation_lifecycle(
 
     required_policy_concepts = (
         (
-            "author → freeze scope → one documentation review",
-            "optional exact reviewed",
-            "correction once",
-            "one final deterministic validation → complete or owner stop",
+            (
+                'write once → review once → if necessary, apply corrections '
+                'once → record locked → validate → finish'
+            ),
         ),
         (
             "only linguistic conformance review",
@@ -1337,17 +1348,27 @@ def validate_issue9_documentation_lifecycle(
             "approved_with_exact_corrections, or blocked",
         ),
         (
-            "all exact replacement wording in the same review",
+            "give all necessary exact replacements in that same review",
             "once against verified preimages",
-            "do not add or change other wording",
-            "do not run a second documentation review",
+            "do not add other wording or get another linguistic verdict",
         ),
         (
-            "blocked verdict creates no accepted-state proposal",
-            "return the change to the owner",
+            (
+                'blocked verdict lets the implementing agent make this one '
+                'correction set'
+            ),
+            'preserve the initial verdict and receipt',
+            (
+                'record the completed lifecycle and linguistic acceptance as '
+                'different results'
+            ),
+            'keep that question with its canonical subject owner',
         ),
         (
-            "each schema version 2 result records the complete blockers array",
+            (
+                'each new result with schema version 3 records the full '
+                'blockers array'
+            ),
             "accept and approved_with_exact_corrections use an empty blockers "
             "array",
             "blocked uses a nonempty blockers array",
@@ -1358,27 +1379,42 @@ def validate_issue9_documentation_lifecycle(
             "review receipt preserves the complete blockers array",
             "exact candidate and frozen review scope bindings",
             "blocked result with an empty blockers array is invalid",
+            "preserve schema 1 and schema 2 historical results and receipts "
+            "without migration",
         ),
         (
-            "it proves these identities: - source. - exact candidate. - frozen "
-            "review scope. - receipt. - accepted state. - final content.",
-            "no unreviewed change remains",
+            (
+                'it proves these identities: - source. - exact candidate. - '
+                'frozen review scope. - receipt. - document state and initial '
+                'review result - final content.'
+            ),
+            'only the frozen candidate and its one set of exact corrections',
             "does not judge linguistic conformance",
         ),
         (
             "do not review an untouched legacy document",
-            "first material edit of an unreviewed legacy document",
-            "complete document",
+            "use the supplied git baseline to find each material change",
+            "older review-state identity must not expand this scope",
+            "review a new document in full",
         ),
         (
             "review only the complete logical units that contain those changes",
-            "do not review unchanged accepted canonical prose again",
+            "do not review unchanged legacy or accepted canonical prose again",
         ),
         (
             "durable review state at document level",
-            "last accepted document identity",
+            'initial review result, and locked lifecycle status',
+            "keep the meanings of existing schema 1 entries unchanged",
             "do not keep persistent sentence, paragraph, or logical-unit "
             "workflow state",
+        ),
+        (
+            "reject a replacement review result or a change outside that set",
+            (
+                'different filename, reviewer, or candidate to start the same '
+                'cycle again'
+            ),
+            "not a claim that the document received linguistic accept",
         ),
     )
     for concepts in required_policy_concepts:
@@ -1400,7 +1436,7 @@ def validate_issue9_documentation_lifecycle(
             "blocked",
         ),
         (
-            "all exact replacement wording in this review",
+            "all necessary exact replacements in this review",
             "path, byte range, and frozen preimage",
             "do not run a second documentation review",
         ),
@@ -1418,7 +1454,11 @@ def validate_issue9_documentation_lifecycle(
             "implementing agent applies those corrections once",
             "does not examine canonical prose for conformance",
             "change your verdict",
-            "returns to the owner",
+            (
+                'record lifecycle completion in the locked state independently '
+                'from linguistic acceptance'
+            ),
+            'unresolved question about a fact stays with its subject owner',
         ),
     )
     for concepts in required_skill_concepts:
@@ -1484,10 +1524,14 @@ def validate_issue9_documentation_lifecycle(
         "tracktemplate-documentation-review",
         "for new or materially changed canonical technical prose, use "
         "tracktemplate-technical-author-lead automatically",
-        "use the technical author lead procedure",
-        "freeze one clean exact candidate in git",
-        "derive the frozen review scope from the last accepted document identity "
-        "and git",
+        'write all candidate documents once',
+        "freeze one exact candidate",
+        (
+            'use the document identity and supplied git baseline to identify '
+            'the complete logical units that changed'
+        ),
+        "review a new document in full",
+        "exclude unchanged legacy prose",
         "one independent documentation reviewer",
         "accept",
         "approved_with_exact_corrections",
@@ -1498,21 +1542,30 @@ def validate_issue9_documentation_lifecycle(
         "exact path",
         "frozen logical-unit identity",
         "formal issue 9 rule identifiers",
-        "apply all exact replacement wording once against verified preimages",
-        "do not invent other canonical prose",
-        "do one final deterministic validation",
-        "if it gives a pass result, complete the cycle",
-        "finish the bounded d-gov-015 authoring and review lifecycle",
+        'apply the set of exact corrections once against verified preimages',
+        'record the locked state for the final content',
+        'preserve the initial verdict and receipt',
+        'do final deterministic validation',
+        "do not repeat linguistic review",
+        "finish the bounded d-gov-018 authoring and review lifecycle",
         "do not start another documentation, quality, publication, wording, or "
         "semantic review",
-        "cycle is write, one review, one permitted adjustment, final "
-        "deterministic validation, and done",
+        (
+            'write once and use one review. if necessary, apply one set of '
+            'exact corrections. record the locked state. do final deterministic'
+            ' validation. finish the cycle'
+        ),
+        (
+            'blocked verdict lets the implementing agent make the one '
+            'correction set'
+        ),
+        'completed lifecycle does not change the initial linguistic verdict',
+        'do not use a replacement candidate to start the same cycle again',
         "cannot ask for or start another documentation review, wording pass, "
         "semantic reinterpretation, or improvement cycle",
-        "stop for the owner",
         "only linguistic conformance review",
         "do not do a second documentation review",
-        "finds unreviewed mutation",
+        'identifies changes outside the one correction set',
         "does not give or change the linguistic verdict",
         "deterministic pre-check is only a review aid",
     )

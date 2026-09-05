@@ -165,24 +165,31 @@ For new or materially changed canonical technical prose, use
 4. Get technical meaning from the applicable canonical subject owner.
 5. Read the technical-term register. Read the applicable documentation policy.
 6. Before you write the affected logical units, use targeted retrieval.
-7. Use the Technical Author Lead procedure: understand once, write
-   once, check once, and improve once.
-8. Freeze one clean exact candidate in Git.
-9. Derive the frozen review scope from the last accepted document identity and
-   Git.
+7. Write all candidate documents once. Before handoff, examine the full diff,
+   terms, exact content, links, and applicable tests. Include the work from
+   other agents. Connect the checks to the candidate bytes.
+8. Freeze one exact candidate. If the task gives commit authority, use a clean
+   Git commit. If it gives no commit authority, preserve the baseline, full
+   diff, and content hashes.
+9. Use the document identity and supplied Git baseline to identify the complete
+   logical units that changed. Review a new document in full. Exclude
+   unchanged legacy prose.
 10. Give the complete scope of the frozen review to one independent Documentation
     Reviewer.
 11. Record one complete `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or `BLOCKED`
     verdict. For `BLOCKED`, record the complete finding set. The finding set
     must not be empty. For each finding, record its exact path and frozen
     logical-unit identity. Include its formal Issue 9 rule identifiers.
-12. For a `BLOCKED` verdict, stop work on the exact candidate. Return it to
-    the owner. Make no accepted-state proposal.
-13. For `APPROVED_WITH_EXACT_CORRECTIONS`, apply all exact replacement wording
-    once against verified preimages. Do not invent other canonical prose.
-14. After the review or correction, do one final deterministic validation.
-    If it gives a `PASS` result, complete the cycle. If it does not, stop for the owner.
-15. Finish the bounded D-GOV-015 authoring and review lifecycle. Do not start
+12. For `APPROVED_WITH_EXACT_CORRECTIONS` or `BLOCKED`, get all necessary exact
+    replacements in that same verdict. Keep an unresolved technical fact or
+    rights question with its canonical subject owner.
+13. Apply the set of exact corrections once against verified preimages.
+    Record the `locked` state for the final content. Preserve the initial
+    verdict and receipt.
+14. Do final deterministic validation. If a deterministic check identifies a
+    specified defect, repair that defect. Do its proof again. Do not repeat
+    linguistic review.
+15. Finish the bounded D-GOV-018 authoring and review lifecycle. Do not start
     another documentation, quality, publication, wording, or semantic review.
 16. After the one review, permitted adjustment, final validation, and applicable
     acceptance, make the accepted content the controlled baseline.
@@ -195,14 +202,20 @@ For new or materially changed canonical technical prose, use
 
 The Documentation Review is the only linguistic conformance review. Do not do
 a second Documentation Review. The STE lookup derives the frozen review scope.
-It validates source, exact candidate, receipt, accepted state, and final-content
-identity. It also finds unreviewed mutation.
+It validates source, exact candidate, receipt, document state, and final-content
+identity. It also identifies changes outside the one correction set.
 
 It does not give or change the linguistic verdict. A deterministic pre-check
 is only a review aid.
 
-For governance documentation, the cycle is write, one review, one permitted
-adjustment, final deterministic validation, and done. Continuous integration
+For governance documentation, write once and use one review. If necessary,
+apply one set of exact corrections. Record the `locked` state. Do final
+deterministic validation. Finish the cycle.
+
+A `BLOCKED` verdict lets the implementing agent make the one correction set.
+The completed lifecycle does not change the initial linguistic verdict.
+Do not use a replacement candidate to start the same cycle again.
+Continuous integration
 can examine the final bytes. It cannot ask for or start another documentation
 review, wording pass, semantic reinterpretation, or improvement cycle.
 The understand, check, improve, and freeze controls are parts of the one

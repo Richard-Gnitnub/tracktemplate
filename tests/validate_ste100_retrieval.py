@@ -138,19 +138,22 @@ def validate_workflow_text(text: str) -> None:
         "read the technical-term register. read the applicable documentation "
         "policy",
         "before you write the affected logical units, use targeted retrieval",
-        "use the technical author lead procedure",
-        "freeze one clean exact candidate in git",
-        "derive the frozen review scope from the last accepted document identity "
-        "and git",
+        "write all candidate documents once",
+        "connect the checks to the candidate bytes",
+        "freeze one exact candidate",
+        "use the document identity and supplied git baseline to identify "
+        "the complete logical units that changed",
+        "exclude unchanged legacy prose",
         "give the complete scope of the frozen review to one independent "
         "documentation reviewer",
         "record one complete accept",
         "approved with exact corrections",
         "or blocked verdict",
-        "apply all exact replacement wording once against verified preimages",
-        "after the review or correction, do one final deterministic validation",
-        "if it gives a pass result, complete the cycle",
-        "finish the bounded d-gov-015 authoring and review lifecycle",
+        "apply the set of exact corrections once against verified preimages",
+        "record the locked state for the final content",
+        "preserve the initial verdict and receipt",
+        "do final deterministic validation",
+        "finish the bounded d-gov-018 authoring and review lifecycle",
         "do not start another documentation, quality, publication, wording, or "
         "semantic review",
         "make the accepted content the controlled baseline",
@@ -174,12 +177,18 @@ def validate_workflow_text(text: str) -> None:
         "owner decision makes complete-source inspection necessary",
         "documentation review is the only linguistic conformance review",
         "do not do a second documentation review",
-        "do not invent other canonical prose",
-        "if it does not, stop for the owner",
-        "finds unreviewed mutation",
+        "keep an unresolved technical fact or rights question with its "
+        "canonical subject owner",
+        "if a deterministic check identifies a specified defect, repair that "
+        "defect. do its proof again",
+        "identifies changes outside the one correction set",
         "does not give or change the linguistic verdict",
-        "cycle is write, one review, one permitted adjustment, final "
-        "deterministic validation, and done",
+        "write once and use one review. if necessary, apply one set of exact "
+        "corrections. record the locked state. do final deterministic "
+        "validation. finish the cycle",
+        "a blocked verdict lets the implementing agent make the one correction set",
+        "the completed lifecycle does not change the initial linguistic verdict",
+        "do not use a replacement candidate to start the same cycle again",
         "cannot ask for or start another documentation review, wording pass, "
         "semantic reinterpretation, or improvement cycle",
     ):
@@ -215,25 +224,39 @@ def validate_source_documentation(text: str) -> None:
         "a pass command result also does not show conformance",
         "do not keep all review receipts for usual work",
         "does not narrow the applicable issue 9 requirement set",
-        "first freeze a clean git commit",
-        "derives the frozen review scope from accepted document identities "
-        "and git",
-        "excludes untouched legacy documents",
-        "includes the complete document for a first edit",
-        "only changed complete logical units after an accepted document identity",
+        "first use the task's commit authority to freeze a clean git commit",
+        "derives the frozen review scope from document identities and git",
+        "scope schema 2 includes the complete logical units that changed in "
+        "an existing document. this includes legacy documents",
+        "review a new document in full",
+        "unchanged legacy prose stays outside the repair scope",
+        "preserved schema 1 scopes keep their initial meaning",
         "one independent documentation reviewer",
         "approved with exact corrections",
-        "result must contain all exact replacement wording",
-        "blocked result, stop for the owner",
-        "gives no accepted-state proposal",
-        "apply each exact replacement once against its verified preimage",
+        "give all necessary exact replacements in that same review. "
+        "this also applies after blocked",
+        "use schema 3 for each new review-result file",
+        "an empty correction set for blocked gives no completion proposal",
+        "do not migrate them to schema 3",
+        "apply the complete exact correction set once",
+        "examine each preimage",
         "do not invent other wording",
-        "do not run a second documentation review",
-        "commit the reviewed content and reference/ste-review-state.json",
+        "do not invent other wording or get another linguistic verdict",
+        "new state schema 2 entries record lifecycle status as locked and "
+        "preserve the initial review result",
+        "they do not claim linguistic accept or project acceptance",
+        "existing schema 1 entries keep their initial meaning and values",
+        "the ste lookup rejects a replacement review. before final validation "
+        "completes the initial cycle, it rejects a new candidate for any of "
+        "the same document paths",
+        "with commit authority, commit the content in the locked state and "
+        "reference/ste-review-state.json",
         "tracktemplate ste100 final= success sentinel",
         "proves source identity, exact candidate identity, frozen review scope, "
-        "receipt, accepted-state, and final-content identity",
-        "detects unreviewed mutation",
+        "receipt, document-state, and final-content identity",
+        "rejects changes outside the candidate and its one exact correction set",
+        "preserves the initial verdict and reports the completed lifecycle "
+        "as a different result",
         "does not judge linguistic conformance",
     ):
         require(fragment in value, "source/retrieval instructions lack: " + fragment)
@@ -315,10 +338,17 @@ def validate_skill_routing(skills: dict[str, str]) -> None:
     require(
         "before you author affected logical units, use the local ste retrieval "
         "interface" in technical_author
-        and "deterministic pre-check results. it is not a documentation review"
-        in technical_author
-        and "before freeze, apply one complete improvement pass"
-        in technical_author
+        and "writing includes the necessary checks and corrections before "
+        "handoff" in technical_author
+        and "when an assertion changes with the prose, preserve technical "
+        "safeguards" in technical_author
+        and "if a changed assertion could accept an incorrect result, "
+        "use a negative test" in technical_author
+        and "these checks are not another documentation review or approval "
+        "stage" in technical_author
+        and "apply the complete set of exact corrections once, also after "
+        "blocked" in technical_author
+        and "a result in the locked state does not become linguistic accept" in technical_author
         and "final validation with a pass result ends this documentation cycle"
         in technical_author
         and "do not send the document to another documentation, quality, "
@@ -710,16 +740,21 @@ def validate_validation_text(validation_text: str) -> None:
         "set",
         "receipt, pre-check, derived cache, and selected lookup results do "
         "not show",
-        "author freezes one clean exact git candidate",
-        "derives the frozen review scope from the last accepted document identity "
-        "and git",
+        "author examines all candidate documents together and freezes their "
+        "exact content",
+        "identifies the complete logical units that changed from document "
+        "identities and the baseline",
+        "review a new document in full",
         "one independent documentation reviewer returns one complete verdict for "
         "the frozen review scope",
         "it is accept",
         "approved with exact corrections",
         "or blocked",
-        "all exact replacement wording is in that review",
-        "applied once against verified preimages",
+        "all necessary exact replacements are in that review",
+        "apply the set once against verified preimages",
+        "then record the locked state for the final content",
+        "preserves the initial review verdict and gives no linguistic "
+        "acceptance",
         "documentation review is the only linguistic conformance review",
         "do not run a second documentation review",
         "final validation does not judge prose",
@@ -728,16 +763,30 @@ def validate_validation_text(validation_text: str) -> None:
         "and receipt",
         "must validate expected document-level state and final content",
         "reject unrelated post-review mutation",
-        "do not include an untouched legacy document in the frozen review scope",
-        "complete document for the first material edit of an unreviewed legacy "
-        "document",
-        "only materially changed complete logical units",
-        "do not include unchanged previously accepted prose",
-        "accepted review state at document level",
+        "do not include unchanged legacy prose in the repair scope",
+        "new scope schema 2 includes only materially changed complete logical "
+        "units",
+        "durable review state at document level",
+        "state entries with schema 2 keep the initial verdict and identify "
+        "the content in the locked state",
+        "preserve existing schema 1 state entries and historical results "
+        "without migration",
         "do not persist sentence, paragraph, or logical-unit workflow state",
-        "a remaining linguistic, semantic, or identity failure returns to the "
-        "owner",
-        "a failure of the frozen review scope also returns to the owner",
+        "a result with schema 3 and a blocked verdict must complete the "
+        "lifecycle when it has a full set of exact corrections. its state "
+        "must be locked . it must not get another review or falsely claim accept",
+        "a blocked result with no correction stays recorded without a "
+        "completion proposal",
+        "an unresolved technical fact or rights question stays with its "
+        "canonical subject owner",
+        "reject replacement reviews and attempts to start the same cycle "
+        "again with a candidate for any of the same document paths",
+        "reject an old schema pair that bypasses a recorded review in this cycle",
+        "after the recorded final commit, let later work start. this includes "
+        "work after document deletion",
+        "if a deterministic check identifies a specified defect, repair it "
+        "at the boundary that caused it. do its proof again",
+        "do not start another linguistic review",
     ):
         require(fragment in validation, "validation owner lacks: " + fragment)
     require(
@@ -1765,6 +1814,17 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
         pass
     else:
         raise AssertionError("contradictory workflow addition was accepted")
+    restarted_workflow = workflows.replace(
+        "A `BLOCKED` verdict lets the implementing agent make the one correction set.",
+        "A `BLOCKED`\nverdict requires another Documentation Review.",
+    )
+    require(restarted_workflow != workflows, "finite-cycle fixture is stale")
+    try:
+        validate_workflow_text(restarted_workflow)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("a BLOCKED review restart was accepted")
 
     documents = load_tracked_markdown()
     competing_terms = dict(documents)
@@ -1862,6 +1922,20 @@ def validate_semantic_mutations(index: dict[str, object]) -> None:
 
     skills = {name: read(SKILLS / name / "SKILL.md") for name in SKILL_NAMES}
     validate_skill_routing(skills)
+    unchecked_author = dict(skills)
+    unchecked_author["tracktemplate-technical-author-lead"] = skills[
+        "tracktemplate-technical-author-lead"
+    ].replace(
+        "When an assertion changes with the prose, preserve technical safeguards.",
+        "Update assertion wording without checking its technical safeguards.",
+    )
+    require(unchecked_author != skills, "author safeguard fixture is stale")
+    try:
+        validate_skill_routing(unchecked_author)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("an unchecked author assertion change was accepted")
     bypassed = dict(skills)
     bypassed["tracktemplate-quality-review"] = bypassed[
         "tracktemplate-quality-review"
@@ -1991,6 +2065,22 @@ def validate_documentation_lifecycle() -> None:
         )
         return git(root, "rev-parse", "HEAD")
 
+    def freeze_retained_review(
+        *, baseline_revision: str, author_id: str,
+        source_manifest: dict[str, object], root: pathlib.Path,
+    ) -> tuple[pathlib.Path, dict[str, object]]:
+        scope = STE._build_review_scope(
+            baseline_revision=baseline_revision,
+            candidate_revision=STE._lifecycle_head(root=root, require_clean=True),
+            author_id=author_id, source_manifest=source_manifest,
+            root=root, schema_version=1,
+        )
+        path, _digest = STE._write_lifecycle_json(
+            root / "tmp" / STE.STE_REVIEW_SCOPE_DIR.name,
+            "scope", scope, root=root,
+        )
+        return path, scope
+
     with tempfile.TemporaryDirectory() as temporary:
         root = pathlib.Path(temporary)
         (root / "reference" / "current").mkdir(parents=True)
@@ -2060,7 +2150,7 @@ def validate_documentation_lifecycle() -> None:
             }
 
         candidate_one = commit(root, "first material edit")
-        scope_path, scope_one = STE.freeze_documentation_review(
+        scope_path, scope_one = freeze_retained_review(
             baseline_revision=baseline,
             author_id="fixture-author",
             source_manifest=source_manifest,
@@ -2073,7 +2163,7 @@ def validate_documentation_lifecycle() -> None:
         document_one = scope_one["documents"][0]
         require(
             document_one["mode"] == "complete-document",
-            "a legacy document did not receive a complete-document scope",
+            "a retained legacy scope lost its complete-document meaning",
         )
         require(
             all(item["path"] != "reference/untouched.md" for item in scope_one["documents"]),
@@ -2386,7 +2476,7 @@ def validate_documentation_lifecycle() -> None:
             encoding="utf-8",
         )
         candidate_two = commit(root, "second material edit")
-        scope_two_path, scope_two = STE.freeze_documentation_review(
+        scope_two_path, scope_two = freeze_retained_review(
             baseline_revision=accepted_one,
             author_id="fixture-author",
             source_manifest=source_manifest,
@@ -2561,7 +2651,7 @@ def validate_documentation_lifecycle() -> None:
             encoding="utf-8",
         )
         commit(root, "deletion and register change")
-        scope_three_path, scope_three = STE.freeze_documentation_review(
+        scope_three_path, scope_three = freeze_retained_review(
             baseline_revision=accepted_two,
             author_id="fixture-author",
             source_manifest=source_manifest,
@@ -2823,6 +2913,460 @@ def validate_documentation_lifecycle() -> None:
         )
 
 
+def validate_finite_documentation_lifecycle() -> None:
+    """Prove one blocked review can close without a replacement verdict."""
+    source_manifest = {
+        "issue": "9",
+        "page_count": 434,
+        "publication_date": "2025-01-15",
+        "sha256": EXPECTED_SOURCE_SHA256,
+        "size_bytes": EXPECTED_SOURCE_SIZE,
+        "standard_id": "ASD-STE100",
+    }
+
+    def git(root: pathlib.Path, *arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments], cwd=root, check=True,
+            capture_output=True, text=True,
+        ).stdout.strip()
+
+    def commit(root: pathlib.Path, message: str) -> str:
+        git(root, "add", "--all")
+        git(
+            root, "-c", "user.name=TrackTemplate Validation",
+            "-c", "user.email=validation@example.invalid",
+            "commit", "--quiet", "-m", message,
+        )
+        return git(root, "rev-parse", "HEAD")
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        (root / "reference").mkdir()
+        (root / "tmp").mkdir()
+        (root / ".gitignore").write_text("tmp/\n", encoding="utf-8")
+        guide = root / "reference" / "guide.md"
+        state_path = root / "reference" / "ste-review-state.json"
+        guide.write_text(
+            "# Changed\n\nKeep the old instruction.\n\n"
+            "# Also changed\n\nKeep the former description.\n\n"
+            "# Unchanged\n\nKeep the untouched legacy instruction.\n",
+            encoding="utf-8",
+        )
+        state_path.write_bytes(STE._canonical_json_bytes(STE._empty_review_state()))
+        git(root, "init", "--quiet")
+        baseline = commit(root, "baseline")
+        candidate_bytes = guide.read_bytes().replace(
+            b"old instruction", b"unclear instruction"
+        ).replace(b"former description", b"current description")
+        guide.write_bytes(candidate_bytes)
+        candidate = commit(root, "one author candidate")
+        scope_path, scope = STE.freeze_documentation_review(
+            baseline_revision=baseline, author_id="author",
+            source_manifest=source_manifest, root=root,
+        )
+        document = scope["documents"][0]
+        start = candidate_bytes.index(b"unclear instruction")
+        preimage = "unclear instruction"
+        candidate_unit = next(
+            unit for unit in document["units"]
+            if unit["side"] == "candidate"
+            and unit["start_byte"] <= start < unit["end_byte"]
+        )
+        result = {
+            "blocker_set_complete": True,
+            "blockers": [{
+                "finding": "Replace the unclear instruction with the exact correction.",
+                "path": "reference/guide.md",
+                "rule_ids": ["1.1"],
+                "unit": {
+                    key: candidate_unit[key]
+                    for key in ("end_byte", "sha256", "side", "start_byte")
+                },
+            }],
+            "corrections": [{
+                "end_byte": start + len(preimage),
+                "path": "reference/guide.md",
+                "preimage": preimage,
+                "preimage_sha256": hashlib.sha256(preimage.encode()).hexdigest(),
+                "replacement": "clear instruction",
+                "start_byte": start,
+            }],
+            "full_applicability_considered": True,
+            "independent": True,
+            "issue9_source_sha256": EXPECTED_SOURCE_SHA256,
+            "result": "BLOCKED",
+            "reviewer_id": "independent-reviewer",
+            "schema_version": 3,
+            "scope_sha256": scope["scope_sha256"],
+        }
+
+        def write_result(name: str, value: dict[str, object]) -> pathlib.Path:
+            path = root / "tmp" / name
+            path.write_bytes(STE._canonical_json_bytes(value))
+            return path
+
+        result_path = write_result("one-review.json", result)
+        downgraded = copy.deepcopy(result)
+        downgraded["schema_version"] = 2
+        downgraded["corrections"] = []
+        expect_ste_error(
+            "ste-review-result-schema-mismatch",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("downgraded-review.json", downgraded),
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        incomplete = copy.deepcopy(result)
+        other_unit = next(
+            unit for unit in document["units"]
+            if unit["side"] == "candidate"
+            and "current description" in unit["text"]
+        )
+        other_blocker = copy.deepcopy(result["blockers"][0])
+        other_blocker["unit"] = {
+            key: other_unit[key]
+            for key in ("end_byte", "sha256", "side", "start_byte")
+        }
+        incomplete["blockers"].append(other_blocker)
+        expect_ste_error(
+            "ste-review-corrections-incomplete",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("incomplete-adjustment.json", incomplete),
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        receipt_path, proposal_path, receipt = STE.record_documentation_review(
+            scope_path=scope_path, result_path=result_path,
+            source_manifest=source_manifest, root=root,
+        )
+        require(proposal_path is not None, "a correctable BLOCKED review cannot close")
+        require(
+            receipt["result"] == "BLOCKED" and receipt["blockers"] == result["blockers"],
+            "recording the adjustment changed the original review verdict or findings",
+        )
+        require(
+            scope["schema_version"] == 2
+            and document["mode"] == "changed-logical-units"
+            and all("untouched legacy" not in unit["text"] for unit in document["units"]),
+            "the finite review expanded into unchanged legacy prose",
+        )
+        old_scope = STE._build_review_scope(
+            baseline_revision=baseline, candidate_revision=candidate,
+            author_id="author", source_manifest=source_manifest,
+            root=root, schema_version=1,
+        )
+        require(
+            old_scope["documents"][0]["mode"] == "complete-document",
+            "retained schema-1 scope reconstruction changed",
+        )
+        legacy_scope_path, _digest = STE._write_lifecycle_json(
+            root / "tmp" / STE.STE_REVIEW_SCOPE_DIR.name,
+            "scope", old_scope, root=root,
+        )
+        legacy_result = copy.deepcopy(result)
+        legacy_result.update(
+            schema_version=2, result="ACCEPT", blockers=[], corrections=[],
+            scope_sha256=old_scope["scope_sha256"],
+        )
+        expect_ste_error(
+            "ste-review-already-recorded",
+            lambda: STE.record_documentation_review(
+                scope_path=legacy_scope_path,
+                result_path=write_result("legacy-reset.json", legacy_result),
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        legacy_receipt_path, _digest = STE._write_lifecycle_json(
+            root / "tmp" / STE.STE_REVIEW_RESULT_DIR.name,
+            "review", STE._review_receipt(legacy_result, scope=old_scope),
+            root=root,
+        )
+        expect_ste_error(
+            "ste-review-already-recorded",
+            lambda: STE.validate_final_review_state(
+                scope_path=legacy_scope_path, receipt_path=legacy_receipt_path,
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        require(
+            STE.record_documentation_review(
+                scope_path=scope_path, result_path=result_path,
+                source_manifest=source_manifest, root=root,
+            ) == (receipt_path, proposal_path, receipt),
+            "an identical record-review retry was not idempotent",
+        )
+        second_review = copy.deepcopy(result)
+        second_review["reviewer_id"] = "another-reviewer"
+        expect_ste_error(
+            "ste-review-already-recorded",
+            lambda: STE.record_documentation_review(
+                scope_path=scope_path,
+                result_path=write_result("second-review.json", second_review),
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        expect_ste_error(
+            "ste-review-already-recorded",
+            lambda: STE.freeze_documentation_review(
+                baseline_revision=baseline, author_id="renamed-author",
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        expect_ste_error(
+            "ste-final-reviewed-bytes-mismatch",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path, receipt_path=receipt_path,
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        proposal_bytes = proposal_path.read_bytes()
+        proposal = load_json(proposal_path)
+        require(
+            proposal["schema_version"] == 2
+            and proposal["documents"][0]["lifecycle_status"] == "locked"
+            and proposal["documents"][0]["review_result"] == "BLOCKED",
+            "the controlled baseline conflates closure with linguistic acceptance",
+        )
+        invalid_state = copy.deepcopy(proposal)
+        invalid_state["documents"][0]["review_result"] = []
+        expect_ste_error(
+            "ste-review-state-invalid",
+            lambda: STE._validate_review_state(invalid_state),
+        )
+        invalid_state = copy.deepcopy(proposal)
+        invalid_state["schema_version"] = 1
+        expect_ste_error(
+            "ste-review-state-invalid",
+            lambda: STE._validate_review_state(invalid_state),
+        )
+        final_bytes = candidate_bytes.replace(
+            b"unclear instruction", b"clear instruction"
+        )
+        guide.write_bytes(final_bytes)
+        adjusted = commit(root, "one adjustment")
+        expect_ste_error(
+            "ste-review-cycle-restart",
+            lambda: STE.freeze_documentation_review(
+                baseline_revision=baseline, author_id="author",
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        expect_ste_error(
+            "ste-review-cycle-restart",
+            lambda: STE.freeze_documentation_review(
+                baseline_revision=candidate, author_id="author",
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        require(adjusted != candidate, "the adjustment did not change the candidate")
+        state_path.write_bytes(proposal_bytes)
+        locked = commit(root, "record locked baseline")
+        final = STE.validate_final_review_state(
+            scope_path=scope_path, receipt_path=receipt_path,
+            source_manifest=source_manifest, root=root,
+        )
+        require(
+            final["result"] == "BLOCKED"
+            and final["status"] == "locked-and-deterministically-validated"
+            and final["final_revision"] == locked,
+            "one adjusted BLOCKED review did not complete honestly",
+        )
+        completion_path = (
+            root / "tmp" / STE.STE_REVIEW_RESULT_DIR.name
+            / "completion-{}.json".format(candidate)
+        )
+        preserved_completion = completion_path.read_bytes()
+        preserved_receipt = receipt_path.read_bytes()
+        guide.write_bytes(final_bytes.replace(b"clear", b"different"))
+        commit(root, "unauthorised second wording adjustment")
+        expect_ste_error(
+            "ste-final-reviewed-bytes-mismatch",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path, receipt_path=receipt_path,
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        guide.write_bytes(final_bytes)
+        false_acceptance = copy.deepcopy(proposal)
+        false_acceptance["documents"][0]["review_result"] = "ACCEPT"
+        state_path.write_bytes(STE._canonical_json_bytes(false_acceptance))
+        commit(root, "false acceptance claim")
+        expect_ste_error(
+            "ste-final-state-mismatch",
+            lambda: STE.validate_final_review_state(
+                scope_path=scope_path, receipt_path=receipt_path,
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+        state_path.write_bytes(proposal_bytes)
+        corrected_proof = commit(root, "restore exact locked state")
+        STE.validate_final_review_state(
+            scope_path=scope_path, receipt_path=receipt_path,
+            source_manifest=source_manifest, root=root,
+        )
+        require(
+            receipt_path.read_bytes() == preserved_receipt,
+            "deterministic validation changed the original review receipt",
+        )
+        require(
+            completion_path.read_bytes() == preserved_completion,
+            "a later deterministic retry rewrote the first completed proof",
+        )
+        guide.write_bytes(final_bytes.replace(b"clear", b"new factual"))
+        commit(root, "later distinct work after controlled baseline")
+        later_scope_path, later_scope = STE.freeze_documentation_review(
+            baseline_revision=corrected_proof, author_id="author",
+            source_manifest=source_manifest, root=root,
+        )
+        unresolved = copy.deepcopy(result)
+        unresolved["scope_sha256"] = later_scope["scope_sha256"]
+        unresolved["corrections"] = []
+        later_unit = next(
+            unit for unit in later_scope["documents"][0]["units"]
+            if unit["side"] == "candidate"
+        )
+        unresolved["blockers"][0]["unit"] = {
+            key: later_unit[key]
+            for key in ("end_byte", "sha256", "side", "start_byte")
+        }
+        unresolved["blockers"][0]["finding"] = "The subject owner must resolve the technical fact."
+        unresolved_receipt, unresolved_proposal, _result = STE.record_documentation_review(
+            scope_path=later_scope_path,
+            result_path=write_result("unresolved-fact.json", unresolved),
+            source_manifest=source_manifest, root=root,
+        )
+        require(unresolved_proposal is None, "an unresolved fact created a completion proposal")
+        expect_ste_error(
+            "ste-review-blocked",
+            lambda: STE.validate_final_review_state(
+                scope_path=later_scope_path, receipt_path=unresolved_receipt,
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        (root / "reference").mkdir()
+        (root / "tmp").mkdir()
+        (root / ".gitignore").write_text("tmp/\n", encoding="utf-8")
+        guide = root / "reference" / "guide.md"
+        state_path = root / "reference" / "ste-review-state.json"
+        old_bytes = b"# Closed\n\nOriginal instruction.\n\n# Current\n\nOld text.\n"
+        guide.write_bytes(old_bytes)
+        state_path.write_bytes(STE._canonical_json_bytes(STE._empty_review_state()))
+        git(root, "init", "--quiet")
+        commit(root, "old accepted text")
+        state_path.write_bytes(STE._canonical_json_bytes({
+            "schema_version": 1,
+            "documents": [{
+                "accepted_blob": "sha1:" + STE._lifecycle_blob_oid(old_bytes),
+                "accepted_sha256": "sha256:" + hashlib.sha256(old_bytes).hexdigest(),
+                "issue9_source": "sha256:" + EXPECTED_SOURCE_SHA256,
+                "path": "reference/guide.md",
+                "review_receipt": "sha256:" + "a" * 64,
+            }],
+        }))
+        closed_bytes = old_bytes.replace(b"Original", b"Owner-closed")
+        guide.write_bytes(closed_bytes)
+        closed_baseline = commit(root, "owner-closed work with retained old state")
+        guide.write_bytes(closed_bytes.replace(b"Old text", b"New text"))
+        commit(root, "new bounded documentation task")
+        scope_path, scope = STE.freeze_documentation_review(
+            baseline_revision=closed_baseline, author_id="author",
+            source_manifest=source_manifest, root=root,
+        )
+        units = scope["documents"][0]["units"]
+        require(
+            all("Owner-closed" not in unit["text"] for unit in units)
+            and any("New text" in unit["text"] for unit in units),
+            "an older state identity reopened already closed baseline prose",
+        )
+        blocked = copy.deepcopy(result)
+        blocked["scope_sha256"] = scope["scope_sha256"]
+        unit = next(unit for unit in units if unit["side"] == "candidate")
+        blocked["blockers"][0]["unit"] = {
+            key: unit[key]
+            for key in ("end_byte", "sha256", "side", "start_byte")
+        }
+        start = guide.read_bytes().index(b"New text")
+        blocked["corrections"] = [{
+            "path": "reference/guide.md", "start_byte": start,
+            "end_byte": start + len(b"New text"), "preimage": "New text",
+            "preimage_sha256": hashlib.sha256(b"New text").hexdigest(),
+            "replacement": "Clear text",
+        }]
+        result_path = root / "tmp" / "blocked.json"
+        result_path.write_bytes(STE._canonical_json_bytes(blocked))
+        STE.record_documentation_review(
+            scope_path=scope_path, result_path=result_path,
+            source_manifest=source_manifest, root=root,
+        )
+        guide.write_bytes(old_bytes)
+        reverted = commit(root, "revert to old matching state without completion")
+        guide.write_bytes(old_bytes.replace(b"Old text", b"Alternative text"))
+        commit(root, "revised candidate after uncompleted revert")
+        expect_ste_error(
+            "ste-review-cycle-restart",
+            lambda: STE.freeze_documentation_review(
+                baseline_revision=reverted, author_id="author",
+                source_manifest=source_manifest, root=root,
+            ),
+        )
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        (root / "reference").mkdir()
+        (root / "tmp").mkdir()
+        (root / ".gitignore").write_text("tmp/\n", encoding="utf-8")
+        guide = root / "reference" / "guide.md"
+        state_path = root / "reference" / "ste-review-state.json"
+        guide.write_text("# Guide\n\nOld instruction.\n", encoding="utf-8")
+        state_path.write_bytes(STE._canonical_json_bytes(STE._empty_review_state()))
+        git(root, "init", "--quiet")
+        baseline = commit(root, "deletion baseline")
+        guide.unlink()
+        commit(root, "document deletion")
+        scope_path, scope = STE.freeze_documentation_review(
+            baseline_revision=baseline, author_id="author",
+            source_manifest=source_manifest, root=root,
+        )
+        accepted = copy.deepcopy(result)
+        accepted.update(
+            result="ACCEPT", blockers=[], corrections=[],
+            scope_sha256=scope["scope_sha256"],
+        )
+        result_path = root / "tmp" / "accepted-deletion.json"
+        result_path.write_bytes(STE._canonical_json_bytes(accepted))
+        receipt_path, proposal_path, _receipt = STE.record_documentation_review(
+            scope_path=scope_path, result_path=result_path,
+            source_manifest=source_manifest, root=root,
+        )
+        require(proposal_path is not None, "an accepted deletion has no state proposal")
+        state_path.write_bytes(proposal_path.read_bytes())
+        deleted_baseline = commit(root, "lock accepted deletion")
+        final = STE.validate_final_review_state(
+            scope_path=scope_path, receipt_path=receipt_path,
+            source_manifest=source_manifest, root=root,
+        )
+        require(
+            final["result"] == "ACCEPT"
+            and final["status"] == "locked-and-deterministically-validated",
+            "an accepted deletion did not complete",
+        )
+        guide.write_text("# Guide\n\nLater distinct instruction.\n", encoding="utf-8")
+        commit(root, "recreate document after completed deletion")
+        _path, scope = STE.freeze_documentation_review(
+            baseline_revision=deleted_baseline, author_id="author",
+            source_manifest=source_manifest, root=root,
+        )
+        require(
+            scope["documents"][0]["mode"] == "complete-document",
+            "a completed deletion prevented later distinct document work",
+        )
+
+
 def validate_lifecycle_git_boundary() -> None:
     """Reject inherited Git execution and object-interpretation controls."""
 
@@ -3017,6 +3561,7 @@ def main() -> None:
     validate_agent_and_validation_routing()
     validate_cache_and_lookup_behaviour(index)
     validate_documentation_lifecycle()
+    validate_finite_documentation_lifecycle()
     validate_lifecycle_git_boundary()
     validate_live_source_resolvability()
     validate_semantic_mutations(index)

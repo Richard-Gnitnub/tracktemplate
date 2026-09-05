@@ -4106,3 +4106,63 @@ for the named checks. It removes only two repeated reads.
 D-GOV-011 defines the new same-host baseline and comparison rule for that
 subsequent cycle. It makes no product change. It admits no performance result,
 defines no budget, and does not accept Exit 4.
+
+<a id="d-gov-018-finite-documentation-completion"></a>
+
+## D-GOV-018 finite documentation completion
+
+The project owner authorised the bounded contract change on 2026-09-05. The
+implementation baseline is `4ee0218cda5bfb2ff5e0a516a0f8d0b70bbedd0e`.
+Protected main stays `583e1ad05d7a821fe67c4905b6569ffceca98fe0`.
+
+| Field | Owner view |
+| --- | --- |
+| Current state | Phase 6 stays at 2/5 accepted exits. This Level 3 change is about documentation authority and tooling. |
+| What changed | D-GOV-018 authorises one set of exact corrections after the sole review. This includes BLOCKED. The author owns all candidate documents and their checks. Record the `locked` state for the result. Validate it. Finish the cycle. |
+| What now works | The contract keeps the initial linguistic verdict and completed lifecycle as different results. Review scope contains complete logical units that changed. It does not include unchanged legacy prose. |
+| Limitations/findings | The former tool rejects corrections and final validation after BLOCKED. The change must preserve receipts, technical safeguards, and source identity. Validation cannot prove linguistic conformance. |
+| Owner decision | Continue with the bounded contract change. The instruction supersedes the clauses of D-GOV-015 and D-GOV-017 that stop work after BLOCKED or make review of a complete legacy document necessary. |
+| Next action | Change the contract. Validate it. Complete one Documentation Review. If necessary, apply one set of exact corrections. Record the `locked` state. Validate it. Finish the cycle. Keep Cycle 3 closed. |
+
+The project owner supplies the decision. `/root` describes the change and owns
+the documentation. `/root/finite_contract` owns executable contract work.
+`/root/finite_risk_review` examined the baseline, policy, tool, and PR-12 and
+PR-22 controls before implementation. That reviewer did not author source or
+prose. The agents are in one team and use one filesystem. The review is not
+external organisational independence.
+
+This technical risk challenge is not a Documentation Review.
+
+The risk recommendation is **Proceed with bounded conditions**. Before final
+validation, the contract owner must preserve the initial verdict and immutable
+receipt. The owner must prove one correction set, final-content identity,
+and rejection of replacement reviews and new cycles for the same document
+paths before the initial cycle is complete. The author must preserve technical
+safeguards and examine all candidate documents together. The independent
+source reviewer must examine the executable changes.
+
+These conditions are due before completion. Unresolved technical facts and
+rights questions stay with their canonical subject owners. There is no dissent
+against the authorised sequence.
+
+PR-12 loop exposure should decrease. This is an expected effect. It is not risk
+closure. PR-22 independent challenge stays necessary. No risk disposition
+changes. The governance-budget exception applies because this task changes
+governance authority.
+
+It adds no product behaviour or accepted phase exit.
+
+Keep the exact review, checks, failed evidence, and hashes of the content in
+the `locked` state with the task evidence. Without commit authority, use a
+content-hash freeze for the sole review. Before you claim completion of the
+Git final-validation command, use it against committed content. Later
+integration cannot start another linguistic review. No new framework,
+document database, or periodic review is authorised.
+
+Before the Documentation Review, the checks of the executable contract gave
+PASS results. They examined corrections after BLOCKED, receipt preservation,
+legacy compatibility, rejection of another review in the same cycle, and later
+work after a completed deletion. The independent source reviewer's probes
+gave FAIL results for three initial defects. After repair, the same probes
+gave PASS results. Keep the initial failures and the successful proofs with
+the task evidence.

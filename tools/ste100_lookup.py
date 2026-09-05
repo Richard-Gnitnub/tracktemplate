@@ -2802,11 +2802,15 @@ def _validate_review_state(value: object) -> dict[str, object]:
             "The STE review-state register has an invalid structure.",
             "Restore the schema-1 document baseline register.",
         )
-    if value["schema_version"] != 1 or not isinstance(value["documents"], list):
+    if (
+        type(value["schema_version"]) is not int
+        or value["schema_version"] not in (1, 2)
+        or not isinstance(value["documents"], list)
+    ):
         raise Ste100Error(
             "ste-review-state-invalid",
             "The STE review-state register has an unsupported schema.",
-            "Use schema version 1 and one ordered document list.",
+            "Use schema version 1 or 2 and one ordered document list.",
         )
     if len(value["documents"]) > MAX_LIFECYCLE_DOCUMENTS:
         raise Ste100Error(
@@ -2816,18 +2820,37 @@ def _validate_review_state(value: object) -> dict[str, object]:
         )
     documents: list[dict[str, str]] = []
     for item in value["documents"]:
-        if not isinstance(item, dict) or set(item) != {
+        identity_fields = {
             "accepted_blob",
             "accepted_sha256",
             "issue9_source",
             "path",
             "review_receipt",
-        }:
+        }
+        closure_fields = {"lifecycle_status", "review_result"}
+        if not isinstance(item, dict) or set(item) not in (
+            identity_fields,
+            identity_fields | closure_fields,
+        ):
             raise Ste100Error(
                 "ste-review-state-invalid",
                 "One STE document baseline has an invalid structure.",
-                "Use only the schema-1 document baseline fields.",
+                "Use document identity fields and schema-2 closure fields.",
             )
+        closure = {}
+        if closure_fields <= set(item):
+            if (
+                value["schema_version"] != 2
+                or item["lifecycle_status"] != "locked"
+                or not isinstance(item["review_result"], str)
+                or item["review_result"] not in STE_REVIEW_RESULTS
+            ):
+                raise Ste100Error(
+                    "ste-review-state-invalid",
+                    "One document has invalid lifecycle closure fields.",
+                    "Keep the original verdict separate from locked status.",
+                )
+            closure = {key: item[key] for key in closure_fields}
         path_text = _lifecycle_path(item["path"], "baseline document path")
         if not _is_canonical_prose_path(path_text):
             raise Ste100Error(
@@ -2865,6 +2888,7 @@ def _validate_review_state(value: object) -> dict[str, object]:
         documents.append(
             {
                 "accepted_blob": accepted_blob,
+                **closure,
                 **identities,
                 "path": path_text,
             }
@@ -2876,7 +2900,7 @@ def _validate_review_state(value: object) -> dict[str, object]:
             "The STE document baselines are not unique and ordered.",
             "Sort the entries by path and remove duplicates.",
         )
-    return {"schema_version": 1, "documents": documents}
+    return {"schema_version": value["schema_version"], "documents": documents}
 
 
 def _review_state_at_revision(
@@ -3202,6 +3226,7 @@ def _scope_document(
     candidate_revision: str,
     state_entry: dict[str, str] | None,
     root: pathlib.Path,
+    changed_legacy_units: bool = False,
 ) -> dict[str, object] | None:
     candidate_item = _lifecycle_git_file(candidate_revision, path_text, root=root)
     candidate_text = (
@@ -3209,7 +3234,7 @@ def _scope_document(
         if candidate_item is not None
         else ""
     )
-    if state_entry is None:
+    if state_entry is None and not changed_legacy_units:
         baseline_item = _lifecycle_git_file(baseline_revision, path_text, root=root)
         selected_item = candidate_item if candidate_item is not None else baseline_item
         if selected_item is None:
@@ -3226,18 +3251,32 @@ def _scope_document(
         )
         baseline_identity = _document_identity_record(baseline_item)
     else:
-        accepted_oid = state_entry["accepted_blob"].removeprefix("sha1:")
-        baseline_payload = _lifecycle_blob(accepted_oid, root=root)
-        if (
-            "sha256:" + _sha256_bytes(baseline_payload)
-            != state_entry["accepted_sha256"]
-        ):
-            raise Ste100Error(
-                "ste-review-state-invalid",
-                "An accepted document blob does not match its SHA-256 identity.",
-                "Restore the accepted review-state register and Git object.",
+        if state_entry is None:
+            baseline_item = _lifecycle_git_file(
+                baseline_revision, path_text, root=root
             )
-        baseline_item = (baseline_payload, accepted_oid)
+            if baseline_item is None:
+                return _scope_document(
+                    path_text,
+                    baseline_revision=baseline_revision,
+                    candidate_revision=candidate_revision,
+                    state_entry=None,
+                    root=root,
+                )
+            baseline_payload = baseline_item[0]
+        else:
+            accepted_oid = state_entry["accepted_blob"].removeprefix("sha1:")
+            baseline_payload = _lifecycle_blob(accepted_oid, root=root)
+            if (
+                "sha256:" + _sha256_bytes(baseline_payload)
+                != state_entry["accepted_sha256"]
+            ):
+                raise Ste100Error(
+                    "ste-review-state-invalid",
+                    "A baseline blob does not match its SHA-256 identity.",
+                    "Restore the review-state register and Git object.",
+                )
+            baseline_item = (baseline_payload, accepted_oid)
         baseline_text = _decode_lifecycle_document(baseline_payload, path_text)
         if path_text in CANONICAL_JSON_PROSE:
             units = _changed_json_units(
@@ -3289,6 +3328,7 @@ def _build_review_scope(
     author_id: str,
     source_manifest: dict[str, object],
     root: pathlib.Path,
+    schema_version: int = 2,
 ) -> dict[str, object]:
     baseline_revision = _lifecycle_revision(baseline_revision, root=root)
     candidate_revision = _lifecycle_revision(candidate_revision, root=root)
@@ -3342,8 +3382,13 @@ def _build_review_scope(
             path_text,
             baseline_revision=baseline_revision,
             candidate_revision=candidate_revision,
-            state_entry=state_entry if isinstance(state_entry, dict) else None,
+            state_entry=(
+                state_entry
+                if schema_version == 1 and isinstance(state_entry, dict)
+                else None
+            ),
             root=root,
+            changed_legacy_units=schema_version == 2,
         )
         if document is not None:
             documents.append(document)
@@ -3366,7 +3411,7 @@ def _build_review_scope(
         "issue9_source": _issue9_identity(source_manifest),
         "pre_review_state": candidate_state,
         "pre_review_state_sha256": _sha256_bytes(candidate_state_payload),
-        "schema_version": 1,
+        "schema_version": schema_version,
     }
     scope["scope_sha256"] = _sha256_bytes(_canonical_json_bytes(scope))
     if len(_canonical_json_bytes(scope)) > MAX_LIFECYCLE_BYTES:
@@ -3512,6 +3557,7 @@ def freeze_documentation_review(
         source_manifest=source_manifest,
         root=root,
     )
+    _check_review_restart(scope, root=root)
     path, _digest = _write_lifecycle_json(
         root / "tmp" / STE_REVIEW_SCOPE_DIR.name,
         "scope",
@@ -3529,13 +3575,15 @@ def _validated_scope(
     require_current_candidate: bool,
 ) -> dict[str, object]:
     scope = _read_lifecycle_json(path, "frozen review scope", root=root)
-    if scope.get("schema_version") != 1 or not isinstance(
-        scope.get("scope_sha256"), str
+    if (
+        type(scope.get("schema_version")) is not int
+        or scope.get("schema_version") not in (1, 2)
+        or not isinstance(scope.get("scope_sha256"), str)
     ):
         raise Ste100Error(
             "ste-review-scope-invalid",
             "The frozen Documentation Review scope has an invalid schema.",
-            "Use the exact generated schema-1 scope.",
+            "Use the exact generated schema-1 or schema-2 scope.",
         )
     supplied_digest = _lifecycle_sha256(scope["scope_sha256"], "scope SHA-256")
     unhashed = {key: value for key, value in scope.items() if key != "scope_sha256"}
@@ -3580,6 +3628,7 @@ def _validated_scope(
         author_id=author_id,
         source_manifest=source_manifest,
         root=root,
+        schema_version=int(scope["schema_version"]),
     )
     if rebuilt != scope:
         raise Ste100Error(
@@ -3788,13 +3837,22 @@ def _validate_review_result(
         raise Ste100Error(
             "ste-review-result-invalid",
             "The Documentation Review result has an invalid structure.",
-            "Return exactly one schema-2 result for the complete frozen scope.",
+            "Return one result with the fields for its frozen scope version.",
         )
-    if value["schema_version"] != 2:
+    if (
+        type(value["schema_version"]) is not int
+        or value["schema_version"] not in (2, 3)
+    ):
         raise Ste100Error(
             "ste-review-result-invalid",
             "The Documentation Review result has an unsupported schema.",
-            "Use schema version 2.",
+            "Use schema version 2 for retained results or 3 for new reviews.",
+        )
+    if value["schema_version"] != int(scope["schema_version"]) + 1:
+        raise Ste100Error(
+            "ste-review-result-schema-mismatch",
+            "The review result version does not match its frozen scope.",
+            "Use result schema 3 with scope schema 2; retain old pairs unchanged.",
         )
     if value["scope_sha256"] != scope["scope_sha256"]:
         raise Ste100Error(
@@ -3860,11 +3918,14 @@ def _validate_review_result(
             "The approved result has no exact correction.",
             "Supply all exact replacements in the same Documentation Review.",
         )
-    if result != "APPROVED_WITH_EXACT_CORRECTIONS" and corrections:
+    permits_corrections = result == "APPROVED_WITH_EXACT_CORRECTIONS" or (
+        value["schema_version"] == 3 and result == "BLOCKED"
+    )
+    if not permits_corrections and corrections:
         raise Ste100Error(
             "ste-review-corrections-invalid",
             "A non-correction review result contains corrections.",
-            "Use an empty correction list for ACCEPT or BLOCKED.",
+            "Use an empty list for ACCEPT and schema-2 BLOCKED results.",
         )
     documents = scope.get("documents")
     candidate = scope.get("candidate")
@@ -3979,6 +4040,26 @@ def _validate_review_result(
                 "start_byte": start,
             }
         )
+    if value["schema_version"] == 3 and result == "BLOCKED" and validated:
+        for blocker in blockers:
+            unit = blocker["unit"]
+            assert isinstance(unit, dict)
+            if not any(
+                correction["path"] == blocker["path"]
+                and (
+                    unit["side"] == "baseline"
+                    or (
+                        int(correction["start_byte"]) < int(unit["end_byte"])
+                        and int(unit["start_byte"]) < int(correction["end_byte"])
+                    )
+                )
+                for correction in validated
+            ):
+                raise Ste100Error(
+                    "ste-review-corrections-incomplete",
+                    "The exact adjustments omit a recorded blocker unit.",
+                    "Supply the complete corrections in the one review.",
+                )
     return {
         "blocker_set_complete": True,
         "blockers": blockers,
@@ -3988,7 +4069,7 @@ def _validate_review_result(
         "issue9_source_sha256": str(value["issue9_source_sha256"]),
         "result": str(result),
         "reviewer_id": reviewer_id,
-        "schema_version": 2,
+        "schema_version": value["schema_version"],
         "scope_sha256": str(value["scope_sha256"]),
     }
 
@@ -4006,6 +4087,199 @@ def _review_receipt(
         "candidate_revision": candidate["candidate_revision"],
         "candidate_tree": candidate["candidate_tree"],
     }
+
+
+def _review_binding(
+    scope: dict[str, object], receipt_digest: str
+) -> dict[str, object]:
+    candidate = scope["candidate"]
+    documents = scope["documents"]
+    assert isinstance(candidate, dict)
+    assert isinstance(documents, list)
+    return {
+        "baseline_revision": candidate["baseline_revision"],
+        "candidate_revision": candidate["candidate_revision"],
+        "paths": sorted(str(item["path"]) for item in documents),
+        "receipt_sha256": receipt_digest,
+        "schema_version": 1,
+        "scope_sha256": scope["scope_sha256"],
+    }
+
+
+def _check_review_restart(
+    scope: dict[str, object], *, root: pathlib.Path
+) -> None:
+    """Keep a revised candidate within its existing local review cycle."""
+    directory = root / "tmp" / STE_REVIEW_RESULT_DIR.name
+    _require_output_within(directory, root / "tmp", "review bindings")
+    if not directory.exists():
+        return
+    if directory.is_symlink():
+        raise Ste100Error(
+            "ste-lifecycle-path-invalid",
+            "The review binding directory is a symbolic link.",
+            "Use the repository-local review result directory.",
+        )
+    candidate = scope["candidate"]
+    documents = scope["documents"]
+    assert isinstance(candidate, dict)
+    assert isinstance(documents, list)
+    candidate_revision = str(candidate["candidate_revision"])
+    baseline_revision = str(candidate["baseline_revision"])
+    paths = {str(item["path"]) for item in documents}
+    for position, path in enumerate(directory.glob("binding-*.json")):
+        if position >= MAX_LIFECYCLE_BLOCKERS:
+            raise Ste100Error(
+                "ste-review-bindings-too-large",
+                "The retained local review bindings exceed their limit.",
+                "Preserve the evidence before bounded repository maintenance.",
+            )
+        binding = _read_lifecycle_json(path, "review binding", root=root)
+        if (
+            set(binding) != {
+                "baseline_revision", "candidate_revision", "paths",
+                "receipt_sha256", "schema_version", "scope_sha256",
+            }
+            or binding["schema_version"] != 1
+            or not isinstance(binding["paths"], list)
+            or not binding["paths"]
+            or len(binding["paths"]) > MAX_LIFECYCLE_DOCUMENTS
+        ):
+            raise Ste100Error(
+                "ste-review-binding-invalid",
+                "A retained review binding has an invalid structure.",
+                "Restore the original local binding without changing it.",
+            )
+        old_revision = _lifecycle_revision(
+            binding["candidate_revision"], root=root
+        )
+        _lifecycle_revision(binding["baseline_revision"], root=root)
+        _lifecycle_sha256(binding["receipt_sha256"], "bound receipt")
+        _lifecycle_sha256(binding["scope_sha256"], "bound scope")
+        bound_paths = [
+            _lifecycle_path(item, "bound document path")
+            for item in binding["paths"]
+        ]
+        if (
+            path.name != "binding-{}.json".format(old_revision)
+            or bound_paths != sorted(set(bound_paths))
+        ):
+            raise Ste100Error(
+                "ste-review-binding-invalid",
+                "A retained review binding has an invalid identity.",
+                "Restore the original local binding without changing it.",
+            )
+        if old_revision == candidate_revision:
+            if binding["scope_sha256"] == scope["scope_sha256"]:
+                continue
+            raise Ste100Error(
+                "ste-review-already-recorded",
+                "This candidate already has its one Documentation Review.",
+                "Use the original frozen scope and review receipt.",
+            )
+        overlap = paths.intersection(bound_paths)
+        ancestor, _output = _lifecycle_git(
+            ["merge-base", "--is-ancestor", old_revision, candidate_revision],
+            root=root,
+            accepted_codes=(0, 1),
+        )
+        if not overlap or (
+            ancestor != 0 and binding["baseline_revision"] != baseline_revision
+        ):
+            continue
+        completion_path = directory / "completion-{}.json".format(old_revision)
+        if completion_path.exists():
+            completion = _validated_review_completion(
+                completion_path, candidate_revision=old_revision,
+                receipt_digest=str(binding["receipt_sha256"]), root=root,
+            )
+            completed_ancestor, _output = _lifecycle_git(
+                ["merge-base", "--is-ancestor",
+                 str(completion["final_revision"]), baseline_revision],
+                root=root, accepted_codes=(0, 1),
+            )
+            if completed_ancestor == 0:
+                continue
+        raise Ste100Error(
+            "ste-review-cycle-restart",
+            "The revised candidate overlaps an unfinished review cycle.",
+            "Complete its locked deterministic proof; do not review again.",
+        )
+
+
+def _bind_documentation_review(
+    scope: dict[str, object], receipt_digest: str, *, root: pathlib.Path
+) -> None:
+    """Atomically bind one result; an identical retry is idempotent."""
+    _check_review_restart(scope, root=root)
+    binding = _review_binding(scope, receipt_digest)
+    directory = root / "tmp" / STE_REVIEW_RESULT_DIR.name
+    _require_output_within(directory, root / "tmp", "review binding output")
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    path = directory / "binding-{}.json".format(binding["candidate_revision"])
+    payload = _canonical_json_bytes(binding)
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        if path.is_symlink() or path.read_bytes() != payload:
+            raise Ste100Error(
+                "ste-review-already-recorded",
+                "This candidate already has a different Documentation Review.",
+                "Keep its original result and apply at most one adjustment.",
+            ) from None
+        return
+    with os.fdopen(descriptor, "wb") as stream:
+        stream.write(payload)
+
+
+def _validated_review_completion(
+    path: pathlib.Path, *, candidate_revision: str,
+    receipt_digest: str, root: pathlib.Path,
+) -> dict[str, object]:
+    completion = _read_lifecycle_json(path, "review completion", root=root)
+    if (
+        set(completion) != {
+            "candidate_revision", "final_revision", "receipt_sha256",
+            "schema_version",
+        }
+        or completion["schema_version"] != 1
+        or completion["candidate_revision"] != candidate_revision
+        or completion["receipt_sha256"] != receipt_digest
+    ):
+        raise Ste100Error(
+            "ste-review-completion-invalid",
+            "The local completion does not identify its original review.",
+            "Restore the exact completion from final deterministic validation.",
+        )
+    _lifecycle_revision(completion["final_revision"], root=root)
+    return completion
+
+
+def _record_review_completion(
+    *, candidate_revision: str, final_revision: str,
+    receipt_digest: str, root: pathlib.Path,
+) -> None:
+    """Retain the first completed proof without rewriting later retries."""
+    path = (
+        root / "tmp" / STE_REVIEW_RESULT_DIR.name
+        / "completion-{}.json".format(candidate_revision)
+    )
+    payload = _canonical_json_bytes({
+        "candidate_revision": candidate_revision,
+        "final_revision": final_revision,
+        "receipt_sha256": receipt_digest,
+        "schema_version": 1,
+    })
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        _validated_review_completion(
+            path, candidate_revision=candidate_revision,
+            receipt_digest=receipt_digest, root=root,
+        )
+        return
+    with os.fdopen(descriptor, "wb") as stream:
+        stream.write(payload)
 
 
 def _corrections_by_path(
@@ -4032,8 +4306,8 @@ def _apply_exact_corrections(
         if result[start:end] != preimage:
             raise Ste100Error(
                 "ste-review-correction-preimage-mismatch",
-                "An approved correction preimage is no longer present.",
-                "Return to the project owner; do not invent replacement prose.",
+                "A recorded correction preimage is no longer present.",
+                "Apply only the recorded correction against the frozen bytes.",
             )
         replacement = str(correction["replacement"]).encode("utf-8")
         result = result[:start] + replacement + result[end:]
@@ -4042,7 +4316,7 @@ def _apply_exact_corrections(
     except UnicodeDecodeError as error:
         raise Ste100Error(
             "ste-review-corrections-invalid",
-            "The approved corrections do not produce valid UTF-8.",
+            "The recorded corrections do not produce valid UTF-8.",
             "Return to the project owner with the review result.",
         ) from error
     return result
@@ -4089,8 +4363,15 @@ def _expected_review_state(
             "path": path_text,
             "review_receipt": "sha256:" + receipt_digest,
         }
+        if receipt["schema_version"] == 3:
+            entries[path_text].update(
+                lifecycle_status="locked",
+                review_result=str(receipt["result"]),
+            )
     state = {
-        "schema_version": 1,
+        "schema_version": (
+            2 if receipt["schema_version"] == 3 else pre_state["schema_version"]
+        ),
         "documents": [entries[path] for path in sorted(entries)],
     }
     return _validate_review_state(state), expected_documents
@@ -4109,18 +4390,25 @@ def record_documentation_review(
         root=root,
         require_current_candidate=True,
     )
+    _check_review_restart(scope, root=root)
     raw_result = _read_lifecycle_json(
         result_path, "Documentation Review result", root=root
     )
     result = _validate_review_result(raw_result, scope=scope, root=root)
     receipt = _review_receipt(result, scope=scope)
+    if result["schema_version"] == 3:
+        _bind_documentation_review(
+            scope, _sha256_bytes(_canonical_json_bytes(receipt)), root=root
+        )
     receipt_path, receipt_digest = _write_lifecycle_json(
         root / "tmp" / STE_REVIEW_RESULT_DIR.name,
         "review",
         receipt,
         root=root,
     )
-    if result["result"] == "BLOCKED":
+    if result["result"] == "BLOCKED" and (
+        result["schema_version"] == 2 or not result["corrections"]
+    ):
         return receipt_path, None, receipt
     state, _expected_documents = _expected_review_state(
         scope=scope,
@@ -4205,11 +4493,30 @@ def validate_final_review_state(
     receipt, receipt_digest = _validated_review_receipt(
         receipt_path, scope=scope, root=root
     )
-    if receipt["result"] == "BLOCKED":
+    _check_review_restart(scope, root=root)
+    if receipt["schema_version"] == 3:
+        candidate = scope["candidate"]
+        assert isinstance(candidate, dict)
+        binding_path = (
+            root / "tmp" / STE_REVIEW_RESULT_DIR.name
+            / "binding-{}.json".format(candidate["candidate_revision"])
+        )
+        binding = _read_lifecycle_json(
+            binding_path, "review binding", root=root
+        )
+        if binding != _review_binding(scope, receipt_digest):
+            raise Ste100Error(
+                "ste-review-binding-invalid",
+                "The final receipt differs from the one recorded review.",
+                "Restore the original review binding and receipt.",
+            )
+    if receipt["result"] == "BLOCKED" and (
+        receipt["schema_version"] == 2 or not receipt["corrections"]
+    ):
         raise Ste100Error(
             "ste-review-blocked",
             "The Documentation Review result is BLOCKED.",
-            "Return the blocker to the project owner.",
+            "Resolve the recorded technical fact with its subject owner.",
         )
     expected_state, expected_documents = _expected_review_state(
         scope=scope,
@@ -4232,7 +4539,7 @@ def validate_final_review_state(
             "The final candidate contains an unreviewed post-review mutation: {}.".format(
                 ", ".join(unexpected)
             ),
-            "Return to the project owner; do not start another review loop.",
+            "Restore the locked bytes and rerun this deterministic check.",
         )
     for path_text, expected_payload in expected_documents.items():
         actual_item = _lifecycle_git_file(final_revision, path_text, root=root)
@@ -4243,14 +4550,21 @@ def validate_final_review_state(
                 "The final bytes do not match the reviewed or exactly corrected bytes: {}.".format(
                     path_text
                 ),
-                "Return to the project owner; do not start another review loop.",
+                "Restore the locked bytes and rerun this deterministic check.",
             )
     state_item = _lifecycle_git_file(final_revision, state_path, root=root)
     if state_item is None or state_item[0] != _canonical_json_bytes(expected_state):
         raise Ste100Error(
             "ste-final-state-mismatch",
-            "The durable STE review state does not match the accepted final documents.",
-            "Return to the project owner; do not start another review loop.",
+            "The durable STE review state does not match the final documents.",
+            "Restore the exact state proposal and rerun this check.",
+        )
+    if receipt["schema_version"] == 3:
+        _record_review_completion(
+            candidate_revision=candidate_revision,
+            final_revision=final_revision,
+            receipt_digest=receipt_digest,
+            root=root,
         )
     return {
         "candidate_revision": candidate_revision,
@@ -4260,7 +4574,11 @@ def validate_final_review_state(
         "receipt_sha256": receipt_digest,
         "result": receipt["result"],
         "scope_sha256": scope["scope_sha256"],
-        "status": "reviewed-state-present-and-no-unreviewed-prose-mutation",
+        "status": (
+            "locked-and-deterministically-validated"
+            if receipt["schema_version"] == 3
+            else "reviewed-state-present-and-no-unreviewed-prose-mutation"
+        ),
     }
 
 
@@ -4450,7 +4768,7 @@ def main(argv: list[str] | None = None) -> int:
                     ),
                     "status": (
                         "documentation-review-blocked"
-                        if receipt["result"] == "BLOCKED"
+                        if receipt["result"] == "BLOCKED" and proposal_path is None
                         else "documentation-review-recorded"
                     ),
                 }

@@ -301,6 +301,17 @@ EXPECTED_PHASE6_DECISIONS = {
         "4f312b96a27fe3cc520766bee2cabab4efbdfba8e501210e79e34115d000ffd6",
         "96924cd013d596cc1807fe5859b1a6ca5459e7541b736d38a1674ec00e3b11d7",
     ),
+    "D-GOV-018": (
+        "2026-09-05",
+        (
+            'Adopt one documentation review, one set of exact corrections, the '
+            'locked state, and validation.'
+        ),
+        "reference/current/PHASE_EVIDENCE.md"
+        "#d-gov-018-finite-documentation-completion",
+        'c31761007ac55ca883cf54ca84dd065955322e8849cddc6330f12f6d44f84a32',
+        '444b8aa0d26b67cd6c33e30d2b7b57c9288a2bb6866d8b6c05dc71e02ef01c4d',
+    ),
 }
 EXPECTED_PHASE6_DECISION_IDS = set(EXPECTED_PHASE6_DECISIONS)
 EXPECTED_PHASE6_AUTHORITY = (
@@ -3907,7 +3918,7 @@ def _validate_decisions(plan: str) -> None:
     )
     _require(
         current_document["current_phase"] == 6
-        and current_document["updated_on"] == "2026-09-04",
+        and current_document["updated_on"] == "2026-09-05",
         "current decision register is not for Phase 6",
     )
     _require(
@@ -5792,6 +5803,79 @@ def _validate_product_direction(current_evidence: str) -> None:
     _validate_current_governance_evidence(current_evidence)
 
 
+def _validate_finite_documentation_completion(
+    plan: str,
+    current_evidence: str,
+) -> None:
+    """Protect D-GOV-018 without changing historical review verdicts."""
+    anchor = '<a id="d-gov-018-finite-documentation-completion"></a>'
+    _require(
+        current_evidence.count(anchor) == 1,
+        "D-GOV-018 evidence anchor is missing or duplicated",
+    )
+    panel = _semantic_text(_section(
+        current_evidence, "D-GOV-018 finite documentation completion"
+    ))
+    for concept in (
+        (
+            'authorises one set of exact corrections after the sole review. '
+            'This includes BLOCKED'
+        ),
+        (
+            'keeps the initial linguistic verdict and completed lifecycle as '
+            'different results'
+        ),
+        "Validation cannot prove linguistic conformance",
+        (
+            'rejection of replacement reviews and new cycles for the same '
+            'document paths before the initial cycle is complete'
+        ),
+        "Keep Cycle 3 closed",
+        "No risk disposition changes",
+        "It adds no product behaviour or accepted phase exit",
+        (
+            'Before you claim completion of the Git final-validation command, '
+            'use it against committed content'
+        ),
+    ):
+        _require(
+            concept in panel,
+            "D-GOV-018 evidence boundary drifted: " + concept,
+        )
+    rows = [
+        line for line in plan.splitlines()
+        if line.startswith("| D-GOV-018 |")
+    ]
+    _require(len(rows) == 1, "D-GOV-018 plan row is missing or duplicated")
+    row = _semantic_text(rows[0])
+    _require(
+        "current/PHASE_EVIDENCE.md#d-gov-018-finite-documentation-completion"
+        in rows[0],
+        "D-GOV-018 plan evidence link drifted",
+    )
+    for concept in (
+        "2026-09-05",
+        (
+            'authorises one set of exact corrections after the sole review. '
+            'This includes a BLOCKED verdict'
+        ),
+        (
+            'Record the locked state for the content. Validate it. Finish the '
+            'cycle'
+        ),
+        'Preserve the initial verdict',
+        (
+            'Review only complete logical units that changed. Do not expand the'
+            ' repair into unchanged legacy prose'
+        ),
+        'Phase 6 stays at 2/5',
+    ):
+        _require(
+            concept in row,
+            "D-GOV-018 plan boundary drifted: " + concept,
+        )
+
+
 def _validate_fixed_paths() -> None:
     redirect = _read(REDIRECT_PATH)
     _require(
@@ -5848,6 +5932,7 @@ def main() -> None:
     _validate_decisions(plan)
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
+    _validate_finite_documentation_completion(plan, current_evidence)
     _validate_product_direction(current_evidence)
     _validate_fixed_paths()
     _validate_ci_workflow()

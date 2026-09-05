@@ -806,15 +806,15 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
     concept_groups = (
         (
             "identify the need → classify → assign ownership → plan",
-            "adjust once when required → validate once → finish the d-gov-015 "
-            "lifecycle",
+            "write once → review once → if necessary, apply corrections once → "
+            "record locked → validate → finish",
             "establish a controlled baseline → make available → use",
             "change under control → supersede or retire → preserve required "
             "history",
         ),
         (
             "documentation review lifecycle is one bounded part",
-            "d-gov-015 remains authoritative for that part",
+            "d-gov-018 controls that bounded cycle",
             "does not create a second linguistic-review lifecycle",
         ),
         (
@@ -856,12 +856,17 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
             "smallest documentation intervention",
         ),
         (
-            "understand once → write once → check once → improve once",
-            "freeze once → review once → validate once → finish",
-            "apply tt-doc-001, tt-doc-002, and d-gov-015 exactly throughout",
+            "before handoff, the author must correct all candidate documents "
+            "together",
+            "when an assertion changes with the prose, keep each technical "
+            "safeguard",
+            "apply tt-doc-001, tt-doc-002, and d-gov-018",
             "one independent documentation reviewer",
-            "do not run another linguistic review",
-            "green final validation ends the bounded d-gov-015 lifecycle",
+            "do not do another linguistic review",
+            "apply that set once. this also applies after blocked",
+            "record the locked state for the content. do final deterministic "
+            "validation",
+            "green final validation ends the bounded d-gov-018 lifecycle",
             "do not send the document to another documentation, quality, "
             "publication, wording, or semantic review",
             "continuous integration can run the required deterministic checks "
@@ -909,8 +914,10 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
         ),
         (
             "compare every proposed change to the accepted controlled baseline",
-            "derive the required review scope from the accepted baseline and git",
-            "review only the required complete logical units",
+            "use the supplied git baseline to identify the necessary review "
+            "scope",
+            "review only the complete logical units that contain the material "
+            "changes",
             "establish a new controlled baseline only after review, validation, "
             "and applicable acceptance",
             "do not reopen unrelated accepted prose",
@@ -918,9 +925,12 @@ def validate_tdmp_lifecycle(engineering: str, terminology: str) -> None:
         ),
         (
             "do not retrospectively rewrite an untouched legacy document",
-            "a first material change can start a baseline review",
-            "if that document has no accepted asd-ste100 baseline",
-            "review the complete document as d-gov-015 requires",
+            "compare the document with the supplied git baseline",
+            "do not include closed work in the repair scope because an older "
+            "review-state identity differs",
+            "keep unchanged legacy prose and frozen historical evidence unchanged",
+            "bounded review does not give a conformance result for the "
+            "complete document",
         ),
         (
             "accepted replacement owns its required current information",

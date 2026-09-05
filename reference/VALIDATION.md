@@ -1145,17 +1145,22 @@ conformance. Source identity validation does not make a positive rights claim.
 
 For each material change to canonical prose, validate the authorised lifecycle:
 
-1. The author freezes one clean exact Git candidate.
-2. The STE lookup derives the frozen review scope from the last accepted document
-   identity and Git.
+1. The author examines all candidate documents together and freezes their
+   exact content. If the task gives commit authority, use a clean Git commit.
+   If it gives no commit authority, preserve the baseline, full diff, and
+   content hashes for review.
+2. The STE lookup identifies the complete logical units that changed from
+   document identities and the baseline. Review a new document in full.
 3. One independent Documentation Reviewer returns one complete verdict for the
    frozen review scope. It is `ACCEPT`, `APPROVED_WITH_EXACT_CORRECTIONS`, or
    `BLOCKED`.
-4. For `APPROVED_WITH_EXACT_CORRECTIONS`, all exact replacement wording is in
-   that review and is applied once against verified preimages.
-5. One final deterministic validation runs after the review or correction.
+4. For `APPROVED_WITH_EXACT_CORRECTIONS` or `BLOCKED`, all necessary exact
+   replacements are in that review. Apply the set once against verified
+   preimages. Then record the `locked` state for the final content.
+5. Final deterministic validation examines the bytes in the `locked` state.
+   It preserves the initial review verdict and gives no linguistic acceptance.
 
-Each new review result must use schema 2. It must record the complete
+Each new review result must use schema 3. It must record the complete
 `blockers` set and confirm that the set is complete. `ACCEPT` and
 `APPROVED_WITH_EXACT_CORRECTIONS` must have an empty `blockers` set. `BLOCKED`
 must have a nonempty `blockers` set. Each `blockers` entry must bind its exact
@@ -1172,11 +1177,11 @@ validate the Git-derived frozen review scope, review result, and receipt. It
 must validate expected document-level state and final content. It must reject
 unrelated post-review mutation.
 
-Do not include an untouched legacy document in the frozen review scope.
-Include the complete document for the first material edit of an unreviewed
-legacy document. After the document has an accepted identity, include only
-materially changed complete logical units. Do not include unchanged previously
-accepted prose. Keep accepted review state at document level. Do not persist
+Do not include unchanged legacy prose in the repair scope. For an existing
+document, new scope schema 2 includes only materially changed complete logical
+units. Keep durable review state at document level. State entries with schema 2
+keep the initial verdict and identify the content in the `locked` state. Preserve
+existing schema 1 state entries and historical results without migration. Do not persist
 sentence, paragraph, or logical-unit workflow state that Git can derive.
 
 `tests/validate_agent_guidance.py` must give a `FAIL` result when a canonical
@@ -1184,19 +1189,33 @@ owner omits one of these controls. `tests/validate_governance_semantics.py`
 must reject removal or weakening of a semantic control. Automatic validation
 and a deterministic pre-check must not claim or change linguistic conformance.
 
-`tests/validate_ste100_retrieval.py` must prove whole-document first review and
-untouched legacy exclusion. It must prove the later changed-unit frozen review
-scope and document-level durable state. It must prove all three verdict routes,
+`tests/validate_ste100_retrieval.py` must prove the bounded existing-document
+scope, complete new-document review, and legacy compatibility. It must prove
+document-level durable state and all three verdict routes,
 exact correction preimages, and final identity binding. It must prove empty
 `blockers` sets for both non-blocking verdicts. For `BLOCKED`, it must prove a
 nonempty complete `blockers` set. It must prove exact finding and frozen-unit
-binding, formal rule identifiers, and receipt preservation. A `BLOCKED` result
-must produce no accepted-state proposal. The validator must reject a missing,
+binding, formal rule identifiers, and receipt preservation. A result with schema 3 and a `BLOCKED` verdict must complete the lifecycle
+when it has a full set of exact corrections. Its state must be `locked`.
+It must not get another review or falsely claim `ACCEPT`. A `BLOCKED` result
+with no correction stays recorded without a completion proposal. An unresolved
+technical fact or rights question stays with its canonical subject owner.
+
+The validator must reject a missing,
 incomplete, empty, or changed `blockers` set. It must reject a set outside the
 frozen review scope. The final validator
 must reject source, frozen review scope, receipt, state, identity, or mutation
-drift. A remaining linguistic, semantic, or identity failure returns to the
-owner. A failure of the frozen review scope also returns to the owner.
+drift. It must reject replacement reviews and attempts to start the same
+cycle again with a candidate for any of the same document paths. It must
+reject an old schema pair that bypasses a recorded review in this cycle.
+
+After the recorded final commit, let later work start. This includes work after
+document deletion. If a deterministic check identifies a specified defect,
+repair it at the boundary that caused it. Do its proof again. Do not start
+another linguistic review.
+
+Without Git commit authority, record the content-hash checks as a different
+result. Do not claim that the command for the exact commit completed.
 
 [Technical provenance](PROVENANCE.md#asd-ste100-issue-9-reference) records the
 rights state in a different authority boundary. The
