@@ -9,6 +9,7 @@ __all__ = (
     "clothoid_entry_displacement",
     "clothoid_entry_displacement_at_station",
     "clothoid_entry_polyline_stations",
+    "main_circle_centre",
     "transition_start_signed_offset",
     "solve_transition_length",
 )
@@ -41,6 +42,27 @@ def clothoid_entry_displacement(length, radius, integration_steps=240):
 
     scale = length * interval / 3.0
     return scale * cosine_sum, scale * sine_sum, alpha
+
+
+def _left_normal(heading):
+    return (-math.sin(heading), math.cos(heading))
+
+
+def main_circle_centre(main_transition, main_radius):
+    """Return the main circle's XY centre in local left-turn millimetres.
+
+    Preserve the inherited endpoint calculation and radius diagnostic.
+    The result is an uncached two-float tuple with no host side effects.
+    """
+    x_end, y_end, entry_angle = clothoid_entry_displacement(
+        main_transition,
+        main_radius,
+    )
+    normal_x, normal_y = _left_normal(entry_angle)
+    return (
+        x_end + (main_radius * normal_x),
+        y_end + (main_radius * normal_y),
+    )
 
 
 def _finite_geometry_value(name, value):

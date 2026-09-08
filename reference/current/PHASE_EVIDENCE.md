@@ -17,11 +17,37 @@ The owner accepted the completed, independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
-| What changed | D-P7-001 opens the current Core alignment, station and multiple-track migration scope. The four criteria stay unchanged. |
-| What now works | The opening records define the authorised sequence and first task. No product behaviour changes in this alignment. |
-| Limitations/findings | D-P6-008 stays in full. Exit 4 is Deferred — unmet. The owner accepts no performance result. All risks and legacy-retirement conditions still apply. |
-| Owner decision | Richard authorised opening integration and the bounded `main_circle_centre` product task through validation, independent review and publication. |
-| Next action | Integrate the opening alignment. Then synchronise clean protected main. Move the calculation into the modular package. Route the B16 Generate/Replace caller through it. |
+| What changed | PR #68 is merged. The exact candidate moves `main_circle_centre` to `tracktemplate.domain.alignment`. The B16 Generate/Replace caller uses this API. |
+| What now works | Standalone, qualified FreeCAD and FreeCAD human-interface checks have PASS results for this exact candidate. The independent review of source and evidence has a PASS result. |
+| Limitations/findings | The time and memory results give no acceptance of product performance. Phase 7 stays at 0/4. D-P6-008, all risks and all conditions for removal of the B14 and B15 routes still apply. |
+| Owner decision | Richard authorised the task in this bounded scope through validation, independent review and publication. The product merge needs a different owner decision. |
+| Next action | Complete validation of the technical documents. Then publish the product pull request. After its CI has a PASS result, bring it to Richard for the merge decision. |
+
+## `main_circle_centre` migration — 2026-09-08
+
+D-P7-001 authorises this Level 2 exact candidate after the merge of PR #68.
+The B16 Generate/Replace caller now uses `tracktemplate.api.main_circle_centre`.
+This API calculates the same results with the same sequence of operations and diagnostics.
+The product validates four functions and the APIs that their callers use.
+If this operation has an error, the product puts the previous values back.
+The [API instructions](../contracts/phase7-main-circle-centre.md) define the bounded scope.
+
+Standalone and qualified FreeCAD checks have PASS results.
+All 14 completed FreeCAD human-interface samples have PASS results from the tools that compare workflows.
+This includes the different samples for `--route legacy`.
+The independent review of source and evidence has a PASS result for this bounded scope.
+The [evidence record](../benchmarks/2026-09-05-phase7-main-circle-centre-regression.md)
+keeps the values, interruption, failure classifications and limitations.
+The different wall times and higher memory values from the exact candidate give no acceptance of product performance.
+
+The evidence needs equal API and caller results, with no change in the subsequent operations that make shapes.
+Data about shapes alone cannot prove that complete shapes or output bytes are equal.
+The API calculates a new result each time. It does not use warm reuse.
+
+This exact candidate gives evidence for Exits 2 and 3. It accepts no exit.
+Phase 7 stays Open at 0/4. D-P6-008 and all conditions for the B14 and B15 routes and their removal stay in full.
+After validation of the technical documents and publication, CI must give a PASS result for the exact candidate.
+Then the next owner decision is the product merge.
 
 ## Phase 7 exit conditions — not admitted
 
