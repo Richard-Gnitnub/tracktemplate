@@ -141,8 +141,10 @@ def _validate_product_boundary():
                 "            build_concentric_core(*arguments))\n"
                 "def run_macro():\n"
                 "    centre = main_circle_centre(600.0, 600.0)\n"
-                "    return build_concentric_core(centre, 600.0, 600.0,\n"
-                "        600.0, 1.5, 'Main Track')\n",
+                "    core = build_concentric_core(centre, 600.0, 600.0,\n"
+                "        600.0, 1.5, 'Main Track')\n"
+                "    add_common_straight_extensions([core], 1.5)\n"
+                "    return core\n",
                 self.module.__dict__,
             )
             self.source_sha256 = "a" * 64
@@ -166,6 +168,7 @@ def _validate_product_boundary():
             "main_circle_centre",
             "clothoid_exit_displacement",
             "build_concentric_core",
+            "add_common_straight_extensions",
         )
     }
     host = FakeHost()
@@ -175,16 +178,16 @@ def _validate_product_boundary():
     )
     assert host.bindings == []
     for name in functions:
-        if name == "build_concentric_core":
-            assert host.module.build_concentric_core.calculation is (
+        if name in {"build_concentric_core", "add_common_straight_extensions"}:
+            assert host.module.__dict__[name].calculation is (
                 functions[name]
             )
         else:
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 4,
-        "contract_id": "tracktemplate:phase7:concentric-core:1",
+        "schema_version": 5,
+        "contract_id": "tracktemplate:phase7:common-straight-extensions:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),

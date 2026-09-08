@@ -182,13 +182,13 @@ product_session, product_route = namespace[
     bootstrap,
 )
 assert product_route == {
-    "schema_version": 4,
-    "contract_id": "tracktemplate:phase7:concentric-core:1",
+    "schema_version": 5,
+    "contract_id": "tracktemplate:phase7:common-straight-extensions:1",
     "route": "modular",
     "comparison_route_available": False,
     "function_names": list(FUNCTION_NAMES) + [
         "main_circle_centre", "clothoid_exit_displacement",
-        "build_concentric_core",
+        "build_concentric_core", "add_common_straight_extensions",
     ],
     "caller_names": list(CALLER_NAMES) + ["run_macro"],
     "workflow_version": "10.2A8A7B15",

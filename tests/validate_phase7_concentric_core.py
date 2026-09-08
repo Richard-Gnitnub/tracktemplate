@@ -47,6 +47,7 @@ FUNCTION_NAMES = (
     "solve_transition_length", "main_circle_centre",
     "clothoid_exit_displacement", "build_concentric_core",
 )
+PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + ("add_common_straight_extensions",)
 TRANSITION_CASES = (
     (0.0, 0.0), (0.0, 25.0), (25.0, 0.0), (25.0, 60.0),
     (60.0, 25.0), (420.0, 600.0), (1.0e-9, 1.0e-8),
@@ -318,13 +319,13 @@ def validate_calculations():
 
 
 def _functions():
-    return {name: getattr(api, name) for name in FUNCTION_NAMES}
+    return {name: getattr(api, name) for name in PRODUCT_FUNCTION_NAMES}
 
 
 def _snapshot(host):
     return {
         name: host.module.__dict__[name]
-        for name in FUNCTION_NAMES if name in host.module.__dict__
+        for name in PRODUCT_FUNCTION_NAMES if name in host.module.__dict__
     }
 
 
@@ -341,6 +342,11 @@ def _fixture(temporary_root):
     """Use exact frozen calculations and a minimal executable host entry."""
     path = ROOT / "AdvancedTurnout.FCMacro"
     _namespace, nodes = legacy_calculations(path)
+    nodes.update({
+        node.name: node for node in ast.parse(path.read_text()).body
+        if isinstance(node, ast.FunctionDef)
+        and node.name in {"dot_xy", "add_common_straight_extensions"}
+    })
     prelude = (
         'import math\nfrom collections import namedtuple\n'
         'from types import SimpleNamespace\n'
@@ -362,6 +368,7 @@ def _fixture(temporary_root):
         '    centre = main_circle_centre(600.0, 600.0)\n'
         '    core = build_concentric_core(centre, 600.0, 600.0, 600.0,\n'
         '        math.pi / 2.0, "Main Track")\n'
+        '    add_common_straight_extensions([core], math.pi / 2.0)\n'
         '    return centre, core\n'
         'run_macro()\n'
     )
@@ -379,6 +386,12 @@ def _expected():
         centre, 600.0, 600.0, 600.0, math.pi / 2.0, "Main Track",
     )
     core["points"] = [Vector(x, y, 0.0) for x, y in core["points"]]
+    # For a singleton the inherited common endpoints are its own endpoints.
+    core.update({
+        "entry_extension": 0.0, "exit_extension": 0.0,
+        "total_length": core["core_length"],
+        "extended_start": core["start"], "extended_end": core["end"],
+    })
     return centre, core
 
 
@@ -402,10 +415,10 @@ def validate_binding():
         assert session.module.LAUNCH_COUNT == 1
         record = session.routing_record()
         assert record == {
-            "schema_version": 4,
-            "contract_id": "tracktemplate:phase7:concentric-core:1",
+            "schema_version": 5,
+            "contract_id": "tracktemplate:phase7:common-straight-extensions:1",
             "route": "modular", "comparison_route_available": False,
-            "function_names": list(FUNCTION_NAMES),
+            "function_names": list(PRODUCT_FUNCTION_NAMES),
             "caller_names": [
                 "main_circle_centre", "build_concentric_core",
                 "prepare_track_alignment", "run_macro",
@@ -427,7 +440,7 @@ def validate_binding():
             raise AssertionError("The core adapter is mutable")
 
         invalid_maps = [dict(_functions(), unselected=lambda: None)]
-        for name in FUNCTION_NAMES:
+        for name in PRODUCT_FUNCTION_NAMES:
             incomplete = _functions()
             incomplete.pop(name)
             invalid_maps.extend((
@@ -440,7 +453,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete six-function",
+                "complete seven-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 
@@ -485,7 +498,7 @@ def validate_binding():
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 
-        for name in FUNCTION_NAMES:
+        for name in PRODUCT_FUNCTION_NAMES:
             old = getattr(session.module, name)
             setattr(session.module, name, None)
             centre_proof._expect_error(

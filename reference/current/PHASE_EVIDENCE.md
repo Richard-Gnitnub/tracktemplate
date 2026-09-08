@@ -17,11 +17,40 @@ The owner accepted the completed, independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
-| What changed | The implementing agent merged PR #70 into clean protected main. The new candidate moves the complete `build_concentric_core` source into `tracktemplate.domain.alignment` for `tracktemplate.api`. The main and secondary-track callers use its result through the small B15 compatibility object `_ConcentricCoreAdapter`. |
-| What now works | Complete calculated results and diagnostics are equal to B14 and B15. Checks with standalone Python, qualified FreeCAD and the applicable human interface have PASS results. The product selects six functions together and puts previous values back after a selection error. |
-| Limitations/findings | This task admits no Phase 7 exit or product performance result. D-P6-008, all risks and all conditions to compare results and remove legacy paths stay in full. |
-| Owner decision | Richard authorised the merge of PR #70 and one subsequent Level 1 or Level 2 result through draft publication. A merge of the new exact-green draft needs another owner decision. |
+| What changed | The implementing agent merged PR #71 into clean protected main. The new candidate moves the common straight-end calculation into `tracktemplate.domain.alignment` for `tracktemplate.api`. The B16 Generate/Replace caller uses its result through `_CommonStraightExtensionsAdapter`. |
+| What now works | Complete calculated results, list changes and existing identities are equal to B14/B15 for the supported records. Standalone, qualified FreeCAD and applicable human-interface checks passed. The product selects seven functions together and puts previous values back after a selection error. |
+| Limitations/findings | Direct calls have about 1.25 microseconds of added wall cost per measured batch. This task accepts no Phase 7 exit or performance result. D-P6-008, all risks and all comparison and legacy-retirement conditions stay in full. |
+| Owner decision | Richard authorised the merge of PR #71 and one subsequent Level 1 or Level 2 result through draft publication. A merge of the new exact-green draft needs another owner decision. |
 | Next action | Complete the applicable validation, independent review and publication route. Bring the new exact-green draft to Richard for merge authority. |
+
+## Common straight-end extension migration — 2026-09-09
+
+The implementing agent merged PR #71 into protected main at `a8e21ce320d2c4ecdac02992508389e574e51d7c`.
+The owner's `$tracktemplate-continue` command authorises this one subsequent Level 2 result under D-GOV-004 and the existing Phase 7 scope.
+
+The existing `run_macro` caller used a B15 calculation that was absent from the domain package.
+The candidate moves that common straight-end calculation into `tracktemplate.domain.alignment` for `tracktemplate.api`.
+A small compatibility object applies its results to the existing host records before the entry and exit spacing checks.
+The [API instructions](../contracts/phase7-common-straight-extensions.md) define its supported input and mutation boundaries.
+
+The pre-change comparison preserves 57 complete B14/B15 groups, each called twice.
+Nine selected standalone test sets and five qualified FreeCAD proofs passed, including 58 groups with native vectors.
+All six new human-interface samples passed. All fourteen new, retained and legacy workflow records give equal results in the deep comparison.
+
+The direct comparison preserves every result and existing identity over 6,000 fresh batch calls per state.
+It measures about 1.25 microseconds of added wall cost per batch call, or 25.33% of the baseline direct cost.
+The [evidence record](../benchmarks/2026-09-09-phase7-common-straight-extensions-regression.md) retains the complete measured boundary, raw proof identities, GUI observations and limitations.
+
+The separate read-only review of source, tests and raw evidence has a PASS result with no actionable findings.
+
+For the bounded scope in Exit 3, the calculation no longer needs FreeCAD or Qt.
+The result supplies comparison evidence for Exit 2 and evidence for the bounded B16 workflow in Exit 1.
+It accepts no whole exit. Phase 7 stays Open at 0/4, with all four exits Pending.
+D-P6-008, all comparison and legacy-retirement conditions, and recorded limitations stay in full.
+Station mapping, turn mirroring, platform calculation, persistence and output contracts stay outside this task.
+
+The entries below retain the publication evidence for PRs #71, #70 and #69.
+Their product merges are complete. They do not select the next work item.
 
 ## `build_concentric_core` migration — 2026-09-08
 

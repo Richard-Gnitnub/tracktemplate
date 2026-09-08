@@ -7,6 +7,7 @@ GEOMETRY_TOLERANCE = 1.0e-8
 _CORE_SAMPLE_SPACING = 3.0
 
 __all__ = (
+    "add_common_straight_extensions",
     "build_concentric_core",
     "clothoid_entry_displacement",
     "clothoid_exit_displacement",
@@ -550,3 +551,51 @@ def build_concentric_core(
         "circular_length": circular_length,
         "core_length": entry_transition + circular_length + exit_transition,
     }
+
+
+def add_common_straight_extensions(alignments, total_angle):
+    """Return common straight-end metadata and optional new XY points.
+
+    Inputs contain only start, end and core_length in local millimetres.
+    The angle is in radians. Keep input records unchanged and preserve
+    the inherited arithmetic and strict geometry-tolerance threshold.
+    """
+    if not alignments:
+        return []
+
+    common_start_x = min(item["start"][0] for item in alignments)
+    tangent_x = math.cos(total_angle)
+    tangent_y = math.sin(total_angle)
+    common_end_projection = max(
+        (item["end"][0] * tangent_x) + (item["end"][1] * tangent_y)
+        for item in alignments
+    )
+    results = []
+    for item in alignments:
+        start_x, start_y = item["start"]
+        entry_extension = max(0.0, start_x - common_start_x)
+        entry_point = None
+        if entry_extension > GEOMETRY_TOLERANCE:
+            entry_point = (common_start_x, start_y)
+
+        end_x, end_y = item["end"]
+        current_projection = (end_x * tangent_x) + (end_y * tangent_y)
+        exit_extension = max(0.0, common_end_projection - current_projection)
+        exit_point = None
+        if exit_extension > GEOMETRY_TOLERANCE:
+            end_x += exit_extension * tangent_x
+            end_y += exit_extension * tangent_y
+            exit_point = (end_x, end_y)
+
+        results.append({
+            "entry_extension": entry_extension,
+            "exit_extension": exit_extension,
+            "total_length": (
+                item["core_length"] + entry_extension + exit_extension
+            ),
+            "extended_start": (common_start_x, start_y),
+            "extended_end": (end_x, end_y),
+            "entry_point": entry_point,
+            "exit_point": exit_point,
+        })
+    return results

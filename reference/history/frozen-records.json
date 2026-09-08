@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "accepted-frozen-records",
-  "updated_on": "2026-09-08",
+  "updated_on": "2026-09-09",
   "records": [
     {"category": "phase-closeout", "path": "reference/phase-evidence/BASELINE.md", "sha256": "ebbf117a0459ad85501544a0ebf993edbe528af69c9f6fb4d358f1042c871e1b"},
     {"category": "phase-closeout", "path": "reference/phase-evidence/PHASE1_CLOSEOUT.md", "sha256": "b2be49068364853691ccf9e4e0ce611e7081b1c8b1a0a8b361a263da1da03a73"},
@@ -43,6 +43,7 @@
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE6_RISKS.json", "sha256": "af5a1b9505d475279f6aad4ee9061f031865ca39d6f6805045caa712fa64af5e"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-05-phase7-main-circle-centre-regression.md", "sha256": "012e7b6a9b5fa38924b468fb11e3d76ef7ebbc6fdbe30643cf7a2fa89a90d176"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-08-phase7-clothoid-exit-regression.md", "sha256": "1a22166a285821224be4251e85435b7208dbf88376fc2386df519aff8574ff21"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-09-08-phase7-concentric-core-regression.md", "sha256": "3876664f966aa8c1f1695c99205a53ce945cfd0af4337008fbc47621a42aab6d"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-08-phase7-concentric-core-regression.md", "sha256": "3876664f966aa8c1f1695c99205a53ce945cfd0af4337008fbc47621a42aab6d"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-09-phase7-common-straight-extensions-regression.md", "sha256": "17495f82696b0b5b63e939a8bda4ce7eba8e29d13dfc81938c86a52e8799a5d9"}
   ]
 }
