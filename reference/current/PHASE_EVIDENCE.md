@@ -17,11 +17,41 @@ The owner accepted the completed, independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
-| What changed | PR #69 is merged into clean protected main. The next exact candidate moves `clothoid_exit_displacement` to `tracktemplate.domain.alignment`. The B16 Generate/Replace caller uses this API. |
-| What now works | Tests of calculated results, product callers and the FreeCAD human interface have PASS results for the bounded scope. The product validates five selected functions. After an error, it puts their previous values back. |
-| Limitations/findings | The time and memory results give no acceptance of product performance. Phase 7 stays at 0/4. D-P6-008, all risks and all conditions for the tests and removal of the B14 and B15 routes stay in full. |
-| Owner decision | Richard authorised the merge of PR #69 and one subsequent Level 1 or Level 2 result through draft publication. A merge of the new product pull request needs a different owner decision. |
-| Next action | Complete the publication route. After CI gives a PASS result for the exact HEAD, bring the new draft to Richard for the merge decision. |
+| What changed | The implementing agent merged PR #70 into clean protected main. The new candidate moves the complete `build_concentric_core` source into `tracktemplate.domain.alignment` for `tracktemplate.api`. The main and secondary-track callers use its result through the small B15 compatibility object `_ConcentricCoreAdapter`. |
+| What now works | Complete calculated results and diagnostics are equal to B14 and B15. Checks with standalone Python, qualified FreeCAD and the applicable human interface have PASS results. The product selects six functions together and puts previous values back after a selection error. |
+| Limitations/findings | This task admits no Phase 7 exit or product performance result. D-P6-008, all risks and all conditions to compare results and remove legacy paths stay in full. |
+| Owner decision | Richard authorised the merge of PR #70 and one subsequent Level 1 or Level 2 result through draft publication. A merge of the new exact-green draft needs another owner decision. |
+| Next action | Complete the applicable validation, independent review and publication route. Bring the new exact-green draft to Richard for merge authority. |
+
+## `build_concentric_core` migration — 2026-09-08
+
+The implementing agent merged PR #70 at `1be47bf38fa00692c60ea2fc03f91ab174801bf2`.
+The owner's `$tracktemplate-continue` command authorises this one subsequent Level 2 result with authority from D-GOV-004 and the Phase 7 scope.
+
+The complete function source is now in `tracktemplate.domain.alignment`.
+Its result contains XY values and the same metadata in the same sequence.
+The small B15 compatibility object `_ConcentricCoreAdapter` changes only the points to FreeCAD `App.Vector` values.
+The actual `run_macro` and `prepare_track_alignment` callers use this route.
+The [API instructions](../contracts/phase7-concentric-core.md) define the bounded scope of the contract.
+
+The API preserves all 184 complete results from checks against B14/B15 and nine invalid cases.
+Eight selected test sets with standalone Python and four proofs with qualified FreeCAD have PASS results.
+All six new FreeCAD human-interface samples have PASS results.
+The checks compare all result data and give equal results for all fourteen new and preserved workflow records.
+The complete `build_concentric_core` measurement includes creation of points and the change to FreeCAD `App.Vector` values.
+
+The independent review of source, tests and raw evidence has a PASS result.
+The [evidence record](../benchmarks/2026-09-08-phase7-concentric-core-regression.md)
+keeps the exact source, raw proof identities and applicable workflow and resource limitations.
+
+For the bounded scope in Exit 3, this result reduces the dependency on B15 to calculate results.
+It supplies evidence for equal results for Exit 2 and workflow evidence for the bounded scope in Exit 1.
+It accepts no whole exit. Phase 7 stays Open at 0/4.
+D-P6-008 stays in full. Station mapping, the remaining migration scope,
+paths to compare results and conditions to remove legacy paths stay unchanged.
+
+The entries below preserve the evidence from publication of PRs #70 and #69.
+Their product merges are complete. They do not select the next work item.
 
 ## `clothoid_exit_displacement` migration — 2026-09-08
 

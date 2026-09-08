@@ -76,6 +76,7 @@ from tracktemplate.application.transition_export import (
     prepare_transition_dxf_export,
 )
 from tracktemplate.domain.alignment import (
+    build_concentric_core,
     clothoid_entry_displacement,
     clothoid_exit_displacement,
     main_circle_centre,
@@ -161,6 +162,7 @@ __all__ = (
     "TransitionPreviewScene",
     "TransitionPreviewSpecification",
     "regenerate_transition_preview",
+    "build_concentric_core",
     "clothoid_entry_displacement",
     "clothoid_exit_displacement",
     "main_circle_centre",

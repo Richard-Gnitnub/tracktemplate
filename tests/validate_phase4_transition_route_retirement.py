@@ -128,15 +128,21 @@ def _validate_product_boundary():
     class FakeHost:
         def __init__(self):
             self.module = types.ModuleType("phase4_product_host_fixture")
+            self.module.App = types.SimpleNamespace(
+                Vector=lambda x, y, z: (x, y, z),
+            )
             exec(
                 "def build_concentric_core(*arguments):\n"
                 "    return (clothoid_entry_displacement(*arguments),\n"
                 "            clothoid_exit_displacement(*arguments))\n"
                 "def prepare_track_alignment(*arguments):\n"
                 "    return (transition_start_signed_offset(*arguments),\n"
-                "            solve_transition_length(*arguments))\n"
+                "            solve_transition_length(*arguments),\n"
+                "            build_concentric_core(*arguments))\n"
                 "def run_macro():\n"
-                "    return main_circle_centre(600.0, 600.0)\n",
+                "    centre = main_circle_centre(600.0, 600.0)\n"
+                "    return build_concentric_core(centre, 600.0, 600.0,\n"
+                "        600.0, 1.5, 'Main Track')\n",
                 self.module.__dict__,
             )
             self.source_sha256 = "a" * 64
@@ -159,6 +165,7 @@ def _validate_product_boundary():
             "solve_transition_length",
             "main_circle_centre",
             "clothoid_exit_displacement",
+            "build_concentric_core",
         )
     }
     host = FakeHost()
@@ -166,17 +173,18 @@ def _validate_product_boundary():
         host,
         functions,
     )
-    assert len(host.bindings) == 1
-    assert host.bindings[0][0] == "modular"
-    assert host.bindings[0][1] == {
-        name: functions[name]
-        for name in functions
-        if name not in {"main_circle_centre", "clothoid_exit_displacement"}
-    }
+    assert host.bindings == []
+    for name in functions:
+        if name == "build_concentric_core":
+            assert host.module.build_concentric_core.calculation is (
+                functions[name]
+            )
+        else:
+            assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 3,
-        "contract_id": "tracktemplate:phase7:clothoid-exit:1",
+        "schema_version": 4,
+        "contract_id": "tracktemplate:phase7:concentric-core:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),
@@ -192,8 +200,7 @@ def _validate_product_boundary():
     }
     assert session.launch_workflow() == "launched"
     assert host.launches == 1
-    assert len(host.bindings) == 2
-    assert all(item[0] == "modular" for item in host.bindings)
+    assert host.bindings == []
 
 
 def _validate_development_oracle_boundary():
