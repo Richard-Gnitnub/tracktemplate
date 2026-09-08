@@ -130,7 +130,8 @@ def _validate_product_boundary():
             self.module = types.ModuleType("phase4_product_host_fixture")
             exec(
                 "def build_concentric_core(*arguments):\n"
-                "    return clothoid_entry_displacement(*arguments)\n"
+                "    return (clothoid_entry_displacement(*arguments),\n"
+                "            clothoid_exit_displacement(*arguments))\n"
                 "def prepare_track_alignment(*arguments):\n"
                 "    return (transition_start_signed_offset(*arguments),\n"
                 "            solve_transition_length(*arguments))\n"
@@ -157,6 +158,7 @@ def _validate_product_boundary():
             "transition_start_signed_offset",
             "solve_transition_length",
             "main_circle_centre",
+            "clothoid_exit_displacement",
         )
     }
     host = FakeHost()
@@ -168,12 +170,13 @@ def _validate_product_boundary():
     assert host.bindings[0][0] == "modular"
     assert host.bindings[0][1] == {
         name: functions[name]
-        for name in functions if name != "main_circle_centre"
+        for name in functions
+        if name not in {"main_circle_centre", "clothoid_exit_displacement"}
     }
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 2,
-        "contract_id": "tracktemplate:phase7:main-circle-centre:1",
+        "schema_version": 3,
+        "contract_id": "tracktemplate:phase7:clothoid-exit:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),

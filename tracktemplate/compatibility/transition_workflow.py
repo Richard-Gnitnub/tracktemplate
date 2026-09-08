@@ -10,9 +10,15 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:main-circle-centre:1"
-PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + ("main_circle_centre",)
-PRODUCT_CALLER_ROUTES = CALLER_ROUTES + (
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:clothoid-exit:1"
+PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
+    "main_circle_centre", "clothoid_exit_displacement",
+)
+PRODUCT_CALLER_ROUTES = tuple(
+    (caller, targets + ("clothoid_exit_displacement",))
+    if caller == "build_concentric_core" else (caller, targets)
+    for caller, targets in CALLER_ROUTES
+) + (
     ("run_macro", ("main_circle_centre",)),
 )
 
@@ -42,7 +48,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete four-function modular workflow is unavailable."
+                "The complete five-function modular workflow is unavailable."
             )
         self._bind_modular()
 
@@ -54,9 +60,8 @@ class ModularTransitionWorkflowSession:
             for name in PRODUCT_FUNCTION_NAMES
         }
         try:
-            namespace["main_circle_centre"] = self._modular_functions[
-                "main_circle_centre"
-            ]
+            for name in ("main_circle_centre", "clothoid_exit_displacement"):
+                namespace[name] = self._modular_functions[name]
             self._host.bind_transition_functions(
                 MODULAR_CALCULATION_ROUTE,
                 {
@@ -88,7 +93,7 @@ class ModularTransitionWorkflowSession:
 
         # The frozen host binder still owns its original three-function
         # mutation. Product reports additionally verify the complete live
-        # closure, including the new centre and the inherited entry point.
+        # closure, including the exit endpoint and the inherited entry point.
         routes = (
             (
                 "transition_start_signed_offset",
@@ -132,7 +137,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 2,
+            "schema_version": 3,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,
