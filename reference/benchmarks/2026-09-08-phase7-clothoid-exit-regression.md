@@ -9,7 +9,7 @@ The comparison baseline is protected main
 `8b06de6bff3901e35548a1be79ebe9f68bb4fc57`, after the merge of PR #69.
 It selects four functions from `tracktemplate.api`.
 The exact candidate adds `clothoid_exit_displacement` and selects five functions.
-The actual `build_concentric_core` caller uses the new API for its endpoint calculation.
+The product caller `build_concentric_core` uses the new API for its endpoint calculation.
 The [API instructions](../contracts/phase7-clothoid-exit.md) define the bounded scope.
 
 Both routes use the qualified host profile
@@ -20,53 +20,56 @@ The fixture SHA-256 is
 The two routes start with the same bytes in `user.cfg` and `system.cfg`.
 The tests do not control data that the operating system keeps after it reads files.
 
-The unchanged `run_phase3_transition_workflow.py` tool supplies two workflows.
+The same `run_phase3_transition_workflow.py` tool supplies two workflows.
 The comparison baseline and exact candidate both use `--route modular`.
 Each workflow has three samples for each route.
 The fixed sequence puts all six baseline samples before the six candidate samples.
 
-Within each group, each round uses `plain-line-edit`, then `connected-straight`.
+In each group, `plain-line-edit` comes before `connected-straight` three times.
 This sequence limits conclusions about effects of the exact candidate.
-The JSON data keep the sequence, dates and individual values.
+The JSON data keep the sequence, dates and values for each sample.
 
-The two completed samples with `--route legacy` from PR #69 stay as comparison evidence.
+The two completed samples with `--route legacy` from PR #69 supply evidence for these checks.
 Their source, fixture, profile and workflow tools have the same identities.
-The tests compare their results with the new samples. Their times are excluded.
-These samples are not repeated.
+The tests compare their results with the new samples. The tests do not use their times.
+This task does not do these two samples again.
 
-The unchanged tool measures two operations for each workflow.
+The same tool measures two operations for each workflow.
 The first uses a new process and the copied fixture.
 The second calculates another result in the same process after the first operation.
-Starting FreeCAD, opening the fixture and the subsequent checks are outside these measured operations.
+These measurements do not include the time to start FreeCAD, open the fixture and do the subsequent checks.
 The same-process operation is not evidence for warm reuse.
 This API keeps no result for reuse.
 
-## Numerical and caller results
+## Calculated results and caller results
 
-Before source movement, the B14 and B15 function bodies gave the same results for 440 input cases.
-Each source also passed ten checks for the invalid `radius` boundary.
-The exact candidate gives equal results with the same numerical operation sequence.
-An independent mathematical identity compares the exit result with the entry result after reflection and rotation.
-Its existing absolute tolerance is `1.0e-9`.
+Before source movement, the B14 and B15 functions gave the same results for 440 input cases.
+Ten checks with `radius <= 0.0` also gave PASS results for each source.
+The exact candidate gives equal results with the same sequence of operations.
 
-Seven selected standalone suites have PASS results.
-All nine changed Python files passed source parsing and Ruff.
-Three qualified FreeCAD tests have process exit status 0 and their required success sentinels.
-They prove equal numerical and actual main, matched and manual caller results.
+A separate check uses the entry result to calculate `expected_x = entry_x * cos(angle) + entry_y * sin(angle)`.
+It also calculates `expected_y = entry_x * sin(angle) - entry_y * cos(angle)`.
+These are the same operations as the test's reflection and rotation.
+The check keeps `abs(dx - expected_x) <= 1.0e-9` and `abs(dy - expected_y) <= 1.0e-9`.
 
-The new proof observes one call to the selected exit API for each of those three caller cases.
-It also proves recovery after an invalid exit function in the caller.
-The existing centre and Phase 3 proofs still pass.
+Seven selected groups of tests with standalone Python have PASS results.
+The source check reports `All 9 changed Python files parsed successfully`. Ruff gave a PASS result.
+Three qualified FreeCAD tests have process exit status 0 and the necessary sentinels.
+Their calculated results and product caller results are equal for `main_alignment`, `match_alignment` and `manual_alignment`.
+
+The new test shows that each of those three caller cases uses the selected exit API one time.
+It also shows recovery after an invalid exit function in the caller.
+The centre and Phase 3 tests also have PASS results.
 
 ## Calculate results again
 
 CPython 3.12.3 measured six samples for each API after the FreeCAD processes stopped.
-The sequence alternates which API runs first in each pair.
+Each subsequent pair changes the API that starts first.
 Each sample calculates 1,800 results: 50 times for each of 36 input pairs with values of zero or more.
-Each call must give the same result as B15. The default for `integration_steps` is 240.
+Each calculated result must be the same as B15. The value for `integration_steps` is 240.
 
-These measurements examine the API in one process. They do not measure the complete FreeCAD workflow.
-All individual values stay in the JSON data.
+These measurements examine the API in one process. They do not measure the full FreeCAD workflow.
+All values for each sample stay in the JSON data.
 
 | Measured quantity | `baseline` median (range), ms | `candidate` median (range), ms | Change |
 | --- | ---: | ---: | ---: |
@@ -74,19 +77,21 @@ All individual values stay in the JSON data.
 | `process_cpu_ms` | 56.627 (56.041–57.382) | 57.024 (56.263–57.579) | +0.397 (+0.701%) |
 
 The candidate medians are higher. The ranges include common values.
-These results do not establish equal product performance or an improvement.
+These results do not show equal or better product performance.
 
 ## FreeCAD workflow results
 
-All twelve new samples completed with process exit status 0 and the required success sentinel.
-Their source files, fixture and initial preferences kept the same identities.
+All twelve new samples completed with process exit status 0 and the necessary sentinel.
+Their source files, fixture and initial `user.cfg` and `system.cfg` files kept the same identities.
 Each sample records `cleanup.remaining: []`. All launched FreeCAD processes stopped.
-The full workflow comparison found equal results for the twelve new and two retained legacy samples.
+The tests compared the full workflow results for the twelve new samples and the two preserved samples with `--route legacy`.
+All these results are equal.
 
-The new samples ran on 2026-09-08 from approximately `20:14` to `20:27` UTC.
+The new samples completed on 2026-09-08 from approximately `20:14` to `20:27` UTC.
 There were 15.749 seconds between the last baseline sample and the first candidate sample.
-The order and uncontrolled operating-system state limit conclusions about effects of the exact candidate.
-No failed GUI attempt or replacement sample occurred.
+The sequence and data from the operating system limit conclusions about effects of the exact candidate.
+The tests do not control those data.
+No GUI sample gave a FAIL result. All twelve GUI samples are the initial samples.
 
 ### Time for each operation
 
@@ -104,8 +109,9 @@ The percentage uses the baseline median.
 | Change the lengths of the connected pair | `wall_ms` | 13183.664 (13177.573–13187.828) | 13180.336 (13176.323–13183.188) | -3.327 (-0.025%) |
 | Change the lengths of the connected pair | `process_cpu_ms` | 2202.825 (2159.155–2260.749) | 2179.277 (2171.672–2270.924) | -23.549 (-1.069%) |
 
-Wall times are approximately 12–14 seconds. Process CPU times are approximately 2–3 seconds.
-This difference has no established cause. It occurs in both routes.
+The `wall_ms` values are equivalent to approximately 12–14 seconds.
+The `process_cpu_ms` values are equivalent to approximately 2–3 seconds.
+The cause of this difference is unknown. The difference occurs in both routes.
 
 ### Memory and objects
 
@@ -119,64 +125,68 @@ Memory values use MiB. The tool stores them in `rss_delta_mb`.
 | Change the lengths of the connected pair | 64.164 (57.785–64.406) | 57.742 (56.676–58.137) | -6.422 (-10.009%) |
 
 The second Replace operation has a higher candidate median memory increase: 11.910 MiB (25.984%).
-Its baseline values include a decrease of 1.332 MiB. All observations stay in the evidence.
+Its baseline values include a decrease of 1.332 MiB. All values stay in the evidence.
 The ranges for each measured time and memory quantity include common values.
-This does not prove equal product performance or exclude worse product performance.
+These values do not show equal product performance. Worse product performance is possible.
 
 Each operation that makes the connected pair adds 14 objects.
-The other measured operations have no object-count change in either route.
+The number of objects stays the same for the other measured operations in either route.
 
 ## Preserved failures and limitations
 
-Two standalone tests initially required the previous current product route.
-They failed when the product route changed from four selected functions to five.
+Two tests with standalone Python initially had checks for the previous current product route.
+They gave FAIL results when the product route changed from four selected functions to five.
 Before repair, their failure class was `test-or-oracle-defect`.
-Only the directly dependent current-route expectations and test fixtures changed.
-Their original proofs then passed. The historical contracts and numerical checks stay unchanged.
+The agent changed only the checks for the current product route and their directly dependent test fixtures.
+The same tests then gave PASS results. The previous API data and checks of calculated results stay the same.
 
-The first standalone summary identifies an earlier version of the new exit test.
-The later test run passed after the final test-fixture adjustment.
-A supplemental receipt connects that run to the frozen test through the same-script source hash capture.
-That attribution is retrospective. The earlier receipt stays available.
+The first summary for standalone Python identifies a previous version of the new exit test.
+The subsequent test gave a PASS result after the last test-fixture adjustment.
+A subsequent evidence record connects that test to the frozen test file.
+The same tool recorded the source hashes for that test.
+The agent made this evidence record after the test. The previous evidence record stays available.
 
-The temporary tool that assembled the completion receipt initially required twelve different values for `process_id`.
+The temporary tool that assembled the completion record initially checked for twelve different values for `process_id`.
 Each isolated process reported `2`. Those values cannot distinguish the twelve isolated instances.
 Before repair, the failure class was `fixture-or-harness-defect`.
 
 The corrected check uses the twelve different instance identities from the launcher.
-Existing receipts prove that each exact instance stopped.
-The failed assertion stays available. No GUI workflow was repeated for this repair.
+The previous evidence files show that each exact instance stopped.
+The initial check with its FAIL result stays available.
+This repair did not do a GUI workflow again.
 
-The documentation prerequisite initially rejected a symbolic link to the official PDF in the new worktree.
-No technical document was authored after that failed prerequisite.
-The exact official file was copied locally, and the tool made a new local derived cache.
-The same prerequisite then passed. The initial symbolic links and failure classification stay available.
+The development-toolchain preflight initially rejected a symbolic link to the official PDF in the new worktree.
+The author copied the exact official file locally, and the tool made a new local derived cache.
+The same development-toolchain preflight then gave a PASS result.
+The author did not start the technical documents until that PASS result.
+The initial symbolic links and failure classification stay available.
 No maintained tool, source identity or writing rule changed.
 
-The earlier PR #69 record keeps its different wall times between dates and its higher candidate memory value.
-Those limitations are not removed by this new evidence.
+The previous PR #69 record keeps its different `wall_ms` values between dates and its higher candidate memory value.
+This new evidence does not remove those limitations.
 
-The unchanged workflow tests compare railway state, identities, sequence, metadata, history and shapes.
+The same workflow tests compare canonical railway state, identities, sequence, metadata, Undo/Redo and shapes.
 They also compare recovery after an error and files that FreeCAD opens again.
-These checks do not prove that complete shapes or output bytes are equal.
-There is no new screenshot or human observation of the physical display.
-The evidence is from the real FreeCAD human interface through the existing automation.
+These checks do not show that full shapes or output bytes are equal.
+There is no new image from the FreeCAD human interface. No person examined the physical display for this evidence.
+The same tools operated the FreeCAD human interface to get this evidence.
 
 This task gives no D-P6-008 acceptance credit and repeats no stopped experiment.
 The full deferred obligation stays mandatory before Phase 10 beta acceptance.
-All comparison paths and legacy-retirement conditions stay in full.
+All paths for these tests and all conditions for removal of the B14 and B15 routes stay in full.
 Phase 7 stays Open at 0/4. Output stays private-development and project status stays `unknown`.
 
 ## Independent review and evidence files
 
 The independent review of source, tests and raw evidence has a PASS result for this bounded scope.
-It found no actionable issue that prevents publication.
-It retained the time and memory limitations and the retrospective test-receipt attribution.
+It found no finding that prevents publication.
+It kept the time and memory limitations.
+It also kept the fact that the agent connected the test result to the source hashes after the test.
 This review gives no phase exit or product performance acceptance.
 
 The local evidence files below are in `tmp/phase7-clothoid-exit/`.
-The GUI summary identifies every sample, individual value and workflow comparison result.
-The host receipt connects the commands, success sentinels, raw files and final preservation checks.
+The GUI summary identifies every sample, each value and the results from the tests that compare workflows.
+The host evidence record connects the commands, necessary sentinels, raw files and last preservation checks.
 The frozen source manifest identifies all ten implementation files.
 
 | Evidence file | SHA-256 |

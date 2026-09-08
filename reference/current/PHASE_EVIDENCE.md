@@ -18,27 +18,28 @@ The owner accepted the completed, independently reviewed
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
 | What changed | PR #69 is merged into clean protected main. The next exact candidate moves `clothoid_exit_displacement` to `tracktemplate.domain.alignment`. The B16 Generate/Replace caller uses this API. |
-| What now works | Numerical, actual caller and FreeCAD human-interface comparisons have PASS results for the bounded scope. The product validates five selected functions and restores their previous values after an error. |
-| Limitations/findings | The time and memory results give no acceptance of product performance. Phase 7 stays at 0/4. D-P6-008, all risks and all comparison and legacy-retirement conditions stay in full. |
-| Owner decision | Richard authorised integration of PR #69 and one subsequent Level 1 or Level 2 result through draft publication. Integration of the new product pull request needs a different owner decision. |
-| Next action | Complete the normal publication route. After CI passes for the exact head, bring the new draft to Richard for the integration decision. |
+| What now works | Tests of calculated results, product callers and the FreeCAD human interface have PASS results for the bounded scope. The product validates five selected functions. After an error, it puts their previous values back. |
+| Limitations/findings | The time and memory results give no acceptance of product performance. Phase 7 stays at 0/4. D-P6-008, all risks and all conditions for the tests and removal of the B14 and B15 routes stay in full. |
+| Owner decision | Richard authorised the merge of PR #69 and one subsequent Level 1 or Level 2 result through draft publication. A merge of the new product pull request needs a different owner decision. |
+| Next action | Complete the publication route. After CI gives a PASS result for the exact HEAD, bring the new draft to Richard for the merge decision. |
 
 ## `clothoid_exit_displacement` migration — 2026-09-08
 
-PR #69 was integrated at protected main
+The implementing agent merged PR #69 into protected main at
 `8b06de6bff3901e35548a1be79ebe9f68bb4fc57`.
 The project owner's `$tracktemplate-continue` command authorises this one subsequent Level 2 result under D-GOV-004.
-D-P7-001 keeps Phase 7 Open with its existing scope and conditions.
+D-P7-001 keeps Phase 7 Open with the same bounded scope and conditions.
 
-The repository shows one direct caller of `clothoid_exit_displacement` in `build_concentric_core`.
-The endpoint calculation was absent from the modular API.
-The exact candidate moves that calculation without a change in its numerical operation sequence, inputs or diagnostics.
-The B16 Generate/Replace caller now selects it with the four existing modular functions.
+The repository shows one caller of `clothoid_exit_displacement` in `build_concentric_core`.
+The endpoint calculation was missing from `tracktemplate.api`.
+The exact candidate moves that endpoint calculation with no change in its sequence of operations, inputs or diagnostics.
+The B16 Generate/Replace caller now selects it with the four functions already selected from `tracktemplate.api`.
 The [API instructions](../contracts/phase7-clothoid-exit.md) define the bounded scope.
 
-The standalone and qualified FreeCAD proofs have PASS results.
-All twelve new FreeCAD human-interface samples have PASS results and equal workflow comparison results.
-The two retained legacy samples also give equal comparison results. Their time values are excluded.
+The tests with standalone Python and qualified FreeCAD have PASS results.
+All twelve new FreeCAD human-interface samples have PASS results. The tests that compare their workflow results show equal values.
+The two preserved samples with `--route legacy` also give equal results in these checks.
+The checks do not use their time values.
 The [evidence record](../benchmarks/2026-09-08-phase7-clothoid-exit-regression.md)
 keeps all values, failure classifications and limitations.
 The independent review of source, tests and raw evidence has a PASS result for this bounded scope.
@@ -46,10 +47,10 @@ The independent review of source, tests and raw evidence has a PASS result for t
 This task supplies more evidence for Exits 2 and 3 and bounded workflow evidence for Exit 1.
 It accepts no exit. Station mapping and the remaining Core migration scope stay outside this task.
 The higher time and memory observations give no acceptance of product performance.
-D-P6-008 stays in full. All comparison paths and their removal conditions stay in full.
+D-P6-008 stays in full. All paths that the tests compare and their removal conditions stay in full.
 
-The earlier `main_circle_centre` entry below keeps its publication-stage evidence from PR #69.
-Its product integration is complete. The next integration decision concerns this new exact candidate.
+The previous `main_circle_centre` entry below keeps its evidence from the publication of PR #69.
+Its product merge is complete. The next merge decision concerns this new exact candidate.
 
 ## `main_circle_centre` migration — 2026-09-08
 

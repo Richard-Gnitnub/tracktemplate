@@ -108,6 +108,24 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:60cd250ab92c22d6d3349b30c8af17a8cca5747a",
+      "accepted_sha256": "sha256:1a22166a285821224be4251e85435b7208dbf88376fc2386df519aff8574ff21",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/benchmarks/2026-09-08-phase7-clothoid-exit-regression.md",
+      "review_receipt": "sha256:7dc8c620c7831a6e08c3d2750275fd42b8ed5758f3aca79d72e837d09e129c67",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
+      "accepted_blob": "sha1:1a404a3806e60d950fec4a858bce2a28be890e4b",
+      "accepted_sha256": "sha256:13a2250d953c47ff9f48dcde358a76b778da6b8ee049f6ec47920704dc361bb8",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/contracts/phase7-clothoid-exit.md",
+      "review_receipt": "sha256:7dc8c620c7831a6e08c3d2750275fd42b8ed5758f3aca79d72e837d09e129c67",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:99d8d74fa62d39b64ba3033c3fbb02bab6e94e81",
       "accepted_sha256": "sha256:2cb06ab9c04a97b37c2ba4858b19161af464d5c0ab74c7070af6fd214230040b",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -117,12 +135,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:a3428a8304d2dd81f6e55b455b99563048df3292",
-      "accepted_sha256": "sha256:24a41ab9ac3824ec0fb0be88f97dcb5a5469b1e048faaeeeb2832f260ab48a34",
+      "accepted_blob": "sha1:88b3cf86906fd6566809b31fb7644dab8406a0ae",
+      "accepted_sha256": "sha256:b92927ebda30026c9ad4cf0dc367b819d8cbdb1c9784eeaa5b724dd33f8db133",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:0dbe26e2d5dd360bdd0b9fcbf8cd4737dd6b5d522e0756efdb47416004d414ec",
+      "review_receipt": "sha256:7dc8c620c7831a6e08c3d2750275fd42b8ed5758f3aca79d72e837d09e129c67",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
