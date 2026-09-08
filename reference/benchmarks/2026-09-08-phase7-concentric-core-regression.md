@@ -1,107 +1,112 @@
-# Phase 7 concentric-core comparison — 2026-09-08
+# Phase 7 `build_concentric_core` checks — 2026-09-08
 
-Status: **Bounded Level 2 evidence. Phase 7 stays Open at 0/4.**
+Status: **Level 2 evidence for the bounded scope. Phase 7 stays Open at 0/4.**
 
 The [current evidence](../current/PHASE_EVIDENCE.md) gives the owner view.
 The [API instructions](../contracts/phase7-concentric-core.md) define this task.
 The [Project Plan](../PROJECT_PLAN.md#phase-7-exit-conditions) owns exit status.
 
-## Source and comparison scope
+## Source and scope of the checks
 
-PR #70 was merged into protected main at
+The implementing agent merged PR #70 into protected main at
 `1be47bf38fa00692c60ea2fc03f91ab174801bf2`.
-The merged tree equals the reviewed `9204e001a558d7ad3b1c0adfbfe6fc4cd3199eff` tree.
-The owner's literal `$tracktemplate-continue` command authorises one subsequent
-Level 1 or Level 2 result under D-GOV-004.
+The merged tree is the same as the reviewed `9204e001a558d7ad3b1c0adfbfe6fc4cd3199eff` tree.
+The owner's `$tracktemplate-continue` command authorises one subsequent Level 1 or Level 2 result with authority from D-GOV-004.
 D-P7-001 keeps Phase 7 Open. D-P6-008 stays unchanged in full.
 
-The complete `build_concentric_core` calculation now uses the modular API.
-Its result includes every point, heading and metadata value for the bounded scope.
-A small object in the B15 compatibility module converts only its points to `App.Vector` values.
+The complete `build_concentric_core` operation now uses `tracktemplate.api`.
+Its result includes every point, `headings` value and metadata value for the bounded scope.
+The `_ConcentricCoreAdapter` object changes only its points to `App.Vector` values for B15 compatibility.
 The actual `run_macro` and `prepare_track_alignment` callers use this object.
-The existing main, matched-spacing and manual-length routes keep their results.
+The main, matched-spacing and manual-length routes keep their results.
 
 The source change keeps the 3 mm point interval, sequence of operations,
-endpoint corrections, diagnostics and result order.
-The platform calculation and its original helpers stay unchanged.
-The source has no new cache or later calculation stage.
-The conversion occurs during the complete core call.
+end point corrections, diagnostics and result sequence.
+The `build_platform_core` function and its initial helper functions stay unchanged.
+The source does not keep results for subsequent use or calculate them in a subsequent operation.
+The complete `build_concentric_core` operation includes the change to `App.Vector` values.
 
-## Calculation and source checks
+## Checks of calculated results and source
 
-Before product movement, the implementing agent compared 184 complete ordered
-results and nine invalid cases from B14 and B15.
-The complete ordered result has SHA-256
+Before the source change, the implementing agent compared 184 complete results
+and nine invalid cases from B14 and B15.
+The checks include the sequence of all result items.
+The complete result with this sequence has SHA-256
 `93f27c8f0a7068a3c0939fe63dda0255308e7cb9e6426776ad2814dbf8393efa`.
 Both accepted source hashes matched their records.
 
-The new domain results equal both oracles for all 184 cases.
-All nine invalid cases keep the same exception type and diagnostic.
-The tests cover unequal and zero transition lengths, the geometry tolerance,
-zero circular length, the circular-angle limit and incomplete centre inputs.
-Independent translation and circle checks also pass.
+The new API results are equal to B14 and B15 for all 184 cases.
+All nine invalid cases keep the same error type and diagnostic.
+The tests include unequal and zero transition lengths, `GEOMETRY_TOLERANCE`,
+zero `circular_length`, the `circular_angle` limit and incomplete `circle_centre` inputs.
+Other tests independently check the results after a move and the distance from `circle_centre`.
+These tests also have PASS results.
 
-The source comparison permits only internal-name changes and replacement of
-vector construction with neutral XY values.
-All thirteen result keys and their order stay unchanged.
-The point and heading lists keep their order.
-The domain and public API import with no FreeCAD or Qt dependency.
+The source check lets only internal names change and XY values replace `App.Vector` construction.
+All thirteen named result items and their sequence stay unchanged.
+The `points` and `headings` values keep their sequence.
+Python can use `tracktemplate.domain.alignment` and the public API with no FreeCAD or Qt dependency.
 
-Eight selected standalone suites have PASS results.
-These include Phase 1 calculation, Phase 2 package structure and both Phase 3 comparisons.
-They also include Phase 4 route retirement and the Phase 7 centre, exit and core suites.
-All eleven changed Python files parse. Ruff 0.16.4 and the diff check pass.
-The implementing agent ran the original strengthened core and Phase 4 checks again.
+Eight selected test sets with standalone Python have PASS results.
+These include calculated results from Phase 1, Phase 2 package structure and both Phase 3 checks that compare results.
+They also include Phase 4 route removal and the Phase 7 centre, exit and core test sets.
+
+Python accepts all eleven changed Python files.
+Ruff 0.16.4 and the diff check have PASS results.
+The implementing agent did the initial core and Phase 4 checks again with their added checks intact.
 Their final test hashes and success outputs are in the frozen receipt.
 
-The directly affected tests now check product schema `4` and six selected functions.
-They keep the historical calculation cases and contract identities.
-Their new B15 fixtures exercise the actual core caller routes.
-The frozen `bind_transition_functions` method stays on its existing development comparison route.
-The new product owns its six-function selection and recovery checks.
+The directly dependent tests now check product schema `4` and six selected functions.
+They keep the historical input cases and contract identities.
+Their new B15 fixtures use the actual `build_concentric_core` caller routes.
+The frozen `bind_transition_functions` method stays on its development route to compare results.
+The new product owns its six-function selection and checks to put previous values back.
 
 ## Qualified FreeCAD checks
 
-Four qualified checks have PASS results, exit status `0` and their exact success sentinels:
+Four checks with the qualified host profile have PASS results, process exit status `0` and their exact success sentinels:
 
-| Test | Bounded proof |
+| Test | Proof for the bounded scope |
 | --- | --- |
-| `freecad_validate_phase7_concentric_core.py` | Complete results, vector types, actual callers and failure recovery |
-| `freecad_validate_phase7_clothoid_exit.py` | Exit calculation and the selected route |
-| `freecad_validate_phase3_transition_slice.py` | Preserved complete caller snapshots and comparison route |
-| `freecad_validate_phase7_main_circle_centre.py` | Centre calculation and the selected route |
+| `freecad_validate_phase7_concentric_core.py` | Complete results, `App.Vector` types, actual callers and recovery after an error |
+| `freecad_validate_phase7_clothoid_exit.py` | Exit endpoint calculation and the selected route |
+| `freecad_validate_phase3_transition_slice.py` | Preserved complete caller snapshots and the route to compare results |
+| `freecad_validate_phase7_main_circle_centre.py` | `main_circle_centre` results and the selected route |
 
-The exact FreeCAD profile is
+The exact host profile for FreeCAD is
 `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`.
-The complete results equal B15, including exact XY values and zero Z values.
-The tests observe the main, matched-spacing and manual-length calls below the conversion.
-Detached calculations and callers are rejected before workflow launch.
-The six previous values return after a failed selection.
-These checks make no document mutation.
+The complete results are equal to B15, including exact XY values and zero Z values.
+The tests examine the main, matched-spacing and manual-length operations below `_ConcentricCoreAdapter`.
+The product rejects functions and callers that do not use their selected APIs before the workflow starts.
+It puts the six previous values back after a selection error.
+These checks make no document change.
 
-## FreeCAD human-interface comparisons
+## FreeCAD human-interface checks
 
-Six new samples completed in isolated FreeCAD instances.
-Each round ran the plain-line edit recipe, then the connected-straight recipe.
+Six new samples completed in isolated FreeCAD processes.
+Each round used the plain-line edit procedure, then the connected-straight procedure.
 The fixed plan kept three samples for each workflow.
-Every sample has a completed record, successful comparison and stopped instance.
-No failed sample was replaced. The source, fixture and preferences stayed unchanged.
+Every sample has a completed record, a PASS result from the checks and a stopped process.
+The tests replaced no sample with a FAIL result.
+The source, fixture and preferences stayed unchanged.
 
-The same-host baseline reuses six successful PR #70 candidate samples.
-Their product source equals the current protected main tree.
-The qualified profile, fixture, preferences and recipe are the same.
-The baseline finished at 20:27:36 UTC. The new series started at 21:37:56 UTC.
-The gap is 4,220.321 seconds. All baseline samples precede the new samples.
-The operating-system file cache was not controlled.
+The same-host baseline uses six PR #70 candidate samples with PASS results again.
+Their product source is the same as the protected main tree.
+The qualified host profile, fixture, preferences and procedure are the same.
 
-The deep comparison includes six baseline records, six new records and two
-preserved legacy records. All fourteen have equal workflow results.
-Only the comparison tool's declared variable fields are excluded.
-History, save/reopen, replacement, failure recovery and semantic values stay in the comparison.
-The legacy records supply correctness evidence only. Their time values are not used.
+The same-host baseline finished at 20:27:36 UTC. The new series started at 21:37:56 UTC.
+The gap is 4,220.321 seconds. All samples from the same-host baseline are before the new samples.
+The tests did not control which file data the operating system kept in memory.
+
+The checks compare all result data from six same-host baseline records, six new records and two preserved legacy records.
+All fourteen have equal workflow results.
+The checks do not include the tool's specified variable fields.
+They include history, persistence, replacement, recovery after errors and the meaning of values.
+The legacy records supply evidence for correct results only.
+The checks do not use their time values.
 
 Each cell below gives the median and the minimum–maximum range for three samples.
-The RSS unit is MiB, as calculated by the existing recipe's `rss_delta_mb` field.
+The procedure's `rss_delta_mb` value gives RSS in MiB.
 Positive RSS values mean an increase during the action.
 
 | Action | Measurement | Same-host baseline | Candidate |
@@ -121,100 +126,115 @@ Positive RSS values mean an increase during the action.
 
 Both states add fourteen objects when they create the connected pair.
 The other three actions have zero object-count change in every sample.
-All wall-time and RSS ranges overlap.
-The return-to-left CPU ranges do not overlap; the other CPU ranges overlap.
-These small descriptive samples establish no numerical budget or statistical equivalence.
-The previous centre and exit reports keep their higher memory and variable time observations.
-This comparison gives no performance acceptance or credit towards D-P6-008.
+All wall-time and RSS ranges include common values.
+The return-to-left CPU ranges have no common value. The other CPU ranges include common values.
 
-## Complete core-call cost
+These small descriptive samples give no accepted limits for measured values or proof that measured differences stay within accepted limits.
+The previous centre and exit reports keep their higher memory values and variable time values.
+These checks give no acceptance of product performance or credit towards D-P6-008.
 
-The recorded plan compares the old B15 core call with the complete new call.
-It includes XY allocation, all metadata and conversion to actual FreeCAD vectors.
-The five previously selected calculations are identical in both states.
-Both states use the same collection overhead.
-Exact result comparisons occur outside the timed blocks.
+## Cost of the complete `build_concentric_core` operation
 
-The run uses 27 finite cases, ten repetitions and six pairs of samples.
-The order alternates between pairs. Each state makes 1,620 complete calls.
-Every call gives equal ordered metadata and XYZ values.
-The qualified process returned exit status `0` with its exact success sentinel.
-No document is changed. All measured GUI instances had stopped before this run.
+The recorded plan compares the old B15 `build_concentric_core` operation with the complete new operation.
+It includes creation of XY values, all metadata and the change to actual FreeCAD `App.Vector` values.
+The five previously selected functions are the same in both states.
+Both states keep all calculated results until the timer stops, with the same added work to collect them.
+The checks compare exact results before or after the measured operations.
 
-Each sample contains 270 calls. Values below are milliseconds.
+The measurement uses 27 cases whose number inputs give `True` with `math.isfinite`, each ten times, and six pairs of samples.
+The sequence changes between pairs. Each state does 1,620 complete operations.
+Every operation gives equal metadata, item sequences and XYZ values.
+
+The process with the qualified host profile returned process exit status `0` with its exact success sentinel.
+It changes no document. All measured FreeCAD GUI processes stopped before this measurement.
+
+Each sample contains 270 operations. Values below are milliseconds.
 
 | Measurement | Baseline median (range) | Candidate median (range) | Median difference |
 | --- | --- | --- | --- |
-| Wall time | 79.181 (77.772–104.627) | 77.105 (73.083–103.320) | −2.076; −2.621% |
-| Process CPU | 79.181 (77.568–104.633) | 76.985 (73.070–103.317) | −2.195; −2.773% |
+| Wall time | 79.181 (77.772–104.627) | 77.105 (73.083–103.320) | −2.076, −2.621% |
+| Process CPU | 79.181 (77.568–104.633) | 76.985 (73.070–103.317) | −2.195, −2.773% |
 
-The ranges overlap. The retained allocation and uncontrolled cache state limit this comparison.
-These observations are bounded regression evidence. They accept no performance result.
-They do not reopen a stopped experiment or change a measurement rule.
+The ranges include common values.
+Creation of new values and uncontrolled data kept for subsequent use limit these checks.
+These results are evidence from regression tests for the bounded scope.
+They accept no product performance result.
+They do not start a stopped experiment again or change any measurement profile or comparison rule.
 
-## Inspection of saved results
+## Inspection of results in FreeCAD files
 
-After measurements, a separate FreeCAD instance opened disposable copies of two completed results.
-It made no product action or save. The source and copied FCStd hashes stayed unchanged.
-Both documents closed and the instance stopped.
+After measurements, a different FreeCAD process opened disposable copies of two completed results.
+It did no product action or operation to write a document to a file.
+The hashes of the source FCStd files and their copies stayed unchanged.
+Both documents closed and the process stopped.
 
-The primary agent and independent quality reviewer inspected the two top-view images.
-They show the curved pair and the connected straight sections with no visible anomaly at this scale.
-These are automated GUI images. No physical workstation screen observation is claimed.
-The images and semantic comparisons do not prove complete B-rep or exported-byte equivalence.
+The primary agent and independent quality reviewer examined the two top-view images.
+They show the curved pair and the connected straight sections with no visible defect at this scale.
+The tool made these GUI images. This record does not claim that a person examined the workstation screen.
+The images and checks of result meaning do not prove that complete B-rep or export bytes are equal.
 
-## Retained evidence and preparation
+## Preserved evidence and preparation
 
 The [previous exit report](2026-09-08-phase7-clothoid-exit-regression.md)
-keeps its original results, limitations and repair history.
-This task does not repeat those experiments to reconstruct history.
-It reuses their exact source for the same-host baseline and applicable raw comparisons.
+keeps its initial results, limitations and repair history.
+This task does not do those experiments again to make new historical records.
+It uses their exact source again for the same-host baseline and applicable checks of raw data.
 
-The approved backup schedule ran after integration of PR #70.
-A new non-overwriting set covers the primary project and all nine existing sibling worktrees.
-Its source and snapshot comparisons pass. Every previous snapshot remains.
-The accepted September 5 restore proof stays current and was not repeated.
-The USB was flushed and safely unmounted. Physical disconnection and separate storage are not claimed.
+The implementing agent used the approved backup schedule after the merge of PR #70.
+A new backup set includes the primary project and all nine sibling worktrees that were present at that time.
+The checks that compare source and snapshots have PASS results.
+Every previous snapshot stays unchanged.
 
-The new worktree initially had no verified local STE cache.
-Documentation preflight stopped with `success-sentinel-missing`.
+The accepted September 5 restore proof still applies. The agent did not do it again.
+The operating system completed the necessary writes and safely disconnected the USB file system.
+This record does not claim that a person removed the device or put it in a different place.
+
+The new worktree initially had no validated local STE cache.
+The development-toolchain preflight for documentation stopped with `success-sentinel-missing`.
 The direct diagnostic was `cache-missing`.
 
 The author classified this as `environment-or-profile-defect` before preparation continued.
-The existing cache rebuild completed, then the original preflight passed.
+The STE lookup completed its rebuild of the cache.
+Then the initial development-toolchain preflight had a PASS result.
 No maintained tool or official source identity changed.
-Product tests have no observed failure in this cycle.
+The product test records show no failure in this cycle.
 
-Three inspection failures affected only temporary inspection or receipt commands.
-The host receipt initially required the copied bridge's `.git/index` bytes to stay identical.
-Normal Git inspection had refreshed that administrative file.
-The host agent classified this as `fixture-or-harness-defect` before correcting the receipt check.
-All other 67 entries and the exact bridge commit were verified.
-The original terminal checks then passed. No host sample was repeated.
+Three inspection failures were only in temporary inspection or receipt commands.
+The host receipt initially checked that the `.git/index` bytes in the copy of `.devtools/freecad-cli` stayed the same.
+Usual Git inspection changed that Git index file.
+Before the receipt correction, the host agent classified this as `fixture-or-harness-defect`.
 
-The quality reviewer initially expected a named JSON sentinel from the GUI runner.
-That runner records completion in `run.json` and prints the evidence path.
-The author initially parsed the successful STE precheck output without removing its declared prefix.
-Both command errors were classified as `fixture-or-harness-defect` before their inspection commands were corrected.
-The original retained outputs then passed those inspections.
-No maintained source, test, rule or proof changed for these corrections.
+The agent validated all other 67 entries and the exact commit for `.devtools/freecad-cli`.
+Then the initial terminal checks had PASS results.
+The agent did not do a host sample again.
+
+The quality reviewer initially checked for a named JSON sentinel from the GUI tool.
+That tool records completion in `run.json` and prints the evidence path.
+The author initially parsed the STE pre-check output with its specified prefix still attached.
+That pre-check had a PASS result.
+
+Before the command corrections, the agents classified both command errors as `fixture-or-harness-defect`.
+The initial preserved outputs then gave PASS results in those inspections.
+No maintained source, test, requirement or proof changed for these corrections.
 
 ## Independent review
 
-The independent source and test reviewer gave a PASS result with no actionable finding.
-The reviewer checked the complete frozen implementation and the raw evidence.
-The reviewer previously supplied read-only selection advice but authored no implementation or host proof.
+The independent reviewer of source and tests gave a PASS result with no finding that needed action.
+The reviewer checked the complete frozen source and tests and the raw evidence.
+The reviewer previously supplied read-only selection advice but wrote no source, tests or host proof.
 The host agent previously supplied architecture and API advice.
-These earlier responsibilities are disclosed in their receipts.
-Canonical prose follows its separate, single Documentation Review.
-No source repair pass was needed.
+Their receipts identify these earlier responsibilities.
+
+Canonical prose follows its single Documentation Review.
+No source repair was necessary.
 
 ## Evidence identities
 
-Local raw evidence stays outside commits under `tmp/phase7-concentric-core/` in
+Local raw evidence stays in `tmp/phase7-concentric-core/` in
 `/home/richard/PycharmProjects/TrackTemplateMacro-worktrees/phase7-concentric-core`.
+Commits do not include it.
 The manifests keep exact commands, source hashes, raw paths, profiles and success outputs.
-They also keep the original failures and their classifications.
+They also keep the initial failures and their failure classifications.
 
 | Local evidence file | SHA-256 |
 | --- | --- |
@@ -228,17 +248,17 @@ They also keep the original failures and their classifications.
 | `visual-capture-result.json` | `bd3fb8a9dc5a17a5c8a74ddde4b2ff7af797ad586cc762c8c1dfdb0850e4881e` |
 | `quality-review.md` | `4f3e97a63fd0720e3d3a1e8f3b697072bb132de1e60816d89719c4c879c839a8` |
 
-The visual receipt identifies both copied documents and both PNG files.
-The images are under `benchmark-output/freecad-bridge/phase7-concentric-core-visual/`.
+The visual receipt identifies both document copies and both PNG files.
+The images are in `benchmark-output/freecad-bridge/phase7-concentric-core-visual/`.
 
 ## Authority and remaining limits
 
-This task reduces the bounded calculation dependency under Phase 7 Exit 3.
-It supplies full calculation comparison evidence for Exit 2 and bounded workflow evidence for Exit 1.
+For the bounded scope in Phase 7 Exit 3, this task reduces the dependency on B15 to calculate results.
+It supplies evidence for equal complete results for Exit 2 and workflow evidence for the bounded scope in Exit 1.
 It admits no complete phase exit. Phase 7 stays Open at 0/4.
 
 The remaining station and multiple-track migration scope is unchanged.
-The existing comparison and legacy-retirement conditions stay in full.
-The source change supplies no performance acceptance, output clearance or release acceptance.
-Project status stays `unknown`; output stays private-development.
-D-P6-008 remains a deferred, unmet obligation before Phase 10 beta acceptance.
+All conditions to compare results and remove legacy paths stay in full.
+The source change supplies no acceptance of product performance, output clearance or release acceptance.
+Project status stays `unknown`. Output keeps private-development status.
+D-P6-008 stays a deferred, unmet obligation before Phase 10 beta acceptance.
