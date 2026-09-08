@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase7:main-circle-centre:1",
+  "recorded_on": "2026-09-05",
+  "authority": "D-P7-001",
+  "change_level": 2,
+  "contract_document": "reference/contracts/phase7-main-circle-centre.md",
+  "calculation": {
+    "module": "tracktemplate.domain.alignment",
+    "api": "tracktemplate.api.main_circle_centre",
+    "parameters": ["main_transition", "main_radius"],
+    "defaults": {},
+    "length_unit": "mm",
+    "frame": "canonical-local-XY-left-turn",
+    "heading_unit": "rad",
+    "private_helper": "_left_normal",
+    "endpoint_function": "clothoid_entry_displacement",
+    "integration_steps": 240,
+    "geometry_tolerance": 1e-8,
+    "left_normal": ["-sin(heading)", "cos(heading)"],
+    "centre": ["x_end + (main_radius * normal_x)", "y_end + (main_radius * normal_y)"],
+    "invalid_radius_diagnostic": "A clothoid radius must be greater than zero."
+  },
+  "comparison": {
+    "b14_path": "AdvancedTurnout.FCMacro",
+    "b14_sha256": "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088",
+    "b15_path": "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro",
+    "b15_sha256": "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848",
+    "retained_fixture": {
+      "main_transition": 600.0,
+      "main_radius": 600.0,
+      "centre": [297.51728975552163, 624.7779655573173],
+      "absolute_tolerance": 1e-9
+    }
+  },
+  "product_routing": {
+    "module": "tracktemplate.compatibility.transition_workflow",
+    "record_schema_version": 2,
+    "route": "modular",
+    "comparison_route_available": false,
+    "function_names": [
+      "clothoid_entry_displacement",
+      "transition_start_signed_offset",
+      "solve_transition_length",
+      "main_circle_centre"
+    ],
+    "caller_names": [
+      "main_circle_centre",
+      "build_concentric_core",
+      "prepare_track_alignment",
+      "run_macro"
+    ],
+    "workflow_version": "10.2A8A7B15",
+    "mixed_route": false
+  },
+  "validation": {
+    "standalone": "tests/validate_phase7_main_circle_centre.py",
+    "qualified_host": "tests/freecad_validate_phase7_main_circle_centre.py"
+  }
+}

@@ -17,11 +17,37 @@ The owner accepted the completed, independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
-| What changed | D-P7-001 opens the current Core alignment, station and multiple-track migration scope. The four criteria stay unchanged. |
-| What now works | The opening records define the authorised sequence and first task. No product behaviour changes in this alignment. |
-| Limitations/findings | D-P6-008 stays in full. Exit 4 is Deferred — unmet. The owner accepts no performance result. All risks and legacy-retirement conditions still apply. |
-| Owner decision | Richard authorised opening integration and the bounded `main_circle_centre` product task through validation, independent review and publication. |
-| Next action | Integrate the opening alignment. Then synchronise clean protected main. Move the calculation into the modular package. Route the B16 Generate/Replace caller through it. |
+| What changed | Opening PR #68 is integrated. The bounded candidate moves `main_circle_centre` into the modular package and routes the existing B16 Generate/Replace caller through it. |
+| What now works | Standalone, qualified FreeCAD and GUI comparisons passed for this candidate. The independent source and evidence review passed. |
+| Limitations/findings | Timing and memory observations give no performance acceptance. Phase 7 stays at 0/4. D-P6-008, all risks and all legacy-retirement conditions remain. |
+| Owner decision | Richard authorised the bounded task through validation, independent review and publication. Product integration needs a separate owner decision. |
+| Next action | Complete document validation and publication. Bring the exact-green product pull request to Richard for its integration decision. |
+
+## Main circle centre migration — 2026-09-08
+
+D-P7-001 authorises this Level 2 candidate after opening PR #68 was integrated.
+The existing B16 Generate/Replace caller now uses the modular
+`main_circle_centre` calculation. The domain API keeps the inherited formula,
+operation order and diagnostics. The product composition validates four
+bindings and restores their previous values after a binding failure.
+The [contract](../contracts/phase7-main-circle-centre.md) defines this boundary.
+
+Standalone and qualified FreeCAD checks passed. All 14 completed GUI samples
+passed the existing workflow comparisons, including separate legacy comparisons.
+The independent source and evidence review passed for this bounded task.
+The [regression record](../benchmarks/2026-09-05-phase7-main-circle-centre-regression.md)
+keeps the measurements, interruption, preserved failures and limits.
+The wall-time spread and higher candidate memory observations support no
+performance acceptance claim.
+
+Shape summaries need analytical and caller parity with unchanged downstream
+construction. They do not alone prove complete geometry or exported byte equality.
+The centre has no cache. Repeated calculation is separate from warm reuse.
+
+This candidate contributes to Exits 2 and 3. It accepts no exit.
+Phase 7 stays Open at 0/4. D-P6-008 and all comparison and retirement conditions
+stay in full. After document validation, publication and exact-green CI,
+the next owner boundary is the separate product integration decision.
 
 ## Phase 7 exit conditions — not admitted
 

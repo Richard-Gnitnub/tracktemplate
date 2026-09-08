@@ -15,7 +15,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import modular_structure  # noqa: E402
-from tracktemplate import compatibility  # noqa: E402
+from tracktemplate import api, compatibility  # noqa: E402
 from tracktemplate.compatibility import transition_workflow  # noqa: E402
 
 
@@ -127,24 +127,36 @@ def _validate_product_boundary():
 
     class FakeHost:
         def __init__(self):
-            self.module = types.SimpleNamespace()
+            self.module = types.ModuleType("phase4_product_host_fixture")
+            exec(
+                "def build_concentric_core(*arguments):\n"
+                "    return clothoid_entry_displacement(*arguments)\n"
+                "def prepare_track_alignment(*arguments):\n"
+                "    return (transition_start_signed_offset(*arguments),\n"
+                "            solve_transition_length(*arguments))\n"
+                "def run_macro():\n"
+                "    return main_circle_centre(600.0, 600.0)\n",
+                self.module.__dict__,
+            )
             self.source_sha256 = "a" * 64
             self.bindings = []
             self.launches = 0
 
         def bind_transition_functions(self, label, functions):
             self.bindings.append((label, dict(functions)))
+            self.module.__dict__.update(functions)
 
         def launch_workflow(self):
             self.launches += 1
             return "launched"
 
     functions = {
-        name: (lambda *arguments: arguments)
+        name: getattr(api, name)
         for name in (
             "clothoid_entry_displacement",
             "transition_start_signed_offset",
             "solve_transition_length",
+            "main_circle_centre",
         )
     }
     host = FakeHost()
@@ -154,10 +166,14 @@ def _validate_product_boundary():
     )
     assert len(host.bindings) == 1
     assert host.bindings[0][0] == "modular"
-    assert host.bindings[0][1] == functions
+    assert host.bindings[0][1] == {
+        name: functions[name]
+        for name in functions if name != "main_circle_centre"
+    }
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 1,
+        "schema_version": 2,
+        "contract_id": "tracktemplate:phase7:main-circle-centre:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),
@@ -165,6 +181,7 @@ def _validate_product_boundary():
             "main_circle_centre",
             "build_concentric_core",
             "prepare_track_alignment",
+            "run_macro",
         ],
         "workflow_version": "10.2A8A7B15",
         "workflow_source_sha256": "a" * 64,

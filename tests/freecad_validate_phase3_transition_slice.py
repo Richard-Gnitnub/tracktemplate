@@ -182,11 +182,12 @@ product_session, product_route = namespace[
     bootstrap,
 )
 assert product_route == {
-    "schema_version": 1,
+    "schema_version": 2,
+    "contract_id": "tracktemplate:phase7:main-circle-centre:1",
     "route": "modular",
     "comparison_route_available": False,
-    "function_names": list(FUNCTION_NAMES),
-    "caller_names": list(CALLER_NAMES),
+    "function_names": list(FUNCTION_NAMES) + ["main_circle_centre"],
+    "caller_names": list(CALLER_NAMES) + ["run_macro"],
     "workflow_version": "10.2A8A7B15",
     "workflow_source_sha256": (
         "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848"
@@ -194,8 +195,12 @@ assert product_route == {
     "mixed_route": False,
 }
 assert _caller_snapshot(product_session.module) == legacy_snapshot
-for name in FUNCTION_NAMES:
+for name in FUNCTION_NAMES + ("main_circle_centre",):
     assert product_session.module.__dict__[name] is getattr(api, name)
+assert (
+    product_session.module.run_macro.__globals__["main_circle_centre"]
+    is api.main_circle_centre
+)
 assert before == _document_state(), (
     "B16 retirement or calculation-only parity changed FreeCAD document state"
 )
