@@ -17,11 +17,41 @@ The owner accepted the completed, independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
-| What changed | PR #69 is merged into clean protected main. The next exact candidate moves `clothoid_exit_displacement` to `tracktemplate.domain.alignment`. The B16 Generate/Replace caller uses this API. |
-| What now works | Tests of calculated results, product callers and the FreeCAD human interface have PASS results for the bounded scope. The product validates five selected functions. After an error, it puts their previous values back. |
-| Limitations/findings | The time and memory results give no acceptance of product performance. Phase 7 stays at 0/4. D-P6-008, all risks and all conditions for the tests and removal of the B14 and B15 routes stay in full. |
-| Owner decision | Richard authorised the merge of PR #69 and one subsequent Level 1 or Level 2 result through draft publication. A merge of the new product pull request needs a different owner decision. |
-| Next action | Complete the publication route. After CI gives a PASS result for the exact HEAD, bring the new draft to Richard for the merge decision. |
+| What changed | PR #70 is merged into clean protected main. The new candidate moves the complete `build_concentric_core` calculation to the modular API. The existing main and secondary-track callers use its result through a small B15 compatibility object. |
+| What now works | Complete calculation results and diagnostics equal B14 and B15. Standalone, qualified FreeCAD and applicable human-interface checks pass. The product selects six functions together and restores previous values after a failed selection. |
+| Limitations/findings | This task admits no Phase 7 exit or performance result. D-P6-008, all risks and all comparison and legacy-retirement conditions stay in full. |
+| Owner decision | Richard authorised the merge of PR #70 and one subsequent Level 1 or Level 2 result through draft publication. Integration of the new exact-green draft needs a separate owner decision. |
+| Next action | Complete the applicable validation, independent review and publication route. Bring the new exact-green draft to Richard for integration authority. |
+
+## `build_concentric_core` migration — 2026-09-08
+
+PR #70 is integrated at `1be47bf38fa00692c60ea2fc03f91ab174801bf2`.
+The owner's literal `$tracktemplate-continue` command authorises this one
+subsequent Level 2 result under D-GOV-004 and the current Phase 7 scope.
+
+The complete calculation now resides in `tracktemplate.domain.alignment`.
+Its result contains neutral XY values and the same ordered metadata.
+A small B15 compatibility object converts only the points to FreeCAD vectors.
+The actual `run_macro` and `prepare_track_alignment` callers use this route.
+The [API instructions](../contracts/phase7-concentric-core.md) define the bounded contract.
+
+The calculation preserves all 184 complete B14/B15 comparison results and nine invalid cases.
+Eight selected standalone suites and four qualified FreeCAD proofs pass.
+All six new FreeCAD human-interface samples pass.
+The deep comparison gives equal results for all fourteen new and retained workflow records.
+The complete core-call comparison includes point allocation and FreeCAD vector conversion.
+The independent review of source, tests and raw evidence has a PASS result.
+The [evidence record](../benchmarks/2026-09-08-phase7-concentric-core-regression.md)
+keeps the exact source, raw proof identities and applicable workflow and resource limitations.
+
+This result reduces the calculation dependency for the bounded scope under Exit 3.
+It supplies equivalence evidence for Exit 2 and bounded workflow evidence for Exit 1.
+It accepts no whole exit. Phase 7 stays Open at 0/4.
+D-P6-008 stays in full. Station mapping, the remaining migration scope,
+comparison paths and legacy-retirement conditions stay unchanged.
+
+The entries below preserve the evidence from publication of PRs #70 and #69.
+Their product integration is complete. They do not select the next work item.
 
 ## `clothoid_exit_displacement` migration — 2026-09-08
 

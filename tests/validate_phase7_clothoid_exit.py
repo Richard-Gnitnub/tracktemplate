@@ -27,6 +27,7 @@ import validate_phase7_main_circle_centre as centre_proof  # noqa: E402
 FUNCTION_NAMES = centre_proof.FUNCTION_NAMES + (
     "clothoid_exit_displacement",
 )
+PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + ("build_concentric_core",)
 CALCULATION_CASES = tuple(
     (length, radius, steps)
     for length, radius in centre_proof.CALCULATION_CASES
@@ -222,56 +223,35 @@ def validate_calculations():
 
 
 def _fixture(temporary_root):
-    tree = ast.parse(phase3_fixture.LEGACY_SOURCE)
-    extra = ast.parse(
-        "LAUNCH_COUNT = 0\n"
-        "def clothoid_exit_displacement(*arguments):\n"
-        "    return ('legacy-exit', arguments)\n"
-        "def build_concentric_core(*arguments):\n"
-        "    return (clothoid_entry_displacement(*arguments),\n"
-        "            clothoid_exit_displacement(*arguments))\n"
-        "def run_macro():\n"
-        "    global LAUNCH_COUNT\n"
-        "    LAUNCH_COUNT += 1\n"
-        "    return (main_circle_centre(600.0, 600.0),\n"
-        "            build_concentric_core(600.0, 600.0))\n"
-    )
-    replacements = {
-        node.name: node for node in extra.body
-        if isinstance(node, ast.FunctionDef)
-    }
-    tree.body = [
-        replacements.get(node.name, node)
-        if isinstance(node, ast.FunctionDef) else node
-        for node in tree.body
-    ]
-    tree.body[:0] = extra.body[:2]
-    source = temporary_root / "legacy.FCMacro"
-    source.write_text(ast.unparse(tree) + "\n", encoding="utf-8")
-    return phase3_fixture._contract(source)
+    from validate_phase7_concentric_core import _fixture as core_fixture
+    return core_fixture(temporary_root)
+
 
 
 def _functions():
-    return {name: getattr(api, name) for name in FUNCTION_NAMES}
+    return {name: getattr(api, name) for name in PRODUCT_FUNCTION_NAMES}
 
 
 def _snapshot(host):
     return {
         name: host.module.__dict__[name]
-        for name in FUNCTION_NAMES if name in host.module.__dict__
+        for name in PRODUCT_FUNCTION_NAMES if name in host.module.__dict__
     }
 
 
 def detached_core(module, functions, exit_function):
-    """Keep the original entry edge valid but corrupt the new exit edge."""
-    core = module.build_concentric_core
+    """Corrupt only the selected domain core's new exit endpoint edge."""
+    core = functions["build_concentric_core"]
     namespace = dict(core.__globals__)
     namespace.update(functions)
     namespace["clothoid_exit_displacement"] = exit_function
     return types.FunctionType(core.__code__, namespace)
 
 
+
 def validate_binding():
+    from validate_phase7_concentric_core import _expected, detached
+
     prefix = "tracktemplate-phase7-exit-"
     with tempfile.TemporaryDirectory(prefix=prefix) as path:
         temporary_root = pathlib.Path(path)
@@ -280,27 +260,21 @@ def validate_binding():
         def load_host():
             return host_loader.load_b15_workflow_host(temporary_root, contract)
 
-        expected = (
-            api.main_circle_centre(600.0, 600.0),
-            (
-                api.clothoid_entry_displacement(600.0, 600.0),
-                api.clothoid_exit_displacement(600.0, 600.0),
-            ),
-        )
+        expected = _expected()
         session = workflow.load_modular_transition_workflow_session(
             temporary_root, api, contract,
         )
         assert session.launch_workflow() == expected
         record = session.routing_record()
-        assert record["schema_version"] == 3
-        assert record["contract_id"] == "tracktemplate:phase7:clothoid-exit:1"
-        assert record["function_names"] == list(FUNCTION_NAMES)
+        assert record["schema_version"] == 4
+        assert record["contract_id"] == "tracktemplate:phase7:concentric-core:1"
+        assert record["function_names"] == list(PRODUCT_FUNCTION_NAMES)
         assert record["caller_names"] == [
             "main_circle_centre", "build_concentric_core",
             "prepare_track_alignment", "run_macro",
         ]
         assert record["comparison_route_available"] is False
-        core = session.module.build_concentric_core
+        core = session.module.build_concentric_core.calculation
         for name in (
             "clothoid_entry_displacement", "clothoid_exit_displacement",
         ):
@@ -308,7 +282,7 @@ def validate_binding():
         assert session.module.LAUNCH_COUNT == 1
 
         invalid_maps = [dict(_functions(), unselected=lambda: None)]
-        for name in FUNCTION_NAMES:
+        for name in PRODUCT_FUNCTION_NAMES:
             incomplete = _functions()
             incomplete.pop(name)
             invalid_maps.extend((
@@ -321,7 +295,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete five-function",
+                "complete six-function",
             )
             assert _snapshot(host) == before
             assert host.module.LAUNCH_COUNT == 0
@@ -329,15 +303,16 @@ def validate_binding():
         for remove_previous in (False, True):
             host = load_host()
             old_exit = host.module.clothoid_exit_displacement
-            host.module.build_concentric_core = detached_core(
-                host.module, _functions(), old_exit,
+            functions = _functions()
+            functions["build_concentric_core"] = detached_core(
+                host.module, functions, old_exit,
             )
             if remove_previous:
                 del host.module.clothoid_exit_displacement
             before = _snapshot(host)
             centre_proof._expect_error(
                 lambda: workflow.ModularTransitionWorkflowSession(
-                    host, _functions(),
+                    host, functions,
                 ),
                 "does not use its selected 'clothoid_exit_displacement'",
             )
@@ -352,13 +327,14 @@ def validate_binding():
         assert session.launch_workflow() == expected
         assert session.module.LAUNCH_COUNT == 2
 
-        session.module.build_concentric_core = detached_core(
-            session.module, _functions(), lambda *values: None,
+        session.module.prepare_track_alignment = detached(
+            session.module.prepare_track_alignment, "build_concentric_core",
+            api.build_concentric_core,
         )
         before = _snapshot(session)
         centre_proof._expect_error(
             session.launch_workflow,
-            "does not use its selected 'clothoid_exit_displacement'",
+            "caller 'prepare_track_alignment' is unavailable",
         )
         assert _snapshot(session) == before
         assert session.module.LAUNCH_COUNT == 2
@@ -373,6 +349,7 @@ def validate_binding():
             ),
             "complete modular transition calculation route",
         )
+
 
 
 def main():

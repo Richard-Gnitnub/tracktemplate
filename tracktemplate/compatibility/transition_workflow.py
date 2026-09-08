@@ -1,7 +1,8 @@
 """Modular-only composition for the inherited B15 GUI workflow host."""
 
+from dataclasses import dataclass
+
 from tracktemplate.compatibility.b15_workflow_host import (
-    CALLER_ROUTES,
     EXPECTED_WORKFLOW_VERSION,
     FUNCTION_NAMES,
     B15WorkflowHostError,
@@ -10,16 +11,23 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:clothoid-exit:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:concentric-core:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
+    "build_concentric_core",
 )
-PRODUCT_CALLER_ROUTES = tuple(
-    (caller, targets + ("clothoid_exit_displacement",))
-    if caller == "build_concentric_core" else (caller, targets)
-    for caller, targets in CALLER_ROUTES
-) + (
-    ("run_macro", ("main_circle_centre",)),
+PRODUCT_CALLER_ROUTES = (
+    ("main_circle_centre", ("clothoid_entry_displacement",)),
+    (
+        "build_concentric_core",
+        ("clothoid_entry_displacement", "clothoid_exit_displacement"),
+    ),
+    (
+        "prepare_track_alignment",
+        ("transition_start_signed_offset", "solve_transition_length",
+         "build_concentric_core"),
+    ),
+    ("run_macro", ("main_circle_centre", "build_concentric_core")),
 )
 
 __all__ = (
@@ -34,8 +42,35 @@ class TransitionWorkflowError(RuntimeError):
     """The modular-only inherited workflow could not be composed safely."""
 
 
+@dataclass(frozen=True)
+class _ConcentricCoreAdapter:
+    """Convert only fresh core points for the temporary inherited host."""
+
+    calculation: object
+    vector_factory: object
+
+    def __call__(
+        self,
+        circle_centre,
+        radius,
+        entry_transition,
+        exit_transition,
+        total_angle,
+        label,
+    ):
+        result = self.calculation(
+            circle_centre, radius, entry_transition, exit_transition,
+            total_angle, label,
+        )
+        result["points"] = [
+            self.vector_factory(float(x), float(y), 0.0)
+            for x, y in result["points"]
+        ]
+        return result
+
+
 class ModularTransitionWorkflowSession:
-    """One inherited GUI host permanently bound to the modular calculation."""
+    """One inherited GUI host permanently bound to modular calculations."""
 
     def __init__(self, host, modular_functions):
         self._host = host
@@ -48,8 +83,19 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete five-function modular workflow is unavailable."
+                "The complete six-function modular workflow is unavailable."
             )
+        vector_factory = getattr(
+            getattr(self.module, "App", None), "Vector", None,
+        )
+        if not callable(vector_factory):
+            raise TransitionWorkflowError(
+                "The inherited host vector constructor is unavailable."
+            )
+        self._host_functions = dict(self._modular_functions)
+        self._host_functions["build_concentric_core"] = _ConcentricCoreAdapter(
+            self._modular_functions["build_concentric_core"], vector_factory,
+        )
         self._bind_modular()
 
     def _bind_modular(self):
@@ -60,49 +106,61 @@ class ModularTransitionWorkflowSession:
             for name in PRODUCT_FUNCTION_NAMES
         }
         try:
-            for name in ("main_circle_centre", "clothoid_exit_displacement"):
-                namespace[name] = self._modular_functions[name]
-            self._host.bind_transition_functions(
-                MODULAR_CALCULATION_ROUTE,
-                {
-                    name: self._modular_functions[name]
-                    for name in FUNCTION_NAMES
-                },
-            )
+            namespace.update(self._host_functions)
             self._validate_binding()
-        except Exception as error:
+        except Exception:
             for name, value in previous.items():
                 if value is missing:
                     namespace.pop(name, None)
                 else:
                     namespace[name] = value
-            if isinstance(error, B15WorkflowHostError):
-                raise TransitionWorkflowError(str(error)) from error
             raise
 
     def _validate_binding(self):
-        """Verify every live edge without repairing a changed binding."""
+        """Verify selected domain and host edges without repairing them."""
         namespace = self.module.__dict__
         for name in PRODUCT_FUNCTION_NAMES:
-            if namespace.get(name) is not self._modular_functions[name]:
+            if namespace.get(name) is not self._host_functions[name]:
                 raise TransitionWorkflowError(
                     "The modular workflow has a mixed {!r} binding.".format(
                         name,
                     )
                 )
 
-        # The frozen host binder still owns its original three-function
-        # mutation. Product reports additionally verify the complete live
-        # closure, including the exit endpoint and the inherited entry point.
-        routes = (
+        adapter = namespace["build_concentric_core"]
+        if (
+            type(adapter) is not _ConcentricCoreAdapter
+            or adapter.calculation is not self._modular_functions[
+                "build_concentric_core"
+            ]
+            or adapter.vector_factory is not getattr(
+                getattr(self.module, "App", None), "Vector", None,
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow core adapter is unavailable."
+            )
+
+        # Product composition owns all six current bindings. The frozen
+        # three-function binder remains solely on the comparison route.
+        domain_routes = (
             (
                 "transition_start_signed_offset",
                 ("clothoid_entry_displacement",),
             ),
             ("solve_transition_length", ("transition_start_signed_offset",)),
-        ) + PRODUCT_CALLER_ROUTES
-        for caller_name, targets in routes:
-            caller = namespace.get(caller_name)
+        ) + PRODUCT_CALLER_ROUTES[:2]
+        routes = [
+            (
+                name, self._modular_functions[name], targets,
+                self._modular_functions, False,
+            )
+            for name, targets in domain_routes
+        ] + [
+            (name, namespace.get(name), targets, self._host_functions, True)
+            for name, targets in PRODUCT_CALLER_ROUTES[2:]
+        ]
+        for caller_name, caller, targets, selected, is_host in routes:
             caller_globals = getattr(caller, "__globals__", None)
             code = getattr(caller, "__code__", None)
             if (
@@ -110,23 +168,17 @@ class ModularTransitionWorkflowSession:
                 or not isinstance(caller_globals, dict)
                 or code is None
                 or not set(targets) <= set(code.co_names)
-                or (
-                    caller_name == "run_macro"
-                    and caller_globals is not namespace
-                )
+                or (is_host and caller_globals is not namespace)
             ):
                 raise TransitionWorkflowError(
-                    "The modular workflow caller {!r} is unavailable.".format(
-                        caller_name,
-                    )
+                    "The modular workflow route caller {!r} is "
+                    "unavailable.".format(caller_name)
                 )
             for target in targets:
-                if caller_globals.get(target) is not self._modular_functions[
-                    target
-                ]:
+                if caller_globals.get(target) is not selected[target]:
                     raise TransitionWorkflowError(
-                        "The modular workflow caller {!r} does not use its "
-                        "selected {!r}.".format(caller_name, target)
+                        "The modular workflow route caller {!r} does not use "
+                        "its selected {!r}.".format(caller_name, target)
                     )
 
     @property
@@ -137,7 +189,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 3,
+            "schema_version": 4,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,

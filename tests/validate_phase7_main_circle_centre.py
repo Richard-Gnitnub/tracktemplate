@@ -30,7 +30,9 @@ FUNCTION_NAMES = (
     "solve_transition_length",
     "main_circle_centre",
 )
-PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + ("clothoid_exit_displacement",)
+PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
+    "clothoid_exit_displacement", "build_concentric_core",
+)
 SOURCE_HASHES = {
     "AdvancedTurnout.FCMacro": (
         "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088"
@@ -219,37 +221,9 @@ def _functions():
 
 
 def _fixture(temporary_root):
-    tree = ast.parse(phase3_fixture.LEGACY_SOURCE)
-    current_core = ast.parse(
-        "def clothoid_exit_displacement(*arguments):\n"
-        "    return ('legacy-exit', arguments)\n"
-        "def build_concentric_core(*arguments):\n"
-        "    return (clothoid_entry_displacement(*arguments),\n"
-        "            clothoid_exit_displacement(*arguments))\n"
-    ).body
-    runner = ast.parse(
-        "def run_macro():\n"
-        "    global LAUNCH_COUNT\n"
-        "    LAUNCH_COUNT += 1\n"
-        "    return main_circle_centre(600.0, 600.0)\n"
-    ).body[0]
-    tree.body = [
-        runner if (
-            isinstance(node, ast.FunctionDef) and node.name == "run_macro"
-        )
-        else node for node in tree.body
-    ]
-    tree.body = [
-        current_core[1] if (
-            isinstance(node, ast.FunctionDef)
-            and node.name == "build_concentric_core"
-        ) else node for node in tree.body
-    ]
-    tree.body.insert(0, current_core[0])
-    tree.body.insert(0, ast.parse("LAUNCH_COUNT = 0").body[0])
-    source = temporary_root / "legacy.FCMacro"
-    source.write_text(ast.unparse(tree) + "\n", encoding="utf-8")
-    return phase3_fixture._contract(source)
+    from validate_phase7_concentric_core import _fixture as core_fixture
+    return core_fixture(temporary_root)
+
 
 
 def _expect_error(action, text):
@@ -277,15 +251,16 @@ def validate_binding():
         session = workflow.load_modular_transition_workflow_session(
             temporary_root, api, contract,
         )
-        expected_centre = api.main_circle_centre(600.0, 600.0)
+        from validate_phase7_concentric_core import _expected
+        expected_centre = _expected()
         assert session.launch_workflow() == expected_centre
         assert session.module.LAUNCH_COUNT == 1
         assert session.module.run_macro.__globals__["main_circle_centre"] is (
             api.main_circle_centre
         )
-        assert session.routing_record()["schema_version"] == 3
+        assert session.routing_record()["schema_version"] == 4
         assert session.routing_record()["contract_id"] == (
-            "tracktemplate:phase7:clothoid-exit:1"
+            "tracktemplate:phase7:concentric-core:1"
         )
         assert session.routing_record()["function_names"] == list(
             PRODUCT_FUNCTION_NAMES
@@ -308,7 +283,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete five-function",
+                "complete six-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 

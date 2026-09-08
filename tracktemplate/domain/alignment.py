@@ -4,8 +4,10 @@ import math
 
 
 GEOMETRY_TOLERANCE = 1.0e-8
+_CORE_SAMPLE_SPACING = 3.0
 
 __all__ = (
+    "build_concentric_core",
     "clothoid_entry_displacement",
     "clothoid_exit_displacement",
     "clothoid_entry_displacement_at_station",
@@ -361,3 +363,190 @@ def solve_transition_length(
             value_low = value_midpoint
 
     return 0.5 * (low + high)
+
+
+def _rotate_xy(x, y, angle):
+    cosine = math.cos(angle)
+    sine = math.sin(angle)
+    return (
+        (x * cosine) - (y * sine),
+        (x * sine) + (y * cosine),
+    )
+
+
+def _integrate_core_segment(
+    points,
+    headings,
+    x,
+    y,
+    heading,
+    length,
+    curvature_function,
+):
+    if length <= GEOMETRY_TOLERANCE:
+        return x, y, heading
+
+    steps = max(1, int(math.ceil(length / _CORE_SAMPLE_SPACING)))
+    distance_step = length / float(steps)
+
+    for index in range(steps):
+        local_midpoint = (index + 0.5) * distance_step
+        curvature = curvature_function(local_midpoint)
+        new_heading = heading + (curvature * distance_step)
+
+        if abs(curvature) < 1.0e-14:
+            x += distance_step * math.cos(heading)
+            y += distance_step * math.sin(heading)
+        else:
+            x += (math.sin(new_heading) - math.sin(heading)) / curvature
+            y += (-math.cos(new_heading) + math.cos(heading)) / curvature
+
+        heading = new_heading
+        points.append((float(x), float(y)))
+        headings.append(heading)
+
+    return x, y, heading
+
+
+def build_concentric_core(
+    circle_centre,
+    radius,
+    entry_transition,
+    exit_transition,
+    total_angle,
+    label,
+):
+    """Return an ordered Euler-circle-Euler mapping with neutral XY points.
+
+    Lengths are millimetres; headings are radians in local left-turn space.
+    Keep inherited diagnostics, fixed 3 mm sampling and endpoint snaps.
+    This calculation constructs no host objects and has no side effects.
+    """
+    if radius <= 0.0:
+        raise ValueError(
+            "The constant radius for '{}' must be greater than zero.".format(
+                label,
+            )
+        )
+    if entry_transition < 0.0 or exit_transition < 0.0:
+        raise ValueError(
+            "Easement lengths for '{}' cannot be negative.".format(label)
+        )
+
+    entry_angle = entry_transition / (2.0 * radius)
+    exit_angle = exit_transition / (2.0 * radius)
+    circular_angle = total_angle - entry_angle - exit_angle
+    if circular_angle < -1.0e-9:
+        raise ValueError(
+            "The independent easements for '{}' consume more angle than the "
+            "complete curve.\n\nEntry easement: {:.3f} mm\nExit easement: "
+            "{:.3f} mm\nMaximum combined length: {:.3f} mm".format(
+                label,
+                entry_transition,
+                exit_transition,
+                2.0 * radius * total_angle,
+            )
+        )
+    circular_angle = max(0.0, circular_angle)
+
+    centre_x, centre_y = circle_centre
+    entry_x, entry_y, _entry_angle_check = clothoid_entry_displacement(
+        entry_transition,
+        radius,
+    )
+
+    entry_normal_x, entry_normal_y = _left_normal(entry_angle)
+    circle_start_x = centre_x - (radius * entry_normal_x)
+    circle_start_y = centre_y - (radius * entry_normal_y)
+    start_x = circle_start_x - entry_x
+    start_y = circle_start_y - entry_y
+
+    points = [(float(start_x), float(start_y))]
+    headings = [0.0]
+    x = start_x
+    y = start_y
+    heading = 0.0
+
+    if entry_transition > GEOMETRY_TOLERANCE:
+        x, y, heading = _integrate_core_segment(
+            points,
+            headings,
+            x,
+            y,
+            heading,
+            entry_transition,
+            lambda station: station / (radius * entry_transition),
+        )
+
+    # Snap to the exact circle start after accumulated sampling error.
+    x = circle_start_x
+    y = circle_start_y
+    heading = entry_angle
+    points[-1] = (float(x), float(y))
+    headings[-1] = heading
+
+    circular_length = radius * circular_angle
+    if circular_length > GEOMETRY_TOLERANCE:
+        x, y, heading = _integrate_core_segment(
+            points,
+            headings,
+            x,
+            y,
+            heading,
+            circular_length,
+            lambda _station: 1.0 / radius,
+        )
+
+    circle_end_heading = total_angle - exit_angle
+    exit_normal_x, exit_normal_y = _left_normal(circle_end_heading)
+    circle_end_x = centre_x - (radius * exit_normal_x)
+    circle_end_y = centre_y - (radius * exit_normal_y)
+    x = circle_end_x
+    y = circle_end_y
+    heading = circle_end_heading
+    points[-1] = (float(x), float(y))
+    headings[-1] = heading
+
+    if exit_transition > GEOMETRY_TOLERANCE:
+        x, y, heading = _integrate_core_segment(
+            points,
+            headings,
+            x,
+            y,
+            heading,
+            exit_transition,
+            lambda station: (1.0 - (station / exit_transition)) / radius,
+        )
+
+        # Snap the endpoint to the independent Simpson-integrated value.
+        exit_dx, exit_dy, _exit_angle_check = clothoid_exit_displacement(
+            exit_transition,
+            radius,
+        )
+        rotated_dx, rotated_dy = _rotate_xy(
+            exit_dx,
+            exit_dy,
+            circle_end_heading,
+        )
+        x = circle_end_x + rotated_dx
+        y = circle_end_y + rotated_dy
+        points[-1] = (float(x), float(y))
+
+    heading = total_angle
+    headings[-1] = heading
+
+    return {
+        "label": label,
+        "points": points,
+        "headings": headings,
+        "start": (start_x, start_y),
+        "end": (x, y),
+        "radius": radius,
+        "entry_transition": entry_transition,
+        "exit_transition": exit_transition,
+        "entry_angle": entry_angle,
+        "exit_angle": exit_angle,
+        "circular_angle": circular_angle,
+        "circular_length": circular_length,
+        "core_length": entry_transition + circular_length + exit_transition,
+    }

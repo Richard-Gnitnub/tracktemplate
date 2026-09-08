@@ -182,12 +182,13 @@ product_session, product_route = namespace[
     bootstrap,
 )
 assert product_route == {
-    "schema_version": 3,
-    "contract_id": "tracktemplate:phase7:clothoid-exit:1",
+    "schema_version": 4,
+    "contract_id": "tracktemplate:phase7:concentric-core:1",
     "route": "modular",
     "comparison_route_available": False,
     "function_names": list(FUNCTION_NAMES) + [
         "main_circle_centre", "clothoid_exit_displacement",
+        "build_concentric_core",
     ],
     "caller_names": list(CALLER_NAMES) + ["run_macro"],
     "workflow_version": "10.2A8A7B15",
@@ -197,6 +198,10 @@ assert product_route == {
     "mixed_route": False,
 }
 assert _caller_snapshot(product_session.module) == legacy_snapshot
+assert product_session.module.build_concentric_core.calculation is (
+    api.build_concentric_core
+)
+assert product_session.module.build_concentric_core.vector_factory is App.Vector
 for name in FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
 ):

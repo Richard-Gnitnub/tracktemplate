@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove exit routing through actual B15 callers on qualified FreeCAD."""
+"""Prove complete core conversion and actual main/parallel host callers."""
 
 import ast
 import copy
@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from tracktemplate.compatibility import b15_workflow_host  # noqa: E402
 from tracktemplate.compatibility import transition_workflow  # noqa: E402
-import validate_phase7_clothoid_exit as exit_proof  # noqa: E402
+import validate_phase7_concentric_core as core_proof  # noqa: E402
 
 
 def document_state():
@@ -29,7 +29,7 @@ def document_state():
 
 
 def caller_snapshot():
-    """Reuse only the unchanged Phase 3 snapshot helpers, not its test run."""
+    """Reuse the exact retained main/matched/manual snapshot helpers."""
     path = ROOT / "tests/freecad_validate_phase3_transition_slice.py"
     source = path.read_text(encoding="utf-8")
     tree = ast.parse(source)
@@ -69,48 +69,82 @@ contract = bootstrap.load_contract(
 )
 snapshot = caller_snapshot()
 host = b15_workflow_host.load_b15_workflow_host(ROOT, contract)
-original = exit_proof._snapshot(host)
+original = core_proof._snapshot(host)
 legacy_results = [
-    host.module.clothoid_exit_displacement(*case)
-    for case in exit_proof.CALCULATION_CASES
+    host.module.build_concentric_core(*case)
+    for case in core_proof.CALCULATION_CASES
+]
+legacy_failures = [
+    core_proof.failure(host.module.build_concentric_core, case)
+    for case in core_proof.INVALID_CASES
 ]
 legacy_snapshot = snapshot(host.module)
-functions = exit_proof._functions()
+functions = core_proof._functions()
+for dependency in (
+    "clothoid_entry_displacement", "clothoid_exit_displacement",
+):
+    incomplete = dict(functions)
+    incomplete["build_concentric_core"] = core_proof.detached(
+        api.build_concentric_core, dependency,
+        getattr(host.module, dependency),
+    )
+    core_proof.centre_proof._expect_error(
+        lambda: transition_workflow.ModularTransitionWorkflowSession(
+            host, incomplete,
+        ),
+        "does not use its selected " + repr(dependency),
+    )
+    assert core_proof._snapshot(host) == original
+    assert document_state() == before
 
-incomplete_functions = dict(functions)
-incomplete_functions["build_concentric_core"] = exit_proof.detached_core(
-    host.module, functions, host.module.clothoid_exit_displacement,
-)
-exit_proof.centre_proof._expect_error(
-    lambda: transition_workflow.ModularTransitionWorkflowSession(
-        host, incomplete_functions,
-    ),
-    "does not use its selected 'clothoid_exit_displacement'",
-)
-assert exit_proof._snapshot(host) == original
-assert document_state() == before
+for caller_name in ("run_macro", "prepare_track_alignment"):
+    caller = getattr(host.module, caller_name)
+    setattr(host.module, caller_name, core_proof.detached(
+        caller, "build_concentric_core", api.build_concentric_core,
+    ))
+    core_proof.centre_proof._expect_error(
+        lambda: transition_workflow.ModularTransitionWorkflowSession(
+            host, functions,
+        ),
+        "caller " + repr(caller_name) + " is unavailable",
+    )
+    assert core_proof._snapshot(host) == original
+    assert document_state() == before
+    setattr(host.module, caller_name, caller)
 
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
 assert record["contract_id"] == "tracktemplate:phase7:concentric-core:1"
 assert record["schema_version"] == 4 and record["mixed_route"] is False
-assert record["function_names"] == list(exit_proof.PRODUCT_FUNCTION_NAMES)
+assert record["function_names"] == list(core_proof.FUNCTION_NAMES)
 assert len(record["caller_names"]) == len(set(record["caller_names"]))
-core = session.module.build_concentric_core.calculation
-for name in ("clothoid_entry_displacement", "clothoid_exit_displacement"):
-    assert name in core.__code__.co_names
-    assert core.__globals__[name] is getattr(api, name)
-assert session.module.run_macro.__globals__ is session.module.__dict__
-assert session.module.run_macro.__globals__["main_circle_centre"] is (
-    api.main_circle_centre
-)
+adapter = session.module.build_concentric_core
+assert type(adapter) is transition_workflow._ConcentricCoreAdapter
+assert adapter.calculation is api.build_concentric_core
+assert adapter.vector_factory is App.Vector
+for caller_name in ("run_macro", "prepare_track_alignment"):
+    caller = getattr(session.module, caller_name)
+    assert caller.__globals__ is session.module.__dict__
+    assert "build_concentric_core" in caller.__code__.co_names
+    assert caller.__globals__["build_concentric_core"] is adapter
+for case, legacy in zip(core_proof.CALCULATION_CASES, legacy_results):
+    result = adapter(*case)
+    assert tuple(result) == tuple(legacy) == core_proof.RESULT_KEYS
+    assert result == legacy
+    assert all(type(point) is App.Vector for point in result["points"])
+    assert all(point.z == 0.0 for point in result["points"])
+    assert core_proof.neutral_result(result) == (
+        core_proof.neutral_result(legacy)
+    ) == api.build_concentric_core(*case)
 assert [
-    session.module.clothoid_exit_displacement(*case)
-    for case in exit_proof.CALCULATION_CASES
-] == legacy_results
+    core_proof.failure(adapter, case)
+    for case in core_proof.INVALID_CASES
+] == legacy_failures
 assert snapshot(session.module) == legacy_snapshot
 assert document_state() == before
 
+# Instrument the existing endpoint below the adapter without changing any
+# arithmetic. The three exact inherited main/matched/manual calls use it.
 calls = []
 
 
@@ -120,8 +154,8 @@ def observed_exit(length, radius, integration_steps=240):
 
 
 observed_functions = dict(functions, clothoid_exit_displacement=observed_exit)
-observed_functions["build_concentric_core"] = exit_proof.detached_core(
-    host.module, observed_functions, observed_exit,
+observed_functions["build_concentric_core"] = core_proof.detached(
+    api.build_concentric_core, "clothoid_exit_displacement", observed_exit,
 )
 observed_session = transition_workflow.ModularTransitionWorkflowSession(
     host, observed_functions,
@@ -131,4 +165,4 @@ assert len(calls) == 3
 assert all(length > 0.0 and radius > 0.0 for length, radius, _steps in calls)
 assert document_state() == before
 
-print("Phase 7 clothoid exit FreeCAD validation passed")
+print("Phase 7 concentric core FreeCAD validation passed")
