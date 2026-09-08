@@ -44,14 +44,14 @@ centre_proof.validate_calculations()
 host = b15_workflow_host.load_b15_workflow_host(ROOT, contract)
 original = {
     name: host.module.__dict__[name]
-    for name in centre_proof.FUNCTION_NAMES
+    for name in centre_proof.PRODUCT_FUNCTION_NAMES
 }
 legacy_results = [
     host.module.main_circle_centre(*case)
     for case in centre_proof.CALCULATION_CASES
 ]
 functions = {
-    name: getattr(api, name) for name in centre_proof.FUNCTION_NAMES
+    name: getattr(api, name) for name in centre_proof.PRODUCT_FUNCTION_NAMES
 }
 wrong_globals = dict(api.main_circle_centre.__globals__)
 wrong_globals["clothoid_entry_displacement"] = lambda *values: None
@@ -66,14 +66,15 @@ centre_proof._expect_error(
     "route",
 )
 assert {
-    name: host.module.__dict__[name] for name in centre_proof.FUNCTION_NAMES
+    name: host.module.__dict__[name]
+    for name in centre_proof.PRODUCT_FUNCTION_NAMES
 } == original
 assert document_state() == before
 
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
-assert record["contract_id"] == "tracktemplate:phase7:main-circle-centre:1"
-assert record["schema_version"] == 2 and record["mixed_route"] is False
+assert record["contract_id"] == "tracktemplate:phase7:clothoid-exit:1"
+assert record["schema_version"] == 3 and record["mixed_route"] is False
 assert session.module.run_macro.__globals__ is session.module.__dict__
 assert session.module.run_macro.__globals__["main_circle_centre"] is (
     api.main_circle_centre

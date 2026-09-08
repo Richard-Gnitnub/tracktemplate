@@ -182,11 +182,13 @@ product_session, product_route = namespace[
     bootstrap,
 )
 assert product_route == {
-    "schema_version": 2,
-    "contract_id": "tracktemplate:phase7:main-circle-centre:1",
+    "schema_version": 3,
+    "contract_id": "tracktemplate:phase7:clothoid-exit:1",
     "route": "modular",
     "comparison_route_available": False,
-    "function_names": list(FUNCTION_NAMES) + ["main_circle_centre"],
+    "function_names": list(FUNCTION_NAMES) + [
+        "main_circle_centre", "clothoid_exit_displacement",
+    ],
     "caller_names": list(CALLER_NAMES) + ["run_macro"],
     "workflow_version": "10.2A8A7B15",
     "workflow_source_sha256": (
@@ -195,7 +197,9 @@ assert product_route == {
     "mixed_route": False,
 }
 assert _caller_snapshot(product_session.module) == legacy_snapshot
-for name in FUNCTION_NAMES + ("main_circle_centre",):
+for name in FUNCTION_NAMES + (
+    "main_circle_centre", "clothoid_exit_displacement",
+):
     assert product_session.module.__dict__[name] is getattr(api, name)
 assert (
     product_session.module.run_macro.__globals__["main_circle_centre"]

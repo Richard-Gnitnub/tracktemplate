@@ -30,6 +30,7 @@ FUNCTION_NAMES = (
     "solve_transition_length",
     "main_circle_centre",
 )
+PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + ("clothoid_exit_displacement",)
 SOURCE_HASHES = {
     "AdvancedTurnout.FCMacro": (
         "51dc8cc1b3803b870649cb6292fbb1ae6bfbd5dc10733c1e5611892cdaa4e088"
@@ -98,7 +99,7 @@ def validate_calculations():
         ROOT / "reference/contracts/phase7-main-circle-centre.json"
     ).read_text(encoding="utf-8"))
     assert contract["schema_version"] == 1
-    assert contract["contract_id"] == workflow.WORKFLOW_CONTRACT_ID
+    assert contract["contract_id"] == "tracktemplate:phase7:main-circle-centre:1"
     assert contract["authority"] == "D-P7-001"
     assert contract["change_level"] == 2
     calculation = contract["calculation"]
@@ -214,11 +215,18 @@ def validate_calculations():
 
 
 def _functions():
-    return {name: getattr(api, name) for name in FUNCTION_NAMES}
+    return {name: getattr(api, name) for name in PRODUCT_FUNCTION_NAMES}
 
 
 def _fixture(temporary_root):
     tree = ast.parse(phase3_fixture.LEGACY_SOURCE)
+    current_core = ast.parse(
+        "def clothoid_exit_displacement(*arguments):\n"
+        "    return ('legacy-exit', arguments)\n"
+        "def build_concentric_core(*arguments):\n"
+        "    return (clothoid_entry_displacement(*arguments),\n"
+        "            clothoid_exit_displacement(*arguments))\n"
+    ).body
     runner = ast.parse(
         "def run_macro():\n"
         "    global LAUNCH_COUNT\n"
@@ -231,6 +239,13 @@ def _fixture(temporary_root):
         )
         else node for node in tree.body
     ]
+    tree.body = [
+        current_core[1] if (
+            isinstance(node, ast.FunctionDef)
+            and node.name == "build_concentric_core"
+        ) else node for node in tree.body
+    ]
+    tree.body.insert(0, current_core[0])
     tree.body.insert(0, ast.parse("LAUNCH_COUNT = 0").body[0])
     source = temporary_root / "legacy.FCMacro"
     source.write_text(ast.unparse(tree) + "\n", encoding="utf-8")
@@ -247,7 +262,7 @@ def _expect_error(action, text):
 
 
 def _snapshot(host):
-    return {name: host.module.__dict__[name] for name in FUNCTION_NAMES}
+    return {name: host.module.__dict__[name] for name in PRODUCT_FUNCTION_NAMES}
 
 
 def validate_binding():
@@ -268,12 +283,12 @@ def validate_binding():
         assert session.module.run_macro.__globals__["main_circle_centre"] is (
             api.main_circle_centre
         )
-        assert session.routing_record()["schema_version"] == 2
+        assert session.routing_record()["schema_version"] == 3
         assert session.routing_record()["contract_id"] == (
-            "tracktemplate:phase7:main-circle-centre:1"
+            "tracktemplate:phase7:clothoid-exit:1"
         )
         assert session.routing_record()["function_names"] == list(
-            FUNCTION_NAMES
+            PRODUCT_FUNCTION_NAMES
         )
         assert session.routing_record()["caller_names"] == [
             "main_circle_centre", "build_concentric_core",
@@ -293,7 +308,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete four-function",
+                "complete five-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 

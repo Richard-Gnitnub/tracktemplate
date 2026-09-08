@@ -7,6 +7,7 @@ GEOMETRY_TOLERANCE = 1.0e-8
 
 __all__ = (
     "clothoid_entry_displacement",
+    "clothoid_exit_displacement",
     "clothoid_entry_displacement_at_station",
     "clothoid_entry_polyline_stations",
     "main_circle_centre",
@@ -34,6 +35,38 @@ def clothoid_entry_displacement(length, radius, integration_steps=240):
     for index in range(steps + 1):
         u = index * interval
         theta = alpha * u * u
+        weight = 1.0
+        if index not in (0, steps):
+            weight = 4.0 if index % 2 else 2.0
+        cosine_sum += weight * math.cos(theta)
+        sine_sum += weight * math.sin(theta)
+
+    scale = length * interval / 3.0
+    return scale * cosine_sum, scale * sine_sum, alpha
+
+
+def clothoid_exit_displacement(length, radius, integration_steps=240):
+    """Return local XY millimetres and radians for a left-turn Euler exit.
+
+    Preserve the inherited Simpson integration and radius diagnostic.
+    The result is an uncached three-float tuple with no host side effects.
+    """
+    if radius <= 0.0:
+        raise ValueError("A clothoid radius must be greater than zero.")
+    if length <= GEOMETRY_TOLERANCE:
+        return 0.0, 0.0, 0.0
+
+    steps = max(40, int(integration_steps))
+    if steps % 2:
+        steps += 1
+    alpha = length / (2.0 * radius)
+    interval = 1.0 / float(steps)
+    cosine_sum = 0.0
+    sine_sum = 0.0
+
+    for index in range(steps + 1):
+        u = index * interval
+        theta = (2.0 * alpha * u) - (alpha * u * u)
         weight = 1.0
         if index not in (0, steps):
             weight = 4.0 if index % 2 else 2.0

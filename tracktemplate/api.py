@@ -77,6 +77,7 @@ from tracktemplate.application.transition_export import (
 )
 from tracktemplate.domain.alignment import (
     clothoid_entry_displacement,
+    clothoid_exit_displacement,
     main_circle_centre,
     solve_transition_length,
     transition_start_signed_offset,
@@ -161,6 +162,7 @@ __all__ = (
     "TransitionPreviewSpecification",
     "regenerate_transition_preview",
     "clothoid_entry_displacement",
+    "clothoid_exit_displacement",
     "main_circle_centre",
     "transition_start_signed_offset",
     "solve_transition_length",
