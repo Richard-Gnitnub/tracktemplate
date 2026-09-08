@@ -1,0 +1,116 @@
+{
+  "active_binding_change": {
+    "after": "0cba462a54eec9da3f81d2b65dc5303329c36798ecf8795dc7deac311ec1a894",
+    "before": "f79f24e8b60d428a1d37685b490d2b29a7092ec24bd07ac93e94458fe131d912",
+    "only_changed_field": "receipt_sha256",
+    "path": "tmp/ste100-review-results/binding-1f29c1b3ab160dce0e620de998e5d3a78062cd81.json"
+  },
+  "authority": "$tracktemplate-technical-author-lead\n\nResume the existing build_concentric_core outcome.\n\nAs project owner, I authorise a one-off exception for the two identified,\nfact-checked path corrections from tools/freecad_bridge to\n.devtools/freecad-cli, and only their directly dependent validation\nidentities.\n\nPreserve candidate 1f29c1b3, the original review and receipt, and the\ndefect evidence. Record the correction separately under this owner\nauthority; do not replace or misrepresent the original review verdict.\n\nThis exception grants no further repair allowance and changes no general\npolicy. Do not start another language review or change product source\nor tooling.\n\nComplete the existing validation and publication route, then stop with\none draft PR and successful exact-head CI. Do not merge or accept an exit.\nReport any remaining validation failure rather than bypassing it.",
+  "candidate_revision": "1f29c1b3ab160dce0e620de998e5d3a78062cd81",
+  "correction_target": {
+    "document": "reference/benchmarks/2026-09-08-phase7-concentric-core-regression.md",
+    "original_receipt_correction_index": 0,
+    "positions_in_original_replacement_utf8": [
+      {
+        "end_byte": 12447,
+        "preimage": "`tools/freecad_bridge`",
+        "replacement": "`.devtools/freecad-cli`",
+        "start_byte": 12425
+      },
+      {
+        "end_byte": 12698,
+        "preimage": "`tools/freecad_bridge`",
+        "replacement": "`.devtools/freecad-cli`",
+        "start_byte": 12676
+      }
+    ]
+  },
+  "defect_evidence": {
+    "tmp/phase7-concentric-core/document-path-proof.json": "4ba03ae373cebe9aba4013d3edf1e828fbe2916a7bd21c759bebf85486b76b76",
+    "tmp/phase7-concentric-core/documentation-review-objective-defect.json": "2e28926ecf6054641cd9ac06901180ae03fac7a1934fa4f8d09845c75ee1afb0",
+    "tmp/phase7-concentric-core/two-token-fact-repair-proposal.patch": "26458b59353921742c42b1bb86f3860e2552e4456b7415074998fde31b151996"
+  },
+  "derived_state_proposal": {
+    "path": "tmp/ste100-review-state-proposals/state-1336585c73d1c1111da3617beea24ff0d969fad8a247dce1b5b926070860a21c.json",
+    "sha256": "1336585c73d1c1111da3617beea24ff0d969fad8a247dce1b5b926070860a21c"
+  },
+  "derived_validator_input": {
+    "identity": "Original review plus the two owner-authorised factual corrections; not a second Documentation Review.",
+    "inherited_fields": "Reviewer, independence, applicability and verdict fields identify the preserved original review only. The owner supplies authority for the two factual corrections.",
+    "path": "tmp/ste100-review-results/review-0cba462a54eec9da3f81d2b65dc5303329c36798ecf8795dc7deac311ec1a894.json",
+    "sha256": "0cba462a54eec9da3f81d2b65dc5303329c36798ecf8795dc7deac311ec1a894"
+  },
+  "deterministic_validation": {
+    "command": [
+      ".venv/bin/python",
+      "tools/ste100_lookup.py",
+      "final-validate",
+      "tmp/ste100-review-scopes/scope-6503e07c8474c622feab750afd232d85e1d1843da5fef7262eec8ee8d7e93f41.json",
+      "tmp/ste100-review-results/review-0cba462a54eec9da3f81d2b65dc5303329c36798ecf8795dc7deac311ec1a894.json"
+    ],
+    "completion": {
+      "candidate_revision": "1f29c1b3ab160dce0e620de998e5d3a78062cd81",
+      "final_revision": "105c7b8efadf7e64bba640aa877fcf6bb126efb2",
+      "receipt_sha256": "0cba462a54eec9da3f81d2b65dc5303329c36798ecf8795dc7deac311ec1a894",
+      "schema_version": 1
+    },
+    "completion_path": "tmp/ste100-review-results/completion-1f29c1b3ab160dce0e620de998e5d3a78062cd81.json",
+    "completion_sha256": "abca9687898cce8fd29a6d0719b94c466b5ee7485b507f5ea7c73b856fc00a88",
+    "exit_status": 0,
+    "final_document_sha256": {
+      "reference/benchmarks/2026-09-08-phase7-concentric-core-regression.md": "3876664f966aa8c1f1695c99205a53ce945cfd0af4337008fbc47621a42aab6d",
+      "reference/contracts/phase7-concentric-core.md": "829f3f3a2a3b3518b9d01c641f5092463c4193d96dfb47b53362a8759d38924b",
+      "reference/current/PHASE_EVIDENCE.md": "74fd4e8cf8dea3c2fc2c12d7233df16ed90472bdf314dc834ea19de7bfe67df6"
+    },
+    "status": "locked-and-deterministically-validated",
+    "success_sentinel": "TRACKTEMPLATE_STE100_FINAL=",
+    "verdict_preserved": "APPROVED_WITH_EXACT_CORRECTIONS"
+  },
+  "factual_validation": {
+    "corrected_log": "tmp/phase7-concentric-core/owner-path-exception/final-path-proof.log",
+    "corrected_log_sha256": "5b77b8707d52a0be72b32b1e152afc30120367af777f112826dd11e1b2f06e08",
+    "corrected_proof": "PASS",
+    "original_proof": "FAIL retained in tmp/phase7-concentric-core/document-path-proof.json"
+  },
+  "identity_advice": {
+    "path": "tmp/phase7-concentric-core/owner-exception-validation-identity-advice.json",
+    "scope": "Mechanical assessment only; no language review.",
+    "sha256": "a89a8a437f59bbdc783d66fb9a86d7d1e9386d8ea754f80c2b6ae32ae0c4980f"
+  },
+  "limits": {
+    "additional_repair_allowance": 0,
+    "general_policy_changed": false,
+    "merge_authorised": false,
+    "new_language_review": false,
+    "phase_exit_accepted": false,
+    "product_source_changed": false,
+    "tooling_changed": false
+  },
+  "original_artifact_identities": {
+    "tmp/phase7-concentric-core/document-path-proof.json": "4ba03ae373cebe9aba4013d3edf1e828fbe2916a7bd21c759bebf85486b76b76",
+    "tmp/phase7-concentric-core/documentation-review-objective-defect.json": "2e28926ecf6054641cd9ac06901180ae03fac7a1934fa4f8d09845c75ee1afb0",
+    "tmp/phase7-concentric-core/two-token-fact-repair-proposal.patch": "26458b59353921742c42b1bb86f3860e2552e4456b7415074998fde31b151996",
+    "tmp/ste100-review-results/binding-1f29c1b3ab160dce0e620de998e5d3a78062cd81.json": "52dd0c0f9a703edf2e9cab60d2e526b7773debc1dbf5b0f0f21e7917af34f77f",
+    "tmp/ste100-review-results/phase7-concentric-core-2026-09-08.json": "853a9a9b607d1fef3acee1b8fda06c6f151a8df61c741ad09eeced3c3d39853a",
+    "tmp/ste100-review-results/review-f79f24e8b60d428a1d37685b490d2b29a7092ec24bd07ac93e94458fe131d912.json": "f79f24e8b60d428a1d37685b490d2b29a7092ec24bd07ac93e94458fe131d912",
+    "tmp/ste100-review-state-proposals/state-f2934eec4acec274565bdf3281baf8fbb056bbcb01fee080f4ad8b66b43060fc.json": "f2934eec4acec274565bdf3281baf8fbb056bbcb01fee080f4ad8b66b43060fc",
+    "tools/ste100_lookup.py": "9368320e12d0c364048398518ff0911c46c3462da6687037252d80dddc3afbbc"
+  },
+  "original_binding": {
+    "retained_copy": "tmp/phase7-concentric-core/owner-path-exception/original-binding.json",
+    "sha256": "52dd0c0f9a703edf2e9cab60d2e526b7773debc1dbf5b0f0f21e7917af34f77f"
+  },
+  "original_receipt": {
+    "path": "tmp/ste100-review-results/review-f79f24e8b60d428a1d37685b490d2b29a7092ec24bd07ac93e94458fe131d912.json",
+    "preserved_verbatim": true,
+    "sha256": "f79f24e8b60d428a1d37685b490d2b29a7092ec24bd07ac93e94458fe131d912"
+  },
+  "original_review": {
+    "path": "tmp/ste100-review-results/phase7-concentric-core-2026-09-08.json",
+    "preserved_verbatim": true,
+    "sha256": "853a9a9b607d1fef3acee1b8fda06c6f151a8df61c741ad09eeced3c3d39853a",
+    "verdict": "APPROVED_WITH_EXACT_CORRECTIONS"
+  },
+  "record_type": "owner-authorised-exact-path-correction",
+  "schema_version": 1
+}
