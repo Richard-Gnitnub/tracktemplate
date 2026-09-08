@@ -99,12 +99,30 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:97b650a1b6a89fb264bab41ea03941f259070710",
-      "accepted_sha256": "sha256:072a666507b01ae2f7c80351834e4ab2e5bb48834603ac81ed31ec2747ec0c5c",
+      "accepted_blob": "sha1:54051ad758daa3b44ad244d2ebdc222333996fb8",
+      "accepted_sha256": "sha256:012e7b6a9b5fa38924b468fb11e3d76ef7ebbc6fdbe30643cf7a2fa89a90d176",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/benchmarks/2026-09-05-phase7-main-circle-centre-regression.md",
+      "review_receipt": "sha256:0dbe26e2d5dd360bdd0b9fcbf8cd4737dd6b5d522e0756efdb47416004d414ec",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
+      "accepted_blob": "sha1:99d8d74fa62d39b64ba3033c3fbb02bab6e94e81",
+      "accepted_sha256": "sha256:2cb06ab9c04a97b37c2ba4858b19161af464d5c0ab74c7070af6fd214230040b",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/contracts/phase7-main-circle-centre.md",
+      "review_receipt": "sha256:0dbe26e2d5dd360bdd0b9fcbf8cd4737dd6b5d522e0756efdb47416004d414ec",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
+      "accepted_blob": "sha1:a3428a8304d2dd81f6e55b455b99563048df3292",
+      "accepted_sha256": "sha256:24a41ab9ac3824ec0fb0be88f97dcb5a5469b1e048faaeeeb2832f260ab48a34",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:1e469702740bd3eea132b0b6efcaa45e06949d29667e489cd42a8687a1953b50",
+      "review_receipt": "sha256:0dbe26e2d5dd360bdd0b9fcbf8cd4737dd6b5d522e0756efdb47416004d414ec",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
