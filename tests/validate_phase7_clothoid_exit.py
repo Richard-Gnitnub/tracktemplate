@@ -27,7 +27,9 @@ import validate_phase7_main_circle_centre as centre_proof  # noqa: E402
 FUNCTION_NAMES = centre_proof.FUNCTION_NAMES + (
     "clothoid_exit_displacement",
 )
-PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + ("build_concentric_core",)
+PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
+    "build_concentric_core", "add_common_straight_extensions",
+)
 CALCULATION_CASES = tuple(
     (length, radius, steps)
     for length, radius in centre_proof.CALCULATION_CASES
@@ -266,8 +268,8 @@ def validate_binding():
         )
         assert session.launch_workflow() == expected
         record = session.routing_record()
-        assert record["schema_version"] == 4
-        assert record["contract_id"] == "tracktemplate:phase7:concentric-core:1"
+        assert record["schema_version"] == 5
+        assert record["contract_id"] == "tracktemplate:phase7:common-straight-extensions:1"
         assert record["function_names"] == list(PRODUCT_FUNCTION_NAMES)
         assert record["caller_names"] == [
             "main_circle_centre", "build_concentric_core",
@@ -295,7 +297,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete six-function",
+                "complete seven-function",
             )
             assert _snapshot(host) == before
             assert host.module.LAUNCH_COUNT == 0

@@ -11,10 +11,10 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:concentric-core:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:common-straight-extensions:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
-    "build_concentric_core",
+    "build_concentric_core", "add_common_straight_extensions",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -27,7 +27,11 @@ PRODUCT_CALLER_ROUTES = (
         ("transition_start_signed_offset", "solve_transition_length",
          "build_concentric_core"),
     ),
-    ("run_macro", ("main_circle_centre", "build_concentric_core")),
+    (
+        "run_macro",
+        ("main_circle_centre", "build_concentric_core",
+         "add_common_straight_extensions"),
+    ),
 )
 
 __all__ = (
@@ -69,6 +73,42 @@ class _ConcentricCoreAdapter:
         return result
 
 
+@dataclass(frozen=True)
+class _CommonStraightExtensionsAdapter:
+    """Apply neutral extension results to the existing inherited records."""
+
+    calculation: object
+    vector_factory: object
+
+    def __call__(self, alignments, total_angle):
+        if not alignments:
+            return
+        inputs = [
+            {
+                "start": item["start"], "end": item["end"],
+                "core_length": item["core_length"],
+            }
+            for item in alignments
+        ]
+        results = self.calculation(inputs, total_angle)
+        for item, result in zip(alignments, results):
+            points = item["points"]
+            headings = item["headings"]
+            if result["entry_point"] is not None:
+                x, y = result["entry_point"]
+                points.insert(0, self.vector_factory(float(x), float(y), 0.0))
+                headings.insert(0, 0.0)
+            if result["exit_point"] is not None:
+                x, y = result["exit_point"]
+                points.append(self.vector_factory(float(x), float(y), 0.0))
+                headings.append(total_angle)
+            item["entry_extension"] = result["entry_extension"]
+            item["exit_extension"] = result["exit_extension"]
+            item["total_length"] = result["total_length"]
+            item["extended_start"] = result["extended_start"]
+            item["extended_end"] = result["extended_end"]
+
+
 class ModularTransitionWorkflowSession:
     """One inherited GUI host permanently bound to modular calculations."""
 
@@ -83,7 +123,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete six-function modular workflow is unavailable."
+                "The complete seven-function modular workflow is unavailable."
             )
         vector_factory = getattr(
             getattr(self.module, "App", None), "Vector", None,
@@ -95,6 +135,12 @@ class ModularTransitionWorkflowSession:
         self._host_functions = dict(self._modular_functions)
         self._host_functions["build_concentric_core"] = _ConcentricCoreAdapter(
             self._modular_functions["build_concentric_core"], vector_factory,
+        )
+        self._host_functions["add_common_straight_extensions"] = (
+            _CommonStraightExtensionsAdapter(
+                self._modular_functions["add_common_straight_extensions"],
+                vector_factory,
+            )
         )
         self._bind_modular()
 
@@ -141,7 +187,22 @@ class ModularTransitionWorkflowSession:
                 "The modular workflow core adapter is unavailable."
             )
 
-        # Product composition owns all six current bindings. The frozen
+        extensions = namespace["add_common_straight_extensions"]
+        if (
+            type(extensions) is not _CommonStraightExtensionsAdapter
+            or extensions.calculation is not self._modular_functions[
+                "add_common_straight_extensions"
+            ]
+            or extensions.vector_factory is not getattr(
+                getattr(self.module, "App", None), "Vector", None,
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow straight-extension adapter is "
+                "unavailable."
+            )
+
+        # Product composition owns all seven current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -189,7 +250,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 4,
+            "schema_version": 5,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,
