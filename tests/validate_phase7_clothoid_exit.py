@@ -171,7 +171,7 @@ def validate_calculations():
         "function_names": list(FUNCTION_NAMES),
         "caller_names": [
             "main_circle_centre", "build_concentric_core",
-            "prepare_track_alignment", "run_macro", "build_straight_routes",
+            "prepare_track_alignment", "run_macro",
         ],
         "workflow_version": "10.2A8A7B15",
         "mixed_route": False,
