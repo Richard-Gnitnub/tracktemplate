@@ -135,6 +135,15 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:4d1274c168883aa53c8864b7e03628d491b8ecac",
+      "accepted_sha256": "sha256:838b4380d7ab5e891acbbe519cce4c8feeb507341b677b15e370e8718c3c6ebc",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/benchmarks/2026-09-09-phase7-straight-route-regression.md",
+      "review_receipt": "sha256:f0ca23a0bc312481f5570c07de7df90568bc7054bd5c667599c54ef729c70219",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:1a404a3806e60d950fec4a858bce2a28be890e4b",
       "accepted_sha256": "sha256:13a2250d953c47ff9f48dcde358a76b778da6b8ee049f6ec47920704dc361bb8",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -171,12 +180,21 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:752c0aab7553a53c77f32ed218f6f5beb3114c47",
-      "accepted_sha256": "sha256:ff5d7430c669b090be2a23e4aa962728722448577f26175bd3cee637a6a4ad3b",
+      "accepted_blob": "sha1:02aca7569671fc41e903f46eef2578ff2f13bc21",
+      "accepted_sha256": "sha256:d6b25dff26436a7adc494978762cb8ee15344be803fc8a31b29d79af44b68ed7",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/contracts/phase7-straight-route.md",
+      "review_receipt": "sha256:f0ca23a0bc312481f5570c07de7df90568bc7054bd5c667599c54ef729c70219",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
+      "accepted_blob": "sha1:018be7b668a3a64384eec88072a7135dafbce958",
+      "accepted_sha256": "sha256:f78ea4b41e58b1053da1edfe199d58350f68fbecc8342cfe1f90fe04fdfca697",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:8e9498e7982270c3d88763d4dcd8b58ae8311ac480528f9cd06a0cbe64434e00",
+      "review_receipt": "sha256:f0ca23a0bc312481f5570c07de7df90568bc7054bd5c667599c54ef729c70219",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {

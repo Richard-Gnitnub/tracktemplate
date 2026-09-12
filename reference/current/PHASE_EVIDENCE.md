@@ -17,39 +17,42 @@ The owner accepted the completed, independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
-| What changed | The implementing agent merged PR #72 into clean protected main. The new candidate moves `build_straight_route` into `tracktemplate.domain.alignment` for `tracktemplate.api`. B16 Generate/Replace uses `_StraightRouteAdapter` for independent and curve-connected straight tracks. |
-| What now works | All 117 B14/B15 cases give equal results. Nine selected standalone sets and six qualified FreeCAD proofs have PASS results. All six candidate human-interface samples pass, and all twelve checks of complete workflow data give equal results. The product selects eight functions together and restores previous values after a selection error. |
-| Limitations/findings | Connected-edit RSS and independent-rejection wall medians are higher in samples taken after a gap of about 80–88 hours. Their cause is not established. Earlier PR #72 added cost, D-P6-008 and all conditions to compare results and remove legacy paths stay in full. This task accepts no exit or performance result. |
+| What changed | The implementing agent merged PR #72 into clean protected main. The new candidate moves `build_straight_route` into `tracktemplate.domain.alignment` for `tracktemplate.api`. B16 Generate/Replace uses `_StraightRouteAdapter` for straight tracks with and without curve connections. |
+| What now works | All 117 B14/B15 cases give equal results. Nine selected standalone sets and six qualified FreeCAD proofs have PASS results. All six candidate human-interface samples have PASS results, and all twelve checks of complete workflow data give equal results. The product selects eight functions together and puts previous values back after a selection error. |
+| Limitations/findings | Connected-edit RSS and wall medians for rejection with no curve connection are higher after a gap of about 80–88 hours. Their cause is unknown. Earlier PR #72 added cost, D-P6-008 and all conditions to compare results and remove legacy paths stay in full. This task accepts no exit or product performance result. |
 | Owner decision | Richard authorised the merge of PR #72 and this one subsequent Level 2 result through draft publication. A merge of the new exact-green draft needs another owner decision. |
-| Next action | Complete the finite documentation and exact-green draft publication. Bring that draft to Richard for merge authority, without accepting a Phase 7 exit. |
+| Next action | Complete the bounded documentation cycle and exact-green draft publication. Bring that draft to Richard for merge authority. Accept no Phase 7 exit. |
 
-## Straight-track calculation migration — 2026-09-12
+## Migration of the function to calculate straight tracks — 2026-09-12
 
 The implementing agent merged the authorised PR #72 head `dbd6a270d4a62b52b16f841b44c640d30f88da59` into protected main at `e6835a7c65ed7d516a18eb34ae55b9ae47cb653a`.
-The owner's `$tracktemplate-continue` command authorises this one subsequent Level 2 result under D-GOV-004 and the Phase 7 scope.
-The interrupted work resumed from its preserved candidate, without repeating completed evidence or selecting new work.
+The owner's `$tracktemplate-continue` command authorises this one subsequent Level 2 result with authority from D-GOV-004 and the Phase 7 scope.
+The interrupted work continued from its preserved candidate. The implementing agent did not do completed checks again or select new work.
 
-The complete `build_straight_route` calculation was missing from Core.
+The complete `build_straight_route` function was missing from Core.
 The candidate moves it into `tracktemplate.domain.alignment` for `tracktemplate.api` and connects the actual B16 caller through `_StraightRouteAdapter`.
-The [API instructions](../contracts/phase7-straight-route.md) preserve independent and curve-connected track calculations, identities, metadata, diagnostics and sequence.
-The host keeps configuration cloning, defaults, UUID operations and creation of new `App.Vector` values.
+The [API instructions](../contracts/phase7-straight-route.md) preserve calculated tracks with and without curve connections, identities, metadata, diagnostics and sequence.
+The host keeps the operations to copy `config`, supply missing values, use UUIDs and create new `App.Vector` values.
 
 All 117 complete B14/B15 cases give equal results.
-Nine selected standalone test sets and six qualified FreeCAD proofs have PASS results; the new qualified proof includes 120 cases and the actual caller.
-All six candidate human-interface samples pass, and all twelve checks of complete workflow data give equal results.
-The fixed direct checks preserve complete results for 60 first-batch and 6,000 repeated calls with new inputs per state.
+Nine selected test sets with standalone Python and six qualified FreeCAD proofs have PASS results.
+The new qualified proof includes 120 cases and the actual caller.
+All six candidate human-interface samples have PASS results, and all twelve checks of complete workflow data give equal results.
+The fixed direct checks preserve complete results for 60 initial-group and 6,000 subsequent operations with new inputs per state.
 
-The [evidence record](../benchmarks/2026-09-09-phase7-straight-route-regression.md) keeps the raw proof identities, original failures, two classified repairs and measured limitations.
-The GUI baselines precede candidate samples by about 80–88 hours.
-Connected-edit RSS and independent-rejection wall medians are higher; their cause is not established.
-The lower direct wall medians give no product performance acceptance and do not replace the retained PR #72 added cost.
+The [evidence record](../benchmarks/2026-09-09-phase7-straight-route-regression.md) keeps the raw proof identities, initial failures, two classified repairs and measured limitations.
+The GUI baselines are before candidate samples by about 80–88 hours.
+Connected-edit RSS and wall medians for rejection with no curve connection are higher. Their cause is unknown.
+The lower direct wall medians give no product performance acceptance and do not replace the preserved PR #72 added cost.
 
 The independent review of source, tests and raw evidence has a PASS result with no findings that need action.
 
-This result supplies bounded evidence for Exit 3 domain separation, Exit 2 equal results and the B16 workflow in Exit 1.
+This result supplies evidence for the bounded scope in Exits 3, 2 and 1.
+The evidence concerns the API with no FreeCAD or Qt dependency, equal results and the B16 workflow, respectively.
 It accepts no whole exit. Phase 7 stays Open at 0/4, with all four exits Pending.
 D-P6-008, all recorded limitations and all conditions to compare results and remove legacy paths stay in full.
 Project status stays `unknown`, and output keeps private-development status.
+
 The following entries preserve earlier evidence. They do not select another work item.
 
 ## Common straight-end extension migration — 2026-09-09
