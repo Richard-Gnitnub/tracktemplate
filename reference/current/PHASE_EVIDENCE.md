@@ -19,37 +19,38 @@ The owner accepted the completed, independently reviewed
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
 | What changed | PR #75 is merged into clean protected main. The new candidate moves `mirror_alignment_for_turn` into Core and connects the actual B16 caller through a small compatibility object. |
 | What now works | Complete bounded results, identities, errors and operation sequence match B14/B15. Selected standalone and qualified FreeCAD checks have PASS results. The complete plain-line workflow gives equal results. The product selects eleven functions together and validates 38 caller entries. |
-| Limitations/findings | Direct reflection of both tracks adds 0.5338985 ms in paired median wall time, or 87.2117%. The positive branch also has added cost. The descriptive change-back sample has higher CPU and RSS change; causes are unknown. D-P6-008, all earlier limitations, comparison requirements and legacy-retirement conditions stay in full. |
-| Owner decision | The owner's subsequent `$tracktemplate-continue` command authorises this one Level 2 result through draft publication. Integration of the resulting exact-green draft needs separate owner authority. |
-| Next action | Bring the resulting exact-green draft to Richard for integration authority. Accept no Phase 7 exit. |
+| Limitations/findings | The direct operation to change curve direction for both tracks adds 0.5338985 ms in paired median wall time, or 87.2117%. The positive branch also has added cost. The descriptive change-back sample has higher CPU and RSS change. Its causes are unknown. D-P6-008, all earlier limitations and all conditions to compare results and remove legacy paths stay in full. |
+| Owner decision | The owner's subsequent `$tracktemplate-continue` command authorises this one Level 2 result through draft publication. A merge of the resulting exact-green draft must have different owner authority. |
+| Next action | Bring the resulting exact-green draft to Richard for authority to merge. Accept no Phase 7 exit. |
 
 ## Migration of the calculation for curve direction — 2026-09-12
 
-The preceding PR #75 is merged into protected main at `ef29e88ec86777ef79503da83e4043e8d3d644a6`.
+The earlier PR #75 is merged into protected main at `ef29e88ec86777ef79503da83e4043e8d3d644a6`.
 The owner's subsequent `$tracktemplate-continue` command authorises this one Level 2 result under D-GOV-004 and the Phase 7 scope.
 
 The complete `mirror_alignment_for_turn` operation was missing from Core.
 It now uses `tracktemplate.domain.alignment` through `tracktemplate.api`.
-The [API instructions](../contracts/phase7-alignment-handedness.md) preserve the signs, identities, errors and sequence of field changes.
+The [API instructions](../contracts/phase7-alignment-handedness.md) preserve the signs, identities, errors and sequence of changes to named items.
 The actual `run_macro` caller processes the main and secondary alignments after common extensions and before length calculations and straight-track construction.
-The product selects eleven functions together and validates 38 caller entries with complete restoration after a selection error.
+The product selects eleven functions together and validates 38 caller entries.
+After a selection error, it puts previous values back and removes added names that were initially absent.
 
-The complete bounded B14/B15 comparison, twelve standalone test sets and eight qualified FreeCAD proofs have PASS results.
-One new plain-line human-interface case gives equal complete workflow results against the applicable retained PR #75 baseline.
+The complete bounded proof to compare B14/B15 results, twelve standalone test sets and eight qualified FreeCAD proofs have PASS results.
+One new plain-line human-interface case gives equal complete workflow results against the applicable preserved PR #75 baseline.
 It includes both curve directions, nine history actions, copied-document persistence, rejection and recovery.
-The independent read-only review of the complete source, tests and raw evidence has a PASS result with no actionable findings.
+The independent read-only review of the complete source, tests and raw evidence has a PASS result with no findings for necessary action.
 
 The [evidence record](../benchmarks/2026-09-12-phase7-alignment-handedness-regression.md) keeps raw proof identities, classified corrections and measured limitations.
-Direct reflection of both generated tracks adds 533.8985 microseconds in paired median wall time, or 87.2117%.
+The direct operation to change curve direction for both generated tracks adds 533.8985 microseconds in paired median wall time, or 87.2117%.
 The positive branch adds 4.1680 microseconds, or 266.6667%, for both tracks.
 These measurements give no performance acceptance and do not select another optimisation.
 
 This result supplies bounded evidence for the API without host dependencies in Exit 3, equal results in Exit 2 and the B16 workflow in Exit 1.
-It accepts no whole exit. Phase 7 stays Open at 0/4, with all four exits Pending.
-D-P6-008, all earlier limitations, comparison requirements and legacy-retirement conditions stay in full.
+It accepts no full exit. Phase 7 stays Open at 0/4, with all four exits Pending.
+D-P6-008, all earlier limitations and all conditions to compare results and remove legacy paths stay in full.
 Project status stays `unknown`, and output keeps private-development status.
 
-The following entries preserve earlier evidence. They do not select another work item.
+The next entries preserve earlier evidence. They do not select another work item.
 
 ## Migration of station values and points — 2026-09-12
 
