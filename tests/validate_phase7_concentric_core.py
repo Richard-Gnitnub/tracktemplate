@@ -18,6 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tracktemplate import api  # noqa: E402
+from validate_phase7_straight_route import STATION_CALLER_NAMES  # noqa: E402
 from tracktemplate.compatibility import (  # noqa: E402
     b15_workflow_host as host_loader,
     transition_workflow as workflow,
@@ -49,6 +50,7 @@ FUNCTION_NAMES = (
 )
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "add_common_straight_extensions", "build_straight_route",
+    "alignment_station_data", "interpolate_alignment_station",
 )
 TRANSITION_CASES = (
     (0.0, 0.0), (0.0, 25.0), (25.0, 0.0), (25.0, 60.0),
@@ -342,7 +344,9 @@ def detached(function, dependency, replacement):
 
 def _fixture(temporary_root):
     """Use exact frozen calculations and a minimal executable host entry."""
-    from validate_phase7_straight_route import straight_fixture_source
+    from validate_phase7_straight_route import (
+        station_fixture_source, straight_fixture_source,
+    )
 
     path = ROOT / "AdvancedTurnout.FCMacro"
     _namespace, nodes = legacy_calculations(path)
@@ -373,12 +377,14 @@ def _fixture(temporary_root):
         '    core = build_concentric_core(centre, 600.0, 600.0, 600.0,\n'
         '        math.pi / 2.0, "Main Track")\n'
         '    add_common_straight_extensions([core], math.pi / 2.0)\n'
+        '    data = alignment_station_data(core)\n'
+        '    interpolate_alignment_station(data, 0.0)\n'
         '    return centre, core\n'
         'run_macro()\n'
     )
     source = temporary_root / "legacy.FCMacro"
     source.write_text(
-        prelude + straight_fixture_source()
+        prelude + straight_fixture_source() + station_fixture_source()
         + "\n".join(ast.unparse(node) for node in nodes.values())
         + "\n" + callers,
     )
@@ -420,14 +426,11 @@ def validate_binding():
         assert session.module.LAUNCH_COUNT == 1
         record = session.routing_record()
         assert record == {
-            "schema_version": 6,
-            "contract_id": "tracktemplate:phase7:straight-route:1",
+            "schema_version": 7,
+            "contract_id": "tracktemplate:phase7:station-mapping:1",
             "route": "modular", "comparison_route_available": False,
             "function_names": list(PRODUCT_FUNCTION_NAMES),
-            "caller_names": [
-                "main_circle_centre", "build_concentric_core",
-                "prepare_track_alignment", "run_macro", "build_straight_routes",
-            ],
+            "caller_names": list(STATION_CALLER_NAMES),
             "workflow_version": "10.2A8A7B15",
             "workflow_source_sha256": host.source_sha256,
             "mixed_route": False,
@@ -458,7 +461,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete eight-function",
+                "complete ten-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 

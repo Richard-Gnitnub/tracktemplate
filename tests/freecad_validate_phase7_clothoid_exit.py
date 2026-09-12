@@ -92,8 +92,8 @@ assert document_state() == before
 
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
-assert record["contract_id"] == "tracktemplate:phase7:straight-route:1"
-assert record["schema_version"] == 6 and record["mixed_route"] is False
+assert record["contract_id"] == "tracktemplate:phase7:station-mapping:1"
+assert record["schema_version"] == 7 and record["mixed_route"] is False
 assert record["function_names"] == list(exit_proof.PRODUCT_FUNCTION_NAMES)
 assert len(record["caller_names"]) == len(set(record["caller_names"]))
 core = session.module.build_concentric_core.calculation

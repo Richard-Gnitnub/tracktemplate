@@ -348,6 +348,89 @@ ADAPTER_FIELDS = (
 )
 
 
+STATION_CALLER_NAMES = (
+    "main_circle_centre",
+    "build_concentric_core",
+    "prepare_track_alignment",
+    "run_macro",
+    "build_straight_routes",
+    "alignment_progress_at_station",
+    "platform_coverage_bounds",
+    "sample_station_interval",
+    "_project_centreline_to_reference_normal",
+    "_offset_point_towards_reference",
+    "calculate_platform_boundaries",
+    "create_between_alignments_face",
+    "_project_formation_point_to_reference",
+    "_simple_formation_swept_face",
+    "create_section_mask_face",
+    "create_section_masks",
+    "apply_registration_features",
+    "find_section_number_origin",
+    "alignment_station_at_cross_section",
+    "calculate_template_section_stations",
+    "apply_track_template_joints",
+    "create_track_template_fixing_holes",
+    "prepare_straight_route_production",
+    "turnout_host_alignment",
+    "map_turnout_local_point",
+    "_turnout_interval_samples",
+    "_crossover_nearest_point_on_alignment",
+    "_crossover_host_travel_vector",
+    "_crossover_automatic_hand",
+    "_crossover_orientation_b",
+    "solve_rea_c10_crossover_geometry",
+    "resolve_automatic_turnout_crossover_extension",
+    "_timber_record_from_layout",
+    "crossover_inherited_timber_records",
+    "crossover_shared_timber_envelope_context",
+    "_crossover_integration_alignment_signature",
+    "_chair_turnout_timber_records",
+    "CrossoverManagerPanel.use_picked_crossover_position",
+)
+
+
+def station_fixture_source():
+    """Load frozen station callers with their actual method and nested code."""
+    source = legacy.B15_PATH.read_text()
+    tree = ast.parse(source)
+    lines = source.splitlines(keepends=True)
+    names = set(STATION_CALLER_NAMES[5:]) | {
+        "alignment_station_data", "interpolate_alignment_station",
+    }
+    names.remove("CrossoverManagerPanel.use_picked_crossover_position")
+    constants = {
+        "TURNOUT_SAMPLE_SPACING", "CROSSOVER_ARRANGEMENT_FACING",
+        "CROSSOVER_HAND_AUTO", "TURNOUT_DEFAULT_GAUGE",
+        "TURNOUT_DEFAULT_FLANGEWAY", "CROSSOVER_DEFAULT_MINIMUM_RADIUS",
+        "GEOMETRY_TOLERANCE",
+    }
+    selected = []
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id in constants
+            for target in node.targets
+        ):
+            selected.append("".join(lines[node.lineno - 1:node.end_lineno]))
+        if isinstance(node, ast.FunctionDef) and node.name in names:
+            selected.append("".join(lines[node.lineno - 1:node.end_lineno]))
+        if (
+            isinstance(node, ast.ClassDef)
+            and node.name == "CrossoverManagerPanel"
+        ):
+            method = next(
+                item for item in node.body
+                if isinstance(item, ast.FunctionDef)
+                and item.name == "use_picked_crossover_position"
+            )
+            minimal_class = ast.ClassDef(
+                name=node.name, bases=[], keywords=[], body=[method],
+                decorator_list=[], type_params=[],
+            )
+            selected.append(ast.unparse(minimal_class))
+    return "import bisect\n" + "\n\n".join(selected) + "\n"
+
+
 def straight_fixture_source():
     """Use exact frozen host normalization and its real direct caller."""
     source = legacy.B14_PATH.read_text()
@@ -665,10 +748,10 @@ def validate_contract():
     assert contract["host_adapter"]["frozen_fields"] == list(ADAPTER_FIELDS)
     assert contract["product_routing"]["record_schema_version"] == 6
     assert contract["product_routing"]["function_names"] == list(
-        workflow.PRODUCT_FUNCTION_NAMES
+        workflow.PRODUCT_FUNCTION_NAMES[:8]
     )
     assert contract["product_routing"]["caller_names"] == [
-        name for name, _targets in workflow.PRODUCT_CALLER_ROUTES
+        name for name, _targets in workflow.PRODUCT_CALLER_ROUTES[:5]
     ]
 
 
@@ -712,10 +795,10 @@ def validate_binding():
         else:
             raise AssertionError("Straight adapter is mutable")
         record = session.routing_record()
-        assert record["schema_version"] == 6
-        assert record["contract_id"] == "tracktemplate:phase7:straight-route:1"
+        assert record["schema_version"] == 7
+        assert record["contract_id"] == "tracktemplate:phase7:station-mapping:1"
         assert record["function_names"] == list(functions)
-        assert record["caller_names"][-1] == "build_straight_routes"
+        assert record["caller_names"] == list(STATION_CALLER_NAMES)
         caller = session.module.build_straight_routes
         assert caller.__globals__ is session.module.__dict__
         assert "build_straight_route" in caller.__code__.co_names
@@ -740,7 +823,7 @@ def validate_binding():
                     lambda: workflow.ModularTransitionWorkflowSession(
                         source, invalid
                     ),
-                    "complete eight-function",
+                    "complete ten-function",
                 )
                 assert core._snapshot(source) == before
         for absent in (False, True):

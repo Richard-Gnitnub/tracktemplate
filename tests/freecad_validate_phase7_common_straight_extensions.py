@@ -97,9 +97,9 @@ host.module.run_macro = runner
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
 assert record["contract_id"] == (
-    "tracktemplate:phase7:straight-route:1"
+    "tracktemplate:phase7:station-mapping:1"
 )
-assert record["schema_version"] == 6 and record["mixed_route"] is False
+assert record["schema_version"] == 7 and record["mixed_route"] is False
 assert record["function_names"] == list(proof.core_proof.PRODUCT_FUNCTION_NAMES)
 adapter = session.module.add_common_straight_extensions
 assert type(adapter) is transition_workflow._CommonStraightExtensionsAdapter

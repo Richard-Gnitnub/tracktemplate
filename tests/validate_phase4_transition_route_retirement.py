@@ -125,7 +125,9 @@ def _validate_product_boundary():
     assert "comparison_route_available" in workflow_source
     assert "load_b15_workflow_host" in workflow_source
 
-    from validate_phase7_straight_route import straight_fixture_source
+    from validate_phase7_straight_route import (
+        STATION_CALLER_NAMES, station_fixture_source, straight_fixture_source,
+    )
 
     class FakeHost:
         def __init__(self):
@@ -133,7 +135,10 @@ def _validate_product_boundary():
             self.module.App = types.SimpleNamespace(
                 Vector=lambda x, y, z: (x, y, z),
             )
-            exec(straight_fixture_source(), self.module.__dict__)
+            exec(
+                straight_fixture_source() + station_fixture_source(),
+                self.module.__dict__,
+            )
             exec(
                 "def build_concentric_core(*arguments):\n"
                 "    return (clothoid_entry_displacement(*arguments),\n"
@@ -147,6 +152,8 @@ def _validate_product_boundary():
                 "    core = build_concentric_core(centre, 600.0, 600.0,\n"
                 "        600.0, 1.5, 'Main Track')\n"
                 "    add_common_straight_extensions([core], 1.5)\n"
+                "    data = alignment_station_data(core)\n"
+                "    interpolate_alignment_station(data, 0.0)\n"
                 "    return core\n",
                 self.module.__dict__,
             )
@@ -173,6 +180,7 @@ def _validate_product_boundary():
             "build_concentric_core",
             "add_common_straight_extensions",
             "build_straight_route",
+            "alignment_station_data", "interpolate_alignment_station",
         )
     }
     host = FakeHost()
@@ -185,6 +193,7 @@ def _validate_product_boundary():
         if name in {
             "build_concentric_core", "add_common_straight_extensions",
             "build_straight_route",
+            "alignment_station_data", "interpolate_alignment_station",
         }:
             assert host.module.__dict__[name].calculation is (
                 functions[name]
@@ -193,18 +202,12 @@ def _validate_product_boundary():
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 6,
-        "contract_id": "tracktemplate:phase7:straight-route:1",
+        "schema_version": 7,
+        "contract_id": "tracktemplate:phase7:station-mapping:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),
-        "caller_names": [
-            "main_circle_centre",
-            "build_concentric_core",
-            "prepare_track_alignment",
-            "run_macro",
-            "build_straight_routes",
-        ],
+        "caller_names": list(STATION_CALLER_NAMES),
         "workflow_version": "10.2A8A7B15",
         "workflow_source_sha256": "a" * 64,
         "mixed_route": False,

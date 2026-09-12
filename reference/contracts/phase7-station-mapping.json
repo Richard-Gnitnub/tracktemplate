@@ -1,0 +1,468 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase7:station-mapping:1",
+  "recorded_on": "2026-09-12",
+  "authority": [
+    "D-GOV-004",
+    "D-P7-001"
+  ],
+  "change_level": 2,
+  "contract_document": "reference/contracts/phase7-station-mapping.md",
+  "calculation": {
+    "module": "tracktemplate.domain.alignment",
+    "api": "tracktemplate.api",
+    "functions": {
+      "alignment_station_data": {
+        "parameters": [
+          "alignment"
+        ],
+        "defaults": {}
+      },
+      "interpolate_alignment_station": {
+        "parameters": [
+          "data",
+          "station"
+        ],
+        "defaults": {}
+      }
+    },
+    "length_unit": "mm",
+    "heading_unit": "rad",
+    "frame": "global-document-XY",
+    "station_direction": "input travel order",
+    "point_protocol": "Two-component neutral XY value: index 0 reads x; index 1 reads y",
+    "required_alignment_keys": [
+      "points",
+      "headings"
+    ],
+    "optional_alignment_defaults": {
+      "entry_extension": 0.0,
+      "exit_extension": 0.0
+    },
+    "station_data_keys": [
+      "alignment",
+      "points",
+      "headings",
+      "stations",
+      "total",
+      "core_start",
+      "core_end"
+    ],
+    "interpolation_required_data_keys": [
+      "total",
+      "stations",
+      "points",
+      "headings"
+    ],
+    "index_result_identity": "Same supplied neutral mapping; shallow point and heading copies; original element order and identities",
+    "index_minimum_points": 2,
+    "index_count_error": "A selected track alignment is incomplete.",
+    "duplicate_policy": "Preserve consecutive duplicates and equal stations",
+    "interpolation_selection": "Inherited min/max clamps and bisect.bisect_right; later segment at equal station",
+    "geometry_tolerance": 1e-08,
+    "heading_policy": "Linear unwrapped interpolation; no new finite or angle normalization",
+    "interpolation_result_type": "AlignmentStationInterpolation",
+    "interpolation_result_fields": [
+      "point",
+      "heading_a",
+      "heading_b",
+      "fraction"
+    ],
+    "interpolation_result_frozen": true,
+    "interpolation_result_persistence": "None; transient neutral calculation result only",
+    "heading_property": "heading_a + ((heading_b - heading_a) * fraction), computed at property access without a cache",
+    "input_mutation": false,
+    "cached": false
+  },
+  "host_adapters": {
+    "module": "tracktemplate.compatibility.transition_workflow",
+    "index": {
+      "private_type": "_AlignmentStationDataAdapter",
+      "frozen_fields": [
+        "calculation"
+      ],
+      "parameters": [
+        "alignment"
+      ],
+      "identity_rule": "Exact selected alignment_station_data function",
+      "result_identity": "Original host alignment mapping; fresh shallow lists retaining original host point and heading element identities"
+    },
+    "interpolation": {
+      "private_type": "_AlignmentStationInterpolationAdapter",
+      "frozen_fields": [
+        "calculation",
+        "vector_factory"
+      ],
+      "parameters": [
+        "data",
+        "station"
+      ],
+      "identity_rule": "Exact selected interpolate_alignment_station function and exact host App.Vector",
+      "vector_factory": "host.module.App.Vector",
+      "vector_calls_per_successful_call": 1,
+      "vector_z": 0.0,
+      "result": [
+        "fresh App.Vector",
+        "heading_radians"
+      ],
+      "operation_order": "Evaluate XY; float(x), float(y); allocate App.Vector; evaluate deferred heading; return tuple"
+    },
+    "private_live_views": [
+      "_StationXYPointView",
+      "_StationPointSequenceView",
+      "_StationAlignmentView",
+      "_StationDataView"
+    ],
+    "live_view_scope": "Temporary neutral component/scalar reads only; no host view escapes in the station-data result",
+    "interpolation_point_conversion": "Constant-size views of only the selected two points; no full point-list conversion or cache",
+    "domain_host_objects": false,
+    "domain_host_callbacks": false,
+    "input_mutation": false,
+    "document_mutation": false
+  },
+  "product_routing": {
+    "record_schema_version": 7,
+    "route": "modular",
+    "comparison_route_available": false,
+    "function_names": [
+      "clothoid_entry_displacement",
+      "transition_start_signed_offset",
+      "solve_transition_length",
+      "main_circle_centre",
+      "clothoid_exit_displacement",
+      "build_concentric_core",
+      "add_common_straight_extensions",
+      "build_straight_route",
+      "alignment_station_data",
+      "interpolate_alignment_station"
+    ],
+    "caller_names": [
+      "main_circle_centre",
+      "build_concentric_core",
+      "prepare_track_alignment",
+      "run_macro",
+      "build_straight_routes",
+      "alignment_progress_at_station",
+      "platform_coverage_bounds",
+      "sample_station_interval",
+      "_project_centreline_to_reference_normal",
+      "_offset_point_towards_reference",
+      "calculate_platform_boundaries",
+      "create_between_alignments_face",
+      "_project_formation_point_to_reference",
+      "_simple_formation_swept_face",
+      "create_section_mask_face",
+      "create_section_masks",
+      "apply_registration_features",
+      "find_section_number_origin",
+      "alignment_station_at_cross_section",
+      "calculate_template_section_stations",
+      "apply_track_template_joints",
+      "create_track_template_fixing_holes",
+      "prepare_straight_route_production",
+      "turnout_host_alignment",
+      "map_turnout_local_point",
+      "_turnout_interval_samples",
+      "_crossover_nearest_point_on_alignment",
+      "_crossover_host_travel_vector",
+      "_crossover_automatic_hand",
+      "_crossover_orientation_b",
+      "solve_rea_c10_crossover_geometry",
+      "resolve_automatic_turnout_crossover_extension",
+      "_timber_record_from_layout",
+      "crossover_inherited_timber_records",
+      "crossover_shared_timber_envelope_context",
+      "_crossover_integration_alignment_signature",
+      "_chair_turnout_timber_records",
+      "CrossoverManagerPanel.use_picked_crossover_position"
+    ],
+    "caller_routes": [
+      {
+        "caller": "main_circle_centre",
+        "targets": [
+          "clothoid_entry_displacement"
+        ]
+      },
+      {
+        "caller": "build_concentric_core",
+        "targets": [
+          "clothoid_entry_displacement",
+          "clothoid_exit_displacement"
+        ]
+      },
+      {
+        "caller": "prepare_track_alignment",
+        "targets": [
+          "transition_start_signed_offset",
+          "solve_transition_length",
+          "build_concentric_core"
+        ]
+      },
+      {
+        "caller": "run_macro",
+        "targets": [
+          "main_circle_centre",
+          "build_concentric_core",
+          "add_common_straight_extensions",
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "build_straight_routes",
+        "targets": [
+          "build_straight_route"
+        ]
+      },
+      {
+        "caller": "alignment_progress_at_station",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "platform_coverage_bounds",
+        "targets": [
+          "alignment_station_data"
+        ]
+      },
+      {
+        "caller": "sample_station_interval",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_project_centreline_to_reference_normal",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_offset_point_towards_reference",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "calculate_platform_boundaries",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "create_between_alignments_face",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_project_formation_point_to_reference",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_simple_formation_swept_face",
+        "targets": [
+          "alignment_station_data"
+        ]
+      },
+      {
+        "caller": "create_section_mask_face",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "create_section_masks",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "apply_registration_features",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "find_section_number_origin",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "alignment_station_at_cross_section",
+        "targets": [
+          "alignment_station_data"
+        ]
+      },
+      {
+        "caller": "calculate_template_section_stations",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "apply_track_template_joints",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "create_track_template_fixing_holes",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "prepare_straight_route_production",
+        "targets": [
+          "alignment_station_data",
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "turnout_host_alignment",
+        "targets": [
+          "alignment_station_data"
+        ]
+      },
+      {
+        "caller": "map_turnout_local_point",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_turnout_interval_samples",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_crossover_nearest_point_on_alignment",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_crossover_host_travel_vector",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_crossover_automatic_hand",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_crossover_orientation_b",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "solve_rea_c10_crossover_geometry",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "resolve_automatic_turnout_crossover_extension",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_timber_record_from_layout",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "crossover_inherited_timber_records",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "crossover_shared_timber_envelope_context",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_crossover_integration_alignment_signature",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "_chair_turnout_timber_records",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      },
+      {
+        "caller": "CrossoverManagerPanel.use_picked_crossover_position",
+        "targets": [
+          "interpolate_alignment_station"
+        ]
+      }
+    ],
+    "station_pair_root_caller_counts": {
+      "alignment_station_data": 15,
+      "interpolate_alignment_station": 30
+    },
+    "station_pair_unique_root_callers": 34,
+    "complete_current_caller_count": 38,
+    "class_method": "CrossoverManagerPanel.use_picked_crossover_position",
+    "nested_context": "_project_centreline_to_reference_normal.point_at_station",
+    "nested_context_rule": "Validate the actual nested code and enclosing host globals; no module alias or extra historical root",
+    "rollback": "Restore all ten prior bindings after failed validation; remove a newly supplied name when originally absent",
+    "workflow_version": "10.2A8A7B15",
+    "mixed_route": false
+  },
+  "scope": {
+    "supported": "Inherited sampled alignments and equivalent indexed data, neutral XY records, ordinary invalid-input and access-order compatibility",
+    "preserved": [
+      "Seven host fields and their insertion order",
+      "Original alignment identity and shallow point/heading aliases",
+      "Travel-order station accumulation and independent extension clamping",
+      "Duplicate-station right bias and inherited span tolerance",
+      "Unwrapped heading arithmetic and fresh-vector ordering",
+      "Ordinary missing-field, count, scalar and point errors in inherited order",
+      "Actual module, class-method and nested caller ownership",
+      "Compatible wider consumers without migration of their product families",
+      "All existing transaction, persistence, output and legacy-retirement conditions"
+    ],
+    "excluded": [
+      "New canonical model, persistence or interchange schema",
+      "New duplicate, heading, finite-value or input-normalization policy",
+      "Hidden cache, eager interpolation point conversion or performance optimisation",
+      "Traceback-frame identity, resource exhaustion or unrelated exotic object behavior",
+      "Whole-family migration or admission of turnout, crossover, timber and chair consumers",
+      "Phase-exit, performance, output or release acceptance"
+    ],
+    "deferred_obligation": "D-P6-008 unchanged in full"
+  },
+  "validation": {
+    "standalone": "tests/validate_phase7_station_mapping.py",
+    "qualified_host": "tests/freecad_validate_phase7_station_mapping.py",
+    "measurement_boundary": "Complete host adaptation, snapshots, point views, neutral result allocation, calculation, vector conversion and deferred heading evaluation",
+    "preimplementation": "Retained B14/B15 characterisation and selected qualified caller-group baseline evidence"
+  }
+}
