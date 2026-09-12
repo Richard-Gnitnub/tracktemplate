@@ -1,6 +1,15 @@
 {
   "documents": [
     {
+      "accepted_blob": "sha1:d3af54f931777f78157911bf23d8f0b4cda0b106",
+      "accepted_sha256": "sha256:b4fa43fb3f2ece201c0fefe62c34ae874653bf390f32fd62ef0f3038f725fd7b",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": ".agents/skills/tracktemplate-continue/SKILL.md",
+      "review_receipt": "sha256:28fef844ad074528d5a2b51effc85f1103ec91d629b14a8e1e33399b6e25c6dd",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:16723f7c4dbc944d43852ccc16dbfab17eb439c0",
       "accepted_sha256": "sha256:2a8eb6b3931f7b5905af24b46f99f44196830c2ed6d59a0058b001ef447f18e5",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -22,12 +31,12 @@
       "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
     },
     {
-      "accepted_blob": "sha1:59d4c8bac53da514b45f790f40d17566dd3a9d64",
-      "accepted_sha256": "sha256:b5dfe87be36a91c5e4f7d43ca88ceb3644232b9d6cb34c83de90ad8c2e38d03a",
+      "accepted_blob": "sha1:47ec95f24a375159f1bd1946baa44c8f9b0e1e29",
+      "accepted_sha256": "sha256:bd2bf0d9612415c5c7f7dab4412393727a1a3f685a0ce8f897adbe59e690a8b2",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/AGENT_WORKFLOWS.md",
-      "review_receipt": "sha256:345706370d73aae95b41fc8f4b72041d25175514592c3a6465c4c83d31b5e627",
+      "review_receipt": "sha256:28fef844ad074528d5a2b51effc85f1103ec91d629b14a8e1e33399b6e25c6dd",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {

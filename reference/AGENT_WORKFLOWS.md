@@ -75,6 +75,69 @@ gives no removal authority. The implementing agent stops if the retirement
 plan has ambiguous or uniquely owned state. The agent also stops if the
 preservation audit does not have a complete result.
 
+## When to report
+
+Apply this owner instruction during each TrackTemplate workflow:
+
+> No material state transition = no user-facing progress message.
+
+Report only a material change to one of these items:
+
+- The result.
+- Which agent does which task.
+- The authority.
+- A condition that prevents work.
+- The condition of validation or review.
+- The condition of the candidate.
+- The condition at a publication boundary or a merge.
+- The condition of work as complete or not complete.
+- An owner decision that is necessary.
+
+Report each change one time.
+
+Unless these usual operations cause a material change, do not report them:
+
+- You read information.
+- You examine data to find information.
+- You use commands.
+- You wait.
+- A small operation has a correct result.
+- You get repository state that did not change.
+
+These operations alone do not show a material change. Time alone does not show
+a material change. Do not report a change that did not occur to supply a report.
+
+Use these items in this sequence for each usual report:
+
+`Action / Actor / Scope / Authority / Result`
+
+Keep the five items in one short row.
+If more information is necessary for an owner decision, give that information.
+Always report a new condition that prevents work.
+Also report a validation with a FAIL result, a changed review verdict or a necessary owner decision.
+
+If the owner tells you to supply information, give it.
+This instruction also applies when no material change occurred.
+
+Keep the workflow owners and applicable requirements for evidence. When work
+ends, use the [instructions for a complete result](ENGINEERING_POLICY.md#completion-report).
+Keep errors and command output unchanged in the applicable evidence.
+
+Caveman is an optional skill for agent reports. This instruction applies with
+or without Caveman. Caveman is not necessary for TrackTemplate.
+Do not apply the short wording of agent reports to these items:
+
+- Canonical documents.
+- Evidence.
+- Errors.
+- Commands.
+- Review verdicts.
+- Other files and outputs from repository work.
+
+Obey other applicable instructions that control this instruction.
+If such an instruction makes a report necessary, supply only the necessary information.
+Do not claim that a material change occurred when none occurred.
+
 ## Instruction budget
 
 Codex combines repository instruction files and applies a finite default byte

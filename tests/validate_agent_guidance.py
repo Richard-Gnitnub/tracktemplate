@@ -159,6 +159,159 @@ def bullet_items(text: str) -> list[str]:
     return items
 
 
+def validate_reporting_contract(workflows: str, continuation: str) -> None:
+    """Protect the local guidance contract, not actual model compliance."""
+    section = direct_section_content(workflows, "When to report")
+    flat = semantic_text(section)
+    for required in (
+        "No material state transition = no user-facing progress message.",
+        "Action / Actor / Scope / Authority / Result",
+        "Report each change one time.",
+        "These operations alone do not show a material change.",
+        "Time alone does not show a material change.",
+        "Do not report a change that did not occur to supply a report.",
+        "Keep the five items in one short row.",
+        "If more information is necessary for an owner decision, give that "
+        "information.",
+        "Always report a new condition that prevents work. Also report a "
+        "validation with a FAIL result, a changed review verdict or a "
+        "necessary owner decision.",
+        "If the owner tells you to supply information, give it. This "
+        "instruction also applies when no material change occurred.",
+        "Caveman is an optional skill for agent reports.",
+        "This instruction applies with or without Caveman.",
+        "Caveman is not necessary for TrackTemplate.",
+        "Obey other applicable instructions that control this instruction.",
+        "If such an instruction makes a report necessary, supply only the "
+        "necessary information.",
+        "Do not claim that a material change occurred when none occurred.",
+    ):
+        require(required in flat, "reporting guidance lost: " + required)
+
+    blocks = [
+        block for block in re.split(r"\n[ \t]*\n", section) if block.strip()
+    ]
+    for introduction, expected_items in (
+        (
+            "Report only a material change to one of these items:",
+            (
+                "The result.",
+                "Which agent does which task.",
+                "The authority.",
+                "A condition that prevents work.",
+                "The condition of validation or review.",
+                "The condition of the candidate.",
+                "The condition at a publication boundary or a merge.",
+                "The condition of work as complete or not complete.",
+                "An owner decision that is necessary.",
+            ),
+        ),
+        (
+            "Unless these usual operations cause a material change, do not "
+            "report them:",
+            (
+                "You read information.",
+                "You examine data to find information.",
+                "You use commands.",
+                "You wait.",
+                "A small operation has a correct result.",
+                "You get repository state that did not change.",
+            ),
+        ),
+        (
+            "Do not apply the short wording of agent reports to these items:",
+            (
+                "Canonical documents.", "Evidence.", "Errors.", "Commands.",
+                "Review verdicts.",
+                "Other files and outputs from repository work.",
+            ),
+        ),
+    ):
+        require(
+            any(
+                (
+                    semantic_text(block) == introduction
+                    or semantic_text(block).endswith(". " + introduction)
+                )
+                and set(expected_items) <= set(bullet_items(next_block))
+                for block, next_block in zip(blocks, blocks[1:])
+            ),
+            "reporting guidance lost category coverage or polarity: "
+            + introduction,
+        )
+    linked = direct_section_content(continuation, "When to report")
+    require(
+        "../../../reference/AGENT_WORKFLOWS.md#when-to-report"
+        in LINK_RE.findall(linked),
+        "continuation lost the canonical reporting link",
+    )
+    require(
+        semantic_text(linked).startswith("Apply the instruction for reports")
+        and "during all of this cycle." in semantic_text(linked),
+        "continuation made the reporting rule optional or local",
+    )
+
+
+def validate_reporting_mutations(workflows: str, continuation: str) -> None:
+    """Check representative losses and inversions without changing files."""
+    wrapped = workflows.replace(
+        "Report only a material change", "**Report only a material change**", 1,
+    ).replace(
+        "The condition of validation or review.",
+        "The condition of validation or\n  review.", 1,
+    )
+    validate_reporting_contract(wrapped, continuation)
+    for label, document, original, replacement in (
+        (
+            "silence rule deletion", "workflows",
+            "No material state transition = no user-facing progress message.",
+            "",
+        ),
+        (
+            "field order inversion", "workflows",
+            "Action / Actor / Scope / Authority / Result",
+            "Action / Scope / Actor / Authority / Result",
+        ),
+        (
+            "routine reporting inversion", "workflows",
+            "do not report them:", "report them:",
+        ),
+        (
+            "Caveman dependency inversion", "workflows",
+            "Caveman is not necessary for TrackTemplate.",
+            "Caveman is necessary for TrackTemplate.",
+        ),
+        (
+            "artefact compression inversion", "workflows",
+            "Do not apply the short wording of agent reports",
+            "Apply the short wording of agent reports",
+        ),
+        (
+            "higher-priority exception inversion", "workflows",
+            "makes a report necessary, supply only the necessary information.",
+            "makes a report necessary, do not supply the necessary information.",
+        ),
+        (
+            "canonical link loss", "continuation",
+            "../../../reference/AGENT_WORKFLOWS.md#when-to-report",
+            "../../../reference/AGENT_WORKFLOWS.md#instruction-budget",
+        ),
+    ):
+        source = workflows if document == "workflows" else continuation
+        require(
+            original in source, "reporting mutation target drifted: " + label,
+        )
+        changed = source.replace(original, replacement, 1)
+        try:
+            validate_reporting_contract(
+                changed if document == "workflows" else workflows,
+                changed if document == "continuation" else continuation,
+            )
+        except AssertionError:
+            continue
+        raise AssertionError("reporting contract mutation escaped: " + label)
+
+
 def validate_explicit_agent_safeguards(agents: str) -> None:
     """Protect every accepted no-silent-change and terminology boundary."""
     change_items = bullet_items(
@@ -1653,6 +1806,8 @@ def main() -> None:
         SKILLS_ROOT / "tracktemplate-ide-workspace-alignment" / "SKILL.md"
     )
     continuation = read(SKILLS_ROOT / "tracktemplate-continue" / "SKILL.md")
+    validate_reporting_contract(workflows, continuation)
+    validate_reporting_mutations(workflows, continuation)
     validate_ide_workspace_alignment_contract(ide_skill, continuation)
     validate_ide_workspace_alignment_mutations(ide_skill, continuation)
     validate_continue_invocation_policy(workflows)
