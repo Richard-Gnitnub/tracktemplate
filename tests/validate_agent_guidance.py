@@ -166,59 +166,79 @@ def validate_reporting_contract(workflows: str, continuation: str) -> None:
     for required in (
         "No material state transition = no user-facing progress message.",
         "Action / Actor / Scope / Authority / Result",
-        "Report each change once.",
-        "These operations alone do not establish a material change.",
-        "Elapsed time alone does not establish a material change.",
-        "Do not invent a change to supply an update.",
-        "Keep the update to one concise line.",
-        "Give more information only when the owner needs it to make a "
-        "decision.",
-        "Do not hide a new blocker, failed validation, changed review verdict, "
-        "or necessary owner decision.",
-        "Answer an explicit owner request even when no material state has "
-        "changed.",
-        "Caveman is an optional user-level communication aid.",
-        "This rule applies with Caveman active or inactive.",
-        "TrackTemplate does not require Caveman.",
-        "Higher-priority instructions remain applicable.",
-        "If a higher-priority instruction requires an update, supply only the "
-        "required information.",
+        "Report each change one time.",
+        "These operations alone do not show a material change.",
+        "Time alone does not show a material change.",
+        "Do not report a change that did not occur to supply a report.",
+        "Keep the five items in one short row.",
+        "If more information is necessary for an owner decision, give that "
+        "information.",
+        "Always report a new condition that prevents work. Also report a "
+        "validation with a FAIL result, a changed review verdict or a "
+        "necessary owner decision.",
+        "If the owner tells you to supply information, give it. This "
+        "instruction also applies when no material change occurred.",
+        "Caveman is an optional skill for agent reports.",
+        "This instruction applies with or without Caveman.",
+        "Caveman is not necessary for TrackTemplate.",
+        "Obey other applicable instructions that control this instruction.",
+        "If such an instruction makes a report necessary, supply only the "
+        "necessary information.",
         "Do not claim that a material change occurred when none occurred.",
     ):
         require(required in flat, "reporting guidance lost: " + required)
 
-    paragraphs = semantic_paragraphs(section)
-    for prefix, concepts in (
+    blocks = [
+        block for block in re.split(r"\n[ \t]*\n", section) if block.strip()
+    ]
+    for introduction, expected_items in (
         (
-            "Report only a material change",
+            "Report only a material change to one of these items:",
             (
-                "outcome", "delegation", "authority", "blocker", "validation",
-                "review", "candidate", "publication", "integration",
-                "completion", "owner-decision boundary",
+                "The result.",
+                "Which agent does which task.",
+                "The authority.",
+                "A condition that prevents work.",
+                "The condition of validation or review.",
+                "The condition of the candidate.",
+                "The condition at a publication boundary or a merge.",
+                "The condition of work as complete or not complete.",
+                "An owner decision that is necessary.",
             ),
         ),
         (
-            "Do not report routine",
+            "Unless these usual operations cause a material change, do not "
+            "report them:",
             (
-                "reads", "searches", "commands", "waits",
-                "successful low-level operations", "state that has not changed",
+                "You read information.",
+                "You examine data to find information.",
+                "You use commands.",
+                "You wait.",
+                "A small operation has a correct result.",
+                "You get repository state that did not change.",
+            ),
+        ),
+        (
+            "Do not apply the short wording of agent reports to these items:",
+            (
+                "Canonical documents.", "Evidence.", "Errors.", "Commands.",
+                "Review verdicts.",
+                "Other files and outputs from repository work.",
             ),
         ),
     ):
         require(
             any(
-                paragraph.startswith(prefix)
-                and all(concept in paragraph for concept in concepts)
-                for paragraph in paragraphs
+                (
+                    semantic_text(block) == introduction
+                    or semantic_text(block).endswith(". " + introduction)
+                )
+                and set(expected_items) <= set(bullet_items(next_block))
+                for block, next_block in zip(blocks, blocks[1:])
             ),
-            "reporting guidance lost category coverage or polarity: " + prefix,
+            "reporting guidance lost category coverage or polarity: "
+            + introduction,
         )
-    require(
-        "Do not apply compressed conversational style to canonical "
-        "documentation, evidence, exact errors, commands, review verdicts, "
-        "or repository artefacts." in flat,
-        "reporting guidance permits compression of retained artefacts",
-    )
     linked = direct_section_content(continuation, "When to report")
     require(
         "../../../reference/AGENT_WORKFLOWS.md#when-to-report"
@@ -226,8 +246,8 @@ def validate_reporting_contract(workflows: str, continuation: str) -> None:
         "continuation lost the canonical reporting link",
     )
     require(
-        semantic_text(linked).startswith("Apply the existing reporting rule")
-        and "throughout this cycle." in semantic_text(linked),
+        semantic_text(linked).startswith("Apply the instruction for reports")
+        and "during all of this cycle." in semantic_text(linked),
         "continuation made the reporting rule optional or local",
     )
 
@@ -237,8 +257,8 @@ def validate_reporting_mutations(workflows: str, continuation: str) -> None:
     wrapped = workflows.replace(
         "Report only a material change", "**Report only a material change**", 1,
     ).replace(
-        "routine reads, searches, commands, waits,",
-        "routine reads,\nsearches, commands, waits,", 1,
+        "The condition of validation or review.",
+        "The condition of validation or\n  review.", 1,
     )
     validate_reporting_contract(wrapped, continuation)
     for label, document, original, replacement in (
@@ -254,22 +274,22 @@ def validate_reporting_mutations(workflows: str, continuation: str) -> None:
         ),
         (
             "routine reporting inversion", "workflows",
-            "Do not report routine", "Report routine",
+            "do not report them:", "report them:",
         ),
         (
             "Caveman dependency inversion", "workflows",
-            "TrackTemplate does not require Caveman.",
-            "TrackTemplate requires Caveman.",
+            "Caveman is not necessary for TrackTemplate.",
+            "Caveman is necessary for TrackTemplate.",
         ),
         (
             "artefact compression inversion", "workflows",
-            "Do not apply\ncompressed conversational style",
-            "Apply compressed conversational style",
+            "Do not apply the short wording of agent reports",
+            "Apply the short wording of agent reports",
         ),
         (
             "higher-priority exception inversion", "workflows",
-            "requires an update, supply only the required information.",
-            "requires an update, do not supply the required information.",
+            "makes a report necessary, supply only the necessary information.",
+            "makes a report necessary, do not supply the necessary information.",
         ),
         (
             "canonical link loss", "continuation",
