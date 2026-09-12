@@ -18,9 +18,9 @@ The owner accepted the completed, independently reviewed
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
 | What changed | The implementing agent merged PR #74 into clean protected main. The new candidate moves the station pair into `tracktemplate.domain.alignment` for `tracktemplate.api` and connects the actual B16 callers through small compatibility objects. |
-| What now works | Complete station results, identities, errors and operation sequence match B14/B15 within the bounded proof. Selected standalone and qualified FreeCAD checks have PASS results. Three human-interface scenarios give equal complete lifecycle results. The product selects ten functions together and validates 38 actual caller routes. |
-| Limitations/findings | Direct station operations have added measured cost. Caller measurements also show higher costs and include operations that count calls. Plain-line rejection and recovery wall times are higher in the descriptive human-interface samples. Their causes are unknown. D-P6-008, earlier PR #72 and PR #73 limitations, and all conditions to compare results and remove legacy paths stay in full. |
-| Owner decision | Richard authorised integration of PR #74 and this one subsequent Level 2 result through draft publication. A merge of the new exact-green draft needs another owner decision. |
+| What now works | Complete station results, identities, errors and operation sequence match B14/B15 within the bounded proof. Selected standalone and qualified FreeCAD checks have PASS results. Three human-interface cases give equal complete workflow results. The product selects ten functions together and validates 38 actual caller routes. |
+| Limitations/findings | Direct station operations have added measured cost. Caller measurements also show higher costs and include operations that count function uses. Plain-line rejection and recovery wall times are higher in the descriptive human-interface samples. Their causes are unknown. D-P6-008, earlier PR #72 and PR #73 limitations, and all conditions to compare results and remove legacy paths stay in full. |
+| Owner decision | Richard authorised the merge of PR #74 and this one subsequent Level 2 result through draft publication. A merge of the new exact-green draft makes another owner decision necessary. |
 | Next action | Complete the bounded documentation cycle and exact-green draft publication. Bring that draft to Richard for merge authority. Accept no Phase 7 exit. |
 
 ## Migration of station values and points — 2026-09-12
@@ -30,20 +30,20 @@ The owner's `$tracktemplate-continue` command authorises this one subsequent Lev
 
 The station functions `alignment_station_data` and `interpolate_alignment_station` were missing from Core.
 They now use `tracktemplate.domain.alignment` through `tracktemplate.api`.
-The [API instructions](../contracts/phase7-station-mapping.md) preserve station values, point identities, ordinary diagnostics and operation sequence.
-Small compatibility objects keep native point creation before the final calculation of track direction.
+The [API instructions](../contracts/phase7-station-mapping.md) preserve station values, point identities, usual diagnostics and operation sequence.
+Small compatibility objects keep host point creation before the final calculation of track direction.
 The product selects ten functions together, checks 38 actual caller routes and puts previous values back after a selection error.
 
 The complete bounded B14/B15 proof and selected standalone and qualified FreeCAD checks have PASS results.
-All twelve actual caller comparisons give equal results, as do the three complete human-interface scenario comparisons.
-The direct series preserves 12,120 timed invocations and sixty complete comparisons across twelve new processes.
-The independent read-only review of the exact source, tests and raw evidence has a PASS result with no findings that need action.
+All twelve actual caller checks to compare results give equal results, as do the three complete human-interface case checks to compare results.
+The direct series preserves 12,120 timed operations and sixty complete checks to compare results across twelve new processes.
+The independent read-only review of the frozen source, tests and raw evidence has a PASS result with no findings for necessary action.
 
 The [evidence record](../benchmarks/2026-09-12-phase7-station-mapping-regression.md) keeps the source identities, raw proof, measured costs and classified initial failures.
-All ten direct boundaries show added median wall cost for subsequent invocations.
+All ten direct sets of operations show added median wall cost for subsequent operations.
 With calculation of station data included, the paired median added cost is 18.435–833.005 microseconds across the five cases.
 
-Caller time measurements include operations that count calls. They do not establish costs without those counting operations.
+Caller time measurements include operations that count function uses. They do not show costs without those counting operations.
 The human-interface samples are descriptive only. None of these measurements gives product performance acceptance.
 
 This result supplies evidence for the bounded scope in Exits 3, 2 and 1.
