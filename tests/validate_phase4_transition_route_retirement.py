@@ -125,12 +125,15 @@ def _validate_product_boundary():
     assert "comparison_route_available" in workflow_source
     assert "load_b15_workflow_host" in workflow_source
 
+    from validate_phase7_straight_route import straight_fixture_source
+
     class FakeHost:
         def __init__(self):
             self.module = types.ModuleType("phase4_product_host_fixture")
             self.module.App = types.SimpleNamespace(
                 Vector=lambda x, y, z: (x, y, z),
             )
+            exec(straight_fixture_source(), self.module.__dict__)
             exec(
                 "def build_concentric_core(*arguments):\n"
                 "    return (clothoid_entry_displacement(*arguments),\n"
@@ -169,6 +172,7 @@ def _validate_product_boundary():
             "clothoid_exit_displacement",
             "build_concentric_core",
             "add_common_straight_extensions",
+            "build_straight_route",
         )
     }
     host = FakeHost()
@@ -178,7 +182,10 @@ def _validate_product_boundary():
     )
     assert host.bindings == []
     for name in functions:
-        if name in {"build_concentric_core", "add_common_straight_extensions"}:
+        if name in {
+            "build_concentric_core", "add_common_straight_extensions",
+            "build_straight_route",
+        }:
             assert host.module.__dict__[name].calculation is (
                 functions[name]
             )
@@ -186,8 +193,8 @@ def _validate_product_boundary():
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 5,
-        "contract_id": "tracktemplate:phase7:common-straight-extensions:1",
+        "schema_version": 6,
+        "contract_id": "tracktemplate:phase7:straight-route:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),
@@ -196,6 +203,7 @@ def _validate_product_boundary():
             "build_concentric_core",
             "prepare_track_alignment",
             "run_macro",
+            "build_straight_routes",
         ],
         "workflow_version": "10.2A8A7B15",
         "workflow_source_sha256": "a" * 64,

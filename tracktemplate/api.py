@@ -78,6 +78,7 @@ from tracktemplate.application.transition_export import (
 from tracktemplate.domain.alignment import (
     add_common_straight_extensions,
     build_concentric_core,
+    build_straight_route,
     clothoid_entry_displacement,
     clothoid_exit_displacement,
     main_circle_centre,
@@ -165,6 +166,7 @@ __all__ = (
     "regenerate_transition_preview",
     "add_common_straight_extensions",
     "build_concentric_core",
+    "build_straight_route",
     "clothoid_entry_displacement",
     "clothoid_exit_displacement",
     "main_circle_centre",
