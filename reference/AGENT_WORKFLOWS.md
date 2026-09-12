@@ -77,40 +77,66 @@ preservation audit does not have a complete result.
 
 ## When to report
 
-Apply this owner instruction during every TrackTemplate workflow:
+Apply this owner instruction during each TrackTemplate workflow:
 
 > No material state transition = no user-facing progress message.
 
-Report only a material change to an outcome, delegation, authority, blocker,
-validation or review state, candidate state, publication or integration state,
-completion, or an owner-decision boundary. Report each change once.
+Report only a material change to one of these items:
 
-Do not report routine reads, searches, commands, waits, successful low-level
-operations, or repeated repository state that has not changed. These operations
-alone do not establish a material change. Elapsed time alone does not establish
-a material change. Do not invent a change to supply an update.
+- The result.
+- Which agent does which task.
+- The authority.
+- A condition that prevents work.
+- The condition of validation or review.
+- The condition of the candidate.
+- The condition at a publication boundary or a merge.
+- The condition of work as complete or not complete.
+- An owner decision that is necessary.
 
-Use this field order for each normal update:
+Report each change one time.
+
+Unless these usual operations cause a material change, do not report them:
+
+- You read information.
+- You examine data to find information.
+- You use commands.
+- You wait.
+- A small operation has a correct result.
+- You get repository state that did not change.
+
+These operations alone do not show a material change. Time alone does not show
+a material change. Do not report a change that did not occur to supply a report.
+
+Use these items in this sequence for each usual report:
 
 `Action / Actor / Scope / Authority / Result`
 
-Keep the update to one concise line. Give more information only when the owner
-needs it to make a decision. Do not hide a new blocker, failed validation,
-changed review verdict, or necessary owner decision. Answer an explicit owner
-request even when no material state has changed.
+Keep the five items in one short row.
+If more information is necessary for an owner decision, give that information.
+Always report a new condition that prevents work.
+Also report a validation with a FAIL result, a changed review verdict or a necessary owner decision.
 
-Keep the existing workflow owners and evidence requirements. Use the existing
-[completion requirements](ENGINEERING_POLICY.md#completion-report) when work
-ends. Keep exact errors and command output in the applicable evidence.
+If the owner tells you to supply information, give it.
+This instruction also applies when no material change occurred.
 
-Caveman is an optional user-level communication aid. This rule applies with
-Caveman active or inactive. TrackTemplate does not require Caveman. Do not apply
-compressed conversational style to canonical documentation, evidence, exact
-errors, commands, review verdicts, or repository artefacts.
+Keep the workflow owners and applicable requirements for evidence. When work
+ends, use the [instructions for a complete result](ENGINEERING_POLICY.md#completion-report).
+Keep errors and command output unchanged in the applicable evidence.
 
-Higher-priority instructions remain applicable. If a higher-priority
-instruction requires an update, supply only the required information. Do not
-claim that a material change occurred when none occurred.
+Caveman is an optional skill for agent reports. This instruction applies with
+or without Caveman. Caveman is not necessary for TrackTemplate.
+Do not apply the short wording of agent reports to these items:
+
+- Canonical documents.
+- Evidence.
+- Errors.
+- Commands.
+- Review verdicts.
+- Other files and outputs from repository work.
+
+Obey other applicable instructions that control this instruction.
+If such an instruction makes a report necessary, supply only the necessary information.
+Do not claim that a material change occurred when none occurred.
 
 ## Instruction budget
 

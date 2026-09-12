@@ -34,8 +34,8 @@ evidence. Otherwise, stop cleanly.
 
 ## When to report
 
-Apply the existing [reporting rule](../../../reference/AGENT_WORKFLOWS.md#when-to-report)
-throughout this cycle. It owns when to report and the required field order.
+Apply the [instruction for reports](../../../reference/AGENT_WORKFLOWS.md#when-to-report)
+during all of this cycle. It owns when to report and the necessary sequence of items.
 
 ## Authority for one cycle
 
