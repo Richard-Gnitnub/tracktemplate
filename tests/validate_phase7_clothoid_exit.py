@@ -15,6 +15,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tracktemplate import api  # noqa: E402
+from validate_phase7_straight_route import STATION_CALLER_NAMES  # noqa: E402
 from tracktemplate.compatibility import (  # noqa: E402
     b15_workflow_host as host_loader,
     transition_workflow as workflow,
@@ -30,6 +31,7 @@ FUNCTION_NAMES = centre_proof.FUNCTION_NAMES + (
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "build_concentric_core", "add_common_straight_extensions",
     "build_straight_route",
+    "alignment_station_data", "interpolate_alignment_station",
 )
 CALCULATION_CASES = tuple(
     (length, radius, steps)
@@ -269,13 +271,10 @@ def validate_binding():
         )
         assert session.launch_workflow() == expected
         record = session.routing_record()
-        assert record["schema_version"] == 6
-        assert record["contract_id"] == "tracktemplate:phase7:straight-route:1"
+        assert record["schema_version"] == 7
+        assert record["contract_id"] == "tracktemplate:phase7:station-mapping:1"
         assert record["function_names"] == list(PRODUCT_FUNCTION_NAMES)
-        assert record["caller_names"] == [
-            "main_circle_centre", "build_concentric_core",
-            "prepare_track_alignment", "run_macro", "build_straight_routes",
-        ]
+        assert record["caller_names"] == list(STATION_CALLER_NAMES)
         assert record["comparison_route_available"] is False
         core = session.module.build_concentric_core.calculation
         for name in (
@@ -298,7 +297,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete eight-function",
+                "complete ten-function",
             )
             assert _snapshot(host) == before
             assert host.module.LAUNCH_COUNT == 0

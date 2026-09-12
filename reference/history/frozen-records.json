@@ -45,6 +45,7 @@
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-08-phase7-clothoid-exit-regression.md", "sha256": "1a22166a285821224be4251e85435b7208dbf88376fc2386df519aff8574ff21"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-08-phase7-concentric-core-regression.md", "sha256": "3876664f966aa8c1f1695c99205a53ce945cfd0af4337008fbc47621a42aab6d"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-09-phase7-common-straight-extensions-regression.md", "sha256": "59046cfde7fa37e8b4c601b2680d06dad54954e5b1abc060d2364e1f9086c4b1"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-09-09-phase7-straight-route-regression.md", "sha256": "838b4380d7ab5e891acbbe519cce4c8feeb507341b677b15e370e8718c3c6ebc"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-09-phase7-straight-route-regression.md", "sha256": "838b4380d7ab5e891acbbe519cce4c8feeb507341b677b15e370e8718c3c6ebc"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-12-phase7-station-mapping-regression.md", "sha256": "3fc8b7c5c7f7b5b73002810b882b700e7560c1393ae50ce2e64b8b865bd9a63b"}
   ]
 }

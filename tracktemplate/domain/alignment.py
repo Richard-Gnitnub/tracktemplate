@@ -1,12 +1,17 @@
 """FreeCAD-independent transition/easement calculations."""
 
+import bisect
 import math
+from dataclasses import dataclass
 
 
 GEOMETRY_TOLERANCE = 1.0e-8
 _CORE_SAMPLE_SPACING = 3.0
 
 __all__ = (
+    "AlignmentStationInterpolation",
+    "alignment_station_data",
+    "interpolate_alignment_station",
     "add_common_straight_extensions",
     "build_concentric_core",
     "build_straight_route",
@@ -840,3 +845,86 @@ def build_straight_route(config, curve_alignments, connected_template_thickness)
         "alignments": alignments,
         "length": config["length"],
     }
+
+
+@dataclass(frozen=True)
+class AlignmentStationInterpolation:
+    """Hold neutral XY and defer heading arithmetic for host allocation order."""
+
+    point: tuple
+    heading_a: float
+    heading_b: float
+    fraction: float
+
+    @property
+    def heading(self):
+        """Return the inherited linear, unwrapped heading in radians."""
+        return self.heading_a + (
+            (self.heading_b - self.heading_a) * self.fraction
+        )
+
+
+def alignment_station_data(alignment):
+    """Index ordered neutral XY pairs and preserve shallow input aliases.
+
+    Coordinates, stations and extensions use millimetres; headings use
+    radians. Preserve incomplete-input errors and duplicate stations.
+    """
+    points = list(alignment.get("points", []))
+    headings = list(alignment.get("headings", []))
+    if len(points) < 2 or len(points) != len(headings):
+        raise ValueError("A selected track alignment is incomplete.")
+
+    stations = [0.0]
+    for point_a, point_b in zip(points[:-1], points[1:]):
+        stations.append(
+            stations[-1] + math.hypot(
+                point_b[0] - point_a[0], point_b[1] - point_a[1],
+            )
+        )
+    total = stations[-1]
+    entry_extension = min(max(0.0, alignment.get("entry_extension", 0.0)), total)
+    exit_extension = min(max(0.0, alignment.get("exit_extension", 0.0)), total)
+    core_start = entry_extension
+    core_end = max(core_start, total - exit_extension)
+    return {
+        "alignment": alignment,
+        "points": points,
+        "headings": headings,
+        "stations": stations,
+        "total": total,
+        "core_start": core_start,
+        "core_end": core_end,
+    }
+
+
+def interpolate_alignment_station(data, station):
+    """Return staged neutral XY and heading for one travel-order station.
+
+    Clamp station millimetres with inherited right bias and span tolerance.
+    Read the result's heading after host point allocation when adapting.
+    """
+    station = min(max(float(station), 0.0), data["total"])
+    stations = data["stations"]
+    index = bisect.bisect_right(stations, station) - 1
+    index = max(0, min(index, len(stations) - 2))
+    start_station = stations[index]
+    finish_station = stations[index + 1]
+    span = finish_station - start_station
+    fraction = (
+        0.0 if span <= GEOMETRY_TOLERANCE
+        else (station - start_station) / span
+    )
+    point_a = data["points"][index]
+    point_b = data["points"][index + 1]
+    heading_a = data["headings"][index]
+    heading_b = data["headings"][index + 1]
+    return AlignmentStationInterpolation(
+        (
+            point_a[0] + ((point_b[0] - point_a[0]) * fraction),
+            point_a[1] + ((point_b[1] - point_a[1]) * fraction),
+        ),
+        heading_a,
+        heading_b,
+        fraction,
+    )

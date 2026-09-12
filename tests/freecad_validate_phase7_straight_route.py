@@ -192,10 +192,10 @@ assert core_proof._snapshot(host) == original and document_state() == before
 module.build_straight_routes = caller
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
-assert record["schema_version"] == 6
-assert record["contract_id"] == "tracktemplate:phase7:straight-route:1"
+assert record["schema_version"] == 7
+assert record["contract_id"] == "tracktemplate:phase7:station-mapping:1"
 assert record["function_names"] == list(functions)
-assert record["caller_names"][-1] == "build_straight_routes"
+assert record["caller_names"] == list(proof.STATION_CALLER_NAMES)
 adapter = module.build_straight_route
 assert type(adapter) is transition_workflow._StraightRouteAdapter
 assert adapter.calculation is api.build_straight_route

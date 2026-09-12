@@ -181,17 +181,20 @@ product_session, product_route = namespace[
     api,
     bootstrap,
 )
+from validate_phase7_straight_route import STATION_CALLER_NAMES  # noqa: E402
+
 assert product_route == {
-    "schema_version": 6,
-    "contract_id": "tracktemplate:phase7:straight-route:1",
+    "schema_version": 7,
+    "contract_id": "tracktemplate:phase7:station-mapping:1",
     "route": "modular",
     "comparison_route_available": False,
     "function_names": list(FUNCTION_NAMES) + [
         "main_circle_centre", "clothoid_exit_displacement",
         "build_concentric_core", "add_common_straight_extensions",
         "build_straight_route",
+        "alignment_station_data", "interpolate_alignment_station",
     ],
-    "caller_names": list(CALLER_NAMES) + ["run_macro", "build_straight_routes"],
+    "caller_names": list(STATION_CALLER_NAMES),
     "workflow_version": "10.2A8A7B15",
     "workflow_source_sha256": (
         "3ac26e395a8d4eacb1ae6108c12986932fbce94bb2f8d398ee0ec80c0706a848"

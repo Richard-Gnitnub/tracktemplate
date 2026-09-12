@@ -76,6 +76,9 @@ from tracktemplate.application.transition_export import (
     prepare_transition_dxf_export,
 )
 from tracktemplate.domain.alignment import (
+    AlignmentStationInterpolation,
+    alignment_station_data,
+    interpolate_alignment_station,
     add_common_straight_extensions,
     build_concentric_core,
     build_straight_route,
@@ -164,6 +167,9 @@ __all__ = (
     "TransitionPreviewScene",
     "TransitionPreviewSpecification",
     "regenerate_transition_preview",
+    "AlignmentStationInterpolation",
+    "alignment_station_data",
+    "interpolate_alignment_station",
     "add_common_straight_extensions",
     "build_concentric_core",
     "build_straight_route",

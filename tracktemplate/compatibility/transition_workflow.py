@@ -11,11 +11,12 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:straight-route:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:station-mapping:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
     "build_straight_route",
+    "alignment_station_data", "interpolate_alignment_station",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -31,9 +32,142 @@ PRODUCT_CALLER_ROUTES = (
     (
         "run_macro",
         ("main_circle_centre", "build_concentric_core",
-         "add_common_straight_extensions"),
+         "add_common_straight_extensions", "alignment_station_data",
+         "interpolate_alignment_station"),
     ),
     ("build_straight_routes", ("build_straight_route",)),
+    (
+        "alignment_progress_at_station",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "platform_coverage_bounds",
+        ("alignment_station_data",),
+    ),
+    (
+        "sample_station_interval",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_project_centreline_to_reference_normal",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_offset_point_towards_reference",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "calculate_platform_boundaries",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "create_between_alignments_face",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "_project_formation_point_to_reference",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_simple_formation_swept_face",
+        ("alignment_station_data",),
+    ),
+    (
+        "create_section_mask_face",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "create_section_masks",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "apply_registration_features",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "find_section_number_origin",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "alignment_station_at_cross_section",
+        ("alignment_station_data",),
+    ),
+    (
+        "calculate_template_section_stations",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "apply_track_template_joints",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "create_track_template_fixing_holes",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "prepare_straight_route_production",
+        ("alignment_station_data", "interpolate_alignment_station"),
+    ),
+    (
+        "turnout_host_alignment",
+        ("alignment_station_data",),
+    ),
+    (
+        "map_turnout_local_point",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_turnout_interval_samples",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_crossover_nearest_point_on_alignment",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_crossover_host_travel_vector",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_crossover_automatic_hand",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_crossover_orientation_b",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "solve_rea_c10_crossover_geometry",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "resolve_automatic_turnout_crossover_extension",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_timber_record_from_layout",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "crossover_inherited_timber_records",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "crossover_shared_timber_envelope_context",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_crossover_integration_alignment_signature",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "_chair_turnout_timber_records",
+        ("interpolate_alignment_station",),
+    ),
+    (
+        "CrossoverManagerPanel.use_picked_crossover_position",
+        ("interpolate_alignment_station",),
+    ),
 )
 
 __all__ = (
@@ -173,6 +307,87 @@ class _StraightRouteAdapter:
         return result
 
 
+@dataclass(frozen=True)
+class _StationXYPointView:
+    """Read one live host coordinate without passing its point to the API."""
+
+    _point: object
+
+    def __getitem__(self, component):
+        if component == 0:
+            return self._point.x
+        if component == 1:
+            return self._point.y
+        raise IndexError(component)
+
+
+@dataclass(frozen=True)
+class _StationPointSequenceView:
+    """Wrap only the host point selected by the inherited integer index."""
+
+    _points: object
+
+    def __getitem__(self, index):
+        return _StationXYPointView(self._points[index])
+
+
+class _StationAlignmentView:
+    """Keep the inherited snapshot and defer optional field access."""
+
+    def __init__(self, alignment):
+        self._alignment = alignment
+        self.points = None
+
+    def get(self, key, default):
+        value = self._alignment.get(key, default)
+        if key == "points":
+            self.points = list(value)
+            return (_StationXYPointView(point) for point in self.points)
+        return value
+
+
+@dataclass(frozen=True)
+class _StationDataView:
+    """Expose neutral component reads in the original data lookup order."""
+
+    _data: object
+
+    def __getitem__(self, key):
+        value = self._data[key]
+        if key == "points":
+            return _StationPointSequenceView(value)
+        return value
+
+
+@dataclass(frozen=True)
+class _AlignmentStationDataAdapter:
+    """Restore original alignment and shallow point identities after indexing."""
+
+    calculation: object
+
+    def __call__(self, alignment):
+        view = _StationAlignmentView(alignment)
+        result = self.calculation(view)
+        result["alignment"] = alignment
+        result["points"] = view.points
+        return result
+
+
+@dataclass(frozen=True)
+class _AlignmentStationInterpolationAdapter:
+    """Allocate the host point before evaluating the captured heading."""
+
+    calculation: object
+    vector_factory: object
+
+    def __call__(self, data, station):
+        result = self.calculation(_StationDataView(data), station)
+        x, y = result.point
+        point = self.vector_factory(float(x), float(y), 0.0)
+        heading = result.heading
+        return point, heading
+
+
 class ModularTransitionWorkflowSession:
     """One inherited GUI host permanently bound to modular calculations."""
 
@@ -187,7 +402,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete eight-function modular workflow is unavailable."
+                "The complete ten-function modular workflow is unavailable."
             )
         vector_factory = getattr(
             getattr(self.module, "App", None), "Vector", None,
@@ -216,6 +431,17 @@ class ModularTransitionWorkflowSession:
         self._host_functions["build_straight_route"] = _StraightRouteAdapter(
             self._modular_functions["build_straight_route"], vector_factory,
             config_cloner, self.module.TEMPLATE_THICKNESS,
+        )
+        self._host_functions["alignment_station_data"] = (
+            _AlignmentStationDataAdapter(
+                self._modular_functions["alignment_station_data"],
+            )
+        )
+        self._host_functions["interpolate_alignment_station"] = (
+            _AlignmentStationInterpolationAdapter(
+                self._modular_functions["interpolate_alignment_station"],
+                vector_factory,
+            )
         )
         self._bind_modular()
 
@@ -297,7 +523,33 @@ class ModularTransitionWorkflowSession:
                 "The modular workflow straight-route adapter is unavailable."
             )
 
-        # Product composition owns all eight current bindings. The frozen
+        station_data = namespace["alignment_station_data"]
+        if (
+            type(station_data) is not _AlignmentStationDataAdapter
+            or station_data.calculation is not self._modular_functions[
+                "alignment_station_data"
+            ]
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow station-data adapter is unavailable."
+            )
+
+        interpolation = namespace["interpolate_alignment_station"]
+        if (
+            type(interpolation) is not _AlignmentStationInterpolationAdapter
+            or interpolation.calculation is not self._modular_functions[
+                "interpolate_alignment_station"
+            ]
+            or interpolation.vector_factory is not getattr(
+                getattr(self.module, "App", None), "Vector", None,
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow station-interpolation adapter is "
+                "unavailable."
+            )
+
+        # Product composition owns all ten current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -313,7 +565,16 @@ class ModularTransitionWorkflowSession:
             )
             for name, targets in domain_routes
         ] + [
-            (name, namespace.get(name), targets, self._host_functions, True)
+            (
+                name,
+                getattr(
+                    namespace.get("CrossoverManagerPanel"),
+                    "use_picked_crossover_position", None,
+                ) if name == (
+                    "CrossoverManagerPanel.use_picked_crossover_position"
+                ) else namespace.get(name),
+                targets, self._host_functions, True,
+            )
             for name, targets in PRODUCT_CALLER_ROUTES[2:]
         ]
         for caller_name, caller, targets, selected, is_host in routes:
@@ -330,6 +591,22 @@ class ModularTransitionWorkflowSession:
                     "The modular workflow route caller {!r} is "
                     "unavailable.".format(caller_name)
                 )
+            if caller_name == "_project_centreline_to_reference_normal":
+                nested = [
+                    item for item in code.co_consts
+                    if isinstance(item, type(code))
+                    and item.co_name == "point_at_station"
+                ]
+                if (
+                    len(nested) != 1
+                    or "interpolate_alignment_station"
+                    not in nested[0].co_names
+                ):
+                    raise TransitionWorkflowError(
+                        "The modular workflow route caller "
+                        "'_project_centreline_to_reference_normal."
+                        "point_at_station' is unavailable."
+                    )
             for target in targets:
                 if caller_globals.get(target) is not selected[target]:
                     raise TransitionWorkflowError(
@@ -345,7 +622,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 6,
+            "schema_version": 7,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,
