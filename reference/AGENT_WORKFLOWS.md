@@ -75,6 +75,43 @@ gives no removal authority. The implementing agent stops if the retirement
 plan has ambiguous or uniquely owned state. The agent also stops if the
 preservation audit does not have a complete result.
 
+## When to report
+
+Apply this owner instruction during every TrackTemplate workflow:
+
+> No material state transition = no user-facing progress message.
+
+Report only a material change to an outcome, delegation, authority, blocker,
+validation or review state, candidate state, publication or integration state,
+completion, or an owner-decision boundary. Report each change once.
+
+Do not report routine reads, searches, commands, waits, successful low-level
+operations, or repeated repository state that has not changed. These operations
+alone do not establish a material change. Elapsed time alone does not establish
+a material change. Do not invent a change to supply an update.
+
+Use this field order for each normal update:
+
+`Action / Actor / Scope / Authority / Result`
+
+Keep the update to one concise line. Give more information only when the owner
+needs it to make a decision. Do not hide a new blocker, failed validation,
+changed review verdict, or necessary owner decision. Answer an explicit owner
+request even when no material state has changed.
+
+Keep the existing workflow owners and evidence requirements. Use the existing
+[completion requirements](ENGINEERING_POLICY.md#completion-report) when work
+ends. Keep exact errors and command output in the applicable evidence.
+
+Caveman is an optional user-level communication aid. This rule applies with
+Caveman active or inactive. TrackTemplate does not require Caveman. Do not apply
+compressed conversational style to canonical documentation, evidence, exact
+errors, commands, review verdicts, or repository artefacts.
+
+Higher-priority instructions remain applicable. If a higher-priority
+instruction requires an update, supply only the required information. Do not
+claim that a material change occurred when none occurred.
+
 ## Instruction budget
 
 Codex combines repository instruction files and applies a finite default byte

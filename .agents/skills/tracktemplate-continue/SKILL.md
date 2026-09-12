@@ -32,6 +32,11 @@ An unfinished item alone is insufficient. The selected result must agree with th
 current authorised programme, exact active phase criterion, and repository
 evidence. Otherwise, stop cleanly.
 
+## When to report
+
+Apply the existing [reporting rule](../../../reference/AGENT_WORKFLOWS.md#when-to-report)
+throughout this cycle. It owns when to report and the required field order.
+
 ## Authority for one cycle
 
 The literal invocation authorises at most these operations:

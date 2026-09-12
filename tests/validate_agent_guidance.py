@@ -159,6 +159,139 @@ def bullet_items(text: str) -> list[str]:
     return items
 
 
+def validate_reporting_contract(workflows: str, continuation: str) -> None:
+    """Protect the local guidance contract, not actual model compliance."""
+    section = direct_section_content(workflows, "When to report")
+    flat = semantic_text(section)
+    for required in (
+        "No material state transition = no user-facing progress message.",
+        "Action / Actor / Scope / Authority / Result",
+        "Report each change once.",
+        "These operations alone do not establish a material change.",
+        "Elapsed time alone does not establish a material change.",
+        "Do not invent a change to supply an update.",
+        "Keep the update to one concise line.",
+        "Give more information only when the owner needs it to make a "
+        "decision.",
+        "Do not hide a new blocker, failed validation, changed review verdict, "
+        "or necessary owner decision.",
+        "Answer an explicit owner request even when no material state has "
+        "changed.",
+        "Caveman is an optional user-level communication aid.",
+        "This rule applies with Caveman active or inactive.",
+        "TrackTemplate does not require Caveman.",
+        "Higher-priority instructions remain applicable.",
+        "If a higher-priority instruction requires an update, supply only the "
+        "required information.",
+        "Do not claim that a material change occurred when none occurred.",
+    ):
+        require(required in flat, "reporting guidance lost: " + required)
+
+    paragraphs = semantic_paragraphs(section)
+    for prefix, concepts in (
+        (
+            "Report only a material change",
+            (
+                "outcome", "delegation", "authority", "blocker", "validation",
+                "review", "candidate", "publication", "integration",
+                "completion", "owner-decision boundary",
+            ),
+        ),
+        (
+            "Do not report routine",
+            (
+                "reads", "searches", "commands", "waits",
+                "successful low-level operations", "state that has not changed",
+            ),
+        ),
+    ):
+        require(
+            any(
+                paragraph.startswith(prefix)
+                and all(concept in paragraph for concept in concepts)
+                for paragraph in paragraphs
+            ),
+            "reporting guidance lost category coverage or polarity: " + prefix,
+        )
+    require(
+        "Do not apply compressed conversational style to canonical "
+        "documentation, evidence, exact errors, commands, review verdicts, "
+        "or repository artefacts." in flat,
+        "reporting guidance permits compression of retained artefacts",
+    )
+    linked = direct_section_content(continuation, "When to report")
+    require(
+        "../../../reference/AGENT_WORKFLOWS.md#when-to-report"
+        in LINK_RE.findall(linked),
+        "continuation lost the canonical reporting link",
+    )
+    require(
+        semantic_text(linked).startswith("Apply the existing reporting rule")
+        and "throughout this cycle." in semantic_text(linked),
+        "continuation made the reporting rule optional or local",
+    )
+
+
+def validate_reporting_mutations(workflows: str, continuation: str) -> None:
+    """Check representative losses and inversions without changing files."""
+    wrapped = workflows.replace(
+        "Report only a material change", "**Report only a material change**", 1,
+    ).replace(
+        "routine reads, searches, commands, waits,",
+        "routine reads,\nsearches, commands, waits,", 1,
+    )
+    validate_reporting_contract(wrapped, continuation)
+    for label, document, original, replacement in (
+        (
+            "silence rule deletion", "workflows",
+            "No material state transition = no user-facing progress message.",
+            "",
+        ),
+        (
+            "field order inversion", "workflows",
+            "Action / Actor / Scope / Authority / Result",
+            "Action / Scope / Actor / Authority / Result",
+        ),
+        (
+            "routine reporting inversion", "workflows",
+            "Do not report routine", "Report routine",
+        ),
+        (
+            "Caveman dependency inversion", "workflows",
+            "TrackTemplate does not require Caveman.",
+            "TrackTemplate requires Caveman.",
+        ),
+        (
+            "artefact compression inversion", "workflows",
+            "Do not apply\ncompressed conversational style",
+            "Apply compressed conversational style",
+        ),
+        (
+            "higher-priority exception inversion", "workflows",
+            "requires an update, supply only the required information.",
+            "requires an update, do not supply the required information.",
+        ),
+        (
+            "canonical link loss", "continuation",
+            "../../../reference/AGENT_WORKFLOWS.md#when-to-report",
+            "../../../reference/AGENT_WORKFLOWS.md#instruction-budget",
+        ),
+    ):
+        source = workflows if document == "workflows" else continuation
+        require(
+            original in source, "reporting mutation target drifted: " + label,
+        )
+        changed = source.replace(original, replacement, 1)
+        try:
+            validate_reporting_contract(
+                changed if document == "workflows" else workflows,
+                changed if document == "continuation" else continuation,
+            )
+        except AssertionError:
+            continue
+        raise AssertionError("reporting contract mutation escaped: " + label)
+
+
 def validate_explicit_agent_safeguards(agents: str) -> None:
     """Protect every accepted no-silent-change and terminology boundary."""
     change_items = bullet_items(
@@ -1653,6 +1786,8 @@ def main() -> None:
         SKILLS_ROOT / "tracktemplate-ide-workspace-alignment" / "SKILL.md"
     )
     continuation = read(SKILLS_ROOT / "tracktemplate-continue" / "SKILL.md")
+    validate_reporting_contract(workflows, continuation)
+    validate_reporting_mutations(workflows, continuation)
     validate_ide_workspace_alignment_contract(ide_skill, continuation)
     validate_ide_workspace_alignment_mutations(ide_skill, continuation)
     validate_continue_invocation_policy(workflows)
