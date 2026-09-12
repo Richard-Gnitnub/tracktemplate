@@ -76,6 +76,7 @@ The earlier contracts and frozen tools for host selection and comparison stay un
 The [regression record](../benchmarks/2026-09-09-phase7-straight-route-regression.md) owns the proof and its limitations.
 Supported inputs include the inherited configurations and generated curve records in that proof.
 The proof also covers invalid configurations and incomplete curve counts with their inherited diagnostics.
+
 The task does not claim identical error timing for custom containers, malformed vector objects or combined injected failures after curve data collection.
 
 The Core migration owner keeps the temporary compatibility object until its caller has a replacement.

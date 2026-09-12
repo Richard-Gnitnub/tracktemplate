@@ -17,11 +17,40 @@ The owner accepted the completed, independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
-| What changed | The implementing agent merged PR #71 into clean protected main. The new candidate moves the function that calculates common straight-end extensions into `tracktemplate.domain.alignment` for `tracktemplate.api`. The B16 Generate/Replace caller uses its result through `_CommonStraightExtensionsAdapter`. |
-| What now works | Complete calculated results, Python `list` changes and previous identities are equal to B14/B15 for the supported records. Checks with standalone Python, qualified FreeCAD and the applicable human interface had PASS results. The product selects seven functions together and puts previous values back after a selection error. |
-| Limitations/findings | Direct operations have about 1.25 microseconds of added wall cost per measured input group. This task accepts no Phase 7 exit or product performance result. D-P6-008, all risks and all conditions to compare results and remove legacy paths stay in full. |
-| Owner decision | Richard authorised the merge of PR #71 and one subsequent Level 1 or Level 2 result through draft publication. A merge of the new exact-green draft needs another owner decision. |
-| Next action | Complete the applicable validation, independent review and publication route. Bring the new exact-green draft to Richard for merge authority. |
+| What changed | The implementing agent merged PR #72 into clean protected main. The new candidate moves `build_straight_route` into `tracktemplate.domain.alignment` for `tracktemplate.api`. B16 Generate/Replace uses `_StraightRouteAdapter` for independent and curve-connected straight tracks. |
+| What now works | All 117 B14/B15 cases give equal results. Nine selected standalone sets and six qualified FreeCAD proofs have PASS results. All six candidate human-interface samples pass, and all twelve checks of complete workflow data give equal results. The product selects eight functions together and restores previous values after a selection error. |
+| Limitations/findings | Connected-edit RSS and independent-rejection wall medians are higher in samples taken after a gap of about 80–88 hours. Their cause is not established. Earlier PR #72 added cost, D-P6-008 and all conditions to compare results and remove legacy paths stay in full. This task accepts no exit or performance result. |
+| Owner decision | Richard authorised the merge of PR #72 and this one subsequent Level 2 result through draft publication. A merge of the new exact-green draft needs another owner decision. |
+| Next action | Complete the finite documentation and exact-green draft publication. Bring that draft to Richard for merge authority, without accepting a Phase 7 exit. |
+
+## Straight-track calculation migration — 2026-09-12
+
+The implementing agent merged the authorised PR #72 head `dbd6a270d4a62b52b16f841b44c640d30f88da59` into protected main at `e6835a7c65ed7d516a18eb34ae55b9ae47cb653a`.
+The owner's `$tracktemplate-continue` command authorises this one subsequent Level 2 result under D-GOV-004 and the Phase 7 scope.
+The interrupted work resumed from its preserved candidate, without repeating completed evidence or selecting new work.
+
+The complete `build_straight_route` calculation was missing from Core.
+The candidate moves it into `tracktemplate.domain.alignment` for `tracktemplate.api` and connects the actual B16 caller through `_StraightRouteAdapter`.
+The [API instructions](../contracts/phase7-straight-route.md) preserve independent and curve-connected track calculations, identities, metadata, diagnostics and sequence.
+The host keeps configuration cloning, defaults, UUID operations and creation of new `App.Vector` values.
+
+All 117 complete B14/B15 cases give equal results.
+Nine selected standalone test sets and six qualified FreeCAD proofs have PASS results; the new qualified proof includes 120 cases and the actual caller.
+All six candidate human-interface samples pass, and all twelve checks of complete workflow data give equal results.
+The fixed direct checks preserve complete results for 60 first-batch and 6,000 repeated calls with new inputs per state.
+
+The [evidence record](../benchmarks/2026-09-09-phase7-straight-route-regression.md) keeps the raw proof identities, original failures, two classified repairs and measured limitations.
+The GUI baselines precede candidate samples by about 80–88 hours.
+Connected-edit RSS and independent-rejection wall medians are higher; their cause is not established.
+The lower direct wall medians give no product performance acceptance and do not replace the retained PR #72 added cost.
+
+The independent review of source, tests and raw evidence has a PASS result with no findings that need action.
+
+This result supplies bounded evidence for Exit 3 domain separation, Exit 2 equal results and the B16 workflow in Exit 1.
+It accepts no whole exit. Phase 7 stays Open at 0/4, with all four exits Pending.
+D-P6-008, all recorded limitations and all conditions to compare results and remove legacy paths stay in full.
+Project status stays `unknown`, and output keeps private-development status.
+The following entries preserve earlier evidence. They do not select another work item.
 
 ## Common straight-end extension migration — 2026-09-09
 
