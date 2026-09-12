@@ -184,8 +184,8 @@ product_session, product_route = namespace[
 from validate_phase7_straight_route import STATION_CALLER_NAMES  # noqa: E402
 
 assert product_route == {
-    "schema_version": 7,
-    "contract_id": "tracktemplate:phase7:station-mapping:1",
+    "schema_version": 8,
+    "contract_id": "tracktemplate:phase7:alignment-handedness:1",
     "route": "modular",
     "comparison_route_available": False,
     "function_names": list(FUNCTION_NAMES) + [
@@ -193,6 +193,7 @@ assert product_route == {
         "build_concentric_core", "add_common_straight_extensions",
         "build_straight_route",
         "alignment_station_data", "interpolate_alignment_station",
+        "mirror_alignment_for_turn",
     ],
     "caller_names": list(STATION_CALLER_NAMES),
     "workflow_version": "10.2A8A7B15",

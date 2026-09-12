@@ -73,8 +73,8 @@ assert document_state() == before
 
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
-assert record["contract_id"] == "tracktemplate:phase7:station-mapping:1"
-assert record["schema_version"] == 7 and record["mixed_route"] is False
+assert record["contract_id"] == "tracktemplate:phase7:alignment-handedness:1"
+assert record["schema_version"] == 8 and record["mixed_route"] is False
 assert session.module.run_macro.__globals__ is session.module.__dict__
 assert session.module.run_macro.__globals__["main_circle_centre"] is (
     api.main_circle_centre

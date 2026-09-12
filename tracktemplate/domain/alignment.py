@@ -20,6 +20,7 @@ __all__ = (
     "clothoid_entry_displacement_at_station",
     "clothoid_entry_polyline_stations",
     "main_circle_centre",
+    "mirror_alignment_for_turn",
     "transition_start_signed_offset",
     "solve_transition_length",
 )
@@ -928,3 +929,23 @@ def interpolate_alignment_station(data, station):
         heading_b,
         fraction,
     )
+
+
+def mirror_alignment_for_turn(alignment, turn_sign):
+    """Yield ordered neutral reflection updates without changing the input.
+
+    Consume and apply each stage before advancing this one-shot iterator.
+    XY uses millimetres and headings use radians. Positive signs yield
+    nothing without reading the mapping; other signs preserve inherited
+    arithmetic and errors. Point pairs are lazy to retain allocation order.
+    """
+    if turn_sign > 0.0:
+        return
+    yield "points", (
+        (point[0], -point[1]) for point in alignment["points"]
+    )
+    yield "headings", [-heading for heading in alignment["headings"]]
+    for key in ("start", "end", "extended_start", "extended_end"):
+        if key in alignment:
+            x, y = alignment[key]
+            yield key, (x, -y)

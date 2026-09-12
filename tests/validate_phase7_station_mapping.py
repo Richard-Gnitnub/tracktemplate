@@ -425,12 +425,14 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 7
-        assert record["contract_id"] == "tracktemplate:phase7:station-mapping:1"
-        assert len(record["function_names"]) == 10
+        assert record["schema_version"] == 8
+        assert record["contract_id"] == (
+            "tracktemplate:phase7:alignment-handedness:1"
+        )
+        assert len(record["function_names"]) == 11
         assert len(workflow.PRODUCT_CALLER_ROUTES) == 38
         assert workflow.PRODUCT_CALLER_ROUTES == expected_caller_routes()
-        assert tuple(record["function_names"][-2:]) == PAIR
+        assert tuple(record["function_names"][8:10]) == PAIR
         for name in workflow.PRODUCT_FUNCTION_NAMES:
             namespace[name] = object()
             require_failure(session.routing_record)
@@ -567,6 +569,19 @@ def expected_caller_routes():
         else:
             routes.append((name, targets))
     assert memberships == {PAIR[0]: 15, PAIR[1]: 30}
+    mirror_callers = [
+        name for name, node in caller_nodes
+        if any(
+            isinstance(call, ast.Call)
+            and isinstance(call.func, ast.Name)
+            and call.func.id == "mirror_alignment_for_turn"
+            for call in ast.walk(node)
+        )
+    ]
+    assert mirror_callers == ["run_macro"]
+    name, targets = routes[3]
+    assert name == "run_macro"
+    routes[3] = (name, targets + ("mirror_alignment_for_turn",))
     return tuple(routes)
 
 

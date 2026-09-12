@@ -32,6 +32,7 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "build_concentric_core", "add_common_straight_extensions",
     "build_straight_route",
     "alignment_station_data", "interpolate_alignment_station",
+    "mirror_alignment_for_turn",
 )
 CALCULATION_CASES = tuple(
     (length, radius, steps)
@@ -271,8 +272,10 @@ def validate_binding():
         )
         assert session.launch_workflow() == expected
         record = session.routing_record()
-        assert record["schema_version"] == 7
-        assert record["contract_id"] == "tracktemplate:phase7:station-mapping:1"
+        assert record["schema_version"] == 8
+        assert record["contract_id"] == (
+            "tracktemplate:phase7:alignment-handedness:1"
+        )
         assert record["function_names"] == list(PRODUCT_FUNCTION_NAMES)
         assert record["caller_names"] == list(STATION_CALLER_NAMES)
         assert record["comparison_route_available"] is False
@@ -297,7 +300,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete ten-function",
+                "complete eleven-function",
             )
             assert _snapshot(host) == before
             assert host.module.LAUNCH_COUNT == 0

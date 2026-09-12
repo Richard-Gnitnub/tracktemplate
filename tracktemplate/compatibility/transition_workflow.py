@@ -11,12 +11,13 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:station-mapping:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:alignment-handedness:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
     "build_straight_route",
     "alignment_station_data", "interpolate_alignment_station",
+    "mirror_alignment_for_turn",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -33,7 +34,7 @@ PRODUCT_CALLER_ROUTES = (
         "run_macro",
         ("main_circle_centre", "build_concentric_core",
          "add_common_straight_extensions", "alignment_station_data",
-         "interpolate_alignment_station"),
+         "interpolate_alignment_station", "mirror_alignment_for_turn"),
     ),
     ("build_straight_routes", ("build_straight_route",)),
     (
@@ -388,6 +389,40 @@ class _AlignmentStationInterpolationAdapter:
         return point, heading
 
 
+@dataclass(frozen=True)
+class _MirrorAlignmentView:
+    """Read neutral points lazily while retaining inherited mapping access."""
+
+    _alignment: object
+
+    def __getitem__(self, key):
+        value = self._alignment[key]
+        if key == "points":
+            return (_StationXYPointView(point) for point in value)
+        return value
+
+    def __contains__(self, key):
+        return key in self._alignment
+
+
+@dataclass(frozen=True)
+class _MirrorAlignmentForTurnAdapter:
+    """Apply each reflection stage before reading the next inherited field."""
+
+    calculation: object
+    vector_factory: object
+
+    def __call__(self, alignment, turn_sign):
+        updates = self.calculation(_MirrorAlignmentView(alignment), turn_sign)
+        for key, value in updates:
+            if key == "points":
+                value = [
+                    self.vector_factory(float(x), float(y), 0.0)
+                    for x, y in value
+                ]
+            alignment[key] = value
+
+
 class ModularTransitionWorkflowSession:
     """One inherited GUI host permanently bound to modular calculations."""
 
@@ -402,7 +437,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete ten-function modular workflow is unavailable."
+                "The complete eleven-function modular workflow is unavailable."
             )
         vector_factory = getattr(
             getattr(self.module, "App", None), "Vector", None,
@@ -440,6 +475,12 @@ class ModularTransitionWorkflowSession:
         self._host_functions["interpolate_alignment_station"] = (
             _AlignmentStationInterpolationAdapter(
                 self._modular_functions["interpolate_alignment_station"],
+                vector_factory,
+            )
+        )
+        self._host_functions["mirror_alignment_for_turn"] = (
+            _MirrorAlignmentForTurnAdapter(
+                self._modular_functions["mirror_alignment_for_turn"],
                 vector_factory,
             )
         )
@@ -549,7 +590,21 @@ class ModularTransitionWorkflowSession:
                 "unavailable."
             )
 
-        # Product composition owns all ten current bindings. The frozen
+        mirror = namespace["mirror_alignment_for_turn"]
+        if (
+            type(mirror) is not _MirrorAlignmentForTurnAdapter
+            or mirror.calculation is not self._modular_functions[
+                "mirror_alignment_for_turn"
+            ]
+            or mirror.vector_factory is not getattr(
+                getattr(self.module, "App", None), "Vector", None,
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow handedness adapter is unavailable."
+            )
+
+        # Product composition owns all eleven current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -622,7 +677,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 7,
+            "schema_version": 8,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,

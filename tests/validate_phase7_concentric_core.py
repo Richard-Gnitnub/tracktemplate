@@ -51,6 +51,7 @@ FUNCTION_NAMES = (
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "add_common_straight_extensions", "build_straight_route",
     "alignment_station_data", "interpolate_alignment_station",
+    "mirror_alignment_for_turn",
 )
 TRANSITION_CASES = (
     (0.0, 0.0), (0.0, 25.0), (25.0, 0.0), (25.0, 60.0),
@@ -353,7 +354,10 @@ def _fixture(temporary_root):
     nodes.update({
         node.name: node for node in ast.parse(path.read_text()).body
         if isinstance(node, ast.FunctionDef)
-        and node.name in {"dot_xy", "add_common_straight_extensions"}
+        and node.name in {
+            "dot_xy", "add_common_straight_extensions",
+            "mirror_alignment_for_turn",
+        }
     })
     prelude = (
         'import math\nfrom collections import namedtuple\n'
@@ -377,6 +381,7 @@ def _fixture(temporary_root):
         '    core = build_concentric_core(centre, 600.0, 600.0, 600.0,\n'
         '        math.pi / 2.0, "Main Track")\n'
         '    add_common_straight_extensions([core], math.pi / 2.0)\n'
+        '    mirror_alignment_for_turn(core, 1.0)\n'
         '    data = alignment_station_data(core)\n'
         '    interpolate_alignment_station(data, 0.0)\n'
         '    return centre, core\n'
@@ -426,8 +431,8 @@ def validate_binding():
         assert session.module.LAUNCH_COUNT == 1
         record = session.routing_record()
         assert record == {
-            "schema_version": 7,
-            "contract_id": "tracktemplate:phase7:station-mapping:1",
+            "schema_version": 8,
+            "contract_id": "tracktemplate:phase7:alignment-handedness:1",
             "route": "modular", "comparison_route_available": False,
             "function_names": list(PRODUCT_FUNCTION_NAMES),
             "caller_names": list(STATION_CALLER_NAMES),
@@ -461,7 +466,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete ten-function",
+                "complete eleven-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 
