@@ -17,11 +17,39 @@ The owner accepted the completed, independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. |
-| What changed | The implementing agent merged PR #74 into clean protected main. The new candidate moves the station pair into `tracktemplate.domain.alignment` for `tracktemplate.api` and connects the actual B16 callers through small compatibility objects. |
-| What now works | Complete station results, identities, errors and operation sequence match B14/B15 within the bounded proof. Selected standalone and qualified FreeCAD checks have PASS results. Three human-interface cases give equal complete workflow results. The product selects ten functions together and validates 38 actual caller routes. |
-| Limitations/findings | Direct station operations have added measured cost. Caller measurements also show higher costs and include operations that count function uses. Plain-line rejection and recovery wall times are higher in the descriptive human-interface samples. Their causes are unknown. D-P6-008, earlier PR #72 and PR #73 limitations, and all conditions to compare results and remove legacy paths stay in full. |
-| Owner decision | Richard authorised the merge of PR #74 and this one subsequent Level 2 result through draft publication. A merge of the new exact-green draft makes another owner decision necessary. |
-| Next action | Complete the bounded documentation cycle and exact-green draft publication. Bring that draft to Richard for merge authority. Accept no Phase 7 exit. |
+| What changed | PR #75 is merged into clean protected main. The new candidate moves `mirror_alignment_for_turn` into Core and connects the actual B16 caller through a small compatibility object. |
+| What now works | Complete bounded results, identities, errors and operation sequence match B14/B15. Selected standalone and qualified FreeCAD checks have PASS results. The complete plain-line workflow gives equal results. The product selects eleven functions together and validates 38 caller entries. |
+| Limitations/findings | Direct reflection of both tracks adds 0.5338985 ms in paired median wall time, or 87.2117%. The positive branch also has added cost. The descriptive change-back sample has higher CPU and RSS change; causes are unknown. D-P6-008, all earlier limitations, comparison requirements and legacy-retirement conditions stay in full. |
+| Owner decision | The owner's subsequent `$tracktemplate-continue` command authorises this one Level 2 result through draft publication. Integration of the resulting exact-green draft needs separate owner authority. |
+| Next action | Bring the resulting exact-green draft to Richard for integration authority. Accept no Phase 7 exit. |
+
+## Migration of the calculation for curve direction — 2026-09-12
+
+The preceding PR #75 is merged into protected main at `ef29e88ec86777ef79503da83e4043e8d3d644a6`.
+The owner's subsequent `$tracktemplate-continue` command authorises this one Level 2 result under D-GOV-004 and the Phase 7 scope.
+
+The complete `mirror_alignment_for_turn` operation was missing from Core.
+It now uses `tracktemplate.domain.alignment` through `tracktemplate.api`.
+The [API instructions](../contracts/phase7-alignment-handedness.md) preserve the signs, identities, errors and sequence of field changes.
+The actual `run_macro` caller processes the main and secondary alignments after common extensions and before length calculations and straight-track construction.
+The product selects eleven functions together and validates 38 caller entries with complete restoration after a selection error.
+
+The complete bounded B14/B15 comparison, twelve standalone test sets and eight qualified FreeCAD proofs have PASS results.
+One new plain-line human-interface case gives equal complete workflow results against the applicable retained PR #75 baseline.
+It includes both curve directions, nine history actions, copied-document persistence, rejection and recovery.
+The independent read-only review of the complete source, tests and raw evidence has a PASS result with no actionable findings.
+
+The [evidence record](../benchmarks/2026-09-12-phase7-alignment-handedness-regression.md) keeps raw proof identities, classified corrections and measured limitations.
+Direct reflection of both generated tracks adds 533.8985 microseconds in paired median wall time, or 87.2117%.
+The positive branch adds 4.1680 microseconds, or 266.6667%, for both tracks.
+These measurements give no performance acceptance and do not select another optimisation.
+
+This result supplies bounded evidence for the API without host dependencies in Exit 3, equal results in Exit 2 and the B16 workflow in Exit 1.
+It accepts no whole exit. Phase 7 stays Open at 0/4, with all four exits Pending.
+D-P6-008, all earlier limitations, comparison requirements and legacy-retirement conditions stay in full.
+Project status stays `unknown`, and output keeps private-development status.
+
+The following entries preserve earlier evidence. They do not select another work item.
 
 ## Migration of station values and points — 2026-09-12
 
