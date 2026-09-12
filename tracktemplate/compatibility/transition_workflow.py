@@ -11,10 +11,11 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:common-straight-extensions:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:straight-route:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
+    "build_straight_route",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -32,6 +33,7 @@ PRODUCT_CALLER_ROUTES = (
         ("main_circle_centre", "build_concentric_core",
          "add_common_straight_extensions"),
     ),
+    ("build_straight_routes", ("build_straight_route",)),
 )
 
 __all__ = (
@@ -109,6 +111,68 @@ class _CommonStraightExtensionsAdapter:
             item["extended_end"] = result["extended_end"]
 
 
+@dataclass(frozen=True)
+class _StraightRouteAdapter:
+    """Keep host normalization and fresh-vector construction at composition."""
+
+    calculation: object
+    vector_factory: object
+    config_cloner: object
+    connected_template_thickness: object
+
+    def __call__(self, config, curve_alignments):
+        config = self.config_cloner(config)
+        inputs = []
+        if (
+            config["enabled"]
+            and (config["create_template"] or config["show_centreline"])
+            and config["connection_mode"] != "Independent datum"
+            and curve_alignments
+        ):
+            for source in curve_alignments:
+                points = list(source.get("points", []))
+                headings = list(source.get("headings", []))
+                valid_counts = len(points) >= 2 and len(points) == len(headings)
+                item = {
+                    "point_count": len(points),
+                    "heading_count": len(headings),
+                    "start": (points[0].x, points[0].y) if valid_counts else None,
+                    "end": (points[-1].x, points[-1].y) if valid_counts else None,
+                    "start_heading": headings[0] if valid_counts else None,
+                    "end_heading": headings[-1] if valid_counts else None,
+                }
+                for key in (
+                    "name", "width", "create_template", "show_centreline",
+                ):
+                    if key in source:
+                        item[key] = source[key]
+                inputs.append(item)
+        result = self.calculation(
+            config, inputs, self.connected_template_thickness,
+        )
+        if result is None:
+            return None
+        for item in result["alignments"]:
+            first, second = item["points"]
+            # The inherited exit allocates its remote endpoint before its join.
+            if config["connection_mode"] == "Curve exit":
+                finish = self.vector_factory(
+                    float(second[0]), float(second[1]), 0.0,
+                )
+                start = self.vector_factory(
+                    float(first[0]), float(first[1]), 0.0,
+                )
+            else:
+                start = self.vector_factory(
+                    float(first[0]), float(first[1]), 0.0,
+                )
+                finish = self.vector_factory(
+                    float(second[0]), float(second[1]), 0.0,
+                )
+            item["points"] = [start, finish]
+        return result
+
+
 class ModularTransitionWorkflowSession:
     """One inherited GUI host permanently bound to modular calculations."""
 
@@ -123,7 +187,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete seven-function modular workflow is unavailable."
+                "The complete eight-function modular workflow is unavailable."
             )
         vector_factory = getattr(
             getattr(self.module, "App", None), "Vector", None,
@@ -141,6 +205,17 @@ class ModularTransitionWorkflowSession:
                 self._modular_functions["add_common_straight_extensions"],
                 vector_factory,
             )
+        )
+        config_cloner = getattr(self.module, "clone_straight_config", None)
+        if not callable(config_cloner) or not hasattr(
+            self.module, "TEMPLATE_THICKNESS",
+        ):
+            raise TransitionWorkflowError(
+                "The inherited straight-route configuration is unavailable."
+            )
+        self._host_functions["build_straight_route"] = _StraightRouteAdapter(
+            self._modular_functions["build_straight_route"], vector_factory,
+            config_cloner, self.module.TEMPLATE_THICKNESS,
         )
         self._bind_modular()
 
@@ -202,7 +277,27 @@ class ModularTransitionWorkflowSession:
                 "unavailable."
             )
 
-        # Product composition owns all seven current bindings. The frozen
+        straight = namespace["build_straight_route"]
+        if (
+            type(straight) is not _StraightRouteAdapter
+            or straight.calculation is not self._modular_functions[
+                "build_straight_route"
+            ]
+            or straight.vector_factory is not getattr(
+                getattr(self.module, "App", None), "Vector", None,
+            )
+            or straight.config_cloner is not getattr(
+                self.module, "clone_straight_config", None,
+            )
+            or straight.connected_template_thickness is not getattr(
+                self.module, "TEMPLATE_THICKNESS", None,
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow straight-route adapter is unavailable."
+            )
+
+        # Product composition owns all eight current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -250,7 +345,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 5,
+            "schema_version": 6,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,

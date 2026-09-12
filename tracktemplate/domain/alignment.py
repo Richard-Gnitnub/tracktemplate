@@ -9,6 +9,7 @@ _CORE_SAMPLE_SPACING = 3.0
 __all__ = (
     "add_common_straight_extensions",
     "build_concentric_core",
+    "build_straight_route",
     "clothoid_entry_displacement",
     "clothoid_exit_displacement",
     "clothoid_entry_displacement_at_station",
@@ -599,3 +600,243 @@ def add_common_straight_extensions(alignments, total_angle):
             "exit_point": exit_point,
         })
     return results
+
+
+_STRAIGHT_CONNECTION_INDEPENDENT = "Independent datum"
+_STRAIGHT_CONNECTION_CURVE_ENTRANCE = "Curve entrance"
+_STRAIGHT_DIRECTION_REVERSE = "Reverse"
+_STRAIGHT_PARALLEL_RIGHT = "Right of travel"
+
+
+def _straight_point(x, y):
+    return float(x), float(y)
+
+
+def _straight_heading_delta(first, second):
+    return abs(math.atan2(math.sin(first - second), math.cos(first - second)))
+
+
+def _straight_alignment_record(
+    route_id,
+    route_name,
+    track_number,
+    name,
+    points,
+    heading,
+    width,
+    thickness,
+    create_template,
+    show_centreline,
+    connection_mode,
+    source_alignment_name="",
+):
+    total_length = 0.0 + math.hypot(
+        points[1][0] - points[0][0], points[1][1] - points[0][1],
+    )
+    if total_length <= GEOMETRY_TOLERANCE:
+        raise ValueError("A straight track length must be greater than zero.")
+    return {
+        "route_id": route_id,
+        "route_name": route_name,
+        "track_number": int(track_number),
+        "name": name,
+        "points": points,
+        "headings": [heading for _point in points],
+        "width": float(width),
+        "template_thickness": float(thickness),
+        "create_template": bool(create_template),
+        "show_centreline": bool(show_centreline),
+        "connection_mode": connection_mode,
+        "source_alignment_name": source_alignment_name,
+        "total_length": total_length,
+        "core_length": total_length,
+        "entry_extension": 0.0,
+        "exit_extension": 0.0,
+        "start": (points[0][0], points[0][1]),
+        "end": (points[-1][0], points[-1][1]),
+        "extended_start": (points[0][0], points[0][1]),
+        "extended_end": (points[-1][0], points[-1][1]),
+    }
+
+
+def build_straight_route(config, curve_alignments, connected_template_thickness):
+    """Build ordered straight-route records from normalized neutral inputs.
+
+    Coordinates and lengths are millimetres, headings are radians, and the
+    normalized config remains the caller's object. No input is mutated.
+    Curve records supply endpoint coordinates, headings and original counts.
+    """
+    if not config["enabled"]:
+        return None
+    if config["length"] <= GEOMETRY_TOLERANCE:
+        raise ValueError(
+            "Straight route '{}' must have a length greater than zero.".format(
+                config["name"]
+            )
+        )
+    if not config["create_template"] and not config["show_centreline"]:
+        raise ValueError(
+            "Straight route '{}' must create a strip, a centreline, "
+            "or both.".format(
+                config["name"]
+            )
+        )
+
+    route_id = "straight-{}".format(config["manager_id"])
+    route_name = config["name"]
+    connection_mode = config["connection_mode"]
+    alignments = []
+
+    if connection_mode == _STRAIGHT_CONNECTION_INDEPENDENT:
+        heading = math.radians(config["rotation_degrees"])
+        if config["direction"] == _STRAIGHT_DIRECTION_REVERSE:
+            heading += math.pi
+        tangent_x = math.cos(heading)
+        tangent_y = math.sin(heading)
+        normal_x, normal_y = _left_normal(heading)
+        side_factor = (
+            -1.0
+            if config["parallel_side"] == _STRAIGHT_PARALLEL_RIGHT
+            else 1.0
+        )
+        for track_index in range(config["track_count"]):
+            offset = side_factor * track_index * config["track_spacing"]
+            start_x = config["start_x"] + (offset * normal_x)
+            start_y = config["start_y"] + (offset * normal_y)
+            finish_x = start_x + (config["length"] * tangent_x)
+            finish_y = start_y + (config["length"] * tangent_y)
+            points = [
+                _straight_point(start_x, start_y),
+                _straight_point(finish_x, finish_y),
+            ]
+            track_name = (
+                route_name
+                if config["track_count"] == 1
+                else "{} - Track {}".format(route_name, track_index + 1)
+            )
+            alignments.append(
+                _straight_alignment_record(
+                    route_id,
+                    route_name,
+                    track_index + 1,
+                    track_name,
+                    points,
+                    heading,
+                    config["template_width"],
+                    config["template_thickness"],
+                    config["create_template"],
+                    config["show_centreline"],
+                    connection_mode,
+                )
+            )
+    else:
+        if not curve_alignments:
+            raise ValueError(
+                "Straight route '{}' cannot connect because no curve "
+                "tracks exist.".format(
+                    route_name
+                )
+            )
+        reference_heading = None
+        for track_index, source_alignment in enumerate(curve_alignments):
+            if (
+                source_alignment["point_count"] < 2
+                or source_alignment["point_count"]
+                != source_alignment["heading_count"]
+            ):
+                raise ValueError(
+                    "Straight route '{}' cannot connect to incomplete curve "
+                    "track '{}'.".format(
+                        route_name,
+                        source_alignment.get("name", track_index + 1),
+                    )
+                )
+            if connection_mode == _STRAIGHT_CONNECTION_CURVE_ENTRANCE:
+                join_point = source_alignment["start"]
+                heading = source_alignment["start_heading"]
+                remote_point = _straight_point(
+                    join_point[0] - (config["length"] * math.cos(heading)),
+                    join_point[1] - (config["length"] * math.sin(heading)),
+                )
+                points = [
+                    remote_point, _straight_point(join_point[0], join_point[1]),
+                ]
+                joined_point = points[-1]
+            else:
+                join_point = source_alignment["end"]
+                heading = source_alignment["end_heading"]
+                remote_point = _straight_point(
+                    join_point[0] + (config["length"] * math.cos(heading)),
+                    join_point[1] + (config["length"] * math.sin(heading)),
+                )
+                points = [
+                    _straight_point(join_point[0], join_point[1]), remote_point,
+                ]
+                joined_point = points[0]
+
+            if reference_heading is None:
+                reference_heading = heading
+            elif _straight_heading_delta(heading, reference_heading) > 1.0e-10:
+                raise ValueError(
+                    "Straight route '{}' cannot connect because the selected "
+                    "curve tracks do not share one tangent direction.".format(
+                        route_name
+                    )
+                )
+
+            join_error = math.hypot(
+                joined_point[0] - join_point[0],
+                joined_point[1] - join_point[1],
+            )
+            source_heading = (
+                source_alignment["start_heading"]
+                if connection_mode == _STRAIGHT_CONNECTION_CURVE_ENTRANCE
+                else source_alignment["end_heading"]
+            )
+            if join_error > 1.0e-7 or _straight_heading_delta(
+                heading, source_heading
+            ) > 1.0e-10:
+                raise ValueError(
+                    "Internal straight connection check failed for '{}' and "
+                    "'{}'.".format(
+                        route_name,
+                        source_alignment.get("name", track_index + 1),
+                    )
+                )
+
+            source_name = str(
+                source_alignment.get("name", "Track {}".format(track_index + 1))
+            )
+            alignments.append(
+                _straight_alignment_record(
+                    route_id,
+                    route_name,
+                    track_index + 1,
+                    "{} - {}".format(route_name, source_name),
+                    points,
+                    heading,
+                    source_alignment["width"],
+                    connected_template_thickness,
+                    config["create_template"]
+                    and source_alignment.get("create_template", True),
+                    config["show_centreline"]
+                    and source_alignment.get("show_centreline", True),
+                    connection_mode,
+                    source_name,
+                )
+            )
+
+    if not alignments:
+        raise ValueError(
+            "Straight route '{}' did not produce any track alignments.".format(
+                route_name
+            )
+        )
+    return {
+        "route_id": route_id,
+        "name": route_name,
+        "connection_mode": connection_mode,
+        "config": config,
+        "alignments": alignments,
+        "length": config["length"],
+    }

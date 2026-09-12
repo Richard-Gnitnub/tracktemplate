@@ -47,7 +47,9 @@ FUNCTION_NAMES = (
     "solve_transition_length", "main_circle_centre",
     "clothoid_exit_displacement", "build_concentric_core",
 )
-PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + ("add_common_straight_extensions",)
+PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
+    "add_common_straight_extensions", "build_straight_route",
+)
 TRANSITION_CASES = (
     (0.0, 0.0), (0.0, 25.0), (25.0, 0.0), (25.0, 60.0),
     (60.0, 25.0), (420.0, 600.0), (1.0e-9, 1.0e-8),
@@ -340,6 +342,8 @@ def detached(function, dependency, replacement):
 
 def _fixture(temporary_root):
     """Use exact frozen calculations and a minimal executable host entry."""
+    from validate_phase7_straight_route import straight_fixture_source
+
     path = ROOT / "AdvancedTurnout.FCMacro"
     _namespace, nodes = legacy_calculations(path)
     nodes.update({
@@ -374,7 +378,8 @@ def _fixture(temporary_root):
     )
     source = temporary_root / "legacy.FCMacro"
     source.write_text(
-        prelude + "\n".join(ast.unparse(node) for node in nodes.values())
+        prelude + straight_fixture_source()
+        + "\n".join(ast.unparse(node) for node in nodes.values())
         + "\n" + callers,
     )
     return centre_proof.phase3_fixture._contract(source)
@@ -415,13 +420,13 @@ def validate_binding():
         assert session.module.LAUNCH_COUNT == 1
         record = session.routing_record()
         assert record == {
-            "schema_version": 5,
-            "contract_id": "tracktemplate:phase7:common-straight-extensions:1",
+            "schema_version": 6,
+            "contract_id": "tracktemplate:phase7:straight-route:1",
             "route": "modular", "comparison_route_available": False,
             "function_names": list(PRODUCT_FUNCTION_NAMES),
             "caller_names": [
                 "main_circle_centre", "build_concentric_core",
-                "prepare_track_alignment", "run_macro",
+                "prepare_track_alignment", "run_macro", "build_straight_routes",
             ],
             "workflow_version": "10.2A8A7B15",
             "workflow_source_sha256": host.source_sha256,
@@ -453,7 +458,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete seven-function",
+                "complete eight-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 

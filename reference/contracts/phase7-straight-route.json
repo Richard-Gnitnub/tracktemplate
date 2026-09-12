@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase7:straight-route:1",
+  "recorded_on": "2026-09-09",
+  "authority": [
+    "D-GOV-004",
+    "D-P7-001"
+  ],
+  "change_level": 2,
+  "contract_document": "reference/contracts/phase7-straight-route.md",
+  "calculation": {
+    "module": "tracktemplate.domain.alignment",
+    "api": "tracktemplate.api.build_straight_route",
+    "parameters": [
+      "config",
+      "curve_alignments",
+      "connected_template_thickness"
+    ],
+    "defaults": {},
+    "input_config": "Existing host-normalized plain configuration dictionary",
+    "curve_required_keys": [
+      "point_count",
+      "heading_count",
+      "start",
+      "end",
+      "start_heading",
+      "end_heading"
+    ],
+    "curve_optional_keys": [
+      "name",
+      "width",
+      "create_template",
+      "show_centreline"
+    ],
+    "width_requirement": "Required for each complete connected curve record",
+    "input_mutation": false,
+    "result_config_identity": "supplied_normalized_config",
+    "length_unit": "mm",
+    "heading_unit": "rad",
+    "frame": "canonical-local-XY-left-turn",
+    "route_keys": [
+      "route_id",
+      "name",
+      "connection_mode",
+      "config",
+      "alignments",
+      "length"
+    ],
+    "alignment_keys": [
+      "route_id",
+      "route_name",
+      "track_number",
+      "name",
+      "points",
+      "headings",
+      "width",
+      "template_thickness",
+      "create_template",
+      "show_centreline",
+      "connection_mode",
+      "source_alignment_name",
+      "total_length",
+      "core_length",
+      "entry_extension",
+      "exit_extension",
+      "start",
+      "end",
+      "extended_start",
+      "extended_end"
+    ],
+    "point_representation": "two-float XY tuple",
+    "geometry_tolerance": 1e-08,
+    "connection_join_tolerance_mm": 1e-07,
+    "heading_tolerance_rad": 1e-10,
+    "disabled_result": null,
+    "cached": false
+  },
+  "host_adapter": {
+    "module": "tracktemplate.compatibility.transition_workflow",
+    "private_type": "_StraightRouteAdapter",
+    "frozen_fields": [
+      "calculation",
+      "vector_factory",
+      "config_cloner",
+      "connected_template_thickness"
+    ],
+    "parameters": [
+      "config",
+      "curve_alignments"
+    ],
+    "vector_factory": "host.module.App.Vector",
+    "config_cloner": "host.module.clone_straight_config",
+    "clone_calls_per_direct_call": 1,
+    "connected_template_thickness": "host.module.TEMPLATE_THICKNESS",
+    "identity_rule": "exact selected function, vector factory, cloner and host thickness object",
+    "vector_order": "Independent and entrance in output order; exit remote second point before join first point",
+    "input_mutation": false,
+    "document_mutation": false
+  },
+  "product_routing": {
+    "record_schema_version": 6,
+    "route": "modular",
+    "comparison_route_available": false,
+    "function_names": [
+      "clothoid_entry_displacement",
+      "transition_start_signed_offset",
+      "solve_transition_length",
+      "main_circle_centre",
+      "clothoid_exit_displacement",
+      "build_concentric_core",
+      "add_common_straight_extensions",
+      "build_straight_route"
+    ],
+    "caller_names": [
+      "main_circle_centre",
+      "build_concentric_core",
+      "prepare_track_alignment",
+      "run_macro",
+      "build_straight_routes"
+    ],
+    "straight_caller": "build_straight_routes",
+    "workflow_version": "10.2A8A7B15",
+    "mixed_route": false
+  },
+  "scope": {
+    "supported": "Normalised plain configurations and well-formed generated curve records; ordinary invalid configuration and endpoint-count diagnostics",
+    "preserved": [
+      "Full ordered route and alignment records",
+      "Host normalization and UUID timing",
+      "Clone identity and untouched input records, lists and vectors",
+      "Independent offsets and reverse travel",
+      "Entrance and exit station direction",
+      "Width, thickness and output-flag defaults",
+      "Normal host vector failures and outer recovery"
+    ],
+    "excluded": [
+      "Arbitrary custom containers or malformed vectors",
+      "Identical exception interleaving for malformed records or combined injected failures after endpoint projection",
+      "Station, mirror, platform, config-schema, production and export migration",
+      "Performance optimisation",
+      "Phase-exit, performance, output and release acceptance"
+    ]
+  },
+  "validation": {
+    "standalone": "tests/validate_phase7_straight_route.py",
+    "qualified_host": "tests/freecad_validate_phase7_straight_route.py"
+  }
+}

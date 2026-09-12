@@ -32,7 +32,7 @@ FUNCTION_NAMES = (
 )
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "clothoid_exit_displacement", "build_concentric_core",
-    "add_common_straight_extensions",
+    "add_common_straight_extensions", "build_straight_route",
 )
 SOURCE_HASHES = {
     "AdvancedTurnout.FCMacro": (
@@ -259,16 +259,16 @@ def validate_binding():
         assert session.module.run_macro.__globals__["main_circle_centre"] is (
             api.main_circle_centre
         )
-        assert session.routing_record()["schema_version"] == 5
+        assert session.routing_record()["schema_version"] == 6
         assert session.routing_record()["contract_id"] == (
-            "tracktemplate:phase7:common-straight-extensions:1"
+            "tracktemplate:phase7:straight-route:1"
         )
         assert session.routing_record()["function_names"] == list(
             PRODUCT_FUNCTION_NAMES
         )
         assert session.routing_record()["caller_names"] == [
             "main_circle_centre", "build_concentric_core",
-            "prepare_track_alignment", "run_macro",
+            "prepare_track_alignment", "run_macro", "build_straight_routes",
         ]
         assert session.routing_record()["comparison_route_available"] is False
 
@@ -284,7 +284,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete seven-function",
+                "complete eight-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 
