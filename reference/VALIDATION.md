@@ -1408,8 +1408,8 @@ CPython 3.13.13 and PySide6/Qt 6.11.1. The host matrix gave the specified
 results in that runtime.
 
 D-GOV-019 adds only the exact FreeCAD 1.1.3 profile with CPython 3.13.15
-and PySide6/Qt 6.11.2. The complete current FreeCADCmd and real-GUI host
-matrix gave the specified results. The independently verified Flatpak app and
+and PySide6/Qt 6.11.2. The complete FreeCADCmd and real-GUI matrices for the current stack
+gave the specified results. The independently verified Flatpak app and
 runtime commits are provenance because the runtime probe does not report them.
 D-GOV-019 gives functional compatibility authority only.
 

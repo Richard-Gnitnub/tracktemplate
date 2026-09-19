@@ -16,20 +16,20 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is Open at 0/4. All four exits are Pending. The platform-transition outcome is parked at 2/2 candidate repairs, and no B0 rerun is authorised. |
-| What changed | D-GOV-019 qualifies only the exact currently deployed FreeCAD 1.1.3 profile with CPython 3.13.15 and PySide6/Qt 6.11.2. The three earlier profiles and their evidence stay qualified. |
+| Current state | Phase 7 is Open at 0/4. All four exits are Pending. The platform-transition outcome is stopped at 2/2 candidate repairs, and no B0 rerun is authorised. |
+| What changed | D-GOV-019 qualifies only the exact currently deployed FreeCAD 1.1.3 profile with CPython 3.13.15 and PySide6/Qt 6.11.2. The three earlier profiles stay qualified. The project preserves their evidence. |
 | What now works | The exact runtime probe, complete FreeCADCmd matrix, copied-document checks and real-GUI matrix gave PASS results for this profile. The profile can supply functional compatibility evidence. |
-| Limitations/findings | The runtime guard cannot examine the recorded Flatpak app and runtime commits. This profile has no performance authority. D-P6-008, the parked platform-transition boundary, all recorded product limitations and all comparison and legacy-retirement conditions stay in full. |
-| Owner decision | Accept D-GOV-019 for this profile only and authorise integration of its exact-green draft. This accepts no Phase 7 exit, performance result, B0 result, output status or release state. |
-| Next action | Bring the exact-green draft to Richard for the combined qualification-acceptance and integration decision. Do not resume B0 or start the saved Caveman efficiency tranche in this cycle. |
+| Limitations/findings | The runtime guard does not report the recorded Flatpak app and runtime commits. This profile has no performance authority. D-P6-008, the stopped platform-transition boundary, all recorded product limitations and all comparison and legacy-retirement conditions stay in full. |
+| Owner decision | Accept D-GOV-019 for this profile only. Authorise integration after the required checks have PASS results. This accepts no Phase 7 exit, performance result, B0 result, output status or release state. |
+| Next action | Bring the draft to Richard for the combined qualification and integration decision after the required checks have PASS results. Do not resume B0 or start the saved Caveman efficiency work in this cycle. |
 
 <a id="freecad-1-1-3-py31315-qt6112-qualification-panel"></a>
 
-## D-GOV-019 qualification panel for the current exact FreeCAD stack
+## D-GOV-019 qualification panel for the current FreeCAD stack
 
 This Level 3 panel uses protected `main`
 `980402adf2e3021739594f34eb1df7af6e4402db` as its source state. It changes
-functional host-compatibility authority and its directly dependent controls.
+functional compatibility authority and its directly dependent controls.
 It changes no TrackTemplate product source. Phase 7 stays Open at 0/4, with
 all four exits Pending. Project status stays `unknown`.
 
@@ -37,12 +37,12 @@ all four exits Pending. Project status stays `unknown`.
 
 | Field | Result |
 | --- | --- |
-| Current state | Three exact FreeCAD profiles are qualified. The platform-transition outcome is parked at 2/2 repairs. The temporary old-stack restoration route is abandoned; its `--no-deploy` material stays cached and is not deployed. No app/runtime mask or hold is present; the unrelated NVIDIA pins are unchanged. |
-| What changed | D-GOV-019 qualifies only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` for functional compatibility. It preserves the three earlier profiles and their evidence. |
-| What now works | The runtime probe, complete current FreeCADCmd matrix and real-GUI matrix gave the specified results for the exact deployed profile. |
+| Current state | Four exact FreeCAD profiles are qualified. The platform-transition outcome is stopped at 2/2 repairs. The owner abandoned the temporary route to restore the earlier stack. Its `--no-deploy` material stays cached and is not deployed. No mask or hold for the app or runtime is present. The project did not change the unrelated NVIDIA pins. |
+| What changed | D-GOV-019 qualifies only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` for functional compatibility. The three earlier profiles stay qualified. The project preserves their evidence. |
+| What now works | The runtime probe and the complete FreeCADCmd and real-GUI matrices gave the specified results for the exact deployed profile. |
 | Limitations/findings | The runtime guard does not report the Flatpak app or runtime commits. Those values are independently verified provenance. The new profile has no Phase 6 performance authority. No B0 run occurred. |
-| Owner decision | Accept D-GOV-019 for this exact profile and authorise integration of the exact-green draft. Preserve all exclusions below. |
-| Next action | Obtain the combined owner qualification-acceptance and integration decision. After integration, keep the platform-transition outcome parked unless the owner separately resumes it. The saved Caveman efficiency tranche remains next before further Phase 7 extraction. |
+| Owner decision | Accept D-GOV-019 for this exact profile. Authorise integration after the required checks have PASS results. Preserve all exclusions below. |
+| Next action | Obtain the owner's combined decision to accept the qualification and integrate the change. After integration, keep the platform-transition outcome stopped unless the owner separately starts it again. The saved Caveman efficiency work remains next before further Phase 7 extraction. |
 
 ### Exact host identity and runtime-guard limit
 
@@ -51,11 +51,11 @@ values. It verified the same deployment again after the matrix.
 
 | Component | Recorded value | Contract use |
 | --- | --- | --- |
-| Host | Linux Mint 22.3 Zena, x86_64, kernel 7.0.0-31-generic; X11 Cinnamon; C.UTF-8; system Flatpak 1.14.6 | Linux and x86_64 are exact-match data. The remaining values are provenance. |
+| Host | Linux Mint 22.3 Zena, x86_64, kernel 7.0.0-31-generic, X11 Cinnamon, C.UTF-8, system Flatpak 1.14.6 | Linux and x86_64 are exact-match data. The remaining values are provenance. |
 | FreeCAD | 1.1.3, revision `44987 (Git)`, source commit `145529fe741292ff0b3977a01195bf0247425794` | The version is exact-match data. The revision and source commit are provenance. |
-| Flatpak app | `app/org.freecad.FreeCAD/x86_64/stable`; commit `e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121`; parent `c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29` | The Flatpak ID and package type are exact-match data. The ref and commits are provenance. |
-| Flatpak runtime | `org.kde.Platform/x86_64/6.11`; commit `fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa`; parent `4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18` | Recorded provenance. |
-| SDK and source | `org.kde.Sdk/x86_64/6.11` metadata (SDK not installed); origin `flathub`; collection `org.flathub.Stable`; system installation | Recorded provenance. |
+| Flatpak app | `app/org.freecad.FreeCAD/x86_64/stable`, commit `e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121`, parent `c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29` | The Flatpak ID and package type are exact-match data. The ref and commits are provenance. |
+| Flatpak runtime | `org.kde.Platform/x86_64/6.11`, commit `fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa`, parent `4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18` | Recorded provenance. |
+| SDK and source | `org.kde.Sdk/x86_64/6.11` metadata (SDK not installed), origin `flathub`, collection `org.flathub.Stable`, system installation | Recorded provenance. |
 | Python | CPython 3.13.15 | Exact-match data. |
 | Qt binding | PySide6 6.11.2 with Qt 6.11.2 | Exact-match data. |
 | Geometry and scene graph | OpenCASCADE 7.8.1 and SIM Coin 4.0.8 | Exact-match data. |
@@ -89,13 +89,13 @@ fixture SHA-256 stayed
 | Unsupported, future, conflicting, corrupt and exact change-back cases | PASS in the complete standalone contract and failure matrices and the applicable FreeCAD checks. |
 | Real-GUI editing and lifecycle | PASS for the Phase 5 ViewProvider, selection, Edit, Undo/Redo, save/reopen, failure recovery and cleanup checks. No document remained open. |
 | Four-route Entry/Exit workflows | PASS. Plain-line and connected-straight legacy and modular results were equal with zero differences. The source fixture stayed byte-identical. |
-| Post-matrix deployment | PASS. App and runtime commits were unchanged, and system and user Flatpak mask lists were empty. |
+| Post-matrix deployment | PASS. The qualification cycle did not change the app or runtime commits. The system and user installations had no Flatpak masks. |
 
 The detailed ignored evidence is in
 `benchmark-output/freecad113-requalification/20260919T170344Z-e6bcddd/`.
 The runtime-probe log has SHA-256
 `3b0641cdfa0c97389daa17b4541772a5883d5e04c0479b4287b787476e28b0a2`.
-The retained headless result manifest has SHA-256
+The manifest for the retained headless results has SHA-256
 `39a577915bbfa93d812dc106ad3b4b1a7720e02443f2c6cfb56bd9031c7ee026`.
 The real-GUI migration and ViewProvider logs have SHA-256
 `adc996312467c3bb821f04f88024e62983418aae5b7977760a3612edb337c25b`
@@ -111,23 +111,22 @@ The preserved environment-recovery receipt has SHA-256
 The first exact-profile preflight stopped before FreeCAD launch because the
 temporary profile status did not start with `qualified`. The established
 D-GOV-010 assessment route uses the direct probe and direct matrix before the
-final profile status exists. The direct probe and matrix then passed. The
-preflight result is preserved and was not treated as host evidence.
+final profile status exists. The direct probe and matrix then passed. The assessment preserved the preflight result and did not use it as host evidence.
 
 The output-equivalence command exited zero and printed its canonical PASS
 sentinel. The local assessment runner expected different punctuation and
 initially labelled only that retained log as failed. The classification record
 has SHA-256
 `6749b9d034f27266831e36b6eec72999e5325bac0ce97252f5a9b5f3323e2e54`.
-The command was not repeated.
+The assessment did not repeat the command.
 
 ### Preservation and exclusions
 
 The earlier profiles, exact identities and historical evidence do not change.
-The current app and runtime were not changed. The old-stack `--no-deploy`
-prefetch stays cached only. No hold was added. The platform-transition
-candidate was not changed, B0 was not run, and its repair accounting stays
-2/2.
+The qualification cycle did not change the current app or runtime. The prefetch
+for the earlier stack stays cached only. The qualification cycle added no hold.
+The qualification cycle did not change the platform-transition candidate or
+run B0. Its repair accounting stays 2/2.
 
 D-GOV-019 adds functional compatibility only. It does not add this profile to
 the three profiles that D-GOV-007 and D-GOV-010 authorise for Phase 6
@@ -144,15 +143,16 @@ status stays `unknown`, and no risk disposition changes.
 
 The sole Documentation Review must examine the changed complete logical units
 in `reference/PROJECT_PLAN.md`, `reference/VALIDATION.md`,
-`reference/current/PHASE_EVIDENCE.md`,
-`reference/current/gate-decisions.json` and the human-readable content in
-`reference/contracts/phase1-compatibility.json`. Exact identifiers, JSON keys,
-commands, hashes and machine values are outside linguistic review.
+`reference/current/PHASE_EVIDENCE.md` and
+`reference/current/gate-decisions.json`. The change to
+`reference/contracts/phase1-compatibility.json` is canonical machine data and
+is outside linguistic review. Exact identifiers, JSON keys, commands, hashes
+and machine values are outside linguistic review.
 
-A separate independent qualification reviewer must examine the exact host,
-complete matrix, retained classifications, preservation and exclusions. The
-reviewer must not edit files. Publication requires both reviews and final
-deterministic validation to pass for the same exact candidate.
+Use a separate independent qualification reviewer to examine the exact host,
+complete matrix, retained classifications, preservation and exclusions. Do not
+let this reviewer edit files. Publish only after both reviews and final
+deterministic validation pass for the same exact candidate.
 
 **Panel recommendation:** **Qualify with bounded conditions.** Qualify only
 the D-GOV-019 profile. Preserve the three earlier profiles. Give the new
