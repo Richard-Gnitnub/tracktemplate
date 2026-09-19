@@ -1031,22 +1031,22 @@ def _validate_owner_view(plan: str) -> None:
         "obligation",
         "Phase 7 is Open at 0/4",
         "All four exits are Pending",
-        "output has private-development status",
-        "Project status stays `unknown`",
-        "D-P7-001",
-        "first bounded product task",
-        "This alignment changes no product source",
-        "All legacy-retirement conditions and wider exclusions still apply",
-        "The owner accepts no performance result",
-        "PR-15 and QA-R04 stay High/Mitigate/Partial",
-        "D-GOV-011 stays stopped with its retained negative evidence",
-        "Richard opened Phase 7 at 0/4",
-        "validation, independent review and publication",
-        "synchronise clean protected main",
-        "main_circle_centre",
-        "Route the B16 Generate/Replace caller",
-        "later product pull request needs another owner decision for "
-        "integration",
+        "Output has private-development status",
+        "project status stays `unknown`",
+        "D-GOV-019",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+        "functional compatibility",
+        "complete current FreeCADCmd and real-GUI host matrix",
+        "three earlier profiles and their evidence stay qualified",
+        "runtime guard does not report the recorded Flatpak app or runtime "
+        "commits",
+        "no performance authority",
+        "No B0 run occurred",
+        "D-P6-008",
+        "platform-transition outcome is parked at 2/2 repairs",
+        "combined qualification-acceptance and integration decision",
+        "saved Caveman efficiency tranche remains next before further Phase 7 "
+        "extraction",
     ):
         _require(
             fragment in owner_view,
@@ -4274,21 +4274,21 @@ def _validate_phase7_decision_carryforward(
     document: dict[str, object],
     phase6_decisions: dict[str, dict[str, object]],
 ) -> None:
-    """Preserve the deferred obligation and exact bounded opening authority."""
+    """Preserve the deferred obligation, opening and exact host authority."""
     _require(
         set(document)
         == {"schema_version", "current_phase", "updated_on", "decisions"}
         and document["schema_version"] == 1
         and document["current_phase"] == 7
-        and document["updated_on"] == "2026-09-05",
-        "current decision register is not the Phase 7 opening state",
+        and document["updated_on"] == "2026-09-19",
+        "current decision register is not the D-GOV-019 Phase 7 state",
     )
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 2
+        and len(records) == 3
         and records[0] == phase6_decisions["D-P6-008"],
-        "Phase 7 must carry the complete unchanged D-P6-008 and one opening",
+        "Phase 7 must carry unchanged D-P6-008, D-P7-001 and D-GOV-019",
     )
     opening = records[1]
     panel = "reference/current/PHASE_EVIDENCE.md#phase-7-opening-panel"
@@ -4319,6 +4319,41 @@ def _validate_phase7_decision_carryforward(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-P7-001 " + field + " digest drifted",
+        )
+
+    qualification = records[2]
+    qualification_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#freecad-1-1-3-py31315-qt6112-qualification-panel"
+    )
+    _require(
+        isinstance(qualification, dict)
+        and set(qualification) == set(phase6_decisions["D-P6-008"])
+        and qualification["id"] == "D-GOV-019"
+        and qualification["decided_on"] == "2026-09-19"
+        and qualification["status"] == "Accepted"
+        and qualification["decision"]
+        == "Qualify the exact current FreeCAD 1.1.3 host profile."
+        and qualification["evidence"] == qualification_panel
+        and qualification["panel_record"] == qualification_panel
+        and qualification["panel_required_under_current_policy"] is True,
+        "D-GOV-019 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        (
+            "authority",
+            "4467555f3faecc33fbfb16e3991568a4a37e0fd158d98323a97fe294ab604da4",
+        ),
+        (
+            "exclusions",
+            "4ce7f1a86d4a5cfbdbc755cdd6bf33aa78b3b205677bdbc9c1ac19ddfa713db7",
+        ),
+    ):
+        value = qualification[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-GOV-019 " + field + " digest drifted",
         )
 
 
@@ -4357,6 +4392,61 @@ def _validate_phase7_opening(evidence: str) -> None:
         _require(
             clause in flat,
             "D-P7-001 bounded first assignment drifted: " + clause,
+        )
+
+
+def _validate_dgov019_qualification(evidence: str) -> None:
+    """Bind the exact functional host qualification and its exclusions."""
+    heading = "D-GOV-019 qualification panel for the current exact FreeCAD stack"
+    panel = _section(evidence, heading)
+    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][2]
+    _require(
+        '<a id="freecad-1-1-3-py31315-qt6112-qualification-panel"></a>'
+        in evidence
+        and _blockquote_paragraphs(panel)
+        == [_semantic_text(record["authority"])],
+        "D-GOV-019 exact owner instruction drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "980402adf2e3021739594f34eb1df7af6e4402db",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+        "e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121",
+        "c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29",
+        "fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa",
+        "4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18",
+        "CPython 3.13.15",
+        "PySide6/Qt 6.11.2",
+        "OpenCASCADE 7.8.1",
+        "SIM Coin 4.0.8",
+        "runtime guard does not report the Flatpak app or runtime commits",
+        "No user FreeCAD deployment duplicates the system app",
+        "No app/runtime mask or hold is present",
+        "unrelated NVIDIA pins are unchanged",
+        "source fixture SHA-256 stayed "
+        "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c",
+        "Unsupported, future, conflicting, corrupt and exact change-back cases",
+        "3b0641cdfa0c97389daa17b4541772a5883d5e04c0479b4287b787476e28b0a2",
+        "051f84d1fc03c9a96660faeb5cffabc7d2954fba5c7c2d96ba993de3a121bb06",
+        "a4231dc47b0999b113cb2491be440f5065813d12af6a9336018acd8fbe19ccac",
+        "temporary profile status did not start with qualified",
+        "The command was not repeated",
+        "old-stack --no-deploy prefetch stays cached only",
+        "platform-transition candidate was not changed, B0 was not run",
+        "repair accounting stays 2/2",
+        "adds functional compatibility only",
+        "does not add this profile to the three profiles",
+        "D-P6-008 stays in full",
+        "Phase 7 stays Open at 0/4 with all four exits Pending",
+        "Output stays private-development",
+        "project status stays unknown",
+        "no risk disposition changes",
+        "sole Documentation Review",
+        "separate independent qualification reviewer",
+    ):
+        _require(
+            clause in flat,
+            "D-GOV-019 qualification boundary drifted: " + clause,
         )
 
 
@@ -4756,7 +4846,7 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001"},
+        | {"D-P7-001", "D-GOV-019"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -6459,6 +6549,7 @@ def main() -> None:
         plan, current_evidence, _read(CURRENT_EVIDENCE_PATH),
     )
     _validate_phase7_opening(_read(CURRENT_EVIDENCE_PATH))
+    _validate_dgov019_qualification(_read(CURRENT_EVIDENCE_PATH))
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_finite_documentation_completion(plan, current_evidence)

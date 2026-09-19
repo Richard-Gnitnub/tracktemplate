@@ -19,7 +19,7 @@ from tools import runtime_compatibility_probe  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "d0633adcd7b75ad02aa46e812da283e62cd0dfb3b68dddc5985c9eea8f614b26"
+    "dd306ad8da93fe7920bf2b55288b0d623520ccf39471c2c72dea400fcb16aff7"
 )
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",
@@ -102,6 +102,20 @@ EXPECTED_UPDATED_PROFILE_MATCH = {
     "python.implementation": "CPython",
     "python.version_info": [3, 13, 13],
 }
+EXPECTED_CURRENT_PROFILE_MATCH = {
+    "freecad.coin_version": "SIM Coin 4.0.8",
+    "freecad.opencascade_version": "7.8.1",
+    "freecad.pyside_version": "6.11.2",
+    "freecad.qt_binding": "PySide6",
+    "freecad.qt_version": "6.11.2",
+    "freecad.version_info": [1, 1, 3],
+    "platform.flatpak_id": "org.freecad.FreeCAD",
+    "platform.machine": "x86_64",
+    "platform.packaging": "flatpak",
+    "platform.system": "Linux",
+    "python.implementation": "CPython",
+    "python.version_info": [3, 13, 15],
+}
 EXPECTED_QUALIFIED_PROFILES = {
     "linux-x86_64-flatpak-freecad-1.1.1": {
         "status": "qualified-reference-and-initial-rc-profile",
@@ -142,6 +156,34 @@ EXPECTED_QUALIFIED_PROFILES = {
             "d7a54c855bce9f4fb7b00b33d43f0ecb1908af510f9147bcc9bc32f614a6bbad"
         ),
         "observed_flatpak_runtime": "org.kde.Platform/x86_64/6.11",
+        "observed_flatpak_sdk": "org.kde.Sdk/x86_64/6.11",
+        "observed_flatpak_origin": "flathub",
+        "observed_flatpak_collection": "org.flathub.Stable",
+        "observed_flatpak_installation": "system",
+    },
+    "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2": {
+        "status": "qualified-additional-exact-host-profile",
+        "exact_match": EXPECTED_CURRENT_PROFILE_MATCH,
+        "observed_freecad_revision": "44987 (Git)",
+        "observed_freecad_commit": (
+            "145529fe741292ff0b3977a01195bf0247425794"
+        ),
+        "observed_flatpak_ref": (
+            "app/org.freecad.FreeCAD/x86_64/stable"
+        ),
+        "observed_flatpak_app_commit": (
+            "e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121"
+        ),
+        "observed_flatpak_parent_commit": (
+            "c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29"
+        ),
+        "observed_flatpak_runtime": "org.kde.Platform/x86_64/6.11",
+        "observed_flatpak_runtime_commit": (
+            "fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa"
+        ),
+        "observed_flatpak_runtime_parent_commit": (
+            "4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18"
+        ),
         "observed_flatpak_sdk": "org.kde.Sdk/x86_64/6.11",
         "observed_flatpak_origin": "flathub",
         "observed_flatpak_collection": "org.flathub.Stable",
@@ -228,7 +270,7 @@ def validate_contract(document):
         "recorded_on": "2026-07-20",
         "status": (
             "phase1-policy-accepted-phase2-development-guard-implemented-"
-            "three-exact-freecad-profiles-qualified"
+            "four-exact-freecad-profiles-qualified"
         ),
         "phase": 1,
     }
@@ -523,6 +565,10 @@ def validate_contract(document):
                 "freecad_1_1_3_py31313_qt6111_qualification",
                 "FreeCAD 1.1.3 Python 3.13.13 and Qt 6.11.1 qualification",
             ),
+            (
+                "freecad_1_1_3_py31315_qt6112_qualification",
+                "FreeCAD 1.1.3 Python 3.13.15 and Qt 6.11.2 qualification",
+            ),
         ):
             qualification = evidence.get(field)
             if not _non_empty_text(qualification):
@@ -537,7 +583,7 @@ def validate_contract(document):
                 not in path.read_text(encoding="utf-8")
             ):
                 errors.append(label + " evidence link is invalid")
-        if evidence.get("runtime_probe_observed_on") != "2026-08-23":
+        if evidence.get("runtime_probe_observed_on") != "2026-09-19":
             errors.append("runtime-probe observation date drifted")
         gaps = evidence.get("known_evidence_gaps")
         if not isinstance(gaps, list) or len(gaps) != 5 or not all(
@@ -878,6 +924,18 @@ def validate_fail_closed_mutations(contract):
     changed["runtime_baseline"]["qualified_profiles"][2]["exact_match"][
         "freecad.qt_version"
     ] = "6.10.3"
+    mutations.append(changed)
+
+    changed = copy.deepcopy(contract)
+    changed["runtime_baseline"]["qualified_profiles"][3]["exact_match"][
+        "python.version_info"
+    ] = [3, 13, 14]
+    mutations.append(changed)
+
+    changed = copy.deepcopy(contract)
+    changed["runtime_baseline"]["qualified_profiles"][3][
+        "observed_flatpak_runtime_commit"
+    ] = "0" * 64
     mutations.append(changed)
 
     changed = copy.deepcopy(contract)

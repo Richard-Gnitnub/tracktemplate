@@ -1393,7 +1393,8 @@ evidence only when its `TRACKTEMPLATE_RUNTIME_PROBE=` record reports
 
 - `linux-x86_64-flatpak-freecad-1.1.1`
 - `linux-x86_64-flatpak-freecad-1.1.3`
-- `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`.
+- `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`
+- `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2`.
 
 An exact 1.1.1 result does not qualify 1.1.3. An exact 1.1.3 result does not
 qualify 1.1.2 or another 1.1.x release. A result for one exact 1.1.3 profile
@@ -1406,11 +1407,18 @@ host identity. D-GOV-010 adds only the exact FreeCAD 1.1.3 profile with
 CPython 3.13.13 and PySide6/Qt 6.11.1. The host matrix gave the specified
 results in that runtime.
 
+D-GOV-019 adds only the exact FreeCAD 1.1.3 profile with CPython 3.13.15
+and PySide6/Qt 6.11.2. The complete current FreeCADCmd and real-GUI host
+matrix gave the specified results. The independently verified Flatpak app and
+runtime commits are provenance because the runtime probe does not report them.
+D-GOV-019 gives functional compatibility authority only.
+
 D-GOV-007 and D-GOV-010 define the
 [hosts for Phase 6 performance evidence](PERFORMANCE_SOP.md#phase-6-performance-host-boundary).
-Together, they authorise only the three compatibility-contract profiles to
-supply candidate evidence for Phase 6 performance. A subsequent decision can
-admit only a performance result from one of these profiles.
+They authorise only the three named profiles that existed through D-GOV-010 to
+supply candidate evidence for Phase 6 performance. D-GOV-019 does not add the
+CPython 3.13.15 and PySide6/Qt 6.11.2 profile to that performance boundary.
+A subsequent decision can admit only a performance result from one of these profiles.
 
 The validator examines new schema-2 results. Each result and summary must
 record the ID and FreeCAD version of its exact host profile. One result set
@@ -1432,7 +1440,7 @@ records the qualified-runtime contract hash. These data identify the exact
 host profile for FreeCAD 1.1.1. D-GOV-007 keeps that report as 1.1.1 evidence.
 The validator does not change the report.
 
-D-GOV-007 and D-GOV-010 admit no performance result. They define no value for a
+D-GOV-007, D-GOV-010 and D-GOV-019 admit no performance result. They define no value for a
 performance budget. They do not accept Exit 4 or claim better performance.
 Before a performance-change claim, D-GOV-009 must record a baseline for this
 profile. The previous 1.1.1-only validator rejected the 1.1.3 test result.

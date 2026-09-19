@@ -589,22 +589,24 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "All legacy-retirement conditions and wider exclusions still apply"
+        and "platform-transition outcome is parked at 2/2 repairs" in owner_view
+        and "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2"
         in owner_view
-        and "The owner accepts no performance result" in owner_view
-        and "PR-15 and QA-R04 stay High/Mitigate/Partial" in owner_view
-        and "D-GOV-011 stays stopped with its retained negative evidence"
+        and "functional compatibility" in owner_view
+        and "complete current FreeCADCmd and real-GUI host matrix" in owner_view
+        and "three earlier profiles and their evidence stay qualified"
         in owner_view
-        and "Richard opened Phase 7 at 0/4" in owner_view
-        and "first bounded product task" in owner_view
-        and "This alignment changes no product source" in owner_view
-        and "synchronise clean protected main" in owner_view
-        and "main_circle_centre" in owner_view
-        and "Route the B16 Generate/Replace caller" in owner_view
-        and "later product pull request needs another owner decision for "
-        "integration" in owner_view
-        and "output has private-development status" in owner_view
-        and "Project status stays `unknown`" in owner_view,
+        and "runtime guard does not report the recorded Flatpak app or runtime "
+        "commits" in owner_view
+        and "no performance authority" in owner_view
+        and "No B0 run occurred" in owner_view
+        and "D-P6-008" in owner_view
+        and "combined qualification-acceptance and integration decision"
+        in owner_view
+        and "saved Caveman efficiency tranche remains next before further "
+        "Phase 7 extraction" in owner_view
+        and "Output has private-development status" in owner_view
+        and "project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",
     )
 

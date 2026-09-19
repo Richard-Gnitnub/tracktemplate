@@ -55,6 +55,7 @@ assert qualification["compatibility_evaluation"]["matched_profile_id"] in {
     "linux-x86_64-flatpak-freecad-1.1.1",
     "linux-x86_64-flatpak-freecad-1.1.3",
     "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
+    "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
 }
 
 before = _document_state()
