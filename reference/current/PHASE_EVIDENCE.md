@@ -20,8 +20,9 @@ The owner accepted the completed, independently reviewed
 | What changed | The six-function platform-transition calculation is in `tracktemplate.domain.alignment`. Three public functions use `tracktemplate.api`. The B16 workflow selects fourteen functions and validates 39 caller routes. |
 | What now works | Standalone, qualified FreeCAD, direct, regression and real-GUI proofs have PASS results. The complete results from the bounded B14/B15, B16 caller and platform-widening GUI comparisons are equal. |
 | Limitations/findings | Direct and single-sample GUI costs are descriptive only. D-GOV-019 gives no performance authority. D-P6-008, all recorded product limitations and all comparison and legacy-retirement conditions stay in full. |
-| Owner decision | After exact-green draft publication, decide whether to integrate only this bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status, wider migration or release state. |
-| Next action | Complete the single prescribed Documentation Review and deterministic documentation validation. Publish one exact-green draft, then bring its exact head to Richard for the integration decision. |
+| Owner decision | After exact-green draft publication, decide whether to integrate only this bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status,
+migration outside this bounded scope or release state. |
+| Next action | Complete the one necessary Documentation Review and deterministic documentation validation. Publish one exact-green draft, then bring its exact head to Richard for the integration decision. |
 
 <a id="freecad-1-1-3-py31315-qt6112-qualification-panel"></a>
 
@@ -165,12 +166,11 @@ Exact owner decision:
 ## Migration of platform-transition calculations — 2026-09-19
 
 Protected main includes the authorised PR #78 at
-`0e6bd083f4ed1774685b6d3a463eb75f763c04aa`. The owner resumed the existing
-platform-transition outcome under D-GOV-004 and D-P7-001. The work preserved
+`0e6bd083f4ed1774685b6d3a463eb75f763c04aa`. The owner authorised continuation of the existing platform-transition outcome
+under D-GOV-004 and D-P7-001. The work preserved
 the frozen plan, all earlier evidence and repair accounting at 2/2.
 
-The six-function analytical closure now uses
-`tracktemplate.domain.alignment`. Three public functions use
+The six related calculations now use `tracktemplate.domain.alignment`. Three public functions use
 `tracktemplate.api`. The existing B16 `prepare_track_alignment` and
 `build_platform_core` callers get those functions through the modular workflow.
 The [API instructions](../contracts/phase7-platform-transitions.md) preserve
@@ -187,8 +187,8 @@ proofs, repair history and exclusions without accepting a phase result.
 
 All 132 direct operations give equal complete results and preserve five named
 invariants. One baseline and one candidate real-GUI sample also give equal
-complete product-semantic results with zero differences. They cover create,
-Edit, Undo/Redo, rejection, save/reopen, preference recovery and cleanup.
+complete product-semantic results with zero differences. They include create, Edit, Undo/Redo, rejection, save/reopen,
+preference recovery and cleanup.
 
 The [evidence record](../benchmarks/2026-09-19-phase7-platform-transitions-regression.md)
 keeps the fixed methods, raw identities, repair history and measured limits.
@@ -201,13 +201,12 @@ directions. They are descriptive only. They give no performance acceptance or
 new performance hypothesis.
 
 This result supplies bounded evidence for the API without host dependencies in
-Exit 3, equal results in Exit 2 and the B16 workflow in Exit 1. It accepts no
-full exit. Phase 7 stays Open at 0/4, with all four exits Pending.
+Exit 3. It supplies evidence of equal results in Exit 2 and B16 workflow
+evidence in Exit 1. It accepts no Phase 7 exit. Phase 7 stays Open at 0/4, with all four exits Pending.
 
 D-P6-008, all recorded limitations and all conditions to compare results and
 remove legacy paths stay in full. Project status stays `unknown`, and output
-keeps private-development status. The new exact-green draft needs a separate
-owner decision for integration.
+keeps private-development status. The new exact-green draft must have a separate owner decision for integration.
 
 ## Migration of the calculation for curve direction — 2026-09-12
 

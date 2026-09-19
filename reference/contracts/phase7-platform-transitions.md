@@ -31,7 +31,8 @@ solve_platform_shape_parameter(
 
 The same domain module keeps `platform_transition_angle`,
 `platform_line_offset` and `_platform_parameter_grid` as internal functions.
-Together, the six functions are one calculation closure. They have no FreeCAD
+Together, the six functions make the complete bounded calculation group. They
+have no FreeCAD
 or Qt dependency.
 
 Lengths and XY values use millimetres. Angles use radians. The calculation uses
@@ -42,7 +43,7 @@ The existing B16 `prepare_track_alignment` caller uses
 `solve_platform_shape_parameter` for the entry and exit. The existing
 `build_platform_core` caller uses `platform_transition_displacement` for the two
 ends and `platform_peak_curvature_factor` for the two peak-curvature values.
-These host callers keep their initial operations and side effects.
+These host callers keep their initial operations and changes to host state.
 
 This extraction does not move `build_platform_core`, all of
 `prepare_track_alignment` or the three alignment-mode calculations. It changes
@@ -51,30 +52,31 @@ condition to remove a legacy path.
 
 ## Transition displacement
 
-`platform_transition_displacement` first checks `radius`. A value at or below
-zero gives this error:
+`platform_transition_displacement` first checks `radius`. A value less than or
+equal to zero gives this error:
 
 ```text
 A platform-transition radius must be greater than zero.
 ```
 
-After that check, a `length` at or below `1.0e-8` gives
+After that check, a `length` less than or equal to `1.0e-8` gives
 `(0.0, 0.0, 0.0)`. This return occurs before checks of `shape_parameter` and
 `transition_kind`.
 
-A `shape_parameter` below `-0.25 - 1.0e-10` gives this error:
+A `shape_parameter` less than `-0.25 - 1.0e-10` gives this error:
 
 ```text
 A platform-transition shape parameter became invalid.
 ```
 
-`transition_kind` must be `entry` or `exit`. Another value gives this error:
+`transition_kind` must be `entry` or `exit`. A different value gives this error:
 
 ```text
 Unknown platform-transition direction.
 ```
 
-The function converts `integration_steps` to `int`. It uses at least 80 steps.
+`int(integration_steps)` gives the step count. The function uses at least 80
+steps.
 If the result is odd, the function adds one. Thus, the numerical integration
 always uses an even step count.
 
@@ -112,10 +114,11 @@ b = -6.0 - (96.0 * shape_parameter)
 c = 6.0 + (32.0 * shape_parameter)
 ```
 
-When the absolute value of `a` is at or below `1.0e-14`, the function uses the
-linear root only if the absolute value of `b` is above that value. Otherwise,
-it uses the roots of the quadratic only when its discriminant is at or above
-zero. Only roots strictly between zero and one become candidates.
+When the absolute value of `a` is less than or equal to `1.0e-14`, the function
+uses the linear root only if the absolute value of `b` is greater than that
+value. In all other cases, it uses the roots of the quadratic only when its
+discriminant is greater than or equal to zero. Only roots greater than zero and
+less than one become candidates.
 
 For each candidate `u`, the function calculates:
 
@@ -128,9 +131,9 @@ The result is the largest candidate value, with a minimum result of `1.0`.
 
 ## Internal support calculations
 
-`platform_transition_angle` gives `0.0` when `length` is at or below
-`1.0e-8`. Otherwise, it uses the final-angle expression in the displacement
-calculation.
+`platform_transition_angle` gives `0.0` when `length` is less than or equal to
+`1.0e-8`. For all other lengths, it uses the final-angle expression in the
+displacement calculation.
 
 `platform_line_offset` first gets `(dx, dy, angle)` from
 `platform_transition_displacement`. For an entry transition, it gives:
@@ -151,20 +154,21 @@ centre_normal_coordinate
 
 `_platform_parameter_grid(lower, upper)` gives an empty Python `list` when
 `upper < lower`. If the interval crosses zero, it supplies 36 equal steps from
-`lower` to zero. For a wholly negative interval, it supplies 80 equal steps and
+`lower` to zero. For an interval with only negative values, it supplies 80 equal steps and
 stops. For a positive part, it supplies 240 quadratic steps from the applicable
 zero or lower bound to `upper`. It adds the upper bound when the last value is
 different by more than `1.0e-12`.
 
 ## Solution for a shape parameter
 
-`solve_platform_shape_parameter` first rejects a `radius` at or below zero. It
+`solve_platform_shape_parameter` first rejects a `radius` less than or equal to
+zero. It
 then rejects a negative `transition_length`. These errors identify the track
 and the applicable entry or exit.
 
-For a length at or below `1.0e-8`, the function calculates the line offset with
-zero length and zero shape. If its difference from `target_line_offset` is at
-or below `1.0e-6`, the result is:
+For a length less than or equal to `1.0e-8`, the function calculates the line
+offset with zero length and zero shape. If its difference from
+`target_line_offset` is less than or equal to `1.0e-6`, the result is:
 
 ```text
 shape_parameter: 0.0
@@ -173,31 +177,34 @@ peak_factor: 1.0
 minimum_radius: radius
 ```
 
-Otherwise, the function reports that the requested spacing needs a non-zero
-transition length. It includes the requested signed offset and the calculated
+If the function does not give this result, it reports that a non-zero
+transition length is necessary for the requested spacing. It includes the requested signed offset and the calculated
 zero-length offset in the diagnostic.
 
 For a non-zero length, the minimum shape value is `-0.187499`. The maximum
 permitted transition angle is the larger of `1.0e-8` and
 `total_angle - 1.0e-8`. These values set the maximum shape value. If the maximum
-is below the minimum, the function reports that the transition is too long for
+is less than the minimum, the function reports that the transition is too long
+for
 the total turn. It includes the length, smallest possible transition angle and
 complete turn angle in the diagnostic.
 
-The function evaluates the parameter grid with 240 integration steps. It keeps
-a grid value when its offset difference is at or below `1.0e-7`. It also keeps
+The function calculates the offset difference for each value in the parameter
+grid with 240 integration steps. It keeps a grid value when its offset
+difference is less than or equal to `1.0e-7`. It also keeps
 each adjacent interval that has a sign change.
 
 The function refines the grid value with the smallest absolute offset
-difference. It searches between the adjacent grid values with 72 golden-section
-iterations and 360 integration steps. It keeps that result only when its
-residual is at or below `1.0e-5`.
+difference. It does 72 golden-section iterations between the adjacent grid
+values and uses 360 integration steps. It keeps that result only when its
+residual is less than or equal to `1.0e-5`.
 
 For each sign-change interval, the function uses at most 72 bisection
-iterations and 320 integration steps. It stops when the residual is at or below
-`1.0e-10` or the parameter interval is at or below `1.0e-9`.
+iterations and 320 integration steps. It stops when the residual is less than
+or equal to `1.0e-10` or the parameter interval is less than or equal to
+`1.0e-9`.
 
-If no candidate remains, the function reports that the requested spacing
+If the function finds no candidate, it reports that the requested spacing
 cannot keep all curvature in the same turn direction. The diagnostic includes
 the transition length, requested signed offset and calculated range of signed
 offsets.
@@ -233,8 +240,8 @@ stay unchanged.
 ## Evidence boundary
 
 The [regression record](../benchmarks/2026-09-19-phase7-platform-transitions-regression.md)
-owns the observed calculation, caller, human-interface and cost evidence. The
-supported scope is the inherited platform-transition calculation and the
+owns the recorded calculation, caller, human-interface and cost evidence. The
+supported scope is the earlier platform-transition calculation and the
 existing B16 preparation and native-core callers in that record.
 
 The result does not accept a solver change, performance optimisation, complete

@@ -12,10 +12,10 @@ calculations and their sequence. The
 The owner authorised PR #78 head
 `ba3fa532e7f0a32c1a9a6120bbc4cc4ec46a9c34`. Protected main merged it at
 `0e6bd083f4ed1774685b6d3a463eb75f763c04aa`. The worktree then moved its
-preserved local candidate and evidence to that exact main state without a
-content loss.
+preserved local candidate and evidence to that exact main state without
+loss of content.
 
-The inherited platform-transition calculation was absent from Core. The
+The earlier platform-transition calculation was absent from Core. The
 candidate moves its six-function analytical closure to
 `tracktemplate.domain.alignment`. `tracktemplate.api` supplies the three public
 functions. The existing `prepare_track_alignment` and `build_platform_core`
@@ -28,7 +28,7 @@ uses schema `9` and contract identity
 `tracktemplate:phase7:platform-transition:1`.
 
 The composition check also validates the three internal calculation functions
-and all edges in their call graph. After a selection error, the workflow puts
+and each call between the six functions. After a selection error, the workflow puts
 all previous values back. It removes a supplied value when that name was
 initially absent.
 
@@ -45,20 +45,21 @@ Its receipt has SHA-256
 `75f3b86cc931ff3f826ce6f2c1815a82da3f27392b2bf0883b140544cf00c2da`.
 The earlier B0 repair backup receipt has SHA-256
 `71decb97051d23b7ab9a51975db3f3ac2617b75cb0e7dc094669500e9548479c`.
-All local work, failed evidence and later receipts remain in their existing
+All local work, failed evidence and later receipts stay in their existing
 worktrees and ignored evidence paths.
 
 ## Calculation and caller proof
 
-The identical B14 and B15 definitions start at lines 7081 and 7495,
-respectively. Their
-combined function fragment has SHA-256
+The B14 and B15 definitions have the same content. The B14 definition starts
+at line 7081, and the B15 definition starts at line 7495. Their combined
+function fragment has SHA-256
 `72c77c486bf4e72e15be1f43015cb98ca9e549fcebdaafad4578fa6019809ca4`.
 The actual calls are in `prepare_track_alignment` and `build_platform_core`.
 
 The baseline characterisation has a PASS result for both immutable sources.
-For each source, it covers seven usual analytical groups, 22 boundary groups,
-eight complete search grids and six usual solver groups. It also covers nine
+For each source, it includes seven usual calculation groups, 22 boundary
+groups, eight complete search grids and six usual solver groups. It also
+includes nine
 diagnostic groups, four complete call traces, nine complete preparation records
 and six native builder records.
 
@@ -82,13 +83,13 @@ result. All points are exact `App.Vector` values with Z equal to zero. FreeCAD
 document state stays unchanged. The result record has SHA-256
 `843b64dd94041f6b706aece5ef87749f19e16a3b9edaea0a3ad29b0776904cfa`.
 
-Thirteen selected standalone test sets have PASS results. They cover Phase 1,
+Thirteen selected standalone test sets have PASS results. They include Phase 1,
 Phase 2, Phase 3 routing and workflows, Phase 4 route removal, all seven earlier
 Phase 7 results and this candidate. The manifest has SHA-256
 `01dc3f36ce94dd3e67a44edf2837d3b0ff090c75590a4e4db768b633eff2f9f7`.
 
 Eight new qualified FreeCAD processes and the completed candidate proof also
-have PASS results. They cover the Phase 3 caller and all eight Phase 7
+have PASS results. They include the Phase 3 caller and all eight Phase 7
 calculation boundaries. Each new process has exit status zero and its necessary
 success sentinel. Their completion receipt has SHA-256
 `2bf0570a570c6d2b2d574c4287a1d7d235da415b66e0cb785cf61fff58e5e53d`.
@@ -129,7 +130,7 @@ record has SHA-256
 
 The first B0 sample finished 4,001.454889 seconds before C0 started. Product
 work and recovery occurred in this interval. The plan does not control the
-operating system file cache or scheduling. Thus, these observations do not
+operating system file cache or scheduling. Thus, these measurements do not
 show typical workflow cost or performance acceptance.
 
 The next table gives medians and [minimum, maximum] from the thirty subsequent
@@ -173,7 +174,7 @@ eleven functions and 38 callers. The candidate has schema `9`, fourteen
 functions and 39 callers. Both use the D-GOV-019 qualified host and bridge pin
 `660ed03f5dc6aeb2dd0e623cc4ed5880b4c90cb7`.
 
-Each sample starts in a fresh isolated FreeCAD GUI session with a copy of the
+Each sample starts in a new isolated FreeCAD GUI session with a copy of the
 same source fixture. The fixture SHA-256 stays
 `0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`
 before and after the two runs.
@@ -190,7 +191,7 @@ workflow:
 
 The checks include complete product-semantic data, shapes, stable identities,
 stored inputs, history, persistence, preference restoration and cleanup. Both
-samples leave the modular route active, preserve all binding identities and
+samples keep the modular route active, preserve all binding identities and
 close their document.
 
 The complete semantic records are equal with zero differences. Their common
@@ -201,7 +202,7 @@ The comparison record has SHA-256
 The complete GUI receipt has SHA-256
 `fbe3c937663bf79068f8d87ee305eeed6f0f0ac0f92ef756d9617c2941ec088f`.
 
-The next values are one sample per state. They are descriptive observations.
+The next values are one sample per state. They are descriptive measurements.
 Wall and CPU values use milliseconds. RSS changes use MiB.
 
 | Action | Baseline wall | Candidate wall | Baseline CPU | Candidate CPU | Baseline RSS change | Candidate RSS change |
@@ -232,7 +233,7 @@ the comparison rule did not change.
 The first B0 helper check used the default Python 3.13 AST representation. That
 default omits empty fields and was different from the Python 3.12 identity in
 the frozen plan. Repair pass 2 set `show_empty=True` and added suffix support to
-preserve the original receipts. The repair stopped before product composition
+preserve the initial receipts. The repair stopped before product composition
 and changed no measurement rule or product source.
 
 The repaired attempt then found an unqualified installed runtime. It stopped
@@ -279,8 +280,8 @@ The review confirms the candidate identities, 132 direct operations and the
 selected standalone and qualified matrices. It also confirms the complete
 regression pipeline, D-GOV-019 host, GUI comparison with zero differences,
 repair accounting at 2/2, consumed harness exception and all stated exclusions.
-The reviewer did not implement the candidate and did not edit files, run
-another proof or review canonical prose. This verdict accepts no Phase 7 exit,
+The reviewer wrote no candidate source or test. The reviewer did not edit
+files, run a different proof or review canonical prose. This verdict accepts no Phase 7 exit,
 performance result, output state or wider migration claim.
 
 ## Evidence identities
@@ -298,8 +299,9 @@ on branch `codex/phase7-platform-transitions`.
 | `tests/freecad_validate_phase7_platform_transitions.py` | `5a1cdf10a0034d1eb71721f794c3d85d7ff97d0589741519c0357a0adddd28c6` |
 
 The next records are under the worktree's ignored
-`tmp/phase7-platform-transitions/` directory unless the path says otherwise.
-They keep original FAIL and later PASS evidence in different records.
+`tmp/phase7-platform-transitions/` directory if the path does not give a
+different location. They keep the initial FAIL and later PASS evidence in
+different records.
 
 | Record | SHA-256 |
 | --- | --- |
@@ -326,15 +328,15 @@ They keep original FAIL and later PASS evidence in different records.
 
 This calculation migration supplies bounded evidence for the API without host
 dependencies in Exit 3. It supplies bounded evidence of equal results in Exit
-2 and B16 workflow evidence in Exit 1. It accepts no full exit. Phase 7 stays
+2 and B16 workflow evidence in Exit 1. It accepts no Phase 7 exit. Phase 7 stays
 Open at 0/4, with all four exits Pending.
 
 D-P6-008 stays in full as a deferred, unmet obligation before Phase 10 beta
 acceptance. All earlier performance limitations and unknown causes stay
-visible. The direct and GUI observations in this record give no performance
+visible. The direct and GUI measurements in this record give no performance
 acceptance and select no optimisation.
 
 All conditions to compare results and remove legacy paths stay in full. This
 task changes no phase criterion, risk, persistence contract, output contract or
 release state. Output stays private-development. Project status stays
-`unknown`. The new draft needs separate owner authority for integration.
+`unknown`. The new draft must have separate owner authority for integration.
