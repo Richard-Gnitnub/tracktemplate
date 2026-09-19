@@ -34,4 +34,13 @@ jobs:
         run: python tools/validate_python_syntax.py
 
       - name: Run standalone tests and repository contracts
+        id: standalone
         run: python tools/run_standalone_validators.py --profile ci
+
+      - name: Preserve standalone validation output
+        if: ${{ always() && steps.standalone.outcome != 'skipped' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: standalone-validation-${{ github.sha }}
+          path: benchmark-output/standalone-validation/
+          if-no-files-found: error
