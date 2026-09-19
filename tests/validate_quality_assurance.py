@@ -589,21 +589,24 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "platform-transition outcome is parked at 2/2 repairs" in owner_view
+        and "platform-transition outcome is stopped at 2/2 repairs" in owner_view
         and "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2"
         in owner_view
         and "functional compatibility" in owner_view
-        and "complete current FreeCADCmd and real-GUI host matrix" in owner_view
-        and "three earlier profiles and their evidence stay qualified"
+        and "complete FreeCADCmd and real-GUI matrices for the current stack"
+        in owner_view
+        and "three earlier profiles stay qualified"
+        in owner_view
+        and "project preserves their evidence"
         in owner_view
         and "runtime guard does not report the recorded Flatpak app or runtime "
         "commits" in owner_view
         and "no performance authority" in owner_view
         and "No B0 run occurred" in owner_view
         and "D-P6-008" in owner_view
-        and "combined qualification-acceptance and integration decision"
+        and "combined qualification and integration decision"
         in owner_view
-        and "saved Caveman efficiency tranche remains next before further "
+        and "saved Caveman efficiency work remains next before further "
         "Phase 7 extraction" in owner_view
         and "Output has private-development status" in owner_view
         and "project status stays `unknown`" in owner_view,

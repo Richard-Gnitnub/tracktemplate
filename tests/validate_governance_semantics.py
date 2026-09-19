@@ -686,17 +686,18 @@ def validate_phase6_closeout_mutations() -> None:
         ),
         (
             "b0-authorised",
-            "platform-transition\ncandidate was not changed, B0 was not run",
+            "qualification cycle did not change the platform-transition "
+            "candidate or\nrun B0",
             "platform-transition candidate ran B0",
-            "D-GOV-019 qualification boundary drifted: "
-            "platform-transition candidate was not changed, B0 was not run",
+            "D-GOV-019 qualification boundary drifted: qualification cycle "
+            "did not change the platform-transition candidate or run B0",
         ),
         (
             "old-stack-deployed",
-            "old-stack `--no-deploy`\nprefetch stays cached only",
+            "prefetch\nfor the earlier stack stays cached only",
             "old-stack prefetch is deployed and held",
-            "D-GOV-019 qualification boundary drifted: old-stack --no-deploy "
-            "prefetch stays cached only",
+            "D-GOV-019 qualification boundary drifted: prefetch for the "
+            "earlier stack stays cached only",
         ),
         (
             "phase7-exit-admitted",

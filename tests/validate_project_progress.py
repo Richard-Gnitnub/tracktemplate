@@ -1036,16 +1036,17 @@ def _validate_owner_view(plan: str) -> None:
         "D-GOV-019",
         "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
         "functional compatibility",
-        "complete current FreeCADCmd and real-GUI host matrix",
-        "three earlier profiles and their evidence stay qualified",
+        "complete FreeCADCmd and real-GUI matrices for the current stack",
+        "three earlier profiles stay qualified",
+        "project preserves their evidence",
         "runtime guard does not report the recorded Flatpak app or runtime "
         "commits",
         "no performance authority",
         "No B0 run occurred",
         "D-P6-008",
-        "platform-transition outcome is parked at 2/2 repairs",
-        "combined qualification-acceptance and integration decision",
-        "saved Caveman efficiency tranche remains next before further Phase 7 "
+        "platform-transition outcome is stopped at 2/2 repairs",
+        "combined qualification and integration decision",
+        "saved Caveman efficiency work remains next before further Phase 7 "
         "extraction",
     ):
         _require(
@@ -4346,7 +4347,7 @@ def _validate_phase7_decision_carryforward(
         ),
         (
             "exclusions",
-            "4ce7f1a86d4a5cfbdbc755cdd6bf33aa78b3b205677bdbc9c1ac19ddfa713db7",
+            "2076cd0b514f8e00f3002516444ee0e5a183c07e58faa18b73b39916d578efa4",
         ),
     ):
         value = qualification[field]
@@ -4397,7 +4398,7 @@ def _validate_phase7_opening(evidence: str) -> None:
 
 def _validate_dgov019_qualification(evidence: str) -> None:
     """Bind the exact functional host qualification and its exclusions."""
-    heading = "D-GOV-019 qualification panel for the current exact FreeCAD stack"
+    heading = "D-GOV-019 qualification panel for the current FreeCAD stack"
     panel = _section(evidence, heading)
     record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][2]
     _require(
@@ -4421,8 +4422,8 @@ def _validate_dgov019_qualification(evidence: str) -> None:
         "SIM Coin 4.0.8",
         "runtime guard does not report the Flatpak app or runtime commits",
         "No user FreeCAD deployment duplicates the system app",
-        "No app/runtime mask or hold is present",
-        "unrelated NVIDIA pins are unchanged",
+        "No mask or hold for the app or runtime is present",
+        "project did not change the unrelated NVIDIA pins",
         "source fixture SHA-256 stayed "
         "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c",
         "Unsupported, future, conflicting, corrupt and exact change-back cases",
@@ -4430,9 +4431,10 @@ def _validate_dgov019_qualification(evidence: str) -> None:
         "051f84d1fc03c9a96660faeb5cffabc7d2954fba5c7c2d96ba993de3a121bb06",
         "a4231dc47b0999b113cb2491be440f5065813d12af6a9336018acd8fbe19ccac",
         "temporary profile status did not start with qualified",
-        "The command was not repeated",
-        "old-stack --no-deploy prefetch stays cached only",
-        "platform-transition candidate was not changed, B0 was not run",
+        "assessment did not repeat the command",
+        "prefetch for the earlier stack stays cached only",
+        "qualification cycle did not change the platform-transition candidate "
+        "or run B0",
         "repair accounting stays 2/2",
         "adds functional compatibility only",
         "does not add this profile to the three profiles",
