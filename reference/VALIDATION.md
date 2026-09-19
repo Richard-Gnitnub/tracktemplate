@@ -307,6 +307,14 @@ workstation-only archive, hash, branch, and upstream evidence. Neither profile
 replaces selected FreeCAD, GUI, backup/restore, output, or owner-decision
 evidence.
 
+The `run_standalone_validators.py` tool writes all command output from each
+validator to one ignored file in
+`benchmark-output/standalone-validation/`. The tool does not show command
+output from a validator that has a `PASS` result. The
+`TRACKTEMPLATE_STANDALONE_VALIDATION=` result gives the directory path. For a
+`FAIL` result, the tool gives a diagnostic and the applicable file path. The
+diagnostic has a byte limit. All command output stays in the ignored file.
+
 For diagnosis of a Python source error, use the same local source check:
 
 ```bash

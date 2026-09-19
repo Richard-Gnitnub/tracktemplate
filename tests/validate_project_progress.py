@@ -6523,8 +6523,26 @@ def _validate_ci_workflow() -> None:
         "tools/run_standalone_validators.py --profile ci" in workflow,
         "CI omits the explicit clean-checkout standalone matrix",
     )
+    for evidence_control in (
+        "id: standalone",
+        "always() && steps.standalone.outcome != 'skipped'",
+        (
+            "uses: actions/upload-artifact@"
+            "ea165f8d65b6e75b540449e92b4886f43607fa02"
+        ),
+        (
+            "name: standalone-validation-"
+            "${{ github.event.pull_request.head.sha || github.sha }}"
+        ),
+        "path: benchmark-output/standalone-validation/",
+        "if-no-files-found: error",
+    ):
+        _require(
+            evidence_control in workflow,
+            "CI standalone-output retention drifted: " + evidence_control,
+        )
     pins = re.findall(r"uses: actions/[a-z-]+@([0-9a-f]{40})", workflow)
-    _require(len(pins) == 2, "official CI actions must be pinned to two full SHAs")
+    _require(len(pins) == 3, "official CI actions must be pinned to three full SHAs")
     _require("timeout-minutes:" in workflow, "CI job lacks a timeout")
 
 
