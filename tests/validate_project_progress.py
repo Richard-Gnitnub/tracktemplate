@@ -6530,7 +6530,10 @@ def _validate_ci_workflow() -> None:
             "uses: actions/upload-artifact@"
             "ea165f8d65b6e75b540449e92b4886f43607fa02"
         ),
-        "name: standalone-validation-${{ github.sha }}",
+        (
+            "name: standalone-validation-"
+            "${{ github.event.pull_request.head.sha || github.sha }}"
+        ),
         "path: benchmark-output/standalone-validation/",
         "if-no-files-found: error",
     ):

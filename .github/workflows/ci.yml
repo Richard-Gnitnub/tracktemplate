@@ -41,6 +41,6 @@ jobs:
         if: ${{ always() && steps.standalone.outcome != 'skipped' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: standalone-validation-${{ github.sha }}
+          name: standalone-validation-${{ github.event.pull_request.head.sha || github.sha }}
           path: benchmark-output/standalone-validation/
           if-no-files-found: error
