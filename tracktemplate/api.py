@@ -86,6 +86,9 @@ from tracktemplate.domain.alignment import (
     clothoid_exit_displacement,
     main_circle_centre,
     mirror_alignment_for_turn,
+    platform_transition_displacement,
+    platform_peak_curvature_factor,
+    solve_platform_shape_parameter,
     solve_transition_length,
     transition_start_signed_offset,
 )
@@ -178,6 +181,9 @@ __all__ = (
     "clothoid_exit_displacement",
     "main_circle_centre",
     "mirror_alignment_for_turn",
+    "platform_transition_displacement",
+    "platform_peak_curvature_factor",
+    "solve_platform_shape_parameter",
     "transition_start_signed_offset",
     "solve_transition_length",
 )
