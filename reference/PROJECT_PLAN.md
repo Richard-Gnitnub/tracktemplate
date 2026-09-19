@@ -12,12 +12,12 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. The output has private-development status. Project status stays `unknown`. |
-| **What changed** | [D-P7-001](current/PHASE_EVIDENCE.md#phase-7-opening-panel) opens the current Core alignment, station and multiple-track migration scope. The owner authorises opening integration and the first bounded product task. |
-| **What now works** | The opening records define the authorised sequence and first task. This alignment changes no product source. |
-| **Limitations/findings** | The owner accepts no performance result. PR-15 and QA-R04 stay High/Mitigate/Partial. All legacy-retirement conditions and wider exclusions still apply. D-GOV-011 stays stopped with its retained negative evidence. |
-| **Owner decision** | Richard opened Phase 7 at 0/4. He authorised integration of the exact-green opening alignment, then the bounded product task through validation, independent review and publication. |
-| **Next action** | Integrate the opening alignment. Then synchronise clean protected main. Move `main_circle_centre` into the modular package. Route the B16 Generate/Replace caller through it. The later product pull request needs another owner decision for integration. |
+| **Current state** | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. The platform-transition outcome is stopped at 2/2 repairs. Output has private-development status, and project status stays `unknown`. |
+| **What changed** | [D-GOV-019](current/PHASE_EVIDENCE.md#freecad-1-1-3-py31315-qt6112-qualification-panel) qualifies only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` for functional compatibility. |
+| **What now works** | The exact runtime probe and the complete FreeCADCmd and real-GUI matrices for the current stack gave PASS results. The three earlier profiles stay qualified. The project preserves their evidence. |
+| **Limitations/findings** | The runtime guard does not report the recorded Flatpak app or runtime commits. The new profile has no performance authority. No B0 run occurred. D-P6-008, recorded product limitations, comparison requirements and legacy-retirement conditions stay in full. |
+| **Owner decision** | Accept D-GOV-019 for this exact profile. Authorise integration after the required checks have PASS results. This accepts no Phase 7 exit, performance result, output status or release state. |
+| **Next action** | Bring the draft for the combined qualification and integration decision after the required checks have PASS results. After integration, keep the platform-transition outcome stopped unless the owner separately starts it again. The saved Caveman efficiency work remains next before further Phase 7 extraction. |
 
 ## Phase status
 
@@ -95,7 +95,7 @@ Phase 7 is Open at 0/4 under D-P7-001. These four original criteria from accepte
 
 ## Owner decisions
 
-The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full and records D-P7-001.
+The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full and records D-P7-001 and D-GOV-019.
 
 | ID | Date | Status | Decision limit |
 | --- | --- | --- | --- |
@@ -138,6 +138,8 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-GOV-015 | 2026-08-31 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-015-simplified-ste-lifecycle) adopts author → freeze scope → one Documentation Review → optional exact reviewed correction once → one final deterministic validation → complete or owner stop. Phase 6 stays at 2/5. If validation is exact-green, the owner permits one draft pull request. The owner gives no merge authority. |
 | D-GOV-017 | 2026-09-04 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-017-whole-technical-document-lifecycle) establishes one TDMP and the Technical Author Lead responsibility. For governance prose, the finite route is write once under D-GOV-015, one Documentation Review, apply its required adjustment once if any, one final deterministic validation, then done. CI can verify final bytes but cannot reopen review or wording. A general quality review applies only to separately changed source or tests. The stopped additional review returned no result and made no tracked mutation. Phase 6 stays at 2/5, and project status stays `unknown`. |
 | D-GOV-018 | 2026-09-05 | Accepted | The [decision](history/phase-closeouts/PHASE6_CLOSEOUT.md#d-gov-018-finite-documentation-completion) authorises one set of exact corrections after the sole review. This includes a `BLOCKED` verdict. Record the `locked` state for the content. Validate it. Finish the cycle. Preserve the initial verdict. Review only complete logical units that changed. Do not expand the repair into unchanged legacy prose. Phase 6 stays at 2/5. |
+| D-GOV-019 | 2026-09-19 | Accepted | The [decision](current/PHASE_EVIDENCE.md#freecad-1-1-3-py31315-qt6112-qualification-panel) qualifies only the exact current FreeCAD 1.1.3 profile with CPython 3.13.15 and PySide6/Qt 6.11.2 for functional compatibility. The three earlier profiles stay qualified. The profile gets no performance or B0 authority. Phase 7 stays Open at 0/4. D-P6-008 and all limitations remain. |
+
 ## Authority and evidence links
 
 - [Current Phase 7 evidence](current/PHASE_EVIDENCE.md)
@@ -145,12 +147,8 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 - [Accepted Phase 6 recovery record](backup-records/2026-09-05-phase6-closeout-recovery.md)
 - [Canonical product vision](PRODUCT_VISION.md)
 - [Capability evidence matrix](CAPABILITY_MATRIX.md)
-- [Frozen Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md)
-- [Frozen Phase 5 decisions](history/phase-closeouts/PHASE5_GATE_DECISIONS.json)
-- [Frozen Phase 5 risk snapshot](history/phase-closeouts/PHASE5_RISKS.json)
-- [Frozen Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md)
-- [Frozen Phase 4 decisions](history/phase-closeouts/PHASE4_GATE_DECISIONS.json)
-- [Frozen Phase 4 risk snapshot](history/phase-closeouts/PHASE4_RISKS.json)
+- [Frozen Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE5_RISKS.json)
+- [Frozen Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE4_RISKS.json)
 - [Engineering policy and TT-DOC-001 profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile) and [Architecture](ARCHITECTURE.md)
 - [Modularisation boundaries](MODULARISATION_PLAN.md)
 - [Validation strategy](VALIDATION.md)

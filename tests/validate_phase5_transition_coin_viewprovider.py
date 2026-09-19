@@ -992,6 +992,10 @@ def _validate_structure_and_controls():
         "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1"
         in runner_text
     )
+    assert (
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2"
+        in runner_text
+    )
     assert "freecad_gui_validate_phase5_transition_coin_viewprovider.py" in (
         runner_text
     )

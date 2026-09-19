@@ -611,7 +611,7 @@ def validate_phase6_closeout_mutations() -> None:
             lambda value=mutated: progress._validate_phase7_decision_carryforward(
                 value, frozen,
             ),
-            "Phase 7 must carry the complete unchanged D-P6-008 and one opening",
+            "Phase 7 must carry unchanged D-P6-008, D-P7-001 and D-GOV-019",
         )
     for field, replacement, diagnostic in (
         ("status", "Proposed", "identity, acceptance or panel routing drifted"),
@@ -634,14 +634,93 @@ def validate_phase6_closeout_mutations() -> None:
             "D-P7-001 " + diagnostic,
         )
     missing_opening = copy.deepcopy(decisions)
-    missing_opening["decisions"].pop()
+    missing_opening["decisions"].pop(1)
     expect_rejected(
         "opening/d-p7-001-missing",
         lambda: progress._validate_phase7_decision_carryforward(
             missing_opening, frozen,
         ),
-        "Phase 7 must carry the complete unchanged D-P6-008 and one opening",
+        "Phase 7 must carry unchanged D-P6-008, D-P7-001 and D-GOV-019",
     )
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        (
+            "authority",
+            "All current and future FreeCAD hosts are qualified.",
+            "authority digest drifted",
+        ),
+        (
+            "exclusions",
+            "B0 and performance evidence are authorised.",
+            "exclusions digest drifted",
+        ),
+    ):
+        mutated = copy.deepcopy(decisions)
+        mutated["decisions"][2][field] = replacement
+        expect_rejected(
+            "qualification/d-gov-019-" + field + "-changed",
+            lambda value=mutated: progress._validate_phase7_decision_carryforward(
+                value, frozen,
+            ),
+            "D-GOV-019 " + diagnostic,
+        )
+    for name, before, after, diagnostic in (
+        (
+            "profile-widened",
+            "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+            "all-FreeCAD-1.1.3-hosts",
+            "D-GOV-019 exact owner instruction drifted or was relocated",
+        ),
+        (
+            "app-identity-drifted",
+            "e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121",
+            "f" * 64,
+            "D-GOV-019 exact owner instruction drifted or was relocated",
+        ),
+        (
+            "performance-authority-added",
+            "D-GOV-019 adds functional compatibility only",
+            "D-GOV-019 adds performance authority",
+            "D-GOV-019 qualification boundary drifted: adds functional "
+            "compatibility only",
+        ),
+        (
+            "b0-authorised",
+            "qualification cycle did not change the platform-transition "
+            "candidate or\nrun B0",
+            "platform-transition candidate ran B0",
+            "D-GOV-019 qualification boundary drifted: qualification cycle "
+            "did not change the platform-transition candidate or run B0",
+        ),
+        (
+            "old-stack-deployed",
+            "prefetch\nfor the earlier stack stays cached only",
+            "old-stack prefetch is deployed and held",
+            "D-GOV-019 qualification boundary drifted: prefetch for the "
+            "earlier stack stays cached only",
+        ),
+        (
+            "phase7-exit-admitted",
+            "Phase 7 stays Open at\n0/4 with all four exits Pending",
+            "Phase 7 has an accepted exit",
+            "D-GOV-019 qualification boundary drifted: Phase 7 stays Open at "
+            "0/4 with all four exits Pending",
+        ),
+        (
+            "risk-state-changed",
+            "no risk disposition changes",
+            "risk dispositions change",
+            "D-GOV-019 qualification boundary drifted: no risk disposition "
+            "changes",
+        ),
+    ):
+        mutated = holding.replace(before, after)
+        expect_rejected(
+            "qualification/" + name,
+            lambda value=mutated: progress._validate_dgov019_qualification(value),
+            diagnostic,
+        )
+
     quote = blockquote_paragraph_containing(holding, "I open Phase 7 at 0/4")
     expect_rejected(
         "opening/d-p7-001-quote-widened",
@@ -3387,16 +3466,15 @@ def validate_documentation_profile_mutations() -> None:
         "the accepted Phase 7 opening or carried D-P6-008 is missing",
     )
 
-    owner_view_restarted = replace_once(
+    owner_view_performance_widened = replace_once(
         plan,
-        "D-GOV-011 stays stopped with its retained negative evidence",
-        "Repeat D-GOV-011 and change its measurement rule",
+        "no performance authority",
+        "full performance authority",
     )
     expect_rejected(
-        "tt-doc/owner-view-stopped-direction-restarted",
-        lambda: progress._validate_owner_view(owner_view_restarted),
-        "project-plan owner view lost or contradicted: D-GOV-011 stays "
-        "stopped with its retained negative evidence",
+        "tt-doc/owner-view-performance-authority-widened",
+        lambda: progress._validate_owner_view(owner_view_performance_widened),
+        "project-plan owner view lost or contradicted: no performance authority",
     )
 
     compatibility_terms_removed = terminology
