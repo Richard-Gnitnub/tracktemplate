@@ -445,6 +445,28 @@ def _validate_run_directory_collision(root):
         raise AssertionError("an existing run directory was overwritten")
 
 
+def _validate_symlinked_run_directory_is_rejected(root):
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-inspection-external-"
+    ) as external:
+        link = root / "retained-link"
+        link.symlink_to(external, target_is_directory=True)
+        outside = pathlib.Path(external) / "escaped"
+        try:
+            bundle.run_bundle(
+                root=root,
+                steps=(
+                    {"name": "read", "command": ["cat", "--", "small.txt"]},
+                ),
+                run_directory=link / "escaped",
+            )
+        except bundle.InspectionError as error:
+            assert "run directory contains a symbolic link" in str(error)
+        else:
+            raise AssertionError("a symlinked run directory was accepted")
+        assert not outside.exists()
+
+
 def validate():
     temporary, root = _fixture()
     try:
@@ -455,6 +477,7 @@ def validate():
         _validate_unsafe_steps(root)
         _validate_untrusted_executable_is_rejected(root)
         _validate_run_directory_collision(root)
+        _validate_symlinked_run_directory_is_rejected(root)
         _validate_retrieval_and_tamper_detection(root, summary)
     finally:
         temporary.cleanup()

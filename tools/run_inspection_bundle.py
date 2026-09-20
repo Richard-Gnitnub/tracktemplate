@@ -287,6 +287,11 @@ def _prepare_run_directory(root, run_directory):
     run_directory = pathlib.Path(os.path.abspath(run_directory))
     if not _inside_root(run_directory, root) or run_directory == root:
         raise InspectionError("run directory is outside the repository")
+    current = root
+    for part in run_directory.relative_to(root).parts:
+        current /= part
+        if current.is_symlink():
+            raise InspectionError("run directory contains a symbolic link")
     try:
         run_directory.mkdir(parents=True, exist_ok=False)
     except FileExistsError:
