@@ -2915,6 +2915,16 @@ def validate_documentation_lifecycle() -> None:
 
 def validate_finite_documentation_lifecycle() -> None:
     """Prove one blocked review can close without a replacement verdict."""
+    retained = "# Accepted unit\n\nKeep the accepted instruction.\n"
+    inserted = retained + "\n## New unit\n\nReview only this new instruction.\n"
+    inserted_units = STE._changed_markdown_units(retained, inserted)
+    require(
+        len(inserted_units) == 1
+        and inserted_units[0]["side"] == "candidate"
+        and inserted_units[0]["text"].startswith("## New unit\n"),
+        "a new section's boundary blank line expanded review into unchanged prose",
+    )
+
     source_manifest = {
         "issue": "9",
         "page_count": 434,

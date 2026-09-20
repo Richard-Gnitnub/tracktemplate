@@ -209,7 +209,7 @@ def validate_frozen_records() -> None:
         "frozen-record status changed",
     )
     require(
-        document["updated_on"] == "2026-09-19",
+        document["updated_on"] == "2026-09-20",
         "frozen-record manifest update date drifted",
     )
     records = document["records"]
@@ -589,25 +589,18 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "platform-transition outcome is stopped at 2/2 repairs" in owner_view
-        and "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2"
+        and "`build_platform_core` candidate has complete PASS evidence"
         in owner_view
-        and "functional compatibility" in owner_view
-        and "complete FreeCADCmd and real-GUI matrices for the current stack"
+        and "PASS result from independent quality review" in owner_view
+        and "Source-and-test repair accounting stays 2/2" in owner_view
+        and "two test-only exceptions are consumed" in owner_view
+        and "schema `10`, fifteen selected functions and 39 callers"
         in owner_view
-        and "three earlier profiles stay qualified"
-        in owner_view
-        and "project preserves their evidence"
-        in owner_view
-        and "runtime guard does not report the recorded Flatpak app or runtime "
-        "commits" in owner_view
-        and "no performance authority" in owner_view
-        and "No B0 run occurred" in owner_view
+        and "zero product-semantic differences" in owner_view
         and "D-P6-008" in owner_view
-        and "combined qualification and integration decision"
+        and "Integration accepts no Phase 7 exit, performance result, output "
+        "status, wider migration, legacy retirement or release state"
         in owner_view
-        and "saved Caveman efficiency work remains next before further "
-        "Phase 7 extraction" in owner_view
         and "Output has private-development status" in owner_view
         and "project status stays `unknown`" in owner_view,
         "PROJECT_PLAN owner view contradicts current authority",

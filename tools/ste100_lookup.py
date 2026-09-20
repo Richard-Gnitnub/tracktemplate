@@ -2970,6 +2970,18 @@ def _changed_line_intervals(
     baseline_text: str,
     candidate_text: str,
 ) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+    def bounded_interval(
+        lines: list[str], start: int, end: int
+    ) -> tuple[int, int] | None:
+        if start == end:
+            return None
+        if any(line.strip() for line in lines[start:end]):
+            while start < end and not lines[start].strip():
+                start += 1
+            while start < end and not lines[end - 1].strip():
+                end -= 1
+        return (start + 1, end) if start < end else None
+
     old_lines = baseline_text.splitlines(keepends=True)
     new_lines = candidate_text.splitlines(keepends=True)
     old_intervals: list[tuple[int, int]] = []
@@ -2979,10 +2991,12 @@ def _changed_line_intervals(
     ).get_opcodes():
         if tag == "equal":
             continue
-        if old_start != old_end:
-            old_intervals.append((old_start + 1, old_end))
-        if new_start != new_end:
-            new_intervals.append((new_start + 1, new_end))
+        old_interval = bounded_interval(old_lines, old_start, old_end)
+        new_interval = bounded_interval(new_lines, new_start, new_end)
+        if old_interval is not None:
+            old_intervals.append(old_interval)
+        if new_interval is not None:
+            new_intervals.append(new_interval)
     return old_intervals, new_intervals
 
 

@@ -1,0 +1,155 @@
+{
+  "authority": "As TrackTemplate project owner, I authorise one bounded Level 3 lifecycle\nrecovery for the platform-core candidate.\nPreserve all existing product, validation, independent-review, scope-audit and\nblocker evidence. Repair accounting remains 2/2 and both existing exceptions\nremain consumed.\nRestore the unchanged D-GOV-019 logical unit exactly to its accepted content\nidentity at SHA `3e37f5da…`. Change only the incorrect locked-state/scope\nidentity and the directly dependent validators needed to represent the actual\nreviewed scope.\nDo not alter product source, tests, fixtures, accepted D-GOV-019 meaning or any\nother unchanged prose. Preserve the accidental out-of-scope review evidence; do\nnot treat it as authority to change that unit.\nDo not perform a second Documentation Review and do not reopen linguistic\ncorrections.\nAfter the bounded recovery, resume deterministic validation. If exact-green,\npublish one draft PR and stop for my integration decision.\nThis authority accepts no Phase 7 exit, performance result, output status,\nrelease state or merge.",
+  "candidate_revision": "61e3155ef7c4bac779433f83d64032a52d395b93",
+  "deterministic_validation": {
+    "completion": {
+      "path": "tmp/phase7-platform-core/documentation-lifecycle-recovery-01/corrected-scope-completion.json",
+      "sha256": "a6e41aa7e8ca1846dd3d2043e2f53ccf622e8cf6de8d6fdc2ab99b2d366311bb",
+      "size_bytes": 246
+    },
+    "entrypoint": "tools.ste100_lookup.validate_final_review_state",
+    "exit_status": 0,
+    "log": {
+      "path": "tmp/phase7-platform-core/documentation-lifecycle-recovery-01/corrected-scope-final-validation.log",
+      "sha256": "947ea845c40d80eb19966709638e6968a802fefcafeb46e370935390a63262e3",
+      "size_bytes": 536
+    },
+    "review_result_preserved": "APPROVED_WITH_EXACT_CORRECTIONS",
+    "status": "locked-and-deterministically-validated",
+    "success_sentinel": "TRACKTEMPLATE_STE100_FINAL=",
+    "validated_clean_revision": "4dd5e586cf391192d313e09f7d9a0022ed6d7f70",
+    "validator_source_sha256": "7384ce6df72f6e62623b95265fe8d13a4a729cf5a762562843a6e7cb54683a29"
+  },
+  "directly_dependent_alignment": {
+    "reference/history/frozen-records.json": "c828bc975b3dbaf3856ba7ae222a4f0fbc4a3b051b9a71157f4b7df8b2a5c877",
+    "tests/validate_governance_semantics.py": "df50e7b30a9bfab73420c8b9d0e6caf3ff6f9945fb165a7e02ad624d7c41558e",
+    "tests/validate_project_progress.py": "43fc956754545d192a66e1c11fdf3be541e0dd7cff3ad008328428a8c1b6410a",
+    "tests/validate_quality_assurance.py": "16b10ac3a8514a48070ee05f264fa03caa5ac083f108abc14dd06a690454d334"
+  },
+  "limits": {
+    "accepted_dgov019_meaning_changed": false,
+    "linguistic_corrections_reopened": false,
+    "merge_authorised": false,
+    "output_status_accepted": false,
+    "performance_result_accepted": false,
+    "phase_7_exit_accepted": false,
+    "product_source_changed": false,
+    "product_test_or_fixture_changed": false,
+    "release_state_accepted": false,
+    "repair_accounting": "2/2",
+    "second_documentation_review": false,
+    "test_only_exceptions_consumed": 2
+  },
+  "locked_state": {
+    "reference/PROJECT_PLAN.md": {
+      "sha256": "294bcfa4869e9b11da65b1206cba1a9a7bf0eb3c851ae4cf048d4ccdabf4b045"
+    },
+    "reference/benchmarks/2026-09-20-phase7-platform-core-regression.md": {
+      "sha256": "d16e4a8d777f9981db4862cbb857fd4e1a1242eb50821862cefc60ecdb1ed4d6"
+    },
+    "reference/contracts/phase7-platform-core.md": {
+      "sha256": "3d70de31f20c6943311f478c4132ab1d94240b8ba099a4a65f1308ec54ea6374"
+    },
+    "reference/current/PHASE_EVIDENCE.md": {
+      "git_blob_sha1": "769f03b65a53fe12f173beda12e50d191836b7a3",
+      "restored_dgov019_unit_sha256": "3e37f5dafff03c553686c39509c9af7ceaffb0c8590967baee71a523703d5bd3",
+      "sha256": "14c38f56b8e241ff05f17adfd13aa963a4c36bcc7494d85d2c026e8be7cd37be"
+    },
+    "reference/ste-review-state.json": {
+      "git_blob_sha1": "01187368abd7a84e2ade65a95e7eaae03aaf45c8",
+      "sha256": "b0171ed47d1bdaa76988e506b13a770e5675efd07900f79197c86dc2348175bf"
+    }
+  },
+  "original_artifacts": {
+    "binding": {
+      "path": "tmp/phase7-platform-core/documentation-lifecycle-recovery-01/original-binding.json",
+      "sha256": "4f033a4fd9d69f061922131ab0d52585d6d66639a581203ebd3eed8a8bf8506e",
+      "size_bytes": 553
+    },
+    "blocker_receipt": {
+      "path": "tmp/phase7-platform-core/documentation-scope-blocker-01/receipt.json",
+      "sha256": "2c35cefc61e70051bb66ecd8e5b433a765571c9c0b73d26f0e28e1c5f6f0002e",
+      "size_bytes": 777
+    },
+    "completion": {
+      "path": "tmp/phase7-platform-core/documentation-lifecycle-recovery-01/original-completion.json",
+      "sha256": "52f8a8cd3c4f4109403a7e7897e8a0d43ef80133a35bf78e04cc19fdad62266c",
+      "size_bytes": 246
+    },
+    "preserved_verbatim": true,
+    "review_receipt": {
+      "path": "tmp/phase7-platform-core/documentation-lifecycle-recovery-01/original-review-receipt.json",
+      "sha256": "59588738593b1e07baa5eb95aabe0d9c0ac94c460c747c35c2fd56ac9a6a63af",
+      "size_bytes": 60196
+    },
+    "scope": {
+      "path": "tmp/phase7-platform-core/documentation-lifecycle-recovery-01/original-scope.json",
+      "sha256": "8c2e675d3c678c09add312ae13ee98bfd6059430757bba56f69891f4e5d852cb",
+      "size_bytes": 58296
+    },
+    "scope_audit": {
+      "path": "tmp/phase7-platform-core/documentation-scope-audit-01.json",
+      "sha256": "b75ad95adf09de6eef86c15af58e9cc48eb3cc9604c5782d2c92bc7d0a0186fd",
+      "size_bytes": 9950
+    }
+  },
+  "original_locked_revision": "0e95d7f465df763082707875b124e2acc377fe04",
+  "record_type": "owner-authorised-platform-core-documentation-scope-recovery",
+  "recovered_artifacts": {
+    "active_binding": {
+      "path": "tmp/ste100-review-results/binding-61e3155ef7c4bac779433f83d64032a52d395b93.json",
+      "sha256": "4fb985c0491b71d3fb05bc4b321ae3bbea519cc2cc3ca5cbd7a52ef997bf08ee",
+      "size_bytes": 553
+    },
+    "active_completion": {
+      "path": "tmp/ste100-review-results/completion-61e3155ef7c4bac779433f83d64032a52d395b93.json",
+      "sha256": "a6e41aa7e8ca1846dd3d2043e2f53ccf622e8cf6de8d6fdc2ab99b2d366311bb",
+      "size_bytes": 246
+    },
+    "corrected_scope": {
+      "path": "tmp/ste100-review-scopes/scope-8bb39786c71945bfcbb4da3c5adae782501b4cb897146abb9f924a49476828bc.json",
+      "sha256": "8bb39786c71945bfcbb4da3c5adae782501b4cb897146abb9f924a49476828bc",
+      "size_bytes": 55566
+    },
+    "corrected_scope_identity_sha256": "526b99c66065f964c5fc9356699c3109655279bf8acf4ee9d1515c2e6bffdc99",
+    "derived_state": {
+      "path": "tmp/ste100-review-state-proposals/state-b0171ed47d1bdaa76988e506b13a770e5675efd07900f79197c86dc2348175bf.json",
+      "sha256": "b0171ed47d1bdaa76988e506b13a770e5675efd07900f79197c86dc2348175bf",
+      "size_bytes": 19632
+    },
+    "derived_validator_receipt": {
+      "path": "tmp/ste100-review-results/review-f6fb2b08ed3505975385d215099bc3d0a7d2a2dd24983d84771a87733426d29d.json",
+      "sha256": "f6fb2b08ed3505975385d215099bc3d0a7d2a2dd24983d84771a87733426d29d",
+      "size_bytes": 55109
+    },
+    "identity": "The original reviewer, independence, applicability and APPROVED_WITH_EXACT_CORRECTIONS fields remain historical review evidence. The owner-derived scope and receipt are deterministic lifecycle-recovery inputs, not a second Documentation Review or a new linguistic verdict."
+  },
+  "recovered_locked_revision": "4dd5e586cf391192d313e09f7d9a0022ed6d7f70",
+  "schema_version": 1,
+  "scope_defect": {
+    "accepted_dgov019_unit_sha256": "3e37f5dafff03c553686c39509c9af7ceaffb0c8590967baee71a523703d5bd3",
+    "accidental_replacement_sha256": "590fe97b765cbba26ff0e6e66753e671cafe84210e5f74dbe6b1cbf329efc5b0",
+    "cause": "A changed range started with the boundary blank line before the newly inserted platform-core heading. Inclusive logical-unit intersection therefore added the unchanged preceding D-GOV-019 unit.",
+    "disposition": "Restore the accepted unit and omit only accidental correction 5 from the owner-derived validator input. The original scope and receipt remain unchanged evidence.",
+    "original_receipt_correction_ordinal": 5
+  },
+  "validator_boundary": {
+    "after_tool": {
+      "path": "tools/ste100_lookup.py",
+      "sha256": "7384ce6df72f6e62623b95265fe8d13a4a729cf5a762562843a6e7cb54683a29",
+      "size_bytes": 182567
+    },
+    "before_tool_sha256": "9368320e12d0c364048398518ff0911c46c3462da6687037252d80dddc3afbbc",
+    "behaviour": "When a changed range contains nonblank lines, discard its leading and trailing blank boundary lines before intersecting Markdown logical units. A blank-only change keeps the earlier behaviour.",
+    "regression": {
+      "path": "tests/validate_ste100_retrieval.py",
+      "sha256": "fb66af8157c25cb5f3515febd7c327b177cadb1c62275f85d7adbee5762a9c4d",
+      "size_bytes": 141637
+    },
+    "regression_result": {
+      "path": "tmp/phase7-platform-core/documentation-lifecycle-recovery-01/scope-validator-regression.exit.json",
+      "sha256": "98715647199ca4877d9fb6b53168289adfc25b371b6b140cb4dd8f7e21e44752",
+      "size_bytes": 383
+    }
+  }
+}
