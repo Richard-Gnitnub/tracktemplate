@@ -79,7 +79,7 @@
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/PROJECT_PLAN.md",
-      "review_receipt": "sha256:59588738593b1e07baa5eb95aabe0d9c0ac94c460c747c35c2fd56ac9a6a63af",
+      "review_receipt": "sha256:57f6dedf6425adf5ef9541bcb6c8a3b14044d776b75df50a763316113ea1e7c7",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -185,7 +185,7 @@
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/benchmarks/2026-09-20-phase7-platform-core-regression.md",
-      "review_receipt": "sha256:59588738593b1e07baa5eb95aabe0d9c0ac94c460c747c35c2fd56ac9a6a63af",
+      "review_receipt": "sha256:57f6dedf6425adf5ef9541bcb6c8a3b14044d776b75df50a763316113ea1e7c7",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -239,7 +239,7 @@
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/contracts/phase7-platform-core.md",
-      "review_receipt": "sha256:59588738593b1e07baa5eb95aabe0d9c0ac94c460c747c35c2fd56ac9a6a63af",
+      "review_receipt": "sha256:57f6dedf6425adf5ef9541bcb6c8a3b14044d776b75df50a763316113ea1e7c7",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -270,12 +270,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:35d172a18978693f16c15d15d49ae9135003cddb",
-      "accepted_sha256": "sha256:de743cb173ec7d28c8695625a3791bddafd50f7398b4a66be17263422c219029",
+      "accepted_blob": "sha1:769f03b65a53fe12f173beda12e50d191836b7a3",
+      "accepted_sha256": "sha256:14c38f56b8e241ff05f17adfd13aa963a4c36bcc7494d85d2c026e8be7cd37be",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:59588738593b1e07baa5eb95aabe0d9c0ac94c460c747c35c2fd56ac9a6a63af",
+      "review_receipt": "sha256:57f6dedf6425adf5ef9541bcb6c8a3b14044d776b75df50a763316113ea1e7c7",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
