@@ -153,6 +153,8 @@ def _validate_product_boundary():
                 "            solve_transition_length(*arguments),\n"
                 "            build_concentric_core(*arguments))\n"
                 "def run_macro():\n"
+                "    assert callable(prepare_track_alignment)\n"
+                "    assert callable(signed_side_factor)\n"
                 "    centre = main_circle_centre(600.0, 600.0)\n"
                 "    core = build_concentric_core(centre, 600.0, 600.0,\n"
                 "        600.0, 1.5, 'Main Track')\n"
@@ -192,6 +194,8 @@ def _validate_product_boundary():
             "platform_peak_curvature_factor",
             "solve_platform_shape_parameter",
             "build_platform_core",
+            "signed_side_factor", "effective_constant_radius",
+            "prepare_track_alignment",
         )
     }
     host = FakeHost()
@@ -203,6 +207,7 @@ def _validate_product_boundary():
     for name in functions:
         if name in {
             "build_concentric_core", "build_platform_core",
+            "prepare_track_alignment",
             "add_common_straight_extensions",
             "build_straight_route",
             "alignment_station_data", "interpolate_alignment_station",
@@ -215,8 +220,8 @@ def _validate_product_boundary():
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 10,
-        "contract_id": "tracktemplate:phase7:platform-core:1",
+        "schema_version": 11,
+        "contract_id": "tracktemplate:phase7:track-preparation:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),

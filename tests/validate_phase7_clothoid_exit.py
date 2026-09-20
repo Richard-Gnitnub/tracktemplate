@@ -37,6 +37,8 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "platform_peak_curvature_factor",
     "solve_platform_shape_parameter",
     "build_platform_core",
+    "signed_side_factor", "effective_constant_radius",
+    "prepare_track_alignment",
 )
 CALCULATION_CASES = tuple(
     (length, radius, steps)
@@ -276,9 +278,9 @@ def validate_binding():
         )
         assert session.launch_workflow() == expected
         record = session.routing_record()
-        assert record["schema_version"] == 10
+        assert record["schema_version"] == 11
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-core:1"
+            "tracktemplate:phase7:track-preparation:1"
         )
         assert record["function_names"] == list(PRODUCT_FUNCTION_NAMES)
         assert record["caller_names"] == list(STATION_CALLER_NAMES)
@@ -304,7 +306,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete fifteen-function",
+                "complete eighteen-function",
             )
             assert _snapshot(host) == before
             assert host.module.LAUNCH_COUNT == 0
@@ -334,18 +336,6 @@ def validate_binding():
         )
         assert session.module.LAUNCH_COUNT == 1
         assert session.launch_workflow() == expected
-        assert session.module.LAUNCH_COUNT == 2
-
-        session.module.prepare_track_alignment = detached(
-            session.module.prepare_track_alignment, "build_concentric_core",
-            api.build_concentric_core,
-        )
-        before = _snapshot(session)
-        centre_proof._expect_error(
-            session.launch_workflow,
-            "caller 'prepare_track_alignment' is unavailable",
-        )
-        assert _snapshot(session) == before
         assert session.module.LAUNCH_COUNT == 2
 
         missing_api = types.SimpleNamespace(**{

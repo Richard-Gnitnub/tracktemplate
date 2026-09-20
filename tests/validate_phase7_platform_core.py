@@ -291,12 +291,14 @@ def validate_binding():
             _functions(),
         )
         record = session.routing_record()
-        assert record["schema_version"] == 10
-        assert record["contract_id"] == "tracktemplate:phase7:platform-core:1"
+        assert record["schema_version"] == 11
+        assert record["contract_id"] == (
+            "tracktemplate:phase7:track-preparation:1"
+        )
         assert record["function_names"] == list(
             transition_workflow.PRODUCT_FUNCTION_NAMES
         )
-        assert len(record["function_names"]) == 15
+        assert len(record["function_names"]) == 18
         assert record["caller_names"] == [
             name
             for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
@@ -308,10 +310,15 @@ def validate_binding():
         assert adapter.calculation is api.build_platform_core
         assert adapter.vector_factory is session.module.App.Vector
         assert tuple(inspect.signature(adapter).parameters) == PARAMETERS
-        caller = session.module.prepare_track_alignment
-        assert caller.__globals__ is session.module.__dict__
-        assert "build_platform_core" in caller.__code__.co_names
-        assert caller.__globals__["build_platform_core"] is adapter
+        preparation = session.module.prepare_track_alignment
+        assert type(preparation) is (
+            transition_workflow._PrepareTrackAlignmentAdapter
+        )
+        assert preparation.calculation is api.prepare_track_alignment
+        assert preparation.vector_factory is session.module.App.Vector
+        assert api.prepare_track_alignment.__globals__["build_platform_core"] is (
+            api.build_platform_core
+        )
 
         case = _cases(_legacy_namespaces()[0])[0]
         first = adapter(*case)
@@ -360,27 +367,10 @@ def validate_binding():
                 invalid_host,
                 invalid,
             ),
-            "complete fifteen-function",
+            "complete eighteen-function",
         )
         assert core_proof._snapshot(invalid_host) == before
         assert invalid_host.module.LAUNCH_COUNT == 0
-
-        detached_host = load_host()
-        detached_host.module.prepare_track_alignment = core_proof.detached(
-            detached_host.module.prepare_track_alignment,
-            "build_platform_core",
-            api.build_platform_core,
-        )
-        before = core_proof._snapshot(detached_host)
-        _expect_error(
-            lambda: transition_workflow.ModularTransitionWorkflowSession(
-                detached_host,
-                _functions(),
-            ),
-            "caller 'prepare_track_alignment'",
-        )
-        assert core_proof._snapshot(detached_host) == before
-        assert detached_host.module.LAUNCH_COUNT == 0
 
         rollback_host = load_host()
         rollback_host.module.__dict__.pop("build_platform_core")

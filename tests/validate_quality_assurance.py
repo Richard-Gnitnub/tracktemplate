@@ -589,12 +589,13 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "`build_platform_core` candidate has complete PASS evidence"
+        and "`prepare_track_alignment` candidate has PASS results "
+        "for all product checks"
         in owner_view
         and "PASS result from independent quality review" in owner_view
         and "Source-and-test repair accounting stays 2/2" in owner_view
-        and "two test-only exceptions are consumed" in owner_view
-        and "schema `10`, fifteen selected functions and 39 callers"
+        and "five test-only exceptions are consumed" in owner_view
+        and "schema `11`, eighteen selected functions and 39 callers"
         in owner_view
         and "zero product-semantic differences" in owner_view
         and "D-P6-008" in owner_view
