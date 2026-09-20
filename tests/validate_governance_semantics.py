@@ -3468,13 +3468,17 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_performance_widened = replace_once(
         plan,
-        "no performance authority",
-        "full performance authority",
+        "Integration accepts no Phase 7 exit, performance result, output "
+        "status, wider migration, legacy retirement or release state.",
+        "Integration accepts the Phase 7 exit, performance result, output "
+        "status, wider migration, legacy retirement and release state.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: no performance authority",
+        "project-plan owner view lost or contradicted: Integration accepts no "
+        "Phase 7 exit, performance result, output status, wider migration, "
+        "legacy retirement or release state",
     )
 
     compatibility_terms_removed = terminology

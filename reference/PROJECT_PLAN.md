@@ -12,13 +12,12 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. The platform-transition outcome is stopped at 2/2 repairs. Output has private-development status, and project status stays `unknown`. |
-| **What changed** | [D-GOV-019](current/PHASE_EVIDENCE.md#freecad-1-1-3-py31315-qt6112-qualification-panel) qualifies only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` for functional compatibility. |
-| **What now works** | The exact runtime probe and the complete FreeCADCmd and real-GUI matrices for the current stack gave PASS results. The three earlier profiles stay qualified. The project preserves their evidence. |
-| **Limitations/findings** | The runtime guard does not report the recorded Flatpak app or runtime commits. The new profile has no performance authority. No B0 run occurred. D-P6-008, recorded product limitations, comparison requirements and legacy-retirement conditions stay in full. |
-| **Owner decision** | Accept D-GOV-019 for this exact profile. Authorise integration after the required checks have PASS results. This accepts no Phase 7 exit, performance result, output status or release state. |
-| **Next action** | Bring the draft for the combined qualification and integration decision after the required checks have PASS results. After integration, keep the platform-transition outcome stopped unless the owner separately starts it again. The saved Caveman efficiency work remains next before further Phase 7 extraction. |
-
+| **Current state** | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. The bounded `build_platform_core` candidate has complete PASS evidence and a PASS result from independent quality review. Output has private-development status, and project status stays `unknown`. |
+| **What changed** | The [current evidence](current/PHASE_EVIDENCE.md#phase7-platform-core-migration) records the host-independent `build_platform_core` calculation, public API and B16 caller conversion of only new XY pairs. The workflow uses schema `10`, fifteen selected functions and 39 callers. |
+| **What now works** | B14, B15 and the candidate give equal complete results and diagnostics for the bounded inputs. Standalone Python, qualified FreeCAD, routing, regression and real-GUI checks have PASS results. The retained current-main and candidate GUI records have zero product-semantic differences. |
+| **Limitations/findings** | Source-and-test repair accounting stays 2/2, and the two test-only exceptions are consumed. The real-GUI proof uses one retained current-main sample and has one new candidate sample. Its resource values are descriptive only. D-P6-008, recorded product limitations, comparison requirements and legacy-retirement conditions stay in full. |
+| **Owner decision** | After exact-green draft publication, Richard must make the integration decision for only the bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
+| **Next action** | Complete exact-head validation and publish one exact-green draft. Give its exact head to Richard for the bounded integration decision. |
 ## Phase status
 
 | Phase | Outcome | Exit status | State |

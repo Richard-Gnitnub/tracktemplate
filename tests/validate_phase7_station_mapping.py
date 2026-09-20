@@ -425,11 +425,11 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 9
+        assert record["schema_version"] == 10
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-transition:1"
+            "tracktemplate:phase7:platform-core:1"
         )
-        assert len(record["function_names"]) == 14
+        assert len(record["function_names"]) == 15
         assert len(workflow.PRODUCT_CALLER_ROUTES) == 39
         assert workflow.PRODUCT_CALLER_ROUTES == expected_caller_routes()
         assert tuple(record["function_names"][8:10]) == PAIR
@@ -538,6 +538,7 @@ def expected_caller_routes():
         ("prepare_track_alignment", (
             "transition_start_signed_offset", "solve_transition_length",
             "build_concentric_core", "solve_platform_shape_parameter",
+            "build_platform_core",
         )),
         ("build_platform_core", (
             "platform_transition_displacement",

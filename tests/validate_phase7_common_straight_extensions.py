@@ -425,9 +425,9 @@ def validate_binding():
             temporary, api, contract,
         )
         assert session.launch_workflow() == core_proof._expected()
-        assert session.routing_record()["schema_version"] == 9
+        assert session.routing_record()["schema_version"] == 10
         assert session.routing_record()["contract_id"] == (
-            "tracktemplate:phase7:platform-transition:1"
+            "tracktemplate:phase7:platform-core:1"
         )
         assert session.routing_record()["function_names"] == (
             list(core_proof.PRODUCT_FUNCTION_NAMES)
@@ -460,7 +460,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, incomplete,
                 ),
-                "complete fourteen-function",
+                "complete fifteen-function",
             )
             assert core_proof._snapshot(host) == before
 

@@ -1033,21 +1033,19 @@ def _validate_owner_view(plan: str) -> None:
         "All four exits are Pending",
         "Output has private-development status",
         "project status stays `unknown`",
-        "D-GOV-019",
-        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
-        "functional compatibility",
-        "complete FreeCADCmd and real-GUI matrices for the current stack",
-        "three earlier profiles stay qualified",
-        "project preserves their evidence",
-        "runtime guard does not report the recorded Flatpak app or runtime "
-        "commits",
-        "no performance authority",
-        "No B0 run occurred",
+        "`build_platform_core` candidate has complete PASS evidence",
+        "PASS result from independent quality review",
+        "host-independent `build_platform_core` calculation",
+        "schema `10`, fifteen selected functions and 39 callers",
+        "zero product-semantic differences",
+        "Source-and-test repair accounting stays 2/2",
+        "two test-only exceptions are consumed",
+        "resource values are descriptive only",
         "D-P6-008",
-        "platform-transition outcome is stopped at 2/2 repairs",
-        "combined qualification and integration decision",
-        "saved Caveman efficiency work remains next before further Phase 7 "
-        "extraction",
+        "recorded product limitations, comparison requirements and "
+        "legacy-retirement conditions stay in full",
+        "Integration accepts no Phase 7 exit, performance result, output "
+        "status, wider migration, legacy retirement or release state",
     ):
         _require(
             fragment in owner_view,
