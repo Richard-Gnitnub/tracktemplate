@@ -180,18 +180,23 @@ and result sequence. The B16 `run_macro` caller uses one adapter to make
 FreeCAD vectors from only new XY points. The workflow selects eighteen
 functions and validates 39 callers with schema `11`.
 
-The bounded proofs compare six valid cases and fifteen invalid cases with B14
-and B15. The six valid cases include all three `alignment_mode` values and
-the two `side` values. The proofs also compare all cases in the earlier
-platform-transition characterisation. The standalone Python and FreeCAD proofs
-preserve exact caller routes, `config` identity, dependency rejection, and
-recovery. Transition persistence, Coin, and Edit checks have PASS results.
+The bounded proofs compare B14 and B15 results for six input sets without an
+error and fifteen input sets with an error. The six input sets without an
+error include all three `alignment_mode` values and
+the two `side` values. The proofs also compare all input sets in the previous
+platform-transition characterisation.
 
-The new GUI candidate completes Create, Edit, Undo/Redo, rejection,
-save/reopen, and cleanup. Its complete result for product semantics is equal
-to the PR #80 comparison baseline. There are zero differences.
+The standalone Python and FreeCAD proofs preserve exact caller routes and
+`config` identity. They validate that the workflow rejects a route when a
+selected dependency changes. They also validate recovery. Transition
+persistence, Coin, and Edit checks have PASS results.
 
-The initial FreeCAD matrix has 8 PASS / 2 FAIL. Its earlier 10/10 claim was
+The new GUI candidate completes Create, Edit, Undo/Redo, and cleanup. It uses
+Save, closes the document, and opens it again. It also rejects the spacing
+value. Its complete result for product semantics is equal to the PR #80
+comparison baseline. There are zero differences.
+
+The initial FreeCAD matrix has 8 PASS / 2 FAIL. Its previous 10/10 claim was
 incorrect because the runner did not validate the necessary sentinels. The
 project keeps the initial logs and independent blocked review. After explicit
 owner authority, the project changed only the two fixtures for these proofs.
@@ -207,9 +212,10 @@ PASS result. The project preserves the initial blocked verdict. The
 keeps exact identities, initial FAIL results, repairs, and measurements.
 
 The GUI comparison has one sample for each state at different times. The task
-does not control operating system cache or scheduling. The measured Create,
-Edit, and rejection wall times increased. These descriptive values give no
-performance acceptance. The proof does not include physical-platform results,
+does not control operating system cache or scheduling.
+The measured wall times for Create, Edit, and Reject spacing increased. These
+descriptive values give no performance acceptance.
+The proof does not include physical-platform results,
 sectioning results, or export bytes.
 
 This task supplies bounded evidence for Phase 7 Exits 1, 2 and 3. It accepts no
@@ -218,7 +224,7 @@ all comparison requirements and all legacy-retirement conditions stay in full.
 Project status stays `unknown`, and output keeps private-development status.
 Only Richard can authorise integration of the new exact-green draft.
 
-The entries below preserve the earlier publication-time evidence. They do not
+The entries below preserve the previous publication-time evidence. They do not
 select the current next action.
 
 ## Migration of the platform-core calculation — 2026-09-20

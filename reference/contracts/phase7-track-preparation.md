@@ -9,8 +9,9 @@ Phase 7 open for Core alignment, station, and multiple-track migration.
 [D-GOV-004](../PROJECT_PLAN.md#owner-decisions) supplies the accepted route for
 bounded Level 2 work. The project owner's 2026-09-20
 `$tracktemplate-chief-of-staff` instruction authorises this result. The
-instruction is to continue Phase 7 and advance its exits. These API instructions
-specify preparation of one secondary track alignment. They accept no Phase 7 exit.
+instruction is to continue Phase 7 and to supply evidence for its exits.
+These API instructions specify preparation of one secondary track alignment.
+They accept no Phase 7 exit.
 
 The B14 and B15 definitions are equal. The product moves
 `signed_side_factor`, `effective_constant_radius`, and
@@ -27,7 +28,7 @@ The B14 and B15 definitions are equal. The product moves
 `curve_spacing` for all other values. Length values use mm.
 
 The two functions change no input. They use no FreeCAD or Qt function. They
-read no document and keep no result for another operation.
+read no document and keep no result for a different operation.
 
 ## Track alignment preparation
 
@@ -101,13 +102,13 @@ in this sequence:
 Each operation without an error returns a new result, a new `points` list,
 and a new `headings` list. Each point is a new pair of X and Y numbers.
 The result from `tracktemplate.domain.alignment` contains no FreeCAD object.
-The function changes no FreeCAD document and keeps no result for another
+The function changes no FreeCAD document and keeps no result for a different
 operation.
 
 For the bounded inputs, an error before the four `config` changes keeps
-`config` and `main_alignment` as they were. The tests compare the complete
-result, its item sequence, input identities, and state after an error with B14
-and B15.
+`config` and `main_alignment` as they were.
+The tests compare all result items, their sequence, input identities, and the
+state after an error with B14 and B15.
 
 ## Diagnostics
 
@@ -143,7 +144,7 @@ a new value when that name had no previous value. The product rejects a mixed
 set of selected values before workflow launch.
 
 The routing record uses schema `11` and the identity
-`tracktemplate:phase7:track-preparation:1`. The task changes no earlier API
+`tracktemplate:phase7:track-preparation:1`. The task changes no previous API
 instructions or their JSON data. It changes no B14, B15,
 `TrackTemplate.FCMacro`, or `load_b15_workflow_host` source.
 
@@ -157,7 +158,7 @@ error from a different `vector_factory`.
 The task does not change persistence, physical-platform, sectioning,
 validation, output, or export behaviour. It does not remove a legacy path.
 The Core migration owner keeps the compatibility adapter until its caller has
-an accepted replacement and all removal conditions are complete.
+an accepted replacement and all removal conditions have PASS results.
 
 The task accepts no Phase 7 exit, product performance result, output status,
 or release state. D-P6-008 and all conditions to compare results and remove
