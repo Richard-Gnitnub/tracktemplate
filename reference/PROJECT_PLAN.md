@@ -12,13 +12,12 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. The bounded `build_platform_core` candidate has complete PASS evidence and an independent quality-review PASS result. Output has private-development status, and project status stays `unknown`. |
-| **What changed** | The [current evidence](current/PHASE_EVIDENCE.md#phase7-platform-core-migration) records the host-independent `build_platform_core` calculation, public API and narrow B16 caller conversion. The workflow uses schema `10`, fifteen selected functions and 39 callers. |
-| **What now works** | B14, B15 and the candidate give equal complete results and diagnostics for the bounded cases. Standalone, qualified FreeCAD, affected routing, regression and real-GUI proofs have PASS results. The retained current-main and candidate GUI records have zero product-semantic differences. |
-| **Limitations/findings** | Source-and-test repair accounting stays 2/2, and both test-only exceptions are consumed. The real-GUI proof reuses one retained current-main sample and has one new candidate sample. Its resource values are descriptive only. D-P6-008, recorded product limitations, comparison requirements and legacy-retirement conditions stay in full. |
-| **Owner decision** | After exact-green draft publication, decide whether to integrate only the bounded Level 2 candidate. This accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
-| **Next action** | Complete final exact-head validation and publish one exact-green draft. Bring its exact head to Richard for the bounded integration decision. |
-
+| **Current state** | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. The bounded `build_platform_core` candidate has complete PASS evidence and a PASS result from independent quality review. Output has private-development status, and project status stays `unknown`. |
+| **What changed** | The [current evidence](current/PHASE_EVIDENCE.md#phase7-platform-core-migration) records the host-independent `build_platform_core` calculation, public API and B16 caller conversion of only new XY pairs. The workflow uses schema `10`, fifteen selected functions and 39 callers. |
+| **What now works** | B14, B15 and the candidate give equal complete results and diagnostics for the bounded inputs. Standalone Python, qualified FreeCAD, routing, regression and real-GUI checks have PASS results. The retained current-main and candidate GUI records have zero product-semantic differences. |
+| **Limitations/findings** | Source-and-test repair accounting stays 2/2, and the two test-only exceptions are consumed. The real-GUI proof uses one retained current-main sample and has one new candidate sample. Its resource values are descriptive only. D-P6-008, recorded product limitations, comparison requirements and legacy-retirement conditions stay in full. |
+| **Owner decision** | After exact-green draft publication, Richard must make the integration decision for only the bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
+| **Next action** | Complete exact-head validation and publish one exact-green draft. Give its exact head to Richard for the bounded integration decision. |
 ## Phase status
 
 | Phase | Outcome | Exit status | State |

@@ -2,7 +2,7 @@
 
 Status: **Level 2 API instructions for the bounded Phase 7 scope.**
 
-The [machine record](phase7-platform-core.json) keeps the exact values.
+The [machine record](phase7-platform-core.json) gives the exact values.
 The [current evidence](../current/PHASE_EVIDENCE.md) owns the task result.
 The [Project Plan](../PROJECT_PLAN.md#phase-7-exit-conditions) owns exit status.
 
@@ -44,41 +44,44 @@ new `points` and `headings` lists for each call. The first and last points are
 equal to `start` and `end`. The last heading is equal to `total_angle`.
 
 The function changes no input. It keeps no result for subsequent use. It
-constructs no FreeCAD object and changes no FreeCAD document.
+creates no FreeCAD object and changes no FreeCAD document.
 
 ## Calculation and point sequence
 
 The function calculates the entry displacement before the exit displacement.
-Each displacement calculation uses 480 steps of the inherited composite
-Simpson calculation. The function rejects an excess combined transition angle
-before it calculates the point lists. A negative circular angle within
-`1.0e-8` radians becomes zero.
+Each displacement calculation uses 480 steps of the B14/B15 composite
+Simpson calculation. The function rejects a combined transition angle that is
+too large before it calculates the point lists. A negative circular angle with
+an absolute value of `1.0e-8` radians or less becomes zero.
 
-The point calculation uses the inherited 3 mm maximum step spacing. For each
-segment, the step count is `ceil(length / 3.0)`. It calculates curvature at the
-middle of each step. It uses the inherited constant-curvature arc calculation
-unless the absolute curvature is less than `1.0e-14`. The geometry tolerance
-is `1.0e-8` mm.
+The point calculation uses the B14/B15 3 mm maximum step spacing. For each
+segment, the step count is `ceil(length / 3.0)`. The function calculates
+curvature at the middle of each step. It uses the B14/B15 constant-curvature
+arc calculation unless the absolute curvature is less than `1.0e-14`. The
+geometry tolerance is `1.0e-8` mm.
 
 The function keeps this endpoint sequence:
 
-1. Calculate the sampled entry transition.
-2. Put the exact calculated circle-start point and heading at its end.
-3. Calculate the sampled constant-radius segment.
-4. Put the exact calculated circle-end point and heading at its end.
-5. Calculate the sampled exit transition.
-6. Put the independently calculated exit-displacement point at its end.
-7. Put `total_angle` in the last heading.
+1. The function calculates the sampled entry transition.
+2. The function puts the exact calculated circle-start point and heading at its
+   end.
+3. The function calculates the sampled constant-radius segment.
+4. The function puts the exact calculated circle-end point and heading at its
+   end.
+5. The function calculates the sampled exit transition.
+6. The function puts the independently calculated exit-displacement point at
+   its end.
+7. The function puts `total_angle` in the last heading.
 
-The function calculates `minimum_radius` from `radius` and the two inherited
-peak-curvature factors. It keeps the inherited operation order and all Python
+The function calculates `minimum_radius` from `radius` and the two B14/B15
+peak-curvature factors. It keeps the B14/B15 operation sequence and all Python
 floating-point operations.
 
 ## Diagnostics
 
-The [machine record](phase7-platform-core.json) keeps the exact diagnostic
+The [machine record](phase7-platform-core.json) gives the exact diagnostic
 format strings and their conditions. The function gives a `ValueError` in this
-order:
+sequence:
 
 1. A radius that is zero or negative.
 2. A negative entry or exit transition length.
@@ -88,9 +91,9 @@ order:
    more than `1.0e-8` radians.
 
 The fifth diagnostic keeps the entry, exit, combined and complete angles in
-degrees. It also keeps the inherited suggested entry and exit lengths. The
-standalone and qualified-host proofs compare the exception type and complete
-diagnostic text with B14 and B15.
+degrees. It also keeps the suggested entry and exit lengths from B14/B15. The
+checks with standalone Python and the qualified host compare the exception
+type and complete diagnostic text with B14 and B15.
 
 ## B16 caller and recovery
 
@@ -105,7 +108,7 @@ other result items unchanged.
 The product selects fifteen functions together and validates 39 caller routes.
 It also validates the two selected calculations that `build_platform_core`
 uses. A selection error puts all previous values back. It removes a supplied
-value when that name was initially absent. The product rejects a mixed set of
+value when that name was initially missing. The product rejects a mixed set of
 selected values before workflow launch.
 
 The routing record uses schema `10` and contract ID

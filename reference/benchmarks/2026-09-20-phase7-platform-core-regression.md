@@ -12,7 +12,7 @@ calculation, result and host conversion. The
 Protected main was
 `009ca95e4412477a1c09639793c13b1a6adad496` when this task started. The
 owner's `$tracktemplate-continue` instruction authorised one subsequent
-repository-evidenced Phase 7 result under D-GOV-004 and D-P7-001.
+repository-evidenced Phase 7 result with authority from D-GOV-004 and D-P7-001.
 
 The B14 and B15 `build_platform_core` definitions start at line 7498 and end at
 line 7676. Their exact source segments are equal. The source-segment SHA-256 is
@@ -23,7 +23,7 @@ B14 and B15 stay unchanged.
 
 The candidate moves the complete calculation to
 `tracktemplate.domain.alignment`. `tracktemplate.api` supplies the public
-function. The B16 `prepare_track_alignment` caller uses it through one narrow
+function. The B16 `prepare_track_alignment` caller uses it through one
 compatibility object. That object changes only new XY point pairs to native
 `App.Vector` values.
 
@@ -31,21 +31,21 @@ The product now selects fifteen functions and validates 39 caller routes. The
 routing record uses schema `10` and contract ID
 `tracktemplate:phase7:platform-core:1`. It rejects a mixed set of selected
 values. After a selection error, it puts each previous value back and removes
-each name that was initially absent.
+each name that was initially missing.
 
-The task changes no B14 or B15 source, launcher, frozen host loader,
-persistence contract, output contract, phase criterion, risk, decision or
-condition to remove a legacy path.
+The task changes no B14 or B15 source, launcher or frozen host loader.
+It changes no persistence contract, output contract, phase criterion, risk,
+decision or condition to remove a legacy path.
 
 ## Pre-change characterisation
 
 The pre-change proof has a PASS result for the two immutable references. For
 each reference, it records these groups:
 
-- Seven usual analytical cases.
-- Twenty-two analytical boundary cases.
+- Seven usual calculation groups.
+- Twenty-two calculation boundary groups.
 - Eight complete parameter grids.
-- Six usual solver cases and nine solver diagnostics.
+- Six usual solver groups and nine solver diagnostics.
 - Four controlled solver records.
 - Nine complete `prepare_track_alignment` records.
 - Six native builder records.
@@ -59,24 +59,25 @@ The non-overwriting pre-change manifest has SHA-256
 ## Calculation and caller proof
 
 The standalone proof compares B14, B15 and the candidate. It checks seven
-complete valid results and four inherited invalid results. The proof keeps the
-eight-parameter signature with no defaults. It also keeps these items:
+complete results for valid inputs and four results for invalid inputs. The
+proof keeps the eight-parameter signature with no defaults. It also keeps
+these items:
 
 - Local left-turn XY values in millimetres and headings in radians.
 - The exact named-item sequence in the result.
 - The 3 mm point spacing and 480-step endpoint displacement calculation.
 - Geometry and straight-curvature tolerances.
-- Endpoint corrections and calculation order.
+- Endpoint corrections and calculation sequence.
 - Complete diagnostic type and text.
 - New result, list and point identities for each call.
 - Translation of points without a change to headings.
 - Minimum-radius metadata.
 - Host-independent import.
 
-The standalone proof also checks the exact compatibility-object identity, the
-`prepare_track_alignment` edge, fifteen selected functions, 39 callers,
-selected calculation dependencies, mixed-route rejection and complete
-recovery after a setup error. The final focused log has SHA-256
+The standalone proof also checks the exact compatibility-object identity
+and the `prepare_track_alignment` edge. It checks fifteen selected functions,
+39 callers, selected calculation dependencies, mixed-route rejection and
+complete recovery after a setup error. The last bounded log has SHA-256
 `8e546e234134fd0936c9771fa7ed85e742f4a3894570956b989abe8fb8d17c6c`.
 
 The qualified proof uses
@@ -89,23 +90,23 @@ with Z equal to zero. FreeCAD document state stays unchanged.
 
 The qualified result has a PASS result and SHA-256
 `1097eed88b965c0edb04b1affe257da2585b3ea2e575a14e90718a86d44053eb`.
-The affected qualified routing matrix has a PASS result in nine of nine new
-FreeCAD processes. Its manifest has SHA-256
+The qualified routing matrix has a PASS result in nine of nine new FreeCAD
+processes. Its manifest has SHA-256
 `9edc6b586d6a8769fc5397679e033cede84ae730ad94bc274654188d3fe469c8`.
 
-The complete transition regression pipeline has a PASS result in all seven
-stages. It includes the validation preflight, Ruff, Python syntax, standalone
+The complete transition regression pipeline has a PASS result for all seven
+checks. It includes the validation preflight, Ruff, Python syntax, standalone
 contracts, the qualified-host preflight, persistence, the Coin scene and the
 Edit lifecycle. Its top-level log has SHA-256
 `85273b417faa204f40848b2d86f4eb27ed8d2dabf4a06710104f042144a9caab`.
 
-## Real-GUI lifecycle and descriptive observations
+## Real-GUI lifecycle and descriptive measurements
 
-The real-GUI proof keeps the accepted PR #79 candidate run as the current-main
-baseline. It does not repeat that run. The baseline uses schema `9`, fourteen
+The real-GUI proof uses the accepted PR #79 candidate run as the current-main
+baseline. It does not do that run again. The baseline uses schema `9`, fourteen
 functions and 39 callers. The new candidate uses schema `10`, fifteen
-functions and 39 callers. Both runs use the D-GOV-019 qualified profile, bridge
-pin `660ed03f5dc6aeb2dd0e623cc4ed5880b4c90cb7` and the same source fixture.
+functions and 39 callers. The two runs use the D-GOV-019 qualified profile,
+bridge pin `660ed03f5dc6aeb2dd0e623cc4ed5880b4c90cb7` and the same source fixture.
 The fixture SHA-256 stays
 `0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.
 
@@ -122,8 +123,8 @@ GUI process:
 7. Restore preferences, close all documents and stop the exact Flatpak
    instance.
 
-The complete product-semantic records are equal with zero differences. Their
-common digest is
+The complete product-semantic records are equal with zero differences. The two
+records have this digest:
 `66dd4bc2b76c3c732db519d003c440e12194004cfad210e380cb5fc7cba4187e`.
 The comparison record has SHA-256
 `6d69732dea7b660e75ce3319fae1c584f9c8f57e72e24e720f13eca2e4dea5ff`.
@@ -142,7 +143,8 @@ milliseconds. RSS changes use MiB.
 
 The two runs occurred at different times. The method does not control operating
 system cache or scheduling. Each state has one GUI sample. Endpoint RSS
-includes the loaded application and does not isolate allocations. Thus, the
+includes all memory in the loaded FreeCAD process. It does not isolate
+allocations. Thus, the
 values do not show typical cost, a performance result or an optimisation
 direction.
 
@@ -151,65 +153,70 @@ sectioning results or export bytes.
 
 ## Preserved failures and bounded corrections
 
-The first pre-change evidence command used `.venv/bin/python` before the fresh
-worktree had its established virtual-environment link. It ran no proof. The
-environment classification and rerun preserve this no-proof result.
+The first pre-change evidence command used `.venv/bin/python` before the new
+worktree had its necessary virtual-environment link. It ran no proof. The
+environment classification and subsequent run preserve this no-proof result.
 
-The first focused standalone proof used literal set braces in a formatted
+The first bounded standalone proof used literal set braces in a formatted
 isolated-import script. Repair pass 1 escaped only those braces. The second
-focused proof compared two separately constructed `namedtuple` vector types.
+bounded proof compared two `namedtuple` vector types from different constructor
+calls.
 Repair pass 2 changed only that assertion to use the exact host vector type.
 
-The third focused proof showed that the product correctly rejected a corrupted
-dependency. Its test expected an internal dependency spelling instead of the
-stable platform diagnostic. Repair accounting was already 2/2. The owner
-authorised one test-only exception to require the stable diagnostic. The exact
-focused rerun then had a PASS result.
+The third bounded proof showed that the product correctly rejected a corrupted
+dependency. That test used an internal dependency spelling as the expected
+result. The stable platform diagnostic was the correct expected result. Repair
+accounting was 2/2 before this exception. The owner
+authorised one test-only exception to use the stable diagnostic as the expected
+result. The subsequent bounded run had a PASS result.
 
-The first qualified proof included a retained expected-rejection case in a
-success-only loop. The earlier complete caller comparison had already shown the
-same rejection. The owner authorised a second test-only exception to assert
-that exact retained rejection. The focused qualified rerun then had a PASS
+The first qualified proof included a retained expected-rejection input in a
+success-only loop. The earlier complete caller comparison showed the same
+rejection. The owner authorised a second test-only exception to assert that
+exact retained rejection. The subsequent bounded qualified run had a PASS
 result.
 
 The raw classification receipts use the phrase `test-harness defect`. The
 canonical failure class for these three test defects is
-`fixture-or-harness-defect`. This record keeps the raw receipts unchanged and
-maps their phrase to the canonical failure class.
+`fixture-or-harness-defect`. This record keeps the raw receipts unchanged. It
+identifies `fixture-or-harness-defect` as the canonical failure class for that
+phrase.
 
-Source-and-test repair accounting stays 2/2. Both owner-authorised test-only
+Source-and-test repair accounting stays 2/2. The two owner-authorised test-only
 exceptions are consumed. The exceptions do not reset or extend the repair
 limit. The diagnostic read that followed the first qualified failure had its
 own command defect and supplies no proof.
 
 The first real-GUI preflight found no pinned `freecad-cli` checkout in the
-fresh worktree. No GUI or product operation ran. The established setup workflow
-installed the exact retained bridge pin in the ignored worktree path, and the
-exact-profile preflight then had a PASS result. The recovery receipt has
+new worktree. No GUI or product operation ran. The setup workflow installed the
+exact retained bridge pin in the ignored worktree path. The exact-profile
+preflight then had a PASS result. The recovery receipt has
 SHA-256
 `2ea095b067e87f0749cd47ad79ab7a70c0aba70330cab50e3a2c4cd1d7da1596`.
 
 The first ignored GUI preparation guard rejected a historical recipe
-identifier after it had correctly changed all output paths. The canonical
-classification is `fixture-or-harness-defect`. The correction narrowed only
-that ignored guard, kept the historical recipe identifier and resumed from the
-first incomplete preparation file. It changed no product, tracked test or
-source file. It is outside the 2/2 source-and-test repair accounting. The
+identifier after it correctly changed all output paths. The canonical
+classification is `fixture-or-harness-defect`. The correction changed only
+that ignored guard. It kept the historical recipe identifier and continued at
+the first preparation file that was not complete. It changed no product,
+tracked test or source file. It is not part of the 2/2 source-and-test repair
+accounting. The
 classification record has SHA-256
 `eea2c84199107e3c0897da6533fbbb3c27569244a882a2e0ebee8b9a05964b5d`.
 
 ## Independent quality review
 
-A fresh independent reviewer completed the first pass read-only. The reviewer
+A new independent reviewer completed the first pass read-only. The reviewer
 examined the complete diff, source, tests, raw failures, classifications,
 manifests, qualified-host logs and real-GUI records. The verdict is PASS. The
 review has no `BLOCKER`, `REQUIRED_BEFORE_EXIT`, `BACKLOG`, `OPTIONAL`,
 `MISSING`, `EXTRA` or `CANNOT_VERIFY` finding.
 
-The review confirms the B14/B15 provenance, host-independent boundary, native
-point conversion, exact caller edge, routing, recovery, exclusions and repair
-accounting. The reviewer changed no file and gave no phase, performance,
-output, migration or release acceptance. The review receipt has SHA-256
+The review gives a PASS result for the B14/B15 provenance, host-independent
+boundary, native point conversion, exact caller edge, routing, recovery,
+exclusions and repair accounting. The reviewer changed no file and gave no
+phase, performance, output, migration or release acceptance. The review
+receipt has SHA-256
 `36ccfc7d4d7699769cb46ff0c4f5049a6b92a56341787b50e64d9d82280eb00d`.
 
 ## Evidence identities
@@ -225,9 +232,9 @@ branch `agent/phase7-platform-core`.
 | `tests/validate_phase7_platform_core.py` | `bd142e3a9344a527750d4363a2ad4d8947acbc85fdc7590eb32df8f33dc9dcdb` |
 | `tests/freecad_validate_phase7_platform_core.py` | `ed58f6e48f234e0eaf1e414253d078ef712dfa0190ca77e0a65d6bb6f194ea86` |
 
-The next records are under the worktree's ignored
-`tmp/phase7-platform-core/` directory. They preserve each initial result and
-later result separately.
+The next records are in the worktree's ignored
+`tmp/phase7-platform-core/` directory. They preserve the initial and subsequent
+results in different files.
 
 | Record | SHA-256 |
 | --- | --- |
@@ -259,5 +266,5 @@ results and remove legacy paths stay in full.
 
 The task gives no physical-platform, sectioning, export-byte, production,
 output or release acceptance. Project status stays `unknown`, and output keeps
-private-development status. The exact-green draft needs a separate owner
+private-development status. The exact-green draft must have its own owner
 decision before integration.
