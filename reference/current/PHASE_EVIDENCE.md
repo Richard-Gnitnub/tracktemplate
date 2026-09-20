@@ -16,13 +16,12 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is Open at 0/4. All four exits are Pending. The bounded platform-transition candidate has complete PASS evidence. Repair accounting stays 2/2, and the one-off harness exception is consumed. |
-| What changed | The six-function platform-transition calculation is in `tracktemplate.domain.alignment`. Three public functions use `tracktemplate.api`. The B16 workflow selects fourteen functions and validates 39 caller routes. |
-| What now works | Standalone, qualified FreeCAD, direct, regression and real-GUI proofs have PASS results. The complete results from the bounded B14/B15, B16 caller and platform-widening GUI comparisons are equal. |
-| Limitations/findings | Direct and single-sample GUI costs are descriptive only. D-GOV-019 gives no performance authority. D-P6-008, all recorded product limitations and all comparison and legacy-retirement conditions stay in full. |
-| Owner decision | After exact-green draft publication, decide whether to integrate only this bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status,
-migration outside this bounded scope or release state. |
-| Next action | Complete the one necessary Documentation Review and deterministic documentation validation. Publish one exact-green draft, then bring its exact head to Richard for the integration decision. |
+| Current state | Phase 7 is Open at 0/4. All four exits are Pending. The bounded `build_platform_core` candidate has complete PASS evidence and an independent quality-review PASS result. Source-and-test repair accounting stays 2/2. Both owner-authorised test-only exceptions are consumed. |
+| What changed | `tracktemplate.domain.alignment` contains the host-independent calculation. `tracktemplate.api` supplies it. The B16 `prepare_track_alignment` caller uses one narrow compatibility object. The workflow selects fifteen functions and validates 39 caller routes with schema `10`. |
+| What now works | B14, B15 and the candidate give equal complete results and diagnostics for the bounded cases. Standalone, qualified FreeCAD, affected routing, regression and real-GUI proofs have PASS results. The retained current-main and candidate GUI records have zero product-semantic differences. |
+| Limitations/findings | The real-GUI proof reuses the retained PR #79 run as its current-main baseline and has one new candidate sample. Its resource values are descriptive only. D-P6-008, all recorded product limitations and all comparison and legacy-retirement conditions stay in full. |
+| Owner decision | After exact-green draft publication, decide whether to integrate only this bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status, migration outside this bounded scope or release state. |
+| Next action | Complete final exact-head validation and publish one exact-green draft. Then bring its exact head to Richard for the integration decision. |
 
 <a id="freecad-1-1-3-py31315-qt6112-qualification-panel"></a>
 
@@ -162,6 +161,65 @@ profile functional compatibility authority only.
 Exact owner decision:
 
 > At protected main `980402adf2e3021739594f34eb1df7af6e4402db`, I qualify only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` for functional host compatibility. This exact system Flatpak deployment has app commit `e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121` with parent `c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29`, and KDE runtime commit `fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa` with parent `4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18`. It has FreeCAD 1.1.3 revision `44987 (Git)`, source commit `145529fe741292ff0b3977a01195bf0247425794`, CPython 3.13.15, PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.8. The complete required qualification matrix and independent review have PASS results. Keep the three earlier exact profiles qualified and preserve their evidence and identities. D-GOV-019 gives functional compatibility authority only. It does not authorise this profile to supply performance evidence. Keep the platform-transition outcome parked before B0 with repair accounting 2/2. Do not reset or resume it. I authorise protected-main integration of the exact-green D-GOV-019 draft through the normal TrackTemplate workflow. After integration, the saved Caveman efficiency tranche remains next before further Phase 7 extraction. This decision does not start that separate work.
+
+<a id="phase7-platform-core-migration"></a>
+
+## Migration of the platform-core calculation — 2026-09-20
+
+Protected main was
+`009ca95e4412477a1c09639793c13b1a6adad496` when this task started. The
+owner's `$tracktemplate-continue` instruction authorises this one Level 2
+result under D-GOV-004 and D-P7-001.
+
+The B14 and B15 `build_platform_core` definitions are equal and stay
+unchanged. The complete calculation now uses
+`tracktemplate.domain.alignment` through `tracktemplate.api`. The unchanged
+B16 `prepare_track_alignment` caller uses one narrow compatibility object to
+change only new XY pairs to native `App.Vector` values. The
+[API instructions](../contracts/phase7-platform-core.md) preserve the exact
+signature, result sequence, diagnostics, sampling, endpoint corrections and
+host conversion.
+
+The product selects fifteen functions and validates 39 caller routes. The
+routing record uses schema `10` and contract ID
+`tracktemplate:phase7:platform-core:1`. It rejects a mixed selection and puts
+all previous values back after a setup error.
+
+The pre-change characterisation, focused standalone proof, focused qualified
+FreeCAD proof, nine affected qualified routes and all seven transition
+regression stages have PASS results. The real-GUI candidate completes Create,
+Edit, Undo/Redo, rejection, save/reopen and cleanup. Its complete
+product-semantic record equals the retained current-main record with zero
+differences.
+
+The [evidence record](../benchmarks/2026-09-20-phase7-platform-core-regression.md)
+keeps the exact identities, retained failures, corrections and limitations.
+Source-and-test repair accounting stays 2/2. Both owner-authorised test-only
+exceptions are consumed. The record maps the raw phrase `test-harness defect`
+to the canonical `fixture-or-harness-defect` class without a change to the raw
+receipts. The ignored GUI preparation correction is outside source-and-test
+repair accounting and changed no tracked product or test.
+
+The independent quality review has a PASS result with no finding in any
+disposition. It confirms the B14/B15 provenance, calculation boundary, native
+conversion, caller route, recovery and exclusions. It gives no phase,
+performance, output or release acceptance.
+
+The retained current-main GUI run was not repeated. The proof has one new GUI
+candidate sample, and the operating system cache and scheduling are not
+controlled. Its time and memory values are descriptive only. The proof does
+not compare physical-platform results, sectioning results or export bytes.
+
+This result supplies bounded evidence for Exits 1, 2 and 3. It accepts no Phase
+7 exit. Phase 7 stays Open at 0/4, with all four exits Pending. D-P6-008, all
+recorded limitations and all conditions to compare results and remove legacy
+paths stay in full. Project status stays `unknown`, and output keeps
+private-development status.
+
+After exact-green draft publication, Richard must decide whether to integrate
+only this bounded Level 2 candidate. That decision cannot accept a Phase 7
+exit, product performance, output, wider migration, legacy retirement or a
+release state unless the owner states that authority separately.
 
 ## Migration of platform-transition calculations — 2026-09-19
 

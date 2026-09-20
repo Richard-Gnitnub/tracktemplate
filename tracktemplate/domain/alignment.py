@@ -14,6 +14,7 @@ __all__ = (
     "interpolate_alignment_station",
     "add_common_straight_extensions",
     "build_concentric_core",
+    "build_platform_core",
     "build_straight_route",
     "clothoid_entry_displacement",
     "clothoid_exit_displacement",
@@ -974,6 +975,201 @@ def build_concentric_core(
         "circular_angle": circular_angle,
         "circular_length": circular_length,
         "core_length": entry_transition + circular_length + exit_transition,
+    }
+
+
+def build_platform_core(
+    circle_centre,
+    radius,
+    entry_transition,
+    exit_transition,
+    entry_shape_parameter,
+    exit_shape_parameter,
+    total_angle,
+    label,
+):
+    """Return a platform-transition core with neutral XY points.
+
+    Lengths are millimetres; headings are radians in local left-turn space.
+    Preserve inherited sampling, endpoint corrections and diagnostics. This
+    calculation constructs no host objects and has no side effects.
+    """
+    if radius <= 0.0:
+        raise ValueError(
+            "The constant radius for '{}' must be greater than zero.".format(
+                label,
+            )
+        )
+    if entry_transition < 0.0 or exit_transition < 0.0:
+        raise ValueError(
+            "Platform transition lengths for '{}' cannot be negative.".format(
+                label,
+            )
+        )
+
+    entry_dx, entry_dy, entry_angle = platform_transition_displacement(
+        entry_transition,
+        radius,
+        entry_shape_parameter,
+        "entry",
+        integration_steps=480,
+    )
+    exit_dx, exit_dy, exit_angle = platform_transition_displacement(
+        exit_transition,
+        radius,
+        exit_shape_parameter,
+        "exit",
+        integration_steps=480,
+    )
+    circular_angle = total_angle - entry_angle - exit_angle
+    if circular_angle < -1.0e-8:
+        combined_angle = entry_angle + exit_angle
+        scale = (
+            0.90 * total_angle / combined_angle
+            if combined_angle > 0.0
+            else 1.0
+        )
+        suggested_entry = max(1.0, entry_transition * min(1.0, scale))
+        suggested_exit = max(1.0, exit_transition * min(1.0, scale))
+        raise ValueError(
+            "The platform transitions for '{}' use more angle than the "
+            "complete curve.\n\n"
+            "Entry transition angle: {:.3f} deg\n"
+            "Exit transition angle: {:.3f} deg\n"
+            "Combined transition angle: {:.3f} deg\n"
+            "Complete turn angle: {:.3f} deg\n\n"
+            "Shorten one or both platform transition lengths. As a "
+            "conservative starting point, try about {:.0f} mm entry and "
+            "{:.0f} mm exit, then increase them if the macro confirms that "
+            "the geometry still fits.".format(
+                label,
+                math.degrees(entry_angle),
+                math.degrees(exit_angle),
+                math.degrees(combined_angle),
+                math.degrees(total_angle),
+                suggested_entry,
+                suggested_exit,
+            )
+        )
+    circular_angle = max(0.0, circular_angle)
+
+    centre_x, centre_y = circle_centre
+    entry_normal_x, entry_normal_y = _left_normal(entry_angle)
+    circle_start_x = centre_x - (radius * entry_normal_x)
+    circle_start_y = centre_y - (radius * entry_normal_y)
+    start_x = circle_start_x - entry_dx
+    start_y = circle_start_y - entry_dy
+
+    points = [(float(start_x), float(start_y))]
+    headings = [0.0]
+    x = start_x
+    y = start_y
+    heading = 0.0
+
+    if entry_transition > GEOMETRY_TOLERANCE:
+        x, y, heading = _integrate_core_segment(
+            points,
+            headings,
+            x,
+            y,
+            heading,
+            entry_transition,
+            lambda station: (1.0 / radius)
+            * (
+                (3.0 * (station / entry_transition) ** 2)
+                - (2.0 * (station / entry_transition) ** 3)
+                + (
+                    16.0
+                    * entry_shape_parameter
+                    * (station / entry_transition) ** 2
+                    * (1.0 - (station / entry_transition)) ** 2
+                )
+            ),
+        )
+
+    x = circle_start_x
+    y = circle_start_y
+    heading = entry_angle
+    points[-1] = (float(x), float(y))
+    headings[-1] = heading
+
+    circular_length = radius * circular_angle
+    if circular_length > GEOMETRY_TOLERANCE:
+        x, y, heading = _integrate_core_segment(
+            points,
+            headings,
+            x,
+            y,
+            heading,
+            circular_length,
+            lambda _station: 1.0 / radius,
+        )
+
+    circle_end_heading = total_angle - exit_angle
+    exit_normal_x, exit_normal_y = _left_normal(circle_end_heading)
+    circle_end_x = centre_x - (radius * exit_normal_x)
+    circle_end_y = centre_y - (radius * exit_normal_y)
+    x = circle_end_x
+    y = circle_end_y
+    heading = circle_end_heading
+    points[-1] = (float(x), float(y))
+    headings[-1] = heading
+
+    if exit_transition > GEOMETRY_TOLERANCE:
+        x, y, heading = _integrate_core_segment(
+            points,
+            headings,
+            x,
+            y,
+            heading,
+            exit_transition,
+            lambda station: (1.0 / radius)
+            * (
+                1.0
+                - (3.0 * (station / exit_transition) ** 2)
+                + (2.0 * (station / exit_transition) ** 3)
+                + (
+                    16.0
+                    * exit_shape_parameter
+                    * (station / exit_transition) ** 2
+                    * (1.0 - (station / exit_transition)) ** 2
+                )
+            ),
+        )
+
+        rotated_dx, rotated_dy = _rotate_xy(
+            exit_dx,
+            exit_dy,
+            circle_end_heading,
+        )
+        x = circle_end_x + rotated_dx
+        y = circle_end_y + rotated_dy
+        points[-1] = (float(x), float(y))
+
+    heading = total_angle
+    headings[-1] = heading
+
+    entry_peak = platform_peak_curvature_factor(entry_shape_parameter)
+    exit_peak = platform_peak_curvature_factor(exit_shape_parameter)
+    minimum_radius = radius / max(1.0, entry_peak, exit_peak)
+
+    return {
+        "label": label,
+        "points": points,
+        "headings": headings,
+        "start": (start_x, start_y),
+        "end": (x, y),
+        "radius": radius,
+        "entry_transition": entry_transition,
+        "exit_transition": exit_transition,
+        "entry_angle": entry_angle,
+        "exit_angle": exit_angle,
+        "circular_angle": circular_angle,
+        "circular_length": circular_length,
+        "core_length": entry_transition + circular_length + exit_transition,
+        "entry_shape_parameter": entry_shape_parameter,
+        "exit_shape_parameter": exit_shape_parameter,
+        "minimum_radius": minimum_radius,
     }
 
 

@@ -115,8 +115,8 @@ for caller_name in ("run_macro", "prepare_track_alignment"):
 
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
-assert record["contract_id"] == "tracktemplate:phase7:platform-transition:1"
-assert record["schema_version"] == 9 and record["mixed_route"] is False
+assert record["contract_id"] == "tracktemplate:phase7:platform-core:1"
+assert record["schema_version"] == 10 and record["mixed_route"] is False
 assert record["function_names"] == list(core_proof.PRODUCT_FUNCTION_NAMES)
 assert len(record["caller_names"]) == len(set(record["caller_names"]))
 adapter = session.module.build_concentric_core

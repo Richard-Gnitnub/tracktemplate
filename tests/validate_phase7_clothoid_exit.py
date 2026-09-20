@@ -36,6 +36,7 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "platform_transition_displacement",
     "platform_peak_curvature_factor",
     "solve_platform_shape_parameter",
+    "build_platform_core",
 )
 CALCULATION_CASES = tuple(
     (length, radius, steps)
@@ -275,9 +276,9 @@ def validate_binding():
         )
         assert session.launch_workflow() == expected
         record = session.routing_record()
-        assert record["schema_version"] == 9
+        assert record["schema_version"] == 10
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-transition:1"
+            "tracktemplate:phase7:platform-core:1"
         )
         assert record["function_names"] == list(PRODUCT_FUNCTION_NAMES)
         assert record["caller_names"] == list(STATION_CALLER_NAMES)
@@ -303,7 +304,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete fourteen-function",
+                "complete fifteen-function",
             )
             assert _snapshot(host) == before
             assert host.module.LAUNCH_COUNT == 0

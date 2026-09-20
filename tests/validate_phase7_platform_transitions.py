@@ -347,6 +347,7 @@ assert not attempted, attempted
 def candidate_characterisation():
     """Exercise the extracted closure and the unchanged actual B16 callers."""
     from tracktemplate import api
+    from tracktemplate.compatibility import transition_workflow
     from tracktemplate.domain import alignment as domain
 
     expected_signatures = {
@@ -391,6 +392,12 @@ def candidate_characterisation():
     _host_independent_import()
     caller_namespace, _nodes = legacy_namespace(B15)
     caller_namespace.update({name: getattr(api, name) for name in PUBLIC})
+    caller_namespace["build_platform_core"] = (
+        transition_workflow._PlatformCoreAdapter(
+            api.build_platform_core,
+            Vector,
+        )
+    )
     return {
         "analytical": analytical_cases(domain.__dict__),
         "solver": solver_cases(domain.__dict__),
@@ -540,17 +547,29 @@ def validate_contract(workflow, routing_record):
     assert "originally absent" in composition["atomic_rollback"]
 
     product = contract["product_routing"]
-    assert product["record_schema_version"] == routing_record["schema_version"]
+    assert product["record_schema_version"] == 9
+    assert routing_record["schema_version"] == 10
     assert product["route"] == routing_record["route"]
     assert product["comparison_route_available"] is False
-    assert product["function_names"] == list(workflow.PRODUCT_FUNCTION_NAMES)
+    historical_names = [
+        name for name in workflow.PRODUCT_FUNCTION_NAMES
+        if name != "build_platform_core"
+    ]
+    assert product["function_names"] == historical_names
     assert product["caller_names"] == [
         caller for caller, _targets in workflow.PRODUCT_CALLER_ROUTES
     ]
-    assert product["caller_routes"] == [
-        {"caller": caller, "targets": list(targets)}
-        for caller, targets in workflow.PRODUCT_CALLER_ROUTES
-    ]
+    historical_routes = []
+    for caller, targets in workflow.PRODUCT_CALLER_ROUTES:
+        if caller == "prepare_track_alignment":
+            targets = tuple(
+                target for target in targets
+                if target != "build_platform_core"
+            )
+        historical_routes.append(
+            {"caller": caller, "targets": list(targets)}
+        )
+    assert product["caller_routes"] == historical_routes
     assert product["complete_current_caller_count"] == 39
     assert product["workflow_version"] == routing_record["workflow_version"]
     assert product["mixed_route"] is False
@@ -644,7 +663,7 @@ def _assert_binding_state(namespace, expected):
 
 
 def validate_binding_and_rollback():
-    """Prove the 14-function host route and every platform closure edge."""
+    """Prove the 15-function host route and every platform closure edge."""
     from tracktemplate import api
     from tracktemplate.compatibility import b15_workflow_host as loader
     from tracktemplate.compatibility import transition_workflow as workflow
@@ -679,8 +698,8 @@ def validate_binding_and_rollback():
         namespace = session.module.__dict__
         record = session.routing_record()
         assert record == {
-            "schema_version": 9,
-            "contract_id": "tracktemplate:phase7:platform-transition:1",
+            "schema_version": 10,
+            "contract_id": "tracktemplate:phase7:platform-core:1",
             "route": "modular",
             "comparison_route_available": False,
             "function_names": list(workflow.PRODUCT_FUNCTION_NAMES),
@@ -691,25 +710,26 @@ def validate_binding_and_rollback():
             "workflow_source_sha256": host.source_sha256,
             "mixed_route": False,
         }
-        assert len(record["function_names"]) == 14
+        assert len(record["function_names"]) == 15
         assert len(record["caller_names"]) == 39
         for name in PUBLIC:
             assert namespace[name] is getattr(api, name)
-        for caller_name, target_names in (
-            ("prepare_track_alignment", (PUBLIC[2],)),
-            ("build_platform_core", PUBLIC[:2]),
-        ):
-            caller = namespace[caller_name]
-            assert caller.__globals__ is namespace
-            assert set(target_names) <= set(caller.__code__.co_names)
-            for name in target_names:
-                assert caller.__globals__[name] is getattr(api, name)
+        caller = namespace["prepare_track_alignment"]
+        assert caller.__globals__ is namespace
+        assert {PUBLIC[2], "build_platform_core"} <= set(
+            caller.__code__.co_names
+        )
+        assert caller.__globals__[PUBLIC[2]] is getattr(api, PUBLIC[2])
+        builder = namespace["build_platform_core"]
+        assert type(builder) is workflow._PlatformCoreAdapter
+        assert builder.calculation is api.build_platform_core
+        assert caller.__globals__["build_platform_core"] is builder
 
         platform_globals = api.solve_platform_shape_parameter.__globals__
         assert platform_globals is domain.__dict__
         assert all(
             getattr(api, name).__globals__ is platform_globals
-            for name in PUBLIC
+            for name in (*PUBLIC, "build_platform_core")
         )
         line_offset = domain.platform_line_offset
         assert line_offset.__globals__ is platform_globals
@@ -770,7 +790,7 @@ def validate_binding_and_rollback():
                 lambda candidate=candidate: workflow.ModularTransitionWorkflowSession(
                     invalid_host, candidate,
                 ),
-                "complete fourteen-function",
+                "complete fifteen-function",
             )
             _assert_binding_state(invalid_namespace, invalid_before)
 

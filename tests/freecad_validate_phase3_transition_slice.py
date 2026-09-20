@@ -185,8 +185,8 @@ product_session, product_route = namespace[
 from validate_phase7_straight_route import STATION_CALLER_NAMES  # noqa: E402
 
 assert product_route == {
-    "schema_version": 9,
-    "contract_id": "tracktemplate:phase7:platform-transition:1",
+    "schema_version": 10,
+    "contract_id": "tracktemplate:phase7:platform-core:1",
     "route": "modular",
     "comparison_route_available": False,
     "function_names": list(FUNCTION_NAMES) + [
@@ -198,6 +198,7 @@ assert product_route == {
         "platform_transition_displacement",
         "platform_peak_curvature_factor",
         "solve_platform_shape_parameter",
+        "build_platform_core",
     ],
     "caller_names": list(STATION_CALLER_NAMES),
     "workflow_version": "10.2A8A7B15",
@@ -211,6 +212,10 @@ assert product_session.module.build_concentric_core.calculation is (
     api.build_concentric_core
 )
 assert product_session.module.build_concentric_core.vector_factory is App.Vector
+assert product_session.module.build_platform_core.calculation is (
+    api.build_platform_core
+)
+assert product_session.module.build_platform_core.vector_factory is App.Vector
 for name in FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "platform_transition_displacement",
