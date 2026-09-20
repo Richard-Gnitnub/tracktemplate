@@ -162,9 +162,9 @@ Exact owner decision:
 
 > At protected main `980402adf2e3021739594f34eb1df7af6e4402db`, I qualify only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` for functional host compatibility. This exact system Flatpak deployment has app commit `e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121` with parent `c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29`, and KDE runtime commit `fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa` with parent `4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18`. It has FreeCAD 1.1.3 revision `44987 (Git)`, source commit `145529fe741292ff0b3977a01195bf0247425794`, CPython 3.13.15, PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.8. The complete required qualification matrix and independent review have PASS results. Keep the three earlier exact profiles qualified and preserve their evidence and identities. D-GOV-019 gives functional compatibility authority only. It does not authorise this profile to supply performance evidence. Keep the platform-transition outcome parked before B0 with repair accounting 2/2. Do not reset or resume it. I authorise protected-main integration of the exact-green D-GOV-019 draft through the normal TrackTemplate workflow. After integration, the saved Caveman efficiency tranche remains next before further Phase 7 extraction. This decision does not start that separate work.
 
-<a id="phase7-platform-core-migration"></a>
-
 ## Migration of the platform-core calculation — 2026-09-20
+
+<a id="phase7-platform-core-migration"></a>
 
 Protected main was
 `009ca95e4412477a1c09639793c13b1a6adad496` when this task started. The
