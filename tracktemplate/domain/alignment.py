@@ -7,6 +7,9 @@ from dataclasses import dataclass
 
 GEOMETRY_TOLERANCE = 1.0e-8
 _CORE_SAMPLE_SPACING = 3.0
+MODE_MATCH_SPACINGS = "Euler - match spacings"
+MODE_USE_LENGTHS = "Euler - use lengths"
+MODE_PLATFORM = "Platform widening"
 
 __all__ = (
     "AlignmentStationInterpolation",
@@ -22,8 +25,11 @@ __all__ = (
     "clothoid_entry_polyline_stations",
     "main_circle_centre",
     "mirror_alignment_for_turn",
+    "effective_constant_radius",
     "platform_transition_displacement",
     "platform_peak_curvature_factor",
+    "prepare_track_alignment",
+    "signed_side_factor",
     "solve_platform_shape_parameter",
     "transition_start_signed_offset",
     "solve_transition_length",
@@ -93,6 +99,10 @@ def clothoid_exit_displacement(length, radius, integration_steps=240):
 
 def _left_normal(heading):
     return (-math.sin(heading), math.cos(heading))
+
+
+def _dot_xy(x, y, unit_x, unit_y):
+    return (x * unit_x) + (y * unit_y)
 
 
 def main_circle_centre(main_transition, main_radius):
@@ -1171,6 +1181,230 @@ def build_platform_core(
         "exit_shape_parameter": exit_shape_parameter,
         "minimum_radius": minimum_radius,
     }
+
+
+def signed_side_factor(side):
+    """Return the dimensionless side sign in the inherited local frame."""
+    return 1.0 if side == "Inside" else -1.0
+
+
+def effective_constant_radius(main_radius, curve_spacing, side):
+    """Return the local side's constant radius in millimetres."""
+    if side == "Inside":
+        return main_radius - curve_spacing
+    return main_radius + curve_spacing
+
+
+def prepare_track_alignment(
+    config,
+    circle_centre,
+    main_radius,
+    total_angle,
+    main_alignment,
+):
+    """Return one neutral local alignment and update ``config`` in place.
+
+    Lengths and XY pairs use millimetres in local left-turn space. Headings
+    and ``total_angle`` use radians.
+    """
+    name = config["name"]
+    side = config["side"]
+    side_factor = signed_side_factor(side)
+
+    if min(
+        config["start_spacing"],
+        config["curve_spacing"],
+        config["finish_spacing"],
+        config["width"],
+    ) <= 0.0:
+        raise ValueError(
+            "All spacing and width values for '{}' must be greater than zero.".format(
+                name
+            )
+        )
+
+    radius = effective_constant_radius(
+        main_radius,
+        config["curve_spacing"],
+        side,
+    )
+    if radius <= config["width"] / 2.0:
+        raise ValueError(
+            "The constant radius for '{}' is {:.3f} mm, which is too small for "
+            "its {:.3f} mm template width.".format(name, radius, config["width"])
+        )
+
+    mode = config["alignment_mode"]
+    if mode == MODE_MATCH_SPACINGS:
+        entry_transition = solve_transition_length(
+            circle_centre[1],
+            radius,
+            side_factor * config["start_spacing"],
+            total_angle,
+            name,
+            "Entry",
+        )
+        exit_transition = solve_transition_length(
+            circle_centre[1],
+            radius,
+            side_factor * config["finish_spacing"],
+            total_angle,
+            name,
+            "Exit",
+        )
+        actual_start_spacing = config["start_spacing"]
+        actual_finish_spacing = config["finish_spacing"]
+        alignment = build_concentric_core(
+            circle_centre,
+            radius,
+            entry_transition,
+            exit_transition,
+            total_angle,
+            name,
+        )
+        alignment["minimum_radius"] = radius
+
+    elif mode == MODE_USE_LENGTHS:
+        entry_transition = config["entry_transition_length"]
+        exit_transition = config["exit_transition_length"]
+        signed_entry = transition_start_signed_offset(
+            circle_centre[1],
+            radius,
+            entry_transition,
+        )
+        signed_exit = transition_start_signed_offset(
+            circle_centre[1],
+            radius,
+            exit_transition,
+        )
+
+        if signed_entry * side_factor <= GEOMETRY_TOLERANCE:
+            raise ValueError(
+                "The manual entry Euler easement for '{}' places its entry straight "
+                "on the wrong side of the main track. Change the entry length or "
+                "select Platform widening.".format(name)
+            )
+        if signed_exit * side_factor <= GEOMETRY_TOLERANCE:
+            raise ValueError(
+                "The manual exit Euler easement for '{}' places its exit straight "
+                "on the wrong side of the main track. Change the exit length or "
+                "select Platform widening.".format(name)
+            )
+
+        actual_start_spacing = abs(signed_entry)
+        actual_finish_spacing = abs(signed_exit)
+        alignment = build_concentric_core(
+            circle_centre,
+            radius,
+            entry_transition,
+            exit_transition,
+            total_angle,
+            name,
+        )
+        alignment["minimum_radius"] = radius
+
+    elif mode == MODE_PLATFORM:
+        entry_transition = config["entry_transition_length"]
+        exit_transition = config["exit_transition_length"]
+        if entry_transition <= GEOMETRY_TOLERANCE:
+            raise ValueError(
+                "Platform widening for '{}' needs a positive Entry transition "
+                "length.".format(name)
+            )
+        if exit_transition <= GEOMETRY_TOLERANCE:
+            raise ValueError(
+                "Platform widening for '{}' needs a positive Exit transition "
+                "length.".format(name)
+            )
+
+        main_entry_line_offset = main_alignment["start"][1]
+        final_normal_x, final_normal_y = _left_normal(total_angle)
+        main_exit_line_offset = _dot_xy(
+            main_alignment["end"][0],
+            main_alignment["end"][1],
+            final_normal_x,
+            final_normal_y,
+        )
+        target_entry_line_offset = (
+            main_entry_line_offset + (side_factor * config["start_spacing"])
+        )
+        target_exit_line_offset = (
+            main_exit_line_offset + (side_factor * config["finish_spacing"])
+        )
+
+        entry_solution = solve_platform_shape_parameter(
+            circle_centre,
+            radius,
+            entry_transition,
+            target_entry_line_offset,
+            total_angle,
+            name,
+            "Entry",
+            "entry",
+        )
+        exit_solution = solve_platform_shape_parameter(
+            circle_centre,
+            radius,
+            exit_transition,
+            target_exit_line_offset,
+            total_angle,
+            name,
+            "Exit",
+            "exit",
+        )
+
+        alignment = build_platform_core(
+            circle_centre,
+            radius,
+            entry_transition,
+            exit_transition,
+            entry_solution["shape_parameter"],
+            exit_solution["shape_parameter"],
+            total_angle,
+            name,
+        )
+        actual_start_spacing = config["start_spacing"]
+        actual_finish_spacing = config["finish_spacing"]
+        alignment["entry_shape_parameter"] = entry_solution["shape_parameter"]
+        alignment["exit_shape_parameter"] = exit_solution["shape_parameter"]
+
+        if alignment["minimum_radius"] <= config["width"] / 2.0:
+            raise ValueError(
+                "The platform widening for '{}' produces a peak minimum radius "
+                "of {:.3f} mm, which is too small for its {:.3f} mm template "
+                "width. Increase the platform transition length or reduce the "
+                "spacing change.".format(
+                    name,
+                    alignment["minimum_radius"],
+                    config["width"],
+                )
+            )
+    else:
+        raise ValueError(
+            "Unknown alignment mode '{}' for '{}'.".format(mode, name)
+        )
+
+    # Store the exact values that produced the geometry. This lets the dialogue
+    # reopen with accurate calculated values in every mode.
+    config["entry_transition_length"] = entry_transition
+    config["exit_transition_length"] = exit_transition
+    config["start_spacing"] = actual_start_spacing
+    config["finish_spacing"] = actual_finish_spacing
+
+    alignment.update(
+        {
+            "name": name,
+            "side": side,
+            "alignment_mode": mode,
+            "start_spacing": actual_start_spacing,
+            "curve_spacing": config["curve_spacing"],
+            "finish_spacing": actual_finish_spacing,
+            "width": config["width"],
+            "create_template": config["create_template"],
+            "show_centreline": config["show_centreline"],
+        }
+    )
+    return alignment
 
 
 def add_common_straight_extensions(alignments, total_angle):

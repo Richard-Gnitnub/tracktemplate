@@ -425,11 +425,11 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 10
+        assert record["schema_version"] == 11
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-core:1"
+            "tracktemplate:phase7:track-preparation:1"
         )
-        assert len(record["function_names"]) == 15
+        assert len(record["function_names"]) == 18
         assert len(workflow.PRODUCT_CALLER_ROUTES) == 39
         assert workflow.PRODUCT_CALLER_ROUTES == expected_caller_routes()
         assert tuple(record["function_names"][8:10]) == PAIR
@@ -536,6 +536,7 @@ def expected_caller_routes():
             "clothoid_entry_displacement", "clothoid_exit_displacement",
         )),
         ("prepare_track_alignment", (
+            "signed_side_factor", "effective_constant_radius",
             "transition_start_signed_offset", "solve_transition_length",
             "build_concentric_core", "solve_platform_shape_parameter",
             "build_platform_core",
@@ -544,8 +545,11 @@ def expected_caller_routes():
             "platform_transition_displacement",
             "platform_peak_curvature_factor",
         )),
-        ("run_macro", ("main_circle_centre", "build_concentric_core",
-                       "add_common_straight_extensions")),
+        ("run_macro", (
+            "main_circle_centre", "build_concentric_core",
+            "prepare_track_alignment", "signed_side_factor",
+            "add_common_straight_extensions",
+        )),
         ("build_straight_routes", ("build_straight_route",)),
     ]
     tree = ast.parse(legacy.B15_PATH.read_text())

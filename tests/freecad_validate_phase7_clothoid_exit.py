@@ -8,6 +8,7 @@ import math
 import pathlib
 import runpy
 import sys
+from unittest import mock
 
 import FreeCAD as App
 
@@ -93,8 +94,8 @@ assert document_state() == before
 
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
-assert record["contract_id"] == "tracktemplate:phase7:platform-core:1"
-assert record["schema_version"] == 10 and record["mixed_route"] is False
+assert record["contract_id"] == "tracktemplate:phase7:track-preparation:1"
+assert record["schema_version"] == 11 and record["mixed_route"] is False
 assert record["function_names"] == list(exit_proof.PRODUCT_FUNCTION_NAMES)
 assert len(record["caller_names"]) == len(set(record["caller_names"]))
 core = session.module.build_concentric_core.calculation
@@ -121,15 +122,19 @@ def observed_exit(length, radius, integration_steps=240):
 
 
 observed_functions = dict(functions, clothoid_exit_displacement=observed_exit)
-observed_functions["build_concentric_core"] = exit_proof.detached_core(
-    host.module, observed_functions, observed_exit,
+with mock.patch.dict(
+    api.build_concentric_core.__globals__,
+    {"clothoid_exit_displacement": observed_exit},
+):
+    observed_session = transition_workflow.ModularTransitionWorkflowSession(
+        host, observed_functions,
+    )
+    assert snapshot(observed_session.module) == legacy_snapshot
+    assert len(calls) == 3
+    assert all(length > 0.0 and radius > 0.0 for length, radius, _steps in calls)
+    assert document_state() == before
+assert api.build_concentric_core.__globals__["clothoid_exit_displacement"] is (
+    api.clothoid_exit_displacement
 )
-observed_session = transition_workflow.ModularTransitionWorkflowSession(
-    host, observed_functions,
-)
-assert snapshot(observed_session.module) == legacy_snapshot
-assert len(calls) == 3
-assert all(length > 0.0 and radius > 0.0 for length, radius, _steps in calls)
-assert document_state() == before
 
 print("Phase 7 clothoid exit FreeCAD validation passed")

@@ -8,6 +8,7 @@ import math
 import pathlib
 import runpy
 import sys
+from unittest import mock
 
 import FreeCAD as App
 
@@ -98,7 +99,7 @@ for dependency in (
     assert core_proof._snapshot(host) == original
     assert document_state() == before
 
-for caller_name in ("run_macro", "prepare_track_alignment"):
+for caller_name in ("run_macro",):
     caller = getattr(host.module, caller_name)
     setattr(host.module, caller_name, core_proof.detached(
         caller, "build_concentric_core", api.build_concentric_core,
@@ -115,19 +116,22 @@ for caller_name in ("run_macro", "prepare_track_alignment"):
 
 session = transition_workflow.ModularTransitionWorkflowSession(host, functions)
 record = session.routing_record()
-assert record["contract_id"] == "tracktemplate:phase7:platform-core:1"
-assert record["schema_version"] == 10 and record["mixed_route"] is False
+assert record["contract_id"] == "tracktemplate:phase7:track-preparation:1"
+assert record["schema_version"] == 11 and record["mixed_route"] is False
 assert record["function_names"] == list(core_proof.PRODUCT_FUNCTION_NAMES)
 assert len(record["caller_names"]) == len(set(record["caller_names"]))
 adapter = session.module.build_concentric_core
 assert type(adapter) is transition_workflow._ConcentricCoreAdapter
 assert adapter.calculation is api.build_concentric_core
 assert adapter.vector_factory is App.Vector
-for caller_name in ("run_macro", "prepare_track_alignment"):
-    caller = getattr(session.module, caller_name)
-    assert caller.__globals__ is session.module.__dict__
-    assert "build_concentric_core" in caller.__code__.co_names
-    assert caller.__globals__["build_concentric_core"] is adapter
+runner = session.module.run_macro
+assert runner.__globals__ is session.module.__dict__
+assert "build_concentric_core" in runner.__code__.co_names
+assert runner.__globals__["build_concentric_core"] is adapter
+preparation = session.module.prepare_track_alignment
+assert type(preparation) is transition_workflow._PrepareTrackAlignmentAdapter
+assert preparation.calculation is api.prepare_track_alignment
+assert preparation.vector_factory is App.Vector
 for case, legacy in zip(core_proof.CALCULATION_CASES, legacy_results):
     result = adapter(*case)
     assert tuple(result) == tuple(legacy) == core_proof.RESULT_KEYS
@@ -155,15 +159,19 @@ def observed_exit(length, radius, integration_steps=240):
 
 
 observed_functions = dict(functions, clothoid_exit_displacement=observed_exit)
-observed_functions["build_concentric_core"] = core_proof.detached(
-    api.build_concentric_core, "clothoid_exit_displacement", observed_exit,
+with mock.patch.dict(
+    api.build_concentric_core.__globals__,
+    {"clothoid_exit_displacement": observed_exit},
+):
+    observed_session = transition_workflow.ModularTransitionWorkflowSession(
+        host, observed_functions,
+    )
+    assert snapshot(observed_session.module) == legacy_snapshot
+    assert len(calls) == 3
+    assert all(length > 0.0 and radius > 0.0 for length, radius, _steps in calls)
+    assert document_state() == before
+assert api.build_concentric_core.__globals__["clothoid_exit_displacement"] is (
+    api.clothoid_exit_displacement
 )
-observed_session = transition_workflow.ModularTransitionWorkflowSession(
-    host, observed_functions,
-)
-assert snapshot(observed_session.module) == legacy_snapshot
-assert len(calls) == 3
-assert all(length > 0.0 and radius > 0.0 for length, radius, _steps in calls)
-assert document_state() == before
 
 print("Phase 7 concentric core FreeCAD validation passed")

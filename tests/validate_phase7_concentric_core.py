@@ -56,6 +56,8 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "platform_peak_curvature_factor",
     "solve_platform_shape_parameter",
     "build_platform_core",
+    "signed_side_factor", "effective_constant_radius",
+    "prepare_track_alignment",
 )
 TRANSITION_CASES = (
     (0.0, 0.0), (0.0, 25.0), (25.0, 0.0), (25.0, 60.0),
@@ -368,6 +370,8 @@ def _fixture(temporary_root):
             "_platform_parameter_grid",
             "solve_platform_shape_parameter",
             "build_platform_core",
+            "signed_side_factor", "effective_constant_radius",
+            "prepare_track_alignment",
         }
     })
     prelude = (
@@ -376,23 +380,31 @@ def _fixture(temporary_root):
         'App = SimpleNamespace(Vector=namedtuple("Vector", "x y z"))\n'
         'MACRO_VERSION_NUMBER = "10.2A8A7B15"\n'
         'GEOMETRY_TOLERANCE = 1.0e-8\nSAMPLE_SPACING = 3.0\n'
+        'MODE_MATCH_SPACINGS = "Euler - match spacings"\n'
+        'MODE_USE_LENGTHS = "Euler - use lengths"\n'
+        'MODE_PLATFORM = "Platform widening"\n'
         'LAUNCH_COUNT = 0\n'
     )
     callers = (
-        'def prepare_track_alignment():\n'
-        '    offset = transition_start_signed_offset(600.0, 600.0, 0.0)\n'
-        '    length = solve_transition_length(600.0, 600.0, offset,\n'
-        '        math.pi / 2.0, "Fixture", "Entry")\n'
-        '    assert callable(solve_platform_shape_parameter)\n'
-        '    assert callable(build_platform_core)\n'
-        '    return build_concentric_core((0.0, 600.0), 600.0, length,\n'
-        '        length, math.pi / 2.0, "Fixture")\n'
         'def run_macro():\n'
         '    global LAUNCH_COUNT\n'
         '    LAUNCH_COUNT += 1\n'
         '    centre = main_circle_centre(600.0, 600.0)\n'
         '    core = build_concentric_core(centre, 600.0, 600.0, 600.0,\n'
         '        math.pi / 2.0, "Main Track")\n'
+        '    config = {\n'
+        '        "name": "Fixture Track", "side": "Outside",\n'
+        '        "alignment_mode": MODE_MATCH_SPACINGS,\n'
+        '        "start_spacing": 50.0, "curve_spacing": 55.0,\n'
+        '        "finish_spacing": 50.0,\n'
+        '        "entry_transition_length": 600.0,\n'
+        '        "exit_transition_length": 600.0, "width": 32.0,\n'
+        '        "create_template": True, "show_centreline": True,\n'
+        '    }\n'
+        '    prepared = prepare_track_alignment(\n'
+        '        config, centre, 600.0, math.pi / 2.0, core,\n'
+        '    )\n'
+        '    signed_side_factor(prepared["side"])\n'
         '    add_common_straight_extensions([core], math.pi / 2.0)\n'
         '    mirror_alignment_for_turn(core, 1.0)\n'
         '    data = alignment_station_data(core)\n'
@@ -434,18 +446,16 @@ def validate_binding():
             return host_loader.load_b15_workflow_host(temporary_root, contract)
 
         host = load_host()
-        legacy_parallel = host.module.prepare_track_alignment()
         session = workflow.load_modular_transition_workflow_session(
             temporary_root, api, contract,
         )
         expected = _expected()
         assert session.launch_workflow() == expected
-        assert session.module.prepare_track_alignment() == legacy_parallel
         assert session.module.LAUNCH_COUNT == 1
         record = session.routing_record()
         assert record == {
-            "schema_version": 10,
-            "contract_id": "tracktemplate:phase7:platform-core:1",
+            "schema_version": 11,
+            "contract_id": "tracktemplate:phase7:track-preparation:1",
             "route": "modular", "comparison_route_available": False,
             "function_names": list(PRODUCT_FUNCTION_NAMES),
             "caller_names": list(STATION_CALLER_NAMES),
@@ -458,6 +468,10 @@ def validate_binding():
         assert adapter.calculation is api.build_concentric_core
         assert adapter.vector_factory is session.module.App.Vector
         assert tuple(inspect.signature(adapter).parameters) == PARAMETERS
+        preparation = session.module.prepare_track_alignment
+        assert type(preparation) is workflow._PrepareTrackAlignmentAdapter
+        assert preparation.calculation is api.prepare_track_alignment
+        assert preparation.vector_factory is session.module.App.Vector
         try:
             adapter.calculation = lambda *arguments: None
         except AttributeError:
@@ -479,7 +493,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete fifteen-function",
+                "complete eighteen-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 
@@ -509,7 +523,7 @@ def validate_binding():
                 assert _snapshot(host) == before
                 assert host.module.LAUNCH_COUNT == 0
 
-        for caller in ("run_macro", "prepare_track_alignment"):
+        for caller in ("run_macro",):
             host = load_host()
             function = getattr(host.module, caller)
             setattr(host.module, caller, detached(

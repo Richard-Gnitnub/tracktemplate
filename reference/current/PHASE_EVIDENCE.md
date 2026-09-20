@@ -16,12 +16,12 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is Open at 0/4. All four exits are Pending. The bounded `build_platform_core` candidate has complete PASS evidence and a PASS result from independent quality review. Source-and-test repair accounting stays 2/2. The two owner-authorised test-only exceptions are consumed. |
-| What changed | `tracktemplate.domain.alignment` contains the host-independent calculation. `tracktemplate.api` supplies it. The B16 `prepare_track_alignment` caller uses one compatibility object. The workflow selects fifteen functions and validates 39 caller routes with schema `10`. |
-| What now works | B14, B15 and the candidate give equal complete results and diagnostics for the bounded inputs. Standalone Python, qualified FreeCAD, routing, regression and real-GUI checks have PASS results. The retained current-main and candidate GUI records have zero product-semantic differences. |
-| Limitations/findings | The real-GUI proof uses the retained PR #79 run as its current-main baseline and has one new candidate sample. Its resource values are descriptive only. D-P6-008, all recorded product limitations and all comparison and legacy-retirement conditions stay in full. |
+| Current state | Phase 7 is Open at 0/4. All four exits are Pending. The bounded `prepare_track_alignment` candidate has PASS results for all product checks and a PASS result from independent quality review. Source-and-test repair accounting stays 2/2. The five exceptions for tests have project-owner authority. All five exceptions are consumed. |
+| What changed | The three functions use `tracktemplate.domain.alignment` through `tracktemplate.api`. The B16 `run_macro` caller uses an adapter to make FreeCAD vectors from new XY points. The workflow selects eighteen functions and validates 39 callers with schema `11`. |
+| What now works | The bounded B14/B15 comparisons, standalone Python checks, FreeCAD checks and transition lifecycle checks have PASS results. The PR #80 comparison baseline and new GUI candidate have zero product-semantic differences. |
+| Limitations/findings | The initial FreeCAD matrix has 8 PASS / 2 FAIL. After the fixture changes, its two proofs gave PASS results with their necessary sentinels. Each GUI state has one sample. Resource values are descriptive only. The measured wall times increased. D-P6-008, all recorded product limitations and all comparison and legacy-retirement conditions stay in full. |
 | Owner decision | After exact-green draft publication, Richard must make the integration decision for only this bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status, wider migration or release state. |
-| Next action | Complete exact-head validation and publish one exact-green draft. Then give its exact head to Richard for the integration decision. |
+| Next action | Complete the review and validation route. Publish one exact-green draft. Give its exact head to Richard for the integration decision. |
 
 <a id="freecad-1-1-3-py31315-qt6112-qualification-panel"></a>
 ## D-GOV-019 qualification panel for the current FreeCAD stack
@@ -160,6 +160,66 @@ profile functional compatibility authority only.
 Exact owner decision:
 
 > At protected main `980402adf2e3021739594f34eb1df7af6e4402db`, I qualify only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` for functional host compatibility. This exact system Flatpak deployment has app commit `e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121` with parent `c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29`, and KDE runtime commit `fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa` with parent `4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18`. It has FreeCAD 1.1.3 revision `44987 (Git)`, source commit `145529fe741292ff0b3977a01195bf0247425794`, CPython 3.13.15, PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.8. The complete required qualification matrix and independent review have PASS results. Keep the three earlier exact profiles qualified and preserve their evidence and identities. D-GOV-019 gives functional compatibility authority only. It does not authorise this profile to supply performance evidence. Keep the platform-transition outcome parked before B0 with repair accounting 2/2. Do not reset or resume it. I authorise protected-main integration of the exact-green D-GOV-019 draft through the normal TrackTemplate workflow. After integration, the saved Caveman efficiency tranche remains next before further Phase 7 extraction. This decision does not start that separate work.
+
+## Migration of track alignment preparation — 2026-09-20
+
+<a id="phase7-track-preparation-migration"></a>
+
+Protected main includes the integrated platform-core result from PR #80 and
+the bounded inspection tooling from PR #81. This task starts at
+`7454a09c86f60e307f2fceb2a27f12d18dd679f0`. The owner's Phase 7 continuation
+instruction authorises this Level 2 result. D-GOV-004 supplies the bounded
+workflow, and D-P7-001 keeps the phase scope.
+
+`prepare_track_alignment`, `signed_side_factor`, and
+`effective_constant_radius` use TrackTemplate Core. The B14 and B15 definitions
+are equal. The task does not change those definitions. The
+[API instructions](../contracts/phase7-track-preparation.md) preserve all three
+`alignment_mode` values, operation sequence, diagnostics, `config` changes,
+and result sequence. The B16 `run_macro` caller uses one adapter to make
+FreeCAD vectors from only new XY points. The workflow selects eighteen
+functions and validates 39 callers with schema `11`.
+
+The bounded proofs compare six valid cases and fifteen invalid cases with B14
+and B15. The six valid cases include all three `alignment_mode` values and
+the two `side` values. The proofs also compare all cases in the earlier
+platform-transition characterisation. The standalone Python and FreeCAD proofs
+preserve exact caller routes, `config` identity, dependency rejection, and
+recovery. Transition persistence, Coin, and Edit checks have PASS results.
+
+The new GUI candidate completes Create, Edit, Undo/Redo, rejection,
+save/reopen, and cleanup. Its complete result for product semantics is equal
+to the PR #80 comparison baseline. There are zero differences.
+
+The initial FreeCAD matrix has 8 PASS / 2 FAIL. Its earlier 10/10 claim was
+incorrect because the runner did not validate the necessary sentinels. The
+project keeps the initial logs and independent blocked review. After explicit
+owner authority, the project changed only the two fixtures for these proofs.
+The two initial commands then gave a zero exit status and their necessary
+sentinels.
+
+Source-and-test repair accounting stays 2/2. The five exceptions for tests have
+project-owner authority. All five exceptions are consumed.
+
+Independent quality review of the source and tests after those changes has a
+PASS result. The project preserves the initial blocked verdict. The
+[evidence record](../benchmarks/2026-09-20-phase7-track-preparation-regression.md)
+keeps exact identities, initial FAIL results, repairs, and measurements.
+
+The GUI comparison has one sample for each state at different times. The task
+does not control operating system cache or scheduling. The measured Create,
+Edit, and rejection wall times increased. These descriptive values give no
+performance acceptance. The proof does not include physical-platform results,
+sectioning results, or export bytes.
+
+This task supplies bounded evidence for Phase 7 Exits 1, 2 and 3. It accepts no
+exit. Phase 7 stays Open at 0/4, and all four exits stay Pending. D-P6-008,
+all comparison requirements and all legacy-retirement conditions stay in full.
+Project status stays `unknown`, and output keeps private-development status.
+Only Richard can authorise integration of the new exact-green draft.
+
+The entries below preserve the earlier publication-time evidence. They do not
+select the current next action.
 
 ## Migration of the platform-core calculation — 2026-09-20
 

@@ -52,8 +52,8 @@ def validate():
     )
     module = session.module
     record = session.routing_record()
-    assert len(record["function_names"]) == (11 if baseline_only else 15)
-    assert record["schema_version"] == (8 if baseline_only else 10)
+    assert len(record["function_names"]) == (11 if baseline_only else 18)
+    assert record["schema_version"] == (8 if baseline_only else 11)
     original, _nodes = proof.legacy_namespace(proof.B15, App.Vector)
     reference = proof.caller_cases(original)
     actual = proof.caller_cases(module.__dict__)
@@ -71,22 +71,29 @@ def validate():
         assert all(type(point) is App.Vector for point in result["points"])
         assert all(point.z == 0.0 for point in result["points"])
     if not baseline_only:
-        assert record["contract_id"] == "tracktemplate:phase7:platform-core:1"
+        assert record["contract_id"] == (
+            "tracktemplate:phase7:track-preparation:1"
+        )
         assert len(transition_workflow.PRODUCT_CALLER_ROUTES) == 39
         for name in proof.PUBLIC:
             assert getattr(module, name) is getattr(api, name)
-        caller = module.prepare_track_alignment
-        assert caller.__globals__ is module.__dict__
-        for name in (proof.PUBLIC[2], "build_platform_core"):
-            assert name in caller.__code__.co_names
-        assert caller.__globals__[proof.PUBLIC[2]] is getattr(
-            api, proof.PUBLIC[2],
+        preparation = module.prepare_track_alignment
+        assert type(preparation) is (
+            transition_workflow._PrepareTrackAlignmentAdapter
+        )
+        assert preparation.calculation is api.prepare_track_alignment
+        assert preparation.vector_factory is App.Vector
+        preparation_globals = api.prepare_track_alignment.__globals__
+        assert preparation_globals[proof.PUBLIC[2]] is getattr(
+            api, proof.PUBLIC[2]
         )
         builder = module.build_platform_core
         assert type(builder) is transition_workflow._PlatformCoreAdapter
         assert builder.calculation is api.build_platform_core
         assert builder.vector_factory is App.Vector
-        assert caller.__globals__["build_platform_core"] is builder
+        assert preparation_globals["build_platform_core"] is (
+            api.build_platform_core
+        )
         for name in proof.PUBLIC[:2]:
             assert name in api.build_platform_core.__code__.co_names
             assert api.build_platform_core.__globals__[name] is getattr(

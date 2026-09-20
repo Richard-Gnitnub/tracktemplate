@@ -548,12 +548,15 @@ def validate_contract(workflow, routing_record):
 
     product = contract["product_routing"]
     assert product["record_schema_version"] == 9
-    assert routing_record["schema_version"] == 10
+    assert routing_record["schema_version"] == 11
     assert product["route"] == routing_record["route"]
     assert product["comparison_route_available"] is False
     historical_names = [
         name for name in workflow.PRODUCT_FUNCTION_NAMES
-        if name != "build_platform_core"
+        if name not in {
+            "build_platform_core", "signed_side_factor",
+            "effective_constant_radius", "prepare_track_alignment",
+        }
     ]
     assert product["function_names"] == historical_names
     assert product["caller_names"] == [
@@ -564,7 +567,17 @@ def validate_contract(workflow, routing_record):
         if caller == "prepare_track_alignment":
             targets = tuple(
                 target for target in targets
-                if target != "build_platform_core"
+                if target not in {
+                    "signed_side_factor", "effective_constant_radius",
+                    "build_platform_core",
+                }
+            )
+        elif caller == "run_macro":
+            targets = tuple(
+                target for target in targets
+                if target not in {
+                    "prepare_track_alignment", "signed_side_factor",
+                }
             )
         historical_routes.append(
             {"caller": caller, "targets": list(targets)}
@@ -663,7 +676,7 @@ def _assert_binding_state(namespace, expected):
 
 
 def validate_binding_and_rollback():
-    """Prove the 15-function host route and every platform closure edge."""
+    """Prove the 18-function host route and every platform closure edge."""
     from tracktemplate import api
     from tracktemplate.compatibility import b15_workflow_host as loader
     from tracktemplate.compatibility import transition_workflow as workflow
@@ -698,8 +711,8 @@ def validate_binding_and_rollback():
         namespace = session.module.__dict__
         record = session.routing_record()
         assert record == {
-            "schema_version": 10,
-            "contract_id": "tracktemplate:phase7:platform-core:1",
+            "schema_version": 11,
+            "contract_id": "tracktemplate:phase7:track-preparation:1",
             "route": "modular",
             "comparison_route_available": False,
             "function_names": list(workflow.PRODUCT_FUNCTION_NAMES),
@@ -710,20 +723,22 @@ def validate_binding_and_rollback():
             "workflow_source_sha256": host.source_sha256,
             "mixed_route": False,
         }
-        assert len(record["function_names"]) == 15
+        assert len(record["function_names"]) == 18
         assert len(record["caller_names"]) == 39
         for name in PUBLIC:
             assert namespace[name] is getattr(api, name)
-        caller = namespace["prepare_track_alignment"]
-        assert caller.__globals__ is namespace
-        assert {PUBLIC[2], "build_platform_core"} <= set(
-            caller.__code__.co_names
-        )
-        assert caller.__globals__[PUBLIC[2]] is getattr(api, PUBLIC[2])
+        preparation = namespace["prepare_track_alignment"]
+        assert type(preparation) is workflow._PrepareTrackAlignmentAdapter
+        assert preparation.calculation is api.prepare_track_alignment
+        assert preparation.vector_factory is namespace["App"].Vector
         builder = namespace["build_platform_core"]
         assert type(builder) is workflow._PlatformCoreAdapter
         assert builder.calculation is api.build_platform_core
-        assert caller.__globals__["build_platform_core"] is builder
+        preparation_globals = api.prepare_track_alignment.__globals__
+        assert preparation_globals[PUBLIC[2]] is getattr(api, PUBLIC[2])
+        assert preparation_globals["build_platform_core"] is (
+            api.build_platform_core
+        )
 
         platform_globals = api.solve_platform_shape_parameter.__globals__
         assert platform_globals is domain.__dict__
@@ -790,7 +805,7 @@ def validate_binding_and_rollback():
                 lambda candidate=candidate: workflow.ModularTransitionWorkflowSession(
                     invalid_host, candidate,
                 ),
-                "complete fifteen-function",
+                "complete eighteen-function",
             )
             _assert_binding_state(invalid_namespace, invalid_before)
 

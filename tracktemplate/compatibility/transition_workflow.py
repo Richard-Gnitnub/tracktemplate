@@ -11,7 +11,7 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-core:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:track-preparation:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
@@ -22,6 +22,8 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "platform_peak_curvature_factor",
     "solve_platform_shape_parameter",
     "build_platform_core",
+    "signed_side_factor", "effective_constant_radius",
+    "prepare_track_alignment",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -31,7 +33,8 @@ PRODUCT_CALLER_ROUTES = (
     ),
     (
         "prepare_track_alignment",
-        ("transition_start_signed_offset", "solve_transition_length",
+        ("signed_side_factor", "effective_constant_radius",
+         "transition_start_signed_offset", "solve_transition_length",
          "build_concentric_core", "solve_platform_shape_parameter",
          "build_platform_core"),
     ),
@@ -43,6 +46,7 @@ PRODUCT_CALLER_ROUTES = (
     (
         "run_macro",
         ("main_circle_centre", "build_concentric_core",
+         "prepare_track_alignment", "signed_side_factor",
          "add_common_straight_extensions", "alignment_station_data",
          "interpolate_alignment_station", "mirror_alignment_for_turn"),
     ),
@@ -247,6 +251,35 @@ class _PlatformCoreAdapter:
             exit_shape_parameter,
             total_angle,
             label,
+        )
+        result["points"] = [
+            self.vector_factory(float(x), float(y), 0.0)
+            for x, y in result["points"]
+        ]
+        return result
+
+
+@dataclass(frozen=True)
+class _PrepareTrackAlignmentAdapter:
+    """Convert only fresh prepared-alignment points for the inherited host."""
+
+    calculation: object
+    vector_factory: object
+
+    def __call__(
+        self,
+        config,
+        circle_centre,
+        main_radius,
+        total_angle,
+        main_alignment,
+    ):
+        result = self.calculation(
+            config,
+            circle_centre,
+            main_radius,
+            total_angle,
+            main_alignment,
         )
         result["points"] = [
             self.vector_factory(float(x), float(y), 0.0)
@@ -482,7 +515,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete fifteen-function modular workflow is unavailable."
+                "The complete eighteen-function modular workflow is unavailable."
             )
         platform_globals = getattr(
             self._modular_functions["solve_platform_shape_parameter"],
@@ -525,6 +558,42 @@ class ModularTransitionWorkflowSession:
             raise TransitionWorkflowError(
                 "The platform-transition domain closure is unavailable."
             )
+        preparation_calculation = self._modular_functions[
+            "prepare_track_alignment"
+        ]
+        preparation_globals = getattr(
+            preparation_calculation, "__globals__", None,
+        )
+        preparation_code = getattr(preparation_calculation, "__code__", None)
+        self._preparation_left_normal = (
+            preparation_globals.get("_left_normal")
+            if isinstance(preparation_globals, dict)
+            else None
+        )
+        self._preparation_dot_xy = (
+            preparation_globals.get("_dot_xy")
+            if isinstance(preparation_globals, dict)
+            else None
+        )
+        if (
+            preparation_globals is not platform_globals
+            or preparation_code is None
+            or not {"_left_normal", "_dot_xy"} <= set(
+                preparation_code.co_names
+            )
+            or not all(
+                callable(function)
+                and getattr(function, "__globals__", None)
+                is preparation_globals
+                for function in (
+                    self._preparation_left_normal,
+                    self._preparation_dot_xy,
+                )
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The track-preparation domain closure is unavailable."
+            )
         vector_factory = getattr(
             getattr(self.module, "App", None), "Vector", None,
         )
@@ -538,6 +607,12 @@ class ModularTransitionWorkflowSession:
         )
         self._host_functions["build_platform_core"] = _PlatformCoreAdapter(
             self._modular_functions["build_platform_core"], vector_factory,
+        )
+        self._host_functions["prepare_track_alignment"] = (
+            _PrepareTrackAlignmentAdapter(
+                self._modular_functions["prepare_track_alignment"],
+                vector_factory,
+            )
         )
         self._host_functions["add_common_straight_extensions"] = (
             _CommonStraightExtensionsAdapter(
@@ -630,6 +705,42 @@ class ModularTransitionWorkflowSession:
         ):
             raise TransitionWorkflowError(
                 "The modular workflow platform-core adapter is unavailable."
+            )
+
+        preparation = namespace["prepare_track_alignment"]
+        if (
+            type(preparation) is not _PrepareTrackAlignmentAdapter
+            or preparation.calculation is not self._modular_functions[
+                "prepare_track_alignment"
+            ]
+            or preparation.vector_factory is not getattr(
+                getattr(self.module, "App", None), "Vector", None,
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow track-preparation adapter is "
+                "unavailable."
+            )
+        preparation_calculation = self._modular_functions[
+            "prepare_track_alignment"
+        ]
+        preparation_globals = getattr(
+            preparation_calculation, "__globals__", None,
+        )
+        preparation_code = getattr(preparation_calculation, "__code__", None)
+        if (
+            not isinstance(preparation_globals, dict)
+            or preparation_code is None
+            or not {"_left_normal", "_dot_xy"} <= set(
+                preparation_code.co_names
+            )
+            or preparation_globals.get("_left_normal")
+            is not self._preparation_left_normal
+            or preparation_globals.get("_dot_xy")
+            is not self._preparation_dot_xy
+        ):
+            raise TransitionWorkflowError(
+                "The track-preparation domain closure is unavailable."
             )
 
         extensions = namespace["add_common_straight_extensions"]
@@ -775,7 +886,7 @@ class ModularTransitionWorkflowSession:
                 "The modular platform solver residual route is unavailable."
             )
 
-        # Product composition owns all fifteen current bindings. The frozen
+        # Product composition owns all eighteen current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -783,10 +894,8 @@ class ModularTransitionWorkflowSession:
                 ("clothoid_entry_displacement",),
             ),
             ("solve_transition_length", ("transition_start_signed_offset",)),
-        ) + PRODUCT_CALLER_ROUTES[:2] + (PRODUCT_CALLER_ROUTES[3],)
-        host_routes = (
-            PRODUCT_CALLER_ROUTES[2:3] + PRODUCT_CALLER_ROUTES[4:]
-        )
+        ) + PRODUCT_CALLER_ROUTES[:4]
+        host_routes = PRODUCT_CALLER_ROUTES[4:]
         routes = [
             (
                 name, self._modular_functions[name], targets,
@@ -851,7 +960,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 10,
+            "schema_version": 11,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,
