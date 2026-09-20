@@ -143,7 +143,11 @@ def _validate_product_boundary():
                 "def build_concentric_core(*arguments):\n"
                 "    return (clothoid_entry_displacement(*arguments),\n"
                 "            clothoid_exit_displacement(*arguments))\n"
+                "def build_platform_core(*arguments):\n"
+                "    return (platform_transition_displacement,\n"
+                "            platform_peak_curvature_factor)\n"
                 "def prepare_track_alignment(*arguments):\n"
+                "    assert callable(solve_platform_shape_parameter)\n"
                 "    return (transition_start_signed_offset(*arguments),\n"
                 "            solve_transition_length(*arguments),\n"
                 "            build_concentric_core(*arguments))\n"
@@ -183,6 +187,9 @@ def _validate_product_boundary():
             "build_straight_route",
             "alignment_station_data", "interpolate_alignment_station",
             "mirror_alignment_for_turn",
+            "platform_transition_displacement",
+            "platform_peak_curvature_factor",
+            "solve_platform_shape_parameter",
         )
     }
     host = FakeHost()
@@ -205,8 +212,8 @@ def _validate_product_boundary():
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 8,
-        "contract_id": "tracktemplate:phase7:alignment-handedness:1",
+        "schema_version": 9,
+        "contract_id": "tracktemplate:phase7:platform-transition:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),

@@ -425,12 +425,12 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 8
+        assert record["schema_version"] == 9
         assert record["contract_id"] == (
-            "tracktemplate:phase7:alignment-handedness:1"
+            "tracktemplate:phase7:platform-transition:1"
         )
-        assert len(record["function_names"]) == 11
-        assert len(workflow.PRODUCT_CALLER_ROUTES) == 38
+        assert len(record["function_names"]) == 14
+        assert len(workflow.PRODUCT_CALLER_ROUTES) == 39
         assert workflow.PRODUCT_CALLER_ROUTES == expected_caller_routes()
         assert tuple(record["function_names"][8:10]) == PAIR
         for name in workflow.PRODUCT_FUNCTION_NAMES:
@@ -537,7 +537,11 @@ def expected_caller_routes():
         )),
         ("prepare_track_alignment", (
             "transition_start_signed_offset", "solve_transition_length",
-            "build_concentric_core",
+            "build_concentric_core", "solve_platform_shape_parameter",
+        )),
+        ("build_platform_core", (
+            "platform_transition_displacement",
+            "platform_peak_curvature_factor",
         )),
         ("run_macro", ("main_circle_centre", "build_concentric_core",
                        "add_common_straight_extensions")),
@@ -579,9 +583,9 @@ def expected_caller_routes():
         )
     ]
     assert mirror_callers == ["run_macro"]
-    name, targets = routes[3]
+    name, targets = routes[4]
     assert name == "run_macro"
-    routes[3] = (name, targets + ("mirror_alignment_for_turn",))
+    routes[4] = (name, targets + ("mirror_alignment_for_turn",))
     return tuple(routes)
 
 

@@ -11,13 +11,16 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:alignment-handedness:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-transition:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
     "build_straight_route",
     "alignment_station_data", "interpolate_alignment_station",
     "mirror_alignment_for_turn",
+    "platform_transition_displacement",
+    "platform_peak_curvature_factor",
+    "solve_platform_shape_parameter",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -28,7 +31,12 @@ PRODUCT_CALLER_ROUTES = (
     (
         "prepare_track_alignment",
         ("transition_start_signed_offset", "solve_transition_length",
-         "build_concentric_core"),
+         "build_concentric_core", "solve_platform_shape_parameter"),
+    ),
+    (
+        "build_platform_core",
+        ("platform_transition_displacement",
+         "platform_peak_curvature_factor"),
     ),
     (
         "run_macro",
@@ -437,7 +445,47 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete eleven-function modular workflow is unavailable."
+                "The complete fourteen-function modular workflow is unavailable."
+            )
+        platform_globals = getattr(
+            self._modular_functions["solve_platform_shape_parameter"],
+            "__globals__",
+            None,
+        )
+        if (
+            not isinstance(platform_globals, dict)
+            or any(
+                getattr(self._modular_functions[name], "__globals__", None)
+                is not platform_globals
+                for name in (
+                    "platform_transition_displacement",
+                    "platform_peak_curvature_factor",
+                )
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The platform-transition domain closure is unavailable."
+            )
+        self._platform_transition_angle = platform_globals.get(
+            "platform_transition_angle"
+        )
+        self._platform_line_offset = platform_globals.get(
+            "platform_line_offset"
+        )
+        self._platform_parameter_grid = platform_globals.get(
+            "_platform_parameter_grid"
+        )
+        if not all(
+            callable(function)
+            and getattr(function, "__globals__", None) is platform_globals
+            for function in (
+                self._platform_transition_angle,
+                self._platform_line_offset,
+                self._platform_parameter_grid,
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The platform-transition domain closure is unavailable."
             )
         vector_factory = getattr(
             getattr(self.module, "App", None), "Vector", None,
@@ -604,7 +652,66 @@ class ModularTransitionWorkflowSession:
                 "The modular workflow handedness adapter is unavailable."
             )
 
-        # Product composition owns all eleven current bindings. The frozen
+        platform_solver = self._modular_functions[
+            "solve_platform_shape_parameter"
+        ]
+        platform_globals = getattr(platform_solver, "__globals__", None)
+        line_offset = self._platform_line_offset
+        line_offset_code = getattr(line_offset, "__code__", None)
+        if (
+            not isinstance(platform_globals, dict)
+            or getattr(line_offset, "__globals__", None) is not platform_globals
+            or line_offset_code is None
+            or "platform_transition_displacement"
+            not in line_offset_code.co_names
+            or platform_globals.get("platform_transition_displacement")
+            is not self._modular_functions[
+                "platform_transition_displacement"
+            ]
+        ):
+            raise TransitionWorkflowError(
+                "The modular platform line-offset route does not use its "
+                "selected displacement calculation."
+            )
+
+        solver_code = getattr(platform_solver, "__code__", None)
+        if (
+            solver_code is None
+            or not {
+                "_platform_parameter_grid",
+                "platform_line_offset",
+                "platform_transition_angle",
+                "platform_peak_curvature_factor",
+            } <= set(solver_code.co_names)
+            or platform_globals.get("_platform_parameter_grid")
+            is not self._platform_parameter_grid
+            or platform_globals.get("platform_line_offset")
+            is not self._platform_line_offset
+            or platform_globals.get("platform_transition_angle")
+            is not self._platform_transition_angle
+            or platform_globals.get("platform_peak_curvature_factor")
+            is not self._modular_functions[
+                "platform_peak_curvature_factor"
+            ]
+        ):
+            raise TransitionWorkflowError(
+                "The modular platform solver does not use its selected "
+                "domain calculations."
+            )
+        nested_residuals = [
+            item for item in solver_code.co_consts
+            if isinstance(item, type(solver_code))
+            and item.co_name == "squared_residual"
+        ]
+        if (
+            len(nested_residuals) != 1
+            or "platform_line_offset" not in nested_residuals[0].co_names
+        ):
+            raise TransitionWorkflowError(
+                "The modular platform solver residual route is unavailable."
+            )
+
+        # Product composition owns all fourteen current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -677,7 +784,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 8,
+            "schema_version": 9,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,

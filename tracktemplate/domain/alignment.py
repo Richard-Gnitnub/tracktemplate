@@ -21,6 +21,9 @@ __all__ = (
     "clothoid_entry_polyline_stations",
     "main_circle_centre",
     "mirror_alignment_for_turn",
+    "platform_transition_displacement",
+    "platform_peak_curvature_factor",
+    "solve_platform_shape_parameter",
     "transition_start_signed_offset",
     "solve_transition_length",
 )
@@ -371,6 +374,420 @@ def solve_transition_length(
             value_low = value_midpoint
 
     return 0.5 * (low + high)
+
+
+def platform_transition_displacement(
+    length,
+    radius,
+    shape_parameter,
+    transition_kind,
+    integration_steps=320,
+):
+    """Return local displacement and angle for a same-direction platform transition.
+
+    Curvature is a smooth polynomial with zero curvature and zero curvature
+    gradient at the straight end, exact 1/radius curvature and zero curvature
+    gradient at the circular end, plus an automatically solved smooth bump.
+    The bump allows a track to diverge to a wider concentric curve without using
+    a geometric reverse curve.
+    """
+    if radius <= 0.0:
+        raise ValueError("A platform-transition radius must be greater than zero.")
+    if length <= GEOMETRY_TOLERANCE:
+        return 0.0, 0.0, 0.0
+    if shape_parameter < -0.25 - 1.0e-10:
+        raise ValueError("A platform-transition shape parameter became invalid.")
+    if transition_kind not in ("entry", "exit"):
+        raise ValueError("Unknown platform-transition direction.")
+
+    steps = max(80, int(integration_steps))
+    if steps % 2:
+        steps += 1
+    interval = 1.0 / float(steps)
+    length_over_radius = length / radius
+    cosine_sum = 0.0
+    sine_sum = 0.0
+
+    for index in range(steps + 1):
+        u = index * interval
+        common_bump_integral = 16.0 * (
+            (u * u * u / 3.0)
+            - (u * u * u * u / 2.0)
+            + (u * u * u * u * u / 5.0)
+        )
+        if transition_kind == "entry":
+            heading = length_over_radius * (
+                (u * u * u)
+                - (0.5 * u * u * u * u)
+                + (shape_parameter * common_bump_integral)
+            )
+        else:
+            heading = length_over_radius * (
+                u
+                - (u * u * u)
+                + (0.5 * u * u * u * u)
+                + (shape_parameter * common_bump_integral)
+            )
+
+        weight = 1.0
+        if index not in (0, steps):
+            weight = 4.0 if index % 2 else 2.0
+        cosine_sum += weight * math.cos(heading)
+        sine_sum += weight * math.sin(heading)
+
+    scale = length * interval / 3.0
+    total_angle = length_over_radius * (
+        0.5 + ((8.0 / 15.0) * shape_parameter)
+    )
+    return scale * cosine_sum, scale * sine_sum, total_angle
+
+
+def platform_peak_curvature_factor(shape_parameter):
+    """Maximum curvature divided by the constant-curve curvature."""
+    candidates = [0.0, 1.0]
+    coefficient_a = 64.0 * shape_parameter
+    coefficient_b = -6.0 - (96.0 * shape_parameter)
+    coefficient_c = 6.0 + (32.0 * shape_parameter)
+
+    if abs(coefficient_a) <= 1.0e-14:
+        if abs(coefficient_b) > 1.0e-14:
+            root = -coefficient_c / coefficient_b
+            if 0.0 < root < 1.0:
+                candidates.append(root)
+    else:
+        discriminant = (
+            coefficient_b * coefficient_b
+            - (4.0 * coefficient_a * coefficient_c)
+        )
+        if discriminant >= 0.0:
+            root_term = math.sqrt(discriminant)
+            for root in (
+                (-coefficient_b - root_term) / (2.0 * coefficient_a),
+                (-coefficient_b + root_term) / (2.0 * coefficient_a),
+            ):
+                if 0.0 < root < 1.0:
+                    candidates.append(root)
+
+    maximum = 0.0
+    for u in candidates:
+        base = (3.0 * u * u) - (2.0 * u * u * u)
+        bump = 16.0 * shape_parameter * u * u * (1.0 - u) * (1.0 - u)
+        maximum = max(maximum, base + bump)
+    return max(1.0, maximum)
+
+
+def platform_transition_angle(length, radius, shape_parameter):
+    if length <= GEOMETRY_TOLERANCE:
+        return 0.0
+    return (length / radius) * (
+        0.5 + ((8.0 / 15.0) * shape_parameter)
+    )
+
+
+def platform_line_offset(
+    circle_centre,
+    radius,
+    length,
+    shape_parameter,
+    total_angle,
+    transition_kind,
+    integration_steps=240,
+):
+    """Signed normal coordinate of the straight attached to a transition."""
+    dx, dy, angle = platform_transition_displacement(
+        length,
+        radius,
+        shape_parameter,
+        transition_kind,
+        integration_steps,
+    )
+    centre_x, centre_y = circle_centre
+
+    if transition_kind == "entry":
+        return centre_y - (radius * math.cos(angle)) - dy
+
+    normal_x, normal_y = _left_normal(total_angle)
+    centre_normal_coordinate = (
+        (centre_x * normal_x) + (centre_y * normal_y)
+    )
+    transition_normal_displacement = (
+        (-dx * math.sin(angle)) + (dy * math.cos(angle))
+    )
+    return (
+        centre_normal_coordinate
+        - (radius * math.cos(angle))
+        + transition_normal_displacement
+    )
+
+
+def _platform_parameter_grid(lower, upper):
+    """Generate a dense, low-curvature-first search grid."""
+    if upper < lower:
+        return []
+
+    values = [lower]
+    if lower < 0.0 < upper:
+        negative_steps = 36
+        for index in range(1, negative_steps + 1):
+            fraction = index / float(negative_steps)
+            values.append(lower + ((0.0 - lower) * fraction))
+    elif upper <= 0.0:
+        steps = 80
+        for index in range(1, steps + 1):
+            fraction = index / float(steps)
+            values.append(lower + ((upper - lower) * fraction))
+        return values
+
+    positive_start = max(0.0, lower)
+    if upper > positive_start:
+        positive_steps = 240
+        for index in range(1, positive_steps + 1):
+            fraction = index / float(positive_steps)
+            # Quadratic spacing gives extra resolution near the gentlest shapes.
+            values.append(
+                positive_start
+                + ((upper - positive_start) * fraction * fraction)
+            )
+
+    if abs(values[-1] - upper) > 1.0e-12:
+        values.append(upper)
+    return values
+
+
+def solve_platform_shape_parameter(
+    circle_centre,
+    radius,
+    transition_length,
+    target_line_offset,
+    total_angle,
+    track_name,
+    end_name,
+    transition_kind,
+):
+    """Solve the gentlest same-direction platform transition for one end."""
+    if radius <= 0.0:
+        raise ValueError(
+            "The platform curve radius for '{}' must be greater than zero.".format(
+                track_name
+            )
+        )
+    if transition_length < 0.0:
+        raise ValueError(
+            "The {} platform transition for '{}' cannot be negative.".format(
+                end_name.lower(),
+                track_name,
+            )
+        )
+
+    if transition_length <= GEOMETRY_TOLERANCE:
+        actual_offset = platform_line_offset(
+            circle_centre,
+            radius,
+            0.0,
+            0.0,
+            total_angle,
+            transition_kind,
+        )
+        if abs(actual_offset - target_line_offset) > 1.0e-6:
+            raise ValueError(
+                "{} platform spacing for '{}' needs a non-zero transition length.\n\n"
+                "Requested signed straight offset: {:+.3f} mm\n"
+                "Zero-length offset: {:+.3f} mm".format(
+                    end_name,
+                    track_name,
+                    target_line_offset,
+                    actual_offset,
+                )
+            )
+        return {
+            "shape_parameter": 0.0,
+            "angle": 0.0,
+            "peak_factor": 1.0,
+            "minimum_radius": radius,
+        }
+
+    length_over_radius = transition_length / radius
+    minimum_shape = -0.187499
+    maximum_angle = max(1.0e-8, total_angle - 1.0e-8)
+    maximum_shape = (15.0 / 8.0) * (
+        (maximum_angle / length_over_radius) - 0.5
+    )
+
+    if maximum_shape < minimum_shape:
+        minimum_possible_angle = platform_transition_angle(
+            transition_length,
+            radius,
+            minimum_shape,
+        )
+        raise ValueError(
+            "The {} platform transition for '{}' is too long for the total turn.\n\n"
+            "Transition length: {:.3f} mm\n"
+            "Smallest possible transition angle: {:.3f} deg\n"
+            "Complete turn angle: {:.3f} deg\n\n"
+            "Shorten this transition or increase the complete turn angle.".format(
+                end_name.lower(),
+                track_name,
+                transition_length,
+                math.degrees(minimum_possible_angle),
+                math.degrees(total_angle),
+            )
+        )
+
+    grid = _platform_parameter_grid(minimum_shape, maximum_shape)
+    samples = []
+    for parameter in grid:
+        offset = platform_line_offset(
+            circle_centre,
+            radius,
+            transition_length,
+            parameter,
+            total_angle,
+            transition_kind,
+            integration_steps=240,
+        )
+        samples.append((parameter, offset - target_line_offset, offset))
+
+    brackets = []
+    exact_parameters = []
+    for parameter, difference, _offset in samples:
+        if abs(difference) <= 1.0e-7:
+            exact_parameters.append(parameter)
+    for first, second in zip(samples[:-1], samples[1:]):
+        if first[1] * second[1] < 0.0:
+            brackets.append((first[0], second[0]))
+
+    candidate_parameters = list(exact_parameters)
+
+    # A valid spacing can touch the edge of the achievable range without
+    # crossing it, so a sign-change search alone is insufficient. Refine the
+    # closest sampled point and accept it when the residual is negligible.
+    if samples:
+        best_index = min(range(len(samples)), key=lambda index: abs(samples[index][1]))
+        left_index = max(0, best_index - 1)
+        right_index = min(len(samples) - 1, best_index + 1)
+        search_low = samples[left_index][0]
+        search_high = samples[right_index][0]
+
+        if search_high > search_low:
+            golden_ratio = (math.sqrt(5.0) - 1.0) / 2.0
+
+            def squared_residual(parameter):
+                difference = platform_line_offset(
+                    circle_centre,
+                    radius,
+                    transition_length,
+                    parameter,
+                    total_angle,
+                    transition_kind,
+                    integration_steps=360,
+                ) - target_line_offset
+                return difference * difference
+
+            a = search_low
+            b = search_high
+            c = b - (golden_ratio * (b - a))
+            d = a + (golden_ratio * (b - a))
+            value_c = squared_residual(c)
+            value_d = squared_residual(d)
+            for _iteration in range(72):
+                if value_c <= value_d:
+                    b = d
+                    d = c
+                    value_d = value_c
+                    c = b - (golden_ratio * (b - a))
+                    value_c = squared_residual(c)
+                else:
+                    a = c
+                    c = d
+                    value_c = value_d
+                    d = a + (golden_ratio * (b - a))
+                    value_d = squared_residual(d)
+            minimum_parameter = 0.5 * (a + b)
+            minimum_residual = math.sqrt(squared_residual(minimum_parameter))
+            if minimum_residual <= 1.0e-5:
+                candidate_parameters.append(minimum_parameter)
+
+    for low, high in brackets:
+        value_low = platform_line_offset(
+            circle_centre,
+            radius,
+            transition_length,
+            low,
+            total_angle,
+            transition_kind,
+            integration_steps=320,
+        ) - target_line_offset
+
+        for _iteration in range(72):
+            midpoint = 0.5 * (low + high)
+            value_midpoint = platform_line_offset(
+                circle_centre,
+                radius,
+                transition_length,
+                midpoint,
+                total_angle,
+                transition_kind,
+                integration_steps=320,
+            ) - target_line_offset
+            if abs(value_midpoint) <= 1.0e-10 or (high - low) <= 1.0e-9:
+                low = midpoint
+                high = midpoint
+                break
+            if value_low * value_midpoint <= 0.0:
+                high = midpoint
+            else:
+                low = midpoint
+                value_low = value_midpoint
+        candidate_parameters.append(0.5 * (low + high))
+
+    if not candidate_parameters:
+        offsets = [item[2] for item in samples]
+        lower_offset = min(offsets)
+        upper_offset = max(offsets)
+        raise ValueError(
+            "{} platform spacing for '{}' cannot be produced with the entered "
+            "transition length while keeping all curvature in the same turn "
+            "direction.\n\n"
+            "Transition length: {:.3f} mm\n"
+            "Requested signed straight offset: {:+.3f} mm\n"
+            "Achievable signed range: {:+.3f} to {:+.3f} mm\n\n"
+            "Change the transition length, straight spacing, curve spacing, main "
+            "radius or total turn angle.".format(
+                end_name,
+                track_name,
+                transition_length,
+                target_line_offset,
+                lower_offset,
+                upper_offset,
+            )
+        )
+
+    # Prefer the solution with the largest minimum radius. This selects the
+    # gentlest valid curvature profile if the equation has more than one root.
+    candidates = []
+    for parameter in candidate_parameters:
+        angle = platform_transition_angle(
+            transition_length,
+            radius,
+            parameter,
+        )
+        peak_factor = platform_peak_curvature_factor(parameter)
+        candidates.append(
+            {
+                "shape_parameter": parameter,
+                "angle": angle,
+                "peak_factor": peak_factor,
+                "minimum_radius": radius / peak_factor,
+            }
+        )
+    candidates.sort(
+        key=lambda item: (
+            -item["minimum_radius"],
+            item["angle"],
+            abs(item["shape_parameter"]),
+        )
+    )
+    return candidates[0]
 
 
 def _rotate_xy(x, y, angle):

@@ -352,6 +352,7 @@ STATION_CALLER_NAMES = (
     "main_circle_centre",
     "build_concentric_core",
     "prepare_track_alignment",
+    "build_platform_core",
     "run_macro",
     "build_straight_routes",
     "alignment_progress_at_station",
@@ -395,7 +396,7 @@ def station_fixture_source():
     source = legacy.B15_PATH.read_text()
     tree = ast.parse(source)
     lines = source.splitlines(keepends=True)
-    names = set(STATION_CALLER_NAMES[5:]) | {
+    names = set(STATION_CALLER_NAMES[6:]) | {
         "alignment_station_data", "interpolate_alignment_station",
     }
     names.remove("CrossoverManagerPanel.use_picked_crossover_position")
@@ -751,7 +752,10 @@ def validate_contract():
         workflow.PRODUCT_FUNCTION_NAMES[:8]
     )
     assert contract["product_routing"]["caller_names"] == [
-        name for name, _targets in workflow.PRODUCT_CALLER_ROUTES[:5]
+        name for name, _targets in (
+            workflow.PRODUCT_CALLER_ROUTES[:3]
+            + workflow.PRODUCT_CALLER_ROUTES[4:6]
+        )
     ]
 
 
@@ -795,9 +799,9 @@ def validate_binding():
         else:
             raise AssertionError("Straight adapter is mutable")
         record = session.routing_record()
-        assert record["schema_version"] == 8
+        assert record["schema_version"] == 9
         assert record["contract_id"] == (
-            "tracktemplate:phase7:alignment-handedness:1"
+            "tracktemplate:phase7:platform-transition:1"
         )
         assert record["function_names"] == list(functions)
         assert record["caller_names"] == list(STATION_CALLER_NAMES)
@@ -825,7 +829,7 @@ def validate_binding():
                     lambda: workflow.ModularTransitionWorkflowSession(
                         source, invalid
                     ),
-                    "complete eleven-function",
+                    "complete fourteen-function",
                 )
                 assert core._snapshot(source) == before
         for absent in (False, True):

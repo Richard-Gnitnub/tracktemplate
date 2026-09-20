@@ -115,11 +115,11 @@ def validate():
                for name in transition_workflow.PRODUCT_FUNCTION_NAMES},
     )
     record = session.routing_record()
-    assert record["schema_version"] == 8
-    assert record["contract_id"] == "tracktemplate:phase7:alignment-handedness:1"
-    assert len(record["function_names"]) == 11
-    assert record["function_names"][-1] == proof.TARGET
-    assert len(transition_workflow.PRODUCT_CALLER_ROUTES) == 38
+    assert record["schema_version"] == 9
+    assert record["contract_id"] == "tracktemplate:phase7:platform-transition:1"
+    assert len(record["function_names"]) == 14
+    assert record["function_names"][10] == proof.TARGET
+    assert len(transition_workflow.PRODUCT_CALLER_ROUTES) == 39
     mirror = module.mirror_alignment_for_turn
     assert type(mirror) is transition_workflow._MirrorAlignmentForTurnAdapter
     assert mirror.calculation is api.mirror_alignment_for_turn

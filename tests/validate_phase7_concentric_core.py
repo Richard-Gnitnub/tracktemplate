@@ -52,6 +52,9 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "add_common_straight_extensions", "build_straight_route",
     "alignment_station_data", "interpolate_alignment_station",
     "mirror_alignment_for_turn",
+    "platform_transition_displacement",
+    "platform_peak_curvature_factor",
+    "solve_platform_shape_parameter",
 )
 TRANSITION_CASES = (
     (0.0, 0.0), (0.0, 25.0), (25.0, 0.0), (25.0, 60.0),
@@ -357,6 +360,13 @@ def _fixture(temporary_root):
         and node.name in {
             "dot_xy", "add_common_straight_extensions",
             "mirror_alignment_for_turn",
+            "platform_transition_displacement",
+            "platform_peak_curvature_factor",
+            "platform_transition_angle",
+            "platform_line_offset",
+            "_platform_parameter_grid",
+            "solve_platform_shape_parameter",
+            "build_platform_core",
         }
     })
     prelude = (
@@ -372,6 +382,7 @@ def _fixture(temporary_root):
         '    offset = transition_start_signed_offset(600.0, 600.0, 0.0)\n'
         '    length = solve_transition_length(600.0, 600.0, offset,\n'
         '        math.pi / 2.0, "Fixture", "Entry")\n'
+        '    assert callable(solve_platform_shape_parameter)\n'
         '    return build_concentric_core((0.0, 600.0), 600.0, length,\n'
         '        length, math.pi / 2.0, "Fixture")\n'
         'def run_macro():\n'
@@ -431,8 +442,8 @@ def validate_binding():
         assert session.module.LAUNCH_COUNT == 1
         record = session.routing_record()
         assert record == {
-            "schema_version": 8,
-            "contract_id": "tracktemplate:phase7:alignment-handedness:1",
+            "schema_version": 9,
+            "contract_id": "tracktemplate:phase7:platform-transition:1",
             "route": "modular", "comparison_route_available": False,
             "function_names": list(PRODUCT_FUNCTION_NAMES),
             "caller_names": list(STATION_CALLER_NAMES),
@@ -466,7 +477,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete eleven-function",
+                "complete fourteen-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 
