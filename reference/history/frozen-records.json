@@ -50,6 +50,6 @@
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-12-phase7-alignment-handedness-regression.md", "sha256": "83b793a53c434801d9c67c24dee9a5e25891c27e4794b8328df7d4d295515d19"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-19-phase7-platform-transitions-regression.md", "sha256": "0141c73d85a41636d0e8dcd1e2de193fc5512449dc9a53470439b4b85bab04e1"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-20-phase7-platform-core-regression.md", "sha256": "d16e4a8d777f9981db4862cbb857fd4e1a1242eb50821862cefc60ecdb1ed4d6"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-09-20-phase7-track-preparation-regression.md", "sha256": "7a0d09b98aef2cd730d37e293bf0f964c499b8d4c021436082811ff818e3f2f0"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-20-phase7-track-preparation-regression.md", "sha256": "fe5549728ef708194dcf8fbed00c34fa0441335226e304b7f60108d5c28ddfa0"}
   ]
 }

@@ -589,7 +589,8 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "`prepare_track_alignment` candidate has complete PASS evidence"
+        and "`prepare_track_alignment` candidate has PASS results "
+        "for all product checks"
         in owner_view
         and "PASS result from independent quality review" in owner_view
         and "Source-and-test repair accounting stays 2/2" in owner_view

@@ -1033,9 +1033,10 @@ def _validate_owner_view(plan: str) -> None:
         "All four exits are Pending",
         "Output has private-development status",
         "project status stays `unknown`",
-        "`prepare_track_alignment` candidate has complete PASS evidence",
+        "`prepare_track_alignment` candidate has PASS results "
+        "for all product checks",
         "PASS result from independent quality review",
-        "host-independent `prepare_track_alignment` calculation",
+        "host-independent `prepare_track_alignment` function",
         "schema `11`, eighteen selected functions and 39 callers",
         "zero product-semantic differences",
         "Source-and-test repair accounting stays 2/2",
