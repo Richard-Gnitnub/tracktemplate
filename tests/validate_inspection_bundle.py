@@ -65,6 +65,61 @@ def _fixture():
     return temporary, root
 
 
+def _deterministic_rg(directory):
+    path = pathlib.Path(directory) / "rg"
+    path.write_text(
+        "#!/usr/bin/env python3\n"
+        "import os\n"
+        "import pathlib\n"
+        "import re\n"
+        "import sys\n"
+        "\n"
+        "def selected_files(values):\n"
+        "    selected = []\n"
+        "    for value in values:\n"
+        "        path = pathlib.Path(value)\n"
+        "        if path.is_file():\n"
+        "            selected.append(path)\n"
+        "            continue\n"
+        "        for base, directories, names in os.walk(path):\n"
+        "            directories[:] = sorted(\n"
+        "                name for name in directories\n"
+        "                if not name.startswith('.')\n"
+        "                and name != 'benchmark-output'\n"
+        "            )\n"
+        "            selected.extend(\n"
+        "                pathlib.Path(base) / name\n"
+        "                for name in sorted(names)\n"
+        "                if not name.startswith('.')\n"
+        "            )\n"
+        "    return sorted(set(selected), key=lambda item: item.as_posix())\n"
+        "\n"
+        "arguments = sys.argv[1:]\n"
+        "if arguments[:2] == ['--files', '--']:\n"
+        "    for selected in selected_files(arguments[2:]):\n"
+        "        print(selected.as_posix())\n"
+        "    raise SystemExit(0)\n"
+        "if len(arguments) >= 4 and arguments[0] == '-n' "
+        "and arguments[2] == '--':\n"
+        "    pattern = re.compile(arguments[1])\n"
+        "    matched = False\n"
+        "    for selected in selected_files(arguments[3:]):\n"
+        "        try:\n"
+        "            lines = selected.read_text(encoding='utf-8').splitlines()\n"
+        "        except (OSError, UnicodeDecodeError):\n"
+        "            continue\n"
+        "        for number, line in enumerate(lines, start=1):\n"
+        "            if pattern.search(line):\n"
+        "                print(f'{number}:{line}')\n"
+        "                matched = True\n"
+        "    raise SystemExit(0 if matched else 1)\n"
+        "raise SystemExit(2)\n",
+        encoding="utf-8",
+    )
+    path.chmod(0o755)
+    return path.resolve()
+
+
 def _steps():
     return (
         {"name": "large-read", "command": ["cat", "--", "large.txt"]},
@@ -89,7 +144,7 @@ def _manifest(root, summary):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _validate_quiet_success_and_retention(root):
+def _validate_quiet_success_and_retention(root, fake_rg):
     stdout = io.StringIO()
     stderr = io.StringIO()
     with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
@@ -120,6 +175,8 @@ def _validate_quiet_success_and_retention(root):
         text=True,
     ).stdout.strip()
     by_name = {result["name"]: result for result in manifest["results"]}
+    assert by_name["search"]["executable"] == str(fake_rg)
+    assert by_name["inventory"]["executable"] == str(fake_rg)
     for result in by_name.values():
         assert pathlib.Path(result["executable"]).is_absolute()
         assert len(result["executable_sha256"]) == 64
@@ -425,6 +482,32 @@ def _validate_untrusted_executable_is_rejected(root):
             os.environ["PATH"] = original_path
 
 
+def _validate_missing_program_fails_closed(root, trusted_resolver):
+    harness_resolver = bundle._resolve_executable
+    original_which = bundle.shutil.which
+    bundle._resolve_executable = trusted_resolver
+    bundle.shutil.which = lambda program: (
+        None if program == "rg" else original_which(program)
+    )
+    try:
+        bundle.validate_steps(
+            (
+                {
+                    "name": "missing-search",
+                    "command": ["rg", "-n", "alpha", "--", "small.txt"],
+                },
+            ),
+            root,
+        )
+    except bundle.InspectionError as error:
+        assert "inspection program is unavailable" in str(error)
+    else:
+        raise AssertionError("a missing inspection program was accepted")
+    finally:
+        bundle.shutil.which = original_which
+        bundle._resolve_executable = harness_resolver
+
+
 def _validate_run_directory_collision(root):
     directory = root / "benchmark-output" / "inspection-bundles" / "collision"
     summary = bundle.run_bundle(
@@ -469,17 +552,30 @@ def _validate_symlinked_run_directory_is_rejected(root):
 
 def validate():
     temporary, root = _fixture()
+    programs = tempfile.TemporaryDirectory(
+        prefix="tracktemplate-inspection-programs-"
+    )
+    fake_rg = _deterministic_rg(programs.name)
+    trusted_resolver = bundle._resolve_executable
+    bundle._resolve_executable = lambda program, selected_root: (
+        fake_rg
+        if program == "rg"
+        else trusted_resolver(program, selected_root)
+    )
     try:
-        summary = _validate_quiet_success_and_retention(root)
+        summary = _validate_quiet_success_and_retention(root, fake_rg)
         _validate_every_run_is_fresh(root, summary)
         _validate_failure_is_bounded_and_complete(root)
         _validate_cli_is_compact_and_has_no_reuse(root)
         _validate_unsafe_steps(root)
         _validate_untrusted_executable_is_rejected(root)
+        _validate_missing_program_fails_closed(root, trusted_resolver)
         _validate_run_directory_collision(root)
         _validate_symlinked_run_directory_is_rejected(root)
         _validate_retrieval_and_tamper_detection(root, summary)
     finally:
+        bundle._resolve_executable = trusted_resolver
+        programs.cleanup()
         temporary.cleanup()
     print("Fresh inspection bundle contract passed")
 
