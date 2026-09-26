@@ -1047,9 +1047,11 @@ def _validate_owner_view(plan: str) -> None:
         "One GUI sample per state gives descriptive resources only",
         "locked Phase evidence keeps its recorded non-blocking trailing-space "
         "warning",
-        "The complete local transition profile passed. Documentation Review, "
-        "final deterministic validation and exact-head CI remain before "
-        "publication",
+        "The complete local transition profile has a PASS result",
+        "The completion route requires a replacement Documentation Review, "
+        "final deterministic validation, draft publication and exact-head CI",
+        "The replacement Documentation Review and final validation precede "
+        "draft publication",
         "D-P6-008",
         "recorded product limitations, comparison requirements and "
         "legacy-retirement conditions stay in full",

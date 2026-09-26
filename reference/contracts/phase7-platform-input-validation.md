@@ -30,8 +30,10 @@ index and requires a different track. It checks positive edge clearances and
 length. For `Outside one track`, it also checks positive width. For a `3D
 platform solid`, it checks positive height. When `vertical_end_ramps` is true,
 that height must be greater than the 1.0 mm template surface plus the
-`1.0e-8` mm geometry tolerance. A `Tapered` entry or exit needs a positive
-end length. `Edges only (2D)` needs `create_edges` to be true.
+`1.0e-8` mm geometry tolerance.
+
+A `Tapered` entry or exit needs a positive end length. `Edges only (2D)`
+needs `create_edges` to be true.
 
 When `check_clearance` is true, the function checks each selected track in
 order. Its minimum is the greater of `required_clearance` and half of the

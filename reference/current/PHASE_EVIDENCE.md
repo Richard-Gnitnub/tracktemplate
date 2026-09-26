@@ -18,18 +18,18 @@ The owner accepted the completed, independently reviewed
 | --- | --- |
 | Current state | Phase 7 is Open at 0/4. All four exits are Pending. PR #83 is integrated on protected main. The bounded `validate_platform_inputs` Level 2 candidate has direct, qualified and GUI PASS evidence and a no-blocker independent source-and-test review. Output stays at private-development status and project status stays `unknown`. |
 | What changed | The [retained result](#phase7-platform-input-validation-migration) puts the B14/B15-identical platform input gate in the Core domain and API. The B16 `calculate_platform_boundaries` caller binds the Core function directly. The candidate selects twenty functions and validates 39 callers with schema `13`. B14 and B15 stay unchanged. |
-| What now works | The direct 29-case and D-GOV-019 qualified comparisons, twelve affected previous qualified proofs and paired platform Create/Edit GUI check have PASS results. The GUI product-semantic result matches the protected-main baseline; invalid-clearance rejection leaves the document and history unchanged. Fresh independent source-and-test review found no blocker. The complete local transition profile passed. Documentation Review, final deterministic validation and exact-head CI remain before publication. |
+| What now works | The direct 29-case and D-GOV-019 qualified comparisons, twelve affected previous qualified proofs and paired platform Create/Edit GUI check have PASS results. The GUI product-semantic result matches the protected-main baseline. Invalid-clearance rejection leaves the document and history unchanged. Fresh independent source-and-test review found no blocker. The complete local transition profile has a PASS result. The completion route requires a replacement Documentation Review, final deterministic validation, draft publication and exact-head CI. |
 | Limitations/findings | This outcome used its normal 2/2 test-only repair passes. The original independent `BLOCKED` verdict and a no-proof FreeCADCmd invocation stay retained. PR #83's separate 2/2 and owner-authorised test-only exception remain historical. Its measured micro-call cost increased. One GUI sample per state gives descriptive resources only. The locked Phase evidence keeps its recorded non-blocking trailing-space warning. D-P6-008, all recorded limitations, comparison requirements and legacy-retirement conditions stay in full. |
-| Owner decision | After exact-green draft publication, Richard decides whether to integrate only this bounded Level 2 result. Integration accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
-| Next action | When final validation, one Documentation Review and exact-head CI pass, bring the draft exact head to Richard for the integration decision. |
+| Owner decision | Once a draft has exact-head CI PASS, Richard decides whether to integrate only this bounded Level 2 result. Integration accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
+| Next action | Bring Richard the exact head of a draft after its exact-head CI passes. The replacement Documentation Review and final validation precede draft publication. |
 
 <a id="phase7-platform-input-validation-migration"></a>
 ## Migration of platform input validation — 2026-09-26
 
-Protected main was `aeec41657c379531b939443619272270cb33cf31`
-after integration of PR #83. D-GOV-004 and the owner's 2026-09-26
-continuation authorise one bounded Level 2 result. D-P7-001 keeps Phase 7
-Open at 0/4 with all four exits Pending.
+The protected-main baseline after PR #83 is
+`aeec41657c379531b939443619272270cb33cf31`. D-GOV-004 and the owner's
+2026-09-26 continuation authorise one bounded Level 2 result. D-P7-001
+keeps Phase 7 Open at 0/4 with all four exits Pending.
 
 The B14 and B15 definitions of `validate_platform_inputs` are identical
 and remain unchanged. The Core calculation uses
@@ -43,14 +43,24 @@ validates 39 caller identities under schema `13`.
 The direct standalone and D-GOV-019 qualified FreeCAD comparisons each
 cover 29 cases and five read paths. The selected caller, binding rollback
 and unchanged FreeCAD document state have PASS results. Twelve affected
-previous qualified proofs also passed. One paired real-GUI platform Create
-and Edit check completed Undo/Redo, invalid-clearance rejection, Save,
-reopen and cleanup. Its product-semantic result equals the fresh protected-
-main baseline. The [detailed evidence](../benchmarks/2026-09-26-phase7-platform-input-validation-regression.md)
-retains the raw output, original failed proof, two classified test-only
-repairs, the first independent `BLOCKED` review, the fresh independent
-`ACCEPT` result and descriptive resource values. Normal repair accounting for this outcome is 2/2 exhausted. The
-separate PR #83 2/2 and owner exception stay historical.
+previous qualified proofs have PASS results. One paired real-GUI platform
+Create and Edit check covers Undo/Redo, invalid-clearance rejection, Save,
+reopen and cleanup. Its product-semantic result equals the fresh
+protected-main baseline.
+
+The [detailed evidence](../benchmarks/2026-09-26-phase7-platform-input-validation-regression.md)
+retains raw output and the original failed proof. It also retains two
+classified test-only repairs and both independent source-and-test reviews.
+The first review is `BLOCKED`. The second has an `ACCEPT` result. Normal
+repair accounting for this outcome is 2/2 exhausted. The separate PR #83
+2/2 and owner exception stay historical.
+
+The original Documentation Review for candidate `9b18b35c0d1136b372929ca7f9b162e853ef6453`
+is `BLOCKED`. The retained receipt SHA-256 is
+`63507297aedc230aa95a603243f61d0543ca47617ed7854cec1180703208f772`.
+It gives no approved correction set. The owner now approves the bounded
+railway meaning of `platform` and one replacement documentation lifecycle.
+The original verdict stays unchanged.
 
 This result contributes bounded evidence to Phase 7 Exits 1, 2 and 3. It
 accepts no exit. The one-sample GUI resource values give no D-P6-008

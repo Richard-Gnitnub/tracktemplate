@@ -604,9 +604,13 @@ def validate_documentation_profile(
         and "measured micro-call cost increased" in owner_view
         and "locked Phase evidence keeps its recorded non-blocking "
         "trailing-space warning" in owner_view
-        and "The complete local transition profile passed. Documentation "
-        "Review, final deterministic validation and exact-head CI remain "
-        "before publication" in owner_view
+        and "The complete local transition profile has a PASS result"
+        in owner_view
+        and "The completion route requires a replacement Documentation "
+        "Review, final deterministic validation, draft publication and "
+        "exact-head CI" in owner_view
+        and "The replacement Documentation Review and final validation "
+        "precede draft publication" in owner_view
         and "D-P6-008" in owner_view
         and "Integration accepts no Phase 7 exit, performance result, output "
         "status, wider migration, legacy retirement or release state"
