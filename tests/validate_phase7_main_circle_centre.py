@@ -42,6 +42,7 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "build_platform_core",
     "signed_side_factor", "effective_constant_radius",
     "prepare_track_alignment", "validate_connected_straight_routes",
+    "validate_platform_inputs",
 )
 SOURCE_HASHES = {
     "AdvancedTurnout.FCMacro": (
@@ -271,9 +272,9 @@ def validate_binding():
         assert session.module.run_macro.__globals__["main_circle_centre"] is (
             api.main_circle_centre
         )
-        assert session.routing_record()["schema_version"] == 12
+        assert session.routing_record()["schema_version"] == 13
         assert session.routing_record()["contract_id"] == (
-            "tracktemplate:phase7:connected-straight-validation:1"
+            "tracktemplate:phase7:platform-input-validation:1"
         )
         assert session.routing_record()["function_names"] == list(
             PRODUCT_FUNCTION_NAMES
@@ -293,7 +294,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete nineteen-function",
+                "complete twenty-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 

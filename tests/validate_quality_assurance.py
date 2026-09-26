@@ -589,20 +589,28 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "PR #82 integrated the bounded `prepare_track_alignment` result"
+        and "PR #83 is integrated on protected main" in owner_view
+        and "bounded `validate_platform_inputs` Level 2 candidate"
         in owner_view
-        and "connected straight route validation result is the current "
-        "Level 2 candidate" in owner_view
-        and "Independent source-and-test review found no blocker" in owner_view
-        and "normal repair accounting is 2/2 exhausted" in owner_view
-        and "one owner-authorised test-only exception is consumed"
+        and "Fresh independent source-and-test review found no blocker"
         in owner_view
-        and "PR #82's separate repair and exception history remains unchanged"
+        and "normal 2/2 test-only repair passes" in owner_view
+        and "original independent `BLOCKED` verdict" in owner_view
+        and "PR #83's separate 2/2 and owner-authorised test-only exception "
+        "remain historical" in owner_view
+        and "schema `13`, twenty selected functions and 39 caller identities"
         in owner_view
-        and "schema `12`, nineteen selected functions and 39 callers"
-        in owner_view
-        and "GUI product comparison has zero differences" in owner_view
+        and "The paired GUI product semantics match" in owner_view
         and "measured micro-call cost increased" in owner_view
+        and "locked Phase evidence keeps its recorded non-blocking "
+        "trailing-space warning" in owner_view
+        and "The complete local transition profile has a PASS result"
+        in owner_view
+        and "The completion route requires a replacement Documentation "
+        "Review, final deterministic validation, draft publication and "
+        "exact-head CI" in owner_view
+        and "The replacement Documentation Review and final validation "
+        "precede draft publication" in owner_view
         and "D-P6-008" in owner_view
         and "Integration accepts no Phase 7 exit, performance result, output "
         "status, wider migration, legacy retirement or release state"

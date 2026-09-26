@@ -548,7 +548,7 @@ def validate_contract(workflow, routing_record):
 
     product = contract["product_routing"]
     assert product["record_schema_version"] == 9
-    assert routing_record["schema_version"] == 12
+    assert routing_record["schema_version"] == 13
     assert product["route"] == routing_record["route"]
     assert product["comparison_route_available"] is False
     historical_names = [
@@ -557,6 +557,7 @@ def validate_contract(workflow, routing_record):
             "build_platform_core", "signed_side_factor",
             "effective_constant_radius", "prepare_track_alignment",
             "validate_connected_straight_routes",
+            "validate_platform_inputs",
         }
     ]
     assert product["function_names"] == historical_names
@@ -580,6 +581,11 @@ def validate_contract(workflow, routing_record):
                     "prepare_track_alignment", "signed_side_factor",
                     "validate_connected_straight_routes",
                 }
+            )
+        elif caller == "calculate_platform_boundaries":
+            targets = tuple(
+                target for target in targets
+                if target != "validate_platform_inputs"
             )
         historical_routes.append(
             {"caller": caller, "targets": list(targets)}
@@ -678,7 +684,7 @@ def _assert_binding_state(namespace, expected):
 
 
 def validate_binding_and_rollback():
-    """Prove the 19-function host route and every platform closure edge."""
+    """Prove the 20-function host route and every platform closure edge."""
     from tracktemplate import api
     from tracktemplate.compatibility import b15_workflow_host as loader
     from tracktemplate.compatibility import transition_workflow as workflow
@@ -713,8 +719,8 @@ def validate_binding_and_rollback():
         namespace = session.module.__dict__
         record = session.routing_record()
         assert record == {
-            "schema_version": 12,
-            "contract_id": "tracktemplate:phase7:connected-straight-validation:1",
+            "schema_version": 13,
+            "contract_id": "tracktemplate:phase7:platform-input-validation:1",
             "route": "modular",
             "comparison_route_available": False,
             "function_names": list(workflow.PRODUCT_FUNCTION_NAMES),
@@ -725,7 +731,7 @@ def validate_binding_and_rollback():
             "workflow_source_sha256": host.source_sha256,
             "mixed_route": False,
         }
-        assert len(record["function_names"]) == 19
+        assert len(record["function_names"]) == 20
         assert len(record["caller_names"]) == 39
         for name in PUBLIC:
             assert namespace[name] is getattr(api, name)
@@ -807,7 +813,7 @@ def validate_binding_and_rollback():
                 lambda candidate=candidate: workflow.ModularTransitionWorkflowSession(
                     invalid_host, candidate,
                 ),
-                "complete nineteen-function",
+                "complete twenty-function",
             )
             _assert_binding_state(invalid_namespace, invalid_before)
 

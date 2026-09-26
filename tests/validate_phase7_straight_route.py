@@ -405,6 +405,9 @@ def station_fixture_source():
         "CROSSOVER_HAND_AUTO", "TURNOUT_DEFAULT_GAUGE",
         "TURNOUT_DEFAULT_FLANGEWAY", "CROSSOVER_DEFAULT_MINIMUM_RADIUS",
         "GEOMETRY_TOLERANCE",
+        "PLATFORM_BETWEEN", "PLATFORM_OUTSIDE",
+        "PLATFORM_END_TAPERED", "PLATFORM_EDGES_ONLY",
+        "PLATFORM_SOLID",
     }
     selected = []
     for node in tree.body:
@@ -799,9 +802,9 @@ def validate_binding():
         else:
             raise AssertionError("Straight adapter is mutable")
         record = session.routing_record()
-        assert record["schema_version"] == 12
+        assert record["schema_version"] == 13
         assert record["contract_id"] == (
-            "tracktemplate:phase7:connected-straight-validation:1"
+            "tracktemplate:phase7:platform-input-validation:1"
         )
         assert record["function_names"] == list(functions)
         assert record["caller_names"] == list(STATION_CALLER_NAMES)
@@ -829,7 +832,7 @@ def validate_binding():
                     lambda: workflow.ModularTransitionWorkflowSession(
                         source, invalid
                     ),
-                    "complete nineteen-function",
+                    "complete twenty-function",
                 )
                 assert core._snapshot(source) == before
         for absent in (False, True):
