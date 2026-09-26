@@ -1033,8 +1033,8 @@ def _validate_owner_view(plan: str) -> None:
         "All four exits are Pending",
         "Output has private-development status",
         "project status stays `unknown`",
-        "PR #83 is integrated on protected main",
-        "bounded `validate_platform_inputs` Level 2 candidate",
+        "PR #84 is integrated on protected main",
+        "bounded `validate_platform_inputs` Level 2 result",
         "B14/B15-identical platform input gate in the Core domain and API",
         "schema `13`, twenty selected functions and 39 caller identities",
         "The paired GUI product semantics match",
@@ -1048,10 +1048,11 @@ def _validate_owner_view(plan: str) -> None:
         "locked Phase evidence keeps its recorded non-blocking trailing-space "
         "warning",
         "The complete local transition profile has a PASS result",
-        "The completion route requires a replacement Documentation Review, "
-        "final deterministic validation, draft publication and exact-head CI",
-        "The replacement Documentation Review and final validation precede "
-        "draft publication",
+        "The replacement Documentation Review approved the candidate with "
+        "three exact corrections; locked final validation and exact-head CI passed",
+        "A next draft needs a separate integration decision",
+        "The [capability matrix](CAPABILITY_MATRIX.md) now maps the integrated "
+        "evidence through PR #84",
         "D-P6-008",
         "recorded product limitations, comparison requirements and "
         "legacy-retirement conditions stay in full",
@@ -5296,7 +5297,8 @@ def _validate_capability_matrix(matrix: str) -> None:
         (
             "Straight track",
             "C — bounded straight/station workflow",
-            "A",
+            "P — bounded Core straight-route and station calculations with "
+            "selected B16 callers only",
             "A",
             "A",
             "A",
@@ -5305,7 +5307,10 @@ def _validate_capability_matrix(matrix: str) -> None:
             "[Phase 1 workflow inventory](phase-evidence/"
             "PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory); "
             "[straight/station series](benchmarks/"
-            "2026-07-20-b14-straight-station-workflow-series.md)",
+            "2026-07-20-b14-straight-station-workflow-series.md); "
+            "[Phase 7 straight-route contract](contracts/phase7-straight-route.md); "
+            "[Phase 7 connected-route contract](contracts/"
+            "phase7-connected-straight-validation.md)",
             "Partial",
         ),
         (
@@ -5340,7 +5345,8 @@ def _validate_capability_matrix(matrix: str) -> None:
         (
             "Multiple parallel tracks",
             "C — fixed two-track fixture",
-            "P — fixture-only Entry/Exit records for one secondary track",
+            "P — bounded Entry/Exit records, secondary-alignment preparation "
+            "and straight-route checks in B16 only",
             "P",
             "P — representative pair only",
             "P — transition records only",
@@ -5349,7 +5355,10 @@ def _validate_capability_matrix(matrix: str) -> None:
             "[Workflow coverage contract](contracts/"
             "phase1-workflow-coverage.json); [Phase 5 closeout](history/"
             "phase-closeouts/PHASE5_CLOSEOUT.md#"
-            "representative-multi-object-selection-and-edit-tranche)",
+            "representative-multi-object-selection-and-edit-tranche); "
+            "[Phase 7 preparation contract](contracts/phase7-track-preparation.md); "
+            "[Phase 7 connected-route contract](contracts/"
+            "phase7-connected-straight-validation.md)",
             "Partial",
         ),
         (
@@ -5460,7 +5469,8 @@ def _validate_capability_matrix(matrix: str) -> None:
             "Platforms",
             "P — substantial B14 source exists; the accepted inventory retains "
             "physical platform and wider-workflow gaps",
-            "A",
+            "P — bounded Core platform-transition and input calculations "
+            "selected in B16 only",
             "A",
             "A",
             "A",
@@ -5468,7 +5478,10 @@ def _validate_capability_matrix(matrix: str) -> None:
             "A",
             "[B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 workflow "
             "inventory](phase-evidence/PHASE1_INVENTORY.md#"
-            "release-critical-workflow-coverage-inventory)",
+            "release-critical-workflow-coverage-inventory); "
+            "[Phase 7 platform-core contract](contracts/phase7-platform-core.md); "
+            "[Phase 7 platform-input contract](contracts/"
+            "phase7-platform-input-validation.md)",
             "Partial",
         ),
         (

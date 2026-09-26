@@ -589,8 +589,8 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "PR #83 is integrated on protected main" in owner_view
-        and "bounded `validate_platform_inputs` Level 2 candidate"
+        and "PR #84 is integrated on protected main" in owner_view
+        and "bounded `validate_platform_inputs` Level 2 result"
         in owner_view
         and "Fresh independent source-and-test review found no blocker"
         in owner_view
@@ -606,11 +606,13 @@ def validate_documentation_profile(
         "trailing-space warning" in owner_view
         and "The complete local transition profile has a PASS result"
         in owner_view
-        and "The completion route requires a replacement Documentation "
-        "Review, final deterministic validation, draft publication and "
-        "exact-head CI" in owner_view
-        and "The replacement Documentation Review and final validation "
-        "precede draft publication" in owner_view
+        and "The replacement Documentation Review approved the candidate "
+        "with three exact corrections; locked final validation and "
+        "exact-head CI passed" in owner_view
+        and "A next draft needs a separate integration decision" in owner_view
+        and "The [capability matrix](CAPABILITY_MATRIX.md) now maps the "
+        "integrated evidence through PR #84"
+        in owner_view
         and "D-P6-008" in owner_view
         and "Integration accepts no Phase 7 exit, performance result, output "
         "status, wider migration, legacy retirement or release state"
