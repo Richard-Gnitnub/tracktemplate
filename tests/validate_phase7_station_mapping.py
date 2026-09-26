@@ -425,12 +425,12 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 14
+        assert record["schema_version"] == 15
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-longitudinal-bounds:1"
+            "tracktemplate:phase7:platform-heading-coverage:1"
         )
-        assert len(record["function_names"]) == 21
-        assert len(workflow.PRODUCT_CALLER_ROUTES) == 39
+        assert len(record["function_names"]) == 24
+        assert len(workflow.PRODUCT_CALLER_ROUTES) == 40
         assert workflow.PRODUCT_CALLER_ROUTES == expected_caller_routes()
         assert tuple(record["function_names"][8:10]) == PAIR
         for name in workflow.PRODUCT_FUNCTION_NAMES:
@@ -594,14 +594,27 @@ def expected_caller_routes():
         "mirror_alignment_for_turn", "validate_connected_straight_routes",
     ))
     for position, (name, targets) in enumerate(routes):
-        if name == "calculate_platform_boundaries":
+        if name == "platform_coverage_bounds":
+            routes[position] = (
+                name, targets + ("alignment_progress_at_station",),
+            )
+        elif name == "calculate_platform_boundaries":
             routes[position] = (
                 name, targets + ("validate_platform_inputs",
-                                 "resolve_platform_longitudinal_bounds"),
+                                 "resolve_platform_longitudinal_bounds",
+                                 "platform_coverage_bounds",
+                                 "station_for_progress_heading",
+                                 "alignment_progress_at_station"),
             )
-            break
-    else:
-        raise AssertionError("The inherited platform caller is missing")
+    assert any(name == "calculate_platform_boundaries"
+               for name, _targets in routes)
+    progress_position = next(
+        index for index, (name, _targets) in enumerate(routes)
+        if name == "alignment_progress_at_station"
+    )
+    routes.insert(progress_position + 1, (
+        "station_for_progress_heading", ("alignment_progress_at_station",),
+    ))
     return tuple(routes)
 
 

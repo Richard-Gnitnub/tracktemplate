@@ -1027,37 +1027,35 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        "Phase 6 is closed with four accepted exits and one deferred, unmet "
-        "obligation",
-        "Phase 7 is Open at 0/4",
-        "All four exits are Pending",
-        "Output has private-development status",
-        "project status stays `unknown`",
-        "PR #84 is in protected `main` at",
-        "Candidate `1180133c63026766369da3e33b69dd7c9869663e`",
-        "B14/B15-identical `resolve_platform_longitudinal_bounds`",
-        "schema `14`, 21 selected functions and 39 caller identities",
-        "The paired GUI platform Create/Edit product semantics match",
-        "no-blocker independent source-and-test review",
-        "The new result is at repair 1/2",
-        "PR #84's separate 2/2 test-only repairs, original `BLOCKED` review "
-        "and no-proof command remain historical",
-        "PR #83's separate repairs and exception remain historical",
-        "Its measured micro-call cost increased",
-        "One GUI sample per state gives no performance credit",
-        "locked Phase evidence keeps its recorded non-blocking trailing-space "
-        "warning",
-        "complete local transition profile have PASS results",
-        "The next owner boundary is Richard's integration decision on this "
-        "candidate after exact-green draft publication",
-        "The [capability matrix](CAPABILITY_MATRIX.md) records integrated "
-        "evidence through PR #84 only",
-        "D-P6-008",
-        "recorded product limitations, comparison requirements and "
-        "legacy-retirement conditions stay in full",
-        "This new candidate has no integration or Phase 7 exit decision",
-        "It accepts no Phase 7 exit, performance result, output status, "
-        "wider migration, legacy retirement or release state",
+        'Phase 6 is closed with four accepted exits',
+        'D-P6-008 records “one deferred, unmet obligation”',
+        'Phase 7 is Open at 0/4',
+        'All four exits are Pending',
+        'Output has private-development status',
+        'project status stays `unknown`',
+        'PR #85 is in protected `main` at `482eb4cb0dddbebdbe92d72fdaa3e1e98d2d5063`',
+        'The exact candidate moves functions for platform direction and station range. It has no merge',
+        'The `alignment_progress_at_station`, `station_for_progress_heading` and `platform_coverage_bounds` functions have the same source in B14 and B15',
+        'schema `15`, 24 selected functions and 40 caller identities',
+        'Tests in standalone Python and with the exact host profile in D-GOV-019 each have PASS results for 193 inputs',
+        'All 14 tests of the related routes have PASS results',
+        'Tests with the FreeCAD human interface give the same platform results for Create/Edit, Undo/Redo, Save/reopen and cleanup',
+        'Full validation and independent review are necessary before publication',
+        'The two usual repairs are completed (2/2)',
+        'No more usual repairs are permitted',
+        'The changes in the two owner decisions before the last decision and the last 1/1 decision for the caller check are completed',
+        'Those decisions give no more project authority for repairs',
+        'The first FAIL results and their failure classifications stay as retained evidence',
+        'The PR #83 and PR #84 histories for repair and review do not change',
+        'PR #83 records: “The measured micro-call cost increased.”',
+        'The locked Phase evidence keeps the recorded “non-blocking trailing-space warning”',
+        'The samples from the FreeCAD human interface give no improvement evidence for D-P6-008',
+        'D-P6-008 and all recorded product limitations apply in full',
+        'D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.”',
+        'The exact candidate has no merge or Phase 7 exit decision',
+        'It gives no acceptance for a Phase 7 exit, performance result, output status, migration of other functions, removal of those paths or a release',
+        'After draft publication with all necessary PASS results, Richard must decide whether to merge this result for its bounded scope',
+        'The [capability matrix](CAPABILITY_MATRIX.md) records evidence from protected `main` through PR #84 only',
     ):
         _require(
             fragment in owner_view,

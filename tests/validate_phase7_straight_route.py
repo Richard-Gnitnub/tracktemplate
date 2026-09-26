@@ -356,6 +356,7 @@ STATION_CALLER_NAMES = (
     "run_macro",
     "build_straight_routes",
     "alignment_progress_at_station",
+    "station_for_progress_heading",
     "platform_coverage_bounds",
     "sample_station_interval",
     "_project_centreline_to_reference_normal",
@@ -407,7 +408,8 @@ def station_fixture_source():
         "GEOMETRY_TOLERANCE",
         "PLATFORM_BETWEEN", "PLATFORM_OUTSIDE",
         "PLATFORM_END_TAPERED", "PLATFORM_EDGES_ONLY",
-        "PLATFORM_SOLID",
+        "PLATFORM_SOLID", "PLATFORM_CORE", "PLATFORM_CONSTANT",
+        "PLATFORM_ENTRY", "PLATFORM_EXIT",
     }
     selected = []
     for node in tree.body:
@@ -802,9 +804,9 @@ def validate_binding():
         else:
             raise AssertionError("Straight adapter is mutable")
         record = session.routing_record()
-        assert record["schema_version"] == 14
+        assert record["schema_version"] == 15
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-longitudinal-bounds:1"
+            "tracktemplate:phase7:platform-heading-coverage:1"
         )
         assert record["function_names"] == list(functions)
         assert record["caller_names"] == list(STATION_CALLER_NAMES)
@@ -832,7 +834,7 @@ def validate_binding():
                     lambda: workflow.ModularTransitionWorkflowSession(
                         source, invalid
                     ),
-                    "complete twenty-one-function",
+                    "complete twenty-four-function",
                 )
                 assert core._snapshot(source) == before
         for absent in (False, True):

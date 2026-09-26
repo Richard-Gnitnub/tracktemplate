@@ -166,7 +166,7 @@ def validate():
     if not baseline_only:
         functions = {name: getattr(api, name)
                      for name in workflow.PRODUCT_FUNCTION_NAMES}
-        assert proof.NAME in functions and len(functions) == 21
+        assert proof.NAME in functions and len(functions) == 24
         assert functions[proof.NAME] is (
             api.resolve_platform_longitudinal_bounds
         )
@@ -199,12 +199,12 @@ def validate():
 
         session = workflow.ModularTransitionWorkflowSession(host, functions)
         route = session.routing_record()
-        assert route["schema_version"] == 14
+        assert route["schema_version"] == 15
         assert route["contract_id"] == (
-            "tracktemplate:phase7:platform-longitudinal-bounds:1"
+            "tracktemplate:phase7:platform-heading-coverage:1"
         )
         assert route["function_names"] == list(functions)
-        assert len(route["caller_names"]) == 39
+        assert len(route["caller_names"]) == 40
         assert route["mixed_route"] is False
         selected = namespace[proof.NAME]
         assert selected is functions[proof.NAME]

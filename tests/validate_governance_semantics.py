@@ -3430,8 +3430,7 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_row = table_row_containing(plan, "**Current state**")
     inflated_view = replace_once(
         owner_view_row,
-        "Phase 6 is closed with four accepted exits and one deferred, unmet "
-        "obligation",
+        "Phase 6 is closed with four accepted exits",
         "Phase 6 is closed with five accepted exits",
     )
     owner_view_status = replace_once(plan, owner_view_row, inflated_view)
@@ -3439,7 +3438,7 @@ def validate_documentation_profile_mutations() -> None:
         "tt-doc/owner-view-status-contradiction",
         lambda: progress._validate_owner_view(owner_view_status),
         "project-plan owner view lost or contradicted: Phase 6 is closed with "
-        "four accepted exits and one deferred, unmet obligation",
+        "four accepted exits",
     )
     owner_view_authority = replace_once(
         plan,
@@ -3468,17 +3467,18 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_performance_widened = replace_once(
         plan,
-        "It accepts no Phase 7 exit, performance result, output status, "
-        "wider migration, legacy retirement or release state.",
+        "It gives no acceptance for a Phase 7 exit, performance result, "
+        "output status, migration of other functions, removal of those "
+        "paths or a release.",
         "It accepts the Phase 7 exit, performance result, output status, "
         "wider migration, legacy retirement and release state.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: It accepts no Phase "
-        "7 exit, performance result, output status, wider migration, "
-        "legacy retirement or release state",
+        "project-plan owner view lost or contradicted: It gives no acceptance "
+        "for a Phase 7 exit, performance result, output status, migration of "
+        "other functions, removal of those paths or a release",
     )
 
     compatibility_terms_removed = terminology

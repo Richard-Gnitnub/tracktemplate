@@ -112,11 +112,11 @@ def validate():
                for name in transition_workflow.PRODUCT_FUNCTION_NAMES},
     )
     record = session.routing_record()
-    assert record["schema_version"] == 14
-    assert len(record["function_names"]) == 21
-    assert len(transition_workflow.PRODUCT_CALLER_ROUTES) == 39
+    assert record["schema_version"] == 15
+    assert len(record["function_names"]) == 24
+    assert len(transition_workflow.PRODUCT_CALLER_ROUTES) == 40
     assert record["contract_id"] == (
-        "tracktemplate:phase7:platform-longitudinal-bounds:1"
+        "tracktemplate:phase7:platform-heading-coverage:1"
     )
     pair = tuple(getattr(module, name) for name in proof.PAIR)
     assert type(pair[0]) is transition_workflow._AlignmentStationDataAdapter
@@ -138,6 +138,17 @@ def validate():
             caller = getattr(getattr(module, owner), method)
         else:
             caller = getattr(module, caller_name)
+        if caller_name == "alignment_progress_at_station":
+            assert type(caller) is transition_workflow._AlignmentProgressAdapter
+            assert caller.calculation is api.alignment_progress_at_station
+            assert caller.interpolation is module.interpolate_alignment_station
+            continue
+        if caller_name == "platform_coverage_bounds":
+            assert type(caller) is transition_workflow._PlatformCoverageAdapter
+            assert caller.calculation is api.platform_coverage_bounds
+            assert caller.station_data is module.alignment_station_data
+            assert caller.progress is module.alignment_progress_at_station
+            continue
         assert caller.__globals__ is module.__dict__
         for target in targets:
             assert caller.__globals__[target] is getattr(module, target)

@@ -548,7 +548,7 @@ def validate_contract(workflow, routing_record):
 
     product = contract["product_routing"]
     assert product["record_schema_version"] == 9
-    assert routing_record["schema_version"] == 14
+    assert routing_record["schema_version"] == 15
     assert product["route"] == routing_record["route"]
     assert product["comparison_route_available"] is False
     historical_names = [
@@ -559,14 +559,20 @@ def validate_contract(workflow, routing_record):
             "validate_connected_straight_routes",
             "validate_platform_inputs",
             "resolve_platform_longitudinal_bounds",
+            "alignment_progress_at_station",
+            "station_for_progress_heading",
+            "platform_coverage_bounds",
         }
     ]
     assert product["function_names"] == historical_names
     assert product["caller_names"] == [
         caller for caller, _targets in workflow.PRODUCT_CALLER_ROUTES
+        if caller != "station_for_progress_heading"
     ]
     historical_routes = []
     for caller, targets in workflow.PRODUCT_CALLER_ROUTES:
+        if caller == "station_for_progress_heading":
+            continue
         if caller == "prepare_track_alignment":
             targets = tuple(
                 target for target in targets
@@ -589,8 +595,14 @@ def validate_contract(workflow, routing_record):
                 if target not in {
                     "validate_platform_inputs",
                     "resolve_platform_longitudinal_bounds",
+                    "platform_coverage_bounds",
+                    "station_for_progress_heading",
+                    "alignment_progress_at_station",
                 }
             )
+        elif caller == "platform_coverage_bounds":
+            targets = tuple(target for target in targets
+                            if target != "alignment_progress_at_station")
         historical_routes.append(
             {"caller": caller, "targets": list(targets)}
         )
@@ -723,9 +735,9 @@ def validate_binding_and_rollback():
         namespace = session.module.__dict__
         record = session.routing_record()
         assert record == {
-            "schema_version": 14,
+            "schema_version": 15,
             "contract_id": (
-                "tracktemplate:phase7:platform-longitudinal-bounds:1"
+                "tracktemplate:phase7:platform-heading-coverage:1"
             ),
             "route": "modular",
             "comparison_route_available": False,
@@ -737,8 +749,8 @@ def validate_binding_and_rollback():
             "workflow_source_sha256": host.source_sha256,
             "mixed_route": False,
         }
-        assert len(record["function_names"]) == 21
-        assert len(record["caller_names"]) == 39
+        assert len(record["function_names"]) == 24
+        assert len(record["caller_names"]) == 40
         for name in PUBLIC:
             assert namespace[name] is getattr(api, name)
         preparation = namespace["prepare_track_alignment"]
@@ -819,7 +831,7 @@ def validate_binding_and_rollback():
                 lambda candidate=candidate: workflow.ModularTransitionWorkflowSession(
                     invalid_host, candidate,
                 ),
-                "complete twenty-one-function",
+                "complete twenty-four-function",
             )
             _assert_binding_state(invalid_namespace, invalid_before)
 

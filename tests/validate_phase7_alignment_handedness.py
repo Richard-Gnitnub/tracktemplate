@@ -485,14 +485,14 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 14
+        assert record["schema_version"] == 15
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-longitudinal-bounds:1"
+            "tracktemplate:phase7:platform-heading-coverage:1"
         )
-        assert len(record["function_names"]) == 21
+        assert len(record["function_names"]) == 24
         assert record["function_names"][10] == TARGET
         assert workflow.PRODUCT_CALLER_ROUTES == station.expected_caller_routes()
-        assert len(workflow.PRODUCT_CALLER_ROUTES) == 39
+        assert len(workflow.PRODUCT_CALLER_ROUTES) == 40
         adapter = namespace[TARGET]
         assert type(adapter) is workflow._MirrorAlignmentForTurnAdapter
         assert adapter.calculation is api.mirror_alignment_for_turn

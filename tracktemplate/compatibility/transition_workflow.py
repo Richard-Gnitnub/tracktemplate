@@ -11,7 +11,7 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-longitudinal-bounds:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-heading-coverage:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
@@ -26,6 +26,8 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "prepare_track_alignment", "validate_connected_straight_routes",
     "validate_platform_inputs",
     "resolve_platform_longitudinal_bounds",
+    "alignment_progress_at_station", "station_for_progress_heading",
+    "platform_coverage_bounds",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -59,8 +61,12 @@ PRODUCT_CALLER_ROUTES = (
         ("interpolate_alignment_station",),
     ),
     (
+        "station_for_progress_heading",
+        ("alignment_progress_at_station",),
+    ),
+    (
         "platform_coverage_bounds",
-        ("alignment_station_data",),
+        ("alignment_station_data", "alignment_progress_at_station"),
     ),
     (
         "sample_station_interval",
@@ -77,7 +83,9 @@ PRODUCT_CALLER_ROUTES = (
     (
         "calculate_platform_boundaries",
         ("alignment_station_data", "interpolate_alignment_station",
-         "validate_platform_inputs", "resolve_platform_longitudinal_bounds"),
+         "validate_platform_inputs", "resolve_platform_longitudinal_bounds",
+         "platform_coverage_bounds", "station_for_progress_heading",
+         "alignment_progress_at_station"),
     ),
     (
         "create_between_alignments_face",
@@ -525,6 +533,87 @@ class _AlignmentStationInterpolationAdapter:
 
 
 @dataclass(frozen=True)
+class _AlignmentProgressAdapter:
+    """Keep the inherited point allocation before reading turn progress."""
+
+    calculation: object
+    interpolation: object
+
+    def __call__(self, data, station, turn_sign):
+        def heading_at_station(_view, selected_station):
+            _point, heading = self.interpolation(data, selected_station)
+            return heading
+
+        return self.calculation(
+            _StationDataView(data), station, turn_sign,
+            _heading_at_station=heading_at_station,
+        )
+
+
+@dataclass(frozen=True)
+class _StationForProgressAdapter:
+    """Keep the selected host interpolation at every bisection point."""
+
+    calculation: object
+    progress: object
+
+    def __call__(self, data, target_progress, turn_sign):
+        def progress_at_station(_view, station, selected_sign):
+            return self.progress(data, station, selected_sign)
+
+        return self.calculation(
+            _StationDataView(data), target_progress, turn_sign,
+            _progress_at_station=progress_at_station,
+        )
+
+
+@dataclass(frozen=True)
+class _CoverageAlignmentView:
+    """Expose only inherited mapping reads to the Core coverage rule."""
+
+    alignment: object
+
+    def get(self, key, default):
+        return self.alignment.get(key, default)
+
+
+@dataclass(frozen=True)
+class _CoverageAlignmentsView:
+    """Preserve the original truth test and lazy alignment iteration."""
+
+    alignments: object
+
+    def __bool__(self):
+        return bool(self.alignments)
+
+    def __iter__(self):
+        for alignment in self.alignments:
+            yield _CoverageAlignmentView(alignment)
+
+
+@dataclass(frozen=True)
+class _PlatformCoverageAdapter:
+    """Keep host points outside Core and reuse selected station adapters."""
+
+    calculation: object
+    station_data: object
+    progress: object
+
+    def _station_data(self, alignment):
+        return _StationDataView(self.station_data(alignment.alignment))
+
+    def _progress_at_station(self, data, station, turn_sign):
+        return self.progress(data._data, station, turn_sign)
+
+    def __call__(self, alignments, coverage, turn_sign):
+        return self.calculation(
+            _CoverageAlignmentsView(alignments), coverage, turn_sign,
+            _station_data=self._station_data,
+            _progress_at_station=self._progress_at_station,
+        )
+
+
+@dataclass(frozen=True)
 class _MirrorAlignmentView:
     """Read neutral points lazily while retaining inherited mapping access."""
 
@@ -572,7 +661,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete twenty-one-function modular workflow is unavailable."
+                "The complete twenty-four-function modular workflow is unavailable."
             )
         platform_globals = getattr(
             self._modular_functions["solve_platform_shape_parameter"],
@@ -727,6 +816,25 @@ class ModularTransitionWorkflowSession:
             _AlignmentStationInterpolationAdapter(
                 self._modular_functions["interpolate_alignment_station"],
                 vector_factory,
+            )
+        )
+        self._host_functions["alignment_progress_at_station"] = (
+            _AlignmentProgressAdapter(
+                self._modular_functions["alignment_progress_at_station"],
+                self._host_functions["interpolate_alignment_station"],
+            )
+        )
+        self._host_functions["station_for_progress_heading"] = (
+            _StationForProgressAdapter(
+                self._modular_functions["station_for_progress_heading"],
+                self._host_functions["alignment_progress_at_station"],
+            )
+        )
+        self._host_functions["platform_coverage_bounds"] = (
+            _PlatformCoverageAdapter(
+                self._modular_functions["platform_coverage_bounds"],
+                self._host_functions["alignment_station_data"],
+                self._host_functions["alignment_progress_at_station"],
             )
         )
         self._host_functions["mirror_alignment_for_turn"] = (
@@ -971,6 +1079,48 @@ class ModularTransitionWorkflowSession:
                 "unavailable."
             )
 
+        progress = namespace["alignment_progress_at_station"]
+        station_for_progress = namespace["station_for_progress_heading"]
+        coverage = namespace["platform_coverage_bounds"]
+        if (
+            type(progress) is not _AlignmentProgressAdapter
+            or progress.calculation is not self._modular_functions[
+                "alignment_progress_at_station"
+            ]
+            or progress.interpolation is not interpolation
+            or type(station_for_progress) is not _StationForProgressAdapter
+            or station_for_progress.calculation is not self._modular_functions[
+                "station_for_progress_heading"
+            ]
+            or station_for_progress.progress is not progress
+            or type(coverage) is not _PlatformCoverageAdapter
+            or coverage.calculation is not self._modular_functions[
+                "platform_coverage_bounds"
+            ]
+            or coverage.station_data is not station_data
+            or coverage.progress is not progress
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow platform station adapters are unavailable."
+            )
+        constants = (
+            "PLATFORM_CORE", "PLATFORM_CONSTANT", "PLATFORM_ENTRY",
+            "PLATFORM_EXIT",
+        )
+        coverage_globals = getattr(coverage.calculation, "__globals__", None)
+        if (
+            coverage_globals is not preparation_globals
+            or any(
+                type(coverage_globals.get(name))
+                is not type(getattr(self.module, name, None))
+                or coverage_globals.get(name) != getattr(self.module, name, None)
+                for name in constants
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The platform coverage domain constants are unavailable."
+            )
+
         mirror = namespace["mirror_alignment_for_turn"]
         if (
             type(mirror) is not _MirrorAlignmentForTurnAdapter
@@ -1053,7 +1203,7 @@ class ModularTransitionWorkflowSession:
                 "The modular platform solver residual route is unavailable."
             )
 
-        # Product composition owns all twenty-one current bindings. The frozen
+        # Product composition owns all twenty-four current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -1061,8 +1211,20 @@ class ModularTransitionWorkflowSession:
                 ("clothoid_entry_displacement",),
             ),
             ("solve_transition_length", ("transition_start_signed_offset",)),
-        ) + PRODUCT_CALLER_ROUTES[:4]
-        host_routes = PRODUCT_CALLER_ROUTES[4:]
+        ) + PRODUCT_CALLER_ROUTES[:4] + tuple(
+            route for route in PRODUCT_CALLER_ROUTES[4:]
+            if route[0] in {
+                "alignment_progress_at_station", "station_for_progress_heading",
+                "platform_coverage_bounds",
+            }
+        )
+        host_routes = tuple(
+            route for route in PRODUCT_CALLER_ROUTES[4:]
+            if route[0] not in {
+                "alignment_progress_at_station", "station_for_progress_heading",
+                "platform_coverage_bounds",
+            }
+        )
         routes = [
             (
                 name, self._modular_functions[name], targets,
@@ -1127,7 +1289,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 14,
+            "schema_version": 15,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,
