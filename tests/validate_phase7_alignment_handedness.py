@@ -485,11 +485,11 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 11
+        assert record["schema_version"] == 12
         assert record["contract_id"] == (
-            "tracktemplate:phase7:track-preparation:1"
+            "tracktemplate:phase7:connected-straight-validation:1"
         )
-        assert len(record["function_names"]) == 18
+        assert len(record["function_names"]) == 19
         assert record["function_names"][10] == TARGET
         assert workflow.PRODUCT_CALLER_ROUTES == station.expected_caller_routes()
         assert len(workflow.PRODUCT_CALLER_ROUTES) == 39
@@ -550,7 +550,7 @@ def validate_binding():
         assert session.routing_record() == record
         for absent in (None, *workflow.PRODUCT_FUNCTION_NAMES):
             fresh = loader.load_b15_workflow_host(temporary_root, contract)
-            if absent is not None:
+            if absent is not None and absent in fresh.module.__dict__:
                 fresh.module.__dict__.pop(absent)
             prior = dict(fresh.module.__dict__)
             with mock.patch.object(

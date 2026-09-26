@@ -477,9 +477,19 @@ def validate_contract():
 
     routing = contract["product_routing"]
     assert routing["record_schema_version"] == 11
-    assert routing["function_names"] == list(
-        transition_workflow.PRODUCT_FUNCTION_NAMES
-    )
+    assert routing["function_names"] == [
+        "clothoid_entry_displacement",
+        "transition_start_signed_offset", "solve_transition_length",
+        "main_circle_centre", "clothoid_exit_displacement",
+        "build_concentric_core", "add_common_straight_extensions",
+        "build_straight_route", "alignment_station_data",
+        "interpolate_alignment_station", "mirror_alignment_for_turn",
+        "platform_transition_displacement",
+        "platform_peak_curvature_factor",
+        "solve_platform_shape_parameter", "build_platform_core",
+        "signed_side_factor", "effective_constant_radius",
+        "prepare_track_alignment",
+    ]
     assert routing["caller_names"] == [
         name for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
     ]
@@ -595,14 +605,14 @@ def validate_binding():
             _functions(),
         )
         record = session.routing_record()
-        assert record["schema_version"] == 11
+        assert record["schema_version"] == 12
         assert record["contract_id"] == (
-            "tracktemplate:phase7:track-preparation:1"
+            "tracktemplate:phase7:connected-straight-validation:1"
         )
         assert record["function_names"] == list(
             transition_workflow.PRODUCT_FUNCTION_NAMES
         )
-        assert len(record["function_names"]) == 18
+        assert len(record["function_names"]) == 19
         assert record["caller_names"] == [
             name
             for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
@@ -686,7 +696,7 @@ def validate_binding():
                 fresh,
                 invalid,
             ),
-            "complete eighteen-function",
+            "complete nineteen-function",
         )
         assert core_proof._snapshot(fresh) == before
         assert fresh.module.LAUNCH_COUNT == 0

@@ -16,12 +16,58 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is Open at 0/4. All four exits are Pending. The bounded `prepare_track_alignment` candidate has PASS results for all product checks and a PASS result from independent quality review. Source-and-test repair accounting stays 2/2. The five exceptions for tests have project-owner authority. All five exceptions are consumed. |
-| What changed | The three functions use `tracktemplate.domain.alignment` through `tracktemplate.api`. The B16 `run_macro` caller uses an adapter to make FreeCAD vectors from new XY points. The workflow selects eighteen functions and validates 39 callers with schema `11`. |
-| What now works | The bounded B14/B15 comparisons, standalone Python checks, FreeCAD checks and transition lifecycle checks have PASS results. The PR #80 comparison baseline and new GUI candidate have zero product-semantic differences. |
-| Limitations/findings | The initial FreeCAD matrix has 8 PASS / 2 FAIL. After the fixture changes, its two proofs gave PASS results with their necessary sentinels. Each GUI state has one sample. Resource values are descriptive only. The measured wall times increased. D-P6-008, all recorded product limitations and all comparison and legacy-retirement conditions stay in full. |
-| Owner decision | After exact-green draft publication, Richard must make the integration decision for only this bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status, wider migration or release state. |
-| Next action | Complete the review and validation route. Publish one exact-green draft. Give its exact head to Richard for the integration decision. |
+| Current state | Phase 7 is Open at 0/4. All four exits are Pending. PR #82 integrated the bounded `prepare_track_alignment` result on protected main. The connected straight route validation result is the current Level 2 candidate. Output stays at private-development status and project status stays `unknown`. |
+| What changed | The [current result](#phase7-connected-straight-validation-migration) puts one B14/B15-identical safety calculation in the Core domain and API. The B16 `run_macro` caller uses a read-only adapter before production. The candidate selects nineteen functions and validates 39 callers with schema `12`. |
+| What now works | The direct B14/B15 comparisons, complete 74/74 standalone profile, 13 qualified headless gates, three transition checks and connected Generate/Replace GUI check have PASS results. The retained main baseline and the new GUI candidate have zero product-semantic differences. Independent source-and-test review found no blocker. |
+| Limitations/findings | This outcome's normal repair accounting is 2/2 exhausted. Its one owner-authorised test-only exception is consumed. PR #82's earlier 2/2 and five exceptions remain historical evidence. The micro-call cost increased; the GUI has one sample per state at different times. These resource values give no performance acceptance. D-P6-008, all recorded limitations, comparison requirements and legacy-retirement conditions stay in full. |
+| Owner decision | After exact-green draft publication, Richard must decide whether to integrate only the bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
+| Next action | Complete the one Documentation Review and final document validation. Publish one exact-green draft, then give its exact head to Richard for the bounded integration decision. |
+
+<a id="phase7-connected-straight-validation-migration"></a>
+## Migration of connected straight route validation — 2026-09-26
+
+Protected main was `1a9d1d679f75b0893a0351619f79b5fcb70adad2`
+when this task started. PR #82 was integrated at that identity. D-GOV-004
+and the owner's 2026-09-26 continuation authorise this one Level 2 result.
+D-P7-001 keeps the Phase 7 scope and its four exit criteria unchanged.
+
+The B14 and B15 definitions of `validate_connected_straight_routes` are
+equal and stay unchanged. The calculation now uses
+`tracktemplate.domain.alignment` through `tracktemplate.api`. The B16
+`run_macro` caller uses a read-only adapter for existing FreeCAD point
+coordinates. It calls the selected validation before production starts.
+The [API instructions](../contracts/phase7-connected-straight-validation.md)
+preserve the exact diagnostic, operation order, limits and input state. The
+candidate routing record selects nineteen functions, validates 39 caller
+identities and uses schema `12`.
+
+The direct standalone and qualified FreeCAD comparisons each cover 71
+cases. The qualified headless matrix gave PASS results for all 13 required
+gates and their success sentinels. The isolated connected Generate/Replace
+GUI candidate completed the edit, rejection, Undo/Redo, Save, reopen and
+cleanup operations. Its complete product result equals the retained
+current-main baseline with zero differences.
+
+This outcome used both normal source-and-test repair passes. The owner
+authorised one separate test-only exception to correct two synthetic-host
+rollback tests. The original failures and the PASS reruns remain in the
+[detailed evidence](../benchmarks/2026-09-26-phase7-connected-straight-validation-regression.md).
+Independent source-and-test review found no blocker. The complete standalone
+pipeline gave 74/74 PASS results. Three remaining transition checks also
+passed. The one Documentation Review and final document validation, then
+exact-head CI, are still necessary for draft publication.
+
+The measured micro-call cost increased. The GUI result has one sample per
+state at different times and uncontrolled cache and scheduling. These
+resource values are descriptive only. The proof does not compare
+physical-platform results, sectioning results, all Core layouts or export
+bytes. This result supplies bounded evidence for Phase 7 Exits 1, 2 and 3,
+and reduces one remaining legacy operation for Exit 4. It accepts no exit.
+Phase 7 stays Open at 0/4 and all four exits stay Pending. D-P6-008, all
+recorded limitations, comparison requirements and legacy-retirement
+conditions stay in full. Project status stays `unknown` and output stays
+at private-development status. Only Richard can authorise integration of
+the new exact-green draft.
 
 <a id="freecad-1-1-3-py31315-qt6112-qualification-panel"></a>
 ## D-GOV-019 qualification panel for the current FreeCAD stack

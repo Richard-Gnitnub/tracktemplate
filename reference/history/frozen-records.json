@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "accepted-frozen-records",
-  "updated_on": "2026-09-20",
+  "updated_on": "2026-09-26",
   "records": [
     {"category": "phase-closeout", "path": "reference/phase-evidence/BASELINE.md", "sha256": "ebbf117a0459ad85501544a0ebf993edbe528af69c9f6fb4d358f1042c871e1b"},
     {"category": "phase-closeout", "path": "reference/phase-evidence/PHASE1_CLOSEOUT.md", "sha256": "b2be49068364853691ccf9e4e0ce611e7081b1c8b1a0a8b361a263da1da03a73"},
@@ -50,6 +50,7 @@
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-12-phase7-alignment-handedness-regression.md", "sha256": "83b793a53c434801d9c67c24dee9a5e25891c27e4794b8328df7d4d295515d19"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-19-phase7-platform-transitions-regression.md", "sha256": "0141c73d85a41636d0e8dcd1e2de193fc5512449dc9a53470439b4b85bab04e1"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-20-phase7-platform-core-regression.md", "sha256": "d16e4a8d777f9981db4862cbb857fd4e1a1242eb50821862cefc60ecdb1ed4d6"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-09-20-phase7-track-preparation-regression.md", "sha256": "fe5549728ef708194dcf8fbed00c34fa0441335226e304b7f60108d5c28ddfa0"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-20-phase7-track-preparation-regression.md", "sha256": "fe5549728ef708194dcf8fbed00c34fa0441335226e304b7f60108d5c28ddfa0"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-connected-straight-validation-regression.md", "sha256": "bd72518633aa946009c360e516adaf0302edec5f954758eb6407719fb35e517c"}
   ]
 }

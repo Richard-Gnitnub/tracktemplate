@@ -11,7 +11,7 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:track-preparation:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:connected-straight-validation:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
@@ -23,7 +23,7 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "solve_platform_shape_parameter",
     "build_platform_core",
     "signed_side_factor", "effective_constant_radius",
-    "prepare_track_alignment",
+    "prepare_track_alignment", "validate_connected_straight_routes",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -48,7 +48,8 @@ PRODUCT_CALLER_ROUTES = (
         ("main_circle_centre", "build_concentric_core",
          "prepare_track_alignment", "signed_side_factor",
          "add_common_straight_extensions", "alignment_station_data",
-         "interpolate_alignment_station", "mirror_alignment_for_turn"),
+         "interpolate_alignment_station", "mirror_alignment_for_turn",
+         "validate_connected_straight_routes"),
     ),
     ("build_straight_routes", ("build_straight_route",)),
     (
@@ -426,6 +427,59 @@ class _StationAlignmentView:
 
 
 @dataclass(frozen=True)
+class _ConnectedStraightAlignmentsView:
+    """Expose curve records without reading their native points early."""
+
+    _alignments: object
+
+    def __len__(self):
+        return len(self._alignments)
+
+    def __iter__(self):
+        for alignment in self._alignments:
+            yield _StationAlignmentView(alignment)
+
+
+@dataclass(frozen=True)
+class _ConnectedStraightRouteView:
+    """Snapshot only the alignment list read by the selected check."""
+
+    _route: object
+
+    def get(self, key, *default):
+        value = self._route.get(key, *default)
+        if key == "alignments":
+            return (
+                _StationAlignmentView(alignment) for alignment in list(value)
+            )
+        return value
+
+
+@dataclass(frozen=True)
+class _ConnectedStraightRoutesView:
+    """Defer route iteration until after the inherited curve count."""
+
+    _routes: object
+
+    def __iter__(self):
+        for route in self._routes:
+            yield _ConnectedStraightRouteView(route)
+
+
+@dataclass(frozen=True)
+class _ConnectedStraightRoutesValidationAdapter:
+    """Read native coordinates without allocating or changing vectors."""
+
+    calculation: object
+
+    def __call__(self, straight_routes, curve_alignments):
+        return self.calculation(
+            _ConnectedStraightRoutesView(straight_routes),
+            _ConnectedStraightAlignmentsView(curve_alignments),
+        )
+
+
+@dataclass(frozen=True)
 class _StationDataView:
     """Expose neutral component reads in the original data lookup order."""
 
@@ -515,7 +569,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete eighteen-function modular workflow is unavailable."
+                "The complete nineteen-function modular workflow is unavailable."
             )
         platform_globals = getattr(
             self._modular_functions["solve_platform_shape_parameter"],
@@ -594,6 +648,31 @@ class ModularTransitionWorkflowSession:
             raise TransitionWorkflowError(
                 "The track-preparation domain closure is unavailable."
             )
+        validation = self._modular_functions[
+            "validate_connected_straight_routes"
+        ]
+        validation_globals = getattr(validation, "__globals__", None)
+        validation_code = getattr(validation, "__code__", None)
+        self._connected_heading_delta = (
+            validation_globals.get("_straight_heading_delta")
+            if isinstance(validation_globals, dict) else None
+        )
+        if (
+            validation_globals is not preparation_globals
+            or validation_code is None
+            or not {"_dot_xy", "_straight_heading_delta"} <= set(
+                validation_code.co_names
+            )
+            or not callable(self._connected_heading_delta)
+            or getattr(self._connected_heading_delta, "__globals__", None)
+            is not validation_globals
+            or validation_globals.get("_dot_xy")
+            is not self._preparation_dot_xy
+        ):
+            raise TransitionWorkflowError(
+                "The connected-straight validation domain closure is "
+                "unavailable."
+            )
         vector_factory = getattr(
             getattr(self.module, "App", None), "Vector", None,
         )
@@ -630,6 +709,11 @@ class ModularTransitionWorkflowSession:
         self._host_functions["build_straight_route"] = _StraightRouteAdapter(
             self._modular_functions["build_straight_route"], vector_factory,
             config_cloner, self.module.TEMPLATE_THICKNESS,
+        )
+        self._host_functions["validate_connected_straight_routes"] = (
+            _ConnectedStraightRoutesValidationAdapter(
+                self._modular_functions["validate_connected_straight_routes"],
+            )
         )
         self._host_functions["alignment_station_data"] = (
             _AlignmentStationDataAdapter(
@@ -778,6 +862,32 @@ class ModularTransitionWorkflowSession:
                 "The modular workflow straight-route adapter is unavailable."
             )
 
+        validation = namespace["validate_connected_straight_routes"]
+        if (
+            type(validation) is not _ConnectedStraightRoutesValidationAdapter
+            or validation.calculation is not self._modular_functions[
+                "validate_connected_straight_routes"
+            ]
+        ):
+            raise TransitionWorkflowError(
+                "The modular workflow connected-straight validation adapter "
+                "is unavailable."
+            )
+        validation_globals = getattr(
+            validation.calculation, "__globals__", None,
+        )
+        if (
+            validation_globals is not preparation_globals
+            or validation_globals.get("_dot_xy")
+            is not self._preparation_dot_xy
+            or validation_globals.get("_straight_heading_delta")
+            is not self._connected_heading_delta
+        ):
+            raise TransitionWorkflowError(
+                "The connected-straight validation domain closure is "
+                "unavailable."
+            )
+
         station_data = namespace["alignment_station_data"]
         if (
             type(station_data) is not _AlignmentStationDataAdapter
@@ -886,7 +996,7 @@ class ModularTransitionWorkflowSession:
                 "The modular platform solver residual route is unavailable."
             )
 
-        # Product composition owns all eighteen current bindings. The frozen
+        # Product composition owns all nineteen current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -960,7 +1070,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 11,
+            "schema_version": 12,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase7:connected-straight-validation:1",
+  "recorded_on": "2026-09-26",
+  "authority": [
+    "D-GOV-004",
+    "D-P7-001",
+    "Project owner Phase 7 continuation on 2026-09-26"
+  ],
+  "change_level": 2,
+  "contract_document": "reference/contracts/phase7-connected-straight-validation.md",
+  "legacy_reference": {
+    "sources": [
+      "AdvancedTurnout.FCMacro",
+      "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro"
+    ],
+    "definition_sha256": "d31423808b7379f8b37682fe4e6396acdf953d36b9dafb91ee286478a56b2e9e",
+    "definition_bytes": 3235,
+    "sole_product_caller": "run_macro",
+    "caller_order": "after build_straight_routes and before prepare_straight_routes_production"
+  },
+  "calculation": {
+    "module": "tracktemplate.domain.alignment",
+    "api": "tracktemplate.api.validate_connected_straight_routes",
+    "parameters": [
+      "straight_routes",
+      "curve_alignments"
+    ],
+    "defaults": {},
+    "return_on_success": null,
+    "length_unit": "mm",
+    "heading_unit": "rad",
+    "frame": "canonical-local-XY-left-turn",
+    "connection_modes": [
+      "Independent datum",
+      "Curve entrance",
+      "Curve exit"
+    ],
+    "independent_mode": "bypass without reading route alignments",
+    "other_modes": "retain the B14/B15 exit branch for every value other than Independent datum or Curve entrance",
+    "operation_order": [
+      "read curve alignment count before route iteration",
+      "read connection mode and bypass Independent datum",
+      "snapshot route alignments and compare track count",
+      "for each track, snapshot straight points, curve points, straight headings, curve headings in that order",
+      "reject incomplete point geometry",
+      "calculate travel projection before join distance and heading difference",
+      "reject join distance, heading difference or wrong travel direction"
+    ],
+    "geometry_tolerance_mm": 1e-08,
+    "join_tolerance_mm": 1e-07,
+    "heading_tolerance_rad": 1e-10,
+    "private_dependencies": [
+      "_dot_xy",
+      "_straight_heading_delta"
+    ],
+    "input_mutation": false,
+    "document_mutation": false,
+    "cached": false,
+    "diagnostics": [
+      "Connected straight route '{}' produced {} track(s), but the curve contains {} track(s). No existing generated objects have been removed.",
+      "Connected straight route '{}' contains incomplete Track {} geometry. No existing generated objects have been removed.",
+      "Connected straight route '{}' failed its Track {} endpoint or tangent validation. No existing generated objects have been removed."
+    ]
+  },
+  "host_adapter": {
+    "module": "tracktemplate.compatibility.transition_workflow",
+    "private_type": "_ConnectedStraightRoutesValidationAdapter",
+    "selected_calculation": "tracktemplate.api.validate_connected_straight_routes",
+    "input_point_type": "FreeCAD App.Vector",
+    "domain_point_access": "read-only neutral X and Y component view",
+    "new_native_vector_allocation": false,
+    "input_mutation": false,
+    "document_mutation": false
+  },
+  "product_routing": {
+    "record_schema_version": 12,
+    "route": "modular",
+    "comparison_route_available": false,
+    "selected_function_count": 19,
+    "caller_count": 39,
+    "selected_caller": "run_macro",
+    "selected_caller_target": "validate_connected_straight_routes",
+    "mixed_route": false,
+    "setup_failure": "put each prior host value back and remove only names that were originally absent"
+  },
+  "scope": {
+    "supported": "B14/B15 connected-straight gate inputs and the bounded B16 Generate/Replace route",
+    "excluded": [
+      "B14 or B15 changes",
+      "new geometry, tolerance or diagnostic behaviour",
+      "stored state, UUID, production or export changes",
+      "legacy path retirement",
+      "Phase 7 exit, performance, output or release acceptance"
+    ]
+  },
+  "validation": {
+    "standalone": "tests/validate_phase7_connected_straight_validation.py",
+    "qualified_host": "tests/freecad_validate_phase7_connected_straight_validation.py"
+  }
+}
