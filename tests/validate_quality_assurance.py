@@ -209,7 +209,7 @@ def validate_frozen_records() -> None:
         "frozen-record status changed",
     )
     require(
-        document["updated_on"] == "2026-09-20",
+        document["updated_on"] == "2026-09-26",
         "frozen-record manifest update date drifted",
     )
     records = document["records"]
@@ -589,15 +589,20 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "`prepare_track_alignment` candidate has PASS results "
-        "for all product checks"
+        and "PR #82 integrated the bounded `prepare_track_alignment` result"
         in owner_view
-        and "PASS result from independent quality review" in owner_view
-        and "Source-and-test repair accounting stays 2/2" in owner_view
-        and "five test-only exceptions are consumed" in owner_view
-        and "schema `11`, eighteen selected functions and 39 callers"
+        and "connected straight route validation result is the current "
+        "Level 2 candidate" in owner_view
+        and "Independent source-and-test review found no blocker" in owner_view
+        and "normal repair accounting is 2/2 exhausted" in owner_view
+        and "one owner-authorised test-only exception is consumed"
         in owner_view
-        and "zero product-semantic differences" in owner_view
+        and "PR #82's separate repair and exception history remains unchanged"
+        in owner_view
+        and "schema `12`, nineteen selected functions and 39 callers"
+        in owner_view
+        and "GUI product comparison has zero differences" in owner_view
+        and "measured micro-call cost increased" in owner_view
         and "D-P6-008" in owner_view
         and "Integration accepts no Phase 7 exit, performance result, output "
         "status, wider migration, legacy retirement or release state"

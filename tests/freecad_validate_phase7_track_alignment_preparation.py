@@ -128,14 +128,14 @@ def validate():
         _functions(),
     )
     record = session.routing_record()
-    assert record["schema_version"] == 11
+    assert record["schema_version"] == 12
     assert record["contract_id"] == (
-        "tracktemplate:phase7:track-preparation:1"
+        "tracktemplate:phase7:connected-straight-validation:1"
     )
     assert record["function_names"] == list(
         transition_workflow.PRODUCT_FUNCTION_NAMES
     )
-    assert len(record["function_names"]) == 18
+    assert len(record["function_names"]) == 19
     assert len(record["caller_names"]) == 39
     assert record["mixed_route"] is False
 

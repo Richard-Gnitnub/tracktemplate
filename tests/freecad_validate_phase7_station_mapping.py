@@ -112,11 +112,11 @@ def validate():
                for name in transition_workflow.PRODUCT_FUNCTION_NAMES},
     )
     record = session.routing_record()
-    assert record["schema_version"] == 11
-    assert len(record["function_names"]) == 18
+    assert record["schema_version"] == 12
+    assert len(record["function_names"]) == 19
     assert len(transition_workflow.PRODUCT_CALLER_ROUTES) == 39
     assert record["contract_id"] == (
-        "tracktemplate:phase7:track-preparation:1"
+        "tracktemplate:phase7:connected-straight-validation:1"
     )
     pair = tuple(getattr(module, name) for name in proof.PAIR)
     assert type(pair[0]) is transition_workflow._AlignmentStationDataAdapter

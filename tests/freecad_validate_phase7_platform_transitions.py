@@ -52,8 +52,8 @@ def validate():
     )
     module = session.module
     record = session.routing_record()
-    assert len(record["function_names"]) == (11 if baseline_only else 18)
-    assert record["schema_version"] == (8 if baseline_only else 11)
+    assert len(record["function_names"]) == (11 if baseline_only else 19)
+    assert record["schema_version"] == (8 if baseline_only else 12)
     original, _nodes = proof.legacy_namespace(proof.B15, App.Vector)
     reference = proof.caller_cases(original)
     actual = proof.caller_cases(module.__dict__)
@@ -72,7 +72,7 @@ def validate():
         assert all(point.z == 0.0 for point in result["points"])
     if not baseline_only:
         assert record["contract_id"] == (
-            "tracktemplate:phase7:track-preparation:1"
+            "tracktemplate:phase7:connected-straight-validation:1"
         )
         assert len(transition_workflow.PRODUCT_CALLER_ROUTES) == 39
         for name in proof.PUBLIC:

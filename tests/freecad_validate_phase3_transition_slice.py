@@ -185,8 +185,8 @@ product_session, product_route = namespace[
 from validate_phase7_straight_route import STATION_CALLER_NAMES  # noqa: E402
 
 assert product_route == {
-    "schema_version": 11,
-    "contract_id": "tracktemplate:phase7:track-preparation:1",
+    "schema_version": 12,
+    "contract_id": "tracktemplate:phase7:connected-straight-validation:1",
     "route": "modular",
     "comparison_route_available": False,
     "function_names": list(FUNCTION_NAMES) + [
@@ -200,7 +200,7 @@ assert product_route == {
         "solve_platform_shape_parameter",
         "build_platform_core",
         "signed_side_factor", "effective_constant_radius",
-        "prepare_track_alignment",
+        "prepare_track_alignment", "validate_connected_straight_routes",
     ],
     "caller_names": list(STATION_CALLER_NAMES),
     "workflow_version": "10.2A8A7B15",

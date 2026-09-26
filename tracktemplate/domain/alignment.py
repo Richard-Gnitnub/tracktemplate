@@ -1695,6 +1695,83 @@ def build_straight_route(config, curve_alignments, connected_template_thickness)
     }
 
 
+def validate_connected_straight_routes(straight_routes, curve_alignments):
+    """Check connected straight tracks using neutral XY points and radians."""
+    expected_count = len(curve_alignments)
+    for route in straight_routes:
+        mode = route.get("connection_mode")
+        if mode == _STRAIGHT_CONNECTION_INDEPENDENT:
+            continue
+        alignments = list(route.get("alignments", []))
+        if len(alignments) != expected_count:
+            raise ValueError(
+                "Connected straight route '{}' produced {} track(s), "
+                "but the curve contains {} track(s). No existing generated "
+                "objects have been removed.".format(
+                    route.get("name", "Unnamed straight"),
+                    len(alignments),
+                    expected_count,
+                )
+            )
+        for index, (straight, curve) in enumerate(
+            zip(alignments, curve_alignments)
+        ):
+            straight_points = list(straight.get("points", []))
+            curve_points = list(curve.get("points", []))
+            straight_headings = list(straight.get("headings", []))
+            curve_headings = list(curve.get("headings", []))
+            if len(straight_points) != 2 or not curve_points:
+                raise ValueError(
+                    "Connected straight route '{}' contains incomplete "
+                    "Track {} geometry. No existing generated objects "
+                    "have been removed.".format(
+                        route.get("name", "Unnamed straight"), index + 1
+                    )
+                )
+            if mode == _STRAIGHT_CONNECTION_CURVE_ENTRANCE:
+                straight_join = straight_points[-1]
+                curve_join = curve_points[0]
+                straight_heading = straight_headings[-1]
+                curve_heading = curve_headings[0]
+                travel_projection = _dot_xy(
+                    straight_points[0][0] - curve_join[0],
+                    straight_points[0][1] - curve_join[1],
+                    math.cos(curve_heading),
+                    math.sin(curve_heading),
+                )
+                expected_sign_ok = travel_projection < -GEOMETRY_TOLERANCE
+            else:
+                straight_join = straight_points[0]
+                curve_join = curve_points[-1]
+                straight_heading = straight_headings[0]
+                curve_heading = curve_headings[-1]
+                travel_projection = _dot_xy(
+                    straight_points[-1][0] - curve_join[0],
+                    straight_points[-1][1] - curve_join[1],
+                    math.cos(curve_heading),
+                    math.sin(curve_heading),
+                )
+                expected_sign_ok = travel_projection > GEOMETRY_TOLERANCE
+            join_error = math.hypot(
+                straight_join[0] - curve_join[0],
+                straight_join[1] - curve_join[1],
+            )
+            if (
+                join_error > 1.0e-7
+                or _straight_heading_delta(
+                    straight_heading, curve_heading
+                ) > 1.0e-10
+                or not expected_sign_ok
+            ):
+                raise ValueError(
+                    "Connected straight route '{}' failed its Track {} "
+                    "endpoint or tangent validation. No existing generated "
+                    "objects have been removed.".format(
+                        route.get("name", "Unnamed straight"), index + 1
+                    )
+                )
+
+
 @dataclass(frozen=True)
 class AlignmentStationInterpolation:
     """Hold neutral XY and defer heading arithmetic for host allocation order."""

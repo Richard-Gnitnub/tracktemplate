@@ -162,6 +162,7 @@ def _validate_product_boundary():
                 "    mirror_alignment_for_turn(core, 1.0)\n"
                 "    data = alignment_station_data(core)\n"
                 "    interpolate_alignment_station(data, 0.0)\n"
+                "    validate_connected_straight_routes([], [])\n"
                 "    return core\n",
                 self.module.__dict__,
             )
@@ -195,7 +196,7 @@ def _validate_product_boundary():
             "solve_platform_shape_parameter",
             "build_platform_core",
             "signed_side_factor", "effective_constant_radius",
-            "prepare_track_alignment",
+            "prepare_track_alignment", "validate_connected_straight_routes",
         )
     }
     host = FakeHost()
@@ -211,7 +212,7 @@ def _validate_product_boundary():
             "add_common_straight_extensions",
             "build_straight_route",
             "alignment_station_data", "interpolate_alignment_station",
-            "mirror_alignment_for_turn",
+            "mirror_alignment_for_turn", "validate_connected_straight_routes",
         }:
             assert host.module.__dict__[name].calculation is (
                 functions[name]
@@ -220,8 +221,8 @@ def _validate_product_boundary():
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 11,
-        "contract_id": "tracktemplate:phase7:track-preparation:1",
+        "schema_version": 12,
+        "contract_id": "tracktemplate:phase7:connected-straight-validation:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),
