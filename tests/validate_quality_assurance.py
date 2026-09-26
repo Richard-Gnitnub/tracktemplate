@@ -589,31 +589,38 @@ def validate_documentation_profile(
         "obligation" in owner_view
         and "Phase 7 is Open at 0/4" in owner_view
         and "All four exits are Pending" in owner_view
-        and "PR #83 is integrated on protected main" in owner_view
-        and "bounded `validate_platform_inputs` Level 2 candidate"
+        and "PR #84 is in protected `main` at" in owner_view
+        and "Candidate `1180133c63026766369da3e33b69dd7c9869663e`"
         in owner_view
-        and "Fresh independent source-and-test review found no blocker"
+        and "platform position candidate"
         in owner_view
-        and "normal 2/2 test-only repair passes" in owner_view
-        and "original independent `BLOCKED` verdict" in owner_view
-        and "PR #83's separate 2/2 and owner-authorised test-only exception "
-        "remain historical" in owner_view
-        and "schema `13`, twenty selected functions and 39 caller identities"
+        and "no-blocker independent source-and-test review"
         in owner_view
-        and "The paired GUI product semantics match" in owner_view
+        and "The new result is at repair 1/2" in owner_view
+        and "PR #84's separate 2/2 test-only repairs, original `BLOCKED` "
+        "review and no-proof command remain historical" in owner_view
+        and "PR #83's separate repairs and exception remain historical"
+        in owner_view
+        and "schema `14`, 21 selected functions and 39 caller identities"
+        in owner_view
+        and "The paired GUI platform Create/Edit product semantics match"
+        in owner_view
         and "measured micro-call cost increased" in owner_view
         and "locked Phase evidence keeps its recorded non-blocking "
         "trailing-space warning" in owner_view
-        and "The complete local transition profile has a PASS result"
+        and "complete local transition profile have PASS results"
         in owner_view
-        and "The completion route requires a replacement Documentation "
-        "Review, final deterministic validation, draft publication and "
-        "exact-head CI" in owner_view
-        and "The replacement Documentation Review and final validation "
-        "precede draft publication" in owner_view
+        and "The next owner boundary is Richard's integration decision on "
+        "this candidate after exact-green draft publication"
+        in owner_view
+        and "The [capability matrix](CAPABILITY_MATRIX.md) records "
+        "integrated evidence through PR #84 only"
+        in owner_view
         and "D-P6-008" in owner_view
-        and "Integration accepts no Phase 7 exit, performance result, output "
-        "status, wider migration, legacy retirement or release state"
+        and "This new candidate has no integration or Phase 7 exit decision"
+        in owner_view
+        and "It accepts no Phase 7 exit, performance result, output status, "
+        "wider migration, legacy retirement or release state"
         in owner_view
         and "Output has private-development status" in owner_view
         and "project status stays `unknown`" in owner_view,

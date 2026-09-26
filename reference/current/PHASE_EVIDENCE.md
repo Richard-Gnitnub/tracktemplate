@@ -16,12 +16,43 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is Open at 0/4. All four exits are Pending. PR #83 is integrated on protected main. The bounded `validate_platform_inputs` Level 2 candidate has direct, qualified and GUI PASS evidence and a no-blocker independent source-and-test review. Output stays at private-development status and project status stays `unknown`. |
-| What changed | The [retained result](#phase7-platform-input-validation-migration) puts the B14/B15-identical platform input gate in the Core domain and API. The B16 `calculate_platform_boundaries` caller binds the Core function directly. The candidate selects twenty functions and validates 39 callers with schema `13`. B14 and B15 stay unchanged. |
-| What now works | The direct 29-case and D-GOV-019 qualified comparisons, twelve affected previous qualified proofs and paired platform Create/Edit GUI check have PASS results. The GUI product-semantic result matches the protected-main baseline. Invalid-clearance rejection leaves the document and history unchanged. Fresh independent source-and-test review found no blocker. The complete local transition profile has a PASS result. The completion route requires a replacement Documentation Review, final deterministic validation, draft publication and exact-head CI. |
-| Limitations/findings | This outcome used its normal 2/2 test-only repair passes. The original independent `BLOCKED` verdict and a no-proof FreeCADCmd invocation stay retained. PR #83's separate 2/2 and owner-authorised test-only exception remain historical. PR #83's measured micro-call cost increased, and one GUI sample per state gives descriptive resources only. The locked Phase evidence keeps its recorded non-blocking trailing-space warning. D-P6-008, all recorded limitations, comparison requirements and legacy-retirement conditions stay in full. |
-| Owner decision | Once a draft has exact-head CI PASS, Richard decides whether to integrate only this bounded Level 2 result. Integration accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
-| Next action | Bring Richard the exact head of a draft after its exact-head CI passes. The replacement Documentation Review and final validation precede draft publication. |
+| Current state | Phase 7 is Open at 0/4. All four exits are Pending. PR #84 is in protected `main` at `365cc49684f40ddfa3ac586112425d30ae6292c6`. The [platform position candidate](#phase7-platform-longitudinal-bounds-migration) has direct, qualified, paired GUI and complete transition-profile PASS evidence and a no-blocker independent source-and-test review. Output stays at private-development status and project status stays `unknown`. |
+| What changed | Candidate `1180133c63026766369da3e33b69dd7c9869663e` puts the B14/B15-identical `resolve_platform_longitudinal_bounds` calculation in the Core domain and API. B16 selects it directly for `calculate_platform_boundaries`. The candidate route selects 21 functions and validates 39 callers with schema `14`. B14 and B15 stay unchanged. The [capability matrix](../CAPABILITY_MATRIX.md) records integrated evidence through PR #84 only. |
+| What now works | The 34-case direct and D-GOV-019 qualified comparisons, five read paths, all 14 affected qualified proofs and complete local transition profile have PASS results. The paired GUI platform Create/Edit product semantics match, including two selected rejections and Save/reopen. A stale route-identity test had a FAIL result, then the same proof had a PASS result after test-only repair 1/2. |
+| Limitations/findings | The new result is at repair 1/2. PR #84's separate 2/2 test-only repairs, original `BLOCKED` review and no-proof command remain historical. PR #83's separate repairs and exception remain historical. Its measured micro-call cost increased. One GUI sample per state gives no performance credit. The locked Phase evidence keeps its recorded non-blocking trailing-space warning. D-P6-008, all recorded limitations, comparison requirements and legacy-retirement conditions stay in full. |
+| Owner decision | Richard authorised integration of PR #84 at exact head `48b6dc0cbec9036d76e144d48924bbb9f251024f`. This new candidate has no integration or Phase 7 exit decision. It accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. Its next exact-green draft needs a separate integration decision. |
+| Next action | The next owner boundary is Richard's integration decision on this candidate after exact-green draft publication. |
+
+<a id="phase7-platform-longitudinal-bounds-migration"></a>
+## Migration of platform length and position — 2026-09-26
+
+PR #84 is in protected `main` at
+`365cc49684f40ddfa3ac586112425d30ae6292c6`. D-GOV-004 and the
+owner's 2026-09-26 continuation authorise this bounded Level 2 candidate.
+The B14 and B15 definitions of `resolve_platform_longitudinal_bounds` are
+equal and stay unchanged. Candidate `1180133c63026766369da3e33b69dd7c9869663e`
+moves the calculation to Core. The B16
+`calculate_platform_boundaries` caller selects it directly. The
+[API instructions](../contracts/phase7-platform-longitudinal-bounds.md)
+keep the eight ordered result values, read and error order, tolerance and
+recovery behaviour. The route uses schema `14`, 21 functions and
+39 caller identities.
+
+The direct standalone and D-GOV-019 qualified comparisons each cover 34
+cases and five read paths. They have PASS results. All 14 affected
+qualified proofs and the complete local transition profile have PASS
+results. A stale existing-route assertion had a FAIL result and then a
+PASS result after test-only repair 1/2. The paired real-GUI platform
+Create/Edit product semantics match. A fresh independent source-and-test
+review found no blocker. The [detailed evidence](../benchmarks/2026-09-26-phase7-platform-longitudinal-bounds-regression.md)
+keeps the raw output and limits.
+
+This candidate contributes bounded evidence to Phase 7 Exits 1, 2 and 3.
+It accepts no exit. It gives no D-P6-008 performance credit and does not
+compare all platform geometry or export bytes. Phase 7 stays Open at 0/4,
+all exits Pending. D-P6-008, all recorded limitations, comparison
+requirements and legacy-retirement conditions stay in full. Project
+status stays `unknown` and output stays at private-development status.
 
 <a id="phase7-platform-input-validation-migration"></a>
 ## Migration of platform input validation — 2026-09-26
@@ -58,9 +89,13 @@ repair accounting for this outcome is 2/2 exhausted. The separate PR #83
 The original Documentation Review for candidate `9b18b35c0d1136b372929ca7f9b162e853ef6453`
 is `BLOCKED`. The retained receipt SHA-256 is
 `63507297aedc230aa95a603243f61d0543ca47617ed7854cec1180703208f772`.
-It gives no approved correction set. The owner now approves the bounded
-railway meaning of `platform` and one replacement documentation lifecycle.
-The original verdict stays unchanged.
+It gives no approved correction set. The owner approved the bounded railway
+meaning of `platform` and one replacement documentation lifecycle. The
+replacement Documentation Review gave an `APPROVED_WITH_EXACT_CORRECTIONS`
+verdict with three exact corrections. The locked final validation and
+exact-head CI had PASS results. PR #84
+merged into protected `main` at `365cc49684f40ddfa3ac586112425d30ae6292c6`.
+The original `BLOCKED` verdict stays unchanged.
 
 This result contributes bounded evidence to Phase 7 Exits 1, 2 and 3. It
 accepts no exit. The one-sample GUI resource values give no D-P6-008
@@ -70,8 +105,8 @@ sectioning results or export bytes and does not remove the legacy path.
 Phase 7 stays Open at 0/4, all exits Pending. D-P6-008, all recorded
 limitations, comparison requirements and legacy-retirement conditions stay
 in full. Project status stays `unknown` and output stays at
-private-development status. Only Richard can authorise integration of an
-exact-green draft.
+private-development status. Richard authorised integration of PR #84 at
+exact head `48b6dc0cbec9036d76e144d48924bbb9f251024f` only.
 
 <a id="phase7-connected-straight-validation-migration"></a>
 ## Migration of connected straight route validation — 2026-09-26

@@ -802,9 +802,9 @@ def validate_binding():
         else:
             raise AssertionError("Straight adapter is mutable")
         record = session.routing_record()
-        assert record["schema_version"] == 13
+        assert record["schema_version"] == 14
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-input-validation:1"
+            "tracktemplate:phase7:platform-longitudinal-bounds:1"
         )
         assert record["function_names"] == list(functions)
         assert record["caller_names"] == list(STATION_CALLER_NAMES)
@@ -832,7 +832,7 @@ def validate_binding():
                     lambda: workflow.ModularTransitionWorkflowSession(
                         source, invalid
                     ),
-                    "complete twenty-function",
+                    "complete twenty-one-function",
                 )
                 assert core._snapshot(source) == before
         for absent in (False, True):

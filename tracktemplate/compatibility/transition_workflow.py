@@ -11,7 +11,7 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-input-validation:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-longitudinal-bounds:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
@@ -25,6 +25,7 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "signed_side_factor", "effective_constant_radius",
     "prepare_track_alignment", "validate_connected_straight_routes",
     "validate_platform_inputs",
+    "resolve_platform_longitudinal_bounds",
 )
 PRODUCT_CALLER_ROUTES = (
     ("main_circle_centre", ("clothoid_entry_displacement",)),
@@ -76,7 +77,7 @@ PRODUCT_CALLER_ROUTES = (
     (
         "calculate_platform_boundaries",
         ("alignment_station_data", "interpolate_alignment_station",
-         "validate_platform_inputs"),
+         "validate_platform_inputs", "resolve_platform_longitudinal_bounds"),
     ),
     (
         "create_between_alignments_face",
@@ -571,7 +572,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete twenty-function modular workflow is unavailable."
+                "The complete twenty-one-function modular workflow is unavailable."
             )
         platform_globals = getattr(
             self._modular_functions["solve_platform_shape_parameter"],
@@ -924,6 +925,26 @@ class ModularTransitionWorkflowSession:
                 "The platform-input validation domain closure is unavailable."
             )
 
+        platform_bounds = namespace["resolve_platform_longitudinal_bounds"]
+        platform_bounds_globals = getattr(platform_bounds, "__globals__", None)
+        platform_bounds_code = getattr(platform_bounds, "__code__", None)
+        if (
+            platform_bounds is not self._modular_functions[
+                "resolve_platform_longitudinal_bounds"
+            ]
+            or platform_bounds_globals is not preparation_globals
+            or platform_bounds_code is None
+            or "GEOMETRY_TOLERANCE" not in platform_bounds_code.co_names
+            or type(platform_bounds_globals.get("GEOMETRY_TOLERANCE"))
+            is not type(getattr(self.module, "GEOMETRY_TOLERANCE", None))
+            or platform_bounds_globals.get("GEOMETRY_TOLERANCE")
+            != getattr(self.module, "GEOMETRY_TOLERANCE", None)
+        ):
+            raise TransitionWorkflowError(
+                "The platform longitudinal-bounds domain closure is "
+                "unavailable."
+            )
+
         station_data = namespace["alignment_station_data"]
         if (
             type(station_data) is not _AlignmentStationDataAdapter
@@ -1032,7 +1053,7 @@ class ModularTransitionWorkflowSession:
                 "The modular platform solver residual route is unavailable."
             )
 
-        # Product composition owns all twenty current bindings. The frozen
+        # Product composition owns all twenty-one current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -1106,7 +1127,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 13,
+            "schema_version": 14,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,

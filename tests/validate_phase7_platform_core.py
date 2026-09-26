@@ -291,14 +291,14 @@ def validate_binding():
             _functions(),
         )
         record = session.routing_record()
-        assert record["schema_version"] == 13
+        assert record["schema_version"] == 14
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-input-validation:1"
+            "tracktemplate:phase7:platform-longitudinal-bounds:1"
         )
         assert record["function_names"] == list(
             transition_workflow.PRODUCT_FUNCTION_NAMES
         )
-        assert len(record["function_names"]) == 20
+        assert len(record["function_names"]) == 21
         assert record["caller_names"] == [
             name
             for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
@@ -367,7 +367,7 @@ def validate_binding():
                 invalid_host,
                 invalid,
             ),
-            "complete twenty-function",
+            "complete twenty-one-function",
         )
         assert core_proof._snapshot(invalid_host) == before
         assert invalid_host.module.LAUNCH_COUNT == 0

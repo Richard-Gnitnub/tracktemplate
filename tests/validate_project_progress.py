@@ -1033,30 +1033,31 @@ def _validate_owner_view(plan: str) -> None:
         "All four exits are Pending",
         "Output has private-development status",
         "project status stays `unknown`",
-        "PR #83 is integrated on protected main",
-        "bounded `validate_platform_inputs` Level 2 candidate",
-        "B14/B15-identical platform input gate in the Core domain and API",
-        "schema `13`, twenty selected functions and 39 caller identities",
-        "The paired GUI product semantics match",
-        "Fresh independent source-and-test review found no blocker",
-        "normal 2/2 test-only repair passes",
-        "original independent `BLOCKED` verdict",
-        "PR #83's separate 2/2 and owner-authorised test-only exception "
-        "remain historical",
-        "PR #83's measured micro-call cost increased, and one GUI sample per "
-        "state gives descriptive resources only",
+        "PR #84 is in protected `main` at",
+        "Candidate `1180133c63026766369da3e33b69dd7c9869663e`",
+        "B14/B15-identical `resolve_platform_longitudinal_bounds`",
+        "schema `14`, 21 selected functions and 39 caller identities",
+        "The paired GUI platform Create/Edit product semantics match",
+        "no-blocker independent source-and-test review",
+        "The new result is at repair 1/2",
+        "PR #84's separate 2/2 test-only repairs, original `BLOCKED` review "
+        "and no-proof command remain historical",
+        "PR #83's separate repairs and exception remain historical",
+        "Its measured micro-call cost increased",
+        "One GUI sample per state gives no performance credit",
         "locked Phase evidence keeps its recorded non-blocking trailing-space "
         "warning",
-        "The complete local transition profile has a PASS result",
-        "The completion route requires a replacement Documentation Review, "
-        "final deterministic validation, draft publication and exact-head CI",
-        "The replacement Documentation Review and final validation precede "
-        "draft publication",
+        "complete local transition profile have PASS results",
+        "The next owner boundary is Richard's integration decision on this "
+        "candidate after exact-green draft publication",
+        "The [capability matrix](CAPABILITY_MATRIX.md) records integrated "
+        "evidence through PR #84 only",
         "D-P6-008",
         "recorded product limitations, comparison requirements and "
         "legacy-retirement conditions stay in full",
-        "Integration accepts no Phase 7 exit, performance result, output "
-        "status, wider migration, legacy retirement or release state",
+        "This new candidate has no integration or Phase 7 exit decision",
+        "It accepts no Phase 7 exit, performance result, output status, "
+        "wider migration, legacy retirement or release state",
     ):
         _require(
             fragment in owner_view,
@@ -5296,16 +5297,21 @@ def _validate_capability_matrix(matrix: str) -> None:
         (
             "Straight track",
             "C — bounded straight/station workflow",
-            "A",
+            "P — bounded Core straight-route and station calculations with "
+            "selected B16 callers only",
             "A",
             "A",
             "A",
             "A",
             "A",
             "[Phase 1 workflow inventory](phase-evidence/"
-            "PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory); "
+            "PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory), "
             "[straight/station series](benchmarks/"
-            "2026-07-20-b14-straight-station-workflow-series.md)",
+            "2026-07-20-b14-straight-station-workflow-series.md), "
+            "[Phase 7 station mapping contract](contracts/phase7-station-mapping.md), "
+            "[Phase 7 straight-route contract](contracts/phase7-straight-route.md), "
+            "[Phase 7 connected-route contract](contracts/"
+            "phase7-connected-straight-validation.md)",
             "Partial",
         ),
         (
@@ -5340,16 +5346,20 @@ def _validate_capability_matrix(matrix: str) -> None:
         (
             "Multiple parallel tracks",
             "C — fixed two-track fixture",
-            "P — fixture-only Entry/Exit records for one secondary track",
+            "P — bounded Entry/Exit records, secondary-alignment preparation "
+            "and straight-route checks in B16 only",
             "P",
             "P — representative pair only",
             "P — transition records only",
             "A",
             "P",
             "[Workflow coverage contract](contracts/"
-            "phase1-workflow-coverage.json); [Phase 5 closeout](history/"
+            "phase1-workflow-coverage.json), [Phase 5 closeout](history/"
             "phase-closeouts/PHASE5_CLOSEOUT.md#"
-            "representative-multi-object-selection-and-edit-tranche)",
+            "representative-multi-object-selection-and-edit-tranche), "
+            "[Phase 7 preparation contract](contracts/phase7-track-preparation.md), "
+            "[Phase 7 connected-route contract](contracts/"
+            "phase7-connected-straight-validation.md)",
             "Partial",
         ),
         (
@@ -5460,15 +5470,19 @@ def _validate_capability_matrix(matrix: str) -> None:
             "Platforms",
             "P — substantial B14 source exists; the accepted inventory retains "
             "physical platform and wider-workflow gaps",
+            "P — bounded Core platform-transition and input calculations "
+            "selected in B16 only",
             "A",
             "A",
             "A",
             "A",
             "A",
-            "A",
-            "[B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 workflow "
+            "[B14 oracle](../AdvancedTurnout.FCMacro), [Phase 1 workflow "
             "inventory](phase-evidence/PHASE1_INVENTORY.md#"
-            "release-critical-workflow-coverage-inventory)",
+            "release-critical-workflow-coverage-inventory), "
+            "[Phase 7 platform-core contract](contracts/phase7-platform-core.md), "
+            "[Phase 7 platform-input contract](contracts/"
+            "phase7-platform-input-validation.md)",
             "Partial",
         ),
         (

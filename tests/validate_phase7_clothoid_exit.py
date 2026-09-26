@@ -40,6 +40,7 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "signed_side_factor", "effective_constant_radius",
     "prepare_track_alignment", "validate_connected_straight_routes",
     "validate_platform_inputs",
+    "resolve_platform_longitudinal_bounds",
 )
 CALCULATION_CASES = tuple(
     (length, radius, steps)
@@ -279,9 +280,9 @@ def validate_binding():
         )
         assert session.launch_workflow() == expected
         record = session.routing_record()
-        assert record["schema_version"] == 13
+        assert record["schema_version"] == 14
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-input-validation:1"
+            "tracktemplate:phase7:platform-longitudinal-bounds:1"
         )
         assert record["function_names"] == list(PRODUCT_FUNCTION_NAMES)
         assert record["caller_names"] == list(STATION_CALLER_NAMES)
@@ -307,7 +308,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete twenty-function",
+                "complete twenty-one-function",
             )
             assert _snapshot(host) == before
             assert host.module.LAUNCH_COUNT == 0
