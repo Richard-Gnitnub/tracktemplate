@@ -1034,31 +1034,29 @@ def _validate_owner_view(plan: str) -> None:
         "Output has private-development status",
         "project status stays `unknown`",
         "PR #84 is in protected `main` at",
-        "bounded `validate_platform_inputs` Level 2 result",
-        "B14/B15-identical platform input gate in the Core domain and API",
-        "schema `13`, twenty selected functions and 39 caller identities",
-        "The paired GUI product semantics match",
-        "Fresh independent source-and-test review found no blocker",
-        "normal 2/2 test-only repair passes",
-        "original independent `BLOCKED` verdict",
-        "PR #83's separate 2/2 and owner-authorised test-only exception "
-        "remain historical",
-        "PR #83's measured micro-call cost increased, and one GUI sample per "
-        "state gives descriptive resources only",
+        "Candidate `1180133c63026766369da3e33b69dd7c9869663e`",
+        "B14/B15-identical `resolve_platform_longitudinal_bounds`",
+        "schema `14`, 21 selected functions and 39 caller identities",
+        "The paired GUI platform Create/Edit product semantics match",
+        "no-blocker independent source-and-test review",
+        "The new result is at repair 1/2",
+        "PR #84's separate 2/2 test-only repairs, original `BLOCKED` review "
+        "and no-proof command remain historical",
+        "PR #83's separate repairs and exception remain historical",
+        "Its measured micro-call cost increased",
+        "One GUI sample per state gives no performance credit",
         "locked Phase evidence keeps its recorded non-blocking trailing-space "
         "warning",
-        "The complete local transition profile has a PASS result",
-        "The replacement Documentation Review gave an "
-        "`APPROVED_WITH_EXACT_CORRECTIONS` verdict with three exact corrections. "
-        "The locked final validation and exact-head CI had PASS results",
-        "A next draft needs a separate integration decision",
-        "The [capability matrix](CAPABILITY_MATRIX.md) now records repository "
-        "evidence through PR #84",
+        "complete local transition profile have PASS results",
+        "Its next exact-green draft needs a separate integration decision",
+        "The [capability matrix](CAPABILITY_MATRIX.md) records integrated "
+        "evidence through PR #84 only",
         "D-P6-008",
         "recorded product limitations, comparison requirements and "
         "legacy-retirement conditions stay in full",
-        "Integration accepts no Phase 7 exit, performance result, output "
-        "status, wider migration, legacy retirement or release state",
+        "This new candidate has no integration or Phase 7 exit decision",
+        "It accepts no Phase 7 exit, performance result, output status, "
+        "wider migration, legacy retirement or release state",
     ):
         _require(
             fragment in owner_view,

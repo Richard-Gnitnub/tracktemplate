@@ -52,6 +52,7 @@
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-20-phase7-platform-core-regression.md", "sha256": "d16e4a8d777f9981db4862cbb857fd4e1a1242eb50821862cefc60ecdb1ed4d6"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-20-phase7-track-preparation-regression.md", "sha256": "fe5549728ef708194dcf8fbed00c34fa0441335226e304b7f60108d5c28ddfa0"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-connected-straight-validation-regression.md", "sha256": "f5cebcbb170fa28a5601edc7981f3b183a569544897772f6502d264307fecf1b"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-input-validation-regression.md", "sha256": "c7c4fb78cb6fae756a3f3d6b74502203974e01142f1e1794f166f0d8a6a7efa7"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-input-validation-regression.md", "sha256": "c7c4fb78cb6fae756a3f3d6b74502203974e01142f1e1794f166f0d8a6a7efa7"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-longitudinal-bounds-regression.md", "sha256": "3feec880922d39a383737384fa82ca41da33da91a0b7e8acf575aa0227d6fb50"}
   ]
 }
