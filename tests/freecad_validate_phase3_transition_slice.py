@@ -185,8 +185,8 @@ product_session, product_route = namespace[
 from validate_phase7_straight_route import STATION_CALLER_NAMES  # noqa: E402
 
 assert product_route == {
-    "schema_version": 15,
-    "contract_id": "tracktemplate:phase7:platform-heading-coverage:1",
+    "schema_version": 16,
+    "contract_id": "tracktemplate:phase7:platform-top-heights:1",
     "route": "modular",
     "comparison_route_available": False,
     "function_names": list(FUNCTION_NAMES) + [
@@ -203,6 +203,7 @@ assert product_route == {
         "prepare_track_alignment", "validate_connected_straight_routes",
         "validate_platform_inputs",
         "resolve_platform_longitudinal_bounds",
+        "calculate_platform_top_heights",
         "alignment_progress_at_station", "station_for_progress_heading",
         "platform_coverage_bounds",
     ],

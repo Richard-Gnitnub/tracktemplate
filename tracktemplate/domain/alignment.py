@@ -42,6 +42,7 @@ __all__ = (
     "platform_transition_displacement",
     "platform_peak_curvature_factor",
     "prepare_track_alignment",
+    "calculate_platform_top_heights",
     "resolve_platform_longitudinal_bounds",
     "validate_platform_inputs",
     "signed_side_factor",
@@ -1860,6 +1861,48 @@ def validate_platform_inputs(config, all_alignments):
                         track["name"], clearance, minimum
                     )
                 )
+
+
+def calculate_platform_top_heights(config, stations, platform_length):
+    """Return inherited platform height values in millimetres."""
+    full_height = float(config["platform_height"])
+    if config["body_output"] != PLATFORM_SOLID:
+        return [full_height for _station in stations]
+
+    entry_length = (
+        float(config["entry_taper_length"])
+        if config["entry_end_style"] == PLATFORM_END_TAPERED
+        else 0.0
+    )
+    exit_length = (
+        float(config["exit_taper_length"])
+        if config["exit_end_style"] == PLATFORM_END_TAPERED
+        else 0.0
+    )
+    trackbed_height = float(TEMPLATE_THICKNESS)
+    heights = []
+    for station in stations:
+        height = full_height
+        if entry_length > GEOMETRY_TOLERANCE and station < entry_length:
+            fraction = min(max(station / entry_length, 0.0), 1.0)
+            height = min(
+                height,
+                trackbed_height + ((full_height - trackbed_height) * fraction),
+            )
+        if (
+            exit_length > GEOMETRY_TOLERANCE
+            and (platform_length - station) < exit_length
+        ):
+            fraction = min(
+                max((platform_length - station) / exit_length, 0.0),
+                1.0,
+            )
+            height = min(
+                height,
+                trackbed_height + ((full_height - trackbed_height) * fraction),
+            )
+        heights.append(max(trackbed_height, height))
+    return heights
 
 
 def resolve_platform_longitudinal_bounds(config, base_start, base_finish):

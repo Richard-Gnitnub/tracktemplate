@@ -405,12 +405,12 @@ assert not attempted, attempted
         )
         namespace = session.module.__dict__
         record = session.routing_record()
-        assert record["schema_version"] == 15
+        assert record["schema_version"] == 16
         assert record["contract_id"] == transition_workflow.WORKFLOW_CONTRACT_ID
         assert record["function_names"] == list(
             transition_workflow.PRODUCT_FUNCTION_NAMES
         )
-        assert len(record["function_names"]) == 24
+        assert len(record["function_names"]) == 25
         assert record["caller_names"] == [
             name for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
         ]
@@ -426,6 +426,7 @@ assert not attempted, attempted
         assert set(caller_targets) == {
             "alignment_station_data", "interpolate_alignment_station",
             "resolve_platform_longitudinal_bounds", NAME,
+            "calculate_platform_top_heights",
             "platform_coverage_bounds", "station_for_progress_heading",
             "alignment_progress_at_station",
         }

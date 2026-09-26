@@ -548,7 +548,7 @@ def validate_contract(workflow, routing_record):
 
     product = contract["product_routing"]
     assert product["record_schema_version"] == 9
-    assert routing_record["schema_version"] == 15
+    assert routing_record["schema_version"] == 16
     assert product["route"] == routing_record["route"]
     assert product["comparison_route_available"] is False
     historical_names = [
@@ -559,6 +559,7 @@ def validate_contract(workflow, routing_record):
             "validate_connected_straight_routes",
             "validate_platform_inputs",
             "resolve_platform_longitudinal_bounds",
+            "calculate_platform_top_heights",
             "alignment_progress_at_station",
             "station_for_progress_heading",
             "platform_coverage_bounds",
@@ -595,6 +596,7 @@ def validate_contract(workflow, routing_record):
                 if target not in {
                     "validate_platform_inputs",
                     "resolve_platform_longitudinal_bounds",
+                    "calculate_platform_top_heights",
                     "platform_coverage_bounds",
                     "station_for_progress_heading",
                     "alignment_progress_at_station",
@@ -735,9 +737,9 @@ def validate_binding_and_rollback():
         namespace = session.module.__dict__
         record = session.routing_record()
         assert record == {
-            "schema_version": 15,
+            "schema_version": 16,
             "contract_id": (
-                "tracktemplate:phase7:platform-heading-coverage:1"
+                "tracktemplate:phase7:platform-top-heights:1"
             ),
             "route": "modular",
             "comparison_route_available": False,
@@ -749,7 +751,7 @@ def validate_binding_and_rollback():
             "workflow_source_sha256": host.source_sha256,
             "mixed_route": False,
         }
-        assert len(record["function_names"]) == 24
+        assert len(record["function_names"]) == 25
         assert len(record["caller_names"]) == 40
         for name in PUBLIC:
             assert namespace[name] is getattr(api, name)
@@ -831,7 +833,7 @@ def validate_binding_and_rollback():
                 lambda candidate=candidate: workflow.ModularTransitionWorkflowSession(
                     invalid_host, candidate,
                 ),
-                "complete twenty-four-function",
+                "complete twenty-five-function",
             )
             _assert_binding_state(invalid_namespace, invalid_before)
 
