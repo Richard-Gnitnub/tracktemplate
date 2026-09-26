@@ -19,7 +19,7 @@ The owner accepted the completed, independently reviewed
 | Current state | Phase 7 is Open at 0/4. All four exits are Pending. PR #82 integrated the bounded `prepare_track_alignment` result on protected main. The connected straight route validation result is the current Level 2 candidate. Output stays at private-development status and project status stays `unknown`. |
 | What changed | The [current result](#phase7-connected-straight-validation-migration) puts one B14/B15-identical safety calculation in the Core domain and API. The B16 `run_macro` caller uses a read-only adapter before production. The candidate selects nineteen functions and validates 39 callers with schema `12`. |
 | What now works | The direct B14/B15 comparisons, complete 74/74 standalone profile, 13 qualified headless gates, three transition checks and connected Generate/Replace GUI check have PASS results. The retained main baseline and the new GUI candidate have zero product-semantic differences. Independent source-and-test review found no blocker. |
-| Limitations/findings | This outcome's normal repair accounting is 2/2 exhausted. Its one owner-authorised test-only exception is consumed. PR #82's earlier 2/2 and five exceptions remain historical evidence. The micro-call cost increased; the GUI has one sample per state at different times. These resource values give no performance acceptance. D-P6-008, all recorded limitations, comparison requirements and legacy-retirement conditions stay in full. |
+| Limitations/findings | This outcome's normal repair accounting is 2/2 exhausted. Its one owner-authorised test-only exception is consumed. PR #82's earlier 2/2 and five exceptions remain historical evidence. The micro-call cost increased. The GUI has one sample per state at different times. These resource values give no performance acceptance. D-P6-008, all recorded limitations, comparison requirements and legacy-retirement conditions stay in full. |
 | Owner decision | After exact-green draft publication, Richard must decide whether to integrate only the bounded Level 2 candidate. Integration accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
 | Next action | Complete the one Documentation Review and final document validation. Publish one exact-green draft, then give its exact head to Richard for the bounded integration decision. |
 
@@ -52,6 +52,7 @@ This outcome used both normal source-and-test repair passes. The owner
 authorised one separate test-only exception to correct two synthetic-host
 rollback tests. The original failures and the PASS reruns remain in the
 [detailed evidence](../benchmarks/2026-09-26-phase7-connected-straight-validation-regression.md).
+
 Independent source-and-test review found no blocker. The complete standalone
 pipeline gave 74/74 PASS results. Three remaining transition checks also
 passed. The one Documentation Review and final document validation, then
@@ -59,10 +60,12 @@ exact-head CI, are still necessary for draft publication.
 
 The measured micro-call cost increased. The GUI result has one sample per
 state at different times and uncontrolled cache and scheduling. These
-resource values are descriptive only. The proof does not compare
+resource values are descriptive only. 
+The proof does not compare
 physical-platform results, sectioning results, all Core layouts or export
 bytes. This result supplies bounded evidence for Phase 7 Exits 1, 2 and 3,
 and reduces one remaining legacy operation for Exit 4. It accepts no exit.
+
 Phase 7 stays Open at 0/4 and all four exits stay Pending. D-P6-008, all
 recorded limitations, comparison requirements and legacy-retirement
 conditions stay in full. Project status stays `unknown` and output stays

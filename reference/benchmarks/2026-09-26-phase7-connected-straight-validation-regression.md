@@ -28,7 +28,7 @@ The new calculation uses `tracktemplate.domain.alignment` through
 point coordinates through read-only X and Y views. It allocates no new
 native vector. The selected B16 caller now uses that adapter. The routing
 record uses schema `12`, nineteen selected functions and 39 caller
-identities. It puts previous values back after a selection error.
+identities. After a selection error, it replaces selected values with their previous values.
 
 | Product file | SHA-256 |
 | --- | --- |
@@ -58,6 +58,7 @@ checks unchanged document state on rejection, routing identity, closure
 identity and recovery. The qualified headless matrix then gave PASS results
 for its preflight, the new proof and all eleven affected previous proofs.
 Each of its 13 gates had a zero exit and its required success sentinel.
+
 The three remaining transition checks for persistence, Coin and Edit also
 gave PASS results with their required sentinels. The project reused the
 qualified preflight and standalone result for those distinct checks.
@@ -66,7 +67,9 @@ The isolated real-GUI comparison uses one connected-straight Generate and
 Replace run for each state. The current-main baseline was recorded on
 2026-09-20. The candidate ran on 2026-09-26. Both use the same D-GOV-019
 profile, copied fixture and frozen protocol. The candidate completes Create,
-Edit, Undo/Redo, rejection, Save, reopen and cleanup. The complete product
+Edit, Undo/Redo, rejection, Save, reopen and cleanup.
+
+The complete product
 comparison has zero differences and the same semantic SHA-256:
 `25b5a51c4fbf73466533cc41d4d55dde5077c26e39d501a14a0214ee01842cff`.
 The fixture SHA-256 remains
@@ -85,7 +88,8 @@ operations after the route grew from eighteen to nineteen functions.
 After the second pass, two synthetic-host rollback tests still stopped with
 `KeyError`. They tried to delete the new selected name from a host where
 that name had never existed. The primary classification is
-`fixture-or-harness-defect`; the original rollback assertion remains valid.
+`fixture-or-harness-defect`. The original rollback assertion remains valid.
+
 The owner authorised one test-only exception for those two tests. Each now
 deletes the name only when it exists. The two original proofs then passed
 with their required sentinels. The exception gives no product-source repair
@@ -98,7 +102,9 @@ keeps all initial failures, corrections and rerun logs. PR #82's separate
 One frozen same-host micro check used three groups of 10,000 fresh calls for
 each of four route cases. The candidate took 2.68 to 2.94 times the
 baseline CPU time per call. The additional time is approximately 5 to 12
-microseconds per call. The GUI used one sample per state at different times.
+microseconds per call.
+
+The GUI used one sample per state at different times.
 Its wall time was lower in the candidate run, but operating-system cache
 and scheduling were not controlled. These values are descriptive. They do
 not prove a performance improvement or satisfy D-P6-008.

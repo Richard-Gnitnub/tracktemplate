@@ -71,7 +71,7 @@ The product selects nineteen functions together and validates 39 caller
 identities. It validates the selected calculation, its private dependencies,
 the adapter and the `run_macro` call. The routing record uses schema `12`
 and identity `tracktemplate:phase7:connected-straight-validation:1`. After a
-setup error, the product puts each previous host value back. It removes a
+setup error, the product replaces each selected host value with its previous value. It removes a
 new value only when the host did not have that name before selection.
 
 ## Scope and limits
