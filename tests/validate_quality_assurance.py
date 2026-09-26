@@ -610,7 +610,8 @@ def validate_documentation_profile(
         "trailing-space warning" in owner_view
         and "complete local transition profile have PASS results"
         in owner_view
-        and "Its next exact-green draft needs a separate integration decision"
+        and "The next owner boundary is Richard's integration decision on "
+        "this candidate after exact-green draft publication"
         in owner_view
         and "The [capability matrix](CAPABILITY_MATRIX.md) records "
         "integrated evidence through PR #84 only"

@@ -1048,7 +1048,8 @@ def _validate_owner_view(plan: str) -> None:
         "locked Phase evidence keeps its recorded non-blocking trailing-space "
         "warning",
         "complete local transition profile have PASS results",
-        "Its next exact-green draft needs a separate integration decision",
+        "The next owner boundary is Richard's integration decision on this "
+        "candidate after exact-green draft publication",
         "The [capability matrix](CAPABILITY_MATRIX.md) records integrated "
         "evidence through PR #84 only",
         "D-P6-008",
