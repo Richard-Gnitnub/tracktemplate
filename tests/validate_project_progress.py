@@ -1033,7 +1033,7 @@ def _validate_owner_view(plan: str) -> None:
         "All four exits are Pending",
         "Output has private-development status",
         "project status stays `unknown`",
-        "PR #84 is integrated on protected main",
+        "PR #84 is in protected `main` at",
         "bounded `validate_platform_inputs` Level 2 result",
         "B14/B15-identical platform input gate in the Core domain and API",
         "schema `13`, twenty selected functions and 39 caller identities",
@@ -1048,10 +1048,11 @@ def _validate_owner_view(plan: str) -> None:
         "locked Phase evidence keeps its recorded non-blocking trailing-space "
         "warning",
         "The complete local transition profile has a PASS result",
-        "The replacement Documentation Review approved the candidate with "
-        "three exact corrections; locked final validation and exact-head CI passed",
+        "The replacement Documentation Review gave an "
+        "`APPROVED_WITH_EXACT_CORRECTIONS` verdict with three exact corrections. "
+        "The locked final validation and exact-head CI had PASS results",
         "A next draft needs a separate integration decision",
-        "The [capability matrix](CAPABILITY_MATRIX.md) now maps the integrated "
+        "The [capability matrix](CAPABILITY_MATRIX.md) now records repository "
         "evidence through PR #84",
         "D-P6-008",
         "recorded product limitations, comparison requirements and "
@@ -5305,10 +5306,11 @@ def _validate_capability_matrix(matrix: str) -> None:
             "A",
             "A",
             "[Phase 1 workflow inventory](phase-evidence/"
-            "PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory); "
+            "PHASE1_INVENTORY.md#release-critical-workflow-coverage-inventory), "
             "[straight/station series](benchmarks/"
-            "2026-07-20-b14-straight-station-workflow-series.md); "
-            "[Phase 7 straight-route contract](contracts/phase7-straight-route.md); "
+            "2026-07-20-b14-straight-station-workflow-series.md), "
+            "[Phase 7 station mapping contract](contracts/phase7-station-mapping.md), "
+            "[Phase 7 straight-route contract](contracts/phase7-straight-route.md), "
             "[Phase 7 connected-route contract](contracts/"
             "phase7-connected-straight-validation.md)",
             "Partial",
@@ -5353,10 +5355,10 @@ def _validate_capability_matrix(matrix: str) -> None:
             "A",
             "P",
             "[Workflow coverage contract](contracts/"
-            "phase1-workflow-coverage.json); [Phase 5 closeout](history/"
+            "phase1-workflow-coverage.json), [Phase 5 closeout](history/"
             "phase-closeouts/PHASE5_CLOSEOUT.md#"
-            "representative-multi-object-selection-and-edit-tranche); "
-            "[Phase 7 preparation contract](contracts/phase7-track-preparation.md); "
+            "representative-multi-object-selection-and-edit-tranche), "
+            "[Phase 7 preparation contract](contracts/phase7-track-preparation.md), "
             "[Phase 7 connected-route contract](contracts/"
             "phase7-connected-straight-validation.md)",
             "Partial",
@@ -5476,10 +5478,10 @@ def _validate_capability_matrix(matrix: str) -> None:
             "A",
             "A",
             "A",
-            "[B14 oracle](../AdvancedTurnout.FCMacro); [Phase 1 workflow "
+            "[B14 oracle](../AdvancedTurnout.FCMacro), [Phase 1 workflow "
             "inventory](phase-evidence/PHASE1_INVENTORY.md#"
-            "release-critical-workflow-coverage-inventory); "
-            "[Phase 7 platform-core contract](contracts/phase7-platform-core.md); "
+            "release-critical-workflow-coverage-inventory), "
+            "[Phase 7 platform-core contract](contracts/phase7-platform-core.md), "
             "[Phase 7 platform-input contract](contracts/"
             "phase7-platform-input-validation.md)",
             "Partial",
