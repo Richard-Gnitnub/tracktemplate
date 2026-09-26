@@ -425,11 +425,11 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 12
+        assert record["schema_version"] == 13
         assert record["contract_id"] == (
-            "tracktemplate:phase7:connected-straight-validation:1"
+            "tracktemplate:phase7:platform-input-validation:1"
         )
-        assert len(record["function_names"]) == 19
+        assert len(record["function_names"]) == 20
         assert len(workflow.PRODUCT_CALLER_ROUTES) == 39
         assert workflow.PRODUCT_CALLER_ROUTES == expected_caller_routes()
         assert tuple(record["function_names"][8:10]) == PAIR
@@ -593,6 +593,14 @@ def expected_caller_routes():
     routes[4] = (name, targets + (
         "mirror_alignment_for_turn", "validate_connected_straight_routes",
     ))
+    for position, (name, targets) in enumerate(routes):
+        if name == "calculate_platform_boundaries":
+            routes[position] = (
+                name, targets + ("validate_platform_inputs",),
+            )
+            break
+    else:
+        raise AssertionError("The inherited platform caller is missing")
     return tuple(routes)
 
 

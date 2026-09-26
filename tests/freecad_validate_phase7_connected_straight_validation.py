@@ -115,7 +115,7 @@ def validate():
     if not baseline_only:
         functions = {name: getattr(api, name)
                      for name in workflow.PRODUCT_FUNCTION_NAMES}
-        assert proof.NAME in functions and len(functions) == 19
+        assert proof.NAME in functions and len(functions) == 20
         # Exercise full restoration after a failure during staged selection.
         rollback = load_host()
         previous = dict(rollback.module.__dict__)
@@ -156,9 +156,9 @@ def validate():
 
         session = workflow.ModularTransitionWorkflowSession(host, functions)
         record = session.routing_record()
-        assert record["schema_version"] == 12
+        assert record["schema_version"] == 13
         assert record["contract_id"] == (
-            "tracktemplate:phase7:connected-straight-validation:1"
+            "tracktemplate:phase7:platform-input-validation:1"
         )
         assert record["function_names"] == list(functions)
         callers = list(dict.fromkeys(name for name, _ in workflow.PRODUCT_CALLER_ROUTES))

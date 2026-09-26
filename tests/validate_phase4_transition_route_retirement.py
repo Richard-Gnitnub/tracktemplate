@@ -197,6 +197,7 @@ def _validate_product_boundary():
             "build_platform_core",
             "signed_side_factor", "effective_constant_radius",
             "prepare_track_alignment", "validate_connected_straight_routes",
+            "validate_platform_inputs",
         )
     }
     host = FakeHost()
@@ -221,8 +222,8 @@ def _validate_product_boundary():
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 12,
-        "contract_id": "tracktemplate:phase7:connected-straight-validation:1",
+        "schema_version": 13,
+        "contract_id": "tracktemplate:phase7:platform-input-validation:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),

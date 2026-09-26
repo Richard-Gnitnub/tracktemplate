@@ -1033,18 +1033,23 @@ def _validate_owner_view(plan: str) -> None:
         "All four exits are Pending",
         "Output has private-development status",
         "project status stays `unknown`",
-        "PR #82 integrated the bounded `prepare_track_alignment` result",
-        "connected straight route validation result is the current Level 2 "
-        "candidate",
-        "B14/B15-identical safety calculation in the Core domain and API",
-        "schema `12`, nineteen selected functions and 39 callers",
-        "GUI product comparison has zero differences",
-        "Independent source-and-test review found no blocker",
-        "normal repair accounting is 2/2 exhausted",
-        "one owner-authorised test-only exception is consumed",
-        "PR #82's separate repair and exception history remains unchanged",
+        "PR #83 is integrated on protected main",
+        "bounded `validate_platform_inputs` Level 2 candidate",
+        "B14/B15-identical platform input gate in the Core domain and API",
+        "schema `13`, twenty selected functions and 39 caller identities",
+        "The paired GUI product semantics match",
+        "Fresh independent source-and-test review found no blocker",
+        "normal 2/2 test-only repair passes",
+        "original independent `BLOCKED` verdict",
+        "PR #83's separate 2/2 and owner-authorised test-only exception "
+        "remain historical",
         "measured micro-call cost increased",
-        "GUI resource values are descriptive only",
+        "One GUI sample per state gives descriptive resources only",
+        "locked Phase evidence keeps its recorded non-blocking trailing-space "
+        "warning",
+        "The complete local transition profile passed. Documentation Review, "
+        "final deterministic validation and exact-head CI remain before "
+        "publication",
         "D-P6-008",
         "recorded product limitations, comparison requirements and "
         "legacy-retirement conditions stay in full",

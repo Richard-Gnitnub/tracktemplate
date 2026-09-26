@@ -6,6 +6,12 @@ from dataclasses import dataclass
 
 
 GEOMETRY_TOLERANCE = 1.0e-8
+TEMPLATE_THICKNESS = 1.0
+PLATFORM_BETWEEN = "Between two tracks"
+PLATFORM_OUTSIDE = "Outside one track"
+PLATFORM_END_TAPERED = "Tapered"
+PLATFORM_EDGES_ONLY = "Edges only (2D)"
+PLATFORM_SOLID = "3D platform solid"
 _CORE_SAMPLE_SPACING = 3.0
 MODE_MATCH_SPACINGS = "Euler - match spacings"
 MODE_USE_LENGTHS = "Euler - use lengths"
@@ -29,6 +35,7 @@ __all__ = (
     "platform_transition_displacement",
     "platform_peak_curvature_factor",
     "prepare_track_alignment",
+    "validate_platform_inputs",
     "signed_side_factor",
     "solve_platform_shape_parameter",
     "transition_start_signed_offset",
@@ -1768,6 +1775,81 @@ def validate_connected_straight_routes(straight_routes, curve_alignments):
                     "endpoint or tangent validation. No existing generated "
                     "objects have been removed.".format(
                         route.get("name", "Unnamed straight"), index + 1
+                    )
+                )
+
+
+def validate_platform_inputs(config, all_alignments):
+    if not config["enabled"]:
+        return
+    if not config["name"].strip():
+        raise ValueError("The platform name cannot be blank.")
+    if not all_alignments:
+        raise ValueError("No track alignments are available for the platform.")
+
+    maximum_index = len(all_alignments) - 1
+    if config["track_a_index"] < 0 or config["track_a_index"] > maximum_index:
+        raise ValueError("Platform Track A no longer exists. Select an available track.")
+    if config["arrangement"] == PLATFORM_BETWEEN:
+        if config["track_b_index"] < 0 or config["track_b_index"] > maximum_index:
+            raise ValueError("Platform Track B no longer exists. Select an available track.")
+        if config["track_a_index"] == config["track_b_index"]:
+            raise ValueError("A between-track platform needs two different tracks.")
+
+    if config["clearance_a"] <= 0.0:
+        raise ValueError("The Track A platform-edge clearance must be greater than zero.")
+    if config["arrangement"] == PLATFORM_BETWEEN and config["clearance_b"] <= 0.0:
+        raise ValueError("The Track B platform-edge clearance must be greater than zero.")
+    if config["platform_length"] <= 0.0:
+        raise ValueError("Platform length must be greater than zero.")
+    if config["arrangement"] == PLATFORM_OUTSIDE and config["platform_width"] <= 0.0:
+        raise ValueError("An outside platform width must be greater than zero.")
+    if config["body_output"] == PLATFORM_SOLID and config["platform_height"] <= 0.0:
+        raise ValueError("A 3D platform height must be greater than zero.")
+    if (
+        config["body_output"] == PLATFORM_SOLID
+        and config["vertical_end_ramps"]
+        and config["platform_height"] <= TEMPLATE_THICKNESS + GEOMETRY_TOLERANCE
+    ):
+        raise ValueError(
+            "A tapered 3D platform must be higher than the {:.3f} mm trackbed "
+            "template surface.".format(TEMPLATE_THICKNESS)
+        )
+    if (
+        config["entry_end_style"] == PLATFORM_END_TAPERED
+        and config["entry_taper_length"] <= 0.0
+    ):
+        raise ValueError("A tapered entry ramp needs an entry end length greater than zero.")
+    if (
+        config["exit_end_style"] == PLATFORM_END_TAPERED
+        and config["exit_taper_length"] <= 0.0
+    ):
+        raise ValueError("A tapered exit ramp needs an exit end length greater than zero.")
+    if not config["create_edges"] and config["body_output"] == PLATFORM_EDGES_ONLY:
+        raise ValueError(
+            "The platform is enabled but both edge creation and body creation are disabled."
+        )
+    if config["check_clearance"]:
+        required = config["required_clearance"]
+        selected = [config["track_a_index"]]
+        clearances = [config["clearance_a"]]
+        if config["arrangement"] == PLATFORM_BETWEEN:
+            selected.append(config["track_b_index"])
+            clearances.append(config["clearance_b"])
+        for track_index, clearance in zip(selected, clearances):
+            track = all_alignments[track_index]
+            template_half_width = (
+                0.5 * float(track["width"])
+                if track.get("create_template", False)
+                else 0.0
+            )
+            minimum = max(required, template_half_width)
+            if clearance + 1.0e-9 < minimum:
+                raise ValueError(
+                    "Platform clearance beside '{}' is {:.3f} mm, but the enabled "
+                    "clearance check requires at least {:.3f} mm. Increase the edge "
+                    "clearance, reduce the required envelope, or untick the check.".format(
+                        track["name"], clearance, minimum
                     )
                 )
 

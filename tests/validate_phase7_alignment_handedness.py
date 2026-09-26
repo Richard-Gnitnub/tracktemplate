@@ -485,11 +485,11 @@ def validate_binding():
         namespace = session.module.__dict__
         original = dict(namespace)
         record = session.routing_record()
-        assert record["schema_version"] == 12
+        assert record["schema_version"] == 13
         assert record["contract_id"] == (
-            "tracktemplate:phase7:connected-straight-validation:1"
+            "tracktemplate:phase7:platform-input-validation:1"
         )
-        assert len(record["function_names"]) == 19
+        assert len(record["function_names"]) == 20
         assert record["function_names"][10] == TARGET
         assert workflow.PRODUCT_CALLER_ROUTES == station.expected_caller_routes()
         assert len(workflow.PRODUCT_CALLER_ROUTES) == 39

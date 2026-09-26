@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase7:platform-input-validation:1",
+  "recorded_on": "2026-09-26",
+  "authority": [
+    "D-GOV-004",
+    "D-P7-001",
+    "Project owner Phase 7 continuation on 2026-09-26"
+  ],
+  "change_level": 2,
+  "contract_document": "reference/contracts/phase7-platform-input-validation.md",
+  "legacy_reference": {
+    "sources": [
+      "AdvancedTurnout.FCMacro",
+      "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro"
+    ],
+    "definition_sha256": "1547dff9a060054e89fe6502a73c4a7cfbfad96cc257ef7a23c672895a1c4d99",
+    "definition_bytes": 3753,
+    "sole_product_caller": "calculate_platform_boundaries",
+    "caller_position": "after the enabled check and before platform-boundary geometry"
+  },
+  "calculation": {
+    "module": "tracktemplate.domain.alignment",
+    "api": "tracktemplate.api.validate_platform_inputs",
+    "parameters": ["config", "all_alignments"],
+    "defaults": {},
+    "return_on_success": null,
+    "length_unit": "mm",
+    "input_mutation": false,
+    "document_mutation": false,
+    "cached": false,
+    "disabled_behavior": "return without reading any other configuration or alignment field",
+    "mode_values": {
+      "between": "Between two tracks",
+      "outside": "Outside one track",
+      "tapered_end": "Tapered",
+      "edges_only": "Edges only (2D)",
+      "solid": "3D platform solid"
+    },
+    "template_thickness_mm": 1.0,
+    "geometry_tolerance_mm": 1e-08,
+    "clearance_comparison_mm": 1e-09,
+    "operation_order": [
+      "enabled and nonblank name",
+      "nonempty alignment list and selected track indices",
+      "positive edge clearances and platform dimensions",
+      "solid height and tapered-solid height above the template surface",
+      "positive tapered-end lengths",
+      "edge-or-body output enabled",
+      "optional selected-track clearance and template-half-width check"
+    ],
+    "diagnostics": [
+      "The platform name cannot be blank.",
+      "No track alignments are available for the platform.",
+      "Platform Track A no longer exists. Select an available track.",
+      "Platform Track B no longer exists. Select an available track.",
+      "A between-track platform needs two different tracks.",
+      "The Track A platform-edge clearance must be greater than zero.",
+      "The Track B platform-edge clearance must be greater than zero.",
+      "Platform length must be greater than zero.",
+      "An outside platform width must be greater than zero.",
+      "A 3D platform height must be greater than zero.",
+      "A tapered 3D platform must be higher than the {:.3f} mm trackbed template surface.",
+      "A tapered entry ramp needs an entry end length greater than zero.",
+      "A tapered exit ramp needs an exit end length greater than zero.",
+      "The platform is enabled but both edge creation and body creation are disabled.",
+      "Platform clearance beside '{}' is {:.3f} mm, but the enabled clearance check requires at least {:.3f} mm. Increase the edge clearance, reduce the required envelope, or untick the check."
+    ]
+  },
+  "product_routing": {
+    "record_schema_version": 13,
+    "route": "modular",
+    "comparison_route_available": false,
+    "selected_function_count": 20,
+    "caller_count": 39,
+    "selected_caller": "calculate_platform_boundaries",
+    "selected_caller_target": "validate_platform_inputs",
+    "adapter": null,
+    "mixed_route": false,
+    "setup_failure": "restore each prior host value and remove only a selected name that was originally absent"
+  },
+  "scope": {
+    "supported": "B14/B15 platform-input gate and bounded B16 platform-boundary caller",
+    "excluded": [
+      "B14 or B15 changes",
+      "new validation, geometry, tolerance or diagnostic behavior",
+      "stored state, production geometry or export changes",
+      "legacy path retirement",
+      "Phase 7 exit, performance, output or release acceptance"
+    ]
+  },
+  "validation": {
+    "standalone": "tests/validate_phase7_platform_input_validation.py",
+    "qualified_host": "tests/freecad_validate_phase7_platform_input_validation.py"
+  }
+}
