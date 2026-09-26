@@ -585,45 +585,33 @@ def validate_documentation_profile(
         "PROJECT_PLAN owner view lost its derivation boundary",
     )
     require(
-        "Phase 6 is closed with four accepted exits and one deferred, unmet "
-        "obligation" in owner_view
-        and "Phase 7 is Open at 0/4" in owner_view
-        and "All four exits are Pending" in owner_view
-        and "PR #84 is in protected `main` at" in owner_view
-        and "Candidate `1180133c63026766369da3e33b69dd7c9869663e`"
-        in owner_view
-        and "platform position candidate"
-        in owner_view
-        and "no-blocker independent source-and-test review"
-        in owner_view
-        and "The new result is at repair 1/2" in owner_view
-        and "PR #84's separate 2/2 test-only repairs, original `BLOCKED` "
-        "review and no-proof command remain historical" in owner_view
-        and "PR #83's separate repairs and exception remain historical"
-        in owner_view
-        and "schema `14`, 21 selected functions and 39 caller identities"
-        in owner_view
-        and "The paired GUI platform Create/Edit product semantics match"
-        in owner_view
-        and "measured micro-call cost increased" in owner_view
-        and "locked Phase evidence keeps its recorded non-blocking "
-        "trailing-space warning" in owner_view
-        and "complete local transition profile have PASS results"
-        in owner_view
-        and "The next owner boundary is Richard's integration decision on "
-        "this candidate after exact-green draft publication"
-        in owner_view
-        and "The [capability matrix](CAPABILITY_MATRIX.md) records "
-        "integrated evidence through PR #84 only"
-        in owner_view
-        and "D-P6-008" in owner_view
-        and "This new candidate has no integration or Phase 7 exit decision"
-        in owner_view
-        and "It accepts no Phase 7 exit, performance result, output status, "
-        "wider migration, legacy retirement or release state"
-        in owner_view
-        and "Output has private-development status" in owner_view
-        and "project status stays `unknown`" in owner_view,
+        all(fragment in " ".join(owner_view.split()) for fragment in (
+            'Phase 6 is closed with four accepted exits and one deferred, unmet obligation',
+            'Phase 7 is Open at 0/4',
+            'All four exits are Pending',
+            'Output has private-development status',
+            'project status stays `unknown`',
+            'PR #85 is in protected `main` at',
+            'bounded platform direction and station range candidate remains unmerged',
+            'B14/B15-identical `alignment_progress_at_station`, `station_for_progress_heading` and `platform_coverage_bounds`',
+            'schema `15`, 24 selected functions and 40 caller identities',
+            '193-case direct and D-GOV-019 qualified comparisons and all 14 affected qualified proofs have PASS results',
+            'The paired GUI platform Create/Edit product semantics match',
+            'Complete validation and independent review remain publication conditions',
+            'Normal repairs are 2/2 exhausted',
+            'Both earlier owner exceptions and the final 1/1 caller-assertion exception are consumed',
+            'Original failures and classifications remain retained evidence',
+            'PR #83 and PR #84 repair and review histories stay unchanged',
+            'PR #83 measured micro-call cost increased',
+            'locked Phase evidence keeps its recorded non-blocking trailing-space warning',
+            'bounded GUI resource samples give no performance credit',
+            "Richard's next owner boundary is integration of this bounded result after exact-green draft publication",
+            'The [capability matrix](CAPABILITY_MATRIX.md) records integrated evidence through PR #84 only',
+            'D-P6-008',
+            'recorded product limitations, comparison requirements and legacy-retirement conditions stay in full',
+            'This candidate has no integration or Phase 7 exit decision',
+            'It accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state',
+        )),
         "PROJECT_PLAN owner view contradicts current authority",
     )
 

@@ -1027,37 +1027,31 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        "Phase 6 is closed with four accepted exits and one deferred, unmet "
-        "obligation",
-        "Phase 7 is Open at 0/4",
-        "All four exits are Pending",
-        "Output has private-development status",
-        "project status stays `unknown`",
-        "PR #84 is in protected `main` at",
-        "Candidate `1180133c63026766369da3e33b69dd7c9869663e`",
-        "B14/B15-identical `resolve_platform_longitudinal_bounds`",
-        "schema `14`, 21 selected functions and 39 caller identities",
-        "The paired GUI platform Create/Edit product semantics match",
-        "no-blocker independent source-and-test review",
-        "The new result is at repair 1/2",
-        "PR #84's separate 2/2 test-only repairs, original `BLOCKED` review "
-        "and no-proof command remain historical",
-        "PR #83's separate repairs and exception remain historical",
-        "Its measured micro-call cost increased",
-        "One GUI sample per state gives no performance credit",
-        "locked Phase evidence keeps its recorded non-blocking trailing-space "
-        "warning",
-        "complete local transition profile have PASS results",
-        "The next owner boundary is Richard's integration decision on this "
-        "candidate after exact-green draft publication",
-        "The [capability matrix](CAPABILITY_MATRIX.md) records integrated "
-        "evidence through PR #84 only",
-        "D-P6-008",
-        "recorded product limitations, comparison requirements and "
-        "legacy-retirement conditions stay in full",
-        "This new candidate has no integration or Phase 7 exit decision",
-        "It accepts no Phase 7 exit, performance result, output status, "
-        "wider migration, legacy retirement or release state",
+        'Phase 6 is closed with four accepted exits and one deferred, unmet obligation',
+        'Phase 7 is Open at 0/4',
+        'All four exits are Pending',
+        'Output has private-development status',
+        'project status stays `unknown`',
+        'PR #85 is in protected `main` at',
+        'bounded platform direction and station range candidate remains unmerged',
+        'B14/B15-identical `alignment_progress_at_station`, `station_for_progress_heading` and `platform_coverage_bounds`',
+        'schema `15`, 24 selected functions and 40 caller identities',
+        '193-case direct and D-GOV-019 qualified comparisons and all 14 affected qualified proofs have PASS results',
+        'The paired GUI platform Create/Edit product semantics match',
+        'Complete validation and independent review remain publication conditions',
+        'Normal repairs are 2/2 exhausted',
+        'Both earlier owner exceptions and the final 1/1 caller-assertion exception are consumed',
+        'Original failures and classifications remain retained evidence',
+        'PR #83 and PR #84 repair and review histories stay unchanged',
+        'PR #83 measured micro-call cost increased',
+        'locked Phase evidence keeps its recorded non-blocking trailing-space warning',
+        'bounded GUI resource samples give no performance credit',
+        "Richard's next owner boundary is integration of this bounded result after exact-green draft publication",
+        'The [capability matrix](CAPABILITY_MATRIX.md) records integrated evidence through PR #84 only',
+        'D-P6-008',
+        'recorded product limitations, comparison requirements and legacy-retirement conditions stay in full',
+        'This candidate has no integration or Phase 7 exit decision',
+        'It accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state',
     ):
         _require(
             fragment in owner_view,

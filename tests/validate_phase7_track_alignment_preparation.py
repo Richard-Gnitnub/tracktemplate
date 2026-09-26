@@ -492,6 +492,7 @@ def validate_contract():
     ]
     assert routing["caller_names"] == [
         name for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
+        if name != "station_for_progress_heading"
     ]
     assert routing["track_preparation_dependencies"] == list(
         PREPARATION_DEPENDENCIES
@@ -605,19 +606,19 @@ def validate_binding():
             _functions(),
         )
         record = session.routing_record()
-        assert record["schema_version"] == 14
+        assert record["schema_version"] == 15
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-longitudinal-bounds:1"
+            "tracktemplate:phase7:platform-heading-coverage:1"
         )
         assert record["function_names"] == list(
             transition_workflow.PRODUCT_FUNCTION_NAMES
         )
-        assert len(record["function_names"]) == 21
+        assert len(record["function_names"]) == 24
         assert record["caller_names"] == [
             name
             for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
         ]
-        assert len(record["caller_names"]) == 39
+        assert len(record["caller_names"]) == 40
         assert record["mixed_route"] is False
 
         adapter = session.module.prepare_track_alignment
@@ -696,7 +697,7 @@ def validate_binding():
                 fresh,
                 invalid,
             ),
-            "complete twenty-one-function",
+            "complete twenty-four-function",
         )
         assert core_proof._snapshot(fresh) == before
         assert fresh.module.LAUNCH_COUNT == 0

@@ -199,6 +199,9 @@ def _validate_product_boundary():
             "prepare_track_alignment", "validate_connected_straight_routes",
             "validate_platform_inputs",
             "resolve_platform_longitudinal_bounds",
+            "alignment_progress_at_station",
+            "station_for_progress_heading",
+            "platform_coverage_bounds",
         )
     }
     host = FakeHost()
@@ -215,6 +218,8 @@ def _validate_product_boundary():
             "build_straight_route",
             "alignment_station_data", "interpolate_alignment_station",
             "mirror_alignment_for_turn", "validate_connected_straight_routes",
+            "alignment_progress_at_station", "station_for_progress_heading",
+            "platform_coverage_bounds",
         }:
             assert host.module.__dict__[name].calculation is (
                 functions[name]
@@ -223,8 +228,8 @@ def _validate_product_boundary():
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 14,
-        "contract_id": "tracktemplate:phase7:platform-longitudinal-bounds:1",
+        "schema_version": 15,
+        "contract_id": "tracktemplate:phase7:platform-heading-coverage:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),

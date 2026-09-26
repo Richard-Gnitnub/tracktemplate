@@ -12,6 +12,10 @@ PLATFORM_OUTSIDE = "Outside one track"
 PLATFORM_END_TAPERED = "Tapered"
 PLATFORM_EDGES_ONLY = "Edges only (2D)"
 PLATFORM_SOLID = "3D platform solid"
+PLATFORM_CONSTANT = "Constant curve only"
+PLATFORM_ENTRY = "Entry transition and constant curve"
+PLATFORM_EXIT = "Constant curve and exit transition"
+PLATFORM_CORE = "Both transitions and constant curve"
 _CORE_SAMPLE_SPACING = 3.0
 MODE_MATCH_SPACINGS = "Euler - match spacings"
 MODE_USE_LENGTHS = "Euler - use lengths"
@@ -21,6 +25,9 @@ __all__ = (
     "AlignmentStationInterpolation",
     "alignment_station_data",
     "interpolate_alignment_station",
+    "alignment_progress_at_station",
+    "station_for_progress_heading",
+    "platform_coverage_bounds",
     "add_common_straight_extensions",
     "build_concentric_core",
     "build_platform_core",
@@ -2003,6 +2010,88 @@ def interpolate_alignment_station(data, station):
         heading_b,
         fraction,
     )
+
+
+def alignment_progress_at_station(
+    data, station, turn_sign, *, _heading_at_station=None,
+):
+    """Return nonnegative turn progress from one station's heading."""
+    if _heading_at_station is None:
+        heading = interpolate_alignment_station(data, station).heading
+    else:
+        heading = _heading_at_station(data, station)
+    return max(0.0, heading * turn_sign)
+
+
+def station_for_progress_heading(
+    data, target_progress, turn_sign, *, _progress_at_station=None,
+):
+    """Locate a turn heading within the inherited core station interval."""
+    low = data["core_start"]
+    high = data["core_end"]
+    progress = (
+        alignment_progress_at_station
+        if _progress_at_station is None else _progress_at_station
+    )
+    progress_low = progress(data, low, turn_sign)
+    progress_high = progress(data, high, turn_sign)
+    target = min(max(float(target_progress), progress_low), progress_high)
+
+    if target <= progress_low + 1.0e-11:
+        return low
+    if target >= progress_high - 1.0e-11:
+        return high
+
+    for _iteration in range(64):
+        midpoint = 0.5 * (low + high)
+        value = progress(data, midpoint, turn_sign)
+        if value < target:
+            low = midpoint
+        else:
+            high = midpoint
+    return 0.5 * (low + high)
+
+
+def platform_coverage_bounds(
+    alignments, coverage, turn_sign, *,
+    _station_data=None, _progress_at_station=None,
+):
+    """Return the shared turn-heading bounds for a selected platform mode."""
+    if not alignments:
+        raise ValueError("A platform needs at least one selected track.")
+
+    station_data = alignment_station_data if _station_data is None else _station_data
+    progress = (
+        alignment_progress_at_station
+        if _progress_at_station is None else _progress_at_station
+    )
+    totals = []
+    entry_limits = []
+    exit_limits = []
+    for alignment in alignments:
+        data = station_data(alignment)
+        total = progress(data, data["core_end"], turn_sign)
+        totals.append(total)
+        entry_limits.append(abs(float(alignment.get("entry_angle", 0.0))))
+        exit_limits.append(total - abs(float(alignment.get("exit_angle", 0.0))))
+
+    total_progress = min(totals)
+    constant_start = max(entry_limits)
+    constant_finish = min(exit_limits)
+    if coverage == PLATFORM_CORE:
+        return 0.0, total_progress
+    if constant_finish <= constant_start + 1.0e-10:
+        raise ValueError(
+            "The selected tracks do not share a usable constant-curve heading range. "
+            "Choose Both transitions and constant curve, or change the track geometry."
+        )
+    if coverage == PLATFORM_CONSTANT:
+        return constant_start, constant_finish
+    if coverage == PLATFORM_ENTRY:
+        return 0.0, constant_finish
+    if coverage == PLATFORM_EXIT:
+        return constant_start, total_progress
+    raise ValueError("Unknown platform coverage mode '{}'.".format(coverage))
 
 
 def mirror_alignment_for_turn(alignment, turn_sign):
