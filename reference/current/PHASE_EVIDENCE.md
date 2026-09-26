@@ -48,7 +48,9 @@ no exit and gives no improvement evidence for D-P6-008. It does not compare all
 platform arrangements, coverage values, shapes, dimensions, positions, stored
 state or export bytes. It removes none of the paths that D-P7-001 keeps. Phase
 7 stays Open at 0/4 with all exits Pending. D-P6-008, all recorded limitations,
-comparison requirements and legacy-retirement conditions stay in full. Output
+comparison requirements and legacy-retirement conditions stay in full.
+
+Output
 stays at private-development status and project status stays `unknown`.
 
 <a id="phase7-platform-heading-coverage-migration"></a>

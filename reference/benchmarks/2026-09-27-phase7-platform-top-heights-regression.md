@@ -59,7 +59,7 @@ snapshot iterated an instrumented station list and caused its injected error.
 The full first output is
 `tmp/phase7-platform-top-heights/focused-standalone.log`, with SHA-256
 `7595cf590ed7a6727e1f52e3789afd398e5145793b7cd0f9a2f26564450645cc`.
-The classification is a test-or-oracle defect. Its record has SHA-256
+The failure class is `test-or-oracle-defect`. Its record is `tmp/phase7-platform-top-heights/repair-1-classification.txt`, with SHA-256
 `0fac846b55f2381d4015a4fb4b23ec8b601987016639d82d341b882c678246d5`.
 
 Repair 1 changed only the pre-call snapshot in the new test. The calculation
@@ -84,7 +84,7 @@ outside-platform fixture did not supply `outside_side`, which the inherited
 caller reads first. The first output is
 `tmp/phase7-platform-top-heights/candidate-qualified.log`, with SHA-256
 `352a3b0a6a522fedaff3382586289b3f2be93356f5a226f17d77beb6ab54c0ee`.
-The fixture-or-harness classification has SHA-256
+The failure class is `fixture-or-harness-defect`. Its record is `tmp/phase7-platform-top-heights/repair-2-classification.txt`, with SHA-256
 `9e5ad494e33259682f0098558b353d7b23f77086ec7866feee0d4985b6bf3bfd`.
 
 Repair 2 supplied the inherited `PLATFORM_LEFT` value to that fixture only.

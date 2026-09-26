@@ -27,9 +27,9 @@ When `body_output` is not `PLATFORM_SOLID`, the function returns a new list.
 Each item has the selected platform height. In this branch, the function does
 not read the entry or exit end inputs. It does not use `platform_length`.
 
-For a solid result, the function reads an entry length only when
+When `body_output` is `PLATFORM_SOLID`, the function reads an entry length only when
 `entry_end_style` is `PLATFORM_END_TAPERED`. It reads an exit length only when
-`exit_end_style` is `PLATFORM_END_TAPERED`. For each different end style, the
+`exit_end_style` is `PLATFORM_END_TAPERED`. For all other values of these two inputs, the
 applicable length is `0.0`.
 
 The function processes stations in their supplied sequence. It starts each
