@@ -74,12 +74,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:545bd351c7cb01c62f82c6e07f797beb1d23ac70",
-      "accepted_sha256": "sha256:2e26252741201ad1e086f296522d2b31edcd5dfbf3ab4aedbacc46cb7ec694ea",
+      "accepted_blob": "sha1:376b586331be5bf700fd63fa8a945b1fe9bfe82e",
+      "accepted_sha256": "sha256:09793aefeca911cf95915caa499287a3fcb05326f9ee288ae578800ba215eabd",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/PROJECT_PLAN.md",
-      "review_receipt": "sha256:38fac5552d4450aec2da8b31eb6644f9366fa98bac4b08aa20266263ca14dcad",
+      "review_receipt": "sha256:8ad24670e2d0dd594c530e59ae7601cedb99428bf20dbf12487d48368fd5e83f",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -209,6 +209,15 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:9b0d19a1336a225e9ea7f5688e63904b58b74932",
+      "accepted_sha256": "sha256:ecea6c8ce2634bb790c75e52dc9c41316a204716b93d11f5e53d9a3d97ddb748",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/benchmarks/2026-09-26-phase7-platform-heading-coverage-regression.md",
+      "review_receipt": "sha256:8ad24670e2d0dd594c530e59ae7601cedb99428bf20dbf12487d48368fd5e83f",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:1337ccb1bc585fabeac232985514c92d03dcc2e6",
       "accepted_sha256": "sha256:c7c4fb78cb6fae756a3f3d6b74502203974e01142f1e1794f166f0d8a6a7efa7",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -290,6 +299,15 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:bdb4895182a73653d303651afafa1ab9e982e6a5",
+      "accepted_sha256": "sha256:46e1c115c4dc95dbd594cb38defbc106d5c3bbd36afc2ec0fbed10e205f70d79",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/contracts/phase7-platform-heading-coverage.md",
+      "review_receipt": "sha256:8ad24670e2d0dd594c530e59ae7601cedb99428bf20dbf12487d48368fd5e83f",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:1433d3ffb954c0882a3b2c865241c21f99a6ff25",
       "accepted_sha256": "sha256:df16ea394d009414cd4788aaed3b7ccc91852003b487ea6e605fe9466ef32c49",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -344,12 +362,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:669b2979a6f82aa5aa56d83a51ec99456f57cde6",
-      "accepted_sha256": "sha256:5302369bf78ae371b68845fac6af3bc7f5cb9556627b557f167e51cf6240f345",
+      "accepted_blob": "sha1:f471bf3c6fe575eded636f7b1a70a0e42a520db3",
+      "accepted_sha256": "sha256:823ce1765c597f268834cd448218eaea9574637db76f992030e8f4c9e6391b3a",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:38fac5552d4450aec2da8b31eb6644f9366fa98bac4b08aa20266263ca14dcad",
+      "review_receipt": "sha256:8ad24670e2d0dd594c530e59ae7601cedb99428bf20dbf12487d48368fd5e83f",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {

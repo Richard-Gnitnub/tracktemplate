@@ -16,46 +16,51 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. PR #85 is in protected `main` at `482eb4cb0dddbebdbe92d72fdaa3e1e98d2d5063`. The bounded platform direction and station range candidate remains unmerged. Output has private-development status and project status stays `unknown`. |
-| What changed | The B14/B15-identical `alignment_progress_at_station`, `station_for_progress_heading` and `platform_coverage_bounds` calculations now use Core. B16 selects their adapters for `calculate_platform_boundaries`. The route uses schema `15`, 24 selected functions and 40 caller identities. B14 and B15 stay unchanged. The [capability matrix](../CAPABILITY_MATRIX.md) records integrated evidence through PR #84 only. |
-| What now works | The 193-case direct and D-GOV-019 qualified comparisons and all 14 affected qualified proofs have PASS results. The paired GUI platform Create/Edit product semantics match, including Undo/Redo, rejection, Save/reopen and cleanup. Complete validation and independent review remain publication conditions. |
-| Limitations/findings | Normal repairs are 2/2 exhausted. Both earlier owner exceptions and the final 1/1 caller-assertion exception are consumed. Original failures and classifications remain retained evidence. PR #83 and PR #84 repair and review histories stay unchanged. PR #83 measured micro-call cost increased. The locked Phase evidence keeps its recorded non-blocking trailing-space warning. The bounded GUI resource samples give no performance credit. D-P6-008, recorded product limitations, comparison requirements and legacy-retirement conditions stay in full. |
-| Owner decision | The owner authorised this bounded Level 2 result and the specified test-only exceptions. This candidate has no integration or Phase 7 exit decision. It accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. |
-| Next action | Richard's next owner boundary is integration of this bounded result after exact-green draft publication. |
+| Current state | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits. D-P6-008 records “one deferred, unmet obligation”.<br><br>PR #85 is in protected `main` at `482eb4cb0dddbebdbe92d72fdaa3e1e98d2d5063`. The exact candidate moves functions for platform direction and station range. It has no merge. Output has private-development status and project status stays `unknown`. |
+| What changed | The `alignment_progress_at_station`, `station_for_progress_heading` and `platform_coverage_bounds` functions have the same source in B14 and B15. These functions use Core. B16 selects their adapters for `calculate_platform_boundaries`. The route uses schema `15`, 24 selected functions and 40 caller identities. B14 and B15 do not change. The [capability matrix](../CAPABILITY_MATRIX.md) records evidence from protected `main` through PR #84 only. |
+| What now works | Tests in standalone Python and with the exact host profile in D-GOV-019 each have PASS results for 193 inputs. All 14 tests of the related routes have PASS results. Tests with the FreeCAD human interface give the same platform results for Create/Edit, Undo/Redo, Save/reopen and cleanup. They also give the same results when the product rejects the selected inputs. Full validation and independent review are necessary before publication. |
+| Limitations/findings | The two usual repairs are completed (2/2). No more usual repairs are permitted. The changes in the two owner decisions before the last decision and the last 1/1 decision for the caller check are completed. Those decisions give no more project authority for repairs. The first FAIL results and their failure classifications stay as retained evidence.<br><br>The PR #83 and PR #84 histories for repair and review do not change. PR #83 records: “The measured micro-call cost increased.” The locked Phase evidence keeps the recorded “non-blocking trailing-space warning”. The samples from the FreeCAD human interface give no improvement evidence for D-P6-008. D-P6-008 and all recorded product limitations apply in full. D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.” |
+| Owner decision | The owner authorised this Level 2 result for its bounded scope and the specified changes to tests. The exact candidate has no merge or Phase 7 exit decision. It gives no acceptance for a Phase 7 exit, performance result, output status, migration of other functions, removal of those paths or a release. |
+| Next action | After draft publication with all necessary PASS results, Richard must decide whether to merge this result for its bounded scope. |
 
 <a id="phase7-platform-heading-coverage-migration"></a>
 ## Migration of platform direction and station range — 2026-09-26
 
-The protected-main baseline is `482eb4cb0dddbebdbe92d72fdaa3e1e98d2d5063`,
-after PR #85. The owner authorised this bounded Level 2 result under
-D-GOV-004. The B14 and B15 definitions of `alignment_progress_at_station`,
-`station_for_progress_heading` and `platform_coverage_bounds` are equal and
-stay unchanged. Core now supplies those calculations through the public API.
-B16 selects their adapters for `calculate_platform_boundaries`. The
-[API instructions](../contracts/phase7-platform-heading-coverage.md) preserve
-values, diagnostics, input reads, host point construction and recovery.
+The comparison baseline is protected `main` at
+`482eb4cb0dddbebdbe92d72fdaa3e1e98d2d5063`, after PR #85.
+The owner authorised this Level 2 result for its bounded scope through D-GOV-004.
+The `alignment_progress_at_station`, `station_for_progress_heading` and
+`platform_coverage_bounds` functions have the same source in B14 and B15.
+That source does not change. Core supplies those functions through the API.
+B16 selects their adapters for `calculate_platform_boundaries`.
+
+The [API instructions](../contracts/phase7-platform-heading-coverage.md) give
+the values and diagnostics that the implementation keeps, and its previous values after a setup error.
+They also give the sequence in which the functions read inputs and make FreeCAD points.
 The route uses schema `15`, 24 functions and 40 caller identities.
 
-The direct standalone and D-GOV-019 qualified comparisons each have PASS
-results for 193 cases. All 14 affected qualified proofs have PASS results.
-The paired real-GUI platform Create/Edit product semantics match the fresh
-protected-main baseline, including Undo/Redo, rejection, Save/reopen and
-cleanup. The [detailed evidence](../benchmarks/2026-09-26-phase7-platform-heading-coverage-regression.md)
-keeps the raw results and all original failures. Normal repairs remain
-2/2 exhausted. Both earlier owner exceptions and the final 1/1 caller-assertion
-exception are consumed. Complete validation and independent review remain
-publication conditions.
+Tests in standalone Python and with the exact host profile in D-GOV-019 each have
+PASS results for 193 inputs. All 14 tests of the related routes have PASS results.
+Tests with the FreeCAD human interface give the same platform results as the new comparison baseline.
+They include Create/Edit, Undo/Redo, Save/reopen and cleanup.
+They also give the same results when the product rejects the selected inputs.
 
-This result contributes bounded evidence to Phase 7 Exits 1, 2 and 3.
-It accepts no exit and gives no D-P6-008 performance credit. It does not
-compare all platform geometry or export bytes and does not remove the
-legacy path. Phase 7 stays Open at 0/4 with all exits Pending. D-P6-008,
-all recorded limitations, comparison requirements and legacy-retirement
-conditions stay in full. Output stays at private-development status and
-project status stays `unknown`. A draft needs Richard's separate
-integration decision.
+The [detailed evidence](../benchmarks/2026-09-26-phase7-platform-heading-coverage-regression.md)
+keeps the full results and all first FAIL results. The two usual repairs
+are completed (2/2). No more usual repairs are permitted. The changes in the
+two previous owner decisions and the last 1/1 decision for the caller check
+are completed. Those decisions give no more project authority for repairs.
+Full validation and independent review are necessary before publication.
 
-<a id="phase7-platform-longitudinal-bounds-migration"></a>
+This result gives evidence for the bounded scope of Phase 7 Exits 1, 2 and 3.
+It accepts no exit and gives no improvement evidence for D-P6-008.
+It does not compare all platform shapes, dimensions and positions, or export bytes.
+It removes none of the paths that D-P7-001 keeps. Phase 7 stays Open at 0/4 with all exits Pending.
+
+D-P6-008 and all recorded limitations apply in full. D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.” Output stays at
+private-development status and project status stays `unknown`.
+A draft cannot have a merge without Richard's separate decision.
+
 ## Migration of platform length and position — 2026-09-26
 
 PR #84 is in protected `main` at
