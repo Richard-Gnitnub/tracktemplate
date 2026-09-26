@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Compare the native B15 platform-input gate with the selected B16 route."""
+"""Prove native platform longitudinal bounds and selected B16 routing."""
 
 import hashlib
 import json
+import math
 import os
 import pathlib
 import runpy
@@ -14,18 +15,21 @@ import FreeCAD as App
 
 TEST_ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE_ROOT = pathlib.Path(os.environ.get(
-    "TRACKTEMPLATE_PLATFORM_INPUT_SOURCE_ROOT", TEST_ROOT,
+    "TRACKTEMPLATE_PLATFORM_BOUNDS_SOURCE_ROOT", TEST_ROOT,
 )).resolve()
 sys.path.insert(0, str(SOURCE_ROOT))
 sys.path.insert(0, str(TEST_ROOT / "tests"))
 
 from tracktemplate import api  # noqa: E402
 from tracktemplate.compatibility import b15_workflow_host  # noqa: E402
-from tracktemplate.compatibility import transition_workflow as workflow  # noqa: E402
-import validate_phase7_platform_input_validation as proof  # noqa: E402
+from tracktemplate.compatibility import (  # noqa: E402
+    transition_workflow as workflow,
+)
+import validate_phase7_platform_input_validation as input_proof  # noqa: E402
+import validate_phase7_platform_longitudinal_bounds as proof  # noqa: E402
 
 
-SENTINEL = "Phase 7 platform input FreeCAD validation passed"
+SENTINEL = "Phase 7 platform longitudinal bounds FreeCAD validation passed"
 PROFILE = "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2"
 
 
@@ -51,25 +55,56 @@ def assert_namespace(namespace, previous):
     assert all(namespace[name] is value for name, value in previous.items())
 
 
-def expect_route_error(action):
+def route_error(action):
     try:
         action()
     except workflow.TransitionWorkflowError:
         return
-    raise AssertionError("A mixed or incomplete platform-input route passed")
+    raise AssertionError("An incomplete or mixed platform-bounds route passed")
+
+
+def caller_rejection(caller, config, alignments):
+    before = proof.snapshot(config)
+    try:
+        caller(config, alignments, 1.0)
+    except ValueError as error:
+        record = {"exception": "ValueError", "message": str(error)}
+    else:
+        raise AssertionError("The platform caller missed bounds rejection")
+    assert proof.snapshot(config) == before
+    return record
+
+
+def caller_case(module):
+    centre = module.main_circle_centre(600.0, 600.0)
+    alignment = module.build_concentric_core(
+        centre, 600.0, 600.0, 600.0, math.pi / 2.0, "Main Track",
+    )
+    alignment.update(name="Main Track", width=32.0,
+                     create_template=True, show_centreline=True)
+    config, _unused = input_proof.base_inputs()
+    config.update(
+        coverage=module.PLATFORM_CORE,
+        centre_offset=1.0e6,
+        platform_length=100.0,
+    )
+    return config, [alignment]
 
 
 def validate():
     baseline_only = (
         "--baseline-only" in sys.argv
-        or os.environ.get("TRACKTEMPLATE_PLATFORM_INPUT_BASELINE_ONLY") == "1"
+        or os.environ.get("TRACKTEMPLATE_PLATFORM_BOUNDS_BASELINE_ONLY") == "1"
     )
     before = document_state()
     for module, relative in (
         (api, "tracktemplate/api.py"),
         (workflow, "tracktemplate/compatibility/transition_workflow.py"),
     ):
-        assert pathlib.Path(module.__file__).resolve() == SOURCE_ROOT / relative
+        assert pathlib.Path(module.__file__).resolve() == (
+            SOURCE_ROOT / relative
+        )
+
     launcher = runpy.run_path(str(SOURCE_ROOT / "TrackTemplate.FCMacro"))
     foundation = launcher["FOUNDATION_RESULT"]
     assert foundation["status"] == "modular-foundation-ready"
@@ -87,57 +122,67 @@ def validate():
 
     host = load_host()
     namespace = host.module.__dict__
-    original_gate = namespace[proof.NAME]
-    original_caller = namespace["calculate_platform_boundaries"]
-    assert original_caller.__globals__ is namespace
-    assert original_caller.__globals__[proof.NAME] is original_gate
-    assert proof.NAME in original_caller.__code__.co_names
-    legacy_gate = proof.legacy_functions()[0]  # B14/B15 identity.
+    native_calculation = namespace[proof.NAME]
+    native_caller = namespace["calculate_platform_boundaries"]
+    assert native_caller.__globals__ is namespace
+    assert native_caller.__globals__[proof.NAME] is native_calculation
+    assert proof.NAME in native_caller.__code__.co_names
+    b14_calculation = proof.legacy_functions()[0]
 
     native_records = []
-    for label, config, alignments in proof.cases():
-        expected = proof.observe(legacy_gate, config, alignments)
+    for label, config, start, finish in proof.cases():
+        expected = proof.observe(b14_calculation, config, start, finish)
         with mock.patch.object(
             App, "Vector", side_effect=AssertionError("native allocation"),
         ):
             observed = proof.observe(
-                original_gate, config, alignments,
+                native_calculation, config, start, finish,
             )
         assert observed == expected, label
         native_records.append({"case": label, "result": observed})
         assert document_state() == before
 
     read_records = []
-    for label in ("disabled-bypass", "outside", "between",
-                  "required-clearance-b", "name-before-count"):
-        expected = proof.read_observation(legacy_gate, label)
-        assert proof.read_observation(original_gate, label) == expected
+    for label in (
+        "midpoint", "available-zero", "length-zero",
+        "centre-outside-right-tolerance", "requested-too-long",
+    ):
+        expected = proof.read_observation(b14_calculation, label)
+        assert proof.read_observation(native_calculation, label) == expected
         for position in range(1, len(expected[1]) + 1):
-            assert proof.read_observation(original_gate, label, position) == (
-                proof.read_observation(legacy_gate, label, position)
-            )
-        read_records.append({"case": label, "reads": len(expected[1]),
-                             "result": expected[0], "events": expected[1]})
+            assert proof.read_observation(
+                native_calculation, label, position,
+            ) == proof.read_observation(b14_calculation, label, position)
+        read_records.append({"case": label, "result": expected[0],
+                             "events": expected[1]})
 
-    record = None
+    caller_config, caller_alignments = caller_case(host.module)
+    native_error = caller_rejection(native_caller, caller_config,
+                                    caller_alignments)
+    assert "centre offset" in native_error["message"].lower()
+    assert document_state() == before
+
+    route = None
     if not baseline_only:
         functions = {name: getattr(api, name)
                      for name in workflow.PRODUCT_FUNCTION_NAMES}
         assert proof.NAME in functions and len(functions) == 21
-        assert functions[proof.NAME] is api.validate_platform_inputs
+        assert functions[proof.NAME] is (
+            api.resolve_platform_longitudinal_bounds
+        )
 
         rollback_host = load_host()
         previous = dict(rollback_host.module.__dict__)
         with mock.patch.object(
             workflow.ModularTransitionWorkflowSession, "_validate_binding",
-            side_effect=RuntimeError("controlled platform-input failure"),
+            side_effect=RuntimeError("controlled platform-bounds failure"),
         ):
             try:
                 workflow.ModularTransitionWorkflowSession(
                     rollback_host, functions,
                 )
             except RuntimeError as error:
-                assert str(error) == "controlled platform-input failure"
+                assert str(error) == "controlled platform-bounds failure"
             else:
                 raise AssertionError("The controlled binding failure was lost")
         assert_namespace(rollback_host.module.__dict__, previous)
@@ -147,75 +192,84 @@ def validate():
         incomplete.pop(proof.NAME)
         rejected_host = load_host()
         previous = dict(rejected_host.module.__dict__)
-        expect_route_error(lambda: workflow.ModularTransitionWorkflowSession(
+        route_error(lambda: workflow.ModularTransitionWorkflowSession(
             rejected_host, incomplete,
         ))
         assert_namespace(rejected_host.module.__dict__, previous)
 
         session = workflow.ModularTransitionWorkflowSession(host, functions)
-        record = session.routing_record()
-        assert record["schema_version"] == 14
-        assert record["contract_id"] == (
+        route = session.routing_record()
+        assert route["schema_version"] == 14
+        assert route["contract_id"] == (
             "tracktemplate:phase7:platform-longitudinal-bounds:1"
         )
-        assert record["function_names"] == list(functions)
-        assert len(record["caller_names"]) == 39
-        assert record["mixed_route"] is False
-        selected_gate = namespace[proof.NAME]
-        assert selected_gate is functions[proof.NAME]
-        assert host.module.calculate_platform_boundaries is original_caller
-        assert original_caller.__globals__[proof.NAME] is selected_gate
-        assert host.module.App is App
+        assert route["function_names"] == list(functions)
+        assert len(route["caller_names"]) == 39
+        assert route["mixed_route"] is False
+        selected = namespace[proof.NAME]
+        assert selected is functions[proof.NAME]
+        assert namespace["calculate_platform_boundaries"] is native_caller
+        assert native_caller.__globals__[proof.NAME] is selected
 
-        for (label, config, alignments), expected in zip(
+        for (label, config, start, finish), expected in zip(
             proof.cases(), native_records,
         ):
             assert label == expected["case"]
             with mock.patch.object(
                 App, "Vector", side_effect=AssertionError("native allocation"),
             ):
-                assert proof.observe(selected_gate, config, alignments) == (
+                assert proof.observe(selected, config, start, finish) == (
                     expected["result"]
                 ), label
             assert document_state() == before
         for item in read_records:
             label = item["case"]
-            assert proof.read_observation(selected_gate, label) == (
+            assert proof.read_observation(selected, label) == (
                 item["result"], item["events"],
             )
-            for position in range(1, item["reads"] + 1):
+            for position in range(1, len(item["events"]) + 1):
                 assert proof.read_observation(
-                    selected_gate, label, position,
-                ) == proof.read_observation(original_gate, label, position)
+                    selected, label, position,
+                ) == proof.read_observation(
+                    native_calculation, label, position,
+                )
 
-        invalid = next(item for item in proof.cases()
-                       if item[0] == "name-blank")
-        expected_error = next(item["result"][1] for item in native_records
-                              if item["case"] == "name-blank")
+        calls = []
+
+        def observed_calculation(*arguments):
+            calls.append(arguments)
+            return selected(*arguments)
+
+        namespace[proof.NAME] = observed_calculation
         try:
-            original_caller(invalid[1], invalid[2], 1.0)
-        except ValueError as error:
-            assert str(error) == expected_error
-        else:
-            raise AssertionError("The selected host caller missed the gate")
-        namespace[proof.NAME] = original_gate
-        try:
-            expect_route_error(session.routing_record)
+            selected_error = caller_rejection(native_caller, caller_config,
+                                              caller_alignments)
         finally:
-            namespace[proof.NAME] = selected_gate
-        assert session.routing_record() == record
+            namespace[proof.NAME] = selected
+        assert selected_error == native_error
+        assert len(calls) == 1
+        assert calls[0][0] is caller_config
+        assert all(isinstance(value, float) for value in calls[0][1:])
+        assert session.routing_record() == route
+        namespace[proof.NAME] = native_calculation
+        try:
+            route_error(session.routing_record)
+        finally:
+            namespace[proof.NAME] = selected
+        assert session.routing_record() == route
 
     assert document_state() == before
     result = {
         "status": "PASS", "baseline_only": baseline_only,
         "qualified_profile": foundation["matched_profile_id"],
         "definition_sha256": proof.DEFINITION_SHA256,
-        "source_root": str(SOURCE_ROOT), "routing": record,
+        "source_root": str(SOURCE_ROOT), "routing": route,
         "case_count": len(native_records), "observations": native_records,
         "read_traces": read_records,
+        "native_caller_rejection": native_error,
         "document_state_unchanged": True,
         "native_vector_constructor_guard": "PASS",
-        "caller_binding_checked": True,
+        "caller_binding_checked": not baseline_only,
         "run_macro_executed": False,
         "source_sha256": {
             relative: hashlib.sha256((SOURCE_ROOT / relative).read_bytes())
@@ -229,7 +283,7 @@ def validate():
         "test_sha256": hashlib.sha256(pathlib.Path(__file__).read_bytes())
                                .hexdigest(),
     }
-    destination = os.environ.get("TRACKTEMPLATE_PLATFORM_INPUT_OUTPUT")
+    destination = os.environ.get("TRACKTEMPLATE_PLATFORM_BOUNDS_OUTPUT")
     if destination:
         with pathlib.Path(destination).open("x", encoding="utf-8") as stream:
             json.dump(result, stream, indent=2, allow_nan=False)
@@ -238,10 +292,12 @@ def validate():
     print(SENTINEL)
 
 
-if __name__ in {"__main__", "freecad_validate_phase7_platform_input_validation"}:
+if __name__ in {
+    "__main__", "freecad_validate_phase7_platform_longitudinal_bounds",
+}:
     try:
         validate()
-    except Exception:  # noqa: BLE001 - retain the qualified-host traceback
+    except Exception:  # noqa: BLE001 - retain qualified-host traceback
         import traceback
 
         traceback.print_exc()

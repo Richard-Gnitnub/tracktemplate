@@ -59,6 +59,7 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "signed_side_factor", "effective_constant_radius",
     "prepare_track_alignment", "validate_connected_straight_routes",
     "validate_platform_inputs",
+    "resolve_platform_longitudinal_bounds",
 )
 TRANSITION_CASES = (
     (0.0, 0.0), (0.0, 25.0), (25.0, 0.0), (25.0, 60.0),
@@ -456,8 +457,10 @@ def validate_binding():
         assert session.module.LAUNCH_COUNT == 1
         record = session.routing_record()
         assert record == {
-            "schema_version": 13,
-            "contract_id": "tracktemplate:phase7:platform-input-validation:1",
+            "schema_version": 14,
+            "contract_id": (
+                "tracktemplate:phase7:platform-longitudinal-bounds:1"
+            ),
             "route": "modular", "comparison_route_available": False,
             "function_names": list(PRODUCT_FUNCTION_NAMES),
             "caller_names": list(STATION_CALLER_NAMES),
@@ -495,7 +498,7 @@ def validate_binding():
                 lambda: workflow.ModularTransitionWorkflowSession(
                     host, invalid,
                 ),
-                "complete twenty-function",
+                "complete twenty-one-function",
             )
             assert _snapshot(host) == before and host.module.LAUNCH_COUNT == 0
 

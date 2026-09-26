@@ -35,6 +35,7 @@ __all__ = (
     "platform_transition_displacement",
     "platform_peak_curvature_factor",
     "prepare_track_alignment",
+    "resolve_platform_longitudinal_bounds",
     "validate_platform_inputs",
     "signed_side_factor",
     "solve_platform_shape_parameter",
@@ -1852,6 +1853,73 @@ def validate_platform_inputs(config, all_alignments):
                         track["name"], clearance, minimum
                     )
                 )
+
+
+def resolve_platform_longitudinal_bounds(config, base_start, base_finish):
+    """Place platform bounds in selected coverage, in millimetres.
+
+    Return the inherited eight ordered values without changing inputs.
+    """
+    base_start = float(base_start)
+    base_finish = float(base_finish)
+    available = base_finish - base_start
+    if available <= GEOMETRY_TOLERANCE:
+        raise ValueError("The selected platform coverage has no usable length.")
+
+    requested_length = float(config["platform_length"])
+    if requested_length <= GEOMETRY_TOLERANCE:
+        raise ValueError("Platform length must be greater than zero.")
+
+    midpoint = 0.5 * (base_start + base_finish)
+    centre_offset = float(config["centre_offset"])
+    centre_station = midpoint + centre_offset
+    half_available = 0.5 * available
+    if (
+        centre_station < base_start - GEOMETRY_TOLERANCE
+        or centre_station > base_finish + GEOMETRY_TOLERANCE
+    ):
+        raise ValueError(
+            "Platform centre offset {:.3f} mm lies outside the selected {:.3f} mm "
+            "coverage. Keep the centre offset between {:.3f} mm and {:.3f} mm.".format(
+                centre_offset,
+                available,
+                -half_available,
+                half_available,
+            )
+        )
+
+    centre_station = min(max(centre_station, base_start), base_finish)
+    maximum_length = max(
+        0.0,
+        2.0 * min(centre_station - base_start, base_finish - centre_station),
+    )
+    if requested_length > maximum_length + GEOMETRY_TOLERANCE:
+        raise ValueError(
+            "Requested platform length {:.3f} mm does not fit around a centre offset "
+            "of {:.3f} mm within the selected coverage. The maximum length at this "
+            "centre is {:.3f} mm. Reduce Platform length to {:.3f} mm or move Centre "
+            "offset towards 0 mm.".format(
+                requested_length,
+                centre_offset,
+                maximum_length,
+                maximum_length,
+            )
+        )
+
+    start_station = centre_station - (0.5 * requested_length)
+    finish_station = centre_station + (0.5 * requested_length)
+    start_station = max(base_start, start_station)
+    finish_station = min(base_finish, finish_station)
+    return {
+        "start_station": start_station,
+        "finish_station": finish_station,
+        "centre_station": centre_station,
+        "centre_offset": centre_station - midpoint,
+        "length": finish_station - start_station,
+        "available_length": available,
+        "start_inset": start_station - base_start,
+        "finish_inset": base_finish - finish_station,
+    }
 
 
 @dataclass(frozen=True)

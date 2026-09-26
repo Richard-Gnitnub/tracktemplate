@@ -115,11 +115,11 @@ def validate():
                for name in transition_workflow.PRODUCT_FUNCTION_NAMES},
     )
     record = session.routing_record()
-    assert record["schema_version"] == 13
+    assert record["schema_version"] == 14
     assert record["contract_id"] == (
-        "tracktemplate:phase7:platform-input-validation:1"
+        "tracktemplate:phase7:platform-longitudinal-bounds:1"
     )
-    assert len(record["function_names"]) == 20
+    assert len(record["function_names"]) == 21
     assert record["function_names"][10] == proof.TARGET
     assert len(transition_workflow.PRODUCT_CALLER_ROUTES) == 39
     mirror = module.mirror_alignment_for_turn

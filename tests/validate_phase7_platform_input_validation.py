@@ -405,12 +405,12 @@ assert not attempted, attempted
         )
         namespace = session.module.__dict__
         record = session.routing_record()
-        assert record["schema_version"] == 13
+        assert record["schema_version"] == 14
         assert record["contract_id"] == transition_workflow.WORKFLOW_CONTRACT_ID
         assert record["function_names"] == list(
             transition_workflow.PRODUCT_FUNCTION_NAMES
         )
-        assert len(record["function_names"]) == 20
+        assert len(record["function_names"]) == 21
         assert record["caller_names"] == [
             name for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
         ]
@@ -424,7 +424,8 @@ assert not attempted, attempted
             "calculate_platform_boundaries"
         ]
         assert set(caller_targets) == {
-            "alignment_station_data", "interpolate_alignment_station", NAME,
+            "alignment_station_data", "interpolate_alignment_station",
+            "resolve_platform_longitudinal_bounds", NAME,
         }
         invalid = next(item for item in cases() if item[0] == "name-blank")
         expected_error = next(item["result"][1] for item in observations
