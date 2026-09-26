@@ -17,7 +17,7 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | **What now works** | The 34-case direct and D-GOV-019 qualified comparisons, five read paths, all 14 affected qualified proofs and complete local transition profile have PASS results. The paired GUI platform Create/Edit product semantics match, including two selected rejections and Save/reopen. A stale route-identity test had a FAIL result, then the same proof had a PASS result after test-only repair 1/2. |
 | **Limitations/findings** | The new result is at repair 1/2. PR #84's separate 2/2 test-only repairs, original `BLOCKED` review and no-proof command remain historical. PR #83's separate repairs and exception remain historical. Its measured micro-call cost increased. One GUI sample per state gives no performance credit. The locked Phase evidence keeps its recorded non-blocking trailing-space warning. D-P6-008, recorded product limitations, comparison requirements and legacy-retirement conditions stay in full. |
 | **Owner decision** | Richard authorised integration of PR #84 at exact head `48b6dc0cbec9036d76e144d48924bbb9f251024f`. This new candidate has no integration or Phase 7 exit decision. It accepts no Phase 7 exit, performance result, output status, wider migration, legacy retirement or release state. Its next exact-green draft needs a separate integration decision. |
-| **Next action** | Finish the documentation lifecycle and align its locked benchmark identity. Publish one exact-green draft for Richard's next integration decision. |
+| **Next action** | The next owner boundary is Richard's integration decision on this candidate after exact-green draft publication. |
 
 ## Phase status
 

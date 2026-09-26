@@ -68,12 +68,15 @@ The complete local `standalone` profile has a PASS result for validation
 preflight and Ruff, tracked Python syntax and standalone contracts. The
 full output is in ignored
 `benchmark-output/validation-pipeline/20260926T192644999425Z/`.
+
 The first affected existing-route proof has a FAIL result because its test
 expects `twenty-function` where the new route gives
 `twenty-one-function`. A directly dependent test-only correction is repair
 pass 1/2. The same proof and the other affected existing-route proofs have
 PASS results after that correction. The first failed invocation did not
-keep a complete run identity. A validation-only disposable reconstruction
+keep a complete run identity.
+
+A validation-only disposable reconstruction
 reproduces the FAIL and candidate PASS. It does not replace the historical
 invocation. The reconstruction manifest is
 `tmp/phase7-post84-capability-and-core/repair1-reconstruction/manifest.json`.
@@ -113,10 +116,11 @@ and test guard then aligned with the draft. The affected governance proof
 rejected all 399 negative mutations and let none escape.
 
 The stable assembled-state complete `transition` profile has a PASS
-result for all seven gates: validation preflight and Ruff, Python syntax,
-76 standalone validators, qualified FreeCAD preflight, transition
-persistence, Coin scene and Edit lifecycle. The full output remains in
-ignored `benchmark-output/validation-pipeline/20260926T194901380643Z/`.
+result for all seven gates. It covers validation preflight and Ruff,
+Python syntax, 76 standalone validators and qualified FreeCAD preflight.
+It also covers transition persistence, Coin scene and Edit lifecycle.
+The full output remains in ignored
+`benchmark-output/validation-pipeline/20260926T194901380643Z/`.
 The wrapper log at
 `tmp/phase7-post84-capability-and-core/transition-profile-stable-draft.log`
 has SHA-256
