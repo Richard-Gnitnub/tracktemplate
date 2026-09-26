@@ -54,6 +54,6 @@
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-connected-straight-validation-regression.md", "sha256": "f5cebcbb170fa28a5601edc7981f3b183a569544897772f6502d264307fecf1b"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-input-validation-regression.md", "sha256": "c7c4fb78cb6fae756a3f3d6b74502203974e01142f1e1794f166f0d8a6a7efa7"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-longitudinal-bounds-regression.md", "sha256": "8d2f76572e3a72bcdc068f8459a94766257051c4d145662aaa6beb9ee8eb586e"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-heading-coverage-regression.md", "sha256": "8f1bcded81c48bfd0aded1408f5819e931d47a93e4671ce616450efd80ed43b0"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-heading-coverage-regression.md", "sha256": "ecea6c8ce2634bb790c75e52dc9c41316a204716b93d11f5e53d9a3d97ddb748"}
   ]
 }
