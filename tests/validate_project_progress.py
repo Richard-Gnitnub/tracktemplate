@@ -1043,8 +1043,8 @@ def _validate_owner_view(plan: str) -> None:
         "original independent `BLOCKED` verdict",
         "PR #83's separate 2/2 and owner-authorised test-only exception "
         "remain historical",
-        "measured micro-call cost increased",
-        "One GUI sample per state gives descriptive resources only",
+        "PR #83's measured micro-call cost increased, and one GUI sample per "
+        "state gives descriptive resources only",
         "locked Phase evidence keeps its recorded non-blocking trailing-space "
         "warning",
         "The complete local transition profile has a PASS result",
