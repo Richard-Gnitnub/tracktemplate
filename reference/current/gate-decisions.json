@@ -13,6 +13,17 @@
       "evidence": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel"
+    },
+    {
+      "id": "D-P8-001",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Open Phase 8 at 0/4.",
+      "authority": "I open Phase 8 at 0/4 for its existing turnout, crossover and timbering scope, preserving its four existing exit criteria unchanged.\nI authorise the directly dependent Level 3 opening alignment and exact-green protected-main integration. Once `main` is clean and synchronised, redundant worktrees and branches are disposed of in the jetbrains ide, I authorise one bounded Level 2 internal, development-only `turnout_valid_toe_range` extraction and checked routing of its five inherited B15 callers through the normal TrackTemplate workflow to one exact-green draft PR.\nKeep TERM-R04 open. Introduce no new public turnout API, schema or UI term.\nPreserve D-P6-008, frozen B14/B15 identities, the inherited B15 host, development-only oracle, all existing risk and recovery duties, and every comparison, adapter, caller, removal and legacy-retirement condition.\nThis accepts no Phase 8 exit, performance result, wider migration, production output, release or legacy removal. Project status remains `unknown`.\nDo not merge the product draft. Report any physical recovery action that requires operator access rather than assuming it occurred.",
+      "exclusions": "All four existing exits remain Pending. The first product slice is internal and development-only; TERM-R04 stays open. No new public turnout API, schema or UI term is authorised. Product work starts only after exact-green opening integration, clean synchronised protected main, audited disposal of redundant worktrees and branches in the JetBrains IDE, and a current non-overwriting pre-migration snapshot under the recovery policy. The product draft needs a separate integration decision. D-P6-008 remains deferred and unmet. All 24 risk dispositions, frozen B14/B15 identities, inherited B15 host, development-only comparison oracle, proof limits and every comparison, adapter, caller, removal and legacy-retirement condition remain. No Phase 8 exit, performance result, wider migration, production output, release state or legacy-path removal is accepted. Project status remains `unknown`.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-8-opening-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-8-opening-panel"
     }
   ]
 }

@@ -784,19 +784,28 @@ def validate_phase6_closeout_mutations() -> None:
     phase8_missing["decisions"] = []
     phase8_widened = copy.deepcopy(current)
     phase8_widened["decisions"][0]["authority"] += " The duty is optional."
-    phase8_opened = copy.deepcopy(current)
-    phase8_opened["decisions"].append({"id": "D-P8-001", "status": "Accepted"})
-    for name, mutated in (
-        ("d-p6-008-missing", phase8_missing),
-        ("d-p6-008-weakened", phase8_widened),
-        ("phase8-opened", phase8_opened),
+    for name, mutated, diagnostic in (
+        ("d-p6-008-missing", phase8_missing, "Phase 8 opening must carry unchanged D-P6-008"),
+        ("d-p6-008-weakened", phase8_widened, "Phase 8 opening must carry unchanged D-P6-008"),
     ):
         expect_rejected(
-            "phase8-holding/" + name,
-            lambda value=mutated: progress._validate_phase8_decision_holding(
+            "phase8-opening/" + name,
+            lambda value=mutated: progress._validate_phase8_decision_opening(
                 value, frozen,
             ),
-            "Phase 8 holding must carry only unchanged D-P6-008",
+            diagnostic,
+        )
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        ("authority", "All Phase 8 exits are accepted.", "authority digest drifted"),
+        ("exclusions", "Performance and release are accepted.", "exclusions digest drifted"),
+    ):
+        changed = copy.deepcopy(current)
+        changed["decisions"][1][field] = replacement
+        expect_rejected(
+            "phase8-opening/d-p8-001-" + field + "-changed",
+            lambda value=changed: progress._validate_phase8_decision_opening(value, frozen),
+            "D-P8-001 " + diagnostic,
         )
     for name, before, after, diagnostic in (
         (
@@ -1141,24 +1150,49 @@ def validate_phase6_closeout_mutations() -> None:
         )),
         "D-P7-006 bounded condition drifted: 37 registered worktrees",
     )
-    current_holding = read("reference/current/PHASE_EVIDENCE.md")
+    current_opening = read("reference/current/PHASE_EVIDENCE.md")
     expect_rejected(
-        "phase8-holding/premature-open",
-        lambda: progress._validate_phase8_holding(replace_once(
-            current_holding,
-            "Phase 8 is unopened and\nunauthorised",
-            "Phase 8 is open and authorised",
-        )),
-        "Phase 8 holding status drifted: Phase 8 is unopened and unauthorised",
+        "phase8-opening/premature-exit-acceptance",
+        lambda: progress._validate_phase8_opening(replace_once(
+            current_opening,
+            "All four exits are\nPending",
+            "All four exits are\nAccepted",
+        ), read("reference/PROJECT_PLAN.md")),
+        "Phase 8 opening status drifted: All four exits are Pending",
     )
     expect_rejected(
-        "phase8-holding/performance-duty-waived",
-        lambda: progress._validate_phase8_holding(replace_once(
-            current_holding,
+        "phase8-opening/performance-duty-waived",
+        lambda: progress._validate_phase8_opening(replace_once(
+            current_opening,
             "mandatory before\nPhase 10 beta acceptance",
             "optional after Phase 10 beta acceptance",
-        )),
-        "Phase 8 holding boundary drifted: mandatory before Phase 10 beta acceptance",
+        ), read("reference/PROJECT_PLAN.md")),
+        "Phase 8 opening boundary drifted: mandatory before Phase 10 beta acceptance",
+    )
+    plan = read("reference/PROJECT_PLAN.md")
+    expect_rejected(
+        "phase8-opening/criterion-broadened",
+        lambda: progress._validate_phase8_opening(
+            current_opening,
+            replace_once(
+                plan,
+                "Straight- and curved-host representative workflows pass deterministic comparison.",
+                "One straight-host workflow passes an informal comparison.",
+            ),
+        ),
+        "Phase 8 plan criteria differ from the four accepted sentences",
+    )
+    expect_rejected(
+        "phase8-opening/pre-migration-snapshot-omitted",
+        lambda: progress._validate_phase8_opening(
+            replace_once(
+                current_opening,
+                "A fresh non-overwriting\npre-migration snapshot must meet",
+                "An optional\npre-migration snapshot can meet",
+            ),
+            plan,
+        ),
+        "D-P8-001 bounded condition drifted: fresh non-overwriting pre-migration snapshot",
     )
 
 
@@ -3433,7 +3467,7 @@ def validate_project_plan_mutations() -> None:
                 "| Open |",
             ),
         )),
-        "no phase may be Open before the Phase 8 opening decision",
+        "Phase 8 must be the only open phase",
     )
 
     exit2_row = table_row_containing(
@@ -3886,16 +3920,16 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_performance_widened = replace_once(
         plan,
-        "It does not open Phase 8 or accept performance, wider migration, "
+        "It accepts no Phase 8 exit, performance, wider migration, "
         "production output, release or legacy removal.",
-        "It opens Phase 8 and accepts performance, wider migration, "
+        "It accepts every Phase 8 exit, performance, wider migration, "
         "production output, release and legacy removal.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: It does not open Phase 8 "
-        "or accept performance, wider migration, production output, release "
+        "project-plan owner view lost or contradicted: It accepts no Phase 8 exit, "
+        "performance, wider migration, production output, release "
         "or legacy removal",
     )
 

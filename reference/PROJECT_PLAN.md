@@ -1,6 +1,6 @@
 # Project Plan
 
-Status: **Phase 7 is closed at 4/4 under D-P7-006. All four exits remain Evidenced and owner-accepted. Phase 8 is Not started at 0/4. D-P6-008 stays Deferred — unmet.**
+Status: **Phase 7 is closed at 4/4 under D-P7-006. All four exits remain Evidenced and owner-accepted. Phase 8 is Open at 0/4 under D-P8-001; all four exits are Pending. D-P6-008 stays Deferred — unmet.**
 
 This dashboard owns phase and exit status. It also owns summaries of live risks and owner decisions. The links identify the applicable evidence. The canonical registers and evidence are the source of this owner view. This view does not establish authority.
 
@@ -12,12 +12,12 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 7 is closed at 4/4 under D-P7-006. Its four exits remain Evidenced and owner-accepted under D-P7-005, D-P7-003, D-P7-004 and D-P7-002. Phase 8 stays Not started at 0/4. Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation. Output stays private-development and project status stays `unknown`. |
-| **What changed** | The owner accepted the Phase 7 closeout and its [independently reviewed recovery proof](backup-records/2026-09-27-phase7-closeout-recovery.md). The [Phase 7 evidence](history/phase-closeouts/PHASE7_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE7_GATE_DECISIONS.json) and [risk snapshot](history/phase-closeouts/PHASE7_RISKS.json) are frozen. The current paths hold unopened Phase 8 records. The [capability matrix](CAPABILITY_MATRIX.md) remains an evidence map through PR #84 only. |
-| **What now works** | The accepted Phase 7 scope includes modular Core layout Create, Edit, Save, reopen, validation and export. The [Exit 1 panel](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-1-admission-panel) links the selected plain-line export proof through PR #91. The other exit panels retain their bounded equivalence, dependency and legacy-preservation evidence. This closeout changes no product behaviour. |
+| **Current state** | Phase 7 is closed at 4/4 under D-P7-006. Its four exits remain Evidenced and owner-accepted under D-P7-005, D-P7-003, D-P7-004 and D-P7-002. Phase 8 is Open at 0/4 under D-P8-001; all four exits are Pending. Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation. Output stays private-development and project status stays `unknown`. |
+| **What changed** | The owner opened Phase 8 for its unchanged four criteria. The [Phase 7 evidence](history/phase-closeouts/PHASE7_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE7_GATE_DECISIONS.json) and [risk snapshot](history/phase-closeouts/PHASE7_RISKS.json) remain frozen. The [independently reviewed recovery proof](backup-records/2026-09-27-phase7-closeout-recovery.md) retains its limits. The [capability matrix](CAPABILITY_MATRIX.md) remains an evidence map through PR #84 only. |
+| **What now works** | The accepted Phase 7 scope includes modular Core layout Create, Edit, Save, reopen, validation and export. The [Exit 1 panel](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-1-admission-panel) links the selected plain-line export proof through PR #91. The other exit panels retain their bounded equivalence, dependency and legacy-preservation evidence. This opening changes no product behaviour. |
 | **Limitations/findings** | The PR #91 comparison uses one fixed B14 plain-line fixture and one prepared plan. It does not prove every platform arrangement or raw-file identity. The two usual repairs remain 2/2 exhausted and the final 1/1 harness exception remains consumed. The initial FAIL and BLOCKED evidence, the PR #83–#87 histories, the measured micro-call cost increase and the locked trailing-space warning remain.<br><br>PR-10 stays Open/Partial and PR-18 stays Open/Effective for current scope. Both B14/B15 identities, the inherited B15 host, development-only comparison oracle, every adapter and caller condition, all removal gates and all comparison and legacy-retirement conditions remain. D-P6-008 stays Deferred — unmet, mandatory before Phase 10 beta acceptance. The GUI samples give no performance acceptance. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
-| **Owner decision** | D-P7-006 closes Phase 7 at 4/4 and accepts its recovery evidence. It authorises only directly dependent Level 3 records and exact-green protected-main integration. It does not open Phase 8 or accept performance, wider migration, production output, release or legacy removal. |
-| **Next action** | After exact-green integration, synchronise protected `main` and stop. Phase 8 opening and any new development require a separate owner decision. |
+| **Owner decision** | [D-P8-001](current/PHASE_EVIDENCE.md#phase-8-opening-panel) opens Phase 8 at 0/4, keeps all four original criteria unchanged and authorises exact-green opening alignment. It separately authorises one internal `turnout_valid_toe_range` slice after clean protected `main` and IDE disposal of redundant worktrees and branches. It accepts no Phase 8 exit, performance, wider migration, production output, release or legacy removal. |
+| **Next action** | Integrate the exact-green Level 3 opening records. Then synchronise protected `main` and dispose of redundant worktrees and branches in the JetBrains IDE before the bounded product slice. The product draft needs a separate integration decision. |
 
 ## Phase status
 
@@ -31,7 +31,7 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | 5 | Lightweight editing prototype and renderer decision | 4/4 evidenced | Complete — accepted 2026-08-01 |
 | 6 | Explicit exact-validation and export seam | 4/5 accepted exits; one deferred, unmet obligation | Complete — accepted 2026-09-05 |
 | 7 | Core alignment, station and multiple-track migration | 4/4 evidenced | Complete — accepted 2026-09-27 |
-| 8 | Turnout, crossover and timbering migration | 0/4 evidenced | Not started |
+| 8 | Turnout, crossover and timbering migration | 0/4 evidenced | Open |
 | 9 | Chair definitions, assisted assimilation, production records and export completion | 0/9 evidenced | Not started |
 | 10 | Workbench integration, launcher reduction and beta Addon packaging | 0/5 evidenced | Not started |
 | 11 | Stabilisation and qualification of the version proposed for release | 0/7 evidenced | Not started |
@@ -60,6 +60,13 @@ Phase 7 is closed at 4/4 under D-P7-006. The four original criteria from accepte
 | Accepted B14/B15 geometry, station mapping, identities, ordering, and metadata remain equivalent. | Evidenced — owner-accepted 2026-09-27 | [D-P7-003 panel and decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-2-admission-panel) |
 | Domain calculations for this family have no FreeCAD/Qt dependency or reverse adapter import. | Evidenced — owner-accepted 2026-09-27 | [D-P7-004 panel and decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-3-admission-panel) |
 | Legacy core-layout paths have either been safely retired or have a documented blocker and removal gate. | Evidenced — owner-accepted 2026-09-27 | [D-P7-002 panel and decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-4-admission-panel) |
+
+## Phase 8 exit conditions
+
+- Turnouts and crossovers retain accepted geometry, topology, timber decisions, identities, findings, and production records.
+- Creation, parameter editing, selection, undo/redo, save/reopen, validation, and export pass in the real GUI.
+- Straight- and curved-host representative workflows pass deterministic comparison.
+- No special-trackwork rule has leaked into the renderer or FreeCAD persistence adapter.
 
 ## Live risks
 <a id="qa-audit-risk-log"></a>
@@ -129,7 +136,8 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-P7-003 | 2026-09-27 | Accepted | The [decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-2-admission-panel) accepts Phase 7 Exit 2 for the B14/B15 comparison sources and the Phase 7 product work in PR #87 and previous pull requests. The project keeps applicable evidence of equivalent results for this scope. Phase 7 is now at 2/4. Exits 1 and 3 stay Pending. All recorded limitations and conditions for evidence from subsequent product changes stay in full. |
 | D-P7-004 | 2026-09-27 | Accepted | The [decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-3-admission-panel) accepts Phase 7 Exit 3 for the Phase 7 calculation family in PR #87 and previous pull requests. The 25 selected functions have no FreeCAD/Qt dependency or reverse adapter import. Phase 7 is now at 3/4. Exit 1 stays Pending. All recorded limitations and later-slice evidence conditions stay in full. |
 | D-P7-005 | 2026-09-27 | Accepted | The [decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-1-admission-panel) accepts Exit 1 against its unchanged criterion on the integrated evidence through PR #91. Phase 7 reaches 4/4 but stays Open pending a separate closeout decision. D-P6-008 and all comparison, adapter, caller, removal and legacy-retirement conditions remain in force. |
-| D-P7-006 | 2026-09-27 | Accepted | The [decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel) closes Phase 7 at 4/4 and accepts the completed recovery evidence. Phase 8 stays Not started at 0/4. D-P6-008 and all accepted limitations remain. No product, performance, output, release or legacy-removal acceptance follows. |
+| D-P7-006 | 2026-09-27 | Accepted | The [decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel) closes Phase 7 at 4/4 and accepts the completed recovery evidence. At closeout, Phase 8 stayed Not started at 0/4. D-P6-008 and all accepted limitations remain. No product, performance, output, release or legacy-removal acceptance follows. |
+| D-P8-001 | 2026-09-27 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-8-opening-panel) opens Phase 8 at 0/4 with its four existing exits Pending. It authorises opening integration and, after clean `main` and IDE disposal of redundant worktrees and branches, one internal `turnout_valid_toe_range` slice to a draft PR. TERM-R04, D-P6-008 and all inherited conditions remain. No exit, performance, output, release or legacy removal is accepted. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English word forms in TT-DOC-001 canonical prose. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
@@ -145,16 +153,8 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-GOV-019 | 2026-09-19 | Accepted | The [decision](history/phase-closeouts/PHASE7_CLOSEOUT.md#freecad-1-1-3-py31315-qt6112-qualification-panel) qualifies only the exact current FreeCAD 1.1.3 profile with CPython 3.13.15 and PySide6/Qt 6.11.2 for functional compatibility. The three earlier profiles stay qualified. The profile gets no performance or B0 authority. Phase 7 stays Open at 0/4. D-P6-008 and all limitations remain. |
 
 ## Authority and evidence links
-- [Current Phase 8 holding record](current/PHASE_EVIDENCE.md), [frozen Phase 7 closeout](history/phase-closeouts/PHASE7_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE7_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE7_RISKS.json), and [recovery record](backup-records/2026-09-27-phase7-closeout-recovery.md)
-- [Frozen Phase 6 closeout](history/phase-closeouts/PHASE6_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE6_RISKS.json), and [recovery record](backup-records/2026-09-05-phase6-closeout-recovery.md)
-- [Canonical product vision](PRODUCT_VISION.md)
-- [Capability evidence matrix](CAPABILITY_MATRIX.md)
-- [Frozen Phase 5 closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE5_RISKS.json)
-- [Frozen Phase 4 closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE4_RISKS.json)
-- [Engineering policy and TT-DOC-001 profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile) and [Architecture](ARCHITECTURE.md)
-- [Modularisation boundaries](MODULARISATION_PLAN.md)
-- [Validation strategy](VALIDATION.md)
-- [Runtime and legacy ingress compatibility contract](contracts/phase1-compatibility.json)
-- [Recovery and backup](RECOVERY_AND_BACKUP.md)
-- [Licensing boundaries](LICENSING_BOUNDARIES.md) and [Provenance](PROVENANCE.md)
-- [Frozen evidence policy and manifest](history/README.md)
+- [Current Phase 8 evidence](current/PHASE_EVIDENCE.md); frozen Phase 7 [closeout](history/phase-closeouts/PHASE7_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE7_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE7_RISKS.json), and [recovery record](backup-records/2026-09-27-phase7-closeout-recovery.md).
+- Frozen Phase 6 [closeout](history/phase-closeouts/PHASE6_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE6_RISKS.json), and [recovery record](backup-records/2026-09-05-phase6-closeout-recovery.md); Phase 5 [closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE5_RISKS.json).
+- Phase 4 [closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE4_RISKS.json); [Product Vision](PRODUCT_VISION.md) and [capability evidence matrix](CAPABILITY_MATRIX.md).
+- [Engineering policy and TT-DOC-001 profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile), [Architecture](ARCHITECTURE.md), [Modularisation boundaries](MODULARISATION_PLAN.md), [Validation strategy](VALIDATION.md), and [runtime and legacy ingress compatibility contract](contracts/phase1-compatibility.json).
+- [Recovery and backup](RECOVERY_AND_BACKUP.md), [Licensing boundaries](LICENSING_BOUNDARIES.md), [Provenance](PROVENANCE.md), and [frozen evidence policy and manifest](history/README.md).
