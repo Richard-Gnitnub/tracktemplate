@@ -869,19 +869,22 @@ def validate_phase6_closeout_mutations() -> None:
         ),
         (
             "later-slice-evidence-waived",
-            "Each later Phase 7 product slice\nmust have its own applicable "
-            "equal-results evidence before integration",
+            "Each subsequent Phase 7 product change must have applicable "
+            "evidence of equal\nresults before integration",
             "Later Phase 7 product slices inherit acceptance without evidence",
-            "D-P7-003 bounded condition drifted: Each later Phase 7 product "
-            "slice must have its own applicable equal-results evidence before "
-            "integration",
+            "D-P7-003 bounded condition drifted: Each subsequent Phase 7 "
+            "product change must have applicable evidence of equal results "
+            "before integration",
         ),
         (
             "stored-state-and-export-accepted",
-            "does not accept untested stored state or export bytes",
-            "accepts untested stored state and export bytes",
-            "D-P7-003 bounded condition drifted: does not accept untested "
-            "stored state or export bytes",
+            "Applicable test results are necessary before this decision can\n"
+            "accept stored state or export bytes",
+            "This decision accepts stored state and export bytes without test "
+            "results",
+            "D-P7-003 bounded condition drifted: Applicable test results are "
+            "necessary before this decision can accept stored state or export "
+            "bytes",
         ),
         (
             "d-p6-008-treated-as-met",
@@ -3600,20 +3603,20 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_performance_widened = replace_once(
         plan,
-        "It accepts no untested platform arrangement, wider migration-family "
-        "completion, performance result, output or release status, legacy-path "
-        "removal, or product change.",
-        "It accepts untested platform arrangements, wider migration-family "
+        "It accepts no platform configuration without a test result, wider "
+        "migration-family completion, performance result, output or release "
+        "status, legacy-path removal, or product change.",
+        "It accepts platform configurations without test results, wider migration-family "
         "completion, performance results, output and release status, legacy-path "
         "removal, and product changes.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: It accepts no untested "
-        "platform arrangement, wider migration-family completion, performance "
-        "result, output or release status, legacy-path removal, or product "
-        "change",
+        "project-plan owner view lost or contradicted: It accepts no platform "
+        "configuration without a test result, wider migration-family completion, "
+        "performance result, output or release status, legacy-path removal, or "
+        "product change",
     )
 
     compatibility_terms_removed = terminology
