@@ -785,10 +785,9 @@ def validate_worktree_retirement_policy(policy):
         "do not use force",
         "do not use git stash",
         "do not move local files as a condition for worktree removal",
-        "a pass audit does not make a git repository inside a worktree removable by git",
+        "a pass audit does not make a populated nested git repository removable",
         "if git worktree remove refuses the target leave it registered and preserved",
-        "record the refusal",
-        "obtain a separate owner decision for a safe route",
+        "record the refusal and obtain a separate owner decision for a safe route",
         "before worktree removal make sure the local state inventory contains all "
         "local files",
         "before removal make sure the preservation audit gives a pass result",
