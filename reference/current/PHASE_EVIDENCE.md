@@ -16,10 +16,10 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is Open at 1/4. Exit 4 is Evidenced and owner-accepted under D-P7-002. Exits 1–3 are Pending. Phase 6 is closed with four accepted exits. D-P6-008 records “one deferred, unmet obligation”.<br><br>PR #87 is in protected `main` at `2aaa0d0cd860a0256abc92e4e1e24c6f218899ee`. The merge preserves exact reviewed tree `ac831721b56064a27485737197e580b7f4294897`, and post-merge CI has a PASS result. Output has private-development status and project status stays `unknown`. |
-| What changed | The integrated `calculate_platform_top_heights` result uses Core through `tracktemplate.api`, and B16 selects it directly for `calculate_platform_boundaries`. The route uses schema `16`, 25 selected functions and 40 caller identities. B14 and B15 do not change. D-P7-002 accepts only Exit 4 on the retained-path preservation and removal-gate basis. The [capability matrix](../CAPABILITY_MATRIX.md) records evidence from protected `main` through PR #84 only. |
-| What now works | Tests in standalone Python and with the exact host profile in D-GOV-019 each have PASS results for 24 cases and five read paths. All 15 related Phase 7 qualified proofs and the Phase 3 route proof have PASS results. Tests with the FreeCAD human interface give the same platform results for Create/Edit, Undo/Redo, Save/reopen and cleanup. The complete transition profile and independent source-and-test review have PASS results. The retained evidence documents the inherited B15 host as a temporary compatibility path and gives its removal gate to the Phase 10 integration owner. |
-| Limitations/findings | The two usual repairs are completed (2/2). No more usual repairs are permitted. The first FAIL results and their failure classifications stay as retained evidence.<br><br>The PR #83, PR #84, PR #85, PR #86 and PR #87 histories for repair and review do not change. PR #83 records: “The measured micro-call cost increased.” The locked Phase evidence keeps the recorded “non-blocking trailing-space warning”. PR-10 stays Open/Partial. PR-18 stays Open/Effective for current scope. The inherited B15 host, development-only comparison oracle and every adapter and caller removal condition stay in full. The samples from the FreeCAD human interface give no improvement evidence for D-P6-008. D-P6-008 and all recorded product limitations apply in full. D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.” |
+| Current state | Phase 7 is Open at 1/4. Exit 4 is Evidenced and owner-accepted under D-P7-002. Exits 1–3 are Pending. Phase 6 is closed with four accepted exits. D-P6-008 records “one deferred, unmet obligation”.<br><br>PR #87 is in protected `main` at `2aaa0d0cd860a0256abc92e4e1e24c6f218899ee`. The merge preserves the exact reviewed tree `ac831721b56064a27485737197e580b7f4294897`. Post-merge CI has a PASS result. Output has private-development status and project status stays `unknown`. |
+| What changed | The integrated `calculate_platform_top_heights` result uses Core through `tracktemplate.api`. B16 selects the function directly for `calculate_platform_boundaries`. The route uses schema `16`, 25 selected functions and 40 caller identities. B14 and B15 do not change. D-P7-002 accepts only Exit 4 on the retained-path preservation and removal-gate basis. The [capability matrix](../CAPABILITY_MATRIX.md) records evidence from protected `main` through PR #84 only. |
+| What now works | Tests in standalone Python and with the exact host profile in D-GOV-019 each have PASS results for 24 cases and five read paths. All 15 related Phase 7 qualified proofs and the Phase 3 route proof have PASS results. Tests with the FreeCAD human interface give the same platform results for Create/Edit, Undo/Redo, Save/reopen and cleanup. The complete transition profile and independent source-and-test review have PASS results. The retained evidence shows that the inherited B15 host is a temporary compatibility path. It names the Phase 10 integration owner for the removal gate. |
+| Limitations/findings | The two usual repairs are completed (2/2). No more usual repairs are permitted. The first FAIL results and their failure classifications stay as retained evidence.<br><br>The PR #83, PR #84, PR #85, PR #86 and PR #87 histories for repair and review do not change. PR #83 records: “The measured micro-call cost increased.” The locked Phase evidence keeps the recorded “non-blocking trailing-space warning”. PR-10 stays Open/Partial. PR-18 stays Open/Effective for current scope.<br><br>The inherited B15 host, development-only comparison oracle and every adapter and caller removal condition stay in full. The samples from the FreeCAD human interface give no improvement evidence for D-P6-008. D-P6-008 and all recorded product limitations apply in full. D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.” |
 | Owner decision | D-P7-002 accepts Phase 7 Exit 4 as Evidenced and owner-accepted. It accepts no performance result, output or release status, wider migration-family completion, or product change. It does not remove a legacy path. |
 | Next action | Complete only the directly dependent D-P7-002 record alignment and its exact-green protected-main integration. Do not start a new product outcome in this cycle. |
 
@@ -760,24 +760,24 @@ It does not change these criteria or narrow them to the first task.
 
 Decision: **D-P7-002 — Accept Phase 7 Exit 4 on the retained-path preservation and removal-gate basis.**
 
-The source state is clean protected `main`
-`2aaa0d0cd860a0256abc92e4e1e24c6f218899ee` after PR #87, with exact
-reviewed tree `ac831721b56064a27485737197e580b7f4294897` and a PASS result
-for post-merge CI.
+The source state is the clean protected `main` commit
+`2aaa0d0cd860a0256abc92e4e1e24c6f218899ee` after PR #87. It has the exact
+reviewed tree `ac831721b56064a27485737197e580b7f4294897`. Post-merge CI has
+a PASS result.
 
 Richard is the project owner and panel chair. The record owner presents the
 alignment. The independent QA/risk reviewer is
-`/root/dp7_002_independent_risk`. The reviewer authored no maintained file.
+`/root/dp7_002_independent_risk`. The reviewer is not an author of a maintained file.
 The independent result is **Proceed with bounded conditions**. There is no
 unresolved dissent.
 
-The retained Phase 4 evidence shows that D-P4-003 retired the product
-comparison switch and kept product composition modular-only. The dual-route
-comparison stays in development-only oracle tooling. The inherited B15 GUI
-host stays a temporary compatibility path. The Phase 10 integration owner
-must remove that host after the equivalent modular Workbench workflows get
-their named Phase 7–9 evidence and no later than the beta gate. B14 and B15
-keep their accepted hashes.
+The retained Phase 4 evidence gives this result from D-P4-003: the product
+comparison switch has retired status and product composition stays modular-only.
+The development-only comparison oracle keeps the dual-route comparison. The
+inherited B15 GUI host stays a temporary compatibility path. The Phase 10
+integration owner must remove that host after the equivalent modular Workbench
+workflows get their named Phase 7–9 evidence. The owner must remove the host no
+later than the beta gate. B14 and B15 keep their accepted hashes.
 
 PR-10 stays Open/Partial because later patches, adapters and callers keep
 their own removal conditions. PR-18 stays Open/Effective for current scope
@@ -786,8 +786,8 @@ is development-only. Every per-family analytical, GUI, exact-output,
 performance, comparison and retirement condition stays in full. Future dual
 paths and unowned patches get no acceptance from this decision.
 
-D-P6-008 stays Deferred — unmet and independently blocks beta while it is
-unmet. The decision gives no performance evidence and no wider migration,
+D-P6-008 stays Deferred — unmet. The obligation independently prevents beta
+acceptance while it is unmet. The decision gives no performance evidence and no wider migration,
 output, release or beta-readiness claim. Output stays private-development and
 project status stays `unknown`.
 
