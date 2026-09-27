@@ -377,14 +377,17 @@ retirement plan contains each location for planned preservation.
 
 A symbolic link can pass only as authoritative local source or retained
 evidence. Give it one classification and an exact preservation location. The
-source and preserved copy must have the same relative path, symbolic link text,
-type, byte size, and SHA-256 identity. Both links must resolve to the same
-existing referent outside the worktree to be removed. No directory between
-each checked root and its link can be a symbolic link. The retirement audit
-must reject a
-missing or changed referent, a symbolic link loop, an unresolved link, and a
-different source or copy identity. It must also reject a symbolic link that
-the plan classifies as cache, disposable state, or ambiguous state.
+source and preserved copy must have the same relative path and symbolic link
+text. They must have the same type, byte size, and SHA-256 identity. Both
+symbolic links must point to the same existing path outside the worktree to
+be removed. No directory between each checked root and its symbolic link
+can be a symbolic link.
+
+The retirement audit must reject a symbolic link if the path to which it
+points is missing or changes. It must reject a symbolic link loop or a
+difference between the source and copy identities. It must also reject a
+symbolic link that the plan classifies as cache, disposable state, or
+ambiguous state.
 
 For this repository, use `refs/remotes/origin/main` as `accepted_ref`.
 Use this command to operate the retirement audit again:

@@ -1054,10 +1054,11 @@ recovery validator must include these invalid states:
 - A duplicate key in the retirement plan
 - A symbolic link in the path for planned preservation
 - A symbolic link classified as cache, disposable state, or ambiguous state
-- A symbolic link with a changed identity, unresolved or looping referent, or
-  referent inside the worktree to be removed
+- A symbolic link with a changed identity or a symbolic link loop
+- A symbolic link that points to no existing path or to a path inside the
+  worktree to be removed
 - A symbolic link whose preserved copy has a different relative path, link
-  text, type, byte size, SHA-256 identity, or referent
+  text, type, byte size, SHA-256 identity, or path to which it points
 - A worktree without a branch whose plan does not use JSON `null` for
   `target.branch`, whose exact HEAD is not contained in the accepted commit,
   or whose HEAD or branch state changed

@@ -19,7 +19,7 @@ The owner accepted the independently reviewed
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
 | What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. A new independently reviewed snapshot covers the 39-worktree estate. D-GOV-020 authorises a bounded correction of the retirement control. |
 | What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. This opening changes no product behaviour. |
-| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. Seven contained worktrees have ignored `.devtools/freecad-cli/` directory entries that the current audit does not support; D-GOV-020 does not resolve them. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
+| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. Seven contained worktrees have ignored `.devtools/freecad-cli/` directory entries that the current audit does not support. D-GOV-020 does not resolve them. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
 | Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 authorises only the bounded retirement-control correction and its exact-green integration. Neither decision accepts an exit, performance, wider migration, production output, release or legacy removal. |
 | Next action | Integrate only an exact-green D-GOV-020 correction. Then get a separate passing plan and audit for each retirement candidate. Remove only safe candidates without `--force`, and check preservation after each removal. Keep five branches with unmerged commits. The product slice remains stopped until the retirement prerequisite is complete. Physical USB storage remains unverified. |
 
@@ -91,6 +91,7 @@ Its set is `2026-09-27-pre-phase8-turnout-migration-01`. The local receipt is
 primary checkout. Its SHA-256 is
 `1d68bd0c9bfd2006c078cfb9964a6db579ff0a2a63782b2a5fd8739147eb1c8f`.
 The snapshot has exact comparison evidence and independent recovery review.
+
 It does not prove coverage of later worktrees. The USB is unmounted. Physical
 removal and separate storage remain unverified.
 
@@ -101,16 +102,18 @@ live risks. The reviewer changed no maintained file. The panel result was
 High. Their treatment, owners, deadlines and control effectiveness do not
 change. This is an agent-team review, not an external organisational review.
 
-The correction permits exact-preserved symbolic links only as retained
+The correction permits symbolic links with exact preservation only as retained
 evidence or authoritative local source. It permits a worktree without a branch
 only when its exact HEAD is contained in the accepted commit. Classification,
 preservation, exact identity, tracked cleanliness and activity checks remain.
 An unsafe or ambiguous state still stops retirement. A separate passing plan
-and audit are necessary for each candidate before non-force removal. Preserve
-the five branches with unmerged commits. Do not start the authorised product
+and audit are necessary for each candidate before non-force removal.
+
+Preserve the five branches with unmerged commits. Do not start the authorised product
 slice until the complete retirement prerequisite passes. The reviewer found
 no basis to change a live risk disposition. The removal result and physical
 USB storage state remain unknown at this decision.
+
 A later read-only estate scan found seven contained worktrees with ignored
 `.devtools/freecad-cli/` directory entries. The audit does not support those
 entries. D-GOV-020 does not authorise another control change or their

@@ -74,12 +74,21 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:d3da760aae5e3c527b212bae7952d5a7eca0c4c5",
-      "accepted_sha256": "sha256:41d7a449f113d7733ff189368dc395fb31e73b8fbb5b94905838285f91a3b2e3",
+      "accepted_blob": "sha1:104076b794bceceef53e5142a4d9b70441f6df22",
+      "accepted_sha256": "sha256:3b5fd85054bf3eaaf43e7af4284f145bf1a7f4cddf7c4e201f34c1b8f7ee3b70",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/PROJECT_PLAN.md",
-      "review_receipt": "sha256:fcb6300374752d6e658f696a27ce32a425b538f12838cb3c19aec783e561d1bb",
+      "review_receipt": "sha256:9f533084d8092300a7af50330de6535c33099b5ac90783d3cbf340af53903c07",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
+      "accepted_blob": "sha1:9e393fe21951bfa3f30206dae023d3eecb111fd4",
+      "accepted_sha256": "sha256:0e9b3fc821e998c0b71e07a4d6cae35f78735fd5e073285c2e3b1857cc8de20f",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/RECOVERY_AND_BACKUP.md",
+      "review_receipt": "sha256:9f533084d8092300a7af50330de6535c33099b5ac90783d3cbf340af53903c07",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -92,12 +101,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:3008206349a28c34ce5a1741204e837053ba7cf2",
-      "accepted_sha256": "sha256:4aa22b953fe78a8a81faffbe7c8476122c2fac0fbea08866a44f62764b70a173",
+      "accepted_blob": "sha1:c25b6b50133b27307c84c02269b66863ccf5145e",
+      "accepted_sha256": "sha256:649800b3eb46a685682197198a363ffc60c05ac642201c49c64ab805aca7b08e",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/VALIDATION.md",
-      "review_receipt": "sha256:fcb6300374752d6e658f696a27ce32a425b538f12838cb3c19aec783e561d1bb",
+      "review_receipt": "sha256:9f533084d8092300a7af50330de6535c33099b5ac90783d3cbf340af53903c07",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -407,21 +416,21 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:bcefaa22e2250af23406a6b5f0470a347bb695c7",
-      "accepted_sha256": "sha256:80b673c61b619b129afc46f21a62358bba6f0dc5b22cdf68d869229f17544bdd",
+      "accepted_blob": "sha1:572d63cf75c0eceb55f0cb3c332b2f1fe96da706",
+      "accepted_sha256": "sha256:e41cc8ee3cffd71027d5e54986d25c4c11f6a0d4639bf4519ec4b72230663ebf",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:fcb6300374752d6e658f696a27ce32a425b538f12838cb3c19aec783e561d1bb",
+      "review_receipt": "sha256:9f533084d8092300a7af50330de6535c33099b5ac90783d3cbf340af53903c07",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:65967a07445b9cbdd974ed6eb75a49ef59044074",
-      "accepted_sha256": "sha256:e71b8f28f91bf0777723527e69edceb757cf17d17b55cabf751ec9478122796a",
+      "accepted_blob": "sha1:ba94f6222678ba22baacdcc5a383ba9fd93c2e45",
+      "accepted_sha256": "sha256:8883490f239d8d2427000bf1e6dab9b30d9896fcfd270f7970bb6803f1e278bf",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/gate-decisions.json",
-      "review_receipt": "sha256:fcb6300374752d6e658f696a27ce32a425b538f12838cb3c19aec783e561d1bb",
+      "review_receipt": "sha256:9f533084d8092300a7af50330de6535c33099b5ac90783d3cbf340af53903c07",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
