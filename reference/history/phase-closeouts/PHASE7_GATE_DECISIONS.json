@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "current_phase": 7,
+  "updated_on": "2026-09-27",
+  "decisions": [
+    {
+      "id": "D-P6-008",
+      "decided_on": "2026-09-05",
+      "status": "Accepted",
+      "decision": "Defer the unmet Phase 6 Exit 4 obligation until before Phase 10 beta acceptance.",
+      "authority": "I approve a Level 3 deferral of Phase 6 Exit 4—“Editing resource use improves beyond normal noise, with complete end-to-end cost accounted for”—for its existing bounded Entry/Exit scope, to a mandatory acceptance condition before the Phase 10 beta gate.\n\nRecord four accepted exits and one deferred, unmet obligation. Do not report 5/5 acceptance. Permit only the necessary sequencing exception for separately authorised later Core development. Preserve normal per-slice checks, comparison paths and all retirement conditions.\n\nI accept the bounded sequencing exposure. I remain accountable for delivery through a named Phase 10 integration owner and for acceptance after independent review. Numerical budgets or improvement on another workload cannot discharge this obligation. If it remains unmet, beta acceptance is blocked.",
+      "exclusions": "Preserve measurement rules, retained negative evidence and stopped directions. Authorise only the directly dependent Level 3 repository alignment. This decision accepts no performance result, closes no phase, opens no subsequent phase, authorises no product implementation or legacy removal, and changes no output or release status.",
+      "evidence": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel"
+    },
+    {
+      "id": "D-P7-001",
+      "decided_on": "2026-09-05",
+      "status": "Accepted",
+      "decision": "Open Phase 7.",
+      "authority": "I open Phase 7 at 0/4 for its existing Core alignment, station and multiple-track migration scope, preserving its four exit criteria and D-P6-008 in full. I authorise the directly dependent Level 3 opening alignment and its exact-green protected-main integration. Once main is clean and synchronised, I authorise the bounded Level 2 main-circle-centre extraction and routing described in this brief through implementation, applicable validation, independent review and publication. Preserve all comparison and legacy-retirement conditions. This decision accepts no Phase 7 exit or performance result and grants no output or release clearance.",
+      "exclusions": "This decision accepts no Phase 7 exit or performance result. It gives no output or release clearance. Preserve all comparison and legacy-retirement conditions and D-P6-008 in full. The later product pull request needs another owner decision for integration. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-opening-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-opening-panel"
+    },
+    {
+      "id": "D-GOV-019",
+      "decided_on": "2026-09-19",
+      "status": "Accepted",
+      "decision": "Qualify the exact current FreeCAD 1.1.3 host profile.",
+      "authority": "At protected main `980402adf2e3021739594f34eb1df7af6e4402db`, I qualify only `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` for functional host compatibility. This exact system Flatpak deployment has app commit `e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121` with parent `c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29`, and KDE runtime commit `fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa` with parent `4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18`. It has FreeCAD 1.1.3 revision `44987 (Git)`, source commit `145529fe741292ff0b3977a01195bf0247425794`, CPython 3.13.15, PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.8. The complete required qualification matrix and independent review have PASS results. Keep the three earlier exact profiles qualified and preserve their evidence and identities. D-GOV-019 gives functional compatibility authority only. It does not authorise this profile to supply performance evidence. Keep the platform-transition outcome parked before B0 with repair accounting 2/2. Do not reset or resume it. I authorise protected-main integration of the exact-green D-GOV-019 draft through the normal TrackTemplate workflow. After integration, the saved Caveman efficiency tranche remains next before further Phase 7 extraction. This decision does not start that separate work.",
+      "exclusions": "This decision changes no product source, public API, railway mathematics, persistence, schema, export behaviour or measurement rule. It changes no performance-evidence host authority, risk disposition, phase or exit status. D-P6-008 stays in full. Phase 7 stays Open at 0/4. Output stays private-development, and project status stays `unknown`. The prefetch for the earlier stack stays cached and undeployed. Add no holds. This decision authorises no B0 run, candidate repair, Caveman work, further Phase 7 extraction or legacy removal. It authorises no production or physical-output clearance, packaging, release or tagging.",
+      "evidence": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#freecad-1-1-3-py31315-qt6112-qualification-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#freecad-1-1-3-py31315-qt6112-qualification-panel"
+    },
+    {
+      "id": "D-P7-002",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Accept Phase 7 Exit 4 on the retained-path preservation and removal-gate basis.",
+      "authority": "As TrackTemplate project owner, I accept D-P7-002.\n\nAccept Phase 7 Exit 4 as Evidenced and owner-accepted on the retained-path preservation and removal-gate basis.\n\nPhase 7 advances to 1/4; Exits 1–3 remain Pending.\n\nPreserve the inherited B15 host, development-only comparison oracle, every adapter and caller removal condition, PR-10 Open/Partial, PR-18 Open/Effective for current scope, D-P6-008, and all comparison and legacy-retirement conditions.\n\nDo not remove a legacy path.\n\nThis accepts no performance result, output or release status, wider migration-family completion, or product change. Project status remains unknown.\n\nI authorise only the directly dependent Level 3 record alignment and its exact-green protected-main integration.",
+      "exclusions": "This decision accepts no performance result, output or release status, wider migration-family completion, product change, future dual path, unowned patch, legacy-path removal or beta readiness. Exits 1–3 remain Pending. Preserve the inherited B15 host, development-only comparison oracle, every adapter and caller removal condition, D-P6-008, and all comparison and legacy-retirement conditions. Preserve PR-10 Open/Partial and PR-18 Open/Effective for current scope. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-4-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-4-admission-panel"
+    },
+    {
+      "id": "D-P7-003",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Accept Phase 7 Exit 2 on a maintained-equivalence basis for the retained B14/B15 oracle and every Phase 7 product slice integrated through PR #87.",
+      "authority": "As TrackTemplate project owner, I accept D-P7-003.\n\nAccept Phase 7 Exit 2 as Evidenced and owner-accepted on a maintained-equivalence basis for the retained B14/B15 oracle and every Phase 7 product slice integrated through PR #87.\n\nPhase 7 advances to 2/4. Exits 1 and 3 remain Pending.\n\nPreserve both frozen B14/B15 identities, the inherited B15 host, development-only comparison oracle, every adapter and caller condition, all removal gates, D-P6-008, and all comparison and legacy-retirement conditions. Later Phase 7 slices must obtain their own applicable equivalence evidence.\n\nThis accepts no untested platform arrangement, wider migration-family completion, performance result, output or release status, legacy-path removal, or product change. Project status remains unknown.\n\nI authorise only the directly dependent Level 3 record alignment and its exact-green protected-main integration.",
+      "exclusions": "This decision accepts no platform configuration without a test result. It also accepts no wider migration-family completion, performance result, output or release status, legacy-path removal, product change, future Phase 7 product change or beta readiness. Exits 1 and 3 stay Pending.\n\nPreserve the two frozen B14/B15 identities, the inherited B15 host, and the development-only comparison oracle. Preserve all adapter and caller conditions, removal gates, D-P6-008, and comparison and legacy-retirement conditions. Each subsequent Phase 7 product change must have applicable evidence of equivalent results.\n\nPreserve PR-10 Open/Partial and PR-18 Open/Effective for current scope. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-2-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-2-admission-panel"
+    },
+    {
+      "id": "D-P7-004",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Accept Phase 7 Exit 3 for the Phase 7 Core alignment, station, straight-route, handedness, platform and multiple-track calculation family integrated through PR #87.",
+      "authority": "As TrackTemplate project owner, I accept D-P7-004.\n\nAccept Phase 7 Exit 3 as Evidenced and owner-accepted for the Phase 7 Core alignment, station, straight-route, handedness, platform and multiple-track calculation family integrated through PR #87: schema 16, 25 selected functions and 40 caller identities.\n\nPhase 7 advances to 3/4. Exit 1 remains Pending.\n\nPreserve both frozen B14/B15 identities, the inherited B15 host, development-only comparison oracle, every adapter and caller condition, all removal gates, D-P6-008, and all comparison and legacy-retirement conditions. Later Phase 7 slices require their own applicable dependency and equivalence evidence.\n\nThis accepts no wider migration-family completion, untested platform arrangement, performance result, output or release status, legacy-path removal or product change. Project status remains unknown.\n\nI authorise only the directly dependent Level 3 record alignment and its exact-green protected-main integration.",
+      "exclusions": "This decision accepts no wider migration-family completion, untested platform arrangement, performance result, output or release status, legacy-path removal, product change or beta readiness. Exit 1 stays Pending.\n\nPreserve the two frozen B14/B15 identities, the inherited B15 host and the development-only comparison oracle. Preserve every adapter and caller condition, all removal gates, D-P6-008, and all comparison and legacy-retirement conditions. Each later Phase 7 product slice must have applicable dependency and equivalence evidence.\n\nPreserve PR-10 Open/Partial and PR-18 Open/Effective for current scope. No risk disposition changes. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-3-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-3-admission-panel"
+    },
+    {
+      "id": "D-P7-005",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Accept Phase 7 Exit 1 on the integrated modular Core layout lifecycle evidence through PR #91.",
+      "authority": "I accept D-P7-005.\nAccept Phase 7 Exit 1 — “Core layouts can be created, edited, saved, reopened, validated, and exported through modular paths.” — as Evidenced and owner-accepted on the integrated evidence through PR #91.\nPhase 7 advances to 4/4 but remains Open pending a separate closeout decision.\nPreserve all recorded proof limits, D-P6-008, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition.\nThis accepts no performance result, wider migration-family completion, production output, release status or legacy-path removal. Project status remains `unknown`.\nI authorise only the directly dependent Level 3 record alignment and its exact-green protected-main integration.",
+      "exclusions": "Phase 7 remains Open and Phase 8 remains Not started. This decision accepts no performance result, wider migration-family completion, production output, release status, legacy-path removal, product change or beta readiness. Preserve all recorded proof limits, D-P6-008, both frozen B14/B15 identities, the inherited B15 host and the development-only comparison oracle. Preserve every adapter and caller condition, all removal gates, and all comparison and legacy-retirement conditions. Preserve PR-10 Open/Partial and PR-18 Open/Effective for current scope. No risk disposition changes. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-1-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-exit-1-admission-panel"
+    },
+    {
+      "id": "D-P7-006",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Close Phase 7 at 4/4 accepted exits.",
+      "authority": "As TrackTemplate project owner, I accept the Phase 7 closeout recovery evidence and close Phase 7 at **4/4 accepted exits**.\nAuthorise only the directly dependent Level 3 closeout records and their exact-green protected-main integration.\nKeep Phase 8 unopened and project status `unknown`.\nPreserve D-P6-008 as deferred and unmet, all recorded proof limitations, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition.\nThis decision grants no performance, wider migration, production-output, release or legacy-removal acceptance.\nAfter exact-green integration, synchronise protected `main` and stop. Do not begin Phase 8 or new development.",
+      "exclusions": "Phase 8 remains unopened at 0/4. Project status remains `unknown` and output remains private-development. D-P6-008 remains deferred and unmet. Preserve all proof limitations, the B14/B15 identities, inherited B15 host, development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition. This grants no performance, wider migration-family, production-output, release, legacy-removal or product-work acceptance.",
+      "evidence": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel"
+    }
+  ]
+}

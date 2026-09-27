@@ -519,13 +519,13 @@ def validate_phase6_closeout_mutations() -> None:
     """Reject acceptance inflation and weakened carried Phase 6 authority."""
     plan = read("reference/PROJECT_PLAN.md")
     closeout = read("reference/history/phase-closeouts/PHASE6_CLOSEOUT.md")
-    holding = read("reference/current/PHASE_EVIDENCE.md")
+    holding = read("reference/history/phase-closeouts/PHASE7_CLOSEOUT.md")
     for name, before, after, diagnostic in (
         (
             "phase7-acceptance-reversed",
-            "Open — 4/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005",
-            "Open — 3/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005",
-            "Phase 7 status differs from D-P7-002 through D-P7-005 acceptance at four exits",
+            "Closed — 4/4 evidenced and owner-accepted exits under D-P7-006",
+            "Closed — 3/4 evidenced and owner-accepted exits under D-P7-006",
+            "Phase 7 closeout status differs from D-P7-006",
         ),
         (
             "phase7-exit1-acceptance-reversed",
@@ -589,7 +589,9 @@ def validate_phase6_closeout_mutations() -> None:
         ),
         "D-P6-009 panel and register differ: exclusions",
     )
-    decisions = json.loads(read("reference/current/gate-decisions.json"))
+    decisions = json.loads(read(
+        "reference/history/phase-closeouts/PHASE7_GATE_DECISIONS.json"
+    ))
     frozen = {
         record["id"]: record
         for record in json.loads(read(
@@ -601,19 +603,19 @@ def validate_phase6_closeout_mutations() -> None:
     widened = copy.deepcopy(decisions)
     widened["decisions"][0]["authority"] += " The obligation is optional."
     unexpected = copy.deepcopy(decisions)
-    unexpected["decisions"].append({"id": "D-P7-006", "status": "Accepted"})
+    unexpected["decisions"].append({"id": "D-P7-007", "status": "Accepted"})
     for name, mutated in (
         ("current-d-p6-008-missing", missing),
         ("current-d-p6-008-weakened", widened),
-        ("current-phase7-additional-authority-invented", unexpected),
+        ("frozen-phase7-additional-authority-invented", unexpected),
     ):
         expect_rejected(
             "closeout/" + name,
             lambda value=mutated: progress._validate_phase7_decision_carryforward(
                 value, frozen,
             ),
-            "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019 "
-            "and D-P7-002 through D-P7-005",
+            "Phase 7 must preserve D-P6-008, D-P7-001, D-GOV-019 "
+            "and D-P7-002 through D-P7-006",
         )
     for field, replacement, diagnostic in (
         ("status", "Proposed", "identity, acceptance or panel routing drifted"),
@@ -642,8 +644,8 @@ def validate_phase6_closeout_mutations() -> None:
         lambda: progress._validate_phase7_decision_carryforward(
             missing_opening, frozen,
         ),
-        "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019 "
-        "and D-P7-002 through D-P7-005",
+        "Phase 7 must preserve D-P6-008, D-P7-001, D-GOV-019 "
+        "and D-P7-002 through D-P7-006",
     )
     for field, replacement, diagnostic in (
         ("status", "Proposed", "identity, acceptance or panel routing drifted"),
@@ -754,6 +756,47 @@ def validate_phase6_closeout_mutations() -> None:
                 value, frozen,
             ),
             "D-P7-005 " + diagnostic,
+        )
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        (
+            "authority",
+            "Phase 8 is open and product development may begin.",
+            "authority digest drifted",
+        ),
+        (
+            "exclusions",
+            "Performance, output and legacy removal are accepted.",
+            "exclusions digest drifted",
+        ),
+    ):
+        mutated = copy.deepcopy(decisions)
+        mutated["decisions"][7][field] = replacement
+        expect_rejected(
+            "closeout/d-p7-006-" + field + "-changed",
+            lambda value=mutated: progress._validate_phase7_decision_carryforward(
+                value, frozen,
+            ),
+            "D-P7-006 " + diagnostic,
+        )
+    current = json.loads(read("reference/current/gate-decisions.json"))
+    phase8_missing = copy.deepcopy(current)
+    phase8_missing["decisions"] = []
+    phase8_widened = copy.deepcopy(current)
+    phase8_widened["decisions"][0]["authority"] += " The duty is optional."
+    phase8_opened = copy.deepcopy(current)
+    phase8_opened["decisions"].append({"id": "D-P8-001", "status": "Accepted"})
+    for name, mutated in (
+        ("d-p6-008-missing", phase8_missing),
+        ("d-p6-008-weakened", phase8_widened),
+        ("phase8-opened", phase8_opened),
+    ):
+        expect_rejected(
+            "phase8-holding/" + name,
+            lambda value=mutated: progress._validate_phase8_decision_holding(
+                value, frozen,
+            ),
+            "Phase 8 holding must carry only unchanged D-P6-008",
         )
     for name, before, after, diagnostic in (
         (
@@ -1068,6 +1111,55 @@ def validate_phase6_closeout_mutations() -> None:
             ): progress._validate_dp7_005_acceptance(value),
             diagnostic,
         )
+
+    closeout_panel = progress._section(
+        holding, "Phase 7 closeout panel and owner decision — 2026-09-27",
+    )
+    owner_quote = blockquote_paragraph_containing(
+        closeout_panel, "I accept the Phase 7 closeout recovery evidence",
+    )
+    expect_rejected(
+        "phase7-closeout/owner-instruction-reversed",
+        lambda: progress._validate_phase7_closeout(replace_once(
+            holding,
+            closeout_panel,
+            replace_once(closeout_panel, owner_quote, owner_quote.replace(
+                "close Phase 7", "reopen Phase 7", 1,
+            )),
+        )),
+        "D-P7-006 exact owner instruction drifted or was relocated",
+    )
+    expect_rejected(
+        "phase7-closeout/recovery-coverage-narrowed",
+        lambda: progress._validate_phase7_closeout(replace_once(
+            holding,
+            closeout_panel,
+            replace_once(
+                closeout_panel, "all 37 registered worktrees",
+                "only 26 registered worktrees",
+            ),
+        )),
+        "D-P7-006 bounded condition drifted: 37 registered worktrees",
+    )
+    current_holding = read("reference/current/PHASE_EVIDENCE.md")
+    expect_rejected(
+        "phase8-holding/premature-open",
+        lambda: progress._validate_phase8_holding(replace_once(
+            current_holding,
+            "Phase 8 is unopened and\nunauthorised",
+            "Phase 8 is open and authorised",
+        )),
+        "Phase 8 holding status drifted: Phase 8 is unopened and unauthorised",
+    )
+    expect_rejected(
+        "phase8-holding/performance-duty-waived",
+        lambda: progress._validate_phase8_holding(replace_once(
+            current_holding,
+            "mandatory before\nPhase 10 beta acceptance",
+            "optional after Phase 10 beta acceptance",
+        )),
+        "Phase 8 holding boundary drifted: mandatory before Phase 10 beta acceptance",
+    )
 
 
 def validate_capability_matrix_mutations() -> None:
@@ -3332,12 +3424,16 @@ def validate_project_plan_mutations() -> None:
         plan, "| 7 | Core alignment, station and multiple-track migration",
     )
     expect_rejected(
-        "project-plan/phase7-closed-without-decision",
+        "project-plan/phase7-reopened-after-closeout",
         lambda: progress._validate_plan_shape(replace_once(
             plan, phase7_row,
-            replace_once(phase7_row, "| Open |", "| Complete |"),
+            replace_once(
+                phase7_row,
+                "| Complete — accepted 2026-09-27 |",
+                "| Open |",
+            ),
         )),
-        "the dashboard must identify only Phase 7 as Open",
+        "no phase may be Open before the Phase 8 opening decision",
     )
 
     exit2_row = table_row_containing(
@@ -3773,10 +3869,10 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
     )
-    plan_status = paragraph_containing(plan, "Status: **Phase 7 is Open")
+    plan_status = paragraph_containing(plan, "Status: **Phase 7 is closed")
     widened_status = replace_once(
         plan_status,
-        "D-P6-008 stays in full",
+        "D-P6-008 stays Deferred — unmet",
         "waive the improvement obligation for every workload",
     )
     owner_view_boundary_widened = replace_once(
@@ -3785,22 +3881,22 @@ def validate_documentation_profile_mutations() -> None:
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
         lambda: progress._validate_plan_shape(owner_view_boundary_widened),
-        "the accepted Phase 7 opening or carried D-P6-008 is missing",
+        "the accepted Phase 7 closeout or carried D-P6-008 is missing",
     )
 
     owner_view_performance_widened = replace_once(
         plan,
-        "No wider migration-family, performance, production-output, release "
-        "or legacy-removal acceptance follows.",
-        "Wider migration-family, performance, production-output, release "
-        "and legacy-removal acceptance follows.",
+        "It does not open Phase 8 or accept performance, wider migration, "
+        "production output, release or legacy removal.",
+        "It opens Phase 8 and accepts performance, wider migration, "
+        "production output, release and legacy removal.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: No wider "
-        "migration-family, performance, production-output, release or "
-        "legacy-removal acceptance follows",
+        "project-plan owner view lost or contradicted: It does not open Phase 8 "
+        "or accept performance, wider migration, production output, release "
+        "or legacy removal",
     )
 
     compatibility_terms_removed = terminology

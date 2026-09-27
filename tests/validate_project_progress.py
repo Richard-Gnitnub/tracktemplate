@@ -81,6 +81,19 @@ PHASE6_DECISIONS_PATH = (
     / "phase-closeouts"
     / "PHASE6_GATE_DECISIONS.json"
 )
+PHASE7_CLOSEOUT_PATH = (
+    ROOT / "reference" / "history" / "phase-closeouts" / "PHASE7_CLOSEOUT.md"
+)
+PHASE7_RISKS_PATH = (
+    ROOT / "reference" / "history" / "phase-closeouts" / "PHASE7_RISKS.json"
+)
+PHASE7_DECISIONS_PATH = (
+    ROOT
+    / "reference"
+    / "history"
+    / "phase-closeouts"
+    / "PHASE7_GATE_DECISIONS.json"
+)
 REDIRECT_PATH = (
     ROOT / "reference" / "phase-evidence" / "PHASE4_CANONICAL_STATE.md"
 )
@@ -1027,38 +1040,43 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        'Phase 7 is Open at 4/4',
-        'Exit 1 is Evidenced and owner-accepted under D-P7-005',
-        'Exits 2, 3 and 4 retain their acceptance under D-P7-003, D-P7-004 and D-P7-002',
+        'Phase 7 is closed at 4/4 under D-P7-006',
+        'Its four exits remain Evidenced and owner-accepted under D-P7-005, D-P7-003, D-P7-004 and D-P7-002',
+        'Phase 8 stays Not started at 0/4',
         'Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation',
         'Output stays private-development',
         'project status stays `unknown`',
-        'PR #91 is in protected `main` at `aae7f5f3388ef1abaa1ef673988a1d5c992f0cfc`',
-        'exact reviewed tree `f1bcbce0f6099c8dd20ec90e8150318288a21844`',
-        'Post-merge CI has a PASS result',
-        'D-P7-005 accepts Exit 1 against its unchanged criterion on the integrated Phase 7 evidence through PR #91',
-        'B16 `run_macro` caller reaches `tracktemplate.api.run_core_layout_export` through an explicit adapter',
-        'D-P7-003 and D-P7-004 retain their bounded equivalence and dependency conditions',
-        'D-P7-002 retains the removal gates',
-        'Core layout Create, Edit, Save, reopen and validation',
-        'PR #91 adds the modular export operation',
-        '17 related qualified checks have PASS results',
-        'paired GUI routes have zero differences after the permitted normalisation',
+        'independently reviewed recovery proof',
+        'Phase 7 evidence',
+        'decisions',
+        'risk snapshot',
+        'current paths hold unopened Phase 8 records',
+        'capability matrix',
+        'evidence map through PR #84 only',
+        'modular Core layout Create, Edit, Save, reopen, validation and export',
+        'selected plain-line export proof through PR #91',
+        'other exit panels retain their bounded equivalence, dependency and legacy-preservation evidence',
+        'This closeout changes no product behaviour',
         'one fixed B14 plain-line fixture and one prepared plan',
-        'two usual repairs remain 2/2 exhausted. The final 1/1 harness exception is consumed',
-        'initial FAIL and BLOCKED evidence stays retained',
-        'PR #83–#87 repair and review histories remain',
-        'non-blocking trailing-space warning',
+        'does not prove every platform arrangement or raw-file identity',
+        'two usual repairs remain 2/2 exhausted',
+        'final 1/1 harness exception remains consumed',
+        'initial FAIL and BLOCKED evidence',
+        'PR #83–#87 histories',
+        'measured micro-call cost increase',
+        'locked trailing-space warning',
         'PR-10 stays Open/Partial',
         'PR-18 stays Open/Effective for current scope',
-        'inherited B15 host, development-only comparison oracle, all adapter and caller conditions, and all removal gates stay in force',
+        'Both B14/B15 identities, the inherited B15 host, development-only comparison oracle',
+        'every adapter and caller condition, all removal gates and all comparison and legacy-retirement conditions remain',
         'D-P6-008 stays Deferred — unmet',
-        'All comparison and legacy-retirement conditions remain',
-        'Phase 7 is 4/4 but remains Open pending a separate closeout decision',
-        'No wider migration-family, performance, production-output, release or legacy-removal acceptance follows',
-        'Bring a separate Phase 7 closeout recommendation to the project owner',
-        'This alignment does not close Phase 7 or open Phase 8',
-        'The [capability matrix](CAPABILITY_MATRIX.md) records evidence through PR #84 only',
+        'mandatory before Phase 10 beta acceptance',
+        'GUI samples give no performance acceptance',
+        'USB is safely unmounted; separate physical storage remains operator-controlled and unverified',
+        'D-P7-006 closes Phase 7 at 4/4 and accepts its recovery evidence',
+        'It does not open Phase 8 or accept performance, wider migration, production output, release or legacy removal',
+        'After exact-green integration, synchronise protected `main` and stop',
+        'Phase 8 opening and any new development require a separate owner decision',
     ):
         _require(
             fragment in owner_view,
@@ -1177,18 +1195,18 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 6 must remain closed at four accepted and one deferred exit",
     )
     _require(
-        [
+        not [
             phase
             for phase, row in rows.items()
             if row["state"] == "Open"
             or str(row["state"]).startswith("Current")
-        ]
-        == [7],
-        "the dashboard must identify only Phase 7 as Open",
+        ],
+        "no phase may be Open before the Phase 8 opening decision",
     )
     _require(
-        rows[7]["count"] == 4 and rows[7]["state"] == "Open",
-        "Phase 7 must remain Open at four evidenced exits",
+        rows[7]["count"] == 4
+        and rows[7]["state"] == "Complete — accepted 2026-09-27",
+        "Phase 7 must be closed at four evidenced exits",
     )
     for phase in range(8, 12):
         _require(
@@ -1197,11 +1215,11 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         )
     preamble = direct_section_content(plan, "Project Plan", level=1)
     _require(
-        "Phase 7 is Open at 4/4 under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005"
+        "Phase 7 is closed at 4/4 under D-P7-006"
         in " ".join(preamble.split())
-        and "D-P6-008 stays in full"
+        and "D-P6-008 stays Deferred — unmet"
         in " ".join(preamble.split()),
-        "the accepted Phase 7 opening or carried D-P6-008 is missing",
+        "the accepted Phase 7 closeout or carried D-P6-008 is missing",
     )
     return rows
 
@@ -4023,14 +4041,13 @@ def _validate_phase6_closeout(
             "D-P6-009 panel and register differ: " + field,
         )
     _require(
-        "Open — 4/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005. "
-        "All four exits are Evidenced and owner-accepted. "
-        "Phase 7 awaits a separate closeout decision"
+        "Closed — 4/4 evidenced and owner-accepted exits under D-P7-006. "
+        "Phase 8 is Not started at 0/4"
         in _semantic_text(direct_section_content(holding, (
             "Phase 7 Core Alignment, Station and Multiple-Track Migration "
-            "Evidence"
+            "Closeout"
         ), level=1)),
-        "Phase 7 status differs from D-P7-002 through D-P7-005 acceptance at four exits",
+        "Phase 7 closeout status differs from D-P7-006",
     )
     for text, heading, exit1_status, exit2_status, exit3_status, exit4_status in (
         (
@@ -4123,6 +4140,7 @@ def _validate_exit4_deferral_risk(
 
 def _validate_risks(plan: str) -> None:
     document = _load_json(RISKS_PATH)
+    phase7_document = _load_json(PHASE7_RISKS_PATH)
     phase6_document = _load_json(PHASE6_RISKS_PATH)
     phase5_document = _load_json(PHASE5_RISKS_PATH)
     phase4_document = _load_json(PHASE4_RISKS_PATH)
@@ -4150,9 +4168,20 @@ def _validate_risks(plan: str) -> None:
         "unsupported frozen risk-register schema",
     )
     _require(
-        document["current_phase"] == 7
-        and document["updated_on"] == "2026-09-05",
-        "risk register is not prepared for Phase 7",
+        document["current_phase"] == 8
+        and document["updated_on"] == "2026-09-27",
+        "risk register is not prepared for the unopened Phase 8 holding state",
+    )
+    _require(
+        set(phase7_document) == set(document)
+        and phase7_document["schema_version"] == 1
+        and phase7_document["current_phase"] == 7
+        and phase7_document["updated_on"] == "2026-09-27",
+        "frozen risk snapshot is not the Phase 7 closeout state",
+    )
+    _require(
+        document["risks"] == phase7_document["risks"],
+        "Phase 8 holding risks differ from the Phase 7 closeout set",
     )
     _require(
         set(phase6_document) == set(document)
@@ -4162,7 +4191,7 @@ def _validate_risks(plan: str) -> None:
         "frozen risk snapshot is not the Phase 6 closeout state",
     )
     _require(
-        document["risks"] == phase6_document["risks"],
+        phase7_document["risks"] == phase6_document["risks"],
         "Phase 7 risks differ from the complete Phase 6 closeout set",
     )
     _require(
@@ -4304,24 +4333,24 @@ def _validate_phase7_decision_carryforward(
     document: dict[str, object],
     phase6_decisions: dict[str, dict[str, object]],
 ) -> None:
-    """Preserve the deferred obligation and all current Phase 7 authority."""
+    """Preserve the deferred obligation and each frozen Phase 7 decision."""
     _require(
         set(document)
         == {"schema_version", "current_phase", "updated_on", "decisions"}
         and document["schema_version"] == 1
         and document["current_phase"] == 7
         and document["updated_on"] == "2026-09-27",
-        "current decision register is not the D-P7-005 Phase 7 state",
+        "frozen decision register is not the Phase 7 closeout state",
     )
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 7
+        and len(records) == 8
         and records[0] == phase6_decisions["D-P6-008"],
-        "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019 and D-P7-002 through D-P7-005",
+        "Phase 7 must preserve D-P6-008, D-P7-001, D-GOV-019 and D-P7-002 through D-P7-006",
     )
     opening = records[1]
-    panel = "reference/current/PHASE_EVIDENCE.md#phase-7-opening-panel"
+    panel = "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-opening-panel"
     _require(
         isinstance(opening, dict)
         and set(opening) == set(phase6_decisions["D-P6-008"])
@@ -4353,7 +4382,7 @@ def _validate_phase7_decision_carryforward(
 
     qualification = records[2]
     qualification_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md"
         "#freecad-1-1-3-py31315-qt6112-qualification-panel"
     )
     _require(
@@ -4388,7 +4417,7 @@ def _validate_phase7_decision_carryforward(
 
     exit4 = records[3]
     exit4_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md"
         "#phase-7-exit-4-admission-panel"
     )
     _require(
@@ -4424,7 +4453,7 @@ def _validate_phase7_decision_carryforward(
 
     exit2 = records[4]
     exit2_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md"
         "#phase-7-exit-2-admission-panel"
     )
     _require(
@@ -4461,7 +4490,7 @@ def _validate_phase7_decision_carryforward(
 
     exit3 = records[5]
     exit3_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md"
         "#phase-7-exit-3-admission-panel"
     )
     _require(
@@ -4498,7 +4527,7 @@ def _validate_phase7_decision_carryforward(
 
     exit1 = records[6]
     exit1_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md"
         "#phase-7-exit-1-admission-panel"
     )
     _require(
@@ -4532,11 +4561,138 @@ def _validate_phase7_decision_carryforward(
             "D-P7-005 " + field + " digest drifted",
         )
 
+    closeout = records[7]
+    closeout_panel = (
+        "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md"
+        "#phase-7-closeout-panel"
+    )
+    _require(
+        isinstance(closeout, dict)
+        and set(closeout) == set(phase6_decisions["D-P6-008"])
+        and closeout["id"] == "D-P7-006"
+        and closeout["decided_on"] == "2026-09-27"
+        and closeout["status"] == "Accepted"
+        and closeout["decision"] == "Close Phase 7 at 4/4 accepted exits."
+        and closeout["evidence"] == closeout_panel
+        and closeout["panel_record"] == closeout_panel
+        and closeout["panel_required_under_current_policy"] is True,
+        "D-P7-006 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        (
+            "authority",
+            "43f8d660c0a6edb07d3dc930812eb8f7460cf37d06c228962ebd42601bb89888",
+        ),
+        (
+            "exclusions",
+            "3dbb4a1bc7172cafd57e136f1b962356aa881ee62ff3f2781dcd1ff7ab5739f5",
+        ),
+    ):
+        value = closeout[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P7-006 " + field + " digest drifted",
+        )
+
+
+def _validate_phase8_decision_holding(
+    document: dict[str, object],
+    phase6_decisions: dict[str, dict[str, object]],
+) -> None:
+    """Keep the unopened Phase 8 register free of new phase authority."""
+    _require(
+        set(document)
+        == {"schema_version", "current_phase", "updated_on", "decisions"}
+        and document["schema_version"] == 1
+        and document["current_phase"] == 8
+        and document["updated_on"] == "2026-09-27",
+        "current decision register is not the Phase 8 holding state",
+    )
+    _require(
+        document["decisions"] == [phase6_decisions["D-P6-008"]],
+        "Phase 8 holding must carry only unchanged D-P6-008",
+    )
+
+
+def _validate_phase7_closeout(evidence: str) -> None:
+    """Bind the closeout to the exact owner instruction and bounded proof."""
+    panel = _section(
+        evidence, "Phase 7 closeout panel and owner decision — 2026-09-27"
+    )
+    decision = _load_json(PHASE7_DECISIONS_PATH)["decisions"][7]
+    _require(
+        '<a id="phase-7-closeout-panel"></a>' in evidence
+        and _blockquote_paragraphs(panel)
+        == [_semantic_text(str(decision["authority"]))],
+        "D-P7-006 exact owner instruction drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "all four original exits Evidenced and owner-accepted",
+        "Phase 8 stays Not started at 0/4",
+        "37 registered worktrees",
+        "exact source-to-snapshot comparison",
+        "2026-09-05 disposable restore drill remains within the monthly interval",
+        "No new drill was required, and no 37-worktree restore is claimed",
+        "Physical storage of the USB away from the computer remains operator-controlled and unverified",
+        "all 24 live risks without changing a disposition",
+        "D-P6-008 keep the deferred, unmet performance obligation",
+        "mandatory before Phase 10 beta acceptance",
+        "Both frozen B14/B15 identities",
+        "development-only comparison oracle remain",
+        "Every per-slice comparison, adapter, caller, removal, and legacy-retirement condition remains",
+        "No legacy path is removed",
+        "Project status stays unknown and output stays private-development",
+        "does not open Phase 8 or authorise product work",
+        "accepts no performance result, wider migration-family completion, production output, release state, or legacy-path removal",
+    ):
+        _require(clause in flat, "D-P7-006 bounded condition drifted: " + clause)
+
+
+def _validate_phase8_holding(evidence: str) -> None:
+    """Require administrative Phase 8 records without an opening claim."""
+    preamble = _semantic_text(direct_section_content(
+        evidence,
+        "Phase 8 Turnout, Crossover and Timbering Migration Holding Record",
+        level=1,
+    ))
+    for clause in (
+        "Not started — 0/4 evidenced exits",
+        "Phase 8 is unopened and unauthorised",
+        "D-P7-006",
+        "all four original exits Evidenced and owner-accepted",
+    ):
+        _require(clause in preamble, "Phase 8 holding status drifted: " + clause)
+    flat = _semantic_text(evidence)
+    for clause in (
+        "The owner has not opened the phase or authorised product work in it",
+        "D-P6-008 stays in full",
+        "The 24 live risks retain their owners, deadlines, treatment and control effectiveness",
+        "No risk disposition changes",
+        "No wider migration-family completion, untested platform arrangement, performance result, production output, release or legacy-path removal is accepted",
+        "Project status remains unknown",
+    ):
+        _require(clause in flat, "Phase 8 holding boundary drifted: " + clause)
+    duties = _semantic_text(_section(evidence, "Continuing duties and risks"))
+    for clause in (
+        "mandatory before Phase 10 beta acceptance",
+        "If it remains unmet, beta acceptance is blocked",
+    ):
+        _require(clause in duties, "Phase 8 holding boundary drifted: " + clause)
+    _require(
+        "history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel"
+        in evidence
+        and "gate-decisions.json" in evidence
+        and "risks.json" in evidence,
+        "Phase 8 holding lost canonical evidence routing",
+    )
+
 
 def _validate_phase7_opening(evidence: str) -> None:
     """Bind the opening quote and first assignment to bounded authority."""
     panel = _section(evidence, "Phase 7 opening panel")
-    opening = _load_json(CURRENT_DECISIONS_PATH)["decisions"][1]
+    opening = _load_json(PHASE7_DECISIONS_PATH)["decisions"][1]
     _require(
         '<a id="phase-7-opening-panel"></a>\n\n'
         '## Phase 7 opening panel' in evidence
@@ -4575,7 +4731,7 @@ def _validate_dgov019_qualification(evidence: str) -> None:
     """Bind the exact functional host qualification and its exclusions."""
     heading = "D-GOV-019 qualification panel for the current FreeCAD stack"
     panel = _section(evidence, heading)
-    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][2]
+    record = _load_json(PHASE7_DECISIONS_PATH)["decisions"][2]
     _require(
         '<a id="freecad-1-1-3-py31315-qt6112-qualification-panel"></a>'
         in evidence
@@ -4631,7 +4787,7 @@ def _validate_dp7_002_acceptance(evidence: str) -> None:
     """Bind Exit 4 admission to the exact owner decision and conditions."""
     heading = "Phase 7 Exit 4 admission panel — 2026-09-27"
     panel = _section(evidence, heading)
-    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][3]
+    record = _load_json(PHASE7_DECISIONS_PATH)["decisions"][3]
     _require(
         '<a id="phase-7-exit-4-admission-panel"></a>' in evidence
         and _blockquote_paragraphs(panel)
@@ -4673,7 +4829,7 @@ def _validate_dp7_003_acceptance(evidence: str) -> None:
     """Bind Exit 2 admission to the exact owner decision and conditions."""
     heading = "Phase 7 Exit 2 admission panel — 2026-09-27"
     panel = _section(evidence, heading)
-    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][4]
+    record = _load_json(PHASE7_DECISIONS_PATH)["decisions"][4]
     _require(
         '<a id="phase-7-exit-2-admission-panel"></a>' in evidence
         and _blockquote_paragraphs(panel)
@@ -4717,7 +4873,7 @@ def _validate_dp7_004_acceptance(evidence: str) -> None:
     """Bind Exit 3 admission to the exact owner decision and conditions."""
     heading = "Phase 7 Exit 3 admission panel — 2026-09-27"
     panel = _section(evidence, heading)
-    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][5]
+    record = _load_json(PHASE7_DECISIONS_PATH)["decisions"][5]
     _require(
         '<a id="phase-7-exit-3-admission-panel"></a>' in evidence
         and _blockquote_paragraphs(panel)
@@ -4788,7 +4944,7 @@ def _validate_dp7_005_acceptance(evidence: str) -> None:
     """Bind Exit 1 admission to the exact owner decision and proof limits."""
     heading = "Phase 7 Exit 1 admission panel — 2026-09-27"
     panel = _section(evidence, heading)
-    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][6]
+    record = _load_json(PHASE7_DECISIONS_PATH)["decisions"][6]
     _require(
         '<a id="phase-7-exit-1-admission-panel"></a>' in evidence
         and _blockquote_paragraphs(panel)
@@ -4966,6 +5122,9 @@ def _validate_decisions(plan: str) -> None:
             )
 
     _validate_phase7_decision_carryforward(
+        _load_json(PHASE7_DECISIONS_PATH), phase6_by_id,
+    )
+    _validate_phase8_decision_holding(
         _load_json(CURRENT_DECISIONS_PATH), phase6_by_id,
     )
 
@@ -5213,9 +5372,12 @@ def _validate_decisions(plan: str) -> None:
         "decision register" in decision_flat
         and "history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
         in decision_section
-        and "keeps D-P6-008 in full and records D-P7-001"
+        and "history/phase-closeouts/PHASE7_GATE_DECISIONS.json"
+        in decision_section
+        and "current decision register" in decision_flat
+        and "keeps D-P6-008 in full"
         in decision_flat,
-        "the current decision-register ownership is missing",
+        "Phase 7 closeout or current decision-register ownership is missing",
     )
     plan_ids = set(
         re.findall(
@@ -5229,7 +5391,7 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005"},
+        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -6943,6 +7105,8 @@ def _validate_ci_workflow() -> None:
 def main() -> None:
     plan = _read(PLAN_PATH)
     current_evidence = _read(PHASE6_CLOSEOUT_PATH)
+    phase7_closeout = _read(PHASE7_CLOSEOUT_PATH)
+    phase8_holding = _read(CURRENT_EVIDENCE_PATH)
     phase4_closeout = _read(PHASE4_CLOSEOUT_PATH)
     phase5_closeout = _read(PHASE5_CLOSEOUT_PATH)
     _validate_plan_shape(plan)
@@ -6960,14 +7124,16 @@ def main() -> None:
     _validate_risks(plan)
     _validate_decisions(plan)
     _validate_phase6_closeout(
-        plan, current_evidence, _read(CURRENT_EVIDENCE_PATH),
+        plan, current_evidence, phase7_closeout,
     )
-    _validate_phase7_opening(_read(CURRENT_EVIDENCE_PATH))
-    _validate_dgov019_qualification(_read(CURRENT_EVIDENCE_PATH))
-    _validate_dp7_002_acceptance(_read(CURRENT_EVIDENCE_PATH))
-    _validate_dp7_003_acceptance(_read(CURRENT_EVIDENCE_PATH))
-    _validate_dp7_004_acceptance(_read(CURRENT_EVIDENCE_PATH))
-    _validate_dp7_005_acceptance(_read(CURRENT_EVIDENCE_PATH))
+    _validate_phase7_opening(phase7_closeout)
+    _validate_dgov019_qualification(phase7_closeout)
+    _validate_dp7_002_acceptance(phase7_closeout)
+    _validate_dp7_003_acceptance(phase7_closeout)
+    _validate_dp7_004_acceptance(phase7_closeout)
+    _validate_dp7_005_acceptance(phase7_closeout)
+    _validate_phase7_closeout(phase7_closeout)
+    _validate_phase8_holding(phase8_holding)
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_finite_documentation_completion(plan, current_evidence)
