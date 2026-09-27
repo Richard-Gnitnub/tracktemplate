@@ -1074,7 +1074,7 @@ def _validate_owner_view(plan: str) -> None:
         'D-P6-008 stays Deferred — unmet',
         'mandatory before Phase 10 beta acceptance',
         'GUI samples give no performance acceptance',
-        'Seven contained worktrees have unsupported ignored `.devtools/freecad-cli/` directory entries; D-GOV-020 does not resolve them',
+        'Seven contained worktrees have unsupported ignored `.devtools/freecad-cli/` directory entries. D-GOV-020 does not resolve them',
         'USB is safely unmounted. Separate physical storage remains operator-controlled and unverified',
         'D-P8-001',
         'opens Phase 8 at 0/4',
