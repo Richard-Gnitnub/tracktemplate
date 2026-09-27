@@ -55,6 +55,7 @@
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-input-validation-regression.md", "sha256": "c7c4fb78cb6fae756a3f3d6b74502203974e01142f1e1794f166f0d8a6a7efa7"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-longitudinal-bounds-regression.md", "sha256": "8d2f76572e3a72bcdc068f8459a94766257051c4d145662aaa6beb9ee8eb586e"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-heading-coverage-regression.md", "sha256": "ecea6c8ce2634bb790c75e52dc9c41316a204716b93d11f5e53d9a3d97ddb748"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-09-27-phase7-platform-top-heights-regression.md", "sha256": "f4bc59aa2376355e6a9ea2b78907757174fd964c77c215a421f7e7eb4411c563"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-27-phase7-platform-top-heights-regression.md", "sha256": "f4bc59aa2376355e6a9ea2b78907757174fd964c77c215a421f7e7eb4411c563"},
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-27-phase7-core-layout-export-regression.md", "sha256": "0157dfe2ab807cd3c8e14075e41fa81db6c04d3fb14919592ca98c1f9b5dd777"}
   ]
 }
