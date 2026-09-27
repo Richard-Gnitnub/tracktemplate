@@ -4710,7 +4710,7 @@ def _validate_phase8_decision_opening(
     )
     for field, digest in (
         ("authority", "dc0364e8aa040030d1caf6a11308956d43be6d13818371f2417c0c7a8424cae5"),
-        ("exclusions", "2be3af2cec5fbb20687c5c4e9c995219544694b97cc155ed1e223f535ae9af9d"),
+        ("exclusions", "0947d5275f44a792fc9281fcc8d577476f41572567b0b9d150830bbbcdfc63e0"),
     ):
         value = nested[field]
         _require(
