@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 7,
-  "updated_on": "2026-09-19",
+  "updated_on": "2026-09-27",
   "decisions": [
     {
       "id": "D-P6-008",
@@ -35,6 +35,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-py31315-qt6112-qualification-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-3-py31315-qt6112-qualification-panel"
+    },
+    {
+      "id": "D-P7-002",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Accept Phase 7 Exit 4 on the retained-path preservation and removal-gate basis.",
+      "authority": "As TrackTemplate project owner, I accept D-P7-002.\n\nAccept Phase 7 Exit 4 as Evidenced and owner-accepted on the retained-path preservation and removal-gate basis.\n\nPhase 7 advances to 1/4; Exits 1–3 remain Pending.\n\nPreserve the inherited B15 host, development-only comparison oracle, every adapter and caller removal condition, PR-10 Open/Partial, PR-18 Open/Effective for current scope, D-P6-008, and all comparison and legacy-retirement conditions.\n\nDo not remove a legacy path.\n\nThis accepts no performance result, output or release status, wider migration-family completion, or product change. Project status remains unknown.\n\nI authorise only the directly dependent Level 3 record alignment and its exact-green protected-main integration.",
+      "exclusions": "This decision accepts no performance result, output or release status, wider migration-family completion, product change, future dual path, unowned patch, legacy-path removal or beta readiness. Exits 1–3 remain Pending. Preserve the inherited B15 host, development-only comparison oracle, every adapter and caller removal condition, D-P6-008, all comparison and legacy-retirement conditions, PR-10 Open/Partial and PR-18 Open/Effective for current scope. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-4-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-4-admission-panel"
     }
   ]
 }
