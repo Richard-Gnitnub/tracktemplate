@@ -807,6 +807,18 @@ def validate_phase6_closeout_mutations() -> None:
             lambda value=changed: progress._validate_phase8_decision_opening(value, frozen),
             "D-P8-001 " + diagnostic,
         )
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        ("authority", "Retire every worktree without preservation proof.", "authority digest drifted"),
+        ("exclusions", "Phase 8 product work may begin before retirement.", "exclusions digest drifted"),
+    ):
+        changed = copy.deepcopy(current)
+        changed["decisions"][2][field] = replacement
+        expect_rejected(
+            "phase8-recovery/d-gov-020-" + field + "-changed",
+            lambda value=changed: progress._validate_phase8_decision_opening(value, frozen),
+            "D-GOV-020 " + diagnostic,
+        )
     for name, before, after, diagnostic in (
         (
             "profile-widened",
@@ -1193,6 +1205,49 @@ def validate_phase6_closeout_mutations() -> None:
             plan,
         ),
         "D-P8-001 bounded condition drifted: A new snapshot must preserve earlier snapshots and meet the recovery policy",
+    )
+    control_panel = progress._section(
+        current_opening, "D-GOV-020 worktree-retirement control panel — 2026-09-27"
+    )
+    expect_rejected(
+        "phase8-recovery/owner-instruction-weakened",
+        lambda: progress._validate_phase8_opening(
+            replace_once(
+                current_opening,
+                control_panel,
+                replace_once(
+                    control_panel,
+                    "Do not use `--force`",
+                    "Use `--force`",
+                ),
+            ),
+            plan,
+        ),
+        "D-GOV-020 exact owner instruction drifted or was relocated",
+    )
+    expect_rejected(
+        "phase8-recovery/unsupported-directory-overlooked",
+        lambda: progress._validate_phase8_opening(
+            replace_once(
+                current_opening,
+                "seven contained worktrees with ignored",
+                "no remaining worktrees with ignored",
+            ),
+            plan,
+        ),
+        "D-GOV-020 bounded condition drifted: seven contained worktrees with ignored .devtools/freecad-cli/",
+    )
+    expect_rejected(
+        "phase8-recovery/snapshot-receipt-identity-changed",
+        lambda: progress._validate_phase8_opening(
+            replace_once(
+                current_opening,
+                "1d68bd0c9bfd2006c078cfb9964a6db579ff0a2a63782b2a5fd8739147eb1c8f",
+                "0" * 64,
+            ),
+            plan,
+        ),
+        "D-GOV-020 bounded condition drifted: 1d68bd0c9bfd2006c078cfb9964a6db579ff0a2a63782b2a5fd8739147eb1c8f",
     )
 
 
@@ -3920,15 +3975,15 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_performance_widened = replace_once(
         plan,
-        "It accepts no Phase 8 exit, performance, wider migration, "
+        "Neither decision accepts a Phase 8 exit, performance, wider migration, "
         "production output, release or legacy removal.",
-        "It accepts every Phase 8 exit, performance, wider migration, "
+        "Both decisions accept every Phase 8 exit, performance, wider migration, "
         "production output, release and legacy removal.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: It accepts no Phase 8 exit, "
+        "project-plan owner view lost or contradicted: Neither decision accepts a Phase 8 exit, "
         "performance, wider migration, production output, release "
         "or legacy removal",
     )

@@ -1053,6 +1053,15 @@ recovery validator must include these invalid states:
 - A different value for `accepted_ref`
 - A duplicate key in the retirement plan
 - A symbolic link in the path for planned preservation
+- A symbolic link classified as cache, disposable state, or ambiguous state
+- A symbolic link with a changed identity or a symbolic link loop
+- A symbolic link that points to no existing path or to a path inside the
+  worktree to be removed
+- A symbolic link whose preserved copy has a different relative path, link
+  text, type, byte size, SHA-256 identity, or path to which it points
+- A worktree without a branch whose plan does not use JSON `null` for
+  `target.branch`, whose exact HEAD is not contained in the accepted commit,
+  or whose HEAD or branch state changed
 - Data from the retirement plan in command output
 - A local path from a file-system error in command output
 - Information from a Git error in command output
@@ -1064,6 +1073,10 @@ it must use `git worktree remove` without `--force`. It must make sure that the
 authoritative local source stays available. Before branch removal, it must show
 that `git worktree list` does not contain the worktree. It must also show that
 the accepted commit contains the branch tip.
+
+For a worktree without a branch, the recovery validator must prove that the
+exact HEAD is contained in the accepted commit. It must show that no branch
+deletion follows removal of that worktree.
 
 Before worktree removal, the validator must examine the local-state types in
 the retirement plan. It must also examine the preservation diff for the

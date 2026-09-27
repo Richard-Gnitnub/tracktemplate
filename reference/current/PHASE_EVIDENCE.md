@@ -17,11 +17,11 @@ The owner accepted the independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
-| What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. The current records now hold the Phase 8 opening decision. |
+| What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. A new independently reviewed snapshot covers the 39-worktree estate. D-GOV-020 authorises a bounded correction of the retirement control. |
 | What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. This opening changes no product behaviour. |
-| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
-| Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises only its Level 3 opening alignment and exact-green integration. After clean protected `main` and removal of redundant worktrees and branches in the JetBrains IDE, it separately authorises one internal `turnout_valid_toe_range` slice to a draft PR. It accepts no exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | Integrate this exact-green opening alignment and synchronise protected `main`. Complete the worktree and branch retirement audit and a fresh pre-migration snapshot before the separately authorised product slice. Report recovery steps that require operator access. |
+| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. Seven contained worktrees have ignored `.devtools/freecad-cli/` directory entries that the current audit does not support. D-GOV-020 does not resolve them. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
+| Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 authorises only the bounded retirement-control correction and its exact-green integration. Neither decision accepts an exit, performance, wider migration, production output, release or legacy removal. |
+| Next action | Integrate only an exact-green D-GOV-020 correction. Then get a separate passing plan and audit for each retirement candidate. Remove only safe candidates without `--force`, and check preservation after each removal. Keep five branches with unmerged commits. The product slice remains stopped until the retirement prerequisite is complete. Physical USB storage remains unverified. |
 
 <a id="phase-8-opening-panel"></a>
 
@@ -78,6 +78,77 @@ all proof limits, TERM-R04, both comparison identities, the inherited host,
 and every comparison, adapter, caller, removal and legacy-retirement condition
 remain. No performance result, wider migration, production output, release
 state or legacy-path removal is accepted. Project status stays `unknown`.
+
+<a id="worktree-retirement-control-panel"></a>
+
+## D-GOV-020 worktree-retirement control panel — 2026-09-27
+
+**Decision boundary:** Protected `main` at
+`18dee347f4e1284bbd1a6e2b6f1658870064576e` contains the Phase 8 opening.
+The separate pre-migration recovery snapshot covers 39 registered worktrees.
+Its set is `2026-09-27-pre-phase8-turnout-migration-01`. The local receipt is
+`tmp/phase8-pre-migration-recovery/terminal-backup-receipt.json` in the
+primary checkout. Its SHA-256 is
+`1d68bd0c9bfd2006c078cfb9964a6db579ff0a2a63782b2a5fd8739147eb1c8f`.
+The snapshot has exact comparison evidence and independent recovery review.
+
+It does not prove coverage of later worktrees. The USB is unmounted. Physical
+removal and separate storage remain unverified.
+
+The independent read-only reviewer `/root/retirement_governance_audit`
+examined the existing retirement control, its two evidenced gaps, and all 24
+live risks. The reviewer changed no maintained file. The panel result was
+**Proceed with bounded conditions**. PR-13 remains Critical and PR-22 remains
+High. Their treatment, owners, deadlines and control effectiveness do not
+change. This is an agent-team review, not an external organisational review.
+
+The correction permits symbolic links with exact preservation only as retained
+evidence or authoritative local source. It permits a worktree without a branch
+only when its exact HEAD is contained in the accepted commit. Classification,
+preservation, exact identity, tracked cleanliness and activity checks remain.
+An unsafe or ambiguous state still stops retirement. A separate passing plan
+and audit are necessary for each candidate before non-force removal.
+
+Preserve the five branches with unmerged commits. Do not start the authorised product
+slice until the complete retirement prerequisite passes. The reviewer found
+no basis to change a live risk disposition. The removal result and physical
+USB storage state remain unknown at this decision.
+
+A later read-only estate scan found seven contained worktrees with ignored
+`.devtools/freecad-cli/` directory entries. The audit does not support those
+entries. D-GOV-020 does not authorise another control change or their
+retirement.
+
+**Exact owner instruction — 2026-09-27:**
+
+> As TrackTemplate project owner, I authorise one bounded Level 3 recovery-control correction to the existing worktree-retirement mechanism.
+>
+> Support only the two evidenced gaps blocking the Phase 8 prerequisite:
+>
+> - exact-preserved symlink local-state entries;
+> - the contained detached worktree.
+>
+> Preserve the existing fail-closed retirement model. Do not weaken accepted-history containment, tracked cleanliness, local-state classification, preservation proof, exact identity checks, ambiguous-state stops, non-force removal or post-removal preservation checks.
+>
+> Add proportionate negative coverage so unsafe, changed, unresolved or insufficiently preserved symlink state still fails, and detached state cannot pass unless its exact commit is proved contained and retirement is otherwise safe.
+>
+> Obtain applicable independent review and integrate only an exact-green recovery-control correction through the normal protected-main workflow.
+>
+> After integration, require a separate passing retirement plan and audit for each retirement candidate before non-force removal. Preserve the five branches with unmerged commits; this authority does not permit their retirement or loss.
+>
+> Do not use `--force`, `git stash`, `git worktree prune` or destructive recovery shortcuts.
+>
+> Do not begin the authorised `turnout_valid_toe_range` product slice until the Phase 8 retirement prerequisite is genuinely complete under the corrected control and all remaining recovery-policy conditions are satisfied.
+>
+> The USB is safely unmounted. Do not claim physical removal or separate storage unless an on-site operator confirms it.
+>
+> Phase 8 remains 0/4 with all exits Pending. D-P6-008 and all existing limitations remain unchanged.
+
+**Structured decision — D-GOV-020:** Authorise only the two evidenced
+retirement-control corrections, negative tests, independent review and
+exact-green integration. Each removal needs its own passing plan and audit.
+No product, phase exit, performance, output, release or physical-storage
+acceptance follows.
 
 ## Phase 8 exit conditions
 

@@ -268,7 +268,9 @@ def _validate_relative_path(value, *, directory_prefix=False):
 
 def _local_state_entry(target, relative, git_state):
     relative = _validate_relative_path(relative)
-    path = target.joinpath(*pathlib.PurePosixPath(relative).parts)
+    path = _preserved_entry_path(target, relative)
+    if path is None:
+        raise SafetyAuditError("local-state path has a non-directory parent")
     try:
         metadata = path.lstat()
         if stat.S_ISREG(metadata.st_mode):
@@ -450,9 +452,25 @@ def _preservation_matches(entries, destination_root, target):
                 identity = hashlib.sha256(
                     os.fsencode(path.readlink())
                 ).hexdigest()
+                source = _preserved_entry_path(target, entry["path"])
+                if source is None:
+                    return False
+                current = _local_state_entry(
+                    target, entry["path"], entry["git_state"]
+                )
+                if current != entry:
+                    return False
+                source_referent = source.resolve(strict=True)
+                preserved_referent = path.resolve(strict=True)
+                if (
+                    source_referent != preserved_referent
+                    or source_referent == target
+                    or target in source_referent.parents
+                ):
+                    return False
             else:
                 return False
-        except (OSError, SafetyAuditError):
+        except (OSError, RuntimeError, SafetyAuditError):
             return False
         if (
             metadata.st_size != entry["size_bytes"]
@@ -591,10 +609,22 @@ def _classification_state(plan, inventory, target):
             )
 
     unsupported = sum(
-        entry["type"] != "file" for entry in inventory["entries"]
+        entry["type"] not in {"file", "symlink"}
+        for entry in inventory["entries"]
     )
     if unsupported:
         findings.append("unsupported-local-state-type")
+    for entry in inventory["entries"]:
+        if entry["type"] != "symlink":
+            continue
+        assigned = assignments[entry["path"]]
+        if len(assigned) != 1:
+            continue
+        group = next(item for item in prepared if item["name"] == assigned[0])
+        if group["classification"] not in {
+            "authoritative-local-source", "retained-evidence"
+        }:
+            findings.append("symlink-preservation-required")
     return {
         "group_count": len(prepared),
         "counts": counts,
@@ -663,8 +693,8 @@ def audit_worktree_retirement(root, target, plan_path=None):
         findings.append("target-tracked-state-not-clean")
     if non_default_index_flag_count:
         findings.append("target-index-flags-not-default")
-    if record["detached"] or not record["branch"]:
-        findings.append("target-branch-not-attached")
+    if record["detached"] == bool(record["branch"]):
+        findings.append("target-branch-state-invalid")
     if record["locked"]:
         findings.append("target-worktree-locked")
     if record["prunable"]:
@@ -680,7 +710,8 @@ def audit_worktree_retirement(root, target, plan_path=None):
         "complete": False,
         "preservation_verified": False,
         "unsupported_type_count": sum(
-            item["type"] != "file" for item in inventory["entries"]
+            item["type"] not in {"file", "symlink"}
+            for item in inventory["entries"]
         ),
         "findings": ["retirement-plan-missing"],
     }
@@ -704,20 +735,24 @@ def audit_worktree_retirement(root, target, plan_path=None):
             "head",
         }:
             raise SafetyAuditError("retirement target identity is malformed")
-        expected_branch = _required_text(
-            target_plan,
-            "branch",
-            "retirement target",
-        )
-        if not expected_branch.startswith("refs/heads/"):
-            raise SafetyAuditError("retirement target branch must be a local ref")
+        expected_branch = target_plan["branch"]
+        if expected_branch is not None:
+            if (
+                not isinstance(expected_branch, str)
+                or not expected_branch.startswith("refs/heads/")
+            ):
+                raise SafetyAuditError(
+                    "retirement target branch must be a local ref or null"
+                )
         expected_head = _validated_sha(
             target_plan.get("head"),
             "retirement target head",
         )
         identity["expected_head_matches"] = record["head"] == expected_head
         identity["expected_branch_matches"] = (
-            record["branch"] == expected_branch
+            record["detached"] and not record["branch"]
+            if expected_branch is None
+            else not record["detached"] and record["branch"] == expected_branch
         )
         if not identity["expected_head_matches"]:
             findings.append("target-head-changed")
@@ -808,6 +843,7 @@ def audit_worktree_retirement(root, target, plan_path=None):
         "target": {
             **identity,
             "registered": True,
+            "detached": record["detached"],
             "tracked_clean": (
                 not tracked_entries and not non_default_index_flag_count
             ),

@@ -24,6 +24,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-8-opening-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-8-opening-panel"
+    },
+    {
+      "id": "D-GOV-020",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Authorise the bounded worktree-retirement control correction.",
+      "authority": "As TrackTemplate project owner, I authorise one bounded Level 3 recovery-control correction to the existing worktree-retirement mechanism.\n\nSupport only the two evidenced gaps blocking the Phase 8 prerequisite:\n\n- exact-preserved symlink local-state entries;\n- the contained detached worktree.\n\nPreserve the existing fail-closed retirement model. Do not weaken accepted-history containment, tracked cleanliness, local-state classification, preservation proof, exact identity checks, ambiguous-state stops, non-force removal or post-removal preservation checks.\n\nAdd proportionate negative coverage so unsafe, changed, unresolved or insufficiently preserved symlink state still fails, and detached state cannot pass unless its exact commit is proved contained and retirement is otherwise safe.\n\nObtain applicable independent review and integrate only an exact-green recovery-control correction through the normal protected-main workflow.\n\nAfter integration, require a separate passing retirement plan and audit for each retirement candidate before non-force removal. Preserve the five branches with unmerged commits; this authority does not permit their retirement or loss.\n\nDo not use `--force`, `git stash`, `git worktree prune` or destructive recovery shortcuts.\n\nDo not begin the authorised `turnout_valid_toe_range` product slice until the Phase 8 retirement prerequisite is genuinely complete under the corrected control and all remaining recovery-policy conditions are satisfied.\n\nThe USB is safely unmounted. Do not claim physical removal or separate storage unless an on-site operator confirms it.\n\nPhase 8 remains 0/4 with all exits Pending. D-P6-008 and all existing limitations remain unchanged.",
+      "exclusions": "Only exact-preserved symbolic link local-state entries and the contained worktree without a branch are in scope. Each retirement candidate needs a separate passing plan and audit before non-force removal. Preserve five branches with unmerged commits and all existing fail-closed controls. No product slice begins before the complete Phase 8 retirement prerequisite. Do not use --force, git stash, git worktree prune or destructive recovery shortcuts. Physical USB removal and separate storage remain unverified. Phase 8 stays Open at 0/4 with all exits Pending. D-P6-008 and all existing limitations remain. No product, exit, performance, output, release or legacy-removal acceptance follows.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#worktree-retirement-control-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#worktree-retirement-control-panel"
     }
   ]
 }
