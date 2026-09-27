@@ -1072,7 +1072,7 @@ def _validate_owner_view(plan: str) -> None:
         'D-P6-008 stays Deferred — unmet',
         'mandatory before Phase 10 beta acceptance',
         'GUI samples give no performance acceptance',
-        'USB is safely unmounted. Separate physical storage remains operator-controlled and unverified',
+        'USB is safely unmounted; separate physical storage remains operator-controlled and unverified',
         'D-P7-006 closes Phase 7 at 4/4 and accepts its recovery evidence',
         'It does not open Phase 8 or accept performance, wider migration, production output, release or legacy removal',
         'After exact-green integration, synchronise protected `main` and stop',
