@@ -522,16 +522,17 @@ def validate_phase6_closeout_mutations() -> None:
     holding = read("reference/current/PHASE_EVIDENCE.md")
     for name, before, after, diagnostic in (
         (
-            "phase7-acceptance-inflated",
-            "Open — 3/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003 and D-P7-004",
-            "Open — 4/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003 and D-P7-004",
-            "Phase 7 status differs from D-P7-002, D-P7-003 and D-P7-004 acceptance at three exits",
+            "phase7-acceptance-reversed",
+            "Open — 4/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005",
+            "Open — 3/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005",
+            "Phase 7 status differs from D-P7-002 through D-P7-005 acceptance at four exits",
         ),
         (
-            "phase7-exit-admitted",
+            "phase7-exit1-acceptance-reversed",
+            progress.EXPECTED_PHASE7_EXIT_CONDITIONS[0]
+            + " | Evidenced — owner-accepted under D-P7-005",
             progress.EXPECTED_PHASE7_EXIT_CONDITIONS[0] + " | Pending",
-            progress.EXPECTED_PHASE7_EXIT_CONDITIONS[0] + " | Evidenced",
-            "Phase 7 criteria or D-P7-002/D-P7-003/D-P7-004 dispositions drifted",
+            "Phase 7 criteria or D-P7-002 through D-P7-005 dispositions drifted",
         ),
         (
             "beta-deadline-waived",
@@ -600,7 +601,7 @@ def validate_phase6_closeout_mutations() -> None:
     widened = copy.deepcopy(decisions)
     widened["decisions"][0]["authority"] += " The obligation is optional."
     unexpected = copy.deepcopy(decisions)
-    unexpected["decisions"].append({"id": "D-P7-005", "status": "Accepted"})
+    unexpected["decisions"].append({"id": "D-P7-006", "status": "Accepted"})
     for name, mutated in (
         ("current-d-p6-008-missing", missing),
         ("current-d-p6-008-weakened", widened),
@@ -611,8 +612,8 @@ def validate_phase6_closeout_mutations() -> None:
             lambda value=mutated: progress._validate_phase7_decision_carryforward(
                 value, frozen,
             ),
-            "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019, "
-            "D-P7-002, D-P7-003 and D-P7-004",
+            "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019 "
+            "and D-P7-002 through D-P7-005",
         )
     for field, replacement, diagnostic in (
         ("status", "Proposed", "identity, acceptance or panel routing drifted"),
@@ -641,8 +642,8 @@ def validate_phase6_closeout_mutations() -> None:
         lambda: progress._validate_phase7_decision_carryforward(
             missing_opening, frozen,
         ),
-        "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019, "
-        "D-P7-002, D-P7-003 and D-P7-004",
+        "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019 "
+        "and D-P7-002 through D-P7-005",
     )
     for field, replacement, diagnostic in (
         ("status", "Proposed", "identity, acceptance or panel routing drifted"),
@@ -731,6 +732,28 @@ def validate_phase6_closeout_mutations() -> None:
                 value, frozen,
             ),
             "D-P7-004 " + diagnostic,
+        )
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        (
+            "authority",
+            "All Phase 7 exits, performance and output are accepted.",
+            "authority digest drifted",
+        ),
+        (
+            "exclusions",
+            "Phase 7 is closed and Phase 8 is open.",
+            "exclusions digest drifted",
+        ),
+    ):
+        mutated = copy.deepcopy(decisions)
+        mutated["decisions"][6][field] = replacement
+        expect_rejected(
+            "exit1/d-p7-005-" + field + "-changed",
+            lambda value=mutated: progress._validate_phase7_decision_carryforward(
+                value, frozen,
+            ),
+            "D-P7-005 " + diagnostic,
         )
     for name, before, after, diagnostic in (
         (
@@ -998,6 +1021,51 @@ def validate_phase6_closeout_mutations() -> None:
             lambda value=replace_once(
                 holding, exit3_panel, mutated_panel,
             ): progress._validate_dp7_004_acceptance(value),
+            diagnostic,
+        )
+
+    exit1_panel = progress._section(
+        holding, "Phase 7 Exit 1 admission panel — 2026-09-27",
+    )
+    for name, before, after, diagnostic in (
+        (
+            "owner-acceptance-inverted",
+            "I accept D-P7-005.",
+            "I reject D-P7-005.",
+            "D-P7-005 exact owner instruction drifted or was relocated",
+        ),
+        (
+            "all-arrangements-claimed",
+            "does not prove all prepared plans or platform\narrangements",
+            "proves all prepared plans and platform arrangements",
+            "D-P7-005 bounded condition drifted: does not prove all prepared "
+            "plans or platform arrangements",
+        ),
+        (
+            "legacy-removal-authorised",
+            "No legacy path is removed.",
+            "All legacy paths are removed.",
+            "D-P7-005 bounded condition drifted: No legacy path is removed",
+        ),
+        (
+            "performance-duty-waived",
+            "mandatory pre-Phase-10-beta gate",
+            "optional post-beta gate",
+            "D-P7-005 bounded condition drifted: mandatory pre-Phase-10-beta gate",
+        ),
+        (
+            "premature-phase-closeout",
+            "Phase 7 reaches 4/4 but remains Open.",
+            "Phase 7 reaches 4/4 and closes.",
+            "D-P7-005 bounded condition drifted: Phase 7 reaches 4/4 but remains Open",
+        ),
+    ):
+        mutated_panel = replace_once(exit1_panel, before, after)
+        expect_rejected(
+            "exit1/" + name,
+            lambda value=replace_once(
+                holding, exit1_panel, mutated_panel,
+            ): progress._validate_dp7_005_acceptance(value),
             diagnostic,
         )
 
@@ -3260,6 +3328,18 @@ def validate_project_plan_mutations() -> None:
         "Phase 6 must remain closed at four accepted and one deferred exit",
     )
 
+    phase7_row = table_row_containing(
+        plan, "| 7 | Core alignment, station and multiple-track migration",
+    )
+    expect_rejected(
+        "project-plan/phase7-closed-without-decision",
+        lambda: progress._validate_plan_shape(replace_once(
+            plan, phase7_row,
+            replace_once(phase7_row, "| Open |", "| Complete |"),
+        )),
+        "the dashboard must identify only Phase 7 as Open",
+    )
+
     exit2_row = table_row_containing(
         plan,
         "Evidenced — owner-accepted 2026-08-02",
@@ -3329,6 +3409,14 @@ def validate_project_plan_mutations() -> None:
         "project-plan/d-p6-007-decision-omitted",
         lambda: progress._validate_decisions(
             replace_once(plan, exit5_decision_row + "\n", "")
+        ),
+        "project-plan decisions differ from the current and frozen registers",
+    )
+    exit1_admission_row = table_row_containing(plan, "| D-P7-005 |")
+    expect_rejected(
+        "project-plan/d-p7-005-decision-omitted",
+        lambda: progress._validate_decisions(
+            replace_once(plan, exit1_admission_row + "\n", "")
         ),
         "project-plan decisions differ from the current and frozen registers",
     )
@@ -3665,15 +3753,15 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_row = table_row_containing(plan, "**Current state**")
     inflated_view = replace_once(
         owner_view_row,
-        "Phase 6 is closed with four accepted exits",
-        "Phase 6 is closed with five accepted exits",
+        "Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation",
+        "Phase 6 retains five accepted exits and D-P6-008 as complete",
     )
     owner_view_status = replace_once(plan, owner_view_row, inflated_view)
     expect_rejected(
         "tt-doc/owner-view-status-contradiction",
         lambda: progress._validate_owner_view(owner_view_status),
-        "project-plan owner view lost or contradicted: Phase 6 is closed with "
-        "four accepted exits",
+        "project-plan owner view lost or contradicted: Phase 6 retains four "
+        "accepted exits and D-P6-008 as one deferred, unmet obligation",
     )
     owner_view_authority = replace_once(
         plan,
@@ -3702,20 +3790,17 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_performance_widened = replace_once(
         plan,
-        "It accepts no wider migration-family completion, platform "
-        "arrangement without a test result, performance result, output or "
-        "release status, legacy-path removal, or product change.",
-        "It accepts wider migration-family completion, platform arrangements "
-        "without test results, performance results, output and release "
-        "status, legacy-path removal, and product changes.",
+        "No wider migration-family, performance, production-output, release "
+        "or legacy-removal acceptance follows.",
+        "Wider migration-family, performance, production-output, release "
+        "and legacy-removal acceptance follows.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: It accepts no wider "
-        "migration-family completion, platform arrangement without a test "
-        "result, performance result, output or release status, legacy-path "
-        "removal, or product change",
+        "project-plan owner view lost or contradicted: No wider "
+        "migration-family, performance, production-output, release or "
+        "legacy-removal acceptance follows",
     )
 
     compatibility_terms_removed = terminology
