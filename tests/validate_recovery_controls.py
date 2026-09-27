@@ -279,6 +279,43 @@ def validate_safety_audit_git_commands(source):
         action = node.args[1].value
         if action in READ_ONLY_GIT_ACTIONS:
             continue
+        arguments = tuple(
+            item.value if isinstance(item, ast.Constant) else None
+            for item in node.args[2:]
+        )
+        if action == "show" and len(node.args) == 3:
+            approved_objects = {
+                ast.dump(
+                    ast.parse(expression, mode="eval").body,
+                    include_attributes=False,
+                )
+                for expression in (
+                    "accepted_commit + ':' + FREECAD_CLI_SETUP_PATH",
+                    "accepted_commit + ':' + FREECAD_CLI_PATCH_PATH",
+                )
+            }
+            if ast.dump(
+                node.args[2], include_attributes=False
+            ) in approved_objects:
+                continue
+        if action == "diff" and arguments in {
+            ("--cached", "--quiet", "HEAD"),
+            ("--name-only", "--no-ext-diff", "-z", "HEAD", "--"),
+        }:
+            continue
+        if (
+            action == "hash-object"
+            and arguments == ("--no-filters", "--", None)
+            and isinstance(node.args[4], ast.Name)
+            and node.args[4].id == "path"
+        ):
+            continue
+        if action == "show-ref" and not arguments:
+            continue
+        if action == "fsck" and arguments == (
+            "--no-reflogs", "--unreachable", "--no-progress"
+        ):
+            continue
         if action == "stash":
             exact_inventory = (
                 len(node.args) == 4
@@ -751,6 +788,9 @@ def validate_worktree_retirement_policy(policy):
         "do not use force",
         "do not use git stash",
         "do not move local files as a condition for worktree removal",
+        "a pass audit does not make a populated nested git repository removable",
+        "if git worktree remove refuses the target leave it registered and preserved",
+        "record the refusal and obtain a separate owner decision for a safe route",
         "before worktree removal make sure the local state inventory contains all "
         "local files",
         "before removal make sure the preservation audit gives a pass result",
@@ -1467,6 +1507,66 @@ def _retirement_plan(repository, target):
             },
         ],
     }
+
+
+def _freecad_cli_retirement_fixture(temp_root, destination):
+    repository, target = _retirement_fixture(temp_root)
+    upstream = temp_root / "freecad-cli-upstream"
+    upstream.mkdir()
+    _run(["git", "init", "-b", "main"], cwd=upstream)
+    _run(["git", "config", "user.name", "Nested Fixture"], cwd=upstream)
+    _run(
+        ["git", "config", "user.email", "nested-fixture@example.invalid"],
+        cwd=upstream,
+    )
+    paths = ["src/bridge-{}.py".format(index) for index in range(6)]
+    (upstream / "src").mkdir()
+    for path in paths:
+        (upstream / path).write_text("baseline\n", encoding="utf-8")
+    _run(["git", "add", "src"], cwd=upstream)
+    _run(["git", "commit", "-m", "Pinned bridge baseline"], cwd=upstream)
+    pinned = _run(["git", "rev-parse", "HEAD"], cwd=upstream).stdout.strip()
+    for path in paths:
+        (upstream / path).write_text("reviewed patch\n", encoding="utf-8")
+    patch = _run(["git", "diff", "--full-index"], cwd=upstream).stdout
+    bridge_authority = repository / "tools/freecad_bridge"
+    bridge_authority.mkdir(parents=True)
+    (bridge_authority / "setup-freecad-cli").write_text(
+        'expected_commit="{}"\n'.format(pinned), encoding="utf-8"
+    )
+    (bridge_authority / "freecad-cli-tracktemplate.patch").write_text(
+        patch, encoding="utf-8"
+    )
+    _run(["git", "add", "tools/freecad_bridge"], cwd=repository)
+    _run(["git", "commit", "-m", "Record bridge fixture authority"], cwd=repository)
+    _run(["git", "push"], cwd=repository)
+
+    checkout = target / ".devtools/freecad-cli"
+    checkout.parent.mkdir()
+    _run(["git", "clone", str(upstream), str(checkout)], cwd=temp_root)
+    _run(["git", "apply", str(bridge_authority / "freecad-cli-tracktemplate.patch")], cwd=checkout)
+    (destination / ".devtools").mkdir(parents=True)
+    shutil.copytree(checkout, destination / ".devtools/freecad-cli")
+    plan = _retirement_plan(repository, target)
+    plan["classifications"].append(
+        {
+            "name": "reviewed-freecad-cli",
+            "classification": "retained-evidence",
+            "paths": [],
+            "prefixes": [safety.FREECAD_CLI_LOCAL_PATH],
+            "proof": {
+                "status": "passed",
+                "owner": "fixture bridge owner",
+                "basis": "exact complete checkout independently preserved",
+            },
+            "disposition": "preserve",
+            "preservation": {
+                "method": "identical-relative-tree",
+                "destination_root": str(destination),
+            },
+        }
+    )
+    return repository, target, checkout, destination, plan, paths
 
 
 def _write_retirement_plan(path, plan):
@@ -2442,6 +2542,318 @@ def _validate_detached_retirement(errors):
             errors.append("detached non-force removal changed retained state")
 
 
+def _validate_freecad_cli_nested_retirement(errors):
+    with contextlib.ExitStack() as stack:
+        temp_root = pathlib.Path(stack.enter_context(
+            tempfile.TemporaryDirectory(
+                prefix="tracktemplate-freecad-cli-retirement-"
+            )
+        ))
+        destination = pathlib.Path(stack.enter_context(
+            tempfile.TemporaryDirectory(
+                prefix="tracktemplate-freecad-cli-preserved-", dir="/dev/shm"
+            )
+        ))
+        repository, target, checkout, destination, plan, paths = (
+            _freecad_cli_retirement_fixture(temp_root, destination)
+        )
+        plan_path = temp_root / "nested-retirement-plan.json"
+
+        def inspect(candidate):
+            _write_retirement_plan(plan_path, candidate)
+            return safety.audit_worktree_retirement(
+                repository, target, plan_path
+            )
+
+        def expect_blocked(label, finding, candidate):
+            report = inspect(candidate)
+            if (
+                report["readiness"]["retirement_ready"]
+                or finding not in report["findings"]
+            ):
+                errors.append(label + " did not fail closed")
+
+        inventory = safety._retirement_inventory(target)
+        nested = [
+            entry for entry in inventory["entries"]
+            if entry["path"] == safety.FREECAD_CLI_LOCAL_PATH
+        ]
+        if (
+            len(nested) != 1
+            or nested[0]["type"] != safety.FREECAD_CLI_LOCAL_TYPE
+        ):
+            errors.append("complete nested checkout was not inventoried once")
+            return
+        ready = inspect(plan)
+        if ready["findings"] or not ready["readiness"]["retirement_ready"]:
+            errors.append("exact-preserved canonical nested checkout was not ready")
+            return
+
+        stale = copy.deepcopy(plan)
+        stale["inventory_sha256"] = "0" * 64
+        expect_blocked("incomplete nested inventory", "local-state-inventory-changed", stale)
+        disposable = copy.deepcopy(plan)
+        disposable["classifications"][-1]["classification"] = (
+            "temporary-disposable-state"
+        )
+        disposable["classifications"][-1]["disposition"] = (
+            "discard-by-normal-worktree-removal"
+        )
+        del disposable["classifications"][-1]["preservation"]
+        expect_blocked(
+            "disposable nested checkout",
+            "freecad-cli-preservation-required",
+            disposable,
+        )
+        ambiguous = copy.deepcopy(disposable)
+        ambiguous["classifications"][-1]["classification"] = (
+            "ambiguous-or-uniquely-owned-state"
+        )
+        expect_blocked(
+            "ambiguous nested checkout",
+            "ambiguous-or-unique-local-state:group-4",
+            ambiguous,
+        )
+
+        preserved = destination / ".devtools/freecad-cli"
+        config = preserved / ".git/config"
+        config_bytes = config.read_bytes()
+        config.write_bytes(config_bytes + b"\n# changed local config\n")
+        expect_blocked(
+            "changed preserved Git config",
+            "required-preservation-not-proved:group-4",
+            plan,
+        )
+        config.write_bytes(config_bytes)
+        preserved_file = preserved / paths[0]
+        preserved_bytes = preserved_file.read_bytes()
+        preserved_file.unlink()
+        expect_blocked(
+            "incomplete preserved nested tree",
+            "required-preservation-not-proved:group-4",
+            plan,
+        )
+        preserved_file.write_bytes(preserved_bytes)
+        same_device = temp_root / "same-device-preservation"
+        (same_device / ".devtools").mkdir(parents=True)
+        shutil.copytree(
+            checkout, same_device / ".devtools/freecad-cli"
+        )
+        local_copy = copy.deepcopy(plan)
+        local_copy["classifications"][-1]["preservation"][
+            "destination_root"
+        ] = str(same_device)
+        expect_blocked(
+            "same-device nested copy",
+            "required-preservation-not-proved:group-4",
+            local_copy,
+        )
+
+        extra_directory = checkout / "src/extra-empty-directory"
+        extra_directory.mkdir()
+        expect_blocked(
+            "unaccounted empty nested directory",
+            "local-state-inventory-changed",
+            plan,
+        )
+        extra_directory.rmdir()
+        extra_directory.mkdir()
+        preserved_empty = preserved / "src/extra-empty-directory"
+        preserved_empty.mkdir()
+        updated = copy.deepcopy(plan)
+        updated["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        if not inspect(updated)["readiness"]["retirement_ready"]:
+            errors.append("exact-preserved empty nested directory was not ready")
+        preserved_empty.rmdir()
+        expect_blocked(
+            "missing preserved empty nested directory",
+            "required-preservation-not-proved:group-4",
+            updated,
+        )
+        extra_directory.rmdir()
+
+        patched_file = checkout / paths[0]
+        patched_bytes = patched_file.read_bytes()
+        patched_file.write_bytes(b"different, unapproved patch\n")
+        (preserved / paths[0]).write_bytes(b"different, unapproved patch\n")
+        updated = copy.deepcopy(plan)
+        updated["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        expect_blocked(
+            "mismatched approved patch",
+            "freecad-cli-identity-not-proved",
+            updated,
+        )
+        patched_file.write_bytes(patched_bytes)
+        (preserved / paths[0]).write_bytes(patched_bytes)
+
+        extra_file = checkout / "unaccounted.txt"
+        extra_file.write_text("unique nested state\n", encoding="utf-8")
+        (preserved / "unaccounted.txt").write_text(
+            "unique nested state\n", encoding="utf-8"
+        )
+        updated["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        expect_blocked(
+            "additional untracked nested state",
+            "freecad-cli-identity-not-proved",
+            updated,
+        )
+        extra_file.unlink()
+        (preserved / "unaccounted.txt").unlink()
+
+        alternates = checkout / ".git/objects/info/alternates"
+        preserved_alternates = preserved / ".git/objects/info/alternates"
+        alternates.write_text("/unapproved/object-store\n", encoding="utf-8")
+        preserved_alternates.write_text(
+            "/unapproved/object-store\n", encoding="utf-8"
+        )
+        updated["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        expect_blocked(
+            "external nested object store",
+            "freecad-cli-identity-not-proved",
+            updated,
+        )
+        alternates.unlink()
+        preserved_alternates.unlink()
+
+        patched_file.chmod(0o755)
+        (preserved / paths[0]).chmod(0o755)
+        updated["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        expect_blocked(
+            "unapproved tracked working mode",
+            "freecad-cli-identity-not-proved",
+            updated,
+        )
+        patched_file.chmod(0o644)
+        (preserved / paths[0]).chmod(0o644)
+
+        _run(["git", "update-index", "--assume-unchanged", paths[0]], cwd=checkout)
+        shutil.copy2(checkout / ".git/index", preserved / ".git/index")
+        updated["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        expect_blocked(
+            "nested index flag",
+            "freecad-cli-identity-not-proved",
+            updated,
+        )
+        _run(["git", "update-index", "--no-assume-unchanged", paths[0]], cwd=checkout)
+
+        _run(
+            [
+                "git", "-c", "user.name=Nested Fixture", "-c",
+                "user.email=nested-fixture@example.invalid", "commit",
+                "--allow-empty", "-m", "Unapproved nested identity",
+            ],
+            cwd=checkout,
+        )
+        updated["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        expect_blocked(
+            "changed nested Git HEAD",
+            "freecad-cli-identity-not-proved",
+            updated,
+        )
+
+    with contextlib.ExitStack() as stack:
+        temp_root = pathlib.Path(stack.enter_context(
+            tempfile.TemporaryDirectory(prefix="tracktemplate-freecad-cli-ref-")
+        ))
+        destination = pathlib.Path(stack.enter_context(
+            tempfile.TemporaryDirectory(
+                prefix="tracktemplate-freecad-cli-preserved-", dir="/dev/shm"
+            )
+        ))
+        repository, target, checkout, destination, plan, _ = (
+            _freecad_cli_retirement_fixture(temp_root, destination)
+        )
+        plan_path = temp_root / "nested-retirement-plan.json"
+        extra_commit = _run(
+            [
+                "git", "-c", "user.name=Nested Fixture", "-c",
+                "user.email=nested-fixture@example.invalid", "commit-tree",
+                "HEAD^{tree}", "-p", "HEAD", "-m", "Extra local commit",
+            ],
+            cwd=checkout,
+        ).stdout.strip()
+        _run(
+            ["git", "update-ref", "refs/heads/extra", extra_commit],
+            cwd=checkout,
+        )
+        plan["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        _write_retirement_plan(plan_path, plan)
+        report = safety.audit_worktree_retirement(repository, target, plan_path)
+        if (
+            report["readiness"]["retirement_ready"]
+            or "freecad-cli-identity-not-proved" not in report["findings"]
+        ):
+            errors.append("extra nested Git ref did not fail closed")
+        _run(["git", "update-ref", "-d", "refs/heads/extra"], cwd=checkout)
+        plan["inventory_sha256"] = safety._retirement_inventory(target)[
+            "sha256"
+        ]
+        _write_retirement_plan(plan_path, plan)
+        report = safety.audit_worktree_retirement(repository, target, plan_path)
+        if (
+            report["readiness"]["retirement_ready"]
+            or "freecad-cli-identity-not-proved" not in report["findings"]
+        ):
+            errors.append("unreachable nested Git commit did not fail closed")
+
+    with contextlib.ExitStack() as stack:
+        temp_root = pathlib.Path(stack.enter_context(
+            tempfile.TemporaryDirectory(
+                prefix="tracktemplate-freecad-cli-normal-remove-"
+            )
+        ))
+        destination = pathlib.Path(stack.enter_context(
+            tempfile.TemporaryDirectory(
+                prefix="tracktemplate-freecad-cli-preserved-", dir="/dev/shm"
+            )
+        ))
+        repository, target, _, destination, plan, _ = (
+            _freecad_cli_retirement_fixture(temp_root, destination)
+        )
+        plan_path = temp_root / "nested-retirement-plan.json"
+        _write_retirement_plan(plan_path, plan)
+        report = safety.audit_worktree_retirement(
+            repository, target, plan_path
+        )
+        if not report["readiness"]["retirement_ready"]:
+            errors.append("nested non-force removal fixture was not ready")
+            return
+        retained_before = safety._freecad_cli_tree_identity(
+            destination / ".devtools/freecad-cli"
+        )
+        removed = _run(
+            ["git", "worktree", "remove", str(target)],
+            cwd=repository,
+            check=False,
+        )
+        retained_after = safety._freecad_cli_tree_identity(
+            destination / ".devtools/freecad-cli"
+        )
+        if (
+            removed.returncode == 0
+            or not target.exists()
+            or retained_before != retained_after
+            or "contains modified or untracked files" not in removed.stderr
+        ):
+            errors.append("nested non-force refusal did not preserve state")
+
+
 def _validate_repository_state(errors):
     with tempfile.TemporaryDirectory(prefix="tracktemplate-safety-") as temp:
         repository = _git_fixture(pathlib.Path(temp))
@@ -2762,6 +3174,11 @@ def _validate_static_controls(errors):
         "_git(root, 'worktree', 'remove', '--force', '/tmp/example')",
         "_git(root, 'worktree', 'prune')",
         "_git(root, 'branch', '-d', 'example')",
+        "_git(root, 'show', '--output=/tmp/unsafe')",
+        "_git(root, 'diff', '--output=/tmp/unsafe')",
+        "_git(root, 'hash-object', '-w', '--', 'data')",
+        "_git(root, 'fsck', '--lost-found')",
+        "_git(root, 'show-ref', '--exclude-existing')",
         "_git(root, action, 'drop', 'stash@{0}')",
         "subprocess.run(['git', 'stash', 'drop', 'stash@{0}'])",
         "subprocess.getoutput('git stash drop stash@{0}')",
@@ -2847,6 +3264,7 @@ def validate(include_live_workstation=False):
     _validate_normal_retirement_fixture(errors)
     _validate_preserved_symlink_retirement(errors)
     _validate_detached_retirement(errors)
+    _validate_freecad_cli_nested_retirement(errors)
     if include_live_workstation:
         _validate_live_audit(errors)
     _validate_static_controls(errors)

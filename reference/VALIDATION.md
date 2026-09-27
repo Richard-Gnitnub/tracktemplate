@@ -1062,6 +1062,15 @@ recovery validator must include these invalid states:
 - A worktree without a branch whose plan does not use JSON `null` for
   `target.branch`, whose exact HEAD is not contained in the accepted commit,
   or whose HEAD or branch state changed
+- A nested Git repository at a path other than `.devtools/freecad-cli/`,
+  or that exact path treated as an ordinary directory or disposable state
+- A nested FreeCAD development repository with a changed pinned commit,
+  index, references, staged or additional tracked changes, or a changed
+  approved six-file patch
+- An unaccounted local-only file or empty directory in that nested repository
+- An incomplete or changed nested inventory, or a preserved full-tree copy
+  with a missing path or different type, mode, size, or file content identity
+- A nested state that is unexplained or unique
 - Data from the retirement plan in command output
 - A local path from a file-system error in command output
 - Information from a Git error in command output

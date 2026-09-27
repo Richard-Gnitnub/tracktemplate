@@ -1052,7 +1052,9 @@ def _validate_owner_view(plan: str) -> None:
         'risk snapshot',
         'The owner opened Phase 8 for its unchanged four criteria',
         'PR #94 integrated the opening',
-        'A later independently reviewed snapshot covers 39 worktrees',
+        'A later independently reviewed snapshot covers the earlier 39-worktree estate',
+        'PR #95 integrated D-GOV-020',
+        'D-GOV-021 authorises only the exact nested FreeCAD development-repository retirement-control treatment',
         'capability matrix',
         'evidence map through PR #84 only',
         'modular Core layout Create, Edit, Save, reopen, validation and export',
@@ -1074,14 +1076,24 @@ def _validate_owner_view(plan: str) -> None:
         'D-P6-008 stays Deferred — unmet',
         'mandatory before Phase 10 beta acceptance',
         'GUI samples give no performance acceptance',
-        'Seven contained worktrees have unsupported ignored `.devtools/freecad-cli/` directory entries. D-GOV-020 does not resolve them',
+        'Seven contained worktrees retain populated `.devtools/freecad-cli/` Git repositories',
+        'D-GOV-020 did not cover their nested state',
+        'D-GOV-021 permits only a bounded exact-state control',
+        'full independent preservation, fresh current-estate backup, and an individual passing plan and audit',
+        'non-force Git removal can still refuse a populated nested repository after an audit PASS',
+        'No live candidate has been removed, and the mechanical route needs a separate owner decision',
         'USB is safely unmounted. Separate physical storage remains operator-controlled and unverified',
         'D-P8-001',
         'opens Phase 8 at 0/4',
         'D-GOV-020',
-        'authorises only a bounded retirement-control correction',
-        'Neither decision accepts a Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Integrate only an exact-green D-GOV-020 correction',
+        'remains the integrated symbolic-link and detached-worktree control',
+        'D-GOV-021',
+        'authorises only the exact nested FreeCAD retirement-control treatment',
+        'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
+        'Use D-GOV-021 only after exact-green integration',
+        'new non-overwriting independent backup of the current estate',
+        'including complete nested trees',
+        'A non-force removal refusal stops the candidate for a separate owner decision',
         'separate passing retirement plan and audit for each retirement candidate',
         'Keep five branches with unmerged commits',
         'Complete the retirement audit and removal of redundant worktrees and branches in the JetBrains IDE before the bounded product slice',
@@ -4622,7 +4634,7 @@ def _validate_phase8_decision_opening(
     decisions = document["decisions"]
     _require(
         isinstance(decisions, list)
-        and len(decisions) == 3
+        and len(decisions) == 4
         and decisions[0] == phase6_decisions["D-P6-008"],
         "Phase 8 opening must carry unchanged D-P6-008",
     )
@@ -4677,6 +4689,34 @@ def _validate_phase8_decision_opening(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-GOV-020 " + field + " digest drifted",
+        )
+    nested = decisions[3]
+    nested_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#nested-freecad-retirement-control-panel"
+    )
+    _require(
+        isinstance(nested, dict)
+        and set(nested) == set(opening)
+        and nested["id"] == "D-GOV-021"
+        and nested["decided_on"] == "2026-09-27"
+        and nested["status"] == "Accepted"
+        and nested["decision"]
+        == "Authorise the bounded nested FreeCAD retirement-control treatment."
+        and nested["evidence"] == nested_panel
+        and nested["panel_record"] == nested_panel
+        and nested["panel_required_under_current_policy"] is True,
+        "D-GOV-021 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        ("authority", "dc0364e8aa040030d1caf6a11308956d43be6d13818371f2417c0c7a8424cae5"),
+        ("exclusions", "2be3af2cec5fbb20687c5c4e9c995219544694b97cc155ed1e223f535ae9af9d"),
+    ):
+        value = nested[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-GOV-021 " + field + " digest drifted",
         )
 
 
@@ -4830,6 +4870,41 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
             clause in control_flat,
             "D-GOV-020 bounded condition drifted: " + clause,
         )
+    nested_panel = _section(
+        evidence, "D-GOV-021 nested FreeCAD retirement-control panel — 2026-09-27"
+    )
+    nested = _load_json(CURRENT_DECISIONS_PATH)["decisions"][3]
+    _require(
+        '<a id="nested-freecad-retirement-control-panel"></a>' in evidence
+        and " ".join(_blockquote_paragraphs(nested_panel))
+        == _semantic_text(str(nested["authority"])),
+        "D-GOV-021 exact owner instruction drifted or was relocated",
+    )
+    nested_flat = _semantic_text(nested_panel)
+    for clause in (
+        "e74e70c2a736de07b50b847f141794efe68234f7",
+        "seven contained parent worktrees",
+        "660ed03f5dc6aeb2dd0e623cc4ed5880b4c90cb7",
+        "six modified files",
+        "empty __pycache__ directory",
+        "no unique nested commit, stash, or unreachable object",
+        "2026-09-27-pre-phase8-turnout-migration-01",
+        "does not cover the later full registered-worktree estate",
+        "new non-overwriting independent snapshot",
+        "complete nested trees",
+        "Physical removal or separate storage has not been confirmed",
+        "/root/nested_governance_panel",
+        "Proceed with bounded conditions",
+        "PR-13 remains Critical/Open/Mitigate/Effective for current scope",
+        "PR-22 remains High/Open/Remove/Effective for current scope",
+        "five branches with unmerged commits stay",
+        "plain git worktree remove refuses it as modified or untracked",
+        "The non-force mechanical route needs a separate owner decision",
+        "No Phase 8 product work starts before the complete retirement prerequisite passes",
+        "Phase 8 stays Open at 0/4",
+        "D-P6-008 and all recorded limitations remain",
+    ):
+        _require(clause in nested_flat, "D-GOV-021 bounded condition drifted: " + clause)
     _require(
         "history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel"
         in evidence
@@ -5541,7 +5616,7 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020"},
+        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
