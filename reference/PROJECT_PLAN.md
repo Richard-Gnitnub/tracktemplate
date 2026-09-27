@@ -1,6 +1,6 @@
 # Project Plan
 
-Status: **Phase 7 is Open at 3/4 under D-P7-001, D-P7-002, D-P7-003 and D-P7-004. Exits 2, 3 and 4 are Evidenced and owner-accepted. Exit 1 is Pending. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. D-P6-008 stays in full.**
+Status: **Phase 7 is Open at 4/4 under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005. All four exits are Evidenced and owner-accepted. Phase 6 is closed with four accepted exits and one deferred, unmet obligation. D-P6-008 stays in full.**
 
 This dashboard owns phase and exit status. It also owns summaries of live risks and owner decisions. The links identify the applicable evidence. The canonical registers and evidence are the source of this owner view. This view does not establish authority.
 
@@ -12,12 +12,12 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 7 is Open at 3/4. Exit 3 is Evidenced and owner-accepted under D-P7-004. Exit 2 is Evidenced and owner-accepted under D-P7-003. Exit 4 is Evidenced and owner-accepted under D-P7-002. Exit 1 is Pending. Phase 6 is closed with four accepted exits. D-P6-008 records “one deferred, unmet obligation”.<br><br>PR #89 is in protected `main` at `c5a29e817ddc81588378eb419617fff39b3ef0cf`. The merge preserves the exact reviewed tree `03117e102e8a8b38dac4163e3a3932a2c2273e3d`. Post-merge CI has a PASS result. Output has private-development status and project status stays `unknown`. |
-| **What changed** | D-P7-004 accepts Exit 3 for the Phase 7 calculation family that is integrated through PR #87. This product work uses schema `16`, 25 selected functions and 40 caller identities. Each subsequent Phase 7 product change must have applicable evidence of dependency direction and equal results. D-P7-003 continues to accept Exit 2 for the B14/B15 comparison sources and this integrated product work. D-P7-002 continues to accept only Exit 4 on the retained-path preservation and removal-gate basis. The [capability matrix](CAPABILITY_MATRIX.md) records evidence from protected `main` through PR #84 only. |
-| **What now works** | All 25 API functions are identities from `tracktemplate.domain.alignment`. Its import statements name only `bisect`, `math` and `dataclass` from `dataclasses`. The module imports no FreeCAD, Qt, compatibility, bridge or adapter module. All 15 related Phase 7 qualified proofs and the Phase 3 route proof have PASS results. The complete transition profile and independent reviews have PASS results. The retained evidence shows that the inherited B15 host is a temporary compatibility path. It names the Phase 10 integration owner for the removal gate. |
-| **Limitations/findings** | The two usual repairs are completed (2/2). No more usual repairs are permitted. The first FAIL results and their failure classifications stay as retained evidence.<br><br>The PR #83, PR #84, PR #85, PR #86 and PR #87 histories for repair and review do not change. PR #83 records: “The measured micro-call cost increased.” The locked Phase evidence keeps the recorded “non-blocking trailing-space warning”. PR-10 stays Open/Partial. PR-18 stays Open/Effective for current scope.<br><br>The inherited B15 host, development-only comparison oracle and every adapter and caller removal condition stay in full. The samples from the FreeCAD human interface give no improvement evidence for D-P6-008. D-P6-008 and all recorded product limitations apply in full. D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.” |
-| **Owner decision** | D-P7-004 accepts Phase 7 Exit 3 as Evidenced and owner-accepted for the calculation family that is integrated through PR #87. Exit 1 stays Pending. It accepts no wider migration-family completion, platform arrangement without a test result, performance result, output or release status, legacy-path removal, or product change. |
-| **Next action** | Complete only the directly dependent D-P7-004 record alignment and its exact-green protected-main integration. Do not start a new product outcome in this cycle. |
+| **Current state** | Phase 7 is Open at 4/4. Exit 1 is Evidenced and owner-accepted under D-P7-005. Exits 2, 3 and 4 retain their acceptance under D-P7-003, D-P7-004 and D-P7-002. Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation.<br><br>PR #91 is in protected `main` at `aae7f5f3388ef1abaa1ef673988a1d5c992f0cfc`. The merge preserves the exact reviewed tree `f1bcbce0f6099c8dd20ec90e8150318288a21844`. Post-merge CI has a PASS result. Output stays private-development and project status stays `unknown`. |
+| **What changed** | D-P7-005 accepts Exit 1 against its unchanged criterion on the integrated Phase 7 evidence through PR #91. The B16 `run_macro` caller reaches `tracktemplate.api.run_core_layout_export` through an explicit adapter. D-P7-003 and D-P7-004 retain their bounded equivalence and dependency conditions for later product changes. D-P7-002 retains the removal gates. The [capability matrix](CAPABILITY_MATRIX.md) records evidence through PR #84 only. |
+| **What now works** | Integrated B16 routes show Core layout Create, Edit, Save, reopen and validation in the qualified FreeCAD human interface. PR #91 adds the modular export operation. Its 17 related qualified checks have PASS results. The paired GUI routes have zero differences after the permitted normalisation and leave no document open. The [Exit 1 panel](current/PHASE_EVIDENCE.md#phase-7-exit-1-admission-panel) links the decisive evidence. |
+| **Limitations/findings** | The PR #91 export comparison uses one fixed B14 plain-line fixture and one prepared plan. It does not prove every platform arrangement or make raw outputs identical where paths, times or metadata differ. The two usual repairs remain 2/2 exhausted; the final 1/1 harness exception is consumed. The initial FAIL and BLOCKED evidence stays retained.<br><br>The PR #83–#87 repair and review histories remain. PR #83 records an increased measured micro-call cost. The locked Phase evidence retains its non-blocking trailing-space warning. PR-10 stays Open/Partial; PR-18 stays Open/Effective for current scope.<br><br>The inherited B15 host, development-only comparison oracle, all adapter and caller conditions, and all removal gates stay in force. D-P6-008 stays Deferred — unmet; the GUI samples give no performance acceptance. All comparison and legacy-retirement conditions remain. |
+| **Owner decision** | D-P7-005 accepts Exit 1 as Evidenced and owner-accepted for the integrated evidence through PR #91. Phase 7 is 4/4 but remains Open pending a separate closeout decision. No wider migration-family, performance, production-output, release or legacy-removal acceptance follows. |
+| **Next action** | Bring a separate Phase 7 closeout recommendation to the project owner. This alignment does not close Phase 7 or open Phase 8. |
 
 ## Phase status
 
@@ -30,7 +30,7 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | 4 | Canonical state, signatures, and persistence | 6/6 evidenced | Complete — accepted 2026-07-28 |
 | 5 | Lightweight editing prototype and renderer decision | 4/4 evidenced | Complete — accepted 2026-08-01 |
 | 6 | Explicit exact-validation and export seam | 4/5 accepted exits; one deferred, unmet obligation | Complete — accepted 2026-09-05 |
-| 7 | Core alignment, station and multiple-track migration | 3/4 evidenced | Open |
+| 7 | Core alignment, station and multiple-track migration | 4/4 evidenced | Open |
 | 8 | Turnout, crossover and timbering migration | 0/4 evidenced | Not started |
 | 9 | Chair definitions, assisted assimilation, production records and export completion | 0/9 evidenced | Not started |
 | 10 | Workbench integration, launcher reduction and beta Addon packaging | 0/5 evidenced | Not started |
@@ -52,11 +52,11 @@ D-P6-008 stays in full, and normal per-slice checks stay mandatory. The unchange
 
 ## Phase 7 exit conditions
 
-Phase 7 is Open at 3/4 under D-P7-001, D-P7-002, D-P7-003 and D-P7-004. These four original criteria from accepted plan revision `d5a3db45ab68a192e3d37f9fad5deb9f66f7de81` stay unchanged.
+Phase 7 is Open at 4/4 under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005. These four original criteria from accepted plan revision `d5a3db45ab68a192e3d37f9fad5deb9f66f7de81` stay unchanged.
 
 | Exit condition | Status | Evidence |
 | --- | --- | --- |
-| Core layouts can be created, edited, saved, reopened, validated, and exported through modular paths. | Pending | No Phase 7 admission |
+| Core layouts can be created, edited, saved, reopened, validated, and exported through modular paths. | Evidenced — owner-accepted 2026-09-27 | [D-P7-005 panel and decision](current/PHASE_EVIDENCE.md#phase-7-exit-1-admission-panel) |
 | Accepted B14/B15 geometry, station mapping, identities, ordering, and metadata remain equivalent. | Evidenced — owner-accepted 2026-09-27 | [D-P7-003 panel and decision](current/PHASE_EVIDENCE.md#phase-7-exit-2-admission-panel) |
 | Domain calculations for this family have no FreeCAD/Qt dependency or reverse adapter import. | Evidenced — owner-accepted 2026-09-27 | [D-P7-004 panel and decision](current/PHASE_EVIDENCE.md#phase-7-exit-3-admission-panel) |
 | Legacy core-layout paths have either been safely retired or have a documented blocker and removal gate. | Evidenced — owner-accepted 2026-09-27 | [D-P7-002 panel and decision](current/PHASE_EVIDENCE.md#phase-7-exit-4-admission-panel) |
@@ -94,7 +94,7 @@ Phase 7 is Open at 3/4 under D-P7-001, D-P7-002, D-P7-003 and D-P7-004. These fo
 | QA-R05 | Low | Tolerate | Root navigation exists. Installation and person guidance remain future work. |
 
 ## Owner decisions
-The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full and records D-P7-001, D-GOV-019, D-P7-002, D-P7-003 and D-P7-004.
+The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full and records D-P7-001, D-GOV-019, D-P7-002, D-P7-003, D-P7-004 and D-P7-005.
 
 | ID | Date | Status | Decision limit |
 | --- | --- | --- | --- |
@@ -128,6 +128,7 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-P7-002 | 2026-09-27 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-7-exit-4-admission-panel) accepts Phase 7 Exit 4 on the retained-path preservation and removal-gate basis. Phase 7 advances to 1/4. Exits 1–3 remain Pending. It accepts no performance result, output or release status, wider migration-family completion, product change or legacy-path removal. |
 | D-P7-003 | 2026-09-27 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-7-exit-2-admission-panel) accepts Phase 7 Exit 2 for the B14/B15 comparison sources and the Phase 7 product work in PR #87 and previous pull requests. The project keeps applicable evidence of equivalent results for this scope. Phase 7 is now at 2/4. Exits 1 and 3 stay Pending. All recorded limitations and conditions for evidence from subsequent product changes stay in full. |
 | D-P7-004 | 2026-09-27 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-7-exit-3-admission-panel) accepts Phase 7 Exit 3 for the Phase 7 calculation family in PR #87 and previous pull requests. The 25 selected functions have no FreeCAD/Qt dependency or reverse adapter import. Phase 7 is now at 3/4. Exit 1 stays Pending. All recorded limitations and later-slice evidence conditions stay in full. |
+| D-P7-005 | 2026-09-27 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-7-exit-1-admission-panel) accepts Exit 1 against its unchanged criterion on the integrated evidence through PR #91. Phase 7 reaches 4/4 but stays Open pending a separate closeout decision. D-P6-008 and all comparison, adapter, caller, removal and legacy-retirement conditions remain in force. |
 | TT-DOC-001 | 2026-08-15 | Accepted | Human comprehensibility is a governance control. ASD-STE100 Issue 9 is the normative standard for canonical technical prose in English. No phase, risk, or product authority changes. |
 | TT-DOC-002 | 2026-08-15 | Accepted | ASD-STE100 Issue 9 stays the normative standard. TrackTemplate uses UK English word forms in TT-DOC-001 canonical prose. No other TT-DOC-001 or project authority changes. |
 | D-GOV-006 | 2026-08-15 | Accepted | The project owner qualified the exact Linux x86_64 stable Flatpak FreeCAD 1.1.3 profile. No product, phase, risk, output, packaging, or release state changed. |
@@ -143,7 +144,6 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-GOV-019 | 2026-09-19 | Accepted | The [decision](current/PHASE_EVIDENCE.md#freecad-1-1-3-py31315-qt6112-qualification-panel) qualifies only the exact current FreeCAD 1.1.3 profile with CPython 3.13.15 and PySide6/Qt 6.11.2 for functional compatibility. The three earlier profiles stay qualified. The profile gets no performance or B0 authority. Phase 7 stays Open at 0/4. D-P6-008 and all limitations remain. |
 
 ## Authority and evidence links
-
 - [Current Phase 7 evidence](current/PHASE_EVIDENCE.md)
 - [Frozen Phase 6 closeout](history/phase-closeouts/PHASE6_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE6_RISKS.json)
 - [Accepted Phase 6 recovery record](backup-records/2026-09-05-phase6-closeout-recovery.md)

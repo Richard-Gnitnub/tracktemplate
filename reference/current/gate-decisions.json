@@ -68,6 +68,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-3-admission-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-3-admission-panel"
+    },
+    {
+      "id": "D-P7-005",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Accept Phase 7 Exit 1 on the integrated modular Core layout lifecycle evidence through PR #91.",
+      "authority": "I accept D-P7-005.\nAccept Phase 7 Exit 1 — “Core layouts can be created, edited, saved, reopened, validated, and exported through modular paths.” — as Evidenced and owner-accepted on the integrated evidence through PR #91.\nPhase 7 advances to 4/4 but remains Open pending a separate closeout decision.\nPreserve all recorded proof limits, D-P6-008, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition.\nThis accepts no performance result, wider migration-family completion, production output, release status or legacy-path removal. Project status remains `unknown`.\nI authorise only the directly dependent Level 3 record alignment and its exact-green protected-main integration.",
+      "exclusions": "Phase 7 remains Open and Phase 8 remains Not started. This decision accepts no performance result, wider migration-family completion, production output, release status, legacy-path removal, product change or beta readiness. Preserve all recorded proof limits, D-P6-008, both frozen B14/B15 identities, the inherited B15 host, the development-only comparison oracle, every adapter and caller condition, all removal gates, and all comparison and legacy-retirement conditions. Preserve PR-10 Open/Partial and PR-18 Open/Effective for current scope. No risk disposition changes. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-1-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-1-admission-panel"
     }
   ]
 }

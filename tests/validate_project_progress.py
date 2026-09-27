@@ -1027,47 +1027,38 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = " ".join(section.split())
     for fragment in (
-        'Phase 6 is closed with four accepted exits',
-        'D-P6-008 records “one deferred, unmet obligation”',
-        'Phase 7 is Open at 3/4',
-        'Exit 3 is Evidenced and owner-accepted under D-P7-004',
-        'Exit 2 is Evidenced and owner-accepted under D-P7-003',
-        'Exit 4 is Evidenced and owner-accepted under D-P7-002',
-        'Exit 1 is Pending',
-        'Output has private-development status',
+        'Phase 7 is Open at 4/4',
+        'Exit 1 is Evidenced and owner-accepted under D-P7-005',
+        'Exits 2, 3 and 4 retain their acceptance under D-P7-003, D-P7-004 and D-P7-002',
+        'Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation',
+        'Output stays private-development',
         'project status stays `unknown`',
-        'PR #89 is in protected `main` at `c5a29e817ddc81588378eb419617fff39b3ef0cf`',
-        'exact reviewed tree `03117e102e8a8b38dac4163e3a3932a2c2273e3d`',
+        'PR #91 is in protected `main` at `aae7f5f3388ef1abaa1ef673988a1d5c992f0cfc`',
+        'exact reviewed tree `f1bcbce0f6099c8dd20ec90e8150318288a21844`',
         'Post-merge CI has a PASS result',
-        'D-P7-004 accepts Exit 3 for the Phase 7 calculation family that is integrated through PR #87',
-        'This product work uses schema `16`, 25 selected functions and 40 caller identities',
-        'Each subsequent Phase 7 product change must have applicable evidence of dependency direction and equal results',
-        'D-P7-003 continues to accept Exit 2 for the B14/B15 comparison sources and this integrated product work',
-        'All 25 API functions are identities from `tracktemplate.domain.alignment`',
-        'Its import statements name only `bisect`, `math` and `dataclass` from `dataclasses`',
-        'The module imports no FreeCAD, Qt, compatibility, bridge or adapter module',
-        'All 15 related Phase 7 qualified proofs and the Phase 3 route proof have PASS results',
-        'The complete transition profile and independent reviews have PASS results',
-        'The retained evidence shows that the inherited B15 host is a temporary compatibility path',
-        'It names the Phase 10 integration owner for the removal gate',
-        'The two usual repairs are completed (2/2)',
-        'No more usual repairs are permitted',
-        'The first FAIL results and their failure classifications stay as retained evidence',
-        'The PR #83, PR #84, PR #85, PR #86 and PR #87 histories for repair and review do not change',
-        'PR #83 records: “The measured micro-call cost increased.”',
-        'The locked Phase evidence keeps the recorded “non-blocking trailing-space warning”',
+        'D-P7-005 accepts Exit 1 against its unchanged criterion on the integrated Phase 7 evidence through PR #91',
+        'B16 `run_macro` caller reaches `tracktemplate.api.run_core_layout_export` through an explicit adapter',
+        'D-P7-003 and D-P7-004 retain their bounded equivalence and dependency conditions',
+        'D-P7-002 retains the removal gates',
+        'Core layout Create, Edit, Save, reopen and validation',
+        'PR #91 adds the modular export operation',
+        '17 related qualified checks have PASS results',
+        'paired GUI routes have zero differences after the permitted normalisation',
+        'one fixed B14 plain-line fixture and one prepared plan',
+        'two usual repairs remain 2/2 exhausted; the final 1/1 harness exception is consumed',
+        'initial FAIL and BLOCKED evidence stays retained',
+        'PR #83–#87 repair and review histories remain',
+        'non-blocking trailing-space warning',
         'PR-10 stays Open/Partial',
         'PR-18 stays Open/Effective for current scope',
-        'The inherited B15 host, development-only comparison oracle and every adapter and caller removal condition stay in full',
-        'The samples from the FreeCAD human interface give no improvement evidence for D-P6-008',
-        'D-P6-008 and all recorded product limitations apply in full',
-        'D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.”',
-        'D-P7-004 accepts Phase 7 Exit 3 as Evidenced and owner-accepted for the calculation family that is integrated through PR #87',
-        'Exit 1 stays Pending',
-        'It accepts no wider migration-family completion, platform arrangement without a test result, performance result, output or release status, legacy-path removal, or product change',
-        'Complete only the directly dependent D-P7-004 record alignment and its exact-green protected-main integration',
-        'Do not start a new product outcome in this cycle',
-        'The [capability matrix](CAPABILITY_MATRIX.md) records evidence from protected `main` through PR #84 only',
+        'inherited B15 host, development-only comparison oracle, all adapter and caller conditions, and all removal gates stay in force',
+        'D-P6-008 stays Deferred — unmet',
+        'All comparison and legacy-retirement conditions remain',
+        'Phase 7 is 4/4 but remains Open pending a separate closeout decision',
+        'No wider migration-family, performance, production-output, release or legacy-removal acceptance follows',
+        'Bring a separate Phase 7 closeout recommendation to the project owner',
+        'This alignment does not close Phase 7 or open Phase 8',
+        'The [capability matrix](CAPABILITY_MATRIX.md) records evidence through PR #84 only',
     ):
         _require(
             fragment in owner_view,
@@ -1196,8 +1187,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the dashboard must identify only Phase 7 as Open",
     )
     _require(
-        rows[7]["count"] == 3 and rows[7]["state"] == "Open",
-        "Phase 7 must remain Open at three evidenced exits",
+        rows[7]["count"] == 4 and rows[7]["state"] == "Open",
+        "Phase 7 must remain Open at four evidenced exits",
     )
     for phase in range(8, 12):
         _require(
@@ -1206,7 +1197,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         )
     preamble = direct_section_content(plan, "Project Plan", level=1)
     _require(
-        "Phase 7 is Open at 3/4 under D-P7-001, D-P7-002, D-P7-003 and D-P7-004"
+        "Phase 7 is Open at 4/4 under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005"
         in " ".join(preamble.split())
         and "D-P6-008 stays in full"
         in " ".join(preamble.split()),
@@ -4032,18 +4023,20 @@ def _validate_phase6_closeout(
             "D-P6-009 panel and register differ: " + field,
         )
     _require(
-        "Open — 3/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003 and D-P7-004. "
-        "Exits 2, 3 and 4 are Evidenced and owner-accepted. Exit 1 is Pending"
+        "Open — 4/4 evidenced exits under D-P7-001, D-P7-002, D-P7-003, D-P7-004 and D-P7-005. "
+        "All four exits are Evidenced and owner-accepted. "
+        "Phase 7 awaits a separate closeout decision"
         in _semantic_text(direct_section_content(holding, (
             "Phase 7 Core Alignment, Station and Multiple-Track Migration "
             "Evidence"
         ), level=1)),
-        "Phase 7 status differs from D-P7-002, D-P7-003 and D-P7-004 acceptance at three exits",
+        "Phase 7 status differs from D-P7-002 through D-P7-005 acceptance at four exits",
     )
-    for text, heading, exit2_status, exit3_status, exit4_status in (
+    for text, heading, exit1_status, exit2_status, exit3_status, exit4_status in (
         (
             plan,
             "Phase 7 exit conditions",
+            "Evidenced — owner-accepted 2026-09-27",
             "Evidenced — owner-accepted 2026-09-27",
             "Evidenced — owner-accepted 2026-09-27",
             "Evidenced — owner-accepted 2026-09-27",
@@ -4051,6 +4044,7 @@ def _validate_phase6_closeout(
         (
             holding,
             "Phase 7 exit conditions",
+            "Evidenced — owner-accepted under D-P7-005",
             "Evidenced — owner-accepted under D-P7-003",
             "Evidenced — owner-accepted under D-P7-004",
             "Evidenced — owner-accepted under D-P7-002",
@@ -4065,12 +4059,12 @@ def _validate_phase6_closeout(
         _require(
             rows
             == [
-                [EXPECTED_PHASE7_EXIT_CONDITIONS[0], "Pending"],
+                [EXPECTED_PHASE7_EXIT_CONDITIONS[0], exit1_status],
                 [EXPECTED_PHASE7_EXIT_CONDITIONS[1], exit2_status],
                 [EXPECTED_PHASE7_EXIT_CONDITIONS[2], exit3_status],
                 [EXPECTED_PHASE7_EXIT_CONDITIONS[3], exit4_status],
             ],
-            "Phase 7 criteria or D-P7-002/D-P7-003/D-P7-004 dispositions drifted",
+            "Phase 7 criteria or D-P7-002 through D-P7-005 dispositions drifted",
         )
     carried = _semantic_text(
         _section(holding, "Carried authority and live risks")
@@ -4317,14 +4311,14 @@ def _validate_phase7_decision_carryforward(
         and document["schema_version"] == 1
         and document["current_phase"] == 7
         and document["updated_on"] == "2026-09-27",
-        "current decision register is not the D-P7-004 Phase 7 state",
+        "current decision register is not the D-P7-005 Phase 7 state",
     )
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 6
+        and len(records) == 7
         and records[0] == phase6_decisions["D-P6-008"],
-        "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019, D-P7-002, D-P7-003 and D-P7-004",
+        "Phase 7 must carry unchanged D-P6-008, D-P7-001, D-GOV-019 and D-P7-002 through D-P7-005",
     )
     opening = records[1]
     panel = "reference/current/PHASE_EVIDENCE.md#phase-7-opening-panel"
@@ -4500,6 +4494,42 @@ def _validate_phase7_decision_carryforward(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-P7-004 " + field + " digest drifted",
+        )
+
+    exit1 = records[6]
+    exit1_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-7-exit-1-admission-panel"
+    )
+    _require(
+        isinstance(exit1, dict)
+        and set(exit1) == set(phase6_decisions["D-P6-008"])
+        and exit1["id"] == "D-P7-005"
+        and exit1["decided_on"] == "2026-09-27"
+        and exit1["status"] == "Accepted"
+        and exit1["decision"]
+        == "Accept Phase 7 Exit 1 on the integrated modular Core layout "
+        "lifecycle evidence through PR #91."
+        and exit1["evidence"] == exit1_panel
+        and exit1["panel_record"] == exit1_panel
+        and exit1["panel_required_under_current_policy"] is True,
+        "D-P7-005 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        (
+            "authority",
+            "bfd2afd122f8f166b39f4616910519e08c4570ebe42ad79ffc749106eb84e899",
+        ),
+        (
+            "exclusions",
+            "37ca6141535f02308f5485c117e6249de027415cf36410a3eb468b1f87780aab",
+        ),
+    ):
+        value = exit1[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P7-005 " + field + " digest drifted",
         )
 
 
@@ -4751,6 +4781,55 @@ def _validate_dp7_004_acceptance(evidence: str) -> None:
         _require(
             clause in flat,
             "D-P7-004 bounded condition drifted: " + clause,
+        )
+
+
+def _validate_dp7_005_acceptance(evidence: str) -> None:
+    """Bind Exit 1 admission to the exact owner decision and proof limits."""
+    heading = "Phase 7 Exit 1 admission panel — 2026-09-27"
+    panel = _section(evidence, heading)
+    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][6]
+    _require(
+        '<a id="phase-7-exit-1-admission-panel"></a>' in evidence
+        and _blockquote_paragraphs(panel)
+        == [
+            _semantic_text(paragraph)
+            for paragraph in str(record["authority"]).split("\n")
+        ],
+        "D-P7-005 exact owner instruction drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "aae7f5f3388ef1abaa1ef673988a1d5c992f0cfc",
+        "f1bcbce0f6099c8dd20ec90e8150318288a21844",
+        "/root/exit1_lifecycle_evidence",
+        "/root/exit1_export_evidence",
+        "Proceed with bounded conditions",
+        EXPECTED_PHASE7_EXIT_CONDITIONS[0],
+        "tracktemplate.api.run_core_layout_export through an explicit adapter",
+        "71 qualified cases and paired GUI proof have PASS results",
+        "17/17 PASS",
+        "zero differences after permitted normalisation",
+        "selected plain-line export journey",
+        "does not prove all prepared plans or platform arrangements",
+        "Raw output files are not all byte-identical",
+        "D-P7-003 and D-P7-004 decisions retain their accepted scope through PR #87",
+        "PR #91 has its own applicable equivalence and dependency evidence",
+        "PR-10 stays Open/Partial and PR-18 stays Open/Effective for current scope",
+        "D-P6-008 keep the deferred, unmet performance obligation",
+        "mandatory pre-Phase-10-beta gate",
+        "B14/B15 comparison identities remain frozen",
+        "inherited B15 host and development-only comparison oracle remain",
+        "Every adapter and caller condition and every removal gate remain in force",
+        "No legacy path is removed",
+        "Output stays private-development and project status stays unknown",
+        "accepts no wider migration-family completion, performance result, production output or release state",
+        "Phase 7 reaches 4/4 but remains Open",
+        "separate owner decision is necessary to close it or open Phase 8",
+    ):
+        _require(
+            clause in flat,
+            "D-P7-005 bounded condition drifted: " + clause,
         )
 
 
@@ -5150,7 +5229,7 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004"},
+        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -6888,6 +6967,7 @@ def main() -> None:
     _validate_dp7_002_acceptance(_read(CURRENT_EVIDENCE_PATH))
     _validate_dp7_003_acceptance(_read(CURRENT_EVIDENCE_PATH))
     _validate_dp7_004_acceptance(_read(CURRENT_EVIDENCE_PATH))
+    _validate_dp7_005_acceptance(_read(CURRENT_EVIDENCE_PATH))
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_finite_documentation_completion(plan, current_evidence)
