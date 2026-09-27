@@ -1076,11 +1076,11 @@ def _validate_owner_view(plan: str) -> None:
         'D-P6-008 stays Deferred — unmet',
         'mandatory before Phase 10 beta acceptance',
         'GUI samples give no performance acceptance',
-        'All seven nested-checkout parent worktrees later passed ordinary non-force removal',
-        'D-GOV-022 was not used',
-        'An independently reviewed 42-root snapshot and seven-checkout restore proof supported 37 individually audited normal retirements',
-        'reviewed current-estate backup, restore proof, individual audits and post-removal checks',
-        'earlier disposable refusal used an unignored checkout',
+        'Git removed all seven without `--force`',
+        'The D-GOV-022 authority remains unused',
+        'An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories',
+        'After removal, each preservation check gave PASS',
+        'The earlier test used a Git repository that the Git ignore rule did not select',
         'Five branches with unmerged commits and their three worktrees remain',
         'USB is safely unmounted. Physical removal and separate storage remain operator-controlled and unverified',
         'D-P8-001',
@@ -1088,11 +1088,11 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-020',
         'remain the integrated exact-state controls',
         'D-GOV-021',
-        'permits one forced removal only after all its exact conditions pass',
+        'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
         'Complete exact-green D-GOV-022 review and draft publication',
-        'Retire both D-GOV-022 worktrees and their branches only after separate passing plans, audits and post-removal proofs',
-        'terminal and replacement D-GOV-022 worktrees also remain registered',
+        'Get a separate retirement plan with removal authority and a passing audit for each of the two D-GOV-022 worktrees',
+        'The terminal and replacement D-GOV-022 worktrees also remain registered',
         'separate owner integration decision',
         'full retirement prerequisite passes',
         'Keep five branches with unmerged commits',
@@ -4747,7 +4747,7 @@ def _validate_phase8_decision_opening(
     )
     for field, digest in (
         ("authority", "9a3baf11bc143e7f6be392b6f2cfcb1da1d95f2e696470053ef1a7fcee501e51"),
-        ("exclusions", "4eaa8e2ca8b3431c254cea3224d8ab7b2dc38dd0383fa6e2e327ff051f34d3b8"),
+        ("exclusions", "02527919067dbf74326d75271760cc3ff61e2925ab36b71ee7999295a5e2bdd7"),
     ):
         value = exception[field]
         _require(
@@ -4955,12 +4955,12 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
     exception_flat = _semantic_text(exception_panel)
     for clause in (
         "exactly one git worktree remove --force",
-        "normal non-force route stays the default",
-        "Ordinary removal refuses solely because",
-        "disposable proof passes for the exact forced operation",
+        "usual removal procedure does not use --force",
+        "git worktree remove operation without --force refuses only because",
+        "test in a temporary repository gives PASS for the exact proposed git worktree remove --force operation",
         "No --force operation occurred",
-        "37 contained worktrees",
-        "36 contained branches",
+        "37 worktrees",
+        "36 branches",
         "five branches with unmerged commits",
         "Physical removal and separate storage remain unconfirmed",
         "product prerequisite stays open",

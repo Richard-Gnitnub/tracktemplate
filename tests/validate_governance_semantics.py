@@ -5084,7 +5084,7 @@ def validate_visible_recovery_mutations() -> None:
         "tracked cleanliness",
         "gives no removal authority",
     )
-    if policy.count("Do not use `--force` in the normal procedure.") != 1:
+    if policy.count("Do not use `--force` in the usual procedure.") != 1:
         raise AssertionError("retirement force prohibitions changed")
     retirement_policy_cases = (
         (
@@ -5207,7 +5207,7 @@ def validate_visible_recovery_mutations() -> None:
         (
             "retirement/force-removal-permitted",
             policy.replace(
-                "Do not use `--force` in the normal procedure.",
+                "Do not use `--force` in the usual procedure.",
                 "Use `--force` when ignored files remain.",
             ),
             "worktree retirement policy lacks: do not use force",
