@@ -1,7 +1,7 @@
-# Phase 8 Turnout, Crossover and Timbering Migration Holding Record
+# Phase 8 Turnout, Crossover and Timbering Migration
 
-Status: **Not started — 0/4 evidenced exits. Phase 8 is unopened and
-unauthorised. These are administrative holding records only.**
+Status: **Open — 0/4 evidenced exits under D-P8-001. All four exits are
+Pending.**
 
 Phase 7 closed on 2026-09-27 under
 [D-P7-006](../history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel)
@@ -16,19 +16,80 @@ The owner accepted the independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 stays Not started at 0/4. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
-| What changed | The owner accepted the Phase 7 closeout and recovery evidence. The completed Phase 7 evidence, decisions and risk snapshot are frozen. The current paths now hold unopened Phase 8 records. |
-| What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. This closeout changes no product behaviour. |
+| Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
+| What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. The current records now hold the Phase 8 opening decision. |
+| What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. This opening changes no product behaviour. |
 | Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
-| Owner decision | D-P7-006 closes Phase 7 at 4/4 and authorises exact-green closeout integration only. It does not open Phase 8, accept performance, clear output or release, or remove a legacy path. |
-| Next action | Stop after protected-main integration. Phase 8 opening and any new product work need a separate owner decision. |
+| Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises only its Level 3 opening alignment and exact-green integration. After clean protected `main` and removal of redundant worktrees and branches in the JetBrains IDE, it separately authorises one internal `turnout_valid_toe_range` slice to a draft PR. It accepts no exit, performance, wider migration, production output, release or legacy removal. |
+| Next action | Integrate this exact-green opening alignment and synchronise protected `main`. Complete the worktree and branch retirement audit and a fresh pre-migration snapshot before the separately authorised product slice. Report recovery steps that require operator access. |
 
-## Phase 8 holding boundary
+<a id="phase-8-opening-panel"></a>
 
-The [project plan](../PROJECT_PLAN.md) identifies Phase 8 as turnout,
-crossover and timbering migration at 0/4. This holding record does not define
-or admit its four criteria. The owner has not opened the phase or authorised
-product work in it. The Phase 7 closeout does not give that authority.
+## Phase 8 opening panel — 2026-09-27
+
+**Decision boundary:** D-P8-001 opens Phase 8 at 0/4. All four original exits
+remain Pending. The [accepted plan revision](https://github.com/Richard-Gnitnub/tracktemplate/blob/d5a3db45ab68a192e3d37f9fad5deb9f66f7de81/reference/PROJECT_PLAN.md#L934-L953)
+owns their unchanged text. This Level 3 alignment changes phase authority, not
+product behaviour. Project status stays `unknown` and output stays
+private-development.
+
+The assessed source was clean protected `main` at
+`3fed822b25b2288370e586f14334d5a16e6065d2` after Phase 7 closeout.
+The independent read-only reviewer `/root/phase8_opening_panel` examined the
+opening boundary and all 24 live risks. The reviewer authored no maintained
+file. The recommendation was **Proceed with bounded conditions**: keep the
+first slice internal and development-only, keep TERM-R04 open, and change no
+risk disposition. The earlier `/root/phase8_opening_review` also gave a
+conditional PASS for that terminology boundary. These are agent-team reviews,
+not external organisational reviews.
+
+The first product assignment is one bounded Level 2 extraction of
+`turnout_valid_toe_range` and checked routing for five inherited B15 callers.
+The first slice starts only after the opening PR is merged into protected
+`main` and protected `main` is clean and synchronised. It also needs the required retirement audit and removal of redundant
+worktrees and branches in the JetBrains IDE. A new snapshot must preserve earlier snapshots and meet the
+[recovery policy](../RECOVERY_AND_BACKUP.md) before product mutation. A recovery step needs operator access if the independent destination
+is unavailable remotely. This opening does not claim
+that the snapshot or removal is complete.
+
+TERM-R04 remains open. The first slice must not add a public turnout API,
+schema or UI term. The frozen B14/B15 identities, inherited B15 host, and
+development-only comparison oracle remain. Per-slice comparison, adapter,
+caller, removal and legacy-retirement conditions remain. The product draft
+requires a separate integration decision.
+
+**Exact owner instruction — 2026-09-27:**
+
+> I open Phase 8 at 0/4 for its existing turnout, crossover and timbering scope, preserving its four existing exit criteria unchanged.
+> I authorise the directly dependent Level 3 opening alignment and exact-green protected-main integration. Once `main` is clean and synchronised, redundant worktrees and branches are disposed of in the jetbrains ide, I authorise one bounded Level 2 internal, development-only `turnout_valid_toe_range` extraction and checked routing of its five inherited B15 callers through the normal TrackTemplate workflow to one exact-green draft PR.
+> Keep TERM-R04 open. Introduce no new public turnout API, schema or UI term.
+> Preserve D-P6-008, frozen B14/B15 identities, the inherited B15 host, development-only oracle, all existing risk and recovery duties, and every comparison, adapter, caller, removal and legacy-retirement condition.
+> This accepts no Phase 8 exit, performance result, wider migration, production output, release or legacy removal. Project status remains `unknown`.
+> Do not merge the product draft. Report any physical recovery action that requires operator access rather than assuming it occurred.
+
+**Structured decision — D-P8-001:** Open Phase 8 at 0/4 for the four unchanged
+criteria below. Authorise the directly dependent Level 3 records and
+exact-green protected-main integration. After the stated prerequisites,
+authorise only the bounded internal first product slice to an exact-green
+draft PR. This decision admits no exit and changes no product behaviour.
+
+**Exclusions:** D-P6-008 stays deferred and unmet. The 24 risk dispositions,
+all proof limits, TERM-R04, both comparison identities, the inherited host,
+and every comparison, adapter, caller, removal and legacy-retirement condition
+remain. No performance result, wider migration, production output, release
+state or legacy-path removal is accepted. Project status stays `unknown`.
+
+## Phase 8 exit conditions
+
+These four criteria are unchanged from accepted plan revision
+`d5a3db45ab68a192e3d37f9fad5deb9f66f7de81`. Each status is Pending.
+
+| Exit condition | Status | Evidence |
+| --- | --- | --- |
+| Turnouts and crossovers retain accepted geometry, topology, timber decisions, identities, findings, and production records. | Pending | No Phase 8 exit admission. |
+| Creation, parameter editing, selection, undo/redo, save/reopen, validation, and export pass in the real GUI. | Pending | No Phase 8 exit admission. |
+| Straight- and curved-host representative workflows pass deterministic comparison. | Pending | No Phase 8 exit admission. |
+| No special-trackwork rule has leaked into the renderer or FreeCAD persistence adapter. | Pending | No Phase 8 exit admission. |
 
 ## Continuing duties and risks
 
