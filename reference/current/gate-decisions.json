@@ -57,6 +57,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-2-admission-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-2-admission-panel"
+    },
+    {
+      "id": "D-P7-004",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Accept Phase 7 Exit 3 for the Phase 7 Core alignment, station, straight-route, handedness, platform and multiple-track calculation family integrated through PR #87.",
+      "authority": "As TrackTemplate project owner, I accept D-P7-004.\n\nAccept Phase 7 Exit 3 as Evidenced and owner-accepted for the Phase 7 Core alignment, station, straight-route, handedness, platform and multiple-track calculation family integrated through PR #87: schema 16, 25 selected functions and 40 caller identities.\n\nPhase 7 advances to 3/4. Exit 1 remains Pending.\n\nPreserve both frozen B14/B15 identities, the inherited B15 host, development-only comparison oracle, every adapter and caller condition, all removal gates, D-P6-008, and all comparison and legacy-retirement conditions. Later Phase 7 slices require their own applicable dependency and equivalence evidence.\n\nThis accepts no wider migration-family completion, untested platform arrangement, performance result, output or release status, legacy-path removal or product change. Project status remains unknown.\n\nI authorise only the directly dependent Level 3 record alignment and its exact-green protected-main integration.",
+      "exclusions": "This decision accepts no wider migration-family completion, untested platform arrangement, performance result, output or release status, legacy-path removal, product change or beta readiness. Exit 1 stays Pending.\n\nPreserve the two frozen B14/B15 identities, the inherited B15 host and the development-only comparison oracle. Preserve every adapter and caller condition, all removal gates, D-P6-008, and all comparison and legacy-retirement conditions. Each later Phase 7 product slice must have applicable dependency and equivalence evidence.\n\nPreserve PR-10 Open/Partial and PR-18 Open/Effective for current scope. No risk disposition changes. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-3-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-3-admission-panel"
     }
   ]
 }
