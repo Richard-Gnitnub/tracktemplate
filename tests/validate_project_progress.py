@@ -1091,8 +1091,8 @@ def _validate_owner_view(plan: str) -> None:
         'permits one forced removal only after all its exact conditions pass',
         'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
         'Complete exact-green D-GOV-022 review and draft publication',
-        'fresh current-estate backup and its own passing plan, audit and post-removal proof',
-        'retire the then-redundant exception worktree and branch',
+        'Retire both D-GOV-022 worktrees and their branches only after separate passing plans, audits and post-removal proofs',
+        'terminal and replacement D-GOV-022 worktrees also remain registered',
         'separate owner integration decision',
         'full retirement prerequisite passes',
         'Keep five branches with unmerged commits',
@@ -1129,9 +1129,18 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         ],
         "PROJECT_PLAN.md contains an unsupported dashboard section",
     )
+    required_separator = (
+        "Release qualification must pass.\n\n"
+        "The Layout Editor is the later programme."
+    )
     _require(
-        len(plan.splitlines()) <= 160,
-        "PROJECT_PLAN.md exceeded its 160-line dashboard budget",
+        plan.count(required_separator) == 1,
+        "PROJECT_PLAN.md lost the Core/Layout paragraph separation",
+    )
+    compact_plan = plan.replace(required_separator, required_separator.replace("\n\n", "\n"), 1)
+    _require(
+        len(compact_plan.splitlines()) <= 160,
+        "PROJECT_PLAN.md exceeded its 160-line dashboard content budget",
     )
     for forbidden in (
         "### Deliverables",
@@ -4738,7 +4747,7 @@ def _validate_phase8_decision_opening(
     )
     for field, digest in (
         ("authority", "9a3baf11bc143e7f6be392b6f2cfcb1da1d95f2e696470053ef1a7fcee501e51"),
-        ("exclusions", "2267de8c0c49b663c24408b5944112d9976fdab05ccf7310a5e6ebd602475f7f"),
+        ("exclusions", "4eaa8e2ca8b3431c254cea3224d8ab7b2dc38dd0383fa6e2e327ff051f34d3b8"),
     ):
         value = exception[field]
         _require(

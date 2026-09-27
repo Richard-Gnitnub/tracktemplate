@@ -468,8 +468,7 @@ refusal. Obtain a separate owner decision for a safe route unless the exact
 D-GOV-022 exception below applies.
 
 D-GOV-022 permits one mechanical exception for a proved
-`.devtools/freecad-cli/` nested checkout. It does not apply to a worktree
-because it contains that checkout. First prove a fresh, non-overwriting
+`.devtools/freecad-cli/` nested checkout. The nested checkout alone does not qualify a worktree for this exception. First prove a fresh, non-overwriting
 independent snapshot of the complete current registered-worktree estate and
 all nested FreeCAD CLI state. Complete the applicable disposable restore proof
 and independent review. Require a current passing retirement plan and audit
@@ -481,8 +480,8 @@ Complete a disposable proof of the exact proposed `git worktree remove --force`
 operation and its post-removal checks. Only then use that command once for the
 exact target. If it refuses, stop. Do not use additional force, manual
 recursive deletion, `git worktree prune`, `git stash`, or another destructive
-workaround. After each removal, compare the preserved state and confirm that
-no unrelated worktree, branch, stash, or retained evidence changed. The
+workaround. After each removal, compare the preserved state. Confirm that no unrelated
+worktree, branch, stash, or retained evidence changed. The
 normal non-force procedure remains the default.
 
 Before worktree removal, make sure the local-state inventory contains all local

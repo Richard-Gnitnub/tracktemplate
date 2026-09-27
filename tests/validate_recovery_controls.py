@@ -790,7 +790,7 @@ def validate_worktree_retirement_policy(policy):
         "record the refusal",
         "obtain a separate owner decision for a safe route",
         "d gov 022 permits one mechanical exception for a proved",
-        "does not apply to a worktree because it contains that checkout",
+        "the nested checkout alone does not qualify a worktree for this exception",
         "complete current registered worktree estate and all nested freecad cli state",
         "complete the applicable disposable restore proof and independent review",
         "ordinary git worktree remove refused only because of the populated nested checkout",

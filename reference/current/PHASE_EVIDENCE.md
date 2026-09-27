@@ -19,9 +19,9 @@ The owner accepted the independently reviewed
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
 | What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. D-GOV-022 authorises only a conditional, single-operation mechanical exception to the normal non-force retirement rule. The independently reviewed 42-root snapshot, seven-checkout restore proof and 37 individual audits supported 37 normal removals and 36 contained-branch deletions. |
 | What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. This opening changes no product behaviour. |
-| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. The earlier disposable refusal used an unignored checkout. All seven nested-checkout parent worktrees later passed ordinary non-force removal under a fresh 42-root backup, applicable restore proof, independent review and individual passing audits. The conditional force exception remains unused. Five branches with unmerged commits and three related worktrees remain; the active D-GOV-022 worktree remains registered. The USB is safely unmounted; physical removal and separate storage are unconfirmed. |
+| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. The earlier disposable refusal used an unignored checkout. All seven nested-checkout parent worktrees later passed ordinary non-force removal under a fresh 42-root backup, applicable restore proof, independent review and individual passing audits. The conditional force exception remains unused. Five branches with unmerged commits and three related worktrees remain. The terminal and replacement D-GOV-022 worktrees remain registered. The USB is safely unmounted. Physical removal and separate storage are unconfirmed. |
 | Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 permits one `--force` operation only after every condition in its exact exception is proved. That condition is not met by the current live evidence. These decisions accept no exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | Complete exact-green D-GOV-022 review and draft publication for a separate owner integration decision. Then synchronise protected `main`, obtain a fresh current-estate backup, and retire the then-redundant exception worktree and branch only after their own passing plan, audit and post-removal proof. Preserve five branches with unmerged commits. The product slice remains stopped until full retirement, clean protected `main` and physical USB storage pass. |
+| Next action | Complete exact-green D-GOV-022 review and draft publication for a separate owner integration decision. Then synchronise protected `main` and obtain a fresh current-estate backup. Retire both D-GOV-022 worktrees and their branches only after separate passing plans, audits and post-removal proofs. Preserve five branches with unmerged commits. The product slice remains stopped until full retirement, clean protected `main` and physical USB storage pass. |
 
 <a id="phase-8-opening-panel"></a>
 
@@ -330,27 +330,28 @@ synchronised. Physical USB separation remains an on-site operator action.
 
 **Post-decision result:** The independently reviewed non-overwriting 42-root
 snapshot and seven-checkout drill-02 restore proof passed. The first restore
-attempt and the first retirement-audit invocation remain retained as failures;
-neither is counted as a PASS. Individual plans, fresh audits and post-removal
+attempt and the first retirement-audit invocation remain retained as failures.
+Neither is counted as a PASS. Individual plans, fresh audits and post-removal
 checks passed for all 37 contained worktrees, including the seven nested
 FreeCAD CLI parents. Ordinary non-force removal succeeded 37 times. Git
-deleted 36 contained branches with `git branch -d`; the detached worktree
+deleted 36 contained branches with `git branch -d`. The detached worktree
 had no branch. No `--force` operation occurred. The five branches with
-unmerged commits remain exact. Five worktrees remain registered: protected
-`main`, three historical unmerged-branch worktrees and the active D-GOV-022
-candidate worktree. The retained terminal backup receipt is
-`5c6ab670b2b2dc73a29f393bc63038873755e833278363e238888dda07cb7562`;
-the 37-result summary is
+unmerged commits remain exact. Five worktrees remained registered after the removals: protected
+`main`, three historical unmerged-branch worktrees and the terminal D-GOV-022
+candidate worktree. The replacement D-GOV-022 worktree was added later.
+Six worktrees are registered now. The retained terminal backup receipt is
+`5c6ab670b2b2dc73a29f393bc63038873755e833278363e238888dda07cb7562`.
+The 37-result summary is
 `63271bdb63a995dc22fee771c4720ca1cfdf83427507d760febb5c977e343371`.
 The independently reviewed USB results-set manifest is
-`58d239054e72ff91f1106ee737aa2cbf5958832c6fe430868da2f44e0253088b`;
-the terminal recovery review is
+`58d239054e72ff91f1106ee737aa2cbf5958832c6fe430868da2f44e0253088b`.
+The terminal recovery review is
 `f15b38442ea208f6049d30e41b194c5062221d15ac492af010c43ac01baba936`.
 The USB is safely unmounted. Physical removal and separate storage remain
-unconfirmed. The exception stays unused, and the product prerequisite stays
-open until the active candidate is integrated, its redundant worktree and
-branch pass separate retirement checks, and the remaining recovery conditions
-are met.
+unconfirmed. The exception stays unused. The product prerequisite stays
+open until D-GOV-022 is integrated and both candidate worktrees and their
+branches pass separate retirement checks. The remaining recovery conditions
+must also pass.
 
 ## Phase 8 exit conditions
 
