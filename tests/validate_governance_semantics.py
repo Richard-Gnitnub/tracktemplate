@@ -808,8 +808,8 @@ def validate_phase6_closeout_mutations() -> None:
         ),
         (
             "removal-deadline-waived",
-            "no\nlater than the beta gate",
-            "at an optional time after\nbeta",
+            "no later than the beta gate",
+            "at an optional time after beta",
             "D-P7-002 bounded condition drifted: no later than the beta gate",
         ),
         (
