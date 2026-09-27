@@ -23,6 +23,44 @@ The owner accepted the completed, independently reviewed
 | Owner decision | D-P7-004 accepts Phase 7 Exit 3 as Evidenced and owner-accepted for the calculation family that is integrated through PR #87. Exit 1 stays Pending. It accepts no wider migration-family completion, platform arrangement without a test result, performance result, output or release status, legacy-path removal, or product change. |
 | Next action | Complete only the directly dependent D-P7-004 record alignment and its exact-green protected-main integration. Do not start a new product outcome in this cycle. |
 
+<a id="phase7-core-layout-export-route"></a>
+## Modular core-layout export route — 2026-09-27
+
+Protected `main` includes PR #90 at
+`00e8ba747bca13ae979915f56c9daee9318c59ca`. D-GOV-004 and the project
+owner's continuation on 2026-09-27 authorise this bounded Level 2 result. The
+exact product-and-test candidate is
+`9a146f7cb9e435fbb28cd34389a114e011d7ded4`.
+
+The equal B14/B15 `run_production_export` operation stays unchanged. B16 now
+uses `tracktemplate.api.run_core_layout_export` through one explicit adapter
+and the five inherited host operations. The separate application-route record
+has schema `1`. The accepted D-P7-004 calculation route stays at schema `16`,
+25 selected functions and 40 caller identities.
+
+Standalone Python and D-GOV-019 qualified checks have PASS results. The
+related qualified matrix is 17/17 PASS, and the complete transition profile is
+7/7 PASS. A paired check in the FreeCAD human interface compares the `native`
+B15 route and the `modular` B16 route. It covers Create, a controlled failure
+for the final STEP task, Save/reopen, DXF, SVG, STL, STEP, manifest output and
+cleanup. The workflow comparison removes the permitted differences and then
+has zero differences. A new independent review of the exact product-and-test
+candidate has a PASS result.
+
+The [detailed evidence](../benchmarks/2026-09-27-phase7-core-layout-export-regression.md)
+keeps the results, original failures and review history.
+
+The two usual repairs are completed (2/2). The project owner's final
+harness-only correction is completed (1/1). A nondefault value of `--port` now
+stops before launch. The original `BLOCKED` review stays as evidence. No more
+correction authority remains in this cycle.
+
+This result supplies the previously missing modular export part of Exit 1. It
+does not admit or accept the exit. Phase 7 stays Open at 3/4, and Exit 1 stays
+Pending. D-P6-008 and every comparison, adapter, caller, removal and
+legacy-retirement condition stay in full. Output stays at private-development
+status and project status stays `unknown`.
+
 <a id="phase7-platform-top-heights-migration"></a>
 ## Migration of platform height values — 2026-09-27
 

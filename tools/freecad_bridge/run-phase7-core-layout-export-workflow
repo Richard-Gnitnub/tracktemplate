@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$(cd "${bridge_dir}/../.." && pwd)"
+
+isolated=false
+default_bridge_port=19875
+bridge_port="${default_bridge_port}"
+read_port=false
+for argument in "$@"; do
+    if [[ "${read_port}" == true ]]; then
+        bridge_port="${argument}"
+        read_port=false
+        continue
+    fi
+    case "${argument}" in
+        --route|--route=*) isolated=true ;;
+        --port) read_port=true ;;
+        --port=*) bridge_port="${argument#*=}" ;;
+    esac
+done
+
+if [[ "${bridge_port}" != "${default_bridge_port}" ]]; then
+    echo "Phase 7 core-layout export requires bridge port ${default_bridge_port}; nondefault ports are not isolated." >&2
+    exit 2
+fi
+
+if [[ "${isolated}" == true ]]; then
+    exec "${bridge_dir}/run-isolated" \
+        /usr/bin/env \
+        TRACKTEMPLATE_BRIDGE_PORT="${bridge_port}" \
+        PYTHONPATH="${project_root}/.devtools/freecad-cli/src" \
+        /usr/bin/python3 \
+        "${bridge_dir}/run_phase7_core_layout_export_workflow.py" "$@"
+fi
+
+exec /usr/bin/env PYTHONPATH="${project_root}/.devtools/freecad-cli/src" \
+    /usr/bin/python3 \
+    "${bridge_dir}/run_phase7_core_layout_export_workflow.py" "$@"
