@@ -16,12 +16,12 @@ The owner accepted the independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 0/4 under D-P8-001; all four exits are Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
+| Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
 | What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. The current records now hold the Phase 8 opening decision. |
 | What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. This opening changes no product behaviour. |
 | Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
-| Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises only its Level 3 opening alignment and exact-green integration. After clean protected `main` and IDE disposal of redundant worktrees and branches, it separately authorises one internal `turnout_valid_toe_range` slice to a draft PR. It accepts no exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | Integrate this exact-green opening alignment and synchronise protected `main`. Complete the worktree and branch retirement audit and a fresh pre-migration snapshot before the separately authorised product slice. Report physical recovery steps that require operator access. |
+| Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises only its Level 3 opening alignment and exact-green integration. After clean protected `main` and removal of redundant worktrees and branches in the JetBrains IDE, it separately authorises one internal `turnout_valid_toe_range` slice to a draft PR. It accepts no exit, performance, wider migration, production output, release or legacy removal. |
+| Next action | Integrate this exact-green opening alignment and synchronise protected `main`. Complete the worktree and branch retirement audit and a fresh pre-migration snapshot before the separately authorised product slice. Report recovery steps that require operator access. |
 
 <a id="phase-8-opening-panel"></a>
 
@@ -45,14 +45,12 @@ not external organisational reviews.
 
 The first product assignment is one bounded Level 2 extraction of
 `turnout_valid_toe_range` and checked routing for five inherited B15 callers.
-The first slice starts only after the opening is integrated and protected
-`main` is clean and synchronised. It also needs disposal of redundant
-worktrees and branches in the JetBrains IDE with the required retirement
-audit. A fresh non-overwriting
-pre-migration snapshot must meet the [recovery policy](../RECOVERY_AND_BACKUP.md)
-before product mutation. Physical recovery steps need operator access if the
-independent destination is unavailable remotely. This opening does not claim
-that the snapshot or disposal is complete.
+The first slice starts only after the opening PR is merged into protected
+`main` and protected `main` is clean and synchronised. It also needs the required retirement audit and removal of redundant
+worktrees and branches in the JetBrains IDE. A new snapshot must preserve earlier snapshots and meet the
+[recovery policy](../RECOVERY_AND_BACKUP.md) before product mutation. A recovery step needs operator access if the independent destination
+is unavailable remotely. This opening does not claim
+that the snapshot or removal is complete.
 
 TERM-R04 remains open. The first slice must not add a public turnout API,
 schema or UI term. The frozen B14/B15 identities, inherited B15 host, and
