@@ -478,6 +478,30 @@ def _preserved_entry_path(destination, relative):
     return parent / parts[-1]
 
 
+def _freecad_cli_tracked_entries(output, *, index):
+    """Parse the complete raw HEAD or stage-zero index of this checkout."""
+    if output and not output.endswith("\0"):
+        return None
+    entries = {}
+    pattern = (
+        r"(100644|100755) ([0-9a-f]{40}) 0"
+        if index else r"(100644|100755) blob ([0-9a-f]{40})"
+    )
+    for raw in output.split("\0"):
+        if not raw:
+            continue
+        metadata, separator, relative = raw.partition("\t")
+        match = re.fullmatch(pattern, metadata)
+        if not separator or not match or relative in entries:
+            return None
+        try:
+            _validate_relative_path(relative)
+        except SafetyAuditError:
+            return None
+        entries[relative] = match.groups()
+    return entries
+
+
 def _freecad_cli_canonical_state(root, checkout, accepted_commit):
     """Check this one nested tool against the accepted bridge authority."""
     setup = _git(
@@ -513,49 +537,59 @@ def _freecad_cli_canonical_state(root, checkout, accepted_commit):
         or (checkout / ".git/objects/info/alternates").exists()
     ):
         return False
-    staged = _git(
-        checkout, "diff", "--cached", "--quiet", "HEAD", allow_failure=True
+    head_entries = _freecad_cli_tracked_entries(
+        _git(checkout, "ls-tree", "-r", "-z", "HEAD").stdout,
+        index=False,
     )
-    if staged.returncode != 0:
+    index_entries = _freecad_cli_tracked_entries(
+        _git(checkout, "ls-files", "-s", "-z").stdout,
+        index=True,
+    )
+    if not head_entries or index_entries != head_entries:
         return False
     index_flags = [
         item for item in _git(checkout, "ls-files", "-v", "-z").stdout.split("\0")
         if item
     ]
-    if any(
-        len(item) < 3
-        or item[1] != " "
-        or item[0] == "S"
-        or item[0].islower()
-        for item in index_flags
+    if (
+        len(index_flags) != len(head_entries)
+        or {item[2:] for item in index_flags} != set(head_entries)
+        or any(
+            len(item) < 3 or item[:2] != "H "
+            or item[2:] not in head_entries
+            for item in index_flags
+        )
     ):
         return False
-    changed = _git(
-        checkout, "diff", "--name-only", "--no-ext-diff", "-z", "HEAD", "--"
-    ).stdout
-    if [item for item in changed.split("\0") if item] != [
-        item[0] for item in headers
-    ]:
+    approved = {
+        path: (before_blob, after_blob)
+        for path, _, before_blob, after_blob in headers
+    }
+    if not set(approved).issubset(head_entries):
         return False
-    for path, _, before_blob, after_blob in headers:
+    for path, (mode, before_blob) in head_entries.items():
+        file_path = _preserved_entry_path(checkout, path)
+        if file_path is None:
+            return False
         try:
-            working_mode = stat.S_IMODE((checkout / path).lstat().st_mode)
+            metadata = file_path.lstat()
         except OSError:
             return False
         if (
-            working_mode & 0o111
-            or not (checkout / path).is_file()
-            or (checkout / path).is_symlink()
-            or not _git(checkout, "ls-files", "-s", "--", path).stdout.startswith(
-                "100644 "
-            )
-            or
-            _git(checkout, "rev-parse", "HEAD:" + path).stdout.strip()
-            != before_blob
-            or _git(
-                checkout, "hash-object", "--no-filters", "--", path
-            ).stdout.strip()
-            != after_blob
+            not stat.S_ISREG(metadata.st_mode)
+            or bool(metadata.st_mode & 0o111) != (mode == "100755")
+        ):
+            return False
+        expected_blob = before_blob
+        if path in approved:
+            approved_before, approved_after = approved[path]
+            if mode != "100644" or before_blob != approved_before:
+                return False
+            expected_blob = approved_after
+        if (
+            _git(checkout, "hash-object", "--no-filters", "--", path)
+            .stdout.strip()
+            != expected_blob
         ):
             return False
     if (

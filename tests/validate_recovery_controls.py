@@ -298,10 +298,7 @@ def validate_safety_audit_git_commands(source):
                 node.args[2], include_attributes=False
             ) in approved_objects:
                 continue
-        if action == "diff" and arguments in {
-            ("--cached", "--quiet", "HEAD"),
-            ("--name-only", "--no-ext-diff", "-z", "HEAD", "--"),
-        }:
+        if action == "ls-tree" and arguments == ("-r", "-z", "HEAD"):
             continue
         if (
             action == "hash-object"
@@ -1523,6 +1520,9 @@ def _freecad_cli_retirement_fixture(temp_root, destination):
     (upstream / "src").mkdir()
     for path in paths:
         (upstream / path).write_text("baseline\n", encoding="utf-8")
+    (upstream / "src/unpatched.py").write_text(
+        "unchanged\n", encoding="utf-8"
+    )
     _run(["git", "add", "src"], cwd=upstream)
     _run(["git", "commit", "-m", "Pinned bridge baseline"], cwd=upstream)
     pinned = _run(["git", "rev-parse", "HEAD"], cwd=upstream).stdout.strip()
@@ -2854,6 +2854,56 @@ def _validate_freecad_cli_nested_retirement(errors):
             errors.append("nested non-force refusal did not preserve state")
 
 
+def _validate_freecad_cli_hidden_tracked_changes(errors):
+    for change in ("hidden-mode", "hidden-line-ending"):
+        with contextlib.ExitStack() as stack:
+            temp_root = pathlib.Path(stack.enter_context(
+                tempfile.TemporaryDirectory(
+                    prefix="tracktemplate-freecad-cli-{}-".format(change)
+                )
+            ))
+            destination = pathlib.Path(stack.enter_context(
+                tempfile.TemporaryDirectory(
+                    prefix="tracktemplate-freecad-cli-preserved-",
+                    dir="/dev/shm",
+                )
+            ))
+            repository, target, checkout, destination, plan, _ = (
+                _freecad_cli_retirement_fixture(temp_root, destination)
+            )
+            unpatched = checkout / "src/unpatched.py"
+            preserved = destination / ".devtools/freecad-cli"
+            if change == "hidden-mode":
+                _run(["git", "config", "core.filemode", "false"], cwd=checkout)
+                unpatched.chmod(unpatched.stat().st_mode | 0o111)
+            else:
+                _run(["git", "config", "core.autocrlf", "true"], cwd=checkout)
+                unpatched.write_bytes(b"unchanged\r\n")
+            shutil.copy2(checkout / ".git/config", preserved / ".git/config")
+            shutil.copy2(unpatched, preserved / "src/unpatched.py")
+            plan["inventory_sha256"] = safety._retirement_inventory(target)[
+                "sha256"
+            ]
+            diff = _run(
+                ["git", "diff", "--name-only", "HEAD", "--"],
+                cwd=checkout,
+            ).stdout.splitlines()
+            if "src/unpatched.py" in diff:
+                errors.append(change + " fixture was not hidden by Git diff")
+                continue
+            plan_path = temp_root / "nested-retirement-plan.json"
+            _write_retirement_plan(plan_path, plan)
+            report = safety.audit_worktree_retirement(
+                repository, target, plan_path
+            )
+            if (
+                report["readiness"]["retirement_ready"]
+                or "freecad-cli-identity-not-proved" not in report["findings"]
+                or not report["classification"]["preservation_verified"]
+            ):
+                errors.append(change + " passed the raw tracked-state proof")
+
+
 def _validate_repository_state(errors):
     with tempfile.TemporaryDirectory(prefix="tracktemplate-safety-") as temp:
         repository = _git_fixture(pathlib.Path(temp))
@@ -3265,6 +3315,7 @@ def validate(include_live_workstation=False):
     _validate_preserved_symlink_retirement(errors)
     _validate_detached_retirement(errors)
     _validate_freecad_cli_nested_retirement(errors)
+    _validate_freecad_cli_hidden_tracked_changes(errors)
     if include_live_workstation:
         _validate_live_audit(errors)
     _validate_static_controls(errors)
