@@ -46,6 +46,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-4-admission-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-4-admission-panel"
+    },
+    {
+      "id": "D-P7-003",
+      "decided_on": "2026-09-27",
+      "status": "Accepted",
+      "decision": "Accept Phase 7 Exit 2 on a maintained-equivalence basis for the retained B14/B15 oracle and every Phase 7 product slice integrated through PR #87.",
+      "authority": "As TrackTemplate project owner, I accept D-P7-003.\n\nAccept Phase 7 Exit 2 as Evidenced and owner-accepted on a maintained-equivalence basis for the retained B14/B15 oracle and every Phase 7 product slice integrated through PR #87.\n\nPhase 7 advances to 2/4. Exits 1 and 3 remain Pending.\n\nPreserve both frozen B14/B15 identities, the inherited B15 host, development-only comparison oracle, every adapter and caller condition, all removal gates, D-P6-008, and all comparison and legacy-retirement conditions. Later Phase 7 slices must obtain their own applicable equivalence evidence.\n\nThis accepts no untested platform arrangement, wider migration-family completion, performance result, output or release status, legacy-path removal, or product change. Project status remains unknown.\n\nI authorise only the directly dependent Level 3 record alignment and its exact-green protected-main integration.",
+      "exclusions": "This decision accepts no untested platform arrangement, wider migration-family completion, performance result, output or release status, legacy-path removal, product change, future Phase 7 slice or beta readiness. Exits 1 and 3 remain Pending. Preserve both frozen B14/B15 identities, the inherited B15 host, development-only comparison oracle, every adapter and caller condition, all removal gates, D-P6-008, and all comparison and legacy-retirement conditions. Later Phase 7 slices must obtain their own applicable equivalence evidence. Preserve PR-10 Open/Partial and PR-18 Open/Effective for current scope. Output stays private-development and project status stays `unknown`.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-2-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-7-exit-2-admission-panel"
     }
   ]
 }
