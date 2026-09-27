@@ -19,7 +19,7 @@ The owner accepted the completed, independently reviewed
 | Current state | Phase 7 is Open at 4/4. Exit 1 is Evidenced and owner-accepted under D-P7-005. Exits 2, 3 and 4 retain their acceptance under D-P7-003, D-P7-004 and D-P7-002. Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation.<br><br>PR #91 is in protected `main` at `aae7f5f3388ef1abaa1ef673988a1d5c992f0cfc`. The merge preserves the exact reviewed tree `f1bcbce0f6099c8dd20ec90e8150318288a21844`. Post-merge CI has a PASS result. Output stays private-development and project status stays `unknown`. |
 | What changed | D-P7-005 accepts Exit 1 against its unchanged criterion on the integrated Phase 7 evidence through PR #91. The B16 `run_macro` caller reaches `tracktemplate.api.run_core_layout_export` through an explicit adapter. D-P7-003 and D-P7-004 retain their bounded equivalence and dependency conditions for later product changes. D-P7-002 retains the removal gates. The [capability matrix](../CAPABILITY_MATRIX.md) records evidence through PR #84 only. |
 | What now works | Integrated B16 routes show Core layout Create, Edit, Save, reopen and validation in the qualified FreeCAD human interface. PR #91 adds the modular export operation. Its 17 related qualified checks have PASS results. The paired GUI routes have zero differences after the permitted normalisation and leave no document open. The [Exit 1 panel](#phase-7-exit-1-admission-panel) links the decisive evidence. |
-| Limitations/findings | The PR #91 export comparison uses one fixed B14 plain-line fixture and one prepared plan. It does not prove every platform arrangement or make raw outputs identical where paths, times or metadata differ. The two usual repairs remain 2/2 exhausted; the final 1/1 harness exception is consumed. The initial FAIL and BLOCKED evidence stays retained.<br><br>The PR #83–#87 repair and review histories remain. PR #83 records an increased measured micro-call cost. The locked Phase evidence retains its non-blocking trailing-space warning. PR-10 stays Open/Partial; PR-18 stays Open/Effective for current scope.<br><br>The inherited B15 host, development-only comparison oracle, all adapter and caller conditions, and all removal gates stay in force. D-P6-008 stays Deferred — unmet; the GUI samples give no performance acceptance. All comparison and legacy-retirement conditions remain. |
+| Limitations/findings | The PR #91 export comparison uses one fixed B14 plain-line fixture and one prepared plan. It does not prove every platform arrangement or make raw outputs identical where paths, times or metadata differ. The two usual repairs remain 2/2 exhausted. The final 1/1 harness exception is consumed. The initial FAIL and BLOCKED evidence stays retained.<br><br>The PR #83–#87 repair and review histories remain. PR #83 records an increased measured micro-call cost. The locked Phase evidence retains its non-blocking trailing-space warning. PR-10 stays Open/Partial. PR-18 stays Open/Effective for current scope.<br><br>The inherited B15 host, development-only comparison oracle, all adapter and caller conditions, and all removal gates stay in force. D-P6-008 stays Deferred — unmet. The GUI samples give no performance acceptance. All comparison and legacy-retirement conditions remain. |
 | Owner decision | D-P7-005 accepts Exit 1 as Evidenced and owner-accepted for the integrated evidence through PR #91. Phase 7 is 4/4 but remains Open pending a separate closeout decision. No wider migration-family, performance, production-output, release or legacy-removal acceptance follows. |
 | Next action | Bring a separate Phase 7 closeout recommendation to the project owner. This alignment does not close Phase 7 or open Phase 8. |
 
@@ -38,7 +38,9 @@ Richard is the project owner and panel chair. The record owner presents this
 alignment. The independent admission reviewers are
 `/root/exit1_lifecycle_evidence` and `/root/exit1_export_evidence`. Neither
 reviewer authored a maintained file. Both reviewers found the unchanged Exit 1
-criterion admission-ready. The independent QA/risk reviewer is
+criterion admission-ready.
+
+The independent QA/risk reviewer is
 `/root/exit1_panel_risk_review`, who also authored no maintained file. The
 reviewer checked all 24 live risks and confirmed **Proceed with bounded
 conditions**. There is no unresolved dissent.
@@ -48,7 +50,9 @@ reopened, validated, and exported through modular paths.” The integrated B16
 track-preparation evidence covers Create, Edit, Undo/Redo, a rejected spacing
 value, Save, close and reopen with equal product semantics. The
 [track-preparation record](../benchmarks/2026-09-20-phase7-track-preparation-regression.md)
-keeps the exact qualified-host and GUI proof. The
+keeps the exact qualified-host and GUI proof.
+
+The
 [connected-straight record](../benchmarks/2026-09-26-phase7-connected-straight-validation-regression.md)
 shows the modular pre-production validation route and a connected Generate and
 Replace journey. Its 71 qualified cases and paired GUI proof have PASS results.
@@ -59,7 +63,9 @@ PR #91 supplies the export part of the criterion. The B16 `run_macro` caller
 uses `tracktemplate.api.run_core_layout_export` through an explicit adapter.
 The [export record](../benchmarks/2026-09-27-phase7-core-layout-export-regression.md)
 keeps the application contract and its evidence. The related qualified matrix
-is 17/17 PASS. The paired FreeCAD GUI proof compares the retained B15 route
+is 17/17 PASS.
+
+The paired FreeCAD GUI proof compares the retained B15 route
 with the B16 modular route. It covers Create, preflight, Save/reopen, DXF, SVG,
 STL, STEP, the manifest and a controlled final-task failure. Both routes
 complete, have zero differences after permitted normalisation and leave no
@@ -67,16 +73,20 @@ document open. The fixed fixture and the source map have recorded identities.
 
 This admission uses the integrated Phase 7 product scope through PR #91. It
 does not change the four original exit criteria. PR #91 proves the selected
-plain-line export journey; it does not prove all prepared plans or platform
+plain-line export journey. It does not prove all prepared plans or platform
 arrangements. The comparison removes route paths, times and allowed metadata
-differences. Raw output files are not all byte-identical. The earlier
-D-P7-003 and D-P7-004 decisions retain their accepted scope through PR #87;
+differences. Raw output files are not all byte-identical.
+
+The earlier
+D-P7-003 and D-P7-004 decisions retain their accepted scope through PR #87.
 PR #91 has its own applicable equivalence and dependency evidence.
 
 The panel checked all 24 live risks without changing a disposition. PR-01 and
 QA-R03 still require complete release-critical workflow evidence. PR-09 keeps
 the output-rights duty. PR-10 stays Open/Partial and PR-18 stays
-Open/Effective for current scope. PR-13 keeps its recovery cadence. PR-17
+Open/Effective for current scope.
+
+PR-13 keeps its recovery cadence. PR-17
 keeps its persistence duty. PR-22 keeps independent authority challenge.
 PR-15, QA-R04 and D-P6-008 keep the deferred, unmet performance obligation
 and its mandatory pre-Phase-10-beta gate. The
@@ -84,7 +94,9 @@ and its mandatory pre-Phase-10-beta gate. The
 
 The B14/B15 comparison identities remain frozen. The inherited B15 host and
 development-only comparison oracle remain. Every adapter and caller condition
-and every removal gate remain in force. No legacy path is removed. Output
+and every removal gate remain in force. No legacy path is removed.
+
+Output
 stays private-development and project status stays `unknown`. This decision
 accepts no wider migration-family completion, performance result, production
 output or release state. Phase 7 reaches 4/4 but remains Open. A separate
