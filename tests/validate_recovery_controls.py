@@ -2051,9 +2051,33 @@ def _validate_worktree_retirement_audit(errors):
             target,
             plan_path,
         )
-        if "unsupported-local-state-type" not in blocked["findings"]:
-            errors.append("unsupported local-state type did not fail closed")
+        if (
+            "symlink-preservation-required" not in blocked["findings"]
+            or blocked["readiness"]["retirement_ready"]
+        ):
+            errors.append("disposable symlink did not fail closed")
         link.unlink()
+
+        fifo = target / "local/unsupported-fifo"
+        os.mkfifo(fifo)
+        unsupported = copy.deepcopy(plan)
+        unsupported["classifications"][2]["paths"].append(
+            "local/unsupported-fifo"
+        )
+        fifo_entry = safety._local_state_entry(
+            target, "local/unsupported-fifo", "ignored"
+        )
+        fifo_inventory = safety._retirement_inventory(target)
+        fifo_inventory["entries"].append(fifo_entry)
+        blocked = safety._classification_state(
+            unsupported, fifo_inventory, target
+        )
+        if (
+            fifo_entry["type"] != "unsupported"
+            or "unsupported-local-state-type" not in blocked["findings"]
+        ):
+            errors.append("unsupported special-file classification gate drifted")
+        fifo.unlink()
 
         (target / "new-tracked.txt").write_text(
             "unaccepted branch commit\n",
@@ -2113,6 +2137,309 @@ def _validate_normal_retirement_fixture(errors):
         branches = _run(["git", "branch", "--list"], cwd=repository).stdout
         if "retirement/test" in branches:
             errors.append("merged local branch was not retired after worktree")
+
+
+def _validate_preserved_symlink_retirement(errors):
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-symlink-retirement-"
+    ) as temporary:
+        temp_root = pathlib.Path(temporary)
+        repository, target = _retirement_fixture(temp_root)
+        referent = temp_root / "qualified-runtime"
+        referent.write_bytes(b"qualified runtime fixture\n")
+        other = temp_root / "different-runtime"
+        other.write_bytes(b"different runtime fixture\n")
+        source = target / "local/runtime-link"
+        preserved = repository / "local/runtime-link"
+        source.symlink_to(referent)
+        preserved.symlink_to(referent)
+        plan = _retirement_plan(repository, target)
+        plan["classifications"].append(
+            {
+                "name": "retained-link",
+                "classification": "retained-evidence",
+                "paths": ["local/runtime-link"],
+                "prefixes": [],
+                "proof": {
+                    "status": "passed",
+                    "owner": "fixture evidence owner",
+                    "basis": "the exact external link is preserved outside the target",
+                },
+                "disposition": "preserve",
+                "preservation": {
+                    "method": "identical-relative-tree",
+                    "destination_root": str(repository),
+                },
+            }
+        )
+        plan_path = temp_root / "symlink-retirement-plan.json"
+
+        def inspect(candidate):
+            _write_retirement_plan(plan_path, candidate)
+            return safety.audit_worktree_retirement(
+                repository, target, plan_path
+            )
+
+        def expect_blocked(label, expected, candidate=None):
+            report = inspect(candidate if candidate is not None else plan)
+            if (
+                expected not in report["findings"]
+                or report["readiness"]["retirement_ready"]
+            ):
+                errors.append(label + " did not fail closed")
+
+        ready = inspect(plan)
+        if (
+            not ready["readiness"]["retirement_ready"]
+            or ready["findings"]
+            or ready["classification"]["counts"]["retained-evidence"]["file_count"]
+            != 1
+        ):
+            errors.append("exact externally preserved symlink was not ready")
+
+        preserved.unlink()
+        expect_blocked("missing symlink copy", "required-preservation-not-proved:group-4")
+        preserved.write_bytes(b"not a symlink\n")
+        expect_blocked("wrong-type symlink copy", "required-preservation-not-proved:group-4")
+        preserved.unlink()
+        preserved.symlink_to(other)
+        expect_blocked("changed symlink copy", "required-preservation-not-proved:group-4")
+        preserved.unlink()
+        preserved.symlink_to(referent)
+
+        referent.unlink()
+        expect_blocked("unresolved symlink referent", "required-preservation-not-proved:group-4")
+        referent.write_bytes(b"qualified runtime fixture\n")
+
+        source.unlink()
+        source.symlink_to(other)
+        expect_blocked("changed source symlink inventory", "local-state-inventory-changed")
+        source.unlink()
+        source.symlink_to(referent)
+
+        for link in (source, preserved):
+            link.unlink()
+            link.symlink_to("runtime-link")
+        looping = copy.deepcopy(plan)
+        looping["inventory_sha256"] = safety._retirement_inventory(target)["sha256"]
+        expect_blocked("looping symlink", "required-preservation-not-proved:group-4", looping)
+
+        for link in (source, preserved):
+            link.unlink()
+            link.symlink_to(target / "local/source.bin")
+        internal = copy.deepcopy(plan)
+        internal["inventory_sha256"] = safety._retirement_inventory(target)["sha256"]
+        expect_blocked("internal target symlink", "required-preservation-not-proved:group-4", internal)
+
+        source.unlink()
+        source.symlink_to("../../qualified-runtime")
+        shifted_root = temp_root / "shifted" / "copy"
+        (shifted_root / "local").mkdir(parents=True)
+        (shifted_root / "local/source.bin").write_bytes(
+            b"authoritative source\n"
+        )
+        (temp_root / "shifted/qualified-runtime").write_bytes(
+            b"different qualified runtime\n"
+        )
+        (shifted_root / "local/runtime-link").symlink_to(
+            "../../qualified-runtime"
+        )
+        relative = copy.deepcopy(plan)
+        relative["inventory_sha256"] = safety._retirement_inventory(target)["sha256"]
+        relative["classifications"][-1]["preservation"]["destination_root"] = (
+            str(shifted_root)
+        )
+        expect_blocked(
+            "relative symlink with changed referent",
+            "required-preservation-not-proved:group-4",
+            relative,
+        )
+
+        source.unlink()
+        source.symlink_to(referent)
+        unclassified = copy.deepcopy(plan)
+        unclassified["classifications"].pop()
+        expect_blocked(
+            "unclassified symlink",
+            "local-state-classification-incomplete",
+            unclassified,
+        )
+        disposable = copy.deepcopy(unclassified)
+        disposable["classifications"][2]["paths"].append(
+            "local/runtime-link"
+        )
+        expect_blocked(
+            "disposable symlink", "symlink-preservation-required", disposable
+        )
+        overlap = copy.deepcopy(plan)
+        overlap["classifications"][2]["paths"].append(
+            "local/runtime-link"
+        )
+        expect_blocked(
+            "overlapping symlink classification",
+            "local-state-classification-overlap",
+            overlap,
+        )
+        ambiguous = copy.deepcopy(plan)
+        ambiguous["classifications"][-1]["classification"] = (
+            "ambiguous-or-uniquely-owned-state"
+        )
+        ambiguous["classifications"][-1]["disposition"] = "retain-and-stop"
+        del ambiguous["classifications"][-1]["preservation"]
+        expect_blocked(
+            "ambiguous symlink",
+            "ambiguous-or-unique-local-state:group-4",
+            ambiguous,
+        )
+
+
+def _validate_detached_retirement(errors):
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-detached-retirement-"
+    ) as temporary:
+        temp_root = pathlib.Path(temporary)
+        repository, target = _retirement_fixture(temp_root)
+        plan = _retirement_plan(repository, target)
+        plan_path = temp_root / "detached-retirement-plan.json"
+
+        def inspect(candidate):
+            _write_retirement_plan(plan_path, candidate)
+            return safety.audit_worktree_retirement(
+                repository, target, plan_path
+            )
+
+        def expect_blocked(label, expected, candidate):
+            report = inspect(candidate)
+            if (
+                expected not in report["findings"]
+                or report["readiness"]["retirement_ready"]
+            ):
+                errors.append(label + " did not fail closed")
+
+        branchless_attached = copy.deepcopy(plan)
+        branchless_attached["target"]["branch"] = None
+        expect_blocked(
+            "attached worktree with detached plan",
+            "target-branch-changed",
+            branchless_attached,
+        )
+        _run(["git", "checkout", "--detach"], cwd=target)
+        plan["target"]["branch"] = None
+        ready = inspect(plan)
+        if (
+            not ready["readiness"]["retirement_ready"]
+            or ready["findings"]
+            or not ready["target"]["detached"]
+            or ready["target"]["branch"]
+            or not ready["target"]["contained_in_accepted_history"]
+        ):
+            errors.append("exact contained detached worktree was not ready")
+
+        attached_plan = copy.deepcopy(plan)
+        attached_plan["target"]["branch"] = "refs/heads/retirement/test"
+        expect_blocked(
+            "detached worktree with attached plan",
+            "target-branch-changed",
+            attached_plan,
+        )
+        changed_head = copy.deepcopy(plan)
+        changed_head["target"]["head"] = "0" * 40
+        expect_blocked(
+            "changed detached HEAD", "target-head-changed", changed_head
+        )
+        active = copy.deepcopy(plan)
+        active["activity"]["status"] = "active"
+        expect_blocked(
+            "active detached worktree",
+            "target-inactivity-not-confirmed",
+            active,
+        )
+        unclassified = copy.deepcopy(plan)
+        unclassified["classifications"].pop()
+        expect_blocked(
+            "unclassified detached state",
+            "local-state-classification-incomplete",
+            unclassified,
+        )
+        (target / "tracked.txt").write_text("dirty\n", encoding="utf-8")
+        expect_blocked(
+            "dirty detached worktree", "target-tracked-state-not-clean", plan
+        )
+        (target / "tracked.txt").write_text("checkpoint\n", encoding="utf-8")
+
+        (target / "new-tracked.txt").write_text(
+            "unaccepted detached commit\n", encoding="utf-8"
+        )
+        _run(["git", "add", "new-tracked.txt"], cwd=target)
+        _run(["git", "commit", "-m", "Unaccepted detached commit"], cwd=target)
+        uncontained = copy.deepcopy(plan)
+        uncontained["target"]["head"] = _run(
+            ["git", "rev-parse", "HEAD"], cwd=target
+        ).stdout.strip()
+        expect_blocked(
+            "uncontained detached HEAD",
+            "target-not-contained-in-accepted-history",
+            uncontained,
+        )
+
+        removal_root = temp_root / "detached-removal"
+        removal_root.mkdir()
+        removal_repository, removal_target = _retirement_fixture(removal_root)
+        _run(["git", "checkout", "--detach"], cwd=removal_target)
+        removal_plan = _retirement_plan(removal_repository, removal_target)
+        removal_plan["target"]["branch"] = None
+        removal_plan_path = removal_root / "retirement-plan.json"
+        _write_retirement_plan(removal_plan_path, removal_plan)
+        removal_report = safety.audit_worktree_retirement(
+            removal_repository, removal_target, removal_plan_path
+        )
+        if not removal_report["readiness"]["retirement_ready"]:
+            errors.append("detached non-force removal fixture was not ready")
+            return
+        worktrees_before = _run(
+            ["git", "worktree", "list", "--porcelain"],
+            cwd=removal_repository,
+        ).stdout
+        primary_before = _run(
+            ["git", "status", "--porcelain=v1", "--ignored"],
+            cwd=removal_repository,
+        ).stdout
+        preserved_before = (removal_repository / "local/source.bin").read_bytes()
+        branches_before = _run(
+            ["git", "show-ref", "--heads"], cwd=removal_repository
+        ).stdout
+        stashes_before = _run(
+            ["git", "stash", "list"], cwd=removal_repository
+        ).stdout
+        _run(
+            ["git", "worktree", "remove", str(removal_target)],
+            cwd=removal_repository,
+        )
+        branches_after = _run(
+            ["git", "show-ref", "--heads"], cwd=removal_repository
+        ).stdout
+        stashes_after = _run(
+            ["git", "stash", "list"], cwd=removal_repository
+        ).stdout
+        worktrees_after = _run(
+            ["git", "worktree", "list", "--porcelain"],
+            cwd=removal_repository,
+        ).stdout
+        primary_after = _run(
+            ["git", "status", "--porcelain=v1", "--ignored"],
+            cwd=removal_repository,
+        ).stdout
+        if (
+            removal_target.exists()
+            or str(removal_target) not in worktrees_before
+            or str(removal_target) in worktrees_after
+            or primary_before != primary_after
+            or branches_before != branches_after
+            or stashes_before != stashes_after
+            or (removal_repository / "local/source.bin").read_bytes()
+            != preserved_before
+        ):
+            errors.append("detached non-force removal changed retained state")
 
 
 def _validate_repository_state(errors):
@@ -2518,6 +2845,8 @@ def validate(include_live_workstation=False):
     _validate_missing_critical_asset(errors)
     _validate_worktree_retirement_audit(errors)
     _validate_normal_retirement_fixture(errors)
+    _validate_preserved_symlink_retirement(errors)
+    _validate_detached_retirement(errors)
     if include_live_workstation:
         _validate_live_audit(errors)
     _validate_static_controls(errors)

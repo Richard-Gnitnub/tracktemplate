@@ -1051,6 +1051,8 @@ def _validate_owner_view(plan: str) -> None:
         'decisions',
         'risk snapshot',
         'The owner opened Phase 8 for its unchanged four criteria',
+        'PR #94 integrated the opening',
+        'A later independently reviewed snapshot covers 39 worktrees',
         'capability matrix',
         'evidence map through PR #84 only',
         'modular Core layout Create, Edit, Save, reopen, validation and export',
@@ -1072,12 +1074,17 @@ def _validate_owner_view(plan: str) -> None:
         'D-P6-008 stays Deferred — unmet',
         'mandatory before Phase 10 beta acceptance',
         'GUI samples give no performance acceptance',
+        'Seven contained worktrees have unsupported ignored `.devtools/freecad-cli/` directory entries; D-GOV-020 does not resolve them',
         'USB is safely unmounted. Separate physical storage remains operator-controlled and unverified',
         'D-P8-001',
         'opens Phase 8 at 0/4',
-        'It accepts no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Integrate the exact-green Level 3 opening records',
-        'complete the retirement audit and removal of redundant worktrees and branches in the JetBrains IDE before the bounded product slice',
+        'D-GOV-020',
+        'authorises only a bounded retirement-control correction',
+        'Neither decision accepts a Phase 8 exit, performance, wider migration, production output, release or legacy removal',
+        'Integrate only an exact-green D-GOV-020 correction',
+        'separate passing retirement plan and audit for each retirement candidate',
+        'Keep five branches with unmerged commits',
+        'Complete the retirement audit and removal of redundant worktrees and branches in the JetBrains IDE before the bounded product slice',
         'The product draft needs a separate integration decision',
     ):
         _require(
@@ -4615,7 +4622,7 @@ def _validate_phase8_decision_opening(
     decisions = document["decisions"]
     _require(
         isinstance(decisions, list)
-        and len(decisions) == 2
+        and len(decisions) == 3
         and decisions[0] == phase6_decisions["D-P6-008"],
         "Phase 8 opening must carry unchanged D-P6-008",
     )
@@ -4646,6 +4653,30 @@ def _validate_phase8_decision_opening(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-P8-001 " + field + " digest drifted",
+        )
+    control = decisions[2]
+    control_panel = "reference/current/PHASE_EVIDENCE.md#worktree-retirement-control-panel"
+    _require(
+        isinstance(control, dict)
+        and set(control) == set(opening)
+        and control["id"] == "D-GOV-020"
+        and control["decided_on"] == "2026-09-27"
+        and control["status"] == "Accepted"
+        and control["decision"] == "Authorise the bounded worktree-retirement control correction."
+        and control["evidence"] == control_panel
+        and control["panel_record"] == control_panel
+        and control["panel_required_under_current_policy"] is True,
+        "D-GOV-020 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        ("authority", "3216a7c28fd75298ba9e7464bbe0cbb8a470b556ef7e6709c83bb700443030f1"),
+        ("exclusions", "70bd50cb5aac4c5ccff24926b4e8ad0056453793457b7f3556d0245dd44cd60f"),
+    ):
+        value = control[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-GOV-020 " + field + " digest drifted",
         )
 
 
@@ -4762,6 +4793,42 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
         _require(
             clause in panel_flat,
             "D-P8-001 bounded condition drifted: " + clause,
+        )
+    control_panel = _section(
+        evidence, "D-GOV-020 worktree-retirement control panel — 2026-09-27"
+    )
+    control = _load_json(CURRENT_DECISIONS_PATH)["decisions"][2]
+    _require(
+        '<a id="worktree-retirement-control-panel"></a>' in evidence
+        and " ".join(_blockquote_paragraphs(control_panel))
+        == _semantic_text(str(control["authority"])),
+        "D-GOV-020 exact owner instruction drifted or was relocated",
+    )
+    control_flat = _semantic_text(control_panel)
+    for clause in (
+        "18dee347f4e1284bbd1a6e2b6f1658870064576e",
+        "39 registered worktrees",
+        "2026-09-27-pre-phase8-turnout-migration-01",
+        "tmp/phase8-pre-migration-recovery/terminal-backup-receipt.json",
+        "1d68bd0c9bfd2006c078cfb9964a6db579ff0a2a63782b2a5fd8739147eb1c8f",
+        "independent recovery review",
+        "does not prove coverage of later worktrees",
+        "Physical removal and separate storage remain unverified",
+        "/root/retirement_governance_audit",
+        "Proceed with bounded conditions",
+        "PR-13 remains Critical and PR-22 remains High",
+        "risk disposition",
+        "only as retained evidence or authoritative local source",
+        "exact HEAD is contained in the accepted commit",
+        "separate passing plan and audit",
+        "Preserve the five branches with unmerged commits",
+        "Do not start the authorised product slice",
+        "seven contained worktrees with ignored .devtools/freecad-cli/",
+        "does not authorise another control change or their retirement",
+    ):
+        _require(
+            clause in control_flat,
+            "D-GOV-020 bounded condition drifted: " + clause,
         )
     _require(
         "history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel"
@@ -5474,7 +5541,7 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001"},
+        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020"},
         "project-plan decisions differ from the current and frozen registers",
     )
 

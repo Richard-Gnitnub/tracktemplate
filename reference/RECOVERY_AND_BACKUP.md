@@ -366,9 +366,25 @@ contains HEAD, the accepted commit, and the local-state inventory SHA-256. The
 retirement plan contains the removal authority. The retirement plan contains
 evidence that no person or process uses the worktree.
 
+If the worktree has no branch, set `target.branch` to JSON `null` in its
+retirement plan. Record its exact HEAD. Show that the accepted commit contains
+that HEAD. Use HEAD for the accepted-history check in steps 3 and 4. Apply
+all other retirement checks. Do not delete a branch for this worktree.
+
 The retirement plan does not contain more than 1 local-state type for an item.
 The retirement plan contains the canonical owner and result for each item. The
 retirement plan contains each location for planned preservation.
+
+A symbolic link can pass only as authoritative local source or retained
+evidence. Give it one classification and an exact preservation location. The
+source and preserved copy must have the same relative path, symbolic link text,
+type, byte size, and SHA-256 identity. Both links must resolve to the same
+existing referent outside the worktree to be removed. No directory between
+each checked root and its link can be a symbolic link. The retirement audit
+must reject a
+missing or changed referent, a symbolic link loop, an unresolved link, and a
+different source or copy identity. It must also reject a symbolic link that
+the plan classifies as cache, disposable state, or ambiguous state.
 
 For this repository, use `refs/remotes/origin/main` as `accepted_ref`.
 Use this command to operate the retirement audit again:
@@ -390,6 +406,11 @@ commit, or local-state inventory SHA-256 changes. If a local-state inventory
 item is not in the retirement plan,
 the retirement audit returns `FAIL`. If the retirement plan contains more than
 1 local-state type for an item, the retirement audit returns `FAIL`.
+
+For a worktree without a branch, `target.branch` must stay JSON `null` and
+its exact HEAD must stay contained in the accepted commit. A changed HEAD or
+a branch attachment fails the audit. No branch removal follows its worktree
+removal.
 
 The retirement audit also returns `FAIL` for:
 
@@ -419,7 +440,8 @@ the location for planned preservation again. Record the preservation diff in
 phase evidence. If `git worktree list` does not contain the worktree, record
 the local branch and branch tip in phase evidence. If the accepted commit
 contains the branch tip for this local branch, use `git branch -d` with the
-removal authority.
+removal authority. For a worktree without a branch, record the exact HEAD
+and no branch. Do not delete a branch for that worktree.
 
 If the project owner gives no removal authority for the branch on GitHub,
 do not remove a branch on GitHub. Do not use `git worktree prune`. During this
