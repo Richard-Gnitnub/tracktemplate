@@ -1054,7 +1054,7 @@ def _validate_owner_view(plan: str) -> None:
         'PR #94 integrated the opening',
         'A later independently reviewed snapshot covers the earlier 39-worktree estate',
         'PR #95 integrated D-GOV-020',
-        'D-GOV-021 authorises only the exact nested FreeCAD development-repository retirement-control treatment',
+        'PR #96 integrated D-GOV-021',
         'capability matrix',
         'evidence map through PR #84 only',
         'modular Core layout Create, Edit, Save, reopen, validation and export',
@@ -1076,27 +1076,27 @@ def _validate_owner_view(plan: str) -> None:
         'D-P6-008 stays Deferred — unmet',
         'mandatory before Phase 10 beta acceptance',
         'GUI samples give no performance acceptance',
-        'Seven contained worktrees retain populated `.devtools/freecad-cli/` Git repositories',
-        'D-GOV-020 did not cover their nested state',
-        'D-GOV-021 permits only a bounded exact-state control',
-        'full independent preservation, fresh current-estate backup, and an individual passing plan and audit',
-        'non-force Git removal can still refuse a populated nested repository after an audit PASS',
-        'No live candidate has been removed, and the mechanical route needs a separate owner decision',
-        'USB is safely unmounted. Separate physical storage remains operator-controlled and unverified',
+        'All seven nested-checkout parent worktrees later passed ordinary non-force removal',
+        'D-GOV-022 was not used',
+        'An independently reviewed 42-root snapshot and seven-checkout restore proof supported 37 individually audited normal retirements',
+        'reviewed current-estate backup, restore proof, individual audits and post-removal checks',
+        'earlier disposable refusal used an unignored checkout',
+        'Five branches with unmerged commits and their three worktrees remain',
+        'USB is safely unmounted. Physical removal and separate storage remain operator-controlled and unverified',
         'D-P8-001',
         'opens Phase 8 at 0/4',
         'D-GOV-020',
-        'remains the integrated symbolic-link and detached-worktree control',
+        'remain the integrated exact-state controls',
         'D-GOV-021',
-        'authorises only the exact nested FreeCAD retirement-control treatment',
+        'permits one forced removal only after all its exact conditions pass',
         'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Use D-GOV-021 only after exact-green integration',
-        'new non-overwriting independent backup of the current estate',
-        'including complete nested trees',
-        'A non-force removal refusal stops the candidate for a separate owner decision',
-        'separate passing retirement plan and audit for each retirement candidate',
+        'Complete exact-green D-GOV-022 review and draft publication',
+        'fresh current-estate backup and its own passing plan, audit and post-removal proof',
+        'retire the then-redundant exception worktree and branch',
+        'separate owner integration decision',
+        'full retirement prerequisite passes',
         'Keep five branches with unmerged commits',
-        'Complete the retirement audit and removal of redundant worktrees and branches in the JetBrains IDE before the bounded product slice',
+        'confirm physical USB storage',
         'The product draft needs a separate integration decision',
     ):
         _require(
@@ -4634,7 +4634,7 @@ def _validate_phase8_decision_opening(
     decisions = document["decisions"]
     _require(
         isinstance(decisions, list)
-        and len(decisions) == 4
+        and len(decisions) == 5
         and decisions[0] == phase6_decisions["D-P6-008"],
         "Phase 8 opening must carry unchanged D-P6-008",
     )
@@ -4717,6 +4717,34 @@ def _validate_phase8_decision_opening(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-GOV-021 " + field + " digest drifted",
+        )
+    exception = decisions[4]
+    exception_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#nested-freecad-mechanical-exception-panel"
+    )
+    _require(
+        isinstance(exception, dict)
+        and set(exception) == set(opening)
+        and exception["id"] == "D-GOV-022"
+        and exception["decided_on"] == "2026-09-27"
+        and exception["status"] == "Accepted"
+        and exception["decision"]
+        == "Permit a conditional, single-operation nested FreeCAD worktree-removal exception."
+        and exception["evidence"] == exception_panel
+        and exception["panel_record"] == exception_panel
+        and exception["panel_required_under_current_policy"] is True,
+        "D-GOV-022 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        ("authority", "9a3baf11bc143e7f6be392b6f2cfcb1da1d95f2e696470053ef1a7fcee501e51"),
+        ("exclusions", "2267de8c0c49b663c24408b5944112d9976fdab05ccf7310a5e6ebd602475f7f"),
+    ):
+        value = exception[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-GOV-022 " + field + " digest drifted",
         )
 
 
@@ -4905,6 +4933,30 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
         "D-P6-008 and all recorded limitations remain",
     ):
         _require(clause in nested_flat, "D-GOV-021 bounded condition drifted: " + clause)
+    exception_panel = _section(
+        evidence, "D-GOV-022 nested FreeCAD mechanical exception panel — 2026-09-27"
+    )
+    exception = _load_json(CURRENT_DECISIONS_PATH)["decisions"][4]
+    _require(
+        '<a id="nested-freecad-mechanical-exception-panel"></a>' in evidence
+        and " ".join(_blockquote_paragraphs(exception_panel))
+        == _semantic_text(str(exception["authority"])),
+        "D-GOV-022 exact owner instruction drifted or was relocated",
+    )
+    exception_flat = _semantic_text(exception_panel)
+    for clause in (
+        "exactly one git worktree remove --force",
+        "normal non-force route stays the default",
+        "Ordinary removal refuses solely because",
+        "disposable proof passes for the exact forced operation",
+        "No --force operation occurred",
+        "37 contained worktrees",
+        "36 contained branches",
+        "five branches with unmerged commits",
+        "Physical removal and separate storage remain unconfirmed",
+        "product prerequisite stays open",
+    ):
+        _require(clause in exception_flat, "D-GOV-022 boundary drifted: " + clause)
     _require(
         "history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel"
         in evidence
@@ -5616,7 +5668,7 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021"},
+        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
