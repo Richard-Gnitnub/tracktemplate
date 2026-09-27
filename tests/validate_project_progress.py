@@ -1045,7 +1045,7 @@ def _validate_owner_view(plan: str) -> None:
         '17 related qualified checks have PASS results',
         'paired GUI routes have zero differences after the permitted normalisation',
         'one fixed B14 plain-line fixture and one prepared plan',
-        'two usual repairs remain 2/2 exhausted; the final 1/1 harness exception is consumed',
+        'two usual repairs remain 2/2 exhausted. The final 1/1 harness exception is consumed',
         'initial FAIL and BLOCKED evidence stays retained',
         'PR #83–#87 repair and review histories remain',
         'non-blocking trailing-space warning',
@@ -4522,7 +4522,7 @@ def _validate_phase7_decision_carryforward(
         ),
         (
             "exclusions",
-            "37ca6141535f02308f5485c117e6249de027415cf36410a3eb468b1f87780aab",
+            "b126c9587b3cff7a7726e02cbeabaa1efcb0e510ee36f84284d5ade28388af05",
         ),
     ):
         value = exit1[field]

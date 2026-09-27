@@ -604,7 +604,7 @@ def validate_documentation_profile(
             '17 related qualified checks have PASS results',
             'paired GUI routes have zero differences after the permitted normalisation',
             'one fixed B14 plain-line fixture and one prepared plan',
-            'two usual repairs remain 2/2 exhausted; the final 1/1 harness exception is consumed',
+            'two usual repairs remain 2/2 exhausted. The final 1/1 harness exception is consumed',
             'initial FAIL and BLOCKED evidence stays retained',
             'PR #83–#87 repair and review histories remain',
             'non-blocking trailing-space warning',
