@@ -22,6 +22,10 @@ RETIREMENT_CLASSIFICATIONS = (
 )
 DISCARD_DISPOSITION = "discard-by-normal-worktree-removal"
 PRESERVE_DISPOSITION = "preserve"
+FREECAD_CLI_LOCAL_PATH = ".devtools/freecad-cli/"
+FREECAD_CLI_LOCAL_TYPE = "freecad-cli-checkout"
+FREECAD_CLI_SETUP_PATH = "tools/freecad_bridge/setup-freecad-cli"
+FREECAD_CLI_PATCH_PATH = "tools/freecad_bridge/freecad-cli-tracktemplate.patch"
 SOURCE_ARCHIVE_PATH = pathlib.Path(
     "reference/t5_files_556b_06_feb_2025.zip"
 )
@@ -266,24 +270,76 @@ def _validate_relative_path(value, *, directory_prefix=False):
     return value + "/" if directory_prefix else value
 
 
+def _freecad_cli_tree_identity(checkout):
+    """Hash the complete one approved nested checkout without following links."""
+    if checkout.is_symlink() or not (checkout / ".git").is_dir():
+        raise SafetyAuditError("FreeCAD CLI checkout identity is unsupported")
+    if (checkout / ".git").is_symlink():
+        raise SafetyAuditError("FreeCAD CLI checkout identity is unsupported")
+    records = []
+    size_bytes = 0
+    pending = [checkout]
+    while pending:
+        directory = pending.pop()
+        try:
+            children = sorted(directory.iterdir(), key=lambda item: item.name)
+        except OSError:
+            raise SafetyAuditError("FreeCAD CLI checkout inspection failed") from None
+        for child in children:
+            try:
+                metadata = child.lstat()
+            except OSError:
+                raise SafetyAuditError(
+                    "FreeCAD CLI checkout inspection failed"
+                ) from None
+            relative = child.relative_to(checkout).as_posix()
+            mode = stat.S_IMODE(metadata.st_mode)
+            if stat.S_ISDIR(metadata.st_mode):
+                records.append((relative, "directory", mode, 0, ""))
+                pending.append(child)
+            elif stat.S_ISREG(metadata.st_mode):
+                records.append(
+                    (relative, "file", mode, metadata.st_size, _sha256(child))
+                )
+                size_bytes += metadata.st_size
+            else:
+                raise SafetyAuditError(
+                    "FreeCAD CLI checkout contains unsupported local state"
+                )
+    encoded = json.dumps(
+        sorted(records), separators=(",", ":"), ensure_ascii=True
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest(), size_bytes
+
+
 def _local_state_entry(target, relative, git_state):
-    relative = _validate_relative_path(relative)
-    path = _preserved_entry_path(target, relative)
+    nested_checkout = relative == FREECAD_CLI_LOCAL_PATH
+    if not nested_checkout:
+        relative = _validate_relative_path(relative)
+    path = _preserved_entry_path(target, relative.rstrip("/"))
     if path is None:
         raise SafetyAuditError("local-state path has a non-directory parent")
     try:
         metadata = path.lstat()
-        if stat.S_ISREG(metadata.st_mode):
+        if nested_checkout:
+            if not stat.S_ISDIR(metadata.st_mode):
+                raise SafetyAuditError("FreeCAD CLI checkout is not a directory")
+            kind = FREECAD_CLI_LOCAL_TYPE
+            identity, size_bytes = _freecad_cli_tree_identity(path)
+        elif stat.S_ISREG(metadata.st_mode):
             kind = "file"
             identity = _sha256(path)
+            size_bytes = metadata.st_size
         elif stat.S_ISLNK(metadata.st_mode):
             kind = "symlink"
             identity = hashlib.sha256(
                 os.fsencode(path.readlink())
             ).hexdigest()
+            size_bytes = metadata.st_size
         else:
             kind = "unsupported"
             identity = ""
+            size_bytes = metadata.st_size
     except SafetyAuditError:
         raise
     except OSError:
@@ -292,7 +348,7 @@ def _local_state_entry(target, relative, git_state):
         "path": relative,
         "git_state": git_state,
         "type": kind,
-        "size_bytes": metadata.st_size,
+        "size_bytes": size_bytes,
         "sha256": identity,
     }
 
@@ -422,6 +478,142 @@ def _preserved_entry_path(destination, relative):
     return parent / parts[-1]
 
 
+def _freecad_cli_tracked_entries(output, *, index):
+    """Parse the complete raw HEAD or stage-zero index of this checkout."""
+    if output and not output.endswith("\0"):
+        return None
+    entries = {}
+    pattern = (
+        r"(100644|100755) ([0-9a-f]{40}) 0"
+        if index else r"(100644|100755) blob ([0-9a-f]{40})"
+    )
+    for raw in output.split("\0"):
+        if not raw:
+            continue
+        metadata, separator, relative = raw.partition("\t")
+        match = re.fullmatch(pattern, metadata)
+        if not separator or not match or relative in entries:
+            return None
+        try:
+            _validate_relative_path(relative)
+        except SafetyAuditError:
+            return None
+        entries[relative] = match.groups()
+    return entries
+
+
+def _freecad_cli_canonical_state(root, checkout, accepted_commit):
+    """Check this one nested tool against the accepted bridge authority."""
+    setup = _git(
+        root, "show", accepted_commit + ":" + FREECAD_CLI_SETUP_PATH
+    ).stdout
+    patch = _git(
+        root, "show", accepted_commit + ":" + FREECAD_CLI_PATCH_PATH
+    ).stdout
+    commits = re.findall(
+        r'^expected_commit="([0-9a-f]{40})"$', setup, re.MULTILINE
+    )
+    headers = re.findall(
+        r"^diff --git a/([^\s]+) b/([^\s]+)\n"
+        r"index ([0-9a-f]{40})\.\.([0-9a-f]{40}) 100644$",
+        patch,
+        re.MULTILINE,
+    )
+    if (
+        len(commits) != 1
+        or len(headers) != 6
+        or any(before != after for before, after, _, _ in headers)
+        or [item[0] for item in headers]
+        != sorted({item[0] for item in headers})
+    ):
+        return False
+    expected = commits[0]
+    if (
+        _git(checkout, "rev-parse", "--show-toplevel").stdout.strip()
+        != str(checkout)
+        or _git(checkout, "rev-parse", "HEAD").stdout.strip() != expected
+        or _git(checkout, "rev-parse", "--is-bare-repository").stdout.strip()
+        != "false"
+        or (checkout / ".git/objects/info/alternates").exists()
+    ):
+        return False
+    head_entries = _freecad_cli_tracked_entries(
+        _git(checkout, "ls-tree", "-r", "-z", "HEAD").stdout,
+        index=False,
+    )
+    index_entries = _freecad_cli_tracked_entries(
+        _git(checkout, "ls-files", "-s", "-z").stdout,
+        index=True,
+    )
+    if not head_entries or index_entries != head_entries:
+        return False
+    index_flags = [
+        item for item in _git(checkout, "ls-files", "-v", "-z").stdout.split("\0")
+        if item
+    ]
+    if (
+        len(index_flags) != len(head_entries)
+        or {item[2:] for item in index_flags} != set(head_entries)
+        or any(
+            len(item) < 3 or item[:2] != "H "
+            or item[2:] not in head_entries
+            for item in index_flags
+        )
+    ):
+        return False
+    approved = {
+        path: (before_blob, after_blob)
+        for path, _, before_blob, after_blob in headers
+    }
+    if not set(approved).issubset(head_entries):
+        return False
+    for path, (mode, before_blob) in head_entries.items():
+        file_path = _preserved_entry_path(checkout, path)
+        if file_path is None:
+            return False
+        try:
+            metadata = file_path.lstat()
+        except OSError:
+            return False
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or bool(metadata.st_mode & 0o111) != (mode == "100755")
+        ):
+            return False
+        expected_blob = before_blob
+        if path in approved:
+            approved_before, approved_after = approved[path]
+            if mode != "100644" or before_blob != approved_before:
+                return False
+            expected_blob = approved_after
+        if (
+            _git(checkout, "hash-object", "--no-filters", "--", path)
+            .stdout.strip()
+            != expected_blob
+        ):
+            return False
+    if (
+        _git(checkout, "ls-files", "--others", "--exclude-standard", "-z").stdout
+        or _git(
+            checkout, "ls-files", "--others", "--ignored",
+            "--exclude-standard", "-z",
+        ).stdout
+        or _git(checkout, "stash", "list", "--format=%H").stdout
+    ):
+        return False
+    refs = _git(checkout, "show-ref", allow_failure=True)
+    if refs.returncode not in {0, 1} or any(
+        line.split(" ", 1)[0] != expected
+        for line in refs.stdout.splitlines()
+    ):
+        return False
+    unreachable = _git(
+        checkout, "fsck", "--no-reflogs", "--unreachable", "--no-progress",
+        allow_failure=True,
+    )
+    return unreachable.returncode == 0 and not unreachable.stdout.strip()
+
+
 def _preservation_matches(entries, destination_root, target):
     try:
         destination = pathlib.Path(destination_root).resolve()
@@ -468,12 +660,30 @@ def _preservation_matches(entries, destination_root, target):
                     or target in source_referent.parents
                 ):
                     return False
+            elif (
+                entry["type"] == FREECAD_CLI_LOCAL_TYPE
+                and entry["path"] == FREECAD_CLI_LOCAL_PATH
+                and stat.S_ISDIR(metadata.st_mode)
+            ):
+                if destination.stat().st_dev == target.stat().st_dev:
+                    return False
+                source = _preserved_entry_path(
+                    target, FREECAD_CLI_LOCAL_PATH.rstrip("/")
+                )
+                if source is None or _local_state_entry(
+                    target, entry["path"], entry["git_state"]
+                ) != entry:
+                    return False
+                identity, size_bytes = _freecad_cli_tree_identity(path)
+                if identity != entry["sha256"] or size_bytes != entry["size_bytes"]:
+                    return False
             else:
                 return False
         except (OSError, RuntimeError, SafetyAuditError):
             return False
         if (
-            metadata.st_size != entry["size_bytes"]
+            (entry["type"] != FREECAD_CLI_LOCAL_TYPE
+             and metadata.st_size != entry["size_bytes"])
             or identity != entry["sha256"]
         ):
             return False
@@ -609,7 +819,7 @@ def _classification_state(plan, inventory, target):
             )
 
     unsupported = sum(
-        entry["type"] not in {"file", "symlink"}
+        entry["type"] not in {"file", "symlink", FREECAD_CLI_LOCAL_TYPE}
         for entry in inventory["entries"]
     )
     if unsupported:
@@ -625,6 +835,17 @@ def _classification_state(plan, inventory, target):
             "authoritative-local-source", "retained-evidence"
         }:
             findings.append("symlink-preservation-required")
+    for entry in inventory["entries"]:
+        if entry["type"] != FREECAD_CLI_LOCAL_TYPE:
+            continue
+        assigned = assignments[entry["path"]]
+        if len(assigned) != 1:
+            continue
+        group = next(item for item in prepared if item["name"] == assigned[0])
+        if group["classification"] not in {
+            "authoritative-local-source", "retained-evidence"
+        }:
+            findings.append("freecad-cli-preservation-required")
     return {
         "group_count": len(prepared),
         "counts": counts,
@@ -710,7 +931,7 @@ def audit_worktree_retirement(root, target, plan_path=None):
         "complete": False,
         "preservation_verified": False,
         "unsupported_type_count": sum(
-            item["type"] not in {"file", "symlink"}
+            item["type"] not in {"file", "symlink", FREECAD_CLI_LOCAL_TYPE}
             for item in inventory["entries"]
         ),
         "findings": ["retirement-plan-missing"],
@@ -810,6 +1031,21 @@ def audit_worktree_retirement(root, target, plan_path=None):
             findings.append("local-state-inventory-changed")
         classification = _classification_state(plan, inventory, target)
         findings.extend(classification["findings"])
+        nested_entries = [
+            item for item in inventory["entries"]
+            if item["type"] == FREECAD_CLI_LOCAL_TYPE
+        ]
+        if nested_entries:
+            checkout = target / FREECAD_CLI_LOCAL_PATH.rstrip("/")
+            if (
+                not identity["accepted_commit_matches"]
+                or not _freecad_cli_canonical_state(
+                    root, checkout, actual_accepted
+                )
+                or _retirement_inventory(target)["sha256"]
+                != inventory["sha256"]
+            ):
+                findings.append("freecad-cli-identity-not-proved")
 
         activity = plan.get("activity")
         activity_confirmed = bool(

@@ -3975,15 +3975,15 @@ def validate_documentation_profile_mutations() -> None:
 
     owner_view_performance_widened = replace_once(
         plan,
-        "Neither decision accepts a Phase 8 exit, performance, wider migration, "
+        "These decisions accept no Phase 8 exit, performance, wider migration, "
         "production output, release or legacy removal.",
-        "Both decisions accept every Phase 8 exit, performance, wider migration, "
+        "These decisions accept every Phase 8 exit, performance, wider migration, "
         "production output, release and legacy removal.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: Neither decision accepts a Phase 8 exit, "
+        "project-plan owner view lost or contradicted: These decisions accept no Phase 8 exit, "
         "performance, wider migration, production output, release "
         "or legacy removal",
     )
@@ -5084,6 +5084,8 @@ def validate_visible_recovery_mutations() -> None:
         "tracked cleanliness",
         "gives no removal authority",
     )
+    if policy.count("Do not use `--force`.") != 2:
+        raise AssertionError("retirement force prohibitions changed")
     retirement_policy_cases = (
         (
             "retirement/merged-state-no-authority-deleted",
@@ -5204,8 +5206,7 @@ def validate_visible_recovery_mutations() -> None:
         ),
         (
             "retirement/force-removal-permitted",
-            replace_once(
-                policy,
+            policy.replace(
                 "Do not use `--force`.",
                 "Use `--force` when ignored files remain.",
             ),

@@ -389,6 +389,34 @@ difference between the source and copy identities. It must also reject a
 symbolic link that the plan classifies as cache, disposable state, or
 ambiguous state.
 
+For this repository, `.devtools/freecad-cli/` is a separate Git repository
+inside some worktrees. Only that exact relative path can use the
+`freecad-cli-checkout` local-state inventory type. Do not treat it as an
+ordinary directory or disposable file state. Other Git repositories inside worktrees remain
+unsupported.
+
+A retirement plan for this path must classify its complete state as
+**Authoritative local source** or **Retained evidence**. It must use
+`identical-relative-tree` preservation in a different location. The audit
+must check the exact Git HEAD for that repository, its index,
+references, tracked changes, and all local-only state.
+
+It must compare the pinned commit in the tracked
+`setup-freecad-cli` command and the six changed files with the tracked
+`freecad-cli-tracktemplate.patch`. The preservation proof must cover every file and directory in that
+repository, including `.git`, ignored files, and empty cache directories. It must compare relative paths, types, modes, sizes, and file
+content identities between source and copy. A changed Git identity makes the audit fail. An additional tracked
+change or file also makes it fail. An incomplete inventory, an unapproved
+file change, or insufficient preservation makes it fail. An unexplained or unique state in that Git repository keeps its
+parent worktree registered.
+
+Before removal, make a new snapshot of the current registered
+worktrees at the approved independent destination. Do not overwrite an
+earlier snapshot. Include each complete `.devtools/freecad-cli/` tree and
+its empty directories. Compare the
+source and snapshot exactly and complete the applicable restore evidence.
+A previous snapshot does not prove coverage of a later estate.
+
 For this repository, use `refs/remotes/origin/main` as `accepted_ref`.
 Use this command to operate the retirement audit again:
 
@@ -433,6 +461,10 @@ audit again. If the retirement audit gives a `FAIL` result, stop. After the
 retirement audit gives a `PASS` result, use `git worktree remove` for the
 worktree. Do not use `--force`. Do not use `git stash`. Do not move local files
 as a condition for worktree removal.
+A `PASS` audit does not make a Git repository inside a worktree
+removable by Git. If `git worktree remove` refuses the target, leave it registered and
+preserved. Do not use `--force`. Do not move local files to make that command
+pass. Record the refusal. Obtain a separate owner decision for a safe route.
 
 Before worktree removal, make sure the local-state inventory contains all local
 files. Before removal, make sure the preservation audit gives a `PASS` result
