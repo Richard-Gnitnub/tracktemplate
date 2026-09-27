@@ -74,12 +74,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:376b586331be5bf700fd63fa8a945b1fe9bfe82e",
-      "accepted_sha256": "sha256:09793aefeca911cf95915caa499287a3fcb05326f9ee288ae578800ba215eabd",
+      "accepted_blob": "sha1:cb1517fccf696e33438a84a9d5055cb853860860",
+      "accepted_sha256": "sha256:2e1b999827638b65e13d93eaef4ccb5d49f73302646731eb2278bd760a6450c8",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/PROJECT_PLAN.md",
-      "review_receipt": "sha256:8ad24670e2d0dd594c530e59ae7601cedb99428bf20dbf12487d48368fd5e83f",
+      "review_receipt": "sha256:33d2043dfe95fbab529e5482a46a2af346ec7689c2a5f96b17a51aa60aec74f1",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -236,6 +236,15 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:ca8cfb8cd524b8b5edefb828453aa13553821dbe",
+      "accepted_sha256": "sha256:f4bc59aa2376355e6a9ea2b78907757174fd964c77c215a421f7e7eb4411c563",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/benchmarks/2026-09-27-phase7-platform-top-heights-regression.md",
+      "review_receipt": "sha256:33d2043dfe95fbab529e5482a46a2af346ec7689c2a5f96b17a51aa60aec74f1",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:8ef7840dbf571994e1a865fd89ef21c5e206d72e",
       "accepted_sha256": "sha256:8638e3cd076a4c17fbfc1551318f18afea3160a20ea24acce2dccfb61dcf17f0",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -326,6 +335,15 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:31f2b4c0162bcf30e539b62136d6eb100a02ebdc",
+      "accepted_sha256": "sha256:961c14adff61ca54892d65490dac71e187a25b0f343da3c925a715fce222c9b0",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/contracts/phase7-platform-top-heights.md",
+      "review_receipt": "sha256:33d2043dfe95fbab529e5482a46a2af346ec7689c2a5f96b17a51aa60aec74f1",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:e0aba3958772bb6c31b7c5997a2b5becbd520f47",
       "accepted_sha256": "sha256:5123011e05cb6dbb9b6fb40b0ae5352a931598cef56c7ff49b95a599f58830f5",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
@@ -362,12 +380,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:f471bf3c6fe575eded636f7b1a70a0e42a520db3",
-      "accepted_sha256": "sha256:823ce1765c597f268834cd448218eaea9574637db76f992030e8f4c9e6391b3a",
+      "accepted_blob": "sha1:3a7a5c1870874fb28931c36ce2597742503e6109",
+      "accepted_sha256": "sha256:408e39eb8a433fd70ca261f9e4a98292742ae47183ad9a8e9ccaa351b96cb321",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:8ad24670e2d0dd594c530e59ae7601cedb99428bf20dbf12487d48368fd5e83f",
+      "review_receipt": "sha256:33d2043dfe95fbab529e5482a46a2af346ec7689c2a5f96b17a51aa60aec74f1",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {

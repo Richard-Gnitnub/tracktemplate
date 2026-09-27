@@ -199,6 +199,7 @@ def _validate_product_boundary():
             "prepare_track_alignment", "validate_connected_straight_routes",
             "validate_platform_inputs",
             "resolve_platform_longitudinal_bounds",
+            "calculate_platform_top_heights",
             "alignment_progress_at_station",
             "station_for_progress_heading",
             "platform_coverage_bounds",
@@ -228,8 +229,8 @@ def _validate_product_boundary():
             assert host.module.__dict__[name] is functions[name]
     assert not hasattr(session, "apply_route")
     assert session.routing_record() == {
-        "schema_version": 15,
-        "contract_id": "tracktemplate:phase7:platform-heading-coverage:1",
+        "schema_version": 16,
+        "contract_id": "tracktemplate:phase7:platform-top-heights:1",
         "route": "modular",
         "comparison_route_available": False,
         "function_names": list(functions),

@@ -111,11 +111,11 @@ def validate():
         host, functions,
     )
     route = session.routing_record()
-    assert route["schema_version"] == 15
+    assert route["schema_version"] == 16
     assert route["contract_id"] == (
-        "tracktemplate:phase7:platform-heading-coverage:1"
+        "tracktemplate:phase7:platform-top-heights:1"
     )
-    assert len(route["function_names"]) == 24
+    assert len(route["function_names"]) == 25
     assert len(route["caller_names"]) == 40
     assert proof.cases(namespace, vector_factory=App.Vector) == expected
     assert native_caller.__globals__ is namespace

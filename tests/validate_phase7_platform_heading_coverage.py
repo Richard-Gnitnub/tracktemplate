@@ -383,8 +383,8 @@ def validate(baseline_only=False):
         host_result = cases(host)
         assert host_result == frozen
         if not baseline_only:
-            assert route["schema_version"] == 15
-            assert len(route["function_names"]) == 24
+            assert route["schema_version"] == 16
+            assert len(route["function_names"]) == 25
             assert len(route["caller_names"]) == 40
             assert all(host[name] is not b15[name] for name in NAMES)
             for name in NAMES:
@@ -441,7 +441,7 @@ def validate(baseline_only=False):
                         rejected, incomplete,
                     )
                 except transition_workflow.TransitionWorkflowError as error:
-                    assert "complete twenty-four-function" in str(error)
+                    assert "complete twenty-five-function" in str(error)
                 else:
                     raise AssertionError("Incomplete platform station route passed")
                 assert tuple(rejected.module.__dict__) == tuple(previous)

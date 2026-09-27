@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Compare frozen platform longitudinal bounds with Core and B16 routing."""
+"""Compare frozen platform top heights with Core and selected B16 routing."""
 
 import argparse
 import ast
 import hashlib
 import inspect
 import json
-import math
 import pathlib
 import subprocess
 import sys
@@ -20,140 +19,150 @@ B15 = ROOT / (
     "model_railway_curve_template_multitrack_v10_2a8a7b15_"
     "chair_performance_and_representation.FCMacro"
 )
-NAME = "resolve_platform_longitudinal_bounds"
+NAME = "calculate_platform_top_heights"
 DEFINITION_SHA256 = (
-    "0b2a8eeed70008fce640ad3f4bb56d4c87a70dd1b447002da99db7751c20362d"
+    "1eda69de0e8abb22c14c9acb4d90b8de09476b0db506f13f07e866247a7df90f"
 )
-RESULT_KEYS = (
-    "start_station", "finish_station", "centre_station", "centre_offset",
-    "length", "available_length", "start_inset", "finish_inset",
+DEFINITION_BYTES = 1401
+CONSTANTS = (
+    "GEOMETRY_TOLERANCE", "TEMPLATE_THICKNESS",
+    "PLATFORM_END_TAPERED", "PLATFORM_SOLID",
 )
-SENTINEL = "Phase 7 platform longitudinal bounds validation passed"
+SENTINEL = "Phase 7 platform top heights validation passed"
 
 
 def legacy_functions():
-    """Compile only the byte-identical B14/B15 definition and tolerance."""
+    """Compile the byte-identical B14/B15 calculation and its constants."""
     functions = []
     for path in (B14, B15):
         source = path.read_text(encoding="utf-8")
         tree = ast.parse(source, filename=str(path))
         node = next(item for item in tree.body
-                    if isinstance(item, ast.FunctionDef) and item.name == NAME)
+                    if isinstance(item, ast.FunctionDef)
+                    and item.name == NAME)
         definition = "".join(source.splitlines(keepends=True)[
             node.lineno - 1:node.end_lineno
         ])
-        assert len(definition.encode("utf-8")) == 2505
-        assert hashlib.sha256(definition.encode("utf-8")).hexdigest() == (
-            DEFINITION_SHA256
-        )
-        tolerance = next(
-            ast.literal_eval(item.value)
+        encoded = definition.encode("utf-8")
+        assert len(encoded) == DEFINITION_BYTES
+        assert hashlib.sha256(encoded).hexdigest() == DEFINITION_SHA256
+        constants = {
+            target.id: ast.literal_eval(item.value)
             for item in tree.body if isinstance(item, ast.Assign)
             for target in item.targets if isinstance(target, ast.Name)
-            and target.id == "GEOMETRY_TOLERANCE"
-        )
-        assert tolerance == 1.0e-8
-        namespace = {"GEOMETRY_TOLERANCE": tolerance}
+            and target.id in CONSTANTS
+        }
+        assert constants == {
+            "GEOMETRY_TOLERANCE": 1.0e-8,
+            "TEMPLATE_THICKNESS": 1.0,
+            "PLATFORM_END_TAPERED": "Tapered",
+            "PLATFORM_SOLID": "3D platform solid",
+        }
+        namespace = dict(constants)
         exec(compile(ast.Module(body=[node], type_ignores=[]),
                      str(path), "exec"), namespace)
         functions.append(namespace[NAME])
     return functions
 
 
+def base_config():
+    return {
+        "platform_height": 15.0,
+        "body_output": "3D platform solid",
+        "entry_end_style": "Square",
+        "entry_taper_length": 40.0,
+        "exit_end_style": "Square",
+        "exit_taper_length": 30.0,
+    }
+
+
 def cases():
-    """Exercise placement, tolerance, invalid types and nonfinite data."""
-    tolerance = 1.0e-8
-    above = math.nextafter(tolerance, math.inf)
-    maximum_plus_tolerance = 150.0 + tolerance
+    """Exercise both output modes, ramp overlap and inherited failures."""
     definitions = (
-        ("midpoint", {}, 0.0, 200.0),
-        ("shifted-offset", {"platform_length": 60.0,
-                            "centre_offset": 20.0}, -50.0, 150.0),
-        ("negative-offset", {"platform_length": 60.0,
-                             "centre_offset": -20.0}, -50.0, 150.0),
-        ("exact-fit", {"platform_length": 150.0,
-                       "centre_offset": 25.0}, 0.0, 200.0),
-        ("length-at-fit-tolerance", {
-            "platform_length": maximum_plus_tolerance,
-            "centre_offset": 25.0,
-        }, 0.0, 200.0),
-        ("length-above-fit-tolerance", {
-            "platform_length": math.nextafter(maximum_plus_tolerance,
-                                               math.inf),
-            "centre_offset": 25.0,
-        }, 0.0, 200.0),
-        ("centre-at-left-tolerance", {
-            "platform_length": 1.0, "centre_offset": -1.0 - tolerance,
-        }, -1.0, 1.0),
-        ("centre-outside-left-tolerance", {
-            "platform_length": 1.0,
-            "centre_offset": math.nextafter(-1.0 - tolerance, -math.inf),
-        }, -1.0, 1.0),
-        ("centre-at-right-tolerance", {
-            "platform_length": 1.0, "centre_offset": 1.0 + tolerance,
-        }, -1.0, 1.0),
-        ("centre-outside-right-tolerance", {
-            "platform_length": 1.0,
-            "centre_offset": math.nextafter(1.0 + tolerance, math.inf),
-        }, -1.0, 1.0),
-        ("centre-at-left-edge", {"centre_offset": -100.0}, 0.0, 200.0),
-        ("centre-at-right-edge", {"centre_offset": 100.0}, 0.0, 200.0),
-        ("available-zero", {}, 0.0, 0.0),
-        ("available-reversed", {}, 200.0, 0.0),
-        ("available-at-tolerance", {}, 0.0, tolerance),
-        ("available-above-tolerance", {
-            "platform_length": above,
-        }, 0.0, above),
-        ("length-negative", {"platform_length": -1.0}, 0.0, 200.0),
-        ("length-zero", {"platform_length": 0.0}, 0.0, 200.0),
-        ("length-at-tolerance", {
-            "platform_length": tolerance,
-        }, 0.0, 200.0),
-        ("length-above-tolerance", {
-            "platform_length": above,
-        }, 0.0, 200.0),
-        ("requested-too-long", {"platform_length": 201.0}, 0.0, 200.0),
-        ("bad-start", {}, None, 200.0),
-        ("bad-finish", {}, 0.0, "invalid"),
-        ("none-length", {"platform_length": None}, 0.0, 200.0),
-        ("bad-length", {"platform_length": "invalid"}, 0.0, 200.0),
-        ("none-offset", {"centre_offset": None}, 0.0, 200.0),
-        ("bad-offset", {"centre_offset": "invalid"}, 0.0, 200.0),
-        ("nan-start", {}, math.nan, 200.0),
-        ("nan-finish", {}, 0.0, math.nan),
-        ("nan-length", {"platform_length": math.nan}, 0.0, 200.0),
-        ("nan-offset", {"centre_offset": math.nan}, 0.0, 200.0),
-        ("infinite-finish", {}, 0.0, math.inf),
-        ("infinite-length", {"platform_length": math.inf}, 0.0, 200.0),
-        ("infinite-offset", {"centre_offset": math.inf}, 0.0, 200.0),
+        ("edges", {"body_output": "Edges only (2D)"},
+         [0.0, 50.0, 100.0], 100.0),
+        ("face", {"body_output": "2D platform face"},
+         [-10.0, "ignored", 110.0], 100.0),
+        ("solid-square", {}, [0.0, 50.0, 100.0], 100.0),
+        ("entry-ramp", {"entry_end_style": "Tapered"},
+         [-10.0, 0.0, 10.0, 20.0, 40.0, 50.0], 100.0),
+        ("exit-ramp", {"exit_end_style": "Tapered"},
+         [50.0, 70.0, 85.0, 100.0, 110.0], 100.0),
+        ("overlap", {
+            "entry_end_style": "Tapered", "entry_taper_length": 70.0,
+            "exit_end_style": "Tapered", "exit_taper_length": 70.0,
+        }, [0.0, 25.0, 50.0, 75.0, 100.0], 100.0),
+        ("height-below-trackbed", {"platform_height": 0.5},
+         [0.0, 50.0, 100.0], 100.0),
+        ("flat-below-trackbed", {
+            "platform_height": 0.5, "body_output": "2D platform face",
+        }, [0.0, 50.0], 100.0),
+        ("entry-zero", {
+            "entry_end_style": "Tapered", "entry_taper_length": 0.0,
+        }, [0.0, 20.0], 100.0),
+        ("exit-negative", {
+            "exit_end_style": "Tapered", "exit_taper_length": -1.0,
+        }, [80.0, 100.0], 100.0),
+        ("empty-stations", {}, [], 100.0),
+        ("tuple-stations", {}, (0.0, 100.0), 100.0),
+        ("bool-height", {"platform_height": True}, [0.0], 100.0),
+        ("none-height", {"platform_height": None}, [0.0], 100.0),
+        ("bad-height", {"platform_height": "invalid"}, [0.0], 100.0),
+        ("missing-body", {"body_output": None}, [0.0], 100.0),
+        ("bad-entry-length", {
+            "entry_end_style": "Tapered", "entry_taper_length": "invalid",
+        }, [0.0], 100.0),
+        ("bad-exit-length", {
+            "exit_end_style": "Tapered", "exit_taper_length": None,
+        }, [100.0], 100.0),
+        ("bad-entry-station", {"entry_end_style": "Tapered"},
+         ["invalid"], 100.0),
+        ("bad-exit-station", {"exit_end_style": "Tapered"},
+         ["invalid"], 100.0),
+        ("bad-platform-length", {"exit_end_style": "Tapered"},
+         [100.0], "invalid"),
+        ("nan-height", {"platform_height": float("nan")},
+         [0.0, 50.0], 100.0),
+        ("infinite-height", {"platform_height": float("inf")},
+         [0.0, 50.0], 100.0),
+        ("nan-station", {"entry_end_style": "Tapered"},
+         [float("nan")], 100.0),
     )
-    for label, overrides, start, finish in definitions:
-        config = {"platform_length": 100.0, "centre_offset": 0.0}
+    for label, overrides, stations, platform_length in definitions:
+        config = base_config()
         config.update(overrides)
-        yield label, config, start, finish
+        yield label, config, stations, platform_length
 
 
 def snapshot(value):
+    if isinstance(value, TraceNumber):
+        return snapshot(value.value)
+    if isinstance(value, TraceStations):
+        return [snapshot(item) for item in list.__iter__(value)]
     if isinstance(value, float):
         return {"float": value.hex()}
     if isinstance(value, dict):
         return [[key, snapshot(item)] for key, item in value.items()]
     if isinstance(value, (list, tuple)):
         return [snapshot(item) for item in value]
+    if hasattr(value, "x") and hasattr(value, "y"):
+        return [snapshot(value.x), snapshot(value.y), snapshot(value.z)]
     return value
 
 
-def observe(function, config, start, finish):
-    identity, before = id(config), snapshot(config)
+def observe(function, config, stations, platform_length):
+    identities = id(config), id(stations)
+    before = snapshot((config, stations, platform_length))
     try:
-        result = function(config, start, finish)
+        returned = function(config, stations, platform_length)
     except Exception as error:  # noqa: BLE001 - preserve inherited failure
-        record = {"exception": type(error).__name__, "message": str(error)}
+        result = {"exception": type(error).__name__, "message": str(error)}
     else:
-        assert tuple(result) == RESULT_KEYS
-        record = {"value": snapshot(result)}
-    assert id(config) == identity and snapshot(config) == before
-    return record
+        assert isinstance(returned, list)
+        result = {"value": snapshot(returned)}
+    assert (id(config), id(stations)) == identities
+    assert snapshot((config, stations, platform_length)) == before
+    return result
 
 
 class ReadFailure(RuntimeError):
@@ -179,6 +188,18 @@ class TraceNumber:
         self.trace.read(self.label + ".float")
         return float(self.value)
 
+    def __lt__(self, other):
+        self.trace.read(self.label + ".lt")
+        return self.value < other
+
+    def __truediv__(self, other):
+        self.trace.read(self.label + ".truediv")
+        return self.value / other
+
+    def __rsub__(self, other):
+        self.trace.read(self.label + ".rsub")
+        return other - self.value
+
 
 class TraceConfig(dict):
     def __init__(self, source, trace):
@@ -190,42 +211,64 @@ class TraceConfig(dict):
         return super().__getitem__(key)
 
 
-def read_observation(function, label, fail_at=None):
-    _label, source, start, finish = next(
-        item for item in cases() if item[0] == label
-    )
+class TraceStations(list):
+    def __init__(self, values, trace):
+        super().__init__(values)
+        self.trace = trace
+
+    def __iter__(self):
+        self.trace.read("stations.iter")
+        for index in range(len(self)):
+            self.trace.read("stations[{}]".format(index))
+            yield TraceNumber(
+                list.__getitem__(self, index),
+                "station[{}]".format(index), self.trace,
+            )
+
+
+def traced_case(label, fail_at=None):
     trace = Trace(fail_at)
-    config = TraceConfig(source, trace)
-    before = snapshot(config)
-    result = observe(
-        function, config, TraceNumber(start, "start", trace),
-        TraceNumber(finish, "finish", trace),
-    )
-    assert snapshot(config) == before
+    config = base_config()
+    stations = [0.0, 25.0, 100.0]
+    if label == "non-solid":
+        config["body_output"] = "2D platform face"
+    elif label == "solid-square":
+        pass
+    elif label == "entry":
+        config["entry_end_style"] = "Tapered"
+    elif label == "exit":
+        config["exit_end_style"] = "Tapered"
+    elif label == "both":
+        config.update(entry_end_style="Tapered",
+                      exit_end_style="Tapered")
+    else:
+        raise AssertionError(label)
+    for key in ("platform_height", "entry_taper_length",
+                "exit_taper_length"):
+        config[key] = TraceNumber(config[key], "config." + key, trace)
+    traced_config = TraceConfig(config, trace)
+    traced_stations = TraceStations(stations, trace)
+    return trace, traced_config, traced_stations
+
+
+def read_observation(function, label, fail_at=None):
+    trace, config, stations = traced_case(label, fail_at)
+    result = observe(function, config, stations, 100.0)
     return result, trace.events
 
 
 def baseline():
     first, second = legacy_functions()
     observations = []
-    for label, config, start, finish in cases():
-        expected = observe(first, config, start, finish)
-        assert observe(second, dict(config), start, finish) == expected, label
+    for label, config, stations, platform_length in cases():
+        expected = observe(first, config, stations, platform_length)
+        assert observe(
+            second, dict(config), type(stations)(stations), platform_length,
+        ) == expected, label
         observations.append({"case": label, "result": expected})
-    assert len(observations) == 34
-    normal = observations[0]["result"]["value"]
-    assert [item[0] for item in normal] == list(RESULT_KEYS)
-    assert normal == snapshot({
-        "start_station": 50.0, "finish_station": 150.0,
-        "centre_station": 100.0, "centre_offset": 0.0,
-        "length": 100.0, "available_length": 200.0,
-        "start_inset": 50.0, "finish_inset": 50.0,
-    })
+    assert len(observations) == 24
     traces = []
-    for label in (
-        "midpoint", "available-zero", "length-zero",
-        "centre-outside-right-tolerance", "requested-too-long",
-    ):
+    for label in ("non-solid", "solid-square", "entry", "exit", "both"):
         expected = read_observation(first, label)
         assert read_observation(second, label) == expected, label
         for position in range(1, len(expected[1]) + 1):
@@ -259,8 +302,8 @@ sys.meta_path.insert(0, Blocker())
 sys.path.insert(0, {root!r})
 from tracktemplate import api
 from tracktemplate.domain import alignment
-assert api.resolve_platform_longitudinal_bounds is (
-    alignment.resolve_platform_longitudinal_bounds
+assert api.calculate_platform_top_heights is (
+    alignment.calculate_platform_top_heights
 )
 assert not attempted, attempted
 """.format(root=str(ROOT))
@@ -276,10 +319,10 @@ def _synthetic_host(first, api, workflow):
     from tracktemplate.compatibility import b15_workflow_host
     import validate_phase3_transition_routing as phase3_fixture
     import validate_phase7_concentric_core as core_fixture
-    import validate_phase7_platform_input_validation as input_proof
 
-    prefix = "tracktemplate-platform-bounds-"
-    with tempfile.TemporaryDirectory(prefix=prefix) as path:
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-platform-heights-",
+    ) as path:
         temporary_root = pathlib.Path(path)
         core_fixture._fixture(temporary_root)
         source = temporary_root / "legacy.FCMacro"
@@ -287,27 +330,15 @@ def _synthetic_host(first, api, workflow):
         launch = "run_macro()\n"
         assert content.endswith(launch)
         tree = ast.parse(B14.read_text(encoding="utf-8"))
-        definitions = {
-            node.name: node for node in tree.body
-            if isinstance(node, ast.FunctionDef)
-            and node.name in {NAME, input_proof.NAME}
-        }
-        constants = {
-            target.id: ast.literal_eval(node.value)
-            for node in tree.body if isinstance(node, ast.Assign)
-            for target in node.targets if isinstance(target, ast.Name)
-            and target.id in input_proof.CONSTANTS
-        }
-        assert set(definitions) == {NAME, input_proof.NAME}
-        assert set(constants) == set(input_proof.CONSTANTS)
-        additions = (
-            "\n".join("{} = {!r}".format(name, constants[name])
-                      for name in input_proof.CONSTANTS)
-            + "\n\n" + ast.unparse(definitions[input_proof.NAME])
-            + "\n\n" + ast.unparse(definitions[NAME]) + "\n"
+        definition = next(
+            node for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == NAME
         )
-        source.write_text(content[:-len(launch)] + additions + launch,
-                          encoding="utf-8")
+        source.write_text(
+            content[:-len(launch)] + "\n" + ast.unparse(definition)
+            + "\n" + launch,
+            encoding="utf-8",
+        )
         contract = phase3_fixture._contract(source)
 
         def load_host():
@@ -316,8 +347,10 @@ def _synthetic_host(first, api, workflow):
             )
 
         def functions():
-            return {name: getattr(api, name)
-                    for name in workflow.PRODUCT_FUNCTION_NAMES}
+            return {
+                name: getattr(api, name)
+                for name in workflow.PRODUCT_FUNCTION_NAMES
+            }
 
         host = load_host()
         namespace = host.module.__dict__
@@ -328,7 +361,9 @@ def _synthetic_host(first, api, workflow):
         session = workflow.ModularTransitionWorkflowSession(host, functions())
         record = session.routing_record()
         assert record["schema_version"] == 16
-        assert record["contract_id"] == workflow.WORKFLOW_CONTRACT_ID
+        assert record["contract_id"] == (
+            "tracktemplate:phase7:platform-top-heights:1"
+        )
         assert record["function_names"] == list(
             workflow.PRODUCT_FUNCTION_NAMES
         )
@@ -343,10 +378,11 @@ def _synthetic_host(first, api, workflow):
         ]
         assert set(targets) == {
             "alignment_station_data", "interpolate_alignment_station",
-            "validate_platform_inputs", NAME, "platform_coverage_bounds",
-            "calculate_platform_top_heights",
-            "station_for_progress_heading", "alignment_progress_at_station",
+            "validate_platform_inputs", "resolve_platform_longitudinal_bounds",
+            NAME, "platform_coverage_bounds", "station_for_progress_heading",
+            "alignment_progress_at_station",
         }
+
         namespace[NAME] = first
         try:
             try:
@@ -354,7 +390,7 @@ def _synthetic_host(first, api, workflow):
             except workflow.TransitionWorkflowError as error:
                 assert "mixed" in str(error)
             else:
-                raise AssertionError("A mixed platform-bounds route passed")
+                raise AssertionError("A mixed platform-height route passed")
         finally:
             namespace[NAME] = api.__dict__[NAME]
         assert session.routing_record() == record
@@ -364,12 +400,13 @@ def _synthetic_host(first, api, workflow):
         rejected_host = load_host()
         previous = dict(rejected_host.module.__dict__)
         try:
-            workflow.ModularTransitionWorkflowSession(rejected_host,
-                                                      incomplete)
+            workflow.ModularTransitionWorkflowSession(
+                rejected_host, incomplete,
+            )
         except workflow.TransitionWorkflowError as error:
-            assert "complete" in str(error)
+            assert "complete twenty-five-function" in str(error)
         else:
-            raise AssertionError("An incomplete platform-bounds route passed")
+            raise AssertionError("An incomplete platform-height route passed")
         assert tuple(rejected_host.module.__dict__) == tuple(previous)
         assert all(rejected_host.module.__dict__[name] is value
                    for name, value in previous.items())
@@ -379,14 +416,14 @@ def _synthetic_host(first, api, workflow):
         previous = dict(rollback_host.module.__dict__)
         with mock.patch.object(
             workflow.ModularTransitionWorkflowSession, "_validate_binding",
-            side_effect=RuntimeError("controlled platform-bounds failure"),
+            side_effect=RuntimeError("controlled platform-height failure"),
         ):
             try:
                 workflow.ModularTransitionWorkflowSession(
                     rollback_host, functions(),
                 )
             except RuntimeError as error:
-                assert str(error) == "controlled platform-bounds failure"
+                assert str(error) == "controlled platform-height failure"
             else:
                 raise AssertionError("The controlled binding failure was lost")
         assert tuple(rollback_host.module.__dict__) == tuple(previous)
@@ -404,21 +441,21 @@ def validate_candidate(first, observations, traces):
     from tracktemplate.compatibility import transition_workflow as workflow
     from tracktemplate.domain import alignment
 
-    calculation = api.resolve_platform_longitudinal_bounds
-    assert calculation is alignment.resolve_platform_longitudinal_bounds
+    calculation = api.calculate_platform_top_heights
+    assert calculation is alignment.calculate_platform_top_heights
     assert NAME in api.__all__ and NAME in alignment.__all__
     signature = inspect.signature(calculation)
     assert tuple(signature.parameters) == (
-        "config", "base_start", "base_finish",
+        "config", "stations", "platform_length",
     )
     assert all(parameter.default is inspect.Parameter.empty
                for parameter in signature.parameters.values())
     _host_independent_import()
-    for (label, config, start, finish), expected in zip(
+    for (label, config, stations, platform_length), expected in zip(
         cases(), observations,
     ):
         assert label == expected["case"]
-        assert observe(calculation, config, start, finish) == (
+        assert observe(calculation, config, stations, platform_length) == (
             expected["result"]
         ), label
     for item in traces:

@@ -606,14 +606,14 @@ def validate_binding():
             _functions(),
         )
         record = session.routing_record()
-        assert record["schema_version"] == 15
+        assert record["schema_version"] == 16
         assert record["contract_id"] == (
-            "tracktemplate:phase7:platform-heading-coverage:1"
+            "tracktemplate:phase7:platform-top-heights:1"
         )
         assert record["function_names"] == list(
             transition_workflow.PRODUCT_FUNCTION_NAMES
         )
-        assert len(record["function_names"]) == 24
+        assert len(record["function_names"]) == 25
         assert record["caller_names"] == [
             name
             for name, _targets in transition_workflow.PRODUCT_CALLER_ROUTES
@@ -697,7 +697,7 @@ def validate_binding():
                 fresh,
                 invalid,
             ),
-            "complete twenty-four-function",
+            "complete twenty-five-function",
         )
         assert core_proof._snapshot(fresh) == before
         assert fresh.module.LAUNCH_COUNT == 0

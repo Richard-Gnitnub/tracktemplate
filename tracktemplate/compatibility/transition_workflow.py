@@ -11,7 +11,7 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
-WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-heading-coverage:1"
+WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-top-heights:1"
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
@@ -26,6 +26,7 @@ PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "prepare_track_alignment", "validate_connected_straight_routes",
     "validate_platform_inputs",
     "resolve_platform_longitudinal_bounds",
+    "calculate_platform_top_heights",
     "alignment_progress_at_station", "station_for_progress_heading",
     "platform_coverage_bounds",
 )
@@ -84,6 +85,7 @@ PRODUCT_CALLER_ROUTES = (
         "calculate_platform_boundaries",
         ("alignment_station_data", "interpolate_alignment_station",
          "validate_platform_inputs", "resolve_platform_longitudinal_bounds",
+         "calculate_platform_top_heights",
          "platform_coverage_bounds", "station_for_progress_heading",
          "alignment_progress_at_station"),
     ),
@@ -661,7 +663,7 @@ class ModularTransitionWorkflowSession:
             )
         ):
             raise TransitionWorkflowError(
-                "The complete twenty-four-function modular workflow is unavailable."
+                "The complete twenty-five-function modular workflow is unavailable."
             )
         platform_globals = getattr(
             self._modular_functions["solve_platform_shape_parameter"],
@@ -1053,6 +1055,36 @@ class ModularTransitionWorkflowSession:
                 "unavailable."
             )
 
+        platform_heights = namespace["calculate_platform_top_heights"]
+        platform_heights_globals = getattr(
+            platform_heights, "__globals__", None,
+        )
+        platform_heights_code = getattr(platform_heights, "__code__", None)
+        platform_height_constants = (
+            "GEOMETRY_TOLERANCE", "TEMPLATE_THICKNESS",
+            "PLATFORM_END_TAPERED", "PLATFORM_SOLID",
+        )
+        if (
+            platform_heights is not self._modular_functions[
+                "calculate_platform_top_heights"
+            ]
+            or platform_heights_globals is not preparation_globals
+            or platform_heights_code is None
+            or not set(platform_height_constants) <= set(
+                platform_heights_code.co_names
+            )
+            or any(
+                type(platform_heights_globals.get(name))
+                is not type(getattr(self.module, name, None))
+                or platform_heights_globals.get(name)
+                != getattr(self.module, name, None)
+                for name in platform_height_constants
+            )
+        ):
+            raise TransitionWorkflowError(
+                "The platform top-height domain closure is unavailable."
+            )
+
         station_data = namespace["alignment_station_data"]
         if (
             type(station_data) is not _AlignmentStationDataAdapter
@@ -1203,7 +1235,7 @@ class ModularTransitionWorkflowSession:
                 "The modular platform solver residual route is unavailable."
             )
 
-        # Product composition owns all twenty-four current bindings. The frozen
+        # Product composition owns all twenty-five current bindings. The frozen
         # three-function binder remains solely on the comparison route.
         domain_routes = (
             (
@@ -1289,7 +1321,7 @@ class ModularTransitionWorkflowSession:
         """Return the non-switchable composition record."""
         self._validate_binding()
         return {
-            "schema_version": 15,
+            "schema_version": 16,
             "contract_id": WORKFLOW_CONTRACT_ID,
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,

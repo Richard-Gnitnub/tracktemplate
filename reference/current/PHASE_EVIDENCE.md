@@ -16,12 +16,42 @@ The owner accepted the completed, independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits. D-P6-008 records “one deferred, unmet obligation”.<br><br>PR #85 is in protected `main` at `482eb4cb0dddbebdbe92d72fdaa3e1e98d2d5063`. The exact candidate moves functions for platform direction and station range. It has no merge. Output has private-development status and project status stays `unknown`. |
-| What changed | The `alignment_progress_at_station`, `station_for_progress_heading` and `platform_coverage_bounds` functions have the same source in B14 and B15. These functions use Core. B16 selects their adapters for `calculate_platform_boundaries`. The route uses schema `15`, 24 selected functions and 40 caller identities. B14 and B15 do not change. The [capability matrix](../CAPABILITY_MATRIX.md) records evidence from protected `main` through PR #84 only. |
-| What now works | Tests in standalone Python and with the exact host profile in D-GOV-019 each have PASS results for 193 inputs. All 14 tests of the related routes have PASS results. Tests with the FreeCAD human interface give the same platform results for Create/Edit, Undo/Redo, Save/reopen and cleanup. They also give the same results when the product rejects the selected inputs. Full validation and independent review are necessary before publication. |
-| Limitations/findings | The two usual repairs are completed (2/2). No more usual repairs are permitted. The changes in the two owner decisions before the last decision and the last 1/1 decision for the caller check are completed. Those decisions give no more project authority for repairs. The first FAIL results and their failure classifications stay as retained evidence.<br><br>The PR #83 and PR #84 histories for repair and review do not change. PR #83 records: “The measured micro-call cost increased.” The locked Phase evidence keeps the recorded “non-blocking trailing-space warning”. The samples from the FreeCAD human interface give no improvement evidence for D-P6-008. D-P6-008 and all recorded product limitations apply in full. D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.” |
+| Current state | Phase 7 is Open at 0/4. All four exits are Pending. Phase 6 is closed with four accepted exits. D-P6-008 records “one deferred, unmet obligation”.<br><br>PR #86 is in protected `main` at `7122dc2f6f8a4123adb039a8d22b0ac95728929c`. The exact candidate moves one platform height calculation to Core and selects it in the B16 platform caller. It has no merge. Output has private-development status and project status stays `unknown`. |
+| What changed | The `calculate_platform_top_heights` function has the same source in B14 and B15. The function uses Core through `tracktemplate.api`. B16 selects it directly for `calculate_platform_boundaries`. The route uses schema `16`, 25 selected functions and 40 caller identities. B14 and B15 do not change. The [capability matrix](../CAPABILITY_MATRIX.md) records evidence from protected `main` through PR #84 only. |
+| What now works | Tests in standalone Python and with the exact host profile in D-GOV-019 each have PASS results for 24 cases and five read paths. All 15 related Phase 7 qualified proofs and the Phase 3 route proof have PASS results. Tests with the FreeCAD human interface give the same platform results for Create/Edit, Undo/Redo, Save/reopen and cleanup. The complete transition profile and independent source-and-test review have PASS results. The Documentation Review lifecycle and final validation are necessary before publication. |
+| Limitations/findings | The two usual repairs are completed (2/2). No more usual repairs are permitted. The first FAIL results and their failure classifications stay as retained evidence.<br><br>The PR #83, PR #84, PR #85 and PR #86 histories for repair and review do not change. PR #83 records: “The measured micro-call cost increased.” The locked Phase evidence keeps the recorded “non-blocking trailing-space warning”. The samples from the FreeCAD human interface give no improvement evidence for D-P6-008. D-P6-008 and all recorded product limitations apply in full. D-P7-001 still gives this instruction: “Preserve all comparison and legacy-retirement conditions.” |
 | Owner decision | The owner authorised this Level 2 result for its bounded scope and the specified changes to tests. The exact candidate has no merge or Phase 7 exit decision. It gives no acceptance for a Phase 7 exit, performance result, output status, migration of other functions, removal of those paths or a release. |
-| Next action | After draft publication with all necessary PASS results, Richard must decide whether to merge this result for its bounded scope. |
+| Next action | Complete the one Documentation Review lifecycle and final validation. After draft publication with all necessary PASS results, Richard must decide whether to merge this result for its bounded scope. |
+
+<a id="phase7-platform-top-heights-migration"></a>
+## Migration of platform height values — 2026-09-27
+
+Protected `main` includes PR #86 at
+`7122dc2f6f8a4123adb039a8d22b0ac95728929c`. D-GOV-004 and the project
+owner's continuation on 2026-09-27 authorise this bounded Level 2 result.
+The equal B14/B15 `calculate_platform_top_heights` calculation now uses Core
+through `tracktemplate.api`. B16 selects it directly in
+`calculate_platform_boundaries`. The route uses schema `16`, 25 selected
+functions and 40 caller identities.
+
+The direct standalone and D-GOV-019 qualified comparisons each cover 24 cases
+and five read paths. All 15 related Phase 7 qualified proofs, the Phase 3 route
+proof and the complete transition profile have PASS results. A paired FreeCAD
+human-interface procedure gives the same Create/Edit, Undo/Redo, Save/reopen
+and cleanup result for protected `main` and the exact candidate. Independent
+source-and-test review has a PASS result. The [detailed evidence](../benchmarks/2026-09-27-phase7-platform-top-heights-regression.md)
+keeps all results and both first FAIL results. The two usual repairs are
+completed (2/2), and no more usual repairs are permitted.
+
+This result supplies bounded evidence for Phase 7 Exits 1, 2 and 3. It accepts
+no exit and gives no improvement evidence for D-P6-008. It does not compare all
+platform arrangements, coverage values, shapes, dimensions, positions, stored
+state or export bytes. It removes none of the paths that D-P7-001 keeps. Phase
+7 stays Open at 0/4 with all exits Pending. D-P6-008, all recorded limitations,
+comparison requirements and legacy-retirement conditions stay in full.
+
+Output
+stays at private-development status and project status stays `unknown`.
 
 <a id="phase7-platform-heading-coverage-migration"></a>
 ## Migration of platform direction and station range — 2026-09-26
