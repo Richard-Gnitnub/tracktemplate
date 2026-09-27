@@ -38,19 +38,21 @@ and the five inherited host operations. The separate application-route record
 has schema `1`. The accepted D-P7-004 calculation route stays at schema `16`,
 25 selected functions and 40 caller identities.
 
-Standalone and D-GOV-019 qualified proofs have PASS results. The related
-qualified matrix is 17/17 PASS, and the complete transition profile is 7/7
-PASS. A paired FreeCAD human-interface proof compares the native B15 and
-modular B16 routes. It covers Create, a controlled final STEP failure,
-Save/reopen, DXF, SVG, STL, STEP, manifest output and cleanup. Its normalized
-workflow comparison has zero differences. Fresh independent review of the
-exact product-and-test candidate has a PASS result. The
-[detailed evidence](../benchmarks/2026-09-27-phase7-core-layout-export-regression.md)
+Standalone Python and D-GOV-019 qualified checks have PASS results. The
+related qualified matrix is 17/17 PASS, and the complete transition profile is
+7/7 PASS. A paired check in the FreeCAD human interface compares the `native`
+B15 route and the `modular` B16 route. It covers Create, a controlled failure
+for the final STEP task, Save/reopen, DXF, SVG, STL, STEP, manifest output and
+cleanup. The workflow comparison removes the permitted differences and then
+has zero differences. A new independent review of the exact product-and-test
+candidate has a PASS result.
+
+The [detailed evidence](../benchmarks/2026-09-27-phase7-core-layout-export-regression.md)
 keeps the results, original failures and review history.
 
-The two usual repairs are completed (2/2). The final owner-controlled
-harness-only correction is completed (1/1). A nondefault bridge port now stops
-before launch. The original `BLOCKED` review stays as evidence. No more
+The two usual repairs are completed (2/2). The project owner's final
+harness-only correction is completed (1/1). A nondefault value of `--port` now
+stops before launch. The original `BLOCKED` review stays as evidence. No more
 correction authority remains in this cycle.
 
 This result supplies the previously missing modular export part of Exit 1. It
