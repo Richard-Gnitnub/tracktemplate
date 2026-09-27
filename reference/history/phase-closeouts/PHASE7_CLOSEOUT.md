@@ -35,7 +35,7 @@ presents the closeout record. `/root/phase7_closeout_recovery_review`
 independently checked the recovery proof and its terminal state.
 `/root/phase7_closeout_panel` independently checked the closeout conditions
 and all 24 live risks. Neither reviewer authored a maintained closeout file.
-The reviewers share the agent team and workspace; this is not an external
+The reviewers share the agent team and workspace. This is not an external
 organisational review. The panel recommendation was **Proceed with bounded
 conditions**, with no unresolved dissent.
 
@@ -61,7 +61,7 @@ deadlines.
 
 Both frozen B14/B15 identities, the inherited B15 host, and the development-only
 comparison oracle remain. Every per-slice comparison, adapter, caller,
-removal, and legacy-retirement condition remains. PR-10 remains Open/Partial;
+removal, and legacy-retirement condition remains. PR-10 remains Open/Partial.
 PR-18 remains Open/Effective for current scope. No legacy path is removed.
 
 **Exact owner instruction — 2026-09-27:**

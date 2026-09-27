@@ -19,7 +19,7 @@ The owner accepted the independently reviewed
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 stays Not started at 0/4. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
 | What changed | The owner accepted the Phase 7 closeout and recovery evidence. The completed Phase 7 evidence, decisions and risk snapshot are frozen. The current paths now hold unopened Phase 8 records. |
 | What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. This closeout changes no product behaviour. |
-| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. The USB is safely unmounted; separate physical storage remains operator-controlled and unverified. |
+| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
 | Owner decision | D-P7-006 closes Phase 7 at 4/4 and authorises exact-green closeout integration only. It does not open Phase 8, accept performance, clear output or release, or remove a legacy path. |
 | Next action | Stop after protected-main integration. Phase 8 opening and any new product work need a separate owner decision. |
 
