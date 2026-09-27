@@ -19,6 +19,7 @@ except ImportError:
 
 from tools.freecad_bridge.ordinary_track_edit_recipe import (
     EXPECTED_TRACK_CONFIGURATION,
+    normalise_version_migration_snapshot,
 )
 from tools.freecad_bridge.freecad_export_metrics import format_export_metrics
 from tools.freecad_bridge.ordinary_track_export_recipe import (
@@ -46,7 +47,22 @@ from tools.freecad_bridge.ordinary_track_recipe import (
 )
 
 
-MODULE_NAME = "tracktemplate_b14_session"
+MODULE_NAME = globals().get(
+    "TRACKTEMPLATE_WORKFLOW_MODULE_NAME",
+    "tracktemplate_b14_session",
+)
+BASE_MACRO_VERSION = globals().get(
+    "TRACKTEMPLATE_BASE_MACRO_VERSION",
+    "10.2A8A7B14",
+)
+ENFORCE_FROZEN_WORKFLOW_HASHES = globals().get(
+    "TRACKTEMPLATE_ENFORCE_FROZEN_WORKFLOW_HASHES",
+    True,
+)
+VERSION_MIGRATION_PREFIXES = globals().get(
+    "TRACKTEMPLATE_VERSION_MIGRATION_PREFIXES",
+    (),
+)
 SUCCESS_TEXT = "Curve and straight-track outputs created successfully"
 
 module = sys.modules.get(MODULE_NAME)
@@ -87,6 +103,13 @@ def _compact_summary(summary):
         "manifest_created": bool(summary.get("manifest_path")),
         "failures": list(summary.get("failures") or []),
     }
+
+
+def _document_contract(snapshot):
+    return normalise_version_migration_snapshot(
+        snapshot,
+        VERSION_MIGRATION_PREFIXES,
+    )
 
 
 def _initial_dialog_contract(dialog):
@@ -383,7 +406,10 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
         state["measurement"]["objects_after"] - objects_before
     )
     after = ordinary_track_document_snapshot(module, active_document)
-    normalised_after = create_time_export_document_snapshot(after)
+    normalised_after = create_time_export_document_snapshot(
+        after,
+        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+    )
     if normalised_after["output_directory"] != str(output_directory):
         raise RuntimeError("Create-time export persisted the wrong output directory")
     state["before_semantic_sha256"] = before["semantic_sha256"]
@@ -483,7 +509,12 @@ preference_keys = (
 preferences_before = {
     key: str(parameter_group.GetString(key, "") or "") for key in preference_keys
 }
-initial_base = ordinary_track_snapshot(module, document)
+initial_base = ordinary_track_snapshot(
+    module,
+    document,
+    enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+    expected_macro_version=BASE_MACRO_VERSION,
+)
 initial_document = ordinary_track_document_snapshot(module, document)
 result = {
     "schema_version": CREATE_TIME_EXPORT_RECIPE_SCHEMA_VERSION,
@@ -500,7 +531,10 @@ try:
         "",
         inject_failure=False,
     )
-    compare_create_time_document_to_base(initial_document, success_document)
+    compare_create_time_document_to_base(
+        _document_contract(initial_document),
+        _document_contract(success_document),
+    )
     result["scenarios"].append(success)
 
     failure, failure_document, normalised_failure = _run_scenario(
@@ -519,7 +553,10 @@ try:
     success_complete = export_directory_snapshot(success_directory)
     success_variant = export_variant_snapshot(success_complete)
     success_hash = validate_export_snapshot(success_variant)
-    if success_hash != EXPECTED_CREATE_TIME_LOGICAL_EXPORT_SHA256:
+    if (
+        ENFORCE_FROZEN_WORKFLOW_HASHES
+        and success_hash != EXPECTED_CREATE_TIME_LOGICAL_EXPORT_SHA256
+    ):
         raise RuntimeError(
             "Unexpected create-time export serialization hash: {}".format(
                 success_hash
@@ -549,7 +586,9 @@ try:
 
     failure_complete = export_directory_snapshot(failure_directory)
     result["failure_output"] = validate_create_time_failure_snapshot(
-        failure_complete, success_variant
+        failure_complete,
+        success_variant,
+        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
     )
 
     document = App.ActiveDocument
@@ -567,7 +606,10 @@ try:
     document = App.openDocument(saved_path)
     reopen_ms = (time.perf_counter() - reopen_started) * 1000.0
     reopened = ordinary_track_document_snapshot(module, document)
-    normalised_reopened = create_time_export_document_snapshot(reopened)
+    normalised_reopened = create_time_export_document_snapshot(
+        reopened,
+        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+    )
     if normalised_reopened["output_directory"] != str(failure_directory):
         raise RuntimeError("Save/reopen changed the persisted export directory")
     if normalised_reopened["semantic_sha256"] != normalised_failure["semantic_sha256"]:
@@ -593,4 +635,7 @@ finally:
 
 if not result["preference_store_restored"]:
     raise RuntimeError("The create-time export recipe did not restore preferences")
-print(json.dumps(result, sort_keys=True))
+if globals().get("TRACKTEMPLATE_CAPTURE_WORKFLOW_RESULT", False):
+    TRACKTEMPLATE_WORKFLOW_RESULT = result
+else:
+    print(json.dumps(result, sort_keys=True))

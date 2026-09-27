@@ -12,6 +12,15 @@ from tracktemplate.compatibility.b15_workflow_host import (
 
 MODULAR_CALCULATION_ROUTE = "modular"
 WORKFLOW_CONTRACT_ID = "tracktemplate:phase7:platform-top-heights:1"
+CORE_LAYOUT_EXPORT_CONTRACT_ID = "tracktemplate:phase7:core-layout-export:1"
+CORE_LAYOUT_EXPORT_HOST_BINDING = "run_production_export"
+CORE_LAYOUT_EXPORT_HOST_OPERATIONS = (
+    ("execute_export_tasks", "execute_export_tasks"),
+    ("build_manifest_rows", "build_manifest_rows"),
+    ("write_export_manifest", "write_export_manifest"),
+    ("failed_export_report", "_failed_export_report"),
+    ("skipped_export_report", "_skipped_export_report"),
+)
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
@@ -1338,6 +1347,159 @@ class ModularTransitionWorkflowSession:
         return self._host.launch_workflow()
 
 
+@dataclass(frozen=True)
+class _CoreLayoutExportAdapter:
+    """Supply inherited export operations to the modular application command."""
+
+    calculation: object
+    execute_export_tasks: object
+    build_manifest_rows: object
+    write_export_manifest: object
+    failed_export_report: object
+    skipped_export_report: object
+
+    def __call__(
+        self,
+        doc,
+        plan,
+        config,
+        set_id,
+        platform_config,
+        formation_config,
+        registration_config,
+        template_assembly_config,
+        exporter_override=None,
+    ):
+        return self.calculation(
+            doc,
+            plan,
+            config,
+            set_id,
+            platform_config,
+            formation_config,
+            registration_config,
+            template_assembly_config,
+            exporter_override,
+            execute_export_tasks=self.execute_export_tasks,
+            build_manifest_rows=self.build_manifest_rows,
+            write_export_manifest=self.write_export_manifest,
+            failed_export_report=self.failed_export_report,
+            skipped_export_report=self.skipped_export_report,
+        )
+
+
+class ModularCoreLayoutWorkflowSession:
+    """Add one modular export command to the selected calculation session."""
+
+    def __init__(self, calculation_session, export_calculation):
+        self._calculation_session = calculation_session
+        self._host = calculation_session._host
+        namespace = self.module.__dict__
+        operations = {}
+        for field_name, host_name in CORE_LAYOUT_EXPORT_HOST_OPERATIONS:
+            operation = namespace.get(host_name)
+            if not callable(operation):
+                raise TransitionWorkflowError(
+                    "The inherited core-layout export operation {!r} is "
+                    "unavailable.".format(host_name)
+                )
+            operations[field_name] = operation
+        if not callable(export_calculation):
+            raise TransitionWorkflowError(
+                "The modular core-layout export command is unavailable."
+            )
+        self._export_calculation = export_calculation
+        self._export_adapter = _CoreLayoutExportAdapter(
+            calculation=export_calculation,
+            **operations,
+        )
+        self._bind_core_layout_export()
+
+    @property
+    def module(self):
+        return self._calculation_session.module
+
+    def _bind_core_layout_export(self):
+        namespace = self.module.__dict__
+        missing = object()
+        previous = namespace.get(CORE_LAYOUT_EXPORT_HOST_BINDING, missing)
+        try:
+            namespace[CORE_LAYOUT_EXPORT_HOST_BINDING] = self._export_adapter
+            self._validate_core_layout_export_binding()
+        except Exception:
+            if previous is missing:
+                namespace.pop(CORE_LAYOUT_EXPORT_HOST_BINDING, None)
+            else:
+                namespace[CORE_LAYOUT_EXPORT_HOST_BINDING] = previous
+            raise
+
+    def _validate_core_layout_export_binding(self):
+        namespace = self.module.__dict__
+        adapter = namespace.get(CORE_LAYOUT_EXPORT_HOST_BINDING)
+        if (
+            type(adapter) is not _CoreLayoutExportAdapter
+            or adapter is not self._export_adapter
+            or adapter.calculation is not self._export_calculation
+        ):
+            raise TransitionWorkflowError(
+                "The modular core-layout export route has a mixed binding."
+            )
+        for field_name, host_name in CORE_LAYOUT_EXPORT_HOST_OPERATIONS:
+            operation = getattr(adapter, field_name)
+            if (
+                namespace.get(host_name) is not operation
+                or getattr(operation, "__globals__", None) is not namespace
+            ):
+                raise TransitionWorkflowError(
+                    "The inherited core-layout export operation {!r} "
+                    "changed.".format(host_name)
+                )
+        caller = namespace.get("run_macro")
+        code = getattr(caller, "__code__", None)
+        if (
+            not callable(caller)
+            or getattr(caller, "__globals__", None) is not namespace
+            or code is None
+            or CORE_LAYOUT_EXPORT_HOST_BINDING not in code.co_names
+        ):
+            raise TransitionWorkflowError(
+                "The inherited run_macro export caller is unavailable."
+            )
+        if caller.__globals__.get(
+            CORE_LAYOUT_EXPORT_HOST_BINDING
+        ) is not adapter:
+            raise TransitionWorkflowError(
+                "The inherited run_macro export caller has a mixed binding."
+            )
+
+    def routing_record(self):
+        """Return the unchanged accepted calculation-routing record."""
+        record = self._calculation_session.routing_record()
+        self._validate_core_layout_export_binding()
+        return record
+
+    def core_layout_export_routing_record(self):
+        """Return the separate modular application-command route record."""
+        self._validate_core_layout_export_binding()
+        return {
+            "schema_version": 1,
+            "contract_id": CORE_LAYOUT_EXPORT_CONTRACT_ID,
+            "route": MODULAR_CALCULATION_ROUTE,
+            "comparison_route_available": False,
+            "command_name": "run_core_layout_export",
+            "host_binding_name": CORE_LAYOUT_EXPORT_HOST_BINDING,
+            "caller_name": "run_macro",
+            "workflow_version": EXPECTED_WORKFLOW_VERSION,
+            "workflow_source_sha256": self._host.source_sha256,
+            "mixed_route": False,
+        }
+
+    def launch_workflow(self):
+        """Launch after restoring and checking both selected route groups."""
+        self._bind_core_layout_export()
+        return self._calculation_session.launch_workflow()
+
+
 def load_modular_transition_workflow_session(
     repository_root,
     modular_api,
@@ -1359,4 +1521,34 @@ def load_modular_transition_workflow_session(
         host = load_b15_workflow_host(repository_root, contract)
     except B15WorkflowHostError as error:
         raise TransitionWorkflowError(str(error)) from error
-    return ModularTransitionWorkflowSession(host, modular_functions)
+    calculation_session = ModularTransitionWorkflowSession(
+        host, modular_functions,
+    )
+    namespace = calculation_session.module.__dict__
+    export_names = {
+        CORE_LAYOUT_EXPORT_HOST_BINDING,
+        *(host_name for _field_name, host_name
+          in CORE_LAYOUT_EXPORT_HOST_OPERATIONS),
+    }
+    present = {name for name in export_names if name in namespace}
+    caller = namespace.get("run_macro")
+    caller_code = getattr(caller, "__code__", None)
+    caller_uses_export = (
+        caller_code is not None
+        and CORE_LAYOUT_EXPORT_HOST_BINDING in caller_code.co_names
+    )
+    if not present and not caller_uses_export:
+        return calculation_session
+    if present != export_names or not caller_uses_export:
+        raise TransitionWorkflowError(
+            "The inherited core-layout export route is incomplete."
+        )
+    try:
+        export_calculation = modular_api.run_core_layout_export
+    except AttributeError as error:
+        raise TransitionWorkflowError(
+            "The modular core-layout export command is unavailable."
+        ) from error
+    return ModularCoreLayoutWorkflowSession(
+        calculation_session, export_calculation,
+    )
