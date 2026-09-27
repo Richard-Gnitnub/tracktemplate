@@ -459,12 +459,17 @@ the retirement audit returns `FAIL` without a path.
 After the retirement plan contains removal authority, operate the retirement
 audit again. If the retirement audit gives a `FAIL` result, stop. After the
 retirement audit gives a `PASS` result, use `git worktree remove` for the
-worktree. Do not use `--force`. Do not use `git stash`. Do not move local files
-as a condition for worktree removal.
+worktree. Do not use `--force` in the usual procedure. Do not use `git stash`.
+Do not move local files as a condition for worktree removal.
 A `PASS` audit does not make a Git repository inside a worktree
 removable by Git. If `git worktree remove` refuses the target, leave it registered and
-preserved. Do not use `--force`. Do not move local files to make that command
-pass. Record the refusal. Obtain a separate owner decision for a safe route.
+preserved. Do not move local files to make that command pass. Record the
+refusal. If the D-GOV-022 conditions do not apply, obtain a separate owner decision for a safe route.
+
+D-GOV-022 authorises one `git worktree remove --force` operation for a worktree with a `.devtools/freecad-cli/` Git repository, subject to all stated conditions. The nested Git repository alone gives no removal authority. First, make sure that a fresh independent snapshot includes all current registered worktrees. Make sure that it includes all nested FreeCAD CLI state and does not overwrite an earlier snapshot. Complete the applicable restore test in a temporary directory. Get an independent review of the result. Make sure that the exact target has a current retirement plan and a current audit with a PASS result. Make sure that its nested Git state has the D-GOV-021 approved pin and six file changes. Make sure that the retirement plan classifies all local state and records complete preservation. Make sure that no person or process uses the target. Compare its Git identity and preserved state with the approved records. If any state is ambiguous, unique, unexplained, or not fully preserved, stop. Make sure that the populated `.devtools/freecad-cli/` Git repository was the only cause of the earlier `git worktree remove` refusal. In a temporary repository, test the exact proposed `git worktree remove --force` operation. Do the required checks after removal. Only then use that command once for the
+exact target. If it refuses, stop. Do not use additional force, manual
+recursive deletion, `git worktree prune`, `git stash`, or another destructive
+workaround. After each removal, compare the preserved state. Make sure that no unrelated worktree, branch, stash, or retained evidence changed. The usual worktree-retirement procedure does not use `--force`.
 
 Before worktree removal, make sure the local-state inventory contains all local
 files. Before removal, make sure the preservation audit gives a `PASS` result

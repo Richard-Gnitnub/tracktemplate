@@ -789,6 +789,17 @@ def validate_worktree_retirement_policy(policy):
         "if git worktree remove refuses the target leave it registered and preserved",
         "record the refusal",
         "obtain a separate owner decision for a safe route",
+        "d gov 022 authorises one git worktree remove force operation",
+        "the nested git repository alone gives no removal authority",
+        "includes all current registered worktrees",
+        "includes all nested freecad cli state and does not overwrite an earlier snapshot",
+        "complete the applicable restore test in a temporary directory",
+        "get an independent review of the result",
+        "populated devtools freecad cli git repository was the only cause of the earlier git worktree remove refusal",
+        "in a temporary repository test the exact proposed git worktree remove force operation",
+        "only then use that command once for the exact target if it refuses stop",
+        "no unrelated worktree branch stash or retained evidence changed",
+        "usual worktree retirement procedure does not use force",
         "before worktree removal make sure the local state inventory contains all "
         "local files",
         "before removal make sure the preservation audit gives a pass result",
@@ -1401,9 +1412,12 @@ def _git_fixture(temp_root):
     return repository
 
 
-def _retirement_fixture(temp_root):
+def _retirement_fixture(temp_root, *, ignore_devtools=False):
     repository = _git_fixture(temp_root)
-    (repository / ".gitignore").write_text("local/\n", encoding="utf-8")
+    ignore_rules = "local/\n"
+    if ignore_devtools:
+        ignore_rules += "/.devtools/\n"
+    (repository / ".gitignore").write_text(ignore_rules, encoding="utf-8")
     _run(["git", "add", ".gitignore"], cwd=repository)
     _run(["git", "commit", "-m", "Ignore local fixture state"], cwd=repository)
     _run(["git", "push"], cwd=repository)
@@ -1508,7 +1522,7 @@ def _retirement_plan(repository, target):
 
 
 def _freecad_cli_retirement_fixture(temp_root, destination):
-    repository, target = _retirement_fixture(temp_root)
+    repository, target = _retirement_fixture(temp_root, ignore_devtools=True)
     upstream = temp_root / "freecad-cli-upstream"
     upstream.mkdir()
     _run(["git", "init", "-b", "main"], cwd=upstream)
@@ -2838,6 +2852,15 @@ def _validate_freecad_cli_nested_retirement(errors):
         retained_before = safety._freecad_cli_tree_identity(
             destination / ".devtools/freecad-cli"
         )
+        worktrees_before = _run(
+            ["git", "worktree", "list", "--porcelain"], cwd=repository
+        ).stdout
+        branches_before = _run(
+            ["git", "show-ref", "--heads"], cwd=repository
+        ).stdout
+        stashes_before = _run(
+            ["git", "stash", "list"], cwd=repository
+        ).stdout
         removed = _run(
             ["git", "worktree", "remove", str(target)],
             cwd=repository,
@@ -2846,13 +2869,25 @@ def _validate_freecad_cli_nested_retirement(errors):
         retained_after = safety._freecad_cli_tree_identity(
             destination / ".devtools/freecad-cli"
         )
+        worktrees_after = _run(
+            ["git", "worktree", "list", "--porcelain"], cwd=repository
+        ).stdout
+        branches_after = _run(
+            ["git", "show-ref", "--heads"], cwd=repository
+        ).stdout
+        stashes_after = _run(
+            ["git", "stash", "list"], cwd=repository
+        ).stdout
         if (
-            removed.returncode == 0
-            or not target.exists()
+            removed.returncode != 0
+            or target.exists()
+            or str(target) not in worktrees_before
+            or str(target) in worktrees_after
             or retained_before != retained_after
-            or "contains modified or untracked files" not in removed.stderr
+            or branches_before != branches_after
+            or stashes_before != stashes_after
         ):
-            errors.append("nested non-force refusal did not preserve state")
+            errors.append("ignored nested non-force removal changed retained state")
 
 
 def _validate_freecad_cli_hidden_tracked_changes(errors):

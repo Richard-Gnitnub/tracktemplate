@@ -17,11 +17,11 @@ The owner accepted the independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
-| What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020. D-GOV-021 authorises only the exact nested FreeCAD development-repository retirement-control treatment. |
+| What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. <br><br>D-GOV-022 authorises one `git worktree remove --force` operation only if its conditions pass. An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories. The 37 individual retirement audits gave PASS. Git removed 37 worktrees without `--force`. Git also deleted 36 branches whose tips the accepted commit contained. |
 | What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. This opening changes no product behaviour. |
-| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. Seven contained worktrees retain populated `.devtools/freecad-cli/` Git repositories. D-GOV-020 did not cover their nested state. D-GOV-021 permits only a bounded exact-state control. Retirement still needs full independent preservation, fresh current-estate backup, and an individual passing plan and audit. A disposable proof shows that non-force Git removal can still refuse a populated nested repository after an audit PASS. No live candidate has been removed, and the mechanical route needs a separate owner decision. The USB is safely unmounted. Separate physical storage remains operator-controlled and unverified. |
-| Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 remains the integrated symbolic-link and detached-worktree control. D-GOV-021 authorises only the exact nested FreeCAD retirement-control treatment. These decisions accept no exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | Use D-GOV-021 only after exact-green integration. The recorded `git worktree remove` refusal needs a project-owner decision before live removal. Keep the seven affected worktrees registered until that decision. If the owner approves a safe route, complete these steps. Obtain new non-overwriting independent backup of the current estate, including complete nested trees, and applicable restore evidence. Get a separate passing retirement plan and audit for each retirement candidate. Remove only proved-safe worktrees without `--force`. Check preservation after each removal. Keep five branches with unmerged commits. A non-force removal refusal stops that candidate for a separate owner decision. The product slice remains stopped until the retirement prerequisite is complete. Physical USB storage remains unverified. |
+| Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. Five branches with unmerged commits and three related worktrees remain. The terminal and replacement D-GOV-022 worktrees remain registered. The USB is safely unmounted. Physical removal and separate storage are unconfirmed. |
+| Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. These decisions accept no exit, performance, wider migration, production output, release or legacy removal. |
+| Next action | Complete exact-green D-GOV-022 review and draft publication for a separate owner integration decision. Then synchronise protected `main` and obtain a fresh current-estate backup. Get a separate retirement plan with removal authority and a passing audit for each of the two D-GOV-022 worktrees. Retire each worktree only after its audit gives PASS. After removal, check preservation before you retire its branch. Preserve five branches with unmerged commits. <br><br>The product slice remains stopped until retirement is complete and protected `main` is clean and synchronised. It also requires on-site operator confirmation of physical USB removal and separate storage. |
 
 <a id="phase-8-opening-panel"></a>
 
@@ -244,6 +244,80 @@ removal authority without fresh current-estate backup and a separate passing
 plan and audit for each worktree. It accepts no product, exit, performance,
 output, release, physical-storage, or legacy-removal result. Phase 8 stays
 Open at 0/4. D-P6-008 and all recorded limitations remain.
+
+<a id="nested-freecad-mechanical-exception-panel"></a>
+
+## D-GOV-022 nested FreeCAD mechanical exception panel — 2026-09-27
+
+**Decision boundary:** PR #96 integrated the D-GOV-021 exact-state control at
+`37421762af74ea12971e240707c7b170dec32a57`. The retained test refusal applies to a Git repository that the Git ignore rule did not select. It does not show a refusal for the seven worktrees with Git repositories under `/.devtools/`. In a separate test with the live ignore rule and six changed nested files, `git worktree remove` removed the temporary worktree. Other ignored state was also present.
+
+The test changed no live worktree. At this decision, the seven parent worktrees had no tracked changes or untracked files that the Git ignore rule did not select. Before retirement, they still needed a fresh independent snapshot, restore evidence, and individual passing retirement plans and audits.
+
+**Risk panel:** PR-13 remains Critical/Open/Mitigate/Effective for current
+scope. A force operation could lose local evidence if any preservation or
+identity check is bypassed. PR-22 remains High/Open/Remove/Effective for
+current scope. D-GOV-022 supplies authority only after independent recovery review and a separate test for the target. The usual removal procedure does not use `--force`. No risk disposition changes.
+
+**Exact owner instruction — 2026-09-27:**
+
+> As TrackTemplate project owner, I authorise one bounded Level 3 exception to the normal non-force worktree-retirement rule for the proved `.devtools/freecad-cli/` nested-checkout case.
+>
+> This exception applies only when:
+>
+> - a fresh non-overwriting independent backup covers the complete current registered-worktree estate and all nested FreeCAD CLI state;
+> - the applicable restore proof passes and receives independent review;
+> - the individual worktree has a current passing retirement plan and audit;
+> - its complete nested FreeCAD CLI state matches the D-GOV-021 approved pin and file changes;
+> - no ambiguous, unique, unexplained or insufficiently preserved state remains;
+> - inactivity and all existing preservation and identity requirements pass; and
+> - a disposable proof demonstrates the exact proposed forced-removal operation and its post-removal checks.
+>
+> Where all of those conditions pass, permit exactly one `git worktree remove --force` for a retirement candidate whose ordinary `git worktree remove` refusal is caused only by the already-proved populated `.devtools/freecad-cli/` nested checkout.
+>
+> The force option is a mechanical removal exception. It gives no authority to bypass a failed audit, unresolved local state, preservation failure, changed identity or other retirement safeguard.
+>
+> After each removal, prove the required preservation diff and confirm that no unrelated worktree, branch, stash or retained evidence changed.
+>
+> If one `--force` operation still refuses removal, stop. Do not use additional force, manual recursive deletion, `git worktree prune`, `git stash` or another destructive workaround without a new owner decision.
+>
+> Preserve the five branches with unmerged commits. This authority does not permit their loss or retirement.
+>
+> Keep the normal non-force rule as the project default. Record this exception narrowly; do not make force removal a general retirement route.
+>
+> Complete the Phase 8 retirement prerequisite only when every required candidate has individually passed its applicable plan, audit, removal and post-removal preservation proof.
+>
+> Do not begin the authorised `turnout_valid_toe_range` product slice until that prerequisite is genuinely complete and protected `main` is clean and synchronised.
+>
+> The USB is currently unmounted. Mounting it for the required fresh backup and later physically removing/storing it remain on-site operator actions and must not be assumed.
+>
+> Phase 8 remains 0/4 with all exits Pending. D-P6-008 and all recorded limitations remain unchanged.
+
+**Decision — D-GOV-022:** The owner authorises one `git worktree remove --force` operation for an individual worktree only if all these conditions pass:
+
+- A fresh independent snapshot covers all current registered worktrees and nested FreeCAD CLI state. It does not overwrite an earlier snapshot.
+- The applicable restore test gives PASS. An independent reviewer examines its result.
+- The target has a current retirement plan. Its current retirement audit gives PASS. Its complete nested Git state matches the D-GOV-021 approved pin and six file changes.
+- The target has the exact Git identity. No person or process uses it. The plan classifies every local-state item. The preservation audit gives PASS.
+- The `git worktree remove` operation without `--force` refuses only because of the populated `.devtools/freecad-cli/` Git repository.
+- A test in a temporary repository gives PASS for the exact proposed `git worktree remove --force` operation and the required checks after removal.
+
+If the forced operation fails, stop. Do not use additional force or another destructive method. After each removal, record the preservation diff. Make sure that no unrelated worktree, branch, stash, or retained evidence changed. Preserve the five branches with unmerged commits.
+
+The D-GOV-022 authority remains **unused** on current evidence. It does not authorise `--force` for a worktree whose removal without `--force` succeeds or whose refusal has another cause. It does not change D-P6-008, Phase 8 at 0/4, product behaviour, an
+exit, performance, output, release, or legacy-removal status. The authorised product slice stays stopped until every required worktree passes its removal and preservation checks. Protected `main` must also be clean and synchronised. Physical USB separation remains an on-site operator action.
+
+**Post-decision result:** The 42-root snapshot and the drill-02 restore test for seven nested Git repositories gave PASS. An independent reviewer examined both results. The first restore attempt and the first retirement-audit invocation remain retained as failures. The evidence does not record either as a PASS.
+
+Each of the 37 worktrees had a passing retirement plan and a fresh audit. The checks after removal gave PASS for all 37, including the seven worktrees with nested FreeCAD CLI repositories. Git removed all 37 worktrees without `--force`. Git deleted 36 branches with `git branch -d`. The accepted commit contained each branch tip.
+
+The detached worktree had no branch. No `--force` operation occurred.
+
+The five branches with unmerged commits remain exact. After the removals, five worktrees remained registered: protected `main`, three historical unmerged-branch worktrees, and the terminal D-GOV-022 worktree. The replacement D-GOV-022 worktree was added later. Six worktrees are registered now. The retained terminal backup receipt is `5c6ab670b2b2dc73a29f393bc63038873755e833278363e238888dda07cb7562`. The 37-result summary is `63271bdb63a995dc22fee771c4720ca1cfdf83427507d760febb5c977e343371`.
+
+The independently reviewed USB results-set manifest is `58d239054e72ff91f1106ee737aa2cbf5958832c6fe430868da2f44e0253088b`. The terminal recovery review is `f15b38442ea208f6049d30e41b194c5062221d15ac492af010c43ac01baba936`. The USB is safely unmounted. Physical removal and separate storage remain unconfirmed. The D-GOV-022 authority remains unused. The product prerequisite stays open until D-GOV-022 is integrated and both candidate worktrees and their branches pass separate retirement checks.
+
+The remaining recovery conditions must also pass.
 
 ## Phase 8 exit conditions
 
