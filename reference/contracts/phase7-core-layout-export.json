@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase7:core-layout-export:1",
+  "recorded_on": "2026-09-27",
+  "status": "draft",
+  "authority": [
+    "D-GOV-004",
+    "D-P7-001",
+    "Project owner Phase 7 continuation on 2026-09-27"
+  ],
+  "change_level": 2,
+  "contract_document": "reference/contracts/phase7-core-layout-export.md",
+  "legacy_reference": {
+    "sources": [
+      "AdvancedTurnout.FCMacro",
+      "model_railway_curve_template_multitrack_v10_2a8a7b15_chair_performance_and_representation.FCMacro"
+    ],
+    "definition": "run_production_export",
+    "definition_sha256": "2de2b2283d550037c3ee0edecc5768ffc802f4c14870db1c326d6e3ff5c94a03",
+    "definition_bytes": 2542,
+    "product_caller": "run_macro"
+  },
+  "application_command": {
+    "module": "tracktemplate.application.core_layout_export",
+    "api": "tracktemplate.api.run_core_layout_export",
+    "parameters": [
+      "doc",
+      "plan",
+      "config",
+      "set_id",
+      "platform_config",
+      "formation_config",
+      "registration_config",
+      "template_assembly_config",
+      "exporter_override"
+    ],
+    "host_operations": [
+      "execute_export_tasks",
+      "build_manifest_rows",
+      "write_export_manifest",
+      "failed_export_report",
+      "skipped_export_report"
+    ],
+    "result_fields": [
+      "output_directory",
+      "successful_files",
+      "failed_files",
+      "skipped_objects",
+      "formats",
+      "manifest_path",
+      "manifest_requested",
+      "failures",
+      "failure_details",
+      "skipped_outputs",
+      "skipped_details",
+      "results"
+    ],
+    "ordinary_manifest_exception": "record the manifest failure and return the inherited result",
+    "other_exception": "continue to the caller",
+    "base_exception": "continue to the caller",
+    "input_mutation": false,
+    "document_operation": "delegated to the inherited execute_export_tasks operation"
+  },
+  "product_routing": {
+    "record_schema_version": 1,
+    "route": "modular",
+    "comparison_route_available": false,
+    "command_name": "run_core_layout_export",
+    "host_binding_name": "run_production_export",
+    "caller_name": "run_macro",
+    "host_operation_bindings": {
+      "execute_export_tasks": "execute_export_tasks",
+      "build_manifest_rows": "build_manifest_rows",
+      "write_export_manifest": "write_export_manifest",
+      "failed_export_report": "_failed_export_report",
+      "skipped_export_report": "_skipped_export_report"
+    },
+    "binding_checks": [
+      "exact application-command identity",
+      "exact adapter identity",
+      "exact host-operation identity and host namespace",
+      "run_macro caller identity and selected binding"
+    ],
+    "setup_failure": "restore the previous run_production_export binding",
+    "calculation_route_unchanged": {
+      "record_schema_version": 16,
+      "selected_function_count": 25,
+      "caller_count": 40
+    }
+  },
+  "scope": {
+    "supported": "B14/B15 prepared core-layout output operation through the bounded B16 caller",
+    "excluded": [
+      "B14 or B15 changes",
+      "task-planning, filename, output-format or manifest-schema changes",
+      "railway calculation or FreeCAD object-rule changes",
+      "accepted exporter failure-model changes",
+      "legacy path retirement",
+      "Phase 7 exit, performance, output or release acceptance"
+    ]
+  },
+  "validation": {
+    "standalone": "tests/validate_phase7_core_layout_export.py",
+    "qualified_host": "tests/freecad_validate_phase7_core_layout_export.py",
+    "paired_gui": "tools/freecad_bridge/run-phase7-core-layout-export-workflow"
+  }
+}
