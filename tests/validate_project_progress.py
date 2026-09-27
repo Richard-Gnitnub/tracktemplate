@@ -1042,7 +1042,7 @@ def _validate_owner_view(plan: str) -> None:
     for fragment in (
         'Phase 7 is closed at 4/4 under D-P7-006',
         'Its four exits remain Evidenced and owner-accepted under D-P7-005, D-P7-003, D-P7-004 and D-P7-002',
-        'Phase 8 is Open at 0/4 under D-P8-001; all four exits are Pending',
+        'Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending',
         'Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation',
         'Output stays private-development',
         'project status stays `unknown`',
@@ -1077,7 +1077,7 @@ def _validate_owner_view(plan: str) -> None:
         'opens Phase 8 at 0/4',
         'It accepts no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
         'Integrate the exact-green Level 3 opening records',
-        'dispose of redundant worktrees and branches in the JetBrains IDE before the bounded product slice',
+        'complete the retirement audit and removal of redundant worktrees and branches in the JetBrains IDE before the bounded product slice',
         'The product draft needs a separate integration decision',
     ):
         _require(
@@ -4639,7 +4639,7 @@ def _validate_phase8_decision_opening(
     )
     for field, digest in (
         ("authority", "c5e352e28134a7b474e841c77696e6de97b479e44f176d1a6696867ff2f62501"),
-        ("exclusions", "acd1e473f321cbd9a357b2a5f3dee3d270f2be6e8afa2bad6522ab77384096c5"),
+        ("exclusions", "290f14e71522bc8b2555dfde0daca20807b51b7472600e60f985e51bb3e8840f"),
     ):
         value = opening[field]
         _require(
@@ -4753,8 +4753,8 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
         "all 24 live risks",
         "first slice internal and development-only",
         "five inherited B15 callers",
-        "fresh non-overwriting pre-migration snapshot",
-        "does not claim that the snapshot or disposal is complete",
+        "A new snapshot must preserve earlier snapshots and meet the recovery policy",
+        "does not claim that the snapshot or removal is complete",
         "TERM-R04 remains open",
         "must not add a public turnout API, schema or UI term",
         "product draft requires a separate integration decision",

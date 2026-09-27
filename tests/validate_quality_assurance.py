@@ -588,7 +588,7 @@ def validate_documentation_profile(
         all(fragment in " ".join(owner_view.split()) for fragment in (
             'Phase 7 is closed at 4/4 under D-P7-006',
             'Its four exits remain Evidenced and owner-accepted under D-P7-005, D-P7-003, D-P7-004 and D-P7-002',
-            'Phase 8 is Open at 0/4 under D-P8-001; all four exits are Pending',
+            'Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending',
             'Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation',
             'Output stays private-development',
             'project status stays `unknown`',
@@ -623,7 +623,7 @@ def validate_documentation_profile(
             'opens Phase 8 at 0/4',
             'It accepts no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
             'Integrate the exact-green Level 3 opening records',
-            'dispose of redundant worktrees and branches in the JetBrains IDE before the bounded product slice',
+            'complete the retirement audit and removal of redundant worktrees and branches in the JetBrains IDE before the bounded product slice',
             'The product draft needs a separate integration decision',
         )),
         "PROJECT_PLAN owner view contradicts current authority",

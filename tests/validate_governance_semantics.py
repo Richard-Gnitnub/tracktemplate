@@ -1187,12 +1187,12 @@ def validate_phase6_closeout_mutations() -> None:
         lambda: progress._validate_phase8_opening(
             replace_once(
                 current_opening,
-                "A fresh non-overwriting\npre-migration snapshot must meet",
-                "An optional\npre-migration snapshot can meet",
+                "A new snapshot must preserve earlier snapshots and meet the",
+                "An optional snapshot can ignore earlier snapshots and skip",
             ),
             plan,
         ),
-        "D-P8-001 bounded condition drifted: fresh non-overwriting pre-migration snapshot",
+        "D-P8-001 bounded condition drifted: A new snapshot must preserve earlier snapshots and meet the recovery policy",
     )
 
 
