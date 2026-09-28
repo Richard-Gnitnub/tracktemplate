@@ -1094,15 +1094,21 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-021',
         'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'worktree-retirement part of the Phase 8 prerequisite',
-        'Obtain on-site confirmation that the safely unmounted USB is removed and stored separately',
-        'verify all remaining recovery conditions and clean, synchronised protected `main`',
+        'Phase 8 retirement and recovery checks',
+        'recorded snapshot, restore, audit, preservation and clean protected-`main` evidence',
+        'Physical USB removal and separate storage remain operational recovery controls, not a D-P8-001 product-start condition',
+        'verify clean, synchronised protected `main` before the authorised `turnout_valid_toe_range` slice',
         'The product draft needs a separate integration decision',
     ):
         _require(
             fragment in owner_view,
             "project-plan owner view lost or contradicted: " + fragment,
         )
+    _require(
+        "Obtain on-site confirmation that the safely unmounted USB is removed and stored separately"
+        not in owner_view,
+        "project-plan owner view restored the unsupported USB product-start gate",
+    )
     plan_preamble = direct_section_content(plan, "Project Plan", level=1)
     _require(
         "canonical registers and evidence are the source of this owner view. "
@@ -4983,11 +4989,16 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
         "776 exact entries from the replacement worktree",
         "deb71c8ca87cb947ff3de7abbfd635103133ade8",
         "e8e373f8cd1f52d32a5094364e7228f19ea5cd4a5b9f938c9c908ab48d534e19",
-        "The worktree-retirement part of the Phase 8 prerequisite is complete",
+        "The Phase 8 retirement and recovery checks are complete on the recorded snapshot, restore, audit, preservation and clean protected-`main` evidence",
         "Physical removal and separate storage remain unverified",
-        "The product-start recovery gate stays open",
+        "An attached or mounted approved USB does not itself block the authorised product slice",
+        "clean, synchronised protected `main` must be verified again before product work",
     ):
         _require(clause in retirement_result, "Phase 8 retirement evidence drifted: " + clause)
+    _require(
+        "The product-start recovery gate stays open" not in retirement_result,
+        "Phase 8 retirement result restored the unsupported USB product-start gate",
+    )
     _require(
         "history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel"
         in evidence

@@ -640,12 +640,18 @@ def validate_documentation_profile(
             'D-GOV-021',
             'authorises one `git worktree remove --force` operation only if all its conditions pass',
             'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-            'worktree-retirement part of the Phase 8 prerequisite',
-            'Obtain on-site confirmation that the safely unmounted USB is removed and stored separately',
-            'verify all remaining recovery conditions and clean, synchronised protected `main`',
+            'Phase 8 retirement and recovery checks',
+            'recorded snapshot, restore, audit, preservation and clean protected-`main` evidence',
+            'Physical USB removal and separate storage remain operational recovery controls, not a D-P8-001 product-start condition',
+            'verify clean, synchronised protected `main` before the authorised `turnout_valid_toe_range` slice',
             'The product draft needs a separate integration decision',
         )),
         "PROJECT_PLAN owner view contradicts current authority",
+    )
+    require(
+        "Obtain on-site confirmation that the safely unmounted USB is removed and stored separately"
+        not in owner_view,
+        "PROJECT_PLAN owner view restored the unsupported USB product-start gate",
     )
 
     require(
