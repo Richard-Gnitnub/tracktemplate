@@ -698,6 +698,48 @@ D-P6-008 and TERM-R04 do not change. All conditions in
 [D-P8-001](#phase-8-opening-panel) apply. This result
 gives no owner acceptance for a Phase 8 exit, production output or release.
 
+## Phase 8 `XO-001` crossover change evidence — 2026-09-28
+
+Before this change, an injected error in an `XO-001` edit removed
+`ChairAnalysis_XO_001` and `ChairPositionMarkers_XO_001`. The edit had not
+completed. This happened with `UndoMode=0` and `UndoMode=1`. B16 now keeps
+these display objects until the edit removes the old crossover with its other
+objects. The same check then kept the copied document data and `Undo`/`Redo`
+data equal before and after the error in both modes.
+
+A check used FreeCAD with `FreeCADGui` active on a qualified host profile. It
+used a copied `.FCStd` file with the fixed `XO-001` on alignments with curves.
+The edit preview for a toe chainage change from 746.298 mm to 746.299 mm did
+not change the document or `Undo`/`Redo` data. An injected error after the
+preview kept the earlier `B4` and two display objects, the `XO-001` selection,
+document data and `Undo`/`Redo` data. The successful edit removed the earlier
+`B4` and two display objects and added one `Undo` entry.
+
+One `Undo` restored the earlier data and display objects. One `Redo` restored
+the changed data. After `document.save()` and `App.openDocument()` on the copy,
+the changed crossover data were equal, and the old display objects were absent.
+This comparison did not include the derived `Shape` of the
+`ModelRailwayCurve` group. The source fixture did not change.
+
+The check before the B16 change and the qualified FreeCAD result are in
+`tmp/phase8-crossover-edit-recovery/red-headless-terminating.log` and
+`tmp/phase8-crossover-edit-recovery/green-headless-after-order.log`.
+The qualified GUI result and images are in
+`benchmark-output/freecad-bridge/phase8-crossover-edit-recovery-gui-runs/20260928T195434595292Z/`.
+
+This result adds evidence for part of Phase 8 Exit 2 and PR-17. PR-17 stays
+Open with Partial control effectiveness. All four exits stay Pending.
+
+The earlier headless and GUI `resolved_analysis_sha256` values still differ.
+Their complete analysis remains unproved. The straight-host evidence has one
+sample. Other crossover inputs and more save/reopen journeys remain unproved.
+The isolated-worktree `local` profile limit remains.
+
+D-P6-008 and TERM-R04 do not change. The B14/B15 comparison and
+legacy-retirement conditions in
+[D-P8-001](#phase-8-opening-panel) remain. This result gives no owner
+acceptance for a Phase 8 exit, production output or release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
