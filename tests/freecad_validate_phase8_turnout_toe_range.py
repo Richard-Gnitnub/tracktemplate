@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove the internal turnout toe-range route on the qualified B15 host."""
+"""Prove the internal turnout range and occupied interval on the B15 host."""
 
 import hashlib
 import json
@@ -32,6 +32,12 @@ CALLERS = (
     "solve_rea_c10_crossover_geometry",
     "CrossoverManagerPanel.update_chainage_range",
     "TurnoutManagerDialog.update_host_summary",
+)
+INTERVAL_CALLERS = (
+    "_turnout_find_overlap",
+    "_build_curve_inheriting_c10_turnout",
+    "build_turnout_host_integration",
+    "solve_rea_c10_crossover_geometry",
 )
 
 
@@ -86,14 +92,26 @@ def validate():
     assert len(record["function_names"]) == 25
     assert len(record["caller_names"]) == 40
     assert "turnout_valid_toe_range" not in record["function_names"]
+    assert "turnout_host_station_interval" not in record["function_names"]
     assert not hasattr(api, "turnout_valid_toe_range")
+    assert not hasattr(api, "turnout_host_station_interval")
     assert namespace["turnout_valid_toe_range"] is turnout.turnout_valid_toe_range
+    assert namespace["turnout_host_station_interval"] is (
+        turnout.turnout_host_station_interval
+    )
     for name in CALLERS:
         function = caller(module, name)
         assert function.__globals__ is namespace, name
         assert "turnout_valid_toe_range" in function.__code__.co_names, name
         assert function.__globals__["turnout_valid_toe_range"] is (
             turnout.turnout_valid_toe_range
+        ), name
+    for name in INTERVAL_CALLERS:
+        function = caller(module, name)
+        assert function.__globals__ is namespace, name
+        assert "turnout_host_station_interval" in function.__code__.co_names, name
+        assert function.__globals__["turnout_host_station_interval"] is (
+            turnout.turnout_host_station_interval
         ), name
 
     frozen = []
@@ -117,6 +135,22 @@ def validate():
             )
             assert results[0] == results[1] == actual
             assert type(actual) is tuple and len(actual) == 2
+    for toe_chainage in (0.0, 746.298, 1542.475839):
+        for orientation in (
+            module.TURNOUT_ORIENTATION_FACING,
+            module.TURNOUT_ORIENTATION_TRAILING,
+        ):
+            results = [
+                legacy["turnout_host_station_interval"](
+                    toe_chainage, dimensions, orientation,
+                )
+                for legacy in frozen
+            ]
+            actual = namespace["turnout_host_station_interval"](
+                toe_chainage, dimensions, orientation,
+            )
+            assert results[0] == results[1] == actual
+            assert type(actual) is tuple and len(actual) == 2
     assert session.routing_record() == record
     assert document_state() == before
 
@@ -127,6 +161,7 @@ def validate():
             "profile_id": foundation["matched_profile_id"],
             "route": record,
             "five_callers": list(CALLERS),
+            "interval_callers": list(INTERVAL_CALLERS),
             "document_state_unchanged": True,
             "source_sha256": {
                 name: hashlib.sha256((SOURCE_ROOT / name).read_bytes()).hexdigest()

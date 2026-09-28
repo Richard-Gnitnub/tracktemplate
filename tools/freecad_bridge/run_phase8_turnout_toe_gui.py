@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove the selected B16 turnout toe range in real inherited GUI controls."""
+"""Prove B16 turnout toe range and occupied interval in the inherited GUI."""
 
 import argparse
 import ast
@@ -52,21 +52,31 @@ SOURCE_PATHS = (
 
 GUI_PROBE = r'''
 import json
+import pathlib
 import sys
 
 import FreeCAD as App
-from PySide6 import QtWidgets
+import FreeCADGui as Gui
+from PySide6 import QtCore, QtGui, QtWidgets
 
-from tools.freecad_bridge.turnout_recipe import select_turnout_host
+from tools.freecad_bridge.turnout_recipe import (
+    TURNOUT_CHAINAGE_MM,
+    TURNOUT_ID,
+    select_turnout_host,
+    turnout_document_snapshot,
+)
 from tracktemplate.domain import turnout as domain_turnout
 
 module = _PHASE3_SESSION.module
 routing = _PHASE3_ROUTING
 selected = domain_turnout.turnout_valid_toe_range
+selected_interval = domain_turnout.turnout_host_station_interval
 if str(module.MACRO_VERSION_NUMBER) != "10.2A8A7B15":
     raise RuntimeError("The inherited B15 host version changed")
 if module.turnout_valid_toe_range is not selected:
     raise RuntimeError("The B16 turnout toe binding is not the selected domain function")
+if module.turnout_host_station_interval is not selected_interval:
+    raise RuntimeError("The B16 turnout interval binding is not the selected domain function")
 if (routing.get("route") != "modular" or routing.get("schema_version") != 16
         or len(routing.get("function_names", ())) != 25
         or len(routing.get("caller_names", ())) != 40):
@@ -84,6 +94,17 @@ for name, caller in callers.items():
             or caller.__globals__["turnout_valid_toe_range"] is not selected
             or "turnout_valid_toe_range" not in caller.__code__.co_names):
         raise RuntimeError("The inherited turnout caller is not routed: " + name)
+interval_callers = {
+    "_turnout_find_overlap": module._turnout_find_overlap,
+    "_build_curve_inheriting_c10_turnout": module._build_curve_inheriting_c10_turnout,
+    "build_turnout_host_integration": module.build_turnout_host_integration,
+    "solve_rea_c10_crossover_geometry": module.solve_rea_c10_crossover_geometry,
+}
+for name, caller in interval_callers.items():
+    if (caller.__globals__ is not module.__dict__
+            or caller.__globals__["turnout_host_station_interval"] is not selected_interval
+            or "turnout_host_station_interval" not in caller.__code__.co_names):
+        raise RuntimeError("The inherited interval caller is not routed: " + name)
 
 document = App.ActiveDocument
 if document is None or not document.FileName:
@@ -159,7 +180,106 @@ def require_range(box, expected):
         raise RuntimeError("The inherited GUI range differs from the domain range: {} != {}".format(actual, expected))
     return actual
 
+def observed_interval_calls(action):
+    calls = []
+    active = []
+    def profile(frame, event, value):
+        if frame.f_code is selected_interval.__code__:
+            if event == "call":
+                item = {
+                    "caller": frame.f_back.f_code.co_name,
+                    "toe_chainage": float(frame.f_locals["toe_chainage"]),
+                    "dimensions": {
+                        key: frame.f_locals["dimensions"][key]
+                        for key in ("module_start_x", "module_end_x")
+                    },
+                    "orientation": str(frame.f_locals["orientation"]),
+                }
+                calls.append(item)
+                active.append(item)
+            elif event == "return" and active:
+                active.pop()["returned"] = list(value)
+    previous = sys.getprofile()
+    sys.setprofile(profile)
+    try:
+        result = action()
+    finally:
+        sys.setprofile(previous)
+    return result, calls
+
+def run_result_dialog(action, expected_text):
+    state = {"active": True, "seen": set(), "matches": [], "unexpected": []}
+    def monitor():
+        if not state["active"]:
+            return
+        for widget in list(QtWidgets.QApplication.topLevelWidgets()):
+            if not isinstance(widget, QtWidgets.QMessageBox) or not widget.isVisible():
+                continue
+            identity = id(widget)
+            if identity in state["seen"]:
+                continue
+            state["seen"].add(identity)
+            message = "{}\n{}".format(widget.text(), widget.informativeText())
+            if expected_text in message:
+                state["matches"].append(message)
+            else:
+                state["unexpected"].append(message)
+            widget.accept()
+        QtCore.QTimer.singleShot(25, monitor)
+    QtCore.QTimer.singleShot(0, monitor)
+    try:
+        action()
+    finally:
+        state["active"] = False
+    if state["unexpected"] or len(state["matches"]) != 1:
+        raise RuntimeError("The turnout action showed unexpected dialogs: {}".format(state))
+    return state["matches"][0]
+
+def configure_turnout_creation():
+    manager.mode_tabs.setCurrentIndex(0)
+    manager.refresh_hosts()
+    current = select_turnout_host(
+        manager.hosts, module.object_string_property, module._integer_object_property
+    )
+    if current["identity"] != selection["identity"]:
+        raise RuntimeError("The turnout manager changed the selected host identity")
+    manager.host_combo.setCurrentIndex(current["index"])
+    choose(manager.orientation_combo, module.TURNOUT_ORIENTATION_FACING)
+    choose(manager.handing_combo, module.TURNOUT_HAND_LEFT)
+    manager.gauge_box.setValue(16.5)
+    manager.flangeway_box.setValue(1.0)
+    manager.chainage_box.setValue(TURNOUT_CHAINAGE_MM)
+    manager.timber_outline_box.setChecked(True)
+    manager.timber_centre_box.setChecked(False)
+    manager.timber_number_box.setChecked(True)
+    manager.timber_length_box.setChecked(False)
+    manager.datum_box.setChecked(True)
+    manager.update_host_summary()
+
+def capture_visuals():
+    visual_dir = pathlib.Path(TRACKTEMPLATE_PHASE8_VISUAL_DIR)
+    top_path = visual_dir / "created-turnout-top-view.png"
+    manager_path = visual_dir / "created-turnout-manager.png"
+    manager.hide()
+    view = Gui.activeDocument().activeView()
+    view.viewTop()
+    view.fitAll()
+    view.redraw()
+    Gui.updateGui()
+    QtWidgets.QApplication.processEvents()
+    view.saveImage(str(top_path), 1600, 1000, "Current")
+    manager.show()
+    QtWidgets.QApplication.processEvents()
+    if not manager.grab().save(str(manager_path), "PNG"):
+        raise RuntimeError("Qt could not save the turnout manager screenshot")
+    for path in (top_path, manager_path):
+        image = QtGui.QImage(str(path))
+        if not path.is_file() or path.stat().st_size == 0 or image.isNull():
+            raise RuntimeError("Turnout GUI screenshot is absent or invalid: {}".format(path))
+    return [str(top_path), str(manager_path)]
+
 cases = []
+interval_proof = None
 try:
     for name, orientation, arrangement in (
         ("facing", module.TURNOUT_ORIENTATION_FACING, module.CROSSOVER_ARRANGEMENT_FACING),
@@ -215,6 +335,83 @@ try:
                 "selected_function_calls": panel_calls,
             },
         })
+
+    configure_turnout_creation()
+    dimensions = module.rea_c10_dimensions(
+        manager.gauge_box.value(), manager.flangeway_box.value()
+    )
+    expected_interval = list(selected_interval(
+        TURNOUT_CHAINAGE_MM, dimensions, module.TURNOUT_ORIENTATION_FACING
+    ))
+    creation_message, creation_calls = observed_interval_calls(
+        lambda: run_result_dialog(manager.create_turnout, "Created " + TURNOUT_ID)
+    )
+    if not any(
+        call["caller"] == "_build_curve_inheriting_c10_turnout"
+        and call["toe_chainage"] == TURNOUT_CHAINAGE_MM
+        and call["returned"] == expected_interval
+        for call in creation_calls
+    ):
+        raise RuntimeError("Turnout creation did not use the selected occupied interval")
+    created = turnout_document_snapshot(module, document)
+    settings = module.settings_for_template_set(document, "SET-001")
+    if settings is None:
+        raise RuntimeError("Turnout creation lost the selected template-set settings")
+    catalogue = json.loads(str(settings.TurnoutConfigurationsJSON))
+    if len(catalogue) != 1 or catalogue[0].get("turnout_id") != TURNOUT_ID:
+        raise RuntimeError("Turnout creation did not persist the selected identity")
+    stored_interval = catalogue[0].get("host_station_interval")
+    if stored_interval != expected_interval:
+        raise RuntimeError("The stored turnout interval differs from the selected calculation")
+    turnout_objects = [
+        obj for obj in document.Objects
+        if module.object_string_property(obj, "TurnoutID", "") == TURNOUT_ID
+    ]
+    if len(turnout_objects) != 8:
+        raise RuntimeError("Turnout creation did not retain eight managed objects")
+    for obj in turnout_objects:
+        config = json.loads(str(obj.TurnoutConfigurationJSON))
+        if config.get("host_station_interval") != expected_interval:
+            raise RuntimeError("A turnout object retained a different occupied interval")
+    created_history = [int(document.UndoCount), int(document.RedoCount)]
+    created_object_count = len(document.Objects)
+    visual_evidence = capture_visuals()
+
+    configure_turnout_creation()
+    rejection_message, rejection_calls = observed_interval_calls(
+        lambda: run_result_dialog(manager.create_turnout, "overlaps " + TURNOUT_ID)
+    )
+    if sum(
+        call["caller"] == "_turnout_find_overlap"
+        and call["toe_chainage"] == TURNOUT_CHAINAGE_MM
+        and call["returned"] == expected_interval
+        for call in rejection_calls
+    ) < 2:
+        raise RuntimeError("Overlap rejection did not compare both selected intervals")
+    rejected = turnout_document_snapshot(module, document)
+    rejected_history = [int(document.UndoCount), int(document.RedoCount)]
+    if (rejected != created or rejected_history != created_history
+            or len(document.Objects) != created_object_count):
+        raise RuntimeError("Rejected overlapping turnout changed the copied document")
+    interval_proof = {
+        "host_identity": selection["identity"],
+        "toe_chainage": TURNOUT_CHAINAGE_MM,
+        "orientation": module.TURNOUT_ORIENTATION_FACING,
+        "dimensions": {key: dimensions[key] for key in ("module_start_x", "module_end_x")},
+        "domain_interval": expected_interval,
+        "stored_interval": stored_interval,
+        "created_semantic_sha256": created["semantic_sha256"],
+        "rejected_semantic_sha256": rejected["semantic_sha256"],
+        "created_object_count": created_object_count,
+        "rejected_object_count": len(document.Objects),
+        "created_history": created_history,
+        "rejected_history": rejected_history,
+        "creation_message": creation_message,
+        "rejection_message": rejection_message,
+        "creation_calls": creation_calls,
+        "rejection_calls": rejection_calls,
+        "visual_evidence": visual_evidence,
+    }
 finally:
     manager.close()
     QtWidgets.QApplication.processEvents()
@@ -231,9 +428,12 @@ print(json.dumps({
         "caller_names": routing["caller_names"],
     },
     "selected_binding": "tracktemplate.domain.turnout.turnout_valid_toe_range",
+    "selected_interval_binding": "tracktemplate.domain.turnout.turnout_host_station_interval",
     "caller_names": list(callers),
+    "interval_caller_names": list(interval_callers),
     "host_identity": selection["identity"],
     "cases": cases,
+    "interval_proof": interval_proof,
 }, sort_keys=True))
 '''
 
@@ -242,7 +442,7 @@ def _source_hashes():
     return {str(path.relative_to(ROOT)): sha256(path) for path in SOURCE_PATHS}
 
 
-def _frozen_oracle(path):
+def _frozen_oracle(path, function_name):
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     selected = []
     for node in tree.body:
@@ -252,7 +452,7 @@ def _frozen_oracle(path):
         ):
             selected.append(node)
         if isinstance(node, ast.FunctionDef) and node.name in (
-            "_turnout_orientation_sign", "turnout_valid_toe_range"
+            "_turnout_orientation_sign", function_name
         ):
             selected.append(node)
     if len(selected) != 3:
@@ -260,7 +460,7 @@ def _frozen_oracle(path):
     module = ast.fix_missing_locations(ast.Module(body=selected, type_ignores=[]))
     namespace = {}
     exec(compile(module, str(path), "exec"), namespace)
-    return namespace["turnout_valid_toe_range"]
+    return namespace[function_name]
 
 
 def _compare_oracles(report, contract):
@@ -274,7 +474,10 @@ def _compare_oracles(report, contract):
         path = ROOT / source["path"]
         if sha256(path) != source["sha256"]:
             raise RuntimeError("The frozen {} source identity drifted".format(label))
-        oracles[label] = _frozen_oracle(path)
+        oracles[label] = {
+            "toe_range": _frozen_oracle(path, "turnout_valid_toe_range"),
+            "interval": _frozen_oracle(path, "turnout_host_station_interval"),
+        }
     cases = report.get("cases")
     if not isinstance(cases, list) or [item.get("orientation") for item in cases] != ["facing", "trailing"]:
         raise RuntimeError("The real GUI proof did not cover facing and trailing")
@@ -290,7 +493,7 @@ def _compare_oracles(report, contract):
             )
             observed = item["gui_range"]
             for label, oracle in oracles.items():
-                expected = list(oracle(*arguments))
+                expected = list(oracle["toe_range"](*arguments))
                 tolerance = 0.5 * 10.0 ** (-int(item["widget_decimals"])) + 1.0e-7
                 if (item["domain_range"] != expected
                         or any(abs(a - b) > tolerance for a, b in zip(observed, expected))):
@@ -299,6 +502,29 @@ def _compare_oracles(report, contract):
                     "orientation": case["orientation"], "control": control,
                     "oracle": label, "range": expected,
                 })
+    interval_proof = report.get("interval_proof")
+    if not isinstance(interval_proof, dict):
+        raise RuntimeError("The real GUI proof has no created turnout interval")
+    interval_arguments = (
+        interval_proof["toe_chainage"],
+        interval_proof["dimensions"],
+        interval_proof["orientation"],
+    )
+    for label, oracle in oracles.items():
+        expected = list(oracle["interval"](*interval_arguments))
+        if (interval_proof["domain_interval"] != expected
+                or interval_proof["stored_interval"] != expected):
+            raise RuntimeError("The stored turnout interval differs from frozen " + label)
+        frozen_results.append({
+            "orientation": "facing", "control": "stored turnout interval",
+            "oracle": label, "interval": expected,
+        })
+    if (interval_proof["created_semantic_sha256"]
+            != interval_proof["rejected_semantic_sha256"]
+            or interval_proof["created_history"] != interval_proof["rejected_history"]
+            or interval_proof["created_object_count"]
+            != interval_proof["rejected_object_count"]):
+        raise RuntimeError("Overlap rejection changed the copied turnout document")
     return frozen_results
 
 
@@ -376,12 +602,21 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
         job = submit_and_wait(
             client,
             "TRACKTEMPLATE_PHASE3_ROUTE = 'modular'\n"
+            + "TRACKTEMPLATE_PHASE8_VISUAL_DIR = {!r}\n".format(str(run_dir))
             + LOADER_PATH.read_text(encoding="utf-8") + "\n" + GUI_PROBE,
             "Phase 8 turnout toe real GUI",
             args.timeout,
         )
         state["probe"] = parse_json_output(job)
         state["frozen_oracle_comparison"] = _compare_oracles(state["probe"], contract)
+        state["visual_evidence"] = {
+            pathlib.Path(path).name: {
+                "path": path,
+                "bytes": pathlib.Path(path).stat().st_size,
+                "sha256": sha256(pathlib.Path(path)),
+            }
+            for path in state["probe"]["interval_proof"]["visual_evidence"]
+        }
         state["run_document_sha256"] = sha256(document_path)
         state["status"] = "PASS"
     except (Exception, SystemExit) as error:
