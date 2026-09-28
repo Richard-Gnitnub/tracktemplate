@@ -182,6 +182,23 @@ MCP endpoint, or script as a separate skill. Put deterministic operations in
 tested scripts. Keep the bounded scope, evidence interpretation, and authority
 decisions visible to the agent and project owner.
 
+If the tool can start related `cat`, `sed -n START[,END]p -- FILE ...`, or
+`rg` commands, use one
+[`run_inspection_bundle.py`](../tools/run_inspection_bundle.py) `run` command.
+The tool keeps all `stdout` and `stderr` command output. The short result
+identifies the manifest and `evidence_key`. Use `retrieve` with the manifest
+and `evidence_key` to get a part of the output. The tool compares the output
+hash with the manifest before it gives that part.
+
+If the tool cannot start a command, use that command without the tool. If
+this group adds work that is not necessary, use the commands without the
+tool. Select only the necessary files and output for each command without
+the tool. When the command completes without an error, return its output only
+if an applicable control makes the output necessary. Keep all necessary
+evidence. Start the commands for each new inspection. Do not
+use a result from a previous command invocation as evidence for a new
+inspection. Do not use the tool in place of necessary validation or review.
+
 ## Development-toolchain preflight routing
 
 The canonical
