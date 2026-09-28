@@ -182,6 +182,15 @@ MCP endpoint, or script as a separate skill. Put deterministic operations in
 tested scripts. Keep the bounded scope, evidence interpretation, and authority
 decisions visible to the agent and project owner.
 
+For related required read-only inspections, prefer one fresh
+[`run_inspection_bundle.py`](../tools/run_inspection_bundle.py) `run` invocation
+when it supports the `cat`, bounded `sed`, or `rg` command forms. The tool keeps
+complete stdout and stderr. Its concise result identifies the manifest and
+evidence key. Use `retrieve` with both identities for a verified excerpt. Use
+direct bounded inspections when the tool does not support the command or
+grouping would add work. Do not use a prior result as current evidence. Do not
+replace required validation or review with an inspection bundle.
+
 ## Development-toolchain preflight routing
 
 The canonical
