@@ -192,9 +192,11 @@ hash with the manifest before it gives that part.
 
 If the tool cannot start a command, use that command without the tool. If
 this group adds work that is not necessary, use the commands without the
-tool. Start the commands for each new inspection. Do not use a result from a
-previous command invocation as evidence for a new inspection. Do not use the
-tool in place of necessary validation or review.
+tool. Limit each direct inspection to the necessary files and output. If
+existing controls permit, do not return successful direct output to the agent.
+Keep all required evidence. Start the commands for each new inspection. Do not
+use a result from a previous command invocation as evidence for a new
+inspection. Do not use the tool in place of necessary validation or review.
 
 ## Development-toolchain preflight routing
 
