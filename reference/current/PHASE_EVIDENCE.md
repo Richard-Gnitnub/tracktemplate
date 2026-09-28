@@ -501,33 +501,40 @@ exit. Project status stays `unknown`.
 
 ## Phase 8 fixed `XO-001` B4 error evidence — 2026-09-28
 
-Before this change, an error at the first `B4` tag left an untagged object in a
-copy of a FreeCAD document when `UndoMode=0`. B16 now removes only the new
-object from that failed command. The check with `UndoMode=0` and `UndoMode=1`
-found the same document data and `Undo`/`Redo` history as before the error.
+With `UndoMode=0` on clean `main`, an error in the first `B4` use of
+`tag_generated_object` leaves a new `Part::Feature` in FreeCAD. The check
+starts with a `.FCStd` file that has the source fixture data. B16 now removes
+only this new `Part::Feature` after the command fails. Checks with
+`UndoMode=0` and `UndoMode=1` show the same FreeCAD data and `Undo`/`Redo`
+counts and names as before the error.
 
-A check with `FreeCADGui` active showed the error and found no new untagged
-object. A later application of `B4` to the fixed `XO-001` produced
-`effective_timber_count=86` and `shared_timber_count=16`. The accepted
+With `FreeCADGui` active, the check shows the error and no new
+`Part::Feature`. B16 then applies `B4` to the fixed `XO-001`. The result has
+`effective_timber_count=86` and `shared_timber_count=16`. The
 `record_identity_sha256`, `stable_record_sha256`, and `resolution_signature`
-values matched. One `Undo` and one `Redo` restored the expected data.
+values equal the [contract values](../contracts/phase1-crossover-timbering.json).
+After one `Undo`, the FreeCAD data equals the data before `B4`. After one
+`Redo`, the data equals the data after `B4`.
 
-The check saved the document as `.FCStd`, closed it, and opened it again. The
-`B4` result was unchanged. The source fixture did not change.
+The check uses `document.save`, `App.closeDocument`, and `App.openDocument`
+in that order. The `B4` result is the same before `App.closeDocument` and
+after `App.openDocument`. The SHA-256 of the source fixture is the same before
+and after the check.
 
-The before-change failure and passing FreeCAD results are in
+The clean `main` result and the B16 FreeCAD results are in
 `benchmark-output/phase8-crossover-b4-recovery/`. The GUI result and images
 are in `benchmark-output/freecad-bridge/phase8-crossover-b4-recovery-gui-runs/20260928T134606144975Z/`.
 
 This result gives partial evidence for Phase 8 Exit 2 only. PR-17 stays
-Open/Partial. All four exits stay Pending. The check does not prove a straight
-alignment, other crossover cases or the complete save/reopen journey.
+Open/Partial. All four exits stay Pending. The check does not show a straight
+alignment or other crossovers. It also does not show all Phase 8 Exit 2
+operations to write, close, and open a file.
 
-The isolated worktree cannot complete the local profile check that needs the
-primary `main` checkout and ignored archive. TERM-R04 stays open. D-P6-008
-stays Deferred — unmet. All B14/B15 comparison and removal conditions remain.
-No full B4 migration, product
-performance, production output, release or exit acceptance follows.
+The primary `main` worktree and an ignored source archive are necessary for
+the local profile check. The isolated worktree does not have these inputs.
+TERM-R04 stays open. D-P6-008 stays Deferred — unmet. The B14/B15 comparison
+and removal conditions do not change. No full B4 migration, product
+performance, production output, release, or exit acceptance follows.
 
 ## Phase 8 exit conditions
 
