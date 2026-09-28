@@ -3,6 +3,9 @@
 from dataclasses import dataclass
 
 from tracktemplate.application import turnout_edit
+from tracktemplate.compatibility.crossover_preflight import (
+    CrossoverPreflightAdapter,
+)
 from tracktemplate.compatibility.b15_workflow_host import (
     EXPECTED_WORKFLOW_VERSION,
     FUNCTION_NAMES,
@@ -230,6 +233,22 @@ _TURNOUT_SUMMARY_CALLERS = (
     "edit_curve_inheriting_c10_turnout",
     "TurnoutManagerDialog.update_host_summary",
     "TurnoutManagerDialog.apply_turnout_edit",
+)
+_CROSSOVER_PREFLIGHT_FUNCTIONS = (
+    "solve_rea_c10_crossover_geometry",
+    "_build_rea_c10_crossover_geometry",
+    "create_rea_c10_crossover",
+    "edit_rea_c10_crossover",
+    "extend_turnout_to_rea_c10_crossover",
+    "crossover_geometry_diagnostics_text",
+    "crossover_solver_trace_text",
+    "turnout_mapping_metrics",
+    "turnout_host_alignment",
+    "existing_turnout_configs",
+    "existing_crossover_configs",
+    "crossover_config_by_id",
+    "object_string_property",
+    "_integer_object_property",
 )
 
 __all__ = (
@@ -930,6 +949,57 @@ class ModularTransitionWorkflowSession:
                     self.module.__dict__,
                 )
             )
+        namespace = self.module.__dict__
+        panel = namespace.get("CrossoverManagerPanel")
+        self._crossover_preflight = None
+        self._crossover_preview_method = None
+        crossover_present = any(
+            name in namespace for name in (
+                "_build_rea_c10_crossover_geometry",
+                "create_rea_c10_crossover",
+                "edit_rea_c10_crossover",
+                "extend_turnout_to_rea_c10_crossover",
+                "turnout_mapping_metrics",
+                "crossover_geometry_diagnostics_text",
+                "crossover_solver_trace_text",
+            )
+        )
+        crossover_complete = (
+            all(
+                callable(namespace.get(name))
+                for name in _CROSSOVER_PREFLIGHT_FUNCTIONS
+            )
+            and isinstance(panel, type)
+            and callable(panel.__dict__.get("_preview_signature"))
+            and callable(panel.__dict__.get("preview_geometry"))
+        )
+        if crossover_present and not crossover_complete:
+            raise TransitionWorkflowError(
+                "The inherited crossover preflight boundary is incomplete."
+            )
+        if crossover_complete:
+            adapter = CrossoverPreflightAdapter(
+                self.module,
+                namespace["solve_rea_c10_crossover_geometry"],
+                namespace["_build_rea_c10_crossover_geometry"],
+                namespace["edit_rea_c10_crossover"],
+                namespace["crossover_geometry_diagnostics_text"],
+                namespace["crossover_solver_trace_text"],
+                panel.__dict__["_preview_signature"],
+            )
+
+            def preview_signature(panel_instance, values):
+                return adapter.preview_signature(panel_instance, values)
+
+            self._crossover_preflight = adapter
+            self._crossover_preview_method = preview_signature
+            self._host_functions.update({
+                "solve_rea_c10_crossover_geometry": adapter.solve,
+                "_build_rea_c10_crossover_geometry": adapter.build,
+                "edit_rea_c10_crossover": adapter.edit,
+                "crossover_geometry_diagnostics_text": adapter.diagnostics,
+                "crossover_solver_trace_text": adapter.trace_text,
+            })
         self._bind_modular()
 
     def _bind_modular(self):
@@ -939,8 +1009,15 @@ class ModularTransitionWorkflowSession:
             name: namespace.get(name, missing)
             for name in self._host_functions
         }
+        panel = namespace.get("CrossoverManagerPanel")
+        previous_preview = (
+            panel.__dict__.get("_preview_signature", missing)
+            if self._crossover_preflight is not None else missing
+        )
         try:
             namespace.update(self._host_functions)
+            if self._crossover_preflight is not None:
+                panel._preview_signature = self._crossover_preview_method
             self._validate_binding()
         except Exception:
             for name, value in previous.items():
@@ -948,11 +1025,25 @@ class ModularTransitionWorkflowSession:
                     namespace.pop(name, None)
                 else:
                     namespace[name] = value
+            if self._crossover_preflight is not None:
+                if previous_preview is missing:
+                    delattr(panel, "_preview_signature")
+                else:
+                    panel._preview_signature = previous_preview
             raise
 
     def _validate_binding(self):
         """Verify selected domain and host edges without repairing them."""
         namespace = self.module.__dict__
+
+        def inherited_caller(name):
+            if (
+                name == "solve_rea_c10_crossover_geometry"
+                and self._crossover_preflight is not None
+            ):
+                return self._crossover_preflight.original_solver
+            return namespace.get(name)
+
         if (
             (_TURNOUT_TOE_RANGE_BINDING in namespace)
             != self._turnout_toe_range_enabled
@@ -985,7 +1076,7 @@ class ModularTransitionWorkflowSession:
                         if isinstance(owner, type) else None
                     )
                 else:
-                    caller = namespace.get(caller_name)
+                    caller = inherited_caller(caller_name)
                 code = getattr(caller, "__code__", None)
                 caller_globals = getattr(caller, "__globals__", None)
                 if (
@@ -1026,7 +1117,7 @@ class ModularTransitionWorkflowSession:
                     "unavailable."
                 )
             for caller_name in _TURNOUT_HOST_INTERVAL_CALLERS:
-                caller = namespace.get(caller_name)
+                caller = inherited_caller(caller_name)
                 code = getattr(caller, "__code__", None)
                 caller_globals = getattr(caller, "__globals__", None)
                 if (
@@ -1089,6 +1180,111 @@ class ModularTransitionWorkflowSession:
                     raise TransitionWorkflowError(
                         "The inherited turnout edit-summary caller {!r} is "
                         "unavailable or mixed.".format(caller_name)
+                    )
+        if self._crossover_preflight is not None:
+            adapter = self._crossover_preflight
+            panel = namespace.get("CrossoverManagerPanel")
+            if not isinstance(panel, type) or (
+                panel.__dict__.get("_preview_signature")
+                is not self._crossover_preview_method
+            ):
+                raise TransitionWorkflowError(
+                    "The crossover panel preflight signature is mixed."
+                )
+            for name in (
+                "solve_rea_c10_crossover_geometry",
+                "_build_rea_c10_crossover_geometry",
+                "edit_rea_c10_crossover",
+                "crossover_geometry_diagnostics_text",
+                "crossover_solver_trace_text",
+            ):
+                if namespace.get(name) is not self._host_functions[name]:
+                    raise TransitionWorkflowError(
+                        "The crossover preflight binding {!r} is mixed."
+                        .format(name)
+                    )
+            if (
+                adapter.module is not self.module
+                or getattr(adapter.original_solver, "__globals__", None)
+                is not namespace
+                or getattr(adapter.original_builder, "__globals__", None)
+                is not namespace
+                or getattr(adapter.original_editor, "__globals__", None)
+                is not namespace
+                or getattr(adapter.original_diagnostics, "__globals__", None)
+                is not namespace
+                or getattr(adapter.original_trace_text, "__globals__", None)
+                is not namespace
+                or getattr(
+                    adapter.original_preview_signature, "__globals__", None,
+                ) is not namespace
+            ):
+                raise TransitionWorkflowError(
+                    "The inherited crossover preflight boundary is unavailable."
+                )
+            def recorded_original(method_name):
+                method = panel.__dict__.get(method_name)
+                if getattr(
+                    method, "_whole_workflow_benchmark_wrapper", False,
+                ):
+                    if getattr(
+                        method, "_whole_workflow_wrapper_version", None,
+                    ) != EXPECTED_WORKFLOW_VERSION:
+                        raise TransitionWorkflowError(
+                            "The inherited crossover {} wrapper drifted."
+                            .format(method_name)
+                        )
+                    method = getattr(
+                        method, "_whole_workflow_original", None,
+                    )
+                return method
+
+            preview = recorded_original("preview_geometry")
+            create_panel = recorded_original("create_crossover")
+            callers = (
+                ("create_rea_c10_crossover",
+                 namespace.get("create_rea_c10_crossover"),
+                 "_build_rea_c10_crossover_geometry"),
+                ("edit_rea_c10_crossover", adapter.original_editor,
+                 "_build_rea_c10_crossover_geometry"),
+                ("extend_turnout_to_rea_c10_crossover",
+                 namespace.get("extend_turnout_to_rea_c10_crossover"),
+                 "_build_rea_c10_crossover_geometry"),
+                ("CrossoverManagerPanel.preview_geometry",
+                 preview,
+                 "solve_rea_c10_crossover_geometry"),
+                ("CrossoverManagerPanel.preview_geometry",
+                 preview,
+                 "_preview_signature"),
+                ("CrossoverManagerPanel.preview_geometry",
+                 preview,
+                 "crossover_geometry_diagnostics_text"),
+                ("CrossoverManagerPanel.preview_geometry",
+                 preview,
+                 "crossover_solver_trace_text"),
+                ("CrossoverManagerPanel.create_crossover",
+                 create_panel,
+                 "preview_geometry"),
+                ("CrossoverManagerPanel.create_crossover",
+                 create_panel,
+                 "create_rea_c10_crossover"),
+                ("CrossoverManagerPanel.create_crossover",
+                 create_panel,
+                 "edit_rea_c10_crossover"),
+                ("CrossoverManagerPanel.create_crossover",
+                 create_panel,
+                 "extend_turnout_to_rea_c10_crossover"),
+            )
+            for caller_name, caller, target in callers:
+                code = getattr(caller, "__code__", None)
+                if (
+                    code is None
+                    or getattr(caller, "__globals__", None) is not namespace
+                    or target not in code.co_names
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited crossover caller {!r} for {!r} is "
+                        "unavailable.".format(caller_name, target)
                     )
         for name in PRODUCT_FUNCTION_NAMES:
             if namespace.get(name) is not self._host_functions[name]:
@@ -1493,7 +1689,12 @@ class ModularTransitionWorkflowSession:
                     "use_picked_crossover_position", None,
                 ) if name == (
                     "CrossoverManagerPanel.use_picked_crossover_position"
-                ) else namespace.get(name),
+                ) else (
+                    self._crossover_preflight.original_solver
+                    if name == "solve_rea_c10_crossover_geometry"
+                    and self._crossover_preflight is not None
+                    else namespace.get(name)
+                ),
                 targets, self._host_functions, True,
             )
             for name, targets in host_routes

@@ -81,6 +81,9 @@ from tracktemplate.application.turnout_edit import (
 from tracktemplate.compatibility.transition_workflow import (
     _TurnoutConfigurationSummaryAdapter,
 )
+from tracktemplate.compatibility.crossover_preflight import (
+    CrossoverPreflightAdapter,
+)
 from tracktemplate.domain import turnout as domain_turnout
 
 module = _PHASE3_SESSION.module
@@ -88,6 +91,12 @@ routing = _PHASE3_ROUTING
 selected = domain_turnout.turnout_valid_toe_range
 selected_interval = domain_turnout.turnout_host_station_interval
 selected_summary_adapter = module.turnout_configuration_change_summary
+crossover_adapter = getattr(
+    module.solve_rea_c10_crossover_geometry, "__self__", None,
+)
+if not isinstance(crossover_adapter, CrossoverPreflightAdapter):
+    raise RuntimeError("The B16 crossover solver is not routed through the selected adapter")
+inherited_crossover_solver = crossover_adapter.original_solver
 if str(module.MACRO_VERSION_NUMBER) != "10.2A8A7B15":
     raise RuntimeError("The inherited B15 host version changed")
 if module.turnout_valid_toe_range is not selected:
@@ -106,7 +115,7 @@ if (routing.get("route") != "modular" or routing.get("schema_version") != 16
 callers = {
     "_build_curve_inheriting_c10_turnout": module._build_curve_inheriting_c10_turnout,
     "_crossover_solve_toe_b": module._crossover_solve_toe_b,
-    "solve_rea_c10_crossover_geometry": module.solve_rea_c10_crossover_geometry,
+    "solve_rea_c10_crossover_geometry": inherited_crossover_solver,
     "CrossoverManagerPanel.update_chainage_range": module.CrossoverManagerPanel.update_chainage_range,
     "TurnoutManagerDialog.update_host_summary": module.TurnoutManagerDialog.update_host_summary,
 }
@@ -119,7 +128,7 @@ interval_callers = {
     "_turnout_find_overlap": module._turnout_find_overlap,
     "_build_curve_inheriting_c10_turnout": module._build_curve_inheriting_c10_turnout,
     "build_turnout_host_integration": module.build_turnout_host_integration,
-    "solve_rea_c10_crossover_geometry": module.solve_rea_c10_crossover_geometry,
+    "solve_rea_c10_crossover_geometry": inherited_crossover_solver,
 }
 for name, caller in interval_callers.items():
     if (caller.__globals__ is not module.__dict__
