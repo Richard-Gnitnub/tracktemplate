@@ -645,6 +645,59 @@ and `PNG` files are in
 The local `ci` profile gave PASS results for all 84 checks. The results are in
 `benchmark-output/standalone-validation/20260928T170104718903Z/`.
 
+## Phase 8 `XO-001` `B4` display evidence — 2026-09-28
+
+B16 keeps the stored `B4` result when a person changes only
+`show_b4_geometry` for the selected `XO-001` on two alignments with curves.
+A check used FreeCAD with `FreeCADGui` active on a qualified host profile.
+After the check called `refresh_crossovers`, `Show final resolved timbering` showed
+the same value as `ViewObject.Visibility`.
+
+The check changed this check box and selected
+`Resolve crossover timbering automatically`. The `B4` object and its
+shape did not change. The check found that `resolve_crossover_b4_timbering`
+and `_shared_timber_shape_from_records` did not run. The stored `B4`
+result, `resolved_analysis` data and `Undo`/`Redo` data did not change.
+
+The check used a `.FCStd` file made from the source fixture. It set
+`ViewObject.Visibility` to `False` and called `document.save()`. After
+FreeCAD opened the file, `ViewObject.Visibility` was `False`. The stored
+`B4` data were equal before and after the file opened. A check found
+equal values at each position in the two `Top` view `.png` files.
+
+The `timber_semantic_sha256` values were different because the derived
+`Shape` of the `ModelRailwayCurve` group changed after the file opened again.
+When the check did not include this `Shape`, the hashes for the stored data were
+equal. The source fixture did not change.
+
+A second check used FreeCAD without `FreeCADGui` active on a qualified host
+profile. It found equal results from `_b4_resolution_signature` for `True`
+and `False` values of `show_b4_geometry`. The check changed `b3_settings`
+and B16 calculated a new `B4` result. After `Undo`, the data
+were equal to the saved data.
+
+The result from FreeCAD without `FreeCADGui` is in
+`tmp/phase8-b4-display-only/final-headless.log`. The result from FreeCAD
+with `FreeCADGui` and the `.png` files are in
+`benchmark-output/freecad-bridge/phase8-crossover-b4-recovery-gui-runs/20260928T184443291454Z/`.
+
+This result adds evidence for Phase 8 exits 1 and 2 and PR-16. PR-16 is
+Open and its control effectiveness is Partial. The [FreeCAD persistence adapter](../ARCHITECTURE.md#3-freecad-persistence-adapter)
+and [presentation adapter](../ARCHITECTURE.md#4-lightweight-presentation-adapter)
+did not change. All four exits stay Pending.
+
+The `resolved_analysis_sha256` values from the two FreeCAD checks are
+different. These checks do not prove that the complete `resolved_analysis`
+data are the same with and without `FreeCADGui` active. The earlier check
+used only one pair of straight alignments. Checks of other crossover
+inputs are necessary. More checks must use `document.save()` and
+`App.openDocument()` for other journeys.
+
+The recorded limit for the `local` profile in this worktree applies.
+D-P6-008 and TERM-R04 do not change. All conditions in
+[D-P8-001](#phase-8-opening-panel) apply. This result
+gives no owner acceptance for a Phase 8 exit, production output or release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision

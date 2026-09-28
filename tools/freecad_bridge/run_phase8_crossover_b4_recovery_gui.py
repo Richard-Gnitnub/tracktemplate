@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove the fixed B16 XO-001 B4 failure recovery in a real FreeCAD GUI."""
+"""Prove fixed B16 XO-001 B4 recovery and visibility in a real GUI."""
 
 import argparse
 import datetime
@@ -107,23 +107,75 @@ def history(active_document):
 def state(active_document):
     ordinary = ordinary_track_document_snapshot(module, active_document)
     timber = recipe.document_snapshot(module, active_document, "XO-001")
+    # A group Shape is derived from its children and GUI visibility on reopen.
+    group = dict(timber["objects"]["ModelRailwayCurve"])
+    if group["type_id"] != "App::DocumentObjectGroup":
+        raise RuntimeError("The model group type changed")
+    group.pop("shape", None)
+    reopen_semantic = dict(timber)
+    reopen_semantic["objects"] = dict(timber["objects"])
+    reopen_semantic["objects"]["ModelRailwayCurve"] = group
     return {
         "ordinary_semantic_sha256": ordinary["semantic_sha256"],
         "timber_semantic_sha256": recipe.digest(timber),
+        "reopen_semantic_sha256": recipe.digest(reopen_semantic),
         "object_names": [str(obj.Name) for obj in active_document.Objects],
         "history": history(active_document),
         "ordinary_semantic": ordinary["semantic"],
         "timber_semantic": timber,
+        "reopen_semantic": reopen_semantic,
     }
 
 
-def require_same_semantics(actual, expected, label):
+def require_same_semantics(
+    actual, expected, label, *, allow_derived_group_shape=False,
+):
     for key in (
         "ordinary_semantic_sha256", "timber_semantic_sha256",
         "object_names", "ordinary_semantic", "timber_semantic",
     ):
         if actual[key] != expected[key]:
-            raise RuntimeError("{} changed the copied document: {}".format(label, key))
+            if (allow_derived_group_shape
+                    and key in ("timber_semantic_sha256", "timber_semantic")
+                    and actual["reopen_semantic"]
+                    == expected["reopen_semantic"]):
+                continue
+            detail = ""
+            if key == "timber_semantic_sha256":
+                before = expected["timber_semantic"]
+                after = actual["timber_semantic"]
+                fields = sorted(
+                    name for name in set(before) | set(after)
+                    if before.get(name) != after.get(name)
+                )
+                detail = " (fields: {})".format(fields)
+                if "config" in fields:
+                    config_fields = sorted(
+                        name for name in set(before["config"]) | set(after["config"])
+                        if before["config"].get(name) != after["config"].get(name)
+                    )
+                    detail += " (config: {})".format(config_fields)
+                if "objects" in fields:
+                    object_fields = {
+                        name: sorted(
+                            field for field in (
+                                set(before["objects"].get(name) or {})
+                                | set(after["objects"].get(name) or {})
+                            )
+                            if (before["objects"].get(name) or {}).get(field)
+                            != (after["objects"].get(name) or {}).get(field)
+                        )
+                        for name in (
+                            set(before["objects"]) | set(after["objects"])
+                        )
+                        if before["objects"].get(name) != after["objects"].get(name)
+                    }
+                    detail += " (objects: {})".format(object_fields)
+            raise RuntimeError(
+                "{} changed the copied document: {}{}".format(
+                    label, key, detail,
+                )
+            )
 
 
 def b4_persistence(active_document):
@@ -390,6 +442,48 @@ try:
             or b4_persistence(document) != applied_persistence):
         raise RuntimeError("Unchanged B4 reuse modified document or history")
 
+    shape_brep = b4_obj.Shape.exportBrepToString()
+    solver = module.resolve_crossover_b4_timbering
+    shape_builder = module._shared_timber_shape_from_records
+    display_calls = {"solver": 0, "shape": 0}
+
+    def counted_solver(*args, **kwargs):
+        display_calls["solver"] += 1
+        return solver(*args, **kwargs)
+
+    def counted_shape(*args, **kwargs):
+        display_calls["shape"] += 1
+        return shape_builder(*args, **kwargs)
+
+    module.resolve_crossover_b4_timbering = counted_solver
+    module._shared_timber_shape_from_records = counted_shape
+    try:
+        for visible in (False, True):
+            panel.show_b4_checkbox.setChecked(visible)
+            QtWidgets.QApplication.processEvents()
+            if bool(b4_obj.ViewObject.Visibility) != visible:
+                raise RuntimeError("The B4 checkbox did not change visibility")
+            panel.apply_b4_button.click()
+            panel.refresh_crossovers("XO-001")
+            if (bool(b4_obj.ViewObject.Visibility) != visible
+                    or panel.show_b4_checkbox.isChecked() != visible
+                    or panel.current_config().get("crossover_id") != "XO-001"):
+                raise RuntimeError("The B4 panel lost live visibility or selection")
+            if (module._crossover_b4_object(document, "XO-001") is not b4_obj
+                    or b4_obj.Shape.exportBrepToString() != shape_brep
+                    or b4_persistence(document) != applied_persistence
+                    or history(document) != applied["history"]):
+                raise RuntimeError("Display-only B4 Apply changed product state")
+        if display_calls != {"solver": 0, "shape": 0}:
+            raise RuntimeError("Display-only B4 Apply rebuilt calculation or shape")
+    finally:
+        module.resolve_crossover_b4_timbering = solver
+        module._shared_timber_shape_from_records = shape_builder
+    if state(document)["timber_semantic_sha256"] != applied[
+        "timber_semantic_sha256"
+    ]:
+        raise RuntimeError("B4 show/hide round trip changed the document")
+
     document.undo()
     document.recompute()
     undone = state(document)
@@ -409,14 +503,40 @@ try:
     if redone_persistence != applied_persistence:
         raise RuntimeError("B4 Redo changed stored resolved diagnostics")
 
+    panel.show_b4_checkbox.setChecked(False)
+    QtWidgets.QApplication.processEvents()
+    if (bool(b4_obj.ViewObject.Visibility)
+            or history(document) != redone["history"]
+            or b4_persistence(document) != applied_persistence):
+        raise RuntimeError("B4 visibility-only save setup changed product state")
+    hidden_before_capture = state(document)
+    hidden_visual = capture_top("xo-001-hidden-b4-top-view.png")
     manager.close()
     QtWidgets.QApplication.processEvents()
+    hidden_saved = state(document)
+    if (history(document) != redone["history"]
+            or b4_persistence(document) != applied_persistence):
+        raise RuntimeError("Closing the B4 panel changed stored result or history")
+    view_capture_changed_objects = sorted(
+        name for name in (
+            set(hidden_before_capture["timber_semantic"]["objects"])
+            | set(hidden_saved["timber_semantic"]["objects"])
+        )
+        if (hidden_before_capture["timber_semantic"]["objects"].get(name)
+            != hidden_saved["timber_semantic"]["objects"].get(name))
+    )
     document.save()
     saved_path = str(document.FileName)
     App.closeDocument(str(document.Name))
     document = App.openDocument(saved_path)
     reopened = state(document)
-    require_same_semantics(reopened, applied, "Copied FCStd save/reopen")
+    require_same_semantics(
+        reopened, hidden_saved, "Copied FCStd save/reopen",
+        allow_derived_group_shape=True,
+    )
+    reopened_b4 = module._crossover_b4_object(document, "XO-001")
+    if reopened_b4 is None or bool(reopened_b4.ViewObject.Visibility):
+        raise RuntimeError("B4 visibility changed after save/reopen")
     reopened_persistence = b4_persistence(document)
     if reopened_persistence != applied_persistence:
         raise RuntimeError("B4 save/reopen changed stored resolved diagnostics")
@@ -481,6 +601,22 @@ try:
             ),
             "document_and_history_unchanged": True,
         },
+        "display_only": {
+            "solver_calls": display_calls["solver"],
+            "shape_calls": display_calls["shape"],
+            "history_unchanged": True,
+            "persistence_unchanged": True,
+            "checkbox_matches_visibility": True,
+            "reopened_hidden": True,
+            "hidden_timber_semantic_sha256": hidden_saved[
+                "timber_semantic_sha256"
+            ],
+            "hidden_reopen_semantic_sha256": hidden_saved[
+                "reopen_semantic_sha256"
+            ],
+            "view_capture_changed_objects": view_capture_changed_objects,
+            "hidden_visual": hidden_visual,
+        },
         "undo": {
             "object_count": len(undone["object_names"]),
             "timber_semantic_sha256": undone["timber_semantic_sha256"],
@@ -498,6 +634,7 @@ try:
             "path": saved_path,
             "object_count": len(reopened["object_names"]),
             "timber_semantic_sha256": reopened["timber_semantic_sha256"],
+            "reopen_semantic_sha256": reopened["reopen_semantic_sha256"],
             "history": reopened["history"],
             "resolved_analysis_sha256": reopened_persistence[
                 "analysis_sha256"
@@ -571,6 +708,13 @@ def _check_probe(probe, contract):
             or probe["redo"]["resolved_analysis_sha256"] != digest
             or probe["save_reopen"]["resolved_analysis_sha256"] != digest):
         raise RuntimeError("B4 resolved diagnostics were not stable in the GUI lifecycle")
+    display = probe["display_only"]
+    if (display["solver_calls"] != 0 or display["shape_calls"] != 0
+            or display["history_unchanged"] is not True
+            or display["persistence_unchanged"] is not True
+            or display["checkbox_matches_visibility"] is not True
+            or display["reopened_hidden"] is not True):
+        raise RuntimeError("The GUI B4 visibility-only route changed calculation")
     if (before["object_count"] != 18
             or failure["object_count"] != 18
             or applied["object_count"] != 20
@@ -584,12 +728,13 @@ def _check_probe(probe, contract):
             or failure["history"] != before["history"]
             or probe["undo"]["timber_semantic_sha256"] != before["timber_semantic_sha256"]
             or probe["redo"]["timber_semantic_sha256"] != applied["timber_semantic_sha256"]
-            or probe["save_reopen"]["timber_semantic_sha256"] != applied["timber_semantic_sha256"]):
+            or probe["save_reopen"]["reopen_semantic_sha256"]
+            != display["hidden_reopen_semantic_sha256"]):
         raise RuntimeError("B4 failure, Undo/Redo or save/reopen changed canonical state")
     return [
         before["visual"], failure["dialog"]["visual"],
         failure["after_visual"], *applied["visuals"],
-        probe["save_reopen"]["visual"],
+        display["hidden_visual"], probe["save_reopen"]["visual"],
     ]
 
 
@@ -628,13 +773,13 @@ def main():
     document_path = run_dir / "phase8-crossover-b4-recovery.FCStd"
     shutil.copy2(base, document_path)
     state = {
-        "recipe_id": "phase8-b16-crossover-b4-first-tag-recovery-gui-v1",
+        "recipe_id": "phase8-b16-crossover-b4-visibility-gui-v2",
         "started_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "source_fixture": str(base),
         "source_fixture_sha256": fixture_hash,
         "source_sha256": source_hashes,
         "run_document": str(document_path),
-        "scope": "fixed curved XO-001 B4 first-tag recovery and one successful GUI lifecycle",
+        "scope": "fixed curved XO-001 B4 recovery, visibility and one GUI lifecycle",
     }
     client = FreeCADClient(
         host="127.0.0.1", port=PORT, timeout=30.0,

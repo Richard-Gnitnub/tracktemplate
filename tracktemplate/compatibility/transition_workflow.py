@@ -256,6 +256,14 @@ _CROSSOVER_PREFLIGHT_FUNCTIONS = (
 _CROSSOVER_B4_RECOVERY_FUNCTIONS = (
     "apply_crossover_b4_timbering",
     "_write_crossover_b4_and_timber_analysis_metadata",
+    "_b4_resolution_signature",
+    "_crossover_b4_result_is_current",
+    "_crossover_b4_object",
+    "crossover_inherited_timber_records",
+    "normalise_crossover_b4_settings",
+    "normalise_crossover_b3_settings",
+    "normalise_crossover_shared_timber_settings",
+    "normalise_crossover_timber_analysis_settings",
     "tag_generated_object",
     "crossover_config_by_id",
     "object_string_property",
@@ -964,6 +972,7 @@ class ModularTransitionWorkflowSession:
         self._crossover_preflight = None
         self._crossover_preview_method = None
         self._crossover_b4_recovery = None
+        self._crossover_b4_panel_update_method = None
         crossover_present = any(
             name in namespace for name in (
                 "_build_rea_c10_crossover_geometry",
@@ -1023,6 +1032,10 @@ class ModularTransitionWorkflowSession:
             )
             and isinstance(namespace.get("CROSSOVER_B4_ROLE"), str)
             and callable(b4_panel_method)
+            and callable(
+                panel.__dict__.get("update_selection_buttons")
+                if isinstance(panel, type) else None
+            )
         )
         if (b4_apply_present or b4_panel_method is not None) and not b4_complete:
             raise TransitionWorkflowError(
@@ -1033,10 +1046,40 @@ class ModularTransitionWorkflowSession:
             self._crossover_b4_recovery = CrossoverB4RecoveryAdapter(
                 self.module, namespace["apply_crossover_b4_timbering"],
                 namespace["_write_crossover_b4_and_timber_analysis_metadata"],
+                namespace["_b4_resolution_signature"],
+                namespace["_crossover_b4_result_is_current"],
             )
-            self._host_functions["apply_crossover_b4_timbering"] = (
-                self._crossover_b4_recovery.apply
-            )
+            b4_adapter = self._crossover_b4_recovery
+            self._host_functions.update({
+                "apply_crossover_b4_timbering": b4_adapter.apply,
+                "_b4_resolution_signature": b4_adapter.resolution_signature,
+                "_crossover_b4_result_is_current": b4_adapter.result_is_current,
+            })
+            original_panel_update = panel.__dict__["update_selection_buttons"]
+
+            def update_selection_buttons(panel_instance):
+                original_panel_update(panel_instance)
+                config = panel_instance.current_config()
+                if config is None:
+                    return
+                obj = namespace["_crossover_b4_object"](
+                    panel_instance.doc, config.get("crossover_id"),
+                )
+                if obj is None:
+                    return
+                view = getattr(obj, "ViewObject", None)
+                if view is None or not hasattr(view, "Visibility"):
+                    return
+                visible = bool(view.Visibility)
+                panel_instance.b4_settings["show_b4_geometry"] = visible
+                checkbox = panel_instance.show_b4_checkbox
+                checkbox.blockSignals(True)
+                try:
+                    checkbox.setChecked(visible)
+                finally:
+                    checkbox.blockSignals(False)
+
+            self._crossover_b4_panel_update_method = update_selection_buttons
         self._bind_modular()
 
     def _bind_modular(self):
@@ -1051,10 +1094,18 @@ class ModularTransitionWorkflowSession:
             panel.__dict__.get("_preview_signature", missing)
             if self._crossover_preflight is not None else missing
         )
+        previous_b4_panel_update = (
+            panel.__dict__.get("update_selection_buttons", missing)
+            if self._crossover_b4_recovery is not None else missing
+        )
         try:
             namespace.update(self._host_functions)
             if self._crossover_preflight is not None:
                 panel._preview_signature = self._crossover_preview_method
+            if self._crossover_b4_recovery is not None:
+                panel.update_selection_buttons = (
+                    self._crossover_b4_panel_update_method
+                )
             self._validate_binding()
         except Exception:
             for name, value in previous.items():
@@ -1067,6 +1118,11 @@ class ModularTransitionWorkflowSession:
                     delattr(panel, "_preview_signature")
                 else:
                     panel._preview_signature = previous_preview
+            if self._crossover_b4_recovery is not None:
+                if previous_b4_panel_update is missing:
+                    delattr(panel, "update_selection_buttons")
+                else:
+                    panel.update_selection_buttons = previous_b4_panel_update
             raise
 
     def _validate_binding(self):
@@ -1352,6 +1408,14 @@ class ModularTransitionWorkflowSession:
                 or namespace.get(
                     "_write_crossover_b4_and_timber_analysis_metadata"
                 ) is not adapter.original_writer
+                or namespace.get("_b4_resolution_signature")
+                is not self._host_functions["_b4_resolution_signature"]
+                or namespace.get("_crossover_b4_result_is_current")
+                is not self._host_functions[
+                    "_crossover_b4_result_is_current"
+                ]
+                or panel.__dict__.get("update_selection_buttons")
+                is not self._crossover_b4_panel_update_method
                 or apply_code is None
                 or "_write_crossover_b4_and_timber_analysis_metadata"
                 not in apply_code.co_names
