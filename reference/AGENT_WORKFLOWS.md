@@ -182,14 +182,19 @@ MCP endpoint, or script as a separate skill. Put deterministic operations in
 tested scripts. Keep the bounded scope, evidence interpretation, and authority
 decisions visible to the agent and project owner.
 
-For related required read-only inspections, prefer one fresh
-[`run_inspection_bundle.py`](../tools/run_inspection_bundle.py) `run` invocation
-when it supports the `cat`, bounded `sed`, or `rg` command forms. The tool keeps
-complete stdout and stderr. Its concise result identifies the manifest and
-evidence key. Use `retrieve` with both identities for a verified excerpt. Use
-direct bounded inspections when the tool does not support the command or
-grouping would add work. Do not use a prior result as current evidence. Do not
-replace required validation or review with an inspection bundle.
+If the tool can start related `cat`, `sed -n START[,END]p -- FILE ...`, or
+`rg` commands, use one
+[`run_inspection_bundle.py`](../tools/run_inspection_bundle.py) `run` command.
+The tool keeps all `stdout` and `stderr` command output. The short result
+identifies the manifest and `evidence_key`. Use `retrieve` with the manifest
+and `evidence_key` to get a part of the output. The tool compares the output
+hash with the manifest before it gives that part.
+
+If the tool cannot start a command, use that command without the tool. If
+this group adds work that is not necessary, use the commands without the
+tool. Start the commands for each new inspection. Do not use a result from a
+previous command invocation as evidence for a new inspection. Do not use the
+tool in place of necessary validation or review.
 
 ## Development-toolchain preflight routing
 
