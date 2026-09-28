@@ -596,42 +596,53 @@ data are in
 
 <a id="phase-8-straight-host-crossover-result"></a>
 
-## Phase 8 straight-host crossover result — 2026-09-28
+## Phase 8 crossover on straight tracks — 2026-09-28
 
-A separate option in the B14 GUI recipe made a copied two-track input. It has
-a 1500 mm straight entrance and a 450 mm straight exit. Its source FCStd did
-not change.
-The default Phase 1 GUI recipe retained its frozen hashes, Undo/Redo sequence,
-and save/reopen result.
+The B14 GUI launcher made a temporary input with two straight tracks.
+Its straight entrances were 1500 mm long, and its straight exits were
+450 mm long. The source FreeCAD file did not change.
+The GUI run for Phase 1 without `--scenario` gave the frozen hashes and
+the same `Undo` and `Redo` sequence. It also gave the same result after
+`document.save()` and `App.openDocument()`.
 
-At Host Track A toe chainage 580.134 mm, the qualified FreeCAD check gave
-equal B14, B15, and B16 crossover configurations after removal of three
-`macro_version` fields. The nine crossover objects had equal exact shapes and
-stable identities. Four production records were equal. B16 rejected a request
-for a minimum radius of 3000 mm without changing the copied document. It made
-one `XO-001` in one Undo unit. Undo, Redo, and one save/reopen passed.
+The check used the qualified host profile for FreeCAD and `toe_chainage_a`
+of 580.134 mm. It found equal B14, B15, and B16 crossover data after it
+removed three `macro_version` fields. The data for all nine crossover
+objects were equal, including their stable identities. Six objects had
+shapes with equal `brep_sha256` values. Four production records were equal.
 
-The qualified real GUI used the straight host pair to preview and make
-`XO-001`. A rejected request left the document and Undo history unchanged.
-The created and reopened top-view images contain the same pixels. This check
-did not include viewport selection, parameter editing, `Validate/Export`, or
-other host pairs.
+B16 rejected a request for a minimum radius of 3000 mm. The request did not
+change the FreeCAD object data or the `Undo` and `Redo` data. B16 made one
+`XO-001` and added one `Undo` entry.
+The `Undo`, `Redo`, `document.save()`, and `App.openDocument()` checks gave
+PASS results.
 
-This result adds one straight-host sample for Exit 3 and some Exit 2
-operations. All four exits remain Pending. The earlier headless/GUI
-`resolved_analysis_sha256` difference remains an unproved cross-profile
-comparison. Wider crossover and broader save/reopen journeys remain unproved.
-D-P6-008, TERM-R04, comparison conditions, and legacy-retirement conditions
-do not change.
+The GUI on the qualified host profile used the two straight tracks. The
+`preview_geometry()` check returned geometry before the GUI made `XO-001`.
+A rejected request did not change the FreeCAD object data or the
+`Undo` and `Redo` data. The `Top` view files before and after `App.openDocument()` had equal
+width, height, and colour values at each position. This check did not
+include viewport selection, parameter editing, `Validate/Export`, or
+other track pairs.
 
-The B14 source recipe and default regression results are in
+This result adds one sample with straight tracks for Exit 3 and some Exit 2
+operations. All four exits stay Pending. The earlier headless and GUI
+`resolved_analysis_sha256` values are different. These checks did not explain the difference or prove equivalent
+full analysis in the two modes.
+
+Other crossover inputs stay unproved. More sequences with `document.save()`
+and `App.openDocument()` stay unproved. D-P6-008 and TERM-R04 do not change.
+All conditions for required checks against legacy paths and for removal of
+those paths also do not change.
+
+The B14 input and Phase 1 check results are in
 `benchmark-output/freecad-bridge/straight-station-runs/20260928T165114Z-phase8-straight-host/`
 and `benchmark-output/freecad-bridge/straight-station-runs/20260928T165910Z/`.
-The qualified FreeCAD result is in
+The result from the qualified host profile is in
 `tmp/phase8-straight-crossover/headless-regenerated-first.log`. The GUI result
-and images are in
+and `PNG` files are in
 `benchmark-output/freecad-bridge/phase8-straight-host-crossover-gui-runs/20260928T165738307958Z/`.
-The local `ci` profile passed all 84 checks. Its results are in
+The local `ci` profile gave PASS results for all 84 checks. The results are in
 `benchmark-output/standalone-validation/20260928T170104718903Z/`.
 
 ## Phase 8 exit conditions
