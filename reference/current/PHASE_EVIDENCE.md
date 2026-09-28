@@ -419,6 +419,37 @@ decision before the merge. No owner decision accepts other migration, product
 performance, production, physical output or release. Project status stays
 `unknown`.
 
+<a id="phase-8-turnout-edit-recovery-candidate"></a>
+
+## Phase 8 turnout edit and recovery evidence — 2026-09-28
+
+The internal `turnout_configuration_change_summary` supplies the ordered
+change list for three inherited B15 callers. For the B15 host, the route check
+rejects a missing or different selection. A check compared its text, order,
+numeric comparison and revision fallback with the frozen B14 and B15 sources.
+The public API, route schema, stored FreeCAD property names and UI terms stay
+the same.
+
+All 82 checks in the complete standalone profile passed. The qualified
+FreeCAD caller check passed. A real GUI check used a copy of a saved `.FCStd`
+file and a curved host. It created `TO-001`, then changed it
+from `Left-hand` to `Right-hand`. The check compared the geometry of the host
+plain line, object names and record order in `ProductionRecordIndexJSON`.
+One Undo restored the created state. Redo restored the edited state. An
+injected edit failure changed neither the document data nor Undo history.
+After save, close and reopen, the copied document had the same captured data
+as the edited document and cleared history. The source fixture stayed
+byte-identical. The raw results are in
+`benchmark-output/standalone-validation/20260928T105448770253Z/`,
+`benchmark-output/phase8-turnout-edit-summary/` and
+`benchmark-output/freecad-bridge/phase8-turnout-toe-gui-runs/20260928T105224825343Z/`.
+
+This is bounded evidence toward Exit 2. The straight-host, crossover and
+broader save/reopen journeys remain unproved. All four Phase 8 exits stay
+Pending. TERM-R04, D-P6-008, the B14/B15 comparison duties and all
+legacy-retirement conditions remain. This result accepts no Phase 8 exit,
+production output or release. Project status stays `unknown`.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
