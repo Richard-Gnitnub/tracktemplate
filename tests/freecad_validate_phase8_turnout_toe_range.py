@@ -20,6 +20,9 @@ sys.path.insert(0, str(SOURCE_ROOT / "tests"))
 
 from tracktemplate import api  # noqa: E402
 from tracktemplate.application import turnout_edit  # noqa: E402
+from tracktemplate.compatibility.crossover_preflight import (  # noqa: E402
+    CrossoverPreflightAdapter,
+)
 from tracktemplate.compatibility import transition_workflow  # noqa: E402
 from tracktemplate.domain import turnout  # noqa: E402
 import validate_phase1_turnout as oracle  # noqa: E402
@@ -118,15 +121,29 @@ def validate():
         turnout_edit.turnout_configuration_change_summary
     )
     assert summary.host_globals is namespace
+    wrapped_solver = namespace["solve_rea_c10_crossover_geometry"]
+    adapter = wrapped_solver.__self__
+    assert type(adapter) is CrossoverPreflightAdapter
+    assert wrapped_solver.__func__ is CrossoverPreflightAdapter.solve
+    assert adapter.module is module
+    assert adapter.original_solver.__globals__ is namespace
     for name in CALLERS:
-        function = caller(module, name)
+        function = (
+            adapter.original_solver
+            if name == "solve_rea_c10_crossover_geometry"
+            else caller(module, name)
+        )
         assert function.__globals__ is namespace, name
         assert "turnout_valid_toe_range" in function.__code__.co_names, name
         assert function.__globals__["turnout_valid_toe_range"] is (
             turnout.turnout_valid_toe_range
         ), name
     for name in INTERVAL_CALLERS:
-        function = caller(module, name)
+        function = (
+            adapter.original_solver
+            if name == "solve_rea_c10_crossover_geometry"
+            else caller(module, name)
+        )
         assert function.__globals__ is namespace, name
         assert "turnout_host_station_interval" in function.__code__.co_names, name
         assert function.__globals__["turnout_host_station_interval"] is (
@@ -238,5 +255,15 @@ def validate():
     print(SENTINEL)
 
 
-if __name__ == "__main__":
-    validate()
+def _run_as_script():
+    try:
+        validate()
+    except Exception:
+        import traceback
+
+        traceback.print_exc()
+        raise SystemExit(1)
+
+
+if __name__ in {"__main__", "freecad_validate_phase8_turnout_toe_range"}:
+    _run_as_script()
