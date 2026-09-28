@@ -444,43 +444,60 @@ TERM-R04 stays open. D-P6-008 stays Deferred — unmet. The conditions in [D-P8-
 
 ## Phase 8 crossover radius evidence — 2026-09-28
 
-TrackTemplate now checks the minimum radius of each turnout road and the
-connecting road before it makes exact crossover shapes. The smallest radius
-must be at least the configured minimum. The result records both host
-identities, their full sampled alignments, the request and a SHA-256 value.
-Preview, create, edit and turnout extension use this check. A change to a host,
-request or occupied interval prevents reuse of a previous preview result. The
-GUI shows the complete crossover decision before the connector solver trace.
+TrackTemplate now checks three minimum radii before it makes exact crossover
+shapes. The components are `Host Track A turnout road`, `Host Track B turnout
+road` and `Connecting road`. The smallest radius must be at least the configured
+minimum. The result records both host identities, alignment data for both hosts,
+input values and a SHA-256 signature.
 
-For the fixed curved-host comparison file, TrackTemplate rejected the
-500.000 mm request. The Host Track B turnout road radius was 540.848375 mm,
-below the configured 600.000000 mm. Direct FreeCAD checks found no change to
-the copied document's objects, stored properties, shapes or Undo/Redo history
-after preview, create, edit and turnout-extension rejection. The 746.298 mm
-request made `XO-001` in one transaction. Its four exact radius values agreed
-with the accepted witness and the earlier calculation within 0.000001 mm.
-The real GUI showed the rejection, creation and rejected edit. The prior
-turnout GUI route also passed. The source comparison file kept its SHA-256.
+TrackTemplate uses this check when a person selects `Preview geometry` or
+makes a crossover. It also uses the check when a person changes a crossover
+or extends a turnout to make a crossover. A change to a host identity,
+alignment, input value or occupied interval prevents reuse of a previous
+result. FreeCAD shows the complete crossover decision before the other
+diagnostic information.
 
-The standalone CI profile passed all 83 checks. The local profile passed 82
-of 83 checks. Its live recovery check requires the `main` checkout and an
-ignored source archive; this isolated product worktree has neither. This is
-an environment and profile mismatch. The raw results are in
-`benchmark-output/standalone-validation/20260928T121032403653Z/`,
-`benchmark-output/standalone-validation/20260928T120120467210Z/`,
-`benchmark-output/freecad-bridge/phase8-crossover-preflight-headless-20260928-02.log`,
-`benchmark-output/freecad-bridge/phase8-crossover-preflight-gui-runs/20260928T120949789318Z/`
-and
-`benchmark-output/freecad-bridge/phase8-turnout-toe-gui-runs/20260928T121137728330Z/`.
+Both alignments in the fixed Phase 1 fixture have curves. TrackTemplate
+rejected a crossover at `Host Track A` toe chainage 500.000 mm. The radius for
+`Host Track B turnout road` was 540.848375 mm, below the configured minimum
+of 600.000000 mm. Direct FreeCAD checks found no change to objects, stored
+properties, shapes or `Undo`/`Redo` history after each rejection. The checks
+rejected `Preview geometry` and attempts to make a crossover. They also
+rejected an attempt to change a crossover or extend a turnout.
 
-This evidence covers one curved-host crossover sample for parts of Phase 8
-Exits 1 and 2. Straight-host and wider crossover cases remain unproved. The
-broader save/reopen, validation and export journeys remain unproved. All four
-Phase 8 exits stay Pending. TERM-R04 stays open. D-P6-008 stays Deferred —
-unmet. The [D-P8-001](#phase-8-opening-panel) conditions, frozen B14/B15
-comparison, and all legacy-retirement conditions remain. There is no product
-performance, production-output, release or Phase 8 exit acceptance. Project
-status stays `unknown`.
+At `Host Track A` toe chainage 746.298 mm, TrackTemplate made `XO-001` in one
+transaction. Its four exact radius values agreed with the 746.298 mm values in
+[the Phase 1 crossover contract](../contracts/phase1-crossover-feasibility.json)
+within 0.000001 mm. They also agreed with the values in
+`complete_radius_preflight` within that tolerance. The FreeCAD check with
+`FreeCADGui` active showed the rejection, the new `XO-001` and a rejected
+change to that crossover. The
+earlier turnout check with `FreeCADGui` active also passed. The SHA-256 of the
+source fixture stayed the same.
+
+The standalone Python validation profile for CI passed all 83 checks. The
+local validation profile passed 82 of 83 checks. Its live recovery check
+requires the `main` checkout and an ignored source archive. This worktree has
+neither, so the failure class is `environment-or-profile-defect`. The raw
+results are in these files and directories:
+
+- `benchmark-output/standalone-validation/20260928T121032403653Z/`
+- `benchmark-output/standalone-validation/20260928T120120467210Z/`
+- `benchmark-output/freecad-bridge/phase8-crossover-preflight-headless-20260928-02.log`
+- `benchmark-output/freecad-bridge/phase8-crossover-preflight-gui-runs/20260928T120949789318Z/`
+- `benchmark-output/freecad-bridge/phase8-turnout-toe-gui-runs/20260928T121137728330Z/`
+
+This evidence covers one crossover sample on alignments with curves for parts
+of Phase 8 Exits 1 and 2. The checks do not cover straight alignments or more
+crossover cases. They do not cover all operations to write a file, close it,
+open it again and select `Validate/Export`. All four Phase 8 exits stay
+Pending.
+
+TERM-R04 stays open. D-P6-008 stays Deferred — unmet. The
+[D-P8-001](#phase-8-opening-panel) conditions, frozen B14/B15 comparison and
+all conditions for removal of the B14/B15 paths remain. No project owner
+decision accepts product performance, production output, release or a Phase 8
+exit. Project status stays `unknown`.
 
 ## Phase 8 exit conditions
 
