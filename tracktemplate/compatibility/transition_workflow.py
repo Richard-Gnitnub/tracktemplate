@@ -255,6 +255,7 @@ _CROSSOVER_PREFLIGHT_FUNCTIONS = (
 )
 _CROSSOVER_B4_RECOVERY_FUNCTIONS = (
     "apply_crossover_b4_timbering",
+    "_write_crossover_b4_and_timber_analysis_metadata",
     "tag_generated_object",
     "crossover_config_by_id",
     "object_string_property",
@@ -1031,6 +1032,7 @@ class ModularTransitionWorkflowSession:
         if b4_complete:
             self._crossover_b4_recovery = CrossoverB4RecoveryAdapter(
                 self.module, namespace["apply_crossover_b4_timbering"],
+                namespace["_write_crossover_b4_and_timber_analysis_metadata"],
             )
             self._host_functions["apply_crossover_b4_timbering"] = (
                 self._crossover_b4_recovery.apply
@@ -1338,12 +1340,21 @@ class ModularTransitionWorkflowSession:
                     )
                 caller = getattr(caller, "_whole_workflow_original", None)
             code = getattr(caller, "__code__", None)
+            apply_code = getattr(adapter.original_apply, "__code__", None)
             if (
                 namespace.get("apply_crossover_b4_timbering")
                 is not self._host_functions["apply_crossover_b4_timbering"]
                 or adapter.module is not self.module
                 or getattr(adapter.original_apply, "__globals__", None)
                 is not namespace
+                or getattr(adapter.original_writer, "__globals__", None)
+                is not namespace
+                or namespace.get(
+                    "_write_crossover_b4_and_timber_analysis_metadata"
+                ) is not adapter.original_writer
+                or apply_code is None
+                or "_write_crossover_b4_and_timber_analysis_metadata"
+                not in apply_code.co_names
                 or getattr(caller, "__globals__", None) is not namespace
                 or code is None
                 or "apply_crossover_b4_timbering" not in code.co_names

@@ -126,6 +126,50 @@ def require_same_semantics(actual, expected, label):
             raise RuntimeError("{} changed the copied document: {}".format(label, key))
 
 
+def b4_persistence(active_document):
+    settings = [
+        obj for obj in active_document.Objects
+        if module.object_string_property(obj, "GeneratedRole", "")
+        == module.CROSSOVER_SETTINGS_ROLE
+        and module.object_string_property(
+            obj, module.CROSSOVER_ID_PROPERTY, ""
+        ) == "XO-001"
+    ]
+    if len(settings) != 1:
+        raise RuntimeError("The selected crossover has no unique settings object")
+    obj = settings[0]
+    config = json.loads(module.object_string_property(
+        obj, module.CROSSOVER_CONFIGURATION_PROPERTY, ""
+    ))
+    result = json.loads(module.object_string_property(
+        obj, module.CROSSOVER_B4_RESULT_PROPERTY, ""
+    ))
+    analysis = json.loads(module.object_string_property(
+        obj, module.CROSSOVER_TIMBER_ANALYSIS_RESULT_PROPERTY, ""
+    ))
+    nested = result.get("resolved_analysis")
+    signature = str((nested or {}).get("geometry_signature") or "")
+    if (not isinstance(nested, dict) or not signature
+            or nested.get("analysis_basis")
+            != "Effective automatically resolved timber arrangement"
+            or nested != analysis
+            or config.get("b4_result") != result
+            or config.get("timber_analysis_signature") != signature
+            or module.object_string_property(
+                obj, module.CROSSOVER_TIMBER_ANALYSIS_SIGNATURE_PROPERTY, ""
+            ) != signature):
+        raise RuntimeError(
+            "B4 resolved diagnostics differ across the stored result, "
+            "configuration and analysis properties"
+        )
+    return {
+        "result": result,
+        "analysis": nested,
+        "signature": signature,
+        "analysis_sha256": recipe.digest(nested),
+    }
+
+
 def image_checked(path):
     image = QtGui.QImage(str(path))
     if not path.is_file() or path.stat().st_size == 0 or image.isNull():
@@ -328,10 +372,23 @@ try:
         raise RuntimeError("The successful B4 object is absent or renamed")
     result_summary = recipe.result_snapshot(module, result)
     shape = recipe.shape_summary(b4_obj.Shape)
+    applied_persistence = b4_persistence(document)
+    if applied_persistence["result"] != result:
+        raise RuntimeError("The panel result differs from raw B4 persistence")
     applied_visuals = [
         capture_panel("xo-001-applied-b4-panel.png"),
         capture_top("xo-001-applied-b4-top-view.png"),
     ]
+
+    reused = module.apply_crossover_b4_timbering(document, "XO-001")
+    if (reused.get("cache_reused") is not True
+            or reused.get("resolved_analysis")
+            != applied_persistence["analysis"]):
+        raise RuntimeError("Unchanged B4 reuse lost resolved diagnostics")
+    require_same_semantics(state(document), applied, "Unchanged B4 reuse")
+    if (history(document) != applied["history"]
+            or b4_persistence(document) != applied_persistence):
+        raise RuntimeError("Unchanged B4 reuse modified document or history")
 
     document.undo()
     document.recompute()
@@ -348,6 +405,9 @@ try:
     if (redone["history"]["undo_count"] != 2
             or redone["history"]["redo_count"] != 0):
         raise RuntimeError("B4 Redo changed history")
+    redone_persistence = b4_persistence(document)
+    if redone_persistence != applied_persistence:
+        raise RuntimeError("B4 Redo changed stored resolved diagnostics")
 
     manager.close()
     QtWidgets.QApplication.processEvents()
@@ -357,6 +417,9 @@ try:
     document = App.openDocument(saved_path)
     reopened = state(document)
     require_same_semantics(reopened, applied, "Copied FCStd save/reopen")
+    reopened_persistence = b4_persistence(document)
+    if reopened_persistence != applied_persistence:
+        raise RuntimeError("B4 save/reopen changed stored resolved diagnostics")
     if (reopened["history"]["undo_count"] != 0
             or reopened["history"]["redo_count"] != 0):
         raise RuntimeError("The reopened document retained prior session history")
@@ -402,8 +465,21 @@ try:
             "timber_semantic_sha256": applied["timber_semantic_sha256"],
             "history": applied["history"],
             "result": result_summary,
+            "resolved_analysis": {
+                "geometry_signature": applied_persistence["signature"],
+                "analysis_basis": applied_persistence["analysis"]["analysis_basis"],
+                "sha256": applied_persistence["analysis_sha256"],
+                "stored_views_match": True,
+            },
             "shape": shape,
             "visuals": applied_visuals,
+        },
+        "unchanged_reuse": {
+            "cache_reused": True,
+            "resolved_analysis_sha256": recipe.digest(
+                reused["resolved_analysis"]
+            ),
+            "document_and_history_unchanged": True,
         },
         "undo": {
             "object_count": len(undone["object_names"]),
@@ -414,12 +490,18 @@ try:
             "object_count": len(redone["object_names"]),
             "timber_semantic_sha256": redone["timber_semantic_sha256"],
             "history": redone["history"],
+            "resolved_analysis_sha256": redone_persistence[
+                "analysis_sha256"
+            ],
         },
         "save_reopen": {
             "path": saved_path,
             "object_count": len(reopened["object_names"]),
             "timber_semantic_sha256": reopened["timber_semantic_sha256"],
             "history": reopened["history"],
+            "resolved_analysis_sha256": reopened_persistence[
+                "analysis_sha256"
+            ],
             "visual": str(reopened_visual),
         },
     }, sort_keys=True))
@@ -473,6 +555,22 @@ def _check_probe(probe, contract):
     before = probe["before"]
     failure = probe["failure"]
     applied = probe["applied"]
+    diagnostics = applied["resolved_analysis"]
+    signature = diagnostics["geometry_signature"]
+    digest = diagnostics["sha256"]
+    if (not signature or len(digest) != 64
+            or diagnostics["analysis_basis"]
+            != "Effective automatically resolved timber arrangement"
+            or diagnostics["stored_views_match"] is not True
+            or probe["unchanged_reuse"]["cache_reused"] is not True
+            or probe["unchanged_reuse"][
+                "document_and_history_unchanged"
+            ] is not True
+            or probe["unchanged_reuse"]["resolved_analysis_sha256"]
+            != digest
+            or probe["redo"]["resolved_analysis_sha256"] != digest
+            or probe["save_reopen"]["resolved_analysis_sha256"] != digest):
+        raise RuntimeError("B4 resolved diagnostics were not stable in the GUI lifecycle")
     if (before["object_count"] != 18
             or failure["object_count"] != 18
             or applied["object_count"] != 20

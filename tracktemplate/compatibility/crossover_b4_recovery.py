@@ -1,4 +1,4 @@
-"""Recover the inherited crossover B4 command's first-tag failure."""
+"""Guard inherited crossover B4 recovery and result persistence."""
 
 from dataclasses import dataclass
 import inspect
@@ -10,10 +10,11 @@ class CrossoverB4RecoveryError(RuntimeError):
 
 @dataclass(frozen=True)
 class CrossoverB4RecoveryAdapter:
-    """Guard one inherited B4 apply without changing its successful result."""
+    """Guard one inherited B4 apply and persist its final analysis."""
 
     module: object
     original_apply: object
+    original_writer: object
 
     def _new_object_is_owned(self, doc, obj, name, identifier):
         """Accept only the untagged object created for this B4 command."""
@@ -36,10 +37,16 @@ class CrossoverB4RecoveryAdapter:
         )
 
     def apply(self, *args, **kwargs):
-        """Remove a known orphan after B15 aborts a failed first B4 tag."""
+        """Persist final analysis or remove a known first-tag orphan."""
         request = inspect.signature(self.original_apply).bind(*args, **kwargs)
         doc = request.arguments["doc"]
         identifier = str(request.arguments["crossover_id"] or "").strip()
+        writer_name = "_write_crossover_b4_and_timber_analysis_metadata"
+        original_writer = getattr(self.module, writer_name, None)
+        if original_writer is not self.original_writer:
+            raise CrossoverB4RecoveryError(
+                "The inherited crossover timbering metadata writer changed."
+            )
         before_names = {str(obj.Name) for obj in doc.Objects}
         before_history = (int(doc.UndoCount), int(doc.RedoCount))
         before_config = self.module.crossover_config_by_id(
@@ -61,8 +68,19 @@ class CrossoverB4RecoveryAdapter:
                     failed_new_b4_tag = name
                 raise
 
-        self.module.tag_generated_object = guarded_tagger
+        def guarded_writer(writer_doc, config, b4_result, analysis_result):
+            if writer_doc is not doc:
+                raise CrossoverB4RecoveryError(
+                    "The crossover timbering metadata document changed."
+                )
+            b4_result["resolved_analysis"] = dict(analysis_result)
+            return original_writer(
+                writer_doc, config, b4_result, analysis_result,
+            )
+
         try:
+            self.module.tag_generated_object = guarded_tagger
+            setattr(self.module, writer_name, guarded_writer)
             try:
                 return self.original_apply(*args, **kwargs)
             except Exception as error:
@@ -100,4 +118,5 @@ class CrossoverB4RecoveryAdapter:
                     ) from error
                 raise
         finally:
+            setattr(self.module, writer_name, original_writer)
             self.module.tag_generated_object = original_tagger
