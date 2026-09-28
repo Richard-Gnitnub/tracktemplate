@@ -536,6 +536,47 @@ TERM-R04 stays open. D-P6-008 stays Deferred — unmet. The B14/B15 comparison
 and removal conditions do not change. No full B4 migration, product
 performance, production output, release, or exit acceptance follows.
 
+## Phase 8 fixed `XO-001` B4 stored result evidence — 2026-09-28
+
+The accepted [Phase 1 contract](../contracts/phase1-crossover-timbering.json)
+records a difference between the first returned `B4` result and its stored
+`resolved_analysis` data. A new guard fails on clean `main` when it compares
+these values. In B16, JSON conversion gives an equal complete
+`resolved_analysis` value in the first result, the configuration, and the
+stored `B4` property. The value stays equal after unchanged reuse, `Redo`,
+and save, close, and reopen.
+
+The `geometry_signature` is nonempty, and `analysis_basis` identifies the
+effective timber arrangement. The fixed sample retains 86 effective timbers,
+16 shared timbers, and the accepted record digests. Qualified FreeCAD checks
+and checks with `FreeCADGui` active cover the first error, subsequent
+application, `Undo`/`Redo`, and one save and reopen sequence. The GUI result
+shows the same summary and shape.
+
+The first run of the guard after the change fails because it compares tuple
+and list forms. The JSON values are equal. The corrected guard and original
+proof pass.
+
+The baseline, failed guard, and passing FreeCAD results are in
+`tmp/phase8-crossover-b4-analysis/`. The GUI result and images are in
+`benchmark-output/freecad-bridge/phase8-crossover-b4-recovery-gui-runs/20260928T144631027771Z/`.
+The local `ci` profile passes all 84 checks in
+`benchmark-output/standalone-validation/20260928T145036677299Z/`.
+
+This is partial evidence for Phase 8 Exits 1 and 2. PR-17 stays Open/Partial,
+and all four exits stay Pending. The checks do not cover a straight alignment,
+other crossovers, or more save and reopen cases. TERM-R04, D-P6-008, the
+B14/B15 comparison, and the conditions for removal of the B14/B15 paths do
+not change. No full B4 migration, product performance, production output,
+release, or exit acceptance follows.
+
+The local profile cannot run in this isolated worktree. It needs the primary
+`main` worktree and an ignored source archive.
+
+The complete `resolved_analysis` digests differ between the headless and GUI
+checks. Their `geometry_signature` values and accepted `B4` records agree.
+Comparison between these checks for Phase 8 Exit 3 remains unproved.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
