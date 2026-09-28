@@ -22,3 +22,15 @@ def turnout_valid_toe_range(host_length, dimensions, orientation):
         minimum = max(0.0, finish_x)
         maximum = min(total, total + start_x)
     return minimum, maximum
+
+
+def turnout_host_station_interval(toe_chainage, dimensions, orientation):
+    """Return the complete turnout module's occupied host interval in mm."""
+    direction = _turnout_orientation_sign(orientation)
+    station_a = float(toe_chainage) + direction * float(
+        dimensions["module_start_x"]
+    )
+    station_b = float(toe_chainage) + direction * float(
+        dimensions["module_end_x"]
+    )
+    return min(station_a, station_b), max(station_a, station_b)

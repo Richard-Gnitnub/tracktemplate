@@ -217,6 +217,13 @@ _TURNOUT_TOE_RANGE_CALLERS = (
     "CrossoverManagerPanel.update_chainage_range",
     "TurnoutManagerDialog.update_host_summary",
 )
+_TURNOUT_HOST_INTERVAL_BINDING = "turnout_host_station_interval"
+_TURNOUT_HOST_INTERVAL_CALLERS = (
+    "_turnout_find_overlap",
+    "_build_curve_inheriting_c10_turnout",
+    "build_turnout_host_integration",
+    "solve_rea_c10_crossover_geometry",
+)
 
 __all__ = (
     "MODULAR_CALCULATION_ROUTE",
@@ -677,6 +684,9 @@ class ModularTransitionWorkflowSession:
         self._turnout_toe_range_enabled = (
             _TURNOUT_TOE_RANGE_BINDING in self.module.__dict__
         )
+        self._turnout_host_interval_enabled = (
+            _TURNOUT_HOST_INTERVAL_BINDING in self.module.__dict__
+        )
         if (
             set(self._modular_functions) != set(PRODUCT_FUNCTION_NAMES)
             or not all(
@@ -871,6 +881,10 @@ class ModularTransitionWorkflowSession:
             self._host_functions[_TURNOUT_TOE_RANGE_BINDING] = (
                 turnout.turnout_valid_toe_range
             )
+        if self._turnout_host_interval_enabled:
+            self._host_functions[_TURNOUT_HOST_INTERVAL_BINDING] = (
+                turnout.turnout_host_station_interval
+            )
         self._bind_modular()
 
     def _bind_modular(self):
@@ -939,6 +953,47 @@ class ModularTransitionWorkflowSession:
                 ):
                     raise TransitionWorkflowError(
                         "The inherited turnout toe-range caller {!r} is "
+                        "unavailable or mixed.".format(caller_name)
+                    )
+        if (
+            (_TURNOUT_HOST_INTERVAL_BINDING in namespace)
+            != self._turnout_host_interval_enabled
+        ):
+            raise TransitionWorkflowError(
+                "The inherited turnout host-interval route has a mixed binding."
+            )
+        if self._turnout_host_interval_enabled:
+            selected = turnout.turnout_host_station_interval
+            selected_globals = getattr(selected, "__globals__", None)
+            selected_code = getattr(selected, "__code__", None)
+            if (
+                self._host_functions[_TURNOUT_HOST_INTERVAL_BINDING]
+                is not selected
+                or namespace.get(_TURNOUT_HOST_INTERVAL_BINDING) is not selected
+                or selected_globals is not turnout.__dict__
+                or selected_code is None
+                or "_turnout_orientation_sign" not in selected_code.co_names
+                or selected_globals.get("_turnout_orientation_sign")
+                is not turnout._turnout_orientation_sign
+            ):
+                raise TransitionWorkflowError(
+                    "The modular turnout host-interval calculation is "
+                    "unavailable."
+                )
+            for caller_name in _TURNOUT_HOST_INTERVAL_CALLERS:
+                caller = namespace.get(caller_name)
+                code = getattr(caller, "__code__", None)
+                caller_globals = getattr(caller, "__globals__", None)
+                if (
+                    not callable(caller)
+                    or code is None
+                    or _TURNOUT_HOST_INTERVAL_BINDING not in code.co_names
+                    or caller_globals is not namespace
+                    or caller_globals.get(_TURNOUT_HOST_INTERVAL_BINDING)
+                    is not selected
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited turnout host-interval caller {!r} is "
                         "unavailable or mixed.".format(caller_name)
                     )
         for name in PRODUCT_FUNCTION_NAMES:

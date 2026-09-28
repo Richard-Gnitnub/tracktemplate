@@ -375,6 +375,31 @@ comparison oracle, every adapter, caller and removal condition, and all
 legacy-retirement conditions remain. There is no performance,
 production-output or release acceptance. Project status remains `unknown`.
 
+<a id="phase-8-turnout-station-interval-candidate"></a>
+
+## Phase 8 `turnout_host_station_interval` candidate — 2026-09-28
+
+The development-only candidate puts the complete turnout module's interval
+calculation in `tracktemplate/domain/turnout.py`. Product composition selects
+it for four inherited B15 callers and rejects a missing or mixed route. Public
+API, routing schema, UI terms and frozen B14/B15 sources stay unchanged.
+
+B14/B15 calculation comparison, all 81 standalone checks and the qualified
+FreeCAD caller check passed. A real-GUI check used a copy of a saved FreeCAD
+document. It created a turnout, checked the stored interval against both
+frozen calculations, and rejected an overlapping turnout without a document
+change. The source document stayed byte-identical. Detailed proof is in
+`benchmark-output/standalone-validation/20260928T095006133000Z/`,
+`benchmark-output/phase8-turnout-host-interval/` and
+`benchmark-output/freecad-bridge/phase8-turnout-toe-gui-runs/20260928T094740556578Z/`.
+
+This is bounded evidence toward Exits 2, 3 and 4. All four exits stay Pending.
+The full Exit 2 journey and representative straight- and curved-host checks
+remain open. TERM-R04 stays open; D-P6-008 stays Deferred — unmet. All existing
+comparison and legacy-retirement conditions remain. The draft needs exact-head
+CI and a separate integration decision. No wider migration, performance,
+production-output or release acceptance follows. Project status stays `unknown`.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
