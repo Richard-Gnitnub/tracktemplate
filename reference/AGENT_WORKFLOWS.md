@@ -192,9 +192,10 @@ hash with the manifest before it gives that part.
 
 If the tool cannot start a command, use that command without the tool. If
 this group adds work that is not necessary, use the commands without the
-tool. Limit each direct inspection to the necessary files and output. If
-existing controls permit, do not return successful direct output to the agent.
-Keep all required evidence. Start the commands for each new inspection. Do not
+tool. Select only the necessary files and output for each command without
+the tool. When the command completes without an error, return its output only
+if an applicable control makes the output necessary. Keep all necessary
+evidence. Start the commands for each new inspection. Do not
 use a result from a previous command invocation as evidence for a new
 inspection. Do not use the tool in place of necessary validation or review.
 

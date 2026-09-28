@@ -31,12 +31,12 @@
       "review_receipt": "sha256:c56528538393dfd48990f8e8c879ff5b585f5bec1e13efb9652cca94a7f27617"
     },
     {
-      "accepted_blob": "sha1:fbd40b0cea463dc6721458cc4491c9673435e2cf",
-      "accepted_sha256": "sha256:555073119449d1ec655d34d2749a25cbd1ddce51d84a22a0d3bac09e54852c91",
+      "accepted_blob": "sha1:080b7eb2893ec54ef538643f862af40a302f99e5",
+      "accepted_sha256": "sha256:8026ad62f243d39294c0db3ae71fc1b797e073f0e51bb93c4eae2fec61f1d8bd",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/AGENT_WORKFLOWS.md",
-      "review_receipt": "sha256:b43ffeee6f3544b84e073fd033fa5e3de5bd2c8216d5bc82bb52e2d58bb6fbe6",
+      "review_receipt": "sha256:4a3aa8ebe778bd862ea5ad72611671b992c559fa487b043bc7745f239b110781",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
