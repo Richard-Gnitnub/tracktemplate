@@ -8,6 +8,7 @@ from tracktemplate.compatibility.b15_workflow_host import (
     B15WorkflowHostError,
     load_b15_workflow_host,
 )
+from tracktemplate.domain import turnout
 
 
 MODULAR_CALCULATION_ROUTE = "modular"
@@ -206,6 +207,15 @@ PRODUCT_CALLER_ROUTES = (
         "CrossoverManagerPanel.use_picked_crossover_position",
         ("interpolate_alignment_station",),
     ),
+)
+
+_TURNOUT_TOE_RANGE_BINDING = "turnout_valid_toe_range"
+_TURNOUT_TOE_RANGE_CALLERS = (
+    "_build_curve_inheriting_c10_turnout",
+    "_crossover_solve_toe_b",
+    "solve_rea_c10_crossover_geometry",
+    "CrossoverManagerPanel.update_chainage_range",
+    "TurnoutManagerDialog.update_host_summary",
 )
 
 __all__ = (
@@ -664,6 +674,9 @@ class ModularTransitionWorkflowSession:
     def __init__(self, host, modular_functions):
         self._host = host
         self._modular_functions = dict(modular_functions)
+        self._turnout_toe_range_enabled = (
+            _TURNOUT_TOE_RANGE_BINDING in self.module.__dict__
+        )
         if (
             set(self._modular_functions) != set(PRODUCT_FUNCTION_NAMES)
             or not all(
@@ -854,6 +867,10 @@ class ModularTransitionWorkflowSession:
                 vector_factory,
             )
         )
+        if self._turnout_toe_range_enabled:
+            self._host_functions[_TURNOUT_TOE_RANGE_BINDING] = (
+                turnout.turnout_valid_toe_range
+            )
         self._bind_modular()
 
     def _bind_modular(self):
@@ -861,7 +878,7 @@ class ModularTransitionWorkflowSession:
         missing = object()
         previous = {
             name: namespace.get(name, missing)
-            for name in PRODUCT_FUNCTION_NAMES
+            for name in self._host_functions
         }
         try:
             namespace.update(self._host_functions)
@@ -877,6 +894,53 @@ class ModularTransitionWorkflowSession:
     def _validate_binding(self):
         """Verify selected domain and host edges without repairing them."""
         namespace = self.module.__dict__
+        if (
+            (_TURNOUT_TOE_RANGE_BINDING in namespace)
+            != self._turnout_toe_range_enabled
+        ):
+            raise TransitionWorkflowError(
+                "The inherited turnout toe-range route has a mixed binding."
+            )
+        if self._turnout_toe_range_enabled:
+            selected = turnout.turnout_valid_toe_range
+            selected_globals = getattr(selected, "__globals__", None)
+            selected_code = getattr(selected, "__code__", None)
+            if (
+                self._host_functions[_TURNOUT_TOE_RANGE_BINDING] is not selected
+                or namespace.get(_TURNOUT_TOE_RANGE_BINDING) is not selected
+                or selected_globals is not turnout.__dict__
+                or selected_code is None
+                or "_turnout_orientation_sign" not in selected_code.co_names
+                or selected_globals.get("_turnout_orientation_sign")
+                is not turnout._turnout_orientation_sign
+            ):
+                raise TransitionWorkflowError(
+                    "The modular turnout toe-range calculation is unavailable."
+                )
+            for caller_name in _TURNOUT_TOE_RANGE_CALLERS:
+                if "." in caller_name:
+                    class_name, method_name = caller_name.split(".", 1)
+                    owner = namespace.get(class_name)
+                    caller = (
+                        getattr(owner, "__dict__", {}).get(method_name)
+                        if isinstance(owner, type) else None
+                    )
+                else:
+                    caller = namespace.get(caller_name)
+                code = getattr(caller, "__code__", None)
+                caller_globals = getattr(caller, "__globals__", None)
+                if (
+                    not callable(caller)
+                    or code is None
+                    or _TURNOUT_TOE_RANGE_BINDING not in code.co_names
+                    or caller_globals is not namespace
+                    or caller_globals.get(_TURNOUT_TOE_RANGE_BINDING)
+                    is not selected
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited turnout toe-range caller {!r} is "
+                        "unavailable or mixed.".format(caller_name)
+                    )
         for name in PRODUCT_FUNCTION_NAMES:
             if namespace.get(name) is not self._host_functions[name]:
                 raise TransitionWorkflowError(
