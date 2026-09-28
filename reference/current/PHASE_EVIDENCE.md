@@ -499,6 +499,43 @@ all conditions for removal of the B14/B15 paths remain. No project owner
 decision accepts product performance, production output, release or a Phase 8
 exit. Project status stays `unknown`.
 
+## Phase 8 fixed `XO-001` B4 error evidence — 2026-09-28
+
+With `UndoMode=0` on clean `main`, an error in the first `B4` use of
+`tag_generated_object` leaves a new `Part::Feature` in FreeCAD. The check
+starts with a `.FCStd` file that has the source fixture data. B16 now removes
+only this new `Part::Feature` after the command fails. Checks with
+`UndoMode=0` and `UndoMode=1` show the same FreeCAD data and `Undo`/`Redo`
+counts and names as before the error.
+
+With `FreeCADGui` active, the check shows the error and no new
+`Part::Feature`. B16 then applies `B4` to the fixed `XO-001`. The result has
+`effective_timber_count=86` and `shared_timber_count=16`. The
+`record_identity_sha256`, `stable_record_sha256`, and `resolution_signature`
+values equal the [contract values](../contracts/phase1-crossover-timbering.json).
+After one `Undo`, the FreeCAD data equals the data before `B4`. After one
+`Redo`, the data equals the data after `B4`.
+
+The check uses `document.save`, `App.closeDocument`, and `App.openDocument`
+in that order. The `B4` result is the same before `App.closeDocument` and
+after `App.openDocument`. The SHA-256 of the source fixture is the same before
+and after the check.
+
+The clean `main` result and the B16 FreeCAD results are in
+`benchmark-output/phase8-crossover-b4-recovery/`. The GUI result and images
+are in `benchmark-output/freecad-bridge/phase8-crossover-b4-recovery-gui-runs/20260928T134606144975Z/`.
+
+This result gives partial evidence for Phase 8 Exit 2 only. PR-17 stays
+Open/Partial. All four exits stay Pending. The check does not show a straight
+alignment or other crossovers. It also does not show all Phase 8 Exit 2
+operations to write, close, and open a file.
+
+The primary `main` worktree and an ignored source archive are necessary for
+the local profile check. The isolated worktree does not have these inputs.
+TERM-R04 stays open. D-P6-008 stays Deferred — unmet. The B14/B15 comparison
+and removal conditions do not change. No full B4 migration, product
+performance, production output, release, or exit acceptance follows.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
