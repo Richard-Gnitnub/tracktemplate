@@ -6,6 +6,9 @@ from tracktemplate.application import turnout_edit
 from tracktemplate.compatibility.crossover_b4_recovery import (
     CrossoverB4RecoveryAdapter,
 )
+from tracktemplate.compatibility.crossover_host_integration_recovery import (
+    CrossoverHostIntegrationRecoveryAdapter,
+)
 from tracktemplate.compatibility.crossover_preflight import (
     CrossoverPreflightAdapter,
 )
@@ -268,6 +271,13 @@ _CROSSOVER_B4_RECOVERY_FUNCTIONS = (
     "tag_generated_object",
     "crossover_config_by_id",
     "object_string_property",
+)
+_CROSSOVER_HOST_INTEGRATION_FUNCTIONS = (
+    "create_crossover_host_integration",
+    "remove_crossover_host_integration",
+    "build_crossover_host_integration",
+    "_crossover_integration_restored_records",
+    "clear_chair_analysis_display",
 )
 
 __all__ = (
@@ -974,6 +984,7 @@ class ModularTransitionWorkflowSession:
         self._crossover_preview_method = None
         self._crossover_b4_recovery = None
         self._crossover_b4_panel_update_method = None
+        self._crossover_host_integration = None
         crossover_present = any(
             name in namespace for name in (
                 "_build_rea_c10_crossover_geometry",
@@ -1081,6 +1092,37 @@ class ModularTransitionWorkflowSession:
                     checkbox.blockSignals(False)
 
             self._crossover_b4_panel_update_method = update_selection_buttons
+        integration_present = any(
+            name in namespace for name in (
+                "create_crossover_host_integration",
+                "remove_crossover_host_integration",
+            )
+        )
+        integration_complete = (
+            all(
+                callable(namespace.get(name))
+                for name in _CROSSOVER_HOST_INTEGRATION_FUNCTIONS
+            )
+            and isinstance(panel, type)
+            and callable(panel.__dict__.get("integrate_selected_crossover"))
+            and callable(panel.__dict__.get("remove_selected_integration"))
+        )
+        if integration_present and not integration_complete:
+            raise TransitionWorkflowError(
+                "The inherited crossover host integration boundary is "
+                "incomplete."
+            )
+        if integration_complete:
+            integration_adapter = CrossoverHostIntegrationRecoveryAdapter(
+                self.module,
+                namespace["create_crossover_host_integration"],
+                namespace["remove_crossover_host_integration"],
+            )
+            self._crossover_host_integration = integration_adapter
+            self._host_functions.update({
+                "create_crossover_host_integration": integration_adapter.create,
+                "remove_crossover_host_integration": integration_adapter.remove,
+            })
         self._bind_modular()
 
     def _bind_modular(self):
@@ -1428,6 +1470,41 @@ class ModularTransitionWorkflowSession:
                     "The inherited crossover timbering recovery route is "
                     "mixed."
                 )
+        if self._crossover_host_integration is not None:
+            adapter = self._crossover_host_integration
+            panel = namespace.get("CrossoverManagerPanel")
+            for action, method_name, original in (
+                ("create_crossover_host_integration",
+                 "integrate_selected_crossover", adapter.original_create),
+                ("remove_crossover_host_integration",
+                 "remove_selected_integration", adapter.original_remove),
+            ):
+                caller = panel.__dict__.get(method_name)
+                if getattr(
+                    caller, "_whole_workflow_benchmark_wrapper", False,
+                ):
+                    if getattr(
+                        caller, "_whole_workflow_wrapper_version", None,
+                    ) != EXPECTED_WORKFLOW_VERSION:
+                        raise TransitionWorkflowError(
+                            "The inherited crossover host integration "
+                            "panel wrapper changed."
+                        )
+                    caller = getattr(
+                        caller, "_whole_workflow_original", None,
+                    )
+                code = getattr(caller, "__code__", None)
+                if (
+                    namespace.get(action) is not self._host_functions[action]
+                    or getattr(original, "__globals__", None) is not namespace
+                    or getattr(caller, "__globals__", None) is not namespace
+                    or code is None
+                    or action not in code.co_names
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited crossover host integration route "
+                        "is mixed."
+                    )
         for name in PRODUCT_FUNCTION_NAMES:
             if namespace.get(name) is not self._host_functions[name]:
                 raise TransitionWorkflowError(

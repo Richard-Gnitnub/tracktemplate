@@ -743,6 +743,54 @@ D-P6-008 and TERM-R04 do not change. All conditions in
 [D-P8-001](#phase-8-opening-panel) apply. This result gives no owner
 acceptance for a Phase 8 exit, production output or release.
 
+## Phase 8 `XO-001` host-integration recovery evidence — 2026-09-29
+
+This Level 2 result covers one `XO-001` crossover on two curved host
+alignments. The work started from clean protected `main` at
+`1b5b7c8f0c4b6974962b09ff505e6a8e292875b3`. The checks used copies of the
+fixed B14 `.FCStd` fixture. Its SHA-256 is
+`0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.
+
+Before the change, rejected host-integration Create and Remove operations
+deleted two chair-display objects before B15 opened a FreeCAD transaction.
+With `Undo` enabled, these operations also added an `Undo` entry. B16 now opens
+one FreeCAD transaction before each inherited operation. It rejects an
+operation before mutation when document `Undo` is disabled. B14, B15, the
+stored schema and the public API did not change.
+
+The qualified FreeCADCmd check caused errors during Create and after a
+production-record write. Each error left the document objects, chair displays,
+production records, bindings and `Undo` history unchanged. Successful Create
+replaced four source records with three integrated records, from eight records
+to seven, and added six integration objects. Remove restored the four source
+records and the eight-record index. Each successful operation added one `Undo`
+entry. The `Undo`, `Redo` and copied save/reopen checks passed.
+
+The qualified FreeCAD 1.1.3 real GUI check used the crossover manager panel.
+It checked the confirmation and error dialogs, visible objects, record changes,
+`Undo`, `Redo` and copied save/reopen after Create and Remove. The panel kept
+`Production ready: No`. The run gave PASS, retained 15 images, checked the
+source and fixture hashes, and closed its document.
+
+The pre-change result is in `tmp/phase8-host-integration/red.log`. The final
+headless result is in `tmp/phase8-host-integration/headless-final-source.log`.
+The GUI receipt and images are in
+`benchmark-output/freecad-bridge/phase8-crossover-host-integration-recovery-gui-runs/20260928T224900599163Z/`.
+
+The headless comparison checks stored state and stable shape measures. It does
+not claim byte equality for BRep data. A copied save/reopen changed one derived
+`ModelRailwayCurve` area by 0.000000001 mm²; the check permits at most
+0.000000002 mm² for that area only. These results cover part of Phase 8 Exit 2
+and PR-17. PR-17 stays Critical, Open and Partial. All four exits stay Pending
+at 0/4.
+
+The retired straight-host edit candidate and its evidence remain separate.
+These checks do not prove other host inputs, complete `resolved_analysis`
+parity, validation, export or production output. D-P6-008 and TERM-R04 remain.
+The frozen B14/B15 identities, inherited B15 host, development-only comparison
+oracle, all comparison conditions and all legacy-retirement conditions remain.
+This result gives no owner acceptance for a Phase 8 exit, output or release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
