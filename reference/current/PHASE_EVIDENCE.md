@@ -499,6 +499,36 @@ all conditions for removal of the B14/B15 paths remain. No project owner
 decision accepts product performance, production output, release or a Phase 8
 exit. Project status stays `unknown`.
 
+## Phase 8 fixed `XO-001` B4 error evidence — 2026-09-28
+
+Before this change, an error at the first `B4` tag left an untagged object in a
+copy of a FreeCAD document when `UndoMode=0`. B16 now removes only the new
+object from that failed command. The check with `UndoMode=0` and `UndoMode=1`
+found the same document data and `Undo`/`Redo` history as before the error.
+
+A check with `FreeCADGui` active showed the error and found no new untagged
+object. A later application of `B4` to the fixed `XO-001` produced
+`effective_timber_count=86` and `shared_timber_count=16`. The accepted
+`record_identity_sha256`, `stable_record_sha256`, and `resolution_signature`
+values matched. One `Undo` and one `Redo` restored the expected data.
+
+The check saved the document as `.FCStd`, closed it, and opened it again. The
+`B4` result was unchanged. The source fixture did not change.
+
+The before-change failure and passing FreeCAD results are in
+`benchmark-output/phase8-crossover-b4-recovery/`. The GUI result and images
+are in `benchmark-output/freecad-bridge/phase8-crossover-b4-recovery-gui-runs/20260928T134606144975Z/`.
+
+This result gives partial evidence for Phase 8 Exit 2 only. PR-17 stays
+Open/Partial. All four exits stay Pending. The check does not prove a straight
+alignment, other crossover cases or the complete save/reopen journey.
+
+The isolated worktree cannot complete the local profile check that needs the
+primary `main` checkout and ignored archive. TERM-R04 stays open. D-P6-008
+stays Deferred — unmet. All B14/B15 comparison and removal conditions remain.
+No full B4 migration, product
+performance, production output, release or exit acceptance follows.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision

@@ -3,6 +3,9 @@
 from dataclasses import dataclass
 
 from tracktemplate.application import turnout_edit
+from tracktemplate.compatibility.crossover_b4_recovery import (
+    CrossoverB4RecoveryAdapter,
+)
 from tracktemplate.compatibility.crossover_preflight import (
     CrossoverPreflightAdapter,
 )
@@ -249,6 +252,12 @@ _CROSSOVER_PREFLIGHT_FUNCTIONS = (
     "crossover_config_by_id",
     "object_string_property",
     "_integer_object_property",
+)
+_CROSSOVER_B4_RECOVERY_FUNCTIONS = (
+    "apply_crossover_b4_timbering",
+    "tag_generated_object",
+    "crossover_config_by_id",
+    "object_string_property",
 )
 
 __all__ = (
@@ -953,6 +962,7 @@ class ModularTransitionWorkflowSession:
         panel = namespace.get("CrossoverManagerPanel")
         self._crossover_preflight = None
         self._crossover_preview_method = None
+        self._crossover_b4_recovery = None
         crossover_present = any(
             name in namespace for name in (
                 "_build_rea_c10_crossover_geometry",
@@ -1000,6 +1010,31 @@ class ModularTransitionWorkflowSession:
                 "crossover_geometry_diagnostics_text": adapter.diagnostics,
                 "crossover_solver_trace_text": adapter.trace_text,
             })
+        b4_apply_present = "apply_crossover_b4_timbering" in namespace
+        b4_panel_method = (
+            panel.__dict__.get("apply_b4_timbering")
+            if isinstance(panel, type) else None
+        )
+        b4_complete = (
+            all(
+                callable(namespace.get(name))
+                for name in _CROSSOVER_B4_RECOVERY_FUNCTIONS
+            )
+            and isinstance(namespace.get("CROSSOVER_B4_ROLE"), str)
+            and callable(b4_panel_method)
+        )
+        if (b4_apply_present or b4_panel_method is not None) and not b4_complete:
+            raise TransitionWorkflowError(
+                "The inherited crossover timbering recovery boundary is "
+                "incomplete."
+            )
+        if b4_complete:
+            self._crossover_b4_recovery = CrossoverB4RecoveryAdapter(
+                self.module, namespace["apply_crossover_b4_timbering"],
+            )
+            self._host_functions["apply_crossover_b4_timbering"] = (
+                self._crossover_b4_recovery.apply
+            )
         self._bind_modular()
 
     def _bind_modular(self):
@@ -1286,6 +1321,37 @@ class ModularTransitionWorkflowSession:
                         "The inherited crossover caller {!r} for {!r} is "
                         "unavailable.".format(caller_name, target)
                     )
+        if self._crossover_b4_recovery is not None:
+            adapter = self._crossover_b4_recovery
+            panel = namespace.get("CrossoverManagerPanel")
+            caller = (
+                panel.__dict__.get("apply_b4_timbering")
+                if isinstance(panel, type) else None
+            )
+            if getattr(caller, "_whole_workflow_benchmark_wrapper", False):
+                if getattr(
+                    caller, "_whole_workflow_wrapper_version", None,
+                ) != EXPECTED_WORKFLOW_VERSION:
+                    raise TransitionWorkflowError(
+                        "The inherited crossover timbering panel wrapper "
+                        "drifted."
+                    )
+                caller = getattr(caller, "_whole_workflow_original", None)
+            code = getattr(caller, "__code__", None)
+            if (
+                namespace.get("apply_crossover_b4_timbering")
+                is not self._host_functions["apply_crossover_b4_timbering"]
+                or adapter.module is not self.module
+                or getattr(adapter.original_apply, "__globals__", None)
+                is not namespace
+                or getattr(caller, "__globals__", None) is not namespace
+                or code is None
+                or "apply_crossover_b4_timbering" not in code.co_names
+            ):
+                raise TransitionWorkflowError(
+                    "The inherited crossover timbering recovery route is "
+                    "mixed."
+                )
         for name in PRODUCT_FUNCTION_NAMES:
             if namespace.get(name) is not self._host_functions[name]:
                 raise TransitionWorkflowError(
