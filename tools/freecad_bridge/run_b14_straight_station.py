@@ -11,6 +11,12 @@ import sys
 
 PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2]
 TOOL_ROOT = PROJECT_ROOT / ".devtools" / "freecad-cli"
+PHASE8_STRAIGHT_HOST_BASE_SHA256 = (
+    "0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c"
+)
+PHASE8_STRAIGHT_HOST_SEMANTIC_SHA256 = (
+    "496a64e43033a5b742d4c82b686ad1bc622508cc4eb6ce8ecadf4d7b9796944d"
+)
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(TOOL_ROOT / "src"))
 
@@ -53,18 +59,30 @@ def main():
     )
     parser.add_argument("--port", type=int, default=19875)
     parser.add_argument("--timeout", type=float, default=1200.0)
+    parser.add_argument(
+        "--scenario",
+        choices=("phase1-frozen", "phase8-straight-host"),
+        default="phase1-frozen",
+    )
     args = parser.parse_args()
 
     base_path = args.base.resolve()
     if not base_path.is_file():
         raise SystemExit("B14 plain-line fixture not found: {}".format(base_path))
     source_sha256_before = sha256(base_path)
+    if (
+        args.scenario == "phase8-straight-host"
+        and source_sha256_before != PHASE8_STRAIGHT_HOST_BASE_SHA256
+    ):
+        raise SystemExit("The Phase 8 straight-host base fixture identity drifted")
 
     token_path = PROJECT_ROOT / "benchmark-output" / "freecad-bridge" / "rpc-token"
     if not token_path.is_file():
         raise SystemExit("Bridge token not found; launch the dedicated FreeCAD session first")
 
     run_stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    if args.scenario == "phase8-straight-host":
+        run_stamp += "-phase8-straight-host"
     run_dir = (
         PROJECT_ROOT
         / "benchmark-output"
@@ -73,7 +91,12 @@ def main():
         / run_stamp
     )
     run_dir.mkdir(parents=True, exist_ok=False)
-    document_path = run_dir / "b14-straight-station.FCStd"
+    document_name = (
+        "b14-long-straight-generated.FCStd"
+        if args.scenario == "phase8-straight-host"
+        else "b14-straight-station.FCStd"
+    )
+    document_path = run_dir / document_name
     shutil.copy2(base_path, document_path)
     result_path = run_dir / "run.json"
 
@@ -88,7 +111,11 @@ def main():
 
     state = {
         "run_started_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "recipe_id": "phase1-b14-straight-station-lifecycle-v1",
+        "recipe_id": (
+            "phase8-b14-straight-host-source-v1"
+            if args.scenario == "phase8-straight-host"
+            else "phase1-b14-straight-station-lifecycle-v1"
+        ),
         "macro": "AdvancedTurnout.FCMacro",
         "macro_sha256": sha256(PROJECT_ROOT / "AdvancedTurnout.FCMacro"),
         "source_fixture": str(base_path),
@@ -97,6 +124,11 @@ def main():
         "run_document": str(document_path),
         "cache_state": "fresh FreeCAD process; copied document; OS file cache uncontrolled",
     }
+    if args.scenario == "phase8-straight-host":
+        state["scenario"] = args.scenario
+        state["comparison_witness_sha256"] = (
+            PHASE8_STRAIGHT_HOST_SEMANTIC_SHA256
+        )
     try:
         state["session_before"] = parse_json_output(execute_file(
             client,
@@ -123,19 +155,37 @@ document = App.openDocument({document_path!r})
 print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}, sort_keys=True))
 """.format(document_path=str(document_path))))
 
+        driver_source = (
+            PROJECT_ROOT
+            / "tools"
+            / "freecad_bridge"
+            / "probes"
+            / "b14_straight_station_driver.py"
+        ).read_text(encoding="utf-8")
+        if args.scenario == "phase8-straight-host":
+            driver_source = (
+                "TRACKTEMPLATE_EDITED_STRAIGHT_LENGTHS_MM = "
+                "(1500.0, 450.0)\n"
+                "TRACKTEMPLATE_EDITED_STRAIGHT_SEMANTIC_SHA256 = {!r}\n"
+                .format(PHASE8_STRAIGHT_HOST_SEMANTIC_SHA256)
+                + driver_source
+            )
         recipe_job = submit_and_wait(
             client,
-            (
-                PROJECT_ROOT
-                / "tools"
-                / "freecad_bridge"
-                / "probes"
-                / "b14_straight_station_driver.py"
-            ).read_text(encoding="utf-8"),
+            driver_source,
             "B14 connected straight/station lifecycle",
             args.timeout,
         )
         state["recipe"] = parse_json_output(recipe_job)
+        if args.scenario == "phase8-straight-host":
+            edited = state["recipe"]["scenarios"][-1]
+            if (
+                edited["snapshot"]["semantic_sha256"]
+                != PHASE8_STRAIGHT_HOST_SEMANTIC_SHA256
+                or state["recipe"]["save_reopen"]["semantic_sha256"]
+                != PHASE8_STRAIGHT_HOST_SEMANTIC_SHA256
+            ):
+                raise RuntimeError("The Phase 8 straight-host witness drifted")
         state["recipe_orchestrator_elapsed_seconds"] = recipe_job.get(
             "orchestrator_elapsed_seconds"
         )

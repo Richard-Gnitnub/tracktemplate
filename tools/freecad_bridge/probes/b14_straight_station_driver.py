@@ -36,6 +36,13 @@ from tools.freecad_bridge.straight_station_recipe import (
 )
 
 
+EDITED_LENGTHS_MM = globals().get(
+    "TRACKTEMPLATE_EDITED_STRAIGHT_LENGTHS_MM", EDITED_LENGTHS_MM
+)
+EXPECTED_EDITED_SEMANTIC_SHA256 = globals().get(
+    "TRACKTEMPLATE_EDITED_STRAIGHT_SEMANTIC_SHA256",
+    EXPECTED_EDITED_SEMANTIC_SHA256,
+)
 MODULE_NAME = globals().get(
     "TRACKTEMPLATE_WORKFLOW_MODULE_NAME",
     "tracktemplate_b14_session",

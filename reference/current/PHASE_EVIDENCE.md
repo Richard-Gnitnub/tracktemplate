@@ -594,6 +594,46 @@ The local `ci` validation profile gives a PASS result for all 84 checks. Its
 data are in
 `benchmark-output/standalone-validation/20260928T145036677299Z/`.
 
+<a id="phase-8-straight-host-crossover-result"></a>
+
+## Phase 8 straight-host crossover result — 2026-09-28
+
+A separate option in the B14 GUI recipe made a copied two-track input. It has
+a 1500 mm straight entrance and a 450 mm straight exit. Its source FCStd did
+not change.
+The default Phase 1 GUI recipe retained its frozen hashes, Undo/Redo sequence,
+and save/reopen result.
+
+At Host Track A toe chainage 580.134 mm, the qualified FreeCAD check gave
+equal B14, B15, and B16 crossover configurations after removal of three
+`macro_version` fields. The nine crossover objects had equal exact shapes and
+stable identities. Four production records were equal. B16 rejected a request
+for a minimum radius of 3000 mm without changing the copied document. It made
+one `XO-001` in one Undo unit. Undo, Redo, and one save/reopen passed.
+
+The qualified real GUI used the straight host pair to preview and make
+`XO-001`. A rejected request left the document and Undo history unchanged.
+The created and reopened top-view images contain the same pixels. This check
+did not include viewport selection, parameter editing, `Validate/Export`, or
+other host pairs.
+
+This result adds one straight-host sample for Exit 3 and some Exit 2
+operations. All four exits remain Pending. The earlier headless/GUI
+`resolved_analysis_sha256` difference remains an unproved cross-profile
+comparison. Wider crossover and broader save/reopen journeys remain unproved.
+D-P6-008, TERM-R04, comparison conditions, and legacy-retirement conditions
+do not change.
+
+The B14 source recipe and default regression results are in
+`benchmark-output/freecad-bridge/straight-station-runs/20260928T165114Z-phase8-straight-host/`
+and `benchmark-output/freecad-bridge/straight-station-runs/20260928T165910Z/`.
+The qualified FreeCAD result is in
+`tmp/phase8-straight-crossover/headless-regenerated-first.log`. The GUI result
+and images are in
+`benchmark-output/freecad-bridge/phase8-straight-host-crossover-gui-runs/20260928T165738307958Z/`.
+The local `ci` profile passed all 84 checks. Its results are in
+`benchmark-output/standalone-validation/20260928T170104718903Z/`.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
