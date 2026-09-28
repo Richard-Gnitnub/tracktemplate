@@ -377,28 +377,47 @@ production-output or release acceptance. Project status remains `unknown`.
 
 <a id="phase-8-turnout-station-interval-candidate"></a>
 
-## Phase 8 `turnout_host_station_interval` candidate — 2026-09-28
+## Phase 8 `turnout_host_station_interval` evidence — 2026-09-28
 
-The development-only candidate puts the complete turnout module's interval
-calculation in `tracktemplate/domain/turnout.py`. Product composition selects
-it for four inherited B15 callers and rejects a missing or mixed route. Public
-API, routing schema, UI terms and frozen B14/B15 sources stay unchanged.
+This change is internal to TrackTemplate. `turnout_host_station_interval` in
+`tracktemplate/domain/turnout.py` calculates the interval from
+`module_start_x` to `module_end_x` on the selected alignment. It uses
+`orientation` to select the direction. TrackTemplate selects `turnout_host_station_interval` for 4 B15 callers. The
+route check rejects a missing selection or a different selection for any
+caller.
 
-B14/B15 calculation comparison, all 81 standalone checks and the qualified
-FreeCAD caller check passed. A real-GUI check used a copy of a saved FreeCAD
-document. It created a turnout, checked the stored interval against both
-frozen calculations, and rejected an overlapping turnout without a document
-change. The source document stayed byte-identical. Detailed proof is in
+The API in `tracktemplate.api` stays the same. The schema for the route stays
+the same. The terms that FreeCAD shows to a person stay the same. The B14/B15
+source files stay the same.
+
+A check compared values from `turnout_host_station_interval` with values from the frozen B14 and B15 sources. The result was
+`PASS`. The validation profile for standalone Python included 81 checks. All
+81 gave `PASS`. The FreeCAD caller check used the qualified host profile and
+gave `PASS`.
+
+A check used FreeCAD with `FreeCADGui` active and a copy of a `.FCStd` file. The
+check made the turnout `TO-001`. It compared the interval in the FreeCAD data
+with B14 and B15 values. TrackTemplate rejected a turnout because its interval
+had values that were also in the interval for `TO-001`. TrackTemplate did not
+change the FreeCAD data when it rejected this turnout. The SHA-256 of the
+source `.FCStd` file was the same before and after the check.
+
+The results are in
 `benchmark-output/standalone-validation/20260928T095006133000Z/`,
 `benchmark-output/phase8-turnout-host-interval/` and
 `benchmark-output/freecad-bridge/phase8-turnout-toe-gui-runs/20260928T094740556578Z/`.
 
-This is bounded evidence toward Exits 2, 3 and 4. All four exits stay Pending.
-The full Exit 2 journey and representative straight- and curved-host checks
-remain open. TERM-R04 stays open; D-P6-008 stays Deferred — unmet. All existing
-comparison and legacy-retirement conditions remain. The draft needs exact-head
-CI and a separate integration decision. No wider migration, performance,
-production-output or release acceptance follows. Project status stays `unknown`.
+This evidence is for Phase 8 exits 2, 3 and 4 only. All 4 exits stay Pending. The checks for all Exit 2 operations are necessary. The Exit 3 checks for
+a straight alignment and an alignment with a curve are necessary.
+
+TERM-R04 stays open. D-P6-008 stays Deferred — unmet. These results do not change the conditions in
+[D-P8-001](#phase-8-opening-panel).
+
+A continuous integration (CI) result with status `success` for the SHA of the
+draft pull request's commit is necessary. The project owner must make a new
+decision before the merge. No owner decision accepts other migration, product
+performance, production, physical output or release. Project status stays
+`unknown`.
 
 ## Phase 8 exit conditions
 
