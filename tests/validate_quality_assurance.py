@@ -601,6 +601,8 @@ def validate_documentation_profile(
             'A later independently reviewed snapshot covers the earlier 39-worktree estate',
             'PR #95 integrated D-GOV-020',
             'PR #96 integrated D-GOV-021',
+            'PR #97 integrated D-GOV-022',
+            'final two worktree retirements',
             'capability matrix',
             'evidence map through PR #84 only',
             'modular Core layout Create, Edit, Save, reopen, validation and export',
@@ -628,6 +630,8 @@ def validate_documentation_profile(
             'After removal, each preservation check gave PASS',
             'The earlier test used a Git repository that the Git ignore rule did not select',
             'Five branches with unmerged commits and their three worktrees remain',
+            'The two D-GOV-022 worktrees are retired',
+            'All eight prior branch refs remain exact',
             'USB is safely unmounted. Physical removal and separate storage remain operator-controlled and unverified',
             'D-P8-001',
             'opens Phase 8 at 0/4',
@@ -636,16 +640,18 @@ def validate_documentation_profile(
             'D-GOV-021',
             'authorises one `git worktree remove --force` operation only if all its conditions pass',
             'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-            'Complete exact-green D-GOV-022 review and draft publication',
-            'Get a separate retirement plan with removal authority and a passing audit for each of the two D-GOV-022 worktrees',
-            'The terminal and replacement D-GOV-022 worktrees also remain registered',
-            'separate owner integration decision',
-            'full retirement prerequisite passes',
-            'Keep five branches with unmerged commits',
-            'confirm physical USB storage',
+            'The project completed the [Phase 8 retirement and recovery checks]',
+            'The recorded snapshot, restore, audit, preservation and clean protected-`main` evidence supports that result',
+            'D-P8-001 does not make these steps necessary before product work',
+            'verify clean, synchronised protected `main` before the authorised `turnout_valid_toe_range` slice',
             'The product draft needs a separate integration decision',
         )),
         "PROJECT_PLAN owner view contradicts current authority",
+    )
+    require(
+        "Obtain on-site confirmation that the safely unmounted USB is removed and stored separately"
+        not in owner_view,
+        "PROJECT_PLAN owner view restored the unsupported USB product-start gate",
     )
 
     require(

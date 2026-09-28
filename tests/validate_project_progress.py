@@ -1055,6 +1055,8 @@ def _validate_owner_view(plan: str) -> None:
         'A later independently reviewed snapshot covers the earlier 39-worktree estate',
         'PR #95 integrated D-GOV-020',
         'PR #96 integrated D-GOV-021',
+        'PR #97 integrated D-GOV-022',
+        'final two worktree retirements',
         'capability matrix',
         'evidence map through PR #84 only',
         'modular Core layout Create, Edit, Save, reopen, validation and export',
@@ -1082,6 +1084,8 @@ def _validate_owner_view(plan: str) -> None:
         'After removal, each preservation check gave PASS',
         'The earlier test used a Git repository that the Git ignore rule did not select',
         'Five branches with unmerged commits and their three worktrees remain',
+        'The two D-GOV-022 worktrees are retired',
+        'All eight prior branch refs remain exact',
         'USB is safely unmounted. Physical removal and separate storage remain operator-controlled and unverified',
         'D-P8-001',
         'opens Phase 8 at 0/4',
@@ -1090,19 +1094,21 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-021',
         'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Complete exact-green D-GOV-022 review and draft publication',
-        'Get a separate retirement plan with removal authority and a passing audit for each of the two D-GOV-022 worktrees',
-        'The terminal and replacement D-GOV-022 worktrees also remain registered',
-        'separate owner integration decision',
-        'full retirement prerequisite passes',
-        'Keep five branches with unmerged commits',
-        'confirm physical USB storage',
+        'The project completed the [Phase 8 retirement and recovery checks]',
+        'The recorded snapshot, restore, audit, preservation and clean protected-`main` evidence supports that result',
+        'D-P8-001 does not make these steps necessary before product work',
+        'verify clean, synchronised protected `main` before the authorised `turnout_valid_toe_range` slice',
         'The product draft needs a separate integration decision',
     ):
         _require(
             fragment in owner_view,
             "project-plan owner view lost or contradicted: " + fragment,
         )
+    _require(
+        "Obtain on-site confirmation that the safely unmounted USB is removed and stored separately"
+        not in owner_view,
+        "project-plan owner view restored the unsupported USB product-start gate",
+    )
     plan_preamble = direct_section_content(plan, "Project Plan", level=1)
     _require(
         "canonical registers and evidence are the source of this owner view. "
@@ -4963,9 +4969,38 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
         "36 branches",
         "five branches with unmerged commits",
         "Physical removal and separate storage remain unconfirmed",
-        "product prerequisite stays open",
+        "At that checkpoint, the product prerequisite stayed open",
     ):
         _require(clause in exception_flat, "D-GOV-022 boundary drifted: " + clause)
+    retirement_result = _section(
+        evidence, "Phase 8 worktree-retirement result — 2026-09-28"
+    )
+    for clause in (
+        "1a8861b342727c54af7ecc95aa42adf4b66082c4",
+        "245b4d56c1cd1d827db6f0af787bdda6e4d131b3",
+        "2026-09-27-pre-dgov022-worktree-retirement-01",
+        "Both D-GOV-022 worktrees had a separate passing retirement plan and current audit",
+        "Git removed each with ordinary `git worktree remove`",
+        "Six worktrees were registered: protected `main`, three worktrees with unmerged branches, and the two D-GOV-022 worktrees",
+        "Four worktrees remained: protected `main` and the same three worktrees with unmerged branches",
+        "The same eight local branches have the same tips. Git removed no branch",
+        "No stash exists. `main` is unchanged and clean",
+        "589 exact entries from the terminal worktree",
+        "776 exact entries from the replacement worktree",
+        "deb71c8ca87cb947ff3de7abbfd635103133ade8",
+        "e8e373f8cd1f52d32a5094364e7228f19ea5cd4a5b9f938c9c908ab48d534e19",
+        "The project completed the Phase 8 worktree retirement and recovery checks",
+        "The recorded snapshot, restore, audit, preservation and clean protected-`main` evidence supports that result",
+        "Physical removal and separate storage remain unverified",
+        "The approved USB can stay connected to the computer and available to software during development",
+        "This state alone does not block the authorised product slice",
+        "clean, synchronised protected `main` must be verified again before product work",
+    ):
+        _require(clause in retirement_result, "Phase 8 retirement evidence drifted: " + clause)
+    _require(
+        "The product-start recovery gate stays open" not in retirement_result,
+        "Phase 8 retirement result restored the unsupported USB product-start gate",
+    )
     _require(
         "history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel"
         in evidence
