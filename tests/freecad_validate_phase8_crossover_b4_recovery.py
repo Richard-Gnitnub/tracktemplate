@@ -268,6 +268,23 @@ def _prove_success_lifecycle(module, document, crossover_id, contract):
     assert len(document.Objects) == counts["after_crossover_geometry"]
     first = module.apply_crossover_b4_timbering(document, crossover_id)
     assert first.get("cache_reused") is False
+    signature_args = (
+        module.crossover_config_by_id(document, crossover_id),
+        first["inherited_signature"],
+        first["shared_result"],
+        first["b3_result"],
+        first["resolved_timbers"],
+        first["unresolved"],
+    )
+    visible_signature = module._b4_resolution_signature(
+        signature_args[0], {"show_b4_geometry": True},
+        *signature_args[1:],
+    )
+    hidden_signature = module._b4_resolution_signature(
+        signature_args[0], {"show_b4_geometry": False},
+        *signature_args[1:],
+    )
+    assert visible_signature == hidden_signature
     core = _assert_core_result(module, first, contract)
     resolved_analysis = _assert_resolved_analysis(
         module, first, document, crossover_id,
@@ -339,6 +356,20 @@ def _prove_success_lifecycle(module, document, crossover_id, contract):
     _assert_resolved_analysis(
         module, reopened, reopened_document, crossover_id, resolved_analysis,
     )
+    assert _persistent_state(_snapshot(
+        module, reopened_document, crossover_id,
+    )) == _persistent_state(saved)
+    reopened_document.UndoMode = 1
+    changed_settings = dict(contract["scenario"]["b3_calculation_change"])
+    changed = module.apply_crossover_b4_timbering(
+        reopened_document, crossover_id,
+        b3_settings=changed_settings,
+    )
+    assert changed.get("cache_reused") is False
+    assert changed["resolution_signature"] != first["resolution_signature"]
+    assert _history(reopened_document)["undo"] == 1
+    reopened_document.undo()
+    reopened_document.recompute()
     assert _persistent_state(_snapshot(
         module, reopened_document, crossover_id,
     )) == _persistent_state(saved)

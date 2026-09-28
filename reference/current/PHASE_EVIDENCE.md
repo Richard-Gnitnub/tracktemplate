@@ -645,6 +645,40 @@ and `PNG` files are in
 The local `ci` profile gave PASS results for all 84 checks. The results are in
 `benchmark-output/standalone-validation/20260928T170104718903Z/`.
 
+## Phase 8 fixed `XO-001` `B4` display evidence — 2026-09-28
+
+B16 now keeps the `B4` calculation result when a person changes only
+`show_b4_geometry` for the fixed curved `XO-001`. In the qualified FreeCAD GUI,
+the `Show final resolved timbering` check box showed the live
+`ViewObject.Visibility` state after the panel refreshed. A change to this check
+box followed by `Resolve crossover timbering automatically` kept the same
+`B4` object and BRep. The solver and shape builder each ran zero times. The stored
+`B4` result, final analysis, and `Undo`/`Redo` history did not change.
+
+The check saved a copy of the `.FCStd` file with `B4` not shown. After FreeCAD
+opened the copy again, the `B4` object was still not shown and its stored data
+were equal. The two Top view PNG files had equal pixel values. The raw
+whole-document timber hashes differed only in the derived Shape of the
+`ModelRailwayCurve` group. When the check excluded that one group Shape, the
+document data hashes were equal. The source fixture did not change.
+
+The qualified headless check found equal `B4` calculation signatures with
+`show_b4_geometry` true and false. A change to the `B3` calculation settings
+made the stored `B4` result invalid for reuse. `Undo` restored the saved data.
+The headless result is in `tmp/phase8-b4-display-only/final-headless.log`. The
+qualified GUI result and images are in
+`benchmark-output/freecad-bridge/phase8-crossover-b4-recovery-gui-runs/20260928T184443291454Z/`.
+
+This result gives partial evidence for Phase 8 Exits 1 and 2 and PR-16. PR-16
+stays Open/Partial. No renderer or FreeCAD persistence adapter changed. All four
+exits stay Pending.
+The headless and GUI full `resolved_analysis_sha256` values are still different.
+Equivalent full analysis in those modes is unproved. The straight-host evidence
+has one sample. Other crossovers and more save/reopen sequences are unproved.
+The isolated-worktree `local` profile limit remains. D-P6-008 and TERM-R04 do
+not change. The B14/B15 comparison and legacy-retirement conditions remain.
+This result accepts no Phase 8 exit, production output, or release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
