@@ -149,6 +149,49 @@ def _assert_core_result(module, result, contract):
     return actual
 
 
+def _assert_resolved_analysis(module, result, document, crossover_id,
+                              expected=None):
+    """Prove the effective analysis in the return and stored B4 payloads."""
+    returned = result.get("resolved_analysis")
+    assert isinstance(returned, dict) and returned, returned
+    # The document stores JSON, which restores nested tuples as lists.
+    analysis = json.loads(json.dumps(returned, sort_keys=True))
+    assert analysis.get("geometry_signature"), analysis
+    assert analysis.get("analysis_basis") == (
+        "Effective automatically resolved timber arrangement"
+    ), analysis.get("analysis_basis")
+    if expected is not None:
+        assert analysis == expected, "Returned B4 resolved analysis changed"
+
+    config = module.crossover_config_by_id(document, crossover_id)
+    assert config is not None
+    stored_result = config.get("b4_result")
+    assert isinstance(stored_result, dict)
+    stored_analysis = stored_result.get("resolved_analysis")
+    if stored_analysis != analysis:
+        differences = sorted(
+            key for key in set(analysis) | set(stored_analysis or {})
+            if analysis.get(key) != (stored_analysis or {}).get(key)
+        )
+        raise AssertionError(
+            "Crossover config changed effective B4 analysis fields: {!r}"
+            .format(differences)
+        )
+    settings = [
+        obj for obj in module._crossover_objects(document, crossover_id)
+        if module.object_string_property(obj, "GeneratedRole", "")
+        == module.CROSSOVER_SETTINGS_ROLE
+    ]
+    assert len(settings) == 1, settings
+    persisted = json.loads(str(getattr(
+        settings[0], module.CROSSOVER_B4_RESULT_PROPERTY,
+    )))
+    assert persisted.get("resolved_analysis") == analysis, (
+        "CrossoverB4ResultJSON lost the effective B4 analysis"
+    )
+    return analysis
+
+
 def _snapshot_difference(before, after):
     before_objects = {item["name"]: item for item in before["objects"]}
     after_objects = {item["name"]: item for item in after["objects"]}
@@ -226,6 +269,9 @@ def _prove_success_lifecycle(module, document, crossover_id, contract):
     first = module.apply_crossover_b4_timbering(document, crossover_id)
     assert first.get("cache_reused") is False
     core = _assert_core_result(module, first, contract)
+    resolved_analysis = _assert_resolved_analysis(
+        module, first, document, crossover_id,
+    )
     b4_object = module._crossover_b4_object(document, crossover_id)
     assert b4_object is not None
     assert recipe.shape_summary(b4_object.Shape) == expected["display_shape"]
@@ -239,6 +285,9 @@ def _prove_success_lifecycle(module, document, crossover_id, contract):
     reused = module.apply_crossover_b4_timbering(document, crossover_id)
     assert reused.get("cache_reused") is True
     _assert_core_result(module, reused, contract)
+    _assert_resolved_analysis(
+        module, reused, document, crossover_id, resolved_analysis,
+    )
     assert len(document.Objects) == counts["after_unchanged_reuse"]
     assert _snapshot(module, document, crossover_id) == after
 
@@ -249,11 +298,19 @@ def _prove_success_lifecycle(module, document, crossover_id, contract):
     assert _document_state(_snapshot(module, document, crossover_id)) == (
         _document_state(before)
     )
+    assert module.crossover_config_by_id(
+        document, crossover_id,
+    ).get("b4_result") == before["config"].get("b4_result")
     document.redo()
     document.recompute()
     assert len(document.Objects) == counts["after_redo"]
     assert _document_state(_snapshot(module, document, crossover_id)) == (
         _document_state(after)
+    )
+    _assert_resolved_analysis(
+        module, module.crossover_config_by_id(document, crossover_id)[
+            "b4_result"
+        ], document, crossover_id, resolved_analysis,
     )
 
     document.save()
@@ -269,14 +326,26 @@ def _prove_success_lifecycle(module, document, crossover_id, contract):
                 _snapshot_difference(saved, reopened_state),
             )
         )
+    _assert_resolved_analysis(
+        module, module.crossover_config_by_id(reopened_document, crossover_id)[
+            "b4_result"
+        ], reopened_document, crossover_id, resolved_analysis,
+    )
     reopened = module.apply_crossover_b4_timbering(
         reopened_document, crossover_id,
     )
     assert reopened.get("cache_reused") is True
     _assert_core_result(module, reopened, contract)
+    _assert_resolved_analysis(
+        module, reopened, reopened_document, crossover_id, resolved_analysis,
+    )
     assert _persistent_state(_snapshot(
         module, reopened_document, crossover_id,
     )) == _persistent_state(saved)
+    core["resolved_analysis_signature"] = resolved_analysis[
+        "geometry_signature"
+    ]
+    core["resolved_analysis_sha256"] = recipe.digest(resolved_analysis)
     return reopened_document, core
 
 

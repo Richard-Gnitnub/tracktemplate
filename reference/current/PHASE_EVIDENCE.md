@@ -536,6 +536,64 @@ TERM-R04 stays open. D-P6-008 stays Deferred — unmet. The B14/B15 comparison
 and removal conditions do not change. No full B4 migration, product
 performance, production output, release, or exit acceptance follows.
 
+## Phase 8 `XO-001` `B4` persistence evidence — 2026-09-28
+
+The accepted [Phase 1 data](../contracts/phase1-crossover-timbering.json)
+show a difference between the initial `B4` result and the `resolved_analysis`
+data in `b4_result`. A new check on clean `main` gives a FAIL result for this
+difference. In `B16`, the 3 `resolved_analysis` values are equal after the
+check applies `json.dumps` and then `json.loads` to the initial result. The
+JSON values in the initial result, `b4_result`, and `CrossoverB4ResultJSON`
+stay equal when the command uses the result again without a change to the
+input. They stay equal after `Redo`, `document.save()`,
+`App.closeDocument()`, and `App.openDocument()`.
+
+The `geometry_signature` value is not empty. The `analysis_basis` value is
+`Effective automatically resolved timber arrangement`. The selected sample
+has 86 for `effective_timber_count` and 16 for `shared_timber_count`. It has
+the accepted `record_identity_sha256` and `stable_record_sha256` values.
+
+The FreeCAD checks use a qualified host profile with and without `FreeCADGui`
+active. They examine one error that the test causes, the next command, and
+`Undo`/`Redo`. They also examine one sequence with `document.save()`,
+`App.closeDocument()`, and `App.openDocument()`. The result with
+`FreeCADGui` active has the same
+`effective_timber_count`, `shared_timber_count`, and shape as the result
+without `FreeCADGui`.
+
+The initial FreeCAD test with the new check gives a FAIL result. The check
+compares `tuple` and `list` values before the JSON operation. These values are
+equal after the JSON operation. The corrected check gives a PASS result in the
+next FreeCAD test.
+
+These checks examine some conditions of Phase 8 Exits 1 and 2. They do not
+give all necessary evidence. PR-17 stays Open with Partial control effectiveness. All 4 Phase 8
+exits stay Pending. The checks do not examine a straight alignment, other
+crossovers, or more sequences with `document.save()`,
+`App.closeDocument()`, and `App.openDocument()`.
+
+TERM-R04, D-P6-008, the B14/B15 checks, and the conditions for removal
+of B14/B15 paths do not change. This result gives no acceptance for a full
+`B4` migration, product performance, production output, release, or a Phase 8
+exit.
+
+The `local` validation profile cannot give a result in this worktree. The
+primary `main` worktree and its source archive are necessary. Git does not
+include the source archive.
+
+The `resolved_analysis_sha256` values from the check without `FreeCADGui` and
+the check with it active are different. The `geometry_signature`,
+`record_identity_sha256`, and `stable_record_sha256` values are equal. These
+checks do not give the necessary evidence for Phase 8 Exit 3.
+
+The result from clean `main`, the FAIL result, and the FreeCAD PASS result
+are in `tmp/phase8-crossover-b4-analysis/`. The data from the check with
+`FreeCADGui` active are in
+`benchmark-output/freecad-bridge/phase8-crossover-b4-recovery-gui-runs/20260928T144631027771Z/`.
+The local `ci` validation profile gives a PASS result for all 84 checks. Its
+data are in
+`benchmark-output/standalone-validation/20260928T145036677299Z/`.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
