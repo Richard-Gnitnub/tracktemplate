@@ -250,6 +250,7 @@ _CROSSOVER_PREFLIGHT_FUNCTIONS = (
     "existing_turnout_configs",
     "existing_crossover_configs",
     "crossover_config_by_id",
+    "clear_chair_analysis_display",
     "object_string_property",
     "_integer_object_property",
 )

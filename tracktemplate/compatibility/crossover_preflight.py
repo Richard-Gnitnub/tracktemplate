@@ -260,7 +260,7 @@ class CrossoverPreflightAdapter:
         return self.original_builder(**arguments)
 
     def edit(self, *args, **kwargs):
-        """Reject before frozen edit clears chair-analysis display objects."""
+        """Keep derived display until the frozen edit transaction removes it."""
         arguments = _bound_arguments(self.original_editor, args, kwargs)
         identifier = str(arguments["crossover_id"] or "").strip()
         if self.module.crossover_config_by_id(
@@ -281,7 +281,30 @@ class CrossoverPreflightAdapter:
         arguments["pre_solved"] = self._checked_result(
             request, arguments["pre_solved"],
         )
-        return self.original_editor(**arguments)
+        original_clear = self.module.clear_chair_analysis_display
+        skipped_early_clear = False
+
+        def keep_display_until_transaction(doc, entity_kind, entity_id):
+            nonlocal skipped_early_clear
+            if (
+                not skipped_early_clear
+                and doc is arguments["doc"]
+                and str(entity_kind).lower() == "crossover"
+                and str(entity_id).strip() == identifier
+            ):
+                # The inherited editor removes these CrossoverID objects
+                # with the rest of the old crossover inside its transaction.
+                skipped_early_clear = True
+                return 0
+            return original_clear(doc, entity_kind, entity_id)
+
+        self.module.clear_chair_analysis_display = (
+            keep_display_until_transaction
+        )
+        try:
+            return self.original_editor(**arguments)
+        finally:
+            self.module.clear_chair_analysis_display = original_clear
 
     def preview_signature(self, panel, values):
         """Invalidate the panel's early return on every preflight input."""
