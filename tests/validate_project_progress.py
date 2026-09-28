@@ -1094,9 +1094,9 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-021',
         'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'These decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Phase 8 retirement and recovery checks',
-        'recorded snapshot, restore, audit, preservation and clean protected-`main` evidence',
-        'Physical USB removal and separate storage remain operational recovery controls, not a D-P8-001 product-start condition',
+        'The project completed the [Phase 8 retirement and recovery checks]',
+        'The recorded snapshot, restore, audit, preservation and clean protected-`main` evidence supports that result',
+        'D-P8-001 does not make these steps necessary before product work',
         'verify clean, synchronised protected `main` before the authorised `turnout_valid_toe_range` slice',
         'The product draft needs a separate integration decision',
     ):
@@ -4989,9 +4989,11 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
         "776 exact entries from the replacement worktree",
         "deb71c8ca87cb947ff3de7abbfd635103133ade8",
         "e8e373f8cd1f52d32a5094364e7228f19ea5cd4a5b9f938c9c908ab48d534e19",
-        "The Phase 8 retirement and recovery checks are complete on the recorded snapshot, restore, audit, preservation and clean protected-`main` evidence",
+        "The project completed the Phase 8 worktree retirement and recovery checks",
+        "The recorded snapshot, restore, audit, preservation and clean protected-`main` evidence supports that result",
         "Physical removal and separate storage remain unverified",
-        "An attached or mounted approved USB does not itself block the authorised product slice",
+        "The approved USB can stay connected to the computer and available to software during development",
+        "This state alone does not block the authorised product slice",
         "clean, synchronised protected `main` must be verified again before product work",
     ):
         _require(clause in retirement_result, "Phase 8 retirement evidence drifted: " + clause)
