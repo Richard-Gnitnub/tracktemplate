@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / ".devtools/freecad-cli/src"))
 
 from freecad_cli.client import FreeCADClient  # noqa: E402
+from tools.freecad_bridge import crossover_timber_recipe as recipe  # noqa: E402
 from tools.freecad_bridge.orchestration import (  # noqa: E402
     execute,
     execute_file,
@@ -590,6 +591,7 @@ try:
                 "analysis_basis": applied_persistence["analysis"]["analysis_basis"],
                 "sha256": applied_persistence["analysis_sha256"],
                 "stored_views_match": True,
+                "full": applied_persistence["analysis"],
             },
             "shape": shape,
             "visuals": applied_visuals,
@@ -695,7 +697,14 @@ def _check_probe(probe, contract):
     diagnostics = applied["resolved_analysis"]
     signature = diagnostics["geometry_signature"]
     digest = diagnostics["sha256"]
+    full_analysis = diagnostics.get("full")
     if (not signature or len(digest) != 64
+            or not isinstance(full_analysis, dict)
+            or recipe.digest(full_analysis) != digest
+            or full_analysis.get("geometry_signature") != signature
+            or not isinstance(
+                full_analysis.get("performance_timings_ms"), dict
+            )
             or diagnostics["analysis_basis"]
             != "Effective automatically resolved timber arrangement"
             or diagnostics["stored_views_match"] is not True
@@ -765,6 +774,7 @@ def main():
     if fixture_hash != contract["fixture"]["sha256"]:
         raise SystemExit("The fixed B14 fixture identity drifted")
     source_hashes = _source_hashes()
+    comparison_source_hashes = recipe.comparison_source_hashes(ROOT)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y%m%dT%H%M%S%fZ"
     )
@@ -778,6 +788,7 @@ def main():
         "source_fixture": str(base),
         "source_fixture_sha256": fixture_hash,
         "source_sha256": source_hashes,
+        "comparison_source_sha256": comparison_source_hashes,
         "run_document": str(document_path),
         "scope": "fixed curved XO-001 B4 recovery, visibility and one GUI lifecycle",
     }
@@ -834,8 +845,13 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             state["cleanup_error"] = "{}: {}".format(type(error).__name__, error)
         state["source_fixture_sha256_after"] = sha256(base)
         state["source_sha256_after"] = _source_hashes()
+        state["comparison_source_sha256_after"] = (
+            recipe.comparison_source_hashes(ROOT)
+        )
         if (state["source_fixture_sha256_after"] != fixture_hash
-                or state["source_sha256_after"] != source_hashes):
+                or state["source_sha256_after"] != source_hashes
+                or state["comparison_source_sha256_after"]
+                != comparison_source_hashes):
             cleanup_failure = RuntimeError("The B4 proof changed its source or fixture")
         if cleanup_failure is not None:
             state["status"] = "FAIL"

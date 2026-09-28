@@ -1,5 +1,6 @@
 """Prove B16 B4 first-tag failure recovery on the fixed XO-001 copy."""
 
+import datetime
 import hashlib
 import json
 import os
@@ -377,6 +378,7 @@ def _prove_success_lifecycle(module, document, crossover_id, contract):
         "geometry_signature"
     ]
     core["resolved_analysis_sha256"] = recipe.digest(resolved_analysis)
+    core["resolved_analysis"] = resolved_analysis
     return reopened_document, core
 
 
@@ -395,6 +397,7 @@ def validate():
     assert fixture_path.is_file(), fixture_path
     fixture_hash = _sha256(fixture_path)
     assert fixture_hash == fixture["sha256"]
+    source_hashes = recipe.comparison_source_hashes(SOURCE_ROOT)
     module = _load_product()
 
     witness = None
@@ -433,10 +436,35 @@ def validate():
             for opened in list(App.listDocuments().values()):
                 if pathlib.Path(opened.FileName) == copy:
                     App.closeDocument(opened.Name)
-    assert _sha256(fixture_path) == fixture_hash
-    print("PHASE8_B4_RECOVERY_WITNESS=" + json.dumps(
-        witness, sort_keys=True, separators=(",", ":"),
-    ))
+    fixture_hash_after = _sha256(fixture_path)
+    source_hashes_after = recipe.comparison_source_hashes(SOURCE_ROOT)
+    assert fixture_hash_after == fixture_hash
+    assert source_hashes_after == source_hashes
+    receipt = {
+        "status": "PASS",
+        "sentinel": SENTINEL,
+        "host_profile_id": PROFILE,
+        "source_fixture_sha256": fixture_hash,
+        "source_fixture_sha256_after": fixture_hash_after,
+        "comparison_source_sha256": source_hashes,
+        "comparison_source_sha256_after": source_hashes_after,
+        "result": witness,
+    }
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y%m%dT%H%M%S%fZ"
+    )
+    run_dir = (
+        SOURCE_ROOT / "benchmark-output/freecad-bridge/"
+        "phase8-crossover-b4-headless-runs" / stamp
+    )
+    run_dir.mkdir(parents=True, exist_ok=False)
+    receipt_path = run_dir / "receipt.json"
+    receipt_path.write_text(
+        json.dumps(receipt, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    print("PHASE8_B4_RECOVERY_RECEIPT=" + str(receipt_path))
+    print("PHASE8_B4_RECOVERY_RECEIPT_SHA256=" + _sha256(receipt_path))
     print(SENTINEL)
 
 

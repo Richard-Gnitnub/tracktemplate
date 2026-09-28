@@ -3,6 +3,7 @@
 import collections
 import hashlib
 import json
+import pathlib
 
 from tools.freecad_bridge import b14_recipe
 
@@ -12,6 +13,34 @@ VOLATILE_RESULT_KEYS = {
     "metadata_update_statistics",
     "performance_timings_ms",
 }
+
+COMPARISON_SOURCE_PATHS = (
+    "AdvancedTurnout.FCMacro",
+    "model_railway_curve_template_multitrack_v10_2a8a7b15_"
+    "chair_performance_and_representation.FCMacro",
+    "TrackTemplate.FCMacro",
+    "reference/contracts/phase1-crossover-timbering.json",
+    "reference/contracts/phase1-compatibility.json",
+    "reference/contracts/phase1-transition-pilot.json",
+    "tools/phase3_transition_pilot.py",
+    "tools/freecad_bridge/b14_recipe.py",
+    "tools/freecad_bridge/ordinary_track_recipe.py",
+    "tools/freecad_bridge/crossover_timber_recipe.py",
+    "tools/freecad_bridge/run_phase8_crossover_b4_recovery_gui.py",
+    "tools/freecad_bridge/compare_phase8_crossover_b4_modes.py",
+    "tests/freecad_validate_phase8_crossover_b4_recovery.py",
+)
+
+
+def comparison_source_hashes(root):
+    """Fingerprint source shared by both fixed XO-001 B4 host proofs."""
+    root = pathlib.Path(root)
+    paths = [root / relative for relative in COMPARISON_SOURCE_PATHS]
+    paths.extend(sorted((root / "tracktemplate").rglob("*.py")))
+    return {
+        str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in paths
+    }
 
 
 def digest(value):
