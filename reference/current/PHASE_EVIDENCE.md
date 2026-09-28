@@ -594,6 +594,57 @@ The local `ci` validation profile gives a PASS result for all 84 checks. Its
 data are in
 `benchmark-output/standalone-validation/20260928T145036677299Z/`.
 
+<a id="phase-8-straight-host-crossover-result"></a>
+
+## Phase 8 crossover on straight tracks — 2026-09-28
+
+The B14 GUI launcher made a temporary input with two straight tracks.
+Its straight entrances were 1500 mm long, and its straight exits were
+450 mm long. The source FreeCAD file did not change.
+The GUI run for Phase 1 without `--scenario` gave the frozen hashes and
+the same `Undo` and `Redo` sequence. It also gave the same result after
+`document.save()` and `App.openDocument()`.
+
+The check used the qualified host profile for FreeCAD and `toe_chainage_a`
+of 580.134 mm. It found equal B14, B15, and B16 crossover data after it
+removed three `macro_version` fields. The data for all nine crossover
+objects were equal, including their stable identities. Six objects had
+shapes with equal `brep_sha256` values. Four production records were equal.
+
+B16 rejected a request for a minimum radius of 3000 mm. The request did not
+change the FreeCAD object data or the `Undo` and `Redo` data. B16 made one
+`XO-001` and added one `Undo` entry.
+The `Undo`, `Redo`, `document.save()`, and `App.openDocument()` checks gave
+PASS results.
+
+The GUI on the qualified host profile used the two straight tracks. The
+`preview_geometry()` check returned geometry before the GUI made `XO-001`.
+A rejected request did not change the FreeCAD object data or the
+`Undo` and `Redo` data. The `Top` view files before and after `App.openDocument()` had equal
+width, height, and colour values at each position. This check did not
+include viewport selection, parameter editing, `Validate/Export`, or
+other track pairs.
+
+This result adds one sample with straight tracks for Exit 3 and some Exit 2
+operations. All four exits stay Pending. The earlier headless and GUI
+`resolved_analysis_sha256` values are different. These checks did not explain the difference or prove equivalent
+full analysis in the two modes.
+
+Other crossover inputs stay unproved. More sequences with `document.save()`
+and `App.openDocument()` stay unproved. D-P6-008 and TERM-R04 do not change.
+All conditions for required checks against legacy paths and for removal of
+those paths also do not change.
+
+The B14 input and Phase 1 check results are in
+`benchmark-output/freecad-bridge/straight-station-runs/20260928T165114Z-phase8-straight-host/`
+and `benchmark-output/freecad-bridge/straight-station-runs/20260928T165910Z/`.
+The result from the qualified host profile is in
+`tmp/phase8-straight-crossover/headless-regenerated-first.log`. The GUI result
+and `PNG` files are in
+`benchmark-output/freecad-bridge/phase8-straight-host-crossover-gui-runs/20260928T165738307958Z/`.
+The local `ci` profile gave PASS results for all 84 checks. The results are in
+`benchmark-output/standalone-validation/20260928T170104718903Z/`.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
