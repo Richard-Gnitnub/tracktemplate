@@ -18,10 +18,10 @@ The owner accepted the independently reviewed
 | --- | --- |
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 0/4 under D-P8-001. All four exits are Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
 | What changed | The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. <br><br>D-GOV-022 authorises one `git worktree remove --force` operation only if its conditions pass. An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories. The 37 individual retirement audits gave PASS. Git removed 37 worktrees without `--force`. Git also deleted 36 branches whose tips the accepted commit contained. <br><br>PR #97 integrated D-GOV-022. A fresh six-root snapshot, restore test, individual audits and post-removal checks gave PASS. Git removed the two remaining D-GOV-022 worktrees without `--force`. The [preservation diff](#phase-8-worktree-retirement-result) records their retained branch tips. |
-| What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. The Phase 8 candidate passes development-only calculation, caller and real-GUI range proofs. |
+| What now works | The four Phase 7 exit decisions keep their accepted bounded evidence. The Phase 8 candidate passed development-only calculation, caller and real-GUI range tests. |
 | Limitations/findings | All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. Five branches with unmerged commits and three related worktrees remain. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight prior branch refs, including both retired-worktree refs, remain.<br><br>The USB is safely unmounted. Physical removal and separate storage remain unverified. |
 | Owner decision | D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. These decisions accept no exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | The owner decides whether to integrate the exact-green draft for the bounded `turnout_valid_toe_range` candidate. Phase 8 remains Open at 0/4; all exits remain Pending. |
+| Next action | The owner decides whether to integrate the exact-green draft for the bounded `turnout_valid_toe_range` candidate. Phase 8 remains Open at 0/4. All exits remain Pending. |
 
 <a id="phase-8-opening-panel"></a>
 
@@ -359,14 +359,16 @@ The frozen B14/B15 calculation comparisons, complete 80-test standalone
 profile, qualified FreeCAD proof and real-GUI range proof passed. The GUI proof
 checked both inherited controls in both turnout orientations against the B14
 and B15 calculations. The initial qualified FreeCAD call gave no proof because
-it did not invoke the test. The corrected invocation passed; both records
+it did not invoke the test. The corrected invocation passed. Both records
 remain in `benchmark-output/phase8-turnout-toe-range/`. The GUI receipt is in
-`benchmark-output/freecad-bridge/phase8-turnout-toe-gui-runs/`. Independent
-source and test review found no blocker. Two standalone fixture corrections
-used the normal 2/2 repair allowance; their original failures remain in
+`benchmark-output/freecad-bridge/phase8-turnout-toe-gui-runs/`.
+
+Independent source and test review found no blocker. Two standalone
+fixture corrections
+used the normal 2/2 repair allowance. Their original failures remain in
 `tmp/phase8-turnout-toe-range/`.
 
-This candidate contributes bounded evidence toward Exits 3 and 4. It accepts
+This candidate contributes bounded evidence toward Exits 3 and 4. D-P8-001 accepts
 no Phase 8 exit or wider turnout, crossover or timbering migration. TERM-R04
 stays open. D-P6-008, both frozen source identities, the development-only
 comparison oracle, every adapter, caller and removal condition, and all
