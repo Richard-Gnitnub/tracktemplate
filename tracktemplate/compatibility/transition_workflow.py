@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 
+from tracktemplate.application import turnout_edit
 from tracktemplate.compatibility.b15_workflow_host import (
     EXPECTED_WORKFLOW_VERSION,
     FUNCTION_NAMES,
@@ -223,6 +224,12 @@ _TURNOUT_HOST_INTERVAL_CALLERS = (
     "_build_curve_inheriting_c10_turnout",
     "build_turnout_host_integration",
     "solve_rea_c10_crossover_geometry",
+)
+_TURNOUT_SUMMARY_BINDING = "turnout_configuration_change_summary"
+_TURNOUT_SUMMARY_CALLERS = (
+    "edit_curve_inheriting_c10_turnout",
+    "TurnoutManagerDialog.update_host_summary",
+    "TurnoutManagerDialog.apply_turnout_edit",
 )
 
 __all__ = (
@@ -675,6 +682,34 @@ class _MirrorAlignmentForTurnAdapter:
             alignment[key] = value
 
 
+def _inherited_revision(namespace, name):
+    """Read a host fallback only when the inherited decision would read it."""
+    try:
+        return namespace[name]
+    except KeyError:
+        raise NameError("name {!r} is not defined".format(name)) from None
+
+
+@dataclass(frozen=True)
+class _TurnoutConfigurationSummaryAdapter:
+    """Keep the inherited two-argument summary and lazy host fallbacks."""
+
+    calculation: object
+    host_globals: object
+
+    def __call__(self, old_config, new_config):
+        return self.calculation(
+            old_config,
+            new_config,
+            lambda: _inherited_revision(
+                self.host_globals, "TURNOUT_RAIL_GEOMETRY_REVISION",
+            ),
+            lambda: _inherited_revision(
+                self.host_globals, "TURNOUT_TIMBER_GEOMETRY_REVISION",
+            ),
+        )
+
+
 class ModularTransitionWorkflowSession:
     """One inherited GUI host permanently bound to modular calculations."""
 
@@ -686,6 +721,9 @@ class ModularTransitionWorkflowSession:
         )
         self._turnout_host_interval_enabled = (
             _TURNOUT_HOST_INTERVAL_BINDING in self.module.__dict__
+        )
+        self._turnout_summary_enabled = (
+            _TURNOUT_SUMMARY_BINDING in self.module.__dict__
         )
         if (
             set(self._modular_functions) != set(PRODUCT_FUNCTION_NAMES)
@@ -885,6 +923,13 @@ class ModularTransitionWorkflowSession:
             self._host_functions[_TURNOUT_HOST_INTERVAL_BINDING] = (
                 turnout.turnout_host_station_interval
             )
+        if self._turnout_summary_enabled:
+            self._host_functions[_TURNOUT_SUMMARY_BINDING] = (
+                _TurnoutConfigurationSummaryAdapter(
+                    turnout_edit.turnout_configuration_change_summary,
+                    self.module.__dict__,
+                )
+            )
         self._bind_modular()
 
     def _bind_modular(self):
@@ -994,6 +1039,55 @@ class ModularTransitionWorkflowSession:
                 ):
                     raise TransitionWorkflowError(
                         "The inherited turnout host-interval caller {!r} is "
+                        "unavailable or mixed.".format(caller_name)
+                    )
+        if (
+            (_TURNOUT_SUMMARY_BINDING in namespace)
+            != self._turnout_summary_enabled
+        ):
+            raise TransitionWorkflowError(
+                "The inherited turnout edit-summary route has a mixed binding."
+            )
+        if self._turnout_summary_enabled:
+            selected = turnout_edit.turnout_configuration_change_summary
+            adapter = self._host_functions[_TURNOUT_SUMMARY_BINDING]
+            if (
+                type(adapter) is not _TurnoutConfigurationSummaryAdapter
+                or namespace.get(_TURNOUT_SUMMARY_BINDING) is not adapter
+                or adapter.calculation is not selected
+                or adapter.host_globals is not namespace
+                or getattr(selected, "__globals__", None)
+                is not turnout_edit.__dict__
+                or any(name not in namespace for name in (
+                    "TURNOUT_RAIL_GEOMETRY_REVISION",
+                    "TURNOUT_TIMBER_GEOMETRY_REVISION",
+                ))
+            ):
+                raise TransitionWorkflowError(
+                    "The modular turnout edit-summary decision is unavailable."
+                )
+            for caller_name in _TURNOUT_SUMMARY_CALLERS:
+                if "." in caller_name:
+                    class_name, method_name = caller_name.split(".", 1)
+                    owner = namespace.get(class_name)
+                    caller = (
+                        getattr(owner, "__dict__", {}).get(method_name)
+                        if isinstance(owner, type) else None
+                    )
+                else:
+                    caller = namespace.get(caller_name)
+                code = getattr(caller, "__code__", None)
+                caller_globals = getattr(caller, "__globals__", None)
+                if (
+                    not callable(caller)
+                    or code is None
+                    or _TURNOUT_SUMMARY_BINDING not in code.co_names
+                    or caller_globals is not namespace
+                    or caller_globals.get(_TURNOUT_SUMMARY_BINDING)
+                    is not adapter
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited turnout edit-summary caller {!r} is "
                         "unavailable or mixed.".format(caller_name)
                     )
         for name in PRODUCT_FUNCTION_NAMES:

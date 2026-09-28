@@ -419,6 +419,27 @@ decision before the merge. No owner decision accepts other migration, product
 performance, production, physical output or release. Project status stays
 `unknown`.
 
+<a id="phase-8-turnout-edit-recovery-candidate"></a>
+
+## Phase 8 turnout change and recovery evidence — 2026-09-28
+
+The internal `turnout_configuration_change_summary` gives the sequence of changes for 3 B15 callers. The route check rejects a missing selection or a different selection for each caller. A check compared the wording and sequence with the frozen B14 and B15 sources. It also compared results for small value differences and missing `rail_geometry_revision` or `timber_geometry_revision` values. The API in `tracktemplate.api`, route schema and FreeCAD property names stay the same. The terms that FreeCAD shows to a person stay the same.
+
+The validation profile for standalone Python included 82 checks. All 82 gave `PASS`. The FreeCAD caller check used the qualified host profile and gave `PASS`.
+
+A check used FreeCAD with `FreeCADGui` active. It used a `.FCStd` file made from the source fixture. The alignment in the file had a curve. The check made `TO-001`. It changed `TurnoutHanding` from `Left-hand` to `Right-hand`.
+
+The check compared the shape of the plain line before and after the change. It compared object names and the sequence of `record_id` values in `ProductionRecordIndexJSON`. One `Undo` operation gave the same FreeCAD data as after the check made `TO-001`. One `Redo` operation gave the same FreeCAD data as after the change. The check then caused an error during a turnout change. The error did not change the FreeCAD data or the data for `Undo` and `Redo`.
+
+The check wrote the `.FCStd` file, closed it and opened it again. After the file opened again, its FreeCAD data had the same SHA-256 as after the change. No `Undo` or `Redo` operation was available after the file opened again. The SHA-256 of the source fixture stayed the same before and after the check. The results are in
+`benchmark-output/standalone-validation/20260928T105448770253Z/`,
+`benchmark-output/phase8-turnout-edit-summary/` and
+`benchmark-output/freecad-bridge/phase8-turnout-toe-gui-runs/20260928T105224825343Z/`.
+
+This evidence is for part of Exit 2 only. Checks for a straight alignment, a crossover and the other Exit 2 operations are necessary. More checks of FreeCAD workflows that write, close and open files again are necessary. All 4 Phase 8 exits stay Pending.
+
+TERM-R04 stays open. D-P6-008 stays Deferred — unmet. The conditions in [D-P8-001](#phase-8-opening-panel) do not change. The checks did not measure product performance for `Edit` or `Validate/Export`. No decision from the project owner gives acceptance for a Phase 8 exit, product performance, production output or release. Project status stays `unknown`.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
