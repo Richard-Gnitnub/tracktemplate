@@ -12,6 +12,9 @@ from tracktemplate.compatibility.crossover_host_integration_recovery import (
 from tracktemplate.compatibility.crossover_preflight import (
     CrossoverPreflightAdapter,
 )
+from tracktemplate.compatibility.turnout_host_integration_recovery import (
+    TurnoutHostIntegrationRecoveryAdapter,
+)
 from tracktemplate.compatibility.b15_workflow_host import (
     EXPECTED_WORKFLOW_VERSION,
     FUNCTION_NAMES,
@@ -277,6 +280,13 @@ _CROSSOVER_HOST_INTEGRATION_FUNCTIONS = (
     "remove_crossover_host_integration",
     "build_crossover_host_integration",
     "_crossover_integration_restored_records",
+    "clear_chair_analysis_display",
+)
+_TURNOUT_HOST_INTEGRATION_FUNCTIONS = (
+    "create_turnout_host_integration",
+    "remove_turnout_host_integration",
+    "build_turnout_host_integration",
+    "turnout_integration_by_id",
     "clear_chair_analysis_display",
 )
 
@@ -985,6 +995,7 @@ class ModularTransitionWorkflowSession:
         self._crossover_b4_recovery = None
         self._crossover_b4_panel_update_method = None
         self._crossover_host_integration = None
+        self._turnout_host_integration = None
         crossover_present = any(
             name in namespace for name in (
                 "_build_rea_c10_crossover_geometry",
@@ -1122,6 +1133,42 @@ class ModularTransitionWorkflowSession:
             self._host_functions.update({
                 "create_crossover_host_integration": integration_adapter.create,
                 "remove_crossover_host_integration": integration_adapter.remove,
+            })
+        turnout_panel = namespace.get("TurnoutManagerDialog")
+        turnout_integration_present = any(
+            name in namespace for name in (
+                "create_turnout_host_integration",
+                "remove_turnout_host_integration",
+            )
+        )
+        turnout_integration_complete = (
+            all(
+                callable(namespace.get(name))
+                for name in _TURNOUT_HOST_INTEGRATION_FUNCTIONS
+            )
+            and isinstance(turnout_panel, type)
+            and callable(turnout_panel.__dict__.get(
+                "integrate_selected_turnout"
+            ))
+            and callable(turnout_panel.__dict__.get(
+                "remove_selected_integration"
+            ))
+        )
+        if turnout_integration_present and not turnout_integration_complete:
+            raise TransitionWorkflowError(
+                "The inherited turnout host integration boundary is "
+                "incomplete."
+            )
+        if turnout_integration_complete:
+            turnout_adapter = TurnoutHostIntegrationRecoveryAdapter(
+                self.module,
+                namespace["create_turnout_host_integration"],
+                namespace["remove_turnout_host_integration"],
+            )
+            self._turnout_host_integration = turnout_adapter
+            self._host_functions.update({
+                "create_turnout_host_integration": turnout_adapter.create,
+                "remove_turnout_host_integration": turnout_adapter.remove,
             })
         self._bind_modular()
 
@@ -1504,6 +1551,42 @@ class ModularTransitionWorkflowSession:
                     raise TransitionWorkflowError(
                         "The inherited crossover host integration route "
                         "is mixed."
+                    )
+        if self._turnout_host_integration is not None:
+            adapter = self._turnout_host_integration
+            panel = namespace.get("TurnoutManagerDialog")
+            for action, method_name, original in (
+                ("create_turnout_host_integration",
+                 "integrate_selected_turnout", adapter.original_create),
+                ("remove_turnout_host_integration",
+                 "remove_selected_integration", adapter.original_remove),
+            ):
+                caller = panel.__dict__.get(method_name)
+                if getattr(
+                    caller, "_whole_workflow_benchmark_wrapper", False,
+                ):
+                    if getattr(
+                        caller, "_whole_workflow_wrapper_version", None,
+                    ) != EXPECTED_WORKFLOW_VERSION:
+                        raise TransitionWorkflowError(
+                            "The inherited turnout host integration "
+                            "panel wrapper changed."
+                        )
+                    caller = getattr(
+                        caller, "_whole_workflow_original", None,
+                    )
+                code = getattr(caller, "__code__", None)
+                if (
+                    namespace.get(action) is not self._host_functions[action]
+                    or adapter.module is not self.module
+                    or getattr(original, "__globals__", None) is not namespace
+                    or getattr(caller, "__globals__", None) is not namespace
+                    or code is None
+                    or action not in code.co_names
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited turnout host integration route is "
+                        "mixed."
                     )
         for name in PRODUCT_FUNCTION_NAMES:
             if namespace.get(name) is not self._host_functions[name]:

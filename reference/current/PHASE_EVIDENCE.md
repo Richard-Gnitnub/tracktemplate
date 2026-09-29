@@ -847,6 +847,83 @@ oracle remains for development use only. All comparison conditions remain.
 No condition to remove a B14 or B15 product path changes. This result gives no
 owner acceptance for a Phase 8 exit, output, or release.
 
+## Phase 8 `TO-001` host integration recovery evidence — 2026-09-29
+
+This Level 2 result is for one `TO-001` turnout on a curve in a file made from
+the B14 fixture. Work started from clean protected `main` at
+`e9a3a9ab04ed82ff053e5ead2b52cae3ae77637b`. The source fixture SHA-256 is
+`0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.
+
+The stopped turnout candidate and its test results with `FAIL` status are in a
+different worktree. A rejected `Create` removed two objects from
+`_chair_analysis_display_objects()`. B15 did not use `openTransaction()` before
+this removal. The removal also added a `Delete` `Undo` entry. B16 now uses
+`openTransaction()` before each B15 host integration `Create` and `Remove`
+operation. B16 rejects these operations before mutation when `UndoMode=0`.
+
+The `FreeCADCmd` check used the qualified host profile. It rejected `Create` and
+`Remove` with no change to the compared FreeCAD data or `Undo` history. The
+check caused a `Create` error before a production data write. It caused errors
+after production data writes during `Create` and `Remove`. After each error, the
+compared FreeCAD data did not change.
+
+Before `Create`, the production `records` data contained ten entries. `Create`
+replaced four source entries with two entries for host integration. After
+`Create`, the data contained eight entries, and the file contained five new
+objects for host integration. After `Remove`, the data contained ten entries and
+the initial object mappings.
+
+Each operation added one `Undo` entry when it completed. The `Undo` and `Redo`
+tests gave `PASS` results for `Create` and `Remove`. The check used `save()` and
+opened the files again after `Create` and `Remove`.
+
+The project owner set a `0.000000002 mm²` limit for the derived
+`RailwayTurnoutIntegration_TO_001` group shape area. The limit applies only when
+the check uses `save()` and opens the file again. No other object or field can
+use this limit. The `ModelRailwayCurve` area limit does not change.
+
+The two area limits have different scopes. The check found equal values for all
+other FreeCAD properties and `records` entries. The check found equal values for
+all other stable shape measures. This check does not show that BRep bytes are
+equal.
+
+The GUI check ran in the qualified host profile for FreeCAD 1.1.3. It used
+`TurnoutManagerDialog` methods and confirmation and error dialogs. It examined
+rejected `Create` and `Remove` operations, object mappings, visibility, and
+objects from `_chair_analysis_display_objects()`. Each operation added one
+`Undo` entry when it completed. The check used `Undo`, `Redo`, and `save()` for
+each operation. It opened each file again.
+
+The GUI result was `PASS` and included 16 images. The check closed its FreeCAD
+file. The source and fixture hashes did not change.
+
+The GUI check compared each `has_shape` value. The `FreeCADCmd` check compared
+area values. The fixture had no `2D chair layout` with the necessary status
+before integration. The Step 6 control was not available. The GUI check did not
+use the Step 6 control.
+
+The `FreeCADCmd` result is in
+`tmp/phase8-turnout-host-integration-qualified-proof/headless-first.log`. The
+GUI result and images are in
+`benchmark-output/freecad-bridge/phase8-turnout-host-integration-recovery-gui-runs/20260929T115749631809Z/`.
+
+This result gives evidence for part of Phase 8 Exit 2 and PR-17. PR-17 has
+`Critical` severity, `Open` status, and `Partial` control effectiveness. Phase 8
+is 0/4, with all four exits Pending.
+
+The checks do not show results for other host inputs or complete production
+metadata. They do not show the sequence of all `records` entries. They did not
+use button signals to start `Create` and `Remove`. They do not show Step 6
+access, validation, export, or production output.
+
+D-P6-008 stays Deferred — unmet. TERM-R04 stays open. B14, B15, FreeCAD property
+definitions, schemas and the public API did not change. B16 continues to use the
+B15 host.
+
+The project uses the comparison oracle for development only. No comparison
+condition or condition to remove a legacy path changed. This result gives no
+acceptance for a Phase 8 exit, output, or release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
