@@ -926,46 +926,44 @@ acceptance for a Phase 8 exit, output, or release.
 
 ## Phase 8 `TO-001` selected SVG and CSV evidence — 2026-09-29
 
-This Level 2 result covers one curved `TO-001` turnout in a copy of the B14
-fixture. Work started from clean protected `main` at
+This Level 2 result is for one `TO-001` turnout on a curve in a copy of
+the B14 fixture. Work started from clean protected `main` at
 `cf3bdfc400253004831da0f93dc4024d165f86de`. The fixture SHA-256 is
 `0a655275f30aa75c6c5de61e99ca675a832870fe705bfa3b8b448ef38002ab8c`.
 No product source, stored schema, public API, or accepted oracle changed.
 
-Both checks created `TO-001` host integration in the copied file. The
-`FreeCADCmd` check called `save()` and opened the file again. It compared the
-eight ordered `records` entries and the two integrated record IDs with the
-saved state. The IDs contain `CURVE`, but the stored `route_id` field is empty.
+The two checks made `TO-001` host integration in copies of the fixture. The
+`FreeCADCmd` check used `save()` and opened the file again. It compared the sequence of eight `records` entries and the two record
+IDs for host integration with the state after `save()`. The IDs contain `CURVE`, but the stored `route_id` field is empty.
 
-Two exports each made one SVG file and one CSV manifest. Both runs gave equal
-normalised SHA-256 values for these files. No finding blocked export in the
-`FreeCADCmd` preflight. The check caused one failure after SVG creation and
-another during the second staged-file commit. Each failure left its output
+In the `FreeCADCmd` check, two exports each made one SVG file and one CSV
+manifest. The two exports gave equal normalised SHA-256 values for these files. No finding in the `FreeCADCmd` preflight prevented export. The check caused one error after the SVG file was made and a second
+error during the commit of the second staged file. Each error left its output
 folder empty and kept the compared document state and `Undo` history.
 
-The qualified FreeCAD 1.1.3 GUI check used `TurnoutManagerDialog` to create
-host integration. It called `save()`, closed the copied file, and opened it
+The GUI check on the qualified FreeCAD 1.1.3 host profile used
+`TurnoutManagerDialog` to make host integration. It used `save()`, closed the copied file, and opened it
 again. The check opened `SelectedProductionExportDialog` directly and
 highlighted the integrated `CuttingProfile` row. The dialog also highlighted
 the paired `Solid` row, with no FreeCAD object selected. Its only preflight
-finding was `OUTPUT_DIRECTORY_WILL_BE_CREATED`, which did not block export.
+finding was `OUTPUT_DIRECTORY_WILL_BE_CREATED`, which did not prevent export.
 
-The confirmation named two files. The summary reported two successful files,
-no failed files, and one skipped solid record. The CSV manifest bound one
-successful profile and one skipped solid row to the integrated objects. The
+The confirmation named two files. The summary showed `Successful files: 2`,
+`Failed files: 0`, and `Skipped outputs: 1`. The CSV manifest had one profile row with `Success` status and one solid
+row with `Skipped` status. The two rows named their `TO-001` host integration
+objects. The
 SVG bounds check gave PASS. The record index, configuration, integration,
 object list, and `Undo` history did not change during export.
 
-The first GUI run failed at the assertion for the highlighted pair. The
+The first GUI receipt has `FAIL` status at the highlighted-pair assertion. The
 copied file has an empty `route_id` field, while the integrated record IDs
-contain `CURVE`. The failure is classified as a fixture-or-harness defect.
-The earlier untracked runner bytes were not retained, so its exact assertion
-cannot be checked again. The first receipt remains, and the final runner
-passed on the same command.
+contain `CURVE`. This entry classifies the first GUI failure as `fixture-or-harness-defect`.
+The project did not keep the earlier untracked runner bytes. The assertion that caused the first error remains unknown. A GUI run after
+the failure gave PASS with the same command.
 
 The `FreeCADCmd` result is in
-`tmp/phase8-turnout-selected-export/headless-first.log`. The passing GUI
-receipt and five images are in
+`tmp/phase8-turnout-selected-export/headless-first.log`. The GUI
+receipt with PASS status and five images are in
 `benchmark-output/freecad-bridge/phase8-turnout-selected-export-gui-runs/20260929T210051286227Z/`.
 The first GUI failure receipt remains in
 `benchmark-output/freecad-bridge/phase8-turnout-selected-export-gui-runs/20260929T205832229894Z/`.
@@ -975,11 +973,10 @@ PASS.
 These checks show selected SVG and CSV export for this copied turnout only.
 They do not show the preselected-object route, manager export entrypoint,
 guided Step 6 access, other host inputs, or complete production metadata.
-Output keeps Private-development status. This result adds partial evidence
-for Phase 8 Exit 2 and PR-17. PR-17 stays Critical, Open, and Partial. Phase 8
+Output keeps Private-development status. This result gives evidence for part of Phase 8 Exit 2 and PR-17. PR-17 stays Critical, Open, and Partial. Phase 8
 stays 0/4, with all four exits Pending.
 
-The separate save/reopen area allowances remain limited to the derived
+The two save/reopen area allowances apply only to the derived
 `ModelRailwayCurve` shape and the derived `TO-001` host-integration group.
 All other compared persistent state and stable shape measures remain exact.
 D-P6-008 stays Deferred — unmet, and TERM-R04 stays open. B14, B15, the
