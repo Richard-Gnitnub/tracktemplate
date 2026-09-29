@@ -797,6 +797,56 @@ The frozen B14/B15 identities, inherited B15 host, development-only comparison
 oracle, all comparison conditions and all legacy-retirement conditions remain.
 This result gives no owner acceptance for a Phase 8 exit, output or release.
 
+## Phase 8 `XO-001` SVG and CSV evidence from highlighted rows — 2026-09-29
+
+This Level 2 result covers one curved `XO-001` on a copy of the fixed B14
+fixture. At the start, protected `main` had no changes and pointed to
+`9d52096da6409d18965daf907401ea320db3c344`. Both checks created B16 host
+integration. Each test script called `document.save()` before it closed and
+opened its copied `.FCStd` file again.
+
+The FreeCADCmd check made one SVG file and one CSV manifest. A second export
+gave the same `normalised_sha256` values for both files. The check caused one
+error after FreeCAD made the SVG file and another error during `commit_staged_export_entries()`.
+Each error left the output directory empty and kept the FreeCAD data and
+`Undo` history. The `CROSSOVER_CHAIR_VALIDATION_OUTSTANDING` finding did not
+stop the operation. The crossover kept `production_ready=False`.
+
+The qualified FreeCAD 1.1.3 GUI check opened
+`SelectedProductionExportDialog` with no FreeCAD object selected. `SelectedProductionExportDialog`
+showed seven records. The check highlighted the integrated `CuttingProfile`
+row. `SelectedProductionExportDialog` also selected its paired `Solid` row.
+The preflight had no
+blocking error. The confirmation showed two files to make.
+
+The summary reported two successful files, no failed files, and one skipped
+solid record. The CSV manifest recorded one successful cutting profile and
+one skipped solid record. The SVG bounds check gave PASS. The production record
+index, object list, and `Undo` history did not change.
+
+The FreeCADCmd result is in `tmp/phase8-selected-export/headless-rerun.log`.
+The GUI receipt and five images are in
+`benchmark-output/freecad-bridge/phase8-crossover-selected-export-gui-runs/20260929T060558000388Z/`.
+
+Three earlier GUI failure receipts remain under
+`benchmark-output/freecad-bridge/phase8-crossover-selected-export-gui-runs/`.
+The GUI check does not show an SVG file from a FreeCAD object selected
+before `SelectedProductionExportDialog` opens. The check used `SelectedProductionExportDialog` directly. It did
+not use the manager entrypoint `_open_selected_export()`. The SVG and CSV manifest have
+Private-development status. They do not clear production output.
+
+This result adds partial evidence for Phase 8 Exit 2 and PR-17. PR-17 remains
+Critical, Open, and Partial. Phase 8 remains at 0/4 with all exits Pending.
+
+The preceding result permits at most 0.000000002 mm² area difference for one
+derived `ModelRailwayCurve` shape after save and reopen. D-P6-008 and TERM-R04
+remain.
+
+The frozen B14/B15 identities and inherited B15 host remain. The comparison
+oracle remains for development use only. All comparison conditions remain.
+No condition to remove a B14 or B15 product path changes. This result gives no
+owner acceptance for a Phase 8 exit, output, or release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
