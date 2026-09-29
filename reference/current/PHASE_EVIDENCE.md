@@ -797,6 +797,45 @@ The frozen B14/B15 identities, inherited B15 host, development-only comparison
 oracle, all comparison conditions and all legacy-retirement conditions remain.
 This result gives no owner acceptance for a Phase 8 exit, output or release.
 
+## Phase 8 `XO-001` highlighted-row SVG evidence — 2026-09-29
+
+This Level 2 result examines one curved `XO-001` on a copy of the fixed B14
+document. The work started from clean protected `main` at
+`9d52096da6409d18965daf907401ea320db3c344`. It follows B16 host
+integration and save/reopen. The qualified
+FreeCADCmd check made one SVG file and one CSV manifest. A second run gave
+the same normalised file content. Simulated exporter and staged-commit errors
+left the output folders empty and kept the document state and `Undo` history.
+The chair-validation finding did not block the operation, and the document
+stayed `Production ready: No`. The raw result is in
+`tmp/phase8-selected-export/headless-rerun.log`.
+
+The qualified FreeCAD 1.1.3 GUI check used the dialog's highlighted-row
+route. The dialog showed seven records when no FreeCAD object was selected.
+The check highlighted the integrated cutting-profile record. The dialog
+included its paired solid record and planned one SVG file and one CSV
+manifest. Its preflight had no blocking error. The confirmation showed two
+files. The summary reported two successful files, no failed files and one
+skipped solid record. The CSV manifest recorded one successful cutting
+profile and one skipped solid record. The SVG bounds check gave PASS. The
+production-record index, object list and `Undo` history did not change.
+The GUI receipt and five images are in
+`benchmark-output/freecad-bridge/phase8-crossover-selected-export-gui-runs/20260929T060558000388Z/`.
+
+Three earlier GUI failure receipts stay under
+`benchmark-output/freecad-bridge/phase8-crossover-selected-export-gui-runs/`. The
+preselected-object export route remains unproved. The check used the dialog
+directly and does not prove its manager entrypoint. The SVG and manifest are
+private-development evidence. They do not clear production output. This
+result gives partial evidence for Phase 8 Exit 2 and PR-17 only. PR-17 stays
+Critical, Open and Partial; Phase 8 stays at 0/4 with all exits Pending.
+
+The bounded derived-shape save/reopen tolerance in the preceding result does
+not change. D-P6-008, TERM-R04, the frozen B14/B15 identities, inherited
+B15 host, all comparison conditions and all legacy-retirement conditions
+remain. This result gives no owner acceptance for a Phase 8 exit, output or
+release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
