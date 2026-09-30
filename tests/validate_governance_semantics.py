@@ -1623,42 +1623,49 @@ def validate_phase8_exit1_admission_mutations() -> None:
     for name, before, after, clause in (
         (
             "representative-limit-lost",
-            "The fixtures are representative. They do not prove\n"
-            "complete turnout or crossover coverage.",
+            "The fixtures are examples. They give no evidence\n"
+            "for every turnout or crossover workflow.",
             "The fixtures prove complete turnout and crossover coverage.",
-            "The fixtures are representative. They do not prove complete "
-            "turnout or crossover coverage",
+            "The fixtures are examples. They give no evidence for every "
+            "turnout or crossover workflow",
         ),
         (
             "straight-edit-limit-lost",
-            "Straight TO Edit equivalence across\nversions remains unproved.",
+            "The evidence does not show equivalent\n"
+            "straight TO Edit results across versions.",
             "Straight TO Edit equivalence across versions is proved.",
-            "Straight TO Edit equivalence across versions remains unproved",
+            "The evidence does not show equivalent straight TO Edit results "
+            "across versions",
         ),
         (
             "historical-gui-limit-lost",
-            "Historical GUI-source limits stay.",
+            "The earlier GUI evidence keeps its\nsource limitations.",
             "Historical GUI receipts prove every current source state.",
-            "Historical GUI-source limits stay",
+            "The earlier GUI evidence keeps its source limitations",
         ),
         (
             "current-curved-gui-limit-lost",
-            "Current-source\ncurved GUI lifecycle coverage remains incomplete.",
+            "Current-source GUI evidence does not include the complete "
+            "curved workflow.",
             "Current-source curved GUI lifecycle coverage is complete.",
-            "Current-source curved GUI lifecycle coverage remains incomplete",
+            "Current-source GUI evidence does not include the complete "
+            "curved workflow",
         ),
         (
             "preselection-failure-erased",
-            "preselection failure stays unresolved.",
-            "preselection failure is resolved.",
-            "The retained B16 NO_SELECTED_PRODUCTION_ITEMS preselection "
-            "failure stays unresolved",
+            "failure stays unresolved when the person\n"
+            "selects an object before export.",
+            "failure is resolved when the person selects an object before export.",
+            "The B16 NO_SELECTED_PRODUCTION_ITEMS failure stays unresolved "
+            "when the person selects an object before export",
         ),
         (
             "persistence-production-limit-lost",
-            "Wider persistence/profile and production-metadata limits stay.",
+            "The limitations for wider persistence, host profiles and "
+            "production metadata\nstay.",
             "Every persistence profile and production-metadata field is proved.",
-            "Wider persistence/profile and production-metadata limits stay",
+            "The limitations for wider persistence, host profiles and "
+            "production metadata stay",
         ),
         (
             "older-digest-limit-lost",
@@ -1668,9 +1675,11 @@ def validate_phase8_exit1_admission_mutations() -> None:
         ),
         (
             "raw-output-identity-limit-lost",
-            "Raw GUI/headless output identity\nremains unproved.",
+            "The evidence does\nnot show that GUI and headless output files "
+            "are identical before any change to\ntheir contents.",
             "Raw GUI/headless output identity is proved.",
-            "Raw GUI/headless output identity remains unproved",
+            "The evidence does not show that GUI and headless output files "
+            "are identical before any change to their contents",
         ),
         (
             "production-clearance-inferred",
@@ -1718,10 +1727,10 @@ def validate_phase8_exit1_admission_mutations() -> None:
         ),
         (
             "earlier-exit-limits-lost",
-            "The [Exit 3 limits](#phase-8-exit-3-admission-panel) and\n"
-            "[Exit 4 limits](#phase-8-exit-4-admission-panel) stay in full.",
+            "The [Exit 3 limitations](#phase-8-exit-3-admission-panel) and\n"
+            "[Exit 4 limitations](#phase-8-exit-4-admission-panel) stay in full.",
             "Earlier exit limits no longer apply.",
-            "The Exit 3 limits and Exit 4 limits stay in full",
+            "The Exit 3 limitations and Exit 4 limitations stay in full",
         ),
     ):
         mutated = replace_once(evidence, panel, replace_once(panel, before, after))
@@ -4419,14 +4428,14 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_row = table_row_containing(plan, "**Current state**")
     inflated_view = replace_once(
         owner_view_row,
-        "Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation",
-        "Phase 6 retains five accepted exits and D-P6-008 as complete",
+        "Phase 6 keeps four accepted exits and D-P6-008 as one deferred, unmet obligation",
+        "Phase 6 keeps five accepted exits and D-P6-008 as complete",
     )
     owner_view_status = replace_once(plan, owner_view_row, inflated_view)
     expect_rejected(
         "tt-doc/owner-view-status-contradiction",
         lambda: progress._validate_owner_view(owner_view_status),
-        "project-plan owner view lost or contradicted: Phase 6 retains four "
+        "project-plan owner view lost or contradicted: Phase 6 keeps four "
         "accepted exits and D-P6-008 as one deferred, unmet obligation",
     )
     owner_view_authority = replace_once(

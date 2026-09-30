@@ -1043,7 +1043,7 @@ def _validate_owner_view(plan: str) -> None:
         'Phase 7 is closed at 4/4 under D-P7-006',
         'Its four exits remain Evidenced and owner-accepted under D-P7-005, D-P7-003, D-P7-004 and D-P7-002',
         'Phase 8 is Open at 3/4 under D-P8-004. Exits 1, 3 and 4 are Evidenced and owner-accepted. Exit 2 stays Pending',
-        'Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation',
+        'Phase 6 keeps four accepted exits and D-P6-008 as one deferred, unmet obligation',
         'Output stays private-development',
         'project status stays `unknown`',
         'independently reviewed recovery proof',
@@ -1097,16 +1097,16 @@ def _validate_owner_view(plan: str) -> None:
         'Exit 2 needs separate evidence and an owner decision',
         'operator-controlled USB storage duty',
         'D-P8-002',
-        'keep Exit 3 and Exit 4 acceptance and all their limits',
+        'keep Exit 3 and Exit 4 acceptance and all their limitations',
         'TERM-R04 stays open',
         'D-P8-003',
         'D-P8-004',
-        'records Exit 1 acceptance at `44eb4bf` for the reviewed representative evidence',
+        'records Exit 1 acceptance at `44eb4bf` for the reviewed examples',
         'The Exit 1 condition stays the same',
         'accepts Exit 1 at `44eb4bf`',
         'Exit 2 stays Pending',
-        'merge the Exit 1 alignment into protected `main`',
-        'Then identify the missing Exit 2 evidence and the work necessary to supply it',
+        'merge the Exit 1 record changes into protected `main`',
+        'Then identify the missing Exit 2 evidence. Identify the work necessary to supply it',
     ):
         _require(
             fragment in owner_view,
@@ -4861,7 +4861,7 @@ def _validate_phase8_decision_opening(
         and exit1["status"] == "Accepted"
         and exit1["decision"]
         == "Accept Phase 8 Exit 1 at protected main 44eb4bf for the reviewed "
-        "representative straight and curved TO-001/XO-001 evidence. The Exit 1 "
+        "straight and curved TO-001/XO-001 examples. The Exit 1 "
         "condition stays the same. Phase 8 is Open at 3/4."
         and exit1["evidence"] == exit1_panel
         and exit1["panel_record"] == exit1_panel
@@ -4875,7 +4875,7 @@ def _validate_phase8_decision_opening(
         ),
         (
             "exclusions",
-            "6ffc0a339bdf96d601769168b2f4da963edf98ccc0918d48592e5ee3d38abb3e",
+            "49f639674ddf7896b1d7b9fba51a15a981847c3fc42ed81605903c0020069ba0",
         ),
     ):
         value = exit1[field]
@@ -4908,19 +4908,20 @@ def _validate_dp8_004_acceptance(evidence: str) -> None:
     for clause in (
         "D-P8-004 accepts Exit 1 at protected main "
         "44eb4bf33d984afb9a6a8b0a14a00d1b02dc1eab for the reviewed "
-        "representative straight and curved TO-001 and XO-001 evidence",
+        "straight and curved TO-001 and XO-001 examples",
         "Phase 8 is Open at 3/4",
         "Exits 3 and 4 keep their accepted status",
         "Exit 2 stays Pending",
         "Exit 3 acceptance alone does not supply that evidence",
         "all 82 ordered timber records and unique identities",
-        "all 86 and their stored-object bindings",
-        "two inherited findings and seven resolved findings",
+        "all 86 records and their connections to stored objects",
+        "two findings from the earlier source and seven resolved findings",
         "all analysis data except performance_timings_ms",
         "Curved TO Create/Edit has ten ordered records",
         "Curved XO has four direct records and an eight-record index",
-        "The 48 TO source hashes and 58 XO source hashes match 44eb4bf",
-        "No new FreeCAD or GUI run is claimed",
+        "The 48 TO source hashes and 58 XO source hashes are the same "
+        "as those at 44eb4bf",
+        "The panel claims no new FreeCAD or GUI run",
         "Independent reviewer /root/exit1_admission",
         "all 24 live risks",
         "recommendation is Proceed with bounded conditions for Exit 1",
@@ -4928,21 +4929,25 @@ def _validate_dp8_004_acceptance(evidence: str) -> None:
         "control effectiveness changes",
         "The recorded owners must complete these duties by their "
         "recorded deadlines",
-        "The fixtures are representative. They do not prove complete "
-        "turnout or crossover coverage",
-        "Straight TO Edit equivalence across versions remains unproved",
-        "Historical GUI-source limits stay",
-        "Current-source curved GUI lifecycle coverage remains incomplete",
-        "The retained B16 NO_SELECTED_PRODUCTION_ITEMS preselection "
-        "failure stays unresolved",
+        "The fixtures are examples. They give no evidence for every "
+        "turnout or crossover workflow",
+        "The evidence does not show equivalent straight TO Edit results "
+        "across versions",
+        "The earlier GUI evidence keeps its source limitations",
+        "Current-source GUI evidence does not include the complete "
+        "curved workflow",
+        "The B16 NO_SELECTED_PRODUCTION_ITEMS failure stays unresolved "
+        "when the person selects an object before export",
         "Successful export from highlighted rows does not resolve that failure",
-        "Wider persistence/profile and production-metadata limits stay",
+        "The limitations for wider persistence, host profiles and "
+        "production metadata stay",
         "The causes of older digest differences remain unknown",
-        "Raw GUI/headless output identity remains unproved",
+        "The evidence does not show that GUI and headless output files "
+        "are identical before any change to their contents",
         "All failed evidence, diagnostics, deferred clearance findings "
-        "and non-production limits stay",
+        "and non-production limitations stay",
         "The product has no production clearance",
-        "The Exit 3 limits and Exit 4 limits stay in full",
+        "The Exit 3 limitations and Exit 4 limitations stay in full",
         "D-P6-008 stays Deferred — unmet and mandatory before Phase 10 "
         "beta acceptance",
         "TERM-R04 stays open",
@@ -4953,8 +4958,8 @@ def _validate_dp8_004_acceptance(evidence: str) -> None:
         "conditions stay",
         "This decision accepts no product change, risk closure, performance "
         "result, wider migration, phase closure, release or legacy-path removal",
-        "may merge after independent acceptance and checks with PASS "
-        "results for the exact candidate",
+        "may merge after acceptance from an independent reviewer",
+        "Checks for the exact candidate must give PASS",
         "Exit 2 needs separate evidence and an owner decision",
     ):
         _require(clause in flat, "D-P8-004 bounded condition drifted: " + clause)
