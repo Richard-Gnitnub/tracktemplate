@@ -47,7 +47,9 @@ HOST_NAMES = (
     "RailwayStraightTrackCentreline_R01_T02",
 )
 TOE_A_MM = 580.134  # The Manager's chainage field has three decimals.
+EDIT_TOE_A_MM = 580.135
 TOE_B_MM = 1316.0914869924563
+EDIT_TOE_B_MM = 1316.0924869924656
 MINIMUM_RESULTING_RADIUS_MM = 2761.6371011858214
 COMPARISON_TOLERANCE_MM = 1.0e-6
 REJECTED_MINIMUM_RADIUS_MM = 3000.0
@@ -126,10 +128,13 @@ def _args(module, document, hosts, radius_mm=600.0):
     )
 
 
-def _neutral_version(value):
-    """Remove only the three inherited macro-version fields."""
+def _neutral_version(value, edited=False):
+    """Remove only frozen-version differences from compared configs."""
     result = json.loads(json.dumps(value, sort_keys=True))
     assert isinstance(result, dict)
+    if edited:
+        assert result["edited_from_macro_version"] == result["macro_version"]
+        del result["edited_from_macro_version"]
     for config in (
         result, result["turnout_a_config"], result["turnout_b_config"],
     ):
@@ -184,6 +189,8 @@ def _snapshot(document):
             "group_members": members,
             "shape": _shape_state(getattr(obj, "Shape", None)),
         })
+    # FreeCAD can enumerate the same objects in another order after Undo.
+    objects.sort(key=lambda item: item["name"])
     return {
         "objects": objects,
         "history": _history(document),
@@ -214,7 +221,12 @@ def _persistent_state(snapshot):
     return state
 
 
-def _crossover_observation(module, document, config, solved):
+def _crossover_observation(
+    module, document, config, solved, *,
+    expected_toe_a_mm=TOE_A_MM,
+    expected_toe_b_mm=TOE_B_MM,
+    edited=False,
+):
     """Retain complete railway config, exact B-reps, and production IDs."""
     identifier = str(config["crossover_id"])
     objects = []
@@ -247,6 +259,7 @@ def _crossover_observation(module, document, config, solved):
         if record.get("route_id") == identifier
     ]
     assert len(objects) == 9
+    assert sum(item["shape"] is not None for item in objects) == 6
     assert len(production) == 4
     record_ids = [record["record_id"] for record in production]
     assert all(record_ids) and len(set(record_ids)) == len(record_ids)
@@ -258,6 +271,7 @@ def _crossover_observation(module, document, config, solved):
     assert config["turnout_b_id"] == "XO-001-B001"
     assert config["production_ready"] is False
     assert config["host_integration_allowed"] is False
+    assert float(config["toe_chainage_a"]) == expected_toe_a_mm
     assert math.isclose(
         float(config["minimum_resulting_radius"]),
         MINIMUM_RESULTING_RADIUS_MM,
@@ -266,13 +280,15 @@ def _crossover_observation(module, document, config, solved):
     )
     assert math.isclose(
         float(config["toe_chainage_b"]),
-        TOE_B_MM,
+        expected_toe_b_mm,
         rel_tol=0.0,
         abs_tol=COMPARISON_TOLERANCE_MM,
     )
     assert solved["toe_chainage_b"] == config["toe_chainage_b"]
+    if edited:
+        assert config["edit_revision"] == 1
     return {
-        "config": _neutral_version(config),
+        "config": _neutral_version(config, edited=edited),
         "objects": objects,
         "production_records": production,
     }
@@ -296,6 +312,52 @@ def _expect_b16_rejection(module, document, arguments):
             diagnostics.append(diagnostic)
         else:
             raise AssertionError("An infeasible straight crossover was accepted")
+        assert _snapshot(document) == before
+    assert diagnostics[0] == diagnostics[1]
+    return diagnostics[0]
+
+
+def _edit_arguments(document, config, hosts):
+    """Use the stored crossover parameters for one toe-chainage edit."""
+    return (
+        document,
+        str(config["crossover_id"]),
+        hosts[0],
+        hosts[1],
+        EDIT_TOE_A_MM,
+        str(config["arrangement"]),
+        str(config["handing"]),
+        float(config["track_gauge"]),
+        float(config["flangeway"]),
+        float(config["minimum_requested_radius"]),
+    )
+
+
+def _solve_edit(module, arguments):
+    return module.solve_rea_c10_crossover_geometry(
+        arguments[0], *arguments[2:],
+        ignored_crossover_id=arguments[1],
+    )
+
+
+def _expect_b16_edit_rejection(module, document, arguments):
+    """Rejected preview and edit must preserve the created crossover."""
+    rejected = (*arguments[:-1], REJECTED_MINIMUM_RADIUS_MM)
+    before = _snapshot(document)
+    diagnostics = []
+    for action in (
+        lambda: _solve_edit(module, rejected),
+        lambda: module.edit_rea_c10_crossover(*rejected),
+    ):
+        try:
+            action()
+        except ValueError as error:
+            diagnostic = str(error)
+            assert "Host Track B turnout road minimum radius" in diagnostic
+            assert "3000.000000 mm" in diagnostic
+            diagnostics.append(diagnostic)
+        else:
+            raise AssertionError("An infeasible crossover edit was accepted")
         assert _snapshot(document) == before
     assert diagnostics[0] == diagnostics[1]
     return diagnostics[0]
@@ -335,6 +397,39 @@ def _b16_lifecycle(module, document, identifier, before, created):
     }
 
 
+def _b16_edit_lifecycle(module, document, identifier, before, edited):
+    """Prove one edit Undo/Redo and copied-file save/reopen."""
+    assert len(document.Objects) == 32
+    assert edited["history"]["undo"] == before["history"]["undo"] + 1
+    assert edited["history"]["redo"] == 0
+    copy_path = pathlib.Path(document.FileName)
+    document.undo()
+    document.recompute()
+    undone = _snapshot(document)
+    assert len(document.Objects) == 32
+    assert _state_without_history(undone) == _state_without_history(before)
+    assert undone["history"]["redo"] == 1
+    document.redo()
+    document.recompute()
+    redone = _snapshot(document)
+    assert _state_without_history(redone) == _state_without_history(edited)
+    assert redone["history"]["redo"] == 0
+    document.save()
+    saved = _snapshot(document)
+    App.closeDocument(document.Name)
+    reopened = App.openDocument(str(copy_path))
+    assert len(reopened.Objects) == 32
+    assert module.crossover_config_by_id(reopened, identifier) is not None
+    reopened_state = _snapshot(reopened)
+    assert _persistent_state(reopened_state) == _persistent_state(saved)
+    return reopened, {
+        "after_edit": len(edited["objects"]),
+        "after_undo": len(undone["objects"]),
+        "after_redo": len(redone["objects"]),
+        "after_reopen": len(reopened_state["objects"]),
+    }
+
+
 def validate():
     contract = json.loads(LEGACY_CONTRACT.read_text(encoding="utf-8"))
     assert contract["contract_id"] == (
@@ -358,8 +453,11 @@ def validate():
     modules["B16"] = _load_b16()
 
     observations = {}
+    edited_observations = {}
     rejection = None
+    edit_rejection = None
     lifecycle = None
+    edit_lifecycle = None
     with tempfile.TemporaryDirectory(
         prefix="tracktemplate-phase8-straight-crossover-"
     ) as temporary:
@@ -401,6 +499,60 @@ def validate():
                         module, document, config["crossover_id"],
                         before, created,
                     )
+                else:
+                    document.save()
+                    saved = _snapshot(document)
+                    App.closeDocument(document.Name)
+                    document = App.openDocument(str(copy))
+                    assert _persistent_state(_snapshot(document)) == (
+                        _persistent_state(saved)
+                    )
+
+                document.UndoMode = 1
+                hosts = _hosts(module, document)
+                current = module.crossover_config_by_id(
+                    document, config["crossover_id"],
+                )
+                edit_arguments = _edit_arguments(document, current, hosts)
+                before_edit = _snapshot(document)
+                if label == "B16":
+                    edit_rejection = _expect_b16_edit_rejection(
+                        module, document, edit_arguments,
+                    )
+                solved_edit = _solve_edit(module, edit_arguments)
+                if label == "B16":
+                    assert solved_edit["complete_radius_preflight"][
+                        "accepted"
+                    ] is True
+                assert _snapshot(document) == before_edit
+                updated = module.edit_rea_c10_crossover(
+                    *edit_arguments, pre_solved=solved_edit,
+                )
+                edited = _snapshot(document)
+                assert len(document.Objects) == 32
+                assert edited["history"]["undo"] == (
+                    before_edit["history"]["undo"] + 1
+                )
+                edited_observations[label] = _crossover_observation(
+                    module, document, updated, solved_edit,
+                    expected_toe_a_mm=EDIT_TOE_A_MM,
+                    expected_toe_b_mm=EDIT_TOE_B_MM,
+                    edited=True,
+                )
+                assert [
+                    item["record_id"]
+                    for item in edited_observations[label][
+                        "production_records"
+                    ]
+                ] == [
+                    item["record_id"]
+                    for item in observations[label]["production_records"]
+                ]
+                if label == "B16":
+                    document, edit_lifecycle = _b16_edit_lifecycle(
+                        module, document, config["crossover_id"],
+                        before_edit, edited,
+                    )
             finally:
                 for opened in list(App.listDocuments().values()):
                     if pathlib.Path(opened.FileName) == copy:
@@ -409,7 +561,11 @@ def validate():
 
     assert observations["B14"] == observations["B15"]
     assert observations["B15"] == observations["B16"]
+    assert edited_observations["B14"] == edited_observations["B15"]
+    assert edited_observations["B15"] == edited_observations["B16"]
     assert rejection is not None and lifecycle is not None
+    assert edit_rejection is not None and edit_lifecycle is not None
+    edited_result = edited_observations["B16"]
     witness = {
         "host_route_id": ROUTE_ID,
         "toe_a_mm": TOE_A_MM,
@@ -427,6 +583,26 @@ def validate():
         },
         "rejection": rejection,
         "lifecycle": lifecycle,
+        "edit": {
+            "toe_a_mm": EDIT_TOE_A_MM,
+            "toe_b_mm": edited_result["config"]["toe_chainage_b"],
+            "minimum_resulting_radius_mm": edited_result[
+                "config"
+            ]["minimum_resulting_radius"],
+            "edit_revision": edited_result["config"]["edit_revision"],
+            "crossover_object_count": len(edited_result["objects"]),
+            "production_record_ids": [
+                item["record_id"]
+                for item in edited_result["production_records"]
+            ],
+            "exact_brep_sha256": {
+                item["role"]: item["shape"]["brep_sha256"]
+                for item in edited_result["objects"]
+                if item["shape"] is not None
+            },
+            "rejection": edit_rejection,
+            "lifecycle": edit_lifecycle,
+        },
         "source_raw_sha256": source_raw_sha256,
         "source_document_semantic_sha256": (
             SOURCE_DOCUMENT_SEMANTIC_SHA256
