@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove B16 straight-host crossover creation and edit in the real GUI."""
+"""Prove B16 straight-host crossover lifecycle and selected GUI export."""
 
 import argparse
 import datetime
@@ -38,8 +38,10 @@ SENTINEL = "PHASE8_STRAIGHT_HOST_CROSSOVER_GUI_PASS"
 
 
 GUI_PROBE = r'''
+import importlib.util
 import json
 import pathlib
+import traceback
 
 import FreeCAD as App
 import FreeCADGui as Gui
@@ -246,6 +248,283 @@ def confirm_create(action):
     return seen["questions"][0]
 
 
+def run_dialogs(action, question_title=None, result_title=None,
+                result_text=None, visual_prefix=None):
+    seen = {
+        "active": True, "questions": [], "results": [],
+        "unexpected": [], "monitor_errors": [],
+    }
+
+    def monitor():
+        if not seen["active"]:
+            return
+        try:
+            for widget in list(QtWidgets.QApplication.topLevelWidgets()):
+                if (not isinstance(widget, QtWidgets.QMessageBox)
+                        or not widget.isVisible()):
+                    continue
+                title = str(widget.windowTitle())
+                message = "{}\n{}".format(
+                    widget.text(), widget.informativeText()
+                )
+                yes = widget.button(QtWidgets.QMessageBox.StandardButton.Yes)
+                item = {"title": title, "message": message}
+                if visual_prefix is not None:
+                    item["details"] = str(widget.detailedText())
+                    item["visual"] = capture_widget(
+                        widget, visual_prefix + ("-confirmation.png"
+                        if yes is not None else "-summary.png"),
+                    )
+                if (question_title is not None and question_title in title
+                        and yes is not None):
+                    seen["questions"].append(item)
+                    yes.click()
+                elif (result_title is not None and result_title in title
+                      and (result_text is None or result_text in message)):
+                    seen["results"].append(item)
+                    widget.accept()
+                else:
+                    seen["unexpected"].append({
+                        "title": title, "message": message,
+                    })
+                    widget.reject()
+        except Exception as error:
+            seen["monitor_errors"].append(
+                "{}: {}".format(type(error).__name__, error)
+            )
+            for widget in list(QtWidgets.QApplication.topLevelWidgets()):
+                if isinstance(widget, QtWidgets.QDialog) and widget.isVisible():
+                    widget.reject()
+        QtCore.QTimer.singleShot(25, monitor)
+
+    QtCore.QTimer.singleShot(0, monitor)
+    try:
+        action()
+    finally:
+        seen["active"] = False
+    if (len(seen["questions"]) != int(question_title is not None)
+            or len(seen["results"]) != int(result_title is not None)
+            or seen["unexpected"] or seen["monitor_errors"]):
+        raise RuntimeError("Straight crossover GUI dialogs changed: {}".format(
+            seen
+        ))
+    return {key: value for key, value in seen.items() if key != "active"}
+
+
+def capture_widget(widget, filename):
+    path = pathlib.Path(TRACKTEMPLATE_PHASE8_VISUAL_DIR) / filename
+    QtWidgets.QApplication.processEvents()
+    if not widget.grab().save(str(path), "PNG"):
+        raise RuntimeError("Qt could not capture " + filename)
+    return image_checked(path)
+
+
+def selected_export_from_main():
+    """Use the main button and highlighted rows without object selection."""
+    helper_path = (_PHASE3_REPOSITORY_ROOT
+                   / "tests/freecad_validate_phase8_straight_host_crossover.py")
+    spec = importlib.util.spec_from_file_location(
+        "_straight_crossover_export_witness", helper_path,
+    )
+    helper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(helper)
+    if helper.ROOT != _PHASE3_REPOSITORY_ROOT:
+        raise RuntimeError("The export witness came from another checkout")
+    catalogue, outline, solid = helper._selected_pair(module, document)
+    outline_id = outline["record_id"]
+    pair_ids = {outline_id, solid["record_id"]}
+    output = pathlib.Path(TRACKTEMPLATE_PHASE8_VISUAL_DIR) / "selected-export"
+    output.mkdir(exist_ok=False)
+    baseline = helper._snapshot(document)
+    Gui.Selection.clearSelection()
+    if module.selected_export_selection_snapshot(document, "SET-001"):
+        raise RuntimeError("The highlighted-row proof has a FreeCAD selection")
+    result = {
+        "parent_count": 0, "button_clicks": 0, "child_count": 0,
+        "error": None, "output": None,
+    }
+    parent_holder = {}
+
+    def reject_dialogs():
+        for widget in list(QtWidgets.QApplication.topLevelWidgets()):
+            if isinstance(widget, QtWidgets.QDialog) and widget.isVisible():
+                widget.reject()
+
+    def operate_child():
+        child = None
+        try:
+            children = [
+                item for item in QtWidgets.QApplication.topLevelWidgets()
+                if isinstance(item, module.SelectedProductionExportDialog)
+                and item.isVisible()
+            ]
+            if len(children) != 1:
+                raise RuntimeError("The main button did not open one child")
+            child = children[0]
+            result["child_count"] += 1
+            if (child.parent() is not parent_holder["dialog"]
+                    or not child.isModal()):
+                raise RuntimeError("The export child lost modal parent ownership")
+            result["child_modal"] = True
+            result["child_parent_main"] = True
+            child._loading_export_controls = True
+            try:
+                choose(child.scope_box, module.SELECTED_EXPORT_SCOPE_OBJECTS)
+                child.output_box.setText(str(output))
+                for key, box in child.format_boxes.items():
+                    box.setChecked(key == module.EXPORT_FORMAT_SVG)
+                child.export_each_section_box.setChecked(True)
+                child.combined_box.setChecked(False)
+                child.manifest_box.setChecked(True)
+                child.overwrite_box.setChecked(False)
+                child.probe_box.setChecked(True)
+            finally:
+                child._loading_export_controls = False
+            child.refresh_preview()
+            if (child.scope.get("selected_objects")
+                    or len(child.preview_records) != len(catalogue)
+                    or child.matching_records or child.export_records
+                    or child.plan
+                    or [issue["issue_code"] for issue in child.issues]
+                    != ["NO_SELECTED_PRODUCTION_ITEMS"]):
+                raise RuntimeError("The unselected export preview changed")
+            column = module.SELECTED_EXPORT_RECORD_FIELDS.index(
+                "Production-record ID"
+            )
+            rows = [
+                row for row in range(child.records_table.rowCount())
+                if child.records_table.item(row, column) is not None
+                and child.records_table.item(row, column).text() == outline_id
+            ]
+            if len(rows) != 1:
+                raise RuntimeError("The straight XO-001 outline row is not unique")
+            child.records_table.selectRow(rows[0])
+            if child._highlighted_record_ids() != {outline_id}:
+                raise RuntimeError("The XO-001 outline row was not highlighted")
+            child.refresh_preview()
+            child.refresh_preview()
+            plan = child.plan or {}
+            result["preview"] = {
+                "issues": child.issues,
+                "highlighted_ids": sorted(child._highlighted_record_ids()),
+                "matching_ids": [item["record_id"]
+                                 for item in child.matching_records],
+                "record_ids": [item["record_id"]
+                               for item in child.export_records],
+                "summary": str(child.summary_label.text()),
+                "visual": capture_widget(
+                    child, "straight-crossover-export-preflight.png",
+                ),
+            }
+            if (child._highlighted_record_ids() != pair_ids
+                    or set(child.scope.get("highlighted_record_ids") or [])
+                    != pair_ids
+                    or {item["record_id"] for item in child.matching_records}
+                    != pair_ids
+                    or {item["route_id"] for item in child.matching_records}
+                    != {"XO-001"}
+                    or result["preview"]["record_ids"] != [outline_id]
+                    or len(plan.get("tasks") or []) != 1
+                    or plan["tasks"][0]["format"] != "svg"
+                    or not plan.get("manifest_path")
+                    or module.preflight_blocking_report(child.issues)
+                    or not child.export_button.isEnabled()
+                    or child.export_button.text() != "Export 2 highlighted rows"):
+                raise RuntimeError("The straight export preflight changed: "
+                                   + str(result["preview"]))
+            if helper._snapshot(document) != baseline:
+                raise RuntimeError("The export preview changed document or Undo")
+            result["dialogs"] = run_dialogs(
+                child.export_button.click,
+                question_title="Confirm selected production export",
+                result_title="Production export complete",
+                result_text="Successful files: 2",
+                visual_prefix="straight-crossover-export",
+            )
+            summary = result["dialogs"]["results"][0]["message"]
+            confirmation = result["dialogs"]["questions"][0]["message"]
+            if ("Failed files: 0" not in summary
+                    or "Formats produced: SVG" not in summary
+                    or "Production records selected for this operation: 2"
+                    not in confirmation
+                    or "Records with compatible selected formats: 1"
+                    not in confirmation
+                    or "Files to produce: 2" not in confirmation):
+                raise RuntimeError("The export confirmation or summary changed")
+            result["output"] = helper._selected_export_output(
+                module, output, plan, outline, solid,
+            )
+            if helper._snapshot(document) != baseline:
+                raise RuntimeError("The export changed document or Undo history")
+            result["document_and_undo_unchanged"] = True
+        except Exception:
+            result["error"] = traceback.format_exc()
+            reject_dialogs()
+        finally:
+            if child is not None:
+                child.close()
+
+    def operate_parent():
+        try:
+            parents = [
+                item for item in QtWidgets.QApplication.topLevelWidgets()
+                if isinstance(item, module.CurveInputDialog)
+                and item.isVisible()
+            ]
+            if len(parents) != 1:
+                raise RuntimeError("The B16 workflow did not open one main dialog")
+            parent = parents[0]
+            parent_holder["dialog"] = parent
+            result["parent_count"] += 1
+            button = parent.selected_export_button
+            if not button.isVisible() or not button.isEnabled():
+                raise RuntimeError("The main export button is unavailable")
+            result["button_text"] = str(button.text())
+            scroll = button.parent()
+            while (scroll is not None
+                   and not isinstance(scroll, QtWidgets.QScrollArea)):
+                scroll = scroll.parent()
+            if scroll is not None:
+                scroll.ensureWidgetVisible(button)
+            result["parent_visual"] = capture_widget(
+                parent, "straight-crossover-main-export.png",
+            )
+            QtCore.QTimer.singleShot(0, operate_child)
+            result["button_clicks"] += 1
+            button.click()
+            parent.reject()
+        except Exception:
+            result["error"] = traceback.format_exc()
+            reject_dialogs()
+
+    def timeout():
+        if result["output"] is None and result["error"] is None:
+            result["error"] = "The main export route timed out"
+            reject_dialogs()
+
+    deadline = QtCore.QTimer()
+    deadline.setSingleShot(True)
+    deadline.timeout.connect(timeout)
+    manager.hide()
+    QtCore.QTimer.singleShot(0, operate_parent)
+    deadline.start(300000)
+    try:
+        _PHASE3_SESSION.launch_workflow()
+    finally:
+        deadline.stop()
+        (output.parent / "selected-export-proof.json").write_text(
+            json.dumps(result, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        manager.show()
+    if result["error"] is not None:
+        raise RuntimeError(result["error"])
+    if (result["parent_count"] != 1 or result["button_clicks"] != 1
+            or result["child_count"] != 1 or result["output"] is None):
+        raise RuntimeError("The main export route was incomplete")
+    return result
+
+
 manager = module.TurnoutManagerDialog(document)
 manager.show()
 manager.mode_tabs.setCurrentIndex(1)
@@ -446,6 +725,11 @@ try:
         capture_panel("straight-host-created-panel.png"),
         capture_top("straight-host-created-top-view.png"),
     ]
+
+    selected_export = selected_export_from_main()
+    same_document(state(document), created, "Selected export")
+    if state(document)["history"] != created["history"]:
+        raise RuntimeError("Selected export changed Undo/Redo history")
 
     document.undo()
     document.recompute()
@@ -732,6 +1016,7 @@ try:
             "diagnostic": positive,
             "visuals": [preview_visual, *created_visuals],
         },
+        "selected_export": selected_export,
         "undo": {
             "object_count": len(undone["object_names"]),
             "semantic_sha256": undone["semantic_sha256"],
@@ -830,6 +1115,8 @@ def _source_hashes():
         ROOT / "tools/freecad_bridge/probes/b14_straight_station_driver.py",
         pathlib.Path(__file__).resolve(),
         ROOT / "tools/freecad_bridge/run-phase8-straight-host-crossover-gui",
+        ROOT / "tests/freecad_validate_phase8_straight_host_crossover.py",
+        ROOT / "tools/freecad_bridge/ordinary_track_export_recipe.py",
         *sorted((ROOT / "tracktemplate").rglob("*.py")),
     ]
     return {str(path.relative_to(ROOT)): sha256(path) for path in paths}
@@ -915,7 +1202,19 @@ def _check_probe(probe):
             or probe["edit_save_reopen"]["history"]["undo_count"] != 0
             or probe["edit_save_reopen"]["history"]["redo_count"] != 0):
         raise RuntimeError("The GUI edit transaction or persistence proof changed")
+    export = probe["selected_export"]
+    if (export["parent_count"] != 1 or export["button_clicks"] != 1
+            or export["child_count"] != 1
+            or export["child_modal"] is not True
+            or export["child_parent_main"] is not True
+            or export["document_and_undo_unchanged"] is not True
+            or export["button_text"] != "Export selected items..."
+            or len(export["output"]["artifacts"]["files"]) != 2):
+        raise RuntimeError("The main selected-export proof changed")
     return [
+        export["parent_visual"], export["preview"]["visual"],
+        export["dialogs"]["questions"][0]["visual"],
+        export["dialogs"]["results"][0]["visual"],
         probe["rejection"]["visual"],
         *probe["creation"]["visuals"],
         probe["save_reopen"]["visual"],
@@ -978,7 +1277,7 @@ def main():
     document_path = run_dir / "straight-host-crossover.FCStd"
     shutil.copy2(base, document_path)
     state = {
-        "recipe_id": "phase8-b16-straight-host-crossover-real-gui-v2",
+        "recipe_id": "phase8-b16-straight-host-crossover-real-gui-v3",
         "started_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "source_fixture": str(base),
         "source_fixture_sha256": fixture_hash,
@@ -989,7 +1288,8 @@ def main():
         "run_document": str(document_path),
         "scope": (
             "one straight-host facing crossover; GUI rejection, creation, "
-            "edit, Undo/Redo and copied-FCStd save/reopen at each state"
+            "edit, Undo/Redo and copied-FCStd save/reopen at each state; "
+            "main-button highlighted-row private SVG/CSV export"
         ),
     }
     client = FreeCADClient(
