@@ -68,6 +68,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-8-exit-3-admission-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-8-exit-3-admission-panel"
+    },
+    {
+      "id": "D-P8-003",
+      "decided_on": "2026-09-30",
+      "status": "Accepted",
+      "decision": "Accept Phase 8 Exit 4 at protected main 72649c5. The Exit 4 condition stays the same. Phase 8 is Open at 2/4.",
+      "authority": "As TrackTemplate project owner, I accept Phase 8 Exit 4 at protected \"main\" \"72649c5\" against its unchanged criterion.\n\nPreserve all existing limitations and inherited conditions.\n\nComplete the dependent Level 3 alignment and integrate it if exact-green and independently accepted.\n\nPhase 8 becomes \"2/4\"; Exits 1 and 2 remain Pending. Then stop.",
+      "exclusions": "Exits 1 and 2 stay Pending. The static source and structure evidence applies to protected main 72649c5 only. It does not establish complete runtime separation in inherited B15 presentation or persistence paths, wider migration, or compliance of a source change after 72649c5. Preserve all Exit 3 limits. Keep D-P6-008 Deferred — unmet. Keep TERM-R04 open. Keep output private-development and project status unknown. Preserve B14/B15 identities, the inherited B15 host and the development-only oracle. Preserve all comparison, adapter, caller, removal and legacy-retirement conditions. No product change, risk closure, performance result, production clearance, phase closure, release or legacy-path removal is accepted.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-8-exit-4-admission-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-8-exit-4-admission-panel"
     }
   ]
 }

@@ -1163,16 +1163,21 @@ def validate_phase6_closeout_mutations() -> None:
         "D-P7-006 bounded condition drifted: 37 registered worktrees",
     )
     current_opening = read("reference/current/PHASE_EVIDENCE.md")
+    current_status = paragraph_containing(
+        current_opening, "Status: **Open — 2/4",
+    )
     expect_rejected(
         "phase8-opening/premature-exit-acceptance",
         lambda: progress._validate_phase8_opening(replace_once(
             current_opening,
-            "Exit 3 is Evidenced\nand owner-accepted. "
-            "Exits 1, 2 and 4 stay Pending.",
-            "Exit 3 is Evidenced\nand owner-accepted. "
-            "Exits 1, 2 and 4 are accepted.",
+            current_status,
+            replace_once(
+                current_status,
+                "Exits 1 and 2 stay Pending.",
+                "Exits 1 and 2 are accepted.",
+            ),
         ), read("reference/PROJECT_PLAN.md")),
-        "Phase 8 opening status drifted: Exits 1, 2 and 4 stay Pending",
+        "Phase 8 opening status drifted: Exits 1 and 2 stay Pending",
     )
     expect_rejected(
         "phase8-opening/performance-duty-waived",
@@ -1295,23 +1300,6 @@ def validate_phase8_exit3_admission_mutations() -> None:
             "D-P8-002 " + diagnostic,
         )
 
-    for number, marker in (
-        (1, "Turnouts and crossovers retain accepted geometry"),
-        (2, "Creation, parameter editing, selection, undo/redo"),
-        (4, "No special-trackwork rule has leaked"),
-    ):
-        row = table_row_containing(evidence, marker)
-        changed = replace_once(
-            row, "| Pending |", "| Evidenced — owner-accepted 2026-09-30 |",
-        )
-        expect_rejected(
-            "phase8-exit3/exit-{}-accepted-without-authority".format(number),
-            lambda value=replace_once(evidence, row, changed): (
-                progress._validate_phase8_opening(value, plan)
-            ),
-            "Phase 8 evidence criteria or Exit 3-only admission status drifted",
-        )
-
     for name, before, after, diagnostic in (
         (
             "source-changed",
@@ -1395,6 +1383,159 @@ def validate_phase8_exit3_admission_mutations() -> None:
             "phase8-exit3/" + name,
             lambda value=mutated: progress._validate_dp8_002_acceptance(value),
             "D-P8-002 bounded condition drifted: " + clause,
+        )
+
+
+def validate_phase8_exit4_admission_mutations() -> None:
+    """Reject changed Exit 4 authority, source, limits and exit status."""
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    plan = read("reference/PROJECT_PLAN.md")
+    panel = progress._section(
+        evidence, "Phase 8 Exit 4 admission panel — 2026-09-30",
+    )
+    current = json.loads(read("reference/current/gate-decisions.json"))
+    frozen = {
+        item["id"]: item
+        for item in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        (
+            "decision",
+            "Accept every Phase 8 exit.",
+            "identity, acceptance or panel routing drifted",
+        ),
+        (
+            "authority",
+            "Accept Exit 4 for every source revision.",
+            "authority digest drifted",
+        ),
+        (
+            "exclusions",
+            "All inherited limits are lifted.",
+            "exclusions digest drifted",
+        ),
+    ):
+        mutated = copy.deepcopy(current)
+        mutated["decisions"][6][field] = replacement
+        expect_rejected(
+            "phase8-exit4/d-p8-003-" + field + "-changed",
+            lambda value=mutated: progress._validate_phase8_decision_opening(
+                value, frozen,
+            ),
+            "D-P8-003 " + diagnostic,
+        )
+
+    for number, marker in (
+        (1, "Turnouts and crossovers retain accepted geometry"),
+        (2, "Creation, parameter editing, selection, undo/redo"),
+    ):
+        row = table_row_containing(evidence, marker)
+        changed = replace_once(
+            row, "| Pending |", "| Evidenced — owner-accepted 2026-09-30 |",
+        )
+        expect_rejected(
+            "phase8-exit4/exit-{}-accepted-without-authority".format(number),
+            lambda value=replace_once(evidence, row, changed): (
+                progress._validate_phase8_opening(value, plan)
+            ),
+            "Phase 8 evidence criteria or Exit 3/4 admission status drifted",
+        )
+
+    for name, before, after, diagnostic in (
+        (
+            "source-changed",
+            "72649c58ba3774224a80fb2a8bf07bbc2ed9131c",
+            "0" * 40,
+            "D-P8-003 bounded condition drifted: D-P8-003 accepts Exit 4 "
+            "at protected main 72649c58ba3774224a80fb2a8bf07bbc2ed9131c",
+        ),
+        (
+            "criterion-changed",
+            "No special-trackwork rule has leaked into the renderer or FreeCAD "
+            "persistence adapter.",
+            "The renderer implements special-trackwork railway rules.",
+            "D-P8-003 unchanged criterion or panel anchor drifted",
+        ),
+        (
+            "owner-instruction-changed",
+            "against its unchanged criterion.",
+            "against a relaxed criterion.",
+            "D-P8-003 exact owner instruction drifted or was relocated",
+        ),
+    ):
+        mutated = replace_once(evidence, panel, replace_once(panel, before, after))
+        expect_rejected(
+            "phase8-exit4/" + name,
+            lambda value=mutated: progress._validate_dp8_003_acceptance(value),
+            diagnostic,
+        )
+
+    for name, before, after, clause in (
+        (
+            "runtime-limit-lost",
+            "These checks do not prove complete runtime separation for "
+            "inherited B15\npresentation or persistence paths.",
+            "These checks prove complete runtime separation for "
+            "all inherited B15\npresentation and persistence paths.",
+            "These checks do not prove complete runtime separation for inherited B15 "
+            "presentation or persistence paths",
+        ),
+        (
+            "compatibility-boundary-lost",
+            "Phase 8 compatibility modules still handle inherited turnout "
+            "and crossover\noperations and FreeCAD document recovery.",
+            "Phase 8 compatibility modules no longer handle inherited turnout "
+            "and crossover\noperations or FreeCAD document recovery.",
+            "Phase 8 compatibility modules still handle inherited turnout and "
+            "crossover operations and FreeCAD document recovery",
+        ),
+        (
+            "removal-gates-lost",
+            "The duplication and removal gates in\nPR-10 and PR-18 stay.",
+            "The duplication and removal gates in\nPR-10 and PR-18 end.",
+            "The duplication and removal gates in PR-10 and PR-18 stay",
+        ),
+        (
+            "later-source-checks-lost",
+            "The project must have applicable separation\nevidence before "
+            "it merges a source change or makes an exit decision.",
+            "The project needs no separation\nevidence before "
+            "it merges a source change or makes an exit decision.",
+            "The project must have applicable separation evidence before "
+            "it merges a source change or makes an exit decision",
+        ),
+        (
+            "future-source-limit-lost",
+            "For each new source change, the\nimplementing agent must do "
+            "the applicable checks before acceptance.",
+            "For each new source change, the\nimplementing agent may skip "
+            "the applicable checks before acceptance.",
+            "For each new source change, the implementing agent must do "
+            "the applicable checks before acceptance",
+        ),
+        (
+            "exit3-limits-lost",
+            "All recorded comparison and GUI limits\nfor Exit 3 stay.",
+            "All recorded comparison and GUI limits\nfor Exit 3 are lifted.",
+            "All recorded comparison and GUI limits for Exit 3 stay",
+        ),
+        (
+            "private-output-limit-lost",
+            "Output stays private-development and project status stays\n"
+            "`unknown`.",
+            "Output is production-cleared and project status becomes\n"
+            "complete.",
+            "Output stays private-development and project status stays unknown",
+        ),
+    ):
+        mutated = replace_once(evidence, panel, replace_once(panel, before, after))
+        expect_rejected(
+            "phase8-exit4/" + name,
+            lambda value=mutated: progress._validate_dp8_003_acceptance(value),
+            "D-P8-003 bounded condition drifted: " + clause,
         )
 
 
@@ -6234,6 +6375,7 @@ def main() -> None:
     validate_exit4_deferral_mutations()
     validate_phase6_closeout_mutations()
     validate_phase8_exit3_admission_mutations()
+    validate_phase8_exit4_admission_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()

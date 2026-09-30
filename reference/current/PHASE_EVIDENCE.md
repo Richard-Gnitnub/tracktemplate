@@ -1,7 +1,7 @@
 # Phase 8 Turnout, Crossover and Timbering Migration
 
-Status: **Open — 1/4 evidenced exits under D-P8-002. Exit 3 is Evidenced
-and owner-accepted. Exits 1, 2 and 4 stay Pending.**
+Status: **Open — 2/4 evidenced exits under D-P8-003. Exits 3 and 4 are
+Evidenced and owner-accepted. Exits 1 and 2 stay Pending.**
 
 Phase 7 closed on 2026-09-27 under
 [D-P7-006](../history/phase-closeouts/PHASE7_CLOSEOUT.md#phase-7-closeout-panel)
@@ -16,12 +16,96 @@ The owner accepted the independently reviewed
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 1/4 under D-P8-002. Exit 3 is Evidenced and owner-accepted. Exits 1, 2 and 4 stay Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
-| What changed | [D-P8-002](#phase-8-exit-3-admission-panel) records Exit 3 acceptance at `f1926b6`. The criterion and comparison limits stay unchanged. <br><br>The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. <br><br>D-GOV-022 authorises one `git worktree remove --force` operation only if its conditions pass. An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories. The 37 individual retirement audits gave PASS. Git removed 37 worktrees without `--force`. Git also deleted 36 branches whose tips the accepted commit contained. <br><br>PR #97 integrated D-GOV-022. A fresh six-root snapshot, restore test, individual audits and post-removal checks gave PASS. Git removed the two remaining D-GOV-022 worktrees without `--force`. The [preservation diff](#phase-8-worktree-retirement-result) records their retained branch tips. |
-| What now works | The [Exit 3 panel](#phase-8-exit-3-admission-panel) identifies the accepted evidence for the straight and curved `TO-001` and `XO-001` workflows. <br><br>The four Phase 7 exit decisions keep their accepted bounded evidence. The Phase 8 candidate passed development-only calculation, caller and real-GUI range tests. |
-| Limitations/findings | The [Exit 3 limits](#phase-8-exit-3-admission-panel) stay. TERM-R04 stays open. <br><br>All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. Five branches with unmerged commits and three related worktrees remain. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight prior branch refs, including both retired-worktree refs, remain.<br><br>The USB is safely unmounted. Physical removal and separate storage remain unverified. |
-| Owner decision | [D-P8-002](#phase-8-exit-3-admission-panel) accepts Exit 3 only. It authorises a merge after independent acceptance and checks with PASS results for the exact candidate. <br><br>D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | After independent acceptance and checks with PASS results for the exact candidate, merge the Exit 3 record changes. Make sure that protected `main` is clean and synchronised. Then examine the remaining Phase 8 exits. If another exit is ready, give its bounded owner decision. Otherwise, identify the missing evidence and the work necessary to supply it. |
+| Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 2/4 under D-P8-003. Exits 3 and 4 are Evidenced and owner-accepted. Exits 1 and 2 stay Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
+| What changed | [D-P8-003](#phase-8-exit-4-admission-panel) records Exit 4 acceptance at `72649c5`. The Exit 4 condition stays the same. [D-P8-002](#phase-8-exit-3-admission-panel) records Exit 3 acceptance and all its limits. <br><br>The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. <br><br>D-GOV-022 authorises one `git worktree remove --force` operation only if its conditions pass. An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories. The 37 individual retirement audits gave PASS. Git removed 37 worktrees without `--force`. Git also deleted 36 branches whose tips the accepted commit contained. <br><br>PR #97 integrated D-GOV-022. A fresh six-root snapshot, restore test, individual audits and post-removal checks gave PASS. Git removed the two remaining D-GOV-022 worktrees without `--force`. The [preservation diff](#phase-8-worktree-retirement-result) records their retained branch tips. |
+| What now works | The [Exit 4 panel](#phase-8-exit-4-admission-panel) identifies accepted evidence for source separation at `72649c5`. The [Exit 3 panel](#phase-8-exit-3-admission-panel) records accepted evidence for straight and curved `TO-001` and `XO-001` workflows. <br><br>The four Phase 7 exit decisions keep their accepted bounded evidence. The Phase 8 candidate passed development-only calculation, caller and real-GUI range tests. |
+| Limitations/findings | The [Exit 4 limits](#phase-8-exit-4-admission-panel) and [Exit 3 limits](#phase-8-exit-3-admission-panel) stay. TERM-R04 stays open. <br><br>All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. Five branches with unmerged commits and three related worktrees remain. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight prior branch refs, including both retired-worktree refs, remain.<br><br>The USB is safely unmounted. Physical removal and separate storage remain unverified. |
+| Owner decision | [D-P8-003](#phase-8-exit-4-admission-panel) accepts Exit 4 at `72649c5`. It authorises the implementing agent to merge the alignment after independent acceptance and checks with PASS results for the exact candidate. [D-P8-002](#phase-8-exit-3-admission-panel) records Exit 3 acceptance and its conditions. <br><br>D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal. |
+| Next action | After independent acceptance and checks with PASS results for the exact candidate, merge the Exit 4 alignment into protected `main`. Make sure that `main` is clean and synchronised. Then stop. Separate evidence and owner decisions are necessary for Exits 1 and 2. |
+
+<a id="phase-8-exit-4-admission-panel"></a>
+
+## Phase 8 Exit 4 admission panel — 2026-09-30
+
+**Decision:** D-P8-003 accepts Exit 4 at protected `main`
+`72649c58ba3774224a80fb2a8bf07bbc2ed9131c`. Phase 8 is Open at 2/4.
+Exits 1 and 2 stay Pending. Exit 3 keeps its accepted status. The Exit 4
+condition stays the same:
+
+> No special-trackwork rule has leaked into the renderer or FreeCAD persistence adapter.
+
+This Level 3 change records the owner's exit decision. It changes no product
+behaviour. This task has more governance work than implementation work because the
+decision changes authority for the phase exit.
+
+**Evidence reviewed:** The Phase 8 opening commit is `18dee347`.
+The accepted source state is `72649c5`. The Git comparison between these
+commits shows no changes to `TrackTemplate.FCMacro`,
+`tracktemplate/presentation/`, `tracktemplate/adapters/freecad/` or
+`tracktemplate/ui/`. The Phase 8 package changes are in the domain,
+application and compatibility layers.
+
+The files in `tracktemplate/presentation/` and
+`tracktemplate/adapters/freecad/` contain no `turnout`, `crossover`,
+`timber` or `B4` terms. At `72649c5`, the recorded output from
+`tools/modular_structure.py` gives 41 modules and 61 import edges. It gives
+no cycles, no prohibited layer edges and no forbidden domain imports. The
+[display evidence](#phase-8-xo-001-b4-display-evidence--2026-09-28)
+records no change to the FreeCAD persistence and presentation adapters.
+
+**Panel:** Richard is the project owner and decision chair. The implementing
+agent supplies the record changes. The independent QA/risk review by
+`/root/exit4_audit` examines the Exit 4 condition, source separation and all
+24 live risks at `72649c5`. The reviewer has no tracked change in this
+candidate.
+
+The review is by project agents. No external organisation is a
+reviewer. The panel recommendation is **Proceed with bounded conditions** for
+Exit 4 only. The review record contains no dissent.
+
+PR-09, PR-13 and PR-17 stay Critical and Open. GUI coverage for PR-01 and
+QA-R03 is not complete. The comparison and removal conditions in PR-10 and
+PR-18 stay. PR-15 and QA-R04 keep the D-P6-008 obligation. The signature duties in PR-16
+stay. The independent review and owner acceptance duties in PR-22 stay.
+
+The risk owners, deadlines, treatments and control effectiveness stay the
+same. This decision closes no risk. The [risk register](risks.json) gives the
+owners and deadlines. Comparison, dependency and recovery checks are mandatory
+for each new source change. The project must have applicable separation
+evidence before it merges a source change or makes an exit decision. These
+checks do not replace Exit 1 or Exit 2 evidence.
+
+**Limits and conditions:** The source and structure checks apply to the exact
+`72649c5` state and the modular presentation and FreeCAD adapter boundaries.
+Phase 8 compatibility modules still handle inherited turnout and crossover
+operations and FreeCAD document recovery. The duplication and removal gates in
+PR-10 and PR-18 stay.
+
+These checks do not prove complete runtime separation for inherited B15
+presentation or persistence paths. For each new source change, the
+implementing agent must do the applicable checks before acceptance. All recorded comparison and GUI limits
+for Exit 3 stay. Exits 1 and 2 stay Pending.
+
+D-P6-008 stays Deferred — unmet and mandatory before Phase 10 beta acceptance.
+TERM-R04 stays open. Output stays private-development and project status stays
+`unknown`. Frozen B14/B15 identities, the inherited B15 host and the
+development-only comparison oracle stay. All comparison, adapter, caller, removal and legacy-retirement
+conditions stay. This decision accepts no performance result, wider migration,
+production clearance, phase closure, release or legacy-path removal.
+
+**Exact owner instruction — 2026-09-30:**
+
+> As TrackTemplate project owner, I accept Phase 8 Exit 4 at protected "main" "72649c5" against its unchanged criterion.
+>
+> Preserve all existing limitations and inherited conditions.
+>
+> Complete the dependent Level 3 alignment and integrate it if exact-green and independently accepted.
+>
+> Phase 8 becomes "2/4"; Exits 1 and 2 remain Pending. Then stop.
+
+**Resulting authority:** If the exact candidate has independent acceptance
+and checks with PASS results, merge it into protected `main`. Make sure
+that `main` is clean and synchronised. Stop after this alignment.
 
 <a id="phase-8-exit-3-admission-panel"></a>
 
@@ -1325,14 +1409,15 @@ no acceptance for a Phase 8 exit, production output or release.
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
-`d5a3db45ab68a192e3d37f9fad5deb9f66f7de81`. D-P8-002 accepts Exit 3 only.
+`d5a3db45ab68a192e3d37f9fad5deb9f66f7de81`. D-P8-002 accepts Exit 3.
+D-P8-003 accepts Exit 4. Neither decision changes an exit condition.
 
 | Exit condition | Status | Evidence |
 | --- | --- | --- |
 | Turnouts and crossovers retain accepted geometry, topology, timber decisions, identities, findings, and production records. | Pending | No Phase 8 exit admission. |
 | Creation, parameter editing, selection, undo/redo, save/reopen, validation, and export pass in the real GUI. | Pending | No Phase 8 exit admission. |
 | Straight- and curved-host representative workflows pass deterministic comparison. | Evidenced — owner-accepted 2026-09-30 | [D-P8-002 panel and decision](#phase-8-exit-3-admission-panel) |
-| No special-trackwork rule has leaked into the renderer or FreeCAD persistence adapter. | Pending | No Phase 8 exit admission. |
+| No special-trackwork rule has leaked into the renderer or FreeCAD persistence adapter. | Evidenced — owner-accepted 2026-09-30 | [D-P8-003 panel and decision](#phase-8-exit-4-admission-panel) |
 
 ## Continuing duties and risks
 
