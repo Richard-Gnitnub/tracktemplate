@@ -1072,22 +1072,27 @@ The source bindings and stable `B4` shape data were also equal. The check did
 not compare exact shape bytes after the file opened again.
 
 The qualified FreeCAD 1.1.3 GUI check used the `CrossoverManagerPanel` for
-the selected `XO-001`. A caused error at the first `B4` object tag showed a
-dialog and left the document, production bindings and `Undo` history unchanged.
-The next `B4` command made 34 objects and one `Undo` unit. The GUI result
-matched the compared data for counts, identities, findings, stable shape data
-and source bindings. Unchanged reuse kept the document and `Undo` history.
+the selected `XO-001`. The GUI showed a dialog for an error at the first `B4`
+object tag. The error left the document, production bindings and `Undo`
+history unchanged. The next `B4` command made 34 objects and increased
+`undo_count` by one. The GUI result matched the compared data for counts,
+identities, findings, stable shape data and source bindings. Unchanged reuse
+kept the document and `Undo` history.
 
 The GUI check changed `Show final resolved timbering` without a new
-calculation or shape build. The check box and the selected crossover stayed
-in step with visibility. `Undo` restored 32 objects, and `Redo` restored 34.
-After the check hid `B4`, saved and opened the copied file, visibility stayed
-off. The stored analysis data and source bindings stayed equal. The new FreeCAD
-session had no earlier `Undo` history.
+calculation or shape build. The check box matched the `B4` object visibility.
+The panel kept `XO-001` selected.
 
-The first headless check gave `FAIL` because it compared `tuple` and `list`
-values before JSON conversion. The corrected check gave `PASS`. The failed
-check and diagnostic data remain in `tmp/phase8-straight-xo-b4/`.
+`Undo` restored 32 objects, and `Redo` restored 34. The check hid `B4` and
+used `save()` and `openDocument()`. Its visibility stayed off. The stored
+analysis data and source bindings stayed equal. The new FreeCAD session had
+no earlier `Undo` history.
+
+The first headless check gave `FAIL`. The test compared `tuple` and `list`
+values before JSON conversion. The failure has the `test-or-oracle-defect`
+class. The corrected check gave `PASS`. The failed check and diagnostic data
+remain in `tmp/phase8-straight-xo-b4/`.
+
 The B14 source receipt is in
 `benchmark-output/freecad-bridge/straight-station-runs/20260930T070824Z-phase8-straight-host/`.
 The passing headless receipt is in
