@@ -1042,7 +1042,7 @@ def _validate_owner_view(plan: str) -> None:
     for fragment in (
         'Phase 7 is closed at 4/4 under D-P7-006',
         'Its four exits remain Evidenced and owner-accepted under D-P7-005, D-P7-003, D-P7-004 and D-P7-002',
-        'Phase 8 is Open at 2/4 under D-P8-003. Exits 3 and 4 are Evidenced and owner-accepted. Exits 1 and 2 stay Pending',
+        'Phase 8 is Open at 3/4 under D-P8-004. Exits 1, 3 and 4 are Evidenced and owner-accepted. Exit 2 stays Pending',
         'Phase 6 retains four accepted exits and D-P6-008 as one deferred, unmet obligation',
         'Output stays private-development',
         'project status stays `unknown`',
@@ -1094,18 +1094,19 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-021',
         'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Separate evidence and owner decisions are necessary for Exits 1 and 2',
+        'Exit 2 needs separate evidence and an owner decision',
         'operator-controlled USB storage duty',
         'D-P8-002',
-        'records Exit 3 acceptance and its limits',
+        'keep Exit 3 and Exit 4 acceptance and all their limits',
         'TERM-R04 stays open',
         'D-P8-003',
-        'records Exit 4 acceptance at `72649c5`',
-        'The Exit 4 condition stays the same',
-        'accepts Exit 4 at `72649c5`',
-        'Exits 1 and 2 stay Pending',
-        'merge the Exit 4 alignment into protected `main`',
-        'Then stop',
+        'D-P8-004',
+        'records Exit 1 acceptance at `44eb4bf` for the reviewed representative evidence',
+        'The Exit 1 condition stays the same',
+        'accepts Exit 1 at `44eb4bf`',
+        'Exit 2 stays Pending',
+        'merge the Exit 1 alignment into protected `main`',
+        'Then identify the missing Exit 2 evidence and the work necessary to supply it',
     ):
         _require(
             fragment in owner_view,
@@ -1249,8 +1250,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 7 must be closed at four evidenced exits",
     )
     _require(
-        rows[8]["count"] == 2 and rows[8]["state"] == "Open",
-        "Phase 8 must be open at two evidenced exits",
+        rows[8]["count"] == 3 and rows[8]["state"] == "Open",
+        "Phase 8 must be open at three evidenced exits",
     )
     for phase in range(9, 12):
         _require(
@@ -1266,10 +1267,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the accepted Phase 7 closeout or carried D-P6-008 is missing",
     )
     _require(
-        "Phase 8 is Open at 2/4 under D-P8-003. Exits 3 and 4 are Evidenced "
-        "and owner-accepted. Exits 1 and 2 stay Pending"
+        "Phase 8 is Open at 3/4 under D-P8-004. Exits 1, 3 and 4 are Evidenced "
+        "and owner-accepted. Exit 2 stays Pending"
         in _semantic_text(preamble),
-        "project-plan Phase 8 Exit 4 admission status drifted",
+        "project-plan Phase 8 Exit 1 admission status drifted",
     )
     return rows
 
@@ -4657,12 +4658,12 @@ def _validate_phase8_decision_opening(
         and document["schema_version"] == 1
         and document["current_phase"] == 8
         and document["updated_on"] == "2026-09-30",
-        "current decision register is not the Phase 8 Exit 3 admission state",
+        "current decision register is not the Phase 8 Exit 1 admission state",
     )
     decisions = document["decisions"]
     _require(
         isinstance(decisions, list)
-        and len(decisions) == 7
+        and len(decisions) == 8
         and decisions[0] == phase6_decisions["D-P6-008"],
         "Phase 8 opening must carry unchanged D-P6-008",
     )
@@ -4847,6 +4848,117 @@ def _validate_phase8_decision_opening(
             "D-P8-003 " + field + " digest drifted",
         )
 
+    exit1 = decisions[7]
+    exit1_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-8-exit-1-acceptance-panel"
+    )
+    _require(
+        isinstance(exit1, dict)
+        and set(exit1) == set(opening)
+        and exit1["id"] == "D-P8-004"
+        and exit1["decided_on"] == "2026-09-30"
+        and exit1["status"] == "Accepted"
+        and exit1["decision"]
+        == "Accept Phase 8 Exit 1 at protected main 44eb4bf for the reviewed "
+        "representative straight and curved TO-001/XO-001 evidence. The Exit 1 "
+        "condition stays the same. Phase 8 is Open at 3/4."
+        and exit1["evidence"] == exit1_panel
+        and exit1["panel_record"] == exit1_panel
+        and exit1["panel_required_under_current_policy"] is True,
+        "D-P8-004 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        (
+            "authority",
+            "2923191cd7b6d4750cd4f8e3c7f341aa5d41a765308fd595d0e952c41a7e53fa",
+        ),
+        (
+            "exclusions",
+            "6ffc0a339bdf96d601769168b2f4da963edf98ccc0918d48592e5ee3d38abb3e",
+        ),
+    ):
+        value = exit1[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P8-004 " + field + " digest drifted",
+        )
+
+
+def _validate_dp8_004_acceptance(evidence: str) -> None:
+    """Bind Exit 1 acceptance to its exact source and representative proof."""
+    panel = _section(evidence, "Phase 8 Exit 1 acceptance panel — 2026-09-30")
+    decision = _load_json(CURRENT_DECISIONS_PATH)["decisions"][7]
+    quotes = _blockquote_paragraphs(panel)
+    criterion = (
+        "Turnouts and crossovers retain accepted geometry, topology, timber "
+        "decisions, identities, findings, and production records."
+    )
+    _require(
+        '<a id="phase-8-exit-1-acceptance-panel"></a>' in evidence
+        and quotes[:1] == [criterion],
+        "D-P8-004 unchanged criterion or panel anchor drifted",
+    )
+    _require(
+        " ".join(quotes[1:]) == _semantic_text(str(decision["authority"])),
+        "D-P8-004 exact owner instruction drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "D-P8-004 accepts Exit 1 at protected main "
+        "44eb4bf33d984afb9a6a8b0a14a00d1b02dc1eab for the reviewed "
+        "representative straight and curved TO-001 and XO-001 evidence",
+        "Phase 8 is Open at 3/4",
+        "Exits 3 and 4 keep their accepted status",
+        "Exit 2 stays Pending",
+        "Exit 3 acceptance alone does not supply that evidence",
+        "all 82 ordered timber records and unique identities",
+        "all 86 and their stored-object bindings",
+        "two inherited findings and seven resolved findings",
+        "all analysis data except performance_timings_ms",
+        "Curved TO Create/Edit has ten ordered records",
+        "Curved XO has four direct records and an eight-record index",
+        "The 48 TO source hashes and 58 XO source hashes match 44eb4bf",
+        "No new FreeCAD or GUI run is claimed",
+        "Independent reviewer /root/exit1_admission",
+        "all 24 live risks",
+        "recommendation is Proceed with bounded conditions for Exit 1",
+        "No risk owner, deadline, treatment, severity, disposition or "
+        "control effectiveness changes",
+        "The recorded owners must complete these duties by their "
+        "recorded deadlines",
+        "The fixtures are representative. They do not prove complete "
+        "turnout or crossover coverage",
+        "Straight TO Edit equivalence across versions remains unproved",
+        "Historical GUI-source limits stay",
+        "Current-source curved GUI lifecycle coverage remains incomplete",
+        "The retained B16 NO_SELECTED_PRODUCTION_ITEMS preselection "
+        "failure stays unresolved",
+        "Successful export from highlighted rows does not resolve that failure",
+        "Wider persistence/profile and production-metadata limits stay",
+        "The causes of older digest differences remain unknown",
+        "Raw GUI/headless output identity remains unproved",
+        "All failed evidence, diagnostics, deferred clearance findings "
+        "and non-production limits stay",
+        "The product has no production clearance",
+        "The Exit 3 limits and Exit 4 limits stay in full",
+        "D-P6-008 stays Deferred — unmet and mandatory before Phase 10 "
+        "beta acceptance",
+        "TERM-R04 stays open",
+        "Output stays private-development and project status stays unknown",
+        "B14/B15 identities, the inherited B15 host and the "
+        "development-only comparison oracle stay",
+        "All comparison, adapter, caller, removal and legacy-retirement "
+        "conditions stay",
+        "This decision accepts no product change, risk closure, performance "
+        "result, wider migration, phase closure, release or legacy-path removal",
+        "may merge after independent acceptance and checks with PASS "
+        "results for the exact candidate",
+        "Exit 2 needs separate evidence and an owner decision",
+    ):
+        _require(clause in flat, "D-P8-004 bounded condition drifted: " + clause)
+
 
 def _validate_dp8_002_acceptance(evidence: str) -> None:
     """Bind Exit 3 admission to its exact source, instruction and limits."""
@@ -5018,9 +5130,9 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
         level=1,
     ))
     for clause in (
-        "Open — 2/4 evidenced exits under D-P8-003",
-        "Exits 3 and 4 are Evidenced and owner-accepted",
-        "Exits 1 and 2 stay Pending",
+        "Open — 3/4 evidenced exits under D-P8-004",
+        "Exits 1, 3 and 4 are Evidenced and owner-accepted",
+        "Exit 2 stays Pending",
         "D-P7-006",
         "all four original exits Evidenced and owner-accepted",
     ):
@@ -5046,14 +5158,16 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
     expected_rows = [
         ["Exit condition", "Status", "Evidence"], ["---"] * 3,
     ]
+    admitted = {1: "D-P8-004", 3: "D-P8-002", 4: "D-P8-003"}
     for number, criterion in enumerate(criteria, start=1):
-        if number in (3, 4):
-            decision_id = "D-P8-002" if number == 3 else "D-P8-003"
+        if number in admitted:
+            decision_id = admitted[number]
+            panel_kind = "acceptance" if number == 1 else "admission"
             expected_rows.append([
                 criterion,
                 "Evidenced — owner-accepted 2026-09-30",
                 f"[{decision_id} panel and decision]"
-                f"(#phase-8-exit-{number}-admission-panel)",
+                f"(#phase-8-exit-{number}-{panel_kind}-panel)",
             ])
         else:
             expected_rows.append([
@@ -5061,7 +5175,7 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
             ])
     _require(
         rows == expected_rows,
-        "Phase 8 evidence criteria or Exit 3/4 admission status drifted",
+        "Phase 8 evidence criteria or Exit 1/3/4 admission status drifted",
     )
     flat = _semantic_text(evidence)
     for clause in (
@@ -5940,7 +6054,7 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003"},
+        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -7685,6 +7799,7 @@ def main() -> None:
     _validate_phase8_opening(phase8_evidence, plan)
     _validate_dp8_002_acceptance(phase8_evidence)
     _validate_dp8_003_acceptance(phase8_evidence)
+    _validate_dp8_004_acceptance(phase8_evidence)
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_finite_documentation_completion(plan, current_evidence)
