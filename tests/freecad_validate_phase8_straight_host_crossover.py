@@ -2,10 +2,12 @@
 
 This qualified FreeCAD check uses one B14 Generate/Replace document with
 1500/450 mm connected straight routes. The source document is never opened
-for mutation. It does not claim real-GUI, export, or Phase 8 acceptance.
+for mutation. This is development comparison, not output acceptance.
 """
 
 import ast
+import copy
+import datetime
 import hashlib
 import json
 import math
@@ -18,12 +20,14 @@ import tempfile
 import types
 
 import FreeCAD as App
+import Materials
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools.freecad_bridge import crossover_timber_recipe as recipe  # noqa: E402
+from tools.freecad_bridge import ordinary_track_export_recipe  # noqa: E402
 from tools.freecad_bridge.ordinary_track_recipe import (  # noqa: E402
     ordinary_track_document_snapshot,
 )
@@ -169,12 +173,29 @@ def _history(document):
     }
 
 
+def _property_value(obj, name):
+    value = getattr(obj, name)
+    if obj.getTypeIdOfProperty(name) != "Materials::PropertyMaterial":
+        return str(value)
+    # FreeCAD returns a copied Material whose repr contains its address.
+    # Keep its persisted UUID and material data instead of that address.
+    return json.dumps({
+        "type": value.TypeId,
+        "uuid": value.UUID,
+        "parent": value.Parent,
+        "properties": value.Properties,
+        "legacy_properties": value.LegacyProperties,
+        "physical_models": value.PhysicalModels,
+        "appearance_models": value.AppearanceModels,
+    }, sort_keys=True)
+
+
 def _snapshot(document):
     """Capture stored properties, memberships, exact shapes, and history."""
     objects = []
     for obj in document.Objects:
         properties = tuple(sorted(
-            (name, str(getattr(obj, name)))
+            (name, _property_value(obj, name))
             for name in obj.PropertiesList
             if name not in {"Shape", "Group", "_Part_ShapeCache"}
         ))
@@ -196,6 +217,31 @@ def _snapshot(document):
         "history": _history(document),
         "file_name": str(document.FileName),
     }
+
+
+def _verify_material_snapshot():
+    """Keep identity and material-value changes visible to the snapshot."""
+    document = App.newDocument("MaterialSnapshotCheck")
+    try:
+        obj = document.addObject("Part::Feature", "MaterialWitness")
+        original = obj.ShapeMaterial
+        before = _snapshot(document)
+        assert _snapshot(document) == before
+        replacement = Materials.Material()
+        assert replacement.UUID != original.UUID
+        obj.ShapeMaterial = replacement
+        assert _snapshot(document) != before
+        obj.ShapeMaterial = original
+        assert _snapshot(document) == before
+        changed = obj.ShapeMaterial
+        changed.Description += " snapshot negative case"
+        assert changed.UUID == original.UUID
+        obj.ShapeMaterial = changed
+        assert _snapshot(document) != before
+        obj.ShapeMaterial = original
+        assert _snapshot(document) == before
+    finally:
+        App.closeDocument(document.Name)
 
 
 def _state_without_history(snapshot):
@@ -430,6 +476,170 @@ def _b16_edit_lifecycle(module, document, identifier, before, edited):
     }
 
 
+def _selected_pair(module, document):
+    """Find the existing unintegrated XO-001 physical representations."""
+    assert module.crossover_host_integration_by_id(document, "XO-001") is None
+    index = module.production_record_index_for_set(document, "SET-001")
+    catalogue = module.hydrate_production_index_records(document, index)
+    assert len(catalogue) == 16
+    crossover = [
+        record for record in catalogue if record["route_id"] == "XO-001"
+    ]
+    assert len(crossover) == 4
+    assert {record["role"] for record in crossover} == {
+        module.CROSSOVER_TEMPLATE_ROLE, module.CROSSOVER_OUTLINE_ROLE,
+        module.CROSSOVER_RAIL_ROLE, module.CROSSOVER_DATUM_ROLE,
+    }
+    pair = [
+        record for record in crossover
+        if record["subtype"] == module.CROSSOVER_SUBTYPE_TEMPLATE
+    ]
+    assert len(pair) == 2
+    outline = next(record for record in pair
+                   if record["category"] == module.EXPORT_CATEGORY_CUTTING)
+    solid = next(record for record in pair
+                 if record["category"] == module.EXPORT_CATEGORY_SOLID)
+    assert outline["role"] == module.CROSSOVER_OUTLINE_ROLE
+    assert solid["role"] == module.CROSSOVER_TEMPLATE_ROLE
+    for record in pair:
+        obj = document.getObject(record["source_name"])
+        assert module.object_string_property(
+            obj, module.CROSSOVER_ID_PROPERTY, "",
+        ) == "XO-001"
+        assert module.selected_export_object_record_ids(obj) == {
+            record["record_id"]
+        }
+    return catalogue, outline, solid
+
+
+def _selected_export_output(module, directory, plan, outline, solid):
+    """Retain full artifact evidence and compare only verified version data."""
+    snapshot = ordinary_track_export_recipe.export_directory_snapshot(directory)
+    svg_name = pathlib.Path(plan["tasks"][0]["path"]).name
+    manifest_name = pathlib.Path(plan["manifest_path"]).name
+    assert set(snapshot["files"]) == {svg_name, manifest_name}
+    assert not snapshot["directories"]
+    assert svg_name.endswith(".svg") and manifest_name.endswith(".csv")
+    bounds = module.validate_svg_export_bounds(str(directory / svg_name))
+    manifest = snapshot["files"][manifest_name]["manifest"]
+    assert manifest["fields"] == list(module.EXPORT_MANIFEST_FIELDS)
+    rows = manifest["rows"]
+    assert len(rows) == 2
+    successful = [row for row in rows if row["Export status"] == "Success"]
+    skipped = [row for row in rows if row["Export status"] == "Skipped"]
+    assert len(successful) == len(skipped) == 1
+    assert successful[0]["Export filename"] == svg_name
+    assert successful[0]["Export format"] == "SVG"
+    assert skipped[0]["Export filename"] == skipped[0]["Export format"] == ""
+    for row, record in ((successful[0], outline), (skipped[0], solid)):
+        assert row["Generated object name"] == record["source_name"]
+        assert row["Generated object role"] == record["role"]
+        assert row["Template-set identifier"] == "SET-001"
+        assert row["Macro version"] == str(module.MACRO_VERSION)
+        for column, key in (
+            ("Track number", "track_number"),
+            ("Platform number", "platform_number"),
+            ("Section number", "section_number"),
+            ("Travel-order number", "travel_order_number"),
+        ):
+            assert row[column] == str(record.get(key) or "")
+    comparison_manifest = copy.deepcopy(manifest)
+    for row in comparison_manifest["rows"]:
+        del row["Macro version"]
+    return {
+        "artifacts": snapshot,
+        "macro_version": str(module.MACRO_VERSION),
+        "svg_bounds": bounds,
+        "comparison": {
+            "filenames": sorted(snapshot["files"]),
+            "svg_sha256": snapshot["files"][svg_name]["normalised_sha256"],
+            "manifest": comparison_manifest,
+        },
+    }
+
+
+def _selected_export(module, document, directory):
+    """Export the outline and retain every preflight finding unchanged."""
+    catalogue, outline, solid = _selected_pair(module, document)
+    scope = {
+        "scope_type": module.SELECTED_EXPORT_SCOPE_OBJECTS,
+        "route_id": "XO-001",
+        "route_label": outline["route_name"],
+        "selected_objects": [{
+            "name": outline["source_name"],
+            "record_ids": {outline["record_id"]},
+            "generated_role": outline["role"],
+            "export_subtype": outline["subtype"],
+            **{key: outline[key] for key in (
+                "route_id", "track_number", "platform_number",
+                "section_number", "feature_number",
+            )},
+        }],
+    }
+    matching = module.filter_production_records_by_selected_scope(
+        catalogue, scope,
+    )
+    assert {item["record_id"] for item in matching} == {
+        outline["record_id"], solid["record_id"],
+    }
+    settings = module.settings_for_template_set(document, "SET-001")
+    config = module.read_production_export_config(settings)
+    config.update({
+        "enabled": True, "output_directory": str(directory),
+        "create_combined_files": False, "create_manifest": True,
+        "overwrite_existing": False, "open_output_directory": False,
+        "formats": {"svg": True, "dxf": False, "step": False, "stl": False},
+    })
+    records, skipped = module.selected_export_records_for_formats(
+        matching, config,
+    )
+    assert [record["record_id"] for record in records] == [outline["record_id"]]
+    assert len(skipped) == 1
+    assert skipped[0]["record"]["record_id"] == solid["record_id"]
+    plan = module.plan_selected_production_export(
+        records, config, "SET-001", scope,
+    )
+    assert len(plan["tasks"]) == 1
+    assert plan["tasks"][0]["format"] == "svg"
+    issues = module.run_production_preflight(
+        document,
+        module.selected_export_validation_records(catalogue, matching, scope),
+        records, module.selected_export_preflight_config(config, plan),
+        "SET-001", module.read_section_config(settings),
+        module.read_registration_config(settings),
+        module.read_template_assembly_config(settings), settings_obj=settings,
+        plan=plan, include_export_checks=True, probe_export_bounds=True,
+        filename_issues_override=module.selected_export_filename_issues(
+            plan, config, "SET-001",
+        ),
+    )
+    evidence = {
+        "issues": issues,
+        "record_ids": [record["record_id"] for record in matching],
+        "macro_version": str(module.MACRO_VERSION),
+    }
+    receipt = directory.parent / (directory.name + ".json")
+    receipt.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+    assert not module.preflight_blocking_report(issues), issues
+    platforms = module.read_platform_configs(settings)
+    summary = module.run_selected_production_export(
+        document, plan, config, "SET-001",
+        platforms[0] if platforms else module.default_platform_config(),
+        module.read_formation_config(settings),
+        module.read_registration_config(settings),
+        module.read_template_assembly_config(settings), extra_skipped=skipped,
+    )
+    evidence["summary"] = summary
+    receipt.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+    assert summary["successful_files"] == 2, summary
+    assert summary["failed_files"] == 0, summary
+    evidence.update(_selected_export_output(
+        module, directory, plan, outline, solid,
+    ))
+    receipt.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+    return evidence
+
+
 def validate():
     contract = json.loads(LEGACY_CONTRACT.read_text(encoding="utf-8"))
     assert contract["contract_id"] == (
@@ -451,6 +661,7 @@ def validate():
             source_state["version"]
         )
     modules["B16"] = _load_b16()
+    _verify_material_snapshot()
 
     observations = {}
     edited_observations = {}
@@ -458,6 +669,15 @@ def validate():
     edit_rejection = None
     lifecycle = None
     edit_lifecycle = None
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y%m%dT%H%M%S%fZ"
+    )
+    export_root = (
+        ROOT / "benchmark-output/phase8-straight-crossover-export" / stamp
+    )
+    export_root.mkdir(parents=True, exist_ok=False)
+    print("PHASE8_STRAIGHT_XO_EXPORT_EVIDENCE=" + str(export_root), flush=True)
+    exports = {}
     with tempfile.TemporaryDirectory(
         prefix="tracktemplate-phase8-straight-crossover-"
     ) as temporary:
@@ -494,6 +714,16 @@ def validate():
                 observations[label] = _crossover_observation(
                     module, document, config, solved,
                 )
+                exports[label] = []
+                for number in (1, 2):
+                    directory = export_root / "{}-{}".format(label, number)
+                    directory.mkdir()
+                    exports[label].append(_selected_export(
+                        module, document, directory,
+                    ))
+                    assert _snapshot(document) == created
+                assert (exports[label][0]["comparison"]
+                        == exports[label][1]["comparison"])
                 if label == "B16":
                     document, lifecycle = _b16_lifecycle(
                         module, document, config["crossover_id"],
@@ -561,6 +791,9 @@ def validate():
 
     assert observations["B14"] == observations["B15"]
     assert observations["B15"] == observations["B16"]
+    assert (exports["B14"][0]["comparison"]
+            == exports["B15"][0]["comparison"]
+            == exports["B16"][0]["comparison"])
     assert edited_observations["B14"] == edited_observations["B15"]
     assert edited_observations["B15"] == edited_observations["B16"]
     assert rejection is not None and lifecycle is not None
@@ -607,7 +840,29 @@ def validate():
         "source_document_semantic_sha256": (
             SOURCE_DOCUMENT_SEMANTIC_SHA256
         ),
+        "source_files_sha256": {
+            str(path.relative_to(ROOT)): _sha256(path)
+            for path in (
+                pathlib.Path(__file__),
+                ROOT / contract["source_state"]["b14"]["path"],
+                ROOT / contract["source_state"]["b15"]["path"],
+                ROOT / "TrackTemplate.FCMacro",
+            )
+        },
+        "selected_export": {
+            "directory": str(export_root),
+            "comparison": exports["B16"][0]["comparison"],
+            "version_by_label": {
+                label: values[0]["macro_version"]
+                for label, values in exports.items()
+            },
+            "document_and_undo_unchanged": True,
+        },
     }
+    (export_root / "witness.json").write_text(
+        json.dumps(witness, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     print("PHASE8_STRAIGHT_CROSSOVER_WITNESS=" + json.dumps(
         witness, sort_keys=True, separators=(",", ":"),
     ))
