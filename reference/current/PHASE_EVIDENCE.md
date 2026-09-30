@@ -1128,24 +1128,28 @@ use copies of one B14 source file. Its SHA-256 is
 before and after the checks. No product source or B14/B15 reference file
 changes.
 
-Both host receipts report `PASS`. Their raw `resolved_analysis` SHA-256 values
-are different. Only the top-level `performance_timings_ms` values differ.
-The report keeps both measured values. The other 20 top-level fields are
-exactly equal, including their nested data, findings, `geometry_signature`
-and all 82 `timbers` entries. Their common SHA-256 after the one exclusion is
+The `FreeCADCmd` and GUI result files report `PASS`, but the SHA-256 values
+for their full `resolved_analysis` data are different. Only the data in the
+`performance_timings_ms` JSON key differs. The check result gives the measured
+times for both checks. The data in the other 20 JSON keys of
+`resolved_analysis` is equal. This includes the `findings` data,
+`geometry_signature` and all 82 `timbers` entries. When the check ignores
+`performance_timings_ms`, the two `resolved_analysis` values have this
+SHA-256:
 `bfbd3f2717f3ec19f0164c291d1f91b68522aefbf7ec5090a65f3c2033ad162e`.
 
-The B14, B15 and B16 observations remain equal for this source.
+The B14, B15 and B16 results remain equal for this source.
 
-The `FreeCADCmd` receipt is in
+The `FreeCADCmd` result file is in
 `benchmark-output/freecad-bridge/phase8-straight-crossover-b4-headless-runs/20260930T091240731184Z/`.
-The GUI receipt, seven images and strict comparison report are in
+The GUI result file, 7 images and the check result file are in
 `benchmark-output/freecad-bridge/phase8-straight-crossover-b4-gui-runs/20260930T091341211190Z/`.
-Standalone negative checks reject changes to non-timing data and receipt
-identities. The earlier failed receipts remain.
+The standalone Python tests show that the check rejects changes to the other
+`resolved_analysis` data and the identities of its input files. The previous
+failed result files remain.
 
-This result adds bounded evidence for part of Phase 8 Exit 3. The earlier
-curved-host `resolved_analysis_sha256` difference remains unexplained. The
+This result adds bounded evidence for part of Phase 8 Exit 3. The previous
+`resolved_analysis_sha256` difference on curved tracks has no known cause. The
 [prior straight `B4` result](#phase-8-straight-crossover-b4-result) keeps its
 deferred rail-clearance finding, construction-mark diagnostic and
 non-production limits.
