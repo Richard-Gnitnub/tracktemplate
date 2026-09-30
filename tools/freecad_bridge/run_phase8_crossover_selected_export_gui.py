@@ -38,6 +38,7 @@ GUI_PROBE = r'''
 import csv
 import json
 import pathlib
+import traceback
 
 import FreeCAD as App
 import FreeCADGui as Gui
@@ -228,6 +229,318 @@ def export_dialog_action(dialog):
     return seen
 
 
+def exercise_selected_export(dialog):
+    try:
+        if dialog.current_set_id() != reopened["set_id"]:
+            raise RuntimeError("The selected export template set changed")
+        scope_index = dialog.scope_box.findText(
+            module.SELECTED_EXPORT_SCOPE_OBJECTS
+        )
+        if scope_index < 0:
+            raise RuntimeError("Selected FreeCAD objects scope is absent")
+        if not dialog.probe_box.isChecked():
+            raise RuntimeError("Mandatory exporter probes are not enabled")
+        refresh_checks = []
+
+        def check_preselection(label):
+            if (dialog.scope.get("selected_objects") != preselected_objects
+                    or dialog._highlighted_record_ids()
+                    or dialog.scope.get("highlighted_record_ids")
+                    or not dialog.probe_box.isChecked()):
+                raise RuntimeError(
+                    "Preselected scope changed during {}".format(label)
+                )
+            refresh_checks.append({
+                "label": label,
+                "selected_objects": dialog.scope["selected_objects"],
+                "probe_documents": len(probe_documents),
+            })
+
+        if TRACKTEMPLATE_PHASE8_SELECTION_ROUTE == "preselected":
+            check_preselection("dialog construction")
+        dialog._loading_export_controls = True
+        try:
+            dialog.scope_box.setCurrentIndex(scope_index)
+            dialog.output_box.setText(TRACKTEMPLATE_PHASE8_OUTPUT_DIR)
+            for key, box in dialog.format_boxes.items():
+                box.setChecked(key == module.EXPORT_FORMAT_SVG)
+            dialog.export_each_section_box.setChecked(True)
+            dialog.combined_box.setChecked(False)
+            dialog.manifest_box.setChecked(True)
+            dialog.overwrite_box.setChecked(False)
+            dialog.probe_box.setChecked(True)
+        finally:
+            dialog._loading_export_controls = False
+        dialog.refresh_preview()
+        if TRACKTEMPLATE_PHASE8_SELECTION_ROUTE == "highlighted":
+            if (dialog.scope.get("selected_objects")
+                    or len(dialog.preview_records) != 7
+                    or dialog.matching_records
+                    or dialog.export_records
+                    or dialog.plan
+                    or [issue.get("issue_code") for issue in dialog.issues]
+                    != ["NO_SELECTED_PRODUCTION_ITEMS"]):
+                raise RuntimeError("The highlighted-row candidate state changed")
+            id_column = module.SELECTED_EXPORT_RECORD_FIELDS.index(
+                "Production-record ID"
+            )
+            outline_rows = [
+                row for row in range(dialog.records_table.rowCount())
+                if (dialog.records_table.item(row, id_column) is not None
+                    and dialog.records_table.item(row, id_column).text()
+                    == outline_id)
+            ]
+            if len(outline_rows) != 1:
+                raise RuntimeError("The integrated outline row is not unique")
+            dialog.records_table.selectRow(outline_rows[0])
+            if dialog._highlighted_record_ids() != {outline_id}:
+                raise RuntimeError("The integrated outline row was not highlighted")
+            dialog.refresh_preview()
+        elif TRACKTEMPLATE_PHASE8_SELECTION_ROUTE == "preselected":
+            check_preselection("configured preview")
+            dialog.refresh_preview()
+            check_preselection("repeated preview")
+            set_scope_index = dialog.scope_box.findText(
+                module.SELECTED_EXPORT_SCOPE_TEMPLATE_SET
+            )
+            if set_scope_index < 0:
+                raise RuntimeError("Template-set export scope is absent")
+            dialog.scope_box.setCurrentIndex(set_scope_index)
+            dialog.scope_box.setCurrentIndex(scope_index)
+            check_preselection("scope round-trip")
+            dialog.manifest_box.setChecked(False)
+            dialog.manifest_box.setChecked(True)
+            check_preselection("manifest control round-trip")
+            if any(after["probe_documents"] <= before["probe_documents"]
+                   for before, after in zip(
+                       refresh_checks, refresh_checks[1:]
+                   )):
+                raise RuntimeError("A refreshed preview bypassed its probes")
+        else:
+            raise RuntimeError("Unknown selected-export selection route")
+        expanded_ids = {
+            str(record.get("record_id") or "")
+            for record in dialog.matching_records
+        }
+        if (len(expanded_ids) != 2
+                or outline_id not in expanded_ids
+                or {str(record.get("category") or "")
+                    for record in dialog.matching_records}
+                != {module.EXPORT_CATEGORY_SOLID,
+                    module.EXPORT_CATEGORY_CUTTING}
+                or {str(record.get("route_id") or "")
+                    for record in dialog.matching_records} != {"XO-001"}):
+            raise RuntimeError("The selected outline representations changed")
+        dialog.refresh_preview()
+        if TRACKTEMPLATE_PHASE8_SELECTION_ROUTE == "highlighted":
+            expected_action = "Export 2 highlighted rows"
+            if (dialog._highlighted_record_ids() != expanded_ids
+                    or set(dialog.scope.get("highlighted_record_ids") or [])
+                    != expanded_ids):
+                raise RuntimeError("The highlighted-row scope did not stabilise")
+        else:
+            expected_action = "Export all matching records"
+            check_preselection("final preview")
+        plan = dialog.plan or {}
+        tasks = list(plan.get("tasks") or [])
+        selected_ids = {
+            str(record.get("record_id") or "")
+            for record in dialog.export_records
+        }
+        blocking = module.preflight_blocking_report(dialog.issues)
+        issue_codes = [
+            str(issue.get("issue_code") or "") for issue in dialog.issues
+        ]
+        chair_issues = [
+            issue for issue in dialog.issues
+            if issue.get("issue_code")
+            == "CROSSOVER_CHAIR_VALIDATION_OUTSTANDING"
+        ]
+        if (selected_ids != {outline_id}
+                or len(dialog.matching_records) != 2
+                or len(tasks) != 1
+                or str(tasks[0].get("format") or "") != "svg"
+                or str(tasks[0].get("records", [{}])[0].get("record_id")
+                       or "") != outline_id
+                or not plan.get("manifest_path")
+                or blocking
+                or len(chair_issues) != 1
+                or chair_issues[0].get("severity") != "Warning"
+                or chair_issues[0].get("blocks_export") is not False
+                or dialog.export_button.text() != expected_action
+                or not dialog.export_button.isEnabled()):
+            raise RuntimeError("Selected export preflight changed: {}".format({
+                "ids": sorted(selected_ids),
+                "highlighted_ids": sorted(dialog._highlighted_record_ids()),
+                "tasks": len(tasks),
+                "issues": issue_codes,
+                "blocking": blocking,
+                "summary": dialog.summary_label.text(),
+            }))
+        preview = {
+            "scope": dialog.scope,
+            "refresh_checks": refresh_checks,
+            "mandatory_probes_enabled": bool(dialog.probe_box.isChecked()),
+            "highlighted_ids": sorted(dialog._highlighted_record_ids()),
+            "matching_record_ids": sorted(expanded_ids),
+            "record_ids": sorted(selected_ids),
+            "plan_paths": sorted(
+                [str(task.get("path") or "") for task in tasks]
+                + [str(plan.get("manifest_path"))]
+            ),
+            "issue_codes": issue_codes,
+            "issues": dialog.issues,
+            "summary": str(dialog.summary_label.text()),
+            "action": str(dialog.export_button.text()),
+            "visual": capture_widget(
+                dialog, "xo-001-selected-export-preflight.png"
+            ),
+        }
+        before_export = index_state(document)
+        probe_count_before_export = len(probe_documents)
+        dialogs = export_dialog_action(dialog)
+        after_export = index_state(document)
+        if (not dialog.probe_box.isChecked()
+                or len(probe_documents) <= probe_count_before_export):
+            raise RuntimeError("Selected export bypassed its mandatory probes")
+        if (after_export["index"] != before_export["index"]
+                or after_export["config"] != before_export["config"]
+                or after_export["object_names"]
+                != before_export["object_names"]
+                or after_export["history"] != before_export["history"]):
+            raise RuntimeError("Selected export changed the copied document")
+    finally:
+        dialog.close()
+        Gui.Selection.clearSelection()
+        QtWidgets.QApplication.processEvents()
+
+    return {
+        "preview": preview,
+        "before_export": before_export,
+        "after_export": after_export,
+        "dialogs": dialogs,
+        "plan": plan,
+        "tasks": tasks,
+    }
+
+
+def run_main_button_export():
+    state = {
+        "entrypoint": "main-button",
+        "parent_count": 0,
+        "button_clicks": 0,
+        "child_count": 0,
+        "result": None,
+        "error": None,
+    }
+    parent_holder = {}
+
+    def reject_visible_dialogs():
+        for widget in list(QtWidgets.QApplication.topLevelWidgets()):
+            if isinstance(widget, QtWidgets.QDialog) and widget.isVisible():
+                widget.reject()
+
+    def operate_child():
+        try:
+            children = [
+                widget for widget in QtWidgets.QApplication.topLevelWidgets()
+                if isinstance(widget, module.SelectedProductionExportDialog)
+                and widget.isVisible()
+            ]
+            if len(children) != 1:
+                raise RuntimeError(
+                    "Main selected-export button opened {} children".format(
+                        len(children)
+                    )
+                )
+            child = children[0]
+            parent = parent_holder["dialog"]
+            if child.parent() is not parent or not child.isModal():
+                raise RuntimeError(
+                    "Main selected-export child lost modal parent ownership"
+                )
+            state["child_count"] += 1
+            state["child_title"] = str(child.windowTitle())
+            state["child_modal"] = bool(child.isModal())
+            state["child_parent_main"] = child.parent() is parent
+            state["result"] = exercise_selected_export(child)
+        except Exception:
+            state["error"] = traceback.format_exc()
+            reject_visible_dialogs()
+
+    def operate_parent():
+        try:
+            parents = [
+                widget for widget in QtWidgets.QApplication.topLevelWidgets()
+                if isinstance(widget, module.CurveInputDialog)
+                and widget.isVisible()
+            ]
+            if len(parents) != 1:
+                raise RuntimeError(
+                    "B16 workflow opened {} main dialogs".format(
+                        len(parents)
+                    )
+                )
+            parent = parents[0]
+            parent_holder["dialog"] = parent
+            state["parent_count"] += 1
+            button = parent.selected_export_button
+            if not button.isVisible() or not button.isEnabled():
+                raise RuntimeError("Main selected-export button is unavailable")
+            state["parent_title"] = str(parent.windowTitle())
+            state["button_text"] = str(button.text())
+            scroll = button.parent()
+            while (scroll is not None
+                   and not isinstance(scroll, QtWidgets.QScrollArea)):
+                scroll = scroll.parent()
+            if scroll is not None:
+                scroll.ensureWidgetVisible(button)
+            QtWidgets.QApplication.processEvents()
+            state["parent_visual"] = capture_widget(
+                parent, "xo-001-main-selected-export-panel.png"
+            )
+            state["main_visual"] = capture_widget(
+                button, "xo-001-main-selected-export-button.png"
+            )
+            if module.selected_export_selection_snapshot(
+                    document, reopened["set_id"]) != preselected_objects:
+                raise RuntimeError("Main dialog changed the admitted selection")
+            QtCore.QTimer.singleShot(0, operate_child)
+            state["button_clicks"] += 1
+            button.click()
+            parent.reject()
+        except Exception:
+            state["error"] = traceback.format_exc()
+            reject_visible_dialogs()
+
+    def timeout():
+        if state["result"] is None and state["error"] is None:
+            state["error"] = "Main selected-export route timed out"
+            reject_visible_dialogs()
+
+    deadline = QtCore.QTimer()
+    deadline.setSingleShot(True)
+    deadline.timeout.connect(timeout)
+    QtCore.QTimer.singleShot(0, operate_parent)
+    deadline.start(300000)
+    try:
+        _PHASE3_SESSION.launch_workflow()
+    finally:
+        deadline.stop()
+    if state["error"] is not None:
+        raise RuntimeError(state["error"])
+    if (state["parent_count"] != 1
+            or state["button_clicks"] != 1
+            or state["child_count"] != 1
+            or state["result"] is None):
+        raise RuntimeError("Main selected-export route was incomplete")
+    route = {
+        key: value for key, value in state.items()
+        if key not in {"result", "error"}
+    }
+    return {"route": route, "result": state["result"]}
+
+
 manager = module.TurnoutManagerDialog(document)
 manager.show()
 manager.mode_tabs.setCurrentIndex(1)
@@ -317,145 +630,77 @@ try:
     if outline is None:
         raise RuntimeError("The reopened integrated outline is absent")
     Gui.Selection.clearSelection()
-    if module.selected_export_selection_snapshot(
-            document, reopened["set_id"]):
+    if TRACKTEMPLATE_PHASE8_SELECTION_ROUTE == "preselected":
+        Gui.Selection.addSelection(outline)
+    preselected_objects = module.selected_export_selection_snapshot(
+        document, reopened["set_id"]
+    )
+    if TRACKTEMPLATE_PHASE8_SELECTION_ROUTE == "preselected":
+        if (len(preselected_objects) != 1
+                or preselected_objects[0].get("name") != outline_name
+                or outline_id not in preselected_objects[0].get("record_ids", [])
+                or preselected_objects[0].get("generated_role") != outline_role):
+            raise RuntimeError("The preselected outline lost its record identity")
+    elif preselected_objects:
         raise RuntimeError("The highlighted-row route needs no FreeCAD selection")
 
-    dialog = module.SelectedProductionExportDialog(document)
-    dialog.setModal(True)
-    dialog.show()
-    QtWidgets.QApplication.processEvents()
+    before_dialog = index_state(document)
+    probe_documents = []
+    original_create_probe = module._create_isolated_preflight_document
+    original_close_probe = module._close_isolated_preflight_document
+
+    def observe_create_probe():
+        probe_document = original_create_probe()
+        probe_documents.append({
+            "name": str(probe_document.Name),
+            "created": str(probe_document.Name) in App.listDocuments(),
+            "closed": False,
+        })
+        return probe_document
+
+    def observe_close_probe(probe_document, original_document_name=""):
+        name = str(probe_document.Name)
+        original_close_probe(probe_document, original_document_name)
+        entry = next(item for item in probe_documents if item["name"] == name)
+        entry["closed"] = name not in App.listDocuments()
+        entry["source_active"] = (
+            App.ActiveDocument is not None
+            and str(App.ActiveDocument.Name) == str(document.Name)
+        )
+
+    module._create_isolated_preflight_document = observe_create_probe
+    module._close_isolated_preflight_document = observe_close_probe
     try:
-        if dialog.current_set_id() != reopened["set_id"]:
-            raise RuntimeError("The selected export template set changed")
-        scope_index = dialog.scope_box.findText(
-            module.SELECTED_EXPORT_SCOPE_OBJECTS
-        )
-        if scope_index < 0:
-            raise RuntimeError("Selected FreeCAD objects scope is absent")
-        dialog._loading_export_controls = True
-        try:
-            dialog.scope_box.setCurrentIndex(scope_index)
-            dialog.output_box.setText(TRACKTEMPLATE_PHASE8_OUTPUT_DIR)
-            for key, box in dialog.format_boxes.items():
-                box.setChecked(key == module.EXPORT_FORMAT_SVG)
-            dialog.export_each_section_box.setChecked(True)
-            dialog.combined_box.setChecked(False)
-            dialog.manifest_box.setChecked(True)
-            dialog.overwrite_box.setChecked(False)
-            dialog.probe_box.setChecked(True)
-        finally:
-            dialog._loading_export_controls = False
-        dialog.refresh_preview()
-        if (dialog.scope.get("selected_objects")
-                or len(dialog.preview_records) != 7
-                or dialog.matching_records
-                or dialog.export_records
-                or dialog.plan
-                or [issue.get("issue_code") for issue in dialog.issues]
-                != ["NO_SELECTED_PRODUCTION_ITEMS"]):
-            raise RuntimeError("The highlighted-row candidate state changed")
-        id_column = module.SELECTED_EXPORT_RECORD_FIELDS.index(
-            "Production-record ID"
-        )
-        outline_rows = [
-            row for row in range(dialog.records_table.rowCount())
-            if (dialog.records_table.item(row, id_column) is not None
-                and dialog.records_table.item(row, id_column).text()
-                == outline_id)
-        ]
-        if len(outline_rows) != 1:
-            raise RuntimeError("The integrated outline row is not unique")
-        dialog.records_table.selectRow(outline_rows[0])
-        if dialog._highlighted_record_ids() != {outline_id}:
-            raise RuntimeError("The integrated outline row was not highlighted")
-        dialog.refresh_preview()
-        expanded_ids = {
-            str(record.get("record_id") or "")
-            for record in dialog.matching_records
-        }
-        if (len(expanded_ids) != 2
-                or outline_id not in expanded_ids
-                or {str(record.get("category") or "")
-                    for record in dialog.matching_records}
-                != {module.EXPORT_CATEGORY_SOLID,
-                    module.EXPORT_CATEGORY_CUTTING}
-                or {str(record.get("route_id") or "")
-                    for record in dialog.matching_records} != {"XO-001"}
-                or dialog._highlighted_record_ids() != expanded_ids):
-            raise RuntimeError("The highlighted outline representations changed")
-        dialog.refresh_preview()
-        if (dialog._highlighted_record_ids() != expanded_ids
-                or set(dialog.scope.get("highlighted_record_ids") or [])
-                != expanded_ids):
-            raise RuntimeError("The highlighted-row scope did not stabilise")
-        plan = dialog.plan or {}
-        tasks = list(plan.get("tasks") or [])
-        selected_ids = {
-            str(record.get("record_id") or "")
-            for record in dialog.export_records
-        }
-        blocking = module.preflight_blocking_report(dialog.issues)
-        issue_codes = [
-            str(issue.get("issue_code") or "") for issue in dialog.issues
-        ]
-        chair_issues = [
-            issue for issue in dialog.issues
-            if issue.get("issue_code")
-            == "CROSSOVER_CHAIR_VALIDATION_OUTSTANDING"
-        ]
-        if (selected_ids != {outline_id}
-                or len(dialog.matching_records) != 2
-                or len(tasks) != 1
-                or str(tasks[0].get("format") or "") != "svg"
-                or str(tasks[0].get("records", [{}])[0].get("record_id")
-                       or "") != outline_id
-                or not plan.get("manifest_path")
-                or blocking
-                or len(chair_issues) != 1
-                or chair_issues[0].get("severity") != "Warning"
-                or chair_issues[0].get("blocks_export") is not False
-                or dialog.export_button.text()
-                != "Export 2 highlighted rows"
-                or not dialog.export_button.isEnabled()):
-            raise RuntimeError("Selected export preflight changed: {}".format({
-                "ids": sorted(selected_ids),
-                "highlighted_ids": sorted(dialog._highlighted_record_ids()),
-                "tasks": len(tasks),
-                "issues": issue_codes,
-                "blocking": blocking,
-                "summary": dialog.summary_label.text(),
-            }))
-        preview = {
-            "scope": dialog.scope,
-            "highlighted_ids": sorted(dialog._highlighted_record_ids()),
-            "matching_record_ids": sorted(expanded_ids),
-            "record_ids": sorted(selected_ids),
-            "plan_paths": sorted(
-                [str(task.get("path") or "") for task in tasks]
-                + [str(plan.get("manifest_path"))]
-            ),
-            "issue_codes": issue_codes,
-            "issues": dialog.issues,
-            "summary": str(dialog.summary_label.text()),
-            "action": str(dialog.export_button.text()),
-            "visual": capture_widget(
-                dialog, "xo-001-selected-export-preflight.png"
-            ),
-        }
-        before_export = index_state(document)
-        dialogs = export_dialog_action(dialog)
-        after_export = index_state(document)
-        if (after_export["index"] != before_export["index"]
-                or after_export["config"] != before_export["config"]
-                or after_export["object_names"]
-                != before_export["object_names"]
-                or after_export["history"] != before_export["history"]):
-            raise RuntimeError("Selected export changed the copied document")
+        if TRACKTEMPLATE_PHASE8_ENTRYPOINT == "main-button":
+            main_result = run_main_button_export()
+            route = main_result["route"]
+            result = main_result["result"]
+        elif TRACKTEMPLATE_PHASE8_ENTRYPOINT == "direct":
+            dialog = module.SelectedProductionExportDialog(document)
+            dialog.setModal(True)
+            dialog.show()
+            QtWidgets.QApplication.processEvents()
+            result = exercise_selected_export(dialog)
+            route = {"entrypoint": "direct", "child_count": 1}
+        else:
+            raise RuntimeError("Unknown selected-export entrypoint")
     finally:
-        dialog.close()
-        Gui.Selection.clearSelection()
-        QtWidgets.QApplication.processEvents()
+        module._create_isolated_preflight_document = original_create_probe
+        module._close_isolated_preflight_document = original_close_probe
+    preview = result["preview"]
+    before_export = result["before_export"]
+    after_export = result["after_export"]
+    dialogs = result["dialogs"]
+    plan = result["plan"]
+    tasks = result["tasks"]
+    if (not probe_documents
+            or any(not item["created"] or not item["closed"]
+                   or not item.get("source_active")
+                   for item in probe_documents)
+            or set(App.listDocuments()) != {str(document.Name)}):
+        raise RuntimeError("Mandatory exporter probes did not run and close")
+    if after_export != before_dialog:
+        raise RuntimeError("Selected export or its preview changed the document")
 
     confirmation = dialogs["confirmations"][0]
     summary = dialogs["summaries"][0]
@@ -483,9 +728,16 @@ try:
         row for row in manifest
         if row.get("Export status") == "Skipped"
     ]
+    solid_records = [
+        record for record in records
+        if str(record.get("record_id") or "")
+        in preview["matching_record_ids"]
+        and record.get("category") == module.EXPORT_CATEGORY_SOLID
+    ]
     if (len(manifest) != 2
             or len(successful) != 1
             or len(skipped) != 1
+            or len(solid_records) != 1
             or successful[0].get("Generated object name") != outline_name
             or successful[0].get("Generated object role")
             != module.CROSSOVER_INTEGRATED_OUTLINE_ROLE
@@ -494,6 +746,12 @@ try:
             != reopened["set_id"]
             or successful[0].get("Export filename") != svg_path.name
             or successful[0].get("Full export path") != str(svg_path)
+            or skipped[0].get("Generated object name")
+            != solid_records[0].get("source_name")
+            or skipped[0].get("Generated object role")
+            != solid_records[0].get("role")
+            or skipped[0].get("Template-set identifier")
+            != reopened["set_id"]
             or "Successful files: 2" not in summary["information"]
             or "Failed files: 0" not in summary["information"]
             or "Formats produced: SVG" not in summary["information"]
@@ -534,12 +792,16 @@ try:
         "reopened_history": reopened["history"],
         "export_history_before": before_export["history"],
         "export_history_after": after_export["history"],
-        "selection_route": "highlighted paired production-record rows",
+        "selection_route": TRACKTEMPLATE_PHASE8_SELECTION_ROUTE,
+        "entrypoint": route,
+        "admitted_selection": preselected_objects,
+        "probe_documents": probe_documents,
         "preview": preview,
         "confirmation": confirmation,
         "summary": summary,
         "svg_bounds": bounds,
         "manifest_success": successful[0],
+        "manifest_skipped": skipped[0],
         "output_files": [str(svg_path), str(manifest_path)],
         "visuals": [integrated_visual, reopened_visual],
     }, sort_keys=True, default=lambda value: sorted(value)))
@@ -578,7 +840,7 @@ print(json.dumps({'closed': closed, 'remaining': remaining}, sort_keys=True))
 """))
 
 
-def _check_probe(probe):
+def _check_probe(probe, selection_route, entrypoint):
     if probe.get("sentinel") != PROBE_SENTINEL:
         raise RuntimeError("The GUI probe did not return its PASS sentinel")
     if (probe.get("matched_profile_id")
@@ -590,14 +852,33 @@ def _check_probe(probe):
             or probe.get("index_count_integrated") != 7
             or probe.get("preview", {}).get("record_ids")
             != [probe.get("outline_record_id")]
+            or probe.get("selection_route") != selection_route
+            or probe.get("entrypoint", {}).get("entrypoint") != entrypoint
+            or probe.get("preview", {}).get("mandatory_probes_enabled")
+            is not True
+            or not probe.get("probe_documents")
             or len(probe.get("output_files") or []) != 2):
         raise RuntimeError("The selected export GUI contract changed")
-    return [
+    if selection_route == "preselected" and (
+            len(probe.get("admitted_selection") or []) != 1
+            or probe["preview"].get("highlighted_ids")
+            or len(probe["preview"].get("refresh_checks") or []) != 6):
+        raise RuntimeError("The preselected export route was not exercised")
+    route = probe["entrypoint"]
+    if entrypoint == "main-button" and (
+            route.get("button_clicks") != 1
+            or route.get("child_modal") is not True
+            or route.get("child_parent_main") is not True):
+        raise RuntimeError("The main export button route was not exercised")
+    visuals = [
         *probe["visuals"],
         probe["preview"]["visual"],
         probe["confirmation"]["visual"],
         probe["summary"]["visual"],
     ]
+    if entrypoint == "main-button":
+        visuals.extend([route["parent_visual"], route["main_visual"]])
+    return visuals
 
 
 def main():
@@ -609,6 +890,13 @@ def main():
     )
     parser.add_argument("--port", type=int, default=PORT)
     parser.add_argument("--timeout", type=float, default=1200.0)
+    parser.add_argument(
+        "--selection-route", choices=("highlighted", "preselected"),
+        default="highlighted",
+    )
+    parser.add_argument(
+        "--entrypoint", choices=("direct", "main-button"), default="direct",
+    )
     args = parser.parse_args()
     if args.port != PORT:
         raise SystemExit("The isolated GUI proof requires port 19875")
@@ -634,7 +922,9 @@ def main():
     output_dir = run_dir / "private-development-output"
     shutil.copy2(base, document_path)
     state = {
-        "recipe_id": "phase8-b16-crossover-highlighted-export-gui-v1",
+        "recipe_id": "phase8-b16-crossover-selected-export-gui-v2",
+        "selection_route": args.selection_route,
+        "entrypoint": args.entrypoint,
         "started_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "source_fixture": str(base),
         "source_fixture_sha256": fixture_hash,
@@ -644,8 +934,8 @@ def main():
         "output_status": "Private development evidence only; no clearance",
         "scope": (
             "fixed curved XO-001, B16 host integration, copied reopen, "
-            "highlighted integrated cutting profile SVG and manifest"
-        ),
+            "{} integrated cutting profile SVG and manifest via {}"
+        ).format(args.selection_route, args.entrypoint),
     }
     client = FreeCADClient(
         host="127.0.0.1", port=PORT, timeout=30.0,
@@ -667,8 +957,7 @@ if App.listDocuments():
 document = App.openDocument({path!r})
 print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}, sort_keys=True))
 """.format(path=str(document_path))))
-        job = submit_and_wait(
-            client,
+        submitted_code = (
             "TRACKTEMPLATE_PHASE3_ROUTE = 'modular'\n"
             + "TRACKTEMPLATE_PHASE8_VISUAL_DIR = {!r}\n".format(
                 str(run_dir)
@@ -676,11 +965,34 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
             + "TRACKTEMPLATE_PHASE8_OUTPUT_DIR = {!r}\n".format(
                 str(output_dir)
             )
-            + LOADER.read_text(encoding="utf-8") + "\n" + GUI_PROBE,
+            + "TRACKTEMPLATE_PHASE8_SELECTION_ROUTE = {!r}\n".format(
+                args.selection_route
+            )
+            + "TRACKTEMPLATE_PHASE8_ENTRYPOINT = {!r}\n".format(
+                args.entrypoint
+            )
+            + LOADER.read_text(encoding="utf-8") + "\n" + GUI_PROBE
+        )
+        submitted_path = run_dir / "submitted-code.py"
+        submitted_path.write_text(submitted_code, encoding="utf-8")
+        state["submitted_code"] = {
+            "path": str(submitted_path), "sha256": sha256(submitted_path),
+        }
+        job = submit_and_wait(
+            client, submitted_code,
             "Phase 8 crossover selected export real GUI", args.timeout,
         )
+        raw_response = run_dir / "raw-response.json"
+        raw_response.write_text(
+            json.dumps(job, indent=2, sort_keys=True) + "\n", encoding="utf-8",
+        )
+        state["raw_response"] = {
+            "path": str(raw_response), "sha256": sha256(raw_response),
+        }
         state["probe"] = parse_json_output(job)
-        visuals = _check_probe(state["probe"])
+        visuals = _check_probe(
+            state["probe"], args.selection_route, args.entrypoint,
+        )
         state["visual_evidence"] = {
             pathlib.Path(path).name: {
                 "path": path,
