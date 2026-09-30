@@ -74,12 +74,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:37c4ae8f9ecff999b8549b60d749f838c0cd7024",
-      "accepted_sha256": "sha256:79a21aa75e0663d4bd1ccbadd8c15580f6da1e2bf9a4a8f11787f6eb7400429c",
+      "accepted_blob": "sha1:a82d255abbeb7f6e23712e3caeffe150eb007b1f",
+      "accepted_sha256": "sha256:8962506671a2cb08bb199a646b3c3c70b9dacb8c3257913e4e5da35f980cd719",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/PROJECT_PLAN.md",
-      "review_receipt": "sha256:49775a23e387f270a0fa4282deef26a1e398b121144e874df8bee21661b513ae",
+      "review_receipt": "sha256:723e6e6d4e6a52a9ae17d6d4a97b1c726956ca67766984b89689535b6f5908f3",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
@@ -416,21 +416,21 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:2f58a22b45f0b499fd54d6b38a1dfe27af268f20",
-      "accepted_sha256": "sha256:48785175d887ca9b9ba557009c47170a3047b1d113d32044a35405da7f4bad04",
+      "accepted_blob": "sha1:772a44d1139f5ecf3d9471cd8d025f2041db0b91",
+      "accepted_sha256": "sha256:96882c3daae25ff2a9670e1d40c2b1715d3bb0de230c0768a2f30abade9aa28b",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:9932972a35895a5e7c08a147af4f0e9dfc4160c30e60da3cb29d3c9ff8d57fff",
+      "review_receipt": "sha256:723e6e6d4e6a52a9ae17d6d4a97b1c726956ca67766984b89689535b6f5908f3",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:a1ae80a9986bc1c2537ba5489b6d634ad4a5fadb",
-      "accepted_sha256": "sha256:ff29e791dbe0f2fbcbde9eb87f4399e462bff599664656db3614e7f6c8d04a68",
+      "accepted_blob": "sha1:530de36d8d13af80d3be5eebc2b06a4d148ebbae",
+      "accepted_sha256": "sha256:204ad9f17d442d4d733c88b099b14f3c63e1055bd6c8a03d6d4b039da811f3a9",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/gate-decisions.json",
-      "review_receipt": "sha256:777934e55a2bd2b1d1ce8ff6a168a8353461859f2273c78fd0406330306fbe07",
+      "review_receipt": "sha256:723e6e6d4e6a52a9ae17d6d4a97b1c726956ca67766984b89689535b6f5908f3",
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
