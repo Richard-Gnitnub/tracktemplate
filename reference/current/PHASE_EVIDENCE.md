@@ -1163,47 +1163,54 @@ performance, selected export, production output, a Phase 8 exit or release.
 
 ## Phase 8 `XO-001` Edit on straight tracks — 2026-09-30
 
-This Level 2 result examines one `XO-001` on two straight tracks in copies of
-one B14 source file. The source SHA-256 is
+This Level 2 result examines one `XO-001` on 2 straight tracks. The checks
+used separate files with the same B14 source data. The source SHA-256 is
 `3b4fc9fd8131981a637a3fd50105b0f1d7e44f311eb51a7f03bf01239ad7a3b1`.
 The source file stayed unchanged.
 
-The qualified `FreeCADCmd` check changed the Host A toe chainage from
-580.134 mm to 580.135 mm. After the Edit, B14, B15 and B16 had equal crossover
-data, nine crossover objects, six exact BRep hashes and four ordered
-production record IDs. The comparison excluded only four frozen
-macro-version fields. B16 rejected an infeasible Edit without a document or
-`Undo` change. One `Undo` restored the previous data, `Redo` restored the
-changed data, and `save()` and `openDocument()` preserved the compared stored
-data and stable shape summaries. The result and required PASS sentinel are in
+The `FreeCADCmd` check used the qualified host profile. It changed the Host A
+toe chainage from 580.134 mm to 580.135 mm. After the `Edit`, B14, B15 and B16
+had equal crossover data, 9 crossover objects, 6 exact BRep hashes and 4 ordered
+values in `production_record_ids`. The comparison excluded only 4 frozen
+macro-version fields. B16 rejected an `Edit` that did not meet the minimum
+radius requirement. The document and `Undo` history did not change.
+
+After 1 `Undo`, the data was equal to the data before the `Edit`. After `Redo`,
+the data was equal to the changed data. The data and stable shape summaries
+stayed equal after `save()` and `openDocument()`. The result and required `PASS`
+sentinel are in
 `tmp/phase8-straight-crossover-edit-lifecycle/headless-final.log`.
 
-The qualified real-GUI check selected the stored `XO-001` in the crossover
-manager. It rejected an infeasible Edit preview and application without a
-document or `Undo` change. The accepted preview also kept the document
-unchanged. The Edit kept `XO-001` selected, kept four live production-record
-source bindings and added one `Undo` entry. `Undo`, `Redo` and save/reopen
-restored the compared states. The PASS receipt and 12 images are in
+The real-GUI check used the qualified host profile. It selected the stored
+`XO-001` in the crossover manager. The preview rejected an `Edit` that did not
+meet the minimum radius requirement. The test also requested the same `Edit` and got a rejection. Neither rejection changed the document or `Undo`
+history. The accepted preview also kept the document unchanged.
+
+The accepted `Edit` kept `XO-001` selected and kept 4 live entries in
+`source_bindings`. It added 1 `Undo` entry. The check got the expected data
+after `Undo`, `Redo` and save/reopen. The `PASS` receipt and 12 images are in
 `benchmark-output/freecad-bridge/phase8-straight-host-crossover-gui-runs/20260930T104018763675Z/`.
 
-The earlier failed straight Edit candidate remains in the
-`phase8-straight-crossover-edit-parity` worktree. A copied-fixture diagnostic
-showed that its headless `Undo` assertion failed only because FreeCAD listed
-the same 32 objects in a different order. Its four GUI FAIL receipts exposed
-test assumptions about generated names and object order, and one deleted
-object handle. The corrected checks retain identity, state and binding
-assertions. After a successful Edit, the GUI still shows `Editing XO-001` in
-Picked placement. The inherited B15 panel clears Edit mode and reports the
-update in its diagnostic, but it does not clear this label. This visible
-limit is `REQUIRED_BEFORE_EXIT` for Exit 2. No B14, B15 or B16 product source
-changed.
+The previous failed straight `Edit` candidate remains in the
+`phase8-straight-crossover-edit-parity` worktree. A fixture diagnostic showed
+that its headless `Undo` assertion failed only because FreeCAD listed the same
+32 objects in a different order. Its 4 GUI `FAIL` receipts showed incorrect
+test assumptions about FreeCAD object identities, object order and 1 deleted
+object handle. The corrected checks still examine identities, document data
+and `source_bindings` values.
+
+After an accepted `Edit`, the GUI still shows `Editing XO-001` in Picked
+placement. The inherited B15 panel clears `Edit` mode and reports the update
+in its diagnostic. It does not remove `Editing XO-001`. This visible limit is
+`REQUIRED_BEFORE_EXIT` for Exit 2. No B14, B15 or B16 product source changed.
 
 This result adds bounded evidence for Phase 8 Exits 2 and 3 and PR-17. It does
 not show selected export, host integration, other crossover inputs, complete
-Exit 2 coverage or product performance. All four exits stay Pending at 0/4.
+Exit 2 coverage or product performance. All 4 exits stay Pending at 0/4.
+
 PR-17 stays Critical, Open and Partial. D-P6-008 stays Deferred — unmet, and
-TERM-R04 stays open. Output stays private-development. This result gives no
-acceptance for a Phase 8 exit, production output or release.
+TERM-R04 stays open. Output keeps Private-development status. This result gives
+no acceptance for a Phase 8 exit, production output or release.
 
 ## Phase 8 exit conditions
 
