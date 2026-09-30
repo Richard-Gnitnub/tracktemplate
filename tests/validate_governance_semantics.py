@@ -1476,10 +1476,10 @@ def validate_phase8_exit4_admission_mutations() -> None:
     for name, before, after, clause in (
         (
             "runtime-limit-lost",
-            "These checks do not prove complete runtime\n"
-            "separation for inherited B15 presentation or persistence paths.",
-            "These checks prove complete runtime\n"
-            "separation for all inherited B15 presentation and persistence paths.",
+            "These checks do not prove complete runtime separation for "
+            "inherited B15\npresentation or persistence paths.",
+            "These checks prove complete runtime separation for "
+            "all inherited B15\npresentation and persistence paths.",
             "These checks do not prove complete runtime separation for inherited B15 "
             "presentation or persistence paths",
         ),
@@ -1494,30 +1494,33 @@ def validate_phase8_exit4_admission_mutations() -> None:
         ),
         (
             "removal-gates-lost",
-            "PR-10 and PR-18 retain their\nduplication and removal gates.",
-            "PR-10 and PR-18 waive their\nduplication and removal gates.",
-            "PR-10 and PR-18 retain their duplication and removal gates",
+            "The duplication and removal gates in\nPR-10 and PR-18 stay.",
+            "The duplication and removal gates in\nPR-10 and PR-18 end.",
+            "The duplication and removal gates in PR-10 and PR-18 stay",
         ),
         (
             "later-source-checks-lost",
-            "A later source change needs applicable separation\n"
-            "evidence before integration and its exit decision.",
-            "A later source change needs no separation\n"
-            "evidence before integration or its exit decision.",
-            "A later source change needs applicable separation evidence "
-            "before integration and its exit decision",
+            "The project must have applicable separation\nevidence before "
+            "it merges a source change or makes an exit decision.",
+            "The project needs no separation\nevidence before "
+            "it merges a source change or makes an exit decision.",
+            "The project must have applicable separation evidence before "
+            "it merges a source change or makes an exit decision",
         ),
         (
             "future-source-limit-lost",
-            "They do not\naccept a future source change without its own checks.",
-            "They now\naccept every future source change without its own checks.",
-            "They do not accept a future source change without its own checks",
+            "For each new source change, the\nimplementing agent must do "
+            "the applicable checks before acceptance.",
+            "For each new source change, the\nimplementing agent may skip "
+            "the applicable checks before acceptance.",
+            "For each new source change, the implementing agent must do "
+            "the applicable checks before acceptance",
         ),
         (
             "exit3-limits-lost",
-            "Exit 3 retains every\nrecorded comparison and GUI limit.",
-            "Exit 3 loses every\nrecorded comparison and GUI limit.",
-            "Exit 3 retains every recorded comparison and GUI limit",
+            "All recorded comparison and GUI limits\nfor Exit 3 stay.",
+            "All recorded comparison and GUI limits\nfor Exit 3 are lifted.",
+            "All recorded comparison and GUI limits for Exit 3 stay",
         ),
         (
             "private-output-limit-lost",

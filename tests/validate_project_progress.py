@@ -1094,16 +1094,17 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-021',
         'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Exits 1 and 2 need separate evidence and owner decisions',
+        'Separate evidence and owner decisions are necessary for Exits 1 and 2',
         'operator-controlled USB storage duty',
         'D-P8-002',
-        'retains Exit 3 acceptance and its comparison limits',
+        'records Exit 3 acceptance and its limits',
         'TERM-R04 stays open',
         'D-P8-003',
-        'records Exit 4 acceptance at `72649c5` against its unchanged criterion',
+        'records Exit 4 acceptance at `72649c5`',
+        'The Exit 4 condition stays the same',
         'accepts Exit 4 at `72649c5`',
         'Exits 1 and 2 stay Pending',
-        'Integrate the exact-green, independently accepted Exit 4 alignment through protected `main`',
+        'merge the Exit 4 alignment into protected `main`',
         'Then stop',
     ):
         _require(
@@ -4822,8 +4823,8 @@ def _validate_phase8_decision_opening(
         and exit4["decided_on"] == "2026-09-30"
         and exit4["status"] == "Accepted"
         and exit4["decision"]
-        == "Accept Phase 8 Exit 4 at protected main 72649c5 against its "
-        "unchanged criterion. Phase 8 is Open at 2/4."
+        == "Accept Phase 8 Exit 4 at protected main 72649c5. The Exit 4 "
+        "condition stays the same. Phase 8 is Open at 2/4."
         and exit4["evidence"] == exit4_panel
         and exit4["panel_record"] == exit4_panel
         and exit4["panel_required_under_current_policy"] is True,
@@ -4836,7 +4837,7 @@ def _validate_phase8_decision_opening(
         ),
         (
             "exclusions",
-            "12bd0e2699e27b47a9e2f0e6062ab915e733a898fe3d1ff532922853086f48f0",
+            "9e1434ed3f81ba336612cb20acdb46a83a75dd1f84442cb1f51c5d8f59746948",
         ),
     ):
         value = exit4[field]
@@ -4935,38 +4936,38 @@ def _validate_dp8_003_acceptance(evidence: str) -> None:
         "TrackTemplate.FCMacro",
         "The Phase 8 package changes are in the domain, application and "
         "compatibility layers",
-        "source search found no turnout, crossover, timber or B4 terms in "
-        "the modular presentation and FreeCAD adapter directories",
-        "41 modules, 61 import edges, no cycles, no prohibited layer edges "
-        "and no forbidden domain imports",
-        "independent read-only QA/risk reviewer",
+        "contain no turnout, crossover, timber or B4 terms",
+        "41 modules and 61 import edges",
+        "no cycles, no prohibited layer edges and no forbidden domain imports",
+        "independent QA/risk review by /root/exit4_audit",
         "all 24 live risks",
         "recommendation is Proceed with bounded conditions for Exit 4 only",
-        "All risk owners, deadlines, treatments and control effectiveness "
-        "stay unchanged",
+        "The risk owners, deadlines, treatments and control effectiveness "
+        "stay the same",
         "This decision closes no risk",
-        "The owners and deadlines in the risk register remain",
-        "Normal per-slice comparison, dependency and recovery checks remain "
-        "mandatory for later changes",
-        "A later source change needs applicable separation evidence before "
-        "integration and its exit decision",
+        "The risk register gives the owners and deadlines",
+        "Comparison, dependency and recovery checks are mandatory for each "
+        "new source change",
+        "The project must have applicable separation evidence before it "
+        "merges a source change or makes an exit decision",
         "These checks do not replace Exit 1 or Exit 2 evidence",
         "source and structure checks apply to the exact 72649c5 state",
         "Phase 8 compatibility modules still handle inherited turnout and "
         "crossover operations and FreeCAD document recovery",
-        "PR-10 and PR-18 retain their duplication and removal gates",
+        "The duplication and removal gates in PR-10 and PR-18 stay",
         "These checks do not prove complete runtime separation for inherited B15 "
         "presentation or persistence paths",
-        "They do not accept a future source change without its own checks",
-        "Exit 3 retains every recorded comparison and GUI limit",
+        "For each new source change, the implementing agent must do the "
+        "applicable checks before acceptance",
+        "All recorded comparison and GUI limits for Exit 3 stay",
         "D-P6-008 stays Deferred — unmet and mandatory before Phase 10 "
         "beta acceptance",
         "TERM-R04 stays open",
         "Output stays private-development and project status stays unknown",
         "Frozen B14/B15 identities, the inherited B15 host and the "
         "development-only comparison oracle stay",
-        "Every comparison, adapter, caller, removal and legacy-retirement "
-        "condition stays",
+        "All comparison, adapter, caller, removal and legacy-retirement "
+        "conditions stay",
         "This decision accepts no performance result, wider migration, "
         "production clearance, phase closure, release or legacy-path removal",
         "Stop after this alignment",
