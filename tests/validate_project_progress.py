@@ -1102,9 +1102,9 @@ def _validate_owner_view(plan: str) -> None:
         'The criterion and comparison limits stay unchanged',
         'accepts Exit 3 only',
         'TERM-R04 stays open',
-        'After the Exit 3 alignment is integrated, verify clean, synchronised protected `main`',
-        'If another exit is ready, present its bounded owner decision',
-        'Otherwise, identify the evidence gap and the work needed to close it',
+        'After Git merges the Exit 3 record changes, make sure that protected `main` is clean and synchronised',
+        'If another exit is ready, give its bounded owner decision',
+        'Otherwise, identify the missing evidence and the work necessary to supply it',
     ):
         _require(
             fragment in owner_view,
@@ -4800,7 +4800,7 @@ def _validate_phase8_decision_opening(
         ),
         (
             "exclusions",
-            "e58e28049977fbe11f9affef836998a18c786e9a9e4b3e7be14e4b64cca58c3e",
+            "b74ce8d108ebbbe15d50e5661eed68328ff080b088e2fda1045b62b92bc2d1fd",
         ),
     ):
         value = admission[field]
@@ -4835,35 +4835,37 @@ def _validate_dp8_002_acceptance(evidence: str) -> None:
         "f1926b6e9e123920076ed988f8baa3e8b8ce7b63",
         "Phase 8 is Open at 1/4",
         "Exits 1, 2 and 4 stay Pending",
-        "The fixtures are representative. They do not prove every host "
-        "or workflow",
-        "The straight TO-001 comparison does not establish cross-version "
-        "Edit parity",
-        "Historical GUI receipts support their recorded source states",
-        "Complete current-source GUI coverage for both curved workflows "
-        "remains absent",
-        "Wider persistence and runtime-profile coverage remain unproved",
-        "Stable save/reopen data does not prove raw shape-byte identity",
-        "The older curved B4 digest differences remain unattributed",
-        "excludes only performance_timings_ms and does not explain those "
-        "older differences",
-        "Raw GUI/headless output identity remains unproved",
-        "Compared geometry does not establish byte or style identity",
-        "All retained failures, diagnostics, deferred clearance findings "
-        "and non-production limits remain",
+        "The fixtures are representative. They give no evidence for every "
+        "host or workflow",
+        "The straight TO-001 comparison does not show equal Edit results "
+        "across versions",
+        "The earlier GUI receipts supply evidence for their recorded source "
+        "states",
+        "There is no complete GUI evidence for both curved workflows at the "
+        "current source state",
+        "The evidence does not show wider persistence or runtime-profile "
+        "coverage",
+        "Stable save/reopen data does not show raw shape-byte identity",
+        "The causes of the older curved B4 digest differences are unknown",
+        "comparison uses all data except performance_timings_ms. It does "
+        "not identify the causes of those older differences",
+        "The evidence does not show raw GUI/headless output identity",
+        "Compared geometry does not show byte or style identity",
+        "All recorded failures, diagnostics, deferred clearance findings "
+        "and non-production limits stay",
         "D-P6-008 stays Deferred — unmet and mandatory before Phase 10 "
         "beta acceptance",
         "TERM-R04 stays open",
         "Output stays private-development and project status stays unknown",
         "Frozen B14/B15 identities, the inherited B15 host and the "
-        "development-only comparison oracle remain",
+        "development-only comparison oracle stay",
         "Every comparison, adapter, caller, removal and legacy-retirement "
-        "condition remains",
+        "condition stays",
         "This decision accepts no performance result, wider migration, "
         "production clearance, phase closure or release",
         "All risk owners, deadlines, dispositions and control effectiveness "
-        "remain unchanged",
-        "Another exit needs its own bounded owner decision",
+        "stay unchanged",
+        "Another exit must have its own bounded owner decision",
     ):
         _require(clause in flat, "D-P8-002 bounded condition drifted: " + clause)
 

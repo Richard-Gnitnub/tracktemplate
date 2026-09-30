@@ -18,10 +18,10 @@ The owner accepted the independently reviewed
 | --- | --- |
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 1/4 under D-P8-002. Exit 3 is Evidenced and owner-accepted. Exits 1, 2 and 4 stay Pending. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
 | What changed | [D-P8-002](#phase-8-exit-3-admission-panel) records Exit 3 acceptance at `f1926b6`. The criterion and comparison limits stay unchanged. <br><br>The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. <br><br>D-GOV-022 authorises one `git worktree remove --force` operation only if its conditions pass. An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories. The 37 individual retirement audits gave PASS. Git removed 37 worktrees without `--force`. Git also deleted 36 branches whose tips the accepted commit contained. <br><br>PR #97 integrated D-GOV-022. A fresh six-root snapshot, restore test, individual audits and post-removal checks gave PASS. Git removed the two remaining D-GOV-022 worktrees without `--force`. The [preservation diff](#phase-8-worktree-retirement-result) records their retained branch tips. |
-| What now works | The [Exit 3 panel](#phase-8-exit-3-admission-panel) identifies the accepted representative comparisons for straight and curved `TO-001` and `XO-001` workflows. <br><br>The four Phase 7 exit decisions keep their accepted bounded evidence. The Phase 8 candidate passed development-only calculation, caller and real-GUI range tests. |
-| Limitations/findings | The [Exit 3 limits](#phase-8-exit-3-admission-panel) remain. TERM-R04 stays open. <br><br>All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. Five branches with unmerged commits and three related worktrees remain. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight prior branch refs, including both retired-worktree refs, remain.<br><br>The USB is safely unmounted. Physical removal and separate storage remain unverified. |
-| Owner decision | [D-P8-002](#phase-8-exit-3-admission-panel) accepts Exit 3 only. It authorises integration after independent acceptance and successful checks for the exact candidate. <br><br>D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | Integrate the Exit 3 alignment after independent acceptance and successful checks for the exact candidate. Verify clean, synchronised protected `main`. Then examine the next Phase 8 boundary. Present a bounded owner decision if another exit is ready. Otherwise, identify the evidence gap and the work needed to close it. |
+| What now works | The [Exit 3 panel](#phase-8-exit-3-admission-panel) identifies the accepted evidence for the straight and curved `TO-001` and `XO-001` workflows. <br><br>The four Phase 7 exit decisions keep their accepted bounded evidence. The Phase 8 candidate passed development-only calculation, caller and real-GUI range tests. |
+| Limitations/findings | The [Exit 3 limits](#phase-8-exit-3-admission-panel) stay. TERM-R04 stays open. <br><br>All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. Five branches with unmerged commits and three related worktrees remain. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight prior branch refs, including both retired-worktree refs, remain.<br><br>The USB is safely unmounted. Physical removal and separate storage remain unverified. |
+| Owner decision | [D-P8-002](#phase-8-exit-3-admission-panel) accepts Exit 3 only. It authorises a merge after independent acceptance and checks with PASS results for the exact candidate. <br><br>D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal. |
+| Next action | After independent acceptance and checks with PASS results for the exact candidate, merge the Exit 3 record changes. Make sure that protected `main` is clean and synchronised. Then examine the remaining Phase 8 exits. If another exit is ready, give its bounded owner decision. Otherwise, identify the missing evidence and the work necessary to supply it. |
 
 <a id="phase-8-exit-3-admission-panel"></a>
 
@@ -35,7 +35,7 @@ Exits 1, 2 and 4 stay Pending. The criterion stays unchanged:
 
 The decision covers the reviewed representative `TO-001` and `XO-001`
 comparisons on straight and curved hosts. This Level 3 change records the
-owner decision. It changes no product behaviour. Its governance work exceeds
+owner decision. It changes no product behaviour. Its governance work is more than the
 implementation work because it changes phase-exit authority.
 
 **Evidence reviewed:**
@@ -43,70 +43,71 @@ implementation work because it changes phase-exit authority.
 - [PR #120](https://github.com/Richard-Gnitnub/tracktemplate/pull/120)
   compares straight `TO-001` selected SVG and CSV output across B14, B15 and
   B16. Each version exports twice. All six compared results are equal after
-  the stated normalisation. The qualified GUI proof retains the existing
-  lifecycle checks and exercises the main export button.
+  the stated normalisation. The qualified GUI evidence keeps the existing
+  lifecycle checks and tests the main export button.
 - [PR #121](https://github.com/Richard-Gnitnub/tracktemplate/pull/121)
-  supplies the corresponding straight `XO-001` comparisons. It retains the
-  lifecycle checks and proves the highlighted-row GUI export route. The
-  incompatible solid stays skipped.
+  supplies the related straight `XO-001` comparisons. It keeps the
+  lifecycle checks and gives evidence for the highlighted-row GUI export route.
+  The export does not include the solid that is not compatible.
 - [PR #122](https://github.com/Richard-Gnitnub/tracktemplate/pull/122)
   compares Create, Edit, applicable `B4` results, stable geometry, identities,
   ordered production records and selected SVG/CSV routes for one curved
-  fixture. The qualified headless proofs pass. Each route exports twice per
-  version. The pull request records the prior GUI evidence and its limits.
+  fixture. The qualified headless checks give PASS results. Each route exports twice per
+  version. The pull request records the earlier GUI evidence and its limits.
 - The earlier [straight turnout](#phase-8-straight-alignment-turnout-result),
   [straight crossover](#phase-8-straight-host-crossover-result),
   [straight B4](#phase-8-straight-crossover-b4-result),
   [analysis comparison](#phase-8-straight-crossover-b4-analysis-result) and
-  [Edit evidence](#phase-8-straight-crossover-edit-result) retain their
+  [Edit evidence](#phase-8-straight-crossover-edit-result) keep their
   bounded results and failed evidence.
 
 **Panel:** Richard is the project owner and decision chair. The implementing
-agent presents the record alignment. The independent read-only QA/risk
+agent supplies the record changes. The independent read-only QA/risk
 reviewer `/root/admission_panel` examines the admission evidence and all 24
-live risks. The reviewer authors no maintained file. This is an agent-team
-review, not an external organisational review. Its recommendation is
+live risks. The reviewer authors no maintained file. Agents do this review. It is not a review by an external organisation. Its recommendation is
 **Proceed with bounded conditions** for Exit 3 only.
 
-PR-01 and QA-R03 retain incomplete GUI coverage. PR-17 stays Critical, Open
-and Partial. PR-09 retains private-development output. PR-10 and PR-18 keep
+PR-01 and QA-R03 keep incomplete GUI coverage. PR-17 stays Critical, Open
+and Partial. PR-09 keeps private-development output. PR-10 and PR-18 keep
 their comparison and removal conditions. PR-13 keeps its recovery duties.
+
 PR-15 and QA-R04 keep D-P6-008. PR-22 keeps independent review and owner
 acceptance. All risk owners, deadlines, dispositions and control effectiveness
-remain unchanged. No risk closure follows from this admission.
+stay unchanged. This decision closes no risk.
 
 **Limits and conditions:**
 
-- The fixtures are representative. They do not prove every host or workflow.
-  The straight `TO-001` comparison does not establish cross-version Edit
-  parity. Its GUI handing edit is a separate proof.
-- Historical GUI receipts support their recorded source states. PR #122
-  identifies four receipts with later source changes. Complete current-source
-  GUI coverage for both curved workflows remains absent.
-- Wider persistence and runtime-profile coverage remain unproved. Stable
-  save/reopen data does not prove raw shape-byte identity.
-- The older curved `B4` digest differences remain unattributed. The later
-  complete-data comparison excludes only `performance_timings_ms` and does
-  not explain those older differences.
-- Raw GUI/headless output identity remains unproved. The straight exports
-  retain different SVG stroke attributes and manifest filename digests.
-  Compared geometry does not establish byte or style identity.
-- All retained failures, diagnostics, deferred clearance findings and
-  non-production limits remain. Production readiness does not follow.
+- The fixtures are representative. They give no evidence for every host or workflow.
+  The straight `TO-001` comparison does not show equal Edit results across
+  versions. Its GUI handing edit supplies separate evidence.
+- The earlier GUI receipts supply evidence for their recorded source states. PR #122
+  identifies four receipts with later source changes. There is no complete GUI
+  evidence for both curved workflows at the current source state.
+- The evidence does not show wider persistence or runtime-profile coverage. Stable
+  save/reopen data does not show raw shape-byte identity.
+- The causes of the older curved `B4` digest differences are unknown. The later
+  comparison uses all data except `performance_timings_ms`. It does not
+  identify the causes of those older differences.
+- The evidence does not show raw GUI/headless output identity. The straight exports
+  keep different SVG stroke attributes and manifest filename digests.
+  Compared geometry does not show byte or style identity.
+- All recorded failures, diagnostics, deferred clearance findings and
+  non-production limits stay. The evidence does not show that the product
+  is ready for production.
 
 D-P6-008 stays Deferred — unmet and mandatory before Phase 10 beta acceptance.
 TERM-R04 stays open. Output stays private-development and project status stays
 `unknown`. Frozen B14/B15 identities, the inherited B15 host and the
-development-only comparison oracle remain. Every comparison, adapter, caller,
-removal and legacy-retirement condition remains. This decision accepts no
+development-only comparison oracle stay. Every comparison, adapter, caller,
+removal and legacy-retirement condition stays. This decision accepts no
 performance result, wider migration, production clearance, phase closure or
 release.
 
-The dated entries below retain their original status at each evidence boundary.
-The earlier `Editing XO-001` finding does not remain an unresolved product
+The dated entries below keep their original status at each evidence boundary.
+The earlier `Editing XO-001` finding is not an unresolved product
 change: [PR #118](https://github.com/Richard-Gnitnub/tracktemplate/pull/118)
 contains its independently reviewed correction and straight and curved GUI
-proof. That correction alone does not accept Exit 2.
+evidence. That correction alone does not accept Exit 2.
 
 **Exact owner instruction — 2026-09-30:**
 
@@ -124,12 +125,13 @@ proof. That correction alone does not accept Exit 2.
 >
 > If another exit is already admission-ready, bring me only its bounded owner decision. If a genuine evidence gap remains, identify gap and work needed to close it.
 
-**Resulting authority:** Integrate only the independently accepted candidate
-with successful checks for its exact head through protected `main`. Then
-verify that `main` is clean and synchronised. Examine the next Phase 8 boundary
-without repeating sufficient Exit 3 evidence. Another exit needs its own
-bounded owner decision. A remaining evidence gap needs an identified work
-item and its applicable validation.
+**Resulting authority:** If checks give PASS results for its exact HEAD, merge
+the independently accepted candidate through protected `main`. Then make sure
+that `main` is clean and synchronised. Examine the remaining Phase 8 exits.
+Do not repeat tests that already supply sufficient Exit 3 evidence.
+
+Another exit must have its own bounded owner decision. For missing evidence,
+identify the work item and its applicable validation.
 
 <a id="phase-8-opening-panel"></a>
 

@@ -1348,39 +1348,44 @@ def validate_phase8_exit3_admission_mutations() -> None:
             "representative-limit-lost",
             "The fixtures are representative.",
             "The fixtures cover every workflow.",
-            "The fixtures are representative. They do not prove every host "
-            "or workflow",
+            "The fixtures are representative. They give no evidence for every "
+            "host or workflow",
         ),
         (
             "straight-edit-limit-lost",
-            "does not establish cross-version Edit",
-            "establishes cross-version Edit",
-            "The straight TO-001 comparison does not establish cross-version "
-            "Edit parity",
+            "does not show equal Edit results across",
+            "shows equal Edit results across",
+            "The straight TO-001 comparison does not show equal Edit results "
+            "across versions",
         ),
         (
             "historical-gui-limit-lost",
-            "Historical GUI receipts support their recorded source states.",
-            "Historical GUI receipts support all future source states.",
-            "Historical GUI receipts support their recorded source states",
+            "The earlier GUI receipts supply evidence for their recorded "
+            "source states.",
+            "The earlier GUI receipts supply evidence for all future "
+            "source states.",
+            "The earlier GUI receipts supply evidence for their recorded "
+            "source states",
         ),
         (
             "persistence-profile-limit-lost",
-            "Wider persistence and runtime-profile coverage remain unproved.",
-            "All persistence and runtime-profile coverage is proved.",
-            "Wider persistence and runtime-profile coverage remain unproved",
+            "The evidence does not show wider persistence or runtime-profile "
+            "coverage.",
+            "The evidence shows all persistence and runtime-profile coverage.",
+            "The evidence does not show wider persistence or runtime-profile "
+            "coverage",
         ),
         (
             "older-digest-limit-lost",
-            "digest differences remain unattributed.",
+            "digest differences are unknown.",
             "digest differences are fully explained.",
-            "The older curved B4 digest differences remain unattributed",
+            "The causes of the older curved B4 digest differences are unknown",
         ),
         (
             "raw-output-identity-limit-lost",
-            "Raw GUI/headless output identity remains unproved.",
-            "Raw GUI/headless output identity is proved.",
-            "Raw GUI/headless output identity remains unproved",
+            "The evidence does not show raw GUI/headless output identity.",
+            "The evidence shows raw GUI/headless output identity.",
+            "The evidence does not show raw GUI/headless output identity",
         ),
     ):
         mutated = replace_once(
