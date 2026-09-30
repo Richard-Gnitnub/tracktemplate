@@ -23,49 +23,70 @@ The owner accepted the independently reviewed
 | Owner decision | [D-P8-004](#phase-8-exit-1-acceptance-panel) accepts Exit 1 at `44eb4bf`. The owner's instructions from this session authorise the implementing agent to merge the record changes. Acceptance from an independent reviewer is necessary. Checks for the exact candidate must give PASS. D-P8-002 and D-P8-003 keep their accepted scope and conditions. <br><br>D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal. |
 | Next action | Get acceptance from an independent reviewer. Make sure that checks for the exact candidate give PASS. Then merge the Exit 1 record changes into protected `main`. Make sure that `main` is clean and synchronised. <br><br>Then identify the missing Exit 2 evidence. Identify the work necessary to supply it. Exit 2 needs separate evidence and an owner decision. |
 
-## Phase 8 export after object selection — 2026-09-30
+## Phase 8 output after object selection — 2026-09-30
 
-This Level 2 repair supports Exit 2. Phase 8 stays Open at 3/4.
-Exit 2 stays Pending. The exit condition stays unchanged.
+This Level 2 repair adds evidence for Exit 2. Phase 8 stays Open at 3/4.
+Exit 2 stays Pending. The exit condition stays the same.
 
-The earlier current-source test reproduced `NO_SELECTED_PRODUCTION_ITEMS`
-after a mandatory export probe cleared the live FreeCAD selection.
-Independent review classified this failure as a pre-existing
-`implementation-defect`. The failed evidence stays in receipt
+The test before this repair gave `NO_SELECTED_PRODUCTION_ITEMS` after
+mandatory `probe_2d_export_bounds` removed the selection from `Gui.Selection`.
+An independent reviewer classified this failure as an `implementation-defect`
+that was present before this cycle. The evidence for that failure has SHA-256
 `0144af537da4ec200c21a51eaf4ffb9a4e63963302380f10a699ad2b00de803e`.
-The new standalone regression failed before the repair and passed after it.
+The new regression test in standalone Python gave `FAIL` before the repair
+and `PASS` after it.
 
-The B16 compatibility layer now keeps the opening selection separately for
-each template set in the export dialog. The dialog keeps this selection through
-subsequent previews and export. The mandatory probes stay enabled. The
-inherited scope controls, highlighted-row route, export checks and warnings stay.
-Focused tests cover empty selection, separate dialogs, changes to nested data,
-multiple template sets, binding rejection and rollback. The existing export
-and inherited-workflow validators pass. The dependency checks pass.
+B16 now keeps the initial selection for each `TemplateSetID` in
+`SelectedProductionExportDialog`. This selection stays during subsequent
+`refresh_preview` and `run_production_export` operations. The mandatory
+`probe_2d_export_bounds` operations stay active. The repair preserves the B15
+`scope_box` operations and the route that uses `_highlighted_record_ids`.
+The `run_production_preflight` checks and `issues` stay the same.
 
-The qualified GUI test opens the dialog through the main export button.
-It uses one copied curved `XO-001` fixture. Six preview checks retain the
-selected object without highlighted rows. Ten temporary probes complete and
-close their documents. Export produces the intended SVG and CSV manifest.
-The test verifies the production-record identities, output bounds and scale.
-Configuration, production records, document objects and transaction history
-stay unchanged. The expected chair warning and incompatible solid skip stay.
+Regression tests examine empty selection, different
+`SelectedProductionExportDialog` objects, changes to `record_ids` in
+`selected_objects`, and more than one `TemplateSetID`.
+The tests also examine how the software rejects incorrect sources and
+preserves the initial software after a failure.
+The `validate_phase7_core_layout_export.py` and
+`validate_phase3_transition_workflows.py` validators give `PASS` results.
+The dependency-direction checks give `PASS` results.
 
-The profile is `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2`.
-The local receipt is
+The FreeCAD test operates `CurveInputDialog.selected_export_button` in the
+FreeCAD display. That operation starts `SelectedProductionExportDialog`.
+The test uses a copy of one `XO-001` fixture with a curve.
+Six `refresh_preview` checks keep the selected object with `highlighted_ids`
+empty. Ten mandatory `probe_2d_export_bounds` operations complete.
+All ten `probe_documents` items have `"closed": true`.
+
+The operation gives the specified `SVG` output and `CSV` manifest.
+The test examines the `record_ids` and uses `validate_svg_export_bounds`
+and `validate_svg_millimetre_scale`.
+The `index`, `config`, `object_names` and `history` data stay the same.
+The `CROSSOVER_CHAIR_VALIDATION_OUTSTANDING` diagnostic and the
+`manifest_skipped` result for `EXPORT_CATEGORY_SOLID` stay.
+
+The qualified host profile is
+`linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2`.
+The local evidence is
 `phase8-crossover-selected-export-gui-runs/20260930T215305158846Z/run.json`,
 SHA-256 `e41a0df427edba16fbc1da939122a72563f5d7ec3dff10edde67cf8322f2567f`.
-It records source and output identities, screenshots and empty final document
-state. The submitted code and raw GUI response stay with this receipt.
+This file contains source and output identities and `visual_evidence`.
+Its `cleanup` data contain `"remaining": []`.
+The `submitted-code.py` and `raw-response.json` files stay with this evidence.
 
 The [Exit 1](#phase-8-exit-1-acceptance-panel),
 [Exit 3](#phase-8-exit-3-admission-panel) and
 [Exit 4](#phase-8-exit-4-admission-panel) limitations and conditions stay.
-This repair does not restore visible viewport selection. Selection across
-documents remains unqualified. Frozen B14/B15 sources stay unchanged.
-D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays
-private-development and project status stays `unknown`. This evidence accepts
-no exit, phase closure, performance result, output clearance or legacy removal.
+This repair does not put the initial selection back in `Gui.Selection`.
+Selection of objects with different `Document` values is outside this evidence.
+The repair preserves the B14/B15 source files.
+
+D-P6-008 stays Deferred — unmet. TERM-R04 stays open.
+The output keeps its private-development status. Project status stays `unknown`.
+These results give no acceptance for a phase exit, product performance or
+production output. They do not complete Phase 8 or authorise removal of a
+product route.
 
 <a id="phase-8-exit-1-acceptance-panel"></a>
 
