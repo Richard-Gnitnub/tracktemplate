@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove one B16 straight-host crossover lifecycle in the real FreeCAD GUI."""
+"""Prove B16 straight-host crossover creation and edit in the real GUI."""
 
 import argparse
 import datetime
@@ -50,6 +50,9 @@ from tools.freecad_bridge.ordinary_track_recipe import (
     ordinary_track_document_snapshot,
     shape_summary,
 )
+from tracktemplate.compatibility.crossover_preflight import (
+    CrossoverPreflightAdapter,
+)
 
 
 module = _PHASE3_SESSION.module
@@ -61,6 +64,12 @@ if str(module.MACRO_VERSION_NUMBER) != "10.2A8A7B15":
     raise RuntimeError("The inherited B15 host version changed")
 if routing.get("route") != "modular" or routing.get("schema_version") != 16:
     raise RuntimeError("The B16 product route is not active")
+edit_binding = getattr(module.edit_rea_c10_crossover, "__self__", None)
+if (not isinstance(edit_binding, CrossoverPreflightAdapter)
+        or edit_binding.module is not module
+        or getattr(module.edit_rea_c10_crossover, "__func__", None)
+        is not CrossoverPreflightAdapter.edit):
+    raise RuntimeError("The GUI edit action is not routed through B16")
 
 
 def history(active_document):
@@ -84,10 +93,88 @@ def state(active_document):
     }
 
 
-def same_document(actual, expected, label):
+def same_document(actual, expected, label, object_order=True):
     for key in ("semantic_sha256", "semantic", "object_names", "configs"):
-        if actual[key] != expected[key]:
+        if key == "object_names" and not object_order:
+            changed = set(actual[key]) != set(expected[key])
+        else:
+            changed = actual[key] != expected[key]
+        if changed:
             raise RuntimeError("{} changed copied document {}".format(label, key))
+
+
+def crossover_integrity(active_document, snapshot, expected_roles,
+                        geometry_roles, expected_record_ids=None):
+    """Check XO-001 roles, shapes, records and live source bindings."""
+    objects = [
+        obj for obj in active_document.Objects
+        if module.object_string_property(
+            obj, module.CROSSOVER_ID_PROPERTY, ""
+        ) == "XO-001"
+    ]
+    by_role = {
+        module.object_string_property(obj, "GeneratedRole", ""): obj
+        for obj in objects
+    }
+    if len(objects) != 9 or set(by_role) != expected_roles:
+        raise RuntimeError("The live XO-001 object roles changed")
+    group = by_role[module.CROSSOVER_GROUP_ROLE]
+    members = list(group.Group)
+    if (len(members) != 8
+            or {
+                module.object_string_property(obj, "GeneratedRole", "")
+                for obj in members
+            } != expected_roles - {module.CROSSOVER_GROUP_ROLE}):
+        raise RuntimeError("The live XO-001 group membership changed")
+    shapes = {
+        role: shape_summary(by_role[role].Shape)
+        for role in geometry_roles
+    }
+    if any(
+        item["is_null"] or not item["is_valid"] or item["edges"] <= 0
+        for item in shapes.values()
+    ):
+        raise RuntimeError("The live XO-001 geometry shapes changed")
+
+    records = snapshot["semantic"]["persistence"]["settings"][
+        "values"
+    ]["ProductionRecordIndexJSON"]["records"]
+    crossover_records = [
+        item for item in records if "|XO-001|" in item["record_id"]
+    ]
+    record_ids = [item["record_id"] for item in crossover_records]
+    if (len(crossover_records) != 4
+            or len(set(record_ids)) != 4
+            or (expected_record_ids is not None
+                and record_ids != expected_record_ids)
+            or {item["role"] for item in crossover_records}
+            != {
+                module.CROSSOVER_TEMPLATE_ROLE,
+                module.CROSSOVER_OUTLINE_ROLE,
+                module.CROSSOVER_RAIL_ROLE,
+                module.CROSSOVER_DATUM_ROLE,
+            }):
+        raise RuntimeError("The live XO-001 production record IDs changed")
+    for record in crossover_records:
+        source = active_document.getObject(record["source_name"])
+        if (source is None
+                or str(source.Name) != str(by_role[record["role"]].Name)
+                or module.object_string_property(
+                    source, module.CROSSOVER_ID_PROPERTY, ""
+                ) != "XO-001"):
+            raise RuntimeError(
+                "XO-001 production record lost its live source binding"
+            )
+    return {
+        "object_names": sorted(str(obj.Name) for obj in objects),
+        "roles": sorted(by_role),
+        "shapes": shapes,
+        "record_ids": record_ids,
+        "source_bindings": {
+            item["record_id"]: item["source_name"]
+            for item in crossover_records
+        },
+    }
 
 
 def choose(combo, value):
@@ -349,6 +436,8 @@ try:
                 for item in crossover_records
             )):
         raise RuntimeError("The straight-host production records changed")
+    created_object_names = sorted(str(obj.Name) for obj in crossover_objects)
+    created_record_ids = [item["record_id"] for item in crossover_records]
     if (len(created["object_names"]) != 32
             or created["history"]["undo_count"] != 1
             or created["history"]["redo_count"] != 0):
@@ -387,6 +476,200 @@ try:
     reopened_visual = capture_top(
         "straight-host-reopened-top-view.png", panel_open=False
     )
+    reopened_integrity = crossover_integrity(
+        document, reopened, expected_roles, geometry_roles,
+        expected_record_ids=created_record_ids,
+    )
+
+    manager = module.TurnoutManagerDialog(document)
+    manager.show()
+    manager.mode_tabs.setCurrentIndex(1)
+    QtWidgets.QApplication.processEvents()
+    panel = manager.crossover_panel
+    panel.refresh_crossovers("XO-001")
+    selected_config = panel.current_config()
+    if (selected_config is None
+            or selected_config.get("crossover_id") != "XO-001"
+            or selected_config != reopened["configs"][0]):
+        raise RuntimeError("The reopened GUI did not select stored XO-001")
+    panel.begin_crossover_edit()
+    if panel.editing_crossover_id != "XO-001":
+        raise RuntimeError("The GUI did not enter XO-001 edit mode")
+    panel.chainage_box.setValue(580.135)
+    if abs(float(panel.chainage_box.value()) - 580.135) > 1.0e-9:
+        raise RuntimeError("The GUI did not retain the edited toe")
+
+    panel.minimum_radius_box.setValue(100000.0)
+    rejected_edit_preview = panel.preview_geometry()
+    edit_rejection = str(panel.diagnostics.toPlainText())
+    if rejected_edit_preview is not None or "REJECTED" not in edit_rejection:
+        raise RuntimeError("The impossible-radius edit preview was accepted")
+    edit_rejected = state(document)
+    same_document(edit_rejected, reopened, "Rejected crossover edit preview")
+    if edit_rejected["history"] != reopened["history"]:
+        raise RuntimeError("Rejected edit preview changed Undo/Redo history")
+    edit_rejected_visual = capture_panel(
+        "straight-host-edit-rejected-preview.png"
+    )
+    panel.create_crossover()
+    rejected_edit_create = state(document)
+    same_document(
+        rejected_edit_create, reopened, "Rejected crossover edit apply"
+    )
+    if rejected_edit_create["history"] != reopened["history"]:
+        raise RuntimeError("Rejected edit apply changed Undo/Redo history")
+
+    panel.minimum_radius_box.setValue(600.0)
+    edit_preview = panel.preview_geometry()
+    if edit_preview is None:
+        raise RuntimeError(
+            "The straight-host GUI edit preview was rejected: {}".format(
+                panel.diagnostics.toPlainText()
+            )
+        )
+    edit_preflight = dict(
+        edit_preview.get("complete_radius_preflight") or {}
+    )
+    if (abs(float(edit_preview.get("toe_chainage_a") or 0)
+            - 580.135) > 1.0e-9
+            or edit_preflight.get("accepted") is not True
+            or len(str(edit_preflight.get("input_signature") or "")) != 64
+            or float(edit_preflight.get(
+                "complete_minimum_radius_mm") or 0
+            ) < 600):
+        raise RuntimeError("Straight-host edit preview lost its radius decision")
+    edit_previewed = state(document)
+    same_document(edit_previewed, reopened, "Crossover edit preview")
+    if edit_previewed["history"] != reopened["history"]:
+        raise RuntimeError("Crossover edit preview changed Undo/Redo history")
+    edit_preview_visual = capture_panel(
+        "straight-host-edit-accepted-preview.png"
+    )
+
+    edit_confirmation = confirm_create(panel.create_crossover)
+    panel.refresh_crossovers("XO-001")
+    edited_config = panel.current_config()
+    edited = state(document)
+    if (edited_config is None
+            or edited_config.get("crossover_id") != "XO-001"
+            or edited_config != edited["configs"][0]
+            or int(edited_config.get("edit_revision") or 0) != 1
+            or abs(float(edited_config.get("toe_chainage_a") or 0)
+                   - 580.135) > 1.0e-9):
+        raise RuntimeError("The GUI did not retain the XO-001 edit identity")
+    preserved_config_keys = (
+        "crossover_id", "template_set_id", "host_a_object",
+        "host_b_object", "arrangement", "handing", "track_gauge",
+        "flangeway", "minimum_requested_radius", "turnout_a_id",
+        "turnout_b_id", "production_ready", "host_integration_allowed",
+    )
+    if any(
+        edited_config.get(key) != config.get(key)
+        for key in preserved_config_keys
+    ):
+        raise RuntimeError("The edit changed a preserved XO-001 config field")
+    if (len(edited["object_names"]) != 32
+            or not set(before["object_names"]).issubset(
+                edited["object_names"]
+            )
+            or len(edited["configs"]) != 1
+            or edited["semantic_sha256"] == reopened["semantic_sha256"]
+            or edited["history"]["undo_count"] != 1
+            or edited["history"]["redo_count"] != 0):
+        raise RuntimeError("GUI edit changed hosts, state or Undo unit")
+    edited_integrity = crossover_integrity(
+        document, edited, expected_roles, geometry_roles,
+        expected_record_ids=created_record_ids,
+    )
+    edited_records = edited["semantic"]["persistence"]["settings"][
+        "values"
+    ]["ProductionRecordIndexJSON"]["records"]
+    if (len(edited_records) != 16
+            or [
+                item for item in edited_records
+                if "|XO-001|" not in item["record_id"]
+            ] != [
+                item for item in created_records
+                if "|XO-001|" not in item["record_id"]
+            ]):
+        raise RuntimeError("The edit changed unrelated production records")
+    edited_visuals = [
+        capture_panel("straight-host-edited-panel.png"),
+        capture_top("straight-host-edited-top-view.png"),
+    ]
+
+    document.undo()
+    document.recompute()
+    edit_undone = state(document)
+    same_document(
+        edit_undone, reopened, "Crossover edit Undo", object_order=False
+    )
+    if (edit_undone["history"]["undo_count"] != 0
+            or edit_undone["history"]["redo_count"] != 1):
+        raise RuntimeError("Crossover edit Undo changed history")
+    undo_integrity = crossover_integrity(
+        document, edit_undone, expected_roles, geometry_roles,
+        expected_record_ids=created_record_ids,
+    )
+    panel.refresh_crossovers("XO-001")
+    undo_config = panel.current_config()
+    if (undo_config is None
+            or undo_config.get("crossover_id") != "XO-001"
+            or undo_config != reopened["configs"][0]):
+        raise RuntimeError("Crossover edit Undo lost XO-001 selection")
+    edit_undo_visual = capture_top(
+        "straight-host-edit-undone-top-view.png"
+    )
+
+    document.redo()
+    document.recompute()
+    edit_redone = state(document)
+    same_document(
+        edit_redone, edited, "Crossover edit Redo", object_order=False
+    )
+    if (edit_redone["history"]["undo_count"] != 1
+            or edit_redone["history"]["redo_count"] != 0):
+        raise RuntimeError("Crossover edit Redo changed history")
+    redo_integrity = crossover_integrity(
+        document, edit_redone, expected_roles, geometry_roles,
+        expected_record_ids=created_record_ids,
+    )
+    panel.refresh_crossovers("XO-001")
+    redo_config = panel.current_config()
+    if (redo_config is None
+            or redo_config.get("crossover_id") != "XO-001"
+            or redo_config != edited_config):
+        raise RuntimeError("Crossover edit Redo lost XO-001 selection")
+    edit_redo_visual = capture_top(
+        "straight-host-edit-redone-top-view.png"
+    )
+
+    manager.close()
+    QtWidgets.QApplication.processEvents()
+    before_edit_save = state(document)
+    same_document(
+        before_edit_save, edited, "Closing edited crossover panel",
+        object_order=False,
+    )
+    document.save()
+    edited_saved_path = str(document.FileName)
+    App.closeDocument(str(document.Name))
+    document = App.openDocument(edited_saved_path)
+    edit_reopened = state(document)
+    same_document(
+        edit_reopened, edited, "Edited copied FCStd save/reopen",
+        object_order=False,
+    )
+    if (edit_reopened["history"]["undo_count"] != 0
+            or edit_reopened["history"]["redo_count"] != 0):
+        raise RuntimeError("The edited reopened document retained history")
+    edit_reopened_integrity = crossover_integrity(
+        document, edit_reopened, expected_roles, geometry_roles,
+        expected_record_ids=created_record_ids,
+    )
+    edit_reopened_visual = capture_top(
+        "straight-host-edited-reopened-top-view.png", panel_open=False
+    )
 
     print(json.dumps({
         "sentinel": "PHASE8_STRAIGHT_HOST_CROSSOVER_GUI_PROBE_PASS",
@@ -414,6 +697,7 @@ try:
                 config["minimum_resulting_radius"]
             ),
             "object_count": len(created["object_names"]),
+            "crossover_object_names": created_object_names,
             "crossover_roles": sorted(crossover_roles),
             "geometry_shapes": geometry_shapes,
             "production_record_count": len(created_records),
@@ -441,8 +725,65 @@ try:
             "path": saved_path,
             "object_count": len(reopened["object_names"]),
             "semantic_sha256": reopened["semantic_sha256"],
+            "source_bindings": reopened_integrity["source_bindings"],
             "history": reopened["history"],
             "visual": reopened_visual,
+        },
+        "edit_rejection": {
+            "diagnostic": edit_rejection,
+            "state_unchanged": True,
+            "history": rejected_edit_create["history"],
+            "visual": edit_rejected_visual,
+        },
+        "edit_preview": {
+            "toe_chainage_a_mm": float(edit_preview["toe_chainage_a"]),
+            "preflight": edit_preflight,
+            "state_unchanged": True,
+            "history": edit_previewed["history"],
+            "visual": edit_preview_visual,
+        },
+        "edit": {
+            "selected_crossover_id": edited_config["crossover_id"],
+            "toe_chainage_a_mm": float(edited_config["toe_chainage_a"]),
+            "edit_revision": int(edited_config["edit_revision"]),
+            "object_count": len(edited["object_names"]),
+            "crossover_object_names": edited_integrity["object_names"],
+            "crossover_roles": edited_integrity["roles"],
+            "geometry_shapes": edited_integrity["shapes"],
+            "production_record_count": len(edited_records),
+            "crossover_production_record_ids": edited_integrity[
+                "record_ids"
+            ],
+            "source_bindings": edited_integrity["source_bindings"],
+            "semantic_sha256": edited["semantic_sha256"],
+            "config": edited_config,
+            "history": edited["history"],
+            "confirmation": edit_confirmation,
+            "visuals": edited_visuals,
+        },
+        "edit_undo": {
+            "selected_crossover_id": undo_config["crossover_id"],
+            "object_count": len(edit_undone["object_names"]),
+            "semantic_sha256": edit_undone["semantic_sha256"],
+            "source_bindings": undo_integrity["source_bindings"],
+            "history": edit_undone["history"],
+            "visual": edit_undo_visual,
+        },
+        "edit_redo": {
+            "selected_crossover_id": redo_config["crossover_id"],
+            "object_count": len(edit_redone["object_names"]),
+            "semantic_sha256": edit_redone["semantic_sha256"],
+            "source_bindings": redo_integrity["source_bindings"],
+            "history": edit_redone["history"],
+            "visual": edit_redo_visual,
+        },
+        "edit_save_reopen": {
+            "path": edited_saved_path,
+            "object_count": len(edit_reopened["object_names"]),
+            "semantic_sha256": edit_reopened["semantic_sha256"],
+            "source_bindings": edit_reopened_integrity["source_bindings"],
+            "history": edit_reopened["history"],
+            "visual": edit_reopened_visual,
         },
     }, sort_keys=True))
 finally:
@@ -506,10 +847,49 @@ def _check_probe(probe):
             or probe["save_reopen"]["semantic_sha256"]
             != probe["creation"]["semantic_sha256"]):
         raise RuntimeError("The GUI transaction or persistence proof changed")
+    if (probe["edit_rejection"]["state_unchanged"] is not True
+            or probe["edit_preview"]["state_unchanged"] is not True
+            or abs(probe["edit_preview"]["toe_chainage_a_mm"]
+                   - 580.135) > 1.0e-9
+            or probe["edit_preview"]["preflight"]["accepted"] is not True
+            or probe["edit"]["selected_crossover_id"] != "XO-001"
+            or probe["edit"]["edit_revision"] != 1
+            or abs(probe["edit"]["toe_chainage_a_mm"]
+                   - 580.135) > 1.0e-9
+            or probe["edit"]["object_count"] != 32
+            or probe["edit"]["production_record_count"] != 16
+            or probe["edit"]["crossover_production_record_ids"]
+            != probe["creation"]["crossover_production_record_ids"]
+            or probe["edit"]["history"]["undo_count"] != 1
+            or probe["edit"]["history"]["redo_count"] != 0
+            or probe["edit"]["semantic_sha256"]
+            == probe["save_reopen"]["semantic_sha256"]
+            or probe["edit_undo"]["selected_crossover_id"] != "XO-001"
+            or probe["edit_undo"]["semantic_sha256"]
+            != probe["save_reopen"]["semantic_sha256"]
+            or probe["edit_undo"]["history"]["undo_count"] != 0
+            or probe["edit_undo"]["history"]["redo_count"] != 1
+            or probe["edit_redo"]["selected_crossover_id"] != "XO-001"
+            or probe["edit_redo"]["semantic_sha256"]
+            != probe["edit"]["semantic_sha256"]
+            or probe["edit_redo"]["history"]["undo_count"] != 1
+            or probe["edit_redo"]["history"]["redo_count"] != 0
+            or probe["edit_save_reopen"]["object_count"] != 32
+            or probe["edit_save_reopen"]["semantic_sha256"]
+            != probe["edit"]["semantic_sha256"]
+            or probe["edit_save_reopen"]["history"]["undo_count"] != 0
+            or probe["edit_save_reopen"]["history"]["redo_count"] != 0):
+        raise RuntimeError("The GUI edit transaction or persistence proof changed")
     return [
         probe["rejection"]["visual"],
         *probe["creation"]["visuals"],
         probe["save_reopen"]["visual"],
+        probe["edit_rejection"]["visual"],
+        probe["edit_preview"]["visual"],
+        *probe["edit"]["visuals"],
+        probe["edit_undo"]["visual"],
+        probe["edit_redo"]["visual"],
+        probe["edit_save_reopen"]["visual"],
     ]
 
 
@@ -563,7 +943,7 @@ def main():
     document_path = run_dir / "straight-host-crossover.FCStd"
     shutil.copy2(base, document_path)
     state = {
-        "recipe_id": "phase8-b16-straight-host-crossover-real-gui-v1",
+        "recipe_id": "phase8-b16-straight-host-crossover-real-gui-v2",
         "started_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "source_fixture": str(base),
         "source_fixture_sha256": fixture_hash,
@@ -574,7 +954,7 @@ def main():
         "run_document": str(document_path),
         "scope": (
             "one straight-host facing crossover; GUI rejection, creation, "
-            "Undo/Redo and one copied-FCStd save/reopen"
+            "edit, Undo/Redo and copied-FCStd save/reopen at each state"
         ),
     }
     client = FreeCADClient(
