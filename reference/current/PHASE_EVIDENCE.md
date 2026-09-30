@@ -984,6 +984,67 @@ inherited B15 host, the development-only comparison oracle, all comparison
 conditions, and all legacy-retirement conditions remain. This result gives no
 acceptance for a Phase 8 exit, output, or release.
 
+<a id="phase-8-straight-alignment-turnout-result"></a>
+
+## Phase 8 turnout on a straight alignment — 2026-09-30
+
+This Level 2 result examines one `TO-001` turnout on a 1500 mm straight
+alignment. Its `orientation` value is `Facing`, and its `handing` value is
+`Left-hand`. Its `toe_chainage` value is 580.134 mm. The checks used copies of
+the B14 source file with SHA-256
+`3ded0cd038971aca86f87fcb18061e3cfaf382e173a8d505d7f638724074efdd`.
+The source file stayed unchanged.
+
+The qualified `FreeCADCmd` check compared B14, B15 and B16 after it excluded
+`macro_version` and `GeneratorVersion`. All three gave equal turnout data.
+Eight turnout objects had equal names, property types and compared values.
+Seven objects with a shape had equal `brep_sha256` values and `summary` data.
+The same 18 ordered `records` entries were present.
+
+B16 rejected an invalid `toe_chainage` value without a document change.
+Its `Undo` operation restored the 23-object source. `Redo` restored the
+31-object turnout state. After `save()` and `openDocument()`, the compared
+properties and stable `summary` data were equal. The check did not compare
+exact shape bytes after `openDocument()`.
+
+The check in the qualified FreeCAD 1.1.3 GUI used `TurnoutManagerDialog`.
+The dialog made `TO-001` and rejected an overlapping second turnout.
+The check changed `handing` from `Left-hand` to `Right-hand`.
+The check caused an error during an edit. The error left the document and
+`Undo` history unchanged. `Undo` and `Redo` restored the compared states.
+
+After `save()` and `openDocument()`, the dialog removed `TO-001`. The check
+compared each state after `Remove`, `Undo`, `Redo`, `save()` and
+`openDocument()` with its expected source or turnout state. The `record_id`
+values kept their order. `Remove` restored 23 objects and 12 `records`
+entries. In the source `ProductionRecordIndexJSON` value, `macro_version`
+changed from the B14 value to the B15 value. All other compared source data
+stayed equal.
+
+The first two GUI `run.json` files record `FAIL`. One test expected the B14
+`macro_version` value after `Remove`. Another test expected the order of
+`document.Objects` after `Remove` and `Undo`. Both have the
+`test-or-oracle-defect` failure class. A diagnostic run intentionally gave
+`FAIL` and kept data for the second test error. After the test repairs, the
+GUI check gave `PASS`.
+
+The `FreeCADCmd` result is in
+`tmp/phase8-straight-turnout/headless-enhanced.log`. The GUI `run.json` file
+with `PASS` status and seven images are in
+`benchmark-output/freecad-bridge/phase8-straight-host-turnout-gui-runs/20260930T054358592293Z/`.
+The three earlier `run.json` files remain under that directory.
+
+These checks cover one copied source file with a straight alignment and one
+`TO-001` turnout. They add bounded evidence for Phase 8 Exits 1, 2 and 3.
+The main result is for Exit 3. They do not show selected export, guided Step 6,
+other host inputs, complete production metadata, or product performance.
+
+All four exits stay Pending at 0/4. D-P6-008 stays Deferred — unmet, and
+TERM-R04 stays open. The frozen B14/B15 sources, inherited B15 host,
+development-only comparison oracle and legacy-retirement conditions remain.
+This result gives no acceptance for a Phase 8 exit, production output, or
+release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+bridge_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$(cd "${bridge_dir}/../.." && pwd)"
+bridge_port=19875
+read_port=false
+for argument in "$@"; do
+    if [[ "${read_port}" == true ]]; then
+        bridge_port="${argument}"
+        read_port=false
+        continue
+    fi
+    case "${argument}" in
+        --port) read_port=true ;;
+        --port=*) bridge_port="${argument#*=}" ;;
+    esac
+done
+if [[ "${read_port}" == true || "${bridge_port}" != 19875 ]]; then
+    echo "Phase 8 straight-turnout GUI proof requires port 19875." >&2
+    exit 2
+fi
+
+exec "${bridge_dir}/run-isolated" \
+    /usr/bin/env \
+    TRACKTEMPLATE_BRIDGE_PORT=19875 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH="${project_root}/.devtools/freecad-cli/src" \
+    /usr/bin/python3 \
+    "${bridge_dir}/run_phase8_straight_host_turnout_gui.py" "$@"
