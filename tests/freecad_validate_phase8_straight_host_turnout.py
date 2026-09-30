@@ -6,6 +6,7 @@ closed and unchanged. This is development comparison, not output acceptance.
 
 import ast
 import copy
+import datetime
 import hashlib
 import json
 import math
@@ -24,6 +25,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools.freecad_bridge import turnout_recipe  # noqa: E402
+from tools.freecad_bridge import ordinary_track_export_recipe  # noqa: E402
 from tools.freecad_bridge.ordinary_track_recipe import (  # noqa: E402
     ordinary_track_document_snapshot,
 )
@@ -284,6 +286,163 @@ def _b16_lifecycle(module, document, before, created):
     }
 
 
+def _selected_pair(module, document):
+    """Find the existing unintegrated TO-001 physical representations."""
+    assert module.turnout_integration_by_id(document, "TO-001") is None
+    index = module.production_record_index_for_set(document, "SET-001")
+    catalogue = module.hydrate_production_index_records(document, index)
+    assert len(catalogue) == 18
+    pair = [
+        record for record in catalogue
+        if record["role"] in {
+            module.TURNOUT_TEMPLATE_ROLE, module.TURNOUT_OUTLINE_ROLE,
+        }
+        and record["route_id"] == ROUTE_ID
+        and module.object_string_property(
+            document.getObject(record["source_name"]), "TurnoutID", "",
+        ) == "TO-001"
+    ]
+    assert len(pair) == 2
+    outline = next(record for record in pair
+                   if record["category"] == module.EXPORT_CATEGORY_CUTTING)
+    solid = next(record for record in pair
+                 if record["category"] == module.EXPORT_CATEGORY_SOLID)
+    for record in pair:
+        obj = document.getObject(record["source_name"])
+        assert module.selected_export_object_record_ids(obj) == {
+            record["record_id"]
+        }
+    return catalogue, outline, solid
+
+
+def _selected_export_output(module, directory, plan, outline, solid):
+    """Retain full artifact evidence and compare only verified version data."""
+    snapshot = ordinary_track_export_recipe.export_directory_snapshot(directory)
+    svg_name = pathlib.Path(plan["tasks"][0]["path"]).name
+    manifest_name = pathlib.Path(plan["manifest_path"]).name
+    assert set(snapshot["files"]) == {svg_name, manifest_name}
+    assert not snapshot["directories"]
+    assert svg_name.endswith(".svg") and manifest_name.endswith(".csv")
+    bounds = module.validate_svg_export_bounds(str(directory / svg_name))
+    manifest = snapshot["files"][manifest_name]["manifest"]
+    assert manifest["fields"] == list(module.EXPORT_MANIFEST_FIELDS)
+    rows = manifest["rows"]
+    assert len(rows) == 2
+    successful = [row for row in rows if row["Export status"] == "Success"]
+    skipped = [row for row in rows if row["Export status"] == "Skipped"]
+    assert len(successful) == len(skipped) == 1
+    assert successful[0]["Export filename"] == svg_name
+    assert successful[0]["Export format"] == "SVG"
+    assert skipped[0]["Export filename"] == skipped[0]["Export format"] == ""
+    for row, record in ((successful[0], outline), (skipped[0], solid)):
+        assert row["Generated object name"] == record["source_name"]
+        assert row["Generated object role"] == record["role"]
+        assert row["Template-set identifier"] == "SET-001"
+        assert row["Macro version"] == str(module.MACRO_VERSION)
+        for column, key in (
+            ("Track number", "track_number"),
+            ("Platform number", "platform_number"),
+            ("Section number", "section_number"),
+            ("Travel-order number", "travel_order_number"),
+        ):
+            assert row[column] == str(record.get(key) or "")
+    comparison_manifest = copy.deepcopy(manifest)
+    for row in comparison_manifest["rows"]:
+        del row["Macro version"]
+    return {
+        "artifacts": snapshot,
+        "macro_version": str(module.MACRO_VERSION),
+        "svg_bounds": bounds,
+        "comparison": {
+            "filenames": sorted(snapshot["files"]),
+            "svg_sha256": snapshot["files"][svg_name]["normalised_sha256"],
+            "manifest": comparison_manifest,
+        },
+    }
+
+
+def _selected_export(module, document, directory):
+    """Export the outline and retain every preflight finding unchanged."""
+    catalogue, outline, solid = _selected_pair(module, document)
+    scope = {
+        "scope_type": module.SELECTED_EXPORT_SCOPE_OBJECTS,
+        "route_id": ROUTE_ID,
+        "route_label": outline["route_name"],
+        "selected_objects": [{
+            "name": outline["source_name"],
+            "record_ids": {outline["record_id"]},
+            "generated_role": outline["role"],
+            "export_subtype": outline["subtype"],
+            **{key: outline[key] for key in (
+                "route_id", "track_number", "platform_number",
+                "section_number", "feature_number",
+            )},
+        }],
+    }
+    matching = module.filter_production_records_by_selected_scope(
+        catalogue, scope,
+    )
+    assert {item["record_id"] for item in matching} == {
+        outline["record_id"], solid["record_id"],
+    }
+    settings = module.settings_for_template_set(document, "SET-001")
+    config = module.read_production_export_config(settings)
+    config.update({
+        "enabled": True, "output_directory": str(directory),
+        "create_combined_files": False, "create_manifest": True,
+        "overwrite_existing": False, "open_output_directory": False,
+        "formats": {"svg": True, "dxf": False, "step": False, "stl": False},
+    })
+    records, skipped = module.selected_export_records_for_formats(
+        matching, config,
+    )
+    assert [record["record_id"] for record in records] == [outline["record_id"]]
+    assert len(skipped) == 1
+    assert skipped[0]["record"]["record_id"] == solid["record_id"]
+    plan = module.plan_selected_production_export(
+        records, config, "SET-001", scope,
+    )
+    assert len(plan["tasks"]) == 1
+    assert plan["tasks"][0]["format"] == "svg"
+    issues = module.run_production_preflight(
+        document,
+        module.selected_export_validation_records(catalogue, matching, scope),
+        records, module.selected_export_preflight_config(config, plan),
+        "SET-001", module.read_section_config(settings),
+        module.read_registration_config(settings),
+        module.read_template_assembly_config(settings), settings_obj=settings,
+        plan=plan, include_export_checks=True, probe_export_bounds=True,
+        filename_issues_override=module.selected_export_filename_issues(
+            plan, config, "SET-001",
+        ),
+    )
+    evidence = {
+        "issues": issues,
+        "record_ids": [record["record_id"] for record in matching],
+        "macro_version": str(module.MACRO_VERSION),
+    }
+    receipt = directory.parent / (directory.name + ".json")
+    receipt.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+    assert not module.preflight_blocking_report(issues), issues
+    platforms = module.read_platform_configs(settings)
+    summary = module.run_selected_production_export(
+        document, plan, config, "SET-001",
+        platforms[0] if platforms else module.default_platform_config(),
+        module.read_formation_config(settings),
+        module.read_registration_config(settings),
+        module.read_template_assembly_config(settings), extra_skipped=skipped,
+    )
+    evidence["summary"] = summary
+    receipt.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+    assert summary["successful_files"] == 2, summary
+    assert summary["failed_files"] == 0, summary
+    evidence.update(_selected_export_output(
+        module, directory, plan, outline, solid,
+    ))
+    receipt.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+    return evidence
+
+
 def validate():
     contract = json.loads(LEGACY_CONTRACT.read_text(encoding="utf-8"))
     assert contract["contract_id"] == (
@@ -305,6 +464,15 @@ def validate():
 
     observations = {}
     lifecycle = None
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y%m%dT%H%M%S%fZ"
+    )
+    export_root = (
+        ROOT / "benchmark-output/phase8-straight-turnout-export" / stamp
+    )
+    export_root.mkdir(parents=True, exist_ok=False)
+    print("PHASE8_STRAIGHT_EXPORT_EVIDENCE=" + str(export_root), flush=True)
+    exports = {}
     with tempfile.TemporaryDirectory(
         prefix="tracktemplate-phase8-straight-turnout-"
     ) as temporary:
@@ -350,6 +518,16 @@ def validate():
                 observations[label] = _turnout_observation(
                     module, document, source_records,
                 )
+                exports[label] = []
+                for number in (1, 2):
+                    directory = export_root / "{}-{}".format(label, number)
+                    directory.mkdir()
+                    exports[label].append(_selected_export(
+                        module, document, directory,
+                    ))
+                    assert _state(document) == created
+                assert (exports[label][0]["comparison"]
+                        == exports[label][1]["comparison"])
                 if label == "B16":
                     document, lifecycle = _b16_lifecycle(
                         module, document, before, created,
@@ -362,6 +540,9 @@ def validate():
 
     assert observations["B14"] == observations["B15"]
     assert observations["B15"] == observations["B16"]
+    assert (exports["B14"][0]["comparison"]
+            == exports["B15"][0]["comparison"]
+            == exports["B16"][0]["comparison"])
     assert lifecycle is not None
     witness = {
         "host_name": HOST_NAME,
@@ -384,7 +565,20 @@ def validate():
         "source_sha256": source_sha256,
         "source_semantic_sha256": SOURCE_SEMANTIC_SHA256,
         "lifecycle": lifecycle,
+        "selected_export": {
+            "directory": str(export_root),
+            "comparison": exports["B16"][0]["comparison"],
+            "version_by_label": {
+                label: values[0]["macro_version"]
+                for label, values in exports.items()
+            },
+            "document_and_undo_unchanged": True,
+        },
     }
+    (export_root / "witness.json").write_text(
+        json.dumps(witness, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     print("PHASE8_STRAIGHT_TURNOUT_WITNESS=" + json.dumps(
         witness, sort_keys=True, separators=(",", ":"),
     ))
