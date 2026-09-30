@@ -22,6 +22,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools.freecad_bridge import crossover_timber_recipe as recipe  # noqa: E402
+from tools.freecad_bridge import (  # noqa: E402
+    compare_phase8_straight_crossover_b4_modes as mode_comparison,
+)
 from tools.freecad_bridge.ordinary_track_recipe import (  # noqa: E402
     ordinary_track_document_snapshot,
 )
@@ -252,6 +255,7 @@ def validate():
     source = _source()
     source_hash = _sha256(source)
     receipt_hash = _sha256(SOURCE_RECEIPT)
+    comparison_source_hashes = mode_comparison.source_hashes(ROOT)
     contract = json.loads(base.LEGACY_CONTRACT.read_text(encoding="utf-8"))
     modules = {}
     for label in ("B14", "B15"):
@@ -263,6 +267,7 @@ def validate():
     modules["B16"] = base._load_b16()
     observations = {}
     lifecycle = None
+    b16_resolved_analysis = None
     with tempfile.TemporaryDirectory(prefix="phase8-straight-xo-b4-") as temp:
         for label, module in modules.items():
             copied = pathlib.Path(temp) / (label.lower() + ".FCStd")
@@ -297,6 +302,25 @@ def validate():
                     module, document, first, before_index,
                 )
                 if label == "B16":
+                    # The GUI receipt is JSON; normalize returned tuples once.
+                    analysis = json.loads(json.dumps(
+                        first["resolved_analysis"], sort_keys=True,
+                    ))
+                    assert isinstance(analysis, dict) and analysis
+                    assert isinstance(
+                        analysis.get("performance_timings_ms"), dict,
+                    ) and analysis["performance_timings_ms"]
+                    assert isinstance(
+                        analysis.get("geometry_signature"), str,
+                    ) and analysis["geometry_signature"]
+                    semantic_analysis = dict(analysis)
+                    del semantic_analysis["performance_timings_ms"]
+                    b16_resolved_analysis = {
+                        "full": analysis,
+                        "sha256": recipe.digest(analysis),
+                        "semantic_sha256": recipe.digest(semantic_analysis),
+                        "geometry_signature": analysis["geometry_signature"],
+                    }
                     document, lifecycle = _b16_lifecycle(
                         module, document, first, observations[label], before,
                     )
@@ -307,9 +331,10 @@ def validate():
             assert _sha256(source) == source_hash
     assert observations["B14"] == observations["B15"]
     assert observations["B15"] == observations["B16"]
-    assert lifecycle is not None
+    assert lifecycle is not None and b16_resolved_analysis is not None
     assert _sha256(source) == source_hash
     assert _sha256(SOURCE_RECEIPT) == receipt_hash
+    assert mode_comparison.source_hashes(ROOT) == comparison_source_hashes
     witness = {
         "status": "PASS",
         "sentinel": SENTINEL,
@@ -320,7 +345,10 @@ def validate():
         "source_fixture_sha256": source_hash,
         "source_fixture_sha256_after": _sha256(source),
         "source_document_semantic_sha256": SOURCE_DOCUMENT_SEMANTIC,
+        "source_sha256": comparison_source_hashes,
+        "source_sha256_after": mode_comparison.source_hashes(ROOT),
         "comparison": observations,
+        "b16_resolved_analysis": b16_resolved_analysis,
         "b16_lifecycle": lifecycle,
     }
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime(

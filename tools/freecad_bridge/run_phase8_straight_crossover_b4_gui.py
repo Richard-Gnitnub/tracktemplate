@@ -61,6 +61,7 @@ SOURCE_PATHS = (
     ROOT / "tools/freecad_bridge/b14_recipe.py",
     ROOT / "tools/freecad_bridge/ordinary_track_recipe.py",
     ROOT / "tools/freecad_bridge/crossover_timber_recipe.py",
+    ROOT / "tools/freecad_bridge/compare_phase8_straight_crossover_b4_modes.py",
     ROOT / "tools/freecad_bridge/run_b14_straight_station.py",
     ROOT / "tools/freecad_bridge/probes/b14_straight_station_driver.py",
     LOADER_PATH,
