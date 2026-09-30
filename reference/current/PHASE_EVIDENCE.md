@@ -1045,6 +1045,73 @@ development-only comparison oracle and legacy-retirement conditions remain.
 This result gives no acceptance for a Phase 8 exit, production output, or
 release.
 
+<a id="phase-8-straight-crossover-b4-result"></a>
+
+## Phase 8 `XO-001` `B4` check on straight tracks — 2026-09-30
+
+This Level 2 result examines `XO-001` on two straight tracks in a copied B14
+source file. The entrance is 1500 mm long, and the exit is 450 mm long.
+The source file SHA-256 is
+`3b4fc9fd8131981a637a3fd50105b0f1d7e44f311eb51a7f03bf01239ad7a3b1`.
+The source file stayed unchanged.
+
+The qualified `FreeCADCmd` check compared the B14, B15 and B16 `B4` results.
+The three results had equal data for all 82 ordered `resolved_timbers` entries
+and their unique `stable_identity` values. Each result had
+`effective_timber_count=82`, `shared_timber_count=18`,
+`unresolved_count=0` and `remaining_production_conflicts=0`. The findings,
+object data for 34 objects, `B4` shape bytes and four direct `XO-001` source
+bindings were equal. Only `macro_version` and `created_at` were excluded from
+the production index comparison.
+
+B16 reused the `B4` result without a document or `Undo` change. One `Undo`
+restored the 32-object crossover state. `Redo` restored the 34-object `B4`
+state. After `save()` and `openDocument()`, the stored `resolved_timbers`
+entries and `resolved_analysis` JSON data were equal to the expected values.
+The source bindings and stable `B4` shape data were also equal. The check did
+not compare exact shape bytes after the file opened again.
+
+The qualified FreeCAD 1.1.3 GUI check used the `CrossoverManagerPanel` for
+the selected `XO-001`. A caused error at the first `B4` object tag showed a
+dialog and left the document, production bindings and `Undo` history unchanged.
+The next `B4` command made 34 objects and one `Undo` unit. The GUI result
+matched the compared data for counts, identities, findings, stable shape data
+and source bindings. Unchanged reuse kept the document and `Undo` history.
+
+The GUI check changed `Show final resolved timbering` without a new
+calculation or shape build. The check box and the selected crossover stayed
+in step with visibility. `Undo` restored 32 objects, and `Redo` restored 34.
+After the check hid `B4`, saved and opened the copied file, visibility stayed
+off. The stored analysis data and source bindings stayed equal. The new FreeCAD
+session had no earlier `Undo` history.
+
+The first headless check gave `FAIL` because it compared `tuple` and `list`
+values before JSON conversion. The corrected check gave `PASS`. The failed
+check and diagnostic data remain in `tmp/phase8-straight-xo-b4/`.
+The B14 source receipt is in
+`benchmark-output/freecad-bridge/straight-station-runs/20260930T070824Z-phase8-straight-host/`.
+The passing headless receipt is in
+`benchmark-output/freecad-bridge/phase8-straight-crossover-b4-headless-runs/20260930T072529794571Z/`.
+The passing GUI receipt and seven images are in
+`benchmark-output/freecad-bridge/phase8-straight-crossover-b4-gui-runs/20260930T073331614634Z/`.
+
+The `rail_and_flangeway_clearance_deferred` finding stays. One
+`CrossoverConstructionMarks` index entry has `diagnostic_status=Error`
+because its geometry is not planar. The GUI result has
+`production_ready=false`, `host_integration_allowed=false` and
+`rail_clearance_checks_reliable=false`. Earlier different
+`resolved_analysis_sha256` values for the curved `B4` checks with and without
+`FreeCADGui` remain unexplained. This straight-track check did not compare all
+`resolved_analysis` fields between the two modes.
+
+This result adds bounded evidence for Phase 8 Exits 1 and 3 and some Exit 2
+operations. All four exits stay Pending at 0/4. It does not show selected
+export, guided Step 6, other crossover inputs, production clearance or product
+performance. D-P6-008 stays Deferred — unmet, and TERM-R04 stays open.
+The frozen B14/B15 sources, inherited B15 host, development-only comparison
+oracle and legacy-retirement conditions remain. This result gives no owner
+acceptance for a Phase 8 exit, production output or release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
