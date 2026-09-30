@@ -646,9 +646,9 @@ def validate_documentation_profile(
             'D-P8-002',
             'accepts Exit 3 only',
             'TERM-R04 stays open',
-            'After Git merges the Exit 3 record changes, make sure that protected `main` is clean and synchronised',
-            'If another exit is ready, give its bounded owner decision',
-            'Otherwise, identify the missing evidence and the work necessary to supply it',
+            'After the Exit 3 alignment is integrated, verify clean, synchronised protected `main`',
+            'If another exit is ready, present its bounded owner decision',
+            'Otherwise, identify the evidence gap and the work needed to close it',
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )
