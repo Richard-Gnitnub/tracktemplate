@@ -1,5 +1,6 @@
 """Modular-only composition for the inherited B15 GUI workflow host."""
 
+import copy
 from dataclasses import dataclass
 
 from tracktemplate.application import turnout_edit
@@ -2120,6 +2121,33 @@ class _CoreLayoutExportAdapter:
         )
 
 
+def _selected_export_scope_method(original_scope, selection_snapshot):
+    """Retain each set's opening selection for one modal export dialog."""
+
+    def current_scope(dialog):
+        snapshots = getattr(
+            dialog, "_tracktemplate_preselected_objects_by_set", None
+        )
+        if snapshots is None:
+            # Capture every set before the first temporary preflight doc.
+            snapshots = {
+                str(dialog.set_box.itemText(index)): copy.deepcopy(
+                    selection_snapshot(
+                        dialog.doc, str(dialog.set_box.itemText(index))
+                    )
+                )
+                for index in range(dialog.set_box.count())
+            }
+            dialog._tracktemplate_preselected_objects_by_set = snapshots
+        scope = original_scope(dialog)
+        scope["selected_objects"] = copy.deepcopy(
+            snapshots.get(dialog.current_set_id(), [])
+        )
+        return scope
+
+    return current_scope
+
+
 class ModularCoreLayoutWorkflowSession:
     """Add one modular export command to the selected calculation session."""
 
@@ -2145,6 +2173,37 @@ class ModularCoreLayoutWorkflowSession:
             calculation=export_calculation,
             **operations,
         )
+        dialog_class = namespace.get("SelectedProductionExportDialog")
+        selection_snapshot = namespace.get(
+            "selected_export_selection_snapshot"
+        )
+        self._selected_export_dialog = None
+        if dialog_class is not None or selection_snapshot is not None:
+            original_scope = (
+                dialog_class.__dict__.get("_current_scope")
+                if isinstance(dialog_class, type) else None
+            )
+            scope_code = getattr(original_scope, "__code__", None)
+            if (
+                not callable(selection_snapshot)
+                or getattr(selection_snapshot, "__globals__", None)
+                is not namespace
+                or not callable(original_scope)
+                or getattr(original_scope, "__globals__", None)
+                is not namespace
+                or scope_code is None
+                or "selected_export_selection_snapshot"
+                not in scope_code.co_names
+            ):
+                raise TransitionWorkflowError(
+                    "The inherited selected-export selection route is "
+                    "incomplete."
+                )
+            self._selected_export_dialog = dialog_class
+            self._selected_export_snapshot = selection_snapshot
+            self._selected_export_scope = _selected_export_scope_method(
+                original_scope, selection_snapshot
+            )
         self._bind_core_layout_export()
 
     @property
@@ -2155,14 +2214,26 @@ class ModularCoreLayoutWorkflowSession:
         namespace = self.module.__dict__
         missing = object()
         previous = namespace.get(CORE_LAYOUT_EXPORT_HOST_BINDING, missing)
+        dialog_class = self._selected_export_dialog
+        previous_scope = (
+            dialog_class.__dict__.get("_current_scope", missing)
+            if dialog_class is not None else missing
+        )
         try:
             namespace[CORE_LAYOUT_EXPORT_HOST_BINDING] = self._export_adapter
+            if dialog_class is not None:
+                dialog_class._current_scope = self._selected_export_scope
             self._validate_core_layout_export_binding()
         except Exception:
             if previous is missing:
                 namespace.pop(CORE_LAYOUT_EXPORT_HOST_BINDING, None)
             else:
                 namespace[CORE_LAYOUT_EXPORT_HOST_BINDING] = previous
+            if dialog_class is not None:
+                if previous_scope is missing:
+                    delattr(dialog_class, "_current_scope")
+                else:
+                    dialog_class._current_scope = previous_scope
             raise
 
     def _validate_core_layout_export_binding(self):
@@ -2202,6 +2273,17 @@ class ModularCoreLayoutWorkflowSession:
         ) is not adapter:
             raise TransitionWorkflowError(
                 "The inherited run_macro export caller has a mixed binding."
+            )
+        dialog_class = self._selected_export_dialog
+        if dialog_class is not None and (
+            namespace.get("SelectedProductionExportDialog") is not dialog_class
+            or namespace.get("selected_export_selection_snapshot")
+            is not self._selected_export_snapshot
+            or dialog_class.__dict__.get("_current_scope")
+            is not self._selected_export_scope
+        ):
+            raise TransitionWorkflowError(
+                "The selected-export selection route has a mixed binding."
             )
 
     def routing_record(self):
