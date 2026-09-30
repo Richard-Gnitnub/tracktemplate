@@ -1117,6 +1117,44 @@ The frozen B14/B15 sources, inherited B15 host, development-only comparison
 oracle and legacy-retirement conditions remain. This result gives no owner
 acceptance for a Phase 8 exit, production output or release.
 
+<a id="phase-8-straight-crossover-b4-analysis-result"></a>
+
+## Phase 8 `XO-001` `B4` data in FreeCADCmd and the GUI — 2026-09-30
+
+This Level 2 result compares the complete `resolved_analysis` data for one
+`XO-001` on straight tracks. The qualified `FreeCADCmd` and real-GUI checks
+use copies of one B14 source file. Its SHA-256 is
+`abe6d3e32bd77e2b146c015b726bf83bde2b9f131fc503b9d0d4c896b73bac19`
+before and after the checks. No product source or B14/B15 reference file
+changes.
+
+Both host receipts report `PASS`. Their raw `resolved_analysis` SHA-256 values
+are different. Only the top-level `performance_timings_ms` values differ.
+The report keeps both measured values. The other 20 top-level fields are
+exactly equal, including their nested data, findings, `geometry_signature`
+and all 82 `timbers` entries. Their common SHA-256 after the one exclusion is
+`bfbd3f2717f3ec19f0164c291d1f91b68522aefbf7ec5090a65f3c2033ad162e`.
+
+The B14, B15 and B16 observations remain equal for this source.
+
+The `FreeCADCmd` receipt is in
+`benchmark-output/freecad-bridge/phase8-straight-crossover-b4-headless-runs/20260930T091240731184Z/`.
+The GUI receipt, seven images and strict comparison report are in
+`benchmark-output/freecad-bridge/phase8-straight-crossover-b4-gui-runs/20260930T091341211190Z/`.
+Standalone negative checks reject changes to non-timing data and receipt
+identities. The earlier failed receipts remain.
+
+This result adds bounded evidence for part of Phase 8 Exit 3. The earlier
+curved-host `resolved_analysis_sha256` difference remains unexplained. The
+[prior straight `B4` result](#phase-8-straight-crossover-b4-result) keeps its
+deferred rail-clearance finding, construction-mark diagnostic and
+non-production limits.
+
+All four exits stay Pending at 0/4. D-P6-008 stays
+Deferred — unmet, and TERM-R04 stays open. Output stays private-development.
+No production clearance follows. This result gives no acceptance for product
+performance, selected export, production output, a Phase 8 exit or release.
+
 ## Phase 8 exit conditions
 
 These four criteria are unchanged from accepted plan revision
