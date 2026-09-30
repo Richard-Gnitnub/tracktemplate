@@ -495,6 +495,8 @@ try:
     panel.begin_crossover_edit()
     if panel.editing_crossover_id != "XO-001":
         raise RuntimeError("The GUI did not enter XO-001 edit mode")
+    if "Editing XO-001" not in str(panel.selection_status.text()):
+        raise RuntimeError("The GUI did not show the XO-001 edit cue")
     panel.chainage_box.setValue(580.135)
     if abs(float(panel.chainage_box.value()) - 580.135) > 1.0e-9:
         raise RuntimeError("The GUI did not retain the edited toe")
@@ -518,6 +520,10 @@ try:
     )
     if rejected_edit_create["history"] != reopened["history"]:
         raise RuntimeError("Rejected edit apply changed Undo/Redo history")
+    rejected_edit_status = str(panel.selection_status.text())
+    if (panel.editing_crossover_id != "XO-001"
+            or "Editing XO-001" not in rejected_edit_status):
+        raise RuntimeError("Rejected XO-001 Edit lost its edit cue")
 
     panel.minimum_radius_box.setValue(600.0)
     edit_preview = panel.preview_geometry()
@@ -547,6 +553,21 @@ try:
     )
 
     edit_confirmation = confirm_create(panel.create_crossover)
+    edit_success_visual = capture_panel("straight-host-edited-panel.png")
+    edit_success_status = str(panel.selection_status.text())
+    edit_success_diagnostic = str(panel.diagnostics.toPlainText())
+    if (panel.editing_crossover_id is not None
+            or "Updated XO-001" not in edit_success_status
+            or "Editing XO-001" in edit_success_status
+            or "Updated XO-001 transactionally." not in
+            edit_success_diagnostic):
+        raise RuntimeError(
+            "Accepted XO-001 Edit left a stale Picked placement cue: "
+            "status={!r}; diagnostic={!r}; visual={!r}".format(
+                edit_success_status, edit_success_diagnostic,
+                edit_success_visual,
+            )
+        )
     panel.refresh_crossovers("XO-001")
     edited_config = panel.current_config()
     edited = state(document)
@@ -594,7 +615,7 @@ try:
             ]):
         raise RuntimeError("The edit changed unrelated production records")
     edited_visuals = [
-        capture_panel("straight-host-edited-panel.png"),
+        edit_success_visual,
         capture_top("straight-host-edited-top-view.png"),
     ]
 
@@ -731,6 +752,7 @@ try:
         },
         "edit_rejection": {
             "diagnostic": edit_rejection,
+            "picked_placement": rejected_edit_status,
             "state_unchanged": True,
             "history": rejected_edit_create["history"],
             "visual": edit_rejected_visual,
@@ -759,6 +781,11 @@ try:
             "config": edited_config,
             "history": edited["history"],
             "confirmation": edit_confirmation,
+            "success_cue": {
+                "picked_placement": edit_success_status,
+                "diagnostic": edit_success_diagnostic,
+                "visual": edit_success_visual,
+            },
             "visuals": edited_visuals,
         },
         "edit_undo": {
@@ -848,6 +875,8 @@ def _check_probe(probe):
             != probe["creation"]["semantic_sha256"]):
         raise RuntimeError("The GUI transaction or persistence proof changed")
     if (probe["edit_rejection"]["state_unchanged"] is not True
+            or "Editing XO-001" not in
+            probe["edit_rejection"]["picked_placement"]
             or probe["edit_preview"]["state_unchanged"] is not True
             or abs(probe["edit_preview"]["toe_chainage_a_mm"]
                    - 580.135) > 1.0e-9
@@ -862,6 +891,12 @@ def _check_probe(probe):
             != probe["creation"]["crossover_production_record_ids"]
             or probe["edit"]["history"]["undo_count"] != 1
             or probe["edit"]["history"]["redo_count"] != 0
+            or "Updated XO-001" not in
+            probe["edit"]["success_cue"]["picked_placement"]
+            or "Editing XO-001" in
+            probe["edit"]["success_cue"]["picked_placement"]
+            or "Updated XO-001 transactionally." not in
+            probe["edit"]["success_cue"]["diagnostic"]
             or probe["edit"]["semantic_sha256"]
             == probe["save_reopen"]["semantic_sha256"]
             or probe["edit_undo"]["selected_crossover_id"] != "XO-001"

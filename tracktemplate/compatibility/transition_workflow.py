@@ -1085,6 +1085,22 @@ class ModularTransitionWorkflowSession:
                 config = panel_instance.current_config()
                 if config is None:
                     return
+                # The inherited commit clears Edit mode before this refresh.
+                # A rejection or cancellation keeps a different cue or mode.
+                identifier = str(config.get("crossover_id") or "")
+                if (
+                    identifier
+                    and not getattr(
+                        panel_instance, "editing_crossover_id", None,
+                    )
+                    and panel_instance.selection_status.text().startswith(
+                        "Editing {}. Adjust hosts or exact Host A chainage"
+                        .format(identifier)
+                    )
+                ):
+                    panel_instance.selection_status.setText(
+                        "Updated {} transactionally.".format(identifier)
+                    )
                 obj = namespace["_crossover_b4_object"](
                     panel_instance.doc, config.get("crossover_id"),
                 )
