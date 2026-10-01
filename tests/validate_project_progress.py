@@ -1042,7 +1042,7 @@ def _validate_owner_view(plan: str) -> None:
     for fragment in (
         'Phase 7 is closed at 4/4 under D-P7-006',
         'Its four exits remain Evidenced and owner-accepted under D-P7-005, D-P7-003, D-P7-004 and D-P7-002',
-        'Phase 8 is Open at 3/4 under D-P8-004. Exits 1, 3 and 4 are Evidenced and owner-accepted. Exit 2 stays Pending',
+        'Phase 8 is Open at 4/4 under D-P8-005. All four exits are Evidenced and owner-accepted. Phase 8 stays Open',
         'Phase 6 keeps four accepted exits and D-P6-008 as one deferred, unmet obligation',
         'Output stays private-development',
         'project status stays `unknown`',
@@ -1094,8 +1094,9 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-021',
         'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Exit 2 needs separate evidence and an owner decision',
-        'operator-controlled USB storage duty',
+        "Complete the recovery evidence before the separate assessment to "
+        "close Phase 8",
+        'Physical removal and separate storage remain operator-controlled and unverified',
         'D-P8-002',
         'keep Exit 3 and Exit 4 acceptance and all their limitations',
         'TERM-R04 stays open',
@@ -1103,10 +1104,15 @@ def _validate_owner_view(plan: str) -> None:
         'D-P8-004',
         'records Exit 1 acceptance at `44eb4bf` for the reviewed examples',
         'The Exit 1 condition stays the same',
-        'accepts Exit 1 at `44eb4bf`',
-        'Exit 2 stays Pending',
-        'merge the Exit 1 record changes into protected `main`',
-        'Then identify the missing Exit 2 evidence. Identify the work necessary to supply it',
+        'accepts Exit 2 at `c82b335` on the proposed evidence and conditions',
+        'D-P8-005',
+        'The Exit 2 condition stays the same',
+        'merge the Exit 2 record changes into protected `main`',
+        'Do not close Phase 8 or open Phase 9 through this decision',
+        "A new snapshot for independent preservation is necessary now",
+        "The evidence does not show a snapshot of all current worktrees and "
+        "their evidence",
+        'The evidence does not show `TO-001` output after a person selects a FreeCAD object',
     ):
         _require(
             fragment in owner_view,
@@ -1250,8 +1256,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "Phase 7 must be closed at four evidenced exits",
     )
     _require(
-        rows[8]["count"] == 3 and rows[8]["state"] == "Open",
-        "Phase 8 must be open at three evidenced exits",
+        rows[8]["count"] == 4 and rows[8]["state"] == "Open",
+        "Phase 8 must be open at four evidenced exits",
     )
     for phase in range(9, 12):
         _require(
@@ -1267,10 +1273,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the accepted Phase 7 closeout or carried D-P6-008 is missing",
     )
     _require(
-        "Phase 8 is Open at 3/4 under D-P8-004. Exits 1, 3 and 4 are Evidenced "
-        "and owner-accepted. Exit 2 stays Pending"
+        "Phase 8 is Open at 4/4 under D-P8-005. All four exits are Evidenced "
+        "and owner-accepted. Phase 8 stays Open"
         in _semantic_text(preamble),
-        "project-plan Phase 8 Exit 1 admission status drifted",
+        "project-plan Phase 8 Exit 2 acceptance status drifted",
     )
     return rows
 
@@ -4657,13 +4663,13 @@ def _validate_phase8_decision_opening(
         == {"schema_version", "current_phase", "updated_on", "decisions"}
         and document["schema_version"] == 1
         and document["current_phase"] == 8
-        and document["updated_on"] == "2026-09-30",
-        "current decision register is not the Phase 8 Exit 1 admission state",
+        and document["updated_on"] == "2026-10-01",
+        "current decision register is not the Phase 8 Exit 2 acceptance state",
     )
     decisions = document["decisions"]
     _require(
         isinstance(decisions, list)
-        and len(decisions) == 8
+        and len(decisions) == 9
         and decisions[0] == phase6_decisions["D-P6-008"],
         "Phase 8 opening must carry unchanged D-P6-008",
     )
@@ -4884,6 +4890,166 @@ def _validate_phase8_decision_opening(
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-P8-004 " + field + " digest drifted",
         )
+
+    exit2 = decisions[8]
+    exit2_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-8-exit-2-acceptance-panel"
+    )
+    _require(
+        isinstance(exit2, dict)
+        and set(exit2) == set(opening)
+        and exit2["id"] == "D-P8-005"
+        and exit2["decided_on"] == "2026-10-01"
+        and exit2["status"] == "Accepted"
+        and exit2["decision"]
+        == "Accept Phase 8 Exit 2 at protected main c82b335 for the reviewed "
+        "TO-001 and XO-001 examples. The Exit 2 condition stays the same. "
+        "Phase 8 is Open at 4/4."
+        and exit2["evidence"] == exit2_panel
+        and exit2["panel_record"] == exit2_panel
+        and exit2["panel_required_under_current_policy"] is True,
+        "D-P8-005 identity, acceptance or panel routing drifted",
+    )
+    for field, digest in (
+        (
+            'authority',
+            '05183ee7e0c7077e845762912fe5d8adaa4e34bdc55076c62de891f912f125ed',
+        ),
+        (
+            'exclusions',
+            "b101b9a3fe5ff8ff522eed8f0080da4b373eeed282417473a868fe2438b24c0a",
+        ),
+    ):
+        value = exit2[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P8-005 " + field + " digest drifted",
+        )
+
+
+def _validate_dp8_005_acceptance(evidence: str) -> None:
+    """Bind Exit 2 acceptance without phase closure or wider GUI claims."""
+    panel = _section(evidence, "Phase 8 Exit 2 acceptance panel — 2026-10-01")
+    decision = _load_json(CURRENT_DECISIONS_PATH)["decisions"][8]
+    quotes = _blockquote_paragraphs(panel)
+    criterion = (
+        "Creation, parameter editing, selection, undo/redo, save/reopen, "
+        "validation, and export pass in the real GUI."
+    )
+    _require(
+        '<a id="phase-8-exit-2-acceptance-panel"></a>' in evidence
+        and quotes[:1] == [criterion],
+        "D-P8-005 unchanged criterion or panel anchor drifted",
+    )
+    _require(
+        " ".join(quotes[1:]) == _semantic_text(str(decision["authority"])),
+        "D-P8-005 exact owner instruction drifted or was relocated",
+    )
+    rows = [
+        _cells(line)
+        for line in panel.splitlines()
+        if line.startswith("| ")
+    ]
+    _require(
+        len(rows) == 9
+        and all(len(row) == 3 and all(row) for row in rows)
+        and [row[0] for row in rows[2:]] == [
+            "Creation", "Parameter editing", "Selection", "Undo/redo",
+            "Save/reopen", "Validation", "Export",
+        ],
+        "D-P8-005 real-GUI operation matrix drifted",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "D-P8-005 accepts Exit 2 at protected main "
+        "c82b335c58c1a0399358dfa5f3690eaac219a9aa for the reviewed "
+        "TO-001 and XO-001 examples",
+        "Phase 8 is Open at 4/4",
+        "All four exits are Evidenced and owner-accepted",
+        "Phase 8 stays Open",
+        "Phase 9 stays Not started",
+        "It did not use checks without that display in place of those "
+        "checks",
+        "This panel claims no new FreeCAD operation",
+        "48 source hashes equal to the source at c82b335",
+        "Each check examines selected_objects in "
+        "SelectedProductionExportDialog six times. Those data stay equal",
+        "Ten mandatory probe_2d_export_bounds operations complete and "
+        "close their temporary documents",
+        "The repair preserves that empty value and the operations that use "
+        "highlighted_record_ids",
+        "Use of the previous evidence supplies no new result at c82b335",
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+        "It gives no product-performance acceptance",
+        "Independent reviewer /root/exit2_admission_evidence",
+        "/root/exit2_source_currency examines the source changes and "
+        "conditions for use of the previous checks",
+        "/root/exit2_admission_risks examines all 24 live risks",
+        "These reviewers did not make the PR #126 repair or do its checks",
+        "The panel recommendation is Proceed with bounded conditions",
+        "No risk owner, deadline, treatment, severity, disposition or "
+        "control effectiveness changes",
+        "The recorded owners must complete the necessary work by the "
+        "recorded deadlines",
+        "They do not prove every input, control, selection route or host "
+        "profile",
+        "The evidence does not show TO-001 output after a person selects "
+        "a FreeCAD object",
+        "The accepted checks with PASS results for that route use XO-001 "
+        "only",
+        "The project keeps the previous NO_SELECTED_PRODUCTION_ITEMS "
+        "failures and the evidence for failure classification",
+        "The mandatory operations occur in the checks with PASS results",
+        "The previous check without those operations supplies evidence for "
+        "failure classification only",
+        "The project does not have the complete source of the initial "
+        "failed test",
+        "No previous failed evidence becomes a PASS result through this "
+        "decision",
+        "The limitation for straight TO-001 Edit across versions stays. The "
+        "source limitations for previous checks stay",
+        "The limitations for wider persistence, host profiles and "
+        "production metadata stay",
+        "The causes of previous hash differences are unknown",
+        "The evidence does not show identical output files from checks with "
+        "and without the FreeCAD display. This limitation applies before "
+        "any change to those files",
+        "The repair does not put Gui.Selection back to its initial state",
+        "The SVG and CSV checks do not show results for every output format",
+        "The Exit 1, Exit 3 and Exit 4 conditions and limitations stay",
+        "A new snapshot for independent preservation is necessary now",
+        "The evidence does not show a new snapshot of the current worktrees "
+        "and the most recent evidence files",
+        "Local preservation does not prove independent preservation",
+        "Richard must complete the independent preservation",
+        "The implementation/QA owner must make sure that all work obeys the "
+        "recovery policy",
+        "This acceptance does not complete that work. It authorises no "
+        "change to the deadline or removal of the condition",
+        "Before a separate decision to close Phase 8, the panel must "
+        "examine the snapshot of the current worktrees and evidence. The "
+        "panel must also examine whether the snapshot is current. It must "
+        "examine the applicable evidence for Backup and restore acceptance",
+        "A person controls physical USB removal and separate storage. The "
+        "evidence does not show completion of those actions",
+        "This decision authorises no retirement",
+        "D-P6-008 stays Deferred — unmet and mandatory before Phase 10 "
+        "beta acceptance",
+        "TERM-R04 stays open",
+        "Output stays private-development and project status stays unknown",
+        "B14/B15 identities, the inherited B15 host and the "
+        "development-only comparison oracle stay",
+        "Every comparison, adapter, caller, removal and legacy-retirement "
+        "condition stays",
+        "It accepts no product change, risk closure, performance result, "
+        "wider migration, production clearance, phase closure, release or "
+        "legacy-path removal",
+        "They authorise the merge after acceptance from an independent "
+        "reviewer. Checks for the exact candidate must give PASS",
+    ):
+        _require(clause in flat, "D-P8-005 bounded condition drifted: " + clause)
 
 
 def _validate_dp8_004_acceptance(evidence: str) -> None:
@@ -5135,9 +5301,9 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
         level=1,
     ))
     for clause in (
-        "Open — 3/4 evidenced exits under D-P8-004",
-        "Exits 1, 3 and 4 are Evidenced and owner-accepted",
-        "Exit 2 stays Pending",
+        "Open — 4/4 evidenced exits under D-P8-005",
+        "All four exits are Evidenced and owner-accepted",
+        "Phase 8 stays Open",
         "D-P7-006",
         "all four original exits Evidenced and owner-accepted",
     ):
@@ -5163,24 +5329,23 @@ def _validate_phase8_opening(evidence: str, plan: str) -> None:
     expected_rows = [
         ["Exit condition", "Status", "Evidence"], ["---"] * 3,
     ]
-    admitted = {1: "D-P8-004", 3: "D-P8-002", 4: "D-P8-003"}
+    admitted = {
+        1: ("D-P8-004", "2026-09-30", "acceptance"),
+        2: ("D-P8-005", "2026-10-01", "acceptance"),
+        3: ("D-P8-002", "2026-09-30", "admission"),
+        4: ("D-P8-003", "2026-09-30", "admission"),
+    }
     for number, criterion in enumerate(criteria, start=1):
-        if number in admitted:
-            decision_id = admitted[number]
-            panel_kind = "acceptance" if number == 1 else "admission"
-            expected_rows.append([
-                criterion,
-                "Evidenced — owner-accepted 2026-09-30",
-                f"[{decision_id} panel and decision]"
-                f"(#phase-8-exit-{number}-{panel_kind}-panel)",
-            ])
-        else:
-            expected_rows.append([
-                criterion, "Pending", "No Phase 8 exit admission.",
-            ])
+        decision_id, date, panel_kind = admitted[number]
+        expected_rows.append([
+            criterion,
+            "Evidenced — owner-accepted " + date,
+            f"[{decision_id} panel and decision]"
+            f"(#phase-8-exit-{number}-{panel_kind}-panel)",
+        ])
     _require(
         rows == expected_rows,
-        "Phase 8 evidence criteria or Exit 1/3/4 admission status drifted",
+        "Phase 8 evidence criteria or four-exit acceptance status drifted",
     )
     flat = _semantic_text(evidence)
     for clause in (
@@ -6059,7 +6224,7 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004"},
+        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -7805,6 +7970,7 @@ def main() -> None:
     _validate_dp8_002_acceptance(phase8_evidence)
     _validate_dp8_003_acceptance(phase8_evidence)
     _validate_dp8_004_acceptance(phase8_evidence)
+    _validate_dp8_005_acceptance(phase8_evidence)
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_finite_documentation_completion(plan, current_evidence)

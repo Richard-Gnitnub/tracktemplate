@@ -1164,20 +1164,21 @@ def validate_phase6_closeout_mutations() -> None:
     )
     current_opening = read("reference/current/PHASE_EVIDENCE.md")
     current_status = paragraph_containing(
-        current_opening, "Status: **Open — 3/4",
+        current_opening, "Status: **Open — 4/4",
     )
     expect_rejected(
-        "phase8-opening/premature-exit-acceptance",
+        "phase8-opening/accepted-exit-count-regressed",
         lambda: progress._validate_phase8_opening(replace_once(
             current_opening,
             current_status,
             replace_once(
                 current_status,
+                "All four exits are\nEvidenced and owner-accepted.",
                 "Exit 2 stays Pending.",
-                "Exit 2 is accepted.",
             ),
         ), read("reference/PROJECT_PLAN.md")),
-        "Phase 8 opening status drifted: Exit 2 stays Pending",
+        "Phase 8 opening status drifted: All four exits are Evidenced "
+        "and owner-accepted",
     )
     expect_rejected(
         "phase8-opening/performance-duty-waived",
@@ -1536,7 +1537,7 @@ def validate_phase8_exit4_admission_mutations() -> None:
 
 
 def validate_phase8_exit1_admission_mutations() -> None:
-    """Reject widened Exit 1 proof, lost conditions and premature Exit 2."""
+    """Reject widened Exit 1 proof and changes to retained conditions."""
     evidence = read("reference/current/PHASE_EVIDENCE.md")
     plan = read("reference/PROJECT_PLAN.md")
     panel = progress._section(
@@ -1581,14 +1582,14 @@ def validate_phase8_exit1_admission_mutations() -> None:
         evidence, "Creation, parameter editing, selection, undo/redo",
     )
     changed = replace_once(
-        row, "| Pending |", "| Evidenced — owner-accepted 2026-09-30 |",
+        row, "| Evidenced — owner-accepted 2026-10-01 |", "| Pending |",
     )
     expect_rejected(
-        "phase8-exit1/exit-2-accepted-without-authority",
+        "phase8-exit1/exit-2-acceptance-regressed",
         lambda: progress._validate_phase8_opening(
             replace_once(evidence, row, changed), plan,
         ),
-        "Phase 8 evidence criteria or Exit 1/3/4 admission status drifted",
+        "Phase 8 evidence criteria or four-exit acceptance status drifted",
     )
 
     for name, before, after, diagnostic in (
@@ -1739,6 +1740,246 @@ def validate_phase8_exit1_admission_mutations() -> None:
             lambda value=mutated: progress._validate_dp8_004_acceptance(value),
             "D-P8-004 bounded condition drifted: " + clause,
         )
+
+
+def validate_phase8_exit2_acceptance_mutations() -> None:
+    """Reject wider Exit 2 claims, lost recovery duties and phase closure."""
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    plan = read("reference/PROJECT_PLAN.md")
+    panel = progress._section(
+        evidence, "Phase 8 Exit 2 acceptance panel — 2026-10-01",
+    )
+    current = json.loads(read("reference/current/gate-decisions.json"))
+    frozen = {
+        item["id"]: item
+        for item in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        (
+            "decided_on", "2026-09-30",
+            "identity, acceptance or panel routing drifted",
+        ),
+        (
+            "decision", "Close Phase 8 and open Phase 9.",
+            "identity, acceptance or panel routing drifted",
+        ),
+        ("authority", "Accept all GUI workflows.", "authority digest drifted"),
+        ("exclusions", "No conditions remain.", "exclusions digest drifted"),
+        (
+            "panel_record", "reference/current/PHASE_EVIDENCE.md",
+            "identity, acceptance or panel routing drifted",
+        ),
+    ):
+        mutated = copy.deepcopy(current)
+        mutated["decisions"][8][field] = replacement
+        expect_rejected(
+            "phase8-exit2/d-p8-005-" + field + "-changed",
+            lambda value=mutated: progress._validate_phase8_decision_opening(
+                value, frozen,
+            ),
+            "D-P8-005 " + diagnostic,
+        )
+
+    for name, before, after, diagnostic in (
+        (
+            "source-changed", "c82b335c58c1a0399358dfa5f3690eaac219a9aa",
+            "0" * 40,
+            "D-P8-005 bounded condition drifted: D-P8-005 accepts Exit 2 "
+            "at protected main c82b335c58c1a0399358dfa5f3690eaac219a9aa",
+        ),
+        (
+            "criterion-changed",
+            "> Creation, parameter editing, selection, undo/redo, "
+            "save/reopen, validation, and export pass in the real GUI.",
+            "> Only creation must pass in the real GUI.",
+            "D-P8-005 unchanged criterion or panel anchor drifted",
+        ),
+        (
+            "owner-instruction-changed",
+            "on the bounded evidence and conditions proposed.",
+            "without any conditions.",
+            "D-P8-005 exact owner instruction drifted or was relocated",
+        ),
+    ):
+        expect_rejected(
+            "phase8-exit2/" + name,
+            lambda value=replace_once(
+                evidence, panel, replace_once(panel, before, after),
+            ): progress._validate_dp8_005_acceptance(value),
+            diagnostic,
+        )
+
+    for name, before, after, clause in (
+        (
+            "to-preselection-limit-lost",
+            "does not show `TO-001`\noutput after a person selects",
+            "proves `TO-001` output after a person selects",
+            "The evidence does not show TO-001 output after a person "
+            "selects a FreeCAD object",
+        ),
+        (
+            "disabled-probes-admitted",
+            "without those operations supplies evidence for failure "
+            "classification only",
+            "without those operations supplies accepted GUI export proof",
+            "The previous check without those operations supplies evidence "
+            "for failure classification only",
+        ),
+        (
+            "failed-evidence-promoted",
+            "No previous failed evidence becomes a `PASS` result",
+            "All previous failed evidence becomes a `PASS` result",
+            "No previous failed evidence becomes a PASS result through this "
+            "decision",
+        ),
+        (
+            "raw-output-identity-inferred",
+            "The evidence does not show identical output files from checks "
+            "with and without\nthe FreeCAD display. This limitation applies "
+            "before any change to those files",
+            "The evidence proves identical output files from checks with "
+            "and without the FreeCAD display",
+            "The evidence does not show identical output files from checks "
+            "with and without the FreeCAD display. This limitation applies "
+            "before any change to those files",
+        ),
+        (
+            "global-selection-restoration-inferred",
+            "does not put `Gui.Selection` back to\n"
+            "its initial state",
+            "puts `Gui.Selection` back to its initial state",
+            "The repair does not put Gui.Selection back to its initial "
+            "state",
+        ),
+        (
+            "backup-duty-delayed",
+            "new snapshot for independent preservation is\nnecessary now",
+            "new snapshot for independent preservation is optional later",
+            "A new snapshot for independent preservation is necessary now",
+        ),
+        (
+            "backup-coverage-inferred",
+            "does not show a new snapshot of the current worktrees",
+            "shows a new snapshot of the current worktrees",
+            "The evidence does not show a new snapshot of the current "
+            "worktrees and the most recent evidence files",
+        ),
+        (
+            "backup-duty-waived",
+            "does not complete that work. It authorises no change to the\n"
+            "deadline or removal of the condition",
+            "completes that work and removes the condition",
+            "This acceptance does not complete that work. It authorises no "
+            "change to the deadline or removal of the condition",
+        ),
+        (
+            "backup-equated-with-local-state",
+            "Local preservation does not prove independent\n"
+            "preservation",
+            "Local preservation proves independent\n"
+            "preservation",
+            "Local preservation does not prove independent preservation",
+        ),
+        (
+            "closeout-recovery-omitted",
+            "the panel must examine the\n"
+            "snapshot of the current worktrees and evidence",
+            "the panel need not examine the snapshot of the current "
+            "worktrees and evidence",
+            "Before a separate decision to close Phase 8, the panel must "
+            "examine the snapshot of the current worktrees and evidence. "
+            "The panel must also examine whether the snapshot is current. "
+            "It must examine the applicable evidence for Backup and restore "
+            "acceptance",
+        ),
+        (
+            "performance-duty-discharged",
+            "D-P6-008 stays Deferred — unmet",
+            "D-P6-008 is complete",
+            "D-P6-008 stays Deferred — unmet and mandatory before "
+            "Phase 10 beta acceptance",
+        ),
+        (
+            "terminology-risk-closed", "TERM-R04 stays open",
+            "TERM-R04 is closed", "TERM-R04 stays open",
+        ),
+        (
+            "output-cleared", "Output stays private-development",
+            "Output is production-cleared",
+            "Output stays private-development and project status stays "
+            "unknown",
+        ),
+        (
+            "legacy-retirement-conditions-waived",
+            "legacy-retirement condition stays",
+            "legacy-retirement condition is waived",
+            "Every comparison, adapter, caller, removal and "
+            "legacy-retirement condition stays",
+        ),
+        (
+            "retirement-authorised",
+            "This decision authorises no\nretirement",
+            "This decision authorises retirement",
+            "This decision authorises no retirement",
+        ),
+    ):
+        expect_rejected(
+            "phase8-exit2/" + name,
+            lambda value=replace_once(
+                evidence, panel, replace_once(panel, before, after),
+            ): progress._validate_dp8_005_acceptance(value),
+            "D-P8-005 bounded condition drifted: " + clause,
+        )
+
+    row = table_row_containing(panel, "| Save/reopen |")
+    expect_rejected(
+        "phase8-exit2/save-reopen-evidence-omitted",
+        lambda: progress._validate_dp8_005_acceptance(replace_once(
+            evidence, panel, replace_once(panel, row + "\n", ""),
+        )),
+        "D-P8-005 real-GUI operation matrix drifted",
+    )
+    row = table_row_containing(
+        evidence, "Creation, parameter editing, selection, undo/redo",
+    )
+    expect_rejected(
+        "phase8-exit2/acceptance-date-copied-from-earlier-exits",
+        lambda: progress._validate_phase8_opening(replace_once(
+            evidence, row, replace_once(row, "2026-10-01", "2026-09-30"),
+        ), plan),
+        "Phase 8 evidence criteria or four-exit acceptance status drifted",
+    )
+    row = table_row_containing(
+        plan, "| 8 | Turnout, crossover and timbering migration",
+    )
+    expect_rejected(
+        "phase8-exit2/phase-8-count-returned-to-three",
+        lambda: progress._validate_plan_shape(replace_once(
+            plan, row, replace_once(row, "4/4 evidenced", "3/4 evidenced"),
+        )),
+        "Phase 8 must be open at four evidenced exits",
+    )
+    expect_rejected(
+        "phase8-exit2/phase-8-closed-without-authority",
+        lambda: progress._validate_plan_shape(replace_once(
+            plan, row, replace_once(
+                row, "| Open |", "| Complete — accepted 2026-10-01 |",
+            ),
+        )),
+        "Phase 8 must be the only open phase",
+    )
+    phase9 = table_row_containing(plan, "| 9 | Chair definitions,")
+    expect_rejected(
+        "phase8-exit2/phase-9-opened-without-authority",
+        lambda: progress._validate_plan_shape(replace_once(
+            plan, phase9,
+            replace_once(phase9, "| Not started |", "| Open |"),
+        )),
+        "Phase 8 must be the only open phase",
+    )
 
 
 def validate_capability_matrix_mutations() -> None:
@@ -6579,6 +6820,7 @@ def main() -> None:
     validate_phase8_exit3_admission_mutations()
     validate_phase8_exit4_admission_mutations()
     validate_phase8_exit1_admission_mutations()
+    validate_phase8_exit2_acceptance_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()
