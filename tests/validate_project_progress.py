@@ -1094,7 +1094,8 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-021',
         'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        'Complete the recovery evidence before a separate Phase 8 closeout assessment',
+        "Complete the recovery evidence before the separate assessment to "
+        "close Phase 8",
         'Physical removal and separate storage remain operator-controlled and unverified',
         'D-P8-002',
         'keep Exit 3 and Exit 4 acceptance and all their limitations',
@@ -1108,8 +1109,9 @@ def _validate_owner_view(plan: str) -> None:
         'The Exit 2 condition stays the same',
         'merge the Exit 2 record changes into protected `main`',
         'Do not close Phase 8 or open Phase 9 through this decision',
-        'The independent snapshot is due',
-        'Current snapshot coverage is unproved',
+        "A new snapshot for independent preservation is necessary now",
+        "The evidence does not show a snapshot of all current worktrees and "
+        "their evidence",
         'The evidence does not show `TO-001` output after a person selects a FreeCAD object',
     ):
         _require(
@@ -4916,7 +4918,7 @@ def _validate_phase8_decision_opening(
         ),
         (
             'exclusions',
-            '6e45bd9c60f1fb33d3ef01f26a17d72b469f304e1f0152ff8e75afce816f3b67',
+            "b101b9a3fe5ff8ff522eed8f0080da4b373eeed282417473a868fe2438b24c0a",
         ),
     ):
         value = exit2[field]
@@ -4968,63 +4970,70 @@ def _validate_dp8_005_acceptance(evidence: str) -> None:
         "All four exits are Evidenced and owner-accepted",
         "Phase 8 stays Open",
         "Phase 9 stays Not started",
-        "It did not use headless checks in place of those checks",
-        "This panel claims no new FreeCAD execution",
+        "It did not use checks without that display in place of those "
+        "checks",
+        "This panel claims no new FreeCAD operation",
         "48 source hashes equal to the source at c82b335",
         "Each check examines selected_objects in "
         "SelectedProductionExportDialog six times. Those data stay equal",
         "Ten mandatory probe_2d_export_bounds operations complete and "
         "close their temporary documents",
-        "The repair preserves that empty value and the highlighted-row "
-        "operations",
-        "This reasoning does not make an earlier execution a new check "
-        "at c82b335",
+        "The repair preserves that empty value and the operations that use "
+        "highlighted_record_ids",
+        "Use of the previous evidence supplies no new result at c82b335",
         "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
         "It gives no product-performance acceptance",
         "Independent reviewer /root/exit2_admission_evidence",
         "/root/exit2_source_currency examines the source changes and "
-        "reuse conditions",
+        "conditions for use of the previous checks",
         "/root/exit2_admission_risks examines all 24 live risks",
-        "These reviewers did not implement or execute the PR #126 repair",
+        "These reviewers did not make the PR #126 repair or do its checks",
         "The panel recommendation is Proceed with bounded conditions",
         "No risk owner, deadline, treatment, severity, disposition or "
         "control effectiveness changes",
-        "The recorded owners must complete their duties by the recorded "
-        "deadlines",
+        "The recorded owners must complete the necessary work by the "
+        "recorded deadlines",
         "They do not prove every input, control, selection route or host "
         "profile",
         "The evidence does not show TO-001 output after a person selects "
         "a FreeCAD object",
-        "The accepted positive checks for that route use XO-001 only",
-        "The earlier NO_SELECTED_PRODUCTION_ITEMS failures and the "
-        "diagnosis remain",
-        "The mandatory operations stay enabled in the positive checks",
-        "The earlier check with those operations disabled remains "
-        "diagnosis only",
-        "The complete source of the original historical test remains "
-        "unavailable",
-        "No earlier failed evidence becomes a PASS result through this "
+        "The accepted checks with PASS results for that route use XO-001 "
+        "only",
+        "The project keeps the previous NO_SELECTED_PRODUCTION_ITEMS "
+        "failures and the evidence for failure classification",
+        "The mandatory operations occur in the checks with PASS results",
+        "The previous check without those operations supplies evidence for "
+        "failure classification only",
+        "The project does not have the complete source of the initial "
+        "failed test",
+        "No previous failed evidence becomes a PASS result through this "
         "decision",
-        "The straight TO cross-version Edit limitation and historical "
-        "source limitations stay",
+        "The limitation for straight TO-001 Edit across versions stays. The "
+        "source limitations for previous checks stay",
         "The limitations for wider persistence, host profiles and "
         "production metadata stay",
-        "Older digest differences remain unexplained",
-        "Raw GUI/headless output identity remains unproved",
-        "The repair does not restore Gui.Selection",
-        "The SVG and CSV checks do not qualify every output format",
+        "The causes of previous hash differences are unknown",
+        "The evidence does not show identical output files from checks with "
+        "and without the FreeCAD display. This limitation applies before "
+        "any change to those files",
+        "The repair does not put Gui.Selection back to its initial state",
+        "The SVG and CSV checks do not show results for every output format",
         "The Exit 1, Exit 3 and Exit 4 conditions and limitations stay",
-        "The independent snapshot is due now",
-        "New independent snapshot coverage for the current worktrees and "
-        "latest raw evidence is unproved",
-        "Local preservation does not prove independent backup",
-        "Richard owns independent backup",
-        "The implementation/QA owner enforces safe handling",
-        "This acceptance does not complete, postpone or waive that duty",
-        "Phase 8 closeout must examine current snapshot coverage, currency "
-        "and the applicable restore evidence",
-        "Physical USB removal and separate storage remain "
-        "operator-controlled and unverified",
+        "A new snapshot for independent preservation is necessary now",
+        "The evidence does not show a new snapshot of the current worktrees "
+        "and the most recent evidence files",
+        "Local preservation does not prove independent preservation",
+        "Richard must complete the independent preservation",
+        "The implementation/QA owner must make sure that all work obeys the "
+        "recovery policy",
+        "This acceptance does not complete that work. It authorises no "
+        "change to the deadline or removal of the condition",
+        "Before a separate decision to close Phase 8, the panel must "
+        "examine the snapshot of the current worktrees and evidence. The "
+        "panel must also examine whether the snapshot is current. It must "
+        "examine the applicable evidence for Backup and restore acceptance",
+        "A person controls physical USB removal and separate storage. The "
+        "evidence does not show completion of those actions",
         "This decision authorises no retirement",
         "D-P6-008 stays Deferred — unmet and mandatory before Phase 10 "
         "beta acceptance",
@@ -5037,8 +5046,8 @@ def _validate_dp8_005_acceptance(evidence: str) -> None:
         "It accepts no product change, risk closure, performance result, "
         "wider migration, production clearance, phase closure, release or "
         "legacy-path removal",
-        "They authorise integration after independent acceptance and "
-        "checks that give PASS for the exact candidate",
+        "They authorise the merge after acceptance from an independent "
+        "reviewer. Checks for the exact candidate must give PASS",
     ):
         _require(clause in flat, "D-P8-005 bounded condition drifted: " + clause)
 

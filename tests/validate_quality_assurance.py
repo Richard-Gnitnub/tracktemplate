@@ -640,7 +640,8 @@ def validate_documentation_profile(
             'D-GOV-021',
             'authorises one `git worktree remove --force` operation only if all its conditions pass',
             'The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-            'Complete the recovery evidence before a separate Phase 8 closeout assessment',
+            "Complete the recovery evidence before the separate assessment "
+            "to close Phase 8",
             'Physical removal and separate storage remain operator-controlled and unverified',
             'D-P8-002',
             'keep Exit 3 and Exit 4 acceptance and all their limitations',
@@ -654,8 +655,9 @@ def validate_documentation_profile(
             'The Exit 2 condition stays the same',
             'merge the Exit 2 record changes into protected `main`',
             'Do not close Phase 8 or open Phase 9 through this decision',
-            'The independent snapshot is due',
-            'Current snapshot coverage is unproved',
+            "A new snapshot for independent preservation is necessary now",
+            "The evidence does not show a snapshot of all current worktrees "
+            "and their evidence",
             'The evidence does not show `TO-001` output after a person selects a FreeCAD object',
         )),
         "PROJECT_PLAN owner view contradicts current authority",

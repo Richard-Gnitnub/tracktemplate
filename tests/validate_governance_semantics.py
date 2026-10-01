@@ -1822,60 +1822,78 @@ def validate_phase8_exit2_acceptance_mutations() -> None:
         ),
         (
             "disabled-probes-admitted",
-            "disabled remains diagnosis only",
-            "disabled is accepted GUI export proof",
-            "The earlier check with those operations disabled remains "
-            "diagnosis only",
+            "without those operations supplies evidence for failure "
+            "classification only",
+            "without those operations supplies accepted GUI export proof",
+            "The previous check without those operations supplies evidence "
+            "for failure classification only",
         ),
         (
             "failed-evidence-promoted",
-            "No earlier failed evidence becomes a `PASS` result",
-            "All earlier failed evidence becomes a `PASS` result",
-            "No earlier failed evidence becomes a PASS result through "
-            "this decision",
+            "No previous failed evidence becomes a `PASS` result",
+            "All previous failed evidence becomes a `PASS` result",
+            "No previous failed evidence becomes a PASS result through this "
+            "decision",
         ),
         (
             "raw-output-identity-inferred",
-            "Raw GUI/headless output identity remains unproved",
-            "Raw GUI/headless output identity is proved",
-            "Raw GUI/headless output identity remains unproved",
+            "The evidence does not show identical output files from checks "
+            "with and without\nthe FreeCAD display. This limitation applies "
+            "before any change to those files",
+            "The evidence proves identical output files from checks with "
+            "and without the FreeCAD display",
+            "The evidence does not show identical output files from checks "
+            "with and without the FreeCAD display. This limitation applies "
+            "before any change to those files",
         ),
         (
             "global-selection-restoration-inferred",
-            "does not restore `Gui.Selection`",
-            "restores `Gui.Selection`",
-            "The repair does not restore Gui.Selection",
+            "does not put `Gui.Selection` back to\n"
+            "its initial state",
+            "puts `Gui.Selection` back to its initial state",
+            "The repair does not put Gui.Selection back to its initial "
+            "state",
         ),
         (
-            "backup-duty-delayed", "independent snapshot is due now",
-            "independent snapshot is optional later",
-            "The independent snapshot is due now",
+            "backup-duty-delayed",
+            "new snapshot for independent preservation is\nnecessary now",
+            "new snapshot for independent preservation is optional later",
+            "A new snapshot for independent preservation is necessary now",
         ),
         (
             "backup-coverage-inferred",
-            "evidence is unproved. Local preservation",
-            "evidence is proved. Local preservation",
-            "New independent snapshot coverage for the current worktrees "
-            "and latest raw evidence is unproved",
+            "does not show a new snapshot of the current worktrees",
+            "shows a new snapshot of the current worktrees",
+            "The evidence does not show a new snapshot of the current "
+            "worktrees and the most recent evidence files",
         ),
         (
             "backup-duty-waived",
-            "does not complete, postpone or waive that duty",
-            "completes, postpones and waives that duty",
-            "This acceptance does not complete, postpone or waive that duty",
+            "does not complete that work. It authorises no change to the\n"
+            "deadline or removal of the condition",
+            "completes that work and removes the condition",
+            "This acceptance does not complete that work. It authorises no "
+            "change to the deadline or removal of the condition",
         ),
         (
             "backup-equated-with-local-state",
-            "Local preservation does not prove independent backup",
-            "Local preservation proves independent backup",
-            "Local preservation does not prove independent backup",
+            "Local preservation does not prove independent\n"
+            "preservation",
+            "Local preservation proves independent\n"
+            "preservation",
+            "Local preservation does not prove independent preservation",
         ),
         (
             "closeout-recovery-omitted",
-            "Phase 8 closeout must examine current snapshot coverage",
-            "Phase 8 closeout need not examine current snapshot coverage",
-            "Phase 8 closeout must examine current snapshot coverage, "
-            "currency and the applicable restore evidence",
+            "the panel must examine the\n"
+            "snapshot of the current worktrees and evidence",
+            "the panel need not examine the snapshot of the current "
+            "worktrees and evidence",
+            "Before a separate decision to close Phase 8, the panel must "
+            "examine the snapshot of the current worktrees and evidence. "
+            "The panel must also examine whether the snapshot is current. "
+            "It must examine the applicable evidence for Backup and restore "
+            "acceptance",
         ),
         (
             "performance-duty-discharged",
@@ -1902,7 +1920,8 @@ def validate_phase8_exit2_acceptance_mutations() -> None:
             "legacy-retirement condition stays",
         ),
         (
-            "retirement-authorised", "This decision authorises no retirement",
+            "retirement-authorised",
+            "This decision authorises no\nretirement",
             "This decision authorises retirement",
             "This decision authorises no retirement",
         ),
