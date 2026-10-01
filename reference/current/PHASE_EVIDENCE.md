@@ -17,92 +17,107 @@ The owner accepted the independently reviewed
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 4/4 under D-P8-005. All four exits are Evidenced and owner-accepted. Phase 8 stays Open. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
-| What changed | [The October 1 preservation record](#phase-8-worktree-retirement-october-1) records removal of 23 worktrees after exact preservation and independent checks. All 45 branch refs remained unchanged. PR #127 integrated the Exit 2 record at `1618ea5`. <br><br>[D-P8-005](#phase-8-exit-2-acceptance-panel) records Exit 2 acceptance at `c82b335` for the reviewed examples. The Exit 2 condition stays the same. Phase 8 stays Open at 4/4. <br><br>[D-P8-004](#phase-8-exit-1-acceptance-panel) records Exit 1 acceptance at `44eb4bf` for the reviewed examples. The Exit 1 condition stays the same. D-P8-002 and D-P8-003 keep Exit 3 and Exit 4 acceptance and all their limitations. <br><br>The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. <br><br>D-GOV-022 authorises one `git worktree remove --force` operation only if its conditions pass. An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories. The 37 individual retirement audits gave PASS. Git removed 37 worktrees without `--force`. Git also deleted 36 branches whose tips the accepted commit contained. <br><br>PR #97 integrated D-GOV-022. A fresh six-root snapshot, restore test, individual audits and post-removal checks gave PASS. Git removed the two remaining D-GOV-022 worktrees without `--force`. The [preservation diff](#phase-8-worktree-retirement-result) records their retained branch tips. |
+| What changed | [The October 1 preservation record](#phase-8-worktree-retirement-october-1) records removal of 23 worktrees after independent preservation and identity checks. All 45 local branches kept the same tips. PR #127 integrated the Exit 2 record at `1618ea5`. <br><br>[D-P8-005](#phase-8-exit-2-acceptance-panel) records Exit 2 acceptance at `c82b335` for the reviewed examples. The Exit 2 condition stays the same. Phase 8 stays Open at 4/4. <br><br>[D-P8-004](#phase-8-exit-1-acceptance-panel) records Exit 1 acceptance at `44eb4bf` for the reviewed examples. The Exit 1 condition stays the same. D-P8-002 and D-P8-003 keep Exit 3 and Exit 4 acceptance and all their limitations. <br><br>The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. <br><br>D-GOV-022 authorises one `git worktree remove --force` operation only if its conditions pass. An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories. The 37 individual retirement audits gave PASS. Git removed 37 worktrees without `--force`. Git also deleted 36 branches whose tips the accepted commit contained. <br><br>PR #97 integrated D-GOV-022. A fresh six-root snapshot, restore test, individual audits and post-removal checks gave PASS. Git removed the two remaining D-GOV-022 worktrees without `--force`. The [preservation diff](#phase-8-worktree-retirement-result) records their retained branch tips. |
 | What now works | The [Exit 2 panel](#phase-8-exit-2-acceptance-panel) records acceptance for the reviewed `TO-001` and `XO-001` operations in the FreeCAD display. It keeps all evidence limitations. <br><br>The [Exit 1 panel](#phase-8-exit-1-acceptance-panel) records acceptance for the unchanged Exit 1 condition. The bounded scope includes only the reviewed straight and curved `TO-001` and `XO-001` workflows. The [Exit 3 panel](#phase-8-exit-3-admission-panel) and [Exit 4 panel](#phase-8-exit-4-admission-panel) keep their accepted evidence. <br><br>The four Phase 7 exit decisions keep their accepted bounded evidence. The Phase 8 candidate passed development-only calculation, caller and real-GUI range tests. |
-| Limitations/findings | The [Exit 2 limitations](#phase-8-exit-2-acceptance-panel) stay. The evidence does not show `TO-001` output after a person selects a FreeCAD object. The [October 1 preservation record](#phase-8-worktree-retirement-october-1) covers all 41 worktrees at its removal boundary and the specified later changes. The monthly restore remains due by 2026-10-05. Before a closeout assessment, check that the recovery evidence remains current. A separate owner decision is necessary to close Phase 8. <br><br>The [Exit 1 limitations](#phase-8-exit-1-acceptance-panel), [Exit 3 limitations](#phase-8-exit-3-admission-panel) and [Exit 4 limitations](#phase-8-exit-4-admission-panel) stay. TERM-R04 stays open. <br><br>All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. At the September 28 retirement boundary, five branches with unmerged commits and three related worktrees remained. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight prior branch refs, including both retired-worktree refs, remained exact at that boundary.<br><br>The owner confirms that the approved USB stays physically connected. Its device identity was verified. Separate physical storage and an off-site copy are not claimed. |
+| Limitations/findings | The [Exit 2 limitations](#phase-8-exit-2-acceptance-panel) stay. The evidence does not show `TO-001` output after a person selects a FreeCAD object. The [October 1 preservation record](#phase-8-worktree-retirement-october-1) records independent preservation of all 41 worktrees at removal and the specified subsequent changes. The monthly recovery test is due by 2026-10-05. Before a closeout assessment, compare the recovery evidence with the repository state. A separate owner decision is necessary to close Phase 8. <br><br>The [Exit 1 limitations](#phase-8-exit-1-acceptance-panel), [Exit 3 limitations](#phase-8-exit-3-admission-panel) and [Exit 4 limitations](#phase-8-exit-4-admission-panel) stay. TERM-R04 stays open. <br><br>All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. At the September 28 retirement, five branches with unmerged commits and three related worktrees stayed. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight previous branch `refs` values stayed the same at that time, including the two for the removed worktrees.<br><br>The owner reports that the approved USB stays connected to the machine. The agent compared its device identity with the approved record. Both identities were the same. This record claims no separate USB location or copy on another machine. |
 | Owner decision | [D-P8-005](#phase-8-exit-2-acceptance-panel) accepts Exit 2 at `c82b335` on the proposed evidence and conditions. D-P8-002, D-P8-003 and D-P8-004 keep their accepted scope and conditions. PR #127 completed that integration at `1618ea5`. The owner separately authorised removal of worktrees that were no longer necessary. This cycle preserves every branch and supplies one draft preservation record. <br><br>D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | Complete the normal publication and integration procedure for the [October 1 preservation record](#phase-8-worktree-retirement-october-1). This continuation cycle stops with the new draft. Before a separate Phase 8 closeout assessment, examine the current recovery evidence under the [recovery policy](../RECOVERY_AND_BACKUP.md#backup-cadence-and-retention). A separate owner decision remains necessary. Do not close Phase 8 or open Phase 9 through this record. |
+| Next action | Complete the normal Git workflow for the [October 1 preservation record](#phase-8-worktree-retirement-october-1). This continuation cycle stops with the new draft. Before a separate Phase 8 closeout assessment, examine the current recovery evidence under the [recovery policy](../RECOVERY_AND_BACKUP.md#backup-cadence-and-retention). A separate owner decision is necessary. Do not close Phase 8 or open Phase 9 through this record. |
 
 
 <a id="phase-8-worktree-retirement-october-1"></a>
 
-## Phase 8 worktree retirement and preservation — 2026-10-01
+## Phase 8 worktree retirement and independent preservation — 2026-10-01
 
-The owner instructed the agent to delete worktrees that were no longer necessary.
-The owner also confirmed that the approved USB stays connected to the machine.
-The agent verified the device identity and mounted filesystem. This Level 1
-record describes the completed work under the existing
+The owner instructed the agent to remove worktrees that were no longer necessary.
+The owner also reported that the approved USB stays connected to the machine.
+The agent examined the device identity and its available data. This Level 1
+record gives the results from the completed work under the existing
 [retirement controls](../RECOVERY_AND_BACKUP.md#worktree-retirement).
 It changes no policy or phase decision.
 
 PR #127 integrated the Exit 2 record at protected `main`
 `1618ea535e42bd01d7d76220b4883ab08e1ad3c2`. Before removal, the new
-`2026-10-01-pre-worktree-retirement-01` snapshot covered all 41 registered
-worktrees. It preserved 64,407 entries and 4,434,264,142 regular-file bytes.
+`2026-10-01-pre-worktree-retirement-01` snapshot preserved all 41 worktrees
+in `git worktree list`. It preserved 64,407 items and 4,434,264,142 bytes
+from regular files.
 
-The source and copy comparisons passed. All 41 checksum comparisons gave no
-differences. The snapshot includes all 18 physical FreeCAD CLI repositories
-and preserves the symbolic links as links.
+The checks of the initial data and snapshot gave `PASS`. All 41 hash checks
+found no differences. The snapshot includes all 18 FreeCAD CLI repositories
+with their own local data. It preserves symbolic links as symbolic links.
 
-The restore test copied all 23 candidates into a new temporary location.
-All 19,512 entries matched. The three physical FreeCAD CLI repositories
-retained their Git identities and passed `git fsck`. The test did not operate
-Git through the copied parent-worktree pointer files or external tool links.
+The agent made copies of all 23 candidates in a new temporary location for
+recovery tests. All 19,512 items had the same data and metadata.
+The three FreeCAD CLI repositories with their own data kept their Git identities.
+Their `git fsck` checks gave `PASS`. The test did not operate Git through the
+copied parent-worktree `.git` files or symbolic links to external tools.
 
-The 2,872-entry initial evidence packet was copied and verified separately.
-An independent reviewer examined the actual snapshot, restores and copied
+The agent preserved the initial local evidence with 2,872 items separately.
+An independent reviewer examined the snapshot, recovery copies and separate
 evidence. The result was `PASS`.
 
-During the checks, PyCharm added four exclusions for temporary test
-environments to the primary project file. The agent preserved that file in a
-separate copy on the USB. A temporary restore test reproduced its 2,005 bytes
-exactly. The live project file was not replaced.
+During the checks, PyCharm added four `excludeFolder` entries to the primary
+project file. The agent preserved that file separately on the USB.
+A temporary recovery test gave a copy with the same 2,005 bytes.
+The agent did not replace the primary project file.
 
-The comparison of all 41 sources found only that file change and two directory timestamps.
-The original snapshot plus the recorded changes matched that source comparison.
-An independent reviewer verified the additional copy and current IDE data.
-The original snapshot and initial IDE record remain unchanged.
+The checks of all 41 worktrees found only that file change and two directory
+`mtime_ns` changes. The initial snapshot and recorded changes had the same
+data as all 41 worktrees at that check.
+An independent reviewer examined the additional copy and IDE data.
+The initial snapshot and initial IDE record stay the same.
 
-A review command later made one 308-byte Ruff cache file in the primary
-worktree. Its parent directory timestamp also changed. The agent paused the
-removals, preserved the file separately on the USB and kept the original
-comparison failure. The independent review classified this generated cache.
+A review command then made one 308-byte Ruff file in the primary
+`.ruff_cache` directory. Its parent directory `mtime_ns` value also changed.
+The agent paused the removals, preserved the file separately on the USB and
+kept the initial FAIL result. The independent review classified this generated
+Ruff data.
 
-The retained-data digests before and after each removal were identical. The record
-does not claim that the cache stayed identical to the initial snapshot.
-The earlier cache bytes and metadata for removals `r13` and `r14` were not
-separately retained. Each removal had identical before-and-after digests,
-but neither the initial snapshot nor the final cache copy reproduces those
-two intermediate states.
+The hashes of the remaining data before and after each removal were the same.
+The record does not claim that the Ruff data stayed the same as the initial
+snapshot. The agent did not separately preserve the earlier Ruff file bytes
+and metadata for removals `r13` and `r14`.
+Each removal had the same hashes before and after removal.
+But the initial snapshot and final Ruff copy do not show those two states
+between the checks.
 
-Each candidate had its own plan and a passing canonical retirement audit.
-The plans classified and preserved all 4,747 local-state items. An independent
-reviewer accepted the exact plans and controls. Before each removal, the
-checks examined the current identity, accepted history, tracked state,
-process use, IDE data, inventory and preserved copy again.
+Each candidate had its own retirement plan and a canonical retirement audit
+with a `PASS` result. The plans classified and preserved all 4,747 local-state
+items. An independent reviewer examined the plans and controls with their
+recorded identities and gave a `PASS` result.
+Before each removal, the checks examined identity, accepted history, tracked
+state, process use, IDE data, the local-state inventory and preserved copy again.
 
 Git removed all 23 worktrees with `git worktree remove`. Every check after
-removal passed. The agent used no `--force` operation and removed no branch.
-The D-GOV-022 exception remains unused. The preservation diff at that boundary is:
+removal gave `PASS`. The agent used no `--force` operation and removed no branch.
+The D-GOV-022 exception stays unused. The preservation diff at that time is:
 
 | Item | Before removal | After removal |
 | --- | --- | --- |
-| Registered worktrees | 41 | 18 |
+| Worktrees in `git worktree list` | 41 | 18 |
 | Local branches | 45 | The same 45 branches have the same tips. |
 | Stashes | None | None |
-| Protected `main` | Clean and synchronised at `1618ea535e42bd01d7d76220b4883ab08e1ad3c2`. | The same commit remains clean and synchronised. |
-| Remaining worktree data | The complete initial state was recorded. | File, directory and link comparisons passed outside the primary Git administration and active proof directory. Git identities, refs, indexes and stashes passed separate checks. The three dirty worktrees retained their bytes. |
-| Removed local state | 4,747 items had exact preservation locations. | The preserved snapshot and evidence remain unchanged. |
+| Protected `main` | Tracked cleanliness at `1618ea535e42bd01d7d76220b4883ab08e1ad3c2`. Local and remote `main` had the same tip. | The same commit and tracked cleanliness. Local and remote `main` have the same tip. |
+| Remaining worktree data | The agent recorded the complete initial Git state and local data. | Checks of files, directories and symbolic links gave `PASS` outside primary `.git` and the active directory for local evidence. Separate checks of Git identities, `refs` values, Git indexes and stashes gave `PASS`. The three dirty worktrees kept the same bytes. |
+| Removed local state | The plans recorded independent preservation locations for 4,747 items. | The snapshot and preserved evidence stay the same. |
 
-The 18 retained worktrees comprise primary `main`, four with unique history,
-three with dirty state, nine with internal symbolic links, and one required
-link target. The nine internal links cannot pass the existing requirement for
-the source and copy to point to the same location outside the removed worktree.
-The required link target must remain available to preserved links. This work
-does not change either condition. The later worktree for this documentation
-record is additional to the 18 worktrees at the removal boundary.
+The 18 remaining worktrees are:
 
-The following local branches remain at their exact tips:
+- Primary `main`.
+- Four worktrees with unique history.
+- Three worktrees with dirty state.
+- Nine worktrees with internal symbolic links.
+- One other worktree that the preserved symbolic links need.
+
+Under the existing retirement condition, the agent cannot remove the nine
+worktrees with internal symbolic links.
+For removal, the symbolic links in the worktree and snapshot must point to the
+same location outside the worktree.
+The preserved symbolic links also need the one other worktree to stay at its
+recorded location. This work does not change either condition.
+The agent made the worktree for this documentation record after removal.
+That worktree is additional to the 18 remaining worktrees.
+
+These local branches keep their tips:
 
 | Plan | Retained local branch | Exact tip |
 | --- | --- | --- |
@@ -130,34 +145,38 @@ The following local branches remain at their exact tips:
 | `r37` | `refs/heads/agent/phase8-turnout-host-interval` | `d9fae5582e2f0375e8d03819cf80f796be4addcd` |
 | `r39` | `refs/heads/agent/phase8-turnout-toe-range` | `29bf176e67dcaae4e6338a3d230c3309be3d30b4` |
 
-**Proof identities:** The complete plan set has SHA-256 `32496c558f69456592ad2071e409b503ea4287f8d8621aa1c204f13e35d7d4a0`.
+**Evidence identities:** The complete plan set has SHA-256 `32496c558f69456592ad2071e409b503ea4287f8d8621aa1c204f13e35d7d4a0`.
 The independent control review has SHA-256 `b8e05d2f4ef7110a080f65e9b59ad8bdf8f2c4f429b91035336b90db246eda20`.
 The completed removal receipt has SHA-256 `930897adf7f9207d6ba9632cc69a1865b91cba3dd865613bb9886b4cfa3647e2`.
 The independent review after removal has SHA-256 `554637aae50b8d131eb6ad662f8f363ebc83fc5813a73488b1843ec4e53ecd80`.
-Detailed plans, inventories and original evidence remain local and in the
-independent copies. Later records must also be preserved before this cycle ends.
+The plans, local-state inventories and initial evidence stay in local records
+and independent copies. The agent must also preserve the records made after
+those copies before this cycle ends.
 
-The failed helper checks, first failed restore and original failed plans
-remain retained. The repaired checks passed. No previous failed result became
-a passing result. The checks of process use and IDE data do not prove unsaved
-buffers or the branch indicator in the visible IDE window.
+The agent keeps the initial FAIL results for the helper checks, first recovery
+test and initial plans. The repaired checks gave `PASS`. No previous FAIL
+result became a PASS result. The process and IDE checks do not show all IDE
+data in memory or the branch name in the visible IDE window.
 
-The owner confirms that the USB remains physically attached. This record
-claims no separate physical storage or off-site copy. The full monthly restore
-remains due by 2026-10-05. The new candidate restores do not replace that drill
-or provide new FreeCAD GUI evidence. A later closeout assessment must examine
-whether the preserved snapshot and its additional records remain current.
+The owner reports that the USB stays connected to the machine.
+This record claims no separate USB location or copy on another machine.
+The full monthly recovery test is due by 2026-10-05.
+The new recovery tests for the candidates do not replace that test or give
+new FreeCAD GUI evidence.
+A closeout assessment must compare the preserved snapshot and its additional
+records with the repository state at that time.
 
 Phase 8 stays Open at 4/4. Phase 9 stays Not started. All four accepted exit
-conditions and their limitations remain unchanged. D-P6-008 stays Deferred —
+conditions and their limitations stay the same. D-P6-008 stays Deferred —
 unmet. TERM-R04 stays open.
 
 Output stays private-development and project
 status stays `unknown`. Every comparison, adapter, caller, removal and
-legacy-retirement condition remains. This work accepts no product change,
+legacy-retirement condition stays the same. This work accepts no product change,
 performance result, risk closure, output clearance, release or legacy removal.
 
 <a id="phase-8-exit-2-acceptance-panel"></a>
+
 
 ## Phase 8 Exit 2 acceptance panel — 2026-10-01
 
