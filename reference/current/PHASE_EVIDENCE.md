@@ -19,9 +19,9 @@ The owner accepted the independently reviewed
 | Current state | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is Open at 4/4 under D-P8-005. All four exits are Evidenced and owner-accepted. Phase 8 stays Open. D-P6-008 stays Deferred — unmet. Output stays private-development and project status stays `unknown`. |
 | What changed | [D-P8-005](#phase-8-exit-2-acceptance-panel) records Exit 2 acceptance at `c82b335` for the reviewed examples. The Exit 2 condition stays the same. Phase 8 stays Open at 4/4. <br><br>[D-P8-004](#phase-8-exit-1-acceptance-panel) records Exit 1 acceptance at `44eb4bf` for the reviewed examples. The Exit 1 condition stays the same. D-P8-002 and D-P8-003 keep Exit 3 and Exit 4 acceptance and all their limitations. <br><br>The owner opened Phase 8 for its four unchanged criteria. The completed Phase 7 evidence, decisions and risk snapshot remain frozen. PR #94 integrated that opening. The retained independently reviewed snapshot covers the earlier 39-worktree estate. PR #95 integrated D-GOV-020 and PR #96 integrated D-GOV-021. <br><br>D-GOV-022 authorises one `git worktree remove --force` operation only if its conditions pass. An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories. The 37 individual retirement audits gave PASS. Git removed 37 worktrees without `--force`. Git also deleted 36 branches whose tips the accepted commit contained. <br><br>PR #97 integrated D-GOV-022. A fresh six-root snapshot, restore test, individual audits and post-removal checks gave PASS. Git removed the two remaining D-GOV-022 worktrees without `--force`. The [preservation diff](#phase-8-worktree-retirement-result) records their retained branch tips. |
 | What now works | The [Exit 2 panel](#phase-8-exit-2-acceptance-panel) records acceptance for the reviewed `TO-001` and `XO-001` operations in the FreeCAD display. It keeps all evidence limitations. <br><br>The [Exit 1 panel](#phase-8-exit-1-acceptance-panel) records acceptance for the unchanged Exit 1 condition. The bounded scope includes only the reviewed straight and curved `TO-001` and `XO-001` workflows. The [Exit 3 panel](#phase-8-exit-3-admission-panel) and [Exit 4 panel](#phase-8-exit-4-admission-panel) keep their accepted evidence. <br><br>The four Phase 7 exit decisions keep their accepted bounded evidence. The Phase 8 candidate passed development-only calculation, caller and real-GUI range tests. |
-| Limitations/findings | The [Exit 2 limitations](#phase-8-exit-2-acceptance-panel) stay. The evidence does not show `TO-001` output after a person selects a FreeCAD object. The independent snapshot is due. Current snapshot coverage is unproved. Phase 8 closure needs a separate owner decision. <br><br>The [Exit 1 limitations](#phase-8-exit-1-acceptance-panel), [Exit 3 limitations](#phase-8-exit-3-admission-panel) and [Exit 4 limitations](#phase-8-exit-4-admission-panel) stay. TERM-R04 stays open. <br><br>All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. Five branches with unmerged commits and three related worktrees remain. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight prior branch refs, including both retired-worktree refs, remain.<br><br>The USB is safely unmounted. Physical removal and separate storage remain unverified. |
+| Limitations/findings | The [Exit 2 limitations](#phase-8-exit-2-acceptance-panel) stay. The evidence does not show `TO-001` output after a person selects a FreeCAD object. A new snapshot for independent preservation is necessary now. The evidence does not show a snapshot of all current worktrees and their evidence. A separate owner decision is necessary to close Phase 8. <br><br>The [Exit 1 limitations](#phase-8-exit-1-acceptance-panel), [Exit 3 limitations](#phase-8-exit-3-admission-panel) and [Exit 4 limitations](#phase-8-exit-4-admission-panel) stay. TERM-R04 stays open. <br><br>All Phase 7 proof limits, B14/B15 identities, the inherited B15 host, the development-only comparison oracle, and every comparison, adapter, caller, removal and legacy-retirement condition remain. D-P6-008 remains mandatory before Phase 10 beta acceptance. <br><br>The earlier test used a Git repository that the Git ignore rule did not select. Its removal without `--force` failed. An independent reviewer examined the 42-root snapshot and restore test. Each of the seven parent worktrees had a passing retirement plan and audit. Git removed all seven without `--force`.<br><br>After removal, each preservation check gave PASS. The D-GOV-022 authority remains unused. Five branches with unmerged commits and three related worktrees remain. The two D-GOV-022 worktrees are retired. Four worktrees remained at that retirement boundary. All eight prior branch refs, including both retired-worktree refs, remain.<br><br>The USB is safely unmounted. Physical removal and separate storage remain unverified. |
 | Owner decision | [D-P8-005](#phase-8-exit-2-acceptance-panel) accepts Exit 2 at `c82b335` on the proposed evidence and conditions. D-P8-002, D-P8-003 and D-P8-004 keep their accepted scope and conditions. The owner's instructions from this session authorise the implementing agent to merge the record changes. Acceptance from an independent reviewer is necessary. Checks for the exact candidate must give PASS. <br><br>D-P8-001 opens Phase 8 at 0/4 and authorises the later internal `turnout_valid_toe_range` slice only after its retirement prerequisites. D-GOV-020 and D-GOV-021 remain the integrated exact-state controls. D-GOV-022 authorises one `git worktree remove --force` operation only if every condition in the decision passes. No current worktree meets these conditions. The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal. |
-| Next action | Get acceptance from an independent reviewer. Make sure that checks for the exact candidate give PASS. Then merge the Exit 2 record changes into protected `main`. Make sure that `main` is clean and synchronised. <br><br>The independent snapshot is due under the [recovery policy](../RECOVERY_AND_BACKUP.md#backup-cadence-and-retention). Complete the recovery evidence before a separate Phase 8 closeout assessment. Do not close Phase 8 or open Phase 9 through this decision. |
+| Next action | Get acceptance from an independent reviewer. Make sure that checks for the exact candidate give PASS. Then merge the Exit 2 record changes into protected `main`. Make sure that `main` is clean and synchronised. <br><br>The [recovery policy](../RECOVERY_AND_BACKUP.md#backup-cadence-and-retention) makes a new snapshot for independent preservation necessary now. Complete the recovery evidence before the separate assessment to close Phase 8. Do not close Phase 8 or open Phase 9 through this decision. |
 
 <a id="phase-8-exit-2-acceptance-panel"></a>
 
@@ -36,122 +36,140 @@ The Exit 2 condition stays the same:
 > Creation, parameter editing, selection, undo/redo, save/reopen, validation, and export pass in the real GUI.
 
 This Level 3 change records the owner's exit decision. It changes no product
-behaviour. Governance work exceeds implementation work because this decision
-changes authority for the phase exit.
+behaviour. Governance work is more than product work because this decision changes
+authority for the phase exit.
 
 **Evidence reviewed:** The panel examined each operation in the Exit 2
-condition. It used the retained checks in the FreeCAD display.
-It did not use headless checks in place of those checks.
+condition. It used evidence from checks in the FreeCAD display.
+It did not use checks without that display in place of those checks.
 
 | Part of the Exit 2 condition | `TO-001` evidence | `XO-001` evidence |
 | --- | --- | --- |
-| Creation | The turnout manager makes the turnout and rejects overlap. | The crossover manager makes the crossover. The output checks also make host integration. |
+| Creation | `TurnoutManagerDialog` makes the turnout and rejects overlap. | `CrossoverManagerPanel` makes the crossover. The output checks also use `create_crossover_host_integration`. |
 | Parameter editing | The checks change `TurnoutHanding` and examine recovery after an error. | The checks change `toe_chainage_a` and examine accepted and rejected `Edit` operations. |
-| Selection | The manager keeps the stored identity. The output checks use highlighted rows. | The manager keeps `XO-001` selected. The output checks keep the initial `selected_objects` data in `SelectedProductionExportDialog` through mandatory `probe_2d_export_bounds` operations. |
-| Undo/redo | The checks restore created and edited states. The straight example also has `Remove` recovery. | The checks restore `Edit` and `B4` states and their stored identities. |
-| Save/reopen | The checks reopen edited and integrated states before output. | The checks reopen edited state, stored `B4` analysis, hidden display state and host integration. |
+| Selection | `TurnoutManagerDialog` keeps the recorded identity. The output checks use rows in `highlighted_record_ids`. | `CrossoverManagerPanel` keeps `XO-001` selected. The output checks keep the initial `selected_objects` data in `SelectedProductionExportDialog` through mandatory `probe_2d_export_bounds` operations. |
+| Undo/redo | The checks use `Undo` and `Redo` for the states from `Create` and `Edit`. The straight example also has `Remove` recovery. | The checks use `Undo` and `Redo` for `Edit` and `B4` states and their recorded identities. |
+| Save/reopen | The checks open the files again before output. The files keep the states after `Edit` and host integration. | The checks open the files again. The files keep the state after `Edit`, recorded `B4` analysis, hidden display state and host integration. |
 | Validation | The checks examine range, overlap, rejected changes and `run_production_preflight` results. | The checks examine radius, `B4` findings, rejected changes and mandatory `probe_2d_export_bounds` results. |
-| Export | The checks make `SVG` and `CSV` files through `selected_export_button` with highlighted rows. | The checks make `SVG` and `CSV` files with highlighted rows or a selected object. Both `selected_export_button` and direct `SelectedProductionExportDialog` operations pass. |
+| Export | The checks make `SVG` and `CSV` files through `selected_export_button` with rows in `highlighted_record_ids`. | The checks make `SVG` and `CSV` files with rows in `highlighted_record_ids` or a selected object. Both `selected_export_button` and direct `SelectedProductionExportDialog` operations pass. |
 
-The evidence includes the retained straight and curved examples.
+The evidence includes the straight and curved examples that the project keeps.
 The independent reviewer examined ten `run.json` files and their SHA-256
-identities. The reviewer examined 82 recorded artifact identities in eight
-curved checks. The two straight checks added 37 artifact, input and document
-checks and four output identities. All compared identities were equal.
+identities. The reviewer examined 82 recorded file identities in eight curved
+checks. The two straight checks added 37 checks of files, inputs and documents.
+They also added four output identities. All compared identities were equal.
+
 All ten checks have `PASS` status, the necessary sentinel and no document left
-open. This panel claims no new FreeCAD execution.
+open. This panel claims no new FreeCAD operation.
 
 PR #126 supplies three checks for the changed output route. Each check has
 48 source hashes equal to the source at `c82b335`.
 
-The two positive checks start with an object selected before output.
+The two checks with an object selected before output give `PASS` results.
 Each check examines `selected_objects` in `SelectedProductionExportDialog` six times.
 Those data stay equal.
 
 Ten mandatory `probe_2d_export_bounds` operations complete and close their
-temporary documents. The check with highlighted rows first rejects empty
+temporary documents. The check with rows in `highlighted_record_ids` first rejects empty
 selection. It completes four mandatory operations.
 
-Earlier checks keep their historical source identities. The independent
-review examined the source changes before reuse of those checks.
+Previous checks keep their initial source identities. Before the panel used
+those checks again, the independent reviewers examined the source changes.
 The change in `transition_workflow.py` affects the output selection.
-The calculation, manager, recovery and persistence operations did not change.
+The calculation, recovery and persistence operations did not change.
+The operations in `TurnoutManagerDialog` and `CrossoverManagerPanel` did not change.
 
-The earlier turnout output checks start with empty `selected_objects` data.
-The repair preserves that empty value and the highlighted-row operations.
-The new crossover checks examine the changed common route.
-This reasoning does not make an earlier execution a new check at `c82b335`.
+The previous turnout output checks start with empty `selected_objects` data.
+The repair preserves that empty value and the operations that use
+`highlighted_record_ids`. The new crossover checks examine the changed common
+route. Use of the previous evidence supplies no new result at `c82b335`.
 
-The qualified functional host profile stays
+The qualified host profile stays
 `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2` under D-GOV-019.
+D-GOV-019 accepts this host profile only for product behaviour.
 It gives no product-performance acceptance.
 
-**Panel:** Richard is the project owner and decision chair. The implementing
+**Panel:** Richard is the project owner and decides. The implementing
 agent presents the records. Independent reviewer `/root/exit2_admission_evidence`
 examines the complete condition and retained evidence.
-`/root/exit2_source_currency` examines the source changes and reuse conditions.
+`/root/exit2_source_currency` examines the source changes and conditions for use of the previous checks.
 `/root/exit2_admission_risks` examines all 24 live risks.
-These reviewers did not implement or execute the PR #126 repair.
+These reviewers did not make the PR #126 repair or do its checks.
 
 Project agents did these reviews in the same environment.
 No external organisation did them.
 
 The panel recommendation is **Proceed with bounded conditions**.
-There is no unresolved dissent. No risk owner, deadline, treatment, severity,
+The reviewers agree with this recommendation. No risk owner, deadline, treatment, severity,
 disposition or control effectiveness changes. The [risk register](risks.json)
 keeps those details.
 
 PR-09, PR-13 and PR-17 stay Critical and Open.
-PR-17 stays Partial. PR-01 and QA-R03 keep wider display-workflow evidence
-duties. PR-10 and PR-18 keep comparison and removal conditions.
+PR-17 stays Partial. PR-01 and QA-R03 keep the conditions for wider workflow
+evidence in the FreeCAD display. PR-10 and PR-18 keep comparison and removal conditions.
 
 PR-15 and QA-R04 keep D-P6-008. PR-16 keeps signature checks.
 PR-22 keeps independent review and owner acceptance.
-The recorded owners must complete their duties by the recorded deadlines.
+The recorded owners must complete the necessary work by the recorded deadlines.
 
 **Limitations and conditions:** These fixtures and operations are examples.
 They do not prove every input, control, selection route or host profile.
-`TO-001` output uses highlighted rows. The evidence does not show `TO-001`
-output after a person selects a FreeCAD object. The accepted positive checks
+`TO-001` output uses rows in `highlighted_record_ids`. The evidence does not show `TO-001`
+output after a person selects a FreeCAD object. The accepted checks with `PASS` results
 for that route use `XO-001` only.
 
-The earlier `NO_SELECTED_PRODUCTION_ITEMS` failures and the diagnosis remain.
-The test before repair gave `FAIL`; the unchanged test after repair gave
-`PASS`. The mandatory operations stay enabled in the positive checks.
-The earlier check with those operations disabled remains diagnosis only.
+The project keeps the previous `NO_SELECTED_PRODUCTION_ITEMS` failures and
+the evidence for failure classification. The test before repair gave `FAIL`.
+The unchanged test after repair gave `PASS`.
+The mandatory operations occur in the checks with `PASS` results.
+The previous check without those operations supplies evidence for failure classification only.
 
-The complete source of the original historical test remains unavailable.
-The earlier `Editing XO-001` finding was corrected in PR #118.
-No earlier failed evidence becomes a `PASS` result through this decision.
+The project does not have the complete source of the initial failed test.
+PR #118 corrected the previous `Editing XO-001` finding.
+No previous failed evidence becomes a `PASS` result through this decision.
 
-The straight TO cross-version `Edit` limitation and historical source
-limitations stay. The limitations for wider persistence, host profiles and
-production metadata stay. Older digest differences remain unexplained.
-Raw GUI/headless output identity remains unproved.
+The limitation for straight `TO-001` `Edit` across versions stays.
+The source limitations for previous checks stay.
+The limitations for wider persistence, host profiles and production metadata
+stay. The causes of previous hash differences are unknown.
+The evidence does not show identical output files from checks with and without
+the FreeCAD display. This limitation applies before any change to those files.
 
-The earlier derived group-shape allowances and exclusions stay confined to
-their recorded cases. Untested guided Step 6 and button-signal routes stay
-outside the evidence. Selection across documents and every `TemplateSetID`
-combination remain unqualified. The repair does not restore `Gui.Selection`.
+The previous conditions for group shapes and the related exclusions apply
+only to their recorded conditions. The evidence does not include Step 6 or
+button-signal routes that the checks did not use.
+The evidence does not show results for selection across documents or every
+`TemplateSetID` combination. The repair does not put `Gui.Selection` back to
+its initial state.
 
-The `SVG` and `CSV` checks do not qualify every output format.
-Chair findings, false production readiness, expected incompatible-solid skips,
-startup diagnostics and `TopoShape` warnings remain.
+The `SVG` and `CSV` checks do not show results for every output format.
+All previous findings stay, including `CROSSOVER_CHAIR_VALIDATION_OUTSTANDING`.
+The recorded `production_ready=False` value stays. The expected `Skipped`
+results for solids that are not compatible stay. The diagnostics at the
+start of FreeCAD and the `TopoShape` warnings stay.
 The [Exit 1](#phase-8-exit-1-acceptance-panel),
 [Exit 3](#phase-8-exit-3-admission-panel) and
 [Exit 4](#phase-8-exit-4-admission-panel) conditions and limitations stay.
 
-**Recovery duty:** The independent snapshot is due now under
+**Recovery conditions:** A new snapshot for independent preservation is
+necessary now under
 [the recovery policy](../RECOVERY_AND_BACKUP.md#backup-cadence-and-retention).
-New independent snapshot coverage for the current worktrees and latest raw
-evidence is unproved. Local preservation does not prove independent backup.
+The evidence does not show a new snapshot of the current worktrees and the
+most recent evidence files. Local preservation does not prove independent
+preservation.
 
-Richard owns independent backup. The implementation/QA owner enforces safe
-handling. This acceptance does not complete, postpone or waive that duty.
+Richard must complete the independent preservation. The implementation/QA
+owner must make sure that all work obeys the recovery policy.
+This acceptance does not complete that work. It authorises no change to the
+deadline or removal of the condition.
 
-Phase 8 closeout must examine current snapshot coverage, currency and the
-applicable restore evidence. Physical USB removal and separate storage remain
-operator-controlled and unverified. This decision authorises no retirement.
+Before a separate decision to close Phase 8, the panel must examine the
+snapshot of the current worktrees and evidence. The panel must also examine
+whether the snapshot is current. It must examine the applicable evidence for
+[Backup and restore acceptance](../RECOVERY_AND_BACKUP.md#backup-and-restore-acceptance).
+A person controls physical USB removal and separate storage. The evidence
+does not show completion of those actions. This decision authorises no
+retirement.
 
 D-P6-008 stays Deferred — unmet and mandatory before Phase 10 beta acceptance.
 TERM-R04 stays open. Output stays private-development and project status stays
@@ -164,23 +182,22 @@ legacy-retirement condition stays.
 > As TrackTemplate project owner, I accept Phase 8 Exit 2 at protected-main c82b335 on the bounded evidence and conditions proposed.
 
 **Resulting authority:** The decision accepts Exit 2 only for the stated
-scope and conditions. It accepts no product change, risk closure, performance
+bounded scope and conditions. It accepts no product change, risk closure, performance
 result, wider migration, production clearance, phase closure, release or
 legacy-path removal. Phase 9 stays Not started.
 
 The owner's instructions from this session authorise the directly dependent
-record changes. They authorise integration after independent acceptance and
-checks that give PASS for the exact candidate.
+record changes. They authorise the merge after acceptance from an independent reviewer.
+Checks for the exact candidate must give PASS.
 
-**Proof/provenance:** The retained owner proposal is in
+**Proof/provenance:** The owner proposal is in
 `tmp/phase8-exit2-admission/owner-decision.md` in the primary checkout.
 Its SHA-256 is
 `defc45b6b5c246588df68bee0e9eb6681b4f8c38c89c104380a77e430da10565`.
 The `assessment.json` file in that directory records the identities of the
 independent evidence, source and risk reviews. The evidence review records all
-ten receipt paths and identities. The source review preserves its reuse
-reasoning. The [PR #126 evidence](#phase-8-output-after-object-selection--2026-09-30)
-records the repaired output route and the exact main-button receipt.
+ten receipt paths and identities. The source review preserves its conditions for use of the previous checks. The [PR #126 evidence](#phase-8-output-after-object-selection--2026-09-30)
+records the repaired output route and the exact `selected_export_button` receipt.
 
 ## Phase 8 output after object selection — 2026-09-30
 
