@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 8,
-  "updated_on": "2026-09-30",
+  "updated_on": "2026-10-01",
   "decisions": [
     {
       "id": "D-P6-008",
@@ -90,6 +90,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-8-exit-1-acceptance-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-8-exit-1-acceptance-panel"
+    },
+    {
+      "id": "D-P8-005",
+      "decided_on": "2026-10-01",
+      "status": "Accepted",
+      "decision": "Accept Phase 8 Exit 2 at protected main c82b335 for the reviewed TO-001 and XO-001 examples. The Exit 2 condition stays the same. Phase 8 is Open at 4/4.",
+      "authority": "As TrackTemplate project owner, I accept Phase 8 Exit 2 at protected-main c82b335 on the bounded evidence and conditions proposed.",
+      "exclusions": "Phase 8 stays Open. Phase 9 stays Not started. Preserve all recorded limitations and failed evidence. The fixtures and operations are examples. TO-001 output uses highlighted rows. The evidence does not show TO-001 output after a person selects a FreeCAD object. The accepted positive checks for that route use XO-001 only.\n\nKeep the straight TO cross-version Edit limitation, historical source limitations, wider persistence, host-profile and production-metadata limitations. Older digest differences remain unexplained. Raw GUI/headless output identity remains unproved. The repair does not restore Gui.Selection. Selection across documents and every TemplateSetID combination remain unqualified. Preserve the unavailable historical test source, diagnostic-only disabled-probe check, derived group-shape allowances, untested guided Step 6 and button-signal routes, chair findings, false production readiness, expected skips and retained warnings. The SVG and CSV checks do not qualify every output format.\n\nThe independent snapshot is due now. New independent snapshot coverage for current worktrees and latest raw evidence is unproved. Richard owns independent backup; the implementation/QA owner enforces safe handling. Acceptance does not complete, postpone or waive the duty. Phase 8 closeout must examine current coverage, currency and applicable restore evidence. Physical USB removal and separate storage remain operator-controlled and unverified. No risk owner, deadline, treatment, severity, disposition or control effectiveness changes.\n\nKeep D-P6-008 Deferred — unmet and mandatory before Phase 10 beta acceptance. Keep TERM-R04 open, output private-development and project status unknown. Preserve B14/B15 identities, the inherited B15 host, development-only comparison oracle and every comparison, adapter, caller, removal and legacy-retirement condition. This decision accepts no product change, risk closure, performance result, wider migration, production clearance, phase closure, release or legacy-path removal.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-8-exit-2-acceptance-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-8-exit-2-acceptance-panel"
     }
   ]
 }
