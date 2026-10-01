@@ -4725,36 +4725,37 @@ def validate_documentation_profile_mutations() -> None:
     retirement_cases = (
         (
             "retirement-count-inflated", "**What changed**",
-            "records removal of 23 worktrees after exact preservation and "
-            "independent checks",
+            'records removal of 23 worktrees after independent '
+            'preservation and identity checks',
             "records removal of 41 worktrees after exact preservation and "
             "independent checks",
         ),
         (
             "retained-branches-deleted", "**What changed**",
-            "All 45 branch refs remained unchanged",
+            'All 45 local branches kept the same tips',
             "All 45 branch refs were deleted",
         ),
         (
             "snapshot-coverage-reduced", "**Limitations/findings**",
-            "covers all 41 worktrees at its removal boundary and the "
-            "specified later changes",
+            'records independent preservation of all 41 worktrees at '
+            'removal and the specified subsequent changes',
             "covers 39 worktrees and needs no later records",
         ),
         (
             "monthly-restore-postponed", "**Limitations/findings**",
-            "The monthly restore remains due by 2026-10-05",
+            'The monthly recovery test is due by 2026-10-05',
             "The monthly restore remains due by 2026-11-05",
         ),
         (
             "recovery-currentness-waived", "**Limitations/findings**",
-            "Before a closeout assessment, check that the recovery evidence "
-            "remains current",
+            'Before a closeout assessment, compare the recovery evidence '
+            'with the repository state',
             "A closeout assessment needs no current recovery evidence",
         ),
         (
             "physical-separation-claimed", "**Limitations/findings**",
-            "Separate physical storage and an off-site copy are not claimed",
+            'This record claims no separate USB location or copy on '
+            'another machine',
             "Separate physical storage and an off-site copy are proved",
         ),
         (
