@@ -4344,13 +4344,14 @@ def validate_phase9_split_mutations() -> None:
     for phase, marker, before, after in (
         (
             "9A", "| 9A-1 |",
-            "One additional chair or support must differ in its chair "
-            "components, interface or assembly pattern.",
+            "Select one more chair or support from repository evidence "
+            "for the smallest proof of a difference in chair components, "
+            "interface or assembly pattern.",
             "An S1 size variant is sufficient.",
         ),
         (
             "9B", "| 9B-3 |",
-            "The same applicable rights gate controls each additional "
+            "The same applicable rights gate controls each other "
             "package.",
             "Additional packages need no rights gate.",
         ),
@@ -4974,7 +4975,7 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_row = table_row_containing(plan, "**Current state**")
     inflated_view = replace_once(
         owner_view_row,
-        "D-P6-008 remains Deferred — unmet",
+        "D-P6-008 stays Deferred — unmet",
         "D-P6-008 is complete",
     )
     expect_rejected(
@@ -4983,7 +4984,7 @@ def validate_documentation_profile_mutations() -> None:
             replace_once(plan, owner_view_row, inflated_view)
         ),
         "project-plan owner view lost or contradicted: "
-        "D-P6-008 remains Deferred — unmet",
+        "D-P6-008 stays Deferred — unmet",
     )
     owner_view_authority = replace_once(
         plan,
@@ -5030,9 +5031,9 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "failed-candidate-promoted", "**What changed**",
-            "earlier local split candidate remains failed evidence only",
-            "earlier local split candidate is accepted",
-            "earlier local split candidate remains failed evidence only",
+            "previous local split candidate remains failed evidence only",
+            "previous local split candidate is accepted",
+            "previous local split candidate remains failed evidence only",
         ),
         (
             "monthly-restore-postponed", "**Limitations/findings**",
@@ -5056,15 +5057,15 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "phase9-opened", "**Owner decision**",
-            "Both phases remain unopened",
+            "The two phases stay Not started",
             "Both phases are open",
-            "Both phases remain unopened",
+            "The two phases stay Not started",
         ),
         (
             "stop-boundary-waived", "**Next action**",
-            "Keep Phase 9B unopened and do no product work",
+            "Keep Phase 9B Not started and do no product work",
             "Begin Phase 9 product work after integration",
-            "Keep Phase 9B unopened and do no product work",
+            "Keep Phase 9B Not started and do no product work",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:

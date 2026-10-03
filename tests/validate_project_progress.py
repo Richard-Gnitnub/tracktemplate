@@ -140,36 +140,38 @@ EXPECTED_PHASE7_EXIT_CONDITIONS = (
 EXPECTED_PHASE9A_EXITS = (
     (
         "9A-1", "3",
-        "The procedural chair generator constructs every in-scope named "
-        "chair component and the assembled S1 chair from the accepted S1 "
-        "ChairDefinition. It can construct them again without the original "
-        "source scan/CAD file or retained FreeCAD geometry. One additional "
-        "chair or support must differ in its chair components, interface or "
-        "assembly pattern. Select the smallest structurally distinct proof "
-        "from repository evidence. It must use the same neutral definition "
-        "and procedural chair generator. An S1 dimension variant alone is "
-        "insufficient. No five-box or opaque-mesh fallback can be labelled "
-        "production-ready.",
+        "The procedural chair generator constructs all named chair "
+        "components in the bounded scope and the assembled S1 chair from "
+        "the accepted S1 ChairDefinition. It can construct them again "
+        "without the source scan/CAD file or FreeCAD geometry that the "
+        "product kept from the first construction. Select one more chair "
+        "or support from repository evidence for the smallest proof of a "
+        "difference in chair components, interface or assembly pattern. "
+        "The other chair or support must use the same neutral "
+        "ChairDefinition schema and procedural chair generator. An S1 "
+        "dimension variant is not sufficient. A five-box or opaque-mesh "
+        "fallback must not have production-ready status.",
     ),
     (
         "9A-2", "4",
-        "Definition package load and round-trip pass in standalone and "
-        "FreeCAD tests. Both test paths reject corrupt and unsupported "
-        "packages. They preserve chair component identities, "
-        "prototype/manufacturing separation and rail fit. The S1 geometry "
-        "that the generator constructs meets accepted reference tolerances "
-        "in both test paths.",
+        "Standalone and FreeCAD tests give a PASS result for definition "
+        "package load and round-trip. The two test paths reject corrupt "
+        "and unsupported packages. Package load and round-trip preserve "
+        "chair component identities, prototype/manufacturing separation "
+        "and rail fit. The two test paths give a PASS result for the S1 "
+        "geometry that the generator constructs against accepted "
+        "reference tolerances.",
     ),
     (
         "9A-3", "5",
         "The operator-assisted S1 pilot is documented and accepted for "
         "bounded architecture proof through the same ChairDefinition and "
-        "procedural chair generator. Arbitrary automatic scan assimilation "
-        "remains outside the RC qualification matrix.",
+        "procedural chair generator. The RC qualification matrix does not "
+        "include arbitrary automatic scan assimilation.",
     ),
     (
         "9A-4", "6, raw evidence",
-        "Raw S1 evidence that cannot be redistributed stays separate. Its "
+        "Raw S1 evidence that cannot be redistributed stays isolated. Its "
         "permitted fitting and use basis is recorded before that evidence "
         "supports the bounded proof or pilot.",
     ),
@@ -177,38 +179,38 @@ EXPECTED_PHASE9A_EXITS = (
 EXPECTED_PHASE9B_EXITS = (
     (
         "9B-1", "1",
-        "Every release-candidate production format has deterministic repeat "
+        "Each release-candidate production format has deterministic repeat "
         "evidence for representative inputs. Preserved B14/B15 behaviour "
         "has legacy/new equivalence evidence. New procedural chair geometry "
-        "uses accepted 9A definition/reference-oracle evidence instead of "
-        "five-box equality.",
+        "uses accepted 9A definition/reference-oracle evidence. It does "
+        "not use five-box equality.",
     ),
     (
         "9B-2", "2",
         "Timber and chair decisions and record identities stay stable across "
-        "edit, save/reopen, validation and export throughout migrated Core "
+        "edit, save/reopen, validation and export across migrated Core "
         "trackwork.",
     ),
     (
         "9B-3", "6, package clearance",
-        "Every chair and support family required for the agreed "
+        "Each chair and support family necessary for the agreed "
         "TrackTemplate Core release candidate is complete across migrated "
         "trackwork. The accepted S1 package has an explicit licence. It "
-        "has no NC, NOASSERTION, reference-only, unknown or otherwise "
-        "incompatible dependency in the project-cleared "
-        "commercial/publication path. The same applicable rights gate "
-        "controls each additional package.",
+        "has no dependency with NC, NOASSERTION, reference-only or unknown "
+        "status. It has no dependency that is incompatible with the "
+        "project-cleared commercial/publication path. The same applicable "
+        "rights gate controls each other package.",
     ),
     (
         "9B-4", "7",
         "Representative output manifests reproduce the complete "
         "package/dependency classification. They cannot claim "
-        "project-cleared after any relevant input is replaced by a "
+        "project-cleared if an applicable input is replaced by a "
         "restricted or unresolved source.",
     ),
     (
         "9B-5", "8",
-        "Export failure cannot partially replace an accepted output set "
+        "Export failure cannot replace only part of an accepted output set "
         "or corrupt the editable model.",
     ),
     (
@@ -1138,7 +1140,7 @@ def _validate_owner_view(plan: str) -> None:
         "D-P8-006",
         "Phase 9A is Not started at 0/4",
         "Phase 9B is Not started at 0/6",
-        "D-P6-008 remains Deferred — unmet",
+        "D-P6-008 stays Deferred — unmet",
         "TERM-R04 stays open",
         "Output stays private-development",
         "project status stays `unknown`",
@@ -1146,7 +1148,7 @@ def _validate_owner_view(plan: str) -> None:
         "accepted original gate",
         "frozen Phase 8 closeout",
         "recovery record",
-        "earlier local split candidate remains failed evidence only",
+        "previous local split candidate remains failed evidence only",
         "accepted straight and curved `TO-001` and `XO-001` examples",
         "This alignment changes no product behaviour",
         "representative-fixture",
@@ -1164,10 +1166,10 @@ def _validate_owner_view(plan: str) -> None:
         "development-only oracle",
         "every comparison, adapter, caller, removal and legacy-retirement condition",
         "No performance, production-output or release acceptance",
-        "Both phases remain unopened",
+        "The two phases stay Not started",
         "No exit, product work, package, output, risk closure",
         "Then open only Phase 9A at 0/4",
-        "Keep Phase 9B unopened and do no product work",
+        "Keep Phase 9B Not started and do no product work",
     ):
         _require(
             fragment in owner_view,
@@ -1411,19 +1413,19 @@ def _validate_phase9_exit_allocation(plan: str, evidence: str) -> None:
     )
     flat = _semantic_text(section)
     for clause in (
-        "nine criteria in the accepted original Phase 9 gate control this "
-        "division",
-        "Original Exit 6 has two separate decisions",
-        "No requirement is lost or accepted twice",
+        "nine criteria in the accepted Phase 9 gate control the two phases",
+        "Exit 6 has two acceptance duties",
+        "All nine requirements continue to apply",
+        "Each acceptance duty has one phase owner",
         "Phase 9A technical proof does not clear a production package or "
         "output",
-        "all chair and support families required for the agreed Core "
+        "all chair and support families necessary for the agreed Core "
         "release candidate",
-        "not every Templot family or post-Core capability",
+        "It does not include all Templot families or post-Core capabilities",
         "neutral ChairDefinition",
         "local reference oracle",
         "provenance, rights, transactional-export and performance controls "
-        "remain",
+        "continue to apply",
     ):
         _require(
             clause in flat,
@@ -1483,7 +1485,8 @@ def _validate_phase9_terms(terminology: str) -> None:
         ),
         "Construct": (
             "Create derived chair geometry from accepted canonical "
-            "chair-definition data without changing that canonical data."
+            "chair-definition data. The operation does not change that "
+            "canonical data."
         ),
         "Regenerate": (
             "Do an evidence workflow again. Replace its retained result."
@@ -1497,7 +1500,7 @@ def _validate_phase9_terms(terminology: str) -> None:
     _require(
         all(term.casefold() != "constituent" for term in rows)
         and "ordinary chair" in terminology.lower()
-        and "The chair terms do not resolve “ordinary chair”" in terminology,
+        and "The chair terms do not define “ordinary chair”" in terminology,
         "Phase 9 chair terminology resolved an excluded term",
     )
 
@@ -5234,10 +5237,10 @@ def _validate_phase9_decision_holding(
         and split["decided_on"] == "2026-10-03"
         and split["status"] == "Accepted"
         and split["decision"] == (
-            "Approve five bounded TrackTemplate technical meanings and "
-            "divide the nine original Phase 9 criteria into four Pending "
-            "Phase 9A exits and six Pending Phase 9B exits. Both phases "
-            "remain Not started."
+            "Approve five bounded TrackTemplate technical meanings. Divide "
+            "the nine Phase 9 criteria in the accepted gate into four "
+            "Pending Phase 9A exits and six Pending Phase 9B exits. The "
+            "two phases stay Not started."
         )
         and split["evidence"] == panel
         and split["panel_record"] == panel
@@ -5251,7 +5254,7 @@ def _validate_phase9_decision_holding(
         ),
         (
             "exclusions",
-            "2bf7499a8647c384055875f4b997a284c21f0ffd14e9e65520ac033a5e7473f6",
+            "9c593d81527de1ed92cc7e46f91bd74a9e3828c1cf83efbc617fbb71dc51ba96",
         ),
     ):
         value = split[field]
@@ -5951,14 +5954,15 @@ def _validate_phase9_holding(evidence: str) -> None:
     flat = _semantic_text(evidence)
     for clause in (
         "The accepted historical Phase 9 gate remains the source",
-        "earlier blocked local candidate is failed evidence only",
+        "previous blocked local candidate is failed evidence only",
         "D-P9-001 approves only the five technical meanings",
-        "It does not open either phase, accept an exit, clear output, close "
-        "a risk or remove a legacy path",
+        "It does not open Phase 9A or Phase 9B, accept an exit, clear "
+        "output, close a risk or remove a legacy path",
         "one independent Documentation Review",
-        "independent test review and exact-tree protected-main integration",
-        "The opening may set only Phase 9A to 0/4 Open",
-        "Phase 9B stays unopened",
+        "Independent test review and exact-tree protected-main integration "
+        "are also necessary",
+        "The opening can set only Phase 9A to 0/4 Open",
+        "Phase 9B stays Not started",
         "This cycle includes no product implementation",
         "D-P6-008 stays in full",
         "mandatory before Phase 10 beta acceptance",
