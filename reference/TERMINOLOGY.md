@@ -185,10 +185,20 @@ Use these technical nouns only with their stated project meanings:
 | Attribution source | A **repeated read** reads all data from the same live record again in one Edit. **Selected-record data** is all canonical data for the selected record. A **pre-registered method** records measurement and decision rules before measurements start. A **fixture-failure classification** identifies a retained fixture or harness failure. |
 | Export | **Sentinel**, **DXF**, **manifest**, **schema**, **API**, and **JSON** keep their meanings from software or export specifications. |
 | Railway | **Centreline**, **plain line**, **chainage**, **station**, **turnout**, **crossover**, and railway behaviour use the canonical railway meanings below. TrackTemplate approves the spelling **Centreline** for this railway context. |
+| Chair | A **chair** is a railway support fitting that TrackTemplate represents. It supports and locates a rail at a sleeper, timber or other applicable support. An accepted `ChairDefinition` gives its exact type, geometry, components and rail interface. |
+| Chair component | A **chair component** is one named part of a chair definition or chair assembly. Examples are a base or plinth, seat, jaw, rib, fillet, key, fastening or interface component. |
+| Procedural chair geometry | **Procedural chair geometry** is derived chair geometry that TrackTemplate constructs deterministically from accepted `ChairDefinition` data and named chair components. It is not retained `Part` geometry, an opaque mesh or a hand-drawn final body. |
+| Procedural chair generator | A **procedural chair generator** is the TrackTemplate software path that constructs procedural chair geometry from an accepted `ChairDefinition`. |
 | Track data | An **alignment** is a track centreline with a specified travel direction. Its API data contain `points`, `headings`, and other track data in the [API instructions](contracts/phase7-station-mapping.md#station-data). A **radius** is a length with the value radius = 1 / abs(curvature) for non-zero `curvature` in `_integrate_core_segment`. Length values use mm in these APIs. The [platform API](contracts/phase7-platform-core.md#calculation-and-point-sequence) defines the constant and minimum values. These meanings change no function, unit, tolerance, or railway requirement. |
 | Railway feature | A **platform** is the railway feature beside one track or between two tracks that the existing platform-related TrackTemplate calculations represent. This meaning is distinct from a software, runtime, or host platform. The [platform-input API](contracts/phase7-platform-input-validation.md#input-and-result) defines the bounded product use. |
 | FreeCAD data | An **adapter** is a software component between a TrackTemplate API and FreeCAD. It supplies inputs to the API, changes data for FreeCAD, and preserves TrackTemplate Core decisions. The [preparation API](contracts/phase7-track-preparation.md#b16-caller-and-recovery) owns the sequence and result identities. A **vector** is a FreeCAD `App.Vector` value with X, Y and Z values. In track preparation, it gives a point with Z equal to zero. These nouns give no authority to make FreeCAD objects canonical state. |
 | Official sources | A **standard** is an external reference that has a requirement set. **ASD-STE100 Issue 9**, **Simplified Technical English (STE)**, and **S1000D** identify standards. **Technical noun**, **technical verb**, **normative standard**, **official standard**, **official source**, **external reference**, **conformance**, **official conformance assessment**, and **linguistic conformance** are standards terms. |
+
+The chair terms do not define “ordinary chair” or the precise S1 prototype
+designation. They give no chair-family classification, S1 dimensions,
+rail section, tolerances or chair component evidence. They give no
+acceptance for provenance, licence, rights, `project-cleared` status, production
+geometry or output.
 
 Use these technical verbs only with their stated project meanings:
 
@@ -231,6 +241,7 @@ Use these technical verbs only with their stated project meanings:
 | **Requalify** | Qualify a different exact host profile against the same compatibility contract. |
 | **Classify** | Put a validation result with `FAIL` in a failure class that the testing policy defines. Put a local-state inventory item in a local-state type that the recovery policy defines. |
 | **Regenerate** | Do an evidence workflow again. Replace its retained result. |
+| **Construct** | Create derived chair geometry from accepted canonical chair-definition data. The operation does not change that canonical data. |
 
 Do not use different technical terms for the same project concept. Do not use
 a technical noun as a verb unless this register also approves the verb. Add a

@@ -122,7 +122,8 @@ PHASE_TOTALS = {
     6: 5,
     7: 4,
     8: 4,
-    9: 9,
+    "9A": 4,
+    "9B": 6,
     10: 5,
     11: 7,
 }
@@ -135,6 +136,88 @@ EXPECTED_PHASE7_EXIT_CONDITIONS = (
     "reverse adapter import.",
     "Legacy core-layout paths have either been safely retired or have a "
     "documented blocker and removal gate.",
+)
+EXPECTED_PHASE9A_EXITS = (
+    (
+        "9A-1", "3",
+        "The procedural chair generator constructs all named chair "
+        "components in the bounded scope and the assembled S1 chair from "
+        "the accepted S1 ChairDefinition. It can construct them again "
+        "without the source scan/CAD file or FreeCAD geometry that the "
+        "product kept from the first construction. Select one more chair "
+        "or support from repository evidence for the smallest proof of a "
+        "difference in chair components, interface or assembly pattern. "
+        "The other chair or support must use the same neutral "
+        "ChairDefinition schema and procedural chair generator. An S1 "
+        "dimension variant is not sufficient. A five-box or opaque-mesh "
+        "fallback must not have production-ready status.",
+    ),
+    (
+        "9A-2", "4",
+        "Standalone and FreeCAD tests give a PASS result for definition "
+        "package load and round-trip. The two test paths reject corrupt "
+        "and unsupported packages. Package load and round-trip preserve "
+        "chair component identities, prototype/manufacturing separation "
+        "and rail fit. The two test paths give a PASS result for the S1 "
+        "geometry that the generator constructs against accepted "
+        "reference tolerances.",
+    ),
+    (
+        "9A-3", "5",
+        "The operator-assisted S1 pilot is documented and accepted for "
+        "bounded architecture proof through the same ChairDefinition and "
+        "procedural chair generator. The RC qualification matrix does not "
+        "include arbitrary automatic scan assimilation.",
+    ),
+    (
+        "9A-4", "6, raw evidence",
+        "Raw S1 evidence that cannot be redistributed stays isolated. Its "
+        "permitted fitting and use basis is recorded before that evidence "
+        "supports the bounded proof or pilot.",
+    ),
+)
+EXPECTED_PHASE9B_EXITS = (
+    (
+        "9B-1", "1",
+        "Each release-candidate production format has deterministic repeat "
+        "evidence for representative inputs. Preserved B14/B15 behaviour "
+        "has legacy/new equivalence evidence. New procedural chair geometry "
+        "uses accepted 9A definition/reference-oracle evidence. It does "
+        "not use five-box equality.",
+    ),
+    (
+        "9B-2", "2",
+        "Timber and chair decisions and record identities stay stable across "
+        "edit, save/reopen, validation and export across migrated Core "
+        "trackwork.",
+    ),
+    (
+        "9B-3", "6, package clearance",
+        "Each chair and support family necessary for the agreed "
+        "TrackTemplate Core release candidate is complete across migrated "
+        "trackwork. The accepted S1 package has an explicit licence. It "
+        "has no dependency with NC, NOASSERTION, reference-only or unknown "
+        "status. It has no dependency that is incompatible with the "
+        "project-cleared commercial/publication path. The same applicable "
+        "rights gate controls each other package.",
+    ),
+    (
+        "9B-4", "7",
+        "Representative output manifests reproduce the complete "
+        "package/dependency classification. They cannot claim "
+        "project-cleared if an applicable input is replaced by a "
+        "restricted or unresolved source.",
+    ),
+    (
+        "9B-5", "8",
+        "Export failure cannot replace only part of an accepted output set "
+        "or corrupt the editable model.",
+    ),
+    (
+        "9B-6", "9",
+        "Editing and end-to-end performance meet the provisional budgets "
+        "derived from measured baselines.",
+    ),
 )
 EXPECTED_RISK_IDS = {
     *{
@@ -1055,16 +1138,17 @@ def _validate_owner_view(plan: str) -> None:
     for fragment in (
         "Phase 8 is closed at 4/4 under",
         "D-P8-006",
-        "Phase 9 stays Not started at 0/9",
-        "D-P6-008 remains Deferred — unmet",
+        "Phase 9A is Not started at 0/4",
+        "Phase 9B is Not started at 0/6",
+        "D-P6-008 stays Deferred — unmet",
         "TERM-R04 stays open",
         "Output stays private-development",
         "project status stays `unknown`",
-        "protected `main` `cfd4387`",
+        "D-P9-001",
+        "accepted original gate",
         "frozen Phase 8 closeout",
         "recovery record",
-        "exact October 1 snapshot and October 3 supplement limits",
-        "Current records now hold unopened Phase 9",
+        "previous local split candidate remains failed evidence only",
         "accepted straight and curved `TO-001` and `XO-001` examples",
         "This alignment changes no product behaviour",
         "representative-fixture",
@@ -1082,9 +1166,10 @@ def _validate_owner_view(plan: str) -> None:
         "development-only oracle",
         "every comparison, adapter, caller, removal and legacy-retirement condition",
         "No performance, production-output or release acceptance",
-        "independently accepted, exact-green protected-main integration",
-        "does not open Phase 9, close a risk or remove a legacy path",
-        "Synchronise clean protected `main` after exact-green integration and stop",
+        "The two phases stay Not started",
+        "No exit, product work, package, output, risk closure",
+        "Then open only Phase 9A at 0/4",
+        "Keep Phase 9B Not started and do no product work",
     ):
         _require(
             fragment in owner_view,
@@ -1104,7 +1189,7 @@ def _validate_owner_view(plan: str) -> None:
     )
 
 
-def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
+def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
     headings = re.findall(r"^#{1,2} .+$", plan, re.MULTILINE)
     _require(
         headings
@@ -1115,6 +1200,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
             "## Phase 6 exit conditions",
             "## Phase 7 exit conditions",
             "## Phase 8 exit conditions",
+            "## Phase 9A and 9B exit conditions",
             "## Live risks",
             "## Owner decisions",
             "## Authority and evidence links",
@@ -1131,8 +1217,8 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
     )
     compact_plan = plan.replace(required_separator, required_separator.replace("\n\n", "\n"), 1)
     _require(
-        len(compact_plan.splitlines()) <= 160,
-        "PROJECT_PLAN.md exceeded its 160-line dashboard content budget",
+        len(compact_plan.splitlines()) <= 190,
+        "PROJECT_PLAN.md exceeded its 190-line dashboard content budget",
     )
     for forbidden in (
         "### Deliverables",
@@ -1169,18 +1255,26 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "project plan routes to the retired descriptive Phase 4 path",
     )
 
-    rows: dict[int, dict[str, object]] = {}
+    rows: dict[int | str, dict[str, object]] = {}
     for line in _section(plan, "Phase status").splitlines():
         cells = _cells(line) if line.startswith("|") else []
-        if len(cells) != 4 or not cells[0].isdigit():
+        if len(cells) != 4 or cells[0] in {"Phase", "---:"}:
             continue
+        _require(
+            re.fullmatch(r"\d+(?:[A-Z])?", cells[0]) is not None,
+            "invalid project phase row: " + cells[0],
+        )
         match = re.fullmatch(
             r"(\d+)/(\d+) (evidenced|accepted exits)"
             r"(; one deferred, unmet obligation)?",
             cells[2],
         )
         _require(match is not None, "invalid phase exit status: " + cells[2])
-        phase = int(cells[0])
+        phase = int(cells[0]) if cells[0].isdigit() else cells[0]
+        _require(
+            phase not in rows,
+            "duplicate project phase row: {}".format(phase),
+        )
         rows[phase] = {
             "count": int(match.group(1)),
             "total": int(match.group(2)),
@@ -1189,7 +1283,10 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
             "state": cells[3],
         }
 
-    _require(set(rows) == set(PHASE_TOTALS), "project phase rows must be 0 through 11")
+    _require(
+        set(rows) == set(PHASE_TOTALS),
+        "project phase rows must be 0–8, 9A, 9B, 10 and 11",
+    )
     for phase, total in PHASE_TOTALS.items():
         _require(rows[phase]["total"] == total, "phase total drifted: {}".format(phase))
         expected_term = "accepted exits" if phase == 6 else "evidenced"
@@ -1231,7 +1328,7 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         and rows[8]["state"] == "Complete — accepted 2026-10-03",
         "Phase 8 must be closed at four evidenced exits",
     )
-    for phase in range(9, 12):
+    for phase in ("9A", "9B", 10, 11):
         _require(
             rows[phase]["count"] == 0 and rows[phase]["state"] == "Not started",
             "Phase {} must remain unopened at zero evidenced exits".format(phase),
@@ -1242,12 +1339,170 @@ def _validate_plan_shape(plan: str) -> dict[int, dict[str, object]]:
         "the carried D-P6-008 obligation is missing",
     )
     _require(
-        "Phase 8 is closed at 4/4 under D-P8-006. All four exits remain "
-        "Evidenced and owner-accepted. Phase 9 is Not started at 0/9"
+        "Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Not started "
+        "at 0/4. Phase 9B is Not started at 0/6"
         in _semantic_text(preamble),
         "project-plan Phase 8 closeout or Phase 9 holding status drifted",
     )
     return rows
+
+
+def _validate_phase9_exit_allocation(plan: str, evidence: str) -> None:
+    """Bind the lossless four/six split without accepting an exit."""
+    section = _section(plan, "Phase 9A and 9B exit conditions")
+    table_lines = [
+        line for line in section.splitlines() if line.startswith("| ")
+    ]
+    expected_length = 4 + len(EXPECTED_PHASE9A_EXITS) + len(
+        EXPECTED_PHASE9B_EXITS
+    )
+    _require(
+        len(table_lines) == expected_length,
+        "Phase 9 split plan exit table row count drifted",
+    )
+    first_b = 2 + len(EXPECTED_PHASE9A_EXITS)
+    a_rows = [_cells(line) for line in table_lines[:first_b]]
+    b_rows = [_cells(line) for line in table_lines[first_b:]]
+    _require(
+        a_rows[:2] == [
+            ["Phase 9A exit", "Original exit", "Exact pending criterion"],
+            ["---", "---:", "---"],
+        ]
+        and b_rows[:2] == [
+            ["Phase 9B exit", "Original exit", "Exact pending criterion"],
+            ["---", "---:", "---"],
+        ],
+        "Phase 9 split plan table structure drifted",
+    )
+    for phase, rows, expected in (
+        ("9A", a_rows[2:], EXPECTED_PHASE9A_EXITS),
+        ("9B", b_rows[2:], EXPECTED_PHASE9B_EXITS),
+    ):
+        actual = [
+            (row[0], row[1], _semantic_text(row[2]))
+            for row in rows
+            if len(row) == 3
+        ]
+        _require(
+            actual == list(expected),
+            "Phase {} original-exit mapping or criterion drifted".format(phase),
+        )
+
+    evidence_section = _section(evidence, "Reallocated Phase 9 requirements")
+    evidence_rows = [
+        _cells(line)
+        for line in evidence_section.splitlines()
+        if line.startswith("| ")
+    ]
+    _require(
+        len(evidence_rows) == 2 + len(EXPECTED_PHASE9A_EXITS)
+        and evidence_rows[:2] == [
+            ["Phase 9A exit", "Status", "Exact criterion"],
+            ["---", "---", "---"],
+        ]
+        and [
+            (row[0], row[1], _semantic_text(row[2]))
+            for row in evidence_rows[2:]
+            if len(row) == 3
+        ]
+        == [
+            (exit_id, "Pending", criterion)
+            for exit_id, _, criterion in EXPECTED_PHASE9A_EXITS
+        ],
+        "Phase 9A evidence criteria or Pending status drifted",
+    )
+    flat = _semantic_text(section)
+    for clause in (
+        "nine criteria in the accepted Phase 9 gate control the two phases",
+        "Exit 6 has two acceptance duties",
+        "All nine requirements continue to apply",
+        "Each acceptance duty has one phase owner",
+        "Phase 9A technical proof does not clear a production package or "
+        "output",
+        "all chair and support families necessary for the agreed Core "
+        "release candidate",
+        "It does not include all Templot families or post-Core capabilities",
+        "neutral ChairDefinition",
+        "local reference oracle",
+        "provenance, rights, transactional-export and performance controls "
+        "continue to apply",
+    ):
+        _require(
+            clause in flat,
+            "Phase 9 split boundary drifted: " + clause,
+        )
+    _require(
+        "regenerate" not in flat.lower()
+        and "constituent" not in flat.lower(),
+        "Phase 9 planning reintroduced an unapproved chair term or verb",
+    )
+
+
+def _validate_phase9_terms(terminology: str) -> None:
+    """Keep the five owner-approved meanings and unresolved terms distinct."""
+    section = _section(terminology, "ASD-STE100 project terminology")
+    rows: dict[str, str] = {}
+    seen_terms: set[str] = set()
+    for line in section.splitlines():
+        if not line.startswith("| "):
+            continue
+        cells = _cells(line)
+        if len(cells) != 2:
+            continue
+        if cells[0] == "---":
+            continue
+        term = _semantic_text(cells[0])
+        _require(
+            term.casefold() not in seen_terms,
+            "Phase 9 technical term row duplicated: " + term,
+        )
+        seen_terms.add(term.casefold())
+        rows[term] = _semantic_text(cells[1])
+    expected = {
+        "Chair": (
+            "A chair is a railway support fitting that TrackTemplate "
+            "represents. It supports and locates a rail at a sleeper, "
+            "timber or other applicable support. An accepted "
+            "ChairDefinition gives its exact type, geometry, components "
+            "and rail interface."
+        ),
+        "Chair component": (
+            "A chair component is one named part of a chair definition "
+            "or chair assembly. Examples are a base or plinth, seat, jaw, "
+            "rib, fillet, key, fastening or interface component."
+        ),
+        "Procedural chair geometry": (
+            "Procedural chair geometry is derived chair geometry that "
+            "TrackTemplate constructs deterministically from accepted "
+            "ChairDefinition data and named chair components. It is not "
+            "retained Part geometry, an opaque mesh or a hand-drawn "
+            "final body."
+        ),
+        "Procedural chair generator": (
+            "A procedural chair generator is the TrackTemplate software "
+            "path that constructs procedural chair geometry from an "
+            "accepted ChairDefinition."
+        ),
+        "Construct": (
+            "Create derived chair geometry from accepted canonical "
+            "chair-definition data. The operation does not change that "
+            "canonical data."
+        ),
+        "Regenerate": (
+            "Do an evidence workflow again. Replace its retained result."
+        ),
+    }
+    for term, meaning in expected.items():
+        _require(
+            rows.get(term) == meaning,
+            "Phase 9 technical meaning drifted: " + term,
+        )
+    _require(
+        all(term.casefold() != "constituent" for term in rows)
+        and "ordinary chair" in terminology.lower()
+        and "The chair terms do not define “ordinary chair”" in terminology,
+        "Phase 9 chair terminology resolved an excluded term",
+    )
 
 
 def _validate_performance_host_sources(
@@ -4950,19 +5205,64 @@ def _validate_phase9_decision_holding(
     document: dict[str, object],
     phase6_decisions: dict[str, dict[str, object]],
 ) -> None:
-    """Keep the unopened Phase 9 register free of new phase authority."""
+    """Bind the split decision and retain the deferred Phase 6 duty."""
     _require(
         set(document)
         == {"schema_version", "current_phase", "updated_on", "decisions"}
         and document["schema_version"] == 1
         and document["current_phase"] == 9
         and document["updated_on"] == "2026-10-03",
-        "current decision register is not the Phase 9 holding state",
+        "current decision register is not the Phase 9 split state",
+    )
+    records = document["decisions"]
+    _require(
+        isinstance(records, list)
+        and len(records) == 2
+        and records[0] == phase6_decisions["D-P6-008"],
+        "Phase 9 split must carry unchanged D-P6-008 first",
+    )
+    split = records[1]
+    panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-9-programme-alignment-panel"
     )
     _require(
-        document["decisions"] == [phase6_decisions["D-P6-008"]],
-        "Phase 9 holding must carry only unchanged D-P6-008",
+        isinstance(split, dict)
+        and set(split) == {
+            "id", "decided_on", "status", "decision", "authority",
+            "exclusions", "evidence", "panel_required_under_current_policy",
+            "panel_record",
+        }
+        and split["id"] == "D-P9-001"
+        and split["decided_on"] == "2026-10-03"
+        and split["status"] == "Accepted"
+        and split["decision"] == (
+            "Approve five bounded TrackTemplate technical meanings. Divide "
+            "the nine Phase 9 criteria in the accepted gate into four "
+            "Pending Phase 9A exits and six Pending Phase 9B exits. The "
+            "two phases stay Not started."
+        )
+        and split["evidence"] == panel
+        and split["panel_record"] == panel
+        and split["panel_required_under_current_policy"] is True,
+        "D-P9-001 split identity, status or panel routing drifted",
     )
+    for field, digest in (
+        (
+            "authority",
+            "37927dae096f791a1cf5963ac70b63840d0a04aab58d6b97caabb2b356085c62",
+        ),
+        (
+            "exclusions",
+            "9c593d81527de1ed92cc7e46f91bd74a9e3828c1cf83efbc617fbb71dc51ba96",
+        ),
+    ):
+        value = split[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P9-001 " + field + " digest drifted",
+        )
 
 
 def _validate_dp8_005_acceptance(evidence: str) -> None:
@@ -5632,24 +5932,38 @@ def _validate_phase8_closeout(evidence: str) -> None:
 
 
 def _validate_phase9_holding(evidence: str) -> None:
-    """Keep fixed current records administrative until Phase 9 is opened."""
+    """Keep both new phases unopened and the inherited limits active."""
     preamble = _semantic_text(direct_section_content(
         evidence,
-        "Phase 9 Chair Definitions, Assisted Assimilation, Production Records "
-        "and Export Completion Holding Record",
+        "Phase 9A and 9B Programme Holding Record",
         level=1,
     ))
     for clause in (
-        "Not started — 0/9 evidenced exits",
-        "Phase 9 is unopened and unauthorised",
+        "Phase 9A is Not started at 0/4",
+        "Phase 9B is Not started at 0/6",
+        "Neither phase is open",
+        "This record gives no product authority",
         "D-P8-006",
         "all four original exits Evidenced and owner-accepted",
     ):
-        _require(clause in preamble, "Phase 9 holding status drifted: " + clause)
+        _require(clause in preamble, "Phase 9 split status drifted: " + clause)
+    _require(
+        '<a id="phase-9-programme-alignment-panel"></a>' in evidence,
+        "D-P9-001 evidence panel anchor drifted",
+    )
     flat = _semantic_text(evidence)
     for clause in (
-        "does not define or admit its nine criteria",
-        "The owner has not opened the phase or authorised product work",
+        "The accepted historical Phase 9 gate remains the source",
+        "previous blocked local candidate is failed evidence only",
+        "D-P9-001 approves only the five technical meanings",
+        "It does not open Phase 9A or Phase 9B, accept an exit, clear "
+        "output, close a risk or remove a legacy path",
+        "one independent Documentation Review",
+        "Independent test review and exact-tree protected-main integration "
+        "are also necessary",
+        "The opening can set only Phase 9A to 0/4 Open",
+        "Phase 9B stays Not started",
+        "This cycle includes no product implementation",
         "D-P6-008 stays in full",
         "mandatory before Phase 10 beta acceptance",
         "Beta acceptance is blocked while it remains unmet",
@@ -5659,7 +5973,7 @@ def _validate_phase9_holding(evidence: str) -> None:
         "No wider migration-family completion, performance result, production output, release or legacy-path removal is accepted",
         "Project status remains unknown",
     ):
-        _require(clause in flat, "Phase 9 holding boundary drifted: " + clause)
+        _require(clause in flat, "Phase 9 split boundary drifted: " + clause)
     _require(
         "history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel"
         in evidence
@@ -6376,7 +6690,8 @@ def _validate_decisions(plan: str) -> None:
         == set(by_id)
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
-        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"},
+        | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
+        | {"D-P9-001"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -8096,6 +8411,8 @@ def main() -> None:
     phase4_closeout = _read(PHASE4_CLOSEOUT_PATH)
     phase5_closeout = _read(PHASE5_CLOSEOUT_PATH)
     _validate_plan_shape(plan)
+    _validate_phase9_exit_allocation(plan, phase9_holding)
+    _validate_phase9_terms(_read(TERMINOLOGY_PATH))
     _validate_exit_conditions(
         plan,
         phase4_closeout,

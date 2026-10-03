@@ -1970,7 +1970,7 @@ def validate_phase8_exit2_acceptance_mutations() -> None:
         )),
         "No phase may be open after Phase 8 closeout",
     )
-    phase9 = table_row_containing(plan, "| 9 | Chair definitions,")
+    phase9 = table_row_containing(plan, "| 9A | S1 and procedural chair")
     expect_rejected(
         "phase8-exit2/phase-9-opened-without-authority",
         lambda: progress._validate_plan_shape(replace_once(
@@ -2104,29 +2104,38 @@ def validate_phase8_closeout_mutations() -> None:
 
     for name, before, after, diagnostic in (
         (
-            "phase9-opened",
-            "Not started — 0/9 evidenced exits",
-            "Open — 0/9 evidenced exits",
-            "Phase 9 holding status drifted: Not started — 0/9 evidenced exits",
+            "phase9a-opened",
+            "Phase 9A is Not started at 0/4",
+            "Phase 9A is Open at 0/4",
+            "Phase 9 split status drifted: Phase 9A is Not started at 0/4",
         ),
         (
-            "criteria-invented",
-            "does not define or admit its nine criteria",
-            "defines and admits nine criteria",
-            "Phase 9 holding boundary drifted: "
-            "does not define or admit its nine criteria",
+            "phase9b-opened",
+            "Phase 9B is Not started at 0/6",
+            "Phase 9B is Open at 0/6",
+            "Phase 9 split status drifted: Phase 9B is Not started at 0/6",
         ),
         (
             "performance-duty-waived",
             "Beta\nacceptance is blocked while it remains unmet",
             "Beta\nacceptance is allowed while it remains unmet",
-            "Phase 9 holding boundary drifted: "
+            "Phase 9 split boundary drifted: "
             "Beta acceptance is blocked while it remains unmet",
         ),
     ):
+        target = (
+            paragraph_containing(holding, "Status: **Phase 9A")
+            if name in {"phase9a-opened", "phase9b-opened"}
+            else holding
+        )
+        mutated_holding = replace_once(target, before, after)
+        if target != holding:
+            mutated_holding = replace_once(
+                holding, target, mutated_holding,
+            )
         expect_rejected(
             "phase9-holding/" + name,
-            lambda value=replace_once(holding, before, after): (
+            lambda value=mutated_holding: (
                 progress._validate_phase9_holding(value)
             ),
             diagnostic,
@@ -2136,7 +2145,7 @@ def validate_phase8_closeout_mutations() -> None:
     expect_rejected(
         "phase9-holding/phase8-decision-carried-as-current",
         lambda: progress._validate_phase9_decision_holding(current, phase6),
-        "Phase 9 holding must carry only unchanged D-P6-008",
+        "Phase 9 split must carry unchanged D-P6-008 first",
     )
 
 
@@ -4302,6 +4311,145 @@ def validate_finite_documentation_mutations() -> None:
         )
 
 
+def validate_phase9_split_mutations() -> None:
+    """Reject invented phases, exit drift and widened terminology."""
+    plan = read("reference/PROJECT_PLAN.md")
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    terminology = read("reference/TERMINOLOGY.md")
+    phase9b = table_row_containing(plan, "| 9B | Core RC chair")
+    extra_phase = replace_once(
+        plan,
+        phase9b + "\n",
+        phase9b + "\n| 9C | Invented phase | 0/1 evidenced | Not started |\n",
+    )
+    expect_rejected(
+        "phase9/extra-9c-status-row",
+        lambda: progress._validate_plan_shape(extra_phase),
+        "project phase rows must be 0–8, 9A, 9B, 10 and 11",
+    )
+    for phase, marker in (
+        ("9A", "| 9A-4 |"),
+        ("9B", "| 9B-6 |"),
+    ):
+        row = table_row_containing(plan, marker)
+        added = replace_once(plan, row + "\n", row + "\n" + row + "\n")
+        expect_rejected(
+            "phase9/extra-{}-exit-row".format(phase.lower()),
+            lambda value=added: progress._validate_phase9_exit_allocation(
+                value, evidence,
+            ),
+            "Phase 9 split plan exit table row count drifted",
+        )
+
+    for phase, marker, before, after in (
+        (
+            "9A", "| 9A-1 |",
+            "Select one more chair or support from repository evidence "
+            "for the smallest proof of a difference in chair components, "
+            "interface or assembly pattern.",
+            "An S1 size variant is sufficient.",
+        ),
+        (
+            "9B", "| 9B-3 |",
+            "The same applicable rights gate controls each other "
+            "package.",
+            "Additional packages need no rights gate.",
+        ),
+    ):
+        row = table_row_containing(plan, marker)
+        changed = replace_once(
+            plan, row, replace_once(row, before, after),
+        )
+        expect_rejected(
+            "phase9/{}-criterion-weakened".format(phase.lower()),
+            lambda value=changed: progress._validate_phase9_exit_allocation(
+                value, evidence,
+            ),
+            "Phase {} original-exit mapping or criterion drifted".format(
+                phase,
+            ),
+        )
+    evidence_row = table_row_containing(evidence, "| 9A-2 |")
+    admitted = replace_once(
+        evidence, evidence_row,
+        replace_once(evidence_row, "| Pending |", "| Evidenced |"),
+    )
+    expect_rejected(
+        "phase9/exit-evidence-self-admitted",
+        lambda: progress._validate_phase9_exit_allocation(plan, admitted),
+        "Phase 9A evidence criteria or Pending status drifted",
+    )
+
+    decision = json.loads(read("reference/current/gate-decisions.json"))
+    phase6 = {
+        record["id"]: record
+        for record in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    for field, replacement, diagnostic in (
+        ("decision", "Open Phase 9B.", "split identity, status or panel routing drifted"),
+        ("authority", "All Phase 9 exits accepted.", "authority digest drifted"),
+        ("exclusions", "Outputs are cleared.", "exclusions digest drifted"),
+        ("panel_record", "reference/current/PHASE_EVIDENCE.md",
+         "split identity, status or panel routing drifted"),
+    ):
+        changed = copy.deepcopy(decision)
+        changed["decisions"][1][field] = replacement
+        expect_rejected(
+            "phase9/d-p9-001-{}-changed".format(field),
+            lambda value=changed: progress._validate_phase9_decision_holding(
+                value, phase6,
+            ),
+            "D-P9-001 " + diagnostic,
+        )
+    changed = copy.deepcopy(decision)
+    changed["decisions"][0]["status"] = "Complete"
+    expect_rejected(
+        "phase9/d-p6-008-prematurely-closed",
+        lambda: progress._validate_phase9_decision_holding(changed, phase6),
+        "Phase 9 split must carry unchanged D-P6-008 first",
+    )
+
+    for term, before, after in (
+        ("Chair", "An accepted `ChairDefinition` gives", "Any scan gives"),
+        ("Regenerate", "Do an evidence workflow again.",
+         "Construct chair geometry again."),
+    ):
+        changed = replace_once(terminology, before, after)
+        expect_rejected(
+            "phase9/{}-meaning-changed".format(term.lower()),
+            lambda value=changed: progress._validate_phase9_terms(value),
+            "Phase 9 technical meaning drifted: " + term,
+        )
+    chair_row = table_row_containing(terminology, "| Chair component |")
+    for spelling, mutation_name in (
+        ("Constituent", "phase9/constituent-term-invented"),
+        ("constituent", "phase9/lowercase-constituent-term-invented"),
+    ):
+        added = replace_once(
+            terminology, chair_row + "\n",
+            chair_row + "\n| {} | A second name for chair component. |\n".format(
+                spelling,
+            ),
+        )
+        expect_rejected(
+            mutation_name,
+            lambda value=added: progress._validate_phase9_terms(value),
+            "Phase 9 chair terminology resolved an excluded term",
+        )
+    approved_chair = table_row_containing(terminology, "| Chair |")
+    duplicate_chair = replace_once(
+        terminology, approved_chair + "\n",
+        "| Chair | A chair is an unreviewed part. |\n" + approved_chair + "\n",
+    )
+    expect_rejected(
+        "phase9/duplicate-chair-term-row",
+        lambda: progress._validate_phase9_terms(duplicate_chair),
+        "Phase 9 technical term row duplicated: Chair",
+    )
+
+
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
     plan = read("reference/PROJECT_PLAN.md")
@@ -4827,7 +4975,7 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_row = table_row_containing(plan, "**Current state**")
     inflated_view = replace_once(
         owner_view_row,
-        "D-P6-008 remains Deferred — unmet",
+        "D-P6-008 stays Deferred — unmet",
         "D-P6-008 is complete",
     )
     expect_rejected(
@@ -4836,7 +4984,7 @@ def validate_documentation_profile_mutations() -> None:
             replace_once(plan, owner_view_row, inflated_view)
         ),
         "project-plan owner view lost or contradicted: "
-        "D-P6-008 remains Deferred — unmet",
+        "D-P6-008 stays Deferred — unmet",
     )
     owner_view_authority = replace_once(
         plan,
@@ -4876,16 +5024,16 @@ def validate_documentation_profile_mutations() -> None:
 
     closeout_cases = (
         (
-            "source-identity-changed", "**What changed**",
-            "protected `main` `cfd4387`",
-            "protected `main` `0000000`",
-            "protected `main` `cfd4387`",
+            "source-gate-changed", "**What changed**",
+            "accepted original gate",
+            "new unreviewed gate",
+            "accepted original gate",
         ),
         (
-            "recovery-limits-inflated", "**What changed**",
-            "exact October 1 snapshot and October 3 supplement limits",
-            "complete-estate snapshot and full restore",
-            "exact October 1 snapshot and October 3 supplement limits",
+            "failed-candidate-promoted", "**What changed**",
+            "previous local split candidate remains failed evidence only",
+            "previous local split candidate is accepted",
+            "previous local split candidate remains failed evidence only",
         ),
         (
             "monthly-restore-postponed", "**Limitations/findings**",
@@ -4909,17 +5057,15 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "phase9-opened", "**Owner decision**",
-            "It does not open Phase 9, close a risk or remove a legacy path",
-            "It opens Phase 9, closes a risk and removes a legacy path",
-            "does not open Phase 9, close a risk or remove a legacy path",
+            "The two phases stay Not started",
+            "Both phases are open",
+            "The two phases stay Not started",
         ),
         (
             "stop-boundary-waived", "**Next action**",
-            "Synchronise clean protected `main` after exact-green "
-            "integration and stop",
+            "Keep Phase 9B Not started and do no product work",
             "Begin Phase 9 product work after integration",
-            "Synchronise clean protected `main` after exact-green "
-            "integration and stop",
+            "Keep Phase 9B Not started and do no product work",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
@@ -7042,6 +7188,7 @@ def main() -> None:
     validate_phase8_exit1_admission_mutations()
     validate_phase8_exit2_acceptance_mutations()
     validate_phase8_closeout_mutations()
+    validate_phase9_split_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()
