@@ -1,4 +1,4 @@
-"""Prepare one reference-only rail-seat construction without host mutation.
+"""Prepare finite reference-only chair components without host mutation.
 
 This finite research operation consumes the existing neutral package v1.
 It does not admit a package, interpret arbitrary procedures, or enable
@@ -19,6 +19,11 @@ from tracktemplate.application.chair_definition import (
     chair_definition_manifest_signature,
     verify_chair_definition_manifest,
 )
+from tracktemplate.domain.chair_key import (
+    ChairKeyGeometry,
+    ChairKeyParameters,
+    construct_chair_key,
+)
 from tracktemplate.domain.chair_seat import (
     ChairSeatGeometry,
     ChairSeatParameters,
@@ -27,6 +32,7 @@ from tracktemplate.domain.chair_seat import (
 
 
 CHAIR_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.seat-reference.v1"
+CHAIR_KEY_RESEARCH_RULE_ID = "tracktemplate.chair.key-reference.v1"
 CHAIR_SEAT_FRAME_RULE_ID = "tracktemplate.chair.source-to-chair-frame.v1"
 _FRAME_PURPOSES = (
     "rail_head_width_mm", "rail_depth_mm", "seat_thickness_mm",
@@ -51,6 +57,22 @@ class ChairSeatResearchResult:
     component_id: str
     procedure_id: str
     geometry: ChairSeatGeometry
+
+
+@dataclass(frozen=True)
+class ChairKeyResearchResult:
+    """Derived KEY(False, False) geometry with unchanged provenance inputs.
+
+    Adapters must prepare again from the package and complete manifest.
+    This record gives no package or production acceptance.
+    """
+
+    package: ChairDefinitionPackage
+    manifest_json: str
+    manifest_signature: str
+    component_id: str
+    procedure_id: str
+    geometry: ChairKeyGeometry
 
 
 def _require(condition, code, path, message):
@@ -156,7 +178,9 @@ def _research_lineage(record, manifest):
         )
 
 
-def _parameter_map(procedure, quantities, expected, path):
+def _parameter_map(
+    procedure, quantities, expected, path, *, allow_key_fish_ratio=False
+):
     selected = [quantities[key] for key in procedure["parameter_quantity_ids"]]
     purposes = [item["purpose"] for item in selected]
     _require(
@@ -166,54 +190,72 @@ def _parameter_map(procedure, quantities, expected, path):
     )
     _require(
         all(
-            item["quantity_kind"] == "length"
-            and item["canonical_unit"] == "mm"
+            (
+                item["quantity_kind"] == "dimensionless"
+                and item["canonical_unit"] == "1"
+            ) if allow_key_fish_ratio and item["purpose"] == "rail_fish_ratio"
+            else (
+                item["quantity_kind"] == "length"
+                and item["canonical_unit"] == "mm"
+            )
             for item in selected
         ),
         "research-parameter-unit", path + ".parameter_quantity_ids",
-        "seat parameters must be full-size lengths in millimetres",
+        "key parameters need lengths in mm and rail_fish_ratio in 1"
+        if allow_key_fish_ratio
+        else "seat parameters must be full-size lengths in millimetres",
     )
     return {item["purpose"]: item for item in selected}
 
 
-def _procedures(definition, quantities):
+def _procedures(definition, quantities, *, key=False):
+    name = "key" if key else "seat"
+    rule_id = (
+        CHAIR_KEY_RESEARCH_RULE_ID if key else CHAIR_SEAT_RESEARCH_RULE_ID
+    )
+    parameter_type = ChairKeyParameters if key else ChairSeatParameters
     procedures = definition["procedures"]
     _require(
         len(procedures) == 2,
         "research-procedure-set", "$.definition.procedures",
-        "only the explicit frame and seat rules are supported",
+        "only the explicit frame and {} rules are supported".format(name),
     )
-    placement, seat = procedures
+    placement, construction = procedures
     _require(
         placement["kind"] == "placement"
         and placement["rule_id"] == CHAIR_SEAT_FRAME_RULE_ID
         and placement["input_ids"] == []
         and len(placement["output_ids"]) == 1
-        and seat["kind"] == "cross-section"
-        and seat["rule_id"] == CHAIR_SEAT_RESEARCH_RULE_ID
-        and seat["input_ids"] == placement["output_ids"]
-        and len(seat["output_ids"]) == 1,
+        and construction["kind"] == "cross-section"
+        and construction["rule_id"] == rule_id
+        and construction["input_ids"] == placement["output_ids"]
+        and len(construction["output_ids"]) == 1,
         "research-procedure-set", "$.definition.procedures",
-        "unsupported seat construction or source-to-chair transform",
+        "unsupported {} construction or source-to-chair transform".format(
+            name
+        ),
     )
     selected = _parameter_map(
-        seat, quantities,
-        tuple(item.name for item in fields(ChairSeatParameters)),
-        "$.definition.procedures[1]",
+        construction, quantities,
+        tuple(item.name for item in fields(parameter_type)),
+        "$.definition.procedures[1]", allow_key_fish_ratio=key,
     )
     frame = _parameter_map(
         placement, quantities, _FRAME_PURPOSES, "$.definition.procedures[0]"
     )
     _require(
-        all(frame[key]["quantity_id"] == selected[key]["quantity_id"]
-            for key in _FRAME_PURPOSES),
+        all(frame[purpose]["quantity_id"] == selected[purpose]["quantity_id"]
+            for purpose in _FRAME_PURPOSES),
         "research-frame-inputs", "$.definition.procedures[0]",
-        "the frame and seat must use the same explicit rail and seat inputs",
+        ("the frame and {} must use the same explicit "
+         "rail and seat inputs").format(name),
     )
-    return placement, seat, selected
+    return placement, construction, selected
 
 
-def _component_contract(definition, placement, seat):
+def _component_contract(definition, placement, construction, *, key=False):
+    name = "key" if key else "seat"
+    role = "key" if key else "rail-seat"
     datums = definition["datums"]
     _require(
         len(datums) == len(CHAIR_REQUIRED_DATUM_ROLES)
@@ -231,24 +273,24 @@ def _component_contract(definition, placement, seat):
     components = definition["components"]
     _require(
         len(components) == 1
-        and components[0]["role"] == "rail-seat"
+        and components[0]["role"] == role
         and components[0]["presence"] == "present"
         and components[0]["placement_datum_id"]
         == by_role["base-mounting-plane"]
-        and components[0]["procedure_ids"] == [seat["procedure_id"]],
+        and components[0]["procedure_ids"] == [construction["procedure_id"]],
         "research-component-set", "$.definition.components",
-        "this proof constructs exactly one declared rail-seat component",
+        "this proof constructs exactly one declared {} component".format(role),
     )
     interfaces = definition["rail_interfaces"]
     _require(
         len(interfaces) == 1
         and interfaces[0]["seat_datum_id"] == by_role["rail-seat-plane"]
         and interfaces[0]["gauge_face_datum_id"] == by_role["gauge-face-datum"]
-        and interfaces[0]["procedure_ids"] == [seat["procedure_id"]]
+        and interfaces[0]["procedure_ids"] == [construction["procedure_id"]]
         and interfaces[0]["clearance_quantity_ids"] == [],
         "research-interface-set", "$.definition.rail_interfaces",
-        "only the declared seat interface without added clearance "
-        "is supported",
+        "only the declared {} interface without added clearance "
+        "is supported".format(name),
     )
     return components[0]["component_id"]
 
@@ -332,5 +374,54 @@ def prepare_chair_seat_research(package, manifest_text):
         manifest_signature=chair_definition_manifest_signature(manifest_text),
         component_id=component_id,
         procedure_id=seat["procedure_id"],
+        geometry=geometry,
+    )
+
+
+def prepare_chair_key_research(package, manifest_text):
+    """Construct only the finite reference key for a solid outer jaw.
+
+    KEY(False, False), rev:A and the recorded model-fit/overlap inputs
+    define this research rule. It applies no manufacturing corrections.
+    Inputs stay immutable, reference-only, private and unadmitted.
+    """
+    if not isinstance(package, ChairDefinitionPackage):
+        raise TypeError("package must be a ChairDefinitionPackage")
+    try:
+        verify_chair_definition_manifest(package, manifest_text)
+    except ChairDefinitionError as error:
+        raise ChairResearchError(
+            error.code, error.path, error.detail
+        ) from error
+    manifest = json.loads(manifest_text)
+    record = package.to_record()
+    _research_metadata(record)
+    _research_lineage(record, manifest)
+    definition = record["definition"]
+    quantities = {
+        item["quantity_id"]: item for item in definition["quantities"]
+    }
+    placement, key, selected = _procedures(definition, quantities, key=True)
+    component_id = _component_contract(definition, placement, key, key=True)
+    _quantity_coverage(record, quantities, selected)
+    try:
+        parameters = ChairKeyParameters(**{
+            name: Fraction(item["canonical_value"])
+            for name, item in selected.items()
+        })
+        geometry = construct_chair_key(parameters)
+    except (TypeError, ValueError) as error:
+        raise ChairResearchError(
+            "research-geometry-invalid", "$.definition.quantities", str(error)
+        ) from error
+    return ChairKeyResearchResult(
+        package=package,
+        manifest_json=json.dumps(
+            manifest, allow_nan=False, ensure_ascii=True,
+            separators=(",", ":"), sort_keys=True,
+        ),
+        manifest_signature=chair_definition_manifest_signature(manifest_text),
+        component_id=component_id,
+        procedure_id=key["procedure_id"],
         geometry=geometry,
     )
