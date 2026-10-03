@@ -194,11 +194,11 @@ Use these technical nouns only with their stated project meanings:
 | FreeCAD data | An **adapter** is a software component between a TrackTemplate API and FreeCAD. It supplies inputs to the API, changes data for FreeCAD, and preserves TrackTemplate Core decisions. The [preparation API](contracts/phase7-track-preparation.md#b16-caller-and-recovery) owns the sequence and result identities. A **vector** is a FreeCAD `App.Vector` value with X, Y and Z values. In track preparation, it gives a point with Z equal to zero. These nouns give no authority to make FreeCAD objects canonical state. |
 | Official sources | A **standard** is an external reference that has a requirement set. **ASD-STE100 Issue 9**, **Simplified Technical English (STE)**, and **S1000D** identify standards. **Technical noun**, **technical verb**, **normative standard**, **official standard**, **official source**, **external reference**, **conformance**, **official conformance assessment**, and **linguistic conformance** are standards terms. |
 
-The chair terms do not resolve “ordinary chair” or the precise S1 prototype
-designation. They do not decide a chair-family classification, S1 dimensions,
-rail section, tolerances or chair component evidence. They do not approve
-provenance, licence, rights, `project-cleared` status, production geometry or
-output.
+The chair terms do not define “ordinary chair” or the precise S1 prototype
+designation. They give no chair-family classification, S1 dimensions,
+rail section, tolerances or chair component evidence. They give no
+acceptance for provenance, licence, rights, `project-cleared` status, production
+geometry or output.
 
 Use these technical verbs only with their stated project meanings:
 
@@ -241,7 +241,7 @@ Use these technical verbs only with their stated project meanings:
 | **Requalify** | Qualify a different exact host profile against the same compatibility contract. |
 | **Classify** | Put a validation result with `FAIL` in a failure class that the testing policy defines. Put a local-state inventory item in a local-state type that the recovery policy defines. |
 | **Regenerate** | Do an evidence workflow again. Replace its retained result. |
-| **Construct** | Create derived chair geometry from accepted canonical chair-definition data without changing that canonical data. |
+| **Construct** | Create derived chair geometry from accepted canonical chair-definition data. The operation does not change that canonical data. |
 
 Do not use different technical terms for the same project concept. Do not use
 a technical noun as a verb unless this register also approves the verb. Add a
