@@ -344,6 +344,14 @@ def _validate_cli_is_compact_and_has_no_reuse(root):
             exit_code = bundle.main(
                 ["run", "--step", 'read=["cat","--","small.txt"]']
             )
+        bundle.default_run_directory = lambda: (
+            root / "benchmark-output" / "inspection-bundles" / "cli-large"
+        )
+        large_stdout = io.StringIO()
+        with contextlib.redirect_stdout(large_stdout):
+            large_exit = bundle.main(
+                ["run", "--step", 'read=["cat","--","large.txt"]']
+            )
     finally:
         bundle.ROOT = original_root
         bundle.default_run_directory = original_directory
@@ -356,6 +364,12 @@ def _validate_cli_is_compact_and_has_no_reuse(root):
     assert payload["status"] == "PASS"
     assert payload["total_count"] == 1
     assert "reuse" not in json.dumps(payload)
+    assert large_exit == 0
+    assert large_stdout.getvalue().startswith(bundle.PASS_SENTINEL)
+    assert len(large_stdout.getvalue().encode("utf-8")) <= 4096
+    assert len(large_stdout.getvalue().encode("utf-8")) <= (
+        (root / "large.txt").stat().st_size // 10
+    )
     parser_stderr = io.StringIO()
     try:
         with contextlib.redirect_stderr(parser_stderr):
@@ -550,6 +564,336 @@ def _validate_symlinked_run_directory_is_rejected(root):
         assert not outside.exists()
 
 
+def _receipt_cli(root, arguments):
+    original_root = bundle.ROOT
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    bundle.ROOT = root
+    try:
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            exit_code = bundle.main(arguments)
+    finally:
+        bundle.ROOT = original_root
+    return exit_code, stdout.getvalue(), stderr.getvalue()
+
+
+def _write_receipt(root, name, receipt):
+    path = root / "benchmark-output" / "inspection-bundles" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(receipt, sort_keys=True), encoding="utf-8")
+    return path
+
+
+def _validate_compact_receipt_access(root):
+    large_stdout = "stdout-start\n" + ("x" * 120000) + "\nstdout-end\n"
+    assurance = {
+        "assurance_id": "post-pr-99-retained-evidence",
+        "expected_head": "a" * 40,
+        "profile": "standalone",
+        "sample_count": 3,
+        "strict": True,
+        "elapsed_seconds": 1.25,
+        "optional_note": None,
+        "limits": {"max_output_bytes": 4096, "minimum_samples": 3},
+    }
+    receipt = {
+        **assurance,
+        "commands": [
+            {
+                "argv": ["python", "-m", "example"],
+                "cwd": ".",
+                "returncode": 0,
+                "stdout": large_stdout,
+                "stderr": "",
+            },
+            {
+                "argv": ["python", "-m", "second"],
+                "cwd": ".",
+                "returncode": 0,
+                "stdout": "complete\n",
+                "stderr": "",
+            },
+        ],
+        "verdict": "PASS",
+    }
+    artifact = _write_receipt(root, "large-command-receipt.json", receipt)
+    original = artifact.read_bytes()
+    evidence_key = hashlib.sha256(original).hexdigest()
+    relative = artifact.relative_to(root).as_posix()
+
+    exit_code, output, errors = _receipt_cli(
+        root, ["summary", "--artifact", relative]
+    )
+    assert exit_code == 0 and errors == ""
+    assert output.startswith(bundle.RECEIPT_SUMMARY_SENTINEL)
+    assert len(output.encode("utf-8")) <= 4096
+    assert len(output.encode("utf-8")) <= len(original) // 10
+    summary = json.loads(output[len(bundle.RECEIPT_SUMMARY_SENTINEL):])
+    assert summary["status"] == summary["verdict"] == "PASS"
+    assert summary["artifact"] == {
+        "bytes": len(original),
+        "path": relative,
+        "sha256": evidence_key,
+    }
+    assert summary["commands"] == {
+        "count": 2,
+        "failed": [],
+        "failed_count": 0,
+        "omitted_failures": 0,
+    }
+    assert summary["fields"] == assurance
+    assert "commands" not in summary["fields"]
+    assert large_stdout not in output
+    assert artifact.read_bytes() == original
+
+    exit_code, output, errors = _receipt_cli(
+        root,
+        [
+            "field", "--artifact", relative, "--evidence-key", evidence_key,
+            "--command-index", "0", "--field", "stdout",
+            "--head-bytes", "64", "--tail-bytes", "64",
+        ],
+    )
+    assert exit_code == 0 and errors == ""
+    first_line = output.splitlines()[0]
+    assert first_line.startswith(bundle.RECEIPT_FIELD_SENTINEL)
+    metadata = json.loads(first_line[len(bundle.RECEIPT_FIELD_SENTINEL):])
+    assert metadata["artifact"] == summary["artifact"]
+    assert metadata["selected_bytes"] == len(large_stdout.encode("utf-8"))
+    assert metadata["selected_sha256"] == hashlib.sha256(
+        large_stdout.encode("utf-8")
+    ).hexdigest()
+    assert metadata["omitted_bytes"] > 0
+    assert metadata["status"] == metadata["verdict"] == "PASS"
+    assert "stdout-start" in output and "stdout-end" in output
+    assert len(output.encode("utf-8")) <= 6144
+    assert artifact.read_bytes() == original
+
+    wrong_key = "0" * 64 if evidence_key != "0" * 64 else "1" * 64
+    exit_code, output, errors = _receipt_cli(
+        root,
+        [
+            "field", "--artifact", relative, "--evidence-key", wrong_key,
+            "--command-index", "0", "--field", "stdout",
+        ],
+    )
+    assert exit_code == 2 and output == ""
+    assert "identity changed" in errors
+
+    tampered = _write_receipt(root, "tampered-command-receipt.json", receipt)
+    changed = tampered.read_bytes().replace(
+        b"stdout-start", b"stdout-other", 1
+    )
+    assert len(changed) == len(original)
+    tampered.write_bytes(changed)
+    exit_code, output, errors = _receipt_cli(
+        root,
+        [
+            "field", "--artifact", tampered.relative_to(root).as_posix(),
+            "--evidence-key", evidence_key, "--command-index", "0",
+            "--field", "stdout",
+        ],
+    )
+    assert exit_code == 2 and output == ""
+    assert "identity changed" in errors
+
+    for arguments in (
+        ["summary", "--artifact", "benchmark-output/absent.json"],
+        ["field", "--artifact", relative, "--evidence-key", evidence_key,
+         "--command-index", "7", "--field", "stdout"],
+        ["field", "--artifact", relative, "--evidence-key", evidence_key,
+         "--command-index", "0", "--field", "absent"],
+    ):
+        exit_code, output, errors = _receipt_cli(root, arguments)
+        assert exit_code == 2 and output == "" and errors
+
+    malformed = root / "benchmark-output" / "malformed-receipt.json"
+    malformed.write_text("{bad json", encoding="utf-8")
+    exit_code, output, errors = _receipt_cli(
+        root, ["summary", "--artifact", malformed.relative_to(root).as_posix()]
+    )
+    assert exit_code == 2 and output == ""
+    assert "not valid JSON" in errors
+
+    nested = root / "benchmark-output" / "nested-receipt.json"
+    nested.write_text(
+        '{"verdict":"PASS","commands":[],"nested":'
+        + ("[" * 10000) + "0" + ("]" * 10000) + "}",
+        encoding="utf-8",
+    )
+    exit_code, output, errors = _receipt_cli(
+        root, ["summary", "--artifact", nested.relative_to(root).as_posix()]
+    )
+    assert exit_code == 2 and output == ""
+    assert "not valid JSON" in errors
+
+    duplicate = root / "benchmark-output" / "duplicate-receipt.json"
+    duplicate.write_text(
+        '{"verdict":"PASS","verdict":"FAIL","commands":[]}',
+        encoding="utf-8",
+    )
+    exit_code, output, errors = _receipt_cli(
+        root, ["summary", "--artifact", duplicate.relative_to(root).as_posix()]
+    )
+    assert exit_code == 2 and output == ""
+    assert "duplicate JSON keys" in errors
+
+    nonfinite = root / "benchmark-output" / "nonfinite-receipt.json"
+    nonfinite.write_text(
+        '{"verdict":"PASS","commands":[{"argv":["echo"],"cwd":".",'
+        '"returncode":0,"stdout":"","stderr":""}],'
+        '"elapsed_seconds":1e10000}',
+        encoding="utf-8",
+    )
+    exit_code, output, errors = _receipt_cli(
+        root, ["summary", "--artifact", nonfinite.relative_to(root).as_posix()]
+    )
+    assert exit_code == 2 and output == ""
+    assert "non-finite JSON number" in errors
+
+    surrogate = _write_receipt(
+        root,
+        "surrogate-receipt.json",
+        {
+            "verdict": "PASS",
+            "commands": [{**receipt["commands"][1], "stdout": "\ud800"}],
+        },
+    )
+    surrogate_original = surrogate.read_bytes()
+    surrogate_key = hashlib.sha256(surrogate_original).hexdigest()
+    exit_code, output, errors = _receipt_cli(
+        root,
+        [
+            "field", "--artifact", surrogate.relative_to(root).as_posix(),
+            "--evidence-key", surrogate_key, "--command-index", "0",
+            "--field", "stdout",
+        ],
+    )
+    assert exit_code == 0 and errors == ""
+    first_line, selected = output.splitlines()
+    metadata = json.loads(first_line[len(bundle.RECEIPT_FIELD_SENTINEL):])
+    assert metadata["rendering"] == "canonical-json"
+    assert metadata["selected_sha256"] == hashlib.sha256(
+        selected.encode("utf-8")
+    ).hexdigest()
+    assert json.loads(selected) == "\ud800"
+    assert len(output.encode("utf-8")) <= bundle.MAX_FIELD_OUTPUT_BYTES
+    assert surrogate.read_bytes() == surrogate_original
+
+    oversized = root / "benchmark-output" / "oversized-receipt.json"
+    with oversized.open("wb") as stream:
+        stream.truncate(bundle.MAX_RECEIPT_BYTES + 1)
+    exit_code, output, errors = _receipt_cli(
+        root, ["summary", "--artifact", oversized.relative_to(root).as_posix()]
+    )
+    assert exit_code == 2 and output == ""
+    assert "exceeds the read limit" in errors
+
+    long_name = "k" * 7000
+    long_field = _write_receipt(
+        root, "long-field-receipt.json",
+        {
+            "verdict": "PASS",
+            "commands": [receipt["commands"][1]],
+            long_name: "value",
+        },
+    )
+    long_key = hashlib.sha256(long_field.read_bytes()).hexdigest()
+    exit_code, output, errors = _receipt_cli(
+        root,
+        [
+            "field", "--artifact", long_field.relative_to(root).as_posix(),
+            "--evidence-key", long_key, "--field", long_name,
+        ],
+    )
+    assert exit_code == 2 and output == ""
+    assert "exceeds the output limit" in errors
+
+    for name, invalid_receipt in (
+        ("empty-commands.json", {"verdict": "PASS", "commands": []}),
+        (
+            "missing-stdout.json",
+            {
+                "verdict": "PASS",
+                "commands": [
+                    {
+                        key: value
+                        for key, value in receipt["commands"][1].items()
+                        if key != "stdout"
+                    }
+                ],
+            },
+        ),
+    ):
+        invalid = _write_receipt(root, name, invalid_receipt)
+        exit_code, output, errors = _receipt_cli(
+            root,
+            ["summary", "--artifact", invalid.relative_to(root).as_posix()],
+        )
+        assert exit_code == 2 and output == ""
+        assert "receipt is invalid" in errors or "result is invalid" in errors
+
+    with tempfile.TemporaryDirectory(
+        prefix="tracktemplate-inspection-external-"
+    ) as external:
+        outside = pathlib.Path(external) / "receipt.json"
+        outside.write_bytes(original)
+        linked = root / "linked-receipt.json"
+        linked.symlink_to(outside)
+        for unsafe, reason in (
+            (str(outside), "escapes the repository"),
+            (linked.relative_to(root).as_posix(), "symbolic link"),
+        ):
+            exit_code, output, errors = _receipt_cli(
+                root, ["summary", "--artifact", unsafe]
+            )
+            assert exit_code == 2 and output == "" and reason in errors
+
+    for name, changed_receipt in (
+        ("failed-verdict.json", {**receipt, "verdict": "FAIL"}),
+        (
+            "failed-command.json",
+            {
+                **receipt,
+                "commands": [
+                    receipt["commands"][0],
+                    {**receipt["commands"][1], "returncode": 7},
+                ],
+            },
+        ),
+    ):
+        failed_artifact = _write_receipt(root, name, changed_receipt)
+        failed_relative = failed_artifact.relative_to(root).as_posix()
+        exit_code, output, errors = _receipt_cli(
+            root, ["summary", "--artifact", failed_relative]
+        )
+        assert exit_code == 1 and errors == ""
+        failed_summary = json.loads(
+            output[len(bundle.RECEIPT_SUMMARY_SENTINEL):]
+        )
+        assert failed_summary["status"] == "FAIL"
+        assert failed_summary["commands"]["count"] == 2
+        assert failed_summary["commands"]["failed_count"] == (
+            1 if name == "failed-command.json" else 0
+        )
+        assert failed_summary["commands"]["failed"] == (
+            [{"index": 1, "returncode": 7}]
+            if name == "failed-command.json" else []
+        )
+        failed_key = hashlib.sha256(failed_artifact.read_bytes()).hexdigest()
+        exit_code, output, errors = _receipt_cli(
+            root,
+            [
+                "field", "--artifact", failed_relative,
+                "--evidence-key", failed_key, "--command-index", "1",
+                "--field", "stdout", "--head-bytes", "8",
+                "--tail-bytes", "8",
+            ],
+        )
+        assert exit_code == 1 and errors == ""
+        assert output.startswith(bundle.RECEIPT_FIELD_SENTINEL)
+
+
 def validate():
     temporary, root = _fixture()
     programs = tempfile.TemporaryDirectory(
@@ -573,6 +917,7 @@ def validate():
         _validate_run_directory_collision(root)
         _validate_symlinked_run_directory_is_rejected(root)
         _validate_retrieval_and_tamper_detection(root, summary)
+        _validate_compact_receipt_access(root)
     finally:
         bundle._resolve_executable = trusted_resolver
         programs.cleanup()
