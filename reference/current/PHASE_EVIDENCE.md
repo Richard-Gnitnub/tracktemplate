@@ -20,7 +20,7 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows and the distinct proof for each accepted exit. Closure adds no workflow proof. |
 | Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable, and the monthly full restore is due by 2026-10-05. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
 | Owner decision | [D-P9-002](#phase-9a-opening-panel) opens only Phase 9A at 0/4 with four Pending exits. Phase 9B stays Not started at 0/6. It accepts no exit, product work, output, package, risk closure or legacy removal. |
-| Next action | Present the first bounded Phase 9A product recommendation from retained S1 evidence. Do not start product work in this record cycle. |
+| Next action | Use retained S1 evidence to recommend the first bounded Phase 9A product task to the owner. Do not start product work in this record cycle. |
 
 <a id="phase-9-programme-alignment-panel"></a>
 
@@ -80,15 +80,16 @@ includes no product implementation.
 **Decision boundary:** The reviewed Phase 9A/9B alignment merged through
 [PR #131](https://github.com/Richard-Gnitnub/tracktemplate/pull/131) at clean,
 protected `main` `851ef81a7f950c1a5425191e051e9cf7207585b9`.
-The merged tree equals the reviewed head tree `938c4de1389c7afc252d4acee9202f464626cbc8`.
+The merged tree has the same identity as the reviewed head tree `938c4de1389c7afc252d4acee9202f464626cbc8`.
 The [owner instruction in D-P9-001](gate-decisions.json) authorises Phase 9A
-opening after exact-green alignment integration. [D-P9-002](gate-decisions.json)
+opening after exact validation, independent acceptance and a merge into protected `main`. [D-P9-002](gate-decisions.json)
 records this separate opening. The four Phase 9A criteria below stay Pending.
 
 **Risk panel:** An independent read-only reviewer checked the opening against
-the merged programme, current records and all 24 live risks. The recommendation
+the merged programme, current records and all 24 live risks. The panel recommendation
 was **Proceed with bounded conditions**, with no dissent. The reviewer shares
 one agent team and workspace with the author. This is not an external review.
+
 PR-09, PR-13, PR-17 and PR-22 keep their recorded states and controls.
 The chair, rights, performance and legacy-retirement risks also stay open.
 The full restore is due by 2026-10-05. USB separate storage is unverified.
@@ -102,7 +103,8 @@ risk closure, release or legacy removal. Exact validation, independent review
 and normal protected-main integration apply to this opening record.
 
 The next product work needs a separate bounded assignment. This opening does
-not select a chair family, S1 values, rail section or rights status.
+not select a chair family, S1 values or a rail section. It does not change
+the rights state.
 
 ## Reallocated Phase 9 requirements
 
