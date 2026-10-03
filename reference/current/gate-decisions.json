@@ -24,6 +24,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9-programme-alignment-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9-programme-alignment-panel"
+    },
+    {
+      "id": "D-P9-002",
+      "decided_on": "2026-10-03",
+      "status": "Accepted",
+      "decision": "Open only Phase 9A at 0/4 with four Pending exits after exact-green integration of the reviewed alignment at protected main 851ef81. Phase 9B remains Not started at 0/6.",
+      "authority": "If the new programme alignment is exact-green and independently accepted, integrate it through the normal protected-main workflow and open Phase 9A at 0/n.\n\nDo not open Phase 9B.\n\nDo not begin Phase 9A product implementation in this cycle.\n\nStop with clean, synchronised protected \"main\" and bring me the first bounded Phase 9A product recommendation.",
+      "exclusions": "All four Phase 9A exits and all six Phase 9B exits stay Pending. No Phase 9B opening, product implementation, chair package, production geometry or output, risk closure, performance or release acceptance, or legacy removal follows. Keep D-P6-008 Deferred — unmet, TERM-R04 open, all 24 live risks, private-development output, unknown project status and all accepted evidence, comparison and retirement limits. The prior blocked candidate remains failed evidence only.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9a-opening-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9a-opening-panel"
     }
   ]
 }

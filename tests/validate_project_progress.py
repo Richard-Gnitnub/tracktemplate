@@ -1138,19 +1138,22 @@ def _validate_owner_view(plan: str) -> None:
     for fragment in (
         "Phase 8 is closed at 4/4 under",
         "D-P8-006",
-        "Phase 9A is Not started at 0/4",
+        "Phase 9A is Open at 0/4 with four Pending exits",
         "Phase 9B is Not started at 0/6",
         "D-P6-008 stays Deferred — unmet",
         "TERM-R04 stays open",
         "Output stays private-development",
         "project status stays `unknown`",
         "D-P9-001",
+        "D-P9-002",
+        "PR #131",
+        "merged tree matches the reviewed head",
         "accepted original gate",
         "frozen Phase 8 closeout",
         "recovery record",
         "previous local split candidate remains failed evidence only",
         "accepted straight and curved `TO-001` and `XO-001` examples",
-        "This alignment changes no product behaviour",
+        "The Phase 9A opening adds no product proof or behaviour",
         "representative-fixture",
         "straight TO Edit",
         "historical GUI-source",
@@ -1166,15 +1169,21 @@ def _validate_owner_view(plan: str) -> None:
         "development-only oracle",
         "every comparison, adapter, caller, removal and legacy-retirement condition",
         "No performance, production-output or release acceptance",
-        "The two phases stay Not started",
+        "opens Phase 9A at 0/4 with all four exits Pending",
         "No exit, product work, package, output, risk closure",
-        "Then open only Phase 9A at 0/4",
-        "Keep Phase 9B Not started and do no product work",
+        "Present one bounded Phase 9A product recommendation",
+        "Keep Phase 9B Not started",
+        "Do not start product implementation in this cycle",
     ):
         _require(
             fragment in owner_view,
             "project-plan owner view lost or contradicted: " + fragment,
         )
+    _require(
+        "Phase 9B stays Not started at 0/6" in _semantic_text(rows[4][1]),
+        "project-plan owner view lost or contradicted: "
+        "Phase 9B stays Not started at 0/6",
+    )
     _require(
         "Obtain on-site confirmation that the safely unmounted USB is removed and stored separately"
         not in owner_view,
@@ -1315,8 +1324,9 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         "Phase 6 must remain closed at four accepted and one deferred exit",
     )
     _require(
-        not any(row["state"] == "Open" for row in rows.values()),
-        "No phase may be open after Phase 8 closeout",
+        [phase for phase, row in rows.items() if row["state"] == "Open"]
+        == ["9A"],
+        "Only Phase 9A may be open",
     )
     _require(
         rows[7]["count"] == 4
@@ -1328,7 +1338,11 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         and rows[8]["state"] == "Complete — accepted 2026-10-03",
         "Phase 8 must be closed at four evidenced exits",
     )
-    for phase in ("9A", "9B", 10, 11):
+    _require(
+        rows["9A"]["count"] == 0 and rows["9A"]["state"] == "Open",
+        "Phase 9A must stay Open at zero evidenced exits",
+    )
+    for phase in ("9B", 10, 11):
         _require(
             rows[phase]["count"] == 0 and rows[phase]["state"] == "Not started",
             "Phase {} must remain unopened at zero evidenced exits".format(phase),
@@ -1339,8 +1353,8 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         "the carried D-P6-008 obligation is missing",
     )
     _require(
-        "Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Not started "
-        "at 0/4. Phase 9B is Not started at 0/6"
+        "Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open "
+        "at 0/4 with four Pending exits. Phase 9B is Not started at 0/6"
         in _semantic_text(preamble),
         "project-plan Phase 8 closeout or Phase 9 holding status drifted",
     )
@@ -5205,21 +5219,25 @@ def _validate_phase9_decision_holding(
     document: dict[str, object],
     phase6_decisions: dict[str, dict[str, object]],
 ) -> None:
-    """Bind the split decision and retain the deferred Phase 6 duty."""
+    """Bind the split and opening decisions and deferred Phase 6 duty."""
     _require(
         set(document)
         == {"schema_version", "current_phase", "updated_on", "decisions"}
         and document["schema_version"] == 1
         and document["current_phase"] == 9
         and document["updated_on"] == "2026-10-03",
-        "current decision register is not the Phase 9 split state",
+        "current decision register is not the Phase 9A opening state",
     )
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 2
+        and bool(records)
         and records[0] == phase6_decisions["D-P6-008"],
         "Phase 9 split must carry unchanged D-P6-008 first",
+    )
+    _require(
+        len(records) == 3,
+        "Phase 9A opening decision chain incomplete or widened",
     )
     split = records[1]
     panel = (
@@ -5262,6 +5280,43 @@ def _validate_phase9_decision_holding(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-P9-001 " + field + " digest drifted",
+        )
+
+    opening = records[2]
+    opening_panel = (
+        "reference/current/PHASE_EVIDENCE.md#phase-9a-opening-panel"
+    )
+    _require(
+        isinstance(opening, dict)
+        and set(opening) == set(split)
+        and opening["id"] == "D-P9-002"
+        and opening["decided_on"] == "2026-10-03"
+        and opening["status"] == "Accepted"
+        and opening["decision"] == (
+            "Open only Phase 9A at 0/4 with four Pending exits after "
+            "exact-green integration of the reviewed alignment at "
+            "protected main 851ef81. Phase 9B remains Not started at 0/6."
+        )
+        and opening["evidence"] == opening_panel
+        and opening["panel_record"] == opening_panel
+        and opening["panel_required_under_current_policy"] is True,
+        "D-P9-002 opening identity, status or panel routing drifted",
+    )
+    for field, digest in (
+        (
+            "authority",
+            "89303b970e5ead09fb446c494410a36a3ccf3628f41b001e6bf48bccd8a30e42",
+        ),
+        (
+            "exclusions",
+            "879544ae8060b36253710ffbd5e338c273a30792ab92482f20181fcbfeb8948d",
+        ),
+    ):
+        value = opening[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P9-002 " + field + " digest drifted",
         )
 
 
@@ -5932,17 +5987,16 @@ def _validate_phase8_closeout(evidence: str) -> None:
 
 
 def _validate_phase9_holding(evidence: str) -> None:
-    """Keep both new phases unopened and the inherited limits active."""
+    """Keep the bounded 9A opening and inherited limits active."""
     preamble = _semantic_text(direct_section_content(
         evidence,
-        "Phase 9A and 9B Programme Holding Record",
+        "Phase 9A Opening and Phase 9B Holding Record",
         level=1,
     ))
     for clause in (
-        "Phase 9A is Not started at 0/4",
+        "Phase 9A is Open at 0/4 with four Pending exits",
         "Phase 9B is Not started at 0/6",
-        "Neither phase is open",
-        "This record gives no product authority",
+        "This record gives no product acceptance",
         "D-P8-006",
         "all four original exits Evidenced and owner-accepted",
     ):
@@ -5951,19 +6005,24 @@ def _validate_phase9_holding(evidence: str) -> None:
         '<a id="phase-9-programme-alignment-panel"></a>' in evidence,
         "D-P9-001 evidence panel anchor drifted",
     )
+    _require(
+        '<a id="phase-9a-opening-panel"></a>' in evidence,
+        "D-P9-002 opening panel anchor drifted",
+    )
     flat = _semantic_text(evidence)
     for clause in (
-        "The accepted historical Phase 9 gate remains the source",
-        "previous blocked local candidate is failed evidence only",
-        "D-P9-001 approves only the five technical meanings",
-        "It does not open Phase 9A or Phase 9B, accept an exit, clear "
-        "output, close a risk or remove a legacy path",
-        "one independent Documentation Review",
-        "Independent test review and exact-tree protected-main integration "
-        "are also necessary",
-        "The opening can set only Phase 9A to 0/4 Open",
+        "exact reviewed Phase 9A/9B alignment under D-P9-001 merged "
+        "through PR #131",
+        "merged tree matches the reviewed head",
+        "D-P9-002 opens only Phase 9A",
+        "historical Phase 9 gate remains the requirement source",
+        "earlier blocked local candidate remains failed evidence only",
+        "This opening changes no product behaviour",
+        "D-P9-002 opens only Phase 9A at 0/4 with four Pending exits",
+        "It accepts no exit, product work, output, package, risk closure "
+        "or legacy removal",
         "Phase 9B stays Not started",
-        "This cycle includes no product implementation",
+        "Do not start product work in this record cycle",
         "D-P6-008 stays in full",
         "mandatory before Phase 10 beta acceptance",
         "Beta acceptance is blocked while it remains unmet",
@@ -5974,6 +6033,26 @@ def _validate_phase9_holding(evidence: str) -> None:
         "Project status remains unknown",
     ):
         _require(clause in flat, "Phase 9 split boundary drifted: " + clause)
+    opening = _semantic_text(_section(
+        evidence, "D-P9-002 Phase 9A opening panel — 2026-10-03",
+    ))
+    for clause in (
+        "851ef81a7f950c1a5425191e051e9cf7207585b9",
+        "938c4de1389c7afc252d4acee9202f464626cbc8",
+        "four Phase 9A criteria below stay Pending",
+        "independent read-only reviewer checked the opening",
+        "all 24 live risks",
+        "Proceed with bounded conditions",
+        "Open only Phase 9A at 0/4 with all four exits Pending",
+        "Keep Phase 9B Not started at 0/6 with all six exits Pending",
+        "Keep D-P6-008 Deferred — unmet, TERM-R04 open",
+        "private-development output",
+        "project status unknown",
+        "Accept no product implementation, exit, package, output, "
+        "performance result, risk closure, release or legacy removal",
+        "next product work needs a separate bounded assignment",
+    ):
+        _require(clause in opening, "D-P9-002 opening limit drifted: " + clause)
     _require(
         "history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel"
         in evidence
@@ -6691,7 +6770,7 @@ def _validate_decisions(plan: str) -> None:
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
-        | {"D-P9-001"},
+        | {"D-P9-001", "D-P9-002"},
         "project-plan decisions differ from the current and frozen registers",
     )
 

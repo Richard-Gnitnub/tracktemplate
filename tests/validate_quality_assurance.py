@@ -588,19 +588,22 @@ def validate_documentation_profile(
         all(fragment in " ".join(owner_view.split()) for fragment in (
             "Phase 8 is closed at 4/4 under",
             "D-P8-006",
-            "Phase 9A is Not started at 0/4",
+            "Phase 9A is Open at 0/4 with four Pending exits",
             "Phase 9B is Not started at 0/6",
             "D-P6-008 stays Deferred — unmet",
             "TERM-R04 stays open",
             "Output stays private-development",
             "project status stays `unknown`",
             "D-P9-001",
+            "D-P9-002",
+            "PR #131",
+            "merged tree matches the reviewed head",
             "accepted original gate",
             "frozen Phase 8 closeout",
             "recovery record",
             "previous local split candidate remains failed evidence only",
             "accepted straight and curved `TO-001` and `XO-001` examples",
-            "This alignment changes no product behaviour",
+            "The Phase 9A opening adds no product proof or behaviour",
             "representative-fixture",
             "straight TO Edit",
             "historical GUI-source",
@@ -617,11 +620,23 @@ def validate_documentation_profile(
             "every comparison, adapter, caller, removal and "
             "legacy-retirement condition",
             "No performance, production-output or release acceptance",
-            "The two phases stay Not started",
+            "opens Phase 9A at 0/4 with all four exits Pending",
             "No exit, product work, package, output, risk closure",
-            "Then open only Phase 9A at 0/4",
-            "Keep Phase 9B Not started and do no product work",
+            "Present one bounded Phase 9A product recommendation",
+            "Keep Phase 9B Not started",
+            "Do not start product implementation in this cycle",
         )),
+        "PROJECT_PLAN owner view contradicts current authority",
+    )
+    decision_row = next(
+        (
+            line for line in owner_view.splitlines()
+            if line.startswith("| **Owner decision** |")
+        ),
+        "",
+    )
+    require(
+        "Phase 9B stays Not started at 0/6" in decision_row,
         "PROJECT_PLAN owner view contradicts current authority",
     )
     require(
