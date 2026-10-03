@@ -319,12 +319,12 @@ It does not select a Core jaw policy.
 
 The neutral `ChairDefinition` supplies fourteen full-size lengths to the
 [analytical construction](../../tracktemplate/domain/chair_base.py).
-The body has 32 outline points, vertical sides, a sloping roof, a top and a complete underside.
+The body has 32 outline points, vertical sides, a sloping roof, a top and a complete bottom.
 Source coordinates use `source_mark_quantum_mm` before the accepted chair-frame transformation.
-Exact intervals reject uncertain rounding and collapsed geometry.
+The analytical construction uses exact intervals and rejects uncertain rounding and collapsed geometry.
 The [research operation](../../tracktemplate/application/chair_research.py)
 preserves field provenance, the complete package and the manifest.
-The source grid and outline midpoint offset are separate from prototype geometry, model fit and manufacturing compensation.
+The source grid and outline midpoint offset are source encoding, not prototype geometry, model fit or manufacturing compensation.
 
 The [standalone test](../../tests/validate_phase9a_chair_base.py) gives a PASS
 result for geometry, units, frames, round-trip and 28 incorrect signed requests.
@@ -336,8 +336,8 @@ Construction, rejected inputs and an injected failure do not change the document
 Independent calculations from the source agree with all 68 component points, seven landmarks,
 bounds and volume for the local reference package.
 The proof uses the frozen 4 mm/ft rev:A rail inputs and a declared identity source placement.
-It does not establish arbitrary placement or recovered GUI state.
-The same seat and key in the common chair frame also give PASS results.
+It gives no validation of arbitrary placement or recovered GUI state.
+The checks of the same seat and key in the same chair frame also give PASS results.
 Numerical comparison limits are not physical fit tolerances.
 This proof does not start the frozen Templot oracle or apply manufacturing corrections.
 
@@ -346,12 +346,13 @@ The worktree `phase9a-s1-base-plinth-research-proof` keeps the complete evidence
 Two FreeCAD screenshots show the base alone and with the seat and key.
 They supply presentation evidence only, with no assembled-chair or contact validation.
 
-One earlier FreeCAD process is absent after capture; its ownership is unproved.
-The evidence does not establish unchanged system processes.
-The temporary capture document closes normally.
+One FreeCAD process from before capture is not present after capture.
+The evidence does not identify its owner.
+The evidence does not show that the system processes stayed the same.
+The temporary capture document closes without error.
 
 The independent source, geometry and provenance review gives a PASS result
-with no actionable findings. Its receipt is
+with no findings. Its receipt is
 `tmp/phase9a-s1-base-proof/independent-base-review.json`.
 The reviewer and authors are in the same agent team and use the same workspace.
 The reviewer also examined the contract before implementation. This is not an external review.
