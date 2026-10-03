@@ -129,6 +129,33 @@ Phase 9B completes only the chair and support families necessary for the
 agreed TrackTemplate Core release candidate. It does not include all
 Templot families or post-Core capabilities.
 
+## Phase 9A-2 quantity check repair — 2026-10-03
+
+The `_quantity` check now uses exact `Fraction` values to compare lengths.
+The result no longer changes with the caller's `decimal.Context`. The
+previous check could accept incorrect values and reject correct values.
+This Level 2 repair follows S1-04 and S1-06 in
+the [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md).
+
+The [standalone test](../../tests/validate_phase4_chair_definition.py) and
+[qualified FreeCAD 1.1.3 test](../../tests/freecad_validate_phase4_chair_definition.py)
+give a PASS result. Each test examines 48 correct and 48 incorrect
+inputs with four different `decimal.Context` values. The tests include five
+units and values from `definition` and `manufacturing_profiles`. They show
+no change to the data, caller's `decimal.Context` or diagnostics.
+The `probe_decimal_context.py` test, `py_compile`
+and Ruff also give a PASS result. The worktree keeps the validation evidence at
+`tmp/phase9a-chair-quantity-exactness/validation.json`.
+
+The independent reviewer gave `ACCEPTED` for source and tests. The reviewer
+shares this agent team and workspace. The review receipt is
+`tmp/phase9a-chair-quantity-exactness/independent-source-review.json`.
+
+This evidence is only for the Phase 9A-2 checks of `ChairDefinition` data.
+Production geometry stays blocked. The evidence does not prove S1 geometry
+or give production acceptance. Phase 9A
+stays at 0/4 with four Pending exits. All recorded limitations stay unchanged.
+
 ## Continuing duties and risks
 
 [D-P6-008](../history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel)

@@ -3,6 +3,7 @@
 
 import copy
 from dataclasses import FrozenInstanceError
+import decimal
 import hashlib
 import json
 import pathlib
@@ -220,6 +221,112 @@ def _validate_round_trip(record, manifest_text):
     return package
 
 
+def _decimal_context_state(context):
+    return (
+        context.prec,
+        context.rounding,
+        context.Emin,
+        context.Emax,
+        context.capitals,
+        context.clamp,
+        dict(context.flags),
+        dict(context.traps),
+    )
+
+
+def validate_decimal_quantity_conversion(record, manifest_text):
+    """Check exact quantities through both standalone and FreeCAD loaders."""
+    cases = (
+        ("12.3456700", "in", "313.58001800", "313.58000000"),
+        ("0.001234567", "ft", "0.3762960216", "0.376296"),
+        (
+            "1.00000000000000000000000000001",
+            "mm",
+            "1.00000000000000000000000000001",
+            "1.000000000000000000000000000",
+        ),
+        ("-12.34567", "cm", "-123.4567", "-123.456"),
+        ("0.0001234567", "m", "0.1234567", "0.123456"),
+        ("-0.000", "mm", "-0.000", "0.001"),
+    )
+    contexts = (
+        (28, decimal.ROUND_HALF_EVEN, False),
+        (6, decimal.ROUND_DOWN, False),
+        (6, decimal.ROUND_UP, False),
+        (6, decimal.ROUND_DOWN, True),
+    )
+    outer_context = _decimal_context_state(decimal.getcontext())
+    for manufacturing in (False, True):
+        for source, unit, canonical, incorrect in cases:
+            converted = copy.deepcopy(record)
+            quantities = (
+                converted["manufacturing_profiles"][0]["quantities"]
+                if manufacturing
+                else converted["definition"]["quantities"]
+            )
+            quantity = quantities[0 if manufacturing else 1]
+            quantity.update(
+                source_value=source,
+                source_unit=unit,
+                canonical_value=canonical,
+            )
+            _resign(converted)
+            expected_text = _canonical_json(converted)
+            invalid = copy.deepcopy(converted)
+            invalid_quantities = (
+                invalid["manufacturing_profiles"][0]["quantities"]
+                if manufacturing
+                else invalid["definition"]["quantities"]
+            )
+            invalid_quantities[0 if manufacturing else 1][
+                "canonical_value"
+            ] = incorrect
+            for precision, rounding, bounded in contexts:
+                with decimal.localcontext() as context:
+                    context.prec = precision
+                    context.rounding = rounding
+                    context.clear_flags()
+                    if bounded:
+                        context.Emin = -1
+                        context.Emax = 1
+                        for signal in (
+                            decimal.Inexact,
+                            decimal.Rounded,
+                            decimal.Overflow,
+                            decimal.Underflow,
+                            decimal.Subnormal,
+                        ):
+                            context.traps[signal] = True
+                    before = _decimal_context_state(context)
+                    package = api.chair_definition_package_from_json(
+                        expected_text, manifest_text
+                    )
+                    encoded = api.chair_definition_package_to_json(package)
+                    assert encoded == expected_text
+                    assert package.to_record() == converted
+                    reopened = api.chair_definition_package_from_json(
+                        encoded, manifest_text
+                    )
+                    assert reopened == package
+                    assert api.chair_definition_package_to_json(
+                        reopened
+                    ) == encoded
+                    status = api.chair_definition_package_status(
+                        reopened, manifest_text
+                    )
+                    assert status["production_geometry_authorized"] is False
+                    assert status["document_mutation_authorized"] is False
+                    assert status["filesystem_mutation_authorized"] is False
+                    assert _decimal_context_state(context) == before
+                    _expect_error(
+                        invalid,
+                        "unit-conversion-mismatch",
+                        manifest_text=manifest_text,
+                    )
+                    assert _decimal_context_state(context) == before
+    assert _decimal_context_state(decimal.getcontext()) == outer_context
+
+
 def _validate_fail_closed_contract(record, manifest_text, package):
     changed = copy.deepcopy(record)
     changed["schema_version"] = 2
@@ -412,6 +519,7 @@ def _validate_public_and_structural_boundaries():
         "dataclasses",
         "datetime",
         "decimal",
+        "fractions",
         "hashlib",
         "json",
         "re",
@@ -486,6 +594,7 @@ def _validate_source_and_phase_controls():
 def validate():
     record, manifest_text = _validate_schema_and_fixture()
     package = _validate_round_trip(record, manifest_text)
+    validate_decimal_quantity_conversion(record, manifest_text)
     _validate_fail_closed_contract(record, manifest_text, package)
     _validate_public_and_structural_boundaries()
     _validate_source_and_phase_controls()

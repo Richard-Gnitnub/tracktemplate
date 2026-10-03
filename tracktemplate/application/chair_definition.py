@@ -9,6 +9,7 @@ the Phase 9 evidence, rights, geometry, and acceptance gates exist.
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal, InvalidOperation
+from fractions import Fraction
 import hashlib
 import json
 import re
@@ -446,8 +447,10 @@ def _quantity(record, path):
                 path + ".canonical_unit",
                 "canonical length unit must be mm",
             )
-        expected = source_value * _length_factor(source_unit, path + ".source_unit")
-        if expected != canonical_value:
+        # Exact finite decimals must not depend on the caller's context.
+        factor = _length_factor(source_unit, path + ".source_unit")
+        expected = Fraction(source_value) * Fraction(factor)
+        if expected != Fraction(canonical_value):
             raise ChairDefinitionError(
                 "unit-conversion-mismatch",
                 path + ".canonical_value",
