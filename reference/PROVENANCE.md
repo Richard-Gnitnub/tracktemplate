@@ -183,34 +183,34 @@ code and does not alter either macro.
 when independent production evidence is necessary. It does not change the
 source snapshot, its classifications or any rights finding above.
 The [licensing boundary](LICENSING_BOUNDARIES.md#phase-9a-reference-only-research)
-owns the research-use and later clearance conditions.
+owns the research-use and subsequent clearance conditions.
 
 The bounded research definition may use the frozen 556b S1/REA data,
 relationships and rail-fit logic. Each Templot-derived field must identify the
 archive hash, source-member hash, exact locator and derivation inputs. It must
 keep `templot_reference_data` and `reference-only` status, with other applicable
-classifications. Calculated fields retain their source dependencies; calculation
+classifications. Calculated fields keep their source dependencies. Calculation
 does not establish independent prototype evidence.
 
 A research input that affects geometry is output-affecting for the private
 research package and output. Record that role separately from the frozen
 comparison-only oracle. Do not change the blocked production manifest or oracle
-lineage to describe the new research role. The research package needs its own
-complete dependency record before use. Research data and outputs remain local
+lineage to report the new research role. The research package needs its own
+complete dependency record before use. Research data and outputs stay local
 and untracked without separate redistribution authority.
 
-Source S1/REA labels do not prove the precise physical prototype designation.
+The source S1/REA labels do not prove the precise physical prototype designation.
 The C&L/EMGS/S4Soc Code 75 reference profile does not prove the dimensions of
-the owner's C&L Code 75 HiNi stock. Prototype geometry and inclination remain
+the owner's C&L Code 75 HiNi stock. Prototype geometry and inclination stay
 separate from the deliberate vertical model fit and manufacturing compensation.
-The exact 556b executable and capture gaps below remain unresolved.
+The exact 556b executable and capture gaps below stay unresolved.
 
 Before production clearance in Phase 9B, record the accepted disposition for
 each output-affecting Templot-derived input under the licensing boundary.
-Independent confirmation or replacement must retain the historical Templot
+Independent confirmation or replacement must keep the historical Templot
 lineage. A compatible rights disposition must identify its evidence and permitted
 use. No path silently changes research data into independently evidenced
-prototype facts or clears a package.
+prototype facts or gives a package production clearance.
 
 ## Exact 556b oracle acquisition/build status
 

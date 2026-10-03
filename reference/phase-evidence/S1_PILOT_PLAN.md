@@ -48,60 +48,58 @@ and rail-fit logic for a bounded research `ChairDefinition` and procedural
 chair generator. Independent primary production evidence is not necessary
 before this research implementation or architecture proof.
 
-The neutral TrackTemplate schema remains canonical. TrackTemplate must construct
+The neutral TrackTemplate schema stays canonical. TrackTemplate must construct
 the geometry through its accepted architecture. A Templot file, opaque mesh
 or retained generated body cannot become the canonical definition.
-Every Templot-derived field must retain its exact source identity, source hash,
+Every Templot-derived field must keep its exact source identity, source hash,
 source locator, derivation inputs and `reference-only` status. Such fields use
 `templot_reference_data`, with other applicable classifications and derivation
 records. A research input that affects geometry is an output-affecting
 dependency of the research output.
 
 Research acceptance is not production admission. The research package and its
-outputs stay private-development and cannot be labelled `project-cleared`.
-They remain local and untracked without separate redistribution authority.
+outputs stay private-development and must not have `project-cleared` status.
+They stay local and untracked without separate redistribution authority.
 The [licensing boundary](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research)
-owns the permitted-use controls. This owner decision does not grant rights
+owns the permitted-use controls. This owner decision gives no permission under rights
 held by another party.
 
 The source labels S1 and REA identify the Templot research source. They do
-not establish an independently evidenced prototype designation. Templot-derived
-values must not be described as independently evidenced prototype facts.
-Prototype geometry, model rail-fit policy and manufacturing compensation remain
+not establish an independently evidenced prototype designation. Do not identify Templot-derived
+values as independently evidenced prototype facts.
+Prototype geometry, model rail-fit policy and manufacturing compensation stay
 separate. The intended vertical model fit for the owner's C&L Code 75 HiNi
 rail does not establish prototype rail inclination or measured physical-stock
 dimensions.
 
-The Phase 1 decision table and acceptance below remain historical evidence.
-S1-07 through S1-15 retain their production-evidence obligations. Their missing
-independent primary evidence does not by itself block the Phase 9A research
-path. Before a bounded research definition is accepted, its evidence must
-identify:
+The Phase 1 decision table and acceptance below stay historical evidence.
+S1-07 through S1-15 keep their production-evidence obligations. The Phase 9A research path does not need that independent primary evidence
+first. Before the owner accepts a bounded research definition, its evidence
+must identify:
 
-- exact frozen source members, hashes, field locators and derivations;
-- named chair components, interfaces, datums and placement landmarks;
-- source values, calculated values, assumptions and unresolved findings;
-- justified numerical comparison criteria and any assisted-pilot residual limits;
-- separate prototype, model-fit and manufacturing effects; and
+- exact frozen source members, hashes, field locators and derivations.
+- named chair components, interfaces, datums and placement landmarks.
+- source values, calculated values, assumptions and unresolved findings.
+- numerical comparison criteria, their reasons and any assisted-pilot residual limits.
+- separate prototype, model-fit and manufacturing effects.
 - the recorded access, fitting and use basis for the private research scope.
 
-Unresolved output-affecting fields still block construction of an affected
-component. No missing dimension or numerical tolerance can receive an invented
-default. Research comparison proves agreement with the declared reference; it
+Do not construct an affected component while its output-affecting fields are
+unresolved. No missing dimension or numerical tolerance can receive an invented
+default. Research comparison proves agreement with the declared reference. It
 does not prove independent prototype accuracy or physical rail fit.
 
-The frozen Templot oracle remains a separate comparison-only dependency.
-Its existing executable and capture gaps remain unresolved. Source-derived
+The frozen Templot oracle stays a separate comparison-only dependency.
+Its existing executable and capture gaps stay unresolved. Source-derived
 research evidence does not establish an exact executable or replace the
-required comparison evidence.
+necessary comparison evidence.
 
 Phase 9B keeps the minimum production evidence bundle, package-rights,
 non-copyright-rights, dependency-manifest and release gates. Each output-affecting
 Templot-derived production input needs a disposition under the
 [licensing boundary](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research).
-The final production package must pass each affected definition, geometry,
-pilot and output check after an input change. The existing blocked production
-manifest, lineage and oracle records retain their current status.
+After an input change, each affected definition, geometry, pilot and output check of the final production package must give a PASS result. The existing blocked production
+manifest, lineage and oracle records keep their current status.
 
 ## Neutral package requirements
 
@@ -111,7 +109,7 @@ not prescribe a ZIP layout or create the Phase 4/9 implementation early.
 1. Package identity: stable package and definition identifiers, package
    version, schema version, precise prototype designation and human-readable
    description. A research package instead keeps the source designation and
-   states that independent prototype identification is unresolved.
+   reports that independent prototype identification is unresolved.
 2. Prototype quantities: full-size values separated from model scale,
    rail-fit policy and manufacturing compensation.
 3. Frames and datums: an explicit right-handed chair-local frame, base mounting
@@ -148,9 +146,9 @@ not prescribe a ZIP layout or create the Phase 4/9 implementation early.
 - Project derivations identify their input field identities and rule/version.
   An adapter may convert validated canonical values to FreeCAD floats only at
   the exact-geometry boundary and under the accepted tolerance policy.
-- No production value is admitted merely because it matches Templot. Research
-  acceptance follows D-P9-003 and keeps reference-only provenance. Unknown or
-  inferred values remain explicit findings and cannot receive an invented default.
+- The project must not admit a production value only because it agrees with Templot.
+  Research acceptance follows D-P9-003 and keeps reference-only provenance. Unknown
+  or inferred values stay explicit findings and cannot receive an invented default.
 
 ### Accepted chair-local frame
 
@@ -194,8 +192,8 @@ values, exact generation, assisted pilot and production/output qualification.
 ## Minimum evidence bundle
 
 This bundle controls production admission and publication. The Phase 9A research
-boundary above does not remove these later duties. Before the working name
-“S1 chair” becomes a published package designation, the evidence bundle must provide:
+boundary above does not remove these subsequent duties. Before the working name
+“S1 chair” becomes a published package designation, the evidence bundle must give:
 
 - a precise prototype/company/standard designation and evidence supporting
   that name;

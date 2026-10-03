@@ -414,15 +414,14 @@ canonical production data.
 
 Under [D-P9-003](current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel),
 bounded Phase 9A reference-only research can start before independent production
-evidence is complete. Frozen Templot5 revision 556b S1/REA inputs may feed a research
+evidence is complete. Frozen Templot5 revision 556b S1/REA inputs can supply data for a research
 `ChairDefinition` and procedural chair generator in this accepted architecture.
-The neutral schema remains canonical. Every Templot-derived field retains exact
+The neutral schema stays canonical. Every Templot-derived field keeps exact
 provenance and `reference-only` status. Opaque generated geometry cannot replace
 named chair components and deterministic construction.
 
-Prototype geometry, model rail-fit policy and manufacturing compensation remain
-separate. The research package and outputs stay private-development and cannot
-be labelled `project-cleared`. The comparison oracle remains separate and
+Prototype geometry, model rail-fit policy and manufacturing compensation stay
+separate. The research package and outputs stay private-development and must not have `project-cleared` status. The comparison oracle stays separate and
 available under its frozen contract.
 
 The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#phase-9a-research-and-phase-9b-production-boundary)

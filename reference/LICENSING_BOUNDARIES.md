@@ -131,7 +131,7 @@ and accepted. In particular:
    must identify their primary evidence rather than cite a Templot comparison
    as their origin.
 2. Material with `reference-only` status and unresolved `third_party_evidence`
-   does not enter a project-cleared production definition. A later compatible
+   does not enter a project-cleared production definition. A subsequent compatible
    rights and provenance disposition must preserve historical source classifications.
    It must record an accepted production status before admission.
 3. A comparison against Templot may record hashes, settings, numeric summaries,
@@ -148,36 +148,36 @@ and accepted. In particular:
 Under [D-P9-003](current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel),
 frozen, provenance-recorded Templot5 revision 556b S1/REA data, relationships
 and rail-fit logic can support a bounded Phase 9A research implementation.
-Independent primary production evidence does not block that research definition,
-procedural chair generator or architecture proof.
+That research definition, procedural chair generator and architecture proof do not
+need independent primary production evidence first.
 
-Every Templot-derived field retains exact provenance and `reference-only` status.
-The neutral TrackTemplate `ChairDefinition` remains canonical. The research
-package and its outputs stay private-development and cannot be labelled
-`project-cleared`. Research data and outputs remain local and untracked without
+Every Templot-derived field keeps exact provenance and `reference-only` status.
+The neutral TrackTemplate `ChairDefinition` stays canonical. The research
+package and its outputs stay private-development and must not have
+`project-cleared` status. Research data and outputs stay local and untracked without
 separate redistribution authority. Source-expression notices and applicable GPL
-duties remain separate from data and output rights.
+duties stay separate from data and output rights.
 
 This is project sequencing authority, not third-party permission or a positive
 rights finding. Record the exact access, fitting and use basis for the research
 scope. Preserve unresolved licence, database-right and non-copyright-rights
-questions. A known restriction on the proposed research use remains a blocker.
-Do not describe a Templot-derived field as an independently evidenced prototype
+questions. A known restriction on the proposed research use makes that use Blocked.
+Do not identify a Templot-derived field as an independently evidenced prototype
 fact. Prototype geometry, model rail-fit policy and manufacturing compensation
-remain separate.
+stay separate.
 
-Before Phase 9B can clear the S1 package for production, publication,
-redistribution or commercial use, each output-affecting Templot-derived input
-needs one of these recorded dispositions:
+Phase 9B owns clearance of the S1 package for production, publication,
+redistribution or commercial use. Before that clearance, each output-affecting
+Templot-derived input needs one of these recorded dispositions:
 
-- independent confirmation with an accepted evidence chain;
-- replacement by project-cleared evidence; or
+- independent confirmation with an accepted evidence chain.
+- replacement by project-cleared evidence.
 - an explicit compatible rights and provenance disposition for the intended use.
 
-Each disposition must preserve source history, identify the final input and
-pass all applicable package, non-copyright-rights, dependency-manifest and release
-gates. Independent confirmation alone does not clear a licence or another
-party's rights. No cleared production dependency may retain `reference-only`,
+Each disposition must preserve source history and identify the final input.
+It must show acceptance under all applicable package, non-copyright-rights,
+dependency-manifest and release gates. Independent confirmation alone gives no permission under a licence or another
+party's rights. No production dependency with `project-cleared` status may have `reference-only`,
 `NC`, `NOASSERTION`, unknown or incompatible status. Research acceptance gives
 no production/package clearance. The final production package must pass each
 affected qualification check after an input change.
@@ -302,7 +302,7 @@ The permitted project statuses are:
 | --- | --- |
 | `project-cleared` | All known dependencies have passed the project's documented provenance, licence, declared-use and non-copyright-rights checks for the stated use, with required conditions recorded; this is an internal release gate, not legal advice or a guarantee that no third-party rights exist |
 | `restricted` | A recorded licence or right prevents the declared intended use or imposes a relevant condition that the production/publication path has not satisfied |
-| `reference-only` | Material may be used for local comparison or validation and the bounded private research construction under D-P9-003. It cannot be a cleared production/publication dependency. |
+| `reference-only` | The project can use material for local comparison or validation and the bounded private research construction under D-P9-003. It cannot be a cleared production/publication dependency. |
 | `unknown` | Ownership, source, licence, output effect, or redistribution status is unresolved |
 
 No current B14/B15 output receives `project-cleared` merely because this policy
@@ -439,7 +439,7 @@ For each applicable scope the project must:
 7. obtain explicit owner acceptance of the first S1 package's evidence,
    licence, intended commercial/publication use and non-copyright-rights record
    before production implementation or package admission. The bounded Phase 9A
-   reference-only research exception above does not clear those later uses.
+   reference-only research exception above gives no clearance for those subsequent uses.
 
 At Phase 1 closeout, the first two scopes had to be fully classified or leave
 the S1 pilot visibly blocked; they were accepted in the latter state. The third

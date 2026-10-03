@@ -129,32 +129,37 @@ def _research_boundary_errors(text):
     clauses = (
         "Independent primary production evidence is not necessary before "
         "this research implementation or architecture proof",
-        "The neutral TrackTemplate schema remains canonical",
+        "The neutral TrackTemplate schema stays canonical",
         "A Templot file, opaque mesh or retained generated body cannot "
         "become the canonical definition",
-        "Every Templot-derived field must retain its exact source identity, "
-        "source hash, source locator, derivation inputs and reference-only status",
+        "Every Templot-derived field must keep its exact source identity, "
+        "source hash, source locator, derivation inputs and "
+        "reference-only status",
         "A research input that affects geometry is an output-affecting "
         "dependency of the research output",
         "Research acceptance is not production admission",
-        "outputs stay private-development and cannot be labelled project-cleared",
-        "They remain local and untracked without separate redistribution authority",
-        "Templot-derived values must not be described as independently "
+        "outputs stay private-development and must not have "
+        "project-cleared status",
+        "They stay local and untracked without separate redistribution "
+        "authority",
+        "Do not identify Templot-derived values as independently "
         "evidenced prototype facts",
         "Prototype geometry, model rail-fit policy and manufacturing "
-        "compensation remain separate",
-        "S1-07 through S1-15 retain their production-evidence obligations",
-        "Unresolved output-affecting fields still block construction "
-        "of an affected component",
+        "compensation stay separate",
+        "S1-07 through S1-15 keep their production-evidence obligations",
+        "Do not construct an affected component while its "
+        "output-affecting fields are unresolved",
         "No missing dimension or numerical tolerance can receive an invented default",
-        "The frozen Templot oracle remains a separate comparison-only dependency",
-        "Its existing executable and capture gaps remain unresolved",
+        "The frozen Templot oracle stays a separate comparison-only "
+        "dependency",
+        "Its existing executable and capture gaps stay unresolved",
         "Phase 9B keeps the minimum production evidence bundle, package-rights, "
         "non-copyright-rights, dependency-manifest and release gates",
-        "The final production package must pass each affected definition, "
-        "geometry, pilot and output check after an input change",
+        "After an input change, each affected definition, geometry, pilot "
+        "and output check of the final production package must give a "
+        "PASS result",
         "The existing blocked production manifest, lineage and oracle "
-        "records retain their current status",
+        "records keep their current status",
     )
     return [
         "S1 research boundary drifted: " + clause
@@ -359,7 +364,7 @@ def main():
         ("prototype facts", "prototype dimensions"),
         ("non-copyright-rights, dependency-manifest and release gates",
          "no further gates"),
-        ("S1-07 through S1-15 retain their production-evidence obligations",
+        ("S1-07 through S1-15 keep their production-evidence obligations",
          "S1-07 through S1-15 are discharged"),
     ):
         assert before in research_section, before

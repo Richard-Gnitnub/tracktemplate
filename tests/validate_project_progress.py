@@ -202,17 +202,17 @@ EXPECTED_PHASE9B_EXITS = (
         "Each chair and support family necessary for the agreed "
         "TrackTemplate Core release candidate is complete across migrated "
         "trackwork. The accepted S1 package has an explicit licence. It "
-        "has no dependency with NC, NOASSERTION, reference-only or unknown "
-        "status. It has no dependency that is incompatible with the "
-        "project-cleared commercial/publication path. The same applicable "
-        "rights gate controls each other package. Before production, "
-        "publication, redistribution or commercial clearance, each "
-        "output-affecting Templot-derived input needs one of three "
-        "dispositions. These are independent confirmation, replacement "
-        "by project-cleared evidence, or an explicit compatible rights "
-        "and provenance disposition. The "
-        "final production package must pass each affected definition, "
-        "geometry, pilot and output check after an input change.",
+        "has no dependency with NC, NOASSERTION, reference-only or "
+        "unknown status. It has no dependency that is incompatible with "
+        "the project-cleared commercial/publication path. The same "
+        "applicable rights gate controls each other package. Before "
+        "production, publication, redistribution or commercial clearance, "
+        "each output-affecting Templot-derived input needs one of three "
+        "dispositions. These are independent confirmation, replacement by "
+        "project-cleared evidence, or an explicit compatible rights and "
+        "provenance disposition. After an input change, each affected "
+        "definition, geometry, pilot and output check of the final "
+        "production package must give a PASS result.",
     ),
     (
         "9B-4", "7",
@@ -1159,10 +1159,13 @@ def _validate_owner_view(plan: str) -> None:
         "project status stays `unknown`",
         "accepted original gate",
         "D-P9-003",
-        "Independent primary evidence no longer blocks that architecture proof",
-        "Phase 9B keeps production/package clearance and all original requirements",
-        "No chair implementation occurs in this cycle",
-        "No definition, exit, package, output, risk closure",
+        "That architecture proof does not need independent primary "
+        "production evidence first",
+        "Phase 9B keeps production/package clearance and all initial "
+        "requirements",
+        "This cycle includes no chair implementation",
+        "This decision accepts no definition, exit, package, output, risk "
+        "closure",
         "recommend the first bounded Phase 9A research implementation task",
         "accepted straight and curved `TO-001` and `XO-001` examples",
         "The Phase 9A opening adds no product proof or behaviour",
@@ -1474,40 +1477,46 @@ def _validate_phase9_research_boundaries(
                 "revision 556b S1/REA inputs for bounded reference-only research",
                 "This project decision gives no third-party permission "
                 "or positive rights finding",
-                "Research inputs that affect output must retain that dependency role",
-                "The comparison oracle remains separate and available "
-                "under its frozen contract",
+                "Research inputs that affect output must keep that "
+                "dependency role",
+                "The comparison oracle stays separate and available under "
+                "its frozen contract",
                 "Phase 9A stays Open at 0/4. Phase 9B stays Not started at "
                 "0/6. Every exit stays Pending",
                 "Output stays private-development and project status stays unknown",
-                "No chair implementation occurs in this cycle",
+                "This cycle includes no chair implementation",
                 "All 24 risk dispositions, owners, deadlines and controls "
-                "remain unchanged",
+                "stay the same",
             ),
         ),
         (
             "licensing", licensing, "Phase 9A reference-only research",
             (
-                "Every Templot-derived field retains exact provenance "
-                "and reference-only status",
-                "The neutral TrackTemplate ChairDefinition remains canonical",
-                "The research package and its outputs stay private-development "
-                "and cannot be labelled project-cleared",
-                "Research data and outputs remain local and untracked "
+                "Every Templot-derived field keeps exact provenance and "
+                "reference-only status",
+                "The neutral TrackTemplate ChairDefinition stays "
+                "canonical",
+                "The research package and its outputs stay "
+                "private-development and must not have project-cleared "
+                "status",
+                "Research data and outputs stay local and untracked "
                 "without separate redistribution authority",
-                "A known restriction on the proposed research use remains a blocker",
+                "A known restriction on the proposed research use makes "
+                "that use Blocked",
                 "each output-affecting Templot-derived input needs one "
                 "of these recorded dispositions",
                 "independent confirmation with an accepted evidence chain",
                 "replacement by project-cleared evidence",
                 "an explicit compatible rights and provenance disposition "
                 "for the intended use",
-                "pass all applicable package, non-copyright-rights, "
-                "dependency-manifest and release gates",
-                "Independent confirmation alone does not clear a licence "
-                "or another party's rights",
-                "No cleared production dependency may retain reference-only, "
-                "NC, NOASSERTION, unknown or incompatible status",
+                "show acceptance under all applicable package, "
+                "non-copyright-rights, dependency-manifest and release "
+                "gates",
+                "Independent confirmation alone gives no permission under "
+                "a licence or another party's rights",
+                "No production dependency with project-cleared status may "
+                "have reference-only, NC, NOASSERTION, unknown or "
+                "incompatible status",
                 "The final production package must pass each affected "
                 "qualification check after an input change",
             ),
@@ -1522,13 +1531,14 @@ def _validate_phase9_research_boundaries(
                 "for the private research package and output",
                 "Record that role separately from the frozen comparison-only oracle",
                 "Do not change the blocked production manifest or oracle "
-                "lineage to describe the new research role",
+                "lineage to report the new research role",
                 "The research package needs its own complete dependency "
                 "record before use",
-                "Independent confirmation or replacement must retain "
-                "the historical Templot lineage",
-                "No path silently changes research data into independently "
-                "evidenced prototype facts or clears a package",
+                "Independent confirmation or replacement must keep the "
+                "historical Templot lineage",
+                "No path silently changes research data into "
+                "independently evidenced prototype facts or gives a "
+                "package production clearance",
             ),
         ),
     )
@@ -5438,7 +5448,7 @@ def _validate_phase9_decision_holding(
         ),
         (
             'exclusions',
-            '0d00120bef5fd734cf79eb3f0c80b876fbc428f60e6b26c101b4394f8f230d5c',
+            "e4df362c505357eb10e8d0b8484cde2244cbb67e527f55aadf3aa8eab3c15511",
         ),
     ):
         value = research[field]
@@ -6141,12 +6151,12 @@ def _validate_phase9_holding(evidence: str) -> None:
     flat = _semantic_text(evidence)
     for clause in (
         "D-P9-003",
-        "The nine original requirements remain",
+        "The nine initial requirements stay",
         "All four Phase 9A exits and all six Phase 9B exits stay Pending",
         "It accepts no definition, package, production output, risk closure "
         "or legacy removal",
         "Phase 9B stays Not started",
-        "No chair implementation occurs in this cycle",
+        "This cycle includes no chair implementation",
         "D-P6-008 stays in full",
         "mandatory before Phase 10 beta acceptance",
         "Beta acceptance is blocked while it remains unmet",
