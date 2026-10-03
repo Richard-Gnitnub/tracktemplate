@@ -310,6 +310,60 @@ Prototype identity, inclination, physical rail fit and rights limits stay unreso
 Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
 This result gives no exit, package, risk or production acceptance. All recorded limits stay.
 
+## Phase 9A S1 base/plinth research proof — 2026-10-04
+
+With authority from D-P9-003 and the owner's instruction to continue, the research path adds
+one complete base and plinth from frozen Templot5 revision 556b.
+This bounded source case has solid jaws and no slot.
+It does not select a Core jaw policy.
+
+The neutral `ChairDefinition` supplies fourteen full-size lengths to the
+[analytical construction](../../tracktemplate/domain/chair_base.py).
+The body has 32 outline points, vertical sides, a sloping roof, a top and a complete bottom.
+Source coordinates use `source_mark_quantum_mm` before the accepted chair-frame transformation.
+The analytical construction uses exact intervals and rejects uncertain rounding and collapsed geometry.
+The [research operation](../../tracktemplate/application/chair_research.py)
+preserves field provenance, the complete package and the manifest.
+The source grid and outline midpoint offset are source encoding, not prototype geometry, model fit or manufacturing compensation.
+
+The [standalone test](../../tests/validate_phase9a_chair_base.py) gives a PASS
+result for geometry, units, frames, round-trip and 28 incorrect signed requests.
+All 41 seat and 27 key rejection checks also give a PASS result.
+The [qualified FreeCAD test](../../tests/freecad_validate_phase9a_chair_base.py)
+constructs one valid closed solid with 68 vertices, 128 edges and 62 faces.
+Construction, rejected inputs and an injected failure do not change the document.
+
+Independent calculations from the source agree with all 68 component points, seven landmarks,
+bounds and volume for the local reference package.
+The proof uses the frozen 4 mm/ft rev:A rail inputs and a declared identity source placement.
+It gives no validation of arbitrary placement or recovered GUI state.
+The checks of the same seat and key in the same chair frame also give PASS results.
+Numerical comparison limits are not physical fit tolerances.
+This proof does not start the frozen Templot oracle or apply manufacturing corrections.
+
+The worktree `phase9a-s1-base-plinth-research-proof` keeps the complete evidence in
+`tmp/phase9a-s1-base-proof/`. The research package, manifest and outputs stay local and untracked.
+Two FreeCAD screenshots show the base alone and with the seat and key.
+They supply presentation evidence only, with no assembled-chair or contact validation.
+
+One FreeCAD process from before capture is not present after capture.
+The evidence does not identify its owner.
+The evidence does not show that the system processes stayed the same.
+The temporary capture document closes without error.
+
+The independent source, geometry and provenance review gives a PASS result
+with no findings. Its receipt is
+`tmp/phase9a-s1-base-proof/independent-base-review.json`.
+The reviewer and authors are in the same agent team and use the same workspace.
+The reviewer also examined the contract before implementation. This is not an external review.
+
+This Level 2 result supplies evidence only for Phase 9A-1 and Phase 9A-2.
+The package stays `reference-only`, private-development and not accepted.
+Prototype identity, inclination, physical rail fit and rights limits stay unresolved as recorded.
+
+Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
+This result gives no exit, package, risk or production acceptance. All recorded limits stay.
+
 ## Continuing duties and risks
 
 [D-P6-008](../history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel)
