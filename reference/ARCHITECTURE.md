@@ -408,10 +408,27 @@ The owner-accepted Phase 1 package/evidence decisions are in
 [S1_PILOT_PLAN.md](phase-evidence/S1_PILOT_PLAN.md). Its exact decimal source-quantity,
 full-size millimetre, chair-local frame and validate-before-mutation rules are
 retained in the neutral chair-definition package v1 boundary accepted in Phase
-4. The plan deliberately leaves the prototype designation, primary evidence,
-rail section, final package licence, rights reviews and numerical tolerances
-blocked; neither the working S1 name nor the conditional CC0 target is
+4. Production evidence, package rights and numerical acceptance remain subject
+to that plan. Neither the working S1 name nor the conditional CC0 target is
 canonical production data.
+
+Under [D-P9-003](current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel),
+bounded Phase 9A reference-only research can start before independent production
+evidence is complete. Frozen Templot5 revision 556b S1/REA inputs may feed a research
+`ChairDefinition` and procedural chair generator in this accepted architecture.
+The neutral schema remains canonical. Every Templot-derived field retains exact
+provenance and `reference-only` status. Opaque generated geometry cannot replace
+named chair components and deterministic construction.
+
+Prototype geometry, model rail-fit policy and manufacturing compensation remain
+separate. The research package and outputs stay private-development and cannot
+be labelled `project-cleared`. The comparison oracle remains separate and
+available under its frozen contract.
+
+The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#phase-9a-research-and-phase-9b-production-boundary)
+owns research acceptance evidence. The [licensing boundary](LICENSING_BOUNDARIES.md#phase-9a-reference-only-research)
+keeps all Phase 9B production/package clearance gates. This sequence change does
+not accept a definition, geometry, numerical tolerance or phase exit.
 
 ### Chair assimilation boundary
 

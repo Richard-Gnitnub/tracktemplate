@@ -105,7 +105,7 @@ field- or component-level where package-level labelling would hide that fact.
 | `project_derivation` | A value or procedural parameter fitted or calculated by project tooling from recorded inputs | May enter canonical data with its complete derivation and input identities |
 | `user_design` | Alignment, topology, parameter, layout, or other creative/engineering choice supplied by the user | May enter canonical state; retained third-party dependencies must still be recorded |
 | `templot_source_expression` | Templot code, comments, close translation, expressive structure, or other GPL-covered source material | May inform or be adapted into GPL-compatible project source with notices and attribution; it is not canonical chair data merely because it computes geometry |
-| `templot_reference_data` | A Templot-authored table, profile, dataset, selection, arrangement, or value collection without an independent accepted evidence chain | Reference/comparison use only until its exact licence, database-right, redistribution, and output status are accepted |
+| `templot_reference_data` | A Templot-authored table, profile, dataset, selection, arrangement, or value collection without an independent accepted evidence chain | Reference/comparison use, including bounded private research under D-P9-003; production clearance needs an accepted compatible rights and provenance disposition |
 | `templot_media_output` | A Templot-generated PDF, screenshot, drawing, DXF, STL, data file, or similar media artifact | Local comparison oracle only unless a source-specific permission permits the intended redistribution and output use |
 | `third_party_evidence` | An external scan, CAD body, drawing, photograph, standard, database, or measurement set | Use only within its recorded access, adaptation, output, and redistribution permissions |
 | `generated_output` | SVG, DXF, STL, STEP, FreeCAD object, report, manifest, image, or physical-production record generated from canonical state | Carries the recorded rights dependencies of its inputs and any protected material deliberately embedded in it |
@@ -130,8 +130,10 @@ and accepted. In particular:
 1. `engineering_fact`, `project_measurement`, and `project_derivation` values
    must identify their primary evidence rather than cite a Templot comparison
    as their origin.
-2. `templot_reference_data`, `templot_media_output`, and unresolved
-   `third_party_evidence` do not enter a project-cleared production definition.
+2. Material with `reference-only` status and unresolved `third_party_evidence`
+   does not enter a project-cleared production definition. A later compatible
+   rights and provenance disposition must preserve historical source classifications.
+   It must record an accepted production status before admission.
 3. A comparison against Templot may record hashes, settings, numeric summaries,
    residuals, and pass/fail findings. The upstream media or dataset remains
    local and untracked unless redistribution is expressly accepted.
@@ -140,6 +142,45 @@ and accepted. In particular:
    the source-informed classification in [PROVENANCE.md](PROVENANCE.md).
 5. Missing or ambiguous provenance is a finding, not an invitation to infer a
    convenient source or licence.
+
+## Phase 9A reference-only research
+
+Under [D-P9-003](current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel),
+frozen, provenance-recorded Templot5 revision 556b S1/REA data, relationships
+and rail-fit logic can support a bounded Phase 9A research implementation.
+Independent primary production evidence does not block that research definition,
+procedural chair generator or architecture proof.
+
+Every Templot-derived field retains exact provenance and `reference-only` status.
+The neutral TrackTemplate `ChairDefinition` remains canonical. The research
+package and its outputs stay private-development and cannot be labelled
+`project-cleared`. Research data and outputs remain local and untracked without
+separate redistribution authority. Source-expression notices and applicable GPL
+duties remain separate from data and output rights.
+
+This is project sequencing authority, not third-party permission or a positive
+rights finding. Record the exact access, fitting and use basis for the research
+scope. Preserve unresolved licence, database-right and non-copyright-rights
+questions. A known restriction on the proposed research use remains a blocker.
+Do not describe a Templot-derived field as an independently evidenced prototype
+fact. Prototype geometry, model rail-fit policy and manufacturing compensation
+remain separate.
+
+Before Phase 9B can clear the S1 package for production, publication,
+redistribution or commercial use, each output-affecting Templot-derived input
+needs one of these recorded dispositions:
+
+- independent confirmation with an accepted evidence chain;
+- replacement by project-cleared evidence; or
+- an explicit compatible rights and provenance disposition for the intended use.
+
+Each disposition must preserve source history, identify the final input and
+pass all applicable package, non-copyright-rights, dependency-manifest and release
+gates. Independent confirmation alone does not clear a licence or another
+party's rights. No cleared production dependency may retain `reference-only`,
+`NC`, `NOASSERTION`, unknown or incompatible status. Research acceptance gives
+no production/package clearance. The final production package must pass each
+affected qualification check after an input change.
 
 ## Neutral chair-definition and collaboration boundary
 
@@ -261,7 +302,7 @@ The permitted project statuses are:
 | --- | --- |
 | `project-cleared` | All known dependencies have passed the project's documented provenance, licence, declared-use and non-copyright-rights checks for the stated use, with required conditions recorded; this is an internal release gate, not legal advice or a guarantee that no third-party rights exist |
 | `restricted` | A recorded licence or right prevents the declared intended use or imposes a relevant condition that the production/publication path has not satisfied |
-| `reference-only` | Material may be used to compare or validate locally but not as a production/publication dependency |
+| `reference-only` | Material may be used for local comparison or validation and the bounded private research construction under D-P9-003. It cannot be a cleared production/publication dependency. |
 | `unknown` | Ownership, source, licence, output effect, or redistribution status is unresolved |
 
 No current B14/B15 output receives `project-cleared` merely because this policy
@@ -397,7 +438,8 @@ For each applicable scope the project must:
    and
 7. obtain explicit owner acceptance of the first S1 package's evidence,
    licence, intended commercial/publication use and non-copyright-rights record
-   before implementation.
+   before production implementation or package admission. The bounded Phase 9A
+   reference-only research exception above does not clear those later uses.
 
 At Phase 1 closeout, the first two scopes had to be fully classified or leave
 the S1 pilot visibly blocked; they were accepted in the latter state. The third

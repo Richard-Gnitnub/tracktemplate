@@ -142,7 +142,8 @@ EXPECTED_PHASE9A_EXITS = (
         "9A-1", "3",
         "The procedural chair generator constructs all named chair "
         "components in the bounded scope and the assembled S1 chair from "
-        "the accepted S1 ChairDefinition. It can construct them again "
+        "the S1 ChairDefinition accepted for reference-only research. It can "
+        "construct them again "
         "without the source scan/CAD file or FreeCAD geometry that the "
         "product kept from the first construction. Select one more chair "
         "or support from repository evidence for the smallest proof of a "
@@ -157,15 +158,20 @@ EXPECTED_PHASE9A_EXITS = (
         "Standalone and FreeCAD tests give a PASS result for definition "
         "package load and round-trip. The two test paths reject corrupt "
         "and unsupported packages. Package load and round-trip preserve "
-        "chair component identities, prototype/manufacturing separation "
-        "and rail fit. The two test paths give a PASS result for the S1 "
+        "chair component identities, prototype geometry, separate model "
+        "rail-fit policy, manufacturing compensation and rail fit. "
+        "They preserve "
+        "exact field provenance and reference-only status for each "
+        "Templot-derived input. The two test paths give a PASS result "
+        "for the S1 "
         "geometry that the generator constructs against accepted "
         "reference tolerances.",
     ),
     (
         "9A-3", "5",
         "The operator-assisted S1 pilot is documented and accepted for "
-        "bounded architecture proof through the same ChairDefinition and "
+        "bounded reference-only architecture proof through the same "
+        "ChairDefinition and "
         "procedural chair generator. The RC qualification matrix does not "
         "include arbitrary automatic scan assimilation.",
     ),
@@ -199,7 +205,14 @@ EXPECTED_PHASE9B_EXITS = (
         "has no dependency with NC, NOASSERTION, reference-only or unknown "
         "status. It has no dependency that is incompatible with the "
         "project-cleared commercial/publication path. The same applicable "
-        "rights gate controls each other package.",
+        "rights gate controls each other package. Before production, "
+        "publication, redistribution or commercial clearance, each "
+        "output-affecting Templot-derived input needs one of three "
+        "dispositions. These are independent confirmation, replacement "
+        "by project-cleared evidence, or an explicit compatible rights "
+        "and provenance disposition. The "
+        "final production package must pass each affected definition, "
+        "geometry, pilot and output check after an input change.",
     ),
     (
         "9B-4", "7",
@@ -1144,14 +1157,13 @@ def _validate_owner_view(plan: str) -> None:
         "TERM-R04 stays open",
         "Output stays private-development",
         "project status stays `unknown`",
-        "D-P9-001",
-        "D-P9-002",
-        "PR #131",
-        "merged tree matches the reviewed head",
         "accepted original gate",
-        "frozen Phase 8 closeout",
-        "recovery record",
-        "previous local split candidate remains failed evidence only",
+        "D-P9-003",
+        "Independent primary evidence no longer blocks that architecture proof",
+        "Phase 9B keeps production/package clearance and all original requirements",
+        "No chair implementation occurs in this cycle",
+        "No definition, exit, package, output, risk closure",
+        "recommend the first bounded Phase 9A research implementation task",
         "accepted straight and curved `TO-001` and `XO-001` examples",
         "The Phase 9A opening adds no product proof or behaviour",
         "representative-fixture",
@@ -1169,12 +1181,7 @@ def _validate_owner_view(plan: str) -> None:
         "development-only oracle",
         "every comparison, adapter, caller, removal and legacy-retirement condition",
         "No performance, production-output or release acceptance",
-        "opens Phase 9A at 0/4 with all four exits Pending",
-        "No exit, product work, package, output, risk closure",
-        "Use retained S1 evidence to recommend one bounded Phase 9A "
-        "product task to the owner",
         "Keep Phase 9B Not started",
-        "Do not start product implementation in this cycle",
     ):
         _require(
             fragment in owner_view,
@@ -1451,6 +1458,87 @@ def _validate_phase9_exit_allocation(plan: str, evidence: str) -> None:
         and "constituent" not in flat.lower(),
         "Phase 9 planning reintroduced an unapproved chair term or verb",
     )
+
+
+
+def _validate_phase9_research_boundaries(
+    evidence: str, licensing: str, provenance: str,
+) -> None:
+    """Keep research permission and production duties in their owners."""
+    sections = (
+        (
+            "decision", evidence,
+            "D-P9-003 Phase 9A research sequencing panel — 2026-10-03",
+            (
+                "Phase 9A can use frozen, provenance-recorded Templot5 "
+                "revision 556b S1/REA inputs for bounded reference-only research",
+                "This project decision gives no third-party permission "
+                "or positive rights finding",
+                "Research inputs that affect output must retain that dependency role",
+                "The comparison oracle remains separate and available "
+                "under its frozen contract",
+                "Phase 9A stays Open at 0/4. Phase 9B stays Not started at "
+                "0/6. Every exit stays Pending",
+                "Output stays private-development and project status stays unknown",
+                "No chair implementation occurs in this cycle",
+                "All 24 risk dispositions, owners, deadlines and controls "
+                "remain unchanged",
+            ),
+        ),
+        (
+            "licensing", licensing, "Phase 9A reference-only research",
+            (
+                "Every Templot-derived field retains exact provenance "
+                "and reference-only status",
+                "The neutral TrackTemplate ChairDefinition remains canonical",
+                "The research package and its outputs stay private-development "
+                "and cannot be labelled project-cleared",
+                "Research data and outputs remain local and untracked "
+                "without separate redistribution authority",
+                "A known restriction on the proposed research use remains a blocker",
+                "each output-affecting Templot-derived input needs one "
+                "of these recorded dispositions",
+                "independent confirmation with an accepted evidence chain",
+                "replacement by project-cleared evidence",
+                "an explicit compatible rights and provenance disposition "
+                "for the intended use",
+                "pass all applicable package, non-copyright-rights, "
+                "dependency-manifest and release gates",
+                "Independent confirmation alone does not clear a licence "
+                "or another party's rights",
+                "No cleared production dependency may retain reference-only, "
+                "NC, NOASSERTION, unknown or incompatible status",
+                "The final production package must pass each affected "
+                "qualification check after an input change",
+            ),
+        ),
+        (
+            "provenance", provenance, "Phase 9A research-input provenance",
+            (
+                "Each Templot-derived field must identify the archive hash, "
+                "source-member hash, exact locator and derivation inputs",
+                "It must keep templot_reference_data and reference-only status",
+                "A research input that affects geometry is output-affecting "
+                "for the private research package and output",
+                "Record that role separately from the frozen comparison-only oracle",
+                "Do not change the blocked production manifest or oracle "
+                "lineage to describe the new research role",
+                "The research package needs its own complete dependency "
+                "record before use",
+                "Independent confirmation or replacement must retain "
+                "the historical Templot lineage",
+                "No path silently changes research data into independently "
+                "evidenced prototype facts or clears a package",
+            ),
+        ),
+    )
+    for owner, document, heading, clauses in sections:
+        section = _semantic_text(direct_section_content(document, heading))
+        for clause in clauses:
+            _require(
+                clause in section,
+                "Phase 9 research " + owner + " boundary drifted: " + clause,
+            )
 
 
 def _validate_phase9_terms(terminology: str) -> None:
@@ -5237,8 +5325,8 @@ def _validate_phase9_decision_holding(
         "Phase 9 split must carry unchanged D-P6-008 first",
     )
     _require(
-        len(records) == 3,
-        "Phase 9A opening decision chain incomplete or widened",
+        len(records) == 4,
+        "Phase 9A research decision chain incomplete or widened",
     )
     split = records[1]
     panel = (
@@ -5318,6 +5406,46 @@ def _validate_phase9_decision_holding(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-P9-002 " + field + " digest drifted",
+        )
+
+
+    research = records[3]
+    research_panel = (
+        "reference/current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel"
+    )
+    _require(
+        isinstance(research, dict)
+        and set(research) == set(split)
+        and research["id"] == "D-P9-003"
+        and research["decided_on"] == "2026-10-03"
+        and research["status"] == "Accepted"
+        and research["decision"] == (
+            "Allow bounded Phase 9A reference-only research from frozen "
+            "Templot5 revision 556b S1/REA inputs before independent "
+            "production evidence is complete. Phase 9B keeps "
+            "production/package clearance and each applicable evidence, "
+            "rights, manifest and release gate."
+        )
+        and research["evidence"] == research_panel
+        and research["panel_record"] == research_panel
+        and research["panel_required_under_current_policy"] is True,
+        "D-P9-003 sequencing identity, status or panel routing drifted",
+    )
+    for field, digest in (
+        (
+            'authority',
+            'b853c3134647cd3579278cc8102a96931d7c2c2aca7f3d1247785fe50a4b9811',
+        ),
+        (
+            'exclusions',
+            '0d00120bef5fd734cf79eb3f0c80b876fbc428f60e6b26c101b4394f8f230d5c',
+        ),
+    ):
+        value = research[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P9-003 " + field + " digest drifted",
         )
 
 
@@ -6012,18 +6140,13 @@ def _validate_phase9_holding(evidence: str) -> None:
     )
     flat = _semantic_text(evidence)
     for clause in (
-        "exact reviewed Phase 9A/9B alignment under D-P9-001 merged "
-        "through PR #131",
-        "merged tree matches the reviewed head",
-        "D-P9-002 opens only Phase 9A",
-        "historical Phase 9 gate remains the requirement source",
-        "earlier blocked local candidate remains failed evidence only",
-        "This opening changes no product behaviour",
-        "D-P9-002 opens only Phase 9A at 0/4 with four Pending exits",
-        "It accepts no exit, product work, output, package, risk closure "
+        "D-P9-003",
+        "The nine original requirements remain",
+        "All four Phase 9A exits and all six Phase 9B exits stay Pending",
+        "It accepts no definition, package, production output, risk closure "
         "or legacy removal",
         "Phase 9B stays Not started",
-        "Do not start product work in this record cycle",
+        "No chair implementation occurs in this cycle",
         "D-P6-008 stays in full",
         "mandatory before Phase 10 beta acceptance",
         "Beta acceptance is blocked while it remains unmet",
@@ -6034,6 +6157,15 @@ def _validate_phase9_holding(evidence: str) -> None:
         "Project status remains unknown",
     ):
         _require(clause in flat, "Phase 9 split boundary drifted: " + clause)
+    split_panel = _semantic_text(direct_section_content(
+        evidence, "D-P9-001 terminology and programme alignment panel — 2026-10-03",
+    ))
+    _require(
+        "The previous local candidates f1c06e2 and 3480aea and their "
+        "BLOCKED review are failed evidence only. They were not merged. "
+        "This decision gives them no retrospective acceptance" in split_panel,
+        "D-P9-001 failed-candidate boundary drifted",
+    )
     opening = _semantic_text(_section(
         evidence, "D-P9-002 Phase 9A opening panel — 2026-10-03",
     ))
@@ -6771,7 +6903,7 @@ def _validate_decisions(plan: str) -> None:
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
-        | {"D-P9-001", "D-P9-002"},
+        | {"D-P9-001", "D-P9-002", "D-P9-003"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -8492,6 +8624,11 @@ def main() -> None:
     phase5_closeout = _read(PHASE5_CLOSEOUT_PATH)
     _validate_plan_shape(plan)
     _validate_phase9_exit_allocation(plan, phase9_holding)
+    _validate_phase9_research_boundaries(
+        phase9_holding,
+        _read(ROOT / "reference" / "LICENSING_BOUNDARIES.md"),
+        _read(ROOT / "reference" / "PROVENANCE.md"),
+    )
     _validate_phase9_terms(_read(TERMINOLOGY_PATH))
     _validate_exit_conditions(
         plan,

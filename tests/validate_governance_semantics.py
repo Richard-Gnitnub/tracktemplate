@@ -2145,7 +2145,7 @@ def validate_phase8_closeout_mutations() -> None:
     expect_rejected(
         "phase9-holding/phase8-decision-carried-as-current",
         lambda: progress._validate_phase9_decision_holding(current, phase6),
-        "Phase 9A opening decision chain incomplete or widened",
+        "Phase 9A research decision chain incomplete or widened",
     )
 
 
@@ -4355,6 +4355,37 @@ def validate_phase9_split_mutations() -> None:
             "package.",
             "Additional packages need no rights gate.",
         ),
+        (
+            "9A-research", "| 9A-1 |",
+            "accepted for reference-only research",
+            "accepted for production",
+        ),
+        (
+            "9A-provenance", "| 9A-2 |",
+            "exact field provenance and reference-only status",
+            "package-level notes without source classification",
+        ),
+        (
+            "9A-separation", "| 9A-2 |",
+            "prototype geometry, separate model rail-fit policy, "
+            "manufacturing compensation and rail fit",
+            "one combined chair geometry record",
+        ),
+        (
+            "9B-disposition", "| 9B-3 |",
+            "each output-affecting Templot-derived input needs one of "
+            "three dispositions. These are independent confirmation, "
+            "replacement by project-cleared evidence, or an explicit "
+            "compatible rights and provenance disposition",
+            "all Templot-derived inputs are automatically cleared",
+        ),
+        (
+            "9B-requalification", "| 9B-3 |",
+            "The final production package must pass each affected "
+            "definition, geometry, pilot and output check after an "
+            "input change.",
+            "Research checks suffice after every production input change.",
+        ),
     ):
         row = table_row_containing(plan, marker)
         changed = replace_once(
@@ -4366,7 +4397,7 @@ def validate_phase9_split_mutations() -> None:
                 value, evidence,
             ),
             "Phase {} original-exit mapping or criterion drifted".format(
-                phase,
+                phase.split("-", 1)[0],
             ),
         )
     evidence_row = table_row_containing(evidence, "| 9A-2 |")
@@ -4423,13 +4454,13 @@ def validate_phase9_split_mutations() -> None:
         "Phase 9 split must carry unchanged D-P6-008 first",
     )
     missing_opening = copy.deepcopy(decision)
-    missing_opening["decisions"].pop()
+    missing_opening["decisions"].pop(2)
     expect_rejected(
         "phase9/d-p9-002-opening-omitted",
         lambda: progress._validate_phase9_decision_holding(
             missing_opening, phase6,
         ),
-        "Phase 9A opening decision chain incomplete or widened",
+        "Phase 9A research decision chain incomplete or widened",
     )
     for field, replacement, diagnostic in (
         (
@@ -4495,6 +4526,112 @@ def validate_phase9_split_mutations() -> None:
         lambda: progress._validate_phase9_terms(duplicate_chair),
         "Phase 9 technical term row duplicated: Chair",
     )
+
+
+
+def validate_phase9_research_mutations() -> None:
+    """Reject misplaced research authority and weakened production gates."""
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    licensing = read("reference/LICENSING_BOUNDARIES.md")
+    provenance = read("reference/PROVENANCE.md")
+    documents = [evidence, licensing, provenance]
+    cases = (
+        (0, "decision", "No chair implementation occurs in this cycle",
+         "Chair implementation starts in this cycle"),
+        (1, "licensing", "exact provenance and `reference-only` status",
+         "unverified production status"),
+        (1, "licensing", "stay private-development", "allow commercial use"),
+        (1, "licensing", "A known restriction on the proposed research use "
+         "remains a blocker", "Known research restrictions do not block use"),
+        (1, "licensing", "each output-affecting Templot-derived input",
+         "selected Templot-derived inputs"),
+        (1, "licensing", "non-copyright-rights, dependency-manifest and release",
+         "optional package"),
+        (1, "licensing", "Independent confirmation alone does not clear a "
+         "licence", "Independent confirmation clears every licence"),
+        (2, "provenance", "archive hash, source-member hash, exact locator "
+         "and derivation inputs", "a broad source name"),
+        (2, "provenance", "is output-affecting for the private",
+         "is non-output-affecting for the private"),
+        (2, "provenance", "separately from the frozen comparison-only oracle",
+         "as part of the production oracle"),
+        (2, "provenance", "its own complete dependency record before use",
+         "no dependency record"),
+    )
+    headings = (
+        "D-P9-003 Phase 9A research sequencing panel — 2026-10-03",
+        "Phase 9A reference-only research",
+        "Phase 9A research-input provenance",
+    )
+    for index, (slot, owner, before, after) in enumerate(cases):
+        document = documents[slot]
+        section = progress.direct_section_content(document, headings[slot])
+        # Normalise wrapping only for mutation selection, not validation.
+        words = before.split()
+        pattern = r"\s+".join(re.escape(word) for word in words)
+        changed_section, count = re.subn(pattern, after, section, count=1)
+        if count != 1:
+            raise AssertionError("research mutation target missing: " + before)
+        changed = list(documents)
+        changed[slot] = replace_once(document, section, changed_section)
+        expect_rejected(
+            "phase9-research/{}-{}".format(owner, index),
+            lambda value=changed: progress._validate_phase9_research_boundaries(
+                *value,
+            ),
+            "Phase 9 research " + owner + " boundary drifted",
+        )
+    for slot, owner in enumerate(("decision", "licensing", "provenance")):
+        document = documents[slot]
+        section = progress.direct_section_content(document, headings[slot])
+        changed = list(documents)
+        changed[slot] = (
+            replace_once(document, section, "\n\nResearch is permitted.\n")
+            + "\n## Unrelated retained material\n" + section
+        )
+        expect_rejected(
+            "phase9-research/{}-relocated".format(owner),
+            lambda value=changed: progress._validate_phase9_research_boundaries(
+                *value,
+            ),
+            "Phase 9 research " + owner + " boundary drifted",
+        )
+    failed_candidate = paragraph_containing(
+        evidence, "The previous local candidates",
+    )
+    changed = replace_once(
+        evidence, failed_candidate,
+        replace_once(failed_candidate, "failed evidence only", "accepted evidence"),
+    )
+    expect_rejected(
+        "phase9-research/failed-candidate-promoted",
+        lambda: progress._validate_phase9_holding(changed),
+        "D-P9-001 failed-candidate boundary drifted",
+    )
+    decision = json.loads(read("reference/current/gate-decisions.json"))
+    phase6 = {
+        record["id"]: record
+        for record in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    for field, replacement, diagnostic in (
+        ("decision", "Clear S1 for production.", "sequencing identity"),
+        ("status", "Proposed", "sequencing identity"),
+        ("panel_record", "reference/current/PHASE_EVIDENCE.md",
+         "sequencing identity"),
+        ("authority", "Accept all Phase 9A exits.", "authority digest"),
+        ("exclusions", "No restrictions apply.", "exclusions digest"),
+    ):
+        changed = copy.deepcopy(decision)
+        changed["decisions"][3][field] = replacement
+        expect_rejected(
+            "phase9-research/d-p9-003-" + field,
+            lambda value=changed: progress._validate_phase9_decision_holding(
+                value, phase6,
+            ),
+            "D-P9-003 " + diagnostic,
+        )
 
 
 def validate_project_plan_mutations() -> None:
@@ -5077,12 +5214,6 @@ def validate_documentation_profile_mutations() -> None:
             "accepted original gate",
         ),
         (
-            "failed-candidate-promoted", "**What changed**",
-            "previous local split candidate remains failed evidence only",
-            "previous local split candidate is accepted",
-            "previous local split candidate remains failed evidence only",
-        ),
-        (
             "monthly-restore-postponed", "**Limitations/findings**",
             "monthly restore remains due by 2026-10-05",
             "monthly restore may wait until 2026-11-05",
@@ -5109,10 +5240,10 @@ def validate_documentation_profile_mutations() -> None:
             "Phase 9B stays Not started at 0/6",
         ),
         (
-            "stop-boundary-waived", "**Next action**",
-            "Do not start product implementation in this cycle",
+            "stop-boundary-waived", "**Owner decision**",
+            "No chair implementation occurs in this cycle",
             "Begin Phase 9 product work after integration",
-            "Do not start product implementation in this cycle",
+            "No chair implementation occurs in this cycle",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
@@ -7236,6 +7367,7 @@ def main() -> None:
     validate_phase8_exit2_acceptance_mutations()
     validate_phase8_closeout_mutations()
     validate_phase9_split_mutations()
+    validate_phase9_research_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()
