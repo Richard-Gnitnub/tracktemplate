@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run fresh bounded read-only inspections with retained complete output."""
+"""Run fresh inspections and read retained command receipts compactly."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import argparse
 import datetime
 import hashlib
 import json
+import math
 import os
 import pathlib
 import re
@@ -23,6 +24,11 @@ FAILURE_SENTINEL = "TRACKTEMPLATE_INSPECTION_FAILURE="
 RETRIEVAL_SENTINEL = "TRACKTEMPLATE_INSPECTION_RETRIEVAL="
 FAILURE_EXCERPT_BYTES = 4096
 MAX_RETRIEVAL_BYTES = 4096
+MAX_RECEIPT_BYTES = 32 * 1024 * 1024
+MAX_SUMMARY_BYTES = 4096
+MAX_FIELD_OUTPUT_BYTES = 6144
+RECEIPT_SUMMARY_SENTINEL = "TRACKTEMPLATE_EVIDENCE_SUMMARY="
+RECEIPT_FIELD_SENTINEL = "TRACKTEMPLATE_EVIDENCE_FIELD="
 STEP_NAME = re.compile(r"[a-z][a-z0-9-]*\Z")
 SED_PRINT_EXPRESSION = re.compile(r"[1-9][0-9]*(?:,[1-9][0-9]*)?p\Z")
 ALLOWED_PROGRAMS = frozenset(("cat", "rg", "sed"))
@@ -544,6 +550,215 @@ def retrieve_output(
     return metadata
 
 
+def _load_receipt(root, artifact_path, evidence_key=None):
+    """Read one retained command receipt without changing its source bytes."""
+    root = pathlib.Path(root).resolve()
+    if root in (pathlib.Path(root.anchor), pathlib.Path.home().resolve()):
+        raise InspectionError("inspection root is unsafe")
+    path = _safe_operand(artifact_path, root)
+    if not path.is_file():
+        raise InspectionError("retained evidence is not a regular file")
+    try:
+        before = path.stat()
+        if before.st_size > MAX_RECEIPT_BYTES:
+            raise InspectionError("retained evidence exceeds the read limit")
+        with path.open("rb") as stream:
+            raw = stream.read(MAX_RECEIPT_BYTES + 1)
+        after = path.stat()
+    except OSError as error:
+        raise InspectionError("retained evidence cannot be read") from error
+    if len(raw) > MAX_RECEIPT_BYTES:
+        raise InspectionError("retained evidence exceeds the read limit")
+    if (before.st_size, before.st_mtime_ns) != (
+        len(raw), after.st_mtime_ns
+    ) or after.st_size != len(raw):
+        raise InspectionError("retained evidence changed during the read")
+    digest = _sha256_bytes(raw)
+    if evidence_key is not None:
+        if not re.fullmatch(r"[0-9a-f]{64}", evidence_key):
+            raise InspectionError("evidence key must be an exact SHA-256")
+        if digest != evidence_key:
+            raise InspectionError("retained evidence identity changed")
+    try:
+        receipt = json.loads(
+            raw,
+            object_pairs_hook=_unique_json_keys,
+            parse_constant=_reject_json_constant,
+            parse_float=_finite_json_float,
+        )
+    except (
+        UnicodeDecodeError, json.JSONDecodeError, ValueError, RecursionError
+    ):
+        raise InspectionError("retained evidence is not valid JSON") from None
+    if (
+        not isinstance(receipt, dict)
+        or not isinstance(receipt.get("verdict"), str)
+        or not isinstance(receipt.get("commands"), list)
+        or not receipt["commands"]
+    ):
+        raise InspectionError("retained command receipt is invalid")
+    for command in receipt["commands"]:
+        if (
+            not isinstance(command, dict)
+            or type(command.get("returncode")) is not int
+            or not isinstance(command.get("argv"), list)
+            or not command["argv"]
+            or not all(isinstance(value, str) for value in command["argv"])
+            or not isinstance(command.get("cwd"), str)
+            or not command["cwd"]
+            or not isinstance(command.get("stdout"), str)
+            or not isinstance(command.get("stderr"), str)
+        ):
+            raise InspectionError("retained command result is invalid")
+    return receipt, {
+        "bytes": len(raw),
+        "path": _display_path(path, root),
+        "sha256": digest,
+    }
+
+
+def _unique_json_keys(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise InspectionError("retained evidence has duplicate JSON keys")
+        value[key] = item
+    return value
+
+
+def _reject_json_constant(_value):
+    raise InspectionError("retained evidence has a non-finite JSON number")
+
+
+def _finite_json_float(value):
+    number = float(value)
+    if not math.isfinite(number):
+        raise InspectionError("retained evidence has a non-finite JSON number")
+    return number
+
+
+def _receipt_status(receipt):
+    return (
+        "PASS"
+        if receipt["verdict"] == "PASS"
+        and all(command["returncode"] == 0 for command in receipt["commands"])
+        else "FAIL"
+    )
+
+
+def summarize_receipt(*, root, artifact_path):
+    """Return bounded status and identities for a retained command receipt."""
+    receipt, artifact = _load_receipt(root, artifact_path)
+    failed = [
+        {"index": index, "returncode": command["returncode"]}
+        for index, command in enumerate(receipt["commands"])
+        if command["returncode"] != 0
+    ]
+    fields = {}
+    unexpanded = {}
+    for name, value in sorted(receipt.items()):
+        if name in ("commands", "verdict"):
+            continue
+        encoded = _canonical_bytes(value)
+        if (
+            isinstance(value, (str, int, float, bool))
+            or value is None
+            or name == "limits"
+        ) and len(encoded) <= 1024:
+            fields[name] = value
+        else:
+            unexpanded[name] = {
+                "items": len(value) if hasattr(value, "__len__") else None,
+                "type": type(value).__name__,
+            }
+    summary = {
+        "artifact": artifact,
+        "commands": {
+            "count": len(receipt["commands"]),
+            "failed": failed[:16],
+            "failed_count": len(failed),
+            "omitted_failures": max(0, len(failed) - 16),
+        },
+        "fields": fields,
+        "status": _receipt_status(receipt),
+        "unexpanded": unexpanded,
+        "verdict": receipt["verdict"],
+    }
+    if len(RECEIPT_SUMMARY_SENTINEL.encode("ascii")) + len(
+        _canonical_bytes(summary)
+    ) + 1 > MAX_SUMMARY_BYTES:
+        raise InspectionError(
+            "retained evidence summary exceeds the output limit"
+        )
+    return summary
+
+
+def retrieve_receipt_field(
+    *, root, artifact_path, evidence_key, field_name, command_index=None,
+    head_bytes=2048, tail_bytes=2048, stream=None,
+):
+    """Write a bounded field from an identity-checked original receipt."""
+    if stream is None:
+        stream = sys.stdout
+    if (
+        head_bytes < 0
+        or tail_bytes < 0
+        or head_bytes + tail_bytes == 0
+        or head_bytes + tail_bytes > MAX_RETRIEVAL_BYTES
+    ):
+        raise InspectionError("retrieval byte limit is invalid")
+    receipt, artifact = _load_receipt(root, artifact_path, evidence_key)
+    if command_index is None:
+        selected = receipt
+    elif 0 <= command_index < len(receipt["commands"]):
+        selected = receipt["commands"][command_index]
+    else:
+        raise InspectionError("command index is absent from the receipt")
+    if not isinstance(selected, dict) or field_name not in selected:
+        raise InspectionError("field is absent from the receipt")
+    value = selected[field_name]
+    if isinstance(value, str):
+        try:
+            raw = value.encode("utf-8")
+            rendering = "text"
+        except UnicodeEncodeError:
+            raw = _canonical_bytes(value)
+            rendering = "canonical-json"
+    else:
+        raw = _canonical_bytes(value)
+        rendering = "canonical-json"
+    head = raw[:head_bytes]
+    tail = raw[max(len(head), len(raw) - tail_bytes):]
+    omitted = len(raw) - len(head) - len(tail)
+    metadata = {
+        "artifact": artifact,
+        "command_index": command_index,
+        "field": field_name,
+        "omitted_bytes": omitted,
+        "rendering": rendering,
+        "selected_bytes": len(raw),
+        "selected_sha256": _sha256_bytes(raw),
+        "status": _receipt_status(receipt),
+        "verdict": receipt["verdict"],
+    }
+    output = (
+        RECEIPT_FIELD_SENTINEL
+        + json.dumps(metadata, sort_keys=True, separators=(",", ":"))
+    )
+    output += "\n" + head.decode("utf-8", errors="replace")
+    if omitted:
+        output += "\n... {} bytes omitted ...\n".format(omitted)
+    output += tail.decode("utf-8", errors="replace")
+    if head or tail:
+        output += "\n"
+    if len(output.encode("utf-8")) > MAX_FIELD_OUTPUT_BYTES:
+        raise InspectionError(
+            "retained evidence field exceeds the output limit"
+        )
+    stream.write(output)
+    return metadata
+
+
 def parse_step(value):
     """Parse ``name=<JSON argv>`` into one inspection step."""
     name, separator, raw_command = value.partition("=")
@@ -568,6 +783,19 @@ def _build_parser():
     retrieve.add_argument("--stream", choices=("stdout", "stderr"), required=True)
     retrieve.add_argument("--head-bytes", type=int, default=2048)
     retrieve.add_argument("--tail-bytes", type=int, default=2048)
+    summary = commands.add_parser(
+        "summary", help="Summarize one retained command-receipt JSON file",
+    )
+    summary.add_argument("--artifact", required=True)
+    field = commands.add_parser(
+        "field", help="Read one identity-checked command-receipt field",
+    )
+    field.add_argument("--artifact", required=True)
+    field.add_argument("--evidence-key", required=True)
+    field.add_argument("--field", required=True)
+    field.add_argument("--command-index", type=int)
+    field.add_argument("--head-bytes", type=int, default=2048)
+    field.add_argument("--tail-bytes", type=int, default=2048)
     return parser
 
 
@@ -587,16 +815,37 @@ def main(argv=None):
                 flush=True,
             )
             return int(bool(summary["failed_count"]))
-        retrieve_output(
+        if arguments.operation == "retrieve":
+            retrieve_output(
+                root=ROOT,
+                manifest_path=arguments.manifest,
+                evidence_key=arguments.evidence_key,
+                step_name=arguments.step,
+                stream_name=arguments.stream,
+                head_bytes=arguments.head_bytes,
+                tail_bytes=arguments.tail_bytes,
+            )
+            return 0
+        if arguments.operation == "summary":
+            summary = summarize_receipt(
+                root=ROOT, artifact_path=arguments.artifact,
+            )
+            print(
+                RECEIPT_SUMMARY_SENTINEL
+                + json.dumps(summary, sort_keys=True, separators=(",", ":")),
+                flush=True,
+            )
+            return int(summary["status"] != "PASS")
+        metadata = retrieve_receipt_field(
             root=ROOT,
-            manifest_path=arguments.manifest,
+            artifact_path=arguments.artifact,
             evidence_key=arguments.evidence_key,
-            step_name=arguments.step,
-            stream_name=arguments.stream,
+            field_name=arguments.field,
+            command_index=arguments.command_index,
             head_bytes=arguments.head_bytes,
             tail_bytes=arguments.tail_bytes,
         )
-        return 0
+        return int(metadata["status"] != "PASS")
     except InspectionError as error:
         print("TRACKTEMPLATE_INSPECTION_ERROR=" + str(error), file=sys.stderr)
         return 2
