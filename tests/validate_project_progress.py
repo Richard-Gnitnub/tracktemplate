@@ -1171,7 +1171,8 @@ def _validate_owner_view(plan: str) -> None:
         "No performance, production-output or release acceptance",
         "opens Phase 9A at 0/4 with all four exits Pending",
         "No exit, product work, package, output, risk closure",
-        "Present one bounded Phase 9A product recommendation",
+        "Use retained S1 evidence to recommend one bounded Phase 9A "
+        "product task to the owner",
         "Keep Phase 9B Not started",
         "Do not start product implementation in this cycle",
     ):
