@@ -779,7 +779,7 @@ def validate_phase6_closeout_mutations() -> None:
             ),
             "D-P7-006 " + diagnostic,
         )
-    current = json.loads(read("reference/current/gate-decisions.json"))
+    current = json.loads(read("reference/history/phase-closeouts/PHASE8_GATE_DECISIONS.json"))
     phase8_missing = copy.deepcopy(current)
     phase8_missing["decisions"] = []
     phase8_widened = copy.deepcopy(current)
@@ -1162,23 +1162,22 @@ def validate_phase6_closeout_mutations() -> None:
         )),
         "D-P7-006 bounded condition drifted: 37 registered worktrees",
     )
-    current_opening = read("reference/current/PHASE_EVIDENCE.md")
+    current_opening = read("reference/history/phase-closeouts/PHASE8_CLOSEOUT.md")
     current_status = paragraph_containing(
-        current_opening, "Status: **Open — 4/4",
+        current_opening, "Status: **Closed — 4/4",
     )
     expect_rejected(
-        "phase8-opening/accepted-exit-count-regressed",
+        "phase8-closeout/phase9-status-opened",
         lambda: progress._validate_phase8_opening(replace_once(
             current_opening,
             current_status,
             replace_once(
                 current_status,
-                "All four exits are\nEvidenced and owner-accepted.",
-                "Exit 2 stays Pending.",
+                "Phase 9 is Not started at 0/9.",
+                "Phase 9 is Open at 0/9.",
             ),
         ), read("reference/PROJECT_PLAN.md")),
-        "Phase 8 opening status drifted: All four exits are Evidenced "
-        "and owner-accepted",
+        "Phase 8 opening status drifted: Phase 9 is Not started at 0/9",
     )
     expect_rejected(
         "phase8-opening/performance-duty-waived",
@@ -1261,12 +1260,12 @@ def validate_phase6_closeout_mutations() -> None:
 
 def validate_phase8_exit3_admission_mutations() -> None:
     """Reject widened acceptance, changed authority and omitted limits."""
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = read("reference/history/phase-closeouts/PHASE8_CLOSEOUT.md")
     plan = read("reference/PROJECT_PLAN.md")
     panel = progress._section(
         evidence, "Phase 8 Exit 3 admission panel — 2026-09-30",
     )
-    current = json.loads(read("reference/current/gate-decisions.json"))
+    current = json.loads(read("reference/history/phase-closeouts/PHASE8_GATE_DECISIONS.json"))
     frozen = {
         item["id"]: item
         for item in json.loads(read(
@@ -1389,11 +1388,11 @@ def validate_phase8_exit3_admission_mutations() -> None:
 
 def validate_phase8_exit4_admission_mutations() -> None:
     """Reject changed Exit 4 authority, source, limits and exit status."""
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = read("reference/history/phase-closeouts/PHASE8_CLOSEOUT.md")
     panel = progress._section(
         evidence, "Phase 8 Exit 4 admission panel — 2026-09-30",
     )
-    current = json.loads(read("reference/current/gate-decisions.json"))
+    current = json.loads(read("reference/history/phase-closeouts/PHASE8_GATE_DECISIONS.json"))
     frozen = {
         item["id"]: item
         for item in json.loads(read(
@@ -1538,12 +1537,12 @@ def validate_phase8_exit4_admission_mutations() -> None:
 
 def validate_phase8_exit1_admission_mutations() -> None:
     """Reject widened Exit 1 proof and changes to retained conditions."""
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = read("reference/history/phase-closeouts/PHASE8_CLOSEOUT.md")
     plan = read("reference/PROJECT_PLAN.md")
     panel = progress._section(
         evidence, "Phase 8 Exit 1 acceptance panel — 2026-09-30",
     )
-    current = json.loads(read("reference/current/gate-decisions.json"))
+    current = json.loads(read("reference/history/phase-closeouts/PHASE8_GATE_DECISIONS.json"))
     frozen = {
         item["id"]: item
         for item in json.loads(read(
@@ -1744,12 +1743,12 @@ def validate_phase8_exit1_admission_mutations() -> None:
 
 def validate_phase8_exit2_acceptance_mutations() -> None:
     """Reject wider Exit 2 claims, lost recovery duties and phase closure."""
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = read("reference/history/phase-closeouts/PHASE8_CLOSEOUT.md")
     plan = read("reference/PROJECT_PLAN.md")
     panel = progress._section(
         evidence, "Phase 8 Exit 2 acceptance panel — 2026-10-01",
     )
-    current = json.loads(read("reference/current/gate-decisions.json"))
+    current = json.loads(read("reference/history/phase-closeouts/PHASE8_GATE_DECISIONS.json"))
     frozen = {
         item["id"]: item
         for item in json.loads(read(
@@ -1960,16 +1959,16 @@ def validate_phase8_exit2_acceptance_mutations() -> None:
         lambda: progress._validate_plan_shape(replace_once(
             plan, row, replace_once(row, "4/4 evidenced", "3/4 evidenced"),
         )),
-        "Phase 8 must be open at four evidenced exits",
+        "Phase 8 must be closed at four evidenced exits",
     )
     expect_rejected(
-        "phase8-exit2/phase-8-closed-without-authority",
+        "phase8-exit2/phase-8-reopened-without-authority",
         lambda: progress._validate_plan_shape(replace_once(
             plan, row, replace_once(
-                row, "| Open |", "| Complete — accepted 2026-10-01 |",
+                row, "| Complete — accepted 2026-10-03 |", "| Open |",
             ),
         )),
-        "Phase 8 must be the only open phase",
+        "No phase may be open after Phase 8 closeout",
     )
     phase9 = table_row_containing(plan, "| 9 | Chair definitions,")
     expect_rejected(
@@ -1978,7 +1977,166 @@ def validate_phase8_exit2_acceptance_mutations() -> None:
             plan, phase9,
             replace_once(phase9, "| Not started |", "| Open |"),
         )),
-        "Phase 8 must be the only open phase",
+        "No phase may be open after Phase 8 closeout",
+    )
+
+
+def validate_phase8_closeout_mutations() -> None:
+    """Reject changed closure authority and premature Phase 9 opening."""
+    archive = read("reference/history/phase-closeouts/PHASE8_CLOSEOUT.md")
+    holding = read("reference/current/PHASE_EVIDENCE.md")
+    decisions = json.loads(read(
+        "reference/history/phase-closeouts/PHASE8_GATE_DECISIONS.json"
+    ))
+    phase6 = {
+        record["id"]: record
+        for record in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    for field, replacement, diagnostic in (
+        ("status", "Proposed", "identity, acceptance or panel routing drifted"),
+        ("decision", "Open Phase 9.", "identity, acceptance or panel routing drifted"),
+        ("authority", "Close every phase.", "authority digest drifted"),
+        ("exclusions", "Release is accepted.", "exclusions digest drifted"),
+        ("panel_record", "reference/current/PHASE_EVIDENCE.md",
+         "identity, acceptance or panel routing drifted"),
+    ):
+        mutated = copy.deepcopy(decisions)
+        mutated["decisions"][9][field] = replacement
+        expect_rejected(
+            "phase8-closeout/d-p8-006-" + field + "-changed",
+            lambda value=mutated: progress._validate_phase8_decision_opening(
+                value, phase6,
+            ),
+            "D-P8-006 " + diagnostic,
+        )
+
+    historical_view = progress._section(
+        archive, "Pre-closeout owner view — 2026-10-03"
+    )
+    for name, before, after, clause in (
+        (
+            "retirement-count-inflated",
+            "records removal of 23 worktrees after independent "
+            "preservation and identity checks",
+            "records removal of 41 worktrees without preservation",
+            "records removal of 23 worktrees after independent "
+            "preservation and identity checks",
+        ),
+        (
+            "snapshot-coverage-reduced",
+            "independent preservation of all 41 worktrees at removal "
+            "and the specified subsequent changes",
+            "preservation of 39 worktrees with no later changes",
+            "independent preservation of all 41 worktrees at removal "
+            "and the specified subsequent changes",
+        ),
+        (
+            "physical-separation-invented",
+            "This record claims no separate USB location or copy on "
+            "another machine",
+            "This record proves separate USB storage and an off-machine copy",
+            "This record claims no separate USB location or copy on "
+            "another machine",
+        ),
+    ):
+        changed = replace_once(historical_view, before, after)
+        expect_rejected(
+            "phase8-history/" + name,
+            lambda value=changed: (
+                progress._validate_phase8_historical_owner_view(
+                    replace_once(archive, historical_view, value)
+                )
+            ),
+            "Phase 8 historical owner view drifted: " + clause,
+        )
+
+    closeout_panel = progress._section(
+        archive, "Phase 8 closeout panel and owner decision — 2026-10-03"
+    )
+    quote_changed = replace_once(
+        closeout_panel,
+        "> I accept the bounded recovery evidence and close Phase 8",
+        "> I accept the bounded recovery evidence and open Phase 9",
+    )
+    expect_rejected(
+        "phase8-closeout/owner-instruction-changed",
+        lambda: progress._validate_phase8_closeout(
+            replace_once(archive, closeout_panel, quote_changed)
+        ),
+        "D-P8-006 exact owner instruction drifted or was relocated",
+    )
+    for name, before, after, clause in (
+        (
+            "recovery-deadline-waived",
+            "The next full test is due by **2026-10-05**",
+            "The next full test is optional",
+            "monthly proof. The next full test is due by 2026-10-05",
+        ),
+        (
+            "risk-duties-erased",
+            "all 24 live risks without changing any severity",
+            "some risks with changed severity",
+            "all 24 live risks without changing any severity",
+        ),
+        (
+            "raw-output-identity-invented",
+            "Raw GUI and\nheadless output-file identity remains unproved",
+            "Raw GUI and\nheadless output-file identity is proved",
+            "Raw GUI and headless output-file identity remains unproved",
+        ),
+        (
+            "legacy-removal-authorised",
+            "No legacy\npath is removed",
+            "Legacy\npaths are removed",
+            "No legacy path is removed",
+        ),
+    ):
+        changed = replace_once(closeout_panel, before, after)
+        expect_rejected(
+            "phase8-closeout/" + name,
+            lambda value=changed: progress._validate_phase8_closeout(
+                replace_once(archive, closeout_panel, value)
+            ),
+            "D-P8-006 bounded condition drifted: " + clause,
+        )
+
+    for name, before, after, diagnostic in (
+        (
+            "phase9-opened",
+            "Not started — 0/9 evidenced exits",
+            "Open — 0/9 evidenced exits",
+            "Phase 9 holding status drifted: Not started — 0/9 evidenced exits",
+        ),
+        (
+            "criteria-invented",
+            "does not define or admit its nine criteria",
+            "defines and admits nine criteria",
+            "Phase 9 holding boundary drifted: "
+            "does not define or admit its nine criteria",
+        ),
+        (
+            "performance-duty-waived",
+            "Beta\nacceptance is blocked while it remains unmet",
+            "Beta\nacceptance is allowed while it remains unmet",
+            "Phase 9 holding boundary drifted: "
+            "Beta acceptance is blocked while it remains unmet",
+        ),
+    ):
+        expect_rejected(
+            "phase9-holding/" + name,
+            lambda value=replace_once(holding, before, after): (
+                progress._validate_phase9_holding(value)
+            ),
+            diagnostic,
+        )
+    current = json.loads(read("reference/current/gate-decisions.json"))
+    current["decisions"].append(decisions["decisions"][9])
+    expect_rejected(
+        "phase9-holding/phase8-decision-carried-as-current",
+        lambda: progress._validate_phase9_decision_holding(current, phase6),
+        "Phase 9 holding must carry only unchanged D-P6-008",
     )
 
 
@@ -4253,7 +4411,7 @@ def validate_project_plan_mutations() -> None:
                 "| Open |",
             ),
         )),
-        "Phase 8 must be the only open phase",
+        "No phase may be open after Phase 8 closeout",
     )
 
     exit2_row = table_row_containing(
@@ -4669,15 +4827,16 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_row = table_row_containing(plan, "**Current state**")
     inflated_view = replace_once(
         owner_view_row,
-        "Phase 6 keeps four accepted exits and D-P6-008 as one deferred, unmet obligation",
-        "Phase 6 keeps five accepted exits and D-P6-008 as complete",
+        "D-P6-008 remains Deferred — unmet",
+        "D-P6-008 is complete",
     )
-    owner_view_status = replace_once(plan, owner_view_row, inflated_view)
     expect_rejected(
         "tt-doc/owner-view-status-contradiction",
-        lambda: progress._validate_owner_view(owner_view_status),
-        "project-plan owner view lost or contradicted: Phase 6 keeps four "
-        "accepted exits and D-P6-008 as one deferred, unmet obligation",
+        lambda: progress._validate_owner_view(
+            replace_once(plan, owner_view_row, inflated_view)
+        ),
+        "project-plan owner view lost or contradicted: "
+        "D-P6-008 remains Deferred — unmet",
     )
     owner_view_authority = replace_once(
         plan,
@@ -4689,87 +4848,81 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
     )
-    plan_status = paragraph_containing(plan, "Status: **Phase 7 is closed")
+    plan_status = paragraph_containing(plan, "Status: **Phase 8 is closed")
     widened_status = replace_once(
         plan_status,
         "D-P6-008 stays Deferred — unmet",
         "waive the improvement obligation for every workload",
     )
-    owner_view_boundary_widened = replace_once(
-        plan, plan_status, widened_status,
-    )
     expect_rejected(
         "tt-doc/owner-view-product-boundary-widened",
-        lambda: progress._validate_plan_shape(owner_view_boundary_widened),
-        "the accepted Phase 7 closeout or carried D-P6-008 is missing",
+        lambda: progress._validate_plan_shape(
+            replace_once(plan, plan_status, widened_status)
+        ),
+        "the carried D-P6-008 obligation is missing",
     )
 
     owner_view_performance_widened = replace_once(
         plan,
-        "The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 "
-        "exit, performance, wider migration, "
-        "production output, release or legacy removal.",
-        "The earlier D-P8-001 and D-GOV-020–022 decisions accept every Phase 8 "
-        "exit, performance, wider migration, "
-        "production output, release and legacy removal.",
+        "No performance, production-output or release acceptance follows.",
+        "Performance, production-output and release acceptance follow.",
     )
     expect_rejected(
         "tt-doc/owner-view-performance-authority-widened",
         lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: The earlier D-P8-001 "
-        "and D-GOV-020–022 decisions accept no Phase 8 exit, "
-        "performance, wider migration, production output, release "
-        "or legacy removal",
+        "project-plan owner view lost or contradicted: "
+        "No performance, production-output or release acceptance",
     )
 
-    retirement_cases = (
+    closeout_cases = (
         (
-            "retirement-count-inflated", "**What changed**",
-            'records removal of 23 worktrees after independent '
-            'preservation and identity checks',
-            "records removal of 41 worktrees after exact preservation and "
-            "independent checks",
+            "source-identity-changed", "**What changed**",
+            "protected `main` `cfd4387`",
+            "protected `main` `0000000`",
+            "protected `main` `cfd4387`",
         ),
         (
-            "retained-branches-deleted", "**What changed**",
-            'All 45 local branches kept the same tips',
-            "All 45 branch refs were deleted",
-        ),
-        (
-            "snapshot-coverage-reduced", "**Limitations/findings**",
-            'records independent preservation of all 41 worktrees at '
-            'removal and the specified subsequent changes',
-            "covers 39 worktrees and needs no later records",
+            "recovery-limits-inflated", "**What changed**",
+            "exact October 1 snapshot and October 3 supplement limits",
+            "complete-estate snapshot and full restore",
+            "exact October 1 snapshot and October 3 supplement limits",
         ),
         (
             "monthly-restore-postponed", "**Limitations/findings**",
-            'The monthly recovery test is due by 2026-10-05',
-            "The monthly restore remains due by 2026-11-05",
-        ),
-        (
-            "recovery-currentness-waived", "**Limitations/findings**",
-            'Before a closeout assessment, compare the recovery evidence '
-            'with the repository state',
-            "A closeout assessment needs no current recovery evidence",
+            "monthly restore remains due by 2026-10-05",
+            "monthly restore may wait until 2026-11-05",
+            "monthly restore remains due by 2026-10-05",
         ),
         (
             "physical-separation-claimed", "**Limitations/findings**",
-            'This record claims no separate USB location or copy on '
-            'another machine',
-            "Separate physical storage and an off-site copy are proved",
+            "separate physical storage is unverified",
+            "separate physical storage is proved",
+            "separate physical storage is unverified",
         ),
         (
-            "draft-boundary-widened", "**Next action**",
-            "This continuation cycle stops with the new draft",
-            "This continuation cycle merges the new draft",
+            "legacy-conditions-waived", "**Limitations/findings**",
+            "every comparison, adapter, caller, removal and "
+            "legacy-retirement condition remain",
+            "all legacy-retirement conditions are waived",
+            "every comparison, adapter, caller, removal and "
+            "legacy-retirement condition",
         ),
         (
-            "record-closes-phase", "**Next action**",
-            "Do not close Phase 8 or open Phase 9 through this record",
-            "Close Phase 8 and open Phase 9 through this record",
+            "phase9-opened", "**Owner decision**",
+            "It does not open Phase 9, close a risk or remove a legacy path",
+            "It opens Phase 9, closes a risk and removes a legacy path",
+            "does not open Phase 9, close a risk or remove a legacy path",
+        ),
+        (
+            "stop-boundary-waived", "**Next action**",
+            "Synchronise clean protected `main` after exact-green "
+            "integration and stop",
+            "Begin Phase 9 product work after integration",
+            "Synchronise clean protected `main` after exact-green "
+            "integration and stop",
         ),
     )
-    for name, field, original, replacement in retirement_cases:
+    for name, field, original, replacement, diagnostic in closeout_cases:
         row = table_row_containing(plan, field)
         mutated = replace_once(
             plan, row, replace_once(row, original, replacement),
@@ -4777,7 +4930,7 @@ def validate_documentation_profile_mutations() -> None:
         expect_rejected(
             "tt-doc/owner-view-" + name,
             lambda value=mutated: progress._validate_owner_view(value),
-            "project-plan owner view lost or contradicted: " + original,
+            "project-plan owner view lost or contradicted: " + diagnostic,
         )
         expect_rejected(
             "tt-doc/quality-owner-view-" + name,
@@ -6888,6 +7041,7 @@ def main() -> None:
     validate_phase8_exit4_admission_mutations()
     validate_phase8_exit1_admission_mutations()
     validate_phase8_exit2_acceptance_mutations()
+    validate_phase8_closeout_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()
