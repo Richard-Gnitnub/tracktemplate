@@ -596,13 +596,10 @@ def validate_documentation_profile(
             "project status stays `unknown`",
             "accepted original gate",
             "D-P9-003",
-            "That architecture proof does not need independent primary "
-            "production evidence first",
-            "Phase 9B keeps production/package clearance and all initial "
-            "requirements",
-            "This cycle includes no chair implementation",
-            "This decision accepts no definition, exit, package, output, "
-            "risk closure",
+            "Independent primary evidence no longer blocks that architecture proof",
+            "Phase 9B keeps production/package clearance and all original requirements",
+            "No chair implementation occurs in this cycle",
+            "No definition, exit, package, output, risk closure",
             "recommend the first bounded Phase 9A research implementation task",
             "accepted straight and curved `TO-001` and `XO-001` examples",
             "The Phase 9A opening adds no product proof or behaviour",

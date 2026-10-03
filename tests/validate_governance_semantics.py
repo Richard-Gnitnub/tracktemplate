@@ -4381,9 +4381,9 @@ def validate_phase9_split_mutations() -> None:
         ),
         (
             "9B-requalification", "| 9B-3 |",
-            "After an input change, each affected definition, geometry, "
-            "pilot and output check of the final production package must "
-            "give a PASS result.",
+            "The final production package must pass each affected "
+            "definition, geometry, pilot and output check after an "
+            "input change.",
             "Research checks suffice after every production input change.",
         ),
     ):
@@ -4536,19 +4536,19 @@ def validate_phase9_research_mutations() -> None:
     provenance = read("reference/PROVENANCE.md")
     documents = [evidence, licensing, provenance]
     cases = (
-        (0, "decision", "This cycle includes no chair implementation",
+        (0, "decision", "No chair implementation occurs in this cycle",
          "Chair implementation starts in this cycle"),
         (1, "licensing", "exact provenance and `reference-only` status",
          "unverified production status"),
         (1, "licensing", "stay private-development", "allow commercial use"),
-        (1, "licensing", "A known restriction on the proposed research "
-                         "use makes that use Blocked", "Known research restrictions do not block use"),
+        (1, "licensing", "A known restriction on the proposed research use "
+         "remains a blocker", "Known research restrictions do not block use"),
         (1, "licensing", "each output-affecting Templot-derived input",
          "selected Templot-derived inputs"),
         (1, "licensing", "non-copyright-rights, dependency-manifest and release",
          "optional package"),
-        (1, "licensing", "Independent confirmation alone gives no "
-                         "permission under a licence", "Independent confirmation clears every licence"),
+        (1, "licensing", "Independent confirmation alone does not clear a "
+         "licence", "Independent confirmation clears every licence"),
         (2, "provenance", "archive hash, source-member hash, exact locator "
          "and derivation inputs", "a broad source name"),
         (2, "provenance", "is output-affecting for the private",
@@ -5241,9 +5241,9 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "stop-boundary-waived", "**Owner decision**",
-            "This cycle includes no chair implementation",
+            "No chair implementation occurs in this cycle",
             "Begin Phase 9 product work after integration",
-            "This cycle includes no chair implementation",
+            "No chair implementation occurs in this cycle",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
