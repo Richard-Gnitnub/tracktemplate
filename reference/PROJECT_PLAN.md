@@ -1,6 +1,6 @@
 # Project Plan
 
-Status: **Phase 8 is closed at 4/4 under D-P8-006. All four exits remain Evidenced and owner-accepted. Phase 9 is Not started at 0/9. D-P6-008 stays Deferred — unmet.**
+Status: **Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Not started at 0/4. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet.**
 
 This dashboard owns phase and exit status. It also owns summaries of live risks and owner decisions. The links identify the applicable evidence. The canonical registers and evidence are the source of this owner view. This view does not establish authority.
 
@@ -12,12 +12,12 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 
 | Field | Current position |
 | --- | --- |
-| **Current state** | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is closed at 4/4 under [D-P8-006](history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel). Phase 9 stays Not started at 0/9. D-P6-008 remains Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| **What changed** | The owner accepted bounded Phase 8 recovery evidence and closed Phase 8 at protected `main` `cfd4387` after PR #128. The [frozen Phase 8 closeout](history/phase-closeouts/PHASE8_CLOSEOUT.md) keeps all four exit decisions, their unchanged criteria and evidence. The [recovery record](backup-records/2026-10-03-phase8-closeout-recovery.md) keeps the exact October 1 snapshot and October 3 supplement limits. Current records now hold unopened Phase 9. |
+| **Current state** | Phase 7 is closed at 4/4 under D-P7-006. Phase 8 is closed at 4/4 under [D-P8-006](history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel). Phase 9A is Not started at 0/4. Phase 9B is Not started at 0/6. D-P6-008 remains Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
+| **What changed** | Under [D-P9-001](current/PHASE_EVIDENCE.md#phase-9-programme-alignment-panel), the owner approved bounded chair terms and divided the nine original Phase 9 criteria. The [accepted original gate](https://github.com/Richard-Gnitnub/tracktemplate/blob/d5a3db45ab68a192e3d37f9fad5deb9f66f7de81/reference/PROJECT_PLAN.md#L1000-L1025) remains the requirement source. The [frozen Phase 8 closeout](history/phase-closeouts/PHASE8_CLOSEOUT.md) and [recovery record](backup-records/2026-10-03-phase8-closeout-recovery.md) keep their evidence and limits. The earlier local split candidate remains failed evidence only. |
 | **What now works** | The accepted straight and curved `TO-001` and `XO-001` examples retain their bounded geometry, real-GUI, deterministic-comparison and separation evidence under D-P8-002 through D-P8-005. The accepted Phase 7 Core-layout paths remain. This alignment changes no product behaviour. |
 | **Limitations/findings** | The [Phase 8 closeout](history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel) retains representative-fixture and straight TO Edit limits. It retains historical GUI-source and wider persistence/profile/metadata limits. TO preselected-object export, selection and format limits remain. Older digest differences remain unresolved. The unproved raw GUI/headless output identity remains a limitation. Failed evidence, expected skips, warnings and chair findings retain their recorded meaning. <br><br>The October 1 recovery lacks two intermediate Ruff-cache states. The full monthly restore remains due by 2026-10-05. The USB stays attached, and separate physical storage is unverified. <br><br>All 24 risks retain their owners, deadlines and controls. D-P6-008 remains mandatory before Phase 10 beta acceptance. Both B14/B15 identities, the inherited B15 host, the development-only oracle and every comparison, adapter, caller, removal and legacy-retirement condition remain. PR-10 remains Open/Partial and PR-18 Open/Effective for current scope. No performance, production-output or release acceptance follows. |
-| **Owner decision** | [D-P8-006](history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel) closes Phase 8 at 4/4 and authorises only dependent Level 3 records and their independently accepted, exact-green protected-main integration. It does not open Phase 9, close a risk or remove a legacy path. The earlier D-P8-001 through D-P8-005 and D-GOV-020 through D-GOV-022 decisions keep their historical scope and limits. |
-| **Next action** | Synchronise clean protected `main` after exact-green integration and stop. Phase 9 opening and product work need separate owner authority. |
+| **Owner decision** | [D-P9-001](current/PHASE_EVIDENCE.md#phase-9-programme-alignment-panel) approves only the stated technical meanings and the pending 9A/9B criteria. Both phases remain unopened. No exit, product work, package, output, risk closure, performance result, release or legacy removal is accepted. D-P8-006 and earlier decisions keep their historical scope. |
+| **Next action** | Integrate the exact reviewed alignment through protected `main`. Then open only Phase 9A at 0/4 under the separate owner instruction. Keep Phase 9B unopened and do no product work in this cycle. |
 
 ## Phase status
 
@@ -32,7 +32,8 @@ The Layout Editor is the later programme. It does not change the Phase 6 exits. 
 | 6 | Explicit exact-validation and export seam | 4/5 accepted exits; one deferred, unmet obligation | Complete — accepted 2026-09-05 |
 | 7 | Core alignment, station and multiple-track migration | 4/4 evidenced | Complete — accepted 2026-09-27 |
 | 8 | Turnout, crossover and timbering migration | 4/4 evidenced | Complete — accepted 2026-10-03 |
-| 9 | Chair definitions, assisted assimilation, production records and export completion | 0/9 evidenced | Not started |
+| 9A | S1 and procedural chair geometry architecture | 0/4 evidenced | Not started |
+| 9B | Core RC chair and support production completion | 0/6 evidenced | Not started |
 | 10 | Workbench integration, launcher reduction and beta Addon packaging | 0/5 evidenced | Not started |
 | 11 | Stabilisation and qualification of the version proposed for release | 0/7 evidenced | Not started |
 ## Phase 6 exit conditions
@@ -63,6 +64,30 @@ Phase 7 is closed at 4/4 under D-P7-006. The four original criteria from accepte
 - Creation, parameter editing, selection, undo/redo, save/reopen, validation, and export pass in the real GUI.
 - Straight- and curved-host representative workflows pass deterministic comparison.
 - No special-trackwork rule has leaked into the renderer or FreeCAD persistence adapter.
+
+## Phase 9A and 9B exit conditions
+
+The nine criteria in the [accepted original Phase 9 gate](https://github.com/Richard-Gnitnub/tracktemplate/blob/d5a3db45ab68a192e3d37f9fad5deb9f66f7de81/reference/PROJECT_PLAN.md#L1000-L1025) control this division. Phase 9A owns original Exits 3–5. Phase 9B owns original Exits 1, 2 and 7–9. Original Exit 6 has two separate decisions. Phase 9A owns raw-evidence separation and permitted fitting and use. Phase 9B owns package licence and the `project-cleared` path. No requirement is lost or accepted twice.
+
+| Phase 9A exit | Original exit | Exact pending criterion |
+| --- | ---: | --- |
+| 9A-1 | 3 | The procedural chair generator constructs every in-scope named chair component and the assembled S1 chair from the accepted S1 `ChairDefinition`. It can construct them again without the original source scan/CAD file or retained FreeCAD geometry. One additional chair or support must differ in its chair components, interface or assembly pattern. Select the smallest structurally distinct proof from repository evidence. It must use the same neutral definition and procedural chair generator. An S1 dimension variant alone is insufficient. No five-box or opaque-mesh fallback can be labelled production-ready. |
+| 9A-2 | 4 | Definition package load and round-trip pass in standalone and FreeCAD tests. Both test paths reject corrupt and unsupported packages. They preserve chair component identities, prototype/manufacturing separation and rail fit. The S1 geometry that the generator constructs meets accepted reference tolerances in both test paths. |
+| 9A-3 | 5 | The operator-assisted S1 pilot is documented and accepted for bounded architecture proof through the same `ChairDefinition` and procedural chair generator. Arbitrary automatic scan assimilation remains outside the RC qualification matrix. |
+| 9A-4 | 6, raw evidence | Raw S1 evidence that cannot be redistributed stays separate. Its permitted fitting and use basis is recorded before that evidence supports the bounded proof or pilot. |
+
+| Phase 9B exit | Original exit | Exact pending criterion |
+| --- | ---: | --- |
+| 9B-1 | 1 | Every release-candidate production format has deterministic repeat evidence for representative inputs. Preserved B14/B15 behaviour has legacy/new equivalence evidence. New procedural chair geometry uses accepted 9A definition/reference-oracle evidence instead of five-box equality. |
+| 9B-2 | 2 | Timber and chair decisions and record identities stay stable across edit, save/reopen, validation and export throughout migrated Core trackwork. |
+| 9B-3 | 6, package clearance | Every chair and support family required for the agreed TrackTemplate Core release candidate is complete across migrated trackwork. The accepted S1 package has an explicit licence. It has no `NC`, `NOASSERTION`, reference-only, unknown or otherwise incompatible dependency in the `project-cleared` commercial/publication path. The same applicable rights gate controls each additional package. |
+| 9B-4 | 7 | Representative output manifests reproduce the complete package/dependency classification. They cannot claim `project-cleared` after any relevant input is replaced by a restricted or unresolved source. |
+| 9B-5 | 8 | Export failure cannot partially replace an accepted output set or corrupt the editable model. |
+| 9B-6 | 9 | Editing and end-to-end performance meet the provisional budgets derived from measured baselines. |
+
+The [original Phase 9 deliverables](https://github.com/Richard-Gnitnub/tracktemplate/blob/d5a3db45ab68a192e3d37f9fad5deb9f66f7de81/reference/PROJECT_PLAN.md#L963-L998) remain in force. They include chair assignment, stable identities, cache invalidation, definition-driven chair components, the local Templot oracle, assisted S1, validated external packages and prototype/scale separation. They also include production records, supported SVG/DXF/STL/STEP and retained FreeCAD paths, and failure-safe export. FreeCAD/OpenCASCADE B-reps may replace Templot DXF `3DFACE` mechanics. Accepted dimensional, chair component, interface, topology and assembled-output comparison against the frozen S1 oracle remains necessary.
+
+Phase 9A technical proof does not clear a production package or output. Phase 9B covers all chair and support families required for the agreed Core release candidate, not every Templot family or post-Core capability. The neutral `ChairDefinition`, procedural chair geometry, local reference oracle and all provenance, rights, transactional-export and performance controls remain.
 ## Live risks
 <a id="qa-audit-risk-log"></a>
 
@@ -96,7 +121,7 @@ Phase 7 is closed at 4/4 under D-P7-006. The four original criteria from accepte
 | QA-R05 | Low | Tolerate | Root navigation exists. Installation and person guidance remain future work. |
 
 ## Owner decisions
-The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), [Phase 7](history/phase-closeouts/PHASE7_GATE_DECISIONS.json) and [Phase 8](history/phase-closeouts/PHASE8_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full.
+The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase 5](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), [Phase 6](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), [Phase 7](history/phase-closeouts/PHASE7_GATE_DECISIONS.json) and [Phase 8](history/phase-closeouts/PHASE8_GATE_DECISIONS.json) registers own their historical decisions below. The [current decision register](current/gate-decisions.json) keeps D-P6-008 in full and records D-P9-001.
 
 | ID | Date | Status | Decision limit |
 | --- | --- | --- | --- |
@@ -154,8 +179,9 @@ The frozen [Phase 4](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), [Phase
 | D-P8-004 | 2026-09-30 | Accepted | The [decision](history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-exit-1-acceptance-panel) accepts Exit 1 at `44eb4bf` for the reviewed examples. The Exit 1 condition stays the same. Phase 8 is Open at 3/4. Exit 2 stays Pending. All limits and conditions stay. |
 | D-P8-005 | 2026-10-01 | Accepted | The [decision](history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-exit-2-acceptance-panel) accepts Exit 2 at `c82b335` for the reviewed `TO-001` and `XO-001` examples. The Exit 2 condition stays the same. Phase 8 is Open at 4/4. All limitations and mandatory recovery conditions stay. This decision does not close Phase 8 or open Phase 9. |
 | D-P8-006 | 2026-10-03 | Accepted | The [decision](history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel) closes Phase 8 at 4/4 on bounded recovery evidence at `cfd4387`. All exit limits and risk duties stay. Phase 9 remains Not started at 0/9. D-P6-008 remains Deferred — unmet. No product, performance, output, release or legacy-removal acceptance follows. |
+| D-P9-001 | 2026-10-03 | Accepted | The [decision](current/PHASE_EVIDENCE.md#phase-9-programme-alignment-panel) approves five bounded terms and divides the original nine Phase 9 criteria into four Pending 9A exits and six Pending 9B exits. Both phases remain Not started. No product, package, output, risk, performance, release or legacy-removal acceptance follows. |
 ## Authority and evidence links
 
-- [Current Phase 9 holding evidence](current/PHASE_EVIDENCE.md). Frozen Phase 8 [closeout](history/phase-closeouts/PHASE8_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE8_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE8_RISKS.json), and [recovery record](backup-records/2026-10-03-phase8-closeout-recovery.md). Frozen Phase 7 [closeout](history/phase-closeouts/PHASE7_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE7_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE7_RISKS.json), and [recovery record](backup-records/2026-09-27-phase7-closeout-recovery.md). Frozen Phase 6 [closeout](history/phase-closeouts/PHASE6_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE6_RISKS.json), and [recovery record](backup-records/2026-09-05-phase6-closeout-recovery.md). Phase 5 [closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE5_RISKS.json).
+- [Current Phase 9A/9B holding evidence](current/PHASE_EVIDENCE.md). Frozen Phase 8 [closeout](history/phase-closeouts/PHASE8_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE8_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE8_RISKS.json), and [recovery record](backup-records/2026-10-03-phase8-closeout-recovery.md). Frozen Phase 7 [closeout](history/phase-closeouts/PHASE7_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE7_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE7_RISKS.json), and [recovery record](backup-records/2026-09-27-phase7-closeout-recovery.md). Frozen Phase 6 [closeout](history/phase-closeouts/PHASE6_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE6_GATE_DECISIONS.json), [risk snapshot](history/phase-closeouts/PHASE6_RISKS.json), and [recovery record](backup-records/2026-09-05-phase6-closeout-recovery.md). Phase 5 [closeout](history/phase-closeouts/PHASE5_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE5_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE5_RISKS.json).
 - Phase 4 [closeout](history/phase-closeouts/PHASE4_CLOSEOUT.md), [decisions](history/phase-closeouts/PHASE4_GATE_DECISIONS.json), and [risk snapshot](history/phase-closeouts/PHASE4_RISKS.json). [Product Vision](PRODUCT_VISION.md) and [capability evidence matrix](CAPABILITY_MATRIX.md). [Engineering policy and TT-DOC-001 profile](ENGINEERING_POLICY.md#tt-doc-001-tracktemplate-technical-documentation-profile), [Architecture](ARCHITECTURE.md), [Modularisation boundaries](MODULARISATION_PLAN.md), [Validation strategy](VALIDATION.md), and [runtime and legacy ingress compatibility contract](contracts/phase1-compatibility.json).
 - [Recovery and backup](RECOVERY_AND_BACKUP.md), [Licensing boundaries](LICENSING_BOUNDARIES.md), [Provenance](PROVENANCE.md), and [frozen evidence policy and manifest](history/README.md).

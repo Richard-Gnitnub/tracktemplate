@@ -1,7 +1,7 @@
-# Phase 9 Chair Definitions, Assisted Assimilation, Production Records and Export Completion Holding Record
+# Phase 9A and 9B Programme Holding Record
 
-Status: **Not started — 0/9 evidenced exits. Phase 9 is unopened and
-unauthorised. These are administrative holding records only.**
+Status: **Phase 9A is Not started at 0/4. Phase 9B is Not started at 0/6.
+Neither phase is open. This record gives no product authority.**
 
 Phase 8 closed on 2026-10-03 under
 [D-P8-006](../history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel)
@@ -15,19 +15,79 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9 stays Not started at 0/9. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | The owner accepted bounded Phase 8 closure at protected `main` `cfd4387`. The four original exit decisions retain their exact accepted scopes. The current paths now hold unopened Phase 9 records. This alignment changes no product behaviour. |
+| Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Not started at 0/4. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
+| What changed | D-P9-001 approves bounded technical meanings and divides the original Phase 9 criteria. The accepted historical Phase 9 gate remains the source. The earlier blocked local candidate is failed evidence only. Phase 8 decisions keep their accepted scopes. This alignment changes no product behaviour. |
 | What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows and the distinct proof for each accepted exit. Closure adds no workflow proof. |
-| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states remain unavailable. The monthly full restore is due by 2026-10-05. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. |
-| Owner decision | D-P8-006 closes Phase 8 at 4/4 and authorises only independently accepted, exact-green closeout integration. It does not open Phase 9, accept performance, clear production output or release, close a risk or remove a legacy path. |
-| Next action | Synchronise protected `main` and stop. Phase 9 opening and any new product work need separate authority. |
+| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states remain unavailable. The monthly full restore is due by 2026-10-05. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
+| Owner decision | [D-P9-001](#phase-9-programme-alignment-panel) approves only the five technical meanings and the pending 9A/9B exit allocation. It does not open either phase, accept an exit, clear output, close a risk or remove a legacy path. |
+| Next action | Integrate the exact reviewed alignment on protected `main`. Then open only Phase 9A at 0/4 under the separate owner instruction. Do not start product work. |
 
-## Phase 9 holding boundary
+<a id="phase-9-programme-alignment-panel"></a>
 
-The [project plan](../PROJECT_PLAN.md) identifies Phase 9 at 0/9. This
-holding record does not define or admit its nine criteria. The owner has
-not opened the phase or authorised product work in it. Phase 8 closeout
-does not supply that authority.
+## D-P9-001 terminology and programme alignment panel — 2026-10-03
+
+**Decision boundary:** The owner approved five bounded technical meanings in
+[TERMINOLOGY.md](../TERMINOLOGY.md#asd-ste100-project-terminology) and directed
+a new Phase 9A/9B alignment cycle from clean protected `main` at
+`ca26a42d7d438a68b9aa506537921e02f674589b`. The exact instruction is in
+[D-P9-001](gate-decisions.json). The nine criteria in the
+[accepted historical plan](https://github.com/Richard-Gnitnub/tracktemplate/blob/d5a3db45ab68a192e3d37f9fad5deb9f66f7de81/reference/PROJECT_PLAN.md#L1000-L1025)
+remain the controlling requirements. The earlier local candidates `f1c06e2`
+and `3480aea` and their `BLOCKED` review are failed evidence only. They were
+not merged. This decision gives them no retrospective acceptance.
+
+`/root` prepared the new allocation. Independent read-only risk reviewer
+`/root/new_phase9_risk_panel` checked the original gate, accepted chair
+architecture and all 24 live risks. The recommendation was **Proceed with
+bounded conditions**, with no dissent. The reviewer shares one agent team
+and workspace with the author. This is not an external organisational review.
+
+**Risk panel:** PR-09 remains Critical/Open/Partial with private-development
+output. PR-13 remains Critical/Open/Effective for current scope. The monthly
+restore is due by 2026-10-05, and separate physical USB storage is unverified.
+PR-17 remains Critical/Open/Partial for persistence. PR-22 remains
+High/Open/Effective for independent challenge. PR-02 through PR-08 and PR-21
+keep the chair and rights duties. PR-10 and PR-18 keep all legacy-retirement
+gates. PR-15 and QA-R04 keep performance duties. All 24 risk dispositions,
+owners, deadlines and controls remain unchanged.
+
+**Structured decision — D-P9-001:** Approve only the five meanings in the
+terminology owner. Do not approve “constituent” as a second term or change the
+registered meaning of “Regenerate”. Keep “ordinary chair”, the precise S1
+designation and every stated technical or rights question unresolved. Divide
+the nine original criteria into four Pending Phase 9A exits and six Pending
+Phase 9B exits below. Original Exit 6 alone has two acceptance duties. Keep
+both phases Not started. Keep D-P6-008 Deferred — unmet, TERM-R04 open,
+private-development output, project status `unknown`, and all accepted limits.
+Accept no product, package, output, performance, release or legacy removal.
+
+Exact validation, one independent Documentation Review, independent test
+review and exact-tree protected-main integration are required before the
+separate Phase 9A opening. The opening may set only Phase 9A to 0/4 Open.
+Phase 9B stays unopened. This cycle includes no product implementation.
+
+## Reallocated Phase 9 requirements
+
+The [project plan](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) owns the
+exact pending criteria. Original Exits 3–5 belong to Phase 9A. Original Exits
+1, 2 and 7–9 belong to Phase 9B. Phase 9A owns raw-evidence separation and
+permitted fitting and use from original Exit 6. Phase 9B owns the licence and
+`project-cleared` package path from that exit. No requirement is accepted
+twice.
+
+| Phase 9A exit | Status | Exact criterion |
+| --- | --- | --- |
+| 9A-1 | Pending | The procedural chair generator constructs every in-scope named chair component and the assembled S1 chair from the accepted S1 `ChairDefinition`. It can construct them again without the original source scan/CAD file or retained FreeCAD geometry. One additional chair or support must differ in its chair components, interface or assembly pattern. Select the smallest structurally distinct proof from repository evidence. It must use the same neutral definition and procedural chair generator. An S1 dimension variant alone is insufficient. No five-box or opaque-mesh fallback can be labelled production-ready. |
+| 9A-2 | Pending | Definition package load and round-trip pass in standalone and FreeCAD tests. Both test paths reject corrupt and unsupported packages. They preserve chair component identities, prototype/manufacturing separation and rail fit. The S1 geometry that the generator constructs meets accepted reference tolerances in both test paths. |
+| 9A-3 | Pending | The operator-assisted S1 pilot is documented and accepted for bounded architecture proof through the same `ChairDefinition` and procedural chair generator. Arbitrary automatic scan assimilation remains outside the RC qualification matrix. |
+| 9A-4 | Pending | Raw S1 evidence that cannot be redistributed stays separate. Its permitted fitting and use basis is recorded before that evidence supports the bounded proof or pilot. |
+
+Phase 9B has six Pending exits in the
+[project plan](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions). It remains
+unopened. Phase 9A technical proof cannot clear a package or output. Phase 9B
+completes only the chair and support families required for the agreed
+TrackTemplate Core release candidate, not every Templot family or post-Core
+capability.
 
 ## Continuing duties and risks
 
