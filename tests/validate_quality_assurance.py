@@ -594,14 +594,16 @@ def validate_documentation_profile(
             "TERM-R04 stays open",
             "Output stays private-development",
             "project status stays `unknown`",
-            "D-P9-001",
-            "D-P9-002",
-            "PR #131",
-            "merged tree matches the reviewed head",
             "accepted original gate",
-            "frozen Phase 8 closeout",
-            "recovery record",
-            "previous local split candidate remains failed evidence only",
+            "D-P9-003",
+            "That architecture proof does not need independent primary "
+            "production evidence first",
+            "Phase 9B keeps production/package clearance and all initial "
+            "requirements",
+            "This cycle includes no chair implementation",
+            "This decision accepts no definition, exit, package, output, "
+            "risk closure",
+            "recommend the first bounded Phase 9A research implementation task",
             "accepted straight and curved `TO-001` and `XO-001` examples",
             "The Phase 9A opening adds no product proof or behaviour",
             "representative-fixture",
@@ -620,12 +622,7 @@ def validate_documentation_profile(
             "every comparison, adapter, caller, removal and "
             "legacy-retirement condition",
             "No performance, production-output or release acceptance",
-            "opens Phase 9A at 0/4 with all four exits Pending",
-            "No exit, product work, package, output, risk closure",
-            "Use retained S1 evidence to recommend one bounded Phase 9A "
-            "product task to the owner",
             "Keep Phase 9B Not started",
-            "Do not start product implementation in this cycle",
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )

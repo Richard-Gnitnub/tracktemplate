@@ -13,6 +13,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import validate_dependency_manifest as manifest_validator  # noqa: E402
+from governance_markdown import direct_section_content  # noqa: E402
 
 
 PLAN_PATH = (
@@ -118,6 +119,54 @@ def _all_reviews_have_status(review, status):
     )
 
 
+
+def _research_boundary_errors(text):
+    """Keep current research scope separate from historical production gates."""
+    section = direct_section_content(
+        text, "Phase 9A research and Phase 9B production boundary",
+    )
+    flat = " ".join(section.replace("`", "").split())
+    clauses = (
+        "Independent primary production evidence is not necessary before "
+        "this research implementation or architecture proof",
+        "The neutral TrackTemplate schema stays canonical",
+        "A Templot file, opaque mesh or retained generated body cannot "
+        "become the canonical definition",
+        "Every Templot-derived field must keep its exact source identity, "
+        "source hash, source locator, derivation inputs and "
+        "reference-only status",
+        "A research input that affects geometry is an output-affecting "
+        "dependency of the research output",
+        "Research acceptance is not production admission",
+        "outputs stay private-development and must not have "
+        "project-cleared status",
+        "They stay local and untracked without separate redistribution "
+        "authority",
+        "Do not identify Templot-derived values as independently "
+        "evidenced prototype facts",
+        "Prototype geometry, model rail-fit policy and manufacturing "
+        "compensation stay separate",
+        "S1-07 through S1-15 keep their production-evidence obligations",
+        "Do not construct an affected component while its "
+        "output-affecting fields are unresolved",
+        "No missing dimension or numerical tolerance can receive an invented default",
+        "The frozen Templot oracle stays a separate comparison-only "
+        "dependency",
+        "Its existing executable and capture gaps stay unresolved",
+        "Phase 9B keeps the minimum production evidence bundle, package-rights, "
+        "non-copyright-rights, dependency-manifest and release gates",
+        "After an input change, each affected definition, geometry, pilot "
+        "and output check of the final production package must give a "
+        "PASS result",
+        "The existing blocked production manifest, lineage and oracle "
+        "records keep their current status",
+    )
+    return [
+        "S1 research boundary drifted: " + clause
+        for clause in clauses if clause not in flat
+    ]
+
+
 def validate_plan(
     text,
     manifest,
@@ -125,7 +174,7 @@ def validate_plan(
     oracle,
     check_repository=True,
 ):
-    errors = []
+    errors = _research_boundary_errors(text)
     for marker in REQUIRED_MARKERS:
         if marker not in text:
             errors.append("S1 pilot plan marker is missing: {}".format(marker))
@@ -305,6 +354,30 @@ def main():
     errors = validate_plan(text, manifest, lineage, oracle)
     if errors:
         raise AssertionError("\n".join(errors))
+
+    research_heading = "Phase 9A research and Phase 9B production boundary"
+    research_section = direct_section_content(text, research_heading)
+    for before, after in (
+        ("and `reference-only` status", "and cleared status"),
+        ("outputs stay private-development", "outputs allow commercial use"),
+        ("is an output-affecting", "is not an output-affecting"),
+        ("prototype facts", "prototype dimensions"),
+        ("non-copyright-rights, dependency-manifest and release gates",
+         "no further gates"),
+        ("S1-07 through S1-15 keep their production-evidence obligations",
+         "S1-07 through S1-15 are discharged"),
+    ):
+        assert before in research_section, before
+        changed_section = research_section.replace(before, after, 1)
+        _expect_invalid(
+            text.replace(research_section, changed_section, 1),
+            manifest, lineage, oracle, "research boundary " + before,
+        )
+    relocated = text.replace(research_section, "\n\nResearch is permitted.\n", 1)
+    relocated += "\n## Unrelated retained material\n" + research_section
+    _expect_invalid(
+        relocated, manifest, lineage, oracle, "research boundary relocated",
+    )
 
     promoted_decision = text.replace(
         "| S1-07 | Precise prototype designation | owner-decision-required |",

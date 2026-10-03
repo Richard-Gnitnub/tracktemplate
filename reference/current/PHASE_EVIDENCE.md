@@ -16,11 +16,11 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 0/4 with four Pending exits. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | The exact reviewed Phase 9A/9B alignment under D-P9-001 merged through [PR #131](https://github.com/Richard-Gnitnub/tracktemplate/pull/131) at protected `main` `851ef81`. The merged tree matches the reviewed head. D-P9-002 opens only Phase 9A. The historical Phase 9 gate remains the requirement source. The earlier blocked local candidate remains failed evidence only. This opening changes no product behaviour. |
+| What changed | [D-P9-003](#phase-9a-research-sequencing-panel) separates reference-only S1 research acceptance in Phase 9A from production/package clearance in Phase 9B. Frozen Templot5 revision 556b data, relationships and rail-fit logic can support the bounded research proof. The nine initial requirements stay. |
 | What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows and the distinct proof for each accepted exit. Closure adds no workflow proof. |
 | Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable, and the monthly full restore is due by 2026-10-05. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
-| Owner decision | [D-P9-002](#phase-9a-opening-panel) opens only Phase 9A at 0/4 with four Pending exits. Phase 9B stays Not started at 0/6. It accepts no exit, product work, output, package, risk closure or legacy removal. |
-| Next action | Use retained S1 evidence to recommend the first bounded Phase 9A product task to the owner. Do not start product work in this record cycle. |
+| Owner decision | [D-P9-003](#phase-9a-research-sequencing-panel) accepts only the bounded sequence and its conditions. All four Phase 9A exits and all six Phase 9B exits stay Pending. It accepts no definition, package, production output, risk closure or legacy removal. |
+| Next action | Complete exact validation, independent review and protected-main integration. Stop with clean, synchronised `main` and recommend the first bounded Phase 9A research implementation task. This cycle includes no chair implementation. |
 
 <a id="phase-9-programme-alignment-panel"></a>
 
@@ -106,6 +106,66 @@ The next product work needs a separate bounded assignment. This opening does
 not select a chair family, S1 values or a rail section. It does not change
 the rights state.
 
+<a id="phase-9a-research-sequencing-panel"></a>
+
+## D-P9-003 Phase 9A research sequencing panel — 2026-10-03
+
+**Decision boundary:** The owner changes the sequence for the first S1 chair
+from clean protected `main` `a8550f3758d4af0f9e14e641a22fa0d56c29d183`.
+The exact instruction is in [D-P9-003](gate-decisions.json). The
+[project plan](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) keeps all nine
+initial requirements in four Phase 9A and six Phase 9B exits.
+
+**Independent challenge:** `/root/research_sequence_requirements` examined the
+initial requirements and architecture before authoring the dependent tests.
+`/root/research_sequence_rights_panel` independently examined the rights boundary
+and all 24 live risks. A separate read-only reviewer,
+`/root/retirement_validator_adjudication`, examined the assembled technical meaning.
+The recommendation is **Proceed with bounded conditions**, with no dissent.
+
+The author corrected one inconsistency in the production rail evidence bundle.
+The independent reviewer accepted that correction against the three permitted
+input dispositions. All reviewers share one agent team and workspace with the
+author. They give no external organisational or professional legal review.
+
+**Risk panel:** PR-02, PR-03, PR-04, PR-06, PR-07 and PR-08 keep their chair,
+evidence and rights controls. PR-09 keeps private-development output and its
+Critical/Open/Partial state. PR-12 and PR-20 keep programme scope controls.
+PR-21 keeps source provenance duties. PR-22 keeps independent challenge.
+
+All 24 risk dispositions, owners, deadlines and controls stay the same.
+D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Recovery duties and all
+comparison, caller, adapter and legacy-retirement conditions stay.
+
+**Structured decision — D-P9-003:** Phase 9A can use frozen, provenance-recorded
+Templot5 revision 556b S1/REA inputs for bounded reference-only research.
+The [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#phase-9a-research-and-phase-9b-production-boundary)
+defines the evidence conditions. The [licensing boundary](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research)
+owns research-use and subsequent production-clearance conditions. This project decision
+gives no third-party permission or positive rights finding.
+
+The research generator and architecture proof do not need independent primary
+production evidence first. Exact source identities, field provenance, named chair
+components, datums and comparison criteria with their reasons are necessary.
+Research inputs that affect output must keep that dependency role.
+The comparison oracle stays separate and available under its frozen contract.
+Its exact executable and capture gaps stay unresolved.
+
+Before Phase 9B production/package clearance, each output-affecting
+Templot-derived input needs an accepted disposition under the licensing boundary.
+After an input change, each affected check of the final production package
+must give a PASS result. This is qualification of the final package, not a second acceptance
+of unchanged Phase 9A architecture evidence.
+
+Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6. Every exit stays
+Pending. Output stays private-development and project status stays `unknown`.
+This decision accepts no S1 definition, package, production output, risk closure
+or release. This cycle includes no chair implementation.
+
+Exact validation and independent review are necessary before normal protected-main
+integration. The cycle ends with clean, synchronised `main` and the first
+bounded Phase 9A implementation recommendation.
+
 ## Reallocated Phase 9 requirements
 
 The [project plan](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) owns
@@ -113,13 +173,13 @@ the exact pending criteria. Exits 3–5 in the accepted Phase 9 gate belong
 to Phase 9A. Exits 1, 2 and 7–9 in that gate belong to Phase 9B. Phase 9A
 owns raw-evidence separation and permitted fitting and use from Exit 6.
 Phase 9B owns the licence and `project-cleared` package path from Exit 6.
-Each acceptance duty has one phase owner.
+Each acceptance duty has one phase owner. D-P9-003 changes the evidence sequence, not the requirement set. Phase 9A accepts reference-only architecture proof. Phase 9B owns production/package clearance and qualification of affected results after production-input changes.
 
 | Phase 9A exit | Status | Exact criterion |
 | --- | --- | --- |
-| 9A-1 | Pending | The procedural chair generator constructs all named chair components in the bounded scope and the assembled S1 chair from the accepted S1 `ChairDefinition`. It can construct them again without the source scan/CAD file or FreeCAD geometry that the product kept from the first construction. Select one more chair or support from repository evidence for the smallest proof of a difference in chair components, interface or assembly pattern. The other chair or support must use the same neutral `ChairDefinition` schema and procedural chair generator. An S1 dimension variant is not sufficient. A five-box or opaque-mesh fallback must not have production-ready status. |
-| 9A-2 | Pending | Standalone and FreeCAD tests give a PASS result for definition package load and round-trip. The two test paths reject corrupt and unsupported packages. Package load and round-trip preserve chair component identities, prototype/manufacturing separation and rail fit. The two test paths give a PASS result for the S1 geometry that the generator constructs against accepted reference tolerances. |
-| 9A-3 | Pending | The operator-assisted S1 pilot is documented and accepted for bounded architecture proof through the same `ChairDefinition` and procedural chair generator. The RC qualification matrix does not include arbitrary automatic scan assimilation. |
+| 9A-1 | Pending | The procedural chair generator constructs all named chair components in the bounded scope and the assembled S1 chair from the S1 `ChairDefinition` accepted for reference-only research. It can construct them again without the source scan/CAD file or FreeCAD geometry that the product kept from the first construction. Select one more chair or support from repository evidence for the smallest proof of a difference in chair components, interface or assembly pattern. The other chair or support must use the same neutral `ChairDefinition` schema and procedural chair generator. An S1 dimension variant is not sufficient. A five-box or opaque-mesh fallback must not have production-ready status. |
+| 9A-2 | Pending | Standalone and FreeCAD tests give a PASS result for definition package load and round-trip. The two test paths reject corrupt and unsupported packages. Package load and round-trip preserve chair component identities, prototype geometry, separate model rail-fit policy, manufacturing compensation and rail fit. They preserve exact field provenance and reference-only status for each Templot-derived input. The two test paths give a PASS result for the S1 geometry that the generator constructs against accepted reference tolerances. |
+| 9A-3 | Pending | The operator-assisted S1 pilot is documented and accepted for bounded reference-only architecture proof through the same `ChairDefinition` and procedural chair generator. The RC qualification matrix does not include arbitrary automatic scan assimilation. |
 | 9A-4 | Pending | Raw S1 evidence that cannot be redistributed stays isolated. Its permitted fitting and use basis is recorded before that evidence supports the bounded proof or pilot. |
 
 Phase 9B has six Pending exits in the
