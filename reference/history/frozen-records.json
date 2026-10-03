@@ -44,7 +44,7 @@
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE7_CLOSEOUT.md", "sha256": "60a4bb20fe5d6a3bdf652c30394a5dce000cc0714561f503b3203aa86cbd9304"},
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE7_GATE_DECISIONS.json", "sha256": "32484fb058d343dd58d396cb2c53f4194c80205fc7f8493706faf82111a27d23"},
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE7_RISKS.json", "sha256": "b6100fa0ea40422616af27999a58e9faa6df98ce511d3a550cd58f10ae4318c3"},
-    {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE8_CLOSEOUT.md", "sha256": "0b60d4bc0a5205365077b294082e735ac0c3b4b096fbf2123f79e6d4fc59334b"},
+    {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE8_CLOSEOUT.md", "sha256": "5fc6f7ec1a6dc9e109fe2d6bad2fdd7405444abdf054c42ba7e9112f135ad2a4"},
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE8_GATE_DECISIONS.json", "sha256": "d0c18282232b6666c1b270e8bca7a7e1a601edbdca66b2a62d482bbb6cca449e"},
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE8_RISKS.json", "sha256": "bc9d3a83494b6a895826fd35b896ec695469a3c1fbe9720451a967d6eaa0769b"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-05-phase7-main-circle-centre-regression.md", "sha256": "012e7b6a9b5fa38924b468fb11e3d76ef7ebbc6fdbe30643cf7a2fa89a90d176"},

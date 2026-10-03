@@ -2070,9 +2070,9 @@ def validate_phase8_closeout_mutations() -> None:
     for name, before, after, clause in (
         (
             "recovery-deadline-waived",
-            "next full test due by **2026-10-05**",
-            "next full test optional",
-            "monthly proof, with the next full test due by 2026-10-05",
+            "The next full test is due by **2026-10-05**",
+            "The next full test is optional",
+            "monthly proof. The next full test is due by 2026-10-05",
         ),
         (
             "risk-duties-erased",

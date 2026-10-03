@@ -5612,7 +5612,7 @@ def _validate_phase8_closeout(evidence: str) -> None:
         "Phase 9 stays Not started at 0/9",
         "cfd4387b9f61f425266448c1ace7d7fea3a889cf",
         "39 exact inputs and a final 113-entry assessment packet",
-        "monthly proof, with the next full test due by 2026-10-05",
+        "monthly proof. The next full test is due by 2026-10-05",
         "remains physically attached",
         "two intermediate Ruff-cache states",
         "all 24 live risks without changing any severity",
