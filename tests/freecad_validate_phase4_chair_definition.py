@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Exercise the Phase 4 chair package contract in qualified FreeCAD."""
 
+import json
 import pathlib
 import sys
 
@@ -9,8 +10,12 @@ import FreeCAD as App
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "tests"))
 
 from tracktemplate import api, bootstrap  # noqa: E402
+from validate_phase4_chair_definition import (  # noqa: E402
+    validate_decimal_quantity_conversion,
+)
 
 
 FIXTURE_PATH = ROOT / "tests" / "fixtures" / "chair-definition-v1-contract.json"
@@ -39,6 +44,7 @@ package = api.chair_definition_package_from_json(fixture_text, manifest_text)
 encoded = api.chair_definition_package_to_json(package)
 reopened = api.chair_definition_package_from_json(encoded, manifest_text)
 status = api.chair_definition_package_status(reopened, manifest_text)
+validate_decimal_quantity_conversion(json.loads(fixture_text), manifest_text)
 after = _document_state()
 
 assert qualification["compatibility_evaluation"]["matched_profile_id"] in {
