@@ -218,6 +218,46 @@ or give production acceptance. Phase 9A
 stays at 0/4 with four phase exits with `Pending` status. All recorded
 limitations stay the same.
 
+## Phase 9A S1SEAT research proof — 2026-10-03
+
+Under D-P9-003 and the owner's bounded implementation instruction, the
+research path constructs only the `S1SEAT` chair component. A neutral
+`ChairDefinition` supplies twelve explicit dimensions to the
+[analytical construction](../../tracktemplate/domain/chair_seat.py).
+The [research operation](../../tracktemplate/application/chair_research.py)
+preserves the complete package, manifest and field provenance. It rejects
+unsupported rules, unresolved inputs and manufacturing profiles.
+
+The [standalone test](../../tests/validate_phase9a_chair_seat.py) gives a PASS
+result for geometry, units, frames, serialisation and 41 incorrect signed
+requests. The [qualified FreeCAD test](../../tests/freecad_validate_phase9a_chair_seat.py)
+gives a PASS result for one valid closed solid with twelve vertices,
+21 edges and eleven faces. It also verifies that construction, rejected
+inputs and an injected failure do not change the document.
+
+The local frozen-source proof uses the declared 4 mm/ft rev:A configuration
+with no filler or manufacturing correction. Source hashes, twelve source
+points, five placement landmarks, bounds and volume give a PASS result.
+The component uses full-size millimetres and the accepted chair frame.
+The numerical comparison limits do not establish physical fit tolerances.
+The worktree `phase9a-s1-seat-research-proof` keeps the complete evidence,
+research package and outputs in `tmp/phase9a-s1-seat-proof/`. Those research
+data remain local and untracked.
+
+The independent source, geometry and provenance review gives a PASS result
+with no actionable findings. Its receipt is
+`tmp/phase9a-s1-seat-proof/independent-seat-review.json`. The reviewer and
+authors share one agent team and workspace. This is not an external review.
+
+This Level 2 result contributes only to Phase 9A-1 and Phase 9A-2.
+It proves no assembled S1 chair, second chair family, GUI workflow,
+production output or executable Templot comparison. The source-default
+configuration is not an observed GUI capture. Prototype identity,
+inclination, physical rail fit and rights limits stay unresolved as recorded.
+The package stays `reference-only`, private-development and not accepted.
+Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
+No exit, package, risk or production acceptance follows. All recorded limits stay.
+
 ## Continuing duties and risks
 
 [D-P6-008](../history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel)
