@@ -11,7 +11,9 @@ contained 64,407 entries and 4,434,264,142 bytes from regular files,
 including 18 nested FreeCAD CLI repositories. Independent checks compared
 the actual snapshot with those source roots. Disposable copies of all 23
 retirement candidates had 19,512 matching entries. Their relevant nested
-repository identities and `git fsck` checks passed. Each removal had a
+repository identities and `git fsck` checks passed.
+
+Each removal had a
 passing individual plan, audit and post-removal check. Git used ordinary
 `git worktree remove` for all 23. It used no `--force` operation and deleted
 no branch. The 45 then-existing local branch tips remained the same.
@@ -23,8 +25,10 @@ approved USB (filesystem UUID `34968419-c112-4f00-9955-cb3b8a5a5d2e`)
 preserved 39 independently checked inputs,
 including four review files totalling 193,012 bytes and the merge bundle.
 The final assessment packet contained 113 independently checked entries.
-Its copy, flush and safe unmount passed. The retained completion receipt is
-`tmp/phase8-closeout-assessment-20261003/completion.json`; it was written
+Its copy, flush and safe unmount passed.
+
+The retained completion receipt is
+`tmp/phase8-closeout-assessment-20261003/completion.json`. The receipt was written
 locally after unmount. Its `PASS` result binds the exact main commit and
 identifies the independent review and preservation receipts by SHA-256.
 The SHA-256 of `completion.json` is
@@ -32,13 +36,15 @@ The SHA-256 of `completion.json` is
 
 The supplement is not a new complete 19-worktree snapshot. The October 1
 candidate restores are not a monthly FreeCAD GUI restore. The last full
-monthly restore is dated 2026-09-05; the next is due by **2026-10-05**.
+monthly restore is dated 2026-09-05. The next is due by **2026-10-05**.
 Richard retains the independent-backup duty and the implementation/QA owner
 retains enforcement of the recovery procedure. Weekly and accepted-tranche
-snapshot triggers remain. The USB is a separate physical device but stays
+snapshot triggers remain.
+
+The USB is a separate physical device but stays
 attached to the machine. Separate physical storage and an off-machine copy
 are not proved. The two intermediate Ruff-cache states for retirements
-r13/r14 remain unavailable; later matching digests do not reconstruct them.
+r13/r14 remain unavailable. Later matching digests do not reconstruct them.
 Earlier failed helper, restore, review and product results remain failed
 evidence. IDE file and window data do not prove unsaved editor buffers or
 the displayed branch indicator.

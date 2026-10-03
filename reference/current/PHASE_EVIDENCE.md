@@ -18,7 +18,7 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9 stays Not started at 0/9. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
 | What changed | The owner accepted bounded Phase 8 closure at protected `main` `cfd4387`. The four original exit decisions retain their exact accepted scopes. The current paths now hold unopened Phase 9 records. This alignment changes no product behaviour. |
 | What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows and the distinct proof for each accepted exit. Closure adds no workflow proof. |
-| Limitations/findings | All representative-fixture, straight TO cross-version Edit, prior GUI-source, wider persistence/profile/metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits remain in the frozen evidence. The r13/r14 intermediate Ruff-cache states remain unavailable. The monthly full restore is due by 2026-10-05. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. |
+| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states remain unavailable. The monthly full restore is due by 2026-10-05. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. |
 | Owner decision | D-P8-006 closes Phase 8 at 4/4 and authorises only independently accepted, exact-green closeout integration. It does not open Phase 9, accept performance, clear production output or release, close a risk or remove a legacy path. |
 | Next action | Synchronise protected `main` and stop. Phase 9 opening and any new product work need separate authority. |
 
@@ -43,7 +43,9 @@ acceptance is blocked while it remains unmet.
 The 24 [live risks](risks.json) keep their owners, deadlines, treatments and
 control effectiveness. PR-13 keeps the backup and restore cadence. PR-09
 keeps output private-development. PR-10 and PR-18 keep the duplication and
-removal gates. PR-15 and QA-R04 keep the performance duty. PR-17, PR-01,
+removal gates. PR-15 and QA-R04 keep the performance duty.
+
+PR-17, PR-01,
 QA-R03 and PR-22 retain their recorded duties. No risk disposition changes.
 
 TERM-R04 remains open. The Phase 8 product evidence remains bounded by its

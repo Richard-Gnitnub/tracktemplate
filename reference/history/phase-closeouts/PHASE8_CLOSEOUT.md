@@ -18,8 +18,7 @@ The owner accepted the independently reviewed
 
 **Decision boundary:** D-P8-006 closes Phase 8 at 4/4. All four original
 criteria and the accepted limits under D-P8-002 through D-P8-005 remain.
-Phase 9 stays Not started at 0/9. This Level 3 record changes phase status;
-it changes no product behaviour. Project status stays `unknown` and output
+Phase 9 stays Not started at 0/9. This Level 3 record changes phase status. It changes no product behaviour. Project status stays `unknown` and output
 stays private-development.
 
 The assessed source was clean, synchronised protected `main` at
@@ -38,10 +37,11 @@ presents this record. `/root/exit2_admission_evidence` separately examined
 the retained exit authority and evidence. `/root/exit2_admission_risks`
 independently examined recovery currentness and all 24 live risks. The
 integration reviewer confirmed the exact merge and clean main. None of these
-reviewers authored this maintained closeout record. They share one agent
-team and workspace; this is not an external organisational review. Their
-recommendation was **Proceed with bounded conditions**, with no unresolved
-dissent.
+reviewers authored this maintained closeout record.
+
+They share one agent team and workspace. This is not an external
+organisational review. Their recommendation was **Proceed with bounded
+conditions**, with no unresolved dissent.
 
 The bounded recovery assessment compared the October 1 snapshot of 41
 worktrees with the surviving estate and the later record worktree. The
@@ -49,12 +49,14 @@ snapshot, 23 copied-candidate restores, retained overlays and terminal packet
 keep their distinct proof limits. An October 3 non-overwriting supplement
 preserved 39 exact inputs and a final 113-entry assessment packet on the
 approved USB. Independent comparisons, copy, flush and safe unmount passed.
+
 The [accepted recovery record](../../backup-records/2026-10-03-phase8-closeout-recovery.md)
 identifies these boundaries. The completion receipt is retained at
-`tmp/phase8-closeout-assessment-20261003/completion.json`; it is local-only
-after the unmount. This supplement is not a new complete-estate snapshot or
+`tmp/phase8-closeout-assessment-20261003/completion.json`. The receipt remains local after the unmount. This supplement is not a new complete-estate snapshot or
 monthly FreeCAD GUI restore. The September 5 full restore remains the current
-monthly proof, with the next full test due by **2026-10-05**. The USB is a
+monthly proof. The next full test is due by **2026-10-05**.
+
+The USB is a
 separate device but remains physically attached. Separate storage or an
 off-machine copy is not claimed. The two intermediate Ruff-cache states for
 retirements r13/r14 remain unavailable. Earlier failed evidence and IDE
@@ -64,6 +66,7 @@ The reviewers examined all 24 live risks without changing any severity,
 state, treatment, control effectiveness, owner or deadline. PR-13 keeps its
 backup and restore duties, including the monthly test. PR-09 keeps output
 private-development. PR-10 and PR-18 keep the duplication and removal gates.
+
 PR-17 retains wider persistence and recovery duties. PR-01 and QA-R03 retain
 wider workflow-proof duties. PR-15 and QA-R04 retain the performance duty.
 PR-22 retains independent acceptance control. The [Phase 8 risk snapshot](PHASE8_RISKS.json)
@@ -84,8 +87,7 @@ comparison oracle, and all per-slice comparison, adapter, caller, removal and
 legacy-retirement conditions remain. TERM-R04 stays open. PR-10 stays
 Open/Partial and PR-18 stays Open/Effective for the current scope. No legacy
 path is removed. [D-P6-008](PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel)
-stays Deferred — unmet and mandatory before Phase 10 beta acceptance; its
-original Entry/Exit scope and independent-review and owner-acceptance duties
+stays Deferred — unmet and mandatory before Phase 10 beta acceptance. Its original Entry/Exit scope and independent-review and owner-acceptance duties
 remain.
 
 **Exact owner instruction — 2026-10-03:**
