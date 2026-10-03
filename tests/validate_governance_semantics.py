@@ -4722,6 +4722,73 @@ def validate_documentation_profile_mutations() -> None:
         "or legacy removal",
     )
 
+    retirement_cases = (
+        (
+            "retirement-count-inflated", "**What changed**",
+            'records removal of 23 worktrees after independent '
+            'preservation and identity checks',
+            "records removal of 41 worktrees after exact preservation and "
+            "independent checks",
+        ),
+        (
+            "retained-branches-deleted", "**What changed**",
+            'All 45 local branches kept the same tips',
+            "All 45 branch refs were deleted",
+        ),
+        (
+            "snapshot-coverage-reduced", "**Limitations/findings**",
+            'records independent preservation of all 41 worktrees at '
+            'removal and the specified subsequent changes',
+            "covers 39 worktrees and needs no later records",
+        ),
+        (
+            "monthly-restore-postponed", "**Limitations/findings**",
+            'The monthly recovery test is due by 2026-10-05',
+            "The monthly restore remains due by 2026-11-05",
+        ),
+        (
+            "recovery-currentness-waived", "**Limitations/findings**",
+            'Before a closeout assessment, compare the recovery evidence '
+            'with the repository state',
+            "A closeout assessment needs no current recovery evidence",
+        ),
+        (
+            "physical-separation-claimed", "**Limitations/findings**",
+            'This record claims no separate USB location or copy on '
+            'another machine',
+            "Separate physical storage and an off-site copy are proved",
+        ),
+        (
+            "draft-boundary-widened", "**Next action**",
+            "This continuation cycle stops with the new draft",
+            "This continuation cycle merges the new draft",
+        ),
+        (
+            "record-closes-phase", "**Next action**",
+            "Do not close Phase 8 or open Phase 9 through this record",
+            "Close Phase 8 and open Phase 9 through this record",
+        ),
+    )
+    for name, field, original, replacement in retirement_cases:
+        row = table_row_containing(plan, field)
+        mutated = replace_once(
+            plan, row, replace_once(row, original, replacement),
+        )
+        expect_rejected(
+            "tt-doc/owner-view-" + name,
+            lambda value=mutated: progress._validate_owner_view(value),
+            "project-plan owner view lost or contradicted: " + original,
+        )
+        expect_rejected(
+            "tt-doc/quality-owner-view-" + name,
+            lambda value=mutated: (
+                quality_assurance.validate_documentation_profile(
+                    engineering, value, learning, terminology,
+                )
+            ),
+            "PROJECT_PLAN owner view contradicts current authority",
+        )
+
     compatibility_terms_removed = terminology
     for marker in (
         "| Host compatibility |",

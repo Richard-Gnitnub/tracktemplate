@@ -1083,10 +1083,17 @@ def _validate_owner_view(plan: str) -> None:
         'An independent reviewer examined the 42-root snapshot and restore evidence for seven nested Git repositories',
         'After removal, each preservation check gave PASS',
         'The earlier test used a Git repository that the Git ignore rule did not select',
-        'Five branches with unmerged commits and their three worktrees remain',
+        'At the September 28 retirement, five branches with unmerged '
+        'commits and their three worktrees stayed',
         'The two D-GOV-022 worktrees are retired',
-        'All eight prior branch refs remain exact',
-        'USB is safely unmounted. Physical removal and separate storage remain operator-controlled and unverified',
+        'All eight previous branch `refs` values stayed the same at that '
+        'time',
+        'The owner reports that the approved USB stays connected to the '
+        'machine',
+        'The agent compared its device identity with the approved record. '
+        'Both identities were the same',
+        'This record claims no separate USB location or copy on another '
+        'machine',
         'D-P8-001',
         'opens Phase 8 at 0/4',
         'D-GOV-020',
@@ -1094,9 +1101,9 @@ def _validate_owner_view(plan: str) -> None:
         'D-GOV-021',
         'authorises one `git worktree remove --force` operation only if all its conditions pass',
         'The earlier D-P8-001 and D-GOV-020–022 decisions accept no Phase 8 exit, performance, wider migration, production output, release or legacy removal',
-        "Complete the recovery evidence before the separate assessment to "
-        "close Phase 8",
-        'Physical removal and separate storage remain operator-controlled and unverified',
+        'The monthly recovery test is due by 2026-10-05',
+        'Before a closeout assessment, compare the recovery evidence with '
+        'the repository state',
         'D-P8-002',
         'keep Exit 3 and Exit 4 acceptance and all their limitations',
         'TERM-R04 stays open',
@@ -1107,11 +1114,15 @@ def _validate_owner_view(plan: str) -> None:
         'accepts Exit 2 at `c82b335` on the proposed evidence and conditions',
         'D-P8-005',
         'The Exit 2 condition stays the same',
-        'merge the Exit 2 record changes into protected `main`',
-        'Do not close Phase 8 or open Phase 9 through this decision',
-        "A new snapshot for independent preservation is necessary now",
-        "The evidence does not show a snapshot of all current worktrees and "
-        "their evidence",
+        'PR #127 completed that integration at `1618ea5`',
+        'records removal of 23 worktrees after independent preservation '
+        'and identity checks',
+        'All 45 local branches kept the same tips',
+        'records independent preservation of all 41 worktrees at removal '
+        'and the specified subsequent changes',
+        'This continuation cycle stops with the new draft',
+        'A separate owner decision is necessary',
+        'Do not close Phase 8 or open Phase 9 through this record',
         'The evidence does not show `TO-001` output after a person selects a FreeCAD object',
     ):
         _require(
