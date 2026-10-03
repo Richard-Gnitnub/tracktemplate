@@ -131,14 +131,14 @@ Templot families or post-Core capabilities.
 
 ## Phase 9A-2 quantity check repair — 2026-10-03
 
-The `_quantity` check now uses exact `Fraction` values to compare lengths.
-The result no longer changes with the caller's `decimal.Context`. The
+The `_quantity` check uses accurate `Fraction` values to compare lengths.
+The result does not change with the caller's `decimal.Context`. The
 previous check could accept incorrect values and reject correct values.
-This Level 2 repair follows S1-04 and S1-06 in
+This Level 2 repair obeys S1-04 and S1-06 in
 the [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md).
 
-The [standalone test](../../tests/validate_phase4_chair_definition.py) and
-[qualified FreeCAD 1.1.3 test](../../tests/freecad_validate_phase4_chair_definition.py)
+The [test for standalone Python](../../tests/validate_phase4_chair_definition.py) and
+[test with the qualified host profile for FreeCAD 1.1.3](../../tests/freecad_validate_phase4_chair_definition.py)
 give a PASS result. Each test examines 48 correct and 48 incorrect
 inputs with four different `decimal.Context` values. The tests include five
 units and values from `definition` and `manufacturing_profiles`. They show
@@ -147,14 +147,16 @@ The `probe_decimal_context.py` test, `py_compile`
 and Ruff also give a PASS result. The worktree keeps the validation evidence at
 `tmp/phase9a-chair-quantity-exactness/validation.json`.
 
-The independent reviewer gave `ACCEPTED` for source and tests. The reviewer
-shares this agent team and workspace. The review receipt is
+The independent reviewer gave `ACCEPTED` for source and tests. The reviewer and implementing agent use the same workspace and are in the
+same group of agents. The review receipt is
 `tmp/phase9a-chair-quantity-exactness/independent-source-review.json`.
 
 This evidence is only for the Phase 9A-2 checks of `ChairDefinition` data.
-Production geometry stays blocked. The evidence does not prove S1 geometry
+This repair gives no authority to construct procedural chair geometry for
+production. The evidence does not validate procedural chair geometry for S1
 or give production acceptance. Phase 9A
-stays at 0/4 with four Pending exits. All recorded limitations stay unchanged.
+stays at 0/4 with four phase exits with `Pending` status. All recorded
+limitations stay the same.
 
 ## Continuing duties and risks
 
