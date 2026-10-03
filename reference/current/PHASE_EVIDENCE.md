@@ -260,6 +260,55 @@ Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
 This result gives no exit, package, risk or production acceptance. All recorded
 limits stay.
 
+## Phase 9A KEY research proof — 2026-10-03
+
+Under D-P9-003 and the owner's continuation instruction, the research path adds
+the `KEY(False, False)` chair component from frozen Templot5 revision 556b.
+This source variant uses a solid outer jaw and is not for a check rail.
+It does not select a Core jaw policy.
+
+The neutral `ChairDefinition` supplies
+eleven lengths and one dimensionless ratio to the
+[analytical construction](../../tracktemplate/domain/chair_key.py).
+The [research operation](../../tracktemplate/application/chair_research.py)
+keeps exact field provenance and the complete package and manifest.
+It keeps model-fit inputs and the source assembly overlap separate.
+Manufacturing profiles remain unsupported.
+
+The [standalone test](../../tests/validate_phase9a_chair_key.py) gives a PASS
+result for geometry, units, frames, round-trip and 27 incorrect signed requests.
+All 41 existing seat rejection checks also give a PASS result.
+The [qualified FreeCAD test](../../tests/freecad_validate_phase9a_chair_key.py)
+constructs one valid closed solid with 20 vertices, 36 edges and 18 faces.
+Construction, rejected inputs and an injected failure do not change the document.
+
+The local proof reuses the frozen 4 mm/ft rev:A rail inputs and accepted chair frame.
+No later FDM or manufacturing correction applies.
+Independent source calculations agree with all 20 component points, nine landmarks,
+bounds and volume. The unchanged seat also passes comparison in the same frame.
+Numerical comparison limits do not establish physical fit tolerances.
+These calculations do not execute the frozen Templot oracle.
+
+The worktree `phase9a-s1-key-research-proof` keeps the complete evidence in
+`tmp/phase9a-s1-key-proof/`. The research package, manifest and outputs stay local
+and untracked. Two FreeCAD screenshots show the component alone and with the seat.
+They supply presentation evidence only. The images do not prove an assembled chair
+or contact with the rail, jaws or seat.
+
+The independent source, geometry and provenance review gives a PASS result
+with no findings that need action. Its receipt is
+`tmp/phase9a-s1-key-proof/independent-key-review.json`.
+The reviewer and authors share one agent team and workspace. This is not an external review.
+
+The retained fixture-order failure is classified as `fixture-or-harness-defect`.
+Its repaired test gives a PASS result without a product or schema change.
+
+This Level 2 result supplies evidence only for Phase 9A-1 and Phase 9A-2.
+The package stays `reference-only`, private-development and not accepted.
+Prototype identity, inclination, physical rail fit and rights limits stay unresolved as recorded.
+Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
+This result gives no exit, package, risk or production acceptance. All recorded limits stay.
+
 ## Continuing duties and risks
 
 [D-P6-008](../history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel)
