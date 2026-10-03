@@ -1,7 +1,7 @@
-# Phase 9A and 9B Programme Holding Record
+# Phase 9A Opening and Phase 9B Holding Record
 
-Status: **Phase 9A is Not started at 0/4. Phase 9B is Not started at 0/6.
-Neither phase is open. This record gives no product authority.**
+Status: **Phase 9A is Open at 0/4 with four Pending exits. Phase 9B is
+Not started at 0/6. This record gives no product acceptance.**
 
 Phase 8 closed on 2026-10-03 under
 [D-P8-006](../history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel)
@@ -15,12 +15,12 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Not started at 0/4. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | D-P9-001 approves bounded technical meanings and divides the original Phase 9 criteria. The accepted historical Phase 9 gate remains the source. The previous blocked local candidate is failed evidence only. Phase 8 decisions keep their accepted scopes. This alignment changes no product behaviour. |
+| Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 0/4 with four Pending exits. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
+| What changed | The exact reviewed Phase 9A/9B alignment under D-P9-001 merged through [PR #131](https://github.com/Richard-Gnitnub/tracktemplate/pull/131) at protected `main` `851ef81`. The merged tree matches the reviewed head. D-P9-002 opens only Phase 9A. The historical Phase 9 gate remains the requirement source. The earlier blocked local candidate remains failed evidence only. This opening changes no product behaviour. |
 | What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows and the distinct proof for each accepted exit. Closure adds no workflow proof. |
 | Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable, and the monthly full restore is due by 2026-10-05. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
-| Owner decision | [D-P9-001](#phase-9-programme-alignment-panel) approves only the five technical meanings and the pending 9A/9B exit allocation. It does not open Phase 9A or Phase 9B, accept an exit, clear output, close a risk or remove a legacy path. |
-| Next action | Integrate the exact reviewed alignment on protected `main`. Then open only Phase 9A at 0/4 under the owner's Phase 9A opening instruction. Do not start product work. |
+| Owner decision | [D-P9-002](#phase-9a-opening-panel) opens only Phase 9A at 0/4 with four Pending exits. Phase 9B stays Not started at 0/6. It accepts no exit, product work, output, package, risk closure or legacy removal. |
+| Next action | Use retained S1 evidence to recommend the first bounded Phase 9A product task to the owner. Do not start product work in this record cycle. |
 
 <a id="phase-9-programme-alignment-panel"></a>
 
@@ -72,6 +72,39 @@ independent Documentation Review are necessary. Independent test review and
 exact-tree protected-main integration are also necessary. The opening can
 set only Phase 9A to 0/4 Open. Phase 9B stays Not started. This cycle
 includes no product implementation.
+
+<a id="phase-9a-opening-panel"></a>
+
+## D-P9-002 Phase 9A opening panel — 2026-10-03
+
+**Decision boundary:** The reviewed Phase 9A/9B alignment merged through
+[PR #131](https://github.com/Richard-Gnitnub/tracktemplate/pull/131) at clean,
+protected `main` `851ef81a7f950c1a5425191e051e9cf7207585b9`.
+The merged tree has the same identity as the reviewed head tree `938c4de1389c7afc252d4acee9202f464626cbc8`.
+The [owner instruction in D-P9-001](gate-decisions.json) authorises Phase 9A
+opening after exact validation, independent acceptance and a merge into protected `main`. [D-P9-002](gate-decisions.json)
+records this separate opening. The four Phase 9A criteria below stay Pending.
+
+**Risk panel:** An independent read-only reviewer checked the opening against
+the merged programme, current records and all 24 live risks. The panel recommendation
+was **Proceed with bounded conditions**, with no dissent. The reviewer shares
+one agent team and workspace with the author. This is not an external review.
+
+PR-09, PR-13, PR-17 and PR-22 keep their recorded states and controls.
+The chair, rights, performance and legacy-retirement risks also stay open.
+The full restore is due by 2026-10-05. USB separate storage is unverified.
+
+**Structured decision — D-P9-002:** Open only Phase 9A at 0/4 with all four
+exits Pending. Keep Phase 9B Not started at 0/6 with all six exits Pending.
+Keep D-P6-008 Deferred — unmet, TERM-R04 open, private-development output,
+project status `unknown`, and every accepted limit and retirement condition.
+Accept no product implementation, exit, package, output, performance result,
+risk closure, release or legacy removal. Exact validation, independent review
+and normal protected-main integration apply to this opening record.
+
+The next product work needs a separate bounded assignment. This opening does
+not select a chair family, S1 values or a rail section. It does not change
+the rights state.
 
 ## Reallocated Phase 9 requirements
 

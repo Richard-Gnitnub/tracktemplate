@@ -1340,10 +1340,11 @@ Project dashboard and current-record consistency:
 .venv/bin/python tests/validate_project_progress.py
 ```
 
-This enforces the compact project-plan sections and line budget. It reconciles
-the frozen Phase 6, Phase 7 and Phase 8 closeouts and unopened Phase 9 state with
-`current/PHASE_EVIDENCE.md`. It validates the detailed frozen and current risk
-and decision JSON registers. It protects the retired descriptive-path redirect.
+This enforces the compact project-plan sections and line budget. It reconciles the frozen Phase 6, Phase 7 and Phase 8 closeouts with
+`current/PHASE_EVIDENCE.md`. It checks that Phase 9A is Open and Phase 9B is
+Not started. It validates the
+detailed frozen and current risk and decision JSON registers. It protects the
+retired descriptive-path redirect.
 It also checks the least-privilege, SHA-pinned standalone CI workflow. It does
 not assess the quality of decision evidence. It does not open a phase or
 replace project-owner acceptance.

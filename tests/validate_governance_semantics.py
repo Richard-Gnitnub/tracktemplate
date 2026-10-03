@@ -1968,16 +1968,16 @@ def validate_phase8_exit2_acceptance_mutations() -> None:
                 row, "| Complete — accepted 2026-10-03 |", "| Open |",
             ),
         )),
-        "No phase may be open after Phase 8 closeout",
+        "Only Phase 9A may be open",
     )
-    phase9 = table_row_containing(plan, "| 9A | S1 and procedural chair")
+    phase9 = table_row_containing(plan, "| 9B | Core RC chair")
     expect_rejected(
-        "phase8-exit2/phase-9-opened-without-authority",
+        "phase8-exit2/phase-9b-opened-without-authority",
         lambda: progress._validate_plan_shape(replace_once(
             plan, phase9,
             replace_once(phase9, "| Not started |", "| Open |"),
         )),
-        "No phase may be open after Phase 8 closeout",
+        "Only Phase 9A may be open",
     )
 
 
@@ -2104,15 +2104,15 @@ def validate_phase8_closeout_mutations() -> None:
 
     for name, before, after, diagnostic in (
         (
-            "phase9a-opened",
-            "Phase 9A is Not started at 0/4",
+            "phase9a-reclosed",
             "Phase 9A is Open at 0/4",
-            "Phase 9 split status drifted: Phase 9A is Not started at 0/4",
+            "Phase 9A is Not started at 0/4",
+            "Phase 9 split status drifted: Phase 9A is Open at 0/4",
         ),
         (
             "phase9b-opened",
-            "Phase 9B is Not started at 0/6",
-            "Phase 9B is Open at 0/6",
+            "Phase 9B is\nNot started at 0/6",
+            "Phase 9B is\nOpen at 0/6",
             "Phase 9 split status drifted: Phase 9B is Not started at 0/6",
         ),
         (
@@ -2125,7 +2125,7 @@ def validate_phase8_closeout_mutations() -> None:
     ):
         target = (
             paragraph_containing(holding, "Status: **Phase 9A")
-            if name in {"phase9a-opened", "phase9b-opened"}
+            if name in {"phase9a-reclosed", "phase9b-opened"}
             else holding
         )
         mutated_holding = replace_once(target, before, after)
@@ -2145,7 +2145,7 @@ def validate_phase8_closeout_mutations() -> None:
     expect_rejected(
         "phase9-holding/phase8-decision-carried-as-current",
         lambda: progress._validate_phase9_decision_holding(current, phase6),
-        "Phase 9 split must carry unchanged D-P6-008 first",
+        "Phase 9A opening decision chain incomplete or widened",
     )
 
 
@@ -4379,6 +4379,18 @@ def validate_phase9_split_mutations() -> None:
         lambda: progress._validate_phase9_exit_allocation(plan, admitted),
         "Phase 9A evidence criteria or Pending status drifted",
     )
+    phase9a = table_row_containing(
+        plan, "| 9A | S1 and procedural chair",
+    )
+    premature_count = replace_once(
+        plan, phase9a,
+        replace_once(phase9a, "0/4 evidenced", "1/4 evidenced"),
+    )
+    expect_rejected(
+        "phase9/phase9a-exit-count-prematurely-accepted",
+        lambda: progress._validate_plan_shape(premature_count),
+        "Phase 9A must stay Open at zero evidenced exits",
+    )
 
     decision = json.loads(read("reference/current/gate-decisions.json"))
     phase6 = {
@@ -4410,6 +4422,41 @@ def validate_phase9_split_mutations() -> None:
         lambda: progress._validate_phase9_decision_holding(changed, phase6),
         "Phase 9 split must carry unchanged D-P6-008 first",
     )
+    missing_opening = copy.deepcopy(decision)
+    missing_opening["decisions"].pop()
+    expect_rejected(
+        "phase9/d-p9-002-opening-omitted",
+        lambda: progress._validate_phase9_decision_holding(
+            missing_opening, phase6,
+        ),
+        "Phase 9A opening decision chain incomplete or widened",
+    )
+    for field, replacement, diagnostic in (
+        (
+            "decision", "Open Phase 9B and accept Exit 1.",
+            "opening identity, status or panel routing drifted",
+        ),
+        (
+            "status", "Proposed",
+            "opening identity, status or panel routing drifted",
+        ),
+        (
+            "panel_record", "reference/current/PHASE_EVIDENCE.md",
+            "opening identity, status or panel routing drifted",
+        ),
+        ("authority", "Open both phases.", "authority digest drifted"),
+        ("exclusions", "Production output is cleared.",
+         "exclusions digest drifted"),
+    ):
+        changed = copy.deepcopy(decision)
+        changed["decisions"][2][field] = replacement
+        expect_rejected(
+            "phase9/d-p9-002-{}-changed".format(field),
+            lambda value=changed: progress._validate_phase9_decision_holding(
+                value, phase6,
+            ),
+            "D-P9-002 " + diagnostic,
+        )
 
     for term, before, after in (
         ("Chair", "An accepted `ChairDefinition` gives", "Any scan gives"),
@@ -4559,7 +4606,7 @@ def validate_project_plan_mutations() -> None:
                 "| Open |",
             ),
         )),
-        "No phase may be open after Phase 8 closeout",
+        "Only Phase 9A may be open",
     )
 
     exit2_row = table_row_containing(
@@ -5056,16 +5103,16 @@ def validate_documentation_profile_mutations() -> None:
             "legacy-retirement condition",
         ),
         (
-            "phase9-opened", "**Owner decision**",
-            "The two phases stay Not started",
-            "Both phases are open",
-            "The two phases stay Not started",
+            "phase9b-opened", "**Owner decision**",
+            "Phase 9B stays Not started at 0/6",
+            "Phase 9B is Open at 0/6",
+            "Phase 9B stays Not started at 0/6",
         ),
         (
             "stop-boundary-waived", "**Next action**",
-            "Keep Phase 9B Not started and do no product work",
+            "Do not start product implementation in this cycle",
             "Begin Phase 9 product work after integration",
-            "Keep Phase 9B Not started and do no product work",
+            "Do not start product implementation in this cycle",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
