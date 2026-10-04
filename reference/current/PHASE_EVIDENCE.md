@@ -364,6 +364,58 @@ Prototype identity, inclination, physical rail fit and rights limits stay unreso
 Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
 This result gives no exit, package, risk or production acceptance. All recorded limits stay.
 
+## Phase 9A S1 outer-jaw research proof — 2026-10-04
+
+With authority from D-P9-003 and the owner's instruction to continue, the research path adds
+one complete solid outer jaw from frozen Templot5 revision 556b.
+This bounded source case uses `loose_pin=False`. It does not select a Core jaw policy.
+
+The unchanged neutral `ChairDefinition` supplies 33 full-size lengths to the
+[analytical construction](../../tracktemplate/domain/chair_outer_jaw.py).
+Four sections, each with 44 points, define the ribs, fillets and connecting faces.
+The body includes both caps and both bevels.
+
+Exact arithmetic preserves the source's fixed 15-degree samples before conversion to FreeCAD coordinates.
+This component does not use the base's source grid or manufacturing corrections.
+The [research operation](../../tracktemplate/application/chair_research.py)
+preserves field provenance, the complete package and the manifest.
+
+The [standalone test](../../tests/validate_phase9a_chair_outer_jaw.py) gives a PASS
+result for geometry, units, frames, round-trip and 33 incorrect signed requests.
+The 41 seat, 27 key and 28 base rejection checks also give PASS results.
+Independent calculations from the frozen source agree with all 178 vertices,
+140 face identities, ten landmarks, four sections, bounds and volume.
+The proof uses the frozen 4 mm/ft rev:A inputs and the accepted chair frame.
+It does not start the Templot oracle or prove the dimensions of physical C&L HiNi rail.
+
+The [qualified FreeCAD test](../../tests/freecad_validate_phase9a_chair_outer_jaw.py)
+and the local reference-package proof give PASS results.
+The outer jaw is one valid closed solid with 178 vertices, 316 edges and 140 faces.
+Construction, rejected inputs and an injected failure do not change the document.
+The same base, seat and key pass their existing checks.
+Numerical comparison limits are not physical fit or manufacturing tolerances.
+
+The worktree `phase9a-s1-outer-jaw-research-proof` keeps the complete evidence in
+`tmp/phase9a-s1-outer-jaw-proof/`, including classified failures and successful repeated proofs.
+The research package, manifest and outputs stay local and untracked.
+
+Two original FreeCAD screenshots show the outer jaw alone and with the base, seat and key.
+They supply presentation evidence only. The four separate components do not prove assembly, contact or a complete chair.
+The temporary capture document closes without error. Only the capture's own processes have a verified lifecycle.
+The earlier base-capture process limitation stays.
+
+The independent source, geometry and provenance review gives a PASS result with no findings.
+Its receipt is `tmp/phase9a-s1-outer-jaw-proof/independent-outer-jaw-review.json`.
+The reviewer and authors are in the same agent team and use the same workspace.
+The reviewer also examined the contract before implementation. This is not an external review.
+
+This Level 2 result supplies evidence only for Phase 9A-1 and Phase 9A-2.
+The package stays `reference-only`, private-development and not accepted.
+Prototype geometry, rail-fit policy and manufacturing compensation stay separate.
+
+Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
+This result gives no exit, package, risk or production acceptance. All recorded limits stay.
+
 ## Continuing duties and risks
 
 [D-P6-008](../history/phase-closeouts/PHASE6_CLOSEOUT.md#phase-6-exit-4-deferral-panel)
