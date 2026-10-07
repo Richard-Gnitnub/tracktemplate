@@ -1,7 +1,7 @@
 # Phase 9A Opening and Phase 9B Holding Record
 
-Status: **Phase 9A is Open at 0/4 with four Pending exits. Phase 9B is
-Not started at 0/6. This record gives no product acceptance.**
+Status: **Phase 9A is Open at 1/4 under D-P9-004. Exits 9A-1–3 stay Pending.
+Phase 9B is Not started at 0/6. This record gives no product acceptance.**
 
 Phase 8 closed on 2026-10-03 under
 [D-P8-006](../history/phase-closeouts/PHASE8_CLOSEOUT.md#phase-8-closeout-panel)
@@ -15,12 +15,12 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 0/4 with four Pending exits. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | [D-P9-003](#phase-9a-research-sequencing-panel) separates reference-only S1 research acceptance in Phase 9A from production/package clearance in Phase 9B. Frozen Templot5 revision 556b inputs can support the bounded research proof. The nine initial requirements stay. [D-GOV-023](#freecad-1-1-4-coin4-0-10-qualification-panel) qualifies only the installed exact FreeCAD 1.1.4 host for functional compatibility. |
-| What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows. The exact FreeCAD 1.1.4 host passed the complete compatibility matrix and opened a copied FCStd in the monthly restore. The merged PR #139 inner-jaw research test also passed on that host. |
+| Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 1/4 under [D-P9-004](#phase-9a-exit-4-admission-panel). Only Exit 9A-4 is Evidenced and owner-accepted.<br><br>Exits 9A-1–3 stay Pending. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
+| What changed | [D-P9-004](#phase-9a-exit-4-admission-panel) accepts only Exit 9A-4 for the recorded S1 evidence at protected `main` `9576614daf6cc69a04d214e824ec32cc7bbe5251`. The exact criterion stays unchanged. The [D-P9-003](#phase-9a-research-sequencing-panel) research conditions and [D-GOV-023](#freecad-1-1-4-coin4-0-10-qualification-panel) functional host qualification stay. |
+| What now works | The S1 records that the project keeps identify the source, five chair components and permitted private research use. Independent review shows local, untracked evidence in the examined roots. This decision adds no product behaviour. The accepted Phase 7 and Phase 8 workflows stay. |
 | Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
-| Owner decision | [D-P9-003](#phase-9a-research-sequencing-panel) accepts only the bounded sequence. It accepts no definition, package, production output, risk closure or legacy removal. [D-GOV-023](#freecad-1-1-4-coin4-0-10-qualification-panel) accepts only exact functional host compatibility. All four Phase 9A exits and all six Phase 9B exits stay Pending. No S1 admission follows. |
-| Next action | Complete exact validation and protected-main alignment for D-GOV-023. Then stop with clean, synchronised `main`. Later Phase 9A work needs a separate bounded assignment. |
+| Owner decision | [D-P9-004](#phase-9a-exit-4-admission-panel) accepts only Exit 9A-4 against the named source state. It gives no positive rights claim or acceptance of a definition, numerical tolerance, assisted S1 pilot, physical fit or production output. It accepts no package, risk closure, performance result, release or legacy removal. Exits 9A-1–3 and all six Phase 9B exits stay Pending. |
+| Next action | Complete only the dependent Level 3 records, validation, independent review and usual protected-main integration for D-P9-004. Then stop with clean, synchronised `main`. No other implementation is selected. |
 
 <a id="phase-9-programme-alignment-panel"></a>
 
@@ -166,10 +166,119 @@ Exact validation and independent review are necessary before normal protected-ma
 integration. The cycle ends with clean, synchronised `main` and the first
 bounded Phase 9A implementation recommendation.
 
+<a id="phase-9a-exit-4-admission-panel"></a>
+
+## D-P9-004 Phase 9A Exit 4 acceptance panel — 2026-10-07
+
+**Decision boundary:** Richard accepts only Exit 9A-4 against protected `main`
+`9576614daf6cc69a04d214e824ec32cc7bbe5251`. The owner instruction is in
+[D-P9-004](gate-decisions.json). The [criterion](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions)
+does not change. After usual integration, Phase 9A is Open at 1/4.
+Exits 9A-1–3 stay Pending. Phase 9B stays Not started at 0/6.
+
+**Exact owner instruction:**
+
+> As TrackTemplate project owner, I accept Phase 9A Exit 9A-4 against protected "main" "9576614daf6cc69a04d214e824ec32cc7bbe5251".
+>
+> Phase 9B remains unopened.
+>
+> Complete only the directly dependent Level 3 repository alignment and normal exact-green integration. After integration, Phase 9A becomes "1/4".
+>
+> Use normal Git preservation. Do not create another external backup unless current repository policy specifically requires one.
+
+**Panel and evidence:** Richard is the panel chair and owns the decision.
+`/root` gives the evidence. `/root/cycle145_readiness` supplies the prior
+readiness assessment. `/root/rail_quality` is the independent reviewer for the same source state. The panel recommendation is **Proceed
+with bounded conditions**, with no dissent.
+
+The reviewers share one agent team and filesystem. This is not a professional rights review.
+
+The primary worktree keeps the decision packet at
+`tmp/phase9a-post144-cycle/owner-decision-packet.json`. It keeps the independent
+review at `tmp/phase9a-post144-cycle/admission-challenge/evidence-admission.json`.
+These records identify the examined source archive and the S1 package and manifest.
+The bounded scope contains `base-plinth`, `rail-seat`, `key`, `inner-jaw` and
+`outer-jaw`, with the S1 central-key identity. It does not admit the L1 package.
+
+| Evidence | SHA-256 |
+| --- | --- |
+| Frozen Templot5 revision 556b source archive | `2faddc9c1bc0ab3a60553f8a9ab14b9e04d7a14608f3404259cbf262f7309cf3` |
+| S1 package | `df5ae7d941754ed7c18ea450d1d22559c61efbd5baaa638d2e84fa9d96b8e4c7` |
+| S1 manifest | `cf45882bbdfa645bd893a22ca0e7f9200810282a2aab015c98074e0c1aee941a` |
+
+The evidence review shows local files outside the Git index in the examined
+roots. The package records its source and each field before the bounded proof
+uses them. The project recorded the access and research-use conditions before that use.
+This is not proof that no copy is elsewhere.
+
+The package keeps `NOASSERTION`
+and `acceptance.status = not-accepted`. The four GB non-copyright reviews keep
+`not-performed`. The decision gives no positive rights claim or third-party
+permission. The [research-use conditions](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research)
+continue to apply.
+
+**Risk panel:** PR-03 keeps evidence outside the canonical data. PR-06,
+PR-07, PR-08 and PR-21 keep their source and rights controls. PR-09 stays
+Critical/Open/Partial, with production output blocked. PR-22 keeps independent review and the owner decision as different controls. All 24 risks keep their recorded
+states, owners, deadlines and control effectiveness. No risk closes.
+
+D-P6-008 stays Deferred — unmet. TERM-R04 stays open. The monthly restore
+stays due by 2026-11-07. Storage of the USB away from the computer stays unverified.
+
+**Bounded conditions:** The owner for chair evidence must preserve source
+identities, field records and source notices. The evidence stays local and
+untracked, with `reference-only` and private-development status. Before a new
+source, evidence type, fitting method or intended use, that owner must record
+the applicable conditions. That owner must then review the conditions before use. A known restriction on the proposed
+private research use stops that use. No wider publication, redistribution or commercial
+use follows.
+
+**Structured decision — D-P9-004:** Accept Exit 9A-4 only for the S1
+evidence with the recorded identities. Record Phase 9A at 1/4 after usual integration with a PASS result from CI
+for the same head. Keep Exits 9A-1–3 Pending and Phase 9B Not started at 0/6.
+
+Accept no S1 definition, numerical tolerance, assisted S1 pilot, physical fit,
+package or production output. Accept no performance result, release, risk
+closure or legacy removal. Output stays private-development and project status
+stays `unknown`.
+
+The frozen executable and capture gaps, source printing allowances, comparison
+criteria and operator-acceptance duties stay. The L1 repair limit is
+`2/2`. The owner-authorised terminal repair limit is `1/1`. No more L1 repairs
+are permitted under either limit.
+
+All failed evidence
+and all comparison, adapter, caller and legacy-retirement conditions stay.
+This cycle changes no product source, research input or package acceptance field.
+Complete only the dependent Level 3 records and validation before usual integration.
+Then stop with clean, synchronised `main`.
+
+**Owner instruction for completion:**
+
+```text
+As TrackTemplate project owner, authorise one bounded terminology-admission and completion step for the existing frozen D-P9-004 / Exit 9A-4 admission cycle at candidate "39bade2e243e888f6417a5ea3ccc90b229f78ae3".
+
+The existing Documentation Review remains the sole linguistic verdict. Preserve its "BLOCKED" verdict, complete 13-finding set, frozen scope and receipt. Do not perform a second Documentation Review.
+
+For missing TrackTemplate technical terminology identified in that review, I authorise admission only where the required controlled meaning is already unambiguous from accepted canonical technical or governance authority and the change merely registers that existing meaning in "reference/TERMINOLOGY.md".
+
+Do not invent, broaden or choose between competing technical meanings. If any required term needs a genuinely new or ambiguous project meaning, stop and return only that term and the smallest owner decision required.
+
+After the bounded terminology admission, apply the review's complete exact correction set once under the existing "BLOCKED" lifecycle, complete directly dependent validation, lock the resulting document state, and continue the existing D-P9-004 alignment through normal exact-green integration if all mandatory gates pass.
+
+Do not reset the documentation lifecycle, create another linguistic review, change product behaviour or extend the accepted 9A-4 scope.
+
+Preserve Exits 9A-1–3 as Pending, keep Phase 9B unopened, and retain all rights, physical-fit, definition, tolerance, pilot, package, production and release boundaries.
+
+Use normal Git preservation. Do not create another external backup unless current repository policy specifically requires one.
+
+After successful integration, Phase 9A becomes "1/4". Then stop.
+```
+
 ## Reallocated Phase 9 requirements
 
 The [project plan](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions) owns
-the exact pending criteria. Exits 3–5 in the accepted Phase 9 gate belong
+the exact criteria. Exits 3–5 in the accepted Phase 9 gate belong
 to Phase 9A. Exits 1, 2 and 7–9 in that gate belong to Phase 9B. Phase 9A
 owns raw-evidence separation and permitted fitting and use from Exit 6.
 Phase 9B owns the licence and `project-cleared` package path from Exit 6.
@@ -180,7 +289,7 @@ Each acceptance duty has one phase owner. D-P9-003 changes the evidence sequence
 | 9A-1 | Pending | The procedural chair generator constructs all named chair components in the bounded scope and the assembled S1 chair from the S1 `ChairDefinition` accepted for reference-only research. It can construct them again without the source scan/CAD file or FreeCAD geometry that the product kept from the first construction. Select one more chair or support from repository evidence for the smallest proof of a difference in chair components, interface or assembly pattern. The other chair or support must use the same neutral `ChairDefinition` schema and procedural chair generator. An S1 dimension variant is not sufficient. A five-box or opaque-mesh fallback must not have production-ready status. |
 | 9A-2 | Pending | Standalone and FreeCAD tests give a PASS result for definition package load and round-trip. The two test paths reject corrupt and unsupported packages. Package load and round-trip preserve chair component identities, prototype geometry, separate model rail-fit policy, manufacturing compensation and rail fit. They preserve exact field provenance and reference-only status for each Templot-derived input. The two test paths give a PASS result for the S1 geometry that the generator constructs against accepted reference tolerances. |
 | 9A-3 | Pending | The operator-assisted S1 pilot is documented and accepted for bounded reference-only architecture proof through the same `ChairDefinition` and procedural chair generator. The RC qualification matrix does not include arbitrary automatic scan assimilation. |
-| 9A-4 | Pending | Raw S1 evidence that cannot be redistributed stays isolated. Its permitted fitting and use basis is recorded before that evidence supports the bounded proof or pilot. |
+| 9A-4 | Evidenced — owner-accepted 2026-10-07 | Raw S1 evidence that cannot be redistributed stays isolated. Its permitted fitting and use basis is recorded before that evidence supports the bounded proof or pilot. |
 
 Phase 9B has six Pending exits in the
 [project plan](../PROJECT_PLAN.md#phase-9a-and-9b-exit-conditions). It stays

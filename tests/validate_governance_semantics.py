@@ -2105,14 +2105,14 @@ def validate_phase8_closeout_mutations() -> None:
     for name, before, after, diagnostic in (
         (
             "phase9a-reclosed",
-            "Phase 9A is Open at 0/4",
-            "Phase 9A is Not started at 0/4",
-            "Phase 9 split status drifted: Phase 9A is Open at 0/4",
+            "Phase 9A is Open at 1/4",
+            "Phase 9A is Not started at 1/4",
+            "Phase 9 split status drifted: Phase 9A is Open at 1/4",
         ),
         (
             "phase9b-opened",
-            "Phase 9B is\nNot started at 0/6",
-            "Phase 9B is\nOpen at 0/6",
+            "Phase 9B is Not started at 0/6",
+            "Phase 9B is Open at 0/6",
             "Phase 9 split status drifted: Phase 9B is Not started at 0/6",
         ),
         (
@@ -4317,8 +4317,12 @@ def validate_phase9_split_mutations() -> None:
     evidence = read("reference/current/PHASE_EVIDENCE.md")
     terminology = read("reference/TERMINOLOGY.md")
     phase9b = table_row_containing(plan, "| 9B | Core RC chair")
+    # Keep the independent dashboard budget from masking the shape proof.
+    compact_plan = replace_once(
+        plan, "\n## Phase status\n\n", "\n## Phase status\n",
+    )
     extra_phase = replace_once(
-        plan,
+        compact_plan,
         phase9b + "\n",
         phase9b + "\n| 9C | Invented phase | 0/1 evidenced | Not started |\n",
     )
@@ -4408,19 +4412,19 @@ def validate_phase9_split_mutations() -> None:
     expect_rejected(
         "phase9/exit-evidence-self-admitted",
         lambda: progress._validate_phase9_exit_allocation(plan, admitted),
-        "Phase 9A evidence criteria or Pending status drifted",
+        "Phase 9A evidence criteria or accepted-exit status drifted",
     )
     phase9a = table_row_containing(
         plan, "| 9A | S1 and procedural chair",
     )
     premature_count = replace_once(
         plan, phase9a,
-        replace_once(phase9a, "0/4 evidenced", "1/4 evidenced"),
+        replace_once(phase9a, "1/4 evidenced", "2/4 evidenced"),
     )
     expect_rejected(
         "phase9/phase9a-exit-count-prematurely-accepted",
         lambda: progress._validate_plan_shape(premature_count),
-        "Phase 9A must stay Open at zero evidenced exits",
+        "Phase 9A must stay Open at one evidenced exit",
     )
 
     decision = json.loads(read("reference/current/gate-decisions.json"))
@@ -4696,6 +4700,109 @@ def validate_phase9_research_mutations() -> None:
                 value, phase6,
             ),
             "D-P9-003 " + diagnostic,
+        )
+
+
+def validate_phase9_exit4_admission_mutations() -> None:
+    """Reject stale, misplaced or wider acceptance of the raw-data exit."""
+    plan = read("reference/PROJECT_PLAN.md")
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    phase9a = table_row_containing(plan, "| 9A | S1 and procedural chair")
+    stale_count = replace_once(
+        plan, phase9a,
+        replace_once(phase9a, "1/4 evidenced", "0/4 evidenced"),
+    )
+    expect_rejected(
+        "phase9-exit4/stale-zero-count",
+        lambda: progress._validate_plan_shape(stale_count),
+        "Phase 9A must stay Open at one evidenced exit",
+    )
+    accepted_row = table_row_containing(evidence, "| 9A-4 |")
+    pending_row = table_row_containing(evidence, "| 9A-1 |")
+    wrong_exit = replace_once(
+        replace_once(
+            evidence, accepted_row,
+            accepted_row.replace(progress.PHASE9A_EXIT4_STATUS, "Pending"),
+        ),
+        pending_row,
+        pending_row.replace("| Pending |", "| Evidenced |"),
+    )
+    expect_rejected(
+        "phase9-exit4/wrong-exit-same-count",
+        lambda: progress._validate_phase9_exit_allocation(plan, wrong_exit),
+        "Phase 9A evidence criteria or accepted-exit status drifted",
+    )
+    decision = json.loads(read("reference/current/gate-decisions.json"))
+    phase6 = {
+        record["id"]: record
+        for record in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    admission = decision["decisions"][5]
+    for name, field, before, after, diagnostic in (
+        ("wrong-exit", "decision", "Exit 9A-4", "Exit 9A-1",
+         "decision boundary"),
+        ("broader-exit", "decision", "Accept only", "Accept all; including",
+         "decision boundary"),
+        ("altered-source", "decision",
+         "9576614daf6cc69a04d214e824ec32cc7bbe5251", "unreviewed-main",
+         "decision boundary"),
+        ("opened-9b", "decision", "Not started at 0/6", "Open at 0/6",
+         "decision boundary"),
+        ("missing-authority", "authority", admission["authority"], "",
+         "exact owner authority"),
+        ("positive-rights", "exclusions", "No S1 definition", "S1 definition",
+         "exclusions boundary"),
+        ("admitted-l1", "exclusions", "L1 package is not admitted",
+         "L1 package is admitted", "exclusions boundary"),
+        ("accepted-package", "exclusions", "no product source or package",
+         "the product source and package", "exclusions boundary"),
+        ("ignored-use-restriction", "exclusions",
+         "private research use stops that use",
+         "private research use permits that use",
+         "exclusions boundary"),
+        ("reset-l1-limit", "exclusions", "No more L1 repairs are permitted",
+         "More L1 repairs are permitted", "exclusions boundary"),
+        ("reset-l1-count", "exclusions", "repair limit is 2/2",
+         "repair limit is 0/2", "exclusions boundary"),
+        ("reset-terminal-count", "exclusions", "repair limit is 1/1",
+         "repair limit is 0/1", "exclusions boundary"),
+    ):
+        changed = copy.deepcopy(decision)
+        changed["decisions"][5][field] = replace_once(
+            admission[field], before, after,
+        )
+        expect_rejected(
+            "phase9-exit4/" + name,
+            lambda value=changed: progress._validate_phase9_decision_holding(
+                value, phase6,
+            ),
+            "D-P9-004 " + diagnostic + " drifted",
+        )
+    panel = progress._section(
+        evidence, "D-P9-004 Phase 9A Exit 4 acceptance panel — 2026-10-07",
+    )
+    for name, before, after, diagnostic in (
+        ("panel-owner-replaced", "> As TrackTemplate project owner,",
+         "> As implementation agent,", "exact panel authority"),
+        ("panel-package-hash-changed",
+         "df5ae7d941754ed7c18ea450d1d22559c61efbd5baaa638d2e84fa9d96b8e4c7",
+         "unreviewed-package", "evidence identity"),
+        ("panel-rights-escalated", "no positive rights claim",
+         "a positive rights claim", "panel boundary"),
+        ("panel-package-accepted", "acceptance.status = not-accepted",
+         "acceptance.status = accepted", "panel boundary"),
+        ("panel-physical-fit-accepted", "Accept no S1 definition",
+         "Accept S1 definition", "panel boundary"),
+    ):
+        changed = replace_once(
+            evidence, panel, replace_once(panel, before, after),
+        )
+        expect_rejected(
+            "phase9-exit4/" + name,
+            lambda value=changed: progress._validate_dp9_004_admission(value),
+            "D-P9-004 " + diagnostic + " drifted",
         )
 
 
@@ -5274,9 +5381,9 @@ def validate_documentation_profile_mutations() -> None:
     closeout_cases = (
         (
             "source-gate-changed", "**What changed**",
-            "accepted original gate",
-            "new unreviewed gate",
-            "accepted original gate",
+            "9576614daf6cc69a04d214e824ec32cc7bbe5251",
+            "unreviewed-source",
+            "9576614daf6cc69a04d214e824ec32cc7bbe5251",
         ),
         (
             "monthly-restore-pass-erased", "**Limitations/findings**",
@@ -5311,10 +5418,10 @@ def validate_documentation_profile_mutations() -> None:
             "Phase 9B stays Not started at 0/6",
         ),
         (
-            "stop-boundary-waived", "**Owner decision**",
-            "This cycle includes no chair implementation",
+            "stop-boundary-waived", "**Next action**",
+            "No other implementation is selected",
             "Begin Phase 9 product work after integration",
-            "This cycle includes no chair implementation",
+            "No other implementation is selected",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
@@ -7439,6 +7546,7 @@ def main() -> None:
     validate_phase8_closeout_mutations()
     validate_phase9_split_mutations()
     validate_phase9_research_mutations()
+    validate_phase9_exit4_admission_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()
