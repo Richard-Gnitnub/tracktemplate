@@ -24,6 +24,11 @@ from tracktemplate.domain.chair_base import (
     ChairBaseParameters,
     construct_chair_base,
 )
+from tracktemplate.domain.chair_inner_jaw import (
+    ChairInnerJawGeometry,
+    ChairInnerJawParameters,
+    construct_chair_inner_jaw,
+)
 from tracktemplate.domain.chair_key import (
     ChairKeyGeometry,
     ChairKeyParameters,
@@ -46,6 +51,9 @@ CHAIR_KEY_RESEARCH_RULE_ID = "tracktemplate.chair.key-reference.v1"
 CHAIR_BASE_RESEARCH_RULE_ID = "tracktemplate.chair.base-reference.v1"
 CHAIR_OUTER_JAW_RESEARCH_RULE_ID = (
     "tracktemplate.chair.outer-jaw-reference.v1"
+)
+CHAIR_INNER_JAW_RESEARCH_RULE_ID = (
+    "tracktemplate.chair.inner-jaw-reference.v1"
 )
 CHAIR_SEAT_FRAME_RULE_ID = "tracktemplate.chair.source-to-chair-frame.v1"
 _FRAME_PURPOSES = (
@@ -119,6 +127,22 @@ class ChairOuterJawResearchResult:
     component_id: str
     procedure_id: str
     geometry: ChairOuterJawGeometry
+
+
+@dataclass(frozen=True)
+class ChairInnerJawResearchResult:
+    """Derived complete inner jaw with unchanged provenance inputs.
+
+    Adapters must prepare again from the package and complete manifest.
+    This record gives no package or production acceptance.
+    """
+
+    package: ChairDefinitionPackage
+    manifest_json: str
+    manifest_signature: str
+    component_id: str
+    procedure_id: str
+    geometry: ChairInnerJawGeometry
 
 
 def _require(condition, code, path, message):
@@ -226,7 +250,7 @@ def _research_lineage(record, manifest):
 
 def _parameter_map(
     procedure, quantities, expected, path, *, allow_key_fish_ratio=False,
-    length_name="seat",
+    allow_inner_jaw_slopes=False, length_name="seat",
 ):
     selected = [quantities[key] for key in procedure["parameter_quantity_ids"]]
     purposes = [item["purpose"] for item in selected]
@@ -235,12 +259,33 @@ def _parameter_map(
         "research-parameter-set", path + ".parameter_quantity_ids",
         "the finite rule requires exactly its named parameter purposes",
     )
+    if allow_key_fish_ratio:
+        unit_message = (
+            "key parameters need lengths in mm and rail_fish_ratio in 1"
+        )
+    elif allow_inner_jaw_slopes:
+        unit_message = (
+            "inner jaw parameters need lengths in mm and the two "
+            "named side slopes in 1"
+        )
+    else:
+        unit_message = (
+            "{} parameters must be full-size lengths in millimetres".format(
+                length_name
+            )
+        )
     _require(
         all(
             (
                 item["quantity_kind"] == "dimensionless"
                 and item["canonical_unit"] == "1"
-            ) if allow_key_fish_ratio and item["purpose"] == "rail_fish_ratio"
+            ) if (
+                (allow_key_fish_ratio
+                 and item["purpose"] == "rail_fish_ratio")
+                or (allow_inner_jaw_slopes and item["purpose"] in (
+                    "top_to_mid_side_slope", "mid_to_seat_side_slope",
+                ))
+            )
             else (
                 item["quantity_kind"] == "length"
                 and item["canonical_unit"] == "mm"
@@ -248,24 +293,25 @@ def _parameter_map(
             for item in selected
         ),
         "research-parameter-unit", path + ".parameter_quantity_ids",
-        "key parameters need lengths in mm and rail_fish_ratio in 1"
-        if allow_key_fish_ratio
-        else "{} parameters must be full-size lengths in millimetres".format(
-            length_name
-        ),
+        unit_message,
     )
     return {item["purpose"]: item for item in selected}
 
 
 def _procedures(
     definition, quantities, *, key=False, base=False, outer_jaw=False,
+    inner_jaw=False,
 ):
     _require(
-        sum((key, base, outer_jaw)) <= 1,
+        sum((key, base, outer_jaw, inner_jaw)) <= 1,
         "research-procedure-set", "$.definition.procedures",
         "only one finite component rule can be selected",
     )
-    if outer_jaw:
+    if inner_jaw:
+        name = "inner jaw"
+        rule_id = CHAIR_INNER_JAW_RESEARCH_RULE_ID
+        parameter_type = ChairInnerJawParameters
+    elif outer_jaw:
         name = "outer jaw"
         rule_id = CHAIR_OUTER_JAW_RESEARCH_RULE_ID
         parameter_type = ChairOuterJawParameters
@@ -304,11 +350,11 @@ def _procedures(
         construction, quantities,
         tuple(item.name for item in fields(parameter_type)),
         "$.definition.procedures[1]", allow_key_fish_ratio=key,
-        length_name=name,
+        allow_inner_jaw_slopes=inner_jaw, length_name=name,
     )
     frame = _parameter_map(
         placement, quantities, _FRAME_PURPOSES, "$.definition.procedures[0]",
-        length_name=name if base or outer_jaw else "seat",
+        length_name=name if base or outer_jaw or inner_jaw else "seat",
     )
     _require(
         all(frame[purpose]["quantity_id"] == selected[purpose]["quantity_id"]
@@ -322,14 +368,16 @@ def _procedures(
 
 def _component_contract(
     definition, placement, construction, *, key=False, base=False,
-    outer_jaw=False,
+    outer_jaw=False, inner_jaw=False,
 ):
     _require(
-        sum((key, base, outer_jaw)) <= 1,
+        sum((key, base, outer_jaw, inner_jaw)) <= 1,
         "research-component-set", "$.definition.components",
         "only one finite component rule can be selected",
     )
-    if outer_jaw:
+    if inner_jaw:
+        name, role = "inner jaw", "inner-jaw"
+    elif outer_jaw:
         name, role = "outer jaw", "outer-jaw"
     elif base:
         name, role = "base", "base-plinth"
@@ -607,5 +655,59 @@ def prepare_chair_outer_jaw_research(package, manifest_text):
         manifest_signature=chair_definition_manifest_signature(manifest_text),
         component_id=component_id,
         procedure_id=outer_jaw["procedure_id"],
+        geometry=geometry,
+    )
+
+
+def prepare_chair_inner_jaw_research(package, manifest_text):
+    """Construct the complete finite inner jaw for a solid reference chair.
+
+    The 35 exact full-size lengths and two dimensionless side slopes
+    define the stand, rib, grip and both side bevels. The finite rule
+    applies no manufacturing correction. Inputs remain reference-only
+    and private, with no document, file or admission metadata changes.
+    """
+    if not isinstance(package, ChairDefinitionPackage):
+        raise TypeError("package must be a ChairDefinitionPackage")
+    try:
+        verify_chair_definition_manifest(package, manifest_text)
+    except ChairDefinitionError as error:
+        raise ChairResearchError(
+            error.code, error.path, error.detail
+        ) from error
+    manifest = json.loads(manifest_text)
+    record = package.to_record()
+    _research_metadata(record)
+    _research_lineage(record, manifest)
+    definition = record["definition"]
+    quantities = {
+        item["quantity_id"]: item for item in definition["quantities"]
+    }
+    placement, inner_jaw, selected = _procedures(
+        definition, quantities, inner_jaw=True,
+    )
+    component_id = _component_contract(
+        definition, placement, inner_jaw, inner_jaw=True,
+    )
+    _quantity_coverage(record, quantities, selected)
+    try:
+        parameters = ChairInnerJawParameters(**{
+            name: Fraction(item["canonical_value"])
+            for name, item in selected.items()
+        })
+        geometry = construct_chair_inner_jaw(parameters)
+    except (TypeError, ValueError) as error:
+        raise ChairResearchError(
+            "research-geometry-invalid", "$.definition.quantities", str(error)
+        ) from error
+    return ChairInnerJawResearchResult(
+        package=package,
+        manifest_json=json.dumps(
+            manifest, allow_nan=False, ensure_ascii=True,
+            separators=(",", ":"), sort_keys=True,
+        ),
+        manifest_signature=chair_definition_manifest_signature(manifest_text),
+        component_id=component_id,
+        procedure_id=inner_jaw["procedure_id"],
         geometry=geometry,
     )
