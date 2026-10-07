@@ -4759,10 +4759,15 @@ def validate_phase9_exit4_admission_mutations() -> None:
         ("accepted-package", "exclusions", "no product source or package",
          "the product source and package", "exclusions boundary"),
         ("ignored-use-restriction", "exclusions",
-         "A known restriction blocks", "A known restriction permits",
+         "private research use stops that use",
+         "private research use permits that use",
          "exclusions boundary"),
-        ("reset-l1-limit", "exclusions", "exhausted L1 repair limits",
-         "reset L1 repair limits", "exclusions boundary"),
+        ("reset-l1-limit", "exclusions", "No more L1 repairs are permitted",
+         "More L1 repairs are permitted", "exclusions boundary"),
+        ("reset-l1-count", "exclusions", "repair limit is 2/2",
+         "repair limit is 0/2", "exclusions boundary"),
+        ("reset-terminal-count", "exclusions", "repair limit is 1/1",
+         "repair limit is 0/1", "exclusions boundary"),
     ):
         changed = copy.deepcopy(decision)
         changed["decisions"][5][field] = replace_once(
@@ -5414,9 +5419,9 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "stop-boundary-waived", "**Next action**",
-            "No further implementation is selected",
+            "No other implementation is selected",
             "Begin Phase 9 product work after integration",
-            "No further implementation is selected",
+            "No other implementation is selected",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:

@@ -1176,7 +1176,7 @@ def _validate_owner_view(plan: str) -> None:
         "D-P9-004",
         "9576614daf6cc69a04d214e824ec32cc7bbe5251",
         "This decision adds no product behaviour",
-        "No further implementation is selected",
+        "No other implementation is selected",
         "D-GOV-023",
         "representative-fixture",
         "straight TO Edit",
@@ -5533,7 +5533,7 @@ def _validate_phase9_decision_holding(
         ("decision", (
             "Accept only Phase 9A Exit 9A-4",
             "protected main 9576614daf6cc69a04d214e824ec32cc7bbe5251",
-            "successful CI for the exact head",
+            "a PASS result from CI for the same head",
             "Phase 9A is Open at 1/4",
             "Exits 9A-1–3 stay Pending",
             "Phase 9B stays Not started at 0/6",
@@ -5542,19 +5542,21 @@ def _validate_phase9_decision_holding(
             "Only the recorded S1 evidence separation and permitted "
             "private research use are accepted",
             "local and untracked, reference-only and private-development",
-            "The separate L1 package is not admitted",
-            "No S1 definition, numerical tolerance, assisted pilot, "
+            "The L1 package is not admitted",
+            "No S1 definition, numerical tolerance, assisted S1 pilot, "
             "physical fit, package, production output or positive rights "
             "claim is accepted",
             "No third-party permission, risk closure, performance result, "
             "release or legacy removal follows",
-            "A known restriction blocks the affected research use",
+            "A known restriction on the proposed private research use stops that use",
             "conditions recorded and reviewed before use",
-            "All 24 risk states, owners, deadlines and controls remain "
+            "All 24 risk states, owners, deadlines and controls stay "
             "unchanged",
             "D-P6-008 stays Deferred — unmet and TERM-R04 stays open",
             "Frozen oracle gaps",
-            "exhausted L1 repair limits",
+            "The L1 repair limit is 2/2",
+            "The owner-authorised terminal repair limit is 1/1",
+            "No more L1 repairs are permitted under either limit",
             "This cycle changes no product source or package acceptance "
             "field",
             "Output stays private-development and project status stays "
@@ -5596,11 +5598,12 @@ def _validate_dp9_004_admission(evidence: str) -> None:
     ):
         _require(identity in panel, "D-P9-004 evidence identity drifted")
     for clause in (
-        "Richard chairs the panel and owns the decision",
-        "independent QA/risk challenge for the same source state",
+        "Richard is the panel chair and owns the decision",
+        "independent reviewer for the same source state",
         "Proceed with bounded conditions",
-        "not an external organisational or professional rights review",
-        "It does not admit the separate L1 package",
+        "reviewers share one agent team and filesystem",
+        "not a professional rights review",
+        "It does not admit the L1 package",
         "NOASSERTION",
         "acceptance.status = not-accepted",
         "not-performed",
@@ -5609,16 +5612,18 @@ def _validate_dp9_004_admission(evidence: str) -> None:
         "control effectiveness",
         "D-P6-008 stays Deferred — unmet",
         "TERM-R04 stays open",
-        "A known restriction on the proposed research use blocks that use",
+        "A known restriction on the proposed private research use stops that use",
         "Accept Exit 9A-4 only",
         "Phase 9A at 1/4",
         "Keep Exits 9A-1–3 Pending and Phase 9B Not started at 0/6",
-        "Accept no S1 definition, numerical tolerance, assisted pilot, "
+        "Accept no S1 definition, numerical tolerance, assisted S1 pilot, "
         "physical fit, package or production output",
         "Accept no performance result, release, risk closure or legacy "
         "removal",
         "Output stays private-development and project status stays unknown",
-        "2/2 and separate terminal limit 1/1 remain exhausted",
+        "The L1 repair limit is 2/2",
+        "The owner-authorised terminal repair limit is 1/1",
+        "No more L1 repairs are permitted under either limit",
         "This cycle changes no product source, research input or package "
         "acceptance field",
     ):

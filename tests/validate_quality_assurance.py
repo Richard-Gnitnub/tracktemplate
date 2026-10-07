@@ -599,7 +599,7 @@ def validate_documentation_profile(
             "D-P9-004",
             "9576614daf6cc69a04d214e824ec32cc7bbe5251",
             "This decision adds no product behaviour",
-            "No further implementation is selected",
+            "No other implementation is selected",
             "D-GOV-023",
             "representative-fixture",
             "straight TO Edit",
