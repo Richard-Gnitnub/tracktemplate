@@ -1,4 +1,4 @@
-"""Validate five transient research solids in one shared-frame compound.
+"""Validate five transient research components in one shared-frame compound.
 
 Component identity survives composition. Pairwise Boolean measurements
 describe overlaps; they do not fuse the components, heal geometry or
@@ -30,6 +30,7 @@ from tracktemplate.adapters.freecad.chair_seat_exact import (
 )
 from tracktemplate.application.chair_research import (
     prepare_chair_assembly_research,
+    prepare_chair_l1_assembly_research,
 )
 from tracktemplate.domain.chair_assembly import CHAIR_ASSEMBLY_ROLES
 
@@ -60,23 +61,36 @@ def _bounds(shape):
     return (box.XMin, box.YMin, box.ZMin, box.XMax, box.YMax, box.ZMax)
 
 
-def _construct_components(research):
+def _construct_components(research, *, l1=False):
     """Construct only after complete package validation has succeeded."""
     builders = (
         construct_chair_base_shape, construct_chair_seat_shape,
         construct_chair_key_shape, construct_chair_outer_jaw_shape,
         construct_chair_inner_jaw_shape,
     )
-    return tuple(builder(component.geometry)
-                 for builder, component in zip(builders, research.components))
+    shapes = []
+    for role, builder, component in zip(
+        CHAIR_ASSEMBLY_ROLES, builders, research.components,
+    ):
+        if l1 and role == "outer-jaw":
+            shapes.append(Part.makeCompound([
+                builder(geometry) for _name, geometry in component.geometry.parts
+            ]))
+        else:
+            shapes.append(builder(component.geometry))
+    return tuple(shapes)
 
 
-def _measure_component(shape, component, role):
-    geometry = component.geometry
+def _measure_component(shape, component, role, *, l1_outer=False, geometry=None):
+    geometry = component.geometry if geometry is None else geometry
+    solid_count = 3 if l1_outer else 1
+    closed = (all(solid.isClosed() for solid in shape.Solids)
+              if l1_outer else shape.isClosed())
     _require(
-        not shape.isNull() and shape.ShapeType == "Solid"
-        and shape.isValid() and shape.isClosed()
-        and len(shape.Solids) == len(shape.Shells) == 1,
+        not shape.isNull()
+        and shape.ShapeType == ("Compound" if l1_outer else "Solid")
+        and shape.isValid() and closed
+        and len(shape.Solids) == len(shape.Shells) == solid_count,
         "invalid-assembly-component", role,
     )
     edges = set()
@@ -125,10 +139,10 @@ def _measure_component(shape, component, role):
         and math.isfinite(volume_budget) and volume_residual <= volume_budget,
         "assembly-component-volume-mismatch", role,
     )
-    return {
+    measurement = {
         "role": role, "component_id": component.component_id,
         "procedure_id": component.procedure_id, "valid": True, "closed": True,
-        "solid_count": 1, "shell_count": 1,
+        "solid_count": solid_count, "shell_count": solid_count,
         "vertex_count": len(shape.Vertexes), "edge_count": len(shape.Edges),
         "face_count": len(shape.Faces), "bounds_mm": bounds,
         "volume_mm3": shape.Volume, "volume_residual_mm3": volume_residual,
@@ -139,6 +153,23 @@ def _measure_component(shape, component, role):
         "maximum_kernel_tolerance_mm": kernel_tolerance,
         "face_ids": tuple(name for name, _ids in geometry.faces),
     }
+    if l1_outer:
+        children = shape.childShapes()
+        _require(
+            tuple(name for name, _part in geometry.parts)
+            == ("body", "bevel-negative", "bevel-positive")
+            and len(children) == 3,
+            "assembly-l1-outer-parts", "expected three named L1 outer pieces",
+        )
+        pieces = []
+        for child, (name, part) in zip(children, geometry.parts):
+            piece = _measure_component(
+                child, component, role + ":" + name, geometry=part,
+            )
+            piece["piece_id"] = name
+            pieces.append(piece)
+        measurement.update(shape_type="Compound", pieces=pieces)
+    return measurement
 
 
 def _measure_contacts(shapes, components):
@@ -189,20 +220,49 @@ def validate_chair_assembly_exact_geometry(package, manifest_text):
     object or cached first construction is kept by this operation.
     """
     research = prepare_chair_assembly_research(package, manifest_text)
+    return _validate_research(
+        research, "tracktemplate.chair-assembly-exact-research.v1",
+    )
+
+
+def validate_chair_l1_assembly_exact_geometry(package, manifest_text):
+    """Measure a freshly constructed, reference-only L1 bounded body.
+
+    The complete original package and manifest pass the finite L1 rules
+    before any host construction. The five components remain separate
+    in full-size mm. This operation keeps no shape, document or file and
+    grants no physical-fit, package or production acceptance.
+    """
+    research = prepare_chair_l1_assembly_research(package, manifest_text)
+    return _validate_research(
+        research, "tracktemplate.chair-l1-assembly-exact-research.v1",
+        l1=True,
+    )
+
+
+def _validate_research(research, contract_id, *, l1=False):
+    """Apply the shared five-component host proof after family validation."""
+    package = research.package
     try:
-        shapes = _construct_components(research)
+        shapes = (_construct_components(research, l1=True) if l1
+                  else _construct_components(research))
         _require(len(shapes) == 5, "assembly-component-count", "expected five")
         components = [
-            _measure_component(shape, component, role)
+            _measure_component(
+                shape, component, role, l1_outer=l1 and role == "outer-jaw",
+            )
             for shape, component, role in zip(
                 shapes, research.components, CHAIR_ASSEMBLY_ROLES,
             )
         ]
         compound = Part.makeCompound(shapes)
+        solid_count = 7 if l1 else 5
         _require(
             not compound.isNull() and compound.ShapeType == "Compound"
-            and compound.isValid() and len(compound.Solids) == 5,
-            "invalid-assembly-compound", "expected five valid named solids",
+            and compound.isValid() and len(compound.Solids) == solid_count,
+            "invalid-assembly-compound",
+            ("expected seven solids in five named components" if l1
+             else "expected five valid named solids"),
         )
         children = compound.childShapes()
         _require(
@@ -229,7 +289,7 @@ def validate_chair_assembly_exact_geometry(package, manifest_text):
         )
         contacts = _measure_contacts(shapes, research.components)
         return {
-            "contract_id": "tracktemplate.chair-assembly-exact-research.v1",
+            "contract_id": contract_id,
             "package_signature": package.content_signature,
             "manifest_signature": research.manifest_signature,
             "project_status": "reference-only",
@@ -238,7 +298,8 @@ def validate_chair_assembly_exact_geometry(package, manifest_text):
             "frame_id": package.to_record()["definition"]["frame"]["frame_id"],
             "length_unit": "mm", "length_basis": "full-size",
             "placement": "central-key-identity",
-            "shape_type": "Compound", "component_count": 5, "solid_count": 5,
+            "shape_type": "Compound", "component_count": 5,
+            "solid_count": solid_count,
             "valid": True, "fused": False, "bounds_mm": bounds,
             "component_volume_sum_mm3": volume_sum,
             "maximum_bounds_residual_mm": residual,

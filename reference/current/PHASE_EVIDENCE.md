@@ -598,6 +598,63 @@ The `phase9a-s1-rail-interface-proof` worktree keeps the detailed evidence in
 classification and the PASS results after the implementing agent did the tests
 again.
 
+## `L1` checks with `reference-only` inputs — 2026-10-07
+
+This Level 2 result adds evidence for Phase 9A-1. The
+[operation](../../tracktemplate/application/chair_research.py)
+uses `ChairDefinitionPackage` schema version 1 to construct a second chair
+structure. The bounded scope contains 5 chair components: `base-plinth`, `rail-seat`,
+`key`, `outer-jaw` and `inner-jaw`.
+
+The `base-plinth` has equal `edge_thickness_mm` and `plinth_thickness_mm`
+values. The `outer-jaw` has 3 parts. The `inner-jaw` uses the
+recorded source limit for its lower points. Previous `S1` tests give PASS results.
+
+The [tests for standalone Python](../../tests/validate_phase9a_chair_l1.py)
+give PASS results for the 5 chair components. They write the input data to
+JSON, read the data again and construct the same result. They reject a `ChairDefinitionPackage` that has `S1` and `L1`
+together in its `rule_id` data. They also reject other incorrect input. Tests with the local source inputs
+also give PASS results.
+
+The [FreeCAD tests](../../tests/freecad_validate_phase9a_chair_l1.py) on the
+qualified host profile give PASS results for 7 `Solid` shapes in 5 chair
+components. The tests report `valid = true` and `closed = true`.
+The tests compare 24 independently calculated
+points. The maximum difference is `0.0 mm`. The FreeCAD `Document` does not change.
+
+The standalone Python test shows that each side part of `outer-jaw` touches
+its middle part along one edge. Between each side part and the middle part,
+FreeCAD reports `distance_mm = 0.0` and `common_volume_mm3 = 0.0`.
+FreeCAD reports `common_edge_count = 0` for each pair. Only the standalone
+Python test shows the edge between the two parts.
+
+The local source input uses `source_mark_quantum_mm` of `0.381 mm` for
+`8 mm/ft`. The result keeps `length_basis = "full-size"` and
+`length_unit = "mm"`. The result is not a product output at `8 mm/ft`.
+The operation rejects inputs for `4 mm/ft` and `6 mm/ft` with
+`ambiguous source mark rounding`.
+
+The [source limitations](../PROVENANCE.md#phase-9a-research-input-provenance) do not change.
+The Templot source includes “including some 3D printing allowances”
+at `dxf_unit.pas:13699`. The result does not show a correct fit between a chair
+and the part that it holds. It does not compare results with the Templot
+executable. It adds no limit for acceptance of calculated values.
+
+The `ChairDefinitionPackage` stays `reference-only`, has private-development
+status and has no acceptance. This result gives no acceptance for production.
+The [canonical policy](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research)
+for licensing does not change.
+Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
+This result gives no phase exit acceptance.
+
+The `phase9a-l1-body-proof` worktree keeps the detailed evidence in
+`tmp/phase9a-l1-body-proof/`. This includes classified FAIL results and the PASS
+result after the one last correction that the project owner authorised.
+The correction changes only the local test, not product source.
+The files `presentation/l1-full-size-axonometric.png` and
+`presentation/l1-full-size-top.png` show the result in FreeCAD.
+The two files give evidence only for how FreeCAD shows the result.
+
 <a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>
 
 ## D-GOV-023 exact FreeCAD 1.1.4 host qualification — 2026-10-07
