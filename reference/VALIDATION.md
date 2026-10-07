@@ -1450,8 +1450,8 @@ D-GOV-019 gives functional compatibility authority only.
 D-GOV-023 adds only the exact FreeCAD 1.1.4 profile with CPython 3.13.15,
 PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.10. The complete
 standalone, FreeCADCmd and real-GUI matrices gave the specified results.
-The Flatpak app and runtime commits are independently verified provenance;
-the runtime probe does not report them. The four earlier profiles stay
+The Flatpak app and runtime commits are independently verified provenance.
+The runtime probe does not report them. The four earlier profiles stay
 qualified. D-GOV-023 gives functional compatibility authority only.
 
 D-GOV-007 and D-GOV-010 define the

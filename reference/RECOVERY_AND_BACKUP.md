@@ -28,7 +28,7 @@ versioned backup and a tested restore.
 
 ## Current protection state
 
-| Layer | State on 2026-07-22 | Boundary |
+| Layer | Current state | Boundary |
 | --- | --- | --- |
 | Codex filesystem sandbox | Active | Routine writes are restricted to the project, temporary storage and the agent workspace; an explicit elevation is a separate user decision |
 | Timeshift system snapshots | Configured: daily, five retained; recent snapshot/restore not verified | Current configuration excludes `/home/richard/**`; it protects system state, not this project or personal FreeCAD documents |
@@ -36,7 +36,7 @@ versioned backup and a tested restore.
 | GitHub `main` | Active and verified 2026-07-28 | Strict, up-to-date `validation` from GitHub Actions app `15368` is required; administrator enforcement is active; force pushes and branch deletion remain blocked; no pull-request review count is required |
 | GitHub remote history | Active | Off-machine copy of pushed Git objects; not a complete backup of ignored assets and not independent of account/repository administration |
 | Independent project-data backup | **Operational for the complete declared project-data scope** | A dated, non-overwriting snapshot on a separate ext4 USB covers `.git`, ignored evidence, repository FCStd fixtures and the source archive; the owner confirmed no valuable external project files require backup |
-| Restore drill | **Passed on 2026-10-07 for the accepted 2026-10-04 set** | Passed and owner-accepted for the complete declared scope on 2026-07-22; see the [initial drill](backup-records/2026-07-22-initial-repository-backup-restore.md). The later drill used a separate empty target and the exact qualified FreeCAD 1.1.4 host. The next monthly drill is due by 2026-11-07. |
+| Restore drill | **Passed on 2026-10-07 for the accepted 2026-10-04 set** | Passed and owner-accepted for the complete declared scope on 2026-07-22. See the [initial drill](backup-records/2026-07-22-initial-repository-backup-restore.md). The later drill used a separate empty target and the exact qualified FreeCAD 1.1.4 host. The next monthly drill is due by 2026-11-07. |
 | Repeat and retention | **Active and verified again 2026-08-01** | The accepted cadence and hard-linked incremental retention were proved again by the [Phase 5 closeout snapshot](backup-records/2026-08-01-phase5-closeout-snapshot.md), covering Git and ignored Phase 5 raw evidence; QA-R01 remains closed |
 
 ## Initial implementation and remaining risk
@@ -523,7 +523,7 @@ The 2026-10-07 monthly drill restored the accepted
 It compared 69,927 entries across 30 registered roots. File bytes, type,
 mode, owner, group, modification time and symbolic-link text matched before
 the 58 required copied-Git-pointer changes. Restored heads, references,
-indexes and dirty states matched; `git fsck --full` passed. The Templot source
+indexes and dirty states matched. `git fsck --full` passed. The Templot source
 archive and one ignored FCStd fixture retained their SHA-256 values. The
 qualified FreeCAD 1.1.4 GUI opened a copied FCStd and verified nine object
 identities without a save or explicit recompute. The snapshot, live Git state
@@ -532,7 +532,7 @@ and source fixture did not change. The ignored completion receipt is
 with SHA-256
 `76f9c0c7681d6778398e01bdd3e43e7ab92c0c16530bcdf2259a7dc593bb9b3b`.
 The drill tests the October 4 set, not later live changes. The USB remains
-attached; separate physical storage is unverified. PR-13 stays open.
+attached. Separate physical storage is unverified. PR-13 stays open.
 
 The first repository-scope drill is recorded in
 [2026-07-22-initial-repository-backup-restore.md](backup-records/2026-07-22-initial-repository-backup-restore.md).

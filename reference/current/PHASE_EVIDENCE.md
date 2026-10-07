@@ -18,7 +18,7 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 0/4 with four Pending exits. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
 | What changed | [D-P9-003](#phase-9a-research-sequencing-panel) separates reference-only S1 research acceptance in Phase 9A from production/package clearance in Phase 9B. Frozen Templot5 revision 556b inputs can support the bounded research proof. The nine initial requirements stay. [D-GOV-023](#freecad-1-1-4-coin4-0-10-qualification-panel) qualifies only the installed exact FreeCAD 1.1.4 host for functional compatibility. |
 | What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows. The exact FreeCAD 1.1.4 host passed the complete compatibility matrix and opened a copied FCStd in the monthly restore. The merged PR #139 inner-jaw research test also passed on that host. |
-| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set; the next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
+| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
 | Owner decision | [D-P9-003](#phase-9a-research-sequencing-panel) accepts only the bounded sequence. It accepts no definition, package, production output, risk closure or legacy removal. [D-GOV-023](#freecad-1-1-4-coin4-0-10-qualification-panel) accepts only exact functional host compatibility. All four Phase 9A exits and all six Phase 9B exits stay Pending. No S1 admission follows. |
 | Next action | Complete exact validation and protected-main alignment for D-GOV-023. Then stop with clean, synchronised `main`. Later Phase 9A work needs a separate bounded assignment. |
 
@@ -494,7 +494,7 @@ FreeCAD has revision `45039 (Git)` and source commit
 `4fd3bf320d9566a27e60069fc8387448aaa3a094`. The exact profile has
 CPython 3.13.15, PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.10.
 The runtime guard matches reported host fields. It does not report the
-Flatpak commits; separate deployment checks verified those values before
+Flatpak commits. Separate deployment checks verified those values before
 and after the matrices.
 
 | Qualification area | Result |
@@ -525,8 +525,8 @@ merged at protected `main` `635763cd5e2385c1d2ff93c34402b1e3e457881e`.
 Its second parent is the reviewed head `c85a8477e06eed012f25582fa500fa5f06b2f35c`.
 The merged tree is the reviewed tree
 `6936888d7134218298b0657c9ec79172cf95be81`.
-The new inner-jaw research FreeCAD check then passed on the qualified host;
-its stdout has SHA-256
+The new inner-jaw research FreeCAD check then passed on the qualified host.
+Its stdout has SHA-256
 `b78065f695e7be53e96210efd637443fc93382d92af7969fd5cadd024684d432`.
 This check adds no S1 admission or exit acceptance.
 
