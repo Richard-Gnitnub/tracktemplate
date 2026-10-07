@@ -72,6 +72,16 @@ def _make_shape(geometry):
     return Part.makeSolid(shell)
 
 
+def construct_chair_outer_jaw_shape(geometry):
+    """Build a transient boundary from validated analytical geometry.
+
+    Adapter composition helper only. The caller must validate its complete
+    research package before construction and check the resulting solid.
+    This function grants no package or production-output acceptance.
+    """
+    return _make_shape(geometry)
+
+
 def validate_chair_outer_jaw_exact_geometry(package, manifest_text):
     """Revalidate canonical research data and return neutral measurements.
 

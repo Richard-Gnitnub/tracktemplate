@@ -473,6 +473,50 @@ The separation of prototype geometry, rail-fit policy and manufacturing compensa
 Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
 This result gives no exit, package, risk or production acceptance. All recorded limits stay.
 
+## Reference-only S1 assembly proof — 2026-10-07
+
+This Level 2 result contributes to Phase 9A-1 and Phase 9A-2 only.
+The package stays `reference-only`, private-development and not accepted.
+Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
+This result gives no S1, exit, package, rights or production acceptance.
+
+Prototype geometry, model rail-fit policy and manufacturing compensation
+stay separate. All recorded limits and risk duties stay unchanged.
+
+The research operation uses one neutral `ChairDefinition` to make an assembly
+from its base/plinth, seat, key, inner jaw and outer jaw. The 5 component rules
+do not change. The local package keeps the same 113 quantity records, source
+lineage and dependencies. Other source records give the position of the key
+at the centre of the assembly. The operation does not move the components at
+random, change their scale or add manufacturing compensation.
+
+[Standalone tests](../../tests/validate_phase9a_chair_assembly.py) give a PASS
+result. They write and read the definition data and make the assembly again.
+The tests reject 14 input records with correct signatures but incorrect data.
+[FreeCAD tests](../../tests/freecad_validate_phase9a_chair_assembly.py) on the
+qualified host profile give a PASS result for 5 closed solids in one `Compound`.
+Each solid passes the FreeCAD `isValid()` check. If the operation fails, the
+FreeCAD document does not change.
+
+The local Templot 556b package gives the same component shapes as the 5
+component proofs. The assembly operation does not read a source file or use
+retained FreeCAD geometry. Tests calculate the expected relation without
+FreeCAD. FreeCAD gives the same relation for all 10 component pairs.
+
+Four pairs touch at surfaces. Four pairs have a positive distance between them.
+Two pairs have common volume. Only the FreeCAD host measures the 2 common
+volumes. These checks do not prove that physical rail stock fits.
+
+The `phase9a-s1-assembly-research-proof` worktree keeps the evidence in
+`tmp/phase9a-s1-assembly-proof/`. The file
+`presentation/s1-assembly-axonometric.png` in that directory shows the
+assembly. The image is presentation evidence only. The assembly keeps 5
+separate solids. This proof does not show a single solid for production.
+
+A reviewer who did not write the source or tests gives a PASS result with no
+findings. The receipt is `independent-quality-review.json` in that directory.
+The reviewer and authors share the same agent team and workspace.
+
 <a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>
 
 ## D-GOV-023 exact FreeCAD 1.1.4 host qualification — 2026-10-07

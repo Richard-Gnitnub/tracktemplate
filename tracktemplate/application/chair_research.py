@@ -19,6 +19,11 @@ from tracktemplate.application.chair_definition import (
     chair_definition_manifest_signature,
     verify_chair_definition_manifest,
 )
+from tracktemplate.domain.chair_assembly import (
+    CHAIR_ASSEMBLY_ROLES,
+    ChairAssemblyGeometry,
+    assemble_chair_components,
+)
 from tracktemplate.domain.chair_base import (
     ChairBaseGeometry,
     ChairBaseParameters,
@@ -300,7 +305,7 @@ def _parameter_map(
 
 def _procedures(
     definition, quantities, *, key=False, base=False, outer_jaw=False,
-    inner_jaw=False,
+    inner_jaw=False, assembly=False,
 ):
     _require(
         sum((key, base, outer_jaw, inner_jaw)) <= 1,
@@ -357,8 +362,14 @@ def _procedures(
         length_name=name if base or outer_jaw or inner_jaw else "seat",
     )
     _require(
-        all(frame[purpose]["quantity_id"] == selected[purpose]["quantity_id"]
-            for purpose in _FRAME_PURPOSES),
+        all(
+            (Fraction(frame[purpose]["canonical_value"])
+             == Fraction(selected[purpose]["canonical_value"]))
+            if assembly else
+            (frame[purpose]["quantity_id"]
+             == selected[purpose]["quantity_id"])
+            for purpose in _FRAME_PURPOSES
+        ),
         "research-frame-inputs", "$.definition.procedures[0]",
         ("the frame and {} must use the same explicit "
          "rail and seat inputs").format(name),
@@ -709,5 +720,134 @@ def prepare_chair_inner_jaw_research(package, manifest_text):
         manifest_signature=chair_definition_manifest_signature(manifest_text),
         component_id=component_id,
         procedure_id=inner_jaw["procedure_id"],
+        geometry=geometry,
+    )
+
+
+@dataclass(frozen=True)
+class ChairAssemblyResearchResult:
+    """Original signed package and its five derived research components."""
+
+    package: ChairDefinitionPackage
+    manifest_json: str
+    manifest_signature: str
+    components: tuple
+    geometry: ChairAssemblyGeometry
+
+
+def prepare_chair_assembly_research(package, manifest_text):
+    """Construct five named components from one complete neutral package.
+
+    One frame, five finite component rules and identity placement form
+    the central-key research assembly. No synthetic subpackage is signed
+    or loaded. All original field identities and lineage remain intact.
+    The operation has no document, filesystem or admission side effect.
+    """
+    if not isinstance(package, ChairDefinitionPackage):
+        raise TypeError("package must be a ChairDefinitionPackage")
+    try:
+        verify_chair_definition_manifest(package, manifest_text)
+    except ChairDefinitionError as error:
+        raise ChairResearchError(error.code, error.path, error.detail) from error
+    manifest = json.loads(manifest_text)
+    record = package.to_record()
+    _research_metadata(record)
+    _research_lineage(record, manifest)
+    definition = record["definition"]
+    specifications = (
+        (CHAIR_BASE_RESEARCH_RULE_ID, ChairBaseParameters,
+         construct_chair_base, ChairBaseResearchResult, {"base": True}),
+        (CHAIR_SEAT_RESEARCH_RULE_ID, ChairSeatParameters,
+         construct_chair_seat, ChairSeatResearchResult, {}),
+        (CHAIR_KEY_RESEARCH_RULE_ID, ChairKeyParameters,
+         construct_chair_key, ChairKeyResearchResult, {"key": True}),
+        (CHAIR_OUTER_JAW_RESEARCH_RULE_ID, ChairOuterJawParameters,
+         construct_chair_outer_jaw, ChairOuterJawResearchResult,
+         {"outer_jaw": True}),
+        (CHAIR_INNER_JAW_RESEARCH_RULE_ID, ChairInnerJawParameters,
+         construct_chair_inner_jaw, ChairInnerJawResearchResult,
+         {"inner_jaw": True}),
+    )
+    procedures = {p["rule_id"]: p for p in definition["procedures"]}
+    _require(
+        len(definition["procedures"]) == 6
+        and set(procedures) == {
+            CHAIR_SEAT_FRAME_RULE_ID, *(s[0] for s in specifications),
+        },
+        "research-assembly-procedures", "$.definition.procedures",
+        "assembly requires one frame and exactly five finite component rules",
+    )
+    components = {c["role"]: c for c in definition["components"]}
+    _require(
+        len(definition["components"]) == 5
+        and set(components) == set(CHAIR_ASSEMBLY_ROLES),
+        "research-assembly-components", "$.definition.components",
+        "assembly requires exactly the five proven component roles",
+    )
+    construction_ids = {
+        procedures[s[0]]["procedure_id"] for s in specifications
+    }
+    interfaces = definition["rail_interfaces"]
+    _require(
+        len(interfaces) == 1
+        and set(interfaces[0]["procedure_ids"]) == construction_ids,
+        "research-assembly-interface", "$.definition.rail_interfaces",
+        "one rail interface must own all five construction procedures",
+    )
+    quantities = {q["quantity_id"]: q for q in definition["quantities"]}
+    placement = procedures[CHAIR_SEAT_FRAME_RULE_ID]
+    selections, all_selected = [], {}
+    for role, spec in zip(CHAIR_ASSEMBLY_ROLES, specifications):
+        rule, parameter_type, constructor, result_type, flags = spec
+        construction = procedures[rule]
+        # A validation view only: no package, signature or lineage changes.
+        view = dict(definition, procedures=[placement, construction],
+                    components=[components[role]], rail_interfaces=[dict(
+                        interfaces[0],
+                        procedure_ids=[construction["procedure_id"]],
+                    )])
+        _, _, selected = _procedures(
+            view, quantities, assembly=True, **flags,
+        )
+        component_id = _component_contract(
+            view, placement, construction, **flags,
+        )
+        all_selected.update({q["quantity_id"]: q for q in selected.values()})
+        selections.append((component_id, construction, selected,
+                           parameter_type, constructor, result_type))
+    all_selected.update({identity: quantities[identity]
+                         for identity in placement["parameter_quantity_ids"]})
+    _quantity_coverage(record, quantities, all_selected)
+    manifest_json = json.dumps(
+        manifest, allow_nan=False, ensure_ascii=True,
+        separators=(",", ":"), sort_keys=True,
+    )
+    signature = chair_definition_manifest_signature(manifest_text)
+    results = []
+    try:
+        for identity, procedure, selected, kind, constructor, result_type in (
+            selections
+        ):
+            parameters = kind(**{
+                name: Fraction(q["canonical_value"])
+                for name, q in selected.items()
+            })
+            results.append(result_type(
+                package=package, manifest_json=manifest_json,
+                manifest_signature=signature, component_id=identity,
+                procedure_id=procedure["procedure_id"],
+                geometry=constructor(parameters),
+            ))
+        geometry = assemble_chair_components(tuple(
+            (role, result.geometry)
+            for role, result in zip(CHAIR_ASSEMBLY_ROLES, results)
+        ))
+    except (TypeError, ValueError) as error:
+        raise ChairResearchError(
+            "research-assembly-geometry-invalid", "$.definition", str(error),
+        ) from error
+    return ChairAssemblyResearchResult(
+        package=package, manifest_json=manifest_json,
+        manifest_signature=signature, components=tuple(results),
         geometry=geometry,
     )
