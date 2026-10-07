@@ -5490,7 +5490,7 @@ def _validate_phase9_decision_holding(
         ),
         (
             "exclusions",
-            "49edde3b29b15b0122216fa349374c7fd908c2c61cdd322a760c772a092a7893",
+            "a462c62b2008a2b6f2d9339bbc567cf2d6111b7e3fdac49a13fb924423a19d25",
         ),
     ):
         value = host[field]
