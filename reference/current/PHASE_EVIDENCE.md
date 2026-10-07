@@ -519,32 +519,38 @@ The reviewer and authors share the same agent team and workspace.
 
 ## Reference-only S1 model comparison proof — 2026-10-07
 
-This Level 2 result supplies a 4 mm/ft comparison of the research assembly
-for Phase 9A-2. It uses the existing full-size assembly proof. The
+This Level 2 result gives geometry at 4 mm/ft for the Phase 9A-2
+comparison. It uses the full-size research assembly proof. The
 [research boundary](../phase-evidence/S1_PILOT_PLAN.md#phase-9a-research-and-phase-9b-production-boundary)
 continues to apply. Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
 
-One explicit request divides full-size lengths by `76.2`. The operation keeps
-the same chair-local origin, axes and central key position. It preserves the
-original definition, component identities, provenance and signatures. It
-rejects other scales, different frames and manufacturing profiles.
+The operation uses the explicit 4 mm/ft scale to divide each full-size length
+by `76.2`. It keeps the chair-local origin, axes and position of the key at
+the centre. It does not change the input definition, component identities,
+provenance or signatures. It rejects other scales, different frames and
+manufacturing profiles.
 
-[Standalone tests](../../tests/validate_phase9a_chair_model_scale.py) give a PASS
-result for exact coordinates, definition round-trip, request identity and
-invalid-input refusal. [FreeCAD tests](../../tests/freecad_validate_phase9a_chair_model_scale.py)
-on the qualified host give a PASS result for 5 closed solids, 491 named
-vertices and all 10 component pairs. Tests also verify surface areas, volumes
-and unchanged documents. The earlier assembly regression tests give PASS results.
+[Standalone tests](../../tests/validate_phase9a_chair_model_scale.py) give a
+PASS result for exact coordinates and definition round-trip. They also check
+the input identity and reject invalid input.
+[FreeCAD tests](../../tests/freecad_validate_phase9a_chair_model_scale.py) on
+the qualified host profile give a PASS result for 5 closed solids, 491 named
+vertices and all 10 component pairs. They also check surface areas, volumes
+and that the FreeCAD document does not change. The assembly regression tests
+give PASS results.
 
-The retained Templot 556b package gives the expected model dimensions and
-landmarks. The operation makes fresh geometry from analytical boundaries.
-It does not read the Templot source or use retained FreeCAD geometry.
-The 5 solids stay separate. FreeCAD measures their common volumes; no
-independent absolute reference confirms those volumes.
+The local Templot 556b research package and the declared scale give the model
+dimensions and landmarks. The FreeCAD path makes new geometry from the
+calculated component boundaries. It reads no Templot source file and uses no
+FreeCAD geometry from the full-size proof.
 
-This proof does not compare against output from the Templot executable.
-It supplies no physical-fit result, production clearance, S1 admission or
-exit acceptance. Numerical comparison criteria still need owner acceptance.
+The output is a `Compound` with 5 solids. FreeCAD measures their common
+volumes. No independent absolute reference confirms those volumes.
+
+This proof does not compare its geometry with output from the Templot
+executable. It gives no result for physical rail fit, production clearance,
+S1 admission or phase exit acceptance. An owner decision on numerical
+comparison criteria is necessary.
 
 The `phase9a-s1-model-scale-proof` worktree keeps the detailed evidence in
 `tmp/phase9a-s1-model-scale-proof/`. The file
