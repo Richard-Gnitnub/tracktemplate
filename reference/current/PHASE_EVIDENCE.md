@@ -517,6 +517,46 @@ A reviewer who did not write the source or tests gives a PASS result with no
 findings. The receipt is `independent-quality-review.json` in that directory.
 The reviewer and authors share the same agent team and workspace.
 
+## Reference-only S1 model comparison proof — 2026-10-07
+
+This Level 2 result gives geometry at 4 mm/ft for the Phase 9A-2
+comparison. It uses the full-size research assembly proof. The
+[research boundary](../phase-evidence/S1_PILOT_PLAN.md#phase-9a-research-and-phase-9b-production-boundary)
+continues to apply. Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
+
+The operation uses the explicit 4 mm/ft scale to divide each full-size length
+by `76.2`. It keeps the chair-local origin, axes and position of the key at
+the centre. It does not change the input definition, component identities,
+provenance or signatures. It rejects other scales, different frames and
+manufacturing profiles.
+
+[Standalone tests](../../tests/validate_phase9a_chair_model_scale.py) give a
+PASS result for exact coordinates and definition round-trip. They also check
+the input identity and reject invalid input.
+[FreeCAD tests](../../tests/freecad_validate_phase9a_chair_model_scale.py) on
+the qualified host profile give a PASS result for 5 closed solids, 491 named
+vertices and all 10 component pairs. They also check surface areas, volumes
+and that the FreeCAD document does not change. The assembly regression tests
+give PASS results.
+
+The local Templot 556b research package and the declared scale give the model
+dimensions and landmarks. The FreeCAD path makes new geometry from the
+calculated component boundaries. It reads no Templot source file and uses no
+FreeCAD geometry from the full-size proof.
+
+The output is a `Compound` with 5 solids. FreeCAD measures their common
+volumes. No independent absolute reference confirms those volumes.
+
+This proof does not compare its geometry with output from the Templot
+executable. It gives no result for physical rail fit, production clearance,
+S1 admission or phase exit acceptance. An owner decision on numerical
+comparison criteria is necessary.
+
+The `phase9a-s1-model-scale-proof` worktree keeps the detailed evidence in
+`tmp/phase9a-s1-model-scale-proof/`. The file
+`presentation/s1-model-4mm-axonometric.png` in that directory shows the result.
+The image supplies presentation evidence only.
+
 <a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>
 
 ## D-GOV-023 exact FreeCAD 1.1.4 host qualification — 2026-10-07
