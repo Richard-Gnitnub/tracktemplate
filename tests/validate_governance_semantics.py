@@ -2145,7 +2145,7 @@ def validate_phase8_closeout_mutations() -> None:
     expect_rejected(
         "phase9-holding/phase8-decision-carried-as-current",
         lambda: progress._validate_phase9_decision_holding(current, phase6),
-        "Phase 9A research decision chain incomplete or widened",
+        "Phase 9A and host decision chain incomplete or widened",
     )
 
 
@@ -4460,7 +4460,7 @@ def validate_phase9_split_mutations() -> None:
         lambda: progress._validate_phase9_decision_holding(
             missing_opening, phase6,
         ),
-        "Phase 9A research decision chain incomplete or widened",
+        "Phase 9A and host decision chain incomplete or widened",
     )
     for field, replacement, diagnostic in (
         (
@@ -4487,6 +4487,71 @@ def validate_phase9_split_mutations() -> None:
                 value, phase6,
             ),
             "D-P9-002 " + diagnostic,
+        )
+
+    for field, replacement, diagnostic in (
+        (
+            "decision", "Qualify every FreeCAD 1.1.x host profile.",
+            "exact host qualification identity or scope drifted",
+        ),
+        (
+            "status", "Proposed",
+            "exact host qualification identity or scope drifted",
+        ),
+        (
+            "panel_record", "reference/current/PHASE_EVIDENCE.md",
+            "exact host qualification identity or scope drifted",
+        ),
+        (
+            "authority", "Qualify this and all later hosts.",
+            "authority digest drifted",
+        ),
+        (
+            "exclusions", "The host can supply Phase 6 performance evidence.",
+            "exclusions digest drifted",
+        ),
+    ):
+        changed = copy.deepcopy(decision)
+        changed["decisions"][4][field] = replacement
+        expect_rejected(
+            "phase9/d-gov-023-{}-changed".format(field),
+            lambda value=changed: progress._validate_phase9_decision_holding(
+                value, phase6,
+            ),
+            "D-GOV-023 " + diagnostic,
+        )
+
+    for name, before, after, diagnostic in (
+        (
+            "profile-widened",
+            "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
+            "all-FreeCAD-1.1.4-hosts",
+            "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
+        ),
+        (
+            "gui-matrix-weakened", "PASS 19/19", "PASS 18/19", "PASS 19/19",
+        ),
+        (
+            "restore-scope-widened", "not later live\nchanges",
+            "including later live\nchanges",
+            "The October 7 drill proves restoration of the October 4 set, "
+            "not later live changes",
+        ),
+        (
+            "performance-authorised", "no Phase 6 performance or B0 authority",
+            "Phase 6 performance and B0 authority",
+            "The new host receives no Phase 6 performance or B0 authority",
+        ),
+        (
+            "s1-admitted", "No S1 definition", "An accepted S1 definition",
+            "No S1 definition, physical fit, production/package or rights status",
+        ),
+    ):
+        changed = replace_once(evidence, before, after)
+        expect_rejected(
+            "phase9/d-gov-023-" + name,
+            lambda value=changed: progress._validate_dgov023_qualification(value),
+            "D-GOV-023 qualification panel drifted: " + diagnostic,
         )
 
     for term, before, after in (
@@ -5214,10 +5279,16 @@ def validate_documentation_profile_mutations() -> None:
             "accepted original gate",
         ),
         (
-            "monthly-restore-postponed", "**Limitations/findings**",
-            "monthly restore remains due by 2026-10-05",
-            "monthly restore may wait until 2026-11-05",
-            "monthly restore remains due by 2026-10-05",
+            "monthly-restore-pass-erased", "**Limitations/findings**",
+            "full monthly restore passed on 2026-10-07",
+            "monthly restore was postponed",
+            "full monthly restore passed on 2026-10-07",
+        ),
+        (
+            "next-monthly-drill-postponed", "**Limitations/findings**",
+            "next monthly drill is due by 2026-11-07",
+            "next monthly drill may wait until 2026-12-07",
+            "next monthly drill is due by 2026-11-07",
         ),
         (
             "physical-separation-claimed", "**Limitations/findings**",

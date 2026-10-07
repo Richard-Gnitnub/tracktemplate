@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 9,
-  "updated_on": "2026-10-03",
+  "updated_on": "2026-10-07",
   "decisions": [
     {
       "id": "D-P6-008",
@@ -46,6 +46,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel"
+    },
+    {
+      "id": "D-GOV-023",
+      "decided_on": "2026-10-07",
+      "status": "Accepted",
+      "decision": "Qualify only the exact installed FreeCAD 1.1.4 / SIM Coin 4.0.10 host profile for functional compatibility after the complete matrix and independent review. Preserve the four earlier profiles.",
+      "authority": "As project owner, authorise qualification of the currently installed FreeCAD 1.1.4 / Coin 4.0.10 host profile under the existing host-qualification process. Do not roll back FreeCAD merely to recover the previous qualified profile. If the current host qualifies, use it for the overdue monthly restore. If that passes and PR #139 remains exact-green and unchanged, continue under the existing integration authority. Do not change product behaviour, PR scope or acceptance state.",
+      "exclusions": "Functional host compatibility only. The qualification does not authorise Phase 6 performance or B0 evidence. The monthly restore tests the accepted October 4 set, not later live changes; physical USB separation remains unverified. Phase 9A stays Open at 0/4 with four Pending exits and Phase 9B stays Not started at 0/6 with six Pending exits. No S1 definition, physical fit, product acceptance, production/package output, rights disposition, risk closure, release or legacy removal follows. D-P6-008 remains Deferred — unmet, TERM-R04 remains open, all 24 live risks keep their duties, output stays private-development and project status stays unknown.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-4-coin4-0-10-qualification-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#freecad-1-1-4-coin4-0-10-qualification-panel"
     }
   ]
 }

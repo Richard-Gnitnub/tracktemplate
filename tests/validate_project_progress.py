@@ -1166,7 +1166,8 @@ def _validate_owner_view(plan: str) -> None:
         "This cycle includes no chair implementation",
         "This decision accepts no definition, exit, package, output, risk "
         "closure",
-        "recommend the first bounded Phase 9A research implementation task",
+        "Later Phase 9A work needs a separate bounded assignment",
+        "D-GOV-023",
         "accepted straight and curved `TO-001` and `XO-001` examples",
         "The Phase 9A opening adds no product proof or behaviour",
         "representative-fixture",
@@ -1176,7 +1177,8 @@ def _validate_owner_view(plan: str) -> None:
         "TO preselected-object export",
         "unproved raw GUI/headless output identity",
         "two intermediate Ruff-cache states",
-        "monthly restore remains due by 2026-10-05",
+        "full monthly restore passed on 2026-10-07",
+        "next monthly drill is due by 2026-11-07",
         "separate physical storage is unverified",
         "All 24 risks retain their owners, deadlines and controls",
         "mandatory before Phase 10 beta acceptance",
@@ -1184,6 +1186,7 @@ def _validate_owner_view(plan: str) -> None:
         "development-only oracle",
         "every comparison, adapter, caller, removal and legacy-retirement condition",
         "No performance, production-output or release acceptance",
+        "The new host has no Phase 6 performance authority",
         "Keep Phase 9B Not started",
     ):
         _require(
@@ -5318,14 +5321,14 @@ def _validate_phase9_decision_holding(
     document: dict[str, object],
     phase6_decisions: dict[str, dict[str, object]],
 ) -> None:
-    """Bind the split and opening decisions and deferred Phase 6 duty."""
+    """Bind Phase 9 decisions, exact host qualification and Phase 6 duty."""
     _require(
         set(document)
         == {"schema_version", "current_phase", "updated_on", "decisions"}
         and document["schema_version"] == 1
         and document["current_phase"] == 9
-        and document["updated_on"] == "2026-10-03",
-        "current decision register is not the Phase 9A opening state",
+        and document["updated_on"] == "2026-10-07",
+        "current decision register date drifted",
     )
     records = document["decisions"]
     _require(
@@ -5335,8 +5338,8 @@ def _validate_phase9_decision_holding(
         "Phase 9 split must carry unchanged D-P6-008 first",
     )
     _require(
-        len(records) == 4,
-        "Phase 9A research decision chain incomplete or widened",
+        len(records) == 5,
+        "Phase 9A and host decision chain incomplete or widened",
     )
     split = records[1]
     panel = (
@@ -5456,6 +5459,45 @@ def _validate_phase9_decision_holding(
             isinstance(value, str)
             and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
             "D-P9-003 " + field + " digest drifted",
+        )
+
+    host = records[4]
+    host_panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#freecad-1-1-4-coin4-0-10-qualification-panel"
+    )
+    _require(
+        isinstance(host, dict)
+        and set(host) == set(split)
+        and host["id"] == "D-GOV-023"
+        and host["decided_on"] == "2026-10-07"
+        and host["status"] == "Accepted"
+        and host["decision"] == (
+            "Qualify only the exact installed FreeCAD 1.1.4 / SIM Coin "
+            "4.0.10 host profile for functional compatibility after the "
+            "complete matrix and independent review. Preserve the four "
+            "earlier profiles."
+        )
+        and host["evidence"] == host_panel
+        and host["panel_record"] == host_panel
+        and host["panel_required_under_current_policy"] is True,
+        "D-GOV-023 exact host qualification identity or scope drifted",
+    )
+    for field, digest in (
+        (
+            "authority",
+            "349940753dbba2a36a8cfd97d50ac854097bccf6ed42535335acb2748f01b1bd",
+        ),
+        (
+            "exclusions",
+            "49edde3b29b15b0122216fa349374c7fd908c2c61cdd322a760c772a092a7893",
+        ),
+    ):
+        value = host[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-GOV-023 " + field + " digest drifted",
         )
 
 
@@ -6205,6 +6247,43 @@ def _validate_phase9_holding(evidence: str) -> None:
     )
 
 
+def _validate_dgov023_qualification(evidence: str) -> None:
+    """Bind the exact host proof, restore limit and acceptance exclusions."""
+    anchor = '<a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>'
+    _require(
+        evidence.count(anchor) == 1,
+        "D-GOV-023 qualification panel anchor drifted",
+    )
+    panel = _semantic_text(_section(
+        evidence, "D-GOV-023 exact FreeCAD 1.1.4 host qualification — 2026-10-07",
+    ))
+    for clause in (
+        "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
+        "e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4",
+        "fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa",
+        "CPython 3.13.15, PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.10",
+        "PASS 93/93",
+        "PASS 52/52",
+        "PASS 19/19",
+        "23 isolated sessions",
+        "92/93",
+        "qualified GUI opened a copied FCStd and checked nine object identities",
+        "9d1e4936bef0e483cccb97fc2902e48838e9ce51e6d178e0be172f307e90660e",
+        "beb9d13bbb74cf2d8fabecd1ca737473acf3a98bb724323349368b354e9eda0f",
+        "The reviewer was distinct from the implementation author",
+        "The October 7 drill proves restoration of the October 4 set, not later live changes",
+        "separate physical storage is unverified",
+        "The new host receives no Phase 6 performance or B0 authority",
+        "Phase 9A Open at 0/4 and Phase 9B Not started at 0/6",
+        "No S1 definition, physical fit, production/package or rights status",
+        "Output remains private-development and project status remains unknown",
+    ):
+        _require(
+            clause in panel,
+            "D-GOV-023 qualification panel drifted: " + clause,
+        )
+
+
 def _validate_phase7_opening(evidence: str) -> None:
     """Bind the opening quote and first assignment to bounded authority."""
     panel = _section(evidence, "Phase 7 opening panel")
@@ -6913,7 +6992,7 @@ def _validate_decisions(plan: str) -> None:
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
-        | {"D-P9-001", "D-P9-002", "D-P9-003"},
+        | {"D-P9-001", "D-P9-002", "D-P9-003", "D-GOV-023"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -8671,6 +8750,7 @@ def main() -> None:
     _validate_dp8_005_acceptance(phase8_evidence)
     _validate_phase8_closeout(phase8_evidence)
     _validate_phase9_holding(phase9_holding)
+    _validate_dgov023_qualification(phase9_holding)
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)
     _validate_finite_documentation_completion(plan, current_evidence)

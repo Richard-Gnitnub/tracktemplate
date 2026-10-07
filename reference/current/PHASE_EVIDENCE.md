@@ -16,11 +16,11 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 0/4 with four Pending exits. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | [D-P9-003](#phase-9a-research-sequencing-panel) separates reference-only S1 research acceptance in Phase 9A from production/package clearance in Phase 9B. Frozen Templot5 revision 556b data, relationships and rail-fit logic can support the bounded research proof. The nine initial requirements stay. |
-| What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows and the distinct proof for each accepted exit. Closure adds no workflow proof. |
-| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable, and the monthly full restore is due by 2026-10-05. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
-| Owner decision | [D-P9-003](#phase-9a-research-sequencing-panel) accepts only the bounded sequence and its conditions. All four Phase 9A exits and all six Phase 9B exits stay Pending. It accepts no definition, package, production output, risk closure or legacy removal. |
-| Next action | Complete exact validation, independent review and protected-main integration. Stop with clean, synchronised `main` and recommend the first bounded Phase 9A research implementation task. This cycle includes no chair implementation. |
+| What changed | [D-P9-003](#phase-9a-research-sequencing-panel) separates reference-only S1 research acceptance in Phase 9A from production/package clearance in Phase 9B. Frozen Templot5 revision 556b inputs can support the bounded research proof. The nine initial requirements stay. [D-GOV-023](#freecad-1-1-4-coin4-0-10-qualification-panel) qualifies only the installed exact FreeCAD 1.1.4 host for functional compatibility. |
+| What now works | [The frozen Phase 8 evidence](../history/phase-closeouts/PHASE8_CLOSEOUT.md) retains the reviewed straight and curved `TO-001` and `XO-001` workflows. The exact FreeCAD 1.1.4 host passed the complete compatibility matrix and opened a copied FCStd in the monthly restore. The merged PR #139 inner-jaw research test also passed on that host. |
+| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set; the next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
+| Owner decision | [D-P9-003](#phase-9a-research-sequencing-panel) accepts only the bounded sequence. It accepts no definition, package, production output, risk closure or legacy removal. [D-GOV-023](#freecad-1-1-4-coin4-0-10-qualification-panel) accepts only exact functional host compatibility. All four Phase 9A exits and all six Phase 9B exits stay Pending. No S1 admission follows. |
+| Next action | Complete exact validation and protected-main alignment for D-GOV-023. Then stop with clean, synchronised `main`. Later Phase 9A work needs a separate bounded assignment. |
 
 <a id="phase-9-programme-alignment-panel"></a>
 
@@ -472,6 +472,82 @@ The separation of prototype geometry, rail-fit policy and manufacturing compensa
 
 Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
 This result gives no exit, package, risk or production acceptance. All recorded limits stay.
+
+<a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>
+
+## D-GOV-023 exact FreeCAD 1.1.4 host qualification — 2026-10-07
+
+**Decision boundary:** The project owner authorised qualification of the
+installed FreeCAD 1.1.4 / SIM Coin 4.0.10 stack under the existing host
+process. The owner did not authorise a rollback to the earlier stack. This
+decision qualifies only
+`linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`
+for functional compatibility. The assessment began from clean protected
+`main` `994cf0b296aaad31c2a182cd8d47b5e7cfb52586`. The four earlier
+qualified profiles and their evidence remain.
+
+The installed system Flatpak app has commit
+`e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4`.
+Its KDE runtime has commit
+`fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa`.
+FreeCAD has revision `45039 (Git)` and source commit
+`4fd3bf320d9566a27e60069fc8387448aaa3a094`. The exact profile has
+CPython 3.13.15, PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.10.
+The runtime guard matches reported host fields. It does not report the
+Flatpak commits; separate deployment checks verified those values before
+and after the matrices.
+
+| Qualification area | Result |
+| --- | --- |
+| Standalone contract and domain/API checks | **PASS 93/93** on the final qualified contract. Parsing passed for 334 tracked Python and macro files. Exact profile mutations and unsupported-host cases were rejected. |
+| FreeCADCmd host matrix | **PASS 52/52** under the exact provisional runtime match: 39 tracked checks and 13 source-bound copies of frozen Phase 8 host scripts. The original historical scripts did not change. |
+| Real-GUI host matrix | **PASS 19/19** across 23 isolated sessions. Migration, editing, Undo/Redo, save/reopen, selected-object export and both historical preselected-object routes passed with mandatory probes enabled. |
+| Final qualified profile | The final runtime probe reported one matched profile, status `qualified` and zero mismatches. FreeCAD and GUI toolchain preflights passed. A changed Coin 4.0.9 value and an undeclared profile were rejected. |
+| Local workstation check | The isolated worktree matrix passed 92/93. Only the live `main`/upstream placement check failed because that worktree was not `main`. The same live check passed on clean, synchronised `main`. The failed result remains retained. |
+| Monthly restore | **PASS** on 2026-10-07. The accepted October 4 set restored 69,927 entries across 30 roots. Git state and ignored evidence matched. The qualified GUI opened a copied FCStd and checked nine object identities. The snapshot and live Git state did not change. |
+
+The ignored host evidence is in
+`benchmark-output/freecad114-qualification/20261007-run01/`.
+Its final qualification receipt has SHA-256
+`9d1e4936bef0e483cccb97fc2902e48838e9ce51e6d178e0be172f307e90660e`.
+The independent technical review receipt has SHA-256
+`beb9d13bbb74cf2d8fabecd1ca737473acf3a98bb724323349368b354e9eda0f`.
+The review checked all six required matrix areas, raw identities, classified
+failures and exclusions. The reviewer was distinct from the implementation
+author but shared the agent team and workspace. The assessment matrices used
+the exact provisional match. Final promotion changed only contract authority
+text and status and the two expected-value validators. It changed no product
+source or runtime match field. Failed assessment attempts and the ambiguous
+first Coin negative probe remain retained.
+
+After the restore passed, [PR #139](https://github.com/Richard-Gnitnub/tracktemplate/pull/139)
+merged at protected `main` `635763cd5e2385c1d2ff93c34402b1e3e457881e`.
+Its second parent is the reviewed head `c85a8477e06eed012f25582fa500fa5f06b2f35c`.
+The merged tree is the reviewed tree
+`6936888d7134218298b0657c9ec79172cf95be81`.
+The new inner-jaw research FreeCAD check then passed on the qualified host;
+its stdout has SHA-256
+`b78065f695e7be53e96210efd637443fc93382d92af7969fd5cadd024684d432`.
+This check adds no S1 admission or exit acceptance.
+
+**Risk panel:** The independent technical review found no host-qualification
+blocker. PR-13 stays Critical/Open/Effective for its current scope. The
+October 7 drill proves restoration of the October 4 set, not later live
+changes. The USB remains attached, so separate physical storage is
+unverified. All 24 live risks keep their owners, deadlines and controls.
+The new host receives no Phase 6 performance or B0 authority. D-P6-008
+stays Deferred — unmet, and TERM-R04 stays open.
+
+**Structured owner decision — D-GOV-023:** Qualify only the exact installed
+FreeCAD 1.1.4 profile above for functional compatibility after the complete
+matrix and independent PASS review. Preserve all four earlier qualified
+profiles. Record the passed monthly restore without widening its backup
+scope. Keep Phase 9A Open at 0/4 and Phase 9B Not started at 0/6, with every
+exit Pending. Output remains private-development and project status remains
+`unknown`. No S1 definition, physical fit, production/package or rights
+status, performance result, release, risk closure or legacy removal is
+accepted. Normal protected-main integration applies only to this bounded
+host alignment.
 
 ## Continuing duties and risks
 

@@ -603,7 +603,8 @@ def validate_documentation_profile(
             "This cycle includes no chair implementation",
             "This decision accepts no definition, exit, package, output, "
             "risk closure",
-            "recommend the first bounded Phase 9A research implementation task",
+            "Later Phase 9A work needs a separate bounded assignment",
+            "D-GOV-023",
             "accepted straight and curved `TO-001` and `XO-001` examples",
             "The Phase 9A opening adds no product proof or behaviour",
             "representative-fixture",
@@ -613,7 +614,8 @@ def validate_documentation_profile(
             "TO preselected-object export",
             "unproved raw GUI/headless output identity",
             "two intermediate Ruff-cache states",
-            "monthly restore remains due by 2026-10-05",
+            "full monthly restore passed on 2026-10-07",
+            "next monthly drill is due by 2026-11-07",
             "separate physical storage is unverified",
             "All 24 risks retain their owners, deadlines and controls",
             "mandatory before Phase 10 beta acceptance",
@@ -622,6 +624,7 @@ def validate_documentation_profile(
             "every comparison, adapter, caller, removal and "
             "legacy-retirement condition",
             "No performance, production-output or release acceptance",
+            "The new host has no Phase 6 performance authority",
             "Keep Phase 9B Not started",
         )),
         "PROJECT_PLAN owner view contradicts current authority",
