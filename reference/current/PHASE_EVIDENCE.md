@@ -557,6 +557,47 @@ The `phase9a-s1-model-scale-proof` worktree keeps the detailed evidence in
 `presentation/s1-model-4mm-axonometric.png` in that directory shows the result.
 The image supplies presentation evidence only.
 
+## S1 checks with `reference-only` inputs — 2026-10-07
+
+This Level 2 result adds evidence for Phase 9A-2 only. Phase 9A stays Open
+at 0/4. Phase 9B stays Not started at 0/6. The `ChairDefinitionPackage`
+stays `reference-only`, has private-development status and has no acceptance.
+
+The [new operation](../../tracktemplate/application/chair_rail_research.py)
+compares input values with calculated values for the `rail-seat`, `key` and
+`inner-jaw` chair components. The values must be equal. The operation rejects
+different values, also when the `content_signature` is correct. The previous
+assembly and `prepare_chair_model_research` operations give the same results
+as before. Input data, identities, hashes and source data do not change.
+
+The [tests for standalone Python](../../tests/validate_phase9a_chair_rail_interface.py)
+give a PASS result for calculated values. They also write the
+`ChairDefinitionPackage` data to JSON, read the data again and give the same
+result. They reject incorrect values with a correct `content_signature`, also
+for differences below the FreeCAD limit for calculated values.
+
+The [FreeCAD tests](../../tests/freecad_validate_phase9a_chair_rail_interface.py)
+on the qualified host profile give a PASS result. The tests include 36 point checks on
+8 faces and 1 pair of end points. The tests also give a PASS result for the
+local `ChairDefinitionPackage`. The FreeCAD `Document` does not change.
+
+The [Templot source](../PROVENANCE.md#phase-9a-research-input-provenance)
+includes “including some 3D printing allowances” at `dxf_unit.pas:13699`.
+Its values do not show measured dimensions for the part that a chair holds.
+The operation uses no optional corrections. This does not remove the limitation.
+
+The result does not show a correct fit between a chair and the part that the
+chair holds. It does not examine the complete shape of that part or the area
+where the parts touch. The result adds no limit for acceptance of calculated
+values. It gives no evidence that the results are the same as output from the
+Templot executable. It gives no acceptance for the `ChairDefinitionPackage`,
+S1 or a phase exit.
+
+The `phase9a-s1-rail-interface-proof` worktree keeps the detailed evidence in
+`tmp/phase9a-s1-rail-interface-proof/`. The evidence includes failure
+classification and the PASS results after the implementing agent did the tests
+again.
+
 <a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>
 
 ## D-GOV-023 exact FreeCAD 1.1.4 host qualification — 2026-10-07
