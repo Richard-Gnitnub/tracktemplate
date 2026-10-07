@@ -4806,6 +4806,80 @@ def validate_phase9_exit4_admission_mutations() -> None:
         )
 
 
+def validate_phase9_evidence_model_mutations() -> None:
+    """Reject engineering, rights or phase authority wider than D-P9-005."""
+    decision = json.loads(read("reference/current/gate-decisions.json"))
+    phase6 = {
+        record["id"]: record
+        for record in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    model = decision["decisions"][6]
+    for name, field, before, after, diagnostic in (
+        ("altered-owner", "authority", model["authority"], "Agent approval",
+         "exact owner authority"),
+        ("oracle-mandatory", "decision", "Remove exact", "Require exact",
+         "decision boundary"),
+        ("source-agreement-sufficient", "decision",
+         "An independent engineering reference chain",
+         "Templot agreement", "decision boundary"),
+        ("independent-chain-optional", "decision",
+         "An independent engineering reference chain, explicit",
+         "An independent engineering reference chain is optional. However, "
+         "explicit", "decision boundary"),
+        ("unaccepted-tolerance", "decision", "accepted numerical tolerances",
+         "unaccepted numerical tolerances", "decision boundary"),
+        ("host-work-resumed", "exclusions", "Do not do more Phase 9 work",
+         "Do more Phase 9 work", "exclusions boundary"),
+        ("lineage-relabelled", "exclusions", "Do not identify Templot-derived",
+         "Identify Templot-derived", "exclusions boundary"),
+        ("sampling-promoted", "exclusions", "not production requirements",
+         "production requirements", "exclusions boundary"),
+        ("opened-9b", "exclusions", "Not started at 0/6", "Open at 0/6",
+         "exclusions boundary"),
+        ("physical-fit-accepted", "exclusions", "No product source",
+         "Product source", "exclusions boundary"),
+        ("rights-accepted", "exclusions", "No positive rights claim",
+         "A positive rights claim", "exclusions boundary"),
+        ("publication-authorised", "exclusions", "no authority to publish",
+         "authority to publish", "exclusions boundary"),
+    ):
+        changed = copy.deepcopy(decision)
+        changed["decisions"][6][field] = replace_once(
+            model[field], before, after,
+        )
+        expect_rejected(
+            "phase9-evidence-model/" + name,
+            lambda value=changed: progress._validate_phase9_decision_holding(
+                value, phase6,
+            ),
+            "D-P9-005 " + diagnostic + " drifted",
+        )
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    panel = progress._section(
+        evidence, "D-P9-005 Phase 9 chair evidence model panel — 2026-10-07",
+    )
+    for name, before, after, diagnostic in (
+        ("panel-owner-replaced", "> As TrackTemplate project owner,",
+         "> As implementing agent,", "exact panel authority"),
+        ("panel-law-is-engineering", "cannot prove engineering validity",
+         "can prove engineering validity", "panel boundary"),
+        ("panel-source-pass-promoted", "results do not become independent",
+         "results become independent", "panel boundary"),
+    ):
+        changed = replace_once(
+            evidence, panel, replace_once(panel, before, after),
+        )
+        expect_rejected(
+            "phase9-evidence-model/" + name,
+            lambda value=changed: progress._validate_dp9_005_evidence_model(
+                value,
+            ),
+            "D-P9-005 " + diagnostic + " drifted",
+        )
+
+
 def validate_project_plan_mutations() -> None:
     """Keep current/future programme polarity in the dashboard preamble."""
     plan = read("reference/PROJECT_PLAN.md")
@@ -7547,6 +7621,7 @@ def main() -> None:
     validate_phase9_split_mutations()
     validate_phase9_research_mutations()
     validate_phase9_exit4_admission_mutations()
+    validate_phase9_evidence_model_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
     validate_documentation_profile_mutations()

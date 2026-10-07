@@ -140,6 +140,12 @@ EXPECTED_DP9_004_AUTHORITY = (
 DP9_004_PANEL = (
     "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-4-admission-panel"
 )
+EXPECTED_DP9_005_AUTHORITY_SHA256 = (
+    "687f3eb50b863ff5e6dc426201c889f4b1cd856f494951acf04f050a08e3e435"
+)
+DP9_005_PANEL = (
+    "reference/current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel"
+)
 PHASE9A_EXIT4_STATUS = "Evidenced — owner-accepted 2026-10-07"
 EXPECTED_PHASE7_EXIT_CONDITIONS = (
     "Core layouts can be created, edited, saved, reopened, validated, and "
@@ -202,7 +208,8 @@ EXPECTED_PHASE9B_EXITS = (
         "Each release-candidate production format has deterministic repeat "
         "evidence for representative inputs. Preserved B14/B15 behaviour "
         "has legacy/new equivalence evidence. New procedural chair geometry "
-        "uses accepted 9A definition/reference-oracle evidence. It does "
+        "uses accepted 9A definition and independent engineering evidence "
+        "under D-P9-005. It does "
         "not use five-box equality.",
     ),
     (
@@ -1464,7 +1471,9 @@ def _validate_phase9_exit_allocation(plan: str, evidence: str) -> None:
         "release candidate",
         "It does not include all Templot families or post-Core capabilities",
         "neutral ChairDefinition",
-        "local reference oracle",
+        "independent engineering reference chain",
+        "Exact Templot 556b execution and output are optional supporting "
+        "evidence",
         "provenance, rights, transactional-export and performance controls "
         "continue to apply",
     ):
@@ -5351,7 +5360,7 @@ def _validate_phase9_decision_holding(
         "Phase 9 split must carry unchanged D-P6-008 first",
     )
     _require(
-        len(records) == 6,
+        len(records) == 7,
         "Phase 9A and host decision chain incomplete or widened",
     )
     split = records[1]
@@ -5569,6 +5578,101 @@ def _validate_phase9_decision_holding(
             and all(clause in _semantic_text(value) for clause in clauses),
             "D-P9-004 " + field + " boundary drifted",
         )
+
+
+    model = records[6]
+    _require(
+        isinstance(model, dict)
+        and set(model) == set(split)
+        and model["id"] == "D-P9-005"
+        and model["decided_on"] == "2026-10-07"
+        and model["status"] == "Accepted"
+        and model["evidence"] == DP9_005_PANEL
+        and model["panel_record"] == DP9_005_PANEL
+        and model["panel_required_under_current_policy"] is True,
+        "D-P9-005 identity, status or panel routing drifted",
+    )
+    authority = model["authority"]
+    _require(
+        isinstance(authority, str)
+        and hashlib.sha256(authority.encode("utf-8")).hexdigest()
+        == EXPECTED_DP9_005_AUTHORITY_SHA256,
+        "D-P9-005 exact owner authority drifted",
+    )
+    for field, clauses in (
+        ("decision", (
+            "Remove exact Templot 556b execution and output as mandatory "
+            "chair acceptance evidence",
+            "An independent engineering reference chain, explicit provenance "
+            "and accepted numerical tolerances are mandatory for every "
+            "production-affecting value",
+            "with its historical lineage",
+            "only the dependent Level 3 repository alignment",
+        )),
+        ("exclusions", (
+            "Do not do more Phase 9 work on this host to operate 556b "
+            "through Lazarus, Windows VM or Wine",
+            "Do not identify Templot-derived values as independent "
+            "without evidence",
+            "not production requirements without independent engineering "
+            "justification",
+            "Preserve the frozen contracts, source identities, historical "
+            "lineage and failed evidence",
+            "Phase 9A stays Open at 1/4 under D-P9-004",
+            "Exits 9A-1–3 stay Pending",
+            "Phase 9B stays Not started at 0/6",
+            "No product source, chair value, numerical tolerance, "
+            "definition, assisted S1 pilot, physical fit, package or "
+            "production output is accepted",
+            "No positive rights claim, third-party permission, risk closure, "
+            "performance result, release or legacy removal follows",
+            "All 24 risk states, owners, deadlines and controls stay "
+            "unchanged",
+            "D-P6-008 stays Deferred — unmet and TERM-R04 stays open",
+            "Output stays private-development and project status stays unknown",
+            "no authority to publish or merge this new candidate",
+        )),
+    ):
+        value = model[field]
+        _require(
+            isinstance(value, str)
+            and all(clause in _semantic_text(value) for clause in clauses),
+            "D-P9-005 " + field + " boundary drifted",
+        )
+
+
+def _validate_dp9_005_evidence_model(evidence: str) -> None:
+    """Keep evidence-method authority separate from chair acceptance."""
+    anchor = '<a id="phase-9-chair-evidence-model-panel"></a>'
+    _require(evidence.count(anchor) == 1, "D-P9-005 panel anchor drifted")
+    panel = _section(
+        evidence, "D-P9-005 Phase 9 chair evidence model panel — 2026-10-07",
+    )
+    quote = "\n\n".join(_blockquote_paragraphs(panel))
+    _require(
+        hashlib.sha256(quote.encode("utf-8")).hexdigest()
+        == EXPECTED_DP9_005_AUTHORITY_SHA256,
+        "D-P9-005 exact panel authority drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "89f5441bed8f8b1b6c7e0c3a400246994923d72b",
+        "It does not change the acceptance of Exit 9A-4",
+        "Proceed with bounded conditions",
+        "reviewer and author are in the same agent team and workspace",
+        "All 24 risk states, owners, deadlines and controls stay unchanged",
+        "Third-party permission by itself cannot prove engineering validity",
+        "Source-derived PASS results do not become independent engineering "
+        "evidence",
+        "Phase 9A stays Open at 1/4 under D-P9-004",
+        "Exits 9A-1–3 stay Pending",
+        "Phase 9B stays Not started at 0/6",
+        "No product change, definition, numerical tolerance, assisted S1 "
+        "pilot, physical fit, package or production output is accepted",
+        "This decision supplies no authority to publish or merge this "
+        "new candidate",
+    ):
+        _require(clause in flat, "D-P9-005 panel boundary drifted: " + clause)
 
 
 def _validate_dp9_004_admission(evidence: str) -> None:
@@ -7123,7 +7227,8 @@ def _validate_decisions(plan: str) -> None:
         | EXPECTED_PHASE5_DECISION_IDS
         | EXPECTED_PHASE6_DECISION_IDS
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
-        | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004", "D-GOV-023"},
+        | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
+           "D-P9-005", "D-GOV-023"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -8882,6 +8987,7 @@ def main() -> None:
     _validate_phase8_closeout(phase8_evidence)
     _validate_phase9_holding(phase9_holding)
     _validate_dp9_004_admission(phase9_holding)
+    _validate_dp9_005_evidence_model(phase9_holding)
     _validate_dgov023_qualification(phase9_holding)
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)

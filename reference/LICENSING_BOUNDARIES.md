@@ -182,6 +182,14 @@ party's rights. No production dependency with `project-cleared` status may have 
 no production/package clearance. The final production package must pass each
 affected qualification check after an input change.
 
+[D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel) changes
+chair acceptance evidence. The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
+owns the independent engineering reference chain and numerical tolerances.
+A compatible rights disposition does not supply independent engineering evidence
+or accept a numerical tolerance. Independent engineering evidence gives no
+third-party permission or package clearance. Historical Templot lineage and
+source-informed status stay.
+
 ## Neutral chair-definition and collaboration boundary
 
 The authoritative interchange is a TrackTemplateMacro `ChairDefinition`, not

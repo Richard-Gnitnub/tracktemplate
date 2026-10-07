@@ -1,7 +1,7 @@
 # First S1 Chair Pilot Plan
 
 Status: **Accepted Phase 1 control; production definition and pilot remain
-blocked. Phase 9A reference-only research follows D-P9-003 below.**
+blocked. Phase 9A research follows D-P9-003. D-P9-005 changes the chair acceptance evidence below.**
 
 This document defines the minimum neutral package, evidence, rights and
 acceptance plan for the first S1 chair. It is a project-control plan, not a
@@ -9,9 +9,9 @@ chair definition, an assertion that the working description “S1” is a precis
 prototype designation, or legal clearance.
 
 The governing boundaries are [ARCHITECTURE.md](../ARCHITECTURE.md) and
-[LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md). The local Templot
-comparison remains controlled by the
-[frozen 556b oracle](../oracles/templot5-556b-s1-oracle.json).
+[LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md). The optional local Templot comparison keeps its
+[frozen 556b contract](../oracles/templot5-556b-s1-oracle.json).
+It is not mandatory evidence for chair acceptance under [D-P9-005](../current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel).
 
 The plan deliberately contains no production dimensions, copied Templot value
 collection, generated chair body or positive rights decision. The current
@@ -73,7 +73,8 @@ rail does not establish prototype rail inclination or measured physical-stock
 dimensions.
 
 The Phase 1 decision table and acceptance below stay historical evidence.
-S1-07 through S1-15 keep their production-evidence obligations. The Phase 9A research path does not need that independent primary evidence
+S1-07 through S1-13 and S1-15 keep their production-evidence obligations.
+D-P9-005 removes S1-14 as a mandatory acceptance condition. The Phase 9A research path does not need that independent primary evidence
 first. Before the owner accepts a bounded research definition, its evidence
 must identify:
 
@@ -89,10 +90,10 @@ unresolved. No missing dimension or numerical tolerance can receive an invented
 default. Research comparison proves agreement with the declared reference. It
 does not prove independent prototype accuracy or physical rail fit.
 
-The frozen Templot oracle stays a separate comparison-only dependency.
-Its existing executable and capture gaps stay unresolved. Source-derived
-research evidence does not establish an exact executable or replace the
-necessary comparison evidence.
+The frozen Templot contract stays a different source of optional comparison evidence.
+D-P9-005 removes the exact executable and output as mandatory acceptance evidence.
+Source-derived research checks keep their recorded scope. They do not prove
+independent engineering accuracy or physical fit.
 
 Phase 9B keeps the minimum production evidence bundle, package-rights,
 non-copyright-rights, dependency-manifest and release gates. Each output-affecting
@@ -100,6 +101,45 @@ Templot-derived production input needs a disposition under the
 [licensing boundary](../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research).
 After an input change, each affected definition, geometry, pilot and output check of the final production package must give a PASS result. The existing blocked production
 manifest, lineage and oracle records keep their current status.
+
+## Chair acceptance evidence under D-P9-005
+
+[D-P9-005](../current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel)
+changes the chair evidence model on 2026-10-07. For chair acceptance, an
+independent engineering reference chain is mandatory. Applicable drawings, standards, rail
+specifications, physical measurements and recorded project derivations can
+supply that chain. Record the source identity and applicable source location for each value. Record units, uncertainty, derivation inputs and the
+intended use. Before acceptance, explicit provenance and accepted numerical tolerances are
+mandatory for every production-affecting value.
+
+Keep a separation between prototype geometry, model rail-fit policy and manufacturing compensation.
+Missing evidence or a tolerance that is not accepted stays a finding.
+Do not give a Templot-derived value independent status without supporting
+independent evidence. Preserve its historical Templot lineage after independent
+confirmation or replacement. Keep a separation between the rights conditions and
+engineering acceptance.
+
+Templot stays source-informed, reference and supporting comparison evidence.
+Agreement with Templot is not sufficient for acceptance of a chair value or tolerance.
+Templot sampling, triangulation and mark-grid behaviour are implementation
+choices. They are not production requirements without independent engineering
+justification. Record that justification and its acceptance before such a
+choice controls production.
+
+Do not do more Phase 9 work on this host to operate 556b through Lazarus, Windows VM or Wine. Keep the frozen capture contract,
+source identities, lineage, failed evidence and local files. No different
+Templot executable becomes an exact-556b result. An absent 556b capture does not stop chair acceptance by itself.
+
+The Phase 1 decision table and owner quotation below stay historical evidence.
+D-P9-005 supersedes the mandatory S1-14 comparison condition. It also supersedes
+that condition in the [historical lineage register](../lineage/phase1-s1-core-lineage.json)
+and [generation map](../lineage/templot5-556b-s1-generation-map.json).
+The register and frozen capture contract keep their historical identities and status.
+
+Under D-P9-003, bounded research is permitted before independent evidence is complete.
+That permission does not accept a definition, numerical tolerance, assisted S1
+pilot, physical fit or production output. Phase 9A stays Open at 1/4.
+Exits 9A-1–3 stay Pending. Phase 9B stays Not started at 0/6.
 
 ## Neutral package requirements
 
@@ -209,9 +249,9 @@ boundary above does not remove these subsequent duties. Before the working name
 - operator-declared component boundaries and placement/fit landmarks;
 - complete field/component classifications, contributor or supplier authority,
   package-licence basis and all four non-copyright-rights reviews; and
-- a local comparison record that keeps the Templot comparison oracle
-  non-output-affecting and untracked. Research inputs are separate dependencies
-  and must record their output effect under D-P9-003.
+- the independent engineering reference chain that is mandatory under D-P9-005. Any optional
+  Templot comparison stays non-output-affecting and untracked. Research inputs
+  are separate dependencies and must record their output effect under D-P9-003.
 
 A rights-compatible drawing/standard plus project measurements may satisfy the
 bundle without a scan. A scan or CAD body may assist fitting, but cannot alone
