@@ -146,13 +146,15 @@ def _research_boundary_errors(text):
         "evidenced prototype facts",
         "Prototype geometry, model rail-fit policy and manufacturing "
         "compensation stay separate",
-        "S1-07 through S1-15 keep their production-evidence obligations",
+        "S1-07 through S1-13 and S1-15 keep their production-evidence "
+        "obligations",
         "Do not construct an affected component while its "
         "output-affecting fields are unresolved",
         "No missing dimension or numerical tolerance can receive an invented default",
-        "The frozen Templot oracle stays a separate comparison-only "
-        "dependency",
-        "Its existing executable and capture gaps stay unresolved",
+        "The frozen Templot contract stays separate as optional comparison "
+        "evidence",
+        "D-P9-005 removes the exact executable and output as mandatory "
+        "acceptance evidence",
         "Phase 9B keeps the minimum production evidence bundle, package-rights, "
         "non-copyright-rights, dependency-manifest and release gates",
         "After an input change, each affected definition, geometry, pilot "
@@ -167,6 +169,53 @@ def _research_boundary_errors(text):
     ]
 
 
+def _engineering_reference_errors(text):
+    """Require engineering evidence without changing frozen oracle history."""
+    section = direct_section_content(
+        text, "Chair acceptance evidence under D-P9-005",
+    )
+    flat = " ".join(section.replace("`", "").split())
+    clauses = (
+        "Chair acceptance requires an independent engineering reference chain",
+        "Record the exact source identity and applicable source location "
+        "for each value",
+        "Record units, uncertainty, derivation inputs and the intended use",
+        "Every production-affecting value needs explicit provenance and "
+        "accepted numerical tolerances before acceptance",
+        "Keep prototype geometry, model rail-fit policy and manufacturing "
+        "compensation separate",
+        "Missing evidence or an unaccepted tolerance remains a finding",
+        "Do not give a Templot-derived value independent status without "
+        "supporting independent evidence",
+        "Preserve its historical Templot lineage after independent "
+        "confirmation or replacement",
+        "The rights conditions remain separate from engineering acceptance",
+        "Agreement with Templot alone cannot accept a chair value or tolerance",
+        "They are not production requirements without independent "
+        "engineering justification",
+        "Record that justification and its acceptance before such a choice "
+        "controls production",
+        "Do not spend further Phase 9 effort establishing a Lazarus, Windows "
+        "VM or Wine execution route for 556b on the current host",
+        "Keep the frozen capture contract, source identities, lineage, "
+        "failed evidence and local artifacts",
+        "No different Templot executable becomes an exact-556b result",
+        "An absent 556b capture no longer blocks chair acceptance by itself",
+        "D-P9-005 supersedes the mandatory S1-14 comparison condition",
+        "The register and frozen capture contract keep their historical "
+        "identities and status",
+        "That permission does not accept a definition, numerical tolerance, "
+        "assisted S1 pilot, physical fit or production output",
+        "Phase 9A stays Open at 1/4",
+        "Exits 9A-1–3 stay Pending",
+        "Phase 9B stays Not started at 0/6",
+    )
+    return [
+        "S1 engineering reference boundary drifted: " + clause
+        for clause in clauses if clause not in flat
+    ]
+
+
 def validate_plan(
     text,
     manifest,
@@ -174,7 +223,7 @@ def validate_plan(
     oracle,
     check_repository=True,
 ):
-    errors = _research_boundary_errors(text)
+    errors = _research_boundary_errors(text) + _engineering_reference_errors(text)
     for marker in REQUIRED_MARKERS:
         if marker not in text:
             errors.append("S1 pilot plan marker is missing: {}".format(marker))
@@ -364,8 +413,8 @@ def main():
         ("prototype facts", "prototype dimensions"),
         ("non-copyright-rights, dependency-manifest and release gates",
          "no further gates"),
-        ("S1-07 through S1-15 keep their production-evidence obligations",
-         "S1-07 through S1-15 are discharged"),
+        ("S1-07 through S1-13 and S1-15 keep their production-evidence "
+         "obligations", "S1-07 through S1-15 are discharged"),
     ):
         assert before in research_section, before
         changed_section = research_section.replace(before, after, 1)
@@ -377,6 +426,43 @@ def main():
     relocated += "\n## Unrelated retained material\n" + research_section
     _expect_invalid(
         relocated, manifest, lineage, oracle, "research boundary relocated",
+    )
+
+    engineering_section = direct_section_content(
+        text, "Chair acceptance evidence under D-P9-005",
+    )
+    engineering_flat = " ".join(engineering_section.split())
+    for before, after in (
+        ("requires an independent engineering reference chain",
+         "requires no independent engineering reference chain"),
+        ("accepted numerical tolerances before acceptance",
+         "numerical tolerances after acceptance"),
+        ("units, uncertainty, derivation inputs", "units only"),
+        ("Do not give a Templot-derived value independent status",
+         "Give a Templot-derived value independent status"),
+        ("Preserve its historical Templot lineage",
+         "Remove its historical Templot lineage"),
+        ("alone cannot accept", "alone can accept"),
+        ("not production requirements without independent engineering",
+         "production requirements without independent engineering"),
+        ("Do not spend further Phase 9 effort", "Spend further Phase 9 effort"),
+        ("No different Templot executable becomes", "A different Templot "
+         "executable becomes"),
+        ("supersedes the mandatory S1-14 comparison condition",
+         "supersedes every Phase 1 evidence condition"),
+        ("permission does not accept", "permission accepts"),
+        ("Phase 9B stays Not started at 0/6", "Phase 9B opens at 0/6"),
+    ):
+        assert before in engineering_flat, before
+        changed = "\n\n" + engineering_flat.replace(before, after, 1) + "\n\n"
+        _expect_invalid(
+            text.replace(engineering_section, changed, 1),
+            manifest, lineage, oracle, "engineering boundary " + before,
+        )
+    relocated = text.replace(engineering_section, "\n\nNo requirements.\n", 1)
+    relocated += "\n## Unrelated retained material\n" + engineering_section
+    _expect_invalid(
+        relocated, manifest, lineage, oracle, "engineering boundary relocated",
     )
 
     promoted_decision = text.replace(

@@ -421,8 +421,12 @@ provenance and `reference-only` status. Opaque generated geometry cannot replace
 named chair components and deterministic construction.
 
 Prototype geometry, model rail-fit policy and manufacturing compensation stay
-separate. The research package and outputs stay private-development and must not have `project-cleared` status. The comparison oracle stays separate and
-available under its frozen contract.
+separate. The research package and outputs stay private-development and must not have `project-cleared` status. The frozen Templot contract remains available for optional comparison.
+[D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel) removes
+exact 556b execution and output as mandatory chair acceptance evidence.
+The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
+owns the independent engineering reference chain. Templot implementation choices
+need independent engineering justification before they become production requirements.
 
 The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#phase-9a-research-and-phase-9b-production-boundary)
 owns research acceptance evidence. The [licensing boundary](LICENSING_BOUNDARIES.md#phase-9a-reference-only-research)

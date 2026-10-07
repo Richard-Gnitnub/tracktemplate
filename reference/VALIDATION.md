@@ -1534,6 +1534,14 @@ requires the current absence of other-S&C/legacy output dependency manifests.
 Adding one requires a truthful register and validation update. It must not use
 an inferred positive status.
 
+[D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel) removes
+exact 556b execution and output as mandatory chair acceptance evidence.
+The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
+owns the independent engineering reference chain and accepted numerical tolerances.
+Retained source-derived tests prove only their stated research or regression
+contract. Their PASS results give no independent provenance, physical-fit or
+production acceptance. Do not establish another 556b execution route on this host.
+
 The oracle-contract test validates the exact-556b capture specification with
 `Blocked` status. It also validates the local-only output-file rule. It
 validates the rejected-version guard and synthetic DXF/STL semantics. When
@@ -1936,7 +1944,7 @@ Select checks by the bounded scope of the change. Report uncovered paths.
 | Railway geometry/topology/timber/chair rules | Representative analytical comparisons and real workflow validation |
 | Export or exact geometry | Target-format output, manifest, rollback and deterministic repeat checks |
 | Chair-definition schema or package loader | Standalone schema validation, deterministic round-trip, corrupt/unsupported rejection, stable component IDs and provenance checks |
-| Procedural chair generator | Templot/reference constituent and assembly comparison, rail-fit/interface checks, valid B-reps/exports, deterministic regeneration and no routine-edit solids |
+| Procedural chair generator | Chair component and assembly comparison against the independent engineering reference chain under D-P9-005; accepted numerical tolerances, rail-fit/interface checks, valid B-reps/exports, deterministic construction and no routine-edit solids. Templot comparison is optional supporting evidence. |
 | Assisted chair assimilation | Calibrated source fixture, landmark/component decisions, measured/inferred audit, residual metrics, unresolved findings, provenance and explicit acceptance |
 | Architecture migration | Legacy/new parity, editing cost and complete Validate/Export cost |
 
@@ -2038,9 +2046,10 @@ deterministic input recipes. They must cover:
 - straight- and curved-host crossovers
 - wider automatic timbering and chair analysis (the fixed `XO-001` B4 and
   post-B4 logical-analysis lifecycles now have dedicated oracles)
-- an exact local capture produced under the tracked frozen-Templot-S1
-  constituent/assembly recipe. The recipe and validator exist. The exact 556b
-  executable, fixture, and output files retain `Blocked` status
+- independent S1 engineering evidence under
+  [D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel), with
+  explicit field provenance and accepted numerical tolerances. The frozen Templot
+  capture contract and its validator remain optional comparison controls.
 - a versioned native S1 chair-definition package with invalid/corrupt fixtures
 - one non-sensitive, project-cleared calibrated scan/CAD/measurement fixture for
   the assisted S1 assimilation pilot

@@ -16,11 +16,100 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 1/4 under [D-P9-004](#phase-9a-exit-4-admission-panel). Only Exit 9A-4 is Evidenced and owner-accepted.<br><br>Exits 9A-1–3 stay Pending. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | [D-P9-004](#phase-9a-exit-4-admission-panel) accepts only Exit 9A-4 for the recorded S1 evidence at protected `main` `9576614daf6cc69a04d214e824ec32cc7bbe5251`. The exact criterion stays unchanged. The [D-P9-003](#phase-9a-research-sequencing-panel) research conditions and [D-GOV-023](#freecad-1-1-4-coin4-0-10-qualification-panel) functional host qualification stay. |
+| What changed | [D-P9-005](#phase-9-chair-evidence-model-panel) changes the chair evidence model. The exact 556b executable and output are no longer mandatory acceptance evidence. The [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005) requires independent engineering evidence. D-P9-004 still accepts only Exit 9A-4 at `9576614daf6cc69a04d214e824ec32cc7bbe5251`. |
 | What now works | The S1 records that the project keeps identify the source, five chair components and permitted private research use. Independent review shows local, untracked evidence in the examined roots. This decision adds no product behaviour. The accepted Phase 7 and Phase 8 workflows stay. |
-| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-15, package rights, rail section, tolerances and the local Templot oracle remain bounded as recorded. |
-| Owner decision | [D-P9-004](#phase-9a-exit-4-admission-panel) accepts only Exit 9A-4 against the named source state. It gives no positive rights claim or acceptance of a definition, numerical tolerance, assisted S1 pilot, physical fit or production output. It accepts no package, risk closure, performance result, release or legacy removal. Exits 9A-1–3 and all six Phase 9B exits stay Pending. |
-| Next action | Complete only the dependent Level 3 records, validation, independent review and usual protected-main integration for D-P9-004. Then stop with clean, synchronised `main`. No other implementation is selected. |
+| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-13 and S1-15, package rights, rail section and tolerances remain bounded as recorded. D-P9-005 makes S1-14 optional comparison evidence. |
+| Owner decision | [D-P9-005](#phase-9-chair-evidence-model-panel) requires an independent engineering reference chain, explicit provenance and accepted numerical tolerances for every production-affecting value. Templot remains source-informed and reference evidence. This decision accepts no definition, numerical tolerance, assisted S1 pilot, physical fit, package, output or rights claim. |
+| Next action | Complete the D-P9-005 alignment through its authorised review and validation route. Then propose the bounded S1 input/evidence mapping below. No other implementation is selected. Publication and integration need their applicable authority. |
+
+<a id="phase-9-chair-evidence-model-panel"></a>
+
+## D-P9-005 Phase 9 chair evidence model panel — 2026-10-07
+
+**Decision boundary:** Richard authorises only the Level 3 change below from
+protected `main` `89f5441bed8f8b1b6c7e0c3a400246994923d72b`.
+The [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
+owns the new acceptance evidence. D-P9-001 through D-P9-004 remain historical
+records. D-P9-005 supersedes only their mandatory exact-556b executable/output
+condition. It does not change the acceptance of Exit 9A-4.
+
+**Exact owner instruction:**
+
+> As TrackTemplate project owner, authorise a Level 3 change to the Phase 9 chair evidence model.
+>
+> The exact Templot 556b executable/output is no longer a mandatory acceptance oracle. Retain Templot as source-informed, reference and corroborating evidence, with its historical lineage preserved.
+>
+> Our current machine cannot provide a reliable Lazarus, Windows VM or Wine execution route for the 556b oracle. Do not spend further Phase 9 effort trying to establish one on this host.
+>
+> For chair acceptance, establish an independent engineering reference chain from suitable drawings, standards, rail specifications, physical measurements and recorded project derivations. Every production-affecting value must have explicit provenance and accepted tolerances; do not relabel Templot-derived values as independent without evidence.
+>
+> Templot-specific implementation choices such as sampling, triangulation or mark-grid behaviour must not become production requirements unless independently justified.
+>
+> Make only the necessary Level 3 repository alignment to express this change. Then identify the smallest next Phase 9A evidence task, preferably mapping the current S1 "ChairDefinition" inputs against available independent engineering sources and identifying the remaining evidence gaps.
+>
+> Keep Phase 9B unopened and preserve all current rights, production and acceptance boundaries.
+>
+> Use normal Git preservation. Do not create an external backup unless repository policy specifically requires one.
+>
+> Stop at the next genuine owner-decision boundary.
+
+**Independent challenge and risk panel:** Richard is the project owner and
+chair. `/root` presents the alignment. Read-only reviewer
+`/root/post145_exit_readiness` examined the affected canonical owners and all
+24 live risks before this alignment. The recommendation is **Proceed with
+bounded conditions**, with no dissent. The reviewer shares one agent team and
+workspace with the author. This is not an external professional review.
+
+PR-02 and PR-04 retain procedural geometry, nominal dimensions and rail-fit
+evidence duties. PR-08 prevents unsupported independent status for Templot data.
+PR-12 retains one current authority. PR-21 and PR-22 retain provenance and
+independent challenge. PR-06, PR-07 and PR-09 retain rights conditions for the
+intended use. PR-09 stays Critical/Open/Partial. PR-13 stays
+Critical/Open/Effective for current scope. PR-17 stays Critical/Open/Partial.
+
+All 24 risk states, owners, deadlines and controls remain unchanged. No risk
+closure or improved control effectiveness follows. The existing owners must
+satisfy the independent evidence and tolerance conditions before chair acceptance.
+Richard retains that acceptance decision.
+
+Missing nominal, hidden-geometry,
+rail-stock and uncertainty evidence remains unresolved. Legal permission alone
+cannot establish engineering validity. No dissent or recovery-policy exception
+is recorded. Normal Git preservation applies. No external backup is due for
+this reversible alignment under the current recovery cadence.
+
+**Resulting authority and exclusions:** The exact 556b executable and output
+are not mandatory chair acceptance evidence. Templot remains source-informed,
+reference and supporting comparison evidence. Preserve historical lineage,
+frozen contracts, failed evidence and research-use limits. Source-derived PASS
+results do not become independent engineering evidence.
+
+Phase 9A stays Open at 1/4 under D-P9-004. Exits 9A-1–3 stay Pending.
+Phase 9B stays Not started at 0/6. No product change, definition, numerical
+tolerance, assisted S1 pilot, physical fit, package or production output is
+accepted. Rights, performance, release and legacy-retirement boundaries remain.
+
+D-P6-008 stays Deferred — unmet and TERM-R04 stays open. Output stays
+private-development and project status stays `unknown`. Previous repair limits
+remain. This decision supplies no authority to publish or merge this new candidate.
+
+**Smallest next evidence task:** Map the current S1 `ChairDefinition` inputs to
+independent engineering sources and explicit evidence gaps. Use the package and
+manifest identities retained under D-P9-004. Account for all 113 quantities,
+their derivation inputs, component construction, assembly placement and rail
+interfaces. Include source printing allowances and representation choices.
+Separate prototype geometry, model rail-fit policy and manufacturing compensation.
+
+For each production-affecting value, identify an exact independent source or
+record the missing evidence. Identify the necessary uncertainty and tolerance
+decisions without inventing numerical limits. The Standard Railway Equipment
+1926 citation remains an unverified bibliographic lead. The owner's C&L Code 75
+HiNi stock still needs recorded measurements. The current package supplies no
+independent engineering source.
+
+Independent review must check mapping completeness
+before source selection or numerical acceptance. This task would advance
+Exits 9A-1 and 9A-2. It accepts no exit and selects no implementation.
 
 <a id="phase-9-programme-alignment-panel"></a>
 
