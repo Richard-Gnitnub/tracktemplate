@@ -39,6 +39,17 @@ from tracktemplate.domain.chair_key import (
     ChairKeyParameters,
     construct_chair_key,
 )
+from tracktemplate.domain.chair_l1 import (
+    ChairL1BaseParameters,
+    ChairL1InnerJawParameters,
+    ChairL1OuterJawParameters,
+    ChairL1SeatParameters,
+    assemble_l1_chair_components,
+    construct_chair_l1_base,
+    construct_chair_l1_inner_jaw,
+    construct_chair_l1_outer_jaw,
+    construct_chair_l1_seat,
+)
 from tracktemplate.domain.chair_outer_jaw import (
     ChairOuterJawGeometry,
     ChairOuterJawParameters,
@@ -59,6 +70,14 @@ CHAIR_OUTER_JAW_RESEARCH_RULE_ID = (
 )
 CHAIR_INNER_JAW_RESEARCH_RULE_ID = (
     "tracktemplate.chair.inner-jaw-reference.v1"
+)
+CHAIR_L1_BASE_RESEARCH_RULE_ID = "tracktemplate.chair.l1-base-reference.v1"
+CHAIR_L1_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.l1-seat-reference.v1"
+CHAIR_L1_OUTER_JAW_RESEARCH_RULE_ID = (
+    "tracktemplate.chair.l1-outer-jaw-reference.v1"
+)
+CHAIR_L1_INNER_JAW_RESEARCH_RULE_ID = (
+    "tracktemplate.chair.l1-inner-jaw-reference.v1"
 )
 CHAIR_SEAT_FRAME_RULE_ID = "tracktemplate.chair.source-to-chair-frame.v1"
 _FRAME_PURPOSES = (
@@ -255,7 +274,8 @@ def _research_lineage(record, manifest):
 
 def _parameter_map(
     procedure, quantities, expected, path, *, allow_key_fish_ratio=False,
-    allow_inner_jaw_slopes=False, length_name="seat",
+    allow_inner_jaw_slopes=False, allow_l1_fillet_factor=False,
+    length_name="seat",
 ):
     selected = [quantities[key] for key in procedure["parameter_quantity_ids"]]
     purposes = [item["purpose"] for item in selected]
@@ -267,6 +287,11 @@ def _parameter_map(
     if allow_key_fish_ratio:
         unit_message = (
             "key parameters need lengths in mm and rail_fish_ratio in 1"
+        )
+    elif allow_l1_fillet_factor:
+        unit_message = (
+            "L1 inner jaw parameters need lengths in mm, two named side "
+            "slopes and plinth_fillet_factor in 1"
         )
     elif allow_inner_jaw_slopes:
         unit_message = (
@@ -290,6 +315,8 @@ def _parameter_map(
                 or (allow_inner_jaw_slopes and item["purpose"] in (
                     "top_to_mid_side_slope", "mid_to_seat_side_slope",
                 ))
+                or (allow_l1_fillet_factor
+                    and item["purpose"] == "plinth_fillet_factor")
             )
             else (
                 item["quantity_kind"] == "length"
@@ -305,7 +332,7 @@ def _parameter_map(
 
 def _procedures(
     definition, quantities, *, key=False, base=False, outer_jaw=False,
-    inner_jaw=False, assembly=False,
+    inner_jaw=False, assembly=False, l1=False,
 ):
     _require(
         sum((key, base, outer_jaw, inner_jaw)) <= 1,
@@ -330,6 +357,19 @@ def _procedures(
             CHAIR_KEY_RESEARCH_RULE_ID if key else CHAIR_SEAT_RESEARCH_RULE_ID
         )
         parameter_type = ChairKeyParameters if key else ChairSeatParameters
+    if l1 and not key:
+        if inner_jaw:
+            rule_id = CHAIR_L1_INNER_JAW_RESEARCH_RULE_ID
+            parameter_type = ChairL1InnerJawParameters
+        elif outer_jaw:
+            rule_id = CHAIR_L1_OUTER_JAW_RESEARCH_RULE_ID
+            parameter_type = ChairL1OuterJawParameters
+        elif base:
+            rule_id = CHAIR_L1_BASE_RESEARCH_RULE_ID
+            parameter_type = ChairL1BaseParameters
+        else:
+            rule_id = CHAIR_L1_SEAT_RESEARCH_RULE_ID
+            parameter_type = ChairL1SeatParameters
     procedures = definition["procedures"]
     _require(
         len(procedures) == 2,
@@ -355,7 +395,8 @@ def _procedures(
         construction, quantities,
         tuple(item.name for item in fields(parameter_type)),
         "$.definition.procedures[1]", allow_key_fish_ratio=key,
-        allow_inner_jaw_slopes=inner_jaw, length_name=name,
+        allow_inner_jaw_slopes=inner_jaw,
+        allow_l1_fillet_factor=l1 and inner_jaw, length_name=name,
     )
     frame = _parameter_map(
         placement, quantities, _FRAME_PURPOSES, "$.definition.procedures[0]",
@@ -743,6 +784,23 @@ def prepare_chair_assembly_research(package, manifest_text):
     or loaded. All original field identities and lineage remain intact.
     The operation has no document, filesystem or admission side effect.
     """
+    return _prepare_assembly_research(package, manifest_text)
+
+
+def prepare_chair_l1_assembly_research(package, manifest_text):
+    """Construct only the finite reference-only L1 body from package v1.
+
+    The shared generator validates the original signed package before
+    construction. Four explicit L1 rules and the unchanged key rule
+    preserve component identities, lineage and private research status.
+    No slot, fastening, loose jaw or manufacturing profile is supported.
+    The operation changes no package, document, file or acceptance state.
+    """
+    return _prepare_assembly_research(package, manifest_text, l1=True)
+
+
+def _prepare_assembly_research(package, manifest_text, *, l1=False):
+    """Use one validated construction path for two finite rule sets."""
     if not isinstance(package, ChairDefinitionPackage):
         raise TypeError("package must be a ChairDefinitionPackage")
     try:
@@ -768,6 +826,22 @@ def prepare_chair_assembly_research(package, manifest_text):
          construct_chair_inner_jaw, ChairInnerJawResearchResult,
          {"inner_jaw": True}),
     )
+    if l1:
+        specifications = (
+            (CHAIR_L1_BASE_RESEARCH_RULE_ID, ChairL1BaseParameters,
+             construct_chair_l1_base, ChairBaseResearchResult,
+             {"base": True}),
+            (CHAIR_L1_SEAT_RESEARCH_RULE_ID, ChairL1SeatParameters,
+             construct_chair_l1_seat, ChairSeatResearchResult, {}),
+            (CHAIR_KEY_RESEARCH_RULE_ID, ChairKeyParameters,
+             construct_chair_key, ChairKeyResearchResult, {"key": True}),
+            (CHAIR_L1_OUTER_JAW_RESEARCH_RULE_ID, ChairL1OuterJawParameters,
+             construct_chair_l1_outer_jaw, ChairOuterJawResearchResult,
+             {"outer_jaw": True}),
+            (CHAIR_L1_INNER_JAW_RESEARCH_RULE_ID, ChairL1InnerJawParameters,
+             construct_chair_l1_inner_jaw, ChairInnerJawResearchResult,
+             {"inner_jaw": True}),
+        )
     procedures = {p["rule_id"]: p for p in definition["procedures"]}
     _require(
         len(definition["procedures"]) == 6
@@ -807,7 +881,7 @@ def prepare_chair_assembly_research(package, manifest_text):
                         procedure_ids=[construction["procedure_id"]],
                     )])
         _, _, selected = _procedures(
-            view, quantities, assembly=True, **flags,
+            view, quantities, assembly=True, l1=l1, **flags,
         )
         component_id = _component_contract(
             view, placement, construction, **flags,
@@ -838,7 +912,9 @@ def prepare_chair_assembly_research(package, manifest_text):
                 procedure_id=procedure["procedure_id"],
                 geometry=constructor(parameters),
             ))
-        geometry = assemble_chair_components(tuple(
+        assemble = (assemble_l1_chair_components if l1
+                    else assemble_chair_components)
+        geometry = assemble(tuple(
             (role, result.geometry)
             for role, result in zip(CHAIR_ASSEMBLY_ROLES, results)
         ))
