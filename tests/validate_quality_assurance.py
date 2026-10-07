@@ -209,7 +209,7 @@ def validate_frozen_records() -> None:
         "frozen-record status changed",
     )
     require(
-        document["updated_on"] == "2026-10-03",
+        document["updated_on"] == "2026-10-07",
         "frozen-record manifest update date drifted",
     )
     records = document["records"]
