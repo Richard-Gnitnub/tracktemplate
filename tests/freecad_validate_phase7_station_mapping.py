@@ -103,6 +103,7 @@ def validate():
     )
     host = b15_workflow_host.load_b15_workflow_host(ROOT, contract)
     module = host.module
+    original_solver = module.solve_rea_c10_crossover_geometry
     original_pair = tuple(getattr(module, name) for name in proof.PAIR)
     original = proof.characterise(*original_pair, App.Vector)
     generated = generated_alignments(module)
@@ -149,6 +150,13 @@ def validate():
             assert caller.station_data is module.alignment_station_data
             assert caller.progress is module.alignment_progress_at_station
             continue
+        if caller_name == "solve_rea_c10_crossover_geometry":
+            adapter = caller.__self__
+            assert type(adapter) is transition_workflow.CrossoverPreflightAdapter
+            assert caller == adapter.solve
+            assert adapter.module is module
+            assert adapter.original_solver is original_solver
+            caller = adapter.original_solver
         assert caller.__globals__ is module.__dict__
         for target in targets:
             assert caller.__globals__[target] is getattr(module, target)

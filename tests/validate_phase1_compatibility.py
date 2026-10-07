@@ -19,7 +19,7 @@ from tools import runtime_compatibility_probe  # noqa: E402
 
 CONTRACT_PATH = ROOT / "reference" / "contracts" / "phase1-compatibility.json"
 EXPECTED_CONTRACT_SHA256 = (
-    "dd306ad8da93fe7920bf2b55288b0d623520ccf39471c2c72dea400fcb16aff7"
+    "6539ff066b8abcd81cb111c3127124580e6bca44eb19c09ea8ae93175de7113f"
 )
 SOURCE_PATHS = {
     "b14": ROOT / "AdvancedTurnout.FCMacro",
@@ -116,6 +116,11 @@ EXPECTED_CURRENT_PROFILE_MATCH = {
     "python.implementation": "CPython",
     "python.version_info": [3, 13, 15],
 }
+EXPECTED_NEW_PROFILE_MATCH = {
+    **EXPECTED_CURRENT_PROFILE_MATCH,
+    "freecad.coin_version": "SIM Coin 4.0.10",
+    "freecad.version_info": [1, 1, 4],
+}
 EXPECTED_QUALIFIED_PROFILES = {
     "linux-x86_64-flatpak-freecad-1.1.1": {
         "status": "qualified-reference-and-initial-rc-profile",
@@ -176,6 +181,34 @@ EXPECTED_QUALIFIED_PROFILES = {
         ),
         "observed_flatpak_parent_commit": (
             "c8bae9a419fcddf1f40c046b064be3b8b98144734b1828428f6a2a944312dd29"
+        ),
+        "observed_flatpak_runtime": "org.kde.Platform/x86_64/6.11",
+        "observed_flatpak_runtime_commit": (
+            "fe192771c0992ad873e6a9ccc6e4f087c76314ce5ced165650cc7ea045a6bbaa"
+        ),
+        "observed_flatpak_runtime_parent_commit": (
+            "4da4797cdce707e1db7bc25720ac5e1f56818c087621f3737ea5482b0ed53c18"
+        ),
+        "observed_flatpak_sdk": "org.kde.Sdk/x86_64/6.11",
+        "observed_flatpak_origin": "flathub",
+        "observed_flatpak_collection": "org.flathub.Stable",
+        "observed_flatpak_installation": "system",
+    },
+    "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10": {
+        "status": "qualified-additional-exact-host-profile",
+        "exact_match": EXPECTED_NEW_PROFILE_MATCH,
+        "observed_freecad_revision": "45039 (Git)",
+        "observed_freecad_commit": (
+            "4fd3bf320d9566a27e60069fc8387448aaa3a094"
+        ),
+        "observed_flatpak_ref": (
+            "app/org.freecad.FreeCAD/x86_64/stable"
+        ),
+        "observed_flatpak_app_commit": (
+            "e63d66825c4daf9adb09283488c2bc2ace92ed8b24bcf81666933226ed082fd4"
+        ),
+        "observed_flatpak_parent_commit": (
+            "e6bcddd5025c49f8b47122b4172dc09f9afeff64fdb1cab83214b7de3e28f121"
         ),
         "observed_flatpak_runtime": "org.kde.Platform/x86_64/6.11",
         "observed_flatpak_runtime_commit": (
@@ -270,7 +303,7 @@ def validate_contract(document):
         "recorded_on": "2026-07-20",
         "status": (
             "phase1-policy-accepted-phase2-development-guard-implemented-"
-            "four-exact-freecad-profiles-qualified"
+            "five-exact-freecad-profiles-qualified"
         ),
         "phase": 1,
     }
@@ -936,6 +969,18 @@ def validate_fail_closed_mutations(contract):
     changed["runtime_baseline"]["qualified_profiles"][3][
         "observed_flatpak_runtime_commit"
     ] = "0" * 64
+    mutations.append(changed)
+
+    changed = copy.deepcopy(contract)
+    changed["runtime_baseline"]["qualified_profiles"][4]["exact_match"][
+        "freecad.coin_version"
+    ] = "SIM Coin 4.0.8"
+    mutations.append(changed)
+
+    changed = copy.deepcopy(contract)
+    changed["runtime_baseline"]["qualified_profiles"][4]["status"] = (
+        "assessment-candidate-pending-full-matrix"
+    )
     mutations.append(changed)
 
     changed = copy.deepcopy(contract)

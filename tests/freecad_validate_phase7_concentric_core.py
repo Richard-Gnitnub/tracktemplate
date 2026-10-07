@@ -63,6 +63,7 @@ assert foundation["matched_profile_id"] in {
     "linux-x86_64-flatpak-freecad-1.1.3",
     "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
     "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+    "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
 }
 assert foundation["workflow_host_loaded"] is False
 api, bootstrap = launcher["_load_foundation"](ROOT)
@@ -165,8 +166,11 @@ with mock.patch.dict(
     api.build_concentric_core.__globals__,
     {"clothoid_exit_displacement": observed_exit},
 ):
+    # A modular session permanently binds its inherited host.
+    observed_host = b15_workflow_host.load_b15_workflow_host(ROOT, contract)
+    assert observed_host.module is not host.module
     observed_session = transition_workflow.ModularTransitionWorkflowSession(
-        host, observed_functions,
+        observed_host, observed_functions,
     )
     assert snapshot(observed_session.module) == legacy_snapshot
     assert len(calls) == 3

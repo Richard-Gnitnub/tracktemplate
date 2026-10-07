@@ -97,11 +97,11 @@ Update this document when the oracle/reference relationship changes.
 ### 3. FreeCAD document validation
 
 - Use an exact host profile that the Phase 1 compatibility contract qualifies.
-  The contract qualifies two exact Linux x86_64 stable
-  `org.freecad.FreeCAD` Flatpak profiles. They use FreeCAD 1.1.1 and 1.1.3.
-  Both profiles contain CPython 3.13.14, PySide6/Qt 6.10.3,
-  OpenCASCADE 7.8.1, and Coin 4.0.8. FreeCAD 1.1.2 and all other host profiles
-  are not qualified.
+  The contract qualifies five exact Linux x86_64 stable
+  `org.freecad.FreeCAD` Flatpak profiles. They include FreeCAD 1.1.1,
+  three distinct FreeCAD 1.1.3 profiles and one FreeCAD 1.1.4 profile.
+  Their Python, Qt and Coin values differ. Match every required field.
+  FreeCAD 1.1.2 and all other host profiles are not qualified.
 - Make sure that object types, properties, groups, visibility, transactions,
   recomputes, and cleanup are correct.
 - Make sure that save and reopen behaviour is correct when persistence changes.
@@ -1427,7 +1427,8 @@ evidence only when its `TRACKTEMPLATE_RUNTIME_PROBE=` record reports
 - `linux-x86_64-flatpak-freecad-1.1.1`
 - `linux-x86_64-flatpak-freecad-1.1.3`
 - `linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1`
-- `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2`.
+- `linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2`
+- `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
 
 An exact 1.1.1 result does not qualify 1.1.3. An exact 1.1.3 result does not
 qualify 1.1.2 or another 1.1.x release. A result for one exact 1.1.3 profile
@@ -1446,11 +1447,19 @@ gave the specified results. The independently verified Flatpak app and
 runtime commits are provenance because the runtime probe does not report them.
 D-GOV-019 gives functional compatibility authority only.
 
+D-GOV-023 adds only the exact FreeCAD 1.1.4 profile with CPython 3.13.15,
+PySide6/Qt 6.11.2, OpenCASCADE 7.8.1 and SIM Coin 4.0.10. The complete
+standalone, FreeCADCmd and real-GUI matrices gave the specified results.
+The Flatpak app and runtime commits are independently verified provenance.
+The runtime probe does not report them. The four earlier profiles stay
+qualified. D-GOV-023 gives functional compatibility authority only.
+
 D-GOV-007 and D-GOV-010 define the
 [hosts for Phase 6 performance evidence](PERFORMANCE_SOP.md#phase-6-performance-host-boundary).
 They authorise only the three named profiles that existed through D-GOV-010 to
 supply candidate evidence for Phase 6 performance. D-GOV-019 does not add the
 CPython 3.13.15 and PySide6/Qt 6.11.2 profile to that performance boundary.
+D-GOV-023 does not add the FreeCAD 1.1.4 profile to that boundary.
 A subsequent decision can admit only a performance result from one of these profiles.
 
 The validator examines new schema-2 results. Each result and summary must

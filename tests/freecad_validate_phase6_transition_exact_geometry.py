@@ -248,7 +248,7 @@ def _validate_success_and_determinism(document, artifact):
     assert receipt.closed is False
     assert receipt.maximum_abs_z_mm == 0.0
     assert receipt.geometry_signature.startswith("sha256:")
-    assert receipt.freecad_version in {"1.1.1", "1.1.3"}
+    assert receipt.freecad_version in {"1.1.1", "1.1.3", "1.1.4"}
     assert receipt.opencascade_version.startswith("7.8.1")
     assert receipt.polyline_length_mm < (
         centreline.points[-1].station_mm
@@ -448,6 +448,7 @@ def validate():
         "linux-x86_64-flatpak-freecad-1.1.3",
         "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
         "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+        "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
     }
 
     document, _obj = _new_editable_document()
