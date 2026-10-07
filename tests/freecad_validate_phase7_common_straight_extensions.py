@@ -59,6 +59,7 @@ assert foundation["matched_profile_id"] in {
     "linux-x86_64-flatpak-freecad-1.1.3",
     "linux-x86_64-flatpak-freecad-1.1.3-py3.13.13-qt6.11.1",
     "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+    "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
 }
 assert foundation["workflow_host_loaded"] is False
 api, bootstrap = launcher["_load_foundation"](ROOT)
@@ -139,8 +140,11 @@ def observed_extensions(alignments, total_angle):
 
 
 observed = dict(functions, add_common_straight_extensions=observed_extensions)
+# A modular session permanently binds its inherited host.
+observed_host = b15_workflow_host.load_b15_workflow_host(ROOT, contract)
+assert observed_host.module is not host.module
 observed_session = transition_workflow.ModularTransitionWorkflowSession(
-    host, observed,
+    observed_host, observed,
 )
 fresh_groups = host_groups(observed_session.module)
 for (name, records, angle), expected in zip(fresh_groups, legacy_results):

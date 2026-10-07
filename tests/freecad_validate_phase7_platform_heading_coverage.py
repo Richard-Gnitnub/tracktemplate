@@ -22,7 +22,10 @@ from tracktemplate.compatibility import transition_workflow  # noqa: E402
 import validate_phase7_platform_heading_coverage as proof  # noqa: E402
 
 
-PROFILE = "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2"
+PROFILES = {
+    "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+    "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
+}
 SENTINEL = "Phase 7 platform heading and coverage FreeCAD validation passed"
 
 
@@ -78,7 +81,7 @@ def validate():
     launcher = runpy.run_path(str(ROOT / "TrackTemplate.FCMacro"))
     foundation = launcher["FOUNDATION_RESULT"]
     assert foundation["status"] == "modular-foundation-ready"
-    assert foundation["matched_profile_id"] == PROFILE
+    assert foundation["matched_profile_id"] in PROFILES
     modular_api, bootstrap = launcher["_load_foundation"](ROOT)
     assert modular_api is api
     contract = bootstrap.load_contract(

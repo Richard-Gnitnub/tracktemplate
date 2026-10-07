@@ -23,7 +23,10 @@ from tracktemplate import bootstrap  # noqa: E402
 
 
 SENTINEL = "Phase 7 core-layout export FreeCAD validation passed"
-PROFILE = "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2"
+PROFILES = {
+    "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+    "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
+}
 
 
 class FixedDateTime(datetime.datetime):
@@ -156,8 +159,9 @@ def validate():
     qualification = bootstrap.require_qualified_runtime(
         ROOT / "reference/contracts/phase1-compatibility.json"
     )
-    assert qualification["compatibility_evaluation"]["matched_profile_id"] == (
-        PROFILE
+    assert (
+        qualification["compatibility_evaluation"]["matched_profile_id"]
+        in PROFILES
     )
     contract = bootstrap.load_contract(
         ROOT / "reference/contracts/phase1-transition-pilot.json"

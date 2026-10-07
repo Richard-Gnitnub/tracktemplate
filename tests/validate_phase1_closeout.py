@@ -240,7 +240,7 @@ def validate_closeout(data, check_repository=True):
     profiles = runtime.get("qualified_profiles") or []
     if compatibility.get("status") != (
         "phase1-policy-accepted-phase2-development-guard-implemented-"
-        "four-exact-freecad-profiles-qualified"
+        "five-exact-freecad-profiles-qualified"
     ):
         errors.append("compatibility contract status drifted")
     actual_profiles = [
@@ -263,6 +263,10 @@ def validate_closeout(data, check_repository=True):
         ),
         (
             "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+            "qualified-additional-exact-host-profile",
+        ),
+        (
+            "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
             "qualified-additional-exact-host-profile",
         ),
     ]:
@@ -450,6 +454,12 @@ def main():
         "status"
     ] = "qualified"
     _expect_invalid(broadened_host, "unsupported Windows qualification")
+
+    downgraded_host = copy.deepcopy(data)
+    downgraded_host["compatibility"]["runtime_baseline"][
+        "qualified_profiles"
+    ][4]["status"] = "assessment-candidate-pending-full-matrix"
+    _expect_invalid(downgraded_host, "lost exact host qualification")
 
     measured_target = copy.deepcopy(data)
     measured_target["performance"]["target_pipeline_slots"][0][

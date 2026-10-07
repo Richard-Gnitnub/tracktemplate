@@ -39,9 +39,10 @@ def validate():
     launcher = runpy.run_path(str(SOURCE_ROOT / "TrackTemplate.FCMacro"))
     foundation = launcher["FOUNDATION_RESULT"]
     assert foundation["status"] == "modular-foundation-ready"
-    assert foundation["matched_profile_id"] == (
-        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2"
-    )
+    assert foundation["matched_profile_id"] in {
+        "linux-x86_64-flatpak-freecad-1.1.3-py3.13.15-qt6.11.2",
+        "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
+    }
     modular_api, bootstrap = launcher["_load_foundation"](SOURCE_ROOT)
     assert modular_api is api
     contract = bootstrap.load_contract(
