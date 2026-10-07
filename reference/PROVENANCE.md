@@ -203,10 +203,11 @@ The source S1/REA labels do not prove the precise physical prototype designation
 The C&L/EMGS/S4Soc Code 75 reference profile does not prove the dimensions of
 the owner's C&L Code 75 HiNi stock. Prototype geometry and inclination stay
 separate from the deliberate vertical model fit and manufacturing compensation.
+
 [D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel) removes
 exact 556b execution and output as mandatory chair acceptance evidence.
 The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
-owns the independent engineering reference chain. Templot remains source-informed,
+owns the independent engineering reference chain. Templot stays source-informed,
 reference and supporting comparison evidence. Source history does not change.
 
 Before production clearance in Phase 9B, record the accepted disposition for
@@ -221,12 +222,12 @@ prototype facts or gives a package production clearance.
 **Historical acquisition record:** The capture contract below is optional under
 [D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel).
 Exact 556b execution and output are no longer mandatory chair acceptance evidence.
-The owner reports no reliable execution route on this host. No further Phase 9
-Lazarus, Windows VM or Wine work is authorised to establish that route.
+The owner reports no reliable execution route on this host.
+Do not do more Phase 9 work to make that route through Lazarus, Windows VM or Wine.
 Preserve the local build and execution evidence. These historical gaps do not
 show that every later build attempt failed.
 
-A comparison reported as exact 556b must still come from the reviewed 556b state.
+A comparison reported as exact 556b must use the reviewed 556b state.
 A nearby Templot release cannot supply that identity. On 2026-07-20 the project recorded a
 fail-closed capture specification at
 [`oracles/templot5-556b-s1-oracle.json`](oracles/templot5-556b-s1-oracle.json).
@@ -247,7 +248,7 @@ available to the native Linux target. The SourceForge ZIP is also not a
 self-contained build bundle: the upstream README calls for modified HtmlViewer
 files, the project references `FrameViewer09` and `synapse_units`, and those
 inputs are absent from the archive. This does not alter the source licence or
-prove that 556b cannot be built. At that probe, the project lacked a reproducible exact build with recorded
+prove that 556b cannot be built. At that probe, the project had no reproducible exact build with recorded
 external inputs, versions, modifications, hashes and licences.
 
 The minimum provenance needed to unblock capture is an exact 556b executable

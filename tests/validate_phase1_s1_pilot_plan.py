@@ -151,8 +151,8 @@ def _research_boundary_errors(text):
         "Do not construct an affected component while its "
         "output-affecting fields are unresolved",
         "No missing dimension or numerical tolerance can receive an invented default",
-        "The frozen Templot contract stays separate as optional comparison "
-        "evidence",
+        "The frozen Templot contract stays a different source of optional "
+        "comparison evidence",
         "D-P9-005 removes the exact executable and output as mandatory "
         "acceptance evidence",
         "Phase 9B keeps the minimum production evidence bundle, package-rights, "
@@ -176,31 +176,34 @@ def _engineering_reference_errors(text):
     )
     flat = " ".join(section.replace("`", "").split())
     clauses = (
-        "Chair acceptance requires an independent engineering reference chain",
-        "Record the exact source identity and applicable source location "
+        "For chair acceptance, an independent engineering reference chain "
+        "is mandatory",
+        "Record the source identity and applicable source location "
         "for each value",
         "Record units, uncertainty, derivation inputs and the intended use",
-        "Every production-affecting value needs explicit provenance and "
-        "accepted numerical tolerances before acceptance",
-        "Keep prototype geometry, model rail-fit policy and manufacturing "
-        "compensation separate",
-        "Missing evidence or an unaccepted tolerance remains a finding",
+        "Before acceptance, explicit provenance and accepted numerical "
+        "tolerances are mandatory for every production-affecting value",
+        "Keep a separation between prototype geometry, model rail-fit "
+        "policy and manufacturing compensation",
+        "Missing evidence or a tolerance that is not accepted stays a finding",
         "Do not give a Templot-derived value independent status without "
         "supporting independent evidence",
         "Preserve its historical Templot lineage after independent "
         "confirmation or replacement",
-        "The rights conditions remain separate from engineering acceptance",
-        "Agreement with Templot alone cannot accept a chair value or tolerance",
+        "Keep a separation between the rights conditions and engineering "
+        "acceptance",
+        "Agreement with Templot is not sufficient for acceptance of a chair "
+        "value or tolerance",
         "They are not production requirements without independent "
         "engineering justification",
         "Record that justification and its acceptance before such a choice "
         "controls production",
-        "Do not spend further Phase 9 effort establishing a Lazarus, Windows "
-        "VM or Wine execution route for 556b on the current host",
+        "Do not do more Phase 9 work on this host to operate 556b through "
+        "Lazarus, Windows VM or Wine",
         "Keep the frozen capture contract, source identities, lineage, "
-        "failed evidence and local artifacts",
+        "failed evidence and local files",
         "No different Templot executable becomes an exact-556b result",
-        "An absent 556b capture no longer blocks chair acceptance by itself",
+        "An absent 556b capture does not stop chair acceptance by itself",
         "D-P9-005 supersedes the mandatory S1-14 comparison condition",
         "The register and frozen capture contract keep their historical "
         "identities and status",
@@ -433,19 +436,20 @@ def main():
     )
     engineering_flat = " ".join(engineering_section.split())
     for before, after in (
-        ("requires an independent engineering reference chain",
-         "requires no independent engineering reference chain"),
-        ("accepted numerical tolerances before acceptance",
-         "numerical tolerances after acceptance"),
+        ("an independent engineering reference chain is mandatory",
+         "no independent engineering reference chain is mandatory"),
+        ("Before acceptance, explicit provenance and accepted numerical "
+         "tolerances", "After acceptance, explicit provenance and "
+         "numerical tolerances"),
         ("units, uncertainty, derivation inputs", "units only"),
         ("Do not give a Templot-derived value independent status",
          "Give a Templot-derived value independent status"),
         ("Preserve its historical Templot lineage",
          "Remove its historical Templot lineage"),
-        ("alone cannot accept", "alone can accept"),
+        ("is not sufficient for acceptance", "is sufficient for acceptance"),
         ("not production requirements without independent engineering",
          "production requirements without independent engineering"),
-        ("Do not spend further Phase 9 effort", "Spend further Phase 9 effort"),
+        ("Do not do more Phase 9 work", "Do more Phase 9 work"),
         ("No different Templot executable becomes", "A different Templot "
          "executable becomes"),
         ("supersedes the mandatory S1-14 comparison condition",

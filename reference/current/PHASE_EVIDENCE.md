@@ -16,11 +16,11 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 1/4 under [D-P9-004](#phase-9a-exit-4-admission-panel). Only Exit 9A-4 is Evidenced and owner-accepted.<br><br>Exits 9A-1–3 stay Pending. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | [D-P9-005](#phase-9-chair-evidence-model-panel) changes the chair evidence model. The exact 556b executable and output are no longer mandatory acceptance evidence. The [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005) requires independent engineering evidence. D-P9-004 still accepts only Exit 9A-4 at `9576614daf6cc69a04d214e824ec32cc7bbe5251`. |
+| What changed | [D-P9-005](#phase-9-chair-evidence-model-panel) changes the chair evidence model. The exact 556b executable and output are no longer mandatory acceptance evidence. Under the [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005), independent engineering evidence is mandatory. D-P9-004 accepts only Exit 9A-4 at `9576614daf6cc69a04d214e824ec32cc7bbe5251`. |
 | What now works | The S1 records that the project keeps identify the source, five chair components and permitted private research use. Independent review shows local, untracked evidence in the examined roots. This decision adds no product behaviour. The accepted Phase 7 and Phase 8 workflows stay. |
-| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. S1-07 through S1-13 and S1-15, package rights, rail section and tolerances remain bounded as recorded. D-P9-005 makes S1-14 optional comparison evidence. |
-| Owner decision | [D-P9-005](#phase-9-chair-evidence-model-panel) requires an independent engineering reference chain, explicit provenance and accepted numerical tolerances for every production-affecting value. Templot remains source-informed and reference evidence. This decision accepts no definition, numerical tolerance, assisted S1 pilot, physical fit, package, output or rights claim. |
-| Next action | Complete the D-P9-005 alignment through its authorised review and validation route. Then propose the bounded S1 input/evidence mapping below. No other implementation is selected. Publication and integration need their applicable authority. |
+| Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. <br><br>S1-07 through S1-13 and S1-15, package rights, rail section and tolerances stay bounded as recorded. D-P9-005 makes S1-14 optional comparison evidence. |
+| Owner decision | Under [D-P9-005](#phase-9-chair-evidence-model-panel), an independent engineering reference chain, explicit provenance and accepted numerical tolerances are mandatory for every production-affecting value. Templot stays source-informed and reference evidence. This decision accepts no definition, numerical tolerance, assisted S1 pilot, physical fit, package, output or rights claim. |
+| Next action | Complete the D-P9-005 alignment through its authorised review and validation route. Then give the owner the bounded S1 input/evidence task below. No other implementation is selected. Publication and integration are permitted only with their applicable authority. |
 
 <a id="phase-9-chair-evidence-model-panel"></a>
 
@@ -29,7 +29,7 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 **Decision boundary:** Richard authorises only the Level 3 change below from
 protected `main` `89f5441bed8f8b1b6c7e0c3a400246994923d72b`.
 The [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
-owns the new acceptance evidence. D-P9-001 through D-P9-004 remain historical
+owns the new acceptance evidence. D-P9-001 through D-P9-004 stay historical
 records. D-P9-005 supersedes only their mandatory exact-556b executable/output
 condition. It does not change the acceptance of Exit 9A-4.
 
@@ -54,32 +54,34 @@ condition. It does not change the acceptance of Exit 9A-4.
 > Stop at the next genuine owner-decision boundary.
 
 **Independent challenge and risk panel:** Richard is the project owner and
-chair. `/root` presents the alignment. Read-only reviewer
-`/root/post145_exit_readiness` examined the affected canonical owners and all
+panel chair. `/root` gives the alignment. Read-only reviewer
+`/root/post145_exit_readiness` examined the applicable canonical owners and all
 24 live risks before this alignment. The recommendation is **Proceed with
-bounded conditions**, with no dissent. The reviewer shares one agent team and
-workspace with the author. This is not an external professional review.
+bounded conditions**, with no dissent. The reviewer and author are in the same agent team and
+workspace. This is not an external professional review.
 
-PR-02 and PR-04 retain procedural geometry, nominal dimensions and rail-fit
+PR-02 and PR-04 keep procedural geometry, nominal dimensions and rail-fit
 evidence duties. PR-08 prevents unsupported independent status for Templot data.
-PR-12 retains one current authority. PR-21 and PR-22 retain provenance and
-independent challenge. PR-06, PR-07 and PR-09 retain rights conditions for the
+PR-12 keeps one current authority. PR-21 and PR-22 keep provenance and
+independent challenge.
+
+PR-06, PR-07 and PR-09 keep rights conditions for the
 intended use. PR-09 stays Critical/Open/Partial. PR-13 stays
 Critical/Open/Effective for current scope. PR-17 stays Critical/Open/Partial.
 
-All 24 risk states, owners, deadlines and controls remain unchanged. No risk
-closure or improved control effectiveness follows. The existing owners must
-satisfy the independent evidence and tolerance conditions before chair acceptance.
-Richard retains that acceptance decision.
+All 24 risk states, owners, deadlines and controls stay unchanged. No risk
+closure or better control effectiveness follows. Before chair acceptance, the existing owners must
+obey the independent evidence and tolerance conditions.
+Richard keeps that acceptance decision.
 
 Missing nominal, hidden-geometry,
-rail-stock and uncertainty evidence remains unresolved. Legal permission alone
-cannot establish engineering validity. No dissent or recovery-policy exception
-is recorded. Normal Git preservation applies. No external backup is due for
+rail-stock and uncertainty evidence stays unresolved. Third-party permission by itself
+cannot prove engineering validity. No dissent or recovery-policy exception
+is recorded. Usual Git preservation applies. No external backup is due for
 this reversible alignment under the current recovery cadence.
 
 **Resulting authority and exclusions:** The exact 556b executable and output
-are not mandatory chair acceptance evidence. Templot remains source-informed,
+are not mandatory chair acceptance evidence. Templot stays source-informed,
 reference and supporting comparison evidence. Preserve historical lineage,
 frozen contracts, failed evidence and research-use limits. Source-derived PASS
 results do not become independent engineering evidence.
@@ -87,28 +89,28 @@ results do not become independent engineering evidence.
 Phase 9A stays Open at 1/4 under D-P9-004. Exits 9A-1–3 stay Pending.
 Phase 9B stays Not started at 0/6. No product change, definition, numerical
 tolerance, assisted S1 pilot, physical fit, package or production output is
-accepted. Rights, performance, release and legacy-retirement boundaries remain.
+accepted. Rights, performance, release and legacy-retirement boundaries stay.
 
 D-P6-008 stays Deferred — unmet and TERM-R04 stays open. Output stays
 private-development and project status stays `unknown`. Previous repair limits
-remain. This decision supplies no authority to publish or merge this new candidate.
+stay. This decision supplies no authority to publish or merge this new candidate.
 
-**Smallest next evidence task:** Map the current S1 `ChairDefinition` inputs to
+**Smallest next evidence task:** Connect the current S1 `ChairDefinition` inputs to
 independent engineering sources and explicit evidence gaps. Use the package and
-manifest identities retained under D-P9-004. Account for all 113 quantities,
+manifest identities kept under D-P9-004. Include all 113 quantities,
 their derivation inputs, component construction, assembly placement and rail
 interfaces. Include source printing allowances and representation choices.
 Separate prototype geometry, model rail-fit policy and manufacturing compensation.
 
-For each production-affecting value, identify an exact independent source or
+For each production-affecting value, identify the independent source and its identity or
 record the missing evidence. Identify the necessary uncertainty and tolerance
-decisions without inventing numerical limits. The Standard Railway Equipment
-1926 citation remains an unverified bibliographic lead. The owner's C&L Code 75
-HiNi stock still needs recorded measurements. The current package supplies no
+decisions without making unsupported numerical limits. The Standard Railway Equipment
+1926 citation stays an unverified bibliographic lead. Recorded measurements of
+the owner's C&L Code 75 HiNi stock are necessary. The current package supplies no
 independent engineering source.
 
-Independent review must check mapping completeness
-before source selection or numerical acceptance. This task would advance
+Independent review must check that the evidence includes all S1 inputs
+before source selection or numerical acceptance. This task can supply evidence for
 Exits 9A-1 and 9A-2. It accepts no exit and selects no implementation.
 
 <a id="phase-9-programme-alignment-panel"></a>

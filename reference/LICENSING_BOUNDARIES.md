@@ -188,7 +188,7 @@ owns the independent engineering reference chain and numerical tolerances.
 A compatible rights disposition does not supply independent engineering evidence
 or accept a numerical tolerance. Independent engineering evidence gives no
 third-party permission or package clearance. Historical Templot lineage and
-source-informed status remain.
+source-informed status stay.
 
 ## Neutral chair-definition and collaboration boundary
 

@@ -5603,14 +5603,15 @@ def _validate_phase9_decision_holding(
         ("decision", (
             "Remove exact Templot 556b execution and output as mandatory "
             "chair acceptance evidence",
-            "Require an independent engineering reference chain",
-            "explicit provenance and accepted numerical tolerances for "
-            "every production-affecting value",
+            "An independent engineering reference chain, explicit provenance "
+            "and accepted numerical tolerances are mandatory for every "
+            "production-affecting value",
             "with its historical lineage",
             "only the dependent Level 3 repository alignment",
         )),
         ("exclusions", (
-            "No further Phase 9 Lazarus, Windows VM or Wine work",
+            "Do not do more Phase 9 work on this host to operate 556b "
+            "through Lazarus, Windows VM or Wine",
             "Do not identify Templot-derived values as independent "
             "without evidence",
             "not production requirements without independent engineering "
@@ -5625,7 +5626,7 @@ def _validate_phase9_decision_holding(
             "production output is accepted",
             "No positive rights claim, third-party permission, risk closure, "
             "performance result, release or legacy removal follows",
-            "All 24 risk states, owners, deadlines and controls remain "
+            "All 24 risk states, owners, deadlines and controls stay "
             "unchanged",
             "D-P6-008 stays Deferred — unmet and TERM-R04 stays open",
             "Output stays private-development and project status stays unknown",
@@ -5658,9 +5659,9 @@ def _validate_dp9_005_evidence_model(evidence: str) -> None:
         "89f5441bed8f8b1b6c7e0c3a400246994923d72b",
         "It does not change the acceptance of Exit 9A-4",
         "Proceed with bounded conditions",
-        "reviewer shares one agent team and workspace",
-        "All 24 risk states, owners, deadlines and controls remain unchanged",
-        "Legal permission alone cannot establish engineering validity",
+        "reviewer and author are in the same agent team and workspace",
+        "All 24 risk states, owners, deadlines and controls stay unchanged",
+        "Third-party permission by itself cannot prove engineering validity",
         "Source-derived PASS results do not become independent engineering "
         "evidence",
         "Phase 9A stays Open at 1/4 under D-P9-004",
