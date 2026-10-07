@@ -473,6 +473,46 @@ The separation of prototype geometry, rail-fit policy and manufacturing compensa
 Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
 This result gives no exit, package, risk or production acceptance. All recorded limits stay.
 
+## Reference-only S1 assembly proof — 2026-10-07
+
+One neutral `ChairDefinition` now constructs the base/plinth, seat, key and
+both jaws as an assembly. The five existing component rules stay unchanged.
+The local package keeps all 113 original quantity records and their original
+lineage and dependencies. Separate source records specify the central key
+placement. The research operation applies no random displacement, scale or
+manufacturing compensation.
+
+[Standalone tests](../../tests/validate_phase9a_chair_assembly.py) give a PASS
+result for round-trip, repeat construction and 14 signed rejection cases.
+[Qualified FreeCAD tests](../../tests/freecad_validate_phase9a_chair_assembly.py)
+give a PASS result for five valid, closed solids in one `Compound`.
+They also check failure isolation and unchanged document state.
+
+The local Templot 556b package gives the same component geometry as the five
+earlier proofs. Construction needs no source file or retained FreeCAD geometry.
+All ten component pairs agree with independent analytical evidence:
+four surface contacts, four gaps and two overlaps. Positive overlap volumes
+have host measurements only. Numerical limits do not establish physical fit.
+
+The `phase9a-s1-assembly-research-proof` worktree keeps the evidence under
+`tmp/phase9a-s1-assembly-proof/`. The original image is
+`presentation/s1-assembly-axonometric.png` in that directory. It supplies
+presentation evidence only. The assembly keeps five separate solids.
+It does not prove a fused production solid.
+
+Independent source review gives a PASS result without findings.
+Its receipt is `independent-quality-review.json` in that directory.
+The reviewer and authors are in the same agent team and workspace.
+
+This Level 2 result contributes to Phase 9A-1 and Phase 9A-2 only.
+The package stays `reference-only`, private-development and not accepted.
+Prototype geometry, model rail-fit policy and manufacturing compensation
+stay separate.
+
+Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
+This result gives no S1, exit, package, rights or production acceptance.
+All recorded limits and risk duties stay unchanged.
+
 <a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>
 
 ## D-GOV-023 exact FreeCAD 1.1.4 host qualification — 2026-10-07
