@@ -557,37 +557,46 @@ The `phase9a-s1-model-scale-proof` worktree keeps the detailed evidence in
 `presentation/s1-model-4mm-axonometric.png` in that directory shows the result.
 The image supplies presentation evidence only.
 
-## Reference-only S1 comparison checks — 2026-10-07
+## S1 checks with `reference-only` inputs — 2026-10-07
 
-This Level 2 result contributes to Phase 9A-2 only. Phase 9A stays Open
-at 0/4. Phase 9B stays Not started at 0/6. The package stays
-`reference-only`, private-development and not accepted.
+This Level 2 result adds evidence for Phase 9A-2 only. Phase 9A stays Open
+at 0/4. Phase 9B stays Not started at 0/6. The `ChairDefinitionPackage`
+stays `reference-only`, has private-development status and has no acceptance.
 
-The [new research operation](../../tracktemplate/application/chair_rail_research.py)
-compares recorded values with calculated values for the seat, key and inner jaw.
-The checks use exact values. It rejects a signed package if a checked
-value disagrees. Existing assembly and model operations give the same results
-as before. Package data, identities, signatures and source records do not change.
+The [new operation](../../tracktemplate/application/chair_rail_research.py)
+compares input values with calculated values for the `rail-seat`, `key` and
+`inner-jaw` chair components. The values must be equal. The operation rejects
+different values, also when the `content_signature` is correct. The previous
+assembly and `prepare_chair_model_research` operations give the same results
+as before. Input data, identities, hashes and source data do not change.
 
-The [standalone tests](../../tests/validate_phase9a_chair_rail_interface.py)
-give a PASS result for the calculated values and for package round-trip.
-They reject incorrect signed values, including differences below the existing
-FreeCAD numerical limit. The
-[FreeCAD tests](../../tests/freecad_validate_phase9a_chair_rail_interface.py)
-on the qualified host give a PASS result for 36 point checks on eight faces
-and one pair of endpoints. The retained local research package also passes
-the checks. The FreeCAD document does not change.
+The [tests for standalone Python](../../tests/validate_phase9a_chair_rail_interface.py)
+give a PASS result for calculated values. They also write the
+`ChairDefinitionPackage` data to JSON, read the data again and give the same
+result. They reject incorrect values with a correct `content_signature`, also
+for differences below the FreeCAD limit for calculated values.
 
-The frozen Templot source includes printing allowances. Its values do not
-establish measured physical rail dimensions. Disabled optional corrections
-do not remove these limits. The proof does not show that physical rail stock
-fits. It does not check a complete rail shape or the area of contact.
-It adds no numerical acceptance limit. It gives no Templot executable-output
-parity, package clearance, S1 admission or phase exit acceptance.
+The [FreeCAD tests](../../tests/freecad_validate_phase9a_chair_rail_interface.py)
+on the qualified host profile give a PASS result. The tests include 36 point checks on
+8 faces and 1 pair of end points. The tests also give a PASS result for the
+local `ChairDefinitionPackage`. The FreeCAD `Document` does not change.
+
+The [Templot source](../PROVENANCE.md#phase-9a-research-input-provenance)
+includes “including some 3D printing allowances” at `dxf_unit.pas:13699`.
+Its values do not show measured dimensions for the part that a chair holds.
+The operation uses no optional corrections. This does not remove the limitation.
+
+The result does not show a correct fit between a chair and the part that the
+chair holds. It does not examine the complete shape of that part or the area
+where the parts touch. The result adds no limit for acceptance of calculated
+values. It gives no evidence that the results are the same as output from the
+Templot executable. It gives no acceptance for the `ChairDefinitionPackage`,
+S1 or a phase exit.
 
 The `phase9a-s1-rail-interface-proof` worktree keeps the detailed evidence in
-`tmp/phase9a-s1-rail-interface-proof/`. The evidence includes classified
-failures and repeated proofs with PASS results.
+`tmp/phase9a-s1-rail-interface-proof/`. The evidence includes failure
+classification and the PASS results after the implementing agent did the tests
+again.
 
 <a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>
 
