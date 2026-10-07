@@ -25,9 +25,9 @@ from tracktemplate.domain.chair_model_scale import (
 
 
 _REQUEST_CONTRACT = "tracktemplate.chair-model-scale-research-request.v1"
-_REQUEST_FIELDS = frozenset((
+_REQUEST_FIELDS = (
     "contract_id", "scale_denominator", "source_frame_id", "origin_datum",
-))
+)
 
 
 class ChairModelResearchError(ChairResearchError):
@@ -74,7 +74,7 @@ def _canonical_json(record):
 
 
 def _validate_request(request, frame):
-    if not isinstance(request, dict) or set(request) != _REQUEST_FIELDS:
+    if not isinstance(request, dict) or set(request) != set(_REQUEST_FIELDS):
         raise ChairModelResearchError(
             "research-model-request-invalid", "$.request",
             "model comparison requires exactly four explicit request fields",
