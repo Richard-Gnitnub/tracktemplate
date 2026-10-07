@@ -475,43 +475,47 @@ This result gives no exit, package, risk or production acceptance. All recorded 
 
 ## Reference-only S1 assembly proof — 2026-10-07
 
-One neutral `ChairDefinition` now constructs the base/plinth, seat, key and
-both jaws as an assembly. The five existing component rules stay unchanged.
-The local package keeps all 113 original quantity records and their original
-lineage and dependencies. Separate source records specify the central key
-placement. The research operation applies no random displacement, scale or
-manufacturing compensation.
-
-[Standalone tests](../../tests/validate_phase9a_chair_assembly.py) give a PASS
-result for round-trip, repeat construction and 14 signed rejection cases.
-[Qualified FreeCAD tests](../../tests/freecad_validate_phase9a_chair_assembly.py)
-give a PASS result for five valid, closed solids in one `Compound`.
-They also check failure isolation and unchanged document state.
-
-The local Templot 556b package gives the same component geometry as the five
-earlier proofs. Construction needs no source file or retained FreeCAD geometry.
-All ten component pairs agree with independent analytical evidence:
-four surface contacts, four gaps and two overlaps. Positive overlap volumes
-have host measurements only. Numerical limits do not establish physical fit.
-
-The `phase9a-s1-assembly-research-proof` worktree keeps the evidence under
-`tmp/phase9a-s1-assembly-proof/`. The original image is
-`presentation/s1-assembly-axonometric.png` in that directory. It supplies
-presentation evidence only. The assembly keeps five separate solids.
-It does not prove a fused production solid.
-
-Independent source review gives a PASS result without findings.
-Its receipt is `independent-quality-review.json` in that directory.
-The reviewer and authors are in the same agent team and workspace.
-
 This Level 2 result contributes to Phase 9A-1 and Phase 9A-2 only.
 The package stays `reference-only`, private-development and not accepted.
-Prototype geometry, model rail-fit policy and manufacturing compensation
-stay separate.
-
 Phase 9A stays Open at 0/4. Phase 9B stays Not started at 0/6.
 This result gives no S1, exit, package, rights or production acceptance.
-All recorded limits and risk duties stay unchanged.
+
+Prototype geometry, model rail-fit policy and manufacturing compensation
+stay separate. All recorded limits and risk duties stay unchanged.
+
+The research operation uses one neutral `ChairDefinition` to make an assembly
+from its base/plinth, seat, key, inner jaw and outer jaw. The 5 component rules
+do not change. The local package keeps the same 113 quantity records, source
+lineage and dependencies. Other source records give the position of the key
+at the centre of the assembly. The operation does not move the components at
+random, change their scale or add manufacturing compensation.
+
+[Standalone tests](../../tests/validate_phase9a_chair_assembly.py) give a PASS
+result. They write and read the definition data and make the assembly again.
+The tests reject 14 input records with correct signatures but incorrect data.
+[FreeCAD tests](../../tests/freecad_validate_phase9a_chair_assembly.py) on the
+qualified host profile give a PASS result for 5 closed solids in one `Compound`.
+Each solid passes the FreeCAD `isValid()` check. If the operation fails, the
+FreeCAD document does not change.
+
+The local Templot 556b package gives the same component shapes as the 5
+component proofs. The assembly operation does not read a source file or use
+retained FreeCAD geometry. Tests calculate the expected relation without
+FreeCAD. FreeCAD gives the same relation for all 10 component pairs.
+
+Four pairs touch at surfaces. Four pairs have a positive distance between them.
+Two pairs have common volume. Only the FreeCAD host measures the 2 common
+volumes. These checks do not prove that physical rail stock fits.
+
+The `phase9a-s1-assembly-research-proof` worktree keeps the evidence in
+`tmp/phase9a-s1-assembly-proof/`. The file
+`presentation/s1-assembly-axonometric.png` in that directory shows the
+assembly. The image is presentation evidence only. The assembly keeps 5
+separate solids. This proof does not show a single solid for production.
+
+A reviewer who did not write the source or tests gives a PASS result with no
+findings. The receipt is `independent-quality-review.json` in that directory.
+The reviewer and authors share the same agent team and workspace.
 
 <a id="freecad-1-1-4-coin4-0-10-qualification-panel"></a>
 
