@@ -104,6 +104,240 @@ EXPECTED_POINTS = {
 }
 
 
+def _rational(value):
+    """Keep rational chord coordinates exact; refuse discarded radicals."""
+    if hasattr(value, "coefficients"):
+        assert not any(value.coefficients[1:])
+        return value.coefficients[0]
+    return Fraction(value)
+
+
+def _clip_polygon(points, normal, offset):
+    """Clip to a closed half-space with rational crossing denominators."""
+    if not points:
+        return ()
+    result = []
+    for a, b in zip(points, points[1:] + points[:1]):
+        da, db = (sum(n * v for n, v in zip(normal, p)) - offset
+                  for p in (a, b))
+        if da <= 0:
+            result.append(a)
+        if (da < 0 < db) or (db < 0 < da):
+            weight = da / _rational(da - db)
+            result.append(tuple(x + weight * (y - x)
+                                for x, y in zip(a, b)))
+    return tuple(result)
+
+
+def _area_squared(points):
+    """Square the polygon vector area without square-root rounding."""
+    vector = [Fraction(0)] * 3
+    for a, b in zip(points, points[1:] + points[:1]):
+        for axis in range(3):
+            j, k = (axis + 1) % 3, (axis + 2) % 3
+            vector[axis] += (a[j] * b[k] - a[k] * b[j]) / 2
+    return _rational(sum(value * value for value in vector))
+
+
+def finite_contact_measurements(assembly, profile):
+    """Measure finite research contacts in full-size mm, never fit limits.
+
+    The rail is a longitudinal prism spanning the complete assembly.
+    Fishing surfaces and the bottom are finite transverse segments.
+    A top-corner cut only removes material above these contact regions.
+    No source values or measured stock data are embedded here. These
+    predicates establish no physical acceptance.
+    """
+    geometries = dict(assembly.components)
+    vertices = {role: {name: (x, y, z) for name, x, y, z in g.vertices}
+                for role, g in geometries.items()}
+
+    def face(role, name):
+        ids = dict(geometries[role].faces)[name]
+        return tuple(vertices[role][identity] for identity in ids)
+
+    p = profile
+    seat = p.seat_thickness_mm
+    foot, head, web = (width / 2 for width in (
+        p.rail_foot_width_mm, p.rail_head_width_mm, p.rail_web_width_mm,
+    ))
+    slope = 1 / p.rail_fish_ratio
+    top = seat + p.rail_depth_mm - p.rail_web_top_depth_mm
+    bottom = seat + p.rail_depth_mm - p.rail_web_bottom_depth_mm
+    planes = {
+        "seat-bottom": ((0, 0, 1), seat, -foot, foot),
+        "inner-web-upper": ((0, 1, 0), -web, -web, -web),
+        "inner-web-lower": ((0, 1, 0), -web, -web, -web),
+        "inner-foot": ((0, -slope, 1), bottom, -foot, -web),
+        "inner-foot-side": ((0, 1, 0), -foot, -foot, -foot),
+    }
+    names = (
+        ("seat-bottom", "rail-seat", "seat-top"),
+        ("inner-web-upper", "inner-jaw", "grip-back-upper"),
+        ("inner-web-lower", "inner-jaw", "grip-back-lower"),
+        ("inner-foot", "inner-jaw", "grip-bottom"),
+        ("inner-foot-side", "inner-jaw", "lower-mid-to-seat-00"),
+    )
+    points = {}
+    for identity, role, name in names:
+        normal, offset, low, high = planes[identity]
+        polygon = face(role, name)
+        assert all(sum(a * v for a, v in zip(normal, point)) == offset
+                   for point in polygon), identity
+        polygon = _clip_polygon(polygon, (0, -1, 0), -low)
+        points[identity] = _clip_polygon(polygon, (0, 1, 0), high)
+    for name, _ids in geometries["key"].faces:
+        polygon = face("key", name)
+        for normal, offset, low, high in (
+            ((0, 1, 0), web, web, web),
+            ((0, -slope, 1), top, web, head),
+            ((0, slope, 1), bottom, web, foot),
+        ):
+            if all(sum(a * v for a, v in zip(normal, point)) == offset
+                   for point in polygon):
+                clipped = _clip_polygon(polygon, (0, -1, 0), -low)
+                clipped = _clip_polygon(clipped, (0, 1, 0), high)
+                if _area_squared(clipped):
+                    points[name] = clipped
+    grip = face("inner-jaw", "grip-top")
+    gaps = tuple(top - slope * y - z for _x, y, z in grip)
+    assert min(gaps) == 0 and max(gaps) > 0
+    edge = tuple(point for point, gap in zip(grip, gaps) if gap == 0)
+    assert len(edge) == 2
+    key = tuple(vertices["key"].values())
+    key_residuals = tuple((y - web, top + slope * y - z,
+                          z - bottom + slope * y) for _x, y, z in key)
+    assert all(min(row) >= 0 for row in key_residuals)
+    # The convex key lies wholly in the rail cavity. For the concave
+    # inner jaw, clip EVERY boundary face into the rail's Z bands.
+    # Each band has one linear gauge-side limit, not a vertex-only test.
+    upper_web, lower_web = top + slope * web, bottom - slope * web
+    bands = (
+        (seat, bottom - slope * foot, 0, -foot),
+        (bottom - slope * foot, lower_web,
+         -p.rail_fish_ratio, -p.rail_fish_ratio * bottom),
+        (lower_web, upper_web, 0, -web),
+        (upper_web, top + slope * head,
+         p.rail_fish_ratio, p.rail_fish_ratio * top),
+        (top + slope * head, seat + p.rail_depth_mm, 0, -head),
+    )
+    for name, _ids in geometries["inner-jaw"].faces:
+        for low, high, z_coefficient, offset in bands:
+            clipped = _clip_polygon(face("inner-jaw", name),
+                                    (0, 0, -1), -low)
+            clipped = _clip_polygon(clipped, (0, 0, 1), high)
+            assert all(y + z_coefficient * z <= offset
+                       for _x, y, z in clipped), name
+    assert max(z for _x, _y, z in vertices["rail-seat"].values()) == seat
+    assert max(z for _x, _y, z in vertices["base-plinth"].values()) < seat
+    assert min(y for _x, y, _z in vertices["outer-jaw"].values()) > max(
+        head, foot,
+    )
+    taper = tuple(vertices["key"][end + "-web-top"]
+                  for end in ("negative-end", "positive-end"))
+    web_gap = max(y - web for _x, y, _z in taper)
+    fish_gap = max(top + slope * y - z for _x, y, z in taper)
+    return {
+        "area_squared_mm4": {name: _area_squared(polygon)
+                             for name, polygon in points.items()},
+        "points_mm": points,
+        "seat_top_area_squared_mm4": _area_squared(face(
+            "rail-seat", "seat-top",
+        )),
+        "under_head_edge_length_squared_mm2": _rational(sum(
+            (a - b) * (a - b) for a, b in zip(*edge)
+        )),
+        "under_head_max_vertical_gap_mm": _rational(max(gaps)),
+        "under_head_contact_area_squared_mm4": Fraction(0),
+        "key_clearance": {
+            "web_max_mm": web_gap,
+            "fish_residual_max_mm": fish_gap,
+            "fish_normal_max_squared_mm2": fish_gap ** 2 / (1 + slope ** 2),
+        },
+        "key_nonpenetration": True,
+        "rail_nonpenetration": True,
+    }
+
+
+def assert_finite_contacts(result):
+    """Compare invented trapezoids/rectangles with independent areas."""
+    measured = finite_contact_measurements(
+        result.model_research.full_size_research.geometry,
+        result.proof.profile,
+    )
+    n = result.proof.profile.rail_fish_ratio
+    # Invented lengths: seat 20 by 8; web heights 4+4, widths
+    # 55/4, 29/2 and 31/2; foot width in Y=3. The lower grip
+    # half-width is 8+3/(5*n). No constructor output supplies these.
+    foot_width = Fraction(189, 4) + Fraction(9, 5) / n
+    foot_side = (17 + Fraction(3, 5) / n) * (10 - 3 / n)
+    expected = {
+        "seat-bottom": Fraction(160 ** 2),
+        "inner-web-upper": Fraction(113, 2) ** 2,
+        "inner-web-lower": Fraction(60 ** 2),
+        "inner-foot": foot_width ** 2 * (1 + 1 / n ** 2),
+        "inner-foot-side": foot_side ** 2,
+        "web-pad": Fraction(48 ** 2),
+        # Key pad 6 by 2; each end triangle has projected area 7.
+        "top-pad": 144 * (1 + 1 / n ** 2),
+        "bottom-pad": 144 * (1 + 1 / n ** 2),
+        **{side + "-" + level + "-ridge": 49 * (1 + 1 / n ** 2)
+           for side in ("negative", "positive")
+           for level in ("top", "bottom")},
+    }
+    assert measured["area_squared_mm4"] == expected
+    assert measured["seat_top_area_squared_mm4"] == 225 ** 2
+    assert measured["under_head_edge_length_squared_mm2"] == (
+        Fraction(55, 4) ** 2
+    )
+    assert measured["under_head_max_vertical_gap_mm"] == Fraction(3, 2) / n
+    assert measured["under_head_contact_area_squared_mm4"] == 0
+    assert measured["key_clearance"] == {
+        "web_max_mm": 1, "fish_residual_max_mm": 1 / n,
+        "fish_normal_max_squared_mm2": 1 / (n ** 2 + 1),
+    }
+    return measured
+
+
+def validate_finite_mutations(result):
+    """Plane-coincident mutations must fail the stronger finite checks."""
+    original = result.model_research.full_size_research.geometry
+    expected = assert_finite_contacts(result)
+    for mutation in ("short-seat", "end-in-rail", "top-area", "lost-ridge"):
+        components = []
+        for role, geometry in original.components:
+            points = []
+            for identity, x, y, z in geometry.vertices:
+                if mutation == "short-seat" and role == "rail-seat":
+                    x /= 2
+                if (mutation == "end-in-rail" and role == "key"
+                        and identity == "positive-end-web-top"):
+                    y = Fraction(1, 2)
+                if (mutation == "top-area" and role == "inner-jaw"
+                        and identity.endswith("-top-front")):
+                    z = Fraction(51, 2) - y / 2
+                points.append((identity, x, y, z))
+            faces = geometry.faces
+            if mutation == "lost-ridge" and role == "key":
+                faces = tuple((name, ids) for name, ids in faces
+                              if name != "positive-top-ridge")
+            components.append((role, replace(
+                geometry, vertices=tuple(points), faces=faces,
+            )))
+        changed = replace(original, components=tuple(components))
+        # These changes escape all nine existing rail-plane equalities.
+        prove_chair_rail_interface(changed, Fraction(381, 5))
+        try:
+            observed = finite_contact_measurements(
+                changed, result.proof.profile,
+            )
+            assert observed == expected
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(mutation + ": finite regression escaped")
+
+
 def change_quantity(record, role, purpose, value):
     """Change one invented canonical quantity with its matching source."""
     identity = "quantity:test:{}:{}".format(role, purpose)
@@ -345,6 +579,8 @@ def validate_rail_interface():
     assert result.model_research == previous
     assert result.model_research.package is package
     assert_proof(result)
+    assert_finite_contacts(result)
+    validate_finite_mutations(result)
     try:
         result.proof.scale_denominator = Fraction(1)
     except FrozenInstanceError:
@@ -378,6 +614,7 @@ def validate_rail_interface():
             other, other_text, REQUEST,
         )
         assert_proof(variant, exact_points=False)
+        assert_finite_contacts(variant)
         assert variant.proof.profile.rail_fish_ratio == Fraction(ratio)
         assert variant.proof.profile.rail_foot_depth_mm == expected_foot
         assert variant.model_research.request_signature != (

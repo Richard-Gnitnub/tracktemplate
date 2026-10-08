@@ -32,6 +32,7 @@ from validate_phase9a_chair_rail_interface import (  # noqa: E402
     EXPECTED_PLANES,
     EXPECTED_POINTS,
     MISMATCH,
+    assert_finite_contacts,
     assert_proof,
     load_package,
     mismatch_cases,
@@ -127,6 +128,122 @@ def prove_then_validate(package, manifest_text, request):
     )
 
 
+def validate_native_finite_contacts(result):
+    """Check finite transient intersections against invented exact areas."""
+    measured = assert_finite_contacts(result)
+    model = result.model_research
+    shapes = dict(zip((c.role for c in model.components),
+                      chair_model_exact._construct_components(model)))
+    scale = float(LENGTH_FACTOR)
+    # Independent invented section: seat Z=8; web ends Z=18,26;
+    # fishing slope=1/2; foot/head half-widths=4,3. The sharp upper
+    # head overbounds any top-corner cut, above all contact regions.
+    section = (
+        (-3, 32), (3, 32), (3, 27), (1, 26), (1, 18),
+        (4, 16.5), (4, 8), (-4, 8), (-4, 16.5), (-1, 18),
+        (-1, 26), (-3, 27),
+    )
+
+    def polygon_face(points):
+        vectors = [App.Vector(*(float(v) * scale for v in point))
+                   for point in points]
+        return Part.Face(Part.makePolygon(vectors + vectors[:1]))
+
+    def bounds_overlap(a, b):
+        return all(max(getattr(a.BoundBox, axis + "Min"),
+                       getattr(b.BoundBox, axis + "Min")) <=
+                   min(getattr(a.BoundBox, axis + "Max"),
+                       getattr(b.BoundBox, axis + "Max")) + NUMERICAL_BUDGET_MM
+                   for axis in "XYZ")
+
+    rail = polygon_face(tuple((-15, y, z) for y, z in section)).extrude(
+        App.Vector(30 * scale, 0, 0),
+    )
+    assert rail.isValid() and rail.isClosed() and len(rail.Solids) == 1
+    areas = measured["area_squared_mm4"]
+    identities = {
+        "base-plinth": (), "outer-jaw": (),
+        "rail-seat": ("seat-bottom",),
+        "inner-jaw": ("inner-web-upper", "inner-web-lower", "inner-foot",
+                      "inner-foot-side"),
+        "key": tuple(name for name in areas if name not in (
+            "seat-bottom", "inner-web-upper", "inner-web-lower",
+            "inner-foot", "inner-foot-side",
+        )),
+    }
+    contacts = {}
+    for role, shape in shapes.items():
+        common = shape.common(rail)
+        assert common.isNull() or common.isValid(), role
+        # Propagate the existing length budget dimensionally. These are
+        # conversion/kernel bounds, not contact or manufacturing limits.
+        area_budget = (shape.Length + rail.Length) * NUMERICAL_BUDGET_MM
+        volume_budget = (shape.Area + rail.Area) * NUMERICAL_BUDGET_MM
+        expected_area = sum(math.sqrt(areas[name])
+                            for name in identities[role]) * scale ** 2
+        assert abs(common.Volume) <= volume_budget, role
+        # Solid common can omit lower-dimensional contact. Intersect
+        # actual boundary faces; their interiors are disjoint, so each
+        # bearing patch contributes once to this finite area sum.
+        bearings = []
+        for face in shape.Faces:
+            for rail_face in rail.Faces:
+                if bounds_overlap(face, rail_face):
+                    bearing = face.common(rail_face)
+                    assert bearing.isNull() or bearing.isValid(), role
+                    if bearing.Area:
+                        bearings.append(bearing.Area)
+        contact_area = sum(bearings)
+        assert len(bearings) == len(identities[role]), role
+        assert abs(contact_area - expected_area) <= area_budget, role
+        if identities[role]:
+            assert shape.distToShape(rail)[0] <= NUMERICAL_BUDGET_MM, role
+        contacts[role] = {
+            "area_mm2": contact_area, "expected_area_mm2": expected_area,
+            "volume_mm3": common.Volume,
+            "bearing_patch_count": len(bearings),
+        }
+    # A whole grip-top face must not become an under-head bearing patch.
+    # The only common geometry is its 55/4-long edge at Y=-1, Z=26.
+    geometry = dict(model.full_size_research.geometry.components)["inner-jaw"]
+    vertices = {name: point for name, *point in geometry.vertices}
+    expected = [tuple(float(v) * scale for v in vertices[name])
+                for name in dict(geometry.faces)["grip-top"]]
+    faces = [face for face in shapes["inner-jaw"].Faces
+             if len(face.Vertexes) == len(expected) and all(
+                 min(math.dist(tuple(vertex.Point), point)
+                     for point in expected)
+                 <= NUMERICAL_BUDGET_MM for vertex in face.Vertexes)]
+    assert len(faces) == 1
+    under_head = polygon_face(((-15, -1, 26), (15, -1, 26),
+                               (15, -3, 27), (-15, -3, 27)))
+    # Common omits the edge too. Section retains the intersection of
+    # these two finite faces and must not become an area contact.
+    edge = faces[0].section(under_head)
+    assert not edge.isNull() and edge.isValid()
+    assert not edge.Faces
+    assert abs(edge.Length - 55 / 4 * scale) <= (
+        2 * len(edge.Edges) * NUMERICAL_BUDGET_MM
+    )
+    # Independently integrate the deliberate key/jaw overlap. The key
+    # fills a 1/4-thick strip behind Y=9, from Z=17 to the jaw top24.
+    # Jaw widths are 16.2 at17, 16 at18, 14 at24; X remains within
+    # the key's [-10,10]. Strip volume = (16.1*1 + 15*6)/4.
+    overlap = shapes["key"].common(shapes["outer-jaw"])
+    expected_overlap = 1061 / 40 * scale ** 3
+    overlap_budget = sum(shapes[role].Area for role in (
+        "key", "outer-jaw",
+    )) * NUMERICAL_BUDGET_MM
+    assert overlap.isValid() and overlap.Volume > overlap_budget
+    assert abs(overlap.Volume - expected_overlap) <= overlap_budget
+    return {
+        "rail_contacts": contacts, "under_head_edge_length_mm": edge.Length,
+        "key_outer_overlap_mm3": overlap.Volume,
+        "expected_key_outer_overlap_mm3": expected_overlap,
+        "physical_rail_fit_proved": False,
+    }
+
+
 def main():
     qualification = bootstrap.require_qualified_runtime(
         ROOT / "reference/contracts/phase1-compatibility.json",
@@ -152,6 +269,7 @@ def main():
         result, receipt = prove_then_validate(package, text, REQUEST)
         assert_proof(result)
         probes = validate_native_planes(result)
+        finite_contacts = validate_native_finite_contacts(result)
         assert receipt == old
         reopened = definitions.chair_definition_package_from_json(encoded, text)
         repeated, reopened_receipt = prove_then_validate(reopened, text, REQUEST)
@@ -182,6 +300,7 @@ def main():
         assert definitions.chair_definition_package_to_json(package) == encoded
         print(json.dumps({
             "qualification": qualification, "probes": probes,
+            "finite_contacts": finite_contacts,
             "physical_rail_fit_proved": False,
             "production_geometry_authorized": False,
             "existing_native_receipt_unchanged": True,
