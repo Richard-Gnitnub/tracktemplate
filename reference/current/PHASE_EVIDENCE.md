@@ -17,10 +17,10 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | --- | --- |
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 2/4 under [D-P9-006](#phase-9a-exit-1-acceptance-panel). Exits 9A-1 and 9A-4 are Evidenced and owner-accepted.<br><br>Exits 9A-2 and 9A-3 stay Pending. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
 | What changed | [D-P9-006](#phase-9a-exit-1-acceptance-panel) accepts the frozen five-component S1 `ChairDefinition` and Exit 9A-1 for reference-only architecture proof. It resolves the D-P9-003 and D-P9-005 conditions only for this bounded acceptance. D-P9-004 keeps Exit 9A-4 accepted at `9576614daf6cc69a04d214e824ec32cc7bbe5251`. |
-| What now works | The procedural chair generator constructs the five S1 chair components and assembled chair without source CAD or retained geometry. The L1 proof uses the same neutral schema and generator with a different component pattern. The owner reviewed nine genuine FreeCAD views as suitable reference evidence. This decision adds no product behaviour. The accepted Phase 7 and Phase 8 workflows stay. |
+| What now works | The procedural chair generator constructs the five S1 chair components and the assembled chair without source CAD or geometry from the first construction. The L1 proof uses the same neutral schema and generator with a different component pattern. The owner reviewed nine views from FreeCAD as applicable reference evidence. This decision adds no product behaviour. The accepted Phase 7 and Phase 8 workflows stay. |
 | Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. <br><br>S1-07 through S1-13 and S1-15, package rights, rail section and tolerances stay bounded as recorded. D-P9-005 makes S1-14 optional comparison evidence. |
 | Owner decision | [D-P9-006](#phase-9a-exit-1-acceptance-panel) accepts only the named S1 `ChairDefinition` and Exit 9A-1 for private research. D-P9-005 keeps independent engineering evidence and accepted numerical tolerances mandatory for production. No numerical tolerance, assisted S1 pilot, physical fit, production package, output or rights claim is accepted. |
-| Next action | Complete the authorised D-P9-006 alignment, finite document review and exact-green protected-main integration. Stop with main clean and synchronised. No other implementation is selected. Phase 9B stays Not started. |
+| Next action | Complete the authorised D-P9-006 alignment and the Documentation Review lifecycle. Then integrate into protected main with a PASS result from CI for the same head. Stop when main has no tracked changes and has the same commit as origin/main. No other implementation is selected. Phase 9B stays Not started. |
 
 <a id="phase-9a-exit-1-acceptance-panel"></a>
 
@@ -45,13 +45,14 @@ Phase 9B stays Not started at 0/6.
 `base-plinth`, `rail-seat`, `key`, `inner-jaw` and `outer-jaw`.
 The procedural chair generator constructs them and the assembled chair from
 the neutral `ChairDefinition`. Repeat construction needs no source scan/CAD
-file or retained FreeCAD geometry. Fastenings and plug/socket components are
+file or FreeCAD geometry from the first construction. Fastenings and plug/socket components are
 outside this bounded scope. This is not a complete S1 production design.
 
 The existing L1 proof uses the same neutral `ChairDefinition` schema and
-procedural chair generator. It has five semantic components and seven solids.
+procedural chair generator. It has five named chair components and seven solids.
 The outer jaw has three parts, and the inner jaw has a lower clip.
 This difference in construction is more than an S1 dimension variant.
+
 The L1 proof supports the second-pattern condition only. No L1 package is
 accepted for production or additional use. A five-box or opaque-mesh fallback
 has no production-ready status.
@@ -74,29 +75,30 @@ Raw source data, packages and generated files stay local and untracked.
 | Same L1 worktree: `tmp/phase9a-l1-body-proof/test-author/inputs/l1-8mm-encoding-reference-package.json` | `8b22958a397098412b54c8c29de8e24977768981d77f8ec53f7edc0e79cbd685` |
 | `tmp/phase9a-exit1-risk-review.json` | `ce1f69a33dbbd3ea74cb83a0888d0cd89084256a215643f1df33f4fe2ad9e3f8` |
 
-The qualified FreeCAD 1.1.4 proof gives a PASS result for six original solids:
+The qualified FreeCAD 1.1.4 proof gives a PASS result for six initial solids:
 five chair components and the rail. Each solid is valid and closed.
-The nine-view assembly and section evidence uses the actual Templot-derived
-research inputs. It is not the synthetic regression fixture or an exact
+The nine-view assembly and section evidence uses the Templot-derived
+research inputs identified above. It is not the synthetic regression fixture or an exact
 Templot executable output. Save/reopen and independent review also give PASS
-results. The owner reviewed those views as suitable reference evidence.
+results. The owner reviewed those views as applicable reference evidence.
 
 The existing standalone and qualified FreeCAD L1 results give PASS results
 within their recorded scope. The source/test identities still match the
 accepted source state. The analytic edge-only outer-jaw contact has zero
-common volume; the native common-edge count is zero. That limitation remains.
+common volume. The FreeCAD common-edge count is zero. That limitation remains.
+
 L1 source encoding and scale restrictions remain. The repair limits stay
-exhausted at 2/2 and terminal 1/1.
+at 2/2 and at 1/1 for the last repair. No further L1 repair is permitted.
 
 **Evidence and acceptance limits:** D-P9-006 resolves the D-P9-003 research
-sequence and the broad D-P9-005 chair evidence condition only for this named
+sequence and the D-P9-005 chair evidence condition only for this named
 S1 `ChairDefinition` and Exit 9A-1. Independent production evidence is not
-a prerequisite for this acceptance. D-P9-005 continues to require independent
+necessary before this acceptance. D-P9-005 continues to require independent
 engineering evidence, explicit provenance and accepted tolerances for production.
 The [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#bounded-exit-9a-1-acceptance-under-d-p9-006)
 owns this distinction. Historical decisions keep their original meaning.
 
-This external decision binds the frozen package and manifest hashes.
+This external decision identifies the frozen package and manifest by their hashes.
 The package fields `acceptance: not-accepted` and `validation: not-run` keep
 their historical values. The package bytes do not change. This decision
 supersedes those historical acceptance fields only for the bounded 9A-1
@@ -107,28 +109,32 @@ Numerical construction guards, including the existing `1e-7 mm` guard and its
 dimensional propagation, are not accepted reference tolerances or physical-fit
 tolerances. Exits 9A-2 and 9A-3 still need their own acceptance evidence.
 No assisted S1 pilot, preload, retention or manufacturing capability is accepted.
-Source allowances, vertical rail, planar seat, central key, faceting and deliberate
+Source allowances, vertical rail, planar seat, central key, faceting and selected
 key-to-outer-jaw overlap keep their recorded research meaning.
-No Templot dimension becomes an independently evidenced prototype fact.
+This decision gives no independent evidence for a Templot dimension as a prototype fact.
 
 **Independent challenge and risk panel:** Richard is the project owner and
 panel chair. `/root` presents the alignment. Read-only reviewer
 `/root/visual_identity_audit` examined all 24 live risks and verified 21
 evidence identities. The recommendation is **Proceed with bounded conditions**.
-There is no dissent. The author and reviewer share one agent team and workspace.
+The reviewer gave no different recommendation.
+
+The author and reviewer share one agent team and workspace.
 This is not an external professional review.
 
 PR-02, PR-03, PR-04, PR-08 and PR-20 keep geometry and scope duties.
 PR-06, PR-07, PR-09 and PR-21 keep rights and provenance duties.
 PR-12 and PR-22 keep one controlled decision and independent challenge.
 PR-09 stays Critical/Open/Partial. PR-13 stays Critical/Open/Effective for
-current scope. PR-17 stays Critical/Open/Partial. All 24 risk states, owners,
+current scope. PR-17 stays Critical/Open/Partial.
+
+All 24 risk states, owners,
 deadlines and controls stay unchanged. No better control effectiveness follows.
 
-Before freeze, `/root` must bind the accepted scope to these identities and
+Before freeze, `/root` must identify the accepted scope with these identities and
 keep numerical and pilot acceptance separate. Before integration, `/root`
 must preserve the 113-entry register, package bytes and every risk disposition.
-The alignment must complete the finite document review and applicable
+The alignment must complete the Documentation Review lifecycle and applicable
 validation with a PASS result from CI for the exact head.
 The provenance owner keeps the existing source and intended-use duties.
 A known restriction stops the proposed use. A new source, fitting method,
@@ -138,15 +144,16 @@ evidence type or intended use still needs its conditions recorded and reviewed.
 S1 `ChairDefinition` and Exit 9A-1 for private research on 2026-10-08.
 No product source, canonical dimension, rail profile, numerical tolerance,
 manufacturing assumption or 113-entry register changes. Physical rail stock,
-hidden geometry and uncertainty evidence remain unresolved for production.
+geometry that is not visible and uncertainty evidence remain unresolved for production.
 No production package, output, rights claim, third-party permission, risk
 closure, performance result, release or legacy removal is accepted.
 
 D-P6-008 stays Deferred — unmet and TERM-R04 stays open. Output stays
 private-development and project status stays `unknown`. Usual Git preservation
 applies. There is no recovery-policy exception or new external backup duty.
+
 Complete only the authorised alignment and protected-main integration.
-Stop with main clean and synchronised. No further implementation is selected.
+Stop when main has no tracked changes and has the same commit as origin/main. No further implementation is selected.
 
 <a id="phase-9-chair-evidence-model-panel"></a>
 

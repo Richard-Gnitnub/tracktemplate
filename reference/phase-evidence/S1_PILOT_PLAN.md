@@ -152,14 +152,14 @@ for reference-only architecture proof. The source baseline is protected `main`
 Its manifest SHA-256 is
 `cf45882bbdfa645bd893a22ca0e7f9200810282a2aab015c98074e0c1aee941a`.
 
-This decision resolves the D-P9-003 research sequence and the broad D-P9-005
+This decision resolves the D-P9-003 research sequence and the D-P9-005
 chair evidence condition only for this named S1 `ChairDefinition` and Exit 9A-1.
-Independent production evidence is not a prerequisite for this acceptance.
+Independent production evidence is not necessary before this acceptance.
 Independent engineering evidence, explicit provenance and accepted numerical
 tolerances remain mandatory for production under D-P9-005.
-The preceding D-P9-005 section retains the status at that historical decision.
+The D-P9-005 section above keeps the status at that historical decision.
 
-The external decision binds these hashes. The package bytes and historical
+The external decision identifies the package and manifest by these hashes. The package bytes and historical
 `acceptance: not-accepted` and `validation: not-run` metadata stay unchanged.
 D-P9-006 supersedes that historical acceptance only for the bounded 9A-1
 reference scope. It does not accept a production package or rights claim.
@@ -170,7 +170,7 @@ The existing L1 proof supports the different-pattern condition through the
 same neutral `ChairDefinition` schema and procedural chair generator.
 It does not give the L1 package new acceptance or use authority.
 
-Construction guards and source agreement do not constitute accepted reference
+Construction guards and source agreement are not accepted reference
 tolerances or physical-fit tolerances. No assisted S1 pilot, physical fit,
 preload, retention or manufacturing capability is accepted. The source values,
 model rail-fit policy and manufacturing compensation keep separate provenance.
