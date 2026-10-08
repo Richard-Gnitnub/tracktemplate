@@ -16,33 +16,33 @@ It supplies evidence for Exits 9A-1 and 9A-2 at baseline
 
 The [machine-readable map](s1-independent-engineering-evidence-map.json)
 contains one record for each quantity. Its package and manifest hashes identify
-the exact local inputs. The package, source values and generated output stay
+the local input identities. The package, source values and generated output stay
 local and untracked. Their Templot lineage and `reference-only` status stay.
 
 | Item | Coverage |
 | --- | --- |
 | Quantity records | 113: 104 lengths and 9 quantities without a length unit |
-| Component ownership | `base`: 14; `inner-jaw`: 29; `key`: 13; `outer-jaw`: 35; `seat`: 22 |
-| Calculated quantities | 25 quantities with 75 declared input relationships |
-| Constructor inputs | 93 different quantities; 20 more quantities supply inputs to calculated values |
+| Component ownership | `base`: 14, `inner-jaw`: 29, `key`: 13, `outer-jaw`: 35, `seat`: 22 |
+| Calculated quantities | 25 quantities with 75 recorded input relationships |
+| Constructor inputs | 93 different quantities. 20 more quantities supply inputs to calculated values. |
 | Construction records | 6 procedures, 5 datums and 5 components |
 | Other relationships | 32 records, plus 9 rail relationships against 8 planes |
 | Quantity values with an independent engineering reference chain | 0 of 113 |
-| Recorded uncertainty and accepted engineering tolerances | Missing for all 113 quantities |
+| Recorded uncertainty and accepted numerical tolerances | Missing for all 113 quantities |
 
 The count includes quantities that only supply inputs to calculated values.
 It counts each quantity one time, also when different procedures use it.
 The recorded inputs do not show that the loader calculates each value again.
-Shared names do not show equal engineering meanings.
+The same names do not show equal engineering meanings.
 
 ## How to read the map
 
-Each quantity record connects its exact identifier to retained sources,
+Each quantity record connects its identifier to sources that the project kept,
 inputs to calculated values, procedures and relationships. Source records give locators
-and hashes where retained files supply them. A null external-source hash means
+and hashes where files that the project kept supply them. A null external-source hash means
 that this task kept no source file. No hash verification of that content occurred.
 
-`candidate_links` identify sources that might supply missing evidence.
+`candidate_links` identify sources that can supply missing evidence.
 `may-help` does not identify an applicable drawing or give evidence for a quantity value.
 `independently_supported_value: false` records the missing independent engineering reference chain.
 Null uncertainty and tolerance fields record missing evidence, not zero limits.
@@ -53,27 +53,27 @@ The relationship's `quantity_ids` give its named inputs.
 
 `gap_routes` identify the necessary type of work:
 
-| Route | Missing evidence |
+| Work type | Missing evidence |
 | --- | --- |
 | `prototype-source-research` | Applicable drawings, standards, dimensions, component interfaces and source revisions |
-| `model-stock-measurement` | Identity of the actual model rail, measured dimensions and measurement uncertainty |
+| `model-stock-measurement` | Identity of the owner’s model rail, measured dimensions and measurement uncertainty |
 | `engineering-derivation-or-decision` | Engineering evidence for a calculated value or a construction method, followed by the applicable acceptance |
 | `manufacturing-empirical-evidence` | Measurements and tests that separate manufacturing effects from prototype geometry and model rail fit |
 
-A calculated quantity also requires evidence for its inputs.
+For a calculated quantity, evidence for its inputs is also necessary.
 Follow `input_quantity_ids` through the map for these gaps.
-All routes keep the requirement for accepted numerical tolerances before
-production acceptance. A source dimension or measurement alone supplies no
-accepted project tolerance.
+All types of work keep the requirement for accepted numerical tolerances before
+production acceptance. A source dimension or measurement by itself supplies no
+accepted numerical tolerance.
 
-## Methods with independently evidenced results
+## Methods with independent evidence
 
-The following methods have independently evidenced results, with these limits:
+The following methods have independent evidence for their results, with these limits:
 
 1. The [NIST conversion factors](https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8)
    and [SI prefixes](https://www.bipm.org/en/measurement-units/si-prefixes)
-   give the exact inch-to-millimetre conversion: `1 in = 25.4 mm`.
-2. With the declared research scale of `4 mm/ft`, the international foot gives
+   give the inch-to-millimetre conversion: `1 in = 25.4 mm`.
+2. With the recorded research scale of `4 mm/ft`, the international foot gives
    the length ratio `4/304.8 = 1/76.2`. With the same ratio in each direction,
    the volume ratio is its cube. This arithmetic gives no acceptance to a scale or shape.
 3. The [C&L explanation](https://www.clfinescale.co.uk/faq-s) gives rail height
@@ -84,17 +84,18 @@ These methods give no evidence for chair dimensions, contact, clearance or physi
 They do not give evidence for the measurement conventions of a historical drawing
 that was not examined.
 
-The Code 75 relationship gives `1.905 mm`. The three retained `rail_depth_mm`
-quantities give `1.900 mm` at the declared research scale.
+The Code 75 relationship gives `1.905 mm`. The three `rail_depth_mm`
+quantities that the project kept give `1.900 mm` at the recorded research scale.
 Their identifiers are `quantity:base:rail_depth_mm`,
 `quantity:key:rail_depth_mm` and `quantity:seat:rail_depth_mm`.
-The difference, retained value minus published code height, is `-0.005 mm`.
-This difference gives no fit verdict. Measurements and accepted tolerances
+The difference, the value that the project kept minus the published code height, is `-0.005 mm`.
+
+This difference does not show whether physical fit is correct. Measurements and accepted tolerances
 are missing. This task changes none of these quantities.
 
 ## Sources that can supply more evidence
 
-The source catalogue in the map records retrieval dates, exact locations,
+The source catalogue in the map records retrieval dates, source locations,
 access limits and unresolved rights. These sources have different uses:
 
 | Source | Available evidence and missing evidence |
@@ -109,11 +110,11 @@ An adjacent catalogue entry does not select the rail section for this chair.
 An available rail publication also does not select it. Catalogue access gives no drawing dimensions.
 The [rights policy](../LICENSING_BOUNDARIES.md) and
 [provenance policy](../PROVENANCE.md) own admission for each intended use.
-This map grants no rights to external material or production output.
+This map gives no rights to external material or production output.
 
-## Relationships that remain unsupported
+## Relationships with missing evidence
 
-The relationship records include component dimensions, shared inputs, frame
+The relationship records include component dimensions, inputs with more than one use, frame
 placement, contact checks and rail surfaces. Evidence for their engineering use is missing.
 Eight infinite planes do not give the complete rail contour.
 Distances between constructed components give no evidence for physical fit.
@@ -126,12 +127,12 @@ The source rail values include source printing allowances. Disabled optional
 manufacturing controls do not remove those embedded effects.
 The independent engineering reference chain must separate prototype geometry, model rail fit and
 manufacturing compensation. Mathematical limits and software comparison limits
-do not supply accepted engineering tolerances.
+do not supply accepted numerical tolerances.
 
 ## Next evidence boundary
 
 Recommendation: get the Box 246 chair drawing, its complete title information
-and any companion sheets. The NERA collection is a different acquisition route.
+and any related sheets. The NERA collection is a different source from which to get drawings.
 Inspection must identify the designation, revision, applicable rail section,
 dimension locations and permitted use before the drawing supplies evidence for quantities.
 The catalogue spelling `S.I.` gives no independent evidence for the intended S1 prototype.

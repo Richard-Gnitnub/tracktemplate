@@ -506,6 +506,15 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:24eb6b002a23062282c1838830fdf25b6b9be563",
+      "accepted_sha256": "sha256:d21efc1eb074bbdba950b1315fd1ca7b44e2e77a032d35890d2a07ecbac50f8b",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/lineage/S1_INDEPENDENT_EVIDENCE_MAP.md",
+      "review_receipt": "sha256:c0b780a3fe787a030130810d219c722ffa589508d13bb43402452d4c0334a7fd",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:c84493f594f6b349ae99a49ac726ecb5e883048c",
       "accepted_sha256": "sha256:99e0fd671380265e261d2585ee4e71991e905e789043d65e212293748e6c6127",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
