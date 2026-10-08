@@ -219,6 +219,64 @@ def _engineering_reference_errors(text):
     ]
 
 
+def _exit1_acceptance_errors(text):
+    """Keep the later research acceptance separate from production duties."""
+    section = direct_section_content(
+        text, "Bounded Exit 9A-1 acceptance under D-P9-006",
+    )
+    identities = (
+        "49c72c294335898ba4e2f3cb02581c8ef6e539a7",
+        "df5ae7d941754ed7c18ea450d1d22559c61efbd5baaa638d2e84fa9d96b8e4c7",
+        "cf45882bbdfa645bd893a22ca0e7f9200810282a2aab015c98074e0c1aee941a",
+    )
+    errors = [
+        "S1 Exit 9A-1 accepted identity drifted: " + identity
+        for identity in identities if identity not in section
+    ]
+    flat = " ".join(section.replace("`", "").split())
+    clauses = (
+        "accepts only the named frozen five-component S1 ChairDefinition "
+        "and Exit 9A-1 for reference-only architecture proof",
+        "chair evidence condition only for this named S1 ChairDefinition "
+        "and Exit 9A-1",
+        "Independent production evidence is not a prerequisite for this "
+        "acceptance",
+        "Independent engineering evidence, explicit provenance and "
+        "accepted numerical tolerances remain mandatory for production "
+        "under D-P9-005",
+        "The preceding D-P9-005 section retains the status at that "
+        "historical decision",
+        "The external decision binds these hashes",
+        "package bytes and historical acceptance: not-accepted and "
+        "validation: not-run metadata stay unchanged",
+        "supersedes that historical acceptance only for the bounded "
+        "9A-1 reference scope",
+        "It does not accept a production package or rights claim",
+        "same neutral ChairDefinition schema and procedural chair generator",
+        "It does not give the L1 package new acceptance or use authority",
+        "Construction guards and source agreement do not constitute "
+        "accepted reference tolerances or physical-fit tolerances",
+        "No assisted S1 pilot, physical fit, preload, retention or "
+        "manufacturing capability is accepted",
+        "model rail-fit policy and manufacturing compensation keep "
+        "separate provenance",
+        "The 113-entry register, source printing allowances and unresolved "
+        "production evidence keep their status",
+        "D-P9-004 private-use conditions still apply",
+        "Phase 9A is Open at 2/4",
+        "Exits 9A-1 and 9A-4 are Evidenced and owner-accepted",
+        "Exits 9A-2 and 9A-3 stay Pending",
+        "Phase 9B stays Not started at 0/6",
+        "No numerical tolerance, production output or positive rights "
+        "finding follows",
+    )
+    errors.extend(
+        "S1 Exit 9A-1 acceptance boundary drifted: " + clause
+        for clause in clauses if clause not in flat
+    )
+    return errors
+
+
 def validate_plan(
     text,
     manifest,
@@ -226,7 +284,11 @@ def validate_plan(
     oracle,
     check_repository=True,
 ):
-    errors = _research_boundary_errors(text) + _engineering_reference_errors(text)
+    errors = (
+        _research_boundary_errors(text)
+        + _engineering_reference_errors(text)
+        + _exit1_acceptance_errors(text)
+    )
     for marker in REQUIRED_MARKERS:
         if marker not in text:
             errors.append("S1 pilot plan marker is missing: {}".format(marker))
@@ -492,6 +554,33 @@ def main():
     output_comparison["dependencies"][1]["output_affecting"] = True
     _expect_invalid(
         text, output_comparison, lineage, oracle, "output-affecting comparison"
+    )
+
+    acceptance_section = direct_section_content(
+        text, "Bounded Exit 9A-1 acceptance under D-P9-006",
+    )
+    for before, after in (
+        ("49c72c294335898ba4e2f3cb02581c8ef6e539a7", "unreviewed-main"),
+        ("df5ae7d941754ed7c18ea450d1d22559c61efbd5baaa638d2e84fa9d96b8e4c7",
+         "unreviewed-package"),
+        ("only for the bounded 9A-1", "for all Phase 9 exits"),
+        ("remain mandatory for production", "are optional for production"),
+        ("do not constitute accepted reference", "constitute accepted reference"),
+        ("No assisted S1 pilot", "An assisted S1 pilot"),
+        ("acceptance: not-accepted", "acceptance: accepted"),
+        ("Exits 9A-2 and 9A-3 stay Pending", "Exits 9A-2 and 9A-3 are accepted"),
+        ("Phase 9B stays Not started at 0/6", "Phase 9B is Open at 0/6"),
+    ):
+        assert before in acceptance_section, before
+        changed = acceptance_section.replace(before, after, 1)
+        _expect_invalid(
+            text.replace(acceptance_section, changed, 1),
+            manifest, lineage, oracle, "Exit 9A-1 boundary " + before,
+        )
+    relocated = text.replace(acceptance_section, "\n\nNo acceptance.\n", 1)
+    relocated += "\n## Unrelated retained material\n" + acceptance_section
+    _expect_invalid(
+        relocated, manifest, lineage, oracle, "Exit 9A-1 boundary relocated",
     )
 
     weakened_oracle = copy.deepcopy(oracle)

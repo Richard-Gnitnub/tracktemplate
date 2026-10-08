@@ -209,7 +209,7 @@ def validate_frozen_records() -> None:
         "frozen-record status changed",
     )
     require(
-        document["updated_on"] == "2026-10-07",
+        document["updated_on"] == "2026-10-08",
         "frozen-record manifest update date drifted",
     )
     records = document["records"]
@@ -588,15 +588,16 @@ def validate_documentation_profile(
         all(fragment in " ".join(owner_view.split()) for fragment in (
             "Phase 8 is closed at 4/4 under",
             "D-P8-006",
-            "Phase 9A is Open at 1/4",
-            "Only Exit 9A-4 is Evidenced and owner-accepted",
-            "Exits 9A-1–3 stay Pending",
+            "Phase 9A is Open at 2/4",
+            "Exits 9A-1 and 9A-4 are Evidenced and owner-accepted",
+            "Exits 9A-2 and 9A-3 stay Pending",
             "Phase 9B is Not started at 0/6",
             "D-P6-008 stays Deferred — unmet",
             "TERM-R04 stays open",
             "Output stays private-development",
             "project status stays `unknown`",
             "D-P9-004",
+            "D-P9-006",
             "9576614daf6cc69a04d214e824ec32cc7bbe5251",
             "This decision adds no product behaviour",
             "No other implementation is selected",
