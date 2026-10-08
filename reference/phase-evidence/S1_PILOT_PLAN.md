@@ -1,7 +1,8 @@
 # First S1 Chair Pilot Plan
 
 Status: **Accepted Phase 1 control; production definition and pilot remain
-blocked. Phase 9A research follows D-P9-003. D-P9-005 changes the chair acceptance evidence below.**
+blocked. D-P9-006 accepts the named frozen S1 `ChairDefinition` for Exit 9A-1
+reference-only architecture proof. Exits 9A-2 and 9A-3 stay Pending.**
 
 This document defines the minimum neutral package, evidence, rights and
 acceptance plan for the first S1 chair. It is a project-control plan, not a
@@ -140,6 +141,45 @@ Under D-P9-003, bounded research is permitted before independent evidence is com
 That permission does not accept a definition, numerical tolerance, assisted S1
 pilot, physical fit or production output. Phase 9A stays Open at 1/4.
 Exits 9A-1–3 stay Pending. Phase 9B stays Not started at 0/6.
+
+## Bounded Exit 9A-1 acceptance under D-P9-006
+
+On 2026-10-08, [D-P9-006](../current/PHASE_EVIDENCE.md#phase-9a-exit-1-acceptance-panel)
+accepts only the named frozen five-component S1 `ChairDefinition` and Exit 9A-1
+for reference-only architecture proof. The source baseline is protected `main`
+`49c72c294335898ba4e2f3cb02581c8ef6e539a7`. The S1 package SHA-256 is
+`df5ae7d941754ed7c18ea450d1d22559c61efbd5baaa638d2e84fa9d96b8e4c7`.
+Its manifest SHA-256 is
+`cf45882bbdfa645bd893a22ca0e7f9200810282a2aab015c98074e0c1aee941a`.
+
+This decision resolves the D-P9-003 research sequence and the D-P9-005
+chair evidence condition only for this named S1 `ChairDefinition` and Exit 9A-1.
+Independent production evidence is not necessary before this acceptance.
+Independent engineering evidence, explicit provenance and accepted numerical
+tolerances remain mandatory for production under D-P9-005.
+The D-P9-005 section above keeps the status at that historical decision.
+
+The external decision identifies the package and manifest by these hashes. The package bytes and historical
+`acceptance: not-accepted` and `validation: not-run` metadata stay unchanged.
+D-P9-006 supersedes that historical acceptance only for the bounded 9A-1
+reference scope. It does not accept a production package or rights claim.
+
+The five chair components are `base-plinth`, `rail-seat`, `key`, `inner-jaw`
+and `outer-jaw`. Fastenings and plug/socket components are outside this scope.
+The existing L1 proof supports the different-pattern condition through the
+same neutral `ChairDefinition` schema and procedural chair generator.
+It does not give the L1 package new acceptance or use authority.
+
+Construction guards and source agreement are not accepted reference
+tolerances or physical-fit tolerances. No assisted S1 pilot, physical fit,
+preload, retention or manufacturing capability is accepted. The source values,
+model rail-fit policy and manufacturing compensation keep separate provenance.
+The 113-entry register, source printing allowances and unresolved production
+evidence keep their status. D-P9-004 private-use conditions still apply.
+
+Phase 9A is Open at 2/4. Exits 9A-1 and 9A-4 are Evidenced and owner-accepted.
+Exits 9A-2 and 9A-3 stay Pending. Phase 9B stays Not started at 0/6.
+No numerical tolerance, production output or positive rights finding follows.
 
 ## Neutral package requirements
 
