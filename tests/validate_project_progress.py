@@ -5716,7 +5716,8 @@ def _validate_dp9_006_decision(
             "Construction guards are not accepted reference tolerances "
             "or physical-fit tolerances",
             "No new L1 package acceptance or use authority follows",
-            "exhausted L1 repair limits stay 2/2 and terminal 1/1",
+            "L1 repair limits stay at 2/2 and at 1/1 for the last repair",
+            "No further L1 repair is permitted",
             "All 24 risk states, owners, deadlines and controls stay "
             "unchanged",
             "D-P6-008 stays Deferred — unmet and TERM-R04 stays open",
@@ -5758,19 +5759,20 @@ def _validate_dp9_006_admission(evidence: str) -> None:
         "Phase 9A is Open at 2/4",
         "Exits 9A-2 and 9A-3 stay Pending",
         "Phase 9B stays Not started at 0/6",
-        "Repeat construction needs no source scan/CAD file or retained "
-        "FreeCAD geometry",
+        "Repeat construction needs no source scan/CAD file or FreeCAD "
+        "geometry from the first construction",
         "existing L1 proof uses the same neutral ChairDefinition schema "
         "and procedural chair generator",
-        "five semantic components and seven solids",
+        "five named chair components and seven solids",
         "more than an S1 dimension variant",
         "No L1 package is accepted for production or additional use",
         "A five-box or opaque-mesh fallback has no production-ready status",
-        "Independent production evidence is not a prerequisite for this "
+        "Independent production evidence is not necessary before this "
         "acceptance",
         "D-P9-005 continues to require independent engineering evidence, "
         "explicit provenance and accepted tolerances for production",
-        "This external decision binds the frozen package and manifest hashes",
+        "This external decision identifies the frozen package and "
+        "manifest by their hashes",
         "acceptance: not-accepted and validation: not-run keep their "
         "historical values",
         "The package bytes do not change",
@@ -5779,8 +5781,8 @@ def _validate_dp9_006_admission(evidence: str) -> None:
         "are not accepted reference tolerances or physical-fit tolerances",
         "No assisted S1 pilot, preload, retention or manufacturing "
         "capability is accepted",
-        "No Templot dimension becomes an independently evidenced "
-        "prototype fact",
+        "This decision gives no independent evidence for a Templot "
+        "dimension as a prototype fact",
         "Proceed with bounded conditions",
         "author and reviewer share one agent team and workspace",
         "All 24 risk states, owners, deadlines and controls stay unchanged",

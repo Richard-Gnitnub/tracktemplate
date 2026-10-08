@@ -239,14 +239,15 @@ def _exit1_acceptance_errors(text):
         "and Exit 9A-1 for reference-only architecture proof",
         "chair evidence condition only for this named S1 ChairDefinition "
         "and Exit 9A-1",
-        "Independent production evidence is not a prerequisite for this "
+        "Independent production evidence is not necessary before this "
         "acceptance",
         "Independent engineering evidence, explicit provenance and "
         "accepted numerical tolerances remain mandatory for production "
         "under D-P9-005",
-        "The preceding D-P9-005 section retains the status at that "
-        "historical decision",
-        "The external decision binds these hashes",
+        "The D-P9-005 section above keeps the status at that historical "
+        "decision",
+        "The external decision identifies the package and manifest by "
+        "these hashes",
         "package bytes and historical acceptance: not-accepted and "
         "validation: not-run metadata stay unchanged",
         "supersedes that historical acceptance only for the bounded "
@@ -254,8 +255,8 @@ def _exit1_acceptance_errors(text):
         "It does not accept a production package or rights claim",
         "same neutral ChairDefinition schema and procedural chair generator",
         "It does not give the L1 package new acceptance or use authority",
-        "Construction guards and source agreement do not constitute "
-        "accepted reference tolerances or physical-fit tolerances",
+        "Construction guards and source agreement are not accepted "
+        "reference tolerances or physical-fit tolerances",
         "No assisted S1 pilot, physical fit, preload, retention or "
         "manufacturing capability is accepted",
         "model rail-fit policy and manufacturing compensation keep "
@@ -565,7 +566,7 @@ def main():
          "unreviewed-package"),
         ("only for the bounded 9A-1", "for all Phase 9 exits"),
         ("remain mandatory for production", "are optional for production"),
-        ("do not constitute accepted reference", "constitute accepted reference"),
+        ("are not accepted reference", "are accepted reference"),
         ("No assisted S1 pilot", "An assisted S1 pilot"),
         ("acceptance: not-accepted", "acceptance: accepted"),
         ("Exits 9A-2 and 9A-3 stay Pending", "Exits 9A-2 and 9A-3 are accepted"),
