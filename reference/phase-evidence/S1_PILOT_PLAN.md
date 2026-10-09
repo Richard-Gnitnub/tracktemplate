@@ -271,11 +271,12 @@ accepts Exit 9A-2 only for the exact frozen five-component S1 reference.
 The decision uses the package, manifest, A0 rail section and thirteen criteria
 identified above. The criteria and their numerical limits stay unchanged.
 The panel owns the accepted evidence and exclusions.
+
 Phase 9A is Open at 3/4. Exit 9A-3 stays Pending.
 Phase 9B stays Not started at 0/6.
 
 The D-P9-007 section records criteria-only acceptance at its date.
-D-P9-008 supplies the separate Exit 9A-2 acceptance. It changes no geometry,
+D-P9-008 gives acceptance for Exit 9A-2. It changes no geometry,
 package bytes, historical metadata or entry in the 113-entry register.
 It accepts no assisted S1 pilot, physical fit, manufacturing capability,
 production output or rights claim. The authorised publication is a draft PR.
