@@ -16,7 +16,7 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 4/4 under [D-P9-009](#phase-9a-exit-3-acceptance-panel). All four Phase 9A exits are Evidenced and owner-accepted.<br><br>Phase 9A is not closed. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | [D-P9-009](#phase-9a-exit-3-acceptance-panel) accepts only Exit 9A-3 for the frozen reference-only assisted S1 pilot. It accepts the declared components, landmarks and retained findings under the unchanged 13 D-P9-007 criteria. D-P9-004, D-P9-006 and D-P9-008 keep their accepted exit scopes. |
+| What changed | [D-P9-009](#phase-9a-exit-3-acceptance-panel) accepts only Exit 9A-3 for the frozen reference-only assisted S1 pilot. It accepts the declared components, landmarks and findings that the project keeps against the unchanged 13 D-P9-007 criteria. D-P9-004, D-P9-006 and D-P9-008 keep their accepted exit scopes. |
 | What now works | The procedural chair generator constructs the five S1 chair components and the assembled chair without source CAD or geometry from the first construction. The L1 proof uses the same neutral schema and generator with a different component pattern. The owner reviewed nine views from FreeCAD as applicable reference evidence. This decision adds no product behaviour. The accepted Phase 7 and Phase 8 workflows stay. |
 | Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. <br><br>S1-07 through S1-13 and S1-15, package rights, rail section and tolerances stay bounded as recorded. D-P9-005 makes S1-14 optional comparison evidence. |
 | Owner decision | [D-P9-009](#phase-9a-exit-3-acceptance-panel) accepts the frozen assisted S1 pilot for reference-only architecture proof through the same `ChairDefinition` and procedural chair generator. D-P9-005 keeps independent engineering evidence and accepted numerical tolerances mandatory for production. This decision accepts no physical fit, production package, output or rights claim. Phase 9A stays Open. Phase 9B stays Not started at 0/6. |
@@ -27,8 +27,8 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 ## D-P9-009 Phase 9A Exit 3 acceptance panel — 2026-10-09
 
 **Decision boundary:** Richard accepts only Exit 9A-3 for the frozen
-reference-only assisted S1 pilot under D-P9-007. This acceptance includes its
-declared components, landmarks and retained findings. The accepted source state
+reference-only assisted S1 pilot with the D-P9-007 conditions. This acceptance includes its
+declared components, landmarks and findings that the project keeps. The accepted source state
 is protected `main` `94b7ffe08f3e298c91025ab12a2c1883215cc279` after PR #151.
 The four exit criteria stay unchanged.
 
@@ -72,13 +72,14 @@ The root identity audit checks 68 identities. Its path is
 
 The native proof at `49c72c294335898ba4e2f3cb02581c8ef6e539a7`, its component
 comparisons and the nine FreeCAD views stay applicable. Product source is unchanged.
-The owner accepted those views as suitable reference evidence.
-This decision uses no repeated source research, geometry construction or visual capture.
+The owner accepted those views as applicable reference evidence.
+This decision adds no source research, geometry construction or visual capture.
 
 **Safety/risk panel:** Richard is the project owner and panel chair.
 `/root` reports the alignment. Read-only reviewer `/root/exit3_existing_evidence`
 recommends **Proceed with bounded conditions**. The reviewer challenges the
 applicable source, inference, rights, scope and acceptance risks.
+
 All 24 risk states, owners, deadlines, treatments and controls stay unchanged.
 This decision closes no risk. The panel records no dissent.
 
@@ -102,7 +103,7 @@ D-P9-005 production duties stay. All L1 repair limits, D-P6-008, TERM-R04 and
 legacy-retirement conditions stay. Output stays private-development and project
 status stays `unknown`.
 
-**Publication boundary:** Complete only the required Level 3 alignment,
+**Publication boundary:** Complete only the necessary Level 3 alignment,
 Documentation Review lifecycle and validation. Publish one draft PR with a
 PASS result from CI for its exact head. Do not merge or close Phase 9A.
 This decision selects no product implementation or Phase 9B work.

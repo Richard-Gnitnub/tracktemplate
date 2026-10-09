@@ -182,14 +182,14 @@ residual does not by itself validate hidden, worn, or nominal geometry.
 [D-P9-009](current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel)
 accepts only the [frozen assisted S1 pilot](phase-evidence/S1_PILOT_PLAN.md#bounded-exit-9a-3-acceptance-under-d-p9-009)
 for Exit 9A-3 reference-only architecture proof. The unchanged 13 D-P9-007
-criteria, including complete finite face and section correspondence, apply
+criteria, with complete finite face and section correspondence, apply
 only to that exact frozen assisted S1 pilot. The owner accepts its declared
-components, landmarks and retained findings. Source-coordinate calibration
-does not establish physical measurement calibration. No value becomes a
+components, landmarks and findings that the project keeps.<br><br>Source-coordinate calibration
+is not physical measurement calibration. No value becomes a
 measured physical dimension or independently evidenced prototype fact.
 This decision claims no measured whole-surface distribution or independently
 derived absolute base/seat overlap magnitude. It changes no numerical limit,
-production duty or validation requirement outside this bounded acceptance.
+production duty or validation requirement outside this bounded acceptance.<br><br>
 Phase 9A stays Open at 4/4. Phase 9B stays Not started at 0/6.
 
 Raw tessellation hash equality is not a general geometric oracle. Meshing

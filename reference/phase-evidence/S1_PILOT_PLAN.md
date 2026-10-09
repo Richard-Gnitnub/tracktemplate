@@ -1,7 +1,7 @@
 # First S1 Chair Pilot Plan
 
-Status: **Accepted Phase 1 control; production definition and production pilot
-remain blocked. D-P9-006 accepts the named frozen S1 `ChairDefinition` for
+Status: **Accepted Phase 1 control. The production definition and production pilot
+stay blocked. D-P9-006 accepts the named frozen S1 `ChairDefinition` for
 Exit 9A-1 reference-only architecture proof. D-P9-008 accepts Exit 9A-2.
 D-P9-009 accepts only the frozen reference-only assisted S1 pilot for Exit 9A-3.**
 
@@ -287,15 +287,15 @@ Do not merge.
 
 On 2026-10-09, [D-P9-009](../current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel)
 accepts only the frozen reference-only assisted S1 pilot and Exit 9A-3.
-The owner accepts its declared components, landmarks and retained findings
-under D-P9-007. The package, manifest and A0 rail identities stay those in
+The owner accepts its declared components, landmarks and findings that the project keeps
+with the D-P9-007 conditions. The package, manifest and A0 rail identities stay those in
 [D-P9-006](#bounded-exit-9a-1-acceptance-under-d-p9-006) and
 [D-P9-007](#s1-reference-comparison-criteria-under-d-p9-007).
 
 The accepted fitting method uses the same neutral `ChairDefinition` and
-procedural chair generator. It converts the declared frozen source evidence
-into the five named components. It does not use retained FreeCAD shapes as
-authoritative input. The following records document its seven duties.
+procedural chair generator. It uses the declared frozen source evidence
+to construct the five named components. It does not use FreeCAD shapes that the product keeps as
+authoritative input. These records give its seven duties.
 
 | Duty | Accepted bounded evidence and limit |
 | --- | --- |
@@ -303,12 +303,12 @@ authoritative input. The following records document its seven duties.
 | Units, scale and frame | Source decimal values and unit conversions stay exact. The chair frame and its five datums stay explicit. The model scale is 1:76.2. The A0 rail already uses model mm. This is source-coordinate calibration, not physical measurement calibration. |
 | Components and landmarks | The owner accepts `base-plinth`, `rail-seat`, `inner-jaw`, `key` and `outer-jaw`, their declared datums and source landmarks. Fastenings and plug/socket components stay outside the scope. |
 | Parameters and findings | The 113 source quantities keep their derivations and unresolved physical measurement uncertainty. A null uncertainty is not zero uncertainty. No value becomes a measured physical dimension or an independently evidenced prototype fact. |
-| Procedural construction | The common loader and `chair_research.prepare_chair_assembly_research` supply the existing model and rail research paths. The usual exact adapter constructs the named solids. Native validation, save/reopen and the nine FreeCAD views remain the evidence. |
-| Residual comparison | The unchanged 13 D-P9-007 criteria apply only to this exact frozen assisted S1 pilot. Complete finite face and section correspondence remains its reference comparison. This decision claims no measured whole-surface distribution or independently derived absolute base/seat overlap magnitude. |
-| Operator approval | The current D-P9-009 owner instruction accepts this bounded assisted S1 pilot. Earlier decisions and the earlier approval of reference views keep their historical limits. This external decision leaves package metadata unchanged. |
+| Procedural construction | The same loader and `chair_research.prepare_chair_assembly_research` supply the current model and rail research paths. The usual exact adapter constructs the named solids. Native validation, save/reopen and the nine FreeCAD views stay the evidence. |
+| Residual comparison | The unchanged 13 D-P9-007 criteria apply only to this exact frozen assisted S1 pilot. Complete finite face and section correspondence stays its reference comparison. This decision claims no measured whole-surface distribution or independently derived absolute base/seat overlap magnitude. |
+| Operator approval | The current D-P9-009 owner instruction accepts this bounded assisted S1 pilot. Earlier decisions and the earlier approval of reference views keep their historical limits. This external decision keeps package metadata unchanged. |
 
 D-P9-009 supplies the bounded assisted S1 pilot acceptance that D-P9-007
-and D-P9-008 did not supply. It applies the existing comparison method and
+and D-P9-008 did not supply. It applies the accepted comparison method and
 numerical limits only to this exact frozen reference. The general production
 and assisted-pilot duties below stay applicable outside this accepted scope.
 No new numerical tolerance follows.
