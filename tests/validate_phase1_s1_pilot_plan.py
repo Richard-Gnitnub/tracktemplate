@@ -498,7 +498,7 @@ def _exit2_acceptance_errors(text):
         "S1 Exit 9A-2 boundary drifted: " + clause
         for clause in clauses if clause not in flat
     ]
-    if ("../current/PHASE_EVIDENCE.md"
+    if ("../history/phase-closeouts/PHASE9A_CLOSEOUT.md"
             "#phase-9a-exit-2-acceptance-panel") not in section:
         errors.append("S1 Exit 9A-2 decision owner link drifted")
     return errors
@@ -544,7 +544,7 @@ def _exit3_acceptance_errors(text):
     errors = ["S1 Exit 9A-3 boundary drifted: " + clause
               for clause in clauses if clause not in flat]
     for target in (
-        "../current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel",
+        "../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-3-acceptance-panel",
         "#bounded-exit-9a-1-acceptance-under-d-p9-006",
         "#s1-reference-comparison-criteria-under-d-p9-007",
     ):

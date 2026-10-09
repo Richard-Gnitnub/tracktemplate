@@ -1968,23 +1968,25 @@ def validate_phase8_exit2_acceptance_mutations() -> None:
                 row, "| Complete — accepted 2026-10-03 |", "| Open |",
             ),
         )),
-        "Only Phase 9A may be open",
+        "Only Phase 9B may be open after Phase 9A closeout",
     )
     phase9 = table_row_containing(plan, "| 9B | Core RC chair")
     expect_rejected(
-        "phase8-exit2/phase-9b-opened-without-authority",
+        "phase8-exit2/phase-9b-reclosed-without-authority",
         lambda: progress._validate_plan_shape(replace_once(
             plan, phase9,
-            replace_once(phase9, "| Not started |", "| Open |"),
+            replace_once(phase9, "| Open |", "| Not started |"),
         )),
-        "Only Phase 9A may be open",
+        "Only Phase 9B may be open after Phase 9A closeout",
     )
 
 
 def validate_phase8_closeout_mutations() -> None:
     """Reject changed closure authority and premature Phase 9 opening."""
     archive = read("reference/history/phase-closeouts/PHASE8_CLOSEOUT.md")
-    holding = read("reference/current/PHASE_EVIDENCE.md")
+    holding = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     decisions = json.loads(read(
         "reference/history/phase-closeouts/PHASE8_GATE_DECISIONS.json"
     ))
@@ -2140,7 +2142,9 @@ def validate_phase8_closeout_mutations() -> None:
             ),
             diagnostic,
         )
-    current = json.loads(read("reference/current/gate-decisions.json"))
+    current = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     current["decisions"].append(decisions["decisions"][9])
     expect_rejected(
         "phase9-holding/phase8-decision-carried-as-current",
@@ -4314,7 +4318,9 @@ def validate_finite_documentation_mutations() -> None:
 def validate_phase9_split_mutations() -> None:
     """Reject invented phases, exit drift and widened terminology."""
     plan = read("reference/PROJECT_PLAN.md")
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     terminology = read("reference/TERMINOLOGY.md")
     phase9b = table_row_containing(plan, "| 9B | Core RC chair")
     # Keep the independent dashboard budget from masking the shape proof.
@@ -4425,10 +4431,12 @@ def validate_phase9_split_mutations() -> None:
     expect_rejected(
         "phase9/phase9a-exit-count-prematurely-accepted",
         lambda: progress._validate_plan_shape(premature_count),
-        "Phase 9A must stay Open at four evidenced exits",
+        "Phase 9A must stay closed at four evidenced exits",
     )
 
-    decision = json.loads(read("reference/current/gate-decisions.json"))
+    decision = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     phase6 = {
         record["id"]: record
         for record in json.loads(read(
@@ -4601,7 +4609,9 @@ def validate_phase9_split_mutations() -> None:
 
 def validate_phase9_research_mutations() -> None:
     """Reject misplaced research authority and weakened production gates."""
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     licensing = read("reference/LICENSING_BOUNDARIES.md")
     provenance = read("reference/PROVENANCE.md")
     documents = [evidence, licensing, provenance]
@@ -4678,7 +4688,9 @@ def validate_phase9_research_mutations() -> None:
         lambda: progress._validate_phase9_holding(changed),
         "D-P9-001 failed-candidate boundary drifted",
     )
-    decision = json.loads(read("reference/current/gate-decisions.json"))
+    decision = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     phase6 = {
         record["id"]: record
         for record in json.loads(read(
@@ -4707,7 +4719,9 @@ def validate_phase9_research_mutations() -> None:
 def validate_phase9_exit4_admission_mutations() -> None:
     """Reject stale, misplaced or wider acceptance of the raw-data exit."""
     plan = read("reference/PROJECT_PLAN.md")
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     phase9a = table_row_containing(plan, "| 9A | S1 and procedural chair")
     stale_count = replace_once(
         plan, phase9a,
@@ -4716,7 +4730,7 @@ def validate_phase9_exit4_admission_mutations() -> None:
     expect_rejected(
         "phase9-exit4/stale-zero-count",
         lambda: progress._validate_plan_shape(stale_count),
-        "Phase 9A must stay Open at four evidenced exits",
+        "Phase 9A must stay closed at four evidenced exits",
     )
     accepted_row = table_row_containing(evidence, "| 9A-4 |")
     other_accepted_row = table_row_containing(evidence, "| 9A-3 |")
@@ -4735,7 +4749,9 @@ def validate_phase9_exit4_admission_mutations() -> None:
         lambda: progress._validate_phase9_exit_allocation(plan, wrong_exit),
         "Phase 9A evidence criteria or accepted-exit status drifted",
     )
-    decision = json.loads(read("reference/current/gate-decisions.json"))
+    decision = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     phase6 = {
         record["id"]: record
         for record in json.loads(read(
@@ -4809,9 +4825,187 @@ def validate_phase9_exit4_admission_mutations() -> None:
         )
 
 
+def validate_phase9_closeout_opening_mutations() -> None:
+    """Reject widened closeout, implicit opening and lost historical proof."""
+    archive = read("reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md")
+    current = read("reference/current/PHASE_EVIDENCE.md")
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    for index, validator, decision_id in (
+        (1, progress._validate_dp9_010_decision, "D-P9-010"),
+        (2, progress._validate_dp9_011_decision, "D-P9-011"),
+    ):
+        record = document["decisions"][index]
+        for field, value, diagnostic in (
+            ("status", "Proposed", "identity, status or panel routing"),
+            ("authority", "Agent acceptance", "exact owner authority"),
+            ("panel_record", "reference/PROJECT_PLAN.md",
+             "identity, status or panel routing"),
+            ("decision", "Accept every production exit", "decision boundary"),
+            ("exclusions", "Physical fit and output are cleared",
+             "exclusions boundary"),
+        ):
+            changed = copy.deepcopy(record)
+            changed[field] = value
+            expect_rejected(
+                "phase9-closeout/" + decision_id + "-" + field,
+                lambda value=changed, check=validator: check(
+                    value, set(record),
+                ),
+                decision_id + " " + diagnostic + " drifted",
+            )
+    for index in range(3):
+        changed = copy.deepcopy(document)
+        changed["decisions"].pop(index)
+        expect_rejected(
+            "phase9-current/decision-removed-" + str(index),
+            lambda value=changed: progress._validate_phase9b_decisions(value),
+            "Phase 9B current decision chain incomplete or widened",
+        )
+    changed = copy.deepcopy(document)
+    changed["decisions"][0]["status"] = "Complete"
+    expect_rejected(
+        "phase9-current/deferred-duty-erased",
+        lambda: progress._validate_phase9b_decisions(changed),
+        "Phase 9B current decision chain incomplete or widened",
+    )
+    for text, heading, checker, decision_id in (
+        (archive, progress.DP9_010_HEADING,
+         progress._validate_phase9a_closeout, "D-P9-010"),
+        (current, progress.DP9_011_HEADING,
+         progress._validate_phase9b_holding, "D-P9-011"),
+    ):
+        panel = progress._section(text, heading)
+        moved = replace_once(text, panel, "\nNo owner decision.\n")
+        moved += "\n## Unrelated material\n" + panel
+        expect_rejected(
+            "phase9-closeout/" + decision_id + "-authority-relocated",
+            lambda value=moved, check=checker: check(value),
+            decision_id + " exact panel authority drifted or was relocated",
+        )
+    panel = progress._section(archive, progress.DP9_010_HEADING)
+    for name, before, after, diagnostic in (
+        ("reference-scope", "frozen\nreference-only scope",
+         "production scope", "D-P9-010 closeout boundary drifted"),
+        ("production-fit", "They do not establish independent prototype",
+         "They establish independent prototype",
+         "D-P9-010 closeout boundary drifted"),
+        ("risk-waiver", "All risk states, severities, owners, deadlines,",
+         "Only some risk states, severities, owners, deadlines,",
+         "D-P9-010 closeout boundary drifted"),
+        ("restore-pass", "monthly restore passed on\n2026-10-07",
+         "monthly restore was postponed",
+         "D-P9-010 closeout boundary drifted"),
+        ("restore-deadline", "next monthly drill is due by\n2026-11-07",
+         "next monthly drill is optional",
+         "D-P9-010 closeout boundary drifted"),
+        ("separate-storage", "Physical separate storage remains unverified",
+         "Physical separate storage is proved",
+         "D-P9-010 closeout boundary drifted"),
+        ("legacy-waiver", "removal and legacy-retirement conditions stay",
+         "removal and legacy-retirement conditions are waived",
+         "D-P9-010 closeout boundary drifted"),
+        ("no-performance", "rights, performance\nresult or release",
+         "rights or release", "D-P9-010 closeout boundary drifted"),
+        ("113-register", "113-entry register and 119 derived",
+         "new register and 119 independent",
+         "D-P9-010 closeout boundary drifted"),
+        ("new-snapshot-restore", "This is not a restore of the October 9 set",
+         "This restores the October 9 set",
+         "D-P9-010 closeout boundary drifted"),
+        ("merge", "Do not merge. This decision", "Merge. This decision",
+         "D-P9-010 closeout boundary drifted"),
+        ("exit-mapping", "[D-P9-004](#phase-9a-exit-4-admission-panel)",
+         "[D-P9-009](#phase-9a-exit-4-admission-panel)",
+         "D-P9-010 accepted-exit mapping drifted"),
+    ):
+        mutated = replace_once(archive, panel,
+                               replace_once(panel, before, after))
+        expect_rejected(
+            "phase9-closeout/" + name,
+            lambda value=mutated: progress._validate_phase9a_closeout(value),
+            diagnostic,
+        )
+    opening = progress._section(current, progress.DP9_011_HEADING)
+    for name, before, after in (
+        ("acceptance", "All six exits stay Pending",
+         "All six exits are accepted"),
+        ("scope", "does not widen the frozen Phase 9A",
+         "widens the frozen Phase 9A"),
+        ("implementation", "This cycle selects no product implementation",
+         "This cycle selects product implementation"),
+        ("rights", "package, output, rights, numerical tolerance",
+         "package, output, numerical tolerance"),
+        ("merge", "Do not merge", "Merge now"),
+        ("deferred-duty", "D-P6-008 stays Deferred — unmet",
+         "D-P6-008 is complete"),
+    ):
+        mutated = replace_once(current, opening,
+                               replace_once(opening, before, after))
+        expect_rejected(
+            "phase9-opening/" + name,
+            lambda value=mutated: progress._validate_phase9b_holding(value),
+            "D-P9-011 opening boundary drifted",
+        )
+    for exit_id, _, _ in progress.EXPECTED_PHASE9B_EXITS:
+        row = table_row_containing(current, "| " + exit_id + " |")
+        mutated = replace_once(current, row, row + " widened")
+        expect_rejected(
+            "phase9-opening/criterion-widened-" + exit_id,
+            lambda value=mutated: progress._validate_phase9b_holding(value),
+            "Phase 9B current criteria or pending status drifted",
+        )
+    risks = progress.PHASE9A_RISKS_PATH.read_bytes()
+    changed_risks = risks.replace(b'"state": "Open"',
+                                  b'"state": "Closed"', 1)
+    expect_rejected(
+        "phase9-closeout/risk-snapshot-rewritten",
+        lambda: progress._validate_phase9a_preservation(archive, changed_risks),
+        "Phase 9A archived or live risk duties changed",
+    )
+    marker = "# Phase 9A Opening and Phase 9B Holding Record"
+    changed_archive = replace_once(archive, marker, marker + "\nRewritten.")
+    expect_rejected(
+        "phase9-closeout/historical-evidence-rewritten",
+        lambda: progress._validate_phase9a_preservation(changed_archive, risks),
+        "Phase 9A retained pre-closeout evidence changed beyond link relocation",
+    )
+    plan = read("reference/PROJECT_PLAN.md")
+    state = table_row_containing(plan, "| Current state |")
+    changed = table_row_containing(plan, "| What changed |")
+    false_state = "Phase 9B is closed at 6/6 with every production exit accepted."
+    moved = replace_once(plan, state, "| Current state | " + false_state + " |")
+    moved = replace_once(
+        moved, changed, changed[:-1] + progress._cells(state)[1] + " |",
+    )
+    expect_rejected(
+        "phase9-owner-view/true-status-relocated-false-status-in-current-row",
+        lambda: progress._validate_owner_view(moved),
+        "project-plan owner-view row authority drifted: Current state",
+    )
+    for field in ("Current state", "What changed", "What now works",
+                  "Limitations/findings", "Owner decision", "Next action"):
+        row = table_row_containing(plan, "| " + field + " |")
+        mutated = replace_once(plan, row, row[:-1] + false_state + " |")
+        expect_rejected(
+            "phase9-owner-view/contradiction-appended-" + field,
+            lambda value=mutated: progress._validate_owner_view(value),
+            "project-plan owner-view row authority drifted: " + field,
+        )
+    row = table_row_containing(plan, "| 9B | Core RC chair")
+    accepted = replace_once(plan, row,
+                            replace_once(row, "0/6 evidenced", "1/6 evidenced"))
+    expect_rejected(
+        "phase9-opening/first-exit-self-accepted",
+        lambda: progress._validate_plan_shape(accepted),
+        "Phase 9B must stay Open at zero evidenced exits",
+    )
+
+
 def validate_phase9_exit3_admission_mutations() -> None:
     """Reject pilot widening, implicit closeout and altered comparisons."""
-    document = json.loads(read("reference/current/gate-decisions.json"))
+    document = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     admission = document["decisions"][10]
     phase6 = {
         record["id"]: record
@@ -4875,7 +5069,9 @@ def validate_phase9_exit3_admission_mutations() -> None:
             ),
             "D-P9-009 " + field + " boundary drifted",
         )
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     panel = progress._section(evidence, progress.DP9_009_HEADING)
     for index, identity in enumerate(progress.DP9_009_IDENTITIES):
         if index < 4:
@@ -4930,11 +5126,13 @@ def validate_phase9_exit3_admission_mutations() -> None:
         "Phase 9A evidence criteria or accepted-exit status drifted",
     )
     row = table_row_containing(plan, "| 9A | S1 and procedural chair")
-    closed = replace_once(plan, row, replace_once(row, "Open", "Complete"))
+    closed = replace_once(plan, row, replace_once(
+        row, "Complete — accepted 2026-10-09", "Open",
+    ))
     expect_rejected(
-        "phase9-exit3/four-exits-imply-closeout",
+        "phase9-exit3/accepted-closeout-reopened",
         lambda: progress._validate_plan_shape(closed),
-        "Only Phase 9A may be open",
+        "Only Phase 9B may be open after Phase 9A closeout",
     )
     validation = read("reference/VALIDATION.md")
     paragraph = paragraph_containing(
@@ -4977,7 +5175,9 @@ def validate_phase9_exit3_admission_mutations() -> None:
 
 def validate_phase9_exit2_admission_mutations() -> None:
     """Reject broadened admission, stale status and altered scope evidence."""
-    document = json.loads(read("reference/current/gate-decisions.json"))
+    document = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     admission = document["decisions"][9]
     phase6 = {
         record["id"]: record
@@ -5036,7 +5236,9 @@ def validate_phase9_exit2_admission_mutations() -> None:
             ),
             "D-P9-008 " + field + " boundary drifted",
         )
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     panel = progress._section(evidence, progress.DP9_008_HEADING)
     for index, identity in enumerate(progress.DP9_008_IDENTITIES):
         if index < 4:
@@ -5093,7 +5295,9 @@ def validate_phase9_exit2_admission_mutations() -> None:
 
 def validate_phase9_reference_criteria_mutations() -> None:
     """Keep criteria authority distinct from exit or production acceptance."""
-    document = json.loads(read("reference/current/gate-decisions.json"))
+    document = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     phase6 = {
         record["id"]: record
         for record in json.loads(read(
@@ -5150,7 +5354,9 @@ def validate_phase9_reference_criteria_mutations() -> None:
             "D-P9-007 " + field + " boundary drifted",
         )
 
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     panel = progress._section(evidence, progress.DP9_007_HEADING)
     for index, identity in enumerate(progress.DP9_007_IDENTITIES):
         changed = replace_once(evidence, panel,
@@ -5232,7 +5438,9 @@ def validate_phase9_reference_criteria_mutations() -> None:
 def validate_phase9_exit1_admission_mutations() -> None:
     """Reject acceptance beyond the frozen S1/L1 construction proof."""
     plan = read("reference/PROJECT_PLAN.md")
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     for exit_id, before in (
         ("9A-2", "| " + progress.PHASE9A_EXIT2_STATUS + " |"),
         ("9A-3", "| " + progress.PHASE9A_EXIT3_STATUS + " |"),
@@ -5261,14 +5469,16 @@ def validate_phase9_exit1_admission_mutations() -> None:
     )
     phase9b = table_row_containing(plan, "| 9B | Core RC chair")
     opened = replace_once(
-        plan, phase9b, replace_once(phase9b, "Not started", "Open"),
+        plan, phase9b, replace_once(phase9b, "Open", "Not started"),
     )
     expect_rejected(
-        "phase9-exit1/phase9b-opened",
+        "phase9-exit1/phase9b-reclosed",
         lambda: progress._validate_plan_shape(opened),
-        "Only Phase 9A may be open",
+        "Only Phase 9B may be open after Phase 9A closeout",
     )
-    document = json.loads(read("reference/current/gate-decisions.json"))
+    document = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     phase6 = {
         record["id"]: record
         for record in json.loads(read(
@@ -5378,7 +5588,9 @@ def validate_phase9_exit1_admission_mutations() -> None:
 
 def validate_phase9_evidence_model_mutations() -> None:
     """Reject engineering, rights or phase authority wider than D-P9-005."""
-    decision = json.loads(read("reference/current/gate-decisions.json"))
+    decision = json.loads(read(
+        "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json"
+    ))
     phase6 = {
         record["id"]: record
         for record in json.loads(read(
@@ -5426,7 +5638,9 @@ def validate_phase9_evidence_model_mutations() -> None:
             ),
             "D-P9-005 " + diagnostic + " drifted",
         )
-    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    evidence = progress._phase9a_historical_record(read(
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+    ))
     panel = progress._section(
         evidence, "D-P9-005 Phase 9 chair evidence model panel — 2026-10-07",
     )
@@ -5559,7 +5773,7 @@ def validate_project_plan_mutations() -> None:
                 "| Open |",
             ),
         )),
-        "Only Phase 9A may be open",
+        "Only Phase 9B may be open after Phase 9A closeout",
     )
 
     exit2_row = table_row_containing(
@@ -5972,10 +6186,10 @@ def validate_documentation_profile_mutations() -> None:
             "TDMP lifecycle lost:",
         )
 
-    owner_view_row = table_row_containing(plan, "**Current state**")
+    owner_view_row = table_row_containing(plan, "| Limitations/findings |")
     inflated_view = replace_once(
         owner_view_row,
-        "D-P6-008 stays Deferred — unmet",
+        "D-P6-008 Deferred — unmet",
         "D-P6-008 is complete",
     )
     expect_rejected(
@@ -5984,7 +6198,7 @@ def validate_documentation_profile_mutations() -> None:
             replace_once(plan, owner_view_row, inflated_view)
         ),
         "project-plan owner view lost or contradicted: "
-        "D-P6-008 stays Deferred — unmet",
+        "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 remain",
     )
     owner_view_authority = replace_once(
         plan,
@@ -5996,7 +6210,7 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(owner_view_authority),
         "project-plan owner view became an authority source",
     )
-    plan_status = paragraph_containing(plan, "Status: **Phase 8 is closed")
+    plan_status = paragraph_containing(plan, "Status: **Phase 9A is closed")
     widened_status = replace_once(
         plan_status,
         "D-P6-008 stays Deferred — unmet",
@@ -6010,62 +6224,44 @@ def validate_documentation_profile_mutations() -> None:
         "the carried D-P6-008 obligation is missing",
     )
 
-    owner_view_performance_widened = replace_once(
-        plan,
-        "No performance, production-output or release acceptance follows.",
-        "Performance, production-output and release acceptance follow.",
-    )
-    expect_rejected(
-        "tt-doc/owner-view-performance-authority-widened",
-        lambda: progress._validate_owner_view(owner_view_performance_widened),
-        "project-plan owner view lost or contradicted: "
-        "No performance, production-output or release acceptance",
-    )
-
     closeout_cases = (
         (
-            "source-gate-changed", "**What changed**",
-            "D-P9-004",
-            "unreviewed-source",
-            "D-P9-004",
+            "source-gate-changed", "| Current state |",
+            "D-P9-010", "unreviewed-source",
+            "Phase 9A is closed at 4/4 under D-P9-010",
         ),
         (
-            "monthly-restore-pass-erased", "**Limitations/findings**",
-            "full monthly restore passed on 2026-10-07",
-            "monthly restore was postponed",
-            "full monthly restore passed on 2026-10-07",
+            "reference-scope-promoted", "| Current state |",
+            "accepted reference-only scopes", "production scopes",
+            "All four exits retain their accepted reference-only scopes",
         ),
         (
-            "next-monthly-drill-postponed", "**Limitations/findings**",
-            "next monthly drill is due by 2026-11-07",
-            "next monthly drill may wait until 2026-12-07",
-            "next monthly drill is due by 2026-11-07",
+            "risk-duties-removed", "| Limitations/findings |",
+            "All 24 risk duties", "No risk duties",
+            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 remain",
         ),
         (
-            "physical-separation-claimed", "**Limitations/findings**",
-            "separate physical storage is unverified",
-            "separate physical storage is proved",
-            "separate physical storage is unverified",
+            "physical-fit-accepted", "| Limitations/findings |",
+            "Physical fit and production/package rights remain unaccepted",
+            "Physical fit and production/package rights are accepted",
+            "Physical fit and production/package rights remain unaccepted",
         ),
         (
-            "legacy-conditions-waived", "**Limitations/findings**",
-            "every comparison, adapter, caller, removal and "
-            "legacy-retirement condition remain",
-            "all legacy-retirement conditions are waived",
-            "every comparison, adapter, caller, removal and "
-            "legacy-retirement condition",
+            "phase9b-exits-accepted", "| Current state |",
+            "All six Phase 9B exits stay Pending",
+            "All six Phase 9B exits are accepted",
+            "All six Phase 9B exits stay Pending",
         ),
         (
-            "phase9b-opened", "**Owner decision**",
-            "Phase 9B stays Not started at 0/6",
-            "Phase 9B is Open at 0/6",
-            "Phase 9B stays Not started at 0/6",
+            "merge-authorised", "| Next action |",
+            "Do not merge", "Merge now",
+            "Publish an exact-green draft PR. Do not merge",
         ),
         (
-            "stop-boundary-waived", "**Next action**",
-            "This decision selects no product implementation",
+            "stop-boundary-waived", "| Next action |",
+            "Select no product implementation in this cycle",
             "Begin Phase 9 product work after integration",
-            "This decision selects no product implementation",
+            "Select no product implementation in this cycle",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
@@ -8195,6 +8391,7 @@ def main() -> None:
     validate_phase9_reference_criteria_mutations()
     validate_phase9_exit2_admission_mutations()
     validate_phase9_exit3_admission_mutations()
+    validate_phase9_closeout_opening_mutations()
     validate_phase9_evidence_model_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()

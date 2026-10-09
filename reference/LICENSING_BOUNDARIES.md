@@ -145,7 +145,7 @@ and accepted. In particular:
 
 ## Phase 9A reference-only research
 
-Under [D-P9-003](current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel),
+Under [D-P9-003](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-research-sequencing-panel),
 frozen, provenance-recorded Templot5 revision 556b S1/REA data, relationships
 and rail-fit logic can support a bounded Phase 9A research implementation.
 That research definition, procedural chair generator and architecture proof do not
@@ -182,7 +182,7 @@ party's rights. No production dependency with `project-cleared` status may have 
 no production/package clearance. The final production package must pass each
 affected qualification check after an input change.
 
-[D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel) changes
+[D-P9-005](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel) changes
 chair acceptance evidence. The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
 owns the independent engineering reference chain and numerical tolerances.
 A compatible rights disposition does not supply independent engineering evidence

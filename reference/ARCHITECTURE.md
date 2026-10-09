@@ -412,7 +412,7 @@ retained in the neutral chair-definition package v1 boundary accepted in Phase
 to that plan. Neither the working S1 name nor the conditional CC0 target is
 canonical production data.
 
-Under [D-P9-003](current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel),
+Under [D-P9-003](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-research-sequencing-panel),
 bounded Phase 9A reference-only research can start before independent production
 evidence is complete. Frozen Templot5 revision 556b S1/REA inputs can supply data for a research
 `ChairDefinition` and procedural chair generator in this accepted architecture.
@@ -422,7 +422,7 @@ named chair components and deterministic construction.
 
 Prototype geometry, model rail-fit policy and manufacturing compensation stay
 separate. The research package and outputs stay private-development and must not have `project-cleared` status. The frozen Templot contract stays available for optional comparison.
-[D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel) removes
+[D-P9-005](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel) removes
 exact 556b execution and output as mandatory chair acceptance evidence.
 The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
 owns the independent engineering reference chain. Independent engineering justification is necessary before Templot implementation choices become production requirements.
