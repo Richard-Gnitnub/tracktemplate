@@ -130,6 +130,168 @@ def _display(module, document, kind=KIND, entity_id=ENTITY_ID):
     return result
 
 
+def _document_state(module, document, kind, entity_id):
+    """Observe exact metadata and native state without changing the document."""
+    objects = []
+    for obj in document.Objects:
+        view = getattr(obj, "ViewObject", None)
+        objects.append({
+            "name": str(obj.Name),
+            "type": str(obj.TypeId),
+            "state": list(obj.State),
+            "properties": sorted(
+                (name, str(getattr(obj, name)))
+                for name in obj.PropertiesList
+                if name not in {
+                    "Shape", "Group", "_Part_ShapeCache", "ShapeMaterial",
+                }
+            ),
+            "members": (sorted(member.Name for member in obj.Group)
+                        if "Group" in obj.PropertiesList else None),
+            "visibility": (bool(view.Visibility)
+                           if App.GuiUp and view is not None else None),
+        })
+    gui_state = None
+    if App.GuiUp:
+        import FreeCADGui as Gui
+
+        gui_state = {
+            "modified": bool(Gui.getDocument(document.Name).Modified),
+            "selection": [
+                (item.DocumentName, item.ObjectName,
+                 tuple(item.SubElementNames))
+                for item in Gui.Selection.getSelectionEx(document.Name)
+            ],
+        }
+    return {
+        "payload": _payload(module, document, kind, entity_id),
+        "config": copy.deepcopy(_config(module, document, kind, entity_id)),
+        "objects": sorted(objects, key=lambda item: item["name"]),
+        "history": _history(document),
+        "display": _display(module, document, kind, entity_id),
+        "gui": gui_state,
+    }
+
+
+def _assert_noop(module, document, analyse, kind=KIND, entity_id=ENTITY_ID):
+    """The real command must preserve native state and stored bytes."""
+    if App.GuiUp:
+        import FreeCADGui as Gui
+        from PySide6 import QtWidgets
+
+        candidates = module._chair_analysis_display_objects(
+            document, kind, entity_id,
+        )
+        Gui.Selection.clearSelection()
+        Gui.Selection.addSelection(candidates[-1])
+        QtWidgets.QApplication.processEvents()
+    before = _document_state(module, document, kind, entity_id)
+    originals = {obj.Name: obj for obj in document.Objects}
+    shapes = {
+        obj.Name: obj.Shape for obj in document.Objects
+        if "Shape" in obj.PropertiesList and not obj.Shape.isNull()
+    }
+    names = (
+        "_chair_write_metadata", "_create_chair_analysis_display",
+        "_document_recompute",
+    )
+    codes = {getattr(module, name).__code__: name for name in names}
+    calls = dict.fromkeys((*names, "openTransaction", "commitTransaction"), 0)
+
+    def observe(frame, event, argument):
+        if event == "call" and frame.f_code in codes:
+            calls[codes[frame.f_code]] += 1
+        elif event == "c_call":
+            name = getattr(argument, "__name__", "")
+            if (name in ("openTransaction", "commitTransaction")
+                    and getattr(argument, "__self__", None) is document):
+                calls[name] += 1
+
+    previous_profile = sys.getprofile()
+    sys.setprofile(observe)
+    try:
+        result = analyse()
+    finally:
+        sys.setprofile(previous_profile)
+    after = _document_state(module, document, kind, entity_id)
+    assert after == before, "Unchanged Analyse changed native document state"
+    assert not any(calls.values()), calls
+    for name, obj in originals.items():
+        assert document.getObject(name) is obj
+    for name, shape in shapes.items():
+        assert document.getObject(name).Shape.isSame(shape), name
+    if result is not None:
+        assert result["cache_reused"] is True
+        assert result["display_cache_reused"] is True
+        assert _logical(result) == _logical(_stored(
+            module, document, kind, entity_id,
+        ))
+    return result, {
+        "payload_sha256": hashlib.sha256(
+            before["payload"].encode("utf-8"),
+        ).hexdigest(),
+        "history": before["history"],
+        "gui": before["gui"],
+        "mutation_calls": calls,
+        "object_count": len(originals),
+        "same_shape_count": len(shapes),
+        "exact_state_unchanged": True,
+    }
+
+
+def _assert_changed_history(module, document, analyse, kind, entity_id):
+    """A changed result remains one reversible native command."""
+    payload = _payload(module, document, kind, entity_id)
+    display = _display(module, document, kind, entity_id)
+    history = _history(document)
+    result = analyse()
+    changed_payload = _payload(module, document, kind, entity_id)
+    changed_display = _display(module, document, kind, entity_id)
+    assert changed_payload != payload
+    assert document.UndoCount == history["undo"] + 1
+    document.undo()
+    assert _payload(module, document, kind, entity_id) == payload
+    assert _display(module, document, kind, entity_id) == display
+    document.redo()
+    assert _payload(module, document, kind, entity_id) == changed_payload
+    assert _display(module, document, kind, entity_id) == changed_display
+    return result
+
+
+def _display_repair_proof(module, document, analyse, kind, entity_id):
+    """A missing or hidden diagnostic layer must still reach legacy repair."""
+    baseline = _logical(_stored(module, document, kind, entity_id))
+    result = {}
+    if App.GuiUp:
+        layers = [
+            obj for obj in module._chair_analysis_display_objects(
+                document, kind, entity_id,
+            )
+            if module.object_string_property(obj, "GeneratedRole", "")
+            == module.CHAIR_POSITION_MARKER_ROLE
+        ]
+        assert len(layers) == 1
+        layers[0].ViewObject.Visibility = False
+        before = _history(document)
+        repaired = analyse()
+        assert _logical(repaired) == baseline
+        assert layers[0].ViewObject.Visibility
+        assert document.UndoCount == before["undo"] + 1
+        result["hidden_layer_repaired"] = True
+    assert module.clear_chair_analysis_display(document, kind, entity_id) > 0
+    before = _history(document)
+    repaired = analyse()
+    assert repaired["cache_reused"] is True
+    assert repaired["display_cache_reused"] is False
+    assert _logical(repaired) == baseline
+    assert document.UndoCount == before["undo"] + 1
+    _reused, result["repaired_noop"] = _assert_noop(
+        module, document, analyse, kind, entity_id,
+    )
+    result["missing_layers_rebuilt"] = True
+    return result
+
+
 class _GuiProof:
     """Observe the existing panel; never replace product calculations."""
 
@@ -156,22 +318,37 @@ class _GuiProof:
         self.panel.show()
         self.qt.QApplication.processEvents()
 
-    def analyse(self):
+    def analyse(self, capture_result=True):
         errors = []
+        returned = []
+        assert self.panel.analyse_button.isEnabled()
 
         def reject_dialog(_parent, title, message, *args, **kwargs):
             errors.append({"title": str(title), "message": str(message)})
             return self.qt.QMessageBox.StandardButton.Ok
 
         original = self.qt.QMessageBox.critical
+        command = self.module.analyse_entity_chair_positions
+
+        def observe_command(*args, **kwargs):
+            result = command(*args, **kwargs)
+            returned.append(result)
+            return result
+
         self.qt.QMessageBox.critical = reject_dialog
+        if capture_result:
+            self.module.analyse_entity_chair_positions = observe_command
         try:
             self.panel.analyse_button.click()
             self.qt.QApplication.processEvents()
         finally:
             self.qt.QMessageBox.critical = original
+            self.module.analyse_entity_chair_positions = command
         assert not errors, errors
-        return _stored(self.module, self.document, self.kind, self.entity_id)
+        if capture_result:
+            assert len(returned) == 1, "The panel did not call Analyse once"
+            return returned[0]
+        return None
 
     def observe(self, label, *, stale):
         import FreeCADGui as Gui
@@ -341,7 +518,9 @@ def _turnout_proof(module, legacy, fixture, run_directory, fixture_digest):
         assert first["cache_reused"] is False
         baseline = _logical(first)
         key = first["geometry_signature"]
-        reused = analyse()
+        reused, result["unchanged_noop"] = _assert_noop(
+            module, document, analyse, kind, entity_id,
+        )
         assert reused["cache_reused"] is True
         assert _logical(reused) == baseline
         config = _config(module, document, kind, entity_id)
@@ -386,7 +565,9 @@ def _turnout_proof(module, legacy, fixture, run_directory, fixture_digest):
         )
         if gui:
             gui.observe("turnout-stale", stale=True)
-        changed = analyse()
+        changed = _assert_changed_history(
+            module, document, analyse, kind, entity_id,
+        )
         assert changed["cache_reused"] is False
         assert changed["geometry_signature"] != key
         affected = [item for item in changed["positions"]
@@ -397,9 +578,13 @@ def _turnout_proof(module, legacy, fixture, run_directory, fixture_digest):
         result["changed_current"] = _freshness(
             module, document, stale=False, kind=kind, entity_id=entity_id,
         )
-        assert analyse()["cache_reused"] is True
+        _unchanged, result["changed_result_noop"] = _assert_noop(
+            module, document, analyse, kind, entity_id,
+        )
         module.chair_rail_records_for_entity = original
-        restored = analyse()
+        restored = _assert_changed_history(
+            module, document, analyse, kind, entity_id,
+        )
         assert restored["cache_reused"] is False
         assert restored["geometry_signature"] == key
         assert _logical(restored) == baseline
@@ -416,11 +601,25 @@ def _turnout_proof(module, legacy, fixture, run_directory, fixture_digest):
         if gui:
             gui.bind(document)
             gui.observe("turnout-reopened-current", stale=False)
-        reopened = analyse()
+        if App.GuiUp:
+            import FreeCADGui as Gui
+
+            assert not Gui.getDocument(document.Name).Modified
+        reopened, result["reopened_noop"] = _assert_noop(
+            module, document, analyse, kind, entity_id,
+        )
         assert reopened["cache_reused"] is True
         assert _logical(reopened) == baseline
         result["reopened_current"] = _freshness(
             module, document, stale=False, kind=kind, entity_id=entity_id,
+        )
+        if gui:
+            _returned, result["native_panel_noop"] = _assert_noop(
+                module, document,
+                lambda: gui.analyse(capture_result=False), kind, entity_id,
+            )
+        result["display_repair"] = _display_repair_proof(
+            module, document, analyse, kind, entity_id,
         )
         result["position_count"] = len(first["positions"])
         result["gui_observations"] = gui.records if gui else None
@@ -480,6 +679,7 @@ def validate():
                 "TrackTemplate.FCMacro",
                 "tracktemplate/compatibility/transition_workflow.py",
                 "tracktemplate/application/chair_analysis_signature.py",
+                "tracktemplate/application/chair_analysis_reuse.py",
             )
         }
         corrected_signature = module._chair_geometry_signature
@@ -559,27 +759,19 @@ def validate():
         }
         if gui is not None:
             gui.observe("current", stale=False)
-        before_reuse = _history(document)
-        second = analyse()
+        # The immutable Phase 1 contract retains the old mutation witness.
+        # Current B16 must now preserve its cold payload and history exactly.
+        second, receipt["unchanged_noop"] = _assert_noop(
+            module, document, analyse,
+        )
         assert second["cache_reused"] is True
         assert second["display_cache_reused"] is True
         assert second["geometry_signature"] == baseline_key
         assert _logical(second) == baseline
         assert _display(module, document) == first_display
         second_payload = _payload(module, document)
-        assert second_payload != first_payload
-        after_reuse = _history(document)
-        assert after_reuse["undo"] == before_reuse["undo"] + 1
-        document.undo()
-        assert _payload(module, document) == first_payload
-        assert _display(module, document) == first_display
-        document.redo()
-        assert _payload(module, document) == second_payload
-        assert _display(module, document) == first_display
-        receipt["reuse_history"] = {
-            "before": before_reuse, "after": after_reuse,
-            "undo_redo_restored_exact_payloads": True,
-        }
+        assert second_payload == first_payload
+        assert _stored(module, document)["cache_reused"] is False
         receipt["failed_explicit_analysis"] = (
             _rejected_analysis_preserves_state(module, document)
         )
@@ -602,7 +794,9 @@ def validate():
         )
         if gui is not None:
             gui.observe("record-change-stale", stale=True)
-        changed = analyse()
+        changed = _assert_changed_history(
+            module, document, analyse, KIND, ENTITY_ID,
+        )
         assert changed["cache_reused"] is False
         assert changed["display_cache_reused"] is False
         assert changed["geometry_signature"] != baseline_key
@@ -612,7 +806,9 @@ def validate():
         assert all(item["timber_identifier"] == changed_identifier
                    for item in selected_positions)
         assert _logical(changed) != baseline
-        changed_reuse = analyse()
+        changed_reuse, receipt["changed_result_noop"] = _assert_noop(
+            module, document, analyse,
+        )
         assert changed_reuse["cache_reused"] is True
         assert _logical(changed_reuse) == _logical(changed)
         receipt["record_change"] = {
@@ -625,7 +821,9 @@ def validate():
         }
         module.chair_timber_records_for_entity = original_extractor
         _freshness(module, document, stale=True)
-        restored = analyse()
+        restored = _assert_changed_history(
+            module, document, analyse, KIND, ENTITY_ID,
+        )
         assert restored["cache_reused"] is False
         assert restored["geometry_signature"] == baseline_key
         assert _logical(restored) == baseline
@@ -645,10 +843,23 @@ def validate():
         if gui is not None:
             gui.bind(document)
             gui.observe("reopened-current", stale=False)
-        reopened_reuse = analyse()
+        if App.GuiUp:
+            import FreeCADGui as Gui
+
+            assert not Gui.getDocument(document.Name).Modified
+        reopened_reuse, receipt["reopened_noop"] = _assert_noop(
+            module, document, analyse,
+        )
         assert reopened_reuse["cache_reused"] is True
         assert reopened_reuse["geometry_signature"] == baseline_key
         assert _logical(reopened_reuse) == baseline
+        if gui is not None:
+            _returned, receipt["native_panel_noop"] = _assert_noop(
+                module, document, lambda: gui.analyse(capture_result=False),
+            )
+        receipt["display_repair"] = _display_repair_proof(
+            module, document, analyse, KIND, ENTITY_ID,
+        )
         receipt["reopened_reuse"] = True
         receipt["historical_geometry_signature"] = historical[
             "geometry_signature"
