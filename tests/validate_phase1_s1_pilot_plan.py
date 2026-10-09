@@ -61,7 +61,8 @@ INTENDED_USES = (
     "physical-production",
 )
 REQUIRED_MARKERS = (
-    "Status: **Accepted Phase 1 control; production definition and pilot remain",
+    "Status: **Accepted Phase 1 control; production definition and production "
+    "pilot",
     "authoritative interchange is a neutral, versioned TrackTemplateMacro",
     "Serialised output-affecting numbers use exact decimal strings",
     "`+X` longitudinally along the nominal rail direction",
@@ -503,6 +504,110 @@ def _exit2_acceptance_errors(text):
     return errors
 
 
+def _exit3_acceptance_errors(text):
+    """Keep the seven pilot duties within the accepted research scope."""
+    section = direct_section_content(
+        text, "Bounded Exit 9A-3 acceptance under D-P9-009",
+    )
+    flat = " ".join(section.replace("`", "").split())
+    clauses = (
+        "accepts only the frozen reference-only assisted S1 pilot and "
+        "Exit 9A-3",
+        "The owner accepts its declared components, landmarks and "
+        "retained findings under D-P9-007",
+        "The accepted fitting method uses the same neutral ChairDefinition "
+        "and procedural chair generator",
+        "It does not use retained FreeCAD shapes as authoritative input",
+        "D-P9-009 supplies the bounded assisted S1 pilot acceptance that "
+        "D-P9-007 and D-P9-008 did not supply",
+        "It applies the existing comparison method and numerical limits "
+        "only to this exact frozen reference",
+        "The general production and assisted-pilot duties below stay "
+        "applicable outside this accepted scope",
+        "No new numerical tolerance follows",
+        "The package keeps acceptance: not-accepted and validation: not-run",
+        "Geometry, source printing allowances, package bytes, the "
+        "113-entry register and all production obligations stay unchanged",
+        "Prototype geometry, model rail-fit policy and manufacturing "
+        "compensation stay separate",
+        "No physical fit, preload, retention, manufacturing capability, "
+        "production package, output or rights acceptance follows",
+        "Arbitrary automatic scan assimilation stays outside the RC "
+        "qualification matrix",
+        "Phase 9A is Open at 4/4",
+        "All four Phase 9A exits are Evidenced and owner-accepted",
+        "Phase 9A is not closed",
+        "Phase 9B stays Not started at 0/6",
+        "Publish only the validated draft PR. Do not merge or close Phase 9A",
+    )
+    errors = ["S1 Exit 9A-3 boundary drifted: " + clause
+              for clause in clauses if clause not in flat]
+    for target in (
+        "../current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel",
+        "#bounded-exit-9a-1-acceptance-under-d-p9-006",
+        "#s1-reference-comparison-criteria-under-d-p9-007",
+    ):
+        if target not in section:
+            errors.append("S1 Exit 9A-3 owner link drifted: " + target)
+    duties = (
+        ("Source and use basis", (
+            "All 119 lineage records stay derived and reference-only",
+            "D-P9-004 private-use conditions",
+        )),
+        ("Units, scale and frame", (
+            "Source decimal values and unit conversions stay exact",
+            "chair frame and its five datums stay explicit",
+            "model scale is 1:76.2", "A0 rail already uses model mm",
+            "source-coordinate calibration, not physical measurement "
+            "calibration",
+        )),
+        ("Components and landmarks", (
+            "base-plinth, rail-seat, inner-jaw, key and outer-jaw",
+            "declared datums and source landmarks",
+            "Fastenings and plug/socket components stay outside the scope",
+        )),
+        ("Parameters and findings", (
+            "113 source quantities keep their derivations and unresolved "
+            "physical measurement uncertainty",
+            "A null uncertainty is not zero uncertainty",
+            "No value becomes a measured physical dimension or an "
+            "independently evidenced prototype fact",
+        )),
+        ("Procedural construction", (
+            "chair_research.prepare_chair_assembly_research",
+            "existing model and rail research paths",
+            "Native validation, save/reopen and the nine FreeCAD views "
+            "remain the evidence",
+        )),
+        ("Residual comparison", (
+            "unchanged 13 D-P9-007 criteria apply only to this exact frozen "
+            "assisted S1 pilot",
+            "Complete finite face and section correspondence remains "
+            "its reference comparison",
+            "no measured whole-surface distribution or independently "
+            "derived absolute base/seat overlap magnitude",
+        )),
+        ("Operator approval", (
+            "current D-P9-009 owner instruction accepts this bounded "
+            "assisted S1 pilot",
+            "Earlier decisions and the earlier approval of reference views "
+            "keep their historical limits",
+            "This external decision leaves package metadata unchanged",
+        )),
+    )
+    rows = [_table_cells(line) for line in section.splitlines()
+            if line.startswith("|")]
+    if (len(rows) != 9 or any(len(row) != 2 for row in rows)
+            or [row[0] for row in rows[2:]] != [name for name, _ in duties]):
+        errors.append("S1 Exit 9A-3 duty inventory or order drifted")
+        return errors
+    for row, (name, required) in zip(rows[2:], duties):
+        content = " ".join(row[1].replace("`", "").split())
+        errors.extend("S1 Exit 9A-3 duty drifted: " + name + ": " + clause
+                      for clause in required if clause not in content)
+    return errors
+
+
 def validate_plan(
     text,
     manifest,
@@ -516,6 +621,7 @@ def validate_plan(
         + _exit1_acceptance_errors(text)
         + _reference_criteria_errors(text)
         + _exit2_acceptance_errors(text)
+        + _exit3_acceptance_errors(text)
     )
     for marker in REQUIRED_MARKERS:
         if marker not in text:
@@ -918,6 +1024,39 @@ def main():
     if not _exit2_acceptance_errors(relocated):
         raise AssertionError("Relocated Exit 9A-2 acceptance escaped")
     print("S1_EXIT2_ACCEPTANCE_MUTATIONS=10")
+
+    exit3_section = direct_section_content(
+        text, "Bounded Exit 9A-3 acceptance under D-P9-009",
+    )
+    for before, after in (
+        ("only the frozen reference-only assisted S1 pilot", "every S1 pilot"),
+        ("same neutral `ChairDefinition`", "a separate geometry system"),
+        ("All 119 lineage records stay derived",
+         "All records are independent"),
+        ("not physical measurement calibration",
+         "physical measurement calibration"),
+        ("`inner-jaw`", "`replacement-jaw`"),
+        ("Fastenings and plug/socket components stay outside the scope",
+         "Fastenings and plug/socket components are accepted"),
+        ("A null uncertainty is not zero uncertainty", "Null means zero"),
+        ("unchanged 13 D-P9-007 criteria", "new numerical criteria"),
+        ("leaves package metadata unchanged", "promotes package metadata"),
+        ("No new numerical tolerance follows", "New tolerances follow"),
+        ("Phase 9A is not closed", "Phase 9A is closed"),
+        ("Phase 9B stays Not started", "Phase 9B is Open"),
+        ("Do not merge or close Phase 9A", "Merge and close Phase 9A"),
+        ("#phase-9a-exit-3-acceptance-panel", "#unreviewed-pilot"),
+    ):
+        assert before in exit3_section, before
+        changed = exit3_section.replace(before, after, 1)
+        if not _exit3_acceptance_errors(
+                text.replace(exit3_section, changed, 1)):
+            raise AssertionError("Exit 9A-3 mutation escaped: " + before)
+    relocated = text.replace(exit3_section, "\n\nNo acceptance.\n", 1)
+    relocated += "\n## Unrelated retained material\n" + exit3_section
+    if not _exit3_acceptance_errors(relocated):
+        raise AssertionError("Relocated Exit 9A-3 acceptance escaped")
+    print("S1_EXIT3_ACCEPTANCE_MUTATIONS=15")
 
     weakened_oracle = copy.deepcopy(oracle)
     weakened_oracle["acceptance_gate"]["canonical_production_input"] = True

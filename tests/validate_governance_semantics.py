@@ -2105,9 +2105,9 @@ def validate_phase8_closeout_mutations() -> None:
     for name, before, after, diagnostic in (
         (
             "phase9a-reclosed",
-            "Phase 9A is Open at 3/4",
-            "Phase 9A is Not started at 3/4",
-            "Phase 9 split status drifted: Phase 9A is Open at 3/4",
+            "Phase 9A is Open at 4/4",
+            "Phase 9A is Not started at 4/4",
+            "Phase 9 split status drifted: Phase 9A is Open at 4/4",
         ),
         (
             "phase9b-opened",
@@ -4407,7 +4407,8 @@ def validate_phase9_split_mutations() -> None:
     evidence_row = table_row_containing(evidence, "| 9A-3 |")
     admitted = replace_once(
         evidence, evidence_row,
-        replace_once(evidence_row, "| Pending |", "| Evidenced |"),
+        replace_once(evidence_row, progress.PHASE9A_EXIT3_STATUS,
+                     "Evidenced"),
     )
     expect_rejected(
         "phase9/exit-evidence-self-admitted",
@@ -4419,12 +4420,12 @@ def validate_phase9_split_mutations() -> None:
     )
     premature_count = replace_once(
         plan, phase9a,
-        replace_once(phase9a, "3/4 evidenced", "4/4 evidenced"),
+        replace_once(phase9a, "4/4 evidenced", "5/4 evidenced"),
     )
     expect_rejected(
         "phase9/phase9a-exit-count-prematurely-accepted",
         lambda: progress._validate_plan_shape(premature_count),
-        "Phase 9A must stay Open at three evidenced exits",
+        "Phase 9A must stay Open at four evidenced exits",
     )
 
     decision = json.loads(read("reference/current/gate-decisions.json"))
@@ -4710,22 +4711,24 @@ def validate_phase9_exit4_admission_mutations() -> None:
     phase9a = table_row_containing(plan, "| 9A | S1 and procedural chair")
     stale_count = replace_once(
         plan, phase9a,
-        replace_once(phase9a, "3/4 evidenced", "0/4 evidenced"),
+        replace_once(phase9a, "4/4 evidenced", "0/4 evidenced"),
     )
     expect_rejected(
         "phase9-exit4/stale-zero-count",
         lambda: progress._validate_plan_shape(stale_count),
-        "Phase 9A must stay Open at three evidenced exits",
+        "Phase 9A must stay Open at four evidenced exits",
     )
     accepted_row = table_row_containing(evidence, "| 9A-4 |")
-    pending_row = table_row_containing(evidence, "| 9A-3 |")
+    other_accepted_row = table_row_containing(evidence, "| 9A-3 |")
     wrong_exit = replace_once(
         replace_once(
             evidence, accepted_row,
-            accepted_row.replace(progress.PHASE9A_EXIT4_STATUS, "Pending"),
+            accepted_row.replace(progress.PHASE9A_EXIT4_STATUS,
+                                 progress.PHASE9A_EXIT3_STATUS),
         ),
-        pending_row,
-        pending_row.replace("| Pending |", "| Evidenced |"),
+        other_accepted_row,
+        other_accepted_row.replace(progress.PHASE9A_EXIT3_STATUS,
+                                   progress.PHASE9A_EXIT4_STATUS),
     )
     expect_rejected(
         "phase9-exit4/wrong-exit-same-count",
@@ -4804,6 +4807,172 @@ def validate_phase9_exit4_admission_mutations() -> None:
             lambda value=changed: progress._validate_dp9_004_admission(value),
             "D-P9-004 " + diagnostic + " drifted",
         )
+
+
+def validate_phase9_exit3_admission_mutations() -> None:
+    """Reject pilot widening, implicit closeout and altered comparisons."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    admission = document["decisions"][10]
+    phase6 = {
+        record["id"]: record
+        for record in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    missing = copy.deepcopy(document)
+    missing["decisions"].pop(10)
+    expect_rejected(
+        "phase9-exit3/decision-removed",
+        lambda: progress._validate_phase9_decision_holding(missing, phase6),
+        "Phase 9A and host decision chain incomplete or widened",
+    )
+    for field, value, diagnostic in (
+        ("authority", "Agent approval.", "exact owner authority"),
+        ("status", "Pending", "identity, status or panel routing"),
+        ("panel_record", progress.DP9_008_PANEL,
+         "identity, status or panel routing"),
+    ):
+        changed = copy.deepcopy(admission)
+        changed[field] = value
+        expect_rejected(
+            "phase9-exit3/record-" + field,
+            lambda value=changed: progress._validate_dp9_009_decision(
+                value, set(admission),
+            ),
+            "D-P9-009 " + diagnostic + " drifted",
+        )
+    for name, field, before, after in (
+        ("wider-pilot", "decision", "frozen reference-only assisted S1 pilot",
+         "every S1 pilot"),
+        ("different-generator", "decision", "same ChairDefinition",
+         "replacement ChairDefinition"),
+        ("new-criteria", "decision", "unchanged thirteen D-P9-007 criteria",
+         "new numerical criteria"),
+        ("phase-closed", "decision", "Phase 9A is not closed",
+         "Phase 9A is closed"),
+        ("phase9b-opened", "decision", "Not started at 0/6", "Open at 0/6"),
+        ("findings-resolved", "exclusions", "unresolved physical",
+         "resolved physical"),
+        ("lineage-promoted", "exclusions", "stay derived and reference-only",
+         "become independent prototype evidence"),
+        ("metadata-promoted", "exclusions", "acceptance: not-accepted",
+         "acceptance: accepted"),
+        ("history-rewritten", "exclusions", "keep their historical meaning",
+         "are rewritten"),
+        ("physical-fit", "exclusions", "physical fit, preload, retention, ",
+         ""),
+        ("scan-accepted", "exclusions", "stays outside the RC",
+         "enters the RC"),
+        ("merge-close-authorised", "exclusions", "Do not merge or close",
+         "Merge and close"),
+    ):
+        changed = copy.deepcopy(admission)
+        changed[field] = replace_once(changed[field], before, after)
+        expect_rejected(
+            "phase9-exit3/record-" + name,
+            lambda value=changed: progress._validate_dp9_009_decision(
+                value, set(admission),
+            ),
+            "D-P9-009 " + field + " boundary drifted",
+        )
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    panel = progress._section(evidence, progress.DP9_009_HEADING)
+    for index, identity in enumerate(progress.DP9_009_IDENTITIES):
+        if index < 4:
+            changed = copy.deepcopy(admission)
+            changed["decision"] = replace_once(
+                changed["decision"], identity, "unreviewed-identity",
+            )
+            expect_rejected(
+                "phase9-exit3/record-identity-" + str(index),
+                lambda value=changed: progress._validate_dp9_009_decision(
+                    value, set(admission),
+                ),
+                "D-P9-009 decision identity drifted",
+            )
+        changed = replace_once(evidence, panel,
+                               replace_once(panel, identity, "unreviewed"))
+        expect_rejected(
+            "phase9-exit3/panel-identity-" + str(index),
+            lambda value=changed: progress._validate_dp9_009_admission(value),
+            "D-P9-009 evidence identity drifted",
+        )
+    for name, before, after in (
+        ("phase-closed", "Phase 9A is not closed", "Phase 9A is closed"),
+        ("broader-pilot", "only to this exact frozen assisted S1 pilot",
+         "to all S1 pilots"),
+        ("metadata-promoted", "acceptance: not-accepted",
+         "acceptance: accepted"),
+        ("claims-expanded", "claims no measured", "claims measured"),
+    ):
+        changed = replace_once(evidence, panel,
+                               replace_once(panel, before, after))
+        expect_rejected(
+            "phase9-exit3/panel-" + name,
+            lambda value=changed: progress._validate_dp9_009_admission(value),
+            "D-P9-009 panel boundary drifted",
+        )
+    relocated = replace_once(evidence, panel, "\nNo acceptance.\n")
+    relocated += "\n## Unrelated material\n" + panel
+    expect_rejected(
+        "phase9-exit3/panel-relocated",
+        lambda: progress._validate_dp9_009_admission(relocated),
+        "D-P9-009 exact panel authority drifted or was relocated",
+    )
+    plan = read("reference/PROJECT_PLAN.md")
+    row = table_row_containing(evidence, "| 9A-3 |")
+    stale = replace_once(evidence, row,
+                         replace_once(row, progress.PHASE9A_EXIT3_STATUS,
+                                      "Pending"))
+    expect_rejected(
+        "phase9-exit3/accepted-exit-reverted",
+        lambda: progress._validate_phase9_exit_allocation(plan, stale),
+        "Phase 9A evidence criteria or accepted-exit status drifted",
+    )
+    row = table_row_containing(plan, "| 9A | S1 and procedural chair")
+    closed = replace_once(plan, row, replace_once(row, "Open", "Complete"))
+    expect_rejected(
+        "phase9-exit3/four-exits-imply-closeout",
+        lambda: progress._validate_plan_shape(closed),
+        "Only Phase 9A may be open",
+    )
+    validation = read("reference/VALIDATION.md")
+    paragraph = paragraph_containing(
+        validation, "accepts only the [frozen assisted S1 pilot]",
+    )
+    for name, before, after in (
+        ("wider-pilot", "only to that exact frozen assisted S1 pilot",
+         "to all S1 pilots"),
+        ("new-numerics", "unchanged 13 D-P9-007", "new 13 pilot"),
+        ("physical-calibration", "does not establish physical",
+         "establishes physical"),
+        ("duties-waived", "changes no numerical limit",
+         "changes numerical limits"),
+    ):
+        changed = replace_once(validation, paragraph,
+                               replace_once(paragraph, before, after))
+        expect_rejected(
+            "phase9-exit3/validation-" + name,
+            lambda value=changed: progress._validate_dp9_009_validation(value),
+            "D-P9-009 validation applicability drifted or was relocated",
+        )
+    changed = replace_once(validation, paragraph,
+                           replace_once(paragraph,
+                                        "#bounded-exit-9a-3-acceptance-"
+                                        "under-d-p9-009",
+                                        "#unreviewed-pilot"))
+    expect_rejected(
+        "phase9-exit3/validation-owner-link",
+        lambda: progress._validate_dp9_009_validation(changed),
+        "D-P9-009 validation owner links drifted",
+    )
+    relocated = replace_once(validation, paragraph, "No pilot acceptance.")
+    relocated += "\n## Unrelated material\n" + paragraph
+    expect_rejected(
+        "phase9-exit3/validation-relocated",
+        lambda: progress._validate_dp9_009_validation(relocated),
+        "D-P9-009 validation applicability drifted or was relocated",
+    )
 
 
 def validate_phase9_exit2_admission_mutations() -> None:
@@ -5066,7 +5235,7 @@ def validate_phase9_exit1_admission_mutations() -> None:
     evidence = read("reference/current/PHASE_EVIDENCE.md")
     for exit_id, before in (
         ("9A-2", "| " + progress.PHASE9A_EXIT2_STATUS + " |"),
-        ("9A-3", "| Pending |"),
+        ("9A-3", "| " + progress.PHASE9A_EXIT3_STATUS + " |"),
     ):
         row = table_row_containing(evidence, "| " + exit_id + " |")
         changed = replace_once(
@@ -5856,9 +6025,9 @@ def validate_documentation_profile_mutations() -> None:
     closeout_cases = (
         (
             "source-gate-changed", "**What changed**",
-            "9576614daf6cc69a04d214e824ec32cc7bbe5251",
+            "D-P9-004",
             "unreviewed-source",
-            "9576614daf6cc69a04d214e824ec32cc7bbe5251",
+            "D-P9-004",
         ),
         (
             "monthly-restore-pass-erased", "**Limitations/findings**",
@@ -8025,6 +8194,7 @@ def main() -> None:
     validate_phase9_exit1_admission_mutations()
     validate_phase9_reference_criteria_mutations()
     validate_phase9_exit2_admission_mutations()
+    validate_phase9_exit3_admission_mutations()
     validate_phase9_evidence_model_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()

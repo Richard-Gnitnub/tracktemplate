@@ -15,7 +15,7 @@
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md", "sha256": "4bb08f425b8ca82083c6752b2742f02ec59e0bc6b4347a322ca92c61f03bd74d"},
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE5_GATE_DECISIONS.json", "sha256": "ff605d61c70ebad4ecd619a01342130f558f0f040369a1db4e1b627d251617a8"},
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE5_RISKS.json", "sha256": "dfae04618e8338f68af6fda967cc0c525c280cd6ed1c9d089c23845b4b87ad5b"},
-    {"category": "phase-foundation", "path": "reference/phase-evidence/S1_PILOT_PLAN.md", "sha256": "31d3562f1b13ae844e3e9823e8aefad245f2d49e58d06c46538399534fcb89f0"},
+    {"category": "phase-foundation", "path": "reference/phase-evidence/S1_PILOT_PLAN.md", "sha256": "e3ed9481bbbbb98478ec3d51cff5c72ded194c416709a8225985999b86267000"},
     {"category": "audit", "path": "reference/QUALITY_ASSURANCE.md", "sha256": "c6a67b15704ce4bc9eb072615043524748e8922dbff724a9f3488011820139f6"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-01.md", "sha256": "099901d286ee7791618fee48a4390090537293e57c15f9d0972bc6750ffdf99c"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md", "sha256": "84dfa419bd608b524027cd78199bf0d9384b8b7a81ba83d687a53d88069a867b"},
