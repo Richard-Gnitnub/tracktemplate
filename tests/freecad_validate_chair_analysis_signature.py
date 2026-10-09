@@ -181,7 +181,10 @@ class _GuiProof:
         self.qt.QApplication.processEvents()
         text = str(self.panel.status.text())
         assert (self.module.CHAIR_STATUS_STALE in text) is stale, text
-        assert self.panel.generate_button.isEnabled() is not stale
+        assert self.panel.support_button.isEnabled() is not stale
+        # This proof does not prepare the validated 2D layout that B15
+        # requires before it enables 3D generation.
+        assert not self.panel.generate_button.isEnabled()
         assert "Production ready: No" in text
         panel_path = self.run_directory / (label + "-panel.png")
         assert self.panel.grab().save(str(panel_path), "PNG")
@@ -198,6 +201,7 @@ class _GuiProof:
             images[path.name] = _sha256(path)
         self.records[label] = {
             "status_text": text,
+            "support_preparation_enabled": self.panel.support_button.isEnabled(),
             "generation_enabled": self.panel.generate_button.isEnabled(),
             "display": _display(
                 self.module, self.document, self.kind, self.entity_id,
