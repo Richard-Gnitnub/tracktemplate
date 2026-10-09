@@ -588,9 +588,9 @@ def validate_documentation_profile(
         all(fragment in " ".join(owner_view.split()) for fragment in (
             "Phase 8 is closed at 4/4 under",
             "D-P8-006",
-            "Phase 9A is Open at 2/4",
-            "Exits 9A-1 and 9A-4 are Evidenced and owner-accepted",
-            "Exits 9A-2 and 9A-3 stay Pending",
+            "Phase 9A is Open at 3/4",
+            "Exits 9A-1, 9A-2 and 9A-4 are Evidenced and owner-accepted",
+            "Exit 9A-3 stays Pending",
             "Phase 9B is Not started at 0/6",
             "D-P6-008 stays Deferred — unmet",
             "TERM-R04 stays open",
@@ -602,9 +602,8 @@ def validate_documentation_profile(
             "This decision adds no product behaviour",
             "This decision selects no product implementation",
             "D-P9-007",
-            "accepts comparison criteria only for the exact frozen S1 "
-            "reference",
-            "Exit 9A-2 stays Pending until separate owner acceptance",
+            "D-P9-008",
+            "accepts only Exit 9A-2 for the frozen S1 reference-only scope",
             "D-GOV-023",
             "representative-fixture",
             "straight TO Edit",
@@ -624,7 +623,7 @@ def validate_documentation_profile(
             "legacy-retirement condition",
             "No performance, production-output or release acceptance",
             "The new host has no Phase 6 performance authority",
-            "Keep Phase 9B Not started",
+            "Keep Exit 9A-3 Pending and Phase 9B Not started",
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )

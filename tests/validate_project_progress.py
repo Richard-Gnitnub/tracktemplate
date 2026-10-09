@@ -180,7 +180,27 @@ DP9_007_IDENTITIES = (
     "7d5a08b269b52e6ebbc26453853ce308343ccd54636454d589add2e1397cc2d6",
     "9d3def6445bc0181ad971639110927c380a8b15d162e00d69ac5f017c6f98f18",
 )
+EXPECTED_DP9_008_AUTHORITY = (
+    "As project owner, I accept Phase 9A Exit 9A-2 for the frozen S1 "
+    "reference-only scope under D-P9-007.\n\n"
+    "Complete the required Level 3 repository alignment and publish the "
+    "exact-green draft PR.\n\n"
+    "Preserve all existing acceptance boundaries. Do not merge."
+)
+DP9_008_PANEL = (
+    "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-2-acceptance-panel"
+)
+DP9_008_HEADING = (
+    "D-P9-008 Phase 9A Exit 2 acceptance panel — 2026-10-09"
+)
+DP9_008_IDENTITIES = (
+    "2a121632f27055434666c01dbd55e7b8f791ecbc",
+    *DP9_006_IDENTITIES[1:],
+    DP9_007_IDENTITIES[2],
+    "1c6f650a04c87940cd60f3b8be1ffac4d6619d669404f23bf97e26bdaefb5963",
+)
 PHASE9A_EXIT1_STATUS = "Evidenced — owner-accepted 2026-10-08"
+PHASE9A_EXIT2_STATUS = "Evidenced — owner-accepted 2026-10-09"
 PHASE9A_EXIT4_STATUS = "Evidenced — owner-accepted 2026-10-07"
 EXPECTED_PHASE7_EXIT_CONDITIONS = (
     "Core layouts can be created, edited, saved, reopened, validated, and "
@@ -1207,9 +1227,9 @@ def _validate_owner_view(plan: str) -> None:
     for fragment in (
         "Phase 8 is closed at 4/4 under",
         "D-P8-006",
-        "Phase 9A is Open at 2/4",
-        "Exits 9A-1 and 9A-4 are Evidenced and owner-accepted",
-        "Exits 9A-2 and 9A-3 stay Pending",
+        "Phase 9A is Open at 3/4",
+        "Exits 9A-1, 9A-2 and 9A-4 are Evidenced and owner-accepted",
+        "Exit 9A-3 stays Pending",
         "Phase 9B is Not started at 0/6",
         "D-P6-008 stays Deferred — unmet",
         "TERM-R04 stays open",
@@ -1221,8 +1241,8 @@ def _validate_owner_view(plan: str) -> None:
         "This decision adds no product behaviour",
         "This decision selects no product implementation",
         "D-P9-007",
-        "accepts comparison criteria only for the exact frozen S1 reference",
-        "Exit 9A-2 stays Pending until separate owner acceptance",
+        "D-P9-008",
+        "accepts only Exit 9A-2 for the frozen S1 reference-only scope",
         "D-GOV-023",
         "representative-fixture",
         "straight TO Edit",
@@ -1241,7 +1261,7 @@ def _validate_owner_view(plan: str) -> None:
         "every comparison, adapter, caller, removal and legacy-retirement condition",
         "No performance, production-output or release acceptance",
         "The new host has no Phase 6 performance authority",
-        "Keep Phase 9B Not started",
+        "Keep Exit 9A-3 Pending and Phase 9B Not started",
     ):
         _require(
             fragment in owner_view,
@@ -1407,8 +1427,8 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         "Phase 8 must be closed at four evidenced exits",
     )
     _require(
-        rows["9A"]["count"] == 2 and rows["9A"]["state"] == "Open",
-        "Phase 9A must stay Open at two evidenced exits",
+        rows["9A"]["count"] == 3 and rows["9A"]["state"] == "Open",
+        "Phase 9A must stay Open at three evidenced exits",
     )
     for phase in ("9B", 10, 11):
         _require(
@@ -1422,7 +1442,7 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
     )
     _require(
         "Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open "
-        "at 2/4 under D-P9-006. Exits 9A-2 and 9A-3 stay Pending. "
+        "at 3/4 under D-P9-008. Exit 9A-3 stays Pending. "
         "Phase 9B is Not started at 0/6"
         in _semantic_text(preamble),
         "project-plan Phase 8 closeout or Phase 9 holding status drifted",
@@ -1431,7 +1451,7 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
 
 
 def _validate_phase9_exit_allocation(plan: str, evidence: str) -> None:
-    """Bind unchanged criteria and the two separately accepted exits."""
+    """Bind unchanged criteria and the three separately accepted exits."""
     section = _section(plan, "Phase 9A and 9B exit conditions")
     table_lines = [
         line for line in section.splitlines() if line.startswith("| ")
@@ -1493,6 +1513,7 @@ def _validate_phase9_exit_allocation(plan: str, evidence: str) -> None:
                 exit_id,
                 {
                     "9A-1": PHASE9A_EXIT1_STATUS,
+                    "9A-2": PHASE9A_EXIT2_STATUS,
                     "9A-4": PHASE9A_EXIT4_STATUS,
                 }.get(exit_id, "Pending"),
                 criterion,
@@ -5391,7 +5412,7 @@ def _validate_phase9_decision_holding(
         == {"schema_version", "current_phase", "updated_on", "decisions"}
         and document["schema_version"] == 1
         and document["current_phase"] == 9
-        and document["updated_on"] == "2026-10-08",
+        and document["updated_on"] == "2026-10-09",
         "current decision register date drifted",
     )
     records = document["decisions"]
@@ -5402,7 +5423,7 @@ def _validate_phase9_decision_holding(
         "Phase 9 split must carry unchanged D-P6-008 first",
     )
     _require(
-        len(records) == 9,
+        len(records) == 10,
         "Phase 9A and host decision chain incomplete or widened",
     )
     split = records[1]
@@ -5684,6 +5705,148 @@ def _validate_phase9_decision_holding(
 
     _validate_dp9_006_decision(records[7], set(split))
     _validate_dp9_007_decision(records[8], set(split))
+    _validate_dp9_008_decision(records[9], set(split))
+
+
+def _validate_dp9_008_decision(
+    admission: dict[str, object], fields: set[str],
+) -> None:
+    """Bind Exit 9A-2 admission to the owner's frozen research scope."""
+    _require(
+        isinstance(admission, dict)
+        and set(admission) == fields
+        and admission["id"] == "D-P9-008"
+        and admission["decided_on"] == "2026-10-09"
+        and admission["status"] == "Accepted"
+        and admission["evidence"] == DP9_008_PANEL
+        and admission["panel_record"] == DP9_008_PANEL
+        and admission["panel_required_under_current_policy"] is True,
+        "D-P9-008 identity, status or panel routing drifted",
+    )
+    _require(
+        admission["authority"] == EXPECTED_DP9_008_AUTHORITY,
+        "D-P9-008 exact owner authority drifted",
+    )
+
+    for identity in DP9_008_IDENTITIES[:4]:
+        _require(
+            identity in str(admission["decision"]),
+            "D-P9-008 decision identity drifted",
+        )
+    for field, clauses in (
+        ("decision", (
+            "Accept only Phase 9A Exit 9A-2 for the exact frozen "
+            "five-component S1 reference under the thirteen criteria "
+            "accepted by D-P9-007",
+            "Phase 9A is Open at 3/4",
+            "Exits 9A-1, 9A-2 and 9A-4 are Evidenced and owner-accepted",
+            "Exit 9A-3 stays Pending",
+            "Phase 9B stays Not started at 0/6",
+        )),
+        ("exclusions", (
+            "Preserve the D-P9-007 criteria and numerical limits",
+            "Complete finite face and section correspondence remains "
+            "the accepted comparison",
+            "Its absolute common volume stays a native observation",
+            "No measured whole-surface distribution or independently "
+            "derived absolute base/seat overlap magnitude is claimed",
+            "Preserve product geometry, numerical implementation, frozen "
+            "package bytes, historical package metadata, source lineage "
+            "and the 113-entry register",
+            "The package retains acceptance: not-accepted and "
+            "validation: not-run",
+            "This external decision accepts the identified evidence for "
+            "Exit 9A-2 only",
+            "D-P9-006 and D-P9-007 keep their historical meaning",
+            "No assisted S1 pilot, independent prototype dimension, "
+            "physical fit, preload, retention, manufacturing capability, "
+            "production package, output or rights claim is accepted",
+            "D-P9-004 private-use conditions and D-P9-005 production "
+            "duties stay",
+            "All 24 risk states, owners, deadlines and controls stay "
+            "unchanged",
+            "Keep all L1 repair limits, D-P6-008 Deferred — unmet, "
+            "TERM-R04 open and all legacy-retirement conditions",
+            "Output stays private-development and project status stays "
+            "unknown",
+            "Publish one draft PR with a PASS result from CI for its "
+            "exact head. Do not merge",
+            "No product implementation, Phase 9A closeout or Phase 9B "
+            "work is authorised",
+        )),
+    ):
+        value = admission[field]
+        _require(
+            isinstance(value, str)
+            and all(clause in _semantic_text(value) for clause in clauses),
+            "D-P9-008 " + field + " boundary drifted",
+        )
+
+
+def _validate_dp9_008_admission(evidence: str) -> None:
+    """Require the exact decision and retained evidence in their panel."""
+    anchor = '<a id="phase-9a-exit-2-acceptance-panel"></a>'
+    _require(evidence.count(anchor) == 1, "D-P9-008 panel anchor drifted")
+    panel = _section(evidence, DP9_008_HEADING)
+    _require(
+        "\n\n".join(_blockquote_paragraphs(panel))
+        == EXPECTED_DP9_008_AUTHORITY,
+        "D-P9-008 exact panel authority drifted or was relocated",
+    )
+    for identity in DP9_008_IDENTITIES:
+        _require(identity in panel, "D-P9-008 evidence identity drifted")
+    for link in (
+        "#phase-9a-reference-comparison-criteria-panel",
+        "../phase-evidence/S1_PILOT_PLAN.md"
+        "#s1-reference-comparison-criteria-under-d-p9-007",
+    ):
+        _require(
+            any(target == link for _label, target in
+                MARKDOWN_LINK_RE.findall(panel)),
+            "D-P9-008 canonical owner link drifted",
+        )
+
+    flat = _semantic_text(panel)
+    for clause in (
+        "Richard accepts only Exit 9A-2 for the exact frozen "
+        "five-component S1 reference under D-P9-007",
+        "The four exit criteria stay unchanged",
+        "Phase 9A is Open at 3/4",
+        "Exit 9A-3 stays Pending",
+        "Phase 9B stays Not started at 0/6",
+        "Standalone and qualified FreeCAD tests give PASS results for "
+        "package load, round-trip and rejection of corrupt or unsupported "
+        "packages",
+        "Prototype geometry, model rail-fit policy and manufacturing "
+        "compensation stay separate",
+        "This decision adds no geometry, numerical limit or product "
+        "behaviour",
+        "Proceed with bounded conditions",
+        "This decision closes no risk",
+        "This is not external independence",
+        "Its absolute common volume stays a native observation",
+        "This decision claims no measured whole-surface distribution or "
+        "independently derived absolute base/seat overlap magnitude",
+        "Product geometry, numerical implementation, package bytes, "
+        "historical package metadata, source lineage and the 113-entry "
+        "register stay unchanged",
+        "D-P9-006 and D-P9-007 keep their historical meaning",
+        "The package retains acceptance: not-accepted and validation: not-run",
+        "This external decision accepts the identified evidence for "
+        "Exit 9A-2 only",
+        "No assisted S1 pilot, independent prototype dimension, physical "
+        "fit, preload, retention, manufacturing capability, production "
+        "package, output or rights claim is accepted",
+        "D-P9-004 private-use conditions and D-P9-005 production duties stay",
+        "All L1 repair limits, D-P6-008, TERM-R04 and legacy-retirement "
+        "conditions stay",
+        "Output stays private-development and project status stays unknown",
+        "Publish one draft PR with a PASS result from CI for its exact "
+        "head. Do not merge",
+        "This decision selects no product implementation, Phase 9A "
+        "closeout or Phase 9B work",
+    ):
+        _require(clause in flat, "D-P9-008 panel boundary drifted: " + clause)
 
 
 def _validate_dp9_007_decision(
@@ -6749,8 +6912,8 @@ def _validate_phase9_holding(evidence: str) -> None:
         level=1,
     ))
     for clause in (
-        "Phase 9A is Open at 2/4 under D-P9-006",
-        "Exits 9A-2 and 9A-3 stay Pending",
+        "Phase 9A is Open at 3/4 under D-P9-008",
+        "Exit 9A-3 stays Pending",
         "Phase 9B is Not started at 0/6",
         "This record gives no product acceptance",
         "D-P8-006",
@@ -7569,7 +7732,7 @@ def _validate_decisions(plan: str) -> None:
         | EXPECTED_PHASE6_DECISION_IDS
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
-           "D-P9-005", "D-P9-006", "D-P9-007", "D-GOV-023"},
+           "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-GOV-023"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -9331,6 +9494,7 @@ def main() -> None:
     _validate_dp9_005_evidence_model(phase9_holding)
     _validate_dp9_006_admission(phase9_holding)
     _validate_dp9_007_criteria(phase9_holding)
+    _validate_dp9_008_admission(phase9_holding)
     _validate_dp9_007_validation(_read(VALIDATION_PATH))
     _validate_dgov023_qualification(phase9_holding)
     _validate_ste_lifecycle_panel(current_evidence)
