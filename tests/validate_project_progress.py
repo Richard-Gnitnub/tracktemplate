@@ -5737,7 +5737,7 @@ def _validate_dp9_008_decision(
         ("decision", (
             "Accept only Phase 9A Exit 9A-2 for the exact frozen "
             "five-component S1 reference under the thirteen criteria "
-            "accepted by D-P9-007",
+            "that D-P9-007 accepts",
             "Phase 9A is Open at 3/4",
             "Exits 9A-1, 9A-2 and 9A-4 are Evidenced and owner-accepted",
             "Exit 9A-3 stays Pending",
@@ -5745,22 +5745,23 @@ def _validate_dp9_008_decision(
         )),
         ("exclusions", (
             "Preserve the D-P9-007 criteria and numerical limits",
-            "Complete finite face and section correspondence remains "
+            "Complete finite face and section correspondence stays "
             "the accepted comparison",
             "Its absolute common volume stays a native observation",
-            "No measured whole-surface distribution or independently "
-            "derived absolute base/seat overlap magnitude is claimed",
+            "This decision claims no measured whole-surface distribution "
+            "or independently derived absolute base/seat overlap magnitude",
             "Preserve product geometry, numerical implementation, frozen "
             "package bytes, historical package metadata, source lineage "
             "and the 113-entry register",
-            "The package retains acceptance: not-accepted and "
+            "The package keeps acceptance: not-accepted and "
             "validation: not-run",
             "This external decision accepts the identified evidence for "
             "Exit 9A-2 only",
             "D-P9-006 and D-P9-007 keep their historical meaning",
-            "No assisted S1 pilot, independent prototype dimension, "
-            "physical fit, preload, retention, manufacturing capability, "
-            "production package, output or rights claim is accepted",
+            "This decision accepts no assisted S1 pilot, independent "
+            "prototype dimension, physical fit, preload, retention, "
+            "manufacturing capability, production package, output or "
+            "rights claim",
             "D-P9-004 private-use conditions and D-P9-005 production "
             "duties stay",
             "All 24 risk states, owners, deadlines and controls stay "
@@ -5771,8 +5772,8 @@ def _validate_dp9_008_decision(
             "unknown",
             "Publish one draft PR with a PASS result from CI for its "
             "exact head. Do not merge",
-            "No product implementation, Phase 9A closeout or Phase 9B "
-            "work is authorised",
+            "This decision authorises no product implementation, Phase 9A "
+            "closeout or Phase 9B work",
         )),
     ):
         value = admission[field]
@@ -5817,8 +5818,8 @@ def _validate_dp9_008_admission(evidence: str) -> None:
         "Standalone and qualified FreeCAD tests give PASS results for "
         "package load, round-trip and rejection of corrupt or unsupported "
         "packages",
-        "Prototype geometry, model rail-fit policy and manufacturing "
-        "compensation stay separate",
+        "The tests preserve the separation of prototype geometry, model "
+        "rail-fit policy and manufacturing compensation",
         "This decision adds no geometry, numerical limit or product "
         "behaviour",
         "Proceed with bounded conditions",
@@ -5831,12 +5832,12 @@ def _validate_dp9_008_admission(evidence: str) -> None:
         "historical package metadata, source lineage and the 113-entry "
         "register stay unchanged",
         "D-P9-006 and D-P9-007 keep their historical meaning",
-        "The package retains acceptance: not-accepted and validation: not-run",
+        "The package keeps acceptance: not-accepted and validation: not-run",
         "This external decision accepts the identified evidence for "
         "Exit 9A-2 only",
-        "No assisted S1 pilot, independent prototype dimension, physical "
-        "fit, preload, retention, manufacturing capability, production "
-        "package, output or rights claim is accepted",
+        "This decision accepts no assisted S1 pilot, independent prototype "
+        "dimension, physical fit, preload, retention, manufacturing "
+        "capability, production package, output or rights claim",
         "D-P9-004 private-use conditions and D-P9-005 production duties stay",
         "All L1 repair limits, D-P6-008, TERM-R04 and legacy-retirement "
         "conditions stay",

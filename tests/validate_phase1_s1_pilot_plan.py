@@ -486,7 +486,7 @@ def _exit2_acceptance_errors(text):
         "Exit 9A-3 stays Pending",
         "Phase 9B stays Not started at 0/6",
         "The D-P9-007 section records criteria-only acceptance at its date",
-        "D-P9-008 supplies the separate Exit 9A-2 acceptance",
+        "D-P9-008 gives acceptance for Exit 9A-2",
         "It changes no geometry, package bytes, historical metadata or "
         "entry in the 113-entry register",
         "It accepts no assisted S1 pilot, physical fit, manufacturing "
