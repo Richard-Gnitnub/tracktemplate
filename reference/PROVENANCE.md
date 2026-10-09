@@ -179,7 +179,7 @@ code and does not alter either macro.
 
 ## Phase 9A research-input provenance
 
-[D-P9-003](current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel) changes
+[D-P9-003](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-research-sequencing-panel) changes
 when independent production evidence is necessary. It does not change the
 source snapshot, its classifications or any rights finding above.
 The [licensing boundary](LICENSING_BOUNDARIES.md#phase-9a-reference-only-research)
@@ -204,7 +204,7 @@ The C&L/EMGS/S4Soc Code 75 reference profile does not prove the dimensions of
 the owner's C&L Code 75 HiNi stock. Prototype geometry and inclination stay
 separate from the deliberate vertical model fit and manufacturing compensation.
 
-[D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel) removes
+[D-P9-005](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel) removes
 exact 556b execution and output as mandatory chair acceptance evidence.
 The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
 owns the independent engineering reference chain. Templot stays source-informed,
@@ -220,7 +220,7 @@ prototype facts or gives a package production clearance.
 ## Exact 556b oracle acquisition/build status
 
 **Historical acquisition record:** The capture contract below is optional under
-[D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel).
+[D-P9-005](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel).
 Exact 556b execution and output are no longer mandatory chair acceptance evidence.
 The owner reports no reliable execution route on this host.
 Do not do more Phase 9 work to make that route through Lazarus, Windows VM or Wine.

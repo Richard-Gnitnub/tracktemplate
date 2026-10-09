@@ -7,8 +7,11 @@ D-P9-009 accepts only the frozen reference-only assisted S1 pilot for Exit 9A-3.
 
 [D-P9-007](#s1-reference-comparison-criteria-under-d-p9-007) accepts only the
 bounded S1 reference-comparison criteria below. D-P9-009 applies them only to
-the exact frozen assisted S1 pilot. Phase 9A is Open at 4/4 and is not closed.
-Phase 9B stays Not started at 0/6.
+the exact frozen assisted S1 pilot. [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel)
+closes Phase 9A at 4/4 for that frozen reference-only scope.
+[D-P9-011](../current/PHASE_EVIDENCE.md#phase-9b-opening-panel) opens Phase 9B
+at 0/6 with all six exits Pending. The dated acceptance sections below keep
+their historical states. The [project plan](../PROJECT_PLAN.md) owns current status.
 
 This document defines the minimum neutral package, evidence, rights and
 acceptance plan for the first S1 chair. It is a project-control plan, not a
@@ -18,7 +21,7 @@ prototype designation, or legal clearance.
 The governing boundaries are [ARCHITECTURE.md](../ARCHITECTURE.md) and
 [LICENSING_BOUNDARIES.md](../LICENSING_BOUNDARIES.md). The optional local Templot comparison keeps its
 [frozen 556b contract](../oracles/templot5-556b-s1-oracle.json).
-It is not mandatory evidence for chair acceptance under [D-P9-005](../current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel).
+It is not mandatory evidence for chair acceptance under [D-P9-005](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel).
 
 The plan deliberately contains no production dimensions, copied Templot value
 collection, generated chair body or positive rights decision. The current
@@ -49,7 +52,7 @@ The project owner accepted these architectural and scope decisions on
 ## Phase 9A research and Phase 9B production boundary
 
 The owner changes the evidence sequence on 2026-10-03 under
-[D-P9-003](../current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel).
+[D-P9-003](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-research-sequencing-panel).
 Phase 9A can use the frozen Templot5 revision 556b S1/REA data, relationships
 and rail-fit logic for a bounded research `ChairDefinition` and procedural
 chair generator. Independent primary production evidence is not necessary
@@ -111,7 +114,7 @@ manifest, lineage and oracle records keep their current status.
 
 ## Chair acceptance evidence under D-P9-005
 
-[D-P9-005](../current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel)
+[D-P9-005](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel)
 changes the chair evidence model on 2026-10-07. For chair acceptance, an
 independent engineering reference chain is mandatory. Applicable drawings, standards, rail
 specifications, physical measurements and recorded project derivations can
@@ -150,7 +153,7 @@ Exits 9A-1–3 stay Pending. Phase 9B stays Not started at 0/6.
 
 ## Bounded Exit 9A-1 acceptance under D-P9-006
 
-On 2026-10-08, [D-P9-006](../current/PHASE_EVIDENCE.md#phase-9a-exit-1-acceptance-panel)
+On 2026-10-08, [D-P9-006](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-1-acceptance-panel)
 accepts only the named frozen five-component S1 `ChairDefinition` and Exit 9A-1
 for reference-only architecture proof. The source baseline is protected `main`
 `49c72c294335898ba4e2f3cb02581c8ef6e539a7`. The S1 package SHA-256 is
@@ -267,7 +270,7 @@ and all other acceptance boundaries stay.
 
 ## Bounded Exit 9A-2 acceptance under D-P9-008
 
-On 2026-10-09, [D-P9-008](../current/PHASE_EVIDENCE.md#phase-9a-exit-2-acceptance-panel)
+On 2026-10-09, [D-P9-008](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-2-acceptance-panel)
 accepts Exit 9A-2 only for the exact frozen five-component S1 reference.
 The decision uses the package, manifest, A0 rail section and thirteen criteria
 identified above. The criteria and their numerical limits stay unchanged.
@@ -285,7 +288,7 @@ Do not merge.
 
 ## Bounded Exit 9A-3 acceptance under D-P9-009
 
-On 2026-10-09, [D-P9-009](../current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel)
+On 2026-10-09, [D-P9-009](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-3-acceptance-panel)
 accepts only the frozen reference-only assisted S1 pilot and Exit 9A-3.
 The owner accepts its declared components, landmarks and findings that the project keeps
 with the D-P9-007 conditions. The package, manifest and A0 rail identities stay those in

@@ -163,7 +163,7 @@ Before a chair definition or generator is accepted:
 - After exact validation, compare deterministic STL/STEP and retained-component
   outputs. Include separate-part identities and assembly placement.
 
-For the exact frozen S1 reference, [D-P9-007](current/PHASE_EVIDENCE.md#phase-9a-reference-comparison-criteria-panel)
+For the exact frozen S1 reference, [D-P9-007](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-reference-comparison-criteria-panel)
 accepts the [13 reference-comparison criteria](phase-evidence/S1_PILOT_PLAN.md#s1-reference-comparison-criteria-under-d-p9-007).
 Complete finite face and section correspondence is the comparison method
 for that declared faceted reference. Separate surface maximum and distribution
@@ -179,7 +179,7 @@ provenance, file hashes, and reported regenerated-versus-source residuals.
 Acceptance requires recorded tolerances and explicit operator approval. A low
 residual does not by itself validate hidden, worn, or nominal geometry.
 
-[D-P9-009](current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel)
+[D-P9-009](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-3-acceptance-panel)
 accepts only the [frozen assisted S1 pilot](phase-evidence/S1_PILOT_PLAN.md#bounded-exit-9a-3-acceptance-under-d-p9-009)
 for Exit 9A-3 reference-only architecture proof. The unchanged 13 D-P9-007
 criteria, with complete finite face and section correspondence, apply
@@ -1362,9 +1362,9 @@ Project dashboard and current-record consistency:
 .venv/bin/python tests/validate_project_progress.py
 ```
 
-This enforces the compact project-plan sections and line budget. It reconciles the frozen Phase 6, Phase 7 and Phase 8 closeouts with
-`current/PHASE_EVIDENCE.md`. It checks that Phase 9A is Open and Phase 9B is
-Not started. It validates the
+This enforces the compact project-plan sections and line budget. It reconciles the frozen Phase 6, Phase 7, Phase 8 and Phase 9A closeouts with
+`current/PHASE_EVIDENCE.md`. It validates that Phase 9A is closed and Phase 9B is
+Open at 0/6 with all six exits Pending. It validates the
 detailed frozen and current risk and decision JSON registers. It protects the
 retired descriptive-path redirect.
 It also checks the least-privilege, SHA-pinned standalone CI workflow. It does
@@ -1556,7 +1556,7 @@ requires the current absence of other-S&C/legacy output dependency manifests.
 Adding one requires a truthful register and validation update. It must not use
 an inferred positive status.
 
-[D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel) removes
+[D-P9-005](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel) removes
 exact 556b execution and output as mandatory chair acceptance evidence.
 The [S1 pilot plan](phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
 owns the independent engineering reference chain and accepted numerical tolerances.
@@ -2069,7 +2069,7 @@ deterministic input recipes. They must cover:
 - wider automatic timbering and chair analysis (the fixed `XO-001` B4 and
   post-B4 logical-analysis lifecycles now have dedicated oracles)
 - independent S1 engineering evidence under
-  [D-P9-005](current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel), with
+  [D-P9-005](history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel), with
   explicit field provenance and accepted numerical tolerances. The frozen Templot
   capture contract and its validator stay optional comparison controls.
 - a versioned native S1 chair-definition package with invalid/corrupt fixtures

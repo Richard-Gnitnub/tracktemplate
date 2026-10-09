@@ -209,7 +209,7 @@ def validate_frozen_records() -> None:
         "frozen-record status changed",
     )
     require(
-        document["updated_on"] == "2026-10-08",
+        document["updated_on"] == "2026-10-09",
         "frozen-record manifest update date drifted",
     )
     records = document["records"]
@@ -586,57 +586,25 @@ def validate_documentation_profile(
     )
     require(
         all(fragment in " ".join(owner_view.split()) for fragment in (
-            "Phase 8 is closed at 4/4 under",
-            "D-P8-006",
-            "Phase 9A is Open at 4/4",
-            "All four Phase 9A exits are Evidenced and owner-accepted",
-            "Phase 9A is not closed",
-            "Phase 9B is Not started at 0/6",
-            "D-P6-008 stays Deferred — unmet",
-            "TERM-R04 stays open",
+            "Phase 9A is closed at 4/4 under [D-P9-010]",
+            "All four exits keep their accepted reference-only scopes",
+            "Phase 9B is Open at 0/6",
+            "All six Phase 9B exits stay Pending",
+            "D-P9-010",
+            "D-P9-011",
+            "This alignment adds no product behaviour",
+            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
             "Output stays private-development",
             "project status stays `unknown`",
-            "D-P9-004",
-            "D-P9-006",
-            "This decision adds no product behaviour",
-            "This decision selects no product implementation",
-            "D-P9-007",
-            "D-P9-008",
-            "D-P9-009",
-            "accepts only Exit 9A-3 for the frozen reference-only assisted S1 "
-            "pilot",
-            "D-GOV-023",
-            "representative-fixture",
-            "straight TO Edit",
-            "historical GUI-source",
-            "wider persistence/profile/metadata",
-            "TO preselected-object export",
-            "unproved raw GUI/headless output identity",
-            "two intermediate Ruff-cache states",
-            "full monthly restore passed on 2026-10-07",
-            "next monthly drill is due by 2026-11-07",
-            "separate physical storage is unverified",
-            "All 24 risks retain their owners, deadlines and controls",
-            "mandatory before Phase 10 beta acceptance",
-            "Both B14/B15 identities",
-            "development-only oracle",
-            "every comparison, adapter, caller, removal and "
-            "legacy-retirement condition",
-            "No performance, production-output or release acceptance",
-            "The new host has no Phase 6 performance authority",
-            "Do not merge or close Phase 9A",
+            "The owner gives no acceptance for physical fit or "
+            "production/package rights",
+            "The owner accepts no production exit or product implementation",
+            "Publish a draft PR with a PASS result from CI for its exact "
+            "head. Do not merge",
+            "Select no product implementation in this cycle",
+            "history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
+            "current/PHASE_EVIDENCE.md#phase-9b-opening-panel",
         )),
-        "PROJECT_PLAN owner view contradicts current authority",
-    )
-    decision_row = next(
-        (
-            line for line in owner_view.splitlines()
-            if line.startswith("| **Owner decision** |")
-        ),
-        "",
-    )
-    require(
-        "Phase 9B stays Not started at 0/6" in decision_row,
         "PROJECT_PLAN owner view contradicts current authority",
     )
     require(

@@ -107,6 +107,16 @@ PHASE8_DECISIONS_PATH = (
     / "phase-closeouts"
     / "PHASE8_GATE_DECISIONS.json"
 )
+PHASE9A_CLOSEOUT_PATH = (
+    ROOT / "reference" / "history" / "phase-closeouts" / "PHASE9A_CLOSEOUT.md"
+)
+PHASE9A_RISKS_PATH = (
+    ROOT / "reference" / "history" / "phase-closeouts" / "PHASE9A_RISKS.json"
+)
+PHASE9A_DECISIONS_PATH = (
+    ROOT / "reference" / "history" / "phase-closeouts"
+    / "PHASE9A_GATE_DECISIONS.json"
+)
 REDIRECT_PATH = (
     ROOT / "reference" / "phase-evidence" / "PHASE4_CANONICAL_STATE.md"
 )
@@ -138,13 +148,13 @@ EXPECTED_DP9_004_AUTHORITY = (
     'unless current repository policy specifically requires one.'
 )
 DP9_004_PANEL = (
-    "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-4-admission-panel"
+    "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-4-admission-panel"
 )
 EXPECTED_DP9_005_AUTHORITY_SHA256 = (
     "687f3eb50b863ff5e6dc426201c889f4b1cd856f494951acf04f050a08e3e435"
 )
 DP9_005_PANEL = (
-    "reference/current/PHASE_EVIDENCE.md#phase-9-chair-evidence-model-panel"
+    "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9-chair-evidence-model-panel"
 )
 EXPECTED_DP9_006_AUTHORITY = (
     "As project owner, I accept the proposed bounded Level 3 admission of "
@@ -153,7 +163,7 @@ EXPECTED_DP9_006_AUTHORITY = (
     "exact-green change."
 )
 DP9_006_PANEL = (
-    "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-1-acceptance-panel"
+    "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-1-acceptance-panel"
 )
 DP9_006_IDENTITIES = (
     "49c72c294335898ba4e2f3cb02581c8ef6e539a7",
@@ -168,7 +178,7 @@ EXPECTED_DP9_007_AUTHORITY = (
     "boundaries. Exit 9A-2 remains Pending until separately accepted."
 )
 DP9_007_PANEL = (
-    "reference/current/PHASE_EVIDENCE.md"
+    "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
     "#phase-9a-reference-comparison-criteria-panel"
 )
 DP9_007_HEADING = (
@@ -188,7 +198,7 @@ EXPECTED_DP9_008_AUTHORITY = (
     "Preserve all existing acceptance boundaries. Do not merge."
 )
 DP9_008_PANEL = (
-    "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-2-acceptance-panel"
+    "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-2-acceptance-panel"
 )
 DP9_008_HEADING = (
     "D-P9-008 Phase 9A Exit 2 acceptance panel — 2026-10-09"
@@ -208,7 +218,7 @@ EXPECTED_DP9_009_AUTHORITY = (
     "Preserve existing acceptance boundaries. Do not merge or close Phase 9A."
 )
 DP9_009_PANEL = (
-    "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel"
+    "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-exit-3-acceptance-panel"
 )
 DP9_009_HEADING = (
     "D-P9-009 Phase 9A Exit 3 acceptance panel — 2026-10-09"
@@ -220,6 +230,15 @@ DP9_009_IDENTITIES = (
     "5d49f95be5bed2b215d07c1594fae68c0c9cadede5afcc455e2811ffb2432085",
     "35012b98549f3c8a1f2e7904a4b84a338b4754346ab8dad39190aca1c6da0dcc",
 )
+EXPECTED_DP9_010_AUTHORITY = (
+    "As project owner, I accept Phase 9A closeout at 4/4 for the frozen "
+    "reference-only scope, subject to the existing closeout conditions.\n\n"
+    "Complete the required Level 3 alignment and publish an exact-green "
+    "draft PR."
+)
+EXPECTED_DP9_011_AUTHORITY = "Im happy to roll into 9b iot maintain flow."
+DP9_010_HEADING = "Phase 9A closeout panel and owner decision — 2026-10-09"
+DP9_011_HEADING = "D-P9-011 Phase 9B opening panel — 2026-10-09"
 PHASE9A_EXIT1_STATUS = "Evidenced — owner-accepted 2026-10-08"
 PHASE9A_EXIT2_STATUS = "Evidenced — owner-accepted 2026-10-09"
 PHASE9A_EXIT3_STATUS = "Evidenced — owner-accepted 2026-10-09"
@@ -1226,78 +1245,72 @@ def _validate_plan_programme(plan: str) -> None:
 
 
 def _validate_owner_view(plan: str) -> None:
-    """Require one derived, status-consistent TT-DOC-001 owner view."""
+    """Require the derived owner view to preserve the two distinct decisions."""
     section = _section(plan, "Current owner view")
-    rows: list[list[str]] = []
-    for line in section.splitlines():
-        cells = _cells(line) if line.startswith("|") else []
-        if len(cells) == 2 and cells[0] not in {"Field", "---"}:
-            rows.append(cells)
-    expected_fields = [
-        "**Current state**",
-        "**What changed**",
-        "**What now works**",
-        "**Limitations/findings**",
-        "**Owner decision**",
-        "**Next action**",
-    ]
+    rows = [
+        _cells(line) for line in section.splitlines()
+        if line.startswith("|")
+    ][2:]
     _require(
-        [row[0] for row in rows] == expected_fields,
+        [len(row) for row in rows] == [2] * 6
+        and [_semantic_text(row[0]) for row in rows] == [
+            "Current state", "What changed", "What now works",
+            "Limitations/findings", "Owner decision", "Next action",
+        ],
         "project-plan owner view fields drifted",
     )
-    owner_view = " ".join(section.split())
+    owner_view = _semantic_text(section)
     for fragment in (
-        "Phase 8 is closed at 4/4 under",
-        "D-P8-006",
-        "Phase 9A is Open at 4/4",
-        "All four Phase 9A exits are Evidenced and owner-accepted",
-        "Phase 9A is not closed",
-        "Phase 9B is Not started at 0/6",
-        "D-P6-008 stays Deferred — unmet",
-        "TERM-R04 stays open",
-        "Output stays private-development",
-        "project status stays `unknown`",
-        "D-P9-004",
-        "D-P9-006",
-        "This decision adds no product behaviour",
-        "This decision selects no product implementation",
-        "D-P9-007",
-        "D-P9-008",
-        "D-P9-009",
-        "accepts only Exit 9A-3 for the frozen reference-only assisted S1 "
-        "pilot",
-        "D-GOV-023",
-        "representative-fixture",
-        "straight TO Edit",
-        "historical GUI-source",
-        "wider persistence/profile/metadata",
-        "TO preselected-object export",
-        "unproved raw GUI/headless output identity",
-        "two intermediate Ruff-cache states",
-        "full monthly restore passed on 2026-10-07",
-        "next monthly drill is due by 2026-11-07",
-        "separate physical storage is unverified",
-        "All 24 risks retain their owners, deadlines and controls",
-        "mandatory before Phase 10 beta acceptance",
-        "Both B14/B15 identities",
-        "development-only oracle",
-        "every comparison, adapter, caller, removal and legacy-retirement condition",
-        "No performance, production-output or release acceptance",
-        "The new host has no Phase 6 performance authority",
-        "Do not merge or close Phase 9A",
+        "Phase 9A is closed at 4/4 under D-P9-010",
+        "All four exits keep their accepted reference-only scopes",
+        "Phase 9B is Open at 0/6 under D-P9-011",
+        "All six Phase 9B exits stay Pending",
+        "The six production criteria stay unchanged",
+        "This alignment adds no product behaviour",
+        "same neutral schema and procedural chair generator",
+        "nine views that the owner reviewed stay applicable reference evidence",
+        "The owner gives no acceptance for physical fit or production/package "
+        "rights",
+        "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
+        "Output stays private-development and project status stays unknown",
+        "D-P9-010 closes only the frozen reference-only Phase 9A scope",
+        "D-P9-011 opens only Phase 9B at 0/6",
+        "The owner accepts no production exit or product implementation",
+        "Publish a draft PR with a PASS result from CI for its exact head. Do "
+        "not merge",
+        "Select no product implementation in this cycle",
     ):
         _require(
             fragment in owner_view,
             "project-plan owner view lost or contradicted: " + fragment,
         )
-    _require(
-        "Phase 9B stays Not started at 0/6" in _semantic_text(rows[4][1]),
-        "project-plan owner view lost or contradicted: "
-        "Phase 9B stays Not started at 0/6",
+    expected_row_digests = (
+        "64251046000ecd38ac69a60e923e2cdad006629e731aec88e1cab1fca73679a3",
+        "dbe4320e38b9d71082f58b6ee3a7a738ed24c0d772f57b3f425371a34be48e37",
+        "0f9d7f5aa8d5523a62348f586dc8f0214e72017f8456be505c0d66be73a04b3a",
+        "3c95270afb9aacdfe27313a50155d8bcc9640edae97e84c2ce27073192d1fc55",
+        "d11ae37356a6b6b387e5e700c7753598f6a8a188d3c92da2fb5ebd6d17ba5e99",
+        "880d42c8d4dc4a6fe4581bf1938631aac92e065a1d5c3f9452cc1ea647b1de2c",
+    )
+    for row, digest in zip(rows, expected_row_digests):
+        _require(
+            hashlib.sha256(_semantic_text(row[1]).encode("utf-8")).hexdigest()
+            == digest,
+            "project-plan owner-view row authority drifted: "
+            + _semantic_text(row[0]),
+        )
+    _require_links(
+        section,
+        (("D-P9-010", "history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+          "#phase-9a-closeout-panel"),
+         ("D-P9-011", "current/PHASE_EVIDENCE.md#phase-9b-opening-panel"),
+         ("closeout", "history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+          "#phase-9a-closeout-panel")),
+        "project-plan owner view closeout or opening route drifted",
     )
     _require(
-        "Obtain on-site confirmation that the safely unmounted USB is removed and stored separately"
-        not in owner_view,
+        "Obtain on-site confirmation that the safely unmounted USB is removed "
+        "and stored separately" not in owner_view,
         "project-plan owner view restored the unsupported USB product-start gate",
     )
     plan_preamble = direct_section_content(plan, "Project Plan", level=1)
@@ -1436,8 +1449,8 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
     )
     _require(
         [phase for phase, row in rows.items() if row["state"] == "Open"]
-        == ["9A"],
-        "Only Phase 9A may be open",
+        == ["9B"],
+        "Only Phase 9B may be open after Phase 9A closeout",
     )
     _require(
         rows[7]["count"] == 4
@@ -1450,10 +1463,15 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         "Phase 8 must be closed at four evidenced exits",
     )
     _require(
-        rows["9A"]["count"] == 4 and rows["9A"]["state"] == "Open",
-        "Phase 9A must stay Open at four evidenced exits",
+        rows["9A"]["count"] == 4
+        and rows["9A"]["state"] == "Complete — accepted 2026-10-09",
+        "Phase 9A must stay closed at four evidenced exits",
     )
-    for phase in ("9B", 10, 11):
+    _require(
+        rows["9B"]["count"] == 0 and rows["9B"]["state"] == "Open",
+        "Phase 9B must stay Open at zero evidenced exits",
+    )
+    for phase in (10, 11):
         _require(
             rows[phase]["count"] == 0 and rows[phase]["state"] == "Not started",
             "Phase {} must remain unopened at zero evidenced exits".format(phase),
@@ -1464,9 +1482,9 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         "the carried D-P6-008 obligation is missing",
     )
     _require(
-        "Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open "
-        "at 4/4 under D-P9-009. Phase 9A is not closed. "
-        "Phase 9B is Not started at 0/6"
+        "Phase 9A is closed at 4/4 under D-P9-010 for its frozen "
+        "reference-only scope. Phase 9B is Open at 0/6 under D-P9-011. "
+        "All six Phase 9B exits are Pending"
         in _semantic_text(preamble),
         "project-plan Phase 8 closeout or Phase 9 holding status drifted",
     )
@@ -5447,12 +5465,12 @@ def _validate_phase9_decision_holding(
         "Phase 9 split must carry unchanged D-P6-008 first",
     )
     _require(
-        len(records) == 11,
+        len(records) == 12,
         "Phase 9A and host decision chain incomplete or widened",
     )
     split = records[1]
     panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
         "#phase-9-programme-alignment-panel"
     )
     _require(
@@ -5495,7 +5513,7 @@ def _validate_phase9_decision_holding(
 
     opening = records[2]
     opening_panel = (
-        "reference/current/PHASE_EVIDENCE.md#phase-9a-opening-panel"
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-opening-panel"
     )
     _require(
         isinstance(opening, dict)
@@ -5533,7 +5551,7 @@ def _validate_phase9_decision_holding(
 
     research = records[3]
     research_panel = (
-        "reference/current/PHASE_EVIDENCE.md#phase-9a-research-sequencing-panel"
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-research-sequencing-panel"
     )
     _require(
         isinstance(research, dict)
@@ -5572,7 +5590,7 @@ def _validate_phase9_decision_holding(
 
     host = records[4]
     host_panel = (
-        "reference/current/PHASE_EVIDENCE.md"
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
         "#freecad-1-1-4-coin4-0-10-qualification-panel"
     )
     _require(
@@ -5731,6 +5749,7 @@ def _validate_phase9_decision_holding(
     _validate_dp9_007_decision(records[8], set(split))
     _validate_dp9_008_decision(records[9], set(split))
     _validate_dp9_009_decision(records[10], set(split))
+    _validate_dp9_010_decision(records[11], set(split))
 
 
 def _validate_dp9_009_decision(
@@ -5831,7 +5850,7 @@ def _validate_dp9_009_admission(evidence: str) -> None:
         "s1-reference-comparison-criteria-under-d-p9-007",
     ):
         _require(
-            "../phase-evidence/S1_PILOT_PLAN.md#" + anchor in panel,
+            "../../phase-evidence/S1_PILOT_PLAN.md#" + anchor in panel,
             "D-P9-009 canonical owner link drifted",
         )
     flat = _semantic_text(panel)
@@ -5902,7 +5921,7 @@ def _validate_dp9_009_validation(validation: str) -> None:
     )
     _require_links(
         paragraph,
-        (("D-P9-009", "current/PHASE_EVIDENCE.md"
+        (("D-P9-009", "history/phase-closeouts/PHASE9A_CLOSEOUT.md"
           "#phase-9a-exit-3-acceptance-panel"),
          ("frozen assisted S1 pilot", "phase-evidence/S1_PILOT_PLAN.md"
           "#bounded-exit-9a-3-acceptance-under-d-p9-009")),
@@ -6000,7 +6019,7 @@ def _validate_dp9_008_admission(evidence: str) -> None:
         _require(identity in panel, "D-P9-008 evidence identity drifted")
     for link in (
         "#phase-9a-reference-comparison-criteria-panel",
-        "../phase-evidence/S1_PILOT_PLAN.md"
+        "../../phase-evidence/S1_PILOT_PLAN.md"
         "#s1-reference-comparison-criteria-under-d-p9-007",
     ):
         _require(
@@ -6134,7 +6153,7 @@ def _validate_dp9_007_criteria(evidence: str) -> None:
     for identity in DP9_007_IDENTITIES:
         _require(identity in panel, "D-P9-007 evidence identity drifted")
     for link in (
-        "../phase-evidence/S1_PILOT_PLAN.md"
+        "../../phase-evidence/S1_PILOT_PLAN.md"
         "#s1-reference-comparison-criteria-under-d-p9-007",
         "#phase-9a-exit-1-acceptance-panel",
     ):
@@ -6206,7 +6225,7 @@ def _validate_dp9_007_validation(validation: str) -> None:
     )
     _require_links(
         paragraph,
-        (("D-P9-007", "current/PHASE_EVIDENCE.md"
+        (("D-P9-007", "history/phase-closeouts/PHASE9A_CLOSEOUT.md"
           "#phase-9a-reference-comparison-criteria-panel"),
          ("13 reference-comparison criteria", "phase-evidence/S1_PILOT_PLAN.md"
           "#s1-reference-comparison-criteria-under-d-p9-007")),
@@ -6405,7 +6424,7 @@ def _validate_dp9_004_admission(evidence: str) -> None:
         "base-plinth", "rail-seat", "key", "inner-jaw", "outer-jaw",
         "tmp/phase9a-post144-cycle/owner-decision-packet.json",
         "tmp/phase9a-post144-cycle/admission-challenge/evidence-admission.json",
-        "../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research",
+        "../../LICENSING_BOUNDARIES.md#phase-9a-reference-only-research",
     ):
         _require(identity in panel, "D-P9-004 evidence identity drifted")
     for clause in (
@@ -7107,6 +7126,281 @@ def _validate_phase8_closeout(evidence: str) -> None:
         _require(clause in flat, "D-P8-006 bounded condition drifted: " + clause)
 
 
+def _validate_dp9_010_decision(
+    record: dict[str, object], fields: set[str],
+) -> None:
+    """Bind D-P9-010 to exact owner authority and bounded publication."""
+    panel = (
+        "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md"
+        "#phase-9a-closeout-panel"
+    )
+    _require(
+        isinstance(record, dict)
+        and set(record) == fields
+        and record["id"] == "D-P9-010"
+        and record["decided_on"] == "2026-10-09"
+        and record["status"] == "Accepted"
+        and record["evidence"] == panel
+        and record["panel_record"] == panel
+        and record["panel_required_under_current_policy"] is True,
+        "D-P9-010 identity, status or panel routing drifted",
+    )
+    _require(
+        record["authority"] == EXPECTED_DP9_010_AUTHORITY,
+        "D-P9-010 exact owner authority drifted",
+    )
+    for field, digest in (
+        ("decision", (
+            "f2a0b8dd1954175972e499d6a71de60f5875d5436508d2160cd1e3a569687674"
+        )),
+        ("exclusions", (
+            "90232244cfbef470164efb8f09e50e0d559dab17741a90cc08da1a2d8266543d"
+        )),
+    ):
+        value = record[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P9-010 " + field + " boundary drifted",
+        )
+
+
+def _validate_dp9_011_decision(
+    record: dict[str, object], fields: set[str],
+) -> None:
+    """Bind D-P9-011 to exact owner authority and bounded publication."""
+    panel = (
+        "reference/current/PHASE_EVIDENCE.md"
+        "#phase-9b-opening-panel"
+    )
+    _require(
+        isinstance(record, dict)
+        and set(record) == fields
+        and record["id"] == "D-P9-011"
+        and record["decided_on"] == "2026-10-09"
+        and record["status"] == "Accepted"
+        and record["evidence"] == panel
+        and record["panel_record"] == panel
+        and record["panel_required_under_current_policy"] is True,
+        "D-P9-011 identity, status or panel routing drifted",
+    )
+    _require(
+        record["authority"] == EXPECTED_DP9_011_AUTHORITY,
+        "D-P9-011 exact owner authority drifted",
+    )
+    for field, digest in (
+        ("decision", (
+            "2ed858632dbed3cdfec88c917143d030711924ccb398223af1199c39d49d0644"
+        )),
+        ("exclusions", (
+            "bcc391db31fc5ed01372b309cf081cb9ff4d2162f8a48a131ff18a9eef8962aa"
+        )),
+    ):
+        value = record[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P9-011 " + field + " boundary drifted",
+        )
+
+
+def _validate_phase9b_decisions(document: dict[str, object]) -> None:
+    """Require separate closeout and opening authority without exit credit."""
+    archive = _load_json(PHASE9A_DECISIONS_PATH)
+    _require(
+        set(document) == set(archive)
+        and document["schema_version"] == 1
+        and document["current_phase"] == 9
+        and document["updated_on"] == "2026-10-09",
+        "Phase 9B current decision header drifted",
+    )
+    records = document["decisions"]
+    _require(
+        isinstance(records, list)
+        and len(records) == 3
+        and records[:2] == [
+            archive["decisions"][0], archive["decisions"][11],
+        ],
+        "Phase 9B current decision chain incomplete or widened",
+    )
+    _validate_dp9_010_decision(records[1], set(records[0]))
+    _validate_dp9_011_decision(records[2], set(records[0]))
+
+
+def _validate_phase9a_closeout(evidence: str) -> None:
+    """Keep the closeout reference-only and preserve all continuing duties."""
+    panel = _section(evidence, DP9_010_HEADING)
+    _require(
+        evidence.count('<a id="phase-9a-closeout-panel"></a>') == 1
+        and "\n\n".join(_blockquote_paragraphs(panel))
+        == EXPECTED_DP9_010_AUTHORITY,
+        "D-P9-010 exact panel authority drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "D-P9-010 closes Phase 9A at 4/4 for the frozen reference-only scope",
+        "All four criteria and their accepted limits stay unchanged",
+        "It adds no product behaviour and opens no subsequent phase",
+        "The subsequent D-P9-011 decision owns Phase 9B opening",
+        "69ef5be79922f694c9019bbd3e33b919c882235e",
+        "9960de8c1ef6a4cf16a9e267ab9e7f5c74962b88",
+        "37892920877", "37893672265", "98/98",
+        "68 identities, nine review receipts and 11 final inputs that the "
+        "project keeps",
+        "The complete D-P9-007 criteria stay unchanged",
+        "nine views that the owner reviewed stay applicable",
+        "They do not validate independent prototype dimensions or physical fit",
+        "This is not external organisational independence",
+        "Proceed with bounded conditions",
+        "All risk states, severities, owners, deadlines, treatments and "
+        "controls stay unchanged",
+        "No risk closes",
+        "45 roots", "156,133 entries and 8,585,174,023 bytes",
+        "All 68 critical identities", "All 45 strict checksum checks passed",
+        "The reviewer did not independently calculate hashes for their "
+        "complete contents again",
+        "1,708 entries", "1,726 entries",
+        "udisksctl unmount command completed without force",
+        "Physical separate storage stays unverified",
+        "This is not a restore of the October 9 set",
+        "monthly restore passed on 2026-10-07",
+        "next monthly drill is due by 2026-11-07",
+        "new alignment worktree is outside the earlier 45-root snapshot",
+        "This record claims no subsequent file inside an earlier packet",
+        "two October 1 intermediate Ruff-cache states stay unavailable",
+        "S1-07 through S1-13 and S1-15",
+        "S1-14 stays optional comparison evidence under D-P9-005",
+        "production tolerances and package rights stay unresolved for "
+        "production",
+        "113-entry register and 119 derived, reference-only lineage records "
+        "stay unchanged",
+        "Vertical-rail and planar-seat adaptations, edge contact and "
+        "deliberate overlap keep their declared meanings",
+        "This record claims no measured whole-surface distribution or "
+        "independently derived absolute base/seat overlap magnitude",
+        "L1 repair limits stay exhausted at 2/2 and terminal correction at 1/1",
+        "All inherited Phase 8 limits stay",
+        "Both B14/B15 identities",
+        "all comparison, adapter, caller, removal and legacy-retirement "
+        "conditions stay",
+        "D-P6-008 stays Deferred — unmet",
+        "mandatory before Phase 10 beta acceptance",
+        "TERM-R04 stays open",
+        "Output stays private-development and project status stays unknown",
+        "Publish a draft PR with a PASS result from CI for its exact head. Do "
+        "not merge",
+        "accepts no physical fit, preload, retention, manufacturing "
+        "capability, production package, output, rights, performance result "
+        "or release",
+        "changes no geometry, numerical tolerance, package bytes, canonical "
+        "dimension or 113-entry register",
+    ):
+        _require(clause in flat, "D-P9-010 closeout boundary drifted: " + clause)
+    for exit_id, decision in (
+        ("9A-1", "D-P9-006"), ("9A-2", "D-P9-008"),
+        ("9A-3", "D-P9-009"), ("9A-4", "D-P9-004"),
+    ):
+        rows = [_cells(line) for line in panel.splitlines()
+                if line.startswith("| " + exit_id + " |")]
+        _require(
+            len(rows) == 1 and _semantic_text(rows[0][1]) == decision,
+            "D-P9-010 accepted-exit mapping drifted",
+        )
+
+
+def _validate_phase9b_holding(evidence: str) -> None:
+    """Require explicit opening only, with six unchanged pending criteria."""
+    preamble = _semantic_text(direct_section_content(
+        evidence, "Phase 9B Opening Record", level=1,
+    ))
+    for clause in (
+        "Phase 9A is closed at 4/4 under D-P9-010 for its frozen reference-only scope",
+        "Phase 9B is Open at 0/6 under D-P9-011",
+        "All six Phase 9B exits are Pending",
+    ):
+        _require(clause in preamble, "Phase 9B opening status drifted: " + clause)
+    panel = _section(evidence, DP9_011_HEADING)
+    _require(
+        evidence.count('<a id="phase-9b-opening-panel"></a>') == 1
+        and _blockquote_paragraphs(panel) == [EXPECTED_DP9_011_AUTHORITY],
+        "D-P9-011 exact panel authority drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "Phase 9B opening at 0/6. All six exits stay Pending",
+        "existing six criteria and production conditions stay",
+        "69ef5be79922f694c9019bbd3e33b919c882235e",
+        "does not change the frozen Phase 9A acceptance or accept any Phase "
+        "9B result",
+        "Proceed with bounded conditions",
+        "No risk closes or changes owner, deadline, treatment or control",
+        "reviewed recovery limits and conditions",
+        "Do not merge. This cycle selects no product implementation",
+        "Opening accepts no physical fit, preload, retention, manufacturing "
+        "capability, production package, output, rights, numerical tolerance, "
+        "performance result or release",
+        "D-P6-008 stays Deferred — unmet. TERM-R04 stays open",
+        "113-entry register and legacy-retirement conditions stay",
+        "Output stays private-development and project status stays unknown",
+    ):
+        _require(clause in flat, "D-P9-011 opening boundary drifted: " + clause)
+    exits = _section(evidence, "Phase 9B exit conditions")
+    rows = [_cells(line) for line in exits.splitlines() if line.startswith("|")]
+    _require(
+        "All six criteria stay unchanged. Each exit is Pending." in exits
+        and rows[:2] == [
+            ["Phase 9B exit", "Original exit", "Exact pending criterion"],
+            ["---", "---:", "---"],
+        ]
+        and [tuple(_semantic_text(cell) for cell in row)
+             for row in rows[2:]] == list(EXPECTED_PHASE9B_EXITS),
+        "Phase 9B current criteria or pending status drifted",
+    )
+
+
+def _phase9a_historical_record(evidence: str) -> str:
+    """Select the dated pre-closeout payload for its retained assertions."""
+    heading = "# Phase 9A Opening and Phase 9B Holding Record"
+    _require(
+        evidence.count(heading) == 1,
+        "Phase 9A retained pre-closeout record is missing or duplicated",
+    )
+    return heading + evidence.split(heading, 1)[1]
+
+
+def _validate_phase9a_preservation(evidence: str, risks: bytes) -> None:
+    """Keep the archived pre-closeout record and all live risk duties."""
+    retained = _phase9a_historical_record(evidence)
+    # Reverse only the archival link relocation, never historical prose.
+    retained = retained.replace(
+        "](../../current/gate-decisions.json)", "](gate-decisions.json)",
+    ).replace(
+        "](../../current/risks.json)", "](risks.json)",
+    )
+    retained = MARKDOWN_LINK_RE.sub(
+        lambda match: "[{}]({})".format(
+            match.group(1),
+            match.group(2).replace("../../", "../", 1)
+            .replace("PHASE9A_GATE_DECISIONS.json", "gate-decisions.json")
+            .replace("PHASE9A_RISKS.json", "risks.json"),
+        ),
+        retained,
+    )
+    _require(
+        hashlib.sha256(retained.encode("utf-8")).hexdigest()
+        == "f0be01f3804593381671f3a323db9dde7bd79a475fc7f3e0cc4ca86071f1cbcd",
+        "Phase 9A retained pre-closeout evidence changed beyond link relocation",
+    )
+    expected_risks = (
+        "7cf2cd877b93a42d9ffdb936870d52617af87c6f6781dd2ad00a86c7d4a8e76c"
+    )
+    _require(
+        hashlib.sha256(risks).hexdigest() == expected_risks
+        and RISKS_PATH.read_bytes() == risks,
+        "Phase 9A archived or live risk duties changed",
+    )
+
+
 def _validate_phase9_holding(evidence: str) -> None:
     """Keep the bounded 9A opening and inherited limits active."""
     preamble = _semantic_text(direct_section_content(
@@ -7665,7 +7959,7 @@ def _validate_decisions(plan: str) -> None:
         _load_json(PHASE8_DECISIONS_PATH), phase6_by_id,
     )
     _validate_phase9_decision_holding(
-        _load_json(CURRENT_DECISIONS_PATH), phase6_by_id,
+        _load_json(PHASE9A_DECISIONS_PATH), phase6_by_id,
     )
 
     _require(
@@ -7936,7 +8230,7 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
-           "D-GOV-023"},
+           "D-P9-010", "D-P9-011", "D-GOV-023"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -9652,7 +9946,8 @@ def main() -> None:
     current_evidence = _read(PHASE6_CLOSEOUT_PATH)
     phase7_closeout = _read(PHASE7_CLOSEOUT_PATH)
     phase8_evidence = _read(PHASE8_CLOSEOUT_PATH)
-    phase9_holding = _read(CURRENT_EVIDENCE_PATH)
+    phase9_closeout = _read(PHASE9A_CLOSEOUT_PATH)
+    phase9_holding = _phase9a_historical_record(phase9_closeout)
     phase4_closeout = _read(PHASE4_CLOSEOUT_PATH)
     phase5_closeout = _read(PHASE5_CLOSEOUT_PATH)
     _validate_plan_shape(plan)
@@ -9694,6 +9989,12 @@ def main() -> None:
     _validate_dp8_005_acceptance(phase8_evidence)
     _validate_phase8_closeout(phase8_evidence)
     _validate_phase9_holding(phase9_holding)
+    _validate_phase9a_preservation(
+        phase9_closeout, PHASE9A_RISKS_PATH.read_bytes(),
+    )
+    _validate_phase9a_closeout(phase9_closeout)
+    _validate_phase9b_holding(_read(CURRENT_EVIDENCE_PATH))
+    _validate_phase9b_decisions(_load_json(CURRENT_DECISIONS_PATH))
     _validate_dp9_004_admission(phase9_holding)
     _validate_dp9_005_evidence_model(phase9_holding)
     _validate_dp9_006_admission(phase9_holding)

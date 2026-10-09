@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "accepted-frozen-records",
-  "updated_on": "2026-10-08",
+  "updated_on": "2026-10-09",
   "records": [
     {"category": "phase-closeout", "path": "reference/phase-evidence/BASELINE.md", "sha256": "ebbf117a0459ad85501544a0ebf993edbe528af69c9f6fb4d358f1042c871e1b"},
     {"category": "phase-closeout", "path": "reference/phase-evidence/PHASE1_CLOSEOUT.md", "sha256": "b2be49068364853691ccf9e4e0ce611e7081b1c8b1a0a8b361a263da1da03a73"},
@@ -15,7 +15,7 @@
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE5_CLOSEOUT.md", "sha256": "4bb08f425b8ca82083c6752b2742f02ec59e0bc6b4347a322ca92c61f03bd74d"},
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE5_GATE_DECISIONS.json", "sha256": "ff605d61c70ebad4ecd619a01342130f558f0f040369a1db4e1b627d251617a8"},
     {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE5_RISKS.json", "sha256": "dfae04618e8338f68af6fda967cc0c525c280cd6ed1c9d089c23845b4b87ad5b"},
-    {"category": "phase-foundation", "path": "reference/phase-evidence/S1_PILOT_PLAN.md", "sha256": "451383a77c5738f6c8a186f5e809b258193f94a52ae2b7a91e54780102ca73b6"},
+    {"category": "phase-foundation", "path": "reference/phase-evidence/S1_PILOT_PLAN.md", "sha256": "85cb52aa1f0edd00574ff032c07cc0a1f6aa4f34012c8f9f3951edd222802c48"},
     {"category": "audit", "path": "reference/QUALITY_ASSURANCE.md", "sha256": "c6a67b15704ce4bc9eb072615043524748e8922dbff724a9f3488011820139f6"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-01.md", "sha256": "099901d286ee7791618fee48a4390090537293e57c15f9d0972bc6750ffdf99c"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-07-19-b14-crossover-xo-001-automated-cold-series.md", "sha256": "84dfa419bd608b524027cd78199bf0d9384b8b7a81ba83d687a53d88069a867b"},
@@ -62,6 +62,9 @@
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-longitudinal-bounds-regression.md", "sha256": "8d2f76572e3a72bcdc068f8459a94766257051c4d145662aaa6beb9ee8eb586e"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-26-phase7-platform-heading-coverage-regression.md", "sha256": "ecea6c8ce2634bb790c75e52dc9c41316a204716b93d11f5e53d9a3d97ddb748"},
     {"category": "benchmark", "path": "reference/benchmarks/2026-09-27-phase7-platform-top-heights-regression.md", "sha256": "f4bc59aa2376355e6a9ea2b78907757174fd964c77c215a421f7e7eb4411c563"},
-    {"category": "benchmark", "path": "reference/benchmarks/2026-09-27-phase7-core-layout-export-regression.md", "sha256": "0157dfe2ab807cd3c8e14075e41fa81db6c04d3fb14919592ca98c1f9b5dd777"}
+    {"category": "benchmark", "path": "reference/benchmarks/2026-09-27-phase7-core-layout-export-regression.md", "sha256": "0157dfe2ab807cd3c8e14075e41fa81db6c04d3fb14919592ca98c1f9b5dd777"},
+    {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md", "sha256": "195ca91237470f84d20d99f41bab307b233cf0c9cfaeff3ad9e392f644837272"},
+    {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE9A_GATE_DECISIONS.json", "sha256": "8f9353efde23756134239b539aef74cf1f13afb86ab548a7c7416b82356950a0"},
+    {"category": "phase-closeout", "path": "reference/history/phase-closeouts/PHASE9A_RISKS.json", "sha256": "7cf2cd877b93a42d9ffdb936870d52617af87c6f6781dd2ad00a86c7d4a8e76c"}
   ]
 }
