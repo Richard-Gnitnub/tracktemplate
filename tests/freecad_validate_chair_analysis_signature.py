@@ -177,12 +177,14 @@ def _assert_noop(module, document, analyse, kind=KIND, entity_id=ENTITY_ID):
     """The real command must preserve native state and stored bytes."""
     if App.GuiUp:
         import FreeCADGui as Gui
+        from PySide6 import QtWidgets
 
         candidates = module._chair_analysis_display_objects(
             document, kind, entity_id,
         )
         Gui.Selection.clearSelection()
         Gui.Selection.addSelection(candidates[-1])
+        QtWidgets.QApplication.processEvents()
     before = _document_state(module, document, kind, entity_id)
     originals = {obj.Name: obj for obj in document.Objects}
     shapes = {
