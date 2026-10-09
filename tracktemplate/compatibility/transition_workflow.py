@@ -3,7 +3,7 @@
 import copy
 from dataclasses import dataclass
 
-from tracktemplate.application import turnout_edit
+from tracktemplate.application import chair_analysis_signature, turnout_edit
 from tracktemplate.compatibility.crossover_b4_recovery import (
     CrossoverB4RecoveryAdapter,
 )
@@ -243,6 +243,30 @@ _TURNOUT_SUMMARY_CALLERS = (
     "edit_curve_inheriting_c10_turnout",
     "TurnoutManagerDialog.update_host_summary",
     "TurnoutManagerDialog.apply_turnout_edit",
+)
+_CHAIR_SIGNATURE_BINDING = "_chair_geometry_signature"
+_CHAIR_SIGNATURE_CALLERS = (
+    "_A8A7B11_ANALYSE_ENTITY_CHAIR_POSITIONS",
+    "chair_analysis_effective_status",
+    "_chair_generation_context",
+)
+_CHAIR_SIGNATURE_ROUTES = (
+    ("analyse_entity_chair_positions", "_A8A7B15_ANALYSE_CHAIRS"),
+    ("_A8A7B15_ANALYSE_CHAIRS", "_A8A7B11_ANALYSE_ENTITY_CHAIR_POSITIONS"),
+    (
+        "_chair_generation_context",
+        "_A8A7B13_GENERATION_CONTEXT_WITHOUT_SETTINGS_CHECK",
+    ),
+    (
+        "_A8A7B13_GENERATION_CONTEXT_WITHOUT_SETTINGS_CHECK",
+        "chair_analysis_effective_status",
+    ),
+)
+_CHAIR_SIGNATURE_SURFACE = (
+    _CHAIR_SIGNATURE_BINDING, *_CHAIR_SIGNATURE_CALLERS,
+    "normalise_chair_analysis_settings", "CHAIR_ANALYSIS_SCHEMA_VERSION",
+    "analyse_entity_chair_positions", "_A8A7B15_ANALYSE_CHAIRS",
+    "_A8A7B13_GENERATION_CONTEXT_WITHOUT_SETTINGS_CHECK",
 )
 _CROSSOVER_PREFLIGHT_FUNCTIONS = (
     "solve_rea_c10_crossover_geometry",
@@ -769,6 +793,21 @@ class _TurnoutConfigurationSummaryAdapter:
         )
 
 
+@dataclass(frozen=True)
+class _ChairAnalysisSignatureAdapter:
+    calculation: object
+    normalise_settings: object
+    schema_version: int
+
+    def __call__(
+        self, entity_kind, config, settings, rail_records, timber_records,
+    ):
+        return self.calculation(
+            entity_kind, config, self.normalise_settings(settings),
+            rail_records, timber_records, schema_version=self.schema_version,
+        )
+
+
 class ModularTransitionWorkflowSession:
     """One inherited GUI host permanently bound to modular calculations."""
 
@@ -990,6 +1029,29 @@ class ModularTransitionWorkflowSession:
                 )
             )
         namespace = self.module.__dict__
+        self._chair_signature_adapter = None
+        if any(name in namespace for name in _CHAIR_SIGNATURE_SURFACE):
+            normaliser = namespace.get("normalise_chair_analysis_settings")
+            schema_version = namespace.get("CHAIR_ANALYSIS_SCHEMA_VERSION")
+            if (
+                not all(name in namespace for name in _CHAIR_SIGNATURE_SURFACE)
+                or not callable(namespace.get(_CHAIR_SIGNATURE_BINDING))
+                or not callable(normaliser)
+                or getattr(normaliser, "__globals__", None) is not namespace
+                or type(schema_version) is not int
+                or schema_version < 1
+            ):
+                raise TransitionWorkflowError(
+                    "The inherited chair-analysis signature route is "
+                    "incomplete."
+                )
+            self._chair_signature_adapter = _ChairAnalysisSignatureAdapter(
+                chair_analysis_signature.chair_analysis_signature,
+                normaliser, schema_version,
+            )
+            self._host_functions[_CHAIR_SIGNATURE_BINDING] = (
+                self._chair_signature_adapter
+            )
         panel = namespace.get("CrossoverManagerPanel")
         self._crossover_preflight = None
         self._crossover_preview_method = None
@@ -1235,6 +1297,68 @@ class ModularTransitionWorkflowSession:
     def _validate_binding(self):
         """Verify selected domain and host edges without repairing them."""
         namespace = self.module.__dict__
+        adapter = self._chair_signature_adapter
+        present = any(name in namespace for name in _CHAIR_SIGNATURE_SURFACE)
+        if present != (adapter is not None):
+            raise TransitionWorkflowError(
+                "The inherited chair-analysis signature route has a "
+                "mixed binding."
+            )
+        if adapter is not None:
+            selected = chair_analysis_signature.chair_analysis_signature
+            if (
+                type(adapter) is not _ChairAnalysisSignatureAdapter
+                or namespace.get(_CHAIR_SIGNATURE_BINDING) is not adapter
+                or self._host_functions[_CHAIR_SIGNATURE_BINDING]
+                is not adapter
+                or adapter.calculation is not selected
+                or getattr(selected, "__globals__", None)
+                is not chair_analysis_signature.__dict__
+                or namespace.get("normalise_chair_analysis_settings")
+                is not adapter.normalise_settings
+                or getattr(adapter.normalise_settings, "__globals__", None)
+                is not namespace
+                or type(namespace.get("CHAIR_ANALYSIS_SCHEMA_VERSION"))
+                is not int
+                or namespace["CHAIR_ANALYSIS_SCHEMA_VERSION"]
+                != adapter.schema_version
+            ):
+                raise TransitionWorkflowError(
+                    "The modular chair-analysis signature route has a "
+                    "mixed binding."
+                )
+            for caller_name in _CHAIR_SIGNATURE_CALLERS:
+                caller = namespace.get(caller_name)
+                code = getattr(caller, "__code__", None)
+                caller_globals = getattr(caller, "__globals__", None)
+                if (
+                    not callable(caller)
+                    or code is None
+                    or _CHAIR_SIGNATURE_BINDING not in code.co_names
+                    or caller_globals is not namespace
+                    or caller_globals.get(_CHAIR_SIGNATURE_BINDING)
+                    is not adapter
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited chair-analysis signature caller {!r} "
+                        "is unavailable or mixed.".format(caller_name)
+                    )
+            for caller_name, target_name in _CHAIR_SIGNATURE_ROUTES:
+                caller = namespace.get(caller_name)
+                target = namespace.get(target_name)
+                code = getattr(caller, "__code__", None)
+                if (
+                    not callable(caller)
+                    or code is None
+                    or target_name not in code.co_names
+                    or getattr(caller, "__globals__", None) is not namespace
+                    or not callable(target)
+                    or getattr(target, "__globals__", None) is not namespace
+                ):
+                    raise TransitionWorkflowError(
+                        "The inherited chair-analysis signature route {!r} "
+                        "is unavailable or mixed.".format(caller_name)
+                    )
 
         def inherited_caller(name):
             if (
