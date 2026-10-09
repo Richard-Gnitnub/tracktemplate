@@ -112,6 +112,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-2-acceptance-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-2-acceptance-panel"
+    },
+    {
+      "id": "D-P9-009",
+      "decided_on": "2026-10-09",
+      "status": "Accepted",
+      "decision": "Accept only Phase 9A Exit 9A-3 for the frozen reference-only assisted S1 pilot with the D-P9-007 conditions. This acceptance includes its declared components, landmarks and findings that the project keeps. The accepted source state is protected main 94b7ffe08f3e298c91025ab12a2c1883215cc279. Identify the package by SHA-256 df5ae7d941754ed7c18ea450d1d22559c61efbd5baaa638d2e84fa9d96b8e4c7, the manifest by SHA-256 cf45882bbdfa645bd893a22ca0e7f9200810282a2aab015c98074e0c1aee941a and the A0 rail section by SHA-256 7d5a08b269b52e6ebbc26453853ce308343ccd54636454d589add2e1397cc2d6.\n\nThe same ChairDefinition and procedural chair generator stay. The unchanged thirteen D-P9-007 criteria apply only to this exact frozen assisted S1 pilot, with complete finite face and section correspondence. The declared components, landmarks and findings that the project keeps stay.\n\nPhase 9A is Open at 4/4. All four Phase 9A exits are Evidenced and owner-accepted. Phase 9A is not closed. Phase 9B stays Not started at 0/6.",
+      "authority": "As project owner, I accept Phase 9A Exit 9A-3 for the frozen reference-only S1 pilot, including its declared components, landmarks and retained findings, under D-P9-007.\n\nComplete the Level 3 repository alignment and publish an exact-green draft PR.\n\nPreserve existing acceptance boundaries. Do not merge or close Phase 9A.",
+      "exclusions": "Preserve the D-P9-007 criteria and numerical limits. This decision claims no measured whole-surface distribution or independently derived absolute base/seat overlap magnitude. All 119 lineage records stay derived and reference-only. All 113 source quantities keep unresolved physical measurement uncertainty.\n\nPreserve product geometry, numerical implementation, frozen package bytes, historical package metadata, source lineage and the 113-entry register. The package keeps acceptance: not-accepted and validation: not-run. This external decision accepts only the identified assisted S1 pilot and Exit 9A-3. It gives the package no new metadata or production licence. D-P9-006, D-P9-007 and D-P9-008 keep their historical meaning.\n\nThis decision accepts no independent prototype dimension, physical fit, preload, retention, manufacturing capability, production package, output or rights claim. Arbitrary automatic scan assimilation stays outside the RC qualification matrix. D-P9-004 private-use conditions and D-P9-005 production duties stay. All 24 risk states, owners, deadlines and controls stay unchanged. Keep all L1 repair limits, D-P6-008 Deferred — unmet, TERM-R04 open and all legacy-retirement conditions. Output stays private-development and project status stays unknown.\n\nComplete only the Level 3 repository alignment, Documentation Review lifecycle and validation. Publish one draft PR with a PASS result from CI for its exact head. Do not merge or close Phase 9A. This decision authorises no product implementation or Phase 9B work.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9a-exit-3-acceptance-panel"
     }
   ]
 }

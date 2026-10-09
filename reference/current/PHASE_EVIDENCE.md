@@ -1,6 +1,6 @@
 # Phase 9A Opening and Phase 9B Holding Record
 
-Status: **Phase 9A is Open at 3/4 under D-P9-008. Exit 9A-3 stays Pending.
+Status: **Phase 9A is Open at 4/4 under D-P9-009. Phase 9A is not closed.
 Phase 9B is Not started at 0/6. This record gives no product acceptance.**
 
 Phase 8 closed on 2026-10-03 under
@@ -15,12 +15,98 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 3/4 under [D-P9-008](#phase-9a-exit-2-acceptance-panel). Exits 9A-1, 9A-2 and 9A-4 are Evidenced and owner-accepted.<br><br>Exit 9A-3 stays Pending. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | [D-P9-008](#phase-9a-exit-2-acceptance-panel) accepts Exit 9A-2 for the exact frozen S1 reference under the 13 criteria that D-P9-007 accepts. D-P9-006 keeps Exit 9A-1 accepted for reference-only architecture proof. D-P9-004 keeps Exit 9A-4 accepted at `9576614daf6cc69a04d214e824ec32cc7bbe5251`. |
+| Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 4/4 under [D-P9-009](#phase-9a-exit-3-acceptance-panel). All four Phase 9A exits are Evidenced and owner-accepted.<br><br>Phase 9A is not closed. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
+| What changed | [D-P9-009](#phase-9a-exit-3-acceptance-panel) accepts only Exit 9A-3 for the frozen reference-only assisted S1 pilot. It accepts the declared components, landmarks and findings that the project keeps against the unchanged 13 D-P9-007 criteria. D-P9-004, D-P9-006 and D-P9-008 keep their accepted exit scopes. |
 | What now works | The procedural chair generator constructs the five S1 chair components and the assembled chair without source CAD or geometry from the first construction. The L1 proof uses the same neutral schema and generator with a different component pattern. The owner reviewed nine views from FreeCAD as applicable reference evidence. This decision adds no product behaviour. The accepted Phase 7 and Phase 8 workflows stay. |
 | Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. <br><br>S1-07 through S1-13 and S1-15, package rights, rail section and tolerances stay bounded as recorded. D-P9-005 makes S1-14 optional comparison evidence. |
-| Owner decision | [D-P9-008](#phase-9a-exit-2-acceptance-panel) accepts only Exit 9A-2 for the frozen S1 reference-only scope under D-P9-007. Exit 9A-3 stays Pending. D-P9-005 keeps independent engineering evidence and accepted numerical tolerances mandatory for production. This decision accepts no assisted S1 pilot, physical fit, production package, output or rights claim. |
-| Next action | Complete the authorised D-P9-008 repository alignment, Documentation Review lifecycle and validation. Publish a draft PR with a PASS result from CI for its exact head. Do not merge. This decision selects no product implementation. Keep Exit 9A-3 Pending and Phase 9B Not started. |
+| Owner decision | [D-P9-009](#phase-9a-exit-3-acceptance-panel) accepts the frozen assisted S1 pilot for reference-only architecture proof through the same `ChairDefinition` and procedural chair generator. D-P9-005 keeps independent engineering evidence and accepted numerical tolerances mandatory for production. This decision accepts no physical fit, production package, output or rights claim. Phase 9A stays Open. Phase 9B stays Not started at 0/6. |
+| Next action | Complete the authorised D-P9-009 repository alignment, Documentation Review lifecycle and validation. Publish a draft PR with a PASS result from CI for its exact head. Do not merge or close Phase 9A. Phase 9B stays Not started. This decision selects no product implementation. |
+
+<a id="phase-9a-exit-3-acceptance-panel"></a>
+
+## D-P9-009 Phase 9A Exit 3 acceptance panel — 2026-10-09
+
+**Decision boundary:** Richard accepts only Exit 9A-3 for the frozen
+reference-only assisted S1 pilot with the D-P9-007 conditions. This acceptance includes its
+declared components, landmarks and findings that the project keeps. The accepted source state
+is protected `main` `94b7ffe08f3e298c91025ab12a2c1883215cc279` after PR #151.
+The four exit criteria stay unchanged.
+
+Phase 9A is Open at 4/4. All four Phase 9A exits are Evidenced and owner-accepted.
+Phase 9A is not closed. Phase 9B stays Not started at 0/6.
+
+**Exact owner instruction:**
+
+> As project owner, I accept Phase 9A Exit 9A-3 for the frozen reference-only S1 pilot, including its declared components, landmarks and retained findings, under D-P9-007.
+>
+> Complete the Level 3 repository alignment and publish an exact-green draft PR.
+>
+> Preserve existing acceptance boundaries. Do not merge or close Phase 9A.
+
+**Accepted evidence:** The [S1 plan](../phase-evidence/S1_PILOT_PLAN.md#bounded-exit-9a-3-acceptance-under-d-p9-009)
+records the accepted fitting method, components, landmarks, findings and comparison conditions.
+The method uses the same neutral `ChairDefinition` and procedural chair generator.
+It does not introduce a second geometry system or arbitrary automatic scan assimilation.
+The unchanged [13 criteria](../phase-evidence/S1_PILOT_PLAN.md#s1-reference-comparison-criteria-under-d-p9-007)
+apply only to this exact frozen assisted S1 pilot.
+This decision adds no geometry, numerical limit or product behaviour.
+
+The package, manifest and A0 rail section keep the identities in
+[D-P9-006](#phase-9a-exit-1-acceptance-panel) and
+[D-P9-008](#phase-9a-exit-2-acceptance-panel).
+The package SHA-256 is
+`df5ae7d941754ed7c18ea450d1d22559c61efbd5baaa638d2e84fa9d96b8e4c7`.
+The manifest SHA-256 is
+`cf45882bbdfa645bd893a22ca0e7f9200810282a2aab015c98074e0c1aee941a`.
+The A0 rail-section SHA-256 is
+`7d5a08b269b52e6ebbc26453853ce308343ccd54636454d589add2e1397cc2d6`.
+
+The independent assessment is
+`tmp/phase9a-exit3-readiness/independent-assessment.json` in the primary repository,
+SHA-256 `5d49f95be5bed2b215d07c1594fae68c0c9cadede5afcc455e2811ffb2432085`.
+It checks 45 identities and examines all seven duties in the
+[chair assimilation boundary](../ARCHITECTURE.md#chair-assimilation-boundary).
+The root identity audit checks 68 identities. Its path is
+`tmp/phase9a-exit3-readiness/existing-identity-audit.json`, with SHA-256
+`35012b98549f3c8a1f2e7904a4b84a338b4754346ab8dad39190aca1c6da0dcc`.
+
+The native proof at `49c72c294335898ba4e2f3cb02581c8ef6e539a7`, its component
+comparisons and the nine FreeCAD views stay applicable. Product source is unchanged.
+The owner accepted those views as applicable reference evidence.
+This decision adds no source research, geometry construction or visual capture.
+
+**Safety/risk panel:** Richard is the project owner and panel chair.
+`/root` reports the alignment. Read-only reviewer `/root/exit3_existing_evidence`
+recommends **Proceed with bounded conditions**. The reviewer challenges the
+applicable source, inference, rights, scope and acceptance risks.
+
+All 24 risk states, owners, deadlines, treatments and controls stay unchanged.
+This decision closes no risk. The panel records no dissent.
+
+The reviewer did not author the geometry or alignment. The agents share one
+team and workspace. This is not external independence. The change owner must
+keep the frozen identities, declared findings, comparison criteria and exclusions
+during alignment and publication. Any wider acceptance needs the applicable authority.
+
+**Preserved boundaries:** Product geometry, numerical implementation, package
+bytes, historical package metadata, source lineage and the 113-entry register
+stay unchanged. D-P9-006, D-P9-007 and D-P9-008 keep their historical meaning.
+The package keeps `acceptance: not-accepted` and `validation: not-run`.
+This external decision accepts only the identified assisted S1 pilot and Exit 9A-3.
+It gives the package no new metadata or production licence.
+
+This decision accepts no independent prototype dimension, physical fit, preload,
+retention, manufacturing capability, production package, output or rights claim.
+It claims no measured whole-surface distribution or independently derived
+absolute base/seat overlap magnitude. D-P9-004 private-use conditions and
+D-P9-005 production duties stay. All L1 repair limits, D-P6-008, TERM-R04 and
+legacy-retirement conditions stay. Output stays private-development and project
+status stays `unknown`.
+
+**Publication boundary:** Complete only the necessary Level 3 alignment,
+Documentation Review lifecycle and validation. Publish one draft PR with a
+PASS result from CI for its exact head. Do not merge or close Phase 9A.
+This decision selects no product implementation or Phase 9B work.
 
 <a id="phase-9a-exit-2-acceptance-panel"></a>
 
@@ -684,7 +770,7 @@ Each acceptance duty has one phase owner. D-P9-003 changes the evidence sequence
 | --- | --- | --- |
 | 9A-1 | Evidenced — owner-accepted 2026-10-08 | The procedural chair generator constructs all named chair components in the bounded scope and the assembled S1 chair from the S1 `ChairDefinition` accepted for reference-only research. It can construct them again without the source scan/CAD file or FreeCAD geometry that the product kept from the first construction. Select one more chair or support from repository evidence for the smallest proof of a difference in chair components, interface or assembly pattern. The other chair or support must use the same neutral `ChairDefinition` schema and procedural chair generator. An S1 dimension variant is not sufficient. A five-box or opaque-mesh fallback must not have production-ready status. |
 | 9A-2 | Evidenced — owner-accepted 2026-10-09 | Standalone and FreeCAD tests give a PASS result for definition package load and round-trip. The two test paths reject corrupt and unsupported packages. Package load and round-trip preserve chair component identities, prototype geometry, separate model rail-fit policy, manufacturing compensation and rail fit. They preserve exact field provenance and reference-only status for each Templot-derived input. The two test paths give a PASS result for the S1 geometry that the generator constructs against accepted reference tolerances. |
-| 9A-3 | Pending | The operator-assisted S1 pilot is documented and accepted for bounded reference-only architecture proof through the same `ChairDefinition` and procedural chair generator. The RC qualification matrix does not include arbitrary automatic scan assimilation. |
+| 9A-3 | Evidenced — owner-accepted 2026-10-09 | The operator-assisted S1 pilot is documented and accepted for bounded reference-only architecture proof through the same `ChairDefinition` and procedural chair generator. The RC qualification matrix does not include arbitrary automatic scan assimilation. |
 | 9A-4 | Evidenced — owner-accepted 2026-10-07 | Raw S1 evidence that cannot be redistributed stays isolated. Its permitted fitting and use basis is recorded before that evidence supports the bounded proof or pilot. |
 
 Phase 9B has six Pending exits in the
