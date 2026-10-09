@@ -99,28 +99,29 @@ removal is accepted. Project status remains `unknown`.
 
 ## Chair results after input changes — 2026-10-09
 
-This Level 2 correction contributes to Exit 9B-2 and PR-16.
-The [private B16 operation](../../tracktemplate/application/chair_analysis_signature.py)
-uses exact input values and identities to calculate `_chair_geometry_signature`.
-The inherited calculation stays the same. Previous B15 results become `Stale`.
-The operator must run `Analyse` before generation can continue.
+This Level 2 correction supplies evidence for Exit 9B-2 and PR-16.
+The [B16 function](../../tracktemplate/application/chair_analysis_signature.py)
+uses input values and identities without a change to calculate `_chair_geometry_signature`.
+B16 calculates chair results with the same method as B15. Previous B15 results become `Stale`.
+A person must select `Analyse` before B16 can make chairs.
 
-The [standalone regression test](../../tests/validate_chair_analysis_signature.py)
+The [regression test outside FreeCAD](../../tests/validate_chair_analysis_signature.py)
 and [FreeCAD regression test](../../tests/freecad_validate_chair_analysis_signature.py)
 give PASS results. The qualified host profile is
 `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
-Copied `XO-001` and `TO-001` cases contain 355 and 168 chair positions.
+The copies for `XO-001` and `TO-001` contain 355 and 168 chair positions.
 
-The tests check inputs that stay the same, inputs that change and inputs that change back.
-They also check save/reopen and Undo/Redo. Generation stops when stored results
-do not agree with the current inputs. After an invalid input, stored results and
-Undo/Redo stay the same. Exact results agree with the frozen B15 calculation.
+The tests examine inputs that stay the same, inputs that change and inputs that change back.
+They also examine save/reopen and Undo/Redo. The software stops before it makes chairs
+if the results in the file do not agree with the inputs.
+After an incorrect input, the results in the file and Undo/Redo stay the same.
+The results agree in all details with those that the frozen B15 functions calculate.
 
-The tests supply changed records to the existing functions. They add no editing command.
+The tests supply changed records to the functions. They add no command to change records.
 
 Phase 9B stays Open at 0/6. All six exits stay Pending.
-This proof accepts no wider migration, performance result, physical fit or production output.
-The accepted geometry, 113-entry register and all existing production conditions stay the same.
+This evidence gives no acceptance for other migration, product performance, physical fit or production output.
+The accepted geometry, 113-entry register and all production conditions stay the same.
 
 ## Phase 9A historical links
 
