@@ -16,11 +16,96 @@ The owner accepted the bounded recovery evidence with its recorded limits.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 8 is closed at 4/4 under D-P8-006. Phase 9A is Open at 2/4 under [D-P9-006](#phase-9a-exit-1-acceptance-panel). Exits 9A-1 and 9A-4 are Evidenced and owner-accepted.<br><br>Exits 9A-2 and 9A-3 stay Pending. Phase 9B is Not started at 0/6. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development and project status stays `unknown`. |
-| What changed | [D-P9-006](#phase-9a-exit-1-acceptance-panel) accepts the frozen five-component S1 `ChairDefinition` and Exit 9A-1 for reference-only architecture proof. It resolves the D-P9-003 and D-P9-005 conditions only for this bounded acceptance. D-P9-004 keeps Exit 9A-4 accepted at `9576614daf6cc69a04d214e824ec32cc7bbe5251`. |
+| What changed | [D-P9-007](#phase-9a-reference-comparison-criteria-panel) accepts the 13 S1 reference-comparison criteria and their bounded conditions. It accepts no exit. D-P9-006 keeps Exit 9A-1 accepted for reference-only architecture proof. D-P9-004 keeps Exit 9A-4 accepted at `9576614daf6cc69a04d214e824ec32cc7bbe5251`. |
 | What now works | The procedural chair generator constructs the five S1 chair components and the assembled chair without source CAD or geometry from the first construction. The L1 proof uses the same neutral schema and generator with a different component pattern. The owner reviewed nine views from FreeCAD as applicable reference evidence. This decision adds no product behaviour. The accepted Phase 7 and Phase 8 workflows stay. |
 | Limitations/findings | The frozen evidence retains representative-fixture, straight TO cross-version Edit and prior GUI-source limits. It also retains wider persistence, profile, metadata, TO preselected-object export, selection, format, historical digest and raw GUI/headless output limits. The r13/r14 intermediate Ruff-cache states stay unavailable. The monthly restore passed on 2026-10-07 for the accepted October 4 set. The next drill is due by 2026-11-07. USB separate storage is unverified. B14/B15 identities, the inherited B15 host, the development-only comparison oracle, all risk duties and every comparison, adapter, caller, removal and legacy-retirement condition remain. <br><br>S1-07 through S1-13 and S1-15, package rights, rail section and tolerances stay bounded as recorded. D-P9-005 makes S1-14 optional comparison evidence. |
-| Owner decision | [D-P9-006](#phase-9a-exit-1-acceptance-panel) accepts only the named S1 `ChairDefinition` and Exit 9A-1 for private research. D-P9-005 keeps independent engineering evidence and accepted numerical tolerances mandatory for production. No numerical tolerance, assisted S1 pilot, physical fit, production package, output or rights claim is accepted. |
-| Next action | Complete the authorised D-P9-006 alignment and the Documentation Review lifecycle. Then integrate into protected main with a PASS result from CI for the same head. Stop when main has no tracked changes and has the same commit as origin/main. No other implementation is selected. Phase 9B stays Not started. |
+| Owner decision | [D-P9-007](#phase-9a-reference-comparison-criteria-panel) accepts comparison criteria only for the exact frozen S1 reference. Exit 9A-2 stays Pending until separate owner acceptance. D-P9-005 keeps independent engineering evidence and accepted numerical tolerances mandatory for production. This decision accepts no assisted S1 pilot, physical fit, production package, output or rights claim. |
+| Next action | Complete the authorised D-P9-007 repository alignment, Documentation Review lifecycle and validation. Keep Exit 9A-2 Pending until separate owner acceptance. This decision selects no product implementation. Phase 9B stays Not started. |
+
+<a id="phase-9a-reference-comparison-criteria-panel"></a>
+
+## D-P9-007 S1 reference-comparison criteria panel — 2026-10-08
+
+**Decision boundary:** Richard accepts the 13 comparison criteria and their
+bounded conditions for the exact frozen five-component S1 reference.
+The [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#s1-reference-comparison-criteria-under-d-p9-007)
+owns these criteria. This decision changes comparison authority only.
+
+Exit 9A-2 stays Pending until separate owner acceptance.
+Phase 9A stays Open at 2/4. Exit 9A-3 stays Pending.
+Phase 9B stays Not started at 0/6.
+
+**Exact owner instruction:**
+
+> As project owner, I accept the proposed 13 S1 reference-comparison criteria and their bounded conditions.
+>
+> Authorise the required Level 3 repository alignment.
+>
+> Preserve existing geometry, the 113-entry register and production boundaries. Exit 9A-2 remains Pending until separately accepted.
+
+**Accepted comparison scope:** This frozen faceted reference uses complete
+finite face and section correspondence. Separate surface maximum and
+distribution statistics are not necessary for this comparison.
+The accepted numerical limits keep their existing values
+and dimensional propagation. They are reference-comparison criteria only.
+They are not physical-fit or manufacturing tolerances.
+
+The base/seat overlap relation has independent support. Its absolute common
+volume stays a native observation, not an independently derived value.
+This decision claims no measured whole-surface distribution.
+
+The source state is protected `main`
+`dda3ea33b5687b42215924d7a830eedb9f4372ff` after PR #149.
+The package and manifest keep the exact identities in
+[D-P9-006](#phase-9a-exit-1-acceptance-panel).
+The frozen A0 rail-section SHA-256 is
+`7d5a08b269b52e6ebbc26453853ce308343ccd54636454d589add2e1397cc2d6`.
+This decision changes no package bytes, historical package metadata, source
+geometry, numerical implementation or entry in the 113-entry register.
+Source values and the detailed source comparison stay local and untracked.
+
+**Evidence reviewed:** The local proposal is
+`tmp/phase9a-post149-exit2-assessment.json`, SHA-256
+`7444309a79f5940c7026b571871b118f70d0ce93578380ef89adcb187c723861`.
+It identifies all 13 criteria, their units, reasons and existing proof receipts.
+The independent review is `tmp/phase9a-post149-decision-review.json`, SHA-256
+`9d3def6445bc0181ad971639110927c380a8b15d162e00d69ac5f017c6f98f18`.
+The reviewer validated five independent source proofs and the 25 product files
+identified by the native receipt. Both retained standalone and qualified
+FreeCAD receipts have exit code zero and their required success sentinels.
+
+The tests keep their original meaning. The project did not do these geometry tests
+or FreeCAD proofs again for this decision. These results do not accept Exit 9A-2.
+
+The alignment review is
+`tmp/phase9a-s1-reference-criteria/factual-risk-review.json` in the alignment worktree,
+SHA-256 `edda50bc4402bec3e1949d16a9067de073c862139b9b0c017e2514912d43bcfd`.
+It shows agreement with all 13 criteria and the owner's criteria-only decision.
+It shows that historical decisions, product geometry, all 24 risks and
+the 113-entry register stay unchanged. It gives no linguistic verdict.
+
+**Safety/risk panel:** Richard is the project owner and panel chair.
+`/root` presents the alignment. Read-only reviewer `/root/decision_review`
+recommends **Proceed with bounded conditions**. The reviewer examined all 24
+live risks. Their owners, deadlines, treatments and controls stay unchanged.
+
+This decision closes no risk. The author and reviewer share one agent team and workspace.
+The reviewer did not author the product geometry, source proofs or proposal.
+This is not external independence. The panel record contains no different recommendation.
+
+Richard accepts the reference criteria with the stated conditions. He does not give
+Exit 9A-2 acceptance. Before a comparison uses these criteria, its evidence must
+identify the exact frozen scope and keep the stated metric limits.
+The change owner must preserve these conditions during alignment.
+Any wider criterion or source change needs its applicable authority.
+
+**Preserved boundaries:** D-P9-006 keeps its historical meaning. D-P9-007
+changes only the status of the named reference-comparison criteria.
+This decision accepts no assisted S1 pilot, independent prototype dimension, physical fit, preload,
+retention, manufacturing capability, production package, output or rights claim. D-P9-004 private-use conditions and D-P9-005 production duties stay.
+All L1 repair limits, D-P6-008, TERM-R04 and legacy-retirement conditions stay.
+Output stays private-development and project status stays `unknown`.
+The authority covers repository alignment only, with no product implementation.
 
 <a id="phase-9a-exit-1-acceptance-panel"></a>
 

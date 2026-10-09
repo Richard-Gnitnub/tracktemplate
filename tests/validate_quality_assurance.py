@@ -600,7 +600,11 @@ def validate_documentation_profile(
             "D-P9-006",
             "9576614daf6cc69a04d214e824ec32cc7bbe5251",
             "This decision adds no product behaviour",
-            "No other implementation is selected",
+            "This decision selects no product implementation",
+            "D-P9-007",
+            "accepts comparison criteria only for the exact frozen S1 "
+            "reference",
+            "Exit 9A-2 stays Pending until separate owner acceptance",
             "D-GOV-023",
             "representative-fixture",
             "straight TO Edit",

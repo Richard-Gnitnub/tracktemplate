@@ -163,6 +163,15 @@ Before a chair definition or generator is accepted:
 - After exact validation, compare deterministic STL/STEP and retained-component
   outputs. Include separate-part identities and assembly placement.
 
+For the exact frozen S1 reference, [D-P9-007](current/PHASE_EVIDENCE.md#phase-9a-reference-comparison-criteria-panel)
+accepts the [13 reference-comparison criteria](phase-evidence/S1_PILOT_PLAN.md#s1-reference-comparison-criteria-under-d-p9-007).
+Complete finite face and section correspondence is the comparison method
+for that declared faceted reference. Separate surface maximum and distribution
+statistics are not necessary for this comparison.
+The numerical limits control reference comparison, not physical fit or production.
+This decision accepts neither Exit 9A-2 nor the assisted S1 pilot.
+The other comparison and production duties stay unchanged.
+
 For the assisted S1 assimilation pilot, also validate calibration, units, and
 the coordinate frame. Validate operator-declared components and landmarks.
 Compare measured values with inferred values. Validate unresolved findings,
