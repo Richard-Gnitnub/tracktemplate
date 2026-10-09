@@ -5760,11 +5760,12 @@ def _validate_dp9_009_decision(
     for field, clauses in (
         ("decision", (
             "Accept only Phase 9A Exit 9A-3 for the frozen reference-only "
-            "assisted S1 pilot, including its declared components, "
-            "landmarks and retained findings, under D-P9-007",
-            "The same ChairDefinition and procedural chair generator remain",
+            "assisted S1 pilot with the D-P9-007 conditions. This acceptance "
+            "includes its declared components, landmarks and findings that "
+            "the project keeps",
+            "The same ChairDefinition and procedural chair generator stay",
             "The unchanged thirteen D-P9-007 criteria apply only to this "
-            "exact frozen assisted S1 pilot, including complete finite "
+            "exact frozen assisted S1 pilot, with complete finite "
             "face and section correspondence",
             "Phase 9A is Open at 4/4",
             "All four Phase 9A exits are Evidenced and owner-accepted",
@@ -5836,9 +5837,9 @@ def _validate_dp9_009_admission(evidence: str) -> None:
     flat = _semantic_text(panel)
     for clause in (
         "Richard accepts only Exit 9A-3 for the frozen reference-only "
-        "assisted S1 pilot under D-P9-007",
+        "assisted S1 pilot with the D-P9-007 conditions",
         "This acceptance includes its declared components, landmarks and "
-        "retained findings",
+        "findings that the project keeps",
         "The four exit criteria stay unchanged",
         "Phase 9A is Open at 4/4",
         "All four Phase 9A exits are Evidenced and owner-accepted",
@@ -5886,16 +5887,16 @@ def _validate_dp9_009_validation(validation: str) -> None:
         section,
         "D-P9-009 accepts only the frozen assisted S1 pilot for Exit 9A-3 "
         "reference-only architecture proof. The unchanged 13 D-P9-007 "
-        "criteria, including complete finite face and section correspondence, "
+        "criteria, with complete finite face and section correspondence, "
         "apply only to that exact frozen assisted S1 pilot. The owner "
-        "accepts its declared components, landmarks and retained findings. "
-        "Source-coordinate calibration does not establish physical "
+        "accepts its declared components, landmarks and findings that the "
+        "project keeps.<br><br>Source-coordinate calibration is not physical "
         "measurement calibration. No value becomes a measured physical "
         "dimension or independently evidenced prototype fact. This "
         "decision claims no measured whole-surface distribution or "
         "independently derived absolute base/seat overlap magnitude. It "
         "changes no numerical limit, production duty or validation "
-        "requirement outside this bounded acceptance. Phase 9A stays "
+        "requirement outside this bounded acceptance.<br><br> Phase 9A stays "
         "Open at 4/4. Phase 9B stays Not started at 0/6.",
         "D-P9-009 validation applicability drifted or was relocated",
     )

@@ -4944,8 +4944,8 @@ def validate_phase9_exit3_admission_mutations() -> None:
         ("wider-pilot", "only to that exact frozen assisted S1 pilot",
          "to all S1 pilots"),
         ("new-numerics", "unchanged 13 D-P9-007", "new 13 pilot"),
-        ("physical-calibration", "does not establish physical",
-         "establishes physical"),
+        ("physical-calibration", "is not physical",
+         "is physical"),
         ("duties-waived", "changes no numerical limit",
          "changes numerical limits"),
     ):

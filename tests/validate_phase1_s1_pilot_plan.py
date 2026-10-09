@@ -61,8 +61,8 @@ INTENDED_USES = (
     "physical-production",
 )
 REQUIRED_MARKERS = (
-    "Status: **Accepted Phase 1 control; production definition and production "
-    "pilot",
+    "Status: **Accepted Phase 1 control. The production definition and "
+    "production pilot",
     "authoritative interchange is a neutral, versioned TrackTemplateMacro",
     "Serialised output-affecting numbers use exact decimal strings",
     "`+X` longitudinally along the nominal rail direction",
@@ -513,14 +513,15 @@ def _exit3_acceptance_errors(text):
     clauses = (
         "accepts only the frozen reference-only assisted S1 pilot and "
         "Exit 9A-3",
-        "The owner accepts its declared components, landmarks and "
-        "retained findings under D-P9-007",
+        "The owner accepts its declared components, landmarks and findings "
+        "that the project keeps with the D-P9-007 conditions",
         "The accepted fitting method uses the same neutral ChairDefinition "
         "and procedural chair generator",
-        "It does not use retained FreeCAD shapes as authoritative input",
+        "It does not use FreeCAD shapes that the product keeps as "
+        "authoritative input",
         "D-P9-009 supplies the bounded assisted S1 pilot acceptance that "
         "D-P9-007 and D-P9-008 did not supply",
-        "It applies the existing comparison method and numerical limits "
+        "It applies the accepted comparison method and numerical limits "
         "only to this exact frozen reference",
         "The general production and assisted-pilot duties below stay "
         "applicable outside this accepted scope",
@@ -575,14 +576,14 @@ def _exit3_acceptance_errors(text):
         )),
         ("Procedural construction", (
             "chair_research.prepare_chair_assembly_research",
-            "existing model and rail research paths",
+            "current model and rail research paths",
             "Native validation, save/reopen and the nine FreeCAD views "
-            "remain the evidence",
+            "stay the evidence",
         )),
         ("Residual comparison", (
             "unchanged 13 D-P9-007 criteria apply only to this exact frozen "
             "assisted S1 pilot",
-            "Complete finite face and section correspondence remains "
+            "Complete finite face and section correspondence stays "
             "its reference comparison",
             "no measured whole-surface distribution or independently "
             "derived absolute base/seat overlap magnitude",
@@ -592,7 +593,7 @@ def _exit3_acceptance_errors(text):
             "assisted S1 pilot",
             "Earlier decisions and the earlier approval of reference views "
             "keep their historical limits",
-            "This external decision leaves package metadata unchanged",
+            "This external decision keeps package metadata unchanged",
         )),
     )
     rows = [_table_cells(line) for line in section.splitlines()
@@ -1040,7 +1041,7 @@ def main():
          "Fastenings and plug/socket components are accepted"),
         ("A null uncertainty is not zero uncertainty", "Null means zero"),
         ("unchanged 13 D-P9-007 criteria", "new numerical criteria"),
-        ("leaves package metadata unchanged", "promotes package metadata"),
+        ("keeps package metadata unchanged", "promotes package metadata"),
         ("No new numerical tolerance follows", "New tolerances follow"),
         ("Phase 9A is not closed", "Phase 9A is closed"),
         ("Phase 9B stays Not started", "Phase 9B is Open"),
