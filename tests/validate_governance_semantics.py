@@ -4886,8 +4886,8 @@ def validate_phase9_closeout_opening_mutations() -> None:
     for name, before, after, diagnostic in (
         ("reference-scope", "frozen\nreference-only scope",
          "production scope", "D-P9-010 closeout boundary drifted"),
-        ("production-fit", "They do not establish independent prototype",
-         "They establish independent prototype",
+        ("production-fit", "They do not validate independent prototype",
+         "They validate independent prototype",
          "D-P9-010 closeout boundary drifted"),
         ("risk-waiver", "All risk states, severities, owners, deadlines,",
          "Only some risk states, severities, owners, deadlines,",
@@ -4898,7 +4898,7 @@ def validate_phase9_closeout_opening_mutations() -> None:
         ("restore-deadline", "next monthly drill is due by\n2026-11-07",
          "next monthly drill is optional",
          "D-P9-010 closeout boundary drifted"),
-        ("separate-storage", "Physical separate storage remains unverified",
+        ("separate-storage", "Physical separate storage stays unverified",
          "Physical separate storage is proved",
          "D-P9-010 closeout boundary drifted"),
         ("legacy-waiver", "removal and legacy-retirement conditions stay",
@@ -4927,10 +4927,10 @@ def validate_phase9_closeout_opening_mutations() -> None:
         )
     opening = progress._section(current, progress.DP9_011_HEADING)
     for name, before, after in (
-        ("acceptance", "All six exits stay Pending",
-         "All six exits are accepted"),
-        ("scope", "does not widen the frozen Phase 9A",
-         "widens the frozen Phase 9A"),
+        ("acceptance", "Phase 9B opening at 0/6. All six exits stay Pending",
+         "Phase 9B opening at 0/6. All six exits are accepted"),
+        ("scope", "does not change the frozen Phase 9A",
+         "changes the frozen Phase 9A"),
         ("implementation", "This cycle selects no product implementation",
          "This cycle selects product implementation"),
         ("rights", "package, output, rights, numerical tolerance",
@@ -6197,8 +6197,8 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(
             replace_once(plan, owner_view_row, inflated_view)
         ),
-        "project-plan owner view lost or contradicted: "
-        "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 remain",
+        "project-plan owner view lost or contradicted: All 24 risk duties, "
+        "D-P6-008 Deferred — unmet and TERM-R04 stay",
     )
     owner_view_authority = replace_once(
         plan,
@@ -6233,18 +6233,21 @@ def validate_documentation_profile_mutations() -> None:
         (
             "reference-scope-promoted", "| Current state |",
             "accepted reference-only scopes", "production scopes",
-            "All four exits retain their accepted reference-only scopes",
+            "All four exits keep their accepted reference-only scopes",
         ),
         (
             "risk-duties-removed", "| Limitations/findings |",
             "All 24 risk duties", "No risk duties",
-            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 remain",
+            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
         ),
         (
             "physical-fit-accepted", "| Limitations/findings |",
-            "Physical fit and production/package rights remain unaccepted",
-            "Physical fit and production/package rights are accepted",
-            "Physical fit and production/package rights remain unaccepted",
+            "The owner gives no acceptance for physical fit or "
+            "production/package rights",
+            "The owner gives acceptance for physical fit or "
+            "production/package rights",
+            "The owner gives no acceptance for physical fit or "
+            "production/package rights",
         ),
         (
             "phase9b-exits-accepted", "| Current state |",
@@ -6255,7 +6258,8 @@ def validate_documentation_profile_mutations() -> None:
         (
             "merge-authorised", "| Next action |",
             "Do not merge", "Merge now",
-            "Publish an exact-green draft PR. Do not merge",
+            "Publish a draft PR with a PASS result from CI for its exact "
+            "head. Do not merge",
         ),
         (
             "stop-boundary-waived", "| Next action |",

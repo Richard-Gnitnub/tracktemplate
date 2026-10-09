@@ -587,18 +587,20 @@ def validate_documentation_profile(
     require(
         all(fragment in " ".join(owner_view.split()) for fragment in (
             "Phase 9A is closed at 4/4 under [D-P9-010]",
-            "All four exits retain their accepted reference-only scopes",
+            "All four exits keep their accepted reference-only scopes",
             "Phase 9B is Open at 0/6",
             "All six Phase 9B exits stay Pending",
             "D-P9-010",
             "D-P9-011",
             "This alignment adds no product behaviour",
-            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 remain",
+            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
             "Output stays private-development",
             "project status stays `unknown`",
-            "Physical fit and production/package rights remain unaccepted",
-            "No production exit or product implementation is accepted",
-            "Publish an exact-green draft PR. Do not merge",
+            "The owner gives no acceptance for physical fit or "
+            "production/package rights",
+            "The owner accepts no production exit or product implementation",
+            "Publish a draft PR with a PASS result from CI for its exact "
+            "head. Do not merge",
             "Select no product implementation in this cycle",
             "history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
             "current/PHASE_EVIDENCE.md#phase-9b-opening-panel",

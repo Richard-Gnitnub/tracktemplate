@@ -1262,20 +1262,22 @@ def _validate_owner_view(plan: str) -> None:
     owner_view = _semantic_text(section)
     for fragment in (
         "Phase 9A is closed at 4/4 under D-P9-010",
-        "All four exits retain their accepted reference-only scopes",
+        "All four exits keep their accepted reference-only scopes",
         "Phase 9B is Open at 0/6 under D-P9-011",
         "All six Phase 9B exits stay Pending",
         "The six production criteria stay unchanged",
         "This alignment adds no product behaviour",
         "same neutral schema and procedural chair generator",
-        "nine owner-reviewed views remain applicable reference evidence",
-        "Physical fit and production/package rights remain unaccepted",
-        "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 remain",
+        "nine views that the owner reviewed stay applicable reference evidence",
+        "The owner gives no acceptance for physical fit or production/package "
+        "rights",
+        "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
         "Output stays private-development and project status stays unknown",
         "D-P9-010 closes only the frozen reference-only Phase 9A scope",
         "D-P9-011 opens only Phase 9B at 0/6",
-        "No production exit or product implementation is accepted",
-        "Publish an exact-green draft PR. Do not merge",
+        "The owner accepts no production exit or product implementation",
+        "Publish a draft PR with a PASS result from CI for its exact head. Do "
+        "not merge",
         "Select no product implementation in this cycle",
     ):
         _require(
@@ -1283,12 +1285,12 @@ def _validate_owner_view(plan: str) -> None:
             "project-plan owner view lost or contradicted: " + fragment,
         )
     expected_row_digests = (
-        "b87c1e140242f9b873c97b1865d442900b94ff8e7f83db6fd991c473bd58a66a",
+        "64251046000ecd38ac69a60e923e2cdad006629e731aec88e1cab1fca73679a3",
         "dbe4320e38b9d71082f58b6ee3a7a738ed24c0d772f57b3f425371a34be48e37",
-        "61f332fd1a84dafa1f40da1ea5ef2e7f8ef731d3b1bac01ab007e56a7089ec05",
-        "ae4ddc471d72f7efaacfb1e39d0ed6a893b0771ca2b2a3eda5a3f12edb1ee09c",
-        "0746f3a91a0daf17b0df1634befc3b392b03c2a251b88dd2fa2059c1761730fd",
-        "161c953290ac03ac74cd39975a5f3f797e2d3074eb7a4c2bcba139de0820d17c",
+        "0f9d7f5aa8d5523a62348f586dc8f0214e72017f8456be505c0d66be73a04b3a",
+        "3c95270afb9aacdfe27313a50155d8bcc9640edae97e84c2ce27073192d1fc55",
+        "d11ae37356a6b6b387e5e700c7753598f6a8a188d3c92da2fb5ebd6d17ba5e99",
+        "880d42c8d4dc4a6fe4581bf1938631aac92e065a1d5c3f9452cc1ea647b1de2c",
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -7152,7 +7154,7 @@ def _validate_dp9_010_decision(
             "f2a0b8dd1954175972e499d6a71de60f5875d5436508d2160cd1e3a569687674"
         )),
         ("exclusions", (
-            "d6a2be052e86f2ba9ffd7656cd30e23cca2e825d635eb3adbda45e850040b10a"
+            "90232244cfbef470164efb8f09e50e0d559dab17741a90cc08da1a2d8266543d"
         )),
     ):
         value = record[field]
@@ -7188,10 +7190,10 @@ def _validate_dp9_011_decision(
     )
     for field, digest in (
         ("decision", (
-            "d00cd98c55317dab5b3ea159016604213ac396a0fc749b241a6cb675202b1258"
+            "2ed858632dbed3cdfec88c917143d030711924ccb398223af1199c39d49d0644"
         )),
         ("exclusions", (
-            "a02180542df4694ab9519ef129956923f851dc09369ec0f798945e55439a5754"
+            "bcc391db31fc5ed01372b309cf081cb9ff4d2162f8a48a131ff18a9eef8962aa"
         )),
     ):
         value = record[field]
@@ -7239,14 +7241,15 @@ def _validate_phase9a_closeout(evidence: str) -> None:
         "D-P9-010 closes Phase 9A at 4/4 for the frozen reference-only scope",
         "All four criteria and their accepted limits stay unchanged",
         "It adds no product behaviour and opens no subsequent phase",
-        "The later D-P9-011 decision owns Phase 9B opening",
+        "The subsequent D-P9-011 decision owns Phase 9B opening",
         "69ef5be79922f694c9019bbd3e33b919c882235e",
         "9960de8c1ef6a4cf16a9e267ab9e7f5c74962b88",
         "37892920877", "37893672265", "98/98",
-        "68 retained identities, nine review receipts and 11 final inputs",
+        "68 identities, nine review receipts and 11 final inputs that the "
+        "project keeps",
         "The complete D-P9-007 criteria stay unchanged",
-        "nine owner-reviewed views remain the applicable native evidence",
-        "They do not establish independent prototype dimensions or physical fit",
+        "nine views that the owner reviewed stay applicable",
+        "They do not validate independent prototype dimensions or physical fit",
         "This is not external organisational independence",
         "Proceed with bounded conditions",
         "All risk states, severities, owners, deadlines, treatments and "
@@ -7254,27 +7257,29 @@ def _validate_phase9a_closeout(evidence: str) -> None:
         "No risk closes",
         "45 roots", "156,133 entries and 8,585,174,023 bytes",
         "All 68 critical identities", "All 45 strict checksum checks passed",
-        "their complete contents were not independently rehashed",
+        "The reviewer did not independently calculate hashes for their "
+        "complete contents again",
         "1,708 entries", "1,726 entries",
-        "USB was safely unmounted without force",
-        "Physical separate storage remains unverified",
+        "udisksctl unmount command completed without force",
+        "Physical separate storage stays unverified",
         "This is not a restore of the October 9 set",
         "monthly restore passed on 2026-10-07",
         "next monthly drill is due by 2026-11-07",
         "new alignment worktree is outside the earlier 45-root snapshot",
-        "No later file is claimed inside an earlier packet",
-        "two October 1 intermediate Ruff-cache states remain unavailable",
+        "This record claims no subsequent file inside an earlier packet",
+        "two October 1 intermediate Ruff-cache states stay unavailable",
         "S1-07 through S1-13 and S1-15",
-        "S1-14 remains optional comparison evidence under D-P9-005",
-        "production tolerances and package rights remain unresolved for production",
+        "S1-14 stays optional comparison evidence under D-P9-005",
+        "production tolerances and package rights stay unresolved for "
+        "production",
         "113-entry register and 119 derived, reference-only lineage records "
         "stay unchanged",
         "Vertical-rail and planar-seat adaptations, edge contact and "
-        "deliberate overlap retain their declared meanings",
-        "No measured whole-surface distribution or independently derived "
-        "absolute base/seat overlap magnitude is claimed",
-        "L1 repair limits remain exhausted at 2/2 and terminal correction at 1/1",
-        "All inherited Phase 8 limits remain",
+        "deliberate overlap keep their declared meanings",
+        "This record claims no measured whole-surface distribution or "
+        "independently derived absolute base/seat overlap magnitude",
+        "L1 repair limits stay exhausted at 2/2 and terminal correction at 1/1",
+        "All inherited Phase 8 limits stay",
         "Both B14/B15 identities",
         "all comparison, adapter, caller, removal and legacy-retirement "
         "conditions stay",
@@ -7282,7 +7287,8 @@ def _validate_phase9a_closeout(evidence: str) -> None:
         "mandatory before Phase 10 beta acceptance",
         "TERM-R04 stays open",
         "Output stays private-development and project status stays unknown",
-        "Publish an exact-green draft PR. Do not merge",
+        "Publish a draft PR with a PASS result from CI for its exact head. Do "
+        "not merge",
         "accepts no physical fit, preload, retention, manufacturing "
         "capability, production package, output, rights, performance result "
         "or release",
@@ -7324,8 +7330,8 @@ def _validate_phase9b_holding(evidence: str) -> None:
         "Phase 9B opening at 0/6. All six exits stay Pending",
         "existing six criteria and production conditions stay",
         "69ef5be79922f694c9019bbd3e33b919c882235e",
-        "does not widen the frozen Phase 9A acceptance or accept any "
-        "Phase 9B result",
+        "does not change the frozen Phase 9A acceptance or accept any Phase "
+        "9B result",
         "Proceed with bounded conditions",
         "No risk closes or changes owner, deadline, treatment or control",
         "reviewed recovery limits and conditions",
@@ -7334,7 +7340,7 @@ def _validate_phase9b_holding(evidence: str) -> None:
         "capability, production package, output, rights, numerical tolerance, "
         "performance result or release",
         "D-P6-008 stays Deferred — unmet. TERM-R04 stays open",
-        "113-entry register and legacy-retirement conditions remain",
+        "113-entry register and legacy-retirement conditions stay",
         "Output stays private-development and project status stays unknown",
     ):
         _require(clause in flat, "D-P9-011 opening boundary drifted: " + clause)
