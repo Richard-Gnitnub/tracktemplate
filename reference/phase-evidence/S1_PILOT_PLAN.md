@@ -4,6 +4,10 @@ Status: **Accepted Phase 1 control; production definition and pilot remain
 blocked. D-P9-006 accepts the named frozen S1 `ChairDefinition` for Exit 9A-1
 reference-only architecture proof. Exits 9A-2 and 9A-3 stay Pending.**
 
+[D-P9-007](#s1-reference-comparison-criteria-under-d-p9-007) accepts only the
+bounded S1 reference-comparison criteria below. Phase 9A stays Open at 2/4.
+Phase 9B stays Not started at 0/6.
+
 This document defines the minimum neutral package, evidence, rights and
 acceptance plan for the first S1 chair. It is a project-control plan, not a
 chair definition, an assertion that the working description “S1” is a precise
@@ -181,6 +185,84 @@ Phase 9A is Open at 2/4. Exits 9A-1 and 9A-4 are Evidenced and owner-accepted.
 Exits 9A-2 and 9A-3 stay Pending. Phase 9B stays Not started at 0/6.
 No numerical tolerance, production output or positive rights finding follows.
 
+## S1 reference-comparison criteria under D-P9-007
+
+The [D-P9-006 section](#bounded-exit-9a-1-acceptance-under-d-p9-006) records that
+decision at its date. D-P9-007 supersedes only its statement that the specified
+construction guards are not accepted reference tolerances.
+The physical-fit and production exclusions stay unchanged.
+
+On 2026-10-08, D-P9-007 accepts the thirteen criteria below for the bounded
+five-component S1 reference comparison. This section owns those criteria and
+their reasons. The decision does not accept Exit 9A-2 or the assisted S1 pilot.
+Phase 9A stays Open at 2/4. Exits 9A-2 and 9A-3 stay Pending.
+Phase 9B stays Not started at 0/6.
+
+The scope uses the exact S1 package and manifest identified by
+[D-P9-006](#bounded-exit-9a-1-acceptance-under-d-p9-006).
+The frozen Templot 556b revision A0 rail section has SHA-256
+`7d5a08b269b52e6ebbc26453853ce308343ccd54636454d589add2e1397cc2d6`.
+This decision accepts no other package, rail section, model scale or manufacturing profile.
+
+The local decision packet is `tmp/phase9a-post149-exit2-assessment.json` in
+the primary repository. Its SHA-256 is
+`7444309a79f5940c7026b571871b118f70d0ce93578380ef89adcb187c723861`.
+Its `proposed_reference_criteria` array gives the order of the thirteen rows.
+Its `independent_source_proofs` record identifies each component proof by path
+and SHA-256. Source coordinates, dimensions, distances and overlap magnitudes
+stay in that local packet and its identified evidence.
+
+The independent decision review is
+`tmp/phase9a-post149-decision-review.json`, with SHA-256
+`9d3def6445bc0181ad971639110927c380a8b15d162e00d69ac5f017c6f98f18`.
+The owner accepts the criteria and recorded conditions only. The proposal to
+accept Exit 9A-2 in those earlier records has no acceptance authority.
+
+In the formulas below, `epsilon = 1e-7 mm` and `f = 5/381`.
+`A` is an area in mm², `V` is a volume in mm³, and `B` is a volume budget in mm³.
+`L` is the total B-rep edge length in mm, not the physical rail length.
+`Nedges` is the number of edges in the compared contact.
+Each comparison uses the stated full-size or model units.
+
+| ID and criterion family | Accepted reference criterion | Reason and limit |
+| --- | --- | --- |
+| 1. Package identity, provenance and neutral round-trip | Records, identifiers, source values and units, canonical quantities, manifests, signatures and `reference-only` status must agree exactly. No numerical tolerance applies. Standalone and FreeCAD paths must reject unsigned corruption and schema 2 before native construction. Prototype, model-fit and manufacturing records stay separate. Production refusal stays. | Exact equality gives no numerical allowance for a metadata or provenance change. |
+| 2. Units, scale and frame | Source decimal values and unit conversions stay exact. Full-size lengths use mm and `chair-local-right-handed-v1`, with the same origin and central-key placement. The model denominator is `381/5 = 76.2` only. Length, area and volume factors are `f`, `f^2` and `f^3`. Algebraic coordinates keep their exact representation. The A0 rail already uses model mm and receives no second scale conversion.<br><br>The rail transform and display-only longitudinal crop stay as identified in row 2 of the local packet. | One declared projection preserves the canonical chair frame and prevents double scaling. The display crop is not a canonical rail length. |
+| 3. Source finite boundaries and sections | Named source corners, ordered face boundaries, diagonals and recorded coplanar consolidations must agree. Rational coefficients must agree exactly. Source facets and quantisation stay unchanged. Each component keeps the historical binary64 formulas and separately dimensioned limits in its `independent_source_proofs` record.<br><br>For algebraic jaw comparisons, source evaluation uses 120 digits, with candidate evaluation at 130 digits for the outer jaw and 140 for the inner jaw. The existing comparison limit is `1e-100 mm` for each length field and `1e-100 mm^3` for each volume field. This includes the recorded coordinate, landmark, section, bounds and volume comparisons. These limits stay separate from the native `epsilon` guard. | Complete finite boundaries and sections test the declared source geometry. Historical arithmetic limits give the maximum numerical evaluation error. They do not describe uncertainty in physical measurements. |
+| 4. Native named-vertex distance and axis bounds | Each Euclidean named-vertex distance must be at most `epsilon`. The maximum absolute residual over the six bound coordinates must be at most `epsilon`. This absolute guard applies separately in full-size mm and model mm. | The guard limits native construction error. It does not become a physical-fit allowance after scaling. |
+| 5. Kernel tolerance | The kernel tolerance must be at most `1e-7 mm`, or pass `math.isclose(value, 1e-7, rel_tol=1e-12, abs_tol=0)` with values in mm. | The relative allowance permits the existing floating-point representation difference only. It permits no physical clearance or kernel-tolerance growth. |
+| 6. Component and assembly volume | Each component volume must be positive and finite. Its absolute residual must be within this limit: `abs(Vnative - Vanalytic) <= max(Ashape * epsilon, abs(Vanalytic) * 1e-12)`. The budget has units mm³. The assembly `Compound` volume must preserve the component sum within the sum of the component budgets. The five solids stay separate and unfused. | The area term gives a dimensional displacement budget. The relative term limits arithmetic error. A component sum is not a fused material volume. |
+| 7. Projection comparison | Coordinates and landmarks must use exact factor `f`. Identities, face cycles and topology stay unchanged. Native component area scaling uses `rel_tol=1e-12` and `abs_tol=0`. The scaled volume budget is `Bmodel + Bfull * f^3`. The pair-distance comparison budget is `epsilon * (1 + f)`. | These budgets include the numerical guards at both scales without acceptance of an arbitrary scale. |
+| 8. Interface plane constraints | Analytical equation residuals must equal exact zero, including signed changes below `epsilon`. Native point comparisons use Euclidean distance at most `epsilon`. For `a*x + b*y + c*z - d`, the native residual budget is `epsilon * (abs(a) + abs(b) + abs(c))`. The 36 named-point checks, eight finite faces and one endpoint relation stay. | The equation residual is not a surface distance. Coefficient magnitudes give its numerical budget. |
+| 9. Finite rail contact and nonpenetration | Contact polygon identities, area-squared values in mm⁴, half-space signs and finite extents must agree exactly. The native area budget is `(Lchair + Lrail) * epsilon` in mm². The rail common-volume budget is `(Achair + Arail) * epsilon` in mm³. Patch counts must stay: seat 1, inner jaw 4, key 7, base 0 and outer jaw 0. All five rail common volumes must stay zero within that numerical budget. | Finite boundaries distinguish a contact patch from a plane extension. Numerical area and volume budgets do not establish physical fit. |
+| 10. Under-head contact dimension | The under-head contact must stay an edge, with zero area and no face. Its reference length stays in the local packet. The native edge-length budget is `2 * Nedges * epsilon`. | The comparison preserves the dimension of the contact. It cannot convert an edge into a bearing area. |
+| 11. Deliberate key/outer-jaw overlap | The exact reference common volume must stay the product of the recorded footprint area and depth. Those values stay in the local packet. The native absolute volume residual must be at most `(Akey + Aouter) * epsilon` in mm³. Positive overlap stays mandatory for this reference. | This comparison preserves the selected source relationship. The overlap is not a fit allowance or proof of preload or retention. |
+| 12. Remaining pairwise joints | All ten pair identities, distances and relation classes must agree with the local packet. Separated pairs are `base/key`, `seat/key`, `key/inner` and `outer/inner`. Zero-distance pairs with no observed common volume are `base/outer`, `base/inner`, `seat/outer` and `seat/inner`. Positive-overlap pairs are `base/seat` and `key/outer`. Exact distances stay in the local packet. The absolute `base/seat` common volume stays a host observation only.<br><br>This criterion requires the independently established `base/seat` overlap relation, not an independently derived absolute overlap magnitude. | Relation classes preserve assembly intent. A host observation must not become a claim of an independently derived magnitude. |
+| 13. Topology and validity | Ordered component and face identities must agree exactly. Boundaries must be closed, valid and correctly oriented, with positive volumes. The result must contain five individual solids in one `Compound`. Each component must keep the exact vertex, edge and face counts in row 13 of the local packet. | Topology and validity checks are necessary with dimensional agreement. The criteria give no authority for healing, a fused chair or production export. |
+
+For this exact frozen faceted reference, the comparison uses complete finite
+face and section correspondence. A separate surface-distance maximum and
+distribution are not necessary for this comparison.
+The comparison keeps source diagonals and the recorded coplanar consolidations.
+For corresponding planar faces, the vertices and the same triangulation
+give every interpolated point. This is the reason for the selected metric,
+not a new measured surface-distance distribution or Hausdorff result.
+Source facets do not become smooth prototype surfaces.
+
+D-P9-007 accepts no new geometry or numerical limit. It gives the existing
+guards only the bounded reference-comparison status specified here.
+The 113-entry register, frozen package bytes, source allowances and field
+provenance stay unchanged. The package keeps its historical
+`acceptance: not-accepted` and `validation: not-run` fields.
+This external decision does not promote those fields or accept a phase exit.
+
+Physical rail measurements, fit tolerances, preload, retention and manufacturing
+capability stay outside this decision. Prototype identity, production rights,
+production output and the assisted S1 pilot also stay outside it.
+This decision claims no measured whole-surface statistics or independently derived absolute
+`base/seat` overlap magnitude. The D-P9-004 private-use conditions
+and all other acceptance boundaries stay.
+
 ## Neutral package requirements
 
 The future schema must describe the following logical records. This list does
@@ -298,6 +380,12 @@ bundle without a scan. A scan or CAD body may assist fitting, but cannot alone
 prove prototype identity, hidden geometry, nominal dimensions or rail fit.
 
 ## Comparison and fit metrics
+
+The [D-P9-007 criteria](#s1-reference-comparison-criteria-under-d-p9-007) own
+the bounded comparison for the exact frozen S1 reference.
+They use complete finite face and section correspondence in place of the
+separate surface maximum and distribution below. This exception does not
+change the production or assisted-pilot duties.
 
 Phase 1 fixes the metric families, not unsupported numerical limits. Phase 9
 must set tolerances from the selected evidence, its uncertainty, the rail-fit

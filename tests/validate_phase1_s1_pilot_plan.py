@@ -82,6 +82,125 @@ REQUIRED_MARKERS = (
     "no S1 production definition, project-cleared package or permission from a",
     "manifest cannot substitute for the recorded owner acceptance",
 )
+REFERENCE_CRITERIA_HEADING = (
+    "S1 reference-comparison criteria under D-P9-007"
+)
+REFERENCE_CRITERIA_IDENTITIES = (
+    "7d5a08b269b52e6ebbc26453853ce308343ccd54636454d589add2e1397cc2d6",
+    "7444309a79f5940c7026b571871b118f70d0ce93578380ef89adcb187c723861",
+    "9d3def6445bc0181ad971639110927c380a8b15d162e00d69ac5f017c6f98f18",
+)
+# Each row owns its rule; a matching phrase elsewhere is insufficient.
+REFERENCE_CRITERIA = (
+    ("Package identity, provenance and neutral round-trip", (
+        "reference-only status must agree exactly",
+        "No numerical tolerance applies",
+        "reject unsigned corruption and schema 2 before native construction",
+        "Prototype, model-fit and manufacturing records stay separate",
+        "Production refusal stays",
+    )),
+    ("Units, scale and frame", (
+        "Source decimal values and unit conversions stay exact",
+        "Full-size lengths use mm and chair-local-right-handed-v1",
+        "same origin and central-key placement",
+        "381/5 = 76.2", "f, f^2 and f^3",
+        "Algebraic coordinates keep their exact representation",
+        "A0 rail already uses model mm and receives no second scale "
+        "conversion",
+        "display crop is not a canonical rail length",
+    )),
+    ("Source finite boundaries and sections", (
+        "ordered face boundaries, diagonals and recorded coplanar "
+        "consolidations must agree",
+        "Rational coefficients must agree exactly",
+        "Source facets and quantisation stay unchanged",
+        "historical binary64 formulas and separately dimensioned limits",
+        "120 digits", "130 digits for the outer jaw and 140 for the inner jaw",
+        "1e-100 mm for each length field and 1e-100 mm^3 for each volume "
+        "field",
+        "coordinate, landmark, section, bounds and volume comparisons",
+        "limits stay separate from the native epsilon guard",
+        "They do not describe uncertainty in physical measurements",
+    )),
+    ("Native named-vertex distance and axis bounds", (
+        "Each Euclidean named-vertex distance must be at most epsilon",
+        "maximum absolute residual over the six bound coordinates must "
+        "be at most epsilon",
+        "applies separately in full-size mm and model mm",
+        "does not become a physical-fit allowance after scaling",
+    )),
+    ("Kernel tolerance", (
+        "at most 1e-7 mm",
+        "math.isclose(value, 1e-7, rel_tol=1e-12, abs_tol=0)",
+        "with values in mm",
+        "permits no physical clearance or kernel-tolerance growth",
+    )),
+    ("Component and assembly volume", (
+        "Each component volume must be positive and finite",
+        "abs(Vnative - Vanalytic) <= max(Ashape * epsilon, "
+        "abs(Vanalytic) * 1e-12)",
+        "budget has units mm³",
+        "preserve the component sum within the sum of the component budgets",
+        "five solids stay separate and unfused",
+        "component sum is not a fused material volume",
+    )),
+    ("Projection comparison", (
+        "Coordinates and landmarks must use exact factor f",
+        "Identities, face cycles and topology stay unchanged",
+        "rel_tol=1e-12 and abs_tol=0",
+        "Bmodel + Bfull * f^3", "epsilon * (1 + f)",
+        "without acceptance of an arbitrary scale",
+    )),
+    ("Interface plane constraints", (
+        "Analytical equation residuals must equal exact zero",
+        "including signed changes below epsilon",
+        "Euclidean distance at most epsilon",
+        "epsilon * (abs(a) + abs(b) + abs(c))",
+        "36 named-point checks, eight finite faces and one endpoint relation",
+        "equation residual is not a surface distance",
+    )),
+    ("Finite rail contact and nonpenetration", (
+        "Contact polygon identities, area-squared values in mm⁴, "
+        "half-space signs and finite extents must agree exactly",
+        "(Lchair + Lrail) * epsilon in mm²",
+        "(Achair + Arail) * epsilon in mm³",
+        "seat 1, inner jaw 4, key 7, base 0 and outer jaw 0",
+        "All five rail common volumes must stay zero within that "
+        "numerical budget",
+        "do not establish physical fit",
+    )),
+    ("Under-head contact dimension", (
+        "must stay an edge, with zero area and no face",
+        "reference length stays in the local packet",
+        "2 * Nedges * epsilon",
+        "cannot convert an edge into a bearing area",
+    )),
+    ("Deliberate key/outer-jaw overlap", (
+        "exact reference common volume must stay the product of the "
+        "recorded footprint area and depth",
+        "Those values stay in the local packet",
+        "(Akey + Aouter) * epsilon in mm³",
+        "Positive overlap stays mandatory for this reference",
+        "overlap is not a fit allowance or proof of preload or retention",
+    )),
+    ("Remaining pairwise joints", (
+        "All ten pair identities, distances and relation classes must agree",
+        "base/key, seat/key, key/inner and outer/inner",
+        "base/outer, base/inner, seat/outer and seat/inner",
+        "Positive-overlap pairs are base/seat and key/outer",
+        "Exact distances stay in the local packet",
+        "absolute base/seat common volume stays a host observation only",
+        "independently established base/seat overlap relation, not an "
+        "independently derived absolute overlap magnitude",
+    )),
+    ("Topology and validity", (
+        "Ordered component and face identities must agree exactly",
+        "closed, valid and correctly oriented, with positive volumes",
+        "five individual solids in one Compound",
+        "exact vertex, edge and face counts in row 13 of the local packet",
+        "no authority for healing, a fused chair or production export",
+    )),
+)
 
 
 def _sha256(path):
@@ -278,6 +397,78 @@ def _exit1_acceptance_errors(text):
     return errors
 
 
+def _reference_criteria_errors(text):
+    """Protect the scoped criteria without promoting pending acceptance."""
+    section = direct_section_content(text, REFERENCE_CRITERIA_HEADING)
+    flat = " ".join(section.replace("`", "").split())
+    errors = [
+        "S1 reference criteria identity drifted: " + identity
+        for identity in REFERENCE_CRITERIA_IDENTITIES
+        if identity not in section
+    ]
+    clauses = (
+        "D-P9-007 supersedes only its statement that the specified "
+        "construction guards are not accepted reference tolerances",
+        "The physical-fit and production exclusions stay unchanged",
+        "decision does not accept Exit 9A-2 or the assisted S1 pilot",
+        "Phase 9A stays Open at 2/4",
+        "Exits 9A-2 and 9A-3 stay Pending",
+        "Phase 9B stays Not started at 0/6",
+        "This decision accepts no other package, rail section, model scale "
+        "or manufacturing profile",
+        "Source coordinates, dimensions, distances and overlap magnitudes "
+        "stay in that local packet and its identified evidence",
+        "proposal to accept Exit 9A-2 in those earlier records has no "
+        "acceptance authority",
+        "epsilon = 1e-7 mm and f = 5/381",
+        "A is an area in mm², V is a volume in mm³, and B is a volume "
+        "budget in mm³",
+        "L is the total B-rep edge length in mm, not the physical rail length",
+        "Nedges is the number of edges in the compared contact",
+        "For this exact frozen faceted reference, the comparison uses "
+        "complete finite face and section correspondence. A separate "
+        "surface-distance maximum and distribution are not necessary for "
+        "this comparison",
+        "not a new measured surface-distance distribution or Hausdorff result",
+        "Source facets do not become smooth prototype surfaces",
+        "D-P9-007 accepts no new geometry or numerical limit",
+        "The 113-entry register, frozen package bytes, source allowances "
+        "and field provenance stay unchanged",
+        "acceptance: not-accepted and validation: not-run fields",
+        "This external decision does not promote those fields or accept "
+        "a phase exit",
+        "Physical rail measurements, fit tolerances, preload, retention "
+        "and manufacturing capability stay outside this decision",
+        "Prototype identity, production rights, production output and "
+        "the assisted S1 pilot also stay outside it",
+        "This decision claims no measured whole-surface statistics or "
+        "independently derived absolute base/seat overlap magnitude",
+        "D-P9-004 private-use conditions and all other acceptance "
+        "boundaries stay",
+    )
+    errors.extend(
+        "S1 reference criteria boundary drifted: " + clause
+        for clause in clauses if clause not in flat
+    )
+    if "#bounded-exit-9a-1-acceptance-under-d-p9-006" not in section:
+        errors.append("S1 reference criteria lost frozen scope owner")
+    rows = [_table_cells(line) for line in section.splitlines()
+            if line.startswith("|")]
+    expected_names = ["{}. {}".format(index, name)
+                      for index, (name, _) in enumerate(REFERENCE_CRITERIA, 1)]
+    if (len(rows) != 15 or any(len(row) != 3 for row in rows)
+            or [row[0] for row in rows[2:]] != expected_names):
+        errors.append("S1 reference criteria inventory or order drifted")
+        return errors
+    for row, (_name, required) in zip(rows[2:], REFERENCE_CRITERIA):
+        content = " ".join(" ".join(row[1:]).replace("`", "").split())
+        errors.extend(
+            "S1 reference criterion {} drifted: {}".format(row[0], clause)
+            for clause in required if clause not in content
+        )
+    return errors
+
+
 def validate_plan(
     text,
     manifest,
@@ -289,6 +480,7 @@ def validate_plan(
         _research_boundary_errors(text)
         + _engineering_reference_errors(text)
         + _exit1_acceptance_errors(text)
+        + _reference_criteria_errors(text)
     )
     for marker in REQUIRED_MARKERS:
         if marker not in text:
@@ -461,6 +653,88 @@ def _expect_invalid(text, manifest, lineage, oracle, label):
         raise AssertionError("mutation unexpectedly passed: {}".format(label))
 
 
+def _validate_reference_criteria_mutations(text):
+    """Reject authority widening and dimensionally wrong comparison rules."""
+    section = direct_section_content(text, REFERENCE_CRITERIA_HEADING)
+    mutations = []
+    for identity in REFERENCE_CRITERIA_IDENTITIES:
+        mutations.append((identity, "unreviewed-evidence", "identity"))
+    for before, after in (
+        ("Exits 9A-2 and 9A-3 stay Pending",
+         "Exits 9A-2 and 9A-3 are accepted"),
+        ("Phase 9A stays Open at 2/4", "Phase 9A stays Open at 3/4"),
+        ("Phase 9B stays Not started at 0/6", "Phase 9B is Open at 0/6"),
+        ("accepts no other package", "accepts any other package"),
+        ("epsilon = 1e-7 mm", "epsilon = 1e-6 mm"),
+        ("f = 5/381", "f = 1/76"),
+        ("total B-rep edge length", "physical rail length"),
+        ("not a new measured surface-distance",
+         "a new measured surface-distance"),
+        ("not-accepted", "accepted"),
+        ("no new geometry or numerical limit",
+         "new geometry and limits"),
+    ):
+        mutations.append((before, after, "boundary"))
+    row_mutations = (
+        (1, "must agree exactly", "may agree approximately"),
+        (2, "receives no second scale conversion",
+         "receives a second conversion"),
+        (3, "1e-100 mm^3", "1e-100 mm"),
+        (3, "130 digits for the outer jaw", "30 digits for the outer jaw"),
+        (4, "separately in full-size mm and model mm", "only in full-size mm"),
+        (5, "rel_tol=1e-12, abs_tol=0", "rel_tol=0, abs_tol=1e-12"),
+        (6, "max(Ashape * epsilon", "min(Ashape * epsilon"),
+        (6, "separate and unfused", "fused into one solid"),
+        (7, "Bmodel + Bfull * f^3", "Bmodel + Bfull * f"),
+        (7, "epsilon * (1 + f)", "epsilon * f"),
+        (8, "must equal exact zero", "may be below epsilon"),
+        (8, "(abs(a) + abs(b) + abs(c))", "(a + b + c)"),
+        (9, "(Lchair + Lrail) * epsilon", "(Achair + Arail) * epsilon"),
+        (9, "inner jaw 4, key 7", "inner jaw 5, key 6"),
+        (10, "an edge, with zero area and no face",
+         "a face with positive area"),
+        (10, "2 * Nedges * epsilon", "Nedges * epsilon"),
+        (11, "Positive overlap stays mandatory",
+         "Positive overlap is optional"),
+        (12, "a host observation only", "an independently derived oracle"),
+        (13, "five individual solids", "one fused solid"),
+    )
+    count = 0
+
+    def reject(candidate, expected):
+        nonlocal count
+        errors = _reference_criteria_errors(candidate)
+        if not any(expected in error for error in errors):
+            raise AssertionError(
+                "reference-criteria mutation escaped or failed for the "
+                "wrong reason: {}: {}".format(expected, errors)
+            )
+        count += 1
+
+    for before, after, boundary in mutations:
+        assert section.count(before) == 1, before
+        changed = section.replace(before, after, 1)
+        reject(text.replace(section, changed, 1),
+               "S1 reference criteria " + boundary)
+    rows = [line for line in section.splitlines() if line.startswith("|")][2:]
+    for number, before, after in row_mutations:
+        row = rows[number - 1]
+        assert row.count(before) == 1, before
+        changed = section.replace(row, row.replace(before, after, 1), 1)
+        reject(text.replace(section, changed, 1),
+               "S1 reference criterion {}.".format(number))
+    for changed in (
+        section.replace(rows[0] + "\n", "", 1),
+        section.replace(rows[0], rows[1], 1),
+    ):
+        reject(text.replace(section, changed, 1),
+               "S1 reference criteria inventory or order")
+    relocated = text.replace(section, "\nNo criteria.\n", 1)
+    relocated += "\n## Unrelated material\n" + section
+    reject(relocated, "S1 reference criteria identity")
+    return count
+
+
 def main():
     text = PLAN_PATH.read_text(encoding="utf-8")
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
@@ -588,6 +862,8 @@ def main():
     weakened_oracle["acceptance_gate"]["canonical_production_input"] = True
     _expect_invalid(text, manifest, lineage, weakened_oracle, "canonical Templot")
 
+    count = _validate_reference_criteria_mutations(text)
+    print("S1_REFERENCE_CRITERIA_MUTATIONS=" + str(count))
     print("Phase 1 S1 pilot plan validation passed")
 
 

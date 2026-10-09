@@ -160,6 +160,26 @@ DP9_006_IDENTITIES = (
     "df5ae7d941754ed7c18ea450d1d22559c61efbd5baaa638d2e84fa9d96b8e4c7",
     "cf45882bbdfa645bd893a22ca0e7f9200810282a2aab015c98074e0c1aee941a",
 )
+EXPECTED_DP9_007_AUTHORITY = (
+    "As project owner, I accept the proposed 13 S1 reference-comparison "
+    "criteria and their bounded conditions.\n\n"
+    "Authorise the required Level 3 repository alignment.\n\n"
+    "Preserve existing geometry, the 113-entry register and production "
+    "boundaries. Exit 9A-2 remains Pending until separately accepted."
+)
+DP9_007_PANEL = (
+    "reference/current/PHASE_EVIDENCE.md"
+    "#phase-9a-reference-comparison-criteria-panel"
+)
+DP9_007_HEADING = (
+    "D-P9-007 S1 reference-comparison criteria panel — 2026-10-08"
+)
+DP9_007_IDENTITIES = (
+    "dda3ea33b5687b42215924d7a830eedb9f4372ff",
+    "7444309a79f5940c7026b571871b118f70d0ce93578380ef89adcb187c723861",
+    "7d5a08b269b52e6ebbc26453853ce308343ccd54636454d589add2e1397cc2d6",
+    "9d3def6445bc0181ad971639110927c380a8b15d162e00d69ac5f017c6f98f18",
+)
 PHASE9A_EXIT1_STATUS = "Evidenced — owner-accepted 2026-10-08"
 PHASE9A_EXIT4_STATUS = "Evidenced — owner-accepted 2026-10-07"
 EXPECTED_PHASE7_EXIT_CONDITIONS = (
@@ -1199,7 +1219,10 @@ def _validate_owner_view(plan: str) -> None:
         "D-P9-006",
         "9576614daf6cc69a04d214e824ec32cc7bbe5251",
         "This decision adds no product behaviour",
-        "No other implementation is selected",
+        "This decision selects no product implementation",
+        "D-P9-007",
+        "accepts comparison criteria only for the exact frozen S1 reference",
+        "Exit 9A-2 stays Pending until separate owner acceptance",
         "D-GOV-023",
         "representative-fixture",
         "straight TO Edit",
@@ -5379,7 +5402,7 @@ def _validate_phase9_decision_holding(
         "Phase 9 split must carry unchanged D-P6-008 first",
     )
     _require(
-        len(records) == 8,
+        len(records) == 9,
         "Phase 9A and host decision chain incomplete or widened",
     )
     split = records[1]
@@ -5660,6 +5683,169 @@ def _validate_phase9_decision_holding(
         )
 
     _validate_dp9_006_decision(records[7], set(split))
+    _validate_dp9_007_decision(records[8], set(split))
+
+
+def _validate_dp9_007_decision(
+    criteria: dict[str, object], fields: set[str],
+) -> None:
+    """Accept reference criteria without accepting another phase exit."""
+    _require(
+        isinstance(criteria, dict)
+        and set(criteria) == fields
+        and criteria["id"] == "D-P9-007"
+        and criteria["decided_on"] == "2026-10-08"
+        and criteria["status"] == "Accepted"
+        and criteria["evidence"] == DP9_007_PANEL
+        and criteria["panel_record"] == DP9_007_PANEL
+        and criteria["panel_required_under_current_policy"] is True,
+        "D-P9-007 identity, status or panel routing drifted",
+    )
+    _require(
+        criteria["authority"] == EXPECTED_DP9_007_AUTHORITY,
+        "D-P9-007 exact owner authority drifted",
+    )
+    _require(
+        DP9_007_IDENTITIES[0] in str(criteria["decision"]),
+        "D-P9-007 accepted source identity drifted",
+    )
+    for field, clauses in (
+        ("decision", (
+            "Accept the 13 S1 reference-comparison criteria and their "
+            "bounded conditions",
+            "exact frozen package, manifest and A0 rail section",
+            "The comparison uses complete finite face and section "
+            "correspondence. Separate surface maximum and distribution "
+            "statistics are not necessary for this declared faceted reference",
+            "existing numerical limits and dimensional propagation become "
+            "accepted reference-comparison criteria only",
+            "Exit 9A-2 stays Pending until separate owner acceptance",
+            "Phase 9A stays Open at 2/4",
+            "Exit 9A-3 stays Pending",
+            "Phase 9B stays Not started at 0/6",
+        )),
+        ("exclusions", (
+            "This decision accepts criteria only",
+            "It accepts no exit, assisted S1 pilot, independent prototype "
+            "dimension, physical fit, preload, retention, manufacturing "
+            "capability, production package, output or rights claim",
+            "base/seat overlap magnitude stays a native observation",
+            "This decision claims no measured whole-surface distribution",
+            "Preserve product geometry, numerical implementation, package "
+            "bytes, historical package metadata, source lineage and the "
+            "113-entry register",
+            "D-P9-006 keeps its historical meaning",
+            "D-P9-004 private-use conditions and D-P9-005 production duties "
+            "stay",
+            "All 24 risk states, owners, deadlines and controls stay "
+            "unchanged",
+            "Keep D-P6-008 Deferred — unmet, TERM-R04 open, all L1 repair "
+            "limits and legacy-retirement conditions",
+            "Output stays private-development and project status stays "
+            "unknown",
+            "Authorise repository alignment only",
+            "No product implementation or Phase 9B opening follows",
+        )),
+    ):
+        value = criteria[field]
+        _require(
+            isinstance(value, str)
+            and all(clause in _semantic_text(value) for clause in clauses),
+            "D-P9-007 " + field + " boundary drifted",
+        )
+
+
+def _validate_dp9_007_criteria(evidence: str) -> None:
+    """Bind the policy panel to its exact authority and local evidence."""
+    anchor = '<a id="phase-9a-reference-comparison-criteria-panel"></a>'
+    _require(evidence.count(anchor) == 1, "D-P9-007 panel anchor drifted")
+    panel = _section(evidence, DP9_007_HEADING)
+    _require(
+        "\n\n".join(_blockquote_paragraphs(panel))
+        == EXPECTED_DP9_007_AUTHORITY,
+        "D-P9-007 exact panel authority drifted or was relocated",
+    )
+    for identity in DP9_007_IDENTITIES:
+        _require(identity in panel, "D-P9-007 evidence identity drifted")
+    for link in (
+        "../phase-evidence/S1_PILOT_PLAN.md"
+        "#s1-reference-comparison-criteria-under-d-p9-007",
+        "#phase-9a-exit-1-acceptance-panel",
+    ):
+        _require(
+            any(target == link for _label, target in
+                MARKDOWN_LINK_RE.findall(panel)),
+            "D-P9-007 canonical owner link drifted",
+        )
+    flat = _semantic_text(panel)
+    for clause in (
+        "Richard accepts the 13 comparison criteria and their bounded "
+        "conditions for the exact frozen five-component S1 reference",
+        "This decision changes comparison authority only",
+        "Exit 9A-2 stays Pending until separate owner acceptance",
+        "Phase 9A stays Open at 2/4",
+        "Exit 9A-3 stays Pending",
+        "Phase 9B stays Not started at 0/6",
+        "This frozen faceted reference uses complete finite face and "
+        "section correspondence. Separate surface maximum and distribution "
+        "statistics are not necessary for this comparison",
+        "accepted numerical limits keep their existing values and "
+        "dimensional propagation",
+        "They are reference-comparison criteria only",
+        "They are not physical-fit or manufacturing tolerances",
+        "base/seat overlap relation has independent support",
+        "Its absolute common volume stays a native observation, not an "
+        "independently derived value",
+        "This decision claims no measured whole-surface distribution",
+        "This decision changes no package bytes, historical package "
+        "metadata, source geometry, numerical implementation or entry "
+        "in the 113-entry register",
+        "Source values and the detailed source comparison stay local "
+        "and untracked",
+        "These results do not accept Exit 9A-2",
+        "Proceed with bounded conditions",
+        "Their owners, deadlines, treatments and controls stay unchanged",
+        "This decision closes no risk",
+        "author and reviewer share one agent team and workspace",
+        "D-P9-006 keeps its historical meaning",
+        "This decision accepts no assisted S1 pilot, independent prototype "
+        "dimension, physical fit, preload, retention, manufacturing "
+        "capability, production package, output or rights claim",
+        "D-P9-004 private-use conditions and D-P9-005 production duties stay",
+        "All L1 repair limits, D-P6-008, TERM-R04 and legacy-retirement "
+        "conditions stay",
+        "Output stays private-development and project status stays unknown",
+        "authority covers repository alignment only, with no product "
+        "implementation",
+    ):
+        _require(clause in flat, "D-P9-007 panel boundary drifted: " + clause)
+
+
+def _validate_dp9_007_validation(validation: str) -> None:
+    """Limit the finite-surface policy to the declared frozen reference."""
+    section = direct_section_content(
+        validation, "6. Chair-definition and assimilation validation", level=3,
+    )
+    paragraph = _require_paragraph(
+        section,
+        "For the exact frozen S1 reference, D-P9-007 accepts the 13 "
+        "reference-comparison criteria. Complete finite face and section "
+        "correspondence is the comparison method for that declared faceted "
+        "reference. Separate surface maximum and distribution statistics "
+        "are not necessary for this comparison. The numerical "
+        "limits control reference comparison, not physical fit or production. "
+        "This decision accepts neither Exit 9A-2 nor the assisted S1 pilot. "
+        "The other comparison and production duties stay unchanged.",
+        "D-P9-007 validation applicability drifted or was relocated",
+    )
+    _require_links(
+        paragraph,
+        (("D-P9-007", "current/PHASE_EVIDENCE.md"
+          "#phase-9a-reference-comparison-criteria-panel"),
+         ("13 reference-comparison criteria", "phase-evidence/S1_PILOT_PLAN.md"
+          "#s1-reference-comparison-criteria-under-d-p9-007")),
+        "D-P9-007 validation owner links drifted",
+    )
 
 
 def _validate_dp9_006_decision(
@@ -7383,7 +7569,7 @@ def _validate_decisions(plan: str) -> None:
         | EXPECTED_PHASE6_DECISION_IDS
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
-           "D-P9-005", "D-P9-006", "D-GOV-023"},
+           "D-P9-005", "D-P9-006", "D-P9-007", "D-GOV-023"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -9144,6 +9330,8 @@ def main() -> None:
     _validate_dp9_004_admission(phase9_holding)
     _validate_dp9_005_evidence_model(phase9_holding)
     _validate_dp9_006_admission(phase9_holding)
+    _validate_dp9_007_criteria(phase9_holding)
+    _validate_dp9_007_validation(_read(VALIDATION_PATH))
     _validate_dgov023_qualification(phase9_holding)
     _validate_ste_lifecycle_panel(current_evidence)
     _validate_tdmp_lifecycle_panel(current_evidence)

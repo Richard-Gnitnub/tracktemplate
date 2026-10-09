@@ -4806,6 +4806,144 @@ def validate_phase9_exit4_admission_mutations() -> None:
         )
 
 
+def validate_phase9_reference_criteria_mutations() -> None:
+    """Keep criteria authority distinct from exit or production acceptance."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    phase6 = {
+        record["id"]: record
+        for record in json.loads(read(
+            "reference/history/phase-closeouts/PHASE6_GATE_DECISIONS.json"
+        ))["decisions"]
+    }
+    missing = copy.deepcopy(document)
+    missing["decisions"].pop(8)
+    expect_rejected(
+        "reference-criteria/decision-removed",
+        lambda: progress._validate_phase9_decision_holding(missing, phase6),
+        "Phase 9A and host decision chain incomplete or widened",
+    )
+    criteria = document["decisions"][8]
+    for field, value, diagnostic in (
+        ("id", "D-P9-008", "identity, status or panel routing"),
+        ("status", "Pending", "identity, status or panel routing"),
+        ("panel_record", progress.DP9_006_PANEL,
+         "identity, status or panel routing"),
+        ("authority", "Agent approval.", "exact owner authority"),
+    ):
+        changed = copy.deepcopy(criteria)
+        changed[field] = value
+        expect_rejected(
+            "reference-criteria/record-" + field,
+            lambda value=changed: progress._validate_dp9_007_decision(
+                value, set(criteria),
+            ),
+            "D-P9-007 " + diagnostic + " drifted",
+        )
+    for name, field, before, after in (
+        ("exit-accepted", "decision", "Exit 9A-2 stays Pending",
+         "Exit 9A-2 is accepted"),
+        ("phase-count", "decision", "Open at 2/4", "Open at 3/4"),
+        ("pilot-accepted", "decision", "Exit 9A-3 stays Pending",
+         "Exit 9A-3 is accepted"),
+        ("phase9b-opened", "decision", "Not started at 0/6", "Open at 0/6"),
+        ("surface-scope", "decision", "for this declared faceted reference",
+         "for all geometry"),
+        ("production-use", "exclusions", "It accepts no exit",
+         "It accepts an exit"),
+        ("magnitude-promoted", "exclusions", "stays a native observation",
+         "is independently derived"),
+        ("history-rewritten", "exclusions",
+         "D-P9-006 keeps its historical meaning", "D-P9-006 is rewritten"),
+    ):
+        changed = copy.deepcopy(criteria)
+        changed[field] = replace_once(changed[field], before, after)
+        expect_rejected(
+            "reference-criteria/record-" + name,
+            lambda value=changed: progress._validate_dp9_007_decision(
+                value, set(criteria),
+            ),
+            "D-P9-007 " + field + " boundary drifted",
+        )
+
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    panel = progress._section(evidence, progress.DP9_007_HEADING)
+    for index, identity in enumerate(progress.DP9_007_IDENTITIES):
+        changed = replace_once(evidence, panel,
+                               replace_once(panel, identity, "unreviewed"))
+        expect_rejected(
+            "reference-criteria/panel-identity-" + str(index),
+            lambda value=changed: progress._validate_dp9_007_criteria(value),
+            "D-P9-007 evidence identity drifted",
+        )
+    for name, before, after in (
+        ("exit-accepted", "Exit 9A-2 stays Pending", "Exit 9A-2 is accepted"),
+        ("fit-accepted", "not physical-fit or manufacturing",
+         "physical-fit and manufacturing"),
+        ("distribution-claimed", "claims no measured whole-surface distribution",
+         "claims a measured whole-surface distribution"),
+        ("package-mutated", "changes no package bytes",
+         "changes package bytes"),
+        ("source-distributed", "stay local and untracked", "are published"),
+        ("production-duties-waived", "D-P9-005 production duties stay",
+         "D-P9-005 production duties end"),
+    ):
+        changed = replace_once(
+            evidence, panel, replace_once(panel, before, after),
+        )
+        expect_rejected(
+            "reference-criteria/panel-" + name,
+            lambda value=changed: progress._validate_dp9_007_criteria(value),
+            "D-P9-007 panel boundary drifted",
+        )
+    moved = replace_once(evidence, panel, "\nNo criteria.\n")
+    moved += "\n## Unrelated material\n" + panel
+    expect_rejected(
+        "reference-criteria/panel-relocated",
+        lambda: progress._validate_dp9_007_criteria(moved),
+        "D-P9-007 exact panel authority drifted or was relocated",
+    )
+
+    validation = read("reference/VALIDATION.md")
+    paragraph = paragraph_containing(
+        validation, "For the exact frozen S1 reference",
+    )
+    for name, before, after in (
+        ("scope-widened", "for that declared faceted reference",
+         "for all geometry"),
+        ("fit-accepted", "not physical fit or production",
+         "physical fit and production"),
+        ("exit-accepted", "accepts neither Exit 9A-2 nor",
+         "accepts Exit 9A-2 and"),
+        ("production-waived", "duties stay unchanged", "duties are waived"),
+    ):
+        changed = replace_once(validation, paragraph,
+                               replace_once(paragraph, before, after))
+        expect_rejected(
+            "reference-criteria/validation-" + name,
+            lambda value=changed: progress._validate_dp9_007_validation(value),
+            "D-P9-007 validation applicability drifted or was relocated",
+        )
+    wrong_link = replace_once(
+        validation, paragraph,
+        replace_once(
+            paragraph, "#s1-reference-comparison-criteria-under-d-p9-007",
+            "#bounded-exit-9a-1-acceptance-under-d-p9-006",
+        ),
+    )
+    expect_rejected(
+        "reference-criteria/validation-owner-link",
+        lambda: progress._validate_dp9_007_validation(wrong_link),
+        "D-P9-007 validation owner links drifted",
+    )
+    moved = replace_once(validation, paragraph, "No criteria.")
+    moved += "\n## Unrelated material\n" + paragraph
+    expect_rejected(
+        "reference-criteria/validation-relocated",
+        lambda: progress._validate_dp9_007_validation(moved),
+        "D-P9-007 validation applicability drifted or was relocated",
+    )
+
+
 def validate_phase9_exit1_admission_mutations() -> None:
     """Reject acceptance beyond the frozen S1/L1 construction proof."""
     plan = read("reference/PROJECT_PLAN.md")
@@ -5637,9 +5775,9 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "stop-boundary-waived", "**Next action**",
-            "No other implementation is selected",
+            "This decision selects no product implementation",
             "Begin Phase 9 product work after integration",
-            "No other implementation is selected",
+            "This decision selects no product implementation",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
@@ -7766,6 +7904,7 @@ def main() -> None:
     validate_phase9_research_mutations()
     validate_phase9_exit4_admission_mutations()
     validate_phase9_exit1_admission_mutations()
+    validate_phase9_reference_criteria_mutations()
     validate_phase9_evidence_model_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()
