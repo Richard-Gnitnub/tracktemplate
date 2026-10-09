@@ -123,6 +123,36 @@ Phase 9B stays Open at 0/6. All six exits stay Pending.
 This evidence gives no acceptance for other migration, product performance, physical fit or production output.
 The accepted geometry, 113-entry register and all production conditions stay the same.
 
+## Unchanged chair analysis preserves document state — 2026-10-09
+
+This Level 2 change supports Exit 9B-2 and the
+[document/history requirement](../VALIDATION.md#observed-regression-obligations).
+In B16, `Analyse` preserves the document when inputs, settings, stored results
+and diagnostic display are current.
+The [guard](../../tracktemplate/compatibility/transition_workflow.py) checks fresh
+rail and timber records before it returns a copy of the stored result.
+The existing operation handles changed settings, incomplete data and diagnostic display repairs.
+The frozen Phase 1 tests keep the earlier defect evidence.
+
+The [standalone test](../../tests/validate_chair_analysis_reuse.py) and
+[FreeCAD test](../../tests/freecad_validate_chair_analysis_signature.py) give PASS results
+outside FreeCAD and in the qualified headless profile.
+The copies for `XO-001` and `TO-001` contain 355 and 168 chair positions.
+Repeated analysis keeps stored bytes, object identities, shapes and document history unchanged.
+It makes no metadata write, display construction, recompute or transaction.
+
+Save/reopen preserves this result. Changed inputs keep one reversible command.
+Missing diagnostic layers still cause repair through the existing operation.
+
+This change does not complete chair migration or correct stored timing measurements.
+For an unchanged result, the software still reads rail and timber records once.
+For changed inputs, the software can read those records twice.
+The stored result describes the earlier calculation. Reuse returns no timing measurements.
+
+Phase 9B stays Open at 0/6, with all six exits Pending.
+This evidence gives no acceptance for performance, physical fit or production output.
+Geometry, the 113-entry register and all accepted boundaries stay unchanged.
+
 ## Phase 9A historical links
 
 These links keep earlier references available at the frozen evidence owner.

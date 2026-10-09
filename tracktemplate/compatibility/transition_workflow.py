@@ -2,8 +2,13 @@
 
 import copy
 from dataclasses import dataclass
+import json
 
-from tracktemplate.application import chair_analysis_signature, turnout_edit
+from tracktemplate.application import (
+    chair_analysis_reuse,
+    chair_analysis_signature,
+    turnout_edit,
+)
 from tracktemplate.compatibility.crossover_b4_recovery import (
     CrossoverB4RecoveryAdapter,
 )
@@ -267,6 +272,18 @@ _CHAIR_SIGNATURE_SURFACE = (
     "normalise_chair_analysis_settings", "CHAIR_ANALYSIS_SCHEMA_VERSION",
     "analyse_entity_chair_positions", "_A8A7B15_ANALYSE_CHAIRS",
     "_A8A7B13_GENERATION_CONTEXT_WITHOUT_SETTINGS_CHECK",
+)
+_CHAIR_REUSE_BINDING = "_A8A7B11_ANALYSE_ENTITY_CHAIR_POSITIONS"
+_CHAIR_REUSE_OPERATIONS = (
+    "turnout_config_by_id", "crossover_config_by_id",
+    "chair_rail_records_for_entity", "chair_timber_records_for_entity",
+    "_chair_read_cached_result", "_chair_settings_object",
+    "_chair_analysis_display_objects", "object_string_property",
+    "_chair_solid_object", "_chair_physical_state_from_object",
+)
+_CHAIR_REUSE_MARKERS = (
+    "_chair_read_cached_result", "_chair_settings_object",
+    "_chair_analysis_display_objects",
 )
 _CROSSOVER_PREFLIGHT_FUNCTIONS = (
     "solve_rea_c10_crossover_geometry",
@@ -808,6 +825,159 @@ class _ChairAnalysisSignatureAdapter:
         )
 
 
+@dataclass(frozen=True)
+class _ChairAnalysisReuseAdapter:
+    """Guard the captured B11 operation; retain both outer B15 wrappers."""
+
+    original: object
+    host_globals: object
+
+    def _presentation_current(self, doc, kind, entity_id, config, cached):
+        host = self.host_globals
+        read = host["object_string_property"]
+        settings = cached["settings"]
+        positions = cached["positions"]
+        group_role = host["CHAIR_ANALYSIS_GROUP_ROLE"]
+        requested = {
+            host["CHAIR_POSITION_MARKER_ROLE"]:
+                bool(settings["markers_visible"]),
+            host["CHAIR_PROTECTED_MARKER_ROLE"]:
+                bool(settings["protected_markers_visible"]),
+            host["CHAIR_FOOTPRINT_MARKER_ROLE"]:
+                bool(settings["footprints_visible"]),
+        }
+        required = {
+            host["CHAIR_POSITION_MARKER_ROLE"]: bool(positions),
+            host["CHAIR_PROTECTED_MARKER_ROLE"]: any(
+                p["mandatory"] or p["protected_features"] for p in positions
+            ),
+            host["CHAIR_FOOTPRINT_MARKER_ROLE"]: any(
+                p["chair_footprint_parameters"].get("polygon")
+                for p in positions
+            ),
+        }
+        identity_property = host[
+            "TURNOUT_ID_PROPERTY" if kind == "turnout"
+            else "CROSSOVER_ID_PROPERTY"
+        ]
+        objects = host["_chair_analysis_display_objects"](doc, kind, entity_id)
+        by_role = {}
+        names = set()
+        gui_active = bool(host["App"].GuiUp)
+        for obj in objects:
+            role = read(obj, "GeneratedRole", "")
+            name = str(obj.Name)
+            if (
+                obj.Document is not doc or not name or name in names
+                or role in by_role
+                or role not in (*requested, group_role)
+                or read(obj, identity_property, "") != entity_id
+                or read(obj, "TemplateSetID", "")
+                != config.get("template_set_id")
+            ):
+                return False
+            names.add(name)
+            by_role[role] = obj
+            visible = (
+                any(requested.values())
+                if role == group_role else requested[role]
+            )
+            view = obj.ViewObject
+            if gui_active:
+                if view is None or bool(view.Visibility) != visible:
+                    return False
+            elif view is not None:
+                # A GUI-less qualified host has no visible presentation.
+                return False
+            if role != group_role and obj.Shape.isNull():
+                return False
+        if group_role not in by_role:
+            return False
+        if any(requested[r] and required[r] and r not in by_role
+               for r in requested):
+            return False
+        group = by_role[group_role]
+        children = list(group.Group)
+        if (
+            len(children) != len(by_role) - 1
+            or {str(obj.Name) for obj in children}
+            != names - {str(group.Name)}
+        ):
+            return False
+        solid = host["_chair_solid_object"](doc, kind, entity_id)
+        if solid is None:
+            return not cached.get("physical_chair_state")
+        physical = host["_chair_physical_state_from_object"](solid)
+        return (
+            isinstance(physical, dict)
+            and physical.get("source_analysis_signature")
+            == cached["geometry_signature"]
+            and physical.get("solid_signature")
+            == read(solid, host["CHAIR_SOLID_SIGNATURE_PROPERTY"], "")
+            and physical.get("status") != host["CHAIR_SOLID_STATUS_STALE"]
+        )
+
+    def _reused_result(self, doc, entity_kind, entity_id, settings):
+        host = self.host_globals
+        kind = str(entity_kind).lower()
+        if kind not in ("turnout", "crossover"):
+            return None
+        config = host[kind + "_config_by_id"](doc, entity_id)
+        if not isinstance(config, dict):
+            return None
+        normalise = host["normalise_chair_analysis_settings"]
+        normalised = normalise(
+            settings if settings is not None
+            else config.get("chair_analysis_settings")
+        )
+        if not normalised.get("cache_enabled"):
+            return None
+        cached = host["_chair_read_cached_result"](doc, kind, entity_id)
+        if not chair_analysis_reuse.chair_analysis_reuse_candidate(
+            kind, entity_id, config, normalised, cached,
+            schema_version=host["CHAIR_ANALYSIS_SCHEMA_VERSION"],
+            macro_version=host["MACRO_VERSION_NUMBER"],
+            inactive_statuses=(
+                host["CHAIR_STATUS_STALE"], host["CHAIR_STATUS_NOT_ANALYSED"],
+            ),
+        ):
+            return None
+        obj = host["_chair_settings_object"](doc, kind, entity_id)
+        read = host["object_string_property"]
+        if (
+            obj is None
+            or read(obj, host["CHAIR_ANALYSIS_STATUS_PROPERTY"], "")
+            != cached["status"]
+            or read(obj, host["CHAIR_ANALYSIS_SIGNATURE_PROPERTY"], "")
+            != cached["geometry_signature"]
+            or json.loads(read(
+                obj, host["CHAIR_ANALYSIS_SETTINGS_PROPERTY"], "",
+            )) != normalised
+        ):
+            return None
+        rails = host["chair_rail_records_for_entity"](doc, kind, config)
+        timbers = host["chair_timber_records_for_entity"](doc, kind, config)
+        signature = host[_CHAIR_SIGNATURE_BINDING](
+            kind, config, normalised, rails, timbers,
+        )
+        if signature != cached["geometry_signature"]:
+            return None
+        return chair_analysis_reuse.reused_chair_analysis_result(
+            cached, signature,
+            self._presentation_current(doc, kind, entity_id, config, cached),
+        )
+
+    def __call__(self, doc, entity_kind, entity_id, settings=None):
+        try:
+            result = self._reused_result(doc, entity_kind, entity_id, settings)
+        except (AttributeError, KeyError, TypeError, ValueError, RuntimeError):
+            # Unproved state follows the unchanged operation and diagnostics.
+            result = None
+        if result is not None:
+            return result
+        return self.original(doc, entity_kind, entity_id, settings)
+
+
 class ModularTransitionWorkflowSession:
     """One inherited GUI host permanently bound to modular calculations."""
 
@@ -1030,6 +1200,7 @@ class ModularTransitionWorkflowSession:
             )
         namespace = self.module.__dict__
         self._chair_signature_adapter = None
+        self._chair_reuse_adapter = None
         if any(name in namespace for name in _CHAIR_SIGNATURE_SURFACE):
             normaliser = namespace.get("normalise_chair_analysis_settings")
             schema_version = namespace.get("CHAIR_ANALYSIS_SCHEMA_VERSION")
@@ -1052,6 +1223,21 @@ class ModularTransitionWorkflowSession:
             self._host_functions[_CHAIR_SIGNATURE_BINDING] = (
                 self._chair_signature_adapter
             )
+            if any(name in namespace for name in _CHAIR_REUSE_MARKERS):
+                if not all(
+                    callable(namespace.get(name))
+                    and getattr(namespace[name], "__globals__", None)
+                    is namespace for name in _CHAIR_REUSE_OPERATIONS
+                ):
+                    raise TransitionWorkflowError(
+                        "The chair-analysis signature reuse route is incomplete."
+                    )
+                self._chair_reuse_adapter = _ChairAnalysisReuseAdapter(
+                    namespace[_CHAIR_REUSE_BINDING], namespace,
+                )
+                self._host_functions[_CHAIR_REUSE_BINDING] = (
+                    self._chair_reuse_adapter
+                )
         panel = namespace.get("CrossoverManagerPanel")
         self._crossover_preflight = None
         self._crossover_preview_method = None
@@ -1305,6 +1491,26 @@ class ModularTransitionWorkflowSession:
                 "mixed binding."
             )
         if adapter is not None:
+            reuse = self._chair_reuse_adapter
+            reuse_present = any(name in namespace for name in _CHAIR_REUSE_MARKERS)
+            if reuse_present != (reuse is not None):
+                raise TransitionWorkflowError(
+                    "The chair-analysis reuse surface has a mixed binding."
+                )
+            if reuse is not None and (
+                type(reuse) is not _ChairAnalysisReuseAdapter
+                or reuse.host_globals is not namespace
+                or namespace.get(_CHAIR_REUSE_BINDING) is not reuse
+                or self._host_functions.get(_CHAIR_REUSE_BINDING) is not reuse
+                or not all(
+                    callable(namespace.get(name))
+                    and getattr(namespace[name], "__globals__", None)
+                    is namespace for name in _CHAIR_REUSE_OPERATIONS
+                )
+            ):
+                raise TransitionWorkflowError(
+                    "The chair-analysis signature reuse route is mixed."
+                )
             selected = chair_analysis_signature.chair_analysis_signature
             if (
                 type(adapter) is not _ChairAnalysisSignatureAdapter
@@ -1328,7 +1534,11 @@ class ModularTransitionWorkflowSession:
                     "mixed binding."
                 )
             for caller_name in _CHAIR_SIGNATURE_CALLERS:
-                caller = namespace.get(caller_name)
+                caller = (
+                    reuse.original
+                    if reuse is not None and caller_name == _CHAIR_REUSE_BINDING
+                    else namespace.get(caller_name)
+                )
                 code = getattr(caller, "__code__", None)
                 caller_globals = getattr(caller, "__globals__", None)
                 if (
@@ -1346,6 +1556,8 @@ class ModularTransitionWorkflowSession:
             for caller_name, target_name in _CHAIR_SIGNATURE_ROUTES:
                 caller = namespace.get(caller_name)
                 target = namespace.get(target_name)
+                if reuse is not None and target_name == _CHAIR_REUSE_BINDING:
+                    target = reuse.original
                 code = getattr(caller, "__code__", None)
                 if (
                     not callable(caller)
