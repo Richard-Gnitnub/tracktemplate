@@ -20,7 +20,7 @@
       "status": "Accepted",
       "decision": "Close Phase 9A at 4/4 for the frozen reference-only scope, subject to the existing closeout conditions.",
       "authority": "As project owner, I accept Phase 9A closeout at 4/4 for the frozen reference-only scope, subject to the existing closeout conditions.\n\nComplete the required Level 3 alignment and publish an exact-green draft PR.",
-      "exclusions": "All four exit scopes, the 13 D-P9-007 criteria, the 113-entry register, geometry, package bytes and numerical limits stay unchanged. Preserve all 24 risk duties, D-P6-008 Deferred — unmet, TERM-R04 open, private-development output, unknown project status and all inherited limits and legacy-retirement conditions. Accept no physical fit, preload, retention, manufacturing capability, production package, output, rights, performance result or release. This decision opens no subsequent phase. Complete only the Level 3 alignment and publish an exact-green draft PR. Do not merge.",
+      "exclusions": "All four exit scopes, the 13 D-P9-007 criteria, the 113-entry register, geometry, package bytes and numerical limits stay unchanged. Preserve all 24 risk duties and all inherited limits and legacy-retirement conditions. Keep D-P6-008 Deferred — unmet, TERM-R04 open, output private-development and project status unknown.\n\nAccept no physical fit, preload, retention, manufacturing capability, production package, output, rights, performance result or release. This decision opens no subsequent phase. Complete only the Level 3 alignment. Publish a draft PR only after CI gives a PASS result for its exact head. Do not merge.",
       "evidence": "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel"
@@ -29,9 +29,9 @@
       "id": "D-P9-011",
       "decided_on": "2026-10-09",
       "status": "Accepted",
-      "decision": "Open only Phase 9B at 0/6. All six Phase 9B exits stay Pending. Phase 9A remains closed at 4/4 for its frozen reference-only scope.",
+      "decision": "Open only Phase 9B at 0/6. All six Phase 9B exits stay Pending. Phase 9A stays closed at 4/4 for its frozen reference-only scope.",
       "authority": "Im happy to roll into 9b iot maintain flow.",
-      "exclusions": "The Phase 9B opening accepts no exit, product implementation, physical fit, preload, retention, manufacturing capability, production package, output, rights, numerical tolerance, performance result or release. Preserve the six existing production criteria, the 113-entry register, all 24 risk duties, D-P6-008 Deferred — unmet, TERM-R04 open, private-development output, unknown project status and all inherited limits and legacy-retirement conditions. Complete only the required Level 3 alignment and exact-green draft PR. Do not merge.",
+      "exclusions": "The Phase 9B opening accepts no exit, product implementation, physical fit, preload, retention, manufacturing capability, production package, output, rights, numerical tolerance, performance result or release. Preserve the six production criteria, the 113-entry register and all 24 risk duties. Keep D-P6-008 Deferred — unmet, TERM-R04 open, output private-development and project status unknown. Preserve all inherited limits and legacy-retirement conditions.\n\nComplete only the necessary Level 3 alignment. Publish a draft PR only after CI gives a PASS result for its exact head. Do not merge.",
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-opening-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9b-opening-panel"

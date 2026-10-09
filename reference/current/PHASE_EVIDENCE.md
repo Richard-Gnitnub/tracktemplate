@@ -12,18 +12,18 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 9A is closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). All four exits retain their accepted reference-only scopes. Phase 9B is Open at 0/6 under [D-P9-011](#phase-9b-opening-panel). All six Phase 9B exits stay Pending. |
+| Current state | Phase 9A is closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). All four exits keep their accepted reference-only scopes. Phase 9B is Open at 0/6 under [D-P9-011](#phase-9b-opening-panel). All six Phase 9B exits stay Pending. |
 | What changed | The owner accepted Phase 9A closeout, then authorised Phase 9B opening. The six production criteria stay unchanged. This alignment adds no product behaviour. |
-| What now works | The accepted S1 and L1 proofs use the same neutral schema and procedural chair generator with different component patterns. The existing qualified FreeCAD proof and nine owner-reviewed views remain applicable reference evidence. |
-| Limitations/findings | The [closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel) keeps all accepted evidence and recovery limits. Physical fit and production/package rights remain unaccepted. All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 remain. Output stays private-development and project status stays `unknown`. |
-| Owner decision | D-P9-010 closes only the frozen reference-only Phase 9A scope. D-P9-011 opens only Phase 9B at 0/6. No production exit or product implementation is accepted. |
-| Next action | Complete this Level 3 alignment and its normal validation and independent review. Publish an exact-green draft PR. Do not merge. Select no product implementation in this cycle. |
+| What now works | The accepted S1 and L1 proofs use the same neutral schema and procedural chair generator with different component patterns. The FreeCAD proof from the qualified profile and the nine views that the owner reviewed stay applicable reference evidence. |
+| Limitations/findings | The [closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel) keeps all accepted evidence and recovery limits. The owner gives no acceptance for physical fit or production/package rights. All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay. Output stays private-development and project status stays `unknown`. |
+| Owner decision | D-P9-010 closes only the frozen reference-only Phase 9A scope. D-P9-011 opens only Phase 9B at 0/6. The owner accepts no production exit or product implementation. |
+| Next action | Complete this Level 3 alignment and its usual validation and independent review. Publish a draft PR with a PASS result from CI for its exact head. Do not merge. Select no product implementation in this cycle. |
 
 <a id="phase-9b-opening-panel"></a>
 
 ## D-P9-011 Phase 9B opening panel — 2026-10-09
 
-**Decision boundary:** After accepting Phase 9A closeout, Richard authorises
+**Decision boundary:** After his acceptance of Phase 9A closeout, Richard authorises
 Phase 9B opening at 0/6. All six exits stay Pending. This decision changes
 only phase status. The existing six criteria and production conditions stay.
 
@@ -31,16 +31,16 @@ only phase status. The existing six criteria and production conditions stay.
 
 > Im happy to roll into 9b iot maintain flow.
 
-The source remains protected `main` `69ef5be79922f694c9019bbd3e33b919c882235e`
-with the accepted D-P9-010 closeout conditions. The owner's later instruction
-supplies separate opening authority. It does not widen the frozen Phase 9A
+The source stays protected `main` `69ef5be79922f694c9019bbd3e33b919c882235e`
+with the accepted D-P9-010 closeout conditions. The owner instruction above
+supplies separate opening authority. It does not change the frozen Phase 9A
 acceptance or accept any Phase 9B result.
 
-**Safety/risk panel:** Richard chairs and decides. `/root` presents this
+**Safety/risk panel:** Richard is the panel chair and decision authority. `/root` supplies this
 alignment. Read-only reviewer `/root/phase9a_closeout_review` examines the
 opening against the accepted closeout, six unchanged criteria and all 24 risks.
-The reviewer is separate from the alignment author. The agents share one team
-and workspace, not external organisational independence.
+The reviewer is separate from the alignment author. The agents work in one team
+and workspace. This is not external organisational independence.
 
 The recommendation is **Proceed with bounded conditions**. No risk closes or
 changes owner, deadline, treatment or control. The panel records no unresolved
@@ -48,13 +48,15 @@ dissent. The [Phase 9A closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#
 keeps the reviewed recovery limits and conditions. Each risk owner keeps the
 deadline in the [current risk register](risks.json).
 
-**Resulting authority:** Phase 9B is Open at 0/6. All six exits remain Pending.
-The required Level 3 alignment and exact-green draft PR are authorised.
-Do not merge. This cycle selects no product implementation. Opening accepts
-no physical fit, preload, retention, manufacturing capability, production
-package, output, rights, numerical tolerance, performance result or release.
+**Resulting authority:** Phase 9B is Open at 0/6. All six exits stay Pending.
+The owner authorises the necessary Level 3 alignment and a draft PR.
+CI must give a PASS result for its exact head.
+Do not merge. This cycle selects no product implementation.
+
+Opening accepts no physical fit, preload, retention, manufacturing capability,
+production package, output, rights, numerical tolerance, performance result or release.
 D-P6-008 stays Deferred — unmet. TERM-R04 stays open. All accepted limits,
-the 113-entry register and legacy-retirement conditions remain. Output stays
+the 113-entry register and legacy-retirement conditions stay. Output stays
 private-development and project status stays `unknown`.
 
 ## Phase 9B exit conditions

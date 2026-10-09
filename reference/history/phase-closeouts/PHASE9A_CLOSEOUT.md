@@ -10,7 +10,7 @@ Scope: frozen reference-only architecture proof.**
 **Decision boundary:** D-P9-010 closes Phase 9A at 4/4 for the frozen
 reference-only scope. All four criteria and their accepted limits stay unchanged.
 This decision changes phase status. It adds no product behaviour and opens no
-subsequent phase. The later D-P9-011 decision owns Phase 9B opening.
+subsequent phase. The subsequent D-P9-011 decision owns Phase 9B opening.
 
 **Exact owner instruction:**
 
@@ -22,8 +22,8 @@ The assessed source is clean, synchronised protected `main`
 `69ef5be79922f694c9019bbd3e33b919c882235e` after PR #152.
 Its tree is the reviewed PR tree `9960de8c1ef6a4cf16a9e267ab9e7f5c74962b88`.
 PR CI run `37892920877` and main CI run `37893672265` each passed 98/98 checks.
-This closeout uses the accepted evidence. It does not repeat source research,
-geometry construction, physical measurements or visual capture.
+This closeout uses the accepted evidence. It does not do source research,
+geometry construction, physical measurements or visual capture again.
 
 | Accepted exit | Decision | Bounded result |
 | --- | --- | --- |
@@ -32,18 +32,19 @@ geometry construction, physical measurements or visual capture.
 | 9A-3 | [D-P9-009](#phase-9a-exit-3-acceptance-panel) | The frozen assisted S1 pilot has accepted components, landmarks and findings with the D-P9-007 conditions. |
 | 9A-4 | [D-P9-004](#phase-9a-exit-4-admission-panel) | Raw evidence stays isolated with its recorded permitted private research use. |
 
-The independent closeout assessment checked 68 retained identities, nine review
-receipts and 11 final inputs. The complete D-P9-007 criteria stay unchanged.
-The existing qualified FreeCAD proof and nine owner-reviewed views remain the
-applicable native evidence. They establish reference-only architecture proof.
-They do not establish independent prototype dimensions or physical fit.
+The independent reviewer examined 68 identities, nine review receipts and
+11 final inputs that the project keeps. The complete D-P9-007 criteria stay unchanged.
+The FreeCAD proof from the qualified profile and the nine views that the owner
+reviewed stay applicable. They show reference-only architecture proof.
+They do not validate independent prototype dimensions or physical fit.
 
-**Safety/risk panel:** Richard is the project owner, panel chair and accepting
-authority. `/root` presents the closeout. Read-only reviewer
+**Safety/risk panel:** Richard is the project owner and panel chair. He has
+authority for acceptance. `/root` supplies the closeout. Read-only reviewer
 `/root/phase9a_closeout_review` examined the four exits, source identities,
-retained findings, recovery evidence and all 24 live risks.
+findings that the project keeps, recovery evidence and all 24 live risks.
+
 The reviewer did not author the geometry, alignment, recovery plan or snapshot
-execution. The agents share one team and workspace. This is not external
+execution. The agents work in one team and workspace. This is not external
 organisational independence.
 
 The recommendation is **Proceed with bounded conditions**. The panel records
@@ -52,37 +53,41 @@ treatments and controls stay unchanged. No risk closes. The frozen
 [risk snapshot](PHASE9A_RISKS.json) records all 24 duties. The
 [current register](../../current/risks.json) continues to own them.
 
-PR-13 retains the backup and restore cadence. PR-09 retains private-development
-output. PR-06, PR-07, PR-08 and PR-21 retain rights and provenance duties.
-PR-02, PR-03 and PR-04 retain chair evidence and production duties.
-PR-01, PR-17 and QA-R03 retain wider workflow and persistence duties.
-PR-15 and QA-R04 retain performance duties. PR-10 and PR-18 retain comparison
-and removal conditions. PR-22 retains independent acceptance control.
+PR-13 keeps the backup and restore cadence. PR-09 keeps private-development
+output. PR-06, PR-07, PR-08 and PR-21 keep rights and provenance duties.
+PR-02, PR-03 and PR-04 keep chair evidence and production duties.
+PR-01, PR-17 and QA-R03 keep wider workflow and persistence duties.
+
+PR-15 and QA-R04 keep performance duties. PR-10 and PR-18 keep comparison
+and removal conditions. PR-22 keeps independent acceptance control.
 Each risk owner keeps the deadline in the unchanged register.
 
-**Recovery evidence:** The October 9 snapshot covers the 45 roots present at
+**Recovery evidence:** The October 9 snapshot includes the 45 roots recorded at
 protected main `69ef5be`. It contains 156,133 entries and 8,585,174,023 bytes
 in regular files. Independent full comparison passed. All 68 critical
-identities, including the nine images and FCStd, matched. Five manifest entry
-arrays matched. All 45 strict checksum checks passed. Git state stayed unchanged.
-Earlier snapshot top-level metadata stayed unchanged; their complete contents
-were not independently rehashed.
+identities were the same in the source and snapshot. These include the nine images and FCStd.
+
+The five manifest entry arrays were the same. All 45 strict checksum checks passed.
+Git state stayed unchanged. Earlier snapshot top-level metadata stayed unchanged.
+The reviewer did not independently calculate hashes for their complete contents again.
 
 The snapshot is `2026-10-09-phase9a-closeout-readiness-recovery-01` on
 the approved USB destination.
 Its separately selected core packet has 1,708 entries. The terminal packet has
 1,726 entries. Independent membership, byte and metadata checks passed for both.
-All flushes passed. The USB was safely unmounted without force.
-Physical separate storage remains unverified.
+
+All results for the flush operation were PASS. The `udisksctl unmount` command completed without force.
+Physical separate storage stays unverified.
 
 This is not a restore of the October 9 set. The monthly restore passed on
 2026-10-07 for the accepted October 4 set. The next monthly drill is due by
 2026-11-07. The new alignment worktree is outside the earlier 45-root snapshot.
-The terminal review, unmount and completion receipts remain local after the
-terminal packet selection. No later file is claimed inside an earlier packet.
-The two October 1 intermediate Ruff-cache states remain unavailable.
 
-The proof receipts remain in the primary repository under
+The terminal review, unmount and completion receipts stay local after the
+terminal packet selection. This record claims no subsequent file inside an earlier packet.
+The two October 1 intermediate Ruff-cache states stay unavailable.
+
+The proof receipts stay in the primary repository under
 `tmp/phase9a-closeout-readiness/`:
 
 | Receipt | SHA-256 |
@@ -94,24 +99,25 @@ The proof receipts remain in the primary repository under
 | `safe-unmount.json` | `1448e3bae563d87be487e7d4a6a41b0ab63f63df77670983d5f407c565faca99` |
 
 **Continuing conditions:** The S1 plan keeps the owners and limits for
-S1-07 through S1-13 and S1-15. S1-14 remains optional comparison evidence
+S1-07 through S1-13 and S1-15. S1-14 stays optional comparison evidence
 under D-P9-005. Exact rail stock, independent dimensions, physical uncertainty,
-production tolerances and package rights remain unresolved for production.
+production tolerances and package rights stay unresolved for production.
 Those limits do not reopen the accepted reference-only exits.
+
 The 113-entry register and 119 derived, reference-only lineage records stay
 unchanged. Vertical-rail and planar-seat adaptations, edge contact and deliberate
-overlap retain their declared meanings. No measured whole-surface distribution
-or independently derived absolute base/seat overlap magnitude is claimed.
-L1 repair limits remain exhausted at 2/2 and terminal correction at 1/1.
+overlap keep their declared meanings. This record claims no measured whole-surface distribution
+or independently derived absolute base/seat overlap magnitude.
+L1 repair limits stay exhausted at 2/2 and terminal correction at 1/1.
 
-All inherited Phase 8 limits remain. Both B14/B15 identities, the inherited
+All inherited Phase 8 limits stay. Both B14/B15 identities, the inherited
 B15 host, development-only oracle and all comparison, adapter, caller,
 removal and legacy-retirement conditions stay. D-P6-008 stays Deferred — unmet
-and remains mandatory before Phase 10 beta acceptance. TERM-R04 stays open.
+and stays mandatory before Phase 10 beta acceptance. TERM-R04 stays open.
 Output stays private-development and project status stays `unknown`.
 
-**Resulting authority:** Complete only the required Level 3 alignment and its
-normal validation and independent review. Publish an exact-green draft PR.
+**Resulting authority:** Complete only the necessary Level 3 alignment and its
+usual validation and independent review. Publish a draft PR with a PASS result from CI for its exact head.
 Do not merge. This decision accepts no physical fit, preload, retention,
 manufacturing capability, production package, output, rights, performance
 result or release. It changes no geometry, numerical tolerance, package bytes,

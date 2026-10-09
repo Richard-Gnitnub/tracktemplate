@@ -1363,7 +1363,7 @@ Project dashboard and current-record consistency:
 ```
 
 This enforces the compact project-plan sections and line budget. It reconciles the frozen Phase 6, Phase 7, Phase 8 and Phase 9A closeouts with
-`current/PHASE_EVIDENCE.md`. It checks that Phase 9A is closed and Phase 9B is
+`current/PHASE_EVIDENCE.md`. It validates that Phase 9A is closed and Phase 9B is
 Open at 0/6 with all six exits Pending. It validates the
 detailed frozen and current risk and decision JSON registers. It protects the
 retired descriptive-path redirect.
