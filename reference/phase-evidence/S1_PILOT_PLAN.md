@@ -2,10 +2,11 @@
 
 Status: **Accepted Phase 1 control; production definition and pilot remain
 blocked. D-P9-006 accepts the named frozen S1 `ChairDefinition` for Exit 9A-1
-reference-only architecture proof. Exits 9A-2 and 9A-3 stay Pending.**
+reference-only architecture proof. D-P9-008 accepts Exit 9A-2 under D-P9-007.
+Exit 9A-3 stays Pending.**
 
 [D-P9-007](#s1-reference-comparison-criteria-under-d-p9-007) accepts only the
-bounded S1 reference-comparison criteria below. Phase 9A stays Open at 2/4.
+bounded S1 reference-comparison criteria below. Phase 9A stays Open at 3/4.
 Phase 9B stays Not started at 0/6.
 
 This document defines the minimum neutral package, evidence, rights and
@@ -262,6 +263,24 @@ production output and the assisted S1 pilot also stay outside it.
 This decision claims no measured whole-surface statistics or independently derived absolute
 `base/seat` overlap magnitude. The D-P9-004 private-use conditions
 and all other acceptance boundaries stay.
+
+## Bounded Exit 9A-2 acceptance under D-P9-008
+
+On 2026-10-09, [D-P9-008](../current/PHASE_EVIDENCE.md#phase-9a-exit-2-acceptance-panel)
+accepts Exit 9A-2 only for the exact frozen five-component S1 reference.
+The decision uses the package, manifest, A0 rail section and thirteen criteria
+identified above. The criteria and their numerical limits stay unchanged.
+The panel owns the accepted evidence and exclusions.
+
+Phase 9A is Open at 3/4. Exit 9A-3 stays Pending.
+Phase 9B stays Not started at 0/6.
+
+The D-P9-007 section records criteria-only acceptance at its date.
+D-P9-008 gives acceptance for Exit 9A-2. It changes no geometry,
+package bytes, historical metadata or entry in the 113-entry register.
+It accepts no assisted S1 pilot, physical fit, manufacturing capability,
+production output or rights claim. The authorised publication is a draft PR.
+Do not merge.
 
 ## Neutral package requirements
 

@@ -469,6 +469,40 @@ def _reference_criteria_errors(text):
     return errors
 
 
+def _exit2_acceptance_errors(text):
+    """Keep exit admission separate from the historical criteria decision."""
+    section = direct_section_content(
+        text, "Bounded Exit 9A-2 acceptance under D-P9-008",
+    )
+    flat = " ".join(section.replace("`", "").split())
+    clauses = (
+        "accepts Exit 9A-2 only for the exact frozen five-component S1 "
+        "reference",
+        "package, manifest, A0 rail section and thirteen criteria "
+        "identified above",
+        "The criteria and their numerical limits stay unchanged",
+        "The panel owns the accepted evidence and exclusions",
+        "Phase 9A is Open at 3/4",
+        "Exit 9A-3 stays Pending",
+        "Phase 9B stays Not started at 0/6",
+        "The D-P9-007 section records criteria-only acceptance at its date",
+        "D-P9-008 gives acceptance for Exit 9A-2",
+        "It changes no geometry, package bytes, historical metadata or "
+        "entry in the 113-entry register",
+        "It accepts no assisted S1 pilot, physical fit, manufacturing "
+        "capability, production output or rights claim",
+        "The authorised publication is a draft PR. Do not merge",
+    )
+    errors = [
+        "S1 Exit 9A-2 boundary drifted: " + clause
+        for clause in clauses if clause not in flat
+    ]
+    if ("../current/PHASE_EVIDENCE.md"
+            "#phase-9a-exit-2-acceptance-panel") not in section:
+        errors.append("S1 Exit 9A-2 decision owner link drifted")
+    return errors
+
+
 def validate_plan(
     text,
     manifest,
@@ -481,6 +515,7 @@ def validate_plan(
         + _engineering_reference_errors(text)
         + _exit1_acceptance_errors(text)
         + _reference_criteria_errors(text)
+        + _exit2_acceptance_errors(text)
     )
     for marker in REQUIRED_MARKERS:
         if marker not in text:
@@ -857,6 +892,32 @@ def main():
     _expect_invalid(
         relocated, manifest, lineage, oracle, "Exit 9A-1 boundary relocated",
     )
+
+    exit2_section = direct_section_content(
+        text, "Bounded Exit 9A-2 acceptance under D-P9-008",
+    )
+    for before, after in (
+        ("only for the exact frozen five-component S1 reference",
+         "for every chair reference"),
+        ("numerical limits stay unchanged", "numerical limits may increase"),
+        ("Exit 9A-3 stays Pending", "Exit 9A-3 is accepted"),
+        ("Phase 9B stays Not started", "Phase 9B is Open"),
+        ("criteria-only acceptance at its date", "all-exit acceptance"),
+        ("It changes no geometry", "It changes geometry"),
+        ("It accepts no assisted S1 pilot", "It accepts an assisted S1 pilot"),
+        ("Do not merge", "Merge"),
+        ("#phase-9a-exit-2-acceptance-panel", "#unreviewed-decision"),
+    ):
+        assert before in exit2_section, before
+        changed = exit2_section.replace(before, after, 1)
+        if not _exit2_acceptance_errors(
+                text.replace(exit2_section, changed, 1)):
+            raise AssertionError("Exit 9A-2 mutation escaped: " + before)
+    relocated = text.replace(exit2_section, "\n\nNo acceptance.\n", 1)
+    relocated += "\n## Unrelated retained material\n" + exit2_section
+    if not _exit2_acceptance_errors(relocated):
+        raise AssertionError("Relocated Exit 9A-2 acceptance escaped")
+    print("S1_EXIT2_ACCEPTANCE_MUTATIONS=10")
 
     weakened_oracle = copy.deepcopy(oracle)
     weakened_oracle["acceptance_gate"]["canonical_production_input"] = True
