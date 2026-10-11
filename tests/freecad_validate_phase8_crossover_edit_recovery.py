@@ -17,7 +17,6 @@ sys.path.insert(0, str(SOURCE_ROOT))
 
 from tools.freecad_bridge import crossover_timber_recipe as recipe  # noqa: E402
 from tracktemplate import api  # noqa: E402
-from tracktemplate.compatibility import transition_workflow  # noqa: E402
 from tracktemplate.compatibility.crossover_preflight import (  # noqa: E402
     CrossoverPreflightAdapter,
 )
@@ -43,11 +42,8 @@ def _load_product():
     assert foundation["matched_profile_id"] == PROFILE
     modular_api, bootstrap = launcher["_load_foundation"](SOURCE_ROOT)
     assert modular_api is api
-    transition = bootstrap.load_contract(
-        SOURCE_ROOT / "reference/contracts/phase1-transition-pilot.json"
-    )
-    session = transition_workflow.load_modular_transition_workflow_session(
-        SOURCE_ROOT, api, transition,
+    session, _routing = launcher["_load_modular_transition_workflow"](
+        SOURCE_ROOT, api, bootstrap,
     )
     module = session.module
     edit = module.edit_rea_c10_crossover

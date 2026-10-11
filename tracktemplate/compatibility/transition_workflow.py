@@ -4,7 +4,6 @@ import copy
 from dataclasses import dataclass
 import json
 
-from tracktemplate.adapters.export.core_layout_files import CoreLayoutExportFiles
 from tracktemplate.application import (
     chair_analysis_reuse,
     chair_analysis_signature,
@@ -2538,10 +2537,22 @@ def _selected_export_scope_method(original_scope, selection_snapshot):
 class ModularCoreLayoutWorkflowSession:
     """Add one modular export command to the selected calculation session."""
 
-    def __init__(self, calculation_session, export_calculation, *, staged=False):
+    def __init__(
+        self,
+        calculation_session,
+        export_calculation,
+        *,
+        staged=False,
+        export_files_factory=None,
+    ):
+        if staged and not callable(export_files_factory):
+            raise TransitionWorkflowError(
+                "The Core export filesystem adapter is unavailable."
+            )
         self._calculation_session = calculation_session
         self._host = calculation_session._host
         self._staged_export = staged
+        self._export_files_factory = export_files_factory
         self._export_operations = (
             STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS if staged
             else CORE_LAYOUT_EXPORT_HOST_OPERATIONS
@@ -2566,7 +2577,7 @@ class ModularCoreLayoutWorkflowSession:
             )
         self._export_calculation = export_calculation
         if staged:
-            operations["export_files_factory"] = CoreLayoutExportFiles
+            operations["export_files_factory"] = self._export_files_factory
         self._export_adapter = self._export_adapter_type(
             calculation=export_calculation,
             **operations,
@@ -2647,7 +2658,7 @@ class ModularCoreLayoutWorkflowSession:
             )
         if (
             self._staged_export
-            and adapter.export_files_factory is not CoreLayoutExportFiles
+            and adapter.export_files_factory is not self._export_files_factory
         ):
             raise TransitionWorkflowError(
                 "The Core export filesystem adapter has a mixed binding."
@@ -2729,6 +2740,8 @@ def load_modular_transition_workflow_session(
     repository_root,
     modular_api,
     contract,
+    *,
+    export_files_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -2776,4 +2789,5 @@ def load_modular_transition_workflow_session(
         ) from error
     return ModularCoreLayoutWorkflowSession(
         calculation_session, export_calculation, staged=True,
+        export_files_factory=export_files_factory,
     )

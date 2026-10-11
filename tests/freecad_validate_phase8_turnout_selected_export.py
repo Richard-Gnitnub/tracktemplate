@@ -25,7 +25,6 @@ sys.path.insert(0, str(ROOT))
 from tools.freecad_bridge import ordinary_track_export_recipe  # noqa: E402
 from tools.freecad_bridge import turnout_recipe  # noqa: E402
 from tracktemplate import api  # noqa: E402
-from tracktemplate.compatibility import transition_workflow  # noqa: E402
 
 
 SENTINEL = "Phase 8 turnout selected export FreeCAD validation passed"
@@ -67,11 +66,8 @@ def _load_product():
     assert foundation["matched_profile_id"] == PROFILE
     modular_api, bootstrap = launcher["_load_foundation"](ROOT)
     assert modular_api is api
-    contract = bootstrap.load_contract(
-        ROOT / "reference/contracts/phase1-transition-pilot.json"
-    )
-    session = transition_workflow.load_modular_transition_workflow_session(
-        ROOT, api, contract,
+    session, _routing = launcher["_load_modular_transition_workflow"](
+        ROOT, api, bootstrap,
     )
     assert str(session.module.MACRO_VERSION_NUMBER) == "10.2A8A7B15"
     return session.module

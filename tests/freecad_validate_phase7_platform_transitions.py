@@ -45,11 +45,8 @@ def validate():
     }
     modular_api, bootstrap = launcher["_load_foundation"](SOURCE_ROOT)
     assert modular_api is api
-    contract = bootstrap.load_contract(
-        SOURCE_ROOT / "reference/contracts/phase1-transition-pilot.json",
-    )
-    session = transition_workflow.load_modular_transition_workflow_session(
-        SOURCE_ROOT, api, contract,
+    session, _routing = launcher["_load_modular_transition_workflow"](
+        SOURCE_ROOT, api, bootstrap,
     )
     module = session.module
     record = session.routing_record()

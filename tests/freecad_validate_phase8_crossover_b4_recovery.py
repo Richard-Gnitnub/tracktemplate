@@ -25,7 +25,6 @@ from tracktemplate import api  # noqa: E402
 from tracktemplate.compatibility.crossover_b4_recovery import (  # noqa: E402
     CrossoverB4RecoveryAdapter,
 )
-from tracktemplate.compatibility import transition_workflow  # noqa: E402
 
 
 SENTINEL = "Phase 8 crossover B4 recovery FreeCAD validation passed"
@@ -45,11 +44,8 @@ def _load_product():
     assert foundation["matched_profile_id"] == PROFILE
     modular_api, bootstrap = launcher["_load_foundation"](SOURCE_ROOT)
     assert modular_api is api
-    contract = bootstrap.load_contract(
-        SOURCE_ROOT / "reference/contracts/phase1-transition-pilot.json"
-    )
-    session = transition_workflow.load_modular_transition_workflow_session(
-        SOURCE_ROOT, api, contract,
+    session, _routing = launcher["_load_modular_transition_workflow"](
+        SOURCE_ROOT, api, bootstrap,
     )
     module = session.module
     apply = module.apply_crossover_b4_timbering

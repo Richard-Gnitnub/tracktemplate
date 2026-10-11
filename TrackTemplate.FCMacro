@@ -44,6 +44,9 @@ def _load_modular_transition_workflow(
     bootstrap,
 ):
     compatibility = importlib.import_module("tracktemplate.compatibility")
+    export_files = importlib.import_module(
+        "tracktemplate.adapters.export.core_layout_files"
+    )
     transition_contract = bootstrap.load_contract(
         repository_root
         / "reference"
@@ -54,6 +57,7 @@ def _load_modular_transition_workflow(
         repository_root,
         api,
         transition_contract,
+        export_files_factory=export_files.CoreLayoutExportFiles,
     )
     return session, session.routing_record()
 

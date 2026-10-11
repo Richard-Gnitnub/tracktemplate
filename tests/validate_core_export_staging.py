@@ -5,6 +5,7 @@ Synthetic payloads exercise the inherited nonempty regular-file boundary.
 They do not claim CAD format, railway, or whole-set publication acceptance.
 """
 
+import ast
 import copy
 from contextlib import ExitStack
 import csv
@@ -454,7 +455,10 @@ def validate_api_route():
             workflow, "ModularTransitionWorkflowSession", return_value=base
         ):
             session = workflow.load_modular_transition_workflow_session(
-                ROOT, api, {}
+                ROOT,
+                api,
+                {},
+                export_files_factory=files.CoreLayoutExportFiles,
             )
     record = session.core_layout_export_routing_record()
     assert record["contract_id"] == contract["contract_id"]
@@ -487,6 +491,20 @@ def validate_api_route():
         object.__setattr__(
             adapter, "export_files_factory", files.CoreLayoutExportFiles
         )
+    for invalid_factory in (None, 42):
+        previous = module.run_production_export
+        try:
+            workflow.ModularCoreLayoutWorkflowSession(
+                base,
+                api.run_staged_core_layout_export,
+                staged=True,
+                export_files_factory=invalid_factory,
+            )
+        except workflow.TransitionWorkflowError:
+            pass
+        else:
+            raise AssertionError("A missing or non-callable factory passed")
+        assert module.run_production_export is previous
     module.run_production_export = object()
     assert session.launch_workflow() is adapter
     previous = module.run_production_export
@@ -500,6 +518,7 @@ def validate_api_route():
                 base,
                 api.run_staged_core_layout_export,
                 staged=True,
+                export_files_factory=files.CoreLayoutExportFiles,
             )
         except RuntimeError as error:
             assert str(error) == "controlled binding failure"
@@ -530,6 +549,153 @@ assert not any(
 )
 """
     subprocess.run([sys.executable, "-c", script, str(ROOT)], check=True)
+
+
+def validate_composition_boundary():
+    """Keep concrete adapters in the existing runtime composition root."""
+    from tools import modular_structure
+
+    report = modular_structure.structure_report(ROOT)
+    assert modular_structure.validate_report(report) == []
+    parsed = ast.parse((ROOT / "TrackTemplate.FCMacro").read_text())
+    function = next(
+        node
+        for node in parsed.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_load_modular_transition_workflow"
+    )
+    calls = []
+    marker = object()
+    routing = {"route": "modular"}
+    session = types.SimpleNamespace(routing_record=lambda: routing)
+
+    def load(*args, **kwargs):
+        assert args == (ROOT, api, marker)
+        assert kwargs == {"export_files_factory": files.CoreLayoutExportFiles}
+        return session
+
+    modules = {
+        "tracktemplate.compatibility": types.SimpleNamespace(
+            load_modular_transition_workflow_session=load,
+        ),
+        "tracktemplate.adapters.export.core_layout_files": files,
+    }
+
+    def resolve(name):
+        calls.append(name)
+        return modules[name]
+
+    namespace = {"importlib": types.SimpleNamespace(import_module=resolve)}
+    exec(
+        compile(
+            ast.Module(body=[function], type_ignores=[]),
+            "<composition boundary>",
+            "exec",
+        ),
+        namespace,
+    )
+    result = namespace[function.name](
+        ROOT,
+        api,
+        types.SimpleNamespace(load_contract=lambda _path: marker),
+    )
+    assert result == (session, routing)
+    assert set(calls) == set(modules)
+
+
+def validate_retained_native_composition():
+    """Exercise retained loader prefixes without claiming historical host proof."""
+    from tracktemplate.compatibility import transition_workflow as workflow
+    from tracktemplate.application import turnout_edit
+    from tracktemplate.domain import turnout
+
+    names = (
+        "phase7_platform_transitions",
+        "phase8_crossover_b4_recovery",
+        "phase8_crossover_edit_recovery",
+        "phase8_crossover_host_integration_recovery",
+        "phase8_crossover_preflight",
+        "phase8_crossover_selected_export",
+        "phase8_straight_host_crossover",
+        "phase8_straight_host_turnout",
+        "phase8_turnout_host_integration_recovery",
+        "phase8_turnout_selected_export",
+        "phase8_turnout_toe_range",
+    )
+    for name in names:
+        path = ROOT / "tests" / ("freecad_validate_" + name + ".py")
+        parsed = ast.parse(path.read_text())
+        matches = [
+            (function, index)
+            for function in parsed.body
+            if isinstance(function, ast.FunctionDef)
+            for index, node in enumerate(function.body)
+            if isinstance(node, ast.Assign)
+            and isinstance(node.value, ast.Call)
+            and isinstance(node.value.func, ast.Subscript)
+            and isinstance(node.value.func.value, ast.Name)
+            and node.value.func.value.id == "launcher"
+            and isinstance(node.value.func.slice, ast.Constant)
+            and node.value.func.slice.value
+            == "_load_modular_transition_workflow"
+        ]
+        assert len(matches) == 1, name
+        function, index = matches[0]
+        profile = next(
+            (
+                ast.literal_eval(node.value)
+                for node in parsed.body
+                if isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name) and target.id == "PROFILE"
+                    for target in node.targets
+                )
+            ),
+            "linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10",
+        )
+        bootstrap = object()
+        module = object()
+        calls = []
+
+        def compose(root, modular_api, supplied_bootstrap):
+            assert root == ROOT and modular_api is api
+            assert supplied_bootstrap is bootstrap
+            calls.append(name)
+            return types.SimpleNamespace(module=module), {"route": "modular"}
+
+        launcher = {
+            "FOUNDATION_RESULT": {
+                "status": "modular-foundation-ready",
+                "matched_profile_id": profile,
+            },
+            "_load_foundation": lambda root: (api, bootstrap),
+            "_load_modular_transition_workflow": compose,
+        }
+        namespace = {
+            "ROOT": ROOT,
+            "SOURCE_ROOT": ROOT,
+            "PROFILE": profile,
+            "api": api,
+            "bootstrap": bootstrap,
+            "os": os,
+            "pathlib": types.SimpleNamespace(Path=Path),
+            "transition_workflow": workflow,
+            "turnout_edit": turnout_edit,
+            "turnout": turnout,
+            "document_state": lambda: {},
+            "runpy": types.SimpleNamespace(run_path=lambda path: launcher),
+        }
+        prefix = copy.deepcopy(function.body[: index + 1])
+        tree = ast.Module(body=prefix, type_ignores=[])
+        exec(compile(tree, str(path), "exec"), namespace)
+        assert namespace["session"].module is module and calls == [name]
+        assert any(
+            isinstance(node, ast.Attribute)
+            and node.attr == "module"
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "session"
+            for node in ast.walk(function)
+        ), name
 
 
 def validate_gui_route_guards():
@@ -630,6 +796,8 @@ def validate_absent_manifest_and_falsy_override(root):
 
 def validate():
     validate_api_route()
+    validate_composition_boundary()
+    validate_retained_native_composition()
     validate_gui_route_guards()
     assert (
         api.run_staged_core_layout_export
