@@ -592,24 +592,34 @@ def validate_documentation_profile(
             "The other five exits stay Pending",
             "D-P9-010",
             "D-P9-012",
-            "This decision adds no product behaviour",
-            "representative migrated Core workflows",
-            "The six exit criteria stay unchanged",
-            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
-            "Output stays private-development",
-            "project status stays `unknown`",
+            "D-P9-013",
+            "authorises a different new directory for each Core Generate "
+            "export",
+            "The full set must become available together",
+            "CSV stays optional",
+            "Returned paths change and previous output stays unchanged",
             "representative-workflow limits, selected export scope, "
             "normalisations, the observed SVG difference and "
             "`production_ready=False`",
-            "D-P9-012 accepts only Exit 9B-2 on the reviewed evidence and "
-            "bounded conditions",
+            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
+            "Output stays private-development and project status stays "
+            "`unknown`",
+            "D-P9-013 authorises only the export policy and its bounded "
+            "implementation",
+            "It accepts no exit",
+            "It gives no assurance that files stay available after a system "
+            "interruption",
+            "It adds no recovery after FreeCAD stops and starts again",
+            "D-P9-012 stays the authority for the one accepted Phase 9B exit",
+            "After CI gives a PASS result for the exact PR head, publish the "
+            "draft PR",
+            "Do not merge or start another outcome",
+            "The six exit criteria stay unchanged",
             "All other exits and production conditions stay",
-            "The Phase 9A closeout and earlier decisions keep their "
-            "accepted limits",
-            "After CI gives a PASS result for the exact PR head, publish "
-            "the draft PR. Do not merge or start further development",
+            "The Phase 9A closeout and earlier decisions keep their accepted limits",
             "history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
             "current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel",
+            "current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel",
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )

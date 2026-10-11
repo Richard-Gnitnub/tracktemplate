@@ -71,8 +71,12 @@ _PHASE3_QUALIFICATION = _PHASE3_BOOTSTRAP.require_qualified_runtime(
     / "phase1-compatibility.json"
 )
 _PHASE3_PRODUCT_COMPOSITION = _PHASE3_ROUTE == "modular"
-if _PHASE3_PRODUCT_COMPOSITION and globals().get(
-    "TRACKTEMPLATE_PHASE7_COMPARISON_EXPORT", False
+_PHASE3_STAGED_COMPARISON = bool(globals().get(
+    "TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False
+))
+if _PHASE3_PRODUCT_COMPOSITION and (
+    globals().get("TRACKTEMPLATE_PHASE7_COMPARISON_EXPORT", False)
+    or _PHASE3_STAGED_COMPARISON
 ):
     # Retain the explicit Phase 7 diagnostic after the normal route advances.
     from tracktemplate.compatibility import b15_workflow_host as _phase7_host
@@ -84,6 +88,14 @@ if _PHASE3_PRODUCT_COMPOSITION and globals().get(
         / "contracts"
         / "phase1-transition-pilot.json"
     )
+    _phase7_export_options = {}
+    if _PHASE3_STAGED_COMPARISON:
+        from tracktemplate.adapters.export.core_layout_files import CoreLayoutExportFiles
+        from tracktemplate.adapters.freecad.core_export_document import CoreExportDocument
+        _phase7_export_options = dict(
+            staged=True, export_files_factory=CoreLayoutExportFiles,
+            export_dispatcher_factory=CoreExportDocument,
+        )
     _PHASE3_SESSION = _phase7_api.ModularCoreLayoutWorkflowSession(
         _phase7_api.ModularTransitionWorkflowSession(
             _phase7_host.load_b15_workflow_host(
@@ -94,7 +106,9 @@ if _PHASE3_PRODUCT_COMPOSITION and globals().get(
                 for name in _phase7_api.PRODUCT_FUNCTION_NAMES
             },
         ),
-        _PHASE3_API.run_core_layout_export,
+        (_PHASE3_API.run_staged_core_layout_export if _PHASE3_STAGED_COMPARISON
+         else _PHASE3_API.run_core_layout_export),
+        **_phase7_export_options,
     )
     _PHASE3_ROUTING = _PHASE3_SESSION.routing_record()
 elif _PHASE3_PRODUCT_COMPOSITION:

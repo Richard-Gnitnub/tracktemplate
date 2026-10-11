@@ -4834,6 +4834,7 @@ def validate_phase9_closeout_opening_mutations() -> None:
         (1, progress._validate_dp9_010_decision, "D-P9-010"),
         (2, progress._validate_dp9_011_decision, "D-P9-011"),
         (3, progress._validate_dp9_012_decision, "D-P9-012"),
+        (4, progress._validate_dp9_013_decision, "D-P9-013"),
     ):
         record = document["decisions"][index]
         for field, value, diagnostic in (
@@ -4854,7 +4855,7 @@ def validate_phase9_closeout_opening_mutations() -> None:
                 ),
                 decision_id + " " + diagnostic + " drifted",
             )
-    for index in range(4):
+    for index in range(5):
         changed = copy.deepcopy(document)
         changed["decisions"].pop(index)
         expect_rejected(
@@ -4876,6 +4877,8 @@ def validate_phase9_closeout_opening_mutations() -> None:
          progress._validate_phase9b_holding, "D-P9-011"),
         (current, progress.DP9_012_HEADING,
          progress._validate_dp9_012_admission, "D-P9-012"),
+        (current, progress.DP9_013_HEADING,
+         progress._validate_dp9_013_policy, "D-P9-013"),
     ):
         panel = progress._section(text, heading)
         moved = replace_once(text, panel, "\nNo owner decision.\n")
@@ -5110,6 +5113,137 @@ def validate_phase9b_exit2_admission_mutations() -> None:
         "phase9b-exit2/evidence-link-changed",
         lambda: progress._validate_dp9_012_admission(changed),
         "D-P9-012 accepted evidence or risk route drifted",
+    )
+
+
+def validate_phase9b_export_policy_mutations() -> None:
+    """Reject changes beyond the approved complete-set export policy."""
+    current = read("reference/current/PHASE_EVIDENCE.md")
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    record = document["decisions"][4]
+    for field, value in (
+        ("id", "D-P9-012"),
+        ("decided_on", "2026-10-09"),
+        ("evidence", "reference/PROJECT_PLAN.md"),
+        ("panel_required_under_current_policy", False),
+    ):
+        changed = copy.deepcopy(record)
+        changed[field] = value
+        expect_rejected(
+            "phase9b-export-policy/record-" + field,
+            lambda value=changed: progress._validate_dp9_013_decision(
+                value, set(record),
+            ),
+            "D-P9-013 identity, status or panel routing drifted",
+        )
+    panel = progress._section(current, progress.DP9_013_HEADING)
+    for name, before, after in (
+        ("source", "6586eda3addaf955be06b69753c906252b72adbe",
+         "unreviewed-source"),
+        ("new-directory", "different new\nchild directory",
+         "previous existing child directory"),
+        ("whole-set", "before one directory operation\nmakes the full set",
+         "while separate file operations make part of the set"),
+        ("replace-existing", "The operation must not replace an existing final path",
+         "An existing final path can be replaced"),
+        ("unsupported-host", "stops with a diagnostic if the host cannot",
+         "continues without a diagnostic if the host cannot"),
+        ("csv-mandatory", "CSV stays optional. A requested CSV",
+         "CSV becomes mandatory. A requested CSV"),
+        ("csv-outside-set", "is part of that same output set",
+         "is written after the output set"),
+        ("paths", "output\npaths and CSV paths identify the new final directory",
+         "output paths keep the selected parent directory"),
+        ("overwrite-ui", "permits replacement of previous outputs no longer applies",
+         "replace previous outputs still applies"),
+        ("prior-output", "All previous output files and "
+         "directories stay unchanged", "Previous output can be replaced"),
+        ("false-old-proof", "They do not establish that all files become available together",
+         "They establish complete-set visibility"),
+        ("cleanup-published", "Once the full set is available, cleanup "
+         "must preserve it", "Cleanup removes a completed set after an error"),
+        ("durability", "It gives no assurance that the files stay available "
+         "after a system interruption", "It assures survival after a system interruption"),
+        ("restart", "It adds no recovery after FreeCAD stops and starts again",
+         "It adds recovery after FreeCAD stops and starts again"),
+        ("hostile-namespace", "These checks do not prevent that change",
+         "These checks prevent that change"),
+        ("risk-duty", "All 24 risk states", "Only 23 risk states"),
+        ("entry-exit", "D-P6-003 and D-P6-004 keep their Entry/Exit conditions",
+         "D-P6-003 and D-P6-004 use the new Core policy"),
+        ("legacy", "previous staging API and selected-export route keep "
+         "their limits", "previous staging API and selected-export route "
+         "adopt the new policy"),
+        ("phase-exit", "It accepts no phase exit", "It accepts Exit 9B-5"),
+        ("deferred-duty", "D-P6-008 stays Deferred — unmet",
+         "D-P6-008 is complete"),
+        ("register", "the 113-entry register", "a replacement register"),
+        ("rights", "Output stays private-development",
+         "Output becomes project-cleared"),
+        ("merge", "Do not merge or start another outcome",
+         "Merge and begin another outcome"),
+    ):
+        changed = replace_once(current, panel,
+                               replace_once(panel, before, after))
+        expect_rejected(
+            "phase9b-export-policy/" + name,
+            lambda value=changed: progress._validate_dp9_013_policy(value),
+            "D-P9-013 policy or bounded conditions drifted",
+        )
+    changed = replace_once(
+        current, panel, panel + "\nAll Phase 9B exits are accepted.\n",
+    )
+    expect_rejected(
+        "phase9b-export-policy/contradiction-appended",
+        lambda: progress._validate_dp9_013_policy(changed),
+        "D-P9-013 policy or bounded conditions drifted",
+    )
+    changed = replace_once(panel, "../contracts/core-layout-export-set.md",
+                           "../contracts/core-layout-export-staging.md")
+    changed = replace_once(current, panel, changed)
+    expect_rejected(
+        "phase9b-export-policy/contract-route",
+        lambda: progress._validate_dp9_013_policy(changed),
+        "D-P9-013 policy or risk route drifted",
+    )
+    architecture = read("reference/ARCHITECTURE.md")
+    section = progress.direct_section_content(
+        architecture, "D-P9-013 Core Generate full output set", level=4,
+    )
+    for name, before, after in (
+        ("partial-set", "One operation must make that full set available",
+         "Separate operations can make parts of the set visible"),
+        ("overwrite", "without a change to an existing path",
+         "with replacement of an existing path"),
+        ("csv", "CSV stays optional", "CSV is mandatory"),
+        ("fallback", "It must not write final files one at a time",
+         "It may write final files one at a time"),
+        ("false-zero", "must not erase the completed set or report zero",
+         "must erase the completed set and report zero"),
+        ("cleanup", "only over temporary data that the operation did not make available "
+         "at the final path",
+         "over all published and temporary data"),
+        ("durability", "It gives no assurance that the files stay available",
+         "It assures that the files survive"),
+        ("restart", "It adds no recovery after FreeCAD stops and starts again",
+         "It adds recovery after FreeCAD stops and starts again"),
+        ("entry-exit", "keep their Entry/Exit scope and recovery authority",
+         "replace their Entry/Exit scope and recovery authority"),
+    ):
+        changed = replace_once(architecture, section,
+                               replace_once(section, before, after))
+        expect_rejected(
+            "phase9b-export-architecture/" + name,
+            lambda value=changed: progress._validate_dp9_013_architecture(value),
+            "D-P9-013 architecture policy boundary drifted",
+        )
+    changed = replace_once(section, "contracts/core-layout-export-set.md",
+                           "contracts/core-layout-export-staging.md")
+    changed = replace_once(architecture, section, changed)
+    expect_rejected(
+        "phase9b-export-architecture/contract-route",
+        lambda: progress._validate_dp9_013_architecture(changed),
+        "D-P9-013 architecture authority route drifted",
     )
 
 
@@ -6368,15 +6502,13 @@ def validate_documentation_profile_mutations() -> None:
         (
             "merge-authorised", "| Next action |",
             "Do not merge", "Merge now",
-            "After CI gives a PASS result for the exact PR head, publish "
-            "the draft PR. Do not merge or start further development",
+            "Do not merge or start another outcome",
         ),
         (
             "stop-boundary-waived", "| Next action |",
-            "Do not merge or start further development",
-            "Do not merge; begin further development",
-            "After CI gives a PASS result for the exact PR head, publish "
-            "the draft PR. Do not merge or start further development",
+            "Do not merge or start another outcome",
+            "Do not merge; begin another outcome",
+            "Do not merge or start another outcome",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
@@ -8508,6 +8640,7 @@ def main() -> None:
     validate_phase9_exit3_admission_mutations()
     validate_phase9_closeout_opening_mutations()
     validate_phase9b_exit2_admission_mutations()
+    validate_phase9b_export_policy_mutations()
     validate_phase9_evidence_model_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()

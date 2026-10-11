@@ -65,27 +65,51 @@ def source_hashes():
     return {str(path.relative_to(ROOT)): sha256(path) for path in paths}
 
 
-def load_product():
+def load_product(*, atomic=False):
     launcher = runpy.run_path(str(ROOT / "TrackTemplate.FCMacro"))
     foundation = launcher["FOUNDATION_RESULT"]
     assert foundation["matched_profile_id"] == PROFILE
     product, bootstrap = launcher["_load_foundation"](ROOT)
-    session, routing = launcher["_load_modular_transition_workflow"](
-        ROOT,
-        product,
-        bootstrap,
-    )
+    if atomic:
+        session, routing = launcher["_load_modular_transition_workflow"](
+            ROOT, product, bootstrap,
+        )
+    else:
+        # Retain the historical staging proof after the normal route advances.
+        from tracktemplate.compatibility import b15_workflow_host
+        from tracktemplate.compatibility import transition_workflow
+
+        contract = bootstrap.load_contract(
+            ROOT / "reference/contracts/phase1-transition-pilot.json"
+        )
+        session = transition_workflow.ModularCoreLayoutWorkflowSession(
+            transition_workflow.ModularTransitionWorkflowSession(
+                b15_workflow_host.load_b15_workflow_host(ROOT, contract),
+                {name: getattr(product, name)
+                 for name in transition_workflow.PRODUCT_FUNCTION_NAMES},
+            ),
+            product.run_staged_core_layout_export,
+            staged=True,
+            export_files_factory=CoreLayoutExportFiles,
+            export_dispatcher_factory=CoreExportDocument,
+        )
+        routing = session.routing_record()
     assert routing["route"] == "modular"
     export_routing = session.core_layout_export_routing_record()
     assert export_routing["contract_id"] == (
-        "tracktemplate:phase9b:core-layout-export-staging:1"
+        "tracktemplate:phase9b:core-layout-export-set:1" if atomic
+        else "tracktemplate:phase9b:core-layout-export-staging:1"
     )
-    assert export_routing["command_name"] == "run_staged_core_layout_export"
+    assert export_routing["command_name"] == (
+        "run_atomic_core_layout_export" if atomic
+        else "run_staged_core_layout_export"
+    )
     assert export_routing["mixed_route"] is False
-    assert (
-        session.module.run_production_export.export_files_factory
-        is CoreLayoutExportFiles
-    )
+    if not atomic:
+        assert (
+            session.module.run_production_export.export_files_factory
+            is CoreLayoutExportFiles
+        )
     assert (
         session.module.run_production_export.export_dispatcher_factory
         is CoreExportDocument

@@ -239,6 +239,46 @@ The export layer keeps the existing safety model:
 7. Apply the accepted transaction's failure rules and clean transient
    geometry without claiming authority over foreign or published state.
 
+<a id="d-p9-013-core-generate-complete-output-set"></a>
+
+#### D-P9-013 Core Generate full output set
+
+[D-P9-013](current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel)
+authorises a different new output directory for each Core Generate export.
+This directory is inside the directory that the operator selects.
+All files in the requested set must pass their existing checks before the
+full directory becomes available at its final path.
+One operation must make that full set available without a change to an existing path.
+If the host cannot supply that operation, export must stop with a diagnostic.
+It must not write final files one at a time as a different route.
+
+CSV stays optional. If the operator requests CSV, it is part of the same set.
+The filenames and content requirements inside the directory stay the same.
+Returned output paths and CSV paths identify the new final directory.
+The usual Core Generate controls must show the changed paths and preserve
+all files and directories from previous operations.
+The previous control that permits replacement of existing outputs does not apply to this route.
+
+The owner calls this policy “atomic whole-set publication”.
+This means that the full set becomes available through one directory operation.
+It gives no assurance that the files stay available after a system interruption.
+It adds no recovery after FreeCAD stops and starts again.
+The bounded contract applies to the qualified Linux ext4 host and an operator-controlled
+output directory. A different process can change that directory during this operation.
+These checks do not prevent that change.
+
+The operation must report if the full directory became available.
+An error after that operation must not erase the completed set or report zero
+completed output. Cleanup has authority only over temporary data that the operation did not make available at the final path.
+Its ownership checks must pass first.
+The isolated FreeCAD objects and editable-model preservation conditions stay.
+The [successor contract](contracts/core-layout-export-set.md) owns the API,
+checks and qualified operating conditions.
+
+D-P6-003 and D-P6-004 keep their Entry/Exit scope and recovery authority.
+The Phase 7 comparison route, previous staging API and selected-export route stay available.
+This policy accepts no Phase 9B exit, output rights, production capability or performance result.
+
 #### D-P6-003 cross-process recovery authority
 
 For the bounded B16 Entry/Exit DXF-and-manifest pair, D-P6-003 selects a strict

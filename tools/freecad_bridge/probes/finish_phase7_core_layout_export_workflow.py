@@ -24,7 +24,13 @@ _PHASE7_EXPECTED_SCENARIOS = (
     "create_time_export_success",
     "create_time_export_final_task_failure",
 )
-if globals().get("TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False):
+if globals().get("TRACKTEMPLATE_CORE_EXPORT_ATOMIC_SET", False):
+    _PHASE7_EXPECTED_SCENARIOS = (
+        "create_time_export_success", "create_time_export_no_csv",
+        "create_time_export_final_task_failure", "create_time_export_collision",
+        "create_time_export_publication_failure", "create_time_export_postpublication",
+    )
+elif globals().get("TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False):
     _PHASE7_EXPECTED_SCENARIOS += (
         "create_time_export_isolated_close_failure",
     )
@@ -268,11 +274,14 @@ if phase3_product_composition:
     staging_barrier = bool(globals().get(
         "TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False,
     ))
+    atomic_set = bool(globals().get("TRACKTEMPLATE_CORE_EXPORT_ATOMIC_SET", False))
     expected_export_contract = (
+        "tracktemplate:phase9b:core-layout-export-set:1" if atomic_set else
         "tracktemplate:phase9b:core-layout-export-staging:1"
         if staging_barrier else "tracktemplate:phase7:core-layout-export:1"
     )
     expected_export_command = (
+        "run_atomic_core_layout_export" if atomic_set else
         "run_staged_core_layout_export"
         if staging_barrier else "run_core_layout_export"
     )

@@ -46,6 +46,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel"
+    },
+    {
+      "id": "D-P9-013",
+      "decided_on": "2026-10-11",
+      "status": "Accepted",
+      "decision": "Accept the Phase 9B Core Generate export policy. Each export uses a different new directory. One directory operation makes the full output set available. CSV stays optional. Output paths change. All previous output stays unchanged.\n\nAuthorise the necessary Level 3 alignment and bounded implementation.",
+      "authority": "As project owner, I approve the proposed Phase 9B Core Generate export policy: unique collision-free folders, atomic whole-set publication, optional CSV, revised output paths and preservation of all previously published outputs.\n\nAuthorise the necessary Level 3 alignment and bounded implementation.\n\nQualify atomic publication without claiming durability or restart recovery. Preserve all other export and acceptance boundaries.",
+      "exclusions": "Qualify only the full output set that becomes available through one directory operation in the tested host. The operator must control the output directory. Claim no assurance that files stay available after a system interruption. Claim no recovery after FreeCAD stops and starts again. Claim no assurance for every filesystem or for changes that another process makes to the directory during this operation. Preserve member filenames and content requirements except the authorised final-path change. Keep CSV optional. Preserve the Phase 7 comparison and staging APIs, selected-export route, and D-P6-003/D-P6-004 Entry/Exit authority.\n\nAccept no phase exit or closeout. Phase 9B stays Open at 1/6 under D-P9-012, with only Exit 9B-2 Evidenced and owner-accepted. The other five exits stay Pending.\n\nPhase 9A stays closed at 4/4 for its frozen reference-only scope. Preserve all six exact criteria, geometry, package bytes, numerical limits, the 113-entry register, all 24 risk duties and legacy-retirement conditions. D-P6-008 stays Deferred — unmet.\n\nTERM-R04 stays open. Output stays private-development and project status stays unknown. Accept no physical fit, preload, retention, manufacturing capability, production package, output clearance, rights, performance result or release.\n\nComplete one bounded implementation with usual validation, independent review and the finite documentation lifecycle. Publish an exact-green draft PR. Do not merge or start another outcome.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel"
     }
   ]
 }
