@@ -4833,6 +4833,7 @@ def validate_phase9_closeout_opening_mutations() -> None:
     for index, validator, decision_id in (
         (1, progress._validate_dp9_010_decision, "D-P9-010"),
         (2, progress._validate_dp9_011_decision, "D-P9-011"),
+        (3, progress._validate_dp9_012_decision, "D-P9-012"),
     ):
         record = document["decisions"][index]
         for field, value, diagnostic in (
@@ -4853,7 +4854,7 @@ def validate_phase9_closeout_opening_mutations() -> None:
                 ),
                 decision_id + " " + diagnostic + " drifted",
             )
-    for index in range(3):
+    for index in range(4):
         changed = copy.deepcopy(document)
         changed["decisions"].pop(index)
         expect_rejected(
@@ -4873,6 +4874,8 @@ def validate_phase9_closeout_opening_mutations() -> None:
          progress._validate_phase9a_closeout, "D-P9-010"),
         (current, progress.DP9_011_HEADING,
          progress._validate_phase9b_holding, "D-P9-011"),
+        (current, progress.DP9_012_HEADING,
+         progress._validate_dp9_012_admission, "D-P9-012"),
     ):
         panel = progress._section(text, heading)
         moved = replace_once(text, panel, "\nNo owner decision.\n")
@@ -4952,7 +4955,7 @@ def validate_phase9_closeout_opening_mutations() -> None:
         expect_rejected(
             "phase9-opening/criterion-widened-" + exit_id,
             lambda value=mutated: progress._validate_phase9b_holding(value),
-            "Phase 9B current criteria or pending status drifted",
+            "Phase 9B current criteria or accepted-exit status drifted",
         )
     risks = progress.PHASE9A_RISKS_PATH.read_bytes()
     changed_risks = risks.replace(b'"state": "Open"',
@@ -4992,12 +4995,121 @@ def validate_phase9_closeout_opening_mutations() -> None:
             "project-plan owner-view row authority drifted: " + field,
         )
     row = table_row_containing(plan, "| 9B | Core RC chair")
-    accepted = replace_once(plan, row,
-                            replace_once(row, "0/6 evidenced", "1/6 evidenced"))
+    for count in ("0/6 evidenced", "2/6 evidenced", "6/6 evidenced"):
+        changed = replace_once(plan, row,
+                               replace_once(row, "1/6 evidenced", count))
+        expect_rejected(
+            "phase9-current/wrong-exit-count-" + count.split()[0],
+            lambda value=changed: progress._validate_plan_shape(value),
+            "Phase 9B must stay Open at one evidenced exit",
+        )
+
+
+def validate_phase9b_exit2_admission_mutations() -> None:
+    """Reject wider exit credit, proof claims and implementation authority."""
+    current = read("reference/current/PHASE_EVIDENCE.md")
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    record = document["decisions"][3]
+    for field, value in (
+        ("id", "D-P9-013"),
+        ("decided_on", "2026-10-09"),
+        ("evidence", "reference/PROJECT_PLAN.md"),
+        ("panel_required_under_current_policy", False),
+    ):
+        changed = copy.deepcopy(record)
+        changed[field] = value
+        expect_rejected(
+            "phase9b-exit2/record-" + field,
+            lambda value=changed: progress._validate_dp9_012_decision(
+                value, set(record),
+            ),
+            "D-P9-012 identity, status or panel routing drifted",
+        )
+    panel = progress._section(current, progress.DP9_012_HEADING)
+    for name, before, after in (
+        ("wrong-exit", "Richard accepts only Exit 9B-2",
+         "Richard accepts only Exit 9B-1"),
+        ("owner-replaced", "Richard is the project owner",
+         "The implementation agent is the project owner"),
+        ("source-replaced", "ee63f47c64b15d159bfd3f8c9a6ea13ddd62b510",
+         "unreviewed-source"),
+        ("scope-widened", "They do not supply evidence for all configurations",
+         "They supply evidence for all configurations"),
+        ("full-validation", "does not validate final chair solids",
+         "validates final chair solids"),
+        ("all-exports", "not chair solids or every production format",
+         "including chair solids and every production format"),
+        ("ready-promoted", "`production_ready=False`",
+         "`production_ready=True`"),
+        ("normalisations-lost", "Keep the permitted normalisations",
+         "Discard the permitted normalisations"),
+        ("byte-identity", "accepts no new numerical\ntolerance or "
+         "byte-equivalence claim", "accepts a new byte-equivalence claim"),
+        ("fit-accepted", "accepts no physical fit", "accepts physical fit"),
+        ("rights-cleared", "Output stays private-development",
+         "Output becomes project-cleared"),
+        ("risk-waived", "All 24 risk states", "Only 23 risk states"),
+        ("performance-waived", "D-P6-008 stays Deferred — unmet",
+         "D-P6-008 is complete"),
+        ("terminology-closed", "TERM-R04 stays open", "TERM-R04 is closed"),
+        ("partial-export-erased", "output stays unresolved",
+         "output is resolved"),
+        ("restore-invented", "Physical separate storage stays unverified",
+         "Physical separate storage is proved"),
+        ("register-replaced", "the 113-entry register", "a new register"),
+        ("phase-closed", "This decision closes no phase",
+         "This decision closes Phase 9B"),
+        ("other-exit-accepted", "accepts no other exit",
+         "accepts all other exits"),
+        ("merge-authorised", "Do not merge or start further\ndevelopment",
+         "Merge and begin further development"),
+        ("development-authorised", "Do not merge or start further\ndevelopment",
+         "Do not merge; begin further development"),
+    ):
+        changed = replace_once(current, panel,
+                               replace_once(panel, before, after))
+        expect_rejected(
+            "phase9b-exit2/" + name,
+            lambda value=changed: progress._validate_dp9_012_admission(value),
+            "D-P9-012 accepted evidence or bounded conditions drifted",
+        )
+    changed = replace_once(
+        current, panel, panel + "\nAll production exits are accepted.\n",
+    )
     expect_rejected(
-        "phase9-opening/first-exit-self-accepted",
-        lambda: progress._validate_plan_shape(accepted),
-        "Phase 9B must stay Open at zero evidenced exits",
+        "phase9b-exit2/contradiction-appended",
+        lambda: progress._validate_dp9_012_admission(changed),
+        "D-P9-012 accepted evidence or bounded conditions drifted",
+    )
+    exits = progress._section(current, "Phase 9B exit conditions")
+    for name, before, after in (
+        ("wrong-exit", "Only Exit 9B-2", "Only Exit 9B-1"),
+        ("wrong-date", "2026-10-11", "2026-10-09"),
+        ("extra-exits", "9B-6 stay Pending", "9B-6 are accepted"),
+    ):
+        changed = replace_once(current, exits,
+                               replace_once(exits, before, after))
+        expect_rejected(
+            "phase9b-exit2/status-" + name,
+            lambda value=changed: progress._validate_phase9b_holding(value),
+            "Phase 9B current criteria or accepted-exit status drifted",
+        )
+    view = progress._section(current, "Current owner view")
+    changed = replace_once(current, view, replace_once(
+        view, "The other five exits stay Pending",
+        "The other five exits are accepted",
+    ))
+    expect_rejected(
+        "phase9b-exit2/evidence-owner-view-widened",
+        lambda: progress._validate_dp9_012_admission(changed),
+        "Phase 9B evidence owner view differs from the accepted plan view",
+    )
+    changed = replace_once(panel, "/pull/160", "/pull/161")
+    changed = replace_once(current, panel, changed)
+    expect_rejected(
+        "phase9b-exit2/evidence-link-changed",
+        lambda: progress._validate_dp9_012_admission(changed),
+        "D-P9-012 accepted evidence or risk route drifted",
     )
 
 
@@ -6228,12 +6340,13 @@ def validate_documentation_profile_mutations() -> None:
         (
             "source-gate-changed", "| Current state |",
             "D-P9-010", "unreviewed-source",
-            "Phase 9A is closed at 4/4 under D-P9-010",
+            "Phase 9A stays closed at 4/4 under D-P9-010",
         ),
         (
-            "reference-scope-promoted", "| Current state |",
-            "accepted reference-only scopes", "production scopes",
-            "All four exits keep their accepted reference-only scopes",
+            "reference-scope-promoted", "| Owner decision |",
+            "keep their accepted limits", "lose their accepted limits",
+            "The Phase 9A closeout and earlier decisions keep their "
+            "accepted limits",
         ),
         (
             "risk-duties-removed", "| Limitations/findings |",
@@ -6241,31 +6354,29 @@ def validate_documentation_profile_mutations() -> None:
             "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
         ),
         (
-            "physical-fit-accepted", "| Limitations/findings |",
-            "The owner gives no acceptance for physical fit or "
-            "production/package rights",
-            "The owner gives acceptance for physical fit or "
-            "production/package rights",
-            "The owner gives no acceptance for physical fit or "
-            "production/package rights",
+            "production-conditions-waived", "| Owner decision |",
+            "All other exits and production conditions stay",
+            "All other exits and production conditions are waived",
+            "All other exits and production conditions stay",
         ),
         (
             "phase9b-exits-accepted", "| Current state |",
-            "All six Phase 9B exits stay Pending",
-            "All six Phase 9B exits are accepted",
-            "All six Phase 9B exits stay Pending",
+            "The other five exits stay Pending",
+            "The other five exits are accepted",
+            "The other five exits stay Pending",
         ),
         (
             "merge-authorised", "| Next action |",
             "Do not merge", "Merge now",
-            "Publish a draft PR with a PASS result from CI for its exact "
-            "head. Do not merge",
+            "After CI gives a PASS result for the exact PR head, publish "
+            "the draft PR. Do not merge or start further development",
         ),
         (
             "stop-boundary-waived", "| Next action |",
-            "Select no product implementation in this cycle",
-            "Begin Phase 9 product work after integration",
-            "Select no product implementation in this cycle",
+            "Do not merge or start further development",
+            "Do not merge; begin further development",
+            "After CI gives a PASS result for the exact PR head, publish "
+            "the draft PR. Do not merge or start further development",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
@@ -8396,6 +8507,7 @@ def main() -> None:
     validate_phase9_exit2_admission_mutations()
     validate_phase9_exit3_admission_mutations()
     validate_phase9_closeout_opening_mutations()
+    validate_phase9b_exit2_admission_mutations()
     validate_phase9_evidence_model_mutations()
     validate_project_plan_mutations()
     validate_finite_documentation_mutations()

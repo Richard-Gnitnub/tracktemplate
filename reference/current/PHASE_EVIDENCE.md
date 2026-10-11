@@ -1,7 +1,8 @@
 # Phase 9B Opening Record
 
 Status: **Phase 9A is closed at 4/4 under D-P9-010 for its frozen reference-only
-scope. Phase 9B is Open at 0/6 under D-P9-011. All six Phase 9B exits are Pending.**
+scope. Phase 9B is Open at 1/6 under D-P9-012. Only Exit 9B-2 is Evidenced
+and owner-accepted. The other five exits stay Pending.**
 
 The [Phase 9A closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md),
 [decisions](../history/phase-closeouts/PHASE9A_GATE_DECISIONS.json) and
@@ -12,12 +13,127 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 9A is closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). All four exits keep their accepted reference-only scopes. Phase 9B is Open at 0/6 under [D-P9-011](#phase-9b-opening-panel). All six Phase 9B exits stay Pending. |
-| What changed | The owner accepted Phase 9A closeout, then authorised Phase 9B opening. The six production criteria stay unchanged. This alignment adds no product behaviour. |
-| What now works | The accepted S1 and L1 proofs use the same neutral schema and procedural chair generator with different component patterns. The FreeCAD proof from the qualified profile and the nine views that the owner reviewed stay applicable reference evidence. |
-| Limitations/findings | The [closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel) keeps all accepted evidence and recovery limits. The owner gives no acceptance for physical fit or production/package rights. All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay. Output stays private-development and project status stays `unknown`. |
-| Owner decision | D-P9-010 closes only the frozen reference-only Phase 9A scope. D-P9-011 opens only Phase 9B at 0/6. The owner accepts no production exit or product implementation. |
-| Next action | Complete this Level 3 alignment and its usual validation and independent review. Publish a draft PR with a PASS result from CI for its exact head. Do not merge. Select no product implementation in this cycle. |
+| Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 1/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel). Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11. The other five exits stay Pending. |
+| What changed | The owner accepts the reviewed evidence for timber and chair decisions and record identities across representative migrated Core workflows. The six exit criteria stay unchanged. This decision adds no product behaviour. |
+| What now works | The accepted Phase 7 and Phase 8 workflows supply evidence with PR #154, PR #155 and PR #160. This evidence covers the bounded edit, save/reopen, validation and export scope. |
+| Limitations/findings | The [admission panel](#phase-9b-exit-2-acceptance-panel) keeps representative-workflow limits, selected export scope, normalisations, the observed SVG difference and `production_ready=False`. All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay. Output stays private-development and project status stays `unknown`. |
+| Owner decision | D-P9-012 accepts only Exit 9B-2 on the reviewed evidence and bounded conditions. All other exits and production conditions stay. The Phase 9A closeout and earlier decisions keep their accepted limits. |
+| Next action | Complete only the necessary Level 3 alignment and its usual validation and independent review. After CI gives a PASS result for the exact PR head, publish the draft PR. Do not merge or start further development. |
+
+<a id="phase-9b-exit-2-acceptance-panel"></a>
+
+## D-P9-012 Phase 9B Exit 2 acceptance panel — 2026-10-11
+
+**Decision boundary:** Richard accepts only Exit 9B-2 on the reviewed evidence
+and bounded conditions. The accepted source is protected `main`
+`ee63f47c64b15d159bfd3f8c9a6ea13ddd62b510` after PR #160.
+CI run `38133332735` passed for that exact source.
+
+Phase 9B is Open at 1/6. Exit 9B-2 is Evidenced and owner-accepted on
+2026-10-11. Exits 9B-1 and 9B-3 through 9B-6 stay Pending.
+All six exact criteria stay unchanged. Phase 9A stays closed at 4/4 for its
+frozen reference-only scope.
+
+**Exact owner instruction:**
+
+> As project owner, I accept Phase 9B Exit 2 on the reviewed evidence and bounded conditions. Authorise the necessary Level 3 decision and repository alignment to an exact-green draft PR. Preserve all exclusions and remaining exit criteria. Do not merge or begin further development.
+
+**Accepted evidence:** The decision uses the accepted
+[Phase 7](../history/phase-closeouts/PHASE7_CLOSEOUT.md) and
+[Phase 8](../history/phase-closeouts/PHASE8_CLOSEOUT.md) evidence with
+[PR #154](https://github.com/Richard-Gnitnub/tracktemplate/pull/154),
+[PR #155](https://github.com/Richard-Gnitnub/tracktemplate/pull/155) and
+[PR #160](https://github.com/Richard-Gnitnub/tracktemplate/pull/160).
+These results show that logical timber and chair decisions and
+record identities stay stable in the reviewed representative migrated Core workflows.
+They do not supply evidence for all configurations or one continuous GUI workflow.
+
+| Exit 9B-2 duty | Accepted evidence and limit |
+| --- | --- |
+| Edit | D-P7-003, D-P7-005, D-P8-004 and D-P8-005 accept the applicable parameter, identity, timber and record evidence. PR #154 and PR #155 add chair input change, change-back, stale rejection and reversible analysis. The chair tests inject values at existing extractor boundaries. They add no editing command. |
+| Save/reopen | The accepted Core lifecycle and PR #155 preserve payload, display and reuse after save/reopen. PR #160 preserves the exact current chair, timber, configuration and production-record state. |
+| Validation | Accepted Core range, topology, timber and pre-production checks stay applicable. PR #160 preserves nonempty current chair state through selected production preflight and export-bound checks. This preflight does not validate final chair solids or physical fit. |
+| Export | Accepted Phase 7 plain-line and Phase 8 turnout/crossover evidence stays applicable. PR #160 adds native and actual GUI selected SVG and CSV export with persistence. These outputs contain cutting outlines and records, not chair solids or every production format. |
+
+The chair-specific proof covers the supported turnout and crossover entity
+kinds. `TO-001` contains 168 chair positions, 40 timbers and eight production records.
+`XO-001` contains 355 chair positions, 86 timbers and seven production records.
+The qualified host profile is
+`linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
+No new functional check or visual capture is necessary for this alignment.
+
+The readiness record is `tmp/phase9b-after-160/exit9b2-readiness.json` in the
+primary repository, SHA-256
+`64eddabc098f55ceca5d7a00b45ba207a2f9bb2bf1a95719abcbc35bcc9a3380`.
+It records the accepted source comparison, proof identities and exclusions.
+The PR #160 validation receipt has SHA-256
+`d8a56d8b3da3d199e8e46a8321eeb674518b5c7c0b03c10daf6bef1085d0ce52`.
+Its independent quality-review receipt has SHA-256
+`74b721c71903f8f488eb5351725e6d31e9705ec24a61581a8cebc21a5c29be4f`.
+The GUI result has SHA-256
+`7e3ef08b4b3827a4c63583b6e3b4a50ea14c1dbb3190052527791ddc69f11bd6`.
+The final GUI candidate binding has SHA-256
+`c1732456cb9e0a1d4614112c6c2a88db3d55b87351f18ed39685ea04f1268455`.
+
+**Safety/risk panel:** Richard is the project owner, panel chair and accepting
+authority. `/root` presents the alignment. Read-only reviewer
+`/root/after158_next_outcome` examined the evidence and bounded admission.
+This reviewer did not author the implementation. The reviewer previously
+selected the bounded outcome and reviewed PR #160. The reviewer also examined
+admission and reviewed backup evidence.
+
+`/root/aperture_native_tests` supplied a risk assessment but authored the
+PR #160 tests. That assessment supplies no independent implementation acceptance.
+The agents share one team and workspace. This is not external organisational
+independence.
+
+The recommendation is **Proceed with bounded conditions**. The panel receipt records
+`"unresolved_dissent": []`. All 24 risk states, severities, owners, deadlines,
+treatments and controls stay unchanged. No risk closes. Each risk owner keeps
+the obligations and deadline in the [current register](risks.json).
+
+PR-01 and QA-R03 keep representative-workflow and wider coverage duties.
+PR-16 keeps input-change and invalidation duties. PR-17 keeps persistence and
+recovery duties. PR-09 keeps output controls. PR-13 keeps the backup and restore
+interval.
+
+PR-15 and QA-R04 keep performance duties. PR-22 keeps independent
+acceptance control. PR-10 and PR-18 keep comparison and removal conditions.
+The applicable chair evidence and rights risks keep their production duties.
+
+PR-09 stays Critical/Open/Partial. PR-13 stays Critical/Open/Effective for its
+current scope. PR-17 stays Critical/Open/Partial.
+
+The independent risk receipt is
+`tmp/phase9b-exit2-admission/risk-panel-input.json`, SHA-256
+`3cb60bf2871d1296b6ed782a2d80ee01bbf2f0de3f3781118dce8cb0e9648e51`.
+It shows all 24 duties and the bounded recommendation. The earlier
+53-root snapshot, core packet and safe unmount passed their checks.
+Physical separate storage stays unverified. The new alignment worktree and
+later receipts are outside that earlier snapshot.
+
+**Preserved findings and exclusions:** Keep the permitted normalisations and
+observed SVG serialisation difference. This decision accepts no new numerical
+tolerance or byte-equivalence claim. Warnings, `production_ready=False`, failed
+evidence, support windows and legacy-removal conditions keep their meanings.
+Normal per-change validation stays mandatory.
+
+Exit 9B-5 stays Pending. The source finding that a later Core export task
+failure can leave partial successful output stays unresolved.
+The Phase 9B export/output owners keep that duty. This decision adds no
+fault proof or implementation and gives no wider rollback acceptance.
+
+Product geometry, package bytes, the 113-entry register and numerical limits
+stay unchanged. This decision accepts no physical fit, preload, retention,
+manufacturing capability, production package, output, rights, performance
+result or release. D-P6-008 stays Deferred — unmet. TERM-R04 stays open.
+Output stays private-development and project status stays `unknown`.
+All earlier acceptance and legacy-retirement conditions stay.
+
+**Publication boundary:** Complete only the necessary Level 3 alignment,
+Documentation Review lifecycle and validation. After CI gives a PASS result for the exact PR head,
+publish the draft PR. Do not merge or start further
+development. This decision closes no phase and accepts no other exit.
 
 <a id="phase-9b-opening-panel"></a>
 
@@ -61,9 +177,11 @@ private-development and project status stays `unknown`.
 
 ## Phase 9B exit conditions
 
-All six criteria stay unchanged. Each exit is Pending.
+All six criteria stay unchanged. Only Exit 9B-2 is Evidenced — owner-accepted
+on 2026-10-11 under [D-P9-012](#phase-9b-exit-2-acceptance-panel).
+Exits 9B-1 and 9B-3 through 9B-6 stay Pending.
 
-| Phase 9B exit | Original exit | Exact pending criterion |
+| Phase 9B exit | Original exit | Exact criterion |
 | --- | ---: | --- |
 | 9B-1 | 1 | Each release-candidate production format has deterministic repeat evidence for representative inputs. Preserved B14/B15 behaviour has legacy/new equivalence evidence. New procedural chair geometry uses accepted 9A definition and independent engineering evidence under D-P9-005. It does not use five-box equality. |
 | 9B-2 | 2 | Timber and chair decisions and record identities stay stable across edit, save/reopen, validation and export across migrated Core trackwork. |
