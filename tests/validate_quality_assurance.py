@@ -586,24 +586,30 @@ def validate_documentation_profile(
     )
     require(
         all(fragment in " ".join(owner_view.split()) for fragment in (
-            "Phase 9A is closed at 4/4 under [D-P9-010]",
-            "All four exits keep their accepted reference-only scopes",
-            "Phase 9B is Open at 0/6",
-            "All six Phase 9B exits stay Pending",
+            "Phase 9A stays closed at 4/4 under [D-P9-010]",
+            "Phase 9B is Open at 1/6",
+            "Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11",
+            "The other five exits stay Pending",
             "D-P9-010",
-            "D-P9-011",
-            "This alignment adds no product behaviour",
+            "D-P9-012",
+            "This decision adds no product behaviour",
+            "representative migrated Core workflows",
+            "The six exit criteria stay unchanged",
             "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
             "Output stays private-development",
             "project status stays `unknown`",
-            "The owner gives no acceptance for physical fit or "
-            "production/package rights",
-            "The owner accepts no production exit or product implementation",
+            "representative-workflow limits, selected export scope, "
+            "normalisations, the observed SVG difference and "
+            "`production_ready=False`",
+            "D-P9-012 accepts only Exit 9B-2 on the reviewed evidence and "
+            "bounded conditions",
+            "All other exits and production conditions stay",
+            "The Phase 9A closeout and earlier decisions keep their "
+            "accepted limits",
             "Publish a draft PR with a PASS result from CI for its exact "
-            "head. Do not merge",
-            "Select no product implementation in this cycle",
+            "head. Do not merge or begin further development",
             "history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
-            "current/PHASE_EVIDENCE.md#phase-9b-opening-panel",
+            "current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel",
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )
