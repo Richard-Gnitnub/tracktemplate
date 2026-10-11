@@ -96,40 +96,69 @@ are missing. This task changes none of these quantities.
 ## Sources that can supply more evidence
 
 The source catalogue in the map records source identities, locations, inspection limits and unresolved rights.
-Its `research_reports` record identifies the complete bibliography that the project owner supplied:
-*TrackTemplate: independent railway engineering reference bibliography*, dated 9 October 2026.
-The record keeps the report filename, byte hash and all 12 numbered entries.
+The `research_reports` records in the map identify the two versions of the bibliography that the project owner supplied:
+*TrackTemplate: independent railway engineering reference bibliography*.
+The 9 October 2026 report contains 12 entries. The changed report of 11 October contains 16 groups.
+Each record keeps the report filename, byte hash and connections to source records.
+
+The 11 October report adds evidence for these items:
+
+- Plain-line sleeper arrangements.
+- Chair families.
+- Switches and crossings.
+- Diamonds, crossovers, slips and scissors.
+- Timbering.
+
+The frozen S1 quantity assessment does not change when the map adds these sources.
 The map preserves the source identifiers from the baseline. The other source records stay the same.
 They include C&L, British Steel, NIST and BIPM.
 
-The inspection statements below come from that report.
+The inspection statements below come from the changed report of 11 October.
 The registration author did not examine the drawings again or examine access at the registration date.
 After a drawing inspection, detailed transcription, revision checks and engineering assessment can be necessary.
 Catalogue inspection gives no evidence for a drawing dimension.
 
-| Report entry | Source and reported inspection |
+| 11 October report group | Source and reported inspection |
 | --- | --- |
-| 1 | LMS compilation, cover dated 1928: specified SRE drawings examined. The cover date does not give the date of each sheet. |
-| 2 | NERA 1926 facsimile: publisher catalogue only. Related plates were not examined. |
-| 3 | NRM collection 2009-7071, Box 246: catalogue entries examined. Drawings not examined. Blank drawing references stay blank. |
-| 4 | REA rail-joint report, 1905: drawing leaves 2, 32 and 52 examined. The complete report was not examined. |
-| 5 | LSWR switch drawing 2, negative 2437: sheet examined. |
-| 6 | LSWR crossing drawing 4c, negative 2474: sheet examined. |
-| 7 | MSLR Type 44 and Type 39 left half: sheets examined, with different dimension coverage. |
-| 8 | GCR check-chair drawing 40A: sheet examined. That number alone does not show that the rail drawing is applicable to this chair. |
-| 9 | BS 9:1935: publisher record only in this report. The earlier contents-preview record stays a different record. |
-| 10 | BS 11:2015: publisher description only. Profile figures and tolerances not examined. |
-| 11 | BS 47-1:1991: publisher description only. Individual profiles not examined. |
-| 12 | PWI bullhead supplement: holding catalogue only. The reported 1943/1991 publication relationship stays unverified. |
+| 1 | LMS compilation, cover dated 1928: specified SRE sheets examined. Other titles mapped without full inspection. The compilation includes a 1943 rider. |
+| 2 | GWR/Western Region staff notes: seven sheets examined, with dates from 1937 to 1959. Some changes to the sheets are not clear. |
+| 3 | Worthington report: plates 6, 23 and 35–36 examined. The 1900 congress and 1901 proceedings have different dates. |
+| 4 | MSLR/GCR drawings: Types 39A, 39B, 44 and 39 left half examined. The through-crossing companion has a missing left part. |
+| 5 | Hunt report: plates 3, 5, 8, 11 and 12 examined. The report gives no values for some small fractions that the researcher could not read or did not record. |
+| 6 | REA rail-joint report, 1905: drawing leaves 2, 32 and 52 examined. The complete report was not examined. |
+| 7 | LSWR: switch drawing 2, crossing drawing 4c and a double-slip fragment examined. The fragment has no verified drawing number. |
+| 8 | NERA 1926 facsimile: publisher description only. Related plates were not examined. |
+| 9 | NERA NER 1912 standards: publisher description only. Related plates were not examined. |
+| 10 | NRM collection 2009-7071, Box 246: catalogue entries examined. Drawings not examined. Blank references stay blank. Retracing dates do not show initial design dates. |
+| 11 | Allen, 1915, GERS product RE042: supplier description only. No figure or dimension examined. The supplier gives personal-use restrictions. |
+| 12 | GCR check-chair drawing 40A: sheet examined. That number alone does not show that the rail drawing is applicable to this chair. |
+| 13 | BS 9:1935: publisher record only in this report. The earlier contents-preview record stays a different record. |
+| 14 | BS 11:2015: publisher description only. Profile figures and tolerances not examined. |
+| 15 | BS 47-1:1991: publisher description only. Individual profiles not examined. |
+| 16 | PWI bullhead supplement: holding catalogue only. The reported 1943/1991 publication relationship stays unverified. |
 
-The machine-readable records keep drawing references, page numbers, printed callouts, engineering findings and limitations from the report.
+The machine-readable records keep drawing references, page numbers, printed callouts, engineering findings and limitations from the two reports.
+They preserve previous observations and links that the 11 October report does not repeat.
 Printed callouts stay as reported source findings. They are not accepted parameters or measurements from scans.
+
 Related sheets in one drawing family are complementary evidence. Reproductions of one sheet do not supply independent confirmations.
 No evidence shows that the LMS, NERA and NRM copies have the same revision.
+Western Region references to SRE designs do not supply independent confirmation of those designs.
+Oldpway and CNAM reproductions of the same publication also do not supply independent confirmations.
 
-The report gives access conditions and prices for its date.
+The 11 October report gives joint-end sleeper intervals with their applicable company, rail and direction.
+These sequences do not give one spacing rule for all railways.
+An overall rail diagram, an obtuse-crossing unit and a complete timbering plan give different information.
+The LMS No.48 jaw-template allowance belongs to an inspection gauge. It is not a chair dimension or manufacturing compensation.
+
+The rider on PDF page 80 has the drawing identifier No.46E. The report does not identify a separate parent drawing.
+Scan order gives no authority to change E to B.
+
+Each report gives access conditions and prices for its date.
 These conditions and prices give no third-party permission and do not show whether the material is available now.
-The reported Oldpway licence statement gives no evidence of its legal chain or project clearance.
+Reported provider permissions do not show the legal chain for those permissions or project clearance.
+The GERS personal-use restriction stays recorded. Registration gives no permission to redistribute the RE042 publication.
+
 The [rights policy](../LICENSING_BOUNDARIES.md) and
 [provenance policy](../PROVENANCE.md) own admission for each intended use.
 Registration includes no drawing files and gives no rights to external material or production output.
@@ -153,24 +182,28 @@ do not supply accepted numerical tolerances.
 
 ## Next evidence boundary
 
-First, examine the historical drawings in the LMS compilation that the report identifies for remote access.
-The report gives this sequence for detailed inspection and transcription:
+The changed report of 11 October gives this sequence for later inspection and transcription.
+The report gives remote access to all five sheets in the LMS compilation.
 
 | Sequence | Drawing and PDF page | Engineering question |
 | --- | --- | --- |
-| 1 | [No.4, p.6](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=6) | S.I. seat, jaws, key faces, base and fixing datums |
-| 2 | [No.2, p.4](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=4) | Rail profile and fishplate interfaces |
-| 3 | [No.1, p.3](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=3) | Key section, taper and fixing interfaces |
-| 4 | [No.18A, p.26](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=26) | Revised P chair and supersession |
-| 5 | [No.38, p.61](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=61) | Crossing-angle variants and the reported S.I. jaw relationship |
+| 1 | [No.1, p.3](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=3) | Joint, end and interior sleeper intervals, sizes, keys and fastenings. Compare No.49. |
+| 2 | [No.38B, p.63](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=63) | Junction and crossover timbering, chair positions and joint support. Compare Nos.38C/38D. |
+| 3 | [No.32, p.49](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=49) | Common-crossing and check geometry, timber intervals and fastenings. Use the applicable chair sheets. |
+| 4 | [No.45B, p.75](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=75) | Full slip diagrams and detailed part-arrangements. Compare No.46B. |
+| 5 | [No.45C, p.76](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=76) | Scissors arrangement, through timbers and specialist supports. Compare No.46C. |
 
-These five drawings belong to one source family. Nos.6, 7 and 18 supply related information.
-Nos.36 and 37 can supply information for a selected crossing chair.
+These five drawings belong to one source family. The records keep the previous component evidence with its initial sequence.
+Nos.4, 2, 18A and 38 keep their component roles. No.48 adds inspection-datum evidence.
 The other company drawings supply comparisons in their reported prototype scopes.
-No dimensioned spring-steel-key drawing was verified in the report.
+
+Complete fixed-diamond and tandem construction records stay unresolved.
+The separate 1:10 switch-diamond rider, parent No.46E and a dimensioned spring-steel-key drawing also stay unresolved.
+The report gives only some evidence for steel and concrete sleepers.
 
 NRM references stay optional archival leads. A physical visit or archive request is not necessary for remote drawing assessment.
-The NERA facsimile and PWI holding are also optional sources. Registration authorises no purchase, visit or external contact.
+The NERA facsimiles, Allen publication and PWI holding are also optional sources.
+Registration authorises no purchase, visit or external contact.
 The derivative NRM list's suggested numbers do not replace blank references in the official catalogue.
 
 In subsequent engineering work, record prototype geometry, model adaptations and manufacturing compensation as different types of data.
