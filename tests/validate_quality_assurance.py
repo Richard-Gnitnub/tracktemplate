@@ -606,8 +606,8 @@ def validate_documentation_profile(
             "All other exits and production conditions stay",
             "The Phase 9A closeout and earlier decisions keep their "
             "accepted limits",
-            "Publish a draft PR with a PASS result from CI for its exact "
-            "head. Do not merge or begin further development",
+            "After CI gives a PASS result for the exact PR head, publish "
+            "the draft PR. Do not merge or start further development",
             "history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
             "current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel",
         )),

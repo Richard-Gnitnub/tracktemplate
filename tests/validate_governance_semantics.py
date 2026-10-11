@@ -5033,8 +5033,8 @@ def validate_phase9b_exit2_admission_mutations() -> None:
          "The implementation agent is the project owner"),
         ("source-replaced", "ee63f47c64b15d159bfd3f8c9a6ea13ddd62b510",
          "unreviewed-source"),
-        ("scope-widened", "They do not establish all configurations",
-         "They establish all configurations"),
+        ("scope-widened", "They do not supply evidence for all configurations",
+         "They supply evidence for all configurations"),
         ("full-validation", "does not validate final chair solids",
          "validates final chair solids"),
         ("all-exports", "not chair solids or every production format",
@@ -5052,18 +5052,18 @@ def validate_phase9b_exit2_admission_mutations() -> None:
         ("performance-waived", "D-P6-008 stays Deferred — unmet",
          "D-P6-008 is complete"),
         ("terminology-closed", "TERM-R04 stays open", "TERM-R04 is closed"),
-        ("partial-export-erased", "output remains unresolved",
+        ("partial-export-erased", "output stays unresolved",
          "output is resolved"),
-        ("restore-invented", "Physical separate storage remains unverified",
+        ("restore-invented", "Physical separate storage stays unverified",
          "Physical separate storage is proved"),
         ("register-replaced", "the 113-entry register", "a new register"),
         ("phase-closed", "This decision closes no phase",
          "This decision closes Phase 9B"),
         ("other-exit-accepted", "accepts no other exit",
          "accepts all other exits"),
-        ("merge-authorised", "Do not merge or begin further\ndevelopment",
+        ("merge-authorised", "Do not merge or start further\ndevelopment",
          "Merge and begin further development"),
-        ("development-authorised", "Do not merge or begin further\ndevelopment",
+        ("development-authorised", "Do not merge or start further\ndevelopment",
          "Do not merge; begin further development"),
     ):
         changed = replace_once(current, panel,
@@ -6368,15 +6368,15 @@ def validate_documentation_profile_mutations() -> None:
         (
             "merge-authorised", "| Next action |",
             "Do not merge", "Merge now",
-            "Publish a draft PR with a PASS result from CI for its exact "
-            "head. Do not merge or begin further development",
+            "After CI gives a PASS result for the exact PR head, publish "
+            "the draft PR. Do not merge or start further development",
         ),
         (
             "stop-boundary-waived", "| Next action |",
-            "Do not merge or begin further development",
+            "Do not merge or start further development",
             "Do not merge; begin further development",
-            "Publish a draft PR with a PASS result from CI for its exact "
-            "head. Do not merge or begin further development",
+            "After CI gives a PASS result for the exact PR head, publish "
+            "the draft PR. Do not merge or start further development",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:

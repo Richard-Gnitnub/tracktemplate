@@ -1291,8 +1291,8 @@ def _validate_owner_view(plan: str) -> None:
         "bounded conditions",
         "All other exits and production conditions stay",
         "The Phase 9A closeout and earlier decisions keep their accepted limits",
-        "Publish a draft PR with a PASS result from CI for its exact head. "
-        "Do not merge or begin further development",
+        "After CI gives a PASS result for the exact PR head, publish "
+        "the draft PR. Do not merge or start further development",
     ):
         _require(
             fragment in owner_view,
@@ -1301,10 +1301,10 @@ def _validate_owner_view(plan: str) -> None:
     expected_row_digests = (
         "f2673cf87fd4bd3a58de0ba035a404cbd1922e33e14f9fb56d5d205e064d2424",
         "65d670ff2053df142fa803581396419d8f5990f3533fcfe578f1ff979e28bb83",
-        "375d6c7d6ee3bff4ff921789b057a874d2c3cbd7ef12ed1c7f7acd02e06c9a24",
+        "071e5f2855d050ad05f6fdb09aad295483c8aae264ac803589b9c280894a2c40",
         "05a2e43ce7acdb3c9df3def54631713a53673a543d0eb0b53cfb65d134f994dd",
         "33189d12ec023979cc23035424ce0a488dea97c88d22223abaf97e589a8514c3",
-        "c1c21e58a52a065bd131466929f42675181125bebf2b9443bcb9114298466f4c",
+        "dffdd4678cc801cd777d262d2e7494fbbcf995de7a88215d5d383b0a7299d5b9",
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -1599,7 +1599,7 @@ def _validate_phase9_exit_allocation(plan: str, evidence: str) -> None:
         "continue to apply",
         "D-P9-012 accepts only Exit 9B-2 on 2026-10-11",
         "Phase 9B is Open at 1/6",
-        "Exit 9B-2 is Evidenced — owner-accepted; the other five exits "
+        "Exit 9B-2 is Evidenced — owner-accepted. The other five exits "
         "stay Pending",
     ):
         _require(
@@ -7248,7 +7248,7 @@ def _validate_dp9_012_decision(
             "660e2db8dc2c6683e66e80015bafc6f964610790c08ebf292439dcf38cb939f0"
         )),
         ("exclusions", (
-            "4453774f11b8d68c26fb6747c01d18a7335c46829ba3b7706ec8c8bc123baf3d"
+            "2c83ec4c72b6ad1b32712a41954dd50e46b0b7442a595e4c20e5cfb131ff477a"
         )),
     ):
         value = record[field]
@@ -7427,7 +7427,7 @@ def _validate_dp9_012_admission(evidence: str) -> None:
     )
     _require(
         hashlib.sha256(_semantic_text(panel).encode("utf-8")).hexdigest()
-        == "3d3908681b575727571602ca84b69fb00181ff8e1243b3366b2605fe247cf790",
+        == "781662ce0b7a2afe75a069573e9c68f842e5b387ffd5b0b0e824b9f191b135c1",
         "D-P9-012 accepted evidence or bounded conditions drifted",
     )
     _require_links(
