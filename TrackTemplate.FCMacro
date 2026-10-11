@@ -50,6 +50,9 @@ def _load_modular_transition_workflow(
     export_document = importlib.import_module(
         "tracktemplate.adapters.freecad.core_export_document"
     )
+    selected_export_files = importlib.import_module(
+        "tracktemplate.adapters.export.selected_export_files"
+    )
     transition_contract = bootstrap.load_contract(
         repository_root
         / "reference"
@@ -62,6 +65,7 @@ def _load_modular_transition_workflow(
         transition_contract,
         export_files_factory=export_files.CoreLayoutExportSetFiles,
         export_dispatcher_factory=export_document.CoreExportDocument,
+        selected_export_files_factory=selected_export_files.SelectedExportFiles,
     )
     return session, session.routing_record()
 

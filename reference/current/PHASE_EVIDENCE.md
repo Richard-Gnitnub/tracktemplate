@@ -20,6 +20,66 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 | Owner decision | D-P9-013 authorises only the export policy and its bounded implementation. It accepts no exit. It gives no assurance that files stay available after a system interruption. It adds no recovery after FreeCAD stops and starts again. D-P9-012 stays the authority for the one accepted Phase 9B exit. All other exits and production conditions stay. <br><br>The Phase 9A closeout and earlier decisions keep their accepted limits. |
 | Next action | Complete the bounded implementation, validation and independent review. After CI gives a PASS result for the exact PR head, publish the draft PR. Do not merge or start another outcome. |
 
+## Previous files stay available after an output error — 2026-10-11
+
+This Level 2 result contributes to Exit 9B-5. The usual B16
+`Export selected production items` route keeps previous file data when an
+output error prevents the software from putting original files in their
+previous locations. The diagnostic gives the directory that still contains
+those files. It does not report unchanged output when the result is uncertain.
+
+The reproduced `implementation-defect` had two `OSError` failures.
+One stopped a new file operation. The other stopped an original file from
+moving back. The previous software then deleted the temporary directory and
+lost that original file. The new `SelectedExportFiles` component keeps the
+directory when it cannot confirm that all original files are back. A successful operation and a failed
+operation that puts all original files back can remove their temporary files.
+
+The [standalone test](../../tests/validate_selected_export_rollback.py)
+compares successful results and file bytes with frozen B15. It also checks
+previous files, CSV on/off, rejected paths and the diagnostic after errors.
+
+The [FreeCAD test](../../tests/freecad_validate_selected_export_rollback.py)
+and [GUI test](../../tools/freecad_bridge/run_selected_export_rollback_gui.py)
+give PASS results on the qualified FreeCAD 1.1.4 profile. The FreeCAD comparison
+uses one `TO-001` scope with `SVG` and `CSV`. The existing comparison rules
+stay unchanged. The checks show successful output, two failure cases and
+unchanged editable data after save/reopen. The standalone test has 23 cases.
+
+The native record is
+`tmp/selected-export-rollback/native-runs/20261011T163500394902Z/result.json`,
+SHA-256 `ee7d7bffc2ef2d56987e10df24dfbb29f59b24b78408ea3a73e0aa4ff84389fd`.
+The GUI record is
+`benchmark-output/freecad-bridge/selected-export-rollback-runs/20261011T163803576148Z/run.json`,
+SHA-256 `e17ed1f98d50ec539d9ec3be5f563d9183c7ea856c63081268e518fd666afca7`.
+
+Both records confirm unchanged source. Four actual GUI images stay with the
+GUI record. The failure image does not show the full path. The test examines
+the full diagnostic text in the actual FreeCAD dialog.
+
+The usual launcher supplies `SelectedExportFiles`. The frozen B15 command
+stays available for comparison. Its removal still needs the existing migration
+acceptance. Filenames, CSV content, geometry and the 113-entry register stay
+unchanged.
+The operator's choice to replace previous files stays unchanged.
+
+The inherited confirmation still says:
+`Destination files change only when the complete export succeeds.`
+This claim is incorrect when original files cannot be put back.
+Independent review records this finding as `REQUIRED_BEFORE_EXIT` for 9B-5.
+The owner of the selected route keeps that duty.
+
+This result does not make all selected files available together. Temporary
+production objects can still enter the editable FreeCAD document. That separate duty stays unresolved.
+The change supplies no operation to put files back after FreeCAD stops and
+starts again. It gives no assurance that files stay available after a system
+interruption. [D-P9-013](#phase-9b-core-export-policy-panel)
+continues to apply only to Core Generate.
+
+Phase 9B stays Open at 1/6.
+Exit 9B-5 and the other four unaccepted exits stay Pending. All existing
+production boundaries stay.
+
 <a id="phase-9b-core-export-policy-panel"></a>
 
 ## D-P9-013 Core Generate export policy panel — 2026-10-11
