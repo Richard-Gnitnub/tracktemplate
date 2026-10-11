@@ -1293,9 +1293,9 @@ def _validate_owner_view(plan: str) -> None:
         "Phase 9B is Open at 1/6 under D-P9-012",
         "Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11",
         "The other five exits stay Pending",
-        "D-P9-013 authorises a different unused directory for each Core "
+        "D-P9-013 authorises a different new directory for each Core "
         "Generate export",
-        "The complete set must become visible together",
+        "The full set must become available together",
         "CSV stays optional",
         "Returned paths change and previous output stays unchanged",
         "representative-workflow limits, selected export scope, "
@@ -1304,11 +1304,14 @@ def _validate_owner_view(plan: str) -> None:
         "Output stays private-development and project status stays unknown",
         "D-P9-013 authorises only the export policy and its bounded "
         "implementation",
-        "It accepts no exit or durability or restart-recovery claim",
-        "D-P9-012 remains the authority for the one accepted Phase 9B exit",
+        "It accepts no exit",
+        "It gives no assurance that files stay available after a system "
+        "interruption",
+        "It adds no recovery after FreeCAD stops and starts again",
+        "D-P9-012 stays the authority for the one accepted Phase 9B exit",
         "After CI gives a PASS result for the exact PR head, publish the "
         "draft PR",
-        "Do not merge or begin another outcome",
+        "Do not merge or start another outcome",
         "The six exit criteria stay unchanged",
         "All other exits and production conditions stay",
         "The Phase 9A closeout and earlier decisions keep their accepted limits",
@@ -1319,11 +1322,11 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         "f2673cf87fd4bd3a58de0ba035a404cbd1922e33e14f9fb56d5d205e064d2424",
-        "333726d98cd855ab065dd16841a16a63398ba54221d7f897ae4ce905004c38cf",
-        "a47b6d7b1e9e55b530a4c3111cbe8f27d3302ae0cd984c407521b76f344ea09a",
+        "191a5f40c6caa7e91f0dd76c346c12b6782fc517a7b81f6c8fe49b9b3bdb0d89",
+        "e858a5aab8fe7e947a8fb8167d5d044dc46d70e26cf8a077f22de9a253659e91",
         "ffa2ba3bed72b670a541a694eae5f744b78256af032f747cb21eabb869b44b4c",
-        "963e6c03bda2157f94abd28f3315d236beeaf91b0ce7dadc09c20466890e3fa7",
-        "2b52260b8c08bad20f1ed8c3f339c01012bb94ccf5632fa13c7f536d0fc54c45",
+        "ed180eb367a371abfcef8e9a7a2cd7fd8e81f2c5ab2b2daa47b16208a213750c",
+        "21ceb09d0454aca7d85985ca98591711fa0d0be47c60e8ca07609bb3c6c228bc",
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -7301,10 +7304,10 @@ def _validate_dp9_013_decision(
     )
     for field, digest in (
         ("decision", (
-            "f40ebb97ff009255235dbb5f82bcb873f28fa2deb0f2e2aa4d86827e7d114dde"
+            "680fb50a290cd74886a7fecb59a4f8fb452fd205c14c2ecff6a64289075204a8"
         )),
         ("exclusions", (
-            "81cdd4f985098d25c658df70c5b62dfd74d4f26322de42a95da320e084fb551c"
+            "d0a01cd7d63bd3a3387504dd62dea8cc97ae7e308fa61588f7bae1805501ff1c"
         )),
     ):
         value = record[field]
@@ -7529,7 +7532,7 @@ def _validate_dp9_013_policy(evidence: str) -> None:
     )
     _require(
         hashlib.sha256(_semantic_text(panel).encode("utf-8")).hexdigest()
-        == "665e205ce666e9a7c68cc2d6a1fec30b0fd7c1c40cf4363ab73be58b711b8d4c",
+        == "2295f6a219542df7c2dec263751276e99bef89eec6e37b946764c0883b6f8876",
         "D-P9-013 policy or bounded conditions drifted",
     )
     _require_links(
@@ -7548,11 +7551,11 @@ def _validate_dp9_013_policy(evidence: str) -> None:
 def _validate_dp9_013_architecture(architecture: str) -> None:
     """Keep atomic visibility bounded without changing Entry/Exit authority."""
     section = direct_section_content(
-        architecture, "D-P9-013 Core Generate complete output set", level=4,
+        architecture, "D-P9-013 Core Generate full output set", level=4,
     )
     _require(
         hashlib.sha256(_semantic_text(section).encode("utf-8")).hexdigest()
-        == "56fd9b2c2531f9c2caa4d8e1a81c8966e4ef36e73822354e261d6b641bdcfafb",
+        == "daba65c789d3925bfd048747123fa235ed9745fff8945cb07907d28060074b96",
         "D-P9-013 architecture policy boundary drifted",
     )
     _require_links(

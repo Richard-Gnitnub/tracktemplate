@@ -5140,34 +5140,34 @@ def validate_phase9b_export_policy_mutations() -> None:
     for name, before, after in (
         ("source", "6586eda3addaf955be06b69753c906252b72adbe",
          "unreviewed-source"),
-        ("new-directory", "different unused\nchild directory",
+        ("new-directory", "different new\nchild directory",
          "previous existing child directory"),
-        ("whole-set", "before one directory operation\nmakes the complete set",
+        ("whole-set", "before one directory operation\nmakes the full set",
          "while separate file operations make part of the set"),
-        ("replace-existing", "An existing final path must not be replaced",
+        ("replace-existing", "The operation must not replace an existing final path",
          "An existing final path can be replaced"),
         ("unsupported-host", "stops with a diagnostic if the host cannot",
          "continues without a diagnostic if the host cannot"),
         ("csv-mandatory", "CSV stays optional. A requested CSV",
          "CSV becomes mandatory. A requested CSV"),
-        ("csv-outside-set", "belongs to that same output set",
+        ("csv-outside-set", "is part of that same output set",
          "is written after the output set"),
         ("paths", "output\npaths and CSV paths identify the new final directory",
          "output paths keep the selected parent directory"),
-        ("overwrite-ui", "replace previous outputs no longer applies",
+        ("overwrite-ui", "permits replacement of previous outputs no longer applies",
          "replace previous outputs still applies"),
-        ("prior-output", "All previously published output files and "
+        ("prior-output", "All previous output files and "
          "directories stay unchanged", "Previous output can be replaced"),
-        ("false-old-proof", "They do not establish complete-set visibility",
+        ("false-old-proof", "They do not establish that all files become available together",
          "They establish complete-set visibility"),
-        ("cleanup-published", "Once the complete set is visible, cleanup "
+        ("cleanup-published", "Once the full set is available, cleanup "
          "must preserve it", "Cleanup removes a completed set after an error"),
-        ("durability", "It gives no assurance that the files survive a "
-         "system interruption", "It assures survival after a system interruption"),
+        ("durability", "It gives no assurance that the files stay available "
+         "after a system interruption", "It assures survival after a system interruption"),
         ("restart", "It adds no recovery after FreeCAD stops and starts again",
          "It adds recovery after FreeCAD stops and starts again"),
-        ("hostile-namespace", "It gives no protection against hostile "
-         "concurrent changes", "It protects against hostile concurrent changes"),
+        ("hostile-namespace", "These checks do not prevent that change",
+         "These checks prevent that change"),
         ("risk-duty", "All 24 risk states", "Only 23 risk states"),
         ("entry-exit", "D-P6-003 and D-P6-004 keep their Entry/Exit conditions",
          "D-P6-003 and D-P6-004 use the new Core policy"),
@@ -5180,7 +5180,7 @@ def validate_phase9b_export_policy_mutations() -> None:
         ("register", "the 113-entry register", "a replacement register"),
         ("rights", "Output stays private-development",
          "Output becomes project-cleared"),
-        ("merge", "Do not merge or begin another outcome",
+        ("merge", "Do not merge or start another outcome",
          "Merge and begin another outcome"),
     ):
         changed = replace_once(current, panel,
@@ -5208,21 +5208,22 @@ def validate_phase9b_export_policy_mutations() -> None:
     )
     architecture = read("reference/ARCHITECTURE.md")
     section = progress.direct_section_content(
-        architecture, "D-P9-013 Core Generate complete output set", level=4,
+        architecture, "D-P9-013 Core Generate full output set", level=4,
     )
     for name, before, after in (
-        ("partial-set", "One operation must make that complete set visible",
+        ("partial-set", "One operation must make that full set available",
          "Separate operations can make parts of the set visible"),
-        ("overwrite", "without replacement of an existing path",
+        ("overwrite", "without a change to an existing path",
          "with replacement of an existing path"),
         ("csv", "CSV stays optional", "CSV is mandatory"),
         ("fallback", "It must not write final files one at a time",
          "It may write final files one at a time"),
         ("false-zero", "must not erase the completed set or report zero",
          "must erase the completed set and report zero"),
-        ("cleanup", "only over unpublished temporary data",
+        ("cleanup", "only over temporary data that the operation did not make available "
+         "at the final path",
          "over all published and temporary data"),
-        ("durability", "It gives no assurance that the files survive",
+        ("durability", "It gives no assurance that the files stay available",
          "It assures that the files survive"),
         ("restart", "It adds no recovery after FreeCAD stops and starts again",
          "It adds recovery after FreeCAD stops and starts again"),
@@ -6501,13 +6502,13 @@ def validate_documentation_profile_mutations() -> None:
         (
             "merge-authorised", "| Next action |",
             "Do not merge", "Merge now",
-            "Do not merge or begin another outcome",
+            "Do not merge or start another outcome",
         ),
         (
             "stop-boundary-waived", "| Next action |",
-            "Do not merge or begin another outcome",
+            "Do not merge or start another outcome",
             "Do not merge; begin another outcome",
-            "Do not merge or begin another outcome",
+            "Do not merge or start another outcome",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:

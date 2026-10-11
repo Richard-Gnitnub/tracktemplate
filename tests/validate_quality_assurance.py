@@ -593,9 +593,9 @@ def validate_documentation_profile(
             "D-P9-010",
             "D-P9-012",
             "D-P9-013",
-            "authorises a different unused directory for each Core Generate "
+            "authorises a different new directory for each Core Generate "
             "export",
-            "The complete set must become visible together",
+            "The full set must become available together",
             "CSV stays optional",
             "Returned paths change and previous output stays unchanged",
             "representative-workflow limits, selected export scope, "
@@ -606,11 +606,14 @@ def validate_documentation_profile(
             "`unknown`",
             "D-P9-013 authorises only the export policy and its bounded "
             "implementation",
-            "It accepts no exit or durability or restart-recovery claim",
-            "D-P9-012 remains the authority for the one accepted Phase 9B exit",
+            "It accepts no exit",
+            "It gives no assurance that files stay available after a system "
+            "interruption",
+            "It adds no recovery after FreeCAD stops and starts again",
+            "D-P9-012 stays the authority for the one accepted Phase 9B exit",
             "After CI gives a PASS result for the exact PR head, publish the "
             "draft PR",
-            "Do not merge or begin another outcome",
+            "Do not merge or start another outcome",
             "The six exit criteria stay unchanged",
             "All other exits and production conditions stay",
             "The Phase 9A closeout and earlier decisions keep their accepted limits",

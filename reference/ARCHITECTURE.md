@@ -239,6 +239,8 @@ The export layer keeps the existing safety model:
 7. Apply the accepted transaction's failure rules and clean transient
    geometry without claiming authority over foreign or published state.
 
+<a id="d-p9-013-core-generate-complete-output-set"></a>
+
 #### D-P9-013 Core Generate full output set
 
 [D-P9-013](current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel)
