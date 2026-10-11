@@ -154,6 +154,37 @@ Phase 9B stays Open at 0/6, with all six exits Pending.
 This evidence gives no acceptance for performance, physical fit or production output.
 Geometry, the 113-entry register and all accepted boundaries stay the same.
 
+## S1 base shape from drawing No. 4 — 2026-10-11
+
+The project owner selected LMS drawing No. 4, `S.I./95R`, as the “provisional prototype target” for this work.
+The project owner also authorised “separate nominal-base development”.
+The production conditions in [S1-07 and S1-08](../phase-evidence/S1_PILOT_PLAN.md#decision-register) stay Pending.
+This Level 2 change supplies evidence for Exit 9B-1 and for a subsequent assessment of inputs for Exit 9B-3.
+
+The [software](../../tracktemplate/domain/chair_base_nominal.py) and
+[FreeCAD adapter](../../tracktemplate/adapters/freecad/chair_base_nominal_exact.py)
+make one `Part.Face` from specified length inputs.
+Its outer shape has four straight parts and four circular corners.
+For No. 4, the dimensions are `14.5 in × 8 in`, with `R1 in` through `90°` at each corner.
+The drawing shows `1″R` at two top corners.
+
+With the same value for all four corners, the calculated area agrees with `115.14 SQ INS` at the precision that No. 4 shows.
+This result gives evidence for the four equal corner values. It does not supply a dimension for each corner.
+The software puts the middle of the shape at `(0, 0, 0)`, with `Z=0` at all points.
+This local position does not give the position of the chair in relation to a rail.
+
+The [standalone Python test](../../tests/validate_phase9b_chair_base_nominal.py) and
+[FreeCAD test](../../tests/freecad_validate_phase9b_chair_base_nominal.py) give PASS results.
+Tests with the qualified host profile also give PASS results for the local No. 4 display and persistence.
+The file `tmp/nominal-base/final/No4-native-visual-proof.json` contains the detailed evidence.
+The base tests give PASS results without changes to their frozen reference path.
+
+This result contains no holes or thickness.
+It supplies no `ChairDefinition`, rail position, physical fit, production dimensions or changes to dimensions for production.
+It gives no acceptance for a positive rights claim.
+The 113-entry register and frozen Phase 9A paths stay the same.
+The output stays in private-development status. Phase 9B stays Open at 0/6, with all six exits Pending.
+
 ## Phase 9A historical links
 
 These links keep earlier references available at the frozen evidence owner.
