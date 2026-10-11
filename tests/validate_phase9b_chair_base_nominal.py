@@ -18,8 +18,10 @@ sys.path.insert(0, str(ROOT))
 
 from tracktemplate.domain.chair_base_nominal import (  # noqa: E402
     ChairBaseNominalArc,
+    ChairBaseNominalAperture,
     ChairBaseNominalLine,
     ChairBaseNominalParameters,
+    compute_chair_base_aperture_geometry,
     compute_chair_base_nominal_geometry,
 )
 
@@ -254,11 +256,200 @@ def validate_invalid_and_near_boundary_inputs():
             raise AssertionError("unsupported parameter record accepted")
 
 
+def _aperture(name, centre, radius):
+    return ChairBaseNominalAperture(
+        name, tuple(map(Fraction, centre)), Fraction(radius),
+    )
+
+
+def validate_aperture_metrics_and_invariants():
+    """Check independent net metrics, empty parity and exact transforms."""
+    parameters = synthetic_parameters()
+    apertures = (
+        _aperture("a", (-4, -3, 0), 2),
+        _aperture("b", (4, 6, 0), Fraction(3, 2)),
+        _aperture("c", (3, -8, 0), 1),
+    )
+    result = compute_chair_base_aperture_geometry(parameters, apertures)
+    assert result.outline == compute_chair_base_nominal_geometry(parameters)
+    assert result.apertures == apertures
+    assert result == compute_chair_base_aperture_geometry(
+        parameters, apertures,
+    )
+    assert (result.area_constant_mm2, result.area_pi_coefficient_mm2,
+            result.perimeter_constant_mm,
+            result.perimeter_pi_coefficient_mm) == (
+                570, Fraction(1, 4), 80, 14,
+            )
+    metrics = (
+        "area_constant_mm2", "area_pi_coefficient_mm2",
+        "perimeter_constant_mm", "perimeter_pi_coefficient_mm",
+    )
+    empty = compute_chair_base_aperture_geometry(parameters, ())
+    reversed_result = compute_chair_base_aperture_geometry(
+        parameters, apertures[::-1],
+    )
+    assert empty.apertures == ()
+    assert reversed_result.apertures == apertures[::-1]
+    for name in metrics:
+        assert getattr(empty, name) == getattr(result.outline, name)
+        assert getattr(reversed_result, name) == getattr(result, name)
+    for record, name in ((result, "apertures"),
+                         (apertures[0], "centre_mm")):
+        try:
+            setattr(record, name, None)
+        except FrozenInstanceError:
+            pass
+        else:
+            raise AssertionError("aperture geometry record is mutable")
+
+    for factor in (Fraction(1, 10 ** 40), Fraction(7, 3),
+                   Fraction(10 ** 40)):
+        scaled_parameters = ChairBaseNominalParameters(**{
+            field.name: getattr(parameters, field.name) * factor
+            for field in fields(parameters)
+        })
+        scaled_apertures = tuple(replace(
+            item, centre_mm=tuple(v * factor for v in item.centre_mm),
+            radius_mm=item.radius_mm * factor,
+        ) for item in apertures)
+        scaled = compute_chair_base_aperture_geometry(
+            scaled_parameters, scaled_apertures,
+        )
+        assert scaled.apertures == scaled_apertures
+        for name in metrics:
+            exponent = 2 if name.startswith("area_") else 1
+            assert getattr(scaled, name) == getattr(result, name) * (
+                factor ** exponent
+            )
+    for axis, radii in ((0, (2, 1, 4, 3)), (1, (4, 3, 2, 1))):
+        reflected = compute_chair_base_aperture_geometry(
+            ChairBaseNominalParameters(
+                Fraction(20), Fraction(30), *map(Fraction, radii),
+            ),
+            tuple(replace(item, centre_mm=tuple(
+                -value if index == axis else value
+                for index, value in enumerate(item.centre_mm)
+            )) for item in apertures),
+        )
+        assert tuple(item.aperture_id for item in reflected.apertures) == (
+            "a", "b", "c",
+        )
+        for name in metrics:
+            assert getattr(reflected, name) == getattr(result, name)
+
+
+def _expect_aperture_failure(apertures, error_type, message):
+    try:
+        compute_chair_base_aperture_geometry(
+            synthetic_parameters(), apertures,
+        )
+    except error_type as error:
+        assert message in str(error)
+    else:
+        raise AssertionError("invalid aperture input was accepted")
+
+
+def validate_aperture_boundaries():
+    """Use exact straight, circular and pair tangencies as boundary proof."""
+    parameters = synthetic_parameters()
+    epsilon = Fraction(1, 10 ** 40)
+    # Each circle has one exact tangent: four straight sides, then four
+    # arcs. Arc centre offsets use the rational 3:4:5 triangle.
+    tangent_cases = (
+        ((0, -14, 0), 1), ((9, 0, 0), 1),
+        ((0, 14, 0), 1), ((-9, 0, 0), 1),
+        ((Fraction(43, 5), Fraction(-69, 5), 0), 1),
+        ((Fraction(38, 5), Fraction(64, 5), 0), 2),
+        ((Fraction(-33, 5), Fraction(59, 5), 0), 3),
+        ((Fraction(-93, 10), Fraction(-72, 5), 0), Fraction(1, 2)),
+        # Arc/line join and the arc centre itself exercise endpoints and
+        # the zero radial vector without a division or angular choice.
+        ((7, 13, 0), 2), ((7, 12, 0), 3),
+    )
+    for centre, radius in tangent_cases:
+        valid = _aperture("boundary", centre, Fraction(radius) - epsilon)
+        compute_chair_base_aperture_geometry(parameters, (valid,))
+        for delta in (Fraction(0), epsilon):
+            _expect_aperture_failure((replace(
+                valid, radius_mm=Fraction(radius) + delta,
+            ),), ValueError, "strictly inside")
+
+    # A large central circle can exceed an individual corner radius.
+    compute_chair_base_aperture_geometry(
+        parameters, (_aperture("central", (0, 0, 0), 5),),
+    )
+    for centre in ((-11, 0, 0), (11, 0, 0), (0, -16, 0), (0, 16, 0),
+                   (-10, -15, 0), (10, -15, 0),
+                   (10, 15, 0), (-10, 15, 0),
+                   (Fraction(99, 10), Fraction(149, 10), 0)):
+        _expect_aperture_failure(
+            (_aperture("outside", centre, Fraction(1, 100)),),
+            ValueError, "strictly inside",
+        )
+    first = _aperture("first", (0, 0, 0), 2)
+    # Separation is exactly 5 through a second 3:4:5 triangle; the sum
+    # of radii is 5. This also rejects concentric/nested openings.
+    second = _aperture("second", (3, 4, 0), 3)
+    compute_chair_base_aperture_geometry(parameters, (
+        first, replace(second, radius_mm=Fraction(3) - epsilon),
+    ))
+    for other in (second, replace(second, radius_mm=Fraction(3) + epsilon),
+                  _aperture("second", (0, 0, 0), 1),
+                  _aperture("second", (1, 0, 0), 4)):
+        _expect_aperture_failure(
+            (first, other), ValueError, "touch or overlap",
+        )
+
+
+def validate_aperture_input_contract():
+    """Reject mutable containers, ambiguous identities and inexact units."""
+    original = _aperture("a", (0, 0, 0), 1)
+    for value in (None, [], {}, [original]):
+        _expect_aperture_failure(value, TypeError, "immutable tuple")
+    for value in (None, {}, (), "a"):
+        _expect_aperture_failure((value,), TypeError,
+                                 "ChairBaseNominalAperture")
+    for value, error_type in ((None, TypeError), (1, TypeError),
+                              ("", ValueError), ("  ", ValueError)):
+        _expect_aperture_failure(
+            (replace(original, aperture_id=value),),
+            error_type, "aperture_id",
+        )
+    _expect_aperture_failure(
+        (original, replace(original, centre_mm=(
+            Fraction(4), Fraction(0), Fraction(0),
+        ))), ValueError, "unique",
+    )
+    for centre in (None, [], [Fraction(0)] * 3, (Fraction(0),) * 2,
+                   (Fraction(0),) * 4, (0, Fraction(0), Fraction(0)),
+                   (Fraction(0), 0.0, Fraction(0)),
+                   (Fraction(0), Fraction(0), True)):
+        _expect_aperture_failure(
+            (replace(original, centre_mm=centre),), TypeError, "centre_mm",
+        )
+    _expect_aperture_failure((replace(
+        original, centre_mm=(Fraction(0), Fraction(0), Fraction(1)),
+    ),), ValueError, "Z=0")
+    for radius in (0, 1.0, True, "1", Decimal("1"), None,
+                   float("nan"), float("inf")):
+        _expect_aperture_failure(
+            (replace(original, radius_mm=radius),), TypeError, "radius_mm",
+        )
+    for radius in (Fraction(0), Fraction(-1)):
+        _expect_aperture_failure(
+            (replace(original, radius_mm=radius),), ValueError, "positive",
+        )
+
+
 def main():
     """Run pure analytical evidence without importing a CAD host."""
     validate_asymmetric_outline()
     validate_scale_and_reflection()
     validate_invalid_and_near_boundary_inputs()
+    validate_aperture_metrics_and_invariants()
+    validate_aperture_boundaries()
+    validate_aperture_input_contract()
     forbidden = {"FreeCAD", "Part", "FreeCADGui", "PySide", "pivy"}
     assert not forbidden.intersection(sys.modules)
     print("Phase 9B nominal chair-base standalone validation passed")

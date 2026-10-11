@@ -185,6 +185,30 @@ It gives no acceptance for a positive rights claim.
 The 113-entry register and frozen Phase 9A paths stay the same.
 The output stays in private-development status. Phase 9B stays Open at 0/6, with all six exits Pending.
 
+## S1 base holes from drawing No. 4 — 2026-10-11
+
+This Level 2 change adds three holes to the bottom of the [No. 4 base](#s1-base-shape-from-drawing-no-4--2026-10-11).
+It supplies evidence for Exit 9B-1 and for a subsequent assessment of inputs for Exit 9B-3.
+The [software](../../tracktemplate/domain/chair_base_nominal.py) and
+[FreeCAD software](../../tracktemplate/adapters/freecad/chair_base_nominal_exact.py) make one `Part.Face` with circular holes.
+The software rejects holes that touch the outer edge or a different hole.
+
+The [standalone Python test](../../tests/validate_phase9b_chair_base_nominal.py) and
+[FreeCAD test](../../tests/freecad_validate_phase9b_chair_base_nominal.py) give PASS results.
+Their dimensions do not come from drawing No. 4.
+The tests of the base without holes and of the frozen Phase 9A base also give PASS results.
+Tests with the qualified host profile give PASS results for the local No. 4 display and persistence.
+The file `tmp/nominal-apertures/final/No4-underside-native-visual-proof.json` contains the detailed evidence, source identity and input limitations.
+
+For the two holes on one side, the local evidence uses equal distances from the middle of that side.
+Drawing No. 4 gives no dimension for each distance.
+The source inputs and output files stay local. Their rights state stays unknown.
+
+The shape has no thickness or vertical surfaces at the holes. It is not a complete chair.
+It gives no acceptance for physical fit or production output.
+The “113-entry register”, frozen Phase 9A paths and accepted conditions stay the same.
+Output stays in private-development status. Phase 9B stays Open at 0/6, with all six exits Pending.
+
 ## Phase 9A historical links
 
 These links keep earlier references available at the frozen evidence owner.
