@@ -9,6 +9,7 @@ import sys
 import time
 
 import FreeCAD as App
+import FreeCADGui as Gui
 
 try:
     from PySide6 import QtCore, QtWidgets
@@ -80,6 +81,7 @@ if document is None or not str(document.FileName or ""):
 run_directory = pathlib.Path(str(document.FileName)).resolve().parent
 success_directory = run_directory / "create-time-export-success"
 failure_directory = run_directory / "create-time-export-final-task-failure"
+isolation_failure_directory = run_directory / "create-time-export-close-failure"
 for output_directory in (success_directory, failure_directory):
     if output_directory.exists():
         raise RuntimeError("Create-time export output already exists: {}".format(output_directory))
@@ -230,7 +232,10 @@ def _configure_dialog(dialog, output_directory):
     }
 
 
-def _run_scenario(name, output_directory, expected_initial_directory, inject_failure):
+def _run_scenario(
+    name, output_directory, expected_initial_directory, inject_failure,
+    *, inject_close_failure=False,
+):
     active_document = App.ActiveDocument
     if active_document is None:
         raise RuntimeError("The create-time export scenario lost its active document")
@@ -253,6 +258,8 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
         "production_export_calls": [],
         "summary_payloads": [],
         "injection_calls": 0,
+        "inside_production_export": False,
+        "inject_close_failure": inject_close_failure,
     }
 
     original_reader = module.read_last_dialog_inputs
@@ -292,7 +299,13 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
     def measured_dispatch(export_document, task, path):
         active_name = str(getattr(active_document, "Name", "") or "")
         export_name = str(getattr(export_document, "Name", "") or "")
-        kind = "deliverable" if export_name == active_name else "preflight_probe"
+        if STAGING_BARRIER:
+            kind = (
+                "deliverable" if state["inside_production_export"]
+                else "preflight_probe"
+            )
+        else:
+            kind = "deliverable" if export_name == active_name else "preflight_probe"
         deliverable_index = 1 + sum(
             item["kind"] == "deliverable" for item in state["dispatch_calls"]
         )
@@ -311,6 +324,9 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
             if STAGING_BARRIER:
                 require_unpublished_finals(path)
                 item["finals_unchanged_before_generation"] = True
+                if export_document is active_document:
+                    raise RuntimeError("Serializer received editable document")
+                item["isolated_document"] = True
         wall_started = time.perf_counter()
         cpu_started = time.process_time()
         rss_before = _current_rss_mb()
@@ -356,8 +372,126 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
                 dispatch_export_task=measured_dispatch,
                 write_export_manifest=measured_manifest,
             )
-        summary = export_call(*args, **kwargs)
-        if STAGING_BARRIER and inject_failure:
+        retained_documents = []
+        if inject_close_failure:
+            from tracktemplate.adapters.freecad.core_export_document import (
+                CoreExportDocument,
+            )
+
+            class CloseFault:
+                def __getattr__(self, attribute):
+                    return getattr(App, attribute)
+
+                def closeDocument(self, document_name):
+                    if document_name in registry:
+                        raise RuntimeError("Attempted to close prior document")
+                    retained_documents.append(App.getDocument(document_name))
+                    raise RuntimeError("controlled GUI isolated close failure")
+
+            export_call = dataclasses.replace(
+                export_call,
+                export_dispatcher_factory=lambda serializer: (
+                    CoreExportDocument(serializer, app=CloseFault())
+                ),
+            )
+        witness = None
+        if STAGING_BARRIER:
+            source = next(
+                obj for obj in active_document.Objects
+                if "Shape" in obj.PropertiesList
+                and not obj.Shape.isNull() and obj.Shape.Edges
+            )
+            witness = App.newDocument("CoreExportSelectionWitness")
+            witness_object = witness.addObject("Part::Feature", "Witness")
+            witness_object.Shape = source.Shape.copy()
+            witness.recompute()
+            Gui.Selection.clearSelection()
+            Gui.Selection.addSelection(
+                active_document.Name, source.Name, "Edge1", 1.0, 2.0, 3.0,
+            )
+            Gui.Selection.addSelection(witness.Name, witness_object.Name)
+            App.setActiveDocument(witness.Name)
+            Gui.Selection.setPreselection(
+                witness_object, "Edge1", 4.0, 5.0, 6.0,
+            )
+            registry = dict(App.listDocuments())
+            selection = _isolation_selection()
+            preselection = _isolation_preselection()
+            if len(selection) != 2:
+                raise RuntimeError("Selection witness was not established")
+            if preselection[0] != witness.Name:
+                raise RuntimeError("Preselection witness was not established")
+            document_before = ordinary_track_document_snapshot(
+                module, active_document
+            )
+            history = (
+                active_document.UndoCount, active_document.RedoCount,
+                tuple(active_document.UndoNames),
+                tuple(active_document.RedoNames),
+            )
+            visibility = {
+                obj.Name: obj.ViewObject.Visibility
+                for obj in active_document.Objects
+            }
+        try:
+            state["inside_production_export"] = True
+            summary = export_call(*args, **kwargs)
+            if STAGING_BARRIER:
+                expected_registry = dict(registry)
+                if inject_close_failure:
+                    if len(retained_documents) != 1:
+                        raise RuntimeError("Owned close fault did not run once")
+                    retained_document = retained_documents[0]
+                    expected_registry[retained_document.Name] = retained_document
+                    if "controlled GUI isolated close failure" not in "\n".join(
+                        summary["failure_details"]
+                    ):
+                        raise RuntimeError("Close diagnostic was not reported")
+                if dict(App.listDocuments()) != expected_registry:
+                    raise RuntimeError("Isolation changed document registry")
+                if (
+                    App.ActiveDocument is not witness
+                    or App.activeDocument() is not witness
+                ):
+                    raise RuntimeError("Isolation changed active document")
+                if _isolation_selection() != selection:
+                    raise RuntimeError("Isolation changed committed selection")
+                if _isolation_preselection() != preselection:
+                    raise RuntimeError("Isolation changed preselection")
+                if ordinary_track_document_snapshot(
+                    module, active_document
+                ) != document_before:
+                    raise RuntimeError("Isolation changed editable state")
+                if history != (
+                    active_document.UndoCount, active_document.RedoCount,
+                    tuple(active_document.UndoNames),
+                    tuple(active_document.RedoNames),
+                ):
+                    raise RuntimeError("Isolation changed document history")
+                if visibility != {
+                    obj.Name: obj.ViewObject.Visibility
+                    for obj in active_document.Objects
+                }:
+                    raise RuntimeError("Isolation changed object visibility")
+                state["isolation"] = {
+                    "registry_restored": not inject_close_failure,
+                    "owned_documents_retained": len(retained_documents),
+                    "other_active_document_restored": True,
+                    "two_document_selection_restored": True,
+                    "subelement_points_restored": True,
+                    "preselection_restored": True,
+                    "editable_state_history_visibility_unchanged": True,
+                }
+        finally:
+            state["inside_production_export"] = False
+            for retained_document in retained_documents:
+                if App.listDocuments().get(retained_document.Name) is not retained_document:
+                    raise RuntimeError("Fixture cleanup lost document identity")
+                App.closeDocument(retained_document.Name)
+            if witness is not None:
+                App.closeDocument(witness.Name)
+                App.setActiveDocument(active_document.Name)
+        if STAGING_BARRIER and (inject_failure or inject_close_failure):
             task_results = summary.get("results") or []
             if len(task_results) != EXPECTED_TASK_COUNT or any(
                 item.get("success") is not False for item in task_results
@@ -541,14 +675,15 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
         )
     probe_calls = [item for item in state["dispatch_calls"] if item["kind"] == "preflight_probe"]
     deliverable_calls = [item for item in state["dispatch_calls"] if item["kind"] == "deliverable"]
-    if len(probe_calls) != 10 or len(deliverable_calls) != EXPECTED_TASK_COUNT:
+    expected_deliverables = 1 if inject_close_failure else EXPECTED_TASK_COUNT
+    if len(probe_calls) != 10 or len(deliverable_calls) != expected_deliverables:
         raise RuntimeError(
             "Unexpected create-time dispatch counts: {}/{}".format(
                 len(probe_calls), len(deliverable_calls)
             )
         )
     planned_files = [item["final_name"] for item in deliverable_calls]
-    if set(planned_files + ["Curve_Set_001_Export_Manifest.csv"]) != set(EXPECTED_EXPORT_FILENAMES):
+    if not inject_close_failure and set(planned_files + ["Curve_Set_001_Export_Manifest.csv"]) != set(EXPECTED_EXPORT_FILENAMES):
         raise RuntimeError("Create-time export planned unexpected filenames")
     state["planned_files"] = planned_files + ["Curve_Set_001_Export_Manifest.csv"]
     if len(state["production_export_calls"]) != 1 or len(state["summary_payloads"]) != 1:
@@ -562,7 +697,7 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
         "manifest_requested": True,
         "manifest_created": True,
     }
-    if STAGING_BARRIER and inject_failure:
+    if STAGING_BARRIER and (inject_failure or inject_close_failure):
         expected_summary.update({
             "successful_files": 0,
             "failed_files": EXPECTED_TASK_COUNT,
@@ -574,10 +709,14 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
             raise RuntimeError(
                 "Unexpected create-time {} summary: {}".format(name, summary)
             )
-    if inject_failure:
-        if state["injection_calls"] != 1:
+    if inject_failure or inject_close_failure:
+        if state["injection_calls"] != int(inject_failure):
             raise RuntimeError("The final-task failure injection did not run once")
-        if not any(CREATE_TIME_EXPORT_FAILURE_MESSAGE in value for value in summary["failures"]):
+        expected_error = (
+            "controlled GUI isolated close failure" if inject_close_failure
+            else CREATE_TIME_EXPORT_FAILURE_MESSAGE
+        )
+        if not any(expected_error in value for value in summary["failures"]):
             raise RuntimeError("The create-time failure summary omitted the injected reason")
         final_text = state["final_success_dialogs"][0]["text"]
         expected_counts = (
@@ -601,7 +740,9 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
             raise RuntimeError("Core export retained a temporary directory")
         if len(state["preflight_warning_questions"]) != int(inject_failure):
             raise RuntimeError("Unexpected overwrite confirmation count")
-        if state["staged_manifest_calls"] != (0 if inject_failure else 1):
+        if state["staged_manifest_calls"] != (
+            0 if inject_failure or inject_close_failure else 1
+        ):
             raise RuntimeError("Unexpected staged manifest generation count")
         state["destination_after"] = _destination_files(output_directory)
     if len(active_document.Objects) != 9:
@@ -617,6 +758,27 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
     state.pop("active", None)
     state.pop("seen", None)
     return state, after, normalised_after
+
+
+def _isolation_selection():
+    """Observe logical selection and exact picked points across documents."""
+    return [
+        (
+            item.DocumentName, item.ObjectName, tuple(item.SubElementNames),
+            tuple((point.x, point.y, point.z) for point in item.PickedPoints),
+            Gui.Selection.isSelected(item.Object, "", 0),
+        )
+        for item in Gui.Selection.getSelectionEx("*", 0)
+    ]
+
+
+def _isolation_preselection():
+    selected = Gui.Selection.getPreselection()
+    return (
+        selected.DocumentName, selected.ObjectName,
+        tuple(selected.SubElementNames),
+        tuple((point.x, point.y, point.z) for point in selected.PickedPoints),
+    )
 
 
 parameter_group = App.ParamGet(module.LAST_INPUTS_PARAMETER_PATH)
@@ -670,6 +832,24 @@ try:
     result["normalised_document_semantic_sha256"] = normalised_success[
         "semantic_sha256"
     ]
+    if STAGING_BARRIER:
+        close_failure, _closed_document, normalised_close = _run_scenario(
+            "create_time_export_isolated_close_failure",
+            isolation_failure_directory,
+            str(failure_directory),
+            inject_failure=False,
+            inject_close_failure=True,
+        )
+        result["scenarios"].append(close_failure)
+        if normalised_close["semantic_sha256"] != normalised_success["semantic_sha256"]:
+            raise RuntimeError("Close failure changed generated document state")
+        if list(isolation_failure_directory.iterdir()):
+            raise RuntimeError("Close failure published output")
+        result["isolation_close_failure_output"] = {
+            "successful_files": 0, "new_final_files": [],
+            "retained_owned_document_reported": True,
+            "editable_document_preserved": True,
+        }
 
     success_complete = export_directory_snapshot(success_directory)
     success_variant = export_variant_snapshot(success_complete)
@@ -744,7 +924,10 @@ try:
         enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
         expected_overwrite_existing=STAGING_BARRIER,
     )
-    if normalised_reopened["output_directory"] != str(failure_directory):
+    final_directory = (
+        isolation_failure_directory if STAGING_BARRIER else failure_directory
+    )
+    if normalised_reopened["output_directory"] != str(final_directory):
         raise RuntimeError("Save/reopen changed the persisted export directory")
     if normalised_reopened["semantic_sha256"] != normalised_failure["semantic_sha256"]:
         raise RuntimeError("Save/reopen changed create-time export document semantics")

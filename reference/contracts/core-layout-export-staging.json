@@ -5,7 +5,8 @@
   "status": "draft",
   "change_level": 2,
   "authority": [
-    "Project owner Phase 9B continuation after PR #161 on 2026-10-11"
+    "Project owner Phase 9B continuation after PR #161 on 2026-10-11",
+    "Project owner Phase 9B continuation after PR #162 on 2026-10-11"
   ],
   "criterion": "9B-5",
   "contract_document": "reference/contracts/core-layout-export-staging.md",
@@ -40,7 +41,9 @@
     "selected-export behaviour changes",
     "new restart or durability guarantees",
     "geometry, manifest schema, numerical-limit or source-classification changes",
-    "phase, exit, physical-fit, manufacturing, rights, production or release acceptance"
+    "phase, exit, physical-fit, manufacturing, rights, production or release acceptance",
+    "raw GUI selection event history or cross-object event interleaving",
+    "malicious serializer isolation or a security sandbox"
   ],
   "validation": {
     "standalone": "tests/validate_core_export_staging.py",
@@ -57,5 +60,23 @@
       "publish",
       "cleanup"
     ]
+  },
+  "serializer_isolation": {
+    "factory_keyword": "export_dispatcher_factory",
+    "implementation": "tracktemplate.adapters.freecad.core_export_document.CoreExportDocument",
+    "factory_input": "selected raw serializer, including an explicit exporter_override",
+    "factory_side_effects": "none; host imports and state access occur only during a task call",
+    "call_inputs": [
+      "editable_doc",
+      "task",
+      "staged_path"
+    ],
+    "serializer_document": "one hidden invocation-owned temporary document per task",
+    "completion_boundary": "owned document closed; original registry, active document and observable GUI selection and preselection restored before the task returns",
+    "selection_scope": "all registered documents; grouped object and subelement membership, picked points and whole-object membership",
+    "failed_cleanup": "no final publication; same original exception with cleanup notes, or explicit cleanup failure",
+    "ordinary_exception_notes": "include cleanup notes in the returned failure details",
+    "raw_serializer_binding": "identity remains checked against the frozen host operation",
+    "source_label_reservation": "owned label-only objects preserve the editable document label namespace and existing FreeCAD duplicate-label allocation; no source shapes or other properties are copied"
   }
 }

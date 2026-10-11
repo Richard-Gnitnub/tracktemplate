@@ -24,6 +24,10 @@ _PHASE7_EXPECTED_SCENARIOS = (
     "create_time_export_success",
     "create_time_export_final_task_failure",
 )
+if globals().get("TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False):
+    _PHASE7_EXPECTED_SCENARIOS += (
+        "create_time_export_isolated_close_failure",
+    )
 
 
 def _normalise_core_layout_export_recipe(
@@ -82,6 +86,11 @@ def _normalise_core_layout_export_recipe(
             result = re.sub(
                 r"RailwayPreflight_[0-9a-fA-F]+",
                 "RailwayPreflight_<generated-id>",
+                result,
+            )
+            result = re.sub(
+                r"TrackTemplateCoreExport_[0-9a-fA-F]+",
+                "TrackTemplateCoreExport_<generated-id>",
                 result,
             )
             return re.sub(

@@ -6,6 +6,7 @@ It does not establish a whole-set publication or recovery guarantee.
 """
 
 import datetime
+import dataclasses
 import hashlib
 import json
 import os
@@ -14,6 +15,7 @@ import runpy
 import shutil
 import sys
 import traceback
+from unittest import mock
 
 import FreeCAD as App
 
@@ -24,6 +26,9 @@ sys.path.insert(0, str(ROOT))
 from tracktemplate import api  # noqa: E402
 from tracktemplate.adapters.export.core_layout_files import (
     CoreLayoutExportFiles,
+)  # noqa: E402
+from tracktemplate.adapters.freecad.core_export_document import (
+    CoreExportDocument,
 )  # noqa: E402
 from tools.freecad_bridge import ordinary_track_recipe as recipe  # noqa: E402
 from tools.freecad_bridge import ordinary_track_export_recipe as artifacts  # noqa: E402
@@ -48,6 +53,18 @@ def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def source_hashes():
+    paths = [
+        ROOT / "TrackTemplate.FCMacro", Path(__file__).resolve(),
+        ROOT / (
+            "model_railway_curve_template_multitrack_v10_2a8a7b15_"
+            "chair_performance_and_representation.FCMacro"
+        ),
+        *sorted((ROOT / "tracktemplate").rglob("*.py")),
+    ]
+    return {str(path.relative_to(ROOT)): sha256(path) for path in paths}
+
+
 def load_product():
     launcher = runpy.run_path(str(ROOT / "TrackTemplate.FCMacro"))
     foundation = launcher["FOUNDATION_RESULT"]
@@ -68,6 +85,10 @@ def load_product():
     assert (
         session.module.run_production_export.export_files_factory
         is CoreLayoutExportFiles
+    )
+    assert (
+        session.module.run_production_export.export_dispatcher_factory
+        is CoreExportDocument
     )
     return session.module, export_routing
 
@@ -175,11 +196,15 @@ def run_success(module, document, directory, *, legacy=False):
         if "Shape" in obj.PropertiesList and not obj.Shape.isNull()
     }
     inputs = input_state((config, plan))
+    registry = dict(App.listDocuments())
+    active = App.ActiveDocument
     summary = _export(module, document, config, plan, legacy=legacy)
     assert summary["successful_files"] == 5 and summary["failed_files"] == 0
     assert summary["manifest_path"] == plan["manifest_path"]
     assert document_state(module, document) == before
     assert input_state((config, plan)) == inputs
+    assert dict(App.listDocuments()) == registry
+    assert App.ActiveDocument is active
     for item, task in zip(summary["results"], plan["tasks"]):
         assert item["task"] is task and item["success"] is True
     for name, obj in objects.items():
@@ -226,6 +251,7 @@ def run_failure(module, document, directory, *, existing):
     calls = []
 
     def fail_last(doc, task, path):
+        assert doc is not document
         assert task is plan["tasks"][len(calls)]
         calls.append(task["format"])
         if len(calls) == len(plan["tasks"]):
@@ -260,6 +286,161 @@ def run_failure(module, document, directory, *, existing):
     }
 
 
+def run_lifecycle_cases(module, document, directory):
+    """Exercise real isolated documents at controlled failure boundaries."""
+    outcomes = []
+    witness = App.newDocument("CoreExportIndependentWitness")
+    obj = witness.addObject("App::FeaturePython", "Witness")
+    obj.addProperty("App::PropertyString", "WitnessValue")
+    obj.WitnessValue = "preserve independent document"
+    witness.recompute()
+    previous_active = document
+    try:
+        for mode in (
+            "success-other-active", "success-no-active",
+            "inconsistent-active", "construction",
+            "recompute", "swallowed-removal", "close", "interruption",
+        ):
+            target = directory / mode
+            target.mkdir()
+            config, plan = prepared_plan(module, document, target)
+            finals = [Path(task["path"]) for task in plan["tasks"]]
+            finals.append(Path(plan["manifest_path"]))
+            for final in finals:
+                final.write_bytes(b"previous accepted output")
+            before_files = {
+                final.name: (final.read_bytes(), final.stat().st_ino)
+                for final in finals
+            }
+            App.setActiveDocument(witness.Name)
+            if mode == "inconsistent-active":
+                App.setActiveDocument("")
+                assert App.ActiveDocument is witness
+                assert App.activeDocument() is None
+            if mode == "success-no-active":
+                setup = App.newDocument("CoreExportActiveSetup")
+                App.closeDocument(setup.Name)
+                assert App.ActiveDocument is None
+                assert App.activeDocument() is None
+            registry = dict(App.listDocuments())
+            active = App.ActiveDocument
+            internal_active = App.activeDocument()
+            before = document_state(module, document)
+            inputs = input_state((config, plan))
+            calls = []
+            retained = []
+            interruption = KeyboardInterrupt("controlled native interruption")
+
+            class CloseFault:
+                def __getattr__(self, name):
+                    return getattr(App, name)
+
+                def closeDocument(self, name):
+                    assert name not in registry
+                    retained.append(App.getDocument(name))
+                    raise RuntimeError("controlled native close failure")
+
+            def dispatch(scratch, task, path):
+                assert scratch is not document and scratch is not witness
+                assert scratch.Name not in registry
+                calls.append(scratch.Name)
+                if mode in {"construction", "interruption"}:
+                    scratch.addObject("Part::Feature", "PartialConstruction")
+                    if mode == "interruption":
+                        raise interruption
+                    raise RuntimeError("controlled native construction failure")
+                return module.dispatch_freecad_export(scratch, task, path)
+
+            adapter = module.run_production_export
+            if mode == "close":
+                adapter = dataclasses.replace(
+                    adapter,
+                    export_dispatcher_factory=lambda serializer: (
+                        CoreExportDocument(serializer, app=CloseFault())
+                    ),
+                )
+            cleanup_calls = []
+
+            def leave_objects(scratch, objects):
+                assert scratch is not document
+                cleanup_calls.append(len(objects))
+                # Frozen cleanup can absorb removal failures. Leave actual
+                # objects to prove closing the isolated document contains it.
+
+            with mock.patch.object(
+                module, "_remove_temporary_export_objects",
+                side_effect=leave_objects if mode == "swallowed-removal"
+                else module._remove_temporary_export_objects,
+            ), mock.patch.object(
+                module, "_document_recompute",
+                side_effect=RuntimeError("controlled native recompute failure")
+                if mode == "recompute" else module._document_recompute,
+            ):
+                try:
+                    summary = adapter(
+                        document, plan, config, "SET-001", {}, {}, {}, {},
+                        exporter_override=dispatch,
+                    )
+                except KeyboardInterrupt as error:
+                    assert mode == "interruption" and error is interruption
+                    summary = None
+            successful = mode.startswith("success") or mode == "swallowed-removal"
+            if successful:
+                assert summary["successful_files"] == 5
+                assert summary["failed_files"] == 0
+                assert len(calls) == 4 and len(set(calls)) == 4
+            else:
+                if summary is not None:
+                    assert summary["successful_files"] == 0
+                    assert summary["failed_files"] > 0
+                    details = "\n".join(summary["failure_details"])
+                    if mode == "inconsistent-active":
+                        assert "active" in details.lower() and not calls
+                    else:
+                        assert "controlled native" in details
+                assert {
+                    final.name: (final.read_bytes(), final.stat().st_ino)
+                    for final in finals
+                } == before_files
+            if mode == "swallowed-removal":
+                assert len(cleanup_calls) == 4 and all(cleanup_calls)
+            if mode == "close":
+                assert len(retained) == 1
+                assert retained[0].Name in "\n".join(
+                    summary["failure_details"]
+                )
+                assert App.getDocument(retained[0].Name) is retained[0]
+                assert set(App.listDocuments()) == set(registry) | {
+                    retained[0].Name
+                }
+                # This test owns the disposable host and the recorded doc.
+                App.closeDocument(retained[0].Name)
+                App.setActiveDocument(active.Name)
+            assert dict(App.listDocuments()) == registry
+            assert App.ActiveDocument is active
+            assert App.activeDocument() is internal_active
+            assert document_state(module, document) == before
+            assert input_state((config, plan)) == inputs
+            assert witness.getObject("Witness") is obj
+            assert obj.WitnessValue == "preserve independent document"
+            assert not list(target.glob(".tracktemplate_core_export_*"))
+            outcomes.append({
+                "case": mode, "isolated_calls": len(calls),
+                "editable_state_unchanged": True,
+                "registry_restored": mode != "close",
+                "owned_close_failure_retained": len(retained),
+                "active_document_restored": True,
+                "success": successful,
+                "inconsistent_active_rejected_before_creation": (
+                    mode == "inconsistent-active" and not calls
+                ),
+            })
+    finally:
+        App.closeDocument(witness.Name)
+        App.setActiveDocument(previous_active.Name)
+    return outcomes
+
+
 def validate():
     assert not App.listDocuments(), "Use an empty isolated qualified host"
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
@@ -286,6 +467,7 @@ def validate():
         "profile": PROFILE,
         "routing": routing,
         "fixture_sha256": sha256(fixture),
+        "source_sha256": source_hashes(),
     }
     try:
         baseline = document_state(module, document)
@@ -310,6 +492,9 @@ def validate():
             )
             for existing in (False, True)
         ]
+        report["isolated_document_lifecycle"] = run_lifecycle_cases(
+            module, document, directory
+        )
         assert document_state(module, document) == baseline
         document.save()
         saved = document_state(module, document)
@@ -321,6 +506,8 @@ def validate():
         assert reopened["semantic"] == saved["semantic"]
         report["save_reopen_exact_canonical_state"] = True
         report["result"] = "PASS"
+        report["source_sha256_after"] = source_hashes()
+        assert report["source_sha256_after"] == report["source_sha256"]
         assert sha256(fixture) == contract["fixture"]["sha256"]
         (directory / "result.json").write_text(
             json.dumps(report, indent=2) + "\n"
