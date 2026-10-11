@@ -283,8 +283,12 @@ named.
 ### Independent railway research registration
 
 The [independent engineering evidence map](lineage/s1-independent-engineering-evidence-map.json)
-records the complete 9 October 2026 research bibliography that the project owner supplied.
-Its `research_reports` record owns the report identity and the mapping of all 12 bibliography entries to source records.
+records both versions of the research bibliography that the project owner supplied.
+The 9 October 2026 report contains 12 entries. The 11 October amendment contains 16 groups.
+Its `research_reports` records own both report identities and their connections to source records.
+
+The amendment adds wider plain-line, chair, switch, crossing, formation and timbering evidence.
+The map keeps earlier observations and source identifiers. It does not duplicate a source when its report group changes.
 Reported drawing inspections, catalogue entries and research leads have different evidence meanings.
 The [companion guidance](lineage/S1_INDEPENDENT_EVIDENCE_MAP.md#next-evidence-boundary)
 puts drawings with reported remote access first. NRM references stay optional archival leads.
