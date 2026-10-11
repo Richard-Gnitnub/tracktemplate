@@ -1,9 +1,9 @@
 # S1 independent engineering evidence map
 
-This map records evidence for the 113 quantities in the current research
-`ChairDefinition`. None of their values has an independent engineering reference chain.
-An applicable chair drawing and evidence for the owner’s model rail are necessary.
-The evidence is not sufficient for a decision to admit a phase exit.
+This map preserves the assessment of 113 quantities in the frozen research
+`ChairDefinition`. That assessment records no independent engineering reference chain for their values.
+The research registration below adds source information. It changes none of those quantity records.
+Source registration gives no acceptance for a dimension, model rail fit or phase exit.
 
 The [S1 pilot plan](../phase-evidence/S1_PILOT_PLAN.md#chair-acceptance-evidence-under-d-p9-005)
 owns the engineering requirements in D-P9-005. The
@@ -95,22 +95,44 @@ are missing. This task changes none of these quantities.
 
 ## Sources that can supply more evidence
 
-The source catalogue in the map records retrieval dates, source locations,
-access limits and unresolved rights. These sources have different uses:
+The source catalogue in the map records source identities, locations, inspection limits and unresolved rights.
+Its `research_reports` record identifies the complete bibliography that the project owner supplied:
+*TrackTemplate: independent railway engineering reference bibliography*, dated 9 October 2026.
+The record keeps the report filename, byte hash and all 12 numbered entries.
+The map preserves the source identifiers from the baseline. The other source records stay the same.
+They include C&L, British Steel, NIST and BIPM.
 
-| Source | Available evidence and missing evidence |
+The inspection statements below come from that report.
+The registration author did not examine the drawings again or examine access at the registration date.
+After a drawing inspection, detailed transcription, revision checks and engineering assessment can be necessary.
+Catalogue inspection gives no evidence for a drawing dimension.
+
+| Report entry | Source and reported inspection |
 | --- | --- |
-| [National Railway Museum catalogue](https://www.railwaymuseum.org.uk/sites/default/files/2018-03/North%20Eastern%20Railway%20Civil%20Engineering%20Drawings%20List.pdf) | PDF page 274, Box 246, shows “Common Chair S.I. 46 LB” with different views and sections. The drawing was not examined. Its designation, revision and applicability stay unresolved. |
-| [NERA 1926 publication](https://ner.org.uk/product/standard-railway-equipment-permanent-way-1926/) | The publisher shows the drawing collection. The related plates and their changes were not examined. |
-| C&L `4RA201A` and rail-code explanation | Supplier identity and the height relationship are available. The owner’s stock, complete contour, measurement uncertainty and tolerances stay unresolved. |
-| BSI `BS 9:1935` and its contents preview | The catalogue identifies the standard. The preview gives the location of the `95R` plate: printed page 41. That plate and applicable tolerance clauses were not examined. |
-| British Steel `RPGD:ENG:072026` | The manufacturer gives dimensions for `BS95RBH`. Evidence of its applicability to this historical chair is missing. The website also gives restrictions on content use. |
+| 1 | LMS compilation, cover dated 1928: specified SRE drawings examined. The cover date does not give the date of each sheet. |
+| 2 | NERA 1926 facsimile: publisher catalogue only. Related plates were not examined. |
+| 3 | NRM collection 2009-7071, Box 246: catalogue entries examined. Drawings not examined. Blank drawing references stay blank. |
+| 4 | REA rail-joint report, 1905: drawing leaves 2, 32 and 52 examined. The complete report was not examined. |
+| 5 | LSWR switch drawing 2, negative 2437: sheet examined. |
+| 6 | LSWR crossing drawing 4c, negative 2474: sheet examined. |
+| 7 | MSLR Type 44 and Type 39 left half: sheets examined, with different dimension coverage. |
+| 8 | GCR check-chair drawing 40A: sheet examined. That number alone does not show that the rail drawing is applicable to this chair. |
+| 9 | BS 9:1935: publisher record only in this report. The earlier contents-preview record stays a different record. |
+| 10 | BS 11:2015: publisher description only. Profile figures and tolerances not examined. |
+| 11 | BS 47-1:1991: publisher description only. Individual profiles not examined. |
+| 12 | PWI bullhead supplement: holding catalogue only. The reported 1943/1991 publication relationship stays unverified. |
 
-An adjacent catalogue entry does not select the rail section for this chair.
-An available rail publication also does not select it. Catalogue access gives no drawing dimensions.
+The machine-readable records keep drawing references, page numbers, printed callouts, engineering findings and limitations from the report.
+Printed callouts stay as reported source findings. They are not accepted parameters or measurements from scans.
+Related sheets in one drawing family are complementary evidence. Reproductions of one sheet do not supply independent confirmations.
+No evidence shows that the LMS, NERA and NRM copies have the same revision.
+
+The report gives access conditions and prices for its date.
+These conditions and prices give no third-party permission and do not show whether the material is available now.
+The reported Oldpway licence statement gives no evidence of its legal chain or project clearance.
 The [rights policy](../LICENSING_BOUNDARIES.md) and
 [provenance policy](../PROVENANCE.md) own admission for each intended use.
-This map gives no rights to external material or production output.
+Registration includes no drawing files and gives no rights to external material or production output.
 
 ## Relationships with missing evidence
 
@@ -131,16 +153,29 @@ do not supply accepted numerical tolerances.
 
 ## Next evidence boundary
 
-Recommendation: get the Box 246 chair drawing, its complete title information
-and any related sheets. The NERA collection is a different source from which to get drawings.
-Inspection must identify the designation, revision, applicable rail section,
-dimension locations and permitted use before the drawing supplies evidence for quantities.
-The catalogue spelling `S.I.` gives no independent evidence for the intended S1 prototype.
+First, examine the historical drawings in the LMS compilation that the report identifies for remote access.
+The report gives this sequence for detailed inspection and transcription:
 
-The supplier and batch identity of the owner’s model rail are also necessary.
-A controlled contour where available, and measurements with recorded uncertainty, are necessary.
-No purchase, source-holder contact or physical measurement occurred in this task.
-Acquisition or access is the next boundary. There is no exit-admission proposal.
+| Sequence | Drawing and PDF page | Engineering question |
+| --- | --- | --- |
+| 1 | [No.4, p.6](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=6) | S.I. seat, jaws, key faces, base and fixing datums |
+| 2 | [No.2, p.4](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=4) | Rail profile and fishplate interfaces |
+| 3 | [No.1, p.3](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=3) | Key section, taper and fixing interfaces |
+| 4 | [No.18A, p.26](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=26) | Revised P chair and supersession |
+| 5 | [No.38, p.61](https://www.lmssociety.org.uk/assets/pdfs/PermanentWay1928.pdf#page=61) | Crossing-angle variants and the reported S.I. jaw relationship |
+
+These five drawings belong to one source family. Nos.6, 7 and 18 supply related information.
+Nos.36 and 37 can supply information for a selected crossing chair.
+The other company drawings supply comparisons in their reported prototype scopes.
+No dimensioned spring-steel-key drawing was verified in the report.
+
+NRM references stay optional archival leads. A physical visit or archive request is not necessary for remote drawing assessment.
+The NERA facsimile and PWI holding are also optional sources. Registration authorises no purchase, visit or external contact.
+The derivative NRM list's suggested numbers do not replace blank references in the official catalogue.
+
+In subsequent engineering work, record prototype geometry, model adaptations and manufacturing compensation as different types of data.
+This registration includes no drawing transcription, geometry change, physical measurement or evidence promotion.
+There is no exit-admission proposal. The project plan owns current phase status.
 
 At the recorded baseline, Phase 9A stays at `1/4`. Exits 9A-1–3 stay Pending.
 Phase 9B stays unopened. This map gives no definition, tolerance, pilot, package,

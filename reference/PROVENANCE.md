@@ -280,6 +280,19 @@ first pilot's working description is an S1 chair; its precise REA/company
 designation must be confirmed from evidence before the published package is
 named.
 
+### Independent railway research registration
+
+The [independent engineering evidence map](lineage/s1-independent-engineering-evidence-map.json)
+records the complete 9 October 2026 research bibliography that the project owner supplied.
+Its `research_reports` record owns the report identity and the mapping of all 12 bibliography entries to source records.
+Reported drawing inspections, catalogue entries and research leads have different evidence meanings.
+The [companion guidance](lineage/S1_INDEPENDENT_EVIDENCE_MAP.md#next-evidence-boundary)
+puts drawings with reported remote access first. NRM references stay optional archival leads.
+
+This registration preserves earlier source observations and unresolved rights.
+It changes no accepted quantity evidence, Templot classification or production clearance.
+It includes no third-party drawing files.
+
 ## ASD-STE100 Issue 9 reference
 
 TrackTemplate uses the official ASD-STE100 Simplified Technical English,
