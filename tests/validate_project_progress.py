@@ -252,6 +252,21 @@ DP9_012_HEADING = (
 DP9_012_PANEL = (
     "reference/current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel"
 )
+EXPECTED_DP9_013_AUTHORITY = (
+    "As project owner, I approve the proposed Phase 9B Core Generate export "
+    "policy: unique collision-free folders, atomic whole-set publication, "
+    "optional CSV, revised output paths and preservation of all previously "
+    "published outputs.\n\n"
+    "Authorise the necessary Level 3 alignment and bounded implementation."
+    "\n\nQualify atomic publication without claiming durability or restart "
+    "recovery. Preserve all other export and acceptance boundaries."
+)
+DP9_013_HEADING = (
+    "D-P9-013 Core Generate export policy panel — 2026-10-11"
+)
+DP9_013_PANEL = (
+    "reference/current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel"
+)
 PHASE9A_EXIT1_STATUS = "Evidenced — owner-accepted 2026-10-08"
 PHASE9A_EXIT2_STATUS = "Evidenced — owner-accepted 2026-10-09"
 PHASE9A_EXIT3_STATUS = "Evidenced — owner-accepted 2026-10-09"
@@ -1278,21 +1293,25 @@ def _validate_owner_view(plan: str) -> None:
         "Phase 9B is Open at 1/6 under D-P9-012",
         "Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11",
         "The other five exits stay Pending",
-        "representative migrated Core workflows",
-        "The six exit criteria stay unchanged",
-        "This decision adds no product behaviour",
-        "accepted Phase 7 and Phase 8 workflows",
-        "PR #154, PR #155 and PR #160",
+        "D-P9-013 authorises a different unused directory for each Core "
+        "Generate export",
+        "The complete set must become visible together",
+        "CSV stays optional",
+        "Returned paths change and previous output stays unchanged",
         "representative-workflow limits, selected export scope, "
         "normalisations, the observed SVG difference and production_ready=False",
         "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
         "Output stays private-development and project status stays unknown",
-        "D-P9-012 accepts only Exit 9B-2 on the reviewed evidence and "
-        "bounded conditions",
+        "D-P9-013 authorises only the export policy and its bounded "
+        "implementation",
+        "It accepts no exit or durability or restart-recovery claim",
+        "D-P9-012 remains the authority for the one accepted Phase 9B exit",
+        "After CI gives a PASS result for the exact PR head, publish the "
+        "draft PR",
+        "Do not merge or begin another outcome",
+        "The six exit criteria stay unchanged",
         "All other exits and production conditions stay",
         "The Phase 9A closeout and earlier decisions keep their accepted limits",
-        "After CI gives a PASS result for the exact PR head, publish "
-        "the draft PR. Do not merge or start further development",
     ):
         _require(
             fragment in owner_view,
@@ -1300,11 +1319,11 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         "f2673cf87fd4bd3a58de0ba035a404cbd1922e33e14f9fb56d5d205e064d2424",
-        "65d670ff2053df142fa803581396419d8f5990f3533fcfe578f1ff979e28bb83",
-        "071e5f2855d050ad05f6fdb09aad295483c8aae264ac803589b9c280894a2c40",
-        "05a2e43ce7acdb3c9df3def54631713a53673a543d0eb0b53cfb65d134f994dd",
-        "33189d12ec023979cc23035424ce0a488dea97c88d22223abaf97e589a8514c3",
-        "dffdd4678cc801cd777d262d2e7494fbbcf995de7a88215d5d383b0a7299d5b9",
+        "333726d98cd855ab065dd16841a16a63398ba54221d7f897ae4ce905004c38cf",
+        "a47b6d7b1e9e55b530a4c3111cbe8f27d3302ae0cd984c407521b76f344ea09a",
+        "ffa2ba3bed72b670a541a694eae5f744b78256af032f747cb21eabb869b44b4c",
+        "963e6c03bda2157f94abd28f3315d236beeaf91b0ce7dadc09c20466890e3fa7",
+        "2b52260b8c08bad20f1ed8c3f339c01012bb94ccf5632fa13c7f536d0fc54c45",
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -1319,7 +1338,9 @@ def _validate_owner_view(plan: str) -> None:
           "#phase-9a-closeout-panel"),
          ("D-P9-012", "current/PHASE_EVIDENCE.md"
           "#phase-9b-exit-2-acceptance-panel"),
-         ("admission panel", "current/PHASE_EVIDENCE.md"
+         ("D-P9-013", "current/PHASE_EVIDENCE.md"
+          "#phase-9b-core-export-policy-panel"),
+         ("Exit 9B-2 admission", "current/PHASE_EVIDENCE.md"
           "#phase-9b-exit-2-acceptance-panel")),
         "project-plan owner view closeout or acceptance route drifted",
     )
@@ -7259,8 +7280,43 @@ def _validate_dp9_012_decision(
         )
 
 
+def _validate_dp9_013_decision(
+    record: dict[str, object], fields: set[str],
+) -> None:
+    """Keep the approved export policy distinct from exit acceptance."""
+    _require(
+        isinstance(record, dict)
+        and set(record) == fields
+        and record["id"] == "D-P9-013"
+        and record["decided_on"] == "2026-10-11"
+        and record["status"] == "Accepted"
+        and record["evidence"] == DP9_013_PANEL
+        and record["panel_record"] == DP9_013_PANEL
+        and record["panel_required_under_current_policy"] is True,
+        "D-P9-013 identity, status or panel routing drifted",
+    )
+    _require(
+        record["authority"] == EXPECTED_DP9_013_AUTHORITY,
+        "D-P9-013 exact owner authority drifted",
+    )
+    for field, digest in (
+        ("decision", (
+            "f40ebb97ff009255235dbb5f82bcb873f28fa2deb0f2e2aa4d86827e7d114dde"
+        )),
+        ("exclusions", (
+            "81cdd4f985098d25c658df70c5b62dfd74d4f26322de42a95da320e084fb551c"
+        )),
+    ):
+        value = record[field]
+        _require(
+            isinstance(value, str)
+            and hashlib.sha256(value.encode("utf-8")).hexdigest() == digest,
+            "D-P9-013 " + field + " boundary drifted",
+        )
+
+
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
-    """Keep inherited decisions and only the accepted 9B-2 admission."""
+    """Keep prior admissions and the bounded D-P9-013 export policy."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
     _require(
         set(document) == set(archive)
@@ -7272,7 +7328,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 4
+        and len(records) == 5
         and records[:2] == [
             archive["decisions"][0], archive["decisions"][11],
         ],
@@ -7281,6 +7337,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     _validate_dp9_010_decision(records[1], set(records[0]))
     _validate_dp9_011_decision(records[2], set(records[0]))
     _validate_dp9_012_decision(records[3], set(records[0]))
+    _validate_dp9_013_decision(records[4], set(records[0]))
 
 
 def _validate_phase9a_closeout(evidence: str) -> None:
@@ -7455,8 +7512,55 @@ def _validate_dp9_012_admission(evidence: str) -> None:
         (("D-P9-010", "../history/phase-closeouts/PHASE9A_CLOSEOUT.md"
           "#phase-9a-closeout-panel"),
          ("D-P9-012", "#phase-9b-exit-2-acceptance-panel"),
-         ("admission panel", "#phase-9b-exit-2-acceptance-panel")),
+         ("D-P9-013", "#phase-9b-core-export-policy-panel"),
+         ("Exit 9B-2 admission", "#phase-9b-exit-2-acceptance-panel")),
         "Phase 9B evidence owner-view route drifted",
+    )
+
+
+def _validate_dp9_013_policy(evidence: str) -> None:
+    """Bind approved policy, retained boundaries and its own evidence panel."""
+    panel = _section(evidence, DP9_013_HEADING)
+    _require(
+        evidence.count('<a id="phase-9b-core-export-policy-panel"></a>') == 1
+        and "\n\n".join(_blockquote_paragraphs(panel))
+        == EXPECTED_DP9_013_AUTHORITY,
+        "D-P9-013 exact panel authority drifted or was relocated",
+    )
+    _require(
+        hashlib.sha256(_semantic_text(panel).encode("utf-8")).hexdigest()
+        == "665e205ce666e9a7c68cc2d6a1fec30b0fd7c1c40cf4363ab73be58b711b8d4c",
+        "D-P9-013 policy or bounded conditions drifted",
+    )
+    _require_links(
+        panel,
+        (("architecture", "../ARCHITECTURE.md"
+          "#d-p9-013-core-generate-complete-output-set"),
+         ("successor contract", "../contracts/core-layout-export-set.md"),
+         ("current register", "risks.json"),
+         ("file tests", "../../tests/validate_core_export_atomic_files.py"),
+         ("application tests", "../../tests/validate_core_export_atomic.py"),
+         ("qualified FreeCAD test", "../../tests/freecad_validate_core_export_atomic.py")),
+        "D-P9-013 policy or risk route drifted",
+    )
+
+
+def _validate_dp9_013_architecture(architecture: str) -> None:
+    """Keep atomic visibility bounded without changing Entry/Exit authority."""
+    section = direct_section_content(
+        architecture, "D-P9-013 Core Generate complete output set", level=4,
+    )
+    _require(
+        hashlib.sha256(_semantic_text(section).encode("utf-8")).hexdigest()
+        == "56fd9b2c2531f9c2caa4d8e1a81c8966e4ef36e73822354e261d6b641bdcfafb",
+        "D-P9-013 architecture policy boundary drifted",
+    )
+    _require_links(
+        section,
+        (("D-P9-013", "current/PHASE_EVIDENCE.md"
+          "#phase-9b-core-export-policy-panel"),
+         ("successor contract", "contracts/core-layout-export-set.md")),
+        "D-P9-013 architecture authority route drifted",
     )
 
 
@@ -8332,7 +8436,7 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
-           "D-P9-010", "D-P9-011", "D-P9-012", "D-GOV-023"},
+           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-GOV-023"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -10097,6 +10201,8 @@ def main() -> None:
     _validate_phase9a_closeout(phase9_closeout)
     _validate_phase9b_holding(_read(CURRENT_EVIDENCE_PATH))
     _validate_dp9_012_admission(_read(CURRENT_EVIDENCE_PATH))
+    _validate_dp9_013_policy(_read(CURRENT_EVIDENCE_PATH))
+    _validate_dp9_013_architecture(_read(ARCHITECTURE_PATH))
     _validate_phase9b_decisions(_load_json(CURRENT_DECISIONS_PATH))
     _validate_dp9_004_admission(phase9_holding)
     _validate_dp9_005_evidence_model(phase9_holding)

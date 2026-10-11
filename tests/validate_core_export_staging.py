@@ -28,6 +28,7 @@ sys.path.insert(0, str(ROOT))
 from tracktemplate import api  # noqa: E402
 from tracktemplate.application import core_layout_export as exports  # noqa: E402
 from tracktemplate.adapters.export import core_layout_files as files  # noqa: E402
+from tracktemplate.adapters.export import core_layout_set as atomic_files  # noqa: E402
 from tracktemplate.adapters.freecad import core_export_document as documents  # noqa: E402
 
 
@@ -465,6 +466,7 @@ def validate_api_route():
                 ROOT,
                 api,
                 {},
+                atomic=False,  # Retained comparison under D-P9-013.
                 export_files_factory=files.CoreLayoutExportFiles,
                 export_dispatcher_factory=documents.CoreExportDocument,
             )
@@ -624,7 +626,7 @@ def validate_composition_boundary():
     def load(*args, **kwargs):
         assert args == (ROOT, api, marker)
         assert kwargs == {
-            "export_files_factory": files.CoreLayoutExportFiles,
+            "export_files_factory": atomic_files.CoreLayoutExportSetFiles,
             "export_dispatcher_factory": documents.CoreExportDocument,
         }
         return session
@@ -633,7 +635,7 @@ def validate_composition_boundary():
         "tracktemplate.compatibility": types.SimpleNamespace(
             load_modular_transition_workflow_session=load,
         ),
-        "tracktemplate.adapters.export.core_layout_files": files,
+        "tracktemplate.adapters.export.core_layout_set": atomic_files,
         "tracktemplate.adapters.freecad.core_export_document": documents,
     }
 

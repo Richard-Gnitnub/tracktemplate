@@ -9,6 +9,7 @@ from tracktemplate.application import (
     chair_analysis_signature,
     turnout_edit,
 )
+from tracktemplate.compatibility.core_export_policy import CoreExportPolicy
 from tracktemplate.compatibility.crossover_b4_recovery import (
     CrossoverB4RecoveryAdapter,
 )
@@ -43,6 +44,9 @@ CORE_LAYOUT_EXPORT_HOST_OPERATIONS = (
 )
 STAGED_CORE_LAYOUT_EXPORT_CONTRACT_ID = (
     "tracktemplate:phase9b:core-layout-export-staging:1"
+)
+ATOMIC_CORE_LAYOUT_EXPORT_CONTRACT_ID = (
+    "tracktemplate:phase9b:core-layout-export-set:1"
 )
 STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS = (
     ("dispatch_export_task", "dispatch_freecad_export"),
@@ -2549,9 +2553,11 @@ class ModularCoreLayoutWorkflowSession:
         export_calculation,
         *,
         staged=False,
+        atomic=False,
         export_files_factory=None,
         export_dispatcher_factory=None,
     ):
+        staged = staged or atomic
         if staged and not callable(export_files_factory):
             raise TransitionWorkflowError(
                 "The Core export filesystem adapter is unavailable."
@@ -2563,6 +2569,7 @@ class ModularCoreLayoutWorkflowSession:
         self._calculation_session = calculation_session
         self._host = calculation_session._host
         self._staged_export = staged
+        self._atomic_export = atomic
         self._export_files_factory = export_files_factory
         self._export_dispatcher_factory = export_dispatcher_factory
         self._export_operations = (
@@ -2574,6 +2581,7 @@ class ModularCoreLayoutWorkflowSession:
             else _CoreLayoutExportAdapter
         )
         namespace = self.module.__dict__
+        self._core_export_policy = CoreExportPolicy(namespace) if atomic else None
         operations = {}
         for field_name, host_name in self._export_operations:
             operation = namespace.get(host_name)
@@ -2638,6 +2646,8 @@ class ModularCoreLayoutWorkflowSession:
         namespace = self.module.__dict__
         missing = object()
         previous = namespace.get(CORE_LAYOUT_EXPORT_HOST_BINDING, missing)
+        policy = self._core_export_policy
+        previous_policy = policy.snapshot() if policy is not None else None
         dialog_class = self._selected_export_dialog
         previous_scope = (
             dialog_class.__dict__.get("_current_scope", missing)
@@ -2645,10 +2655,14 @@ class ModularCoreLayoutWorkflowSession:
         )
         try:
             namespace[CORE_LAYOUT_EXPORT_HOST_BINDING] = self._export_adapter
+            if policy is not None:
+                policy.bind()
             if dialog_class is not None:
                 dialog_class._current_scope = self._selected_export_scope
             self._validate_core_layout_export_binding()
         except Exception:
+            if policy is not None:
+                policy.restore(previous_policy)
             if previous is missing:
                 namespace.pop(CORE_LAYOUT_EXPORT_HOST_BINDING, None)
             else:
@@ -2663,6 +2677,8 @@ class ModularCoreLayoutWorkflowSession:
     def _validate_core_layout_export_binding(self):
         namespace = self.module.__dict__
         adapter = namespace.get(CORE_LAYOUT_EXPORT_HOST_BINDING)
+        if self._core_export_policy is not None:
+            self._core_export_policy.validate()
         if (
             type(adapter) is not self._export_adapter_type
             or adapter is not self._export_adapter
@@ -2737,13 +2753,15 @@ class ModularCoreLayoutWorkflowSession:
         return {
             "schema_version": 1,
             "contract_id": (
-                STAGED_CORE_LAYOUT_EXPORT_CONTRACT_ID if self._staged_export
+                ATOMIC_CORE_LAYOUT_EXPORT_CONTRACT_ID if self._atomic_export
+                else STAGED_CORE_LAYOUT_EXPORT_CONTRACT_ID if self._staged_export
                 else CORE_LAYOUT_EXPORT_CONTRACT_ID
             ),
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,
             "command_name": (
-                "run_staged_core_layout_export" if self._staged_export
+                "run_atomic_core_layout_export" if self._atomic_export
+                else "run_staged_core_layout_export" if self._staged_export
                 else "run_core_layout_export"
             ),
             "host_binding_name": CORE_LAYOUT_EXPORT_HOST_BINDING,
@@ -2764,6 +2782,7 @@ def load_modular_transition_workflow_session(
     modular_api,
     contract,
     *,
+    atomic=True,
     export_files_factory=None,
     export_dispatcher_factory=None,
 ):
@@ -2806,13 +2825,16 @@ def load_modular_transition_workflow_session(
             "The inherited core-layout export route is incomplete."
         )
     try:
-        export_calculation = modular_api.run_staged_core_layout_export
+        export_calculation = (
+            modular_api.run_atomic_core_layout_export if atomic
+            else modular_api.run_staged_core_layout_export
+        )
     except AttributeError as error:
         raise TransitionWorkflowError(
             "The modular core-layout export command is unavailable."
         ) from error
     return ModularCoreLayoutWorkflowSession(
-        calculation_session, export_calculation, staged=True,
+        calculation_session, export_calculation, staged=True, atomic=atomic,
         export_files_factory=export_files_factory,
         export_dispatcher_factory=export_dispatcher_factory,
     )

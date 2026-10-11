@@ -1,5 +1,7 @@
 """Drive B14 plain-line create-time export and its final-task failure."""
 
+import copy
+import csv
 import dataclasses
 import hashlib
 import json
@@ -70,6 +72,9 @@ SUCCESS_TEXT = "Curve and straight-track outputs created successfully"
 STAGING_BARRIER = bool(globals().get(
     "TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False,
 ))
+
+ATOMIC_SET = bool(globals().get("TRACKTEMPLATE_CORE_EXPORT_ATOMIC_SET", False))
+ISOLATED_EXPORT = STAGING_BARRIER or ATOMIC_SET
 
 module = sys.modules.get(MODULE_NAME)
 if module is None:
@@ -155,7 +160,7 @@ def _initial_dialog_contract(dialog):
     }
 
 
-def _configure_dialog(dialog, output_directory):
+def _configure_dialog(dialog, output_directory, *, manifest=True):
     dialog.transition_box.setValue(600.0)
     dialog.radius_box.setValue(600.0)
     dialog.angle_box.setValue(90.0)
@@ -179,14 +184,19 @@ def _configure_dialog(dialog, output_directory):
     dialog.production_each_section_box.setChecked(True)
     dialog.production_combined_box.setChecked(True)
     dialog.production_overwrite_box.setChecked(STAGING_BARRIER)
-    dialog.production_manifest_box.setChecked(True)
-    dialog.production_open_directory_box.setChecked(False)
+    dialog.production_manifest_box.setChecked(manifest)
+    dialog.production_open_directory_box.setChecked(ATOMIC_SET)
     for format_key in EXPORT_FORMATS:
         box = dialog.production_format_boxes[format_key]
         if not box.isEnabled():
             raise ValueError("The {} exporter is unavailable".format(format_key.upper()))
         box.setChecked(True)
     dialog._update_production_export_controls()
+    if ATOMIC_SET:
+        if dialog.production_overwrite_box.isEnabled():
+            raise RuntimeError("Atomic Core exposes the obsolete overwrite option")
+        if dialog.production_overwrite_box.text() != "New folder for each export":
+            raise RuntimeError("Atomic Core does not explain its folder policy")
 
     values = dialog.values()
     production = values[15]
@@ -207,9 +217,9 @@ def _configure_dialog(dialog, output_directory):
         ("overwrite_choice" if STAGING_BARRIER else "non_overwrite"): (
             production.get("overwrite_existing") is STAGING_BARRIER
         ),
-        "manifest": production.get("create_manifest") is True,
+        "manifest": production.get("create_manifest") is manifest,
         "combined": production.get("create_combined_files") is True,
-        "no_open_directory": production.get("open_output_directory") is False,
+        "open_directory_choice": production.get("open_output_directory") is ATOMIC_SET,
         "replace_output": values[17] == module.OUTPUT_REPLACE,
     }
     failed = sorted(name for name, passed in checks.items() if not passed)
@@ -234,7 +244,7 @@ def _configure_dialog(dialog, output_directory):
 
 def _run_scenario(
     name, output_directory, expected_initial_directory, inject_failure,
-    *, inject_close_failure=False,
+    *, inject_close_failure=False, manifest=True, publication_failure=None,
 ):
     active_document = App.ActiveDocument
     if active_document is None:
@@ -267,7 +277,9 @@ def _run_scenario(
     original_dispatch = module.dispatch_freecad_export
     original_export = module.run_production_export
     original_show_summary = module.show_production_export_summary
-    if STAGING_BARRIER:
+    original_open_directory = module.open_export_directory
+    state["open_directory_calls"] = []
+    if ISOLATED_EXPORT:
         state["destination_before"] = destination_before
         state["staged_manifest_calls"] = 0
         state["preflight_warning_questions"] = []
@@ -275,6 +287,8 @@ def _run_scenario(
     def require_unpublished_finals(path):
         if _destination_files(output_directory) != destination_before:
             raise RuntimeError("Core export published before staging completed")
+        if ATOMIC_SET and pathlib.Path(state["planned_child"]).exists():
+            raise RuntimeError("Core output child visible before all members are ready")
         if pathlib.Path(path).resolve().parent == output_directory.resolve():
             raise RuntimeError("Core export generated a payload at a final path")
 
@@ -299,7 +313,7 @@ def _run_scenario(
     def measured_dispatch(export_document, task, path):
         active_name = str(getattr(active_document, "Name", "") or "")
         export_name = str(getattr(export_document, "Name", "") or "")
-        if STAGING_BARRIER:
+        if ISOLATED_EXPORT:
             kind = (
                 "deliverable" if state["inside_production_export"]
                 else "preflight_probe"
@@ -321,7 +335,7 @@ def _run_scenario(
         }
         if kind == "deliverable":
             item["deliverable_index"] = deliverable_index
-            if STAGING_BARRIER:
+            if ISOLATED_EXPORT:
                 require_unpublished_finals(path)
                 item["finals_unchanged_before_generation"] = True
                 if export_document is active_document:
@@ -366,12 +380,38 @@ def _run_scenario(
         rss_before = _current_rss_mb()
         objects_before = len(active_document.Objects)
         export_call = original_export
-        if STAGING_BARRIER:
+        if ATOMIC_SET:
+            plan = args[1]
+            state["planned_child"] = plan["output_directory"]
+            state["planned_paths"] = [task["path"] for task in plan["tasks"]]
+            state["planned_manifest"] = plan.get("manifest_path", "")
+            if pathlib.Path(state["planned_child"]).parent != output_directory:
+                raise RuntimeError("Core planned a child outside the selected parent")
+            if any(pathlib.Path(path).parent != pathlib.Path(state["planned_child"])
+                   for path in state["planned_paths"]):
+                raise RuntimeError("Core planned a member outside its child")
+        if ISOLATED_EXPORT:
             export_call = dataclasses.replace(
                 original_export,
                 dispatch_export_task=measured_dispatch,
                 write_export_manifest=measured_manifest,
             )
+        if ATOMIC_SET:
+            from tracktemplate.adapters.export.core_layout_set import CoreLayoutExportSetFiles
+
+            class FaultFiles(CoreLayoutExportSetFiles):
+                def publish(self):
+                    child = pathlib.Path(state["planned_child"])
+                    if publication_failure == "collision":
+                        child.mkdir()
+                        (child / "foreign.txt").write_text("preserve foreign output\n")
+                    if publication_failure == "publication":
+                        raise OSError("controlled GUI publication failure")
+                    super().publish()
+                    if publication_failure == "postpublication":
+                        raise OSError("controlled GUI postpublication diagnostic")
+
+            export_call = dataclasses.replace(export_call, export_files_factory=FaultFiles)
         retained_documents = []
         if inject_close_failure:
             from tracktemplate.adapters.freecad.core_export_document import (
@@ -395,7 +435,7 @@ def _run_scenario(
                 ),
             )
         witness = None
-        if STAGING_BARRIER:
+        if ISOLATED_EXPORT:
             source = next(
                 obj for obj in active_document.Objects
                 if "Shape" in obj.PropertiesList
@@ -436,7 +476,7 @@ def _run_scenario(
         try:
             state["inside_production_export"] = True
             summary = export_call(*args, **kwargs)
-            if STAGING_BARRIER:
+            if ISOLATED_EXPORT:
                 expected_registry = dict(registry)
                 if inject_close_failure:
                     if len(retained_documents) != 1:
@@ -498,6 +538,15 @@ def _run_scenario(
             ):
                 raise RuntimeError("Staging abort reported published task success")
         item = _compact_summary(summary)
+        if ATOMIC_SET:
+            state["atomic_summary"] = {
+                key: summary[key] for key in (
+                    "publication_state", "output_directory", "manifest_path",
+                )
+            }
+            for item_result, task in zip(summary["results"], args[1]["tasks"]):
+                if item_result["task"] is not task:
+                    raise RuntimeError("Core changed task identity")
         item.update({
             "wall_ms": (time.perf_counter() - wall_started) * 1000.0,
             "process_cpu_ms": (time.process_time() - cpu_started) * 1000.0,
@@ -534,7 +583,7 @@ def _run_scenario(
                         raise ValueError("Create-time export loaded the wrong output directory")
                     state["initial_dialog"] = initial
                     state["configured_dialog"] = _configure_dialog(
-                        widget, output_directory
+                        widget, output_directory, manifest=manifest
                     )
                     state["curve_dialogs"] += 1
                     widget.accept()
@@ -563,7 +612,7 @@ def _run_scenario(
                     state["preflight_warning_questions"].append(record)
                     yes_button.click()
                 elif "Production export complete" in record["title"]:
-                    if STAGING_BARRIER:
+                    if ISOLATED_EXPORT:
                         capture = run_directory / "{}-summary.png".format(name)
                         if not widget.grab().save(str(capture), "PNG"):
                             raise RuntimeError("Could not capture export summary")
@@ -593,6 +642,8 @@ def _run_scenario(
     module.dispatch_freecad_export = measured_dispatch
     module.run_production_export = measured_export
     module.show_production_export_summary = measured_show_summary
+    if ATOMIC_SET:
+        module.open_export_directory = lambda path: state["open_directory_calls"].append(path)
     wall_started = time.perf_counter()
     cpu_started = time.process_time()
     rss_before = _current_rss_mb()
@@ -607,6 +658,7 @@ def _run_scenario(
         module.dispatch_freecad_export = original_dispatch
         module.run_production_export = original_export
         module.show_production_export_summary = original_show_summary
+        module.open_export_directory = original_open_directory
 
     state["measurement"] = {
         "wall_ms": (time.perf_counter() - wall_started) * 1000.0,
@@ -623,10 +675,13 @@ def _run_scenario(
         state["measurement"]["objects_after"] - objects_before
     )
     after = ordinary_track_document_snapshot(module, active_document)
-    normalised_after = create_time_export_document_snapshot(
-        after,
-        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
-        expected_overwrite_existing=STAGING_BARRIER,
+    normalised_after = (
+        _atomic_document_contract(after, manifest=manifest) if ATOMIC_SET else
+        create_time_export_document_snapshot(
+            after,
+            enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+            expected_overwrite_existing=STAGING_BARRIER,
+        )
     )
     if normalised_after["output_directory"] != str(output_directory):
         raise RuntimeError("Create-time export persisted the wrong output directory")
@@ -653,6 +708,12 @@ def _run_scenario(
     preflight = state["preflight_calls"][0]
     if preflight["task_count"] != EXPECTED_TASK_COUNT:
         raise RuntimeError("Create-time export planned an unexpected task count")
+    if ATOMIC_SET:
+        _validate_atomic_scenario(state, output_directory, destination_before,
+                                  manifest, inject_failure, publication_failure)
+        state.pop("active", None)
+        state.pop("seen", None)
+        return state, after, normalised_after
     expected_warning_count = 3 if STAGING_BARRIER and inject_failure else 0
     expected_issue_codes = (
         [] if output_directory_existed
@@ -725,7 +786,7 @@ def _run_scenario(
         )
         if expected_counts not in final_text:
             raise RuntimeError("The final dialog omitted create-time failure counts")
-        if STAGING_BARRIER:
+        if ISOLATED_EXPORT:
             if "Successful files: 0" not in state[
                 "export_summary_dialogs"
             ][0]["informative_text"]:
@@ -781,6 +842,174 @@ def _isolation_preselection():
     )
 
 
+def _atomic_document_contract(snapshot, *, manifest):
+    """Check authorised UI choices before comparing unchanged geometry."""
+    candidate = copy.deepcopy(snapshot)
+    for owner in ("settings", "template"):
+        config = candidate["semantic"]["persistence"][owner]["values"][
+            "ProductionExportConfigurationJSON"
+        ]
+        if config["create_manifest"] is not manifest or config["open_output_directory"] is not True:
+            raise RuntimeError("Atomic export persisted different CSV/Open Folder choices")
+        config["create_manifest"] = True
+        config["open_output_directory"] = False
+    return create_time_export_document_snapshot(candidate, enforce_expected_hash=False)
+
+
+def _validate_atomic_scenario(state, parent, before, manifest, preparation_failure, publication_failure):
+    summary = state["summary_payloads"][0]
+    atomic = state["atomic_summary"]
+    child = pathlib.Path(state["planned_child"])
+    published = not preparation_failure and publication_failure in (None, "postpublication")
+    if atomic["publication_state"] != ("published" if published else "not-published"):
+        raise RuntimeError("Core reported the wrong publication state")
+    expected_directory = str(child if published else parent)
+    if atomic["output_directory"] != expected_directory:
+        raise RuntimeError("Core summary selected the wrong directory")
+    if state["open_directory_calls"] != [expected_directory]:
+        raise RuntimeError("Open Folder did not receive the summary directory")
+    if atomic["manifest_path"] != (state["planned_manifest"] if published and manifest else ""):
+        raise RuntimeError("Core returned an incorrect CSV path")
+    if summary["successful_files"] != (EXPECTED_TASK_COUNT + int(manifest) if published else 0):
+        raise RuntimeError("Core lost or invented published successes")
+    expected_failures = (1 if publication_failure == "postpublication" else
+                         EXPECTED_TASK_COUNT + int(bool(publication_failure)) if not published else 0)
+    if summary["failed_files"] != expected_failures:
+        raise RuntimeError("Core diagnostics count differs: {}".format(summary))
+    if summary["manifest_requested"] is not manifest or summary["manifest_created"] is not (published and manifest):
+        raise RuntimeError("Core reported an incorrect optional CSV outcome")
+    if summary["formats"] != (["DXF", "STEP", "STL", "SVG"] if published else []):
+        raise RuntimeError("Core reported incorrect published formats")
+    preflight = state["preflight_calls"][0]
+    if preflight["issue_counts"].get("blocking", 0) or preflight["issue_counts"].get("Error", 0):
+        raise RuntimeError("Atomic GUI preflight blocked the fixture")
+    if preflight["issue_codes"] != ["OUTPUT_DIRECTORY_WILL_BE_CREATED"]:
+        raise RuntimeError("Atomic GUI preflight did not identify its fresh child")
+    probes = [item for item in state["dispatch_calls"] if item["kind"] == "preflight_probe"]
+    deliverables = [item for item in state["dispatch_calls"] if item["kind"] == "deliverable"]
+    if len(probes) != 10 or len(deliverables) != EXPECTED_TASK_COUNT:
+        raise RuntimeError("Atomic GUI dispatch count differs")
+    if state["staged_manifest_calls"] != int(manifest and not preparation_failure):
+        raise RuntimeError("Atomic GUI built an unrequested or premature CSV")
+    if _destination_files(parent) != before:
+        raise RuntimeError("Atomic GUI changed existing parent outputs")
+    if list(parent.glob(".tracktemplate_core_export_set_*")):
+        raise RuntimeError("Atomic GUI retained owned unpublished files")
+    if published:
+        expected_names = {pathlib.Path(path).name for path in state["planned_paths"]}
+        if manifest:
+            expected_names.add(pathlib.Path(state["planned_manifest"]).name)
+        if {path.name for path in child.iterdir()} != expected_names:
+            raise RuntimeError("Published Core inventory differs from the plan")
+        if manifest:
+            with pathlib.Path(atomic["manifest_path"]).open(newline="", encoding="utf-8-sig") as stream:
+                rows = list(csv.DictReader(stream))
+            if {row["Full export path"] for row in rows} != set(state["planned_paths"]):
+                raise RuntimeError("CSV does not identify final child members")
+            if any(row["Export status"] != "Success" for row in rows):
+                raise RuntimeError("Complete-set CSV reports an unsuccessful member")
+        if str(child) not in state["export_summary_dialogs"][0]["informative_text"]:
+            raise RuntimeError("Visible summary omitted published child path")
+    elif publication_failure == "collision":
+        if {path.name for path in child.iterdir()} != {"foreign.txt"}:
+            raise RuntimeError("Collision altered the foreign child inventory")
+        if (child / "foreign.txt").read_text() != "preserve foreign output\n":
+            raise RuntimeError("Collision changed foreign bytes")
+    elif child.exists():
+        raise RuntimeError("Failed atomic export left a visible child")
+    if preparation_failure and not any(CREATE_TIME_EXPORT_FAILURE_MESSAGE in value for value in summary["failures"]):
+        raise RuntimeError("Preparation failure omitted its diagnostic")
+    if publication_failure in {"publication", "postpublication"} and not any(
+        "controlled GUI " + publication_failure in value for value in summary["failures"]
+    ):
+        raise RuntimeError("Publication failure omitted its diagnostic")
+    if len(App.ActiveDocument.Objects) != 9:
+        raise RuntimeError("Atomic export changed editable object inventory")
+    state["atomic_checks"] = {
+        "old_parent_outputs_unchanged": True, "planned_member_identity_preserved": True,
+        "complete_child_inventory": published, "open_folder_path_verified": True,
+        "csv_final_paths_verified": published and manifest,
+        "published_successes_preserved_after_diagnostic": publication_failure == "postpublication",
+    }
+
+
+def _run_atomic_recipe():
+    parent = run_directory / "atomic-core-output-parent"
+    parent.mkdir()
+    old = parent / "previous-complete-set"
+    old.mkdir()
+    (old / "operator-output.svg").write_text("preserve previous output\n")
+    (parent / "operator-output.svg").write_text("preserve parent output\n")
+    old_witness = {path: (path.stat().st_ino, path.stat().st_mtime_ns, path.read_bytes())
+                   for path in (old / "operator-output.svg", parent / "operator-output.svg")}
+    previous_directory = ""
+    published_witnesses = {}
+    normalised = None
+    first_child = None
+    for name, manifest, preparation, publication in (
+        ("create_time_export_success", True, False, None),
+        ("create_time_export_no_csv", False, False, None),
+        ("create_time_export_final_task_failure", True, True, None),
+        ("create_time_export_collision", True, False, "collision"),
+        ("create_time_export_publication_failure", True, False, "publication"),
+        ("create_time_export_postpublication", True, False, "postpublication"),
+    ):
+        scenario, snapshot, contract = _run_scenario(
+            name, parent, previous_directory, preparation,
+            manifest=manifest, publication_failure=publication,
+        )
+        result["scenarios"].append(scenario)
+        if normalised is None:
+            normalised = contract
+            first_child = pathlib.Path(scenario["planned_child"])
+            compare_create_time_document_to_base(
+                _document_contract(initial_document), _document_contract(snapshot),
+            )
+        elif contract["semantic_sha256"] != normalised["semantic_sha256"]:
+            raise RuntimeError("Atomic scenario changed generated document semantics")
+        for path, witness in old_witness.items():
+            if (path.stat().st_ino, path.stat().st_mtime_ns, path.read_bytes()) != witness:
+                raise RuntimeError("Atomic scenario changed prior output identity or bytes")
+        for path, witness in published_witnesses.items():
+            if (path.stat().st_ino, path.stat().st_mtime_ns, path.read_bytes()) != witness:
+                raise RuntimeError("A subsequent Generate changed a prior published set")
+        if scenario["atomic_summary"]["publication_state"] == "published":
+            for path in pathlib.Path(scenario["planned_child"]).iterdir():
+                published_witnesses[path] = (
+                    path.stat().st_ino, path.stat().st_mtime_ns, path.read_bytes(),
+                )
+        previous_directory = str(parent)
+    output = export_directory_snapshot(first_child)
+    variant = export_variant_snapshot(output)
+    logical_hash = validate_export_snapshot(variant)
+    metrics = format_export_metrics(module, first_child, variant, shape_summary)
+    if format_metrics_sha256(metrics) != EXPECTED_EXPORT_METRICS_SHA256:
+        raise RuntimeError("Atomic Core geometry metrics changed")
+    result["success_output"] = {
+        "file_count": len(output["files"]), "logical_sha256": logical_hash,
+        "format_metrics_sha256": format_metrics_sha256(metrics), "format_metrics": metrics,
+    }
+    doc = App.ActiveDocument
+    doc.recompute()
+    before_save = ordinary_track_document_snapshot(module, doc)
+    doc.save()
+    saved_path, saved_name = str(doc.FileName), str(doc.Name)
+    App.closeDocument(saved_name)
+    doc = App.openDocument(saved_path)
+    after_save = ordinary_track_document_snapshot(module, doc)
+    if after_save != before_save:
+        raise RuntimeError("Atomic save/reopen changed exact document snapshot")
+    reopened = _atomic_document_contract(after_save, manifest=True)
+    if reopened["output_directory"] != str(parent):
+        raise RuntimeError("Atomic save/reopen did not retain selected parent")
+    result["save_reopen"] = {"path": saved_path, "objects": len(doc.Objects),
+                             "selected_parent_preserved": True,
+                             "exact_document_snapshot_preserved": True}
+    result["normalised_document_semantic_sha256"] = normalised["semantic_sha256"]
+    result["failure_output"] = {"old_outputs_identity_bytes_preserved": True,
+                                "collision_owner_preserved": True}
+
+
 parameter_group = App.ParamGet(module.LAST_INPUTS_PARAMETER_PATH)
 preference_keys = (
     module.LAST_INPUTS_PARAMETER_KEY,
@@ -806,142 +1035,145 @@ result = {
 }
 
 try:
-    success, success_document, normalised_success = _run_scenario(
-        "create_time_export_success",
-        success_directory,
-        "",
-        inject_failure=False,
-    )
-    compare_create_time_document_to_base(
-        _document_contract(initial_document),
-        _document_contract(success_document),
-    )
-    result["scenarios"].append(success)
-
-    if STAGING_BARRIER:
-        seeded_destination = _seed_staging_failure_directory()
-    failure, failure_document, normalised_failure = _run_scenario(
-        "create_time_export_final_task_failure",
-        failure_directory,
-        str(success_directory),
-        inject_failure=True,
-    )
-    result["scenarios"].append(failure)
-    if normalised_success["semantic_sha256"] != normalised_failure["semantic_sha256"]:
-        raise RuntimeError("Create-time success/failure document semantics differ")
-    result["normalised_document_semantic_sha256"] = normalised_success[
-        "semantic_sha256"
-    ]
-    if STAGING_BARRIER:
-        close_failure, _closed_document, normalised_close = _run_scenario(
-            "create_time_export_isolated_close_failure",
-            isolation_failure_directory,
-            str(failure_directory),
-            inject_failure=False,
-            inject_close_failure=True,
-        )
-        result["scenarios"].append(close_failure)
-        if normalised_close["semantic_sha256"] != normalised_success["semantic_sha256"]:
-            raise RuntimeError("Close failure changed generated document state")
-        if list(isolation_failure_directory.iterdir()):
-            raise RuntimeError("Close failure published output")
-        result["isolation_close_failure_output"] = {
-            "successful_files": 0, "new_final_files": [],
-            "retained_owned_document_reported": True,
-            "editable_document_preserved": True,
-        }
-
-    success_complete = export_directory_snapshot(success_directory)
-    success_variant = export_variant_snapshot(success_complete)
-    success_hash = validate_export_snapshot(success_variant)
-    if (
-        ENFORCE_FROZEN_WORKFLOW_HASHES
-        and success_hash != EXPECTED_CREATE_TIME_LOGICAL_EXPORT_SHA256
-    ):
-        raise RuntimeError(
-            "Unexpected create-time export serialization hash: {}".format(
-                success_hash
-            )
-        )
-    format_metrics = format_export_metrics(
-        module, success_directory, success_variant, shape_summary
-    )
-    metrics_hash = format_metrics_sha256(format_metrics)
-    if metrics_hash != EXPECTED_EXPORT_METRICS_SHA256:
-        raise RuntimeError(
-            "Create-time export production metrics differ from selected export: {}".format(
-                metrics_hash
-            )
-        )
-    result["success_output"] = {
-        "file_count": len(success_complete["files"]),
-        "directories": list(success_complete["directories"]),
-        "logical_sha256": success_hash,
-        "selected_export_logical_sha256": EXPECTED_LOGICAL_EXPORT_SHA256,
-        "serialization_matches_selected_export": (
-            success_hash == EXPECTED_LOGICAL_EXPORT_SHA256
-        ),
-        "format_metrics_sha256": metrics_hash,
-        "format_metrics": format_metrics,
-    }
-
-    if STAGING_BARRIER:
-        result["failure_output"] = {
-            "prepublication_abort": True,
-            "successful_files": 0,
-            "new_final_files": [],
-            "existing_destination_files": seeded_destination,
-            "destination_bytes_preserved": (
-                _destination_files(failure_directory) == seeded_destination
-            ),
-            "staging_directories": [],
-        }
+    if ATOMIC_SET:
+        _run_atomic_recipe()
     else:
-        failure_complete = export_directory_snapshot(failure_directory)
-        result["failure_output"] = validate_create_time_failure_snapshot(
-            failure_complete,
-            success_variant,
-            enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+        success, success_document, normalised_success = _run_scenario(
+            "create_time_export_success",
+            success_directory,
+            "",
+            inject_failure=False,
         )
+        compare_create_time_document_to_base(
+            _document_contract(initial_document),
+            _document_contract(success_document),
+        )
+        result["scenarios"].append(success)
 
-    document = App.ActiveDocument
-    persistence_started = time.perf_counter()
-    recompute_started = time.perf_counter()
-    document.recompute()
-    recompute_ms = (time.perf_counter() - recompute_started) * 1000.0
-    save_started = time.perf_counter()
-    document.save()
-    save_ms = (time.perf_counter() - save_started) * 1000.0
-    saved_path = str(document.FileName)
-    saved_name = str(document.Name)
-    reopen_started = time.perf_counter()
-    App.closeDocument(saved_name)
-    document = App.openDocument(saved_path)
-    reopen_ms = (time.perf_counter() - reopen_started) * 1000.0
-    reopened = ordinary_track_document_snapshot(module, document)
-    normalised_reopened = create_time_export_document_snapshot(
-        reopened,
-        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
-        expected_overwrite_existing=STAGING_BARRIER,
-    )
-    final_directory = (
-        isolation_failure_directory if STAGING_BARRIER else failure_directory
-    )
-    if normalised_reopened["output_directory"] != str(final_directory):
-        raise RuntimeError("Save/reopen changed the persisted export directory")
-    if normalised_reopened["semantic_sha256"] != normalised_failure["semantic_sha256"]:
-        raise RuntimeError("Save/reopen changed create-time export document semantics")
-    result["save_reopen"] = {
-        "path": saved_path,
-        "objects": len(document.Objects),
-        "normalised_semantic_sha256": normalised_reopened["semantic_sha256"],
-        "measurement": {
-            "wall_ms": (time.perf_counter() - persistence_started) * 1000.0,
-            "recompute_ms": recompute_ms,
-            "save_ms": save_ms,
-            "close_reopen_ms": reopen_ms,
-        },
-    }
+        if STAGING_BARRIER:
+            seeded_destination = _seed_staging_failure_directory()
+        failure, failure_document, normalised_failure = _run_scenario(
+            "create_time_export_final_task_failure",
+            failure_directory,
+            str(success_directory),
+            inject_failure=True,
+        )
+        result["scenarios"].append(failure)
+        if normalised_success["semantic_sha256"] != normalised_failure["semantic_sha256"]:
+            raise RuntimeError("Create-time success/failure document semantics differ")
+        result["normalised_document_semantic_sha256"] = normalised_success[
+            "semantic_sha256"
+        ]
+        if STAGING_BARRIER:
+            close_failure, _closed_document, normalised_close = _run_scenario(
+                "create_time_export_isolated_close_failure",
+                isolation_failure_directory,
+                str(failure_directory),
+                inject_failure=False,
+                inject_close_failure=True,
+            )
+            result["scenarios"].append(close_failure)
+            if normalised_close["semantic_sha256"] != normalised_success["semantic_sha256"]:
+                raise RuntimeError("Close failure changed generated document state")
+            if list(isolation_failure_directory.iterdir()):
+                raise RuntimeError("Close failure published output")
+            result["isolation_close_failure_output"] = {
+                "successful_files": 0, "new_final_files": [],
+                "retained_owned_document_reported": True,
+                "editable_document_preserved": True,
+            }
+
+        success_complete = export_directory_snapshot(success_directory)
+        success_variant = export_variant_snapshot(success_complete)
+        success_hash = validate_export_snapshot(success_variant)
+        if (
+            ENFORCE_FROZEN_WORKFLOW_HASHES
+            and success_hash != EXPECTED_CREATE_TIME_LOGICAL_EXPORT_SHA256
+        ):
+            raise RuntimeError(
+                "Unexpected create-time export serialization hash: {}".format(
+                    success_hash
+                )
+            )
+        format_metrics = format_export_metrics(
+            module, success_directory, success_variant, shape_summary
+        )
+        metrics_hash = format_metrics_sha256(format_metrics)
+        if metrics_hash != EXPECTED_EXPORT_METRICS_SHA256:
+            raise RuntimeError(
+                "Create-time export production metrics differ from selected export: {}".format(
+                    metrics_hash
+                )
+            )
+        result["success_output"] = {
+            "file_count": len(success_complete["files"]),
+            "directories": list(success_complete["directories"]),
+            "logical_sha256": success_hash,
+            "selected_export_logical_sha256": EXPECTED_LOGICAL_EXPORT_SHA256,
+            "serialization_matches_selected_export": (
+                success_hash == EXPECTED_LOGICAL_EXPORT_SHA256
+            ),
+            "format_metrics_sha256": metrics_hash,
+            "format_metrics": format_metrics,
+        }
+
+        if STAGING_BARRIER:
+            result["failure_output"] = {
+                "prepublication_abort": True,
+                "successful_files": 0,
+                "new_final_files": [],
+                "existing_destination_files": seeded_destination,
+                "destination_bytes_preserved": (
+                    _destination_files(failure_directory) == seeded_destination
+                ),
+                "staging_directories": [],
+            }
+        else:
+            failure_complete = export_directory_snapshot(failure_directory)
+            result["failure_output"] = validate_create_time_failure_snapshot(
+                failure_complete,
+                success_variant,
+                enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+            )
+
+        document = App.ActiveDocument
+        persistence_started = time.perf_counter()
+        recompute_started = time.perf_counter()
+        document.recompute()
+        recompute_ms = (time.perf_counter() - recompute_started) * 1000.0
+        save_started = time.perf_counter()
+        document.save()
+        save_ms = (time.perf_counter() - save_started) * 1000.0
+        saved_path = str(document.FileName)
+        saved_name = str(document.Name)
+        reopen_started = time.perf_counter()
+        App.closeDocument(saved_name)
+        document = App.openDocument(saved_path)
+        reopen_ms = (time.perf_counter() - reopen_started) * 1000.0
+        reopened = ordinary_track_document_snapshot(module, document)
+        normalised_reopened = create_time_export_document_snapshot(
+            reopened,
+            enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+            expected_overwrite_existing=STAGING_BARRIER,
+        )
+        final_directory = (
+            isolation_failure_directory if STAGING_BARRIER else failure_directory
+        )
+        if normalised_reopened["output_directory"] != str(final_directory):
+            raise RuntimeError("Save/reopen changed the persisted export directory")
+        if normalised_reopened["semantic_sha256"] != normalised_failure["semantic_sha256"]:
+            raise RuntimeError("Save/reopen changed create-time export document semantics")
+        result["save_reopen"] = {
+            "path": saved_path,
+            "objects": len(document.Objects),
+            "normalised_semantic_sha256": normalised_reopened["semantic_sha256"],
+            "measurement": {
+                "wall_ms": (time.perf_counter() - persistence_started) * 1000.0,
+                "recompute_ms": recompute_ms,
+                "save_ms": save_ms,
+                "close_reopen_ms": reopen_ms,
+            },
+        }
 finally:
     for key, value in preferences_before.items():
         parameter_group.SetString(key, value)

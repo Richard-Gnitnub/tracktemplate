@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase9b:core-layout-export-set:1",
+  "recorded_on": "2026-10-11",
+  "status": "draft",
+  "change_level": 3,
+  "authority": [
+    "D-P9-013"
+  ],
+  "criterion": "9B-5",
+  "contract_document": "reference/contracts/core-layout-export-set.md",
+  "application_command": "tracktemplate.api.run_atomic_core_layout_export",
+  "application_module": "tracktemplate.application.core_export_set",
+  "retained_commands": [
+    "tracktemplate.api.run_core_layout_export",
+    "tracktemplate.api.run_staged_core_layout_export"
+  ],
+  "plan": {
+    "helper": "prepare_core_export_plan",
+    "signature": "prepare_core_export_plan(records, config, set_id, *, plan_export)",
+    "side_effects": "none",
+    "child_name": "Core_Export_<uuidhex>",
+    "required_field": "output_directory",
+    "input_mutation": false,
+    "path_change": "all output members and optional CSV use a unique final child directory beneath the selected parent"
+  },
+  "product_routing": {
+    "record_schema_version": 1,
+    "route": "modular",
+    "comparison_route_available": false,
+    "command_name": "run_atomic_core_layout_export",
+    "host_binding_name": "run_production_export",
+    "caller_name": "run_macro"
+  },
+  "file_operations": {
+    "factory_keyword": "export_files_factory",
+    "implementation": "tracktemplate.adapters.export.core_layout_set.CoreLayoutExportSetFiles",
+    "constructor_side_effects": "none",
+    "methods": [
+      "open",
+      "stage",
+      "validate",
+      "publish",
+      "cleanup"
+    ],
+    "state": [
+      "published",
+      "publication_state",
+      "output_directory"
+    ],
+    "publication_primitive": "renameat2(RENAME_NOREPLACE)",
+    "publication_scope": "one complete validated directory; no per-member final writes",
+    "fallback": false
+  },
+  "host_scope": {
+    "system": "Linux",
+    "filesystem": "ext4",
+    "same_filesystem": true,
+    "namespace": "operator-controlled; hostile concurrent namespace mutation is not supported"
+  },
+  "csv": {
+    "required": false,
+    "requested_member": "same complete output set",
+    "omitted": "no CSV row builder or writer call",
+    "schema_change": false,
+    "path_values": "final child-directory member paths"
+  },
+  "result": {
+    "existing_fields": "Phase 7 fields retained",
+    "added_fields": [
+      "publication_state"
+    ],
+    "publication_states": [
+      "not-published",
+      "published",
+      "uncertain"
+    ],
+    "prepublication_failure": "zero confirmed completed files; selected parent directory; no completed CSV path",
+    "published": "complete member counts and final child paths retained after a later diagnostic",
+    "uncertain": "visible diagnostic; preserve uncertain state without cleanup deletion"
+  },
+  "preservation": [
+    "all previous files, directories and symbolic links",
+    "all published output sets",
+    "editable document and isolated serializer completion requirements",
+    "existing member filenames and content requirements except declared final-path change"
+  ],
+  "excluded": [
+    "durability or restart recovery",
+    "universal filesystem support",
+    "hostile concurrent namespace isolation",
+    "D-P6-003 or D-P6-004 changes",
+    "Phase 7 or previous staging API changes",
+    "selected-export behaviour changes",
+    "geometry, CSV schema, numerical-limit or source-classification changes",
+    "phase, exit, physical-fit, manufacturing, rights, production, performance or release acceptance"
+  ],
+  "validation": {
+    "standalone": [
+      "tests/validate_core_export_atomic_files.py",
+      "tests/validate_core_export_atomic.py"
+    ],
+    "qualified_host": "tests/freecad_validate_core_export_atomic.py",
+    "gui_command": "tools/freecad_bridge/run-phase7-core-layout-export-workflow --route modular --atomic-set",
+    "retained_comparisons": [
+      "tests/validate_core_export_staging.py",
+      "tests/freecad_validate_core_export_staging.py",
+      "Phase 7 diagnostic route"
+    ],
+    "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel"
+  }
+}

@@ -75,6 +75,9 @@ from tracktemplate.application.transition_export import (
     TransitionDxfExportRequest,
     prepare_transition_dxf_export,
 )
+from tracktemplate.application.core_export_set import (
+    run_atomic_core_layout_export,
+)
 from tracktemplate.application.core_layout_export import (
     run_core_layout_export,
     run_staged_core_layout_export,
@@ -177,6 +180,7 @@ __all__ = (
     "prepare_transition_dxf_export",
     "run_core_layout_export",
     "run_staged_core_layout_export",
+    "run_atomic_core_layout_export",
     "transition_state_from_json",
     "transition_state_to_json",
     "TRANSITION_PREVIEW_CENTRELINE_LAYER_ID",
