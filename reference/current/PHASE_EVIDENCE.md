@@ -378,53 +378,54 @@ D-P9-012 continues to apply. Phase 9B stays Open at 1/6, with five exits Pending
 Phase 9A stays closed for its frozen reference-only scope. Output stays
 private-development and project status stays `unknown`.
 
-## Core export uses a separate FreeCAD document — 2026-10-11
+## Core Generate uses an isolated FreeCAD object — 2026-10-11
 
-This Level 2 result advances the editable-model requirement in Exit 9B-5.
-The usual Core Generate route uses a separate temporary `App.Document` for
-each format task. It closes only the object with the identity that it owns.
-An error during this work prevents final file writes.
-The [contract](../contracts/core-layout-export-staging.md#separate-objects-for-export)
+This Level 2 result supplies part of the work for Exit 9B-5 to preserve the previous `App.Document`.
+The usual Core Generate route uses an isolated temporary `App.Document` for
+each task with a `format` value. It closes only the object with the identity that it owns.
+An error during this work prevents file writes to output paths in `plan`.
+The [contract](../contracts/core-layout-export-staging.md#isolated-objects-for-output)
 owns the operation and its limits.
 
-The standalone test gives PASS results for 21 document cases and 34 file cases.
-The qualified FreeCAD test compares DXF, SVG, STL, STEP and CSV output with the
-previous route. The existing comparisons and geometry checks give PASS results.
-Eight additional cases examine active state, construction, recompute, object
-removal, document close and interruption. Original document state, geometry,
-object identities and history stay unchanged in these cases. Save/reopen gives
-a PASS result.
+The test for standalone Python gives PASS results for 21 `App.Document` tests and 34 file tests.
+The test with the qualified host profile for FreeCAD compares DXF, SVG, STL, STEP and CSV output with the
+previous route. The previous checks that compare output and `Shape` values give PASS results.
+Eight more tests examine the active condition, `App.newDocument`, `recompute`, object
+removal, `App.closeDocument` and interruption. The previous `App.Document` condition, `Shape` values, object identities, `UndoCount`, `RedoCount`, `UndoNames` and `RedoNames` stay the same in these tests.
+The test with `save` and `openDocument` gives a PASS result.
 
-The real-GUI proof uses Core Generate for success, final STEP failure and
-failure to close the temporary document. It restores selection in two previous
-documents, picked coordinates, preselection and a different active document.
-It checks the logical selection, not the order of previous selection events.
-The close failure reports zero completed files and 13 outputs that did not
-complete. No final files exist. The diagnostic identifies the temporary document
-that stays open. The proof records that retained object before test cleanup.
-It does not claim that the document registry was restored in this failure case.
+The test in the GUI uses Core Generate for success, an error in the last STEP task and
+an error from `App.closeDocument`. It puts the previous selection in two
+`App.Document` objects, `PickedPoints` and the condition from `Gui.Selection.getPreselection()` back.
+It also puts a different `App.Document` back in its previous active condition.
+It checks the logical selection, not the previous sequence of changes to the selection.
+
+The error from `App.closeDocument` gives zero completed files and 13 outputs that did not
+complete. There are no output files. The diagnostic identifies the temporary `App.Document`
+that stays open. The test records that open object before test cleanup.
+It does not claim that `App.listDocuments()` returns its previous result after this error.
 
 The host profile is
 `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
-The native record is
-`tmp/core-export-staging/native-runs/20261011T140119162975Z/result.json`,
-SHA-256 `3f3bb75a86eed942df07a20d315ba875cddffdd3f06a3ca982bfb417f37c1615`.
-The GUI record is
-`benchmark-output/freecad-bridge/phase7-core-layout-export-workflow-runs/20261011T140002316392Z-modular/run.json`,
-SHA-256 `621be48fc058e77ebe4b9c52e46948c792f502b4dd18b8c367049e75516486f4`.
-That GUI directory contains actual summary captures for all three cases.
-Both records bind the tested source and copied fixture. No operator document changes.
+The FreeCAD result is
+`tmp/core-export-staging/native-runs/20261011T141112296335Z/result.json`,
+SHA-256 `ecadcfd70a1a952d990d8618e4565c95526d9ae832aebb0f2ba7d6e773a0d1cc`.
+The GUI result is
+`benchmark-output/freecad-bridge/phase7-core-layout-export-workflow-runs/20261011T141115247985Z-modular/run.json`,
+SHA-256 `fb727153740caec92b77fbd08932657f8e08c799eea3f0a752b35c0d8e8fdb92`.
+That GUI directory contains actual images of the result for all three tests.
+The two results identify the tested source and copied fixture. No operator `App.Document` changes.
 
-Successful close contains temporary-object removal failures for this route.
-The Phase 7 comparison route and selected export keep their previous limits.
-The complete output-set requirement and its recovery stay unresolved for Exit 9B-5.
-This result gives no new assurance for arbitrary asynchronous interruption.
+When `App.closeDocument` completes, it removes objects that a previous removal operation did not remove in this route.
+The Phase 7 route used to compare output and `SelectedProductionExportDialog` keep their previous limits.
+The complete output requirement and its recovery stay unresolved for Exit 9B-5.
+The [accepted interruption conditions](../ARCHITECTURE.md#supported-exporter-failure-model) stay the same.
 
 D-P9-012 continues to apply. Phase 9B stays Open at 1/6, with five exits Pending.
-Phase 9A stays closed for its frozen reference-only scope.
-Geometry, the 113-entry register and accepted numerical limits do not change.
-Output stays private-development and project status stays `unknown`.
-This result gives no physical-fit, manufacturing, rights, performance or production acceptance.
+Phase 9A stays closed for its frozen `reference-only` scope.
+Data that define product shapes, the 113-entry register and accepted numerical limits do not change.
+Output stays in `private-development` status and project status stays `unknown`.
+This result gives no acceptance for physical fit, rights, performance, production or the ability to make parts.
 
 ## Phase 9A historical links
 
