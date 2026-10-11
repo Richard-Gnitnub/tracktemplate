@@ -2475,6 +2475,7 @@ class _StagedCoreLayoutExportAdapter:
     failed_export_report: object
     skipped_export_report: object
     export_files_factory: object
+    export_dispatcher_factory: object
 
     def __call__(
         self,
@@ -2488,6 +2489,11 @@ class _StagedCoreLayoutExportAdapter:
         template_assembly_config,
         exporter_override=None,
     ):
+        serializer = (
+            self.dispatch_export_task if exporter_override is None
+            else exporter_override
+        )
+        dispatcher = self.export_dispatcher_factory(serializer)
         return self.calculation(
             doc,
             plan,
@@ -2497,8 +2503,8 @@ class _StagedCoreLayoutExportAdapter:
             formation_config,
             registration_config,
             template_assembly_config,
-            exporter_override,
-            dispatch_export_task=self.dispatch_export_task,
+            None,
+            dispatch_export_task=dispatcher,
             build_manifest_rows=self.build_manifest_rows,
             write_export_manifest=self.write_export_manifest,
             failed_export_report=self.failed_export_report,
@@ -2544,15 +2550,21 @@ class ModularCoreLayoutWorkflowSession:
         *,
         staged=False,
         export_files_factory=None,
+        export_dispatcher_factory=None,
     ):
         if staged and not callable(export_files_factory):
             raise TransitionWorkflowError(
                 "The Core export filesystem adapter is unavailable."
             )
+        if staged and not callable(export_dispatcher_factory):
+            raise TransitionWorkflowError(
+                "The Core export document adapter is unavailable."
+            )
         self._calculation_session = calculation_session
         self._host = calculation_session._host
         self._staged_export = staged
         self._export_files_factory = export_files_factory
+        self._export_dispatcher_factory = export_dispatcher_factory
         self._export_operations = (
             STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS if staged
             else CORE_LAYOUT_EXPORT_HOST_OPERATIONS
@@ -2578,6 +2590,9 @@ class ModularCoreLayoutWorkflowSession:
         self._export_calculation = export_calculation
         if staged:
             operations["export_files_factory"] = self._export_files_factory
+            operations["export_dispatcher_factory"] = (
+                self._export_dispatcher_factory
+            )
         self._export_adapter = self._export_adapter_type(
             calculation=export_calculation,
             **operations,
@@ -2663,6 +2678,14 @@ class ModularCoreLayoutWorkflowSession:
             raise TransitionWorkflowError(
                 "The Core export filesystem adapter has a mixed binding."
             )
+        if (
+            self._staged_export
+            and adapter.export_dispatcher_factory
+            is not self._export_dispatcher_factory
+        ):
+            raise TransitionWorkflowError(
+                "The Core export document adapter has a mixed binding."
+            )
         for field_name, host_name in self._export_operations:
             operation = getattr(adapter, field_name)
             if (
@@ -2742,6 +2765,7 @@ def load_modular_transition_workflow_session(
     contract,
     *,
     export_files_factory=None,
+    export_dispatcher_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -2790,4 +2814,5 @@ def load_modular_transition_workflow_session(
     return ModularCoreLayoutWorkflowSession(
         calculation_session, export_calculation, staged=True,
         export_files_factory=export_files_factory,
+        export_dispatcher_factory=export_dispatcher_factory,
     )

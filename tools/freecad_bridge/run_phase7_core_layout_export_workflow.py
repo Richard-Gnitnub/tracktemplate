@@ -318,7 +318,7 @@ def _run_route(args, base_path):
             datetime.timezone.utc
         ).isoformat(),
         "recipe_id": (
-            "phase9b-core-layout-export-staging-workflow-v1"
+            "phase9b-core-layout-export-isolation-workflow-v1"
             if args.staging_barrier
             else "phase7-b16-core-layout-export-workflow-v1"
         ),

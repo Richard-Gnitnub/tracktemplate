@@ -28,6 +28,7 @@ sys.path.insert(0, str(ROOT))
 from tracktemplate import api  # noqa: E402
 from tracktemplate.application import core_layout_export as exports  # noqa: E402
 from tracktemplate.adapters.export import core_layout_files as files  # noqa: E402
+from tracktemplate.adapters.freecad import core_export_document as documents  # noqa: E402
 
 
 SENTINEL = "Core export staging validation passed"
@@ -420,6 +421,12 @@ def validate_api_route():
         contract["host_operations"]["dispatch_export_task"]
         == "dispatch_freecad_export"
     )
+    assert contract["serializer_isolation"]["factory_keyword"] == (
+        "export_dispatcher_factory"
+    )
+    assert contract["serializer_isolation"]["implementation"] == (
+        "tracktemplate.adapters.freecad.core_export_document.CoreExportDocument"
+    )
 
     module = types.ModuleType("_staging_route_fixture")
     namespace = module.__dict__
@@ -459,6 +466,7 @@ def validate_api_route():
                 api,
                 {},
                 export_files_factory=files.CoreLayoutExportFiles,
+                export_dispatcher_factory=documents.CoreExportDocument,
             )
     record = session.core_layout_export_routing_record()
     assert record["contract_id"] == contract["contract_id"]
@@ -468,6 +476,7 @@ def validate_api_route():
     adapter = module.run_production_export
     assert adapter.calculation is api.run_staged_core_layout_export
     assert adapter.export_files_factory is files.CoreLayoutExportFiles
+    assert adapter.export_dispatcher_factory is documents.CoreExportDocument
     assert tuple(inspect.signature(adapter).parameters) == expected[:9]
     for name in ("run_production_export", "dispatch_freecad_export"):
         with mock.patch.object(module, name, lambda: None):
@@ -491,6 +500,33 @@ def validate_api_route():
         object.__setattr__(
             adapter, "export_files_factory", files.CoreLayoutExportFiles
         )
+    object.__setattr__(adapter, "export_dispatcher_factory", lambda: None)
+    try:
+        try:
+            session.core_layout_export_routing_record()
+        except workflow.TransitionWorkflowError:
+            pass
+        else:
+            raise AssertionError("A replaced document factory passed")
+    finally:
+        object.__setattr__(
+            adapter, "export_dispatcher_factory", documents.CoreExportDocument
+        )
+    for invalid_factory in (None, 42):
+        previous = module.run_production_export
+        try:
+            workflow.ModularCoreLayoutWorkflowSession(
+                base,
+                api.run_staged_core_layout_export,
+                staged=True,
+                export_files_factory=files.CoreLayoutExportFiles,
+                export_dispatcher_factory=invalid_factory,
+            )
+        except workflow.TransitionWorkflowError:
+            pass
+        else:
+            raise AssertionError("An invalid document factory passed")
+        assert module.run_production_export is previous
     for invalid_factory in (None, 42):
         previous = module.run_production_export
         try:
@@ -499,6 +535,7 @@ def validate_api_route():
                 api.run_staged_core_layout_export,
                 staged=True,
                 export_files_factory=invalid_factory,
+                export_dispatcher_factory=documents.CoreExportDocument,
             )
         except workflow.TransitionWorkflowError:
             pass
@@ -519,6 +556,7 @@ def validate_api_route():
                 api.run_staged_core_layout_export,
                 staged=True,
                 export_files_factory=files.CoreLayoutExportFiles,
+                export_dispatcher_factory=documents.CoreExportDocument,
             )
         except RuntimeError as error:
             assert str(error) == "controlled binding failure"
@@ -550,6 +588,20 @@ assert not any(
 """
     subprocess.run([sys.executable, "-c", script, str(ROOT)], check=True)
 
+    script = """
+import builtins, sys
+sys.path.insert(0, sys.argv[1])
+original = builtins.__import__
+def guarded(name, *args, **kwargs):
+    assert name.split('.')[0] not in {'FreeCAD', 'FreeCADGui'}, name
+    return original(name, *args, **kwargs)
+builtins.__import__ = guarded
+from tracktemplate.adapters.freecad.core_export_document import CoreExportDocument
+CoreExportDocument(lambda *args: None)
+assert 'FreeCAD' not in sys.modules and 'FreeCADGui' not in sys.modules
+"""
+    subprocess.run([sys.executable, "-c", script, str(ROOT)], check=True)
+
 
 def validate_composition_boundary():
     """Keep concrete adapters in the existing runtime composition root."""
@@ -571,7 +623,10 @@ def validate_composition_boundary():
 
     def load(*args, **kwargs):
         assert args == (ROOT, api, marker)
-        assert kwargs == {"export_files_factory": files.CoreLayoutExportFiles}
+        assert kwargs == {
+            "export_files_factory": files.CoreLayoutExportFiles,
+            "export_dispatcher_factory": documents.CoreExportDocument,
+        }
         return session
 
     modules = {
@@ -579,6 +634,7 @@ def validate_composition_boundary():
             load_modular_transition_workflow_session=load,
         ),
         "tracktemplate.adapters.export.core_layout_files": files,
+        "tracktemplate.adapters.freecad.core_export_document": documents,
     }
 
     def resolve(name):
@@ -794,7 +850,347 @@ def validate_absent_manifest_and_falsy_override(root):
     assert not any(path.suffix == ".csv" for path in root.iterdir())
 
 
+class ExportDocumentFixture:
+    """Keep label-only placeholders distinct from source feature witnesses."""
+
+    def __init__(self, name):
+        self.Name = name
+        self.FileName = ""
+        self.Temporary = True
+        self.objects = {}
+
+    @property
+    def Objects(self):
+        return tuple(self.objects.values())
+
+    def getObject(self, name):
+        return self.objects.get(name)
+
+    def addObject(self, type_id, name):
+        assert type_id == "App::FeaturePython"
+        assert name not in self.objects
+        obj = types.SimpleNamespace(Name=name, Label=name, TypeId=type_id)
+        self.objects[name] = obj
+        return obj
+
+
+class DocumentHost:
+    """Independent lifecycle model with observable global GUI side effects."""
+
+    GuiUp = True
+
+    def __init__(self):
+        self.documents = {}
+        for name in ("Editable", "Other"):
+            document = self.make_document(name)
+            document.objects["Shape"] = types.SimpleNamespace(
+                Name="Shape", Label=name + " source", Document=document,
+            )
+            self.documents[name] = document
+        self.ActiveDocument = self.documents["Other"]
+        self.actual_active = self.ActiveDocument
+        self.created = []
+        self.closed = []
+        self.creation_fault = None
+        self.close_fault = None
+        self.active_fault = None
+        self.gui = types.SimpleNamespace(Selection=SelectionHost(self))
+
+    @staticmethod
+    def make_document(name):
+        return ExportDocumentFixture(name)
+
+    def listDocuments(self):
+        return dict(self.documents)
+
+    def activeDocument(self):
+        return self.actual_active
+
+    def newDocument(self, name, label, hidden, temporary):
+        assert hidden is True and temporary is True
+        assert name not in self.documents
+        self.created.append(name)
+        document = self.make_document(name)
+        self.documents[name] = document
+        self.ActiveDocument = self.actual_active = document
+        if self.creation_fault is not None:
+            return self.creation_fault(document)
+        return document
+
+    def closeDocument(self, name):
+        self.closed.append(name)
+        if self.close_fault is not None:
+            self.close_fault(name)
+        del self.documents[name]
+        self.ActiveDocument = self.actual_active = None
+        self.gui.Selection.clearSelection()
+        self.gui.Selection.clearPreselection()
+
+    def setActiveDocument(self, name):
+        if self.active_fault is not None:
+            self.active_fault(name)
+        self.ActiveDocument = self.actual_active = self.documents.get(name)
+
+
+class SelectionHost:
+    """Model grouped subelements, whole membership and hover independently."""
+
+    def __init__(self, app):
+        self.app = app
+        self.entries = [
+            ("Editable", "Shape", "", (0.0, 0.0, 0.0)),
+            ("Other", "Shape", "Edge2", (1.25, 2.5, 3.75)),
+            ("Editable", "Shape", "Face1", (4.0, 5.0, 6.0)),
+        ]
+        self.hover = ("Other", "Shape", "Edge1", (7.0, 8.0, 9.0))
+        self.read_fault = None
+        self.write_fault = None
+        self.hover_fault = None
+
+    def item(self, document_name, object_name, names, points):
+        document = self.app.documents[document_name]
+        return types.SimpleNamespace(
+            DocumentName=document_name, ObjectName=object_name,
+            Object=document.getObject(object_name),
+            SubElementNames=tuple(names),
+            PickedPoints=tuple(
+                types.SimpleNamespace(x=x, y=y, z=z) for x, y, z in points
+            ),
+        )
+
+    def getSelectionEx(self, document, resolve):
+        assert (document, resolve) == ("*", 0)
+        if self.read_fault is not None:
+            self.read_fault()
+        groups = {}
+        for doc, obj, subname, point in self.entries:
+            group = groups.setdefault((doc, obj), ([], []))
+            if subname:
+                group[0].append(subname)
+                group[1].append(point)
+        return [self.item(*names, *values) for names, values in groups.items()]
+
+    def isSelected(self, obj, subname, resolve):
+        assert resolve == 0
+        return any(
+            (doc, name, sub) == (obj.Document.Name, obj.Name, subname)
+            for doc, name, sub, _point in self.entries
+        )
+
+    def clearSelection(self):
+        self.entries = []
+
+    def addSelection(self, document, obj, subname, x, y, z, clear):
+        assert clear is False
+        if self.write_fault is not None:
+            self.write_fault()
+        self.entries.append((document, obj, subname, (x, y, z)))
+
+    def getPreselection(self):
+        if self.hover is None:
+            return types.SimpleNamespace(DocumentName="", ObjectName="")
+        doc, obj, subname, point = self.hover
+        return self.item(doc, obj, (subname,), (point,))
+
+    def clearPreselection(self):
+        self.hover = None
+
+    def setPreselection(self, obj, subname, x, y, z):
+        if self.hover_fault is not None:
+            self.hover_fault()
+        self.hover = (obj.Document.Name, obj.Name, subname, (x, y, z))
+
+
+def validate_document_isolation():
+    """Disprove ownership, cleanup and callback-routing claims independently."""
+    faults = (
+        "success", "no-active", "headless", "serializer", "interrupt",
+        "swallowed-removal", "close", "close-interrupt", "both",
+        "new-raises", "new-returns-existing", "new-extra", "new-saved",
+        "new-not-temporary", "scratch-replaced", "active", "selection",
+        "preselection", "selection-read", "contradictory-active",
+        "label-holder",
+    )
+    for fault in faults:
+        app = DocumentHost()
+        editable = app.documents["Editable"]
+        previous = dict(app.documents)
+        initial_selection = set(app.gui.Selection.entries)
+        initial_hover = app.gui.Selection.hover
+        if fault == "no-active":
+            app.ActiveDocument = app.actual_active = None
+        if fault == "headless":
+            app.GuiUp = False
+        if fault == "contradictory-active":
+            app.actual_active = None
+        active = app.ActiveDocument
+        error = (
+            ControlledInterruption("controlled serializer interruption")
+            if fault in ("interrupt", "close-interrupt")
+            else RuntimeError("controlled serializer failure")
+        )
+        cleanup_error = RuntimeError("controlled close failure")
+
+        def fail(value):
+            def operation(*_args):
+                raise value
+            return operation
+
+        if fault == "new-raises":
+            app.creation_fault = fail(error)
+        elif fault == "new-returns-existing":
+            app.creation_fault = lambda _doc: editable
+        elif fault == "new-extra":
+            def add_foreign(document):
+                app.documents["Foreign"] = app.make_document("Foreign")
+                return document
+            app.creation_fault = add_foreign
+        elif fault in ("new-saved", "new-not-temporary"):
+            def invalid_document(document):
+                if fault == "new-saved":
+                    document.FileName = "/operator/retained.FCStd"
+                else:
+                    document.Temporary = False
+                return document
+            app.creation_fault = invalid_document
+        elif fault == "label-holder":
+            def fail_label_holder(document):
+                document.addObject = fail(error)
+                return document
+            app.creation_fault = fail_label_holder
+        if fault in ("close", "both", "close-interrupt"):
+            app.close_fault = fail(
+                error if fault == "close-interrupt" else cleanup_error
+            )
+        if fault == "active":
+            app.active_fault = fail(RuntimeError("controlled active failure"))
+        if fault == "selection":
+            app.gui.Selection.write_fault = fail(
+                RuntimeError("controlled selection failure")
+            )
+        if fault == "preselection":
+            app.gui.Selection.hover_fault = fail(
+                RuntimeError("controlled preselection failure")
+            )
+        if fault == "selection-read":
+            app.gui.Selection.read_fault = fail(error)
+        task = {"records": [object()], "format": "step"}
+        calls = []
+
+        def serializer(document, supplied_task, path):
+            assert supplied_task is task and path == "/stage/payload.step"
+            assert all(document is not item for item in previous.values())
+            assert app.documents.get(document.Name) is document
+            assert {obj.Label for obj in document.Objects} == {
+                obj.Label for obj in editable.Objects
+            }
+            assert all(not hasattr(obj, "Shape") for obj in document.Objects)
+            calls.append(document)
+            document.objects["LeakedTemporaryObject"] = object()
+            if fault in ("serializer", "interrupt", "both"):
+                raise error
+            if fault == "scratch-replaced":
+                app.documents[document.Name] = app.make_document(document.Name)
+
+        wrapped = documents.CoreExportDocument(
+            serializer, app=app, gui=app.gui if app.GuiUp else None,
+        )
+        assert not app.created and not app.closed
+        caught = None
+        try:
+            wrapped(editable, task, "/stage/payload.step")
+        except BaseException as observed:
+            caught = observed
+        if fault in ("success", "no-active", "headless", "swallowed-removal"):
+            assert caught is None, (fault, caught)
+        else:
+            assert caught is not None, fault
+        if fault in (
+            "serializer", "interrupt", "both", "close-interrupt",
+            "new-raises", "selection-read", "label-holder",
+        ):
+            assert caught is error, fault
+        if fault == "both":
+            assert "controlled close failure" in " ".join(caught.__notes__)
+        if fault in ("close", "both", "close-interrupt"):
+            diagnostic = str(caught) + " ".join(
+                getattr(caught, "__notes__", ())
+            )
+            assert app.created[0] in diagnostic
+        assert all(name not in previous for name in app.closed)
+        assert all(app.documents.get(name) is doc for name, doc in previous.items())
+        assert editable.objects == {"Shape": editable.getObject("Shape")}
+        if fault in ("new-raises", "new-returns-existing", "scratch-replaced"):
+            assert not app.closed, fault
+        if fault in ("new-extra", "new-saved", "new-not-temporary"):
+            assert app.closed == app.created, fault
+        if fault == "new-extra":
+            assert set(app.documents) == set(previous) | {"Foreign"}
+        if fault in ("selection-read", "contradictory-active"):
+            assert not app.created and not calls, fault
+        if fault not in (
+            "new-raises", "new-returns-existing", "new-extra", "close",
+            "both", "close-interrupt", "scratch-replaced",
+        ):
+            assert app.documents == previous, fault
+        if fault not in ("active", "contradictory-active"):
+            assert app.ActiveDocument is active and app.actual_active is active
+        if app.GuiUp and fault != "selection":
+            assert set(app.gui.Selection.entries) == initial_selection, fault
+        if app.GuiUp and fault != "preselection":
+            assert app.gui.Selection.hover == initial_hover, fault
+
+    from tracktemplate.compatibility import transition_workflow as workflow
+
+    raw = object()
+    override = object()
+    wrapped = object()
+    calls = []
+
+    def factory(serializer):
+        calls.append(serializer)
+        return wrapped
+
+    def calculation(*args, **kwargs):
+        assert args[8] is None
+        assert kwargs["dispatch_export_task"] is wrapped
+        return "isolated"
+
+    adapter = workflow._StagedCoreLayoutExportAdapter(
+        calculation, raw, None, None, None, None, None, factory,
+    )
+    arguments = (object(), {}, {}, "set", {}, {}, {}, {})
+    assert adapter(*arguments) == "isolated"
+    assert adapter(*arguments, exporter_override=override) == "isolated"
+    assert calls == [raw, override]
+    with tempfile.TemporaryDirectory(prefix="core-document-failure-") as tmp:
+        root = Path(tmp)
+        plan, config = inputs(root, existing=True)
+        before = file_witness(root)
+        app = DocumentHost()
+        primary = RuntimeError("primary serializer failure")
+        app.close_fault = fail(RuntimeError("secondary document close failure"))
+        result = api.run_staged_core_layout_export(
+            app.documents["Editable"], plan, config, "set", {}, {}, {}, {},
+            dispatch_export_task=documents.CoreExportDocument(
+                fail(primary), app=app, gui=app.gui,
+            ),
+            build_manifest_rows=lambda *_args: [],
+            write_export_manifest=lambda *_args: None,
+            failed_export_report=lambda item: (item["error"], item["error"]),
+            skipped_export_report=lambda item: (item["reason"], item["reason"]),
+            export_files_factory=files.CoreLayoutExportFiles,
+        )
+        assert result["successful_files"] == 0
+        assert file_witness(root) == before
+        details = "\n".join(result["failure_details"])
+        assert "primary serializer failure" in details
+        assert "secondary document close failure" in details
+    print("CORE_EXPORT_DOCUMENT_CASES=" + str(len(faults)))
+
+
 def validate():
+    validate_document_isolation()
     validate_api_route()
     validate_composition_boundary()
     validate_retained_native_composition()

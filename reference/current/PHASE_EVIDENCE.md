@@ -378,6 +378,54 @@ D-P9-012 continues to apply. Phase 9B stays Open at 1/6, with five exits Pending
 Phase 9A stays closed for its frozen reference-only scope. Output stays
 private-development and project status stays `unknown`.
 
+## Core export uses a separate FreeCAD document — 2026-10-11
+
+This Level 2 result advances the editable-model requirement in Exit 9B-5.
+The usual Core Generate route uses a separate temporary `App.Document` for
+each format task. It closes only the object with the identity that it owns.
+An error during this work prevents final file writes.
+The [contract](../contracts/core-layout-export-staging.md#separate-objects-for-export)
+owns the operation and its limits.
+
+The standalone test gives PASS results for 21 document cases and 34 file cases.
+The qualified FreeCAD test compares DXF, SVG, STL, STEP and CSV output with the
+previous route. The existing comparisons and geometry checks give PASS results.
+Eight additional cases examine active state, construction, recompute, object
+removal, document close and interruption. Original document state, geometry,
+object identities and history stay unchanged in these cases. Save/reopen gives
+a PASS result.
+
+The real-GUI proof uses Core Generate for success, final STEP failure and
+failure to close the temporary document. It restores selection in two previous
+documents, picked coordinates, preselection and a different active document.
+It checks the logical selection, not the order of previous selection events.
+The close failure reports zero completed files and 13 outputs that did not
+complete. No final files exist. The diagnostic identifies the temporary document
+that stays open. The proof records that retained object before test cleanup.
+It does not claim that the document registry was restored in this failure case.
+
+The host profile is
+`linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
+The native record is
+`tmp/core-export-staging/native-runs/20261011T140119162975Z/result.json`,
+SHA-256 `3f3bb75a86eed942df07a20d315ba875cddffdd3f06a3ca982bfb417f37c1615`.
+The GUI record is
+`benchmark-output/freecad-bridge/phase7-core-layout-export-workflow-runs/20261011T140002316392Z-modular/run.json`,
+SHA-256 `621be48fc058e77ebe4b9c52e46948c792f502b4dd18b8c367049e75516486f4`.
+That GUI directory contains actual summary captures for all three cases.
+Both records bind the tested source and copied fixture. No operator document changes.
+
+Successful close contains temporary-object removal failures for this route.
+The Phase 7 comparison route and selected export keep their previous limits.
+The complete output-set requirement and its recovery stay unresolved for Exit 9B-5.
+This result gives no new assurance for arbitrary asynchronous interruption.
+
+D-P9-012 continues to apply. Phase 9B stays Open at 1/6, with five exits Pending.
+Phase 9A stays closed for its frozen reference-only scope.
+Geometry, the 113-entry register and accepted numerical limits do not change.
+Output stays private-development and project status stays `unknown`.
+This result gives no physical-fit, manufacturing, rights, performance or production acceptance.
+
 ## Phase 9A historical links
 
 These links keep earlier references available at the frozen evidence owner.

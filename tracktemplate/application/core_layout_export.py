@@ -177,6 +177,9 @@ def run_staged_core_layout_export(
             manifest_success = True
     except Exception as error:
         operation_error = "Core export {} failed: {}".format(phase, error)
+        notes = getattr(error, "__notes__", ())
+        if notes:
+            operation_error += "\n" + "\n".join(str(note) for note in notes)
         if failed_item is not None:
             failed_item["error"] = operation_error
         for item in results:

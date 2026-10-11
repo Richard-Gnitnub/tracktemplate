@@ -31,7 +31,9 @@ positional inputs as `run_core_layout_export`. The compatibility adapter
 supplies `dispatch_export_task`, `build_manifest_rows`,
 `write_export_manifest`, `failed_export_report` and `skipped_export_report`.
 `dispatch_export_task` uses `dispatch_freecad_export`.
-A supplied `exporter_override` replaces that operation for a test.
+The usual Core Generate route supplies that operation through
+`CoreExportDocument`. A supplied `exporter_override` replaces the operation
+inside `CoreExportDocument` for a test.
 
 The necessary `export_files_factory` input supplies
 `tracktemplate.adapters.export.core_layout_files.CoreLayoutExportFiles`.
@@ -115,12 +117,51 @@ The document transaction completes before export starts. An export error
 does not put the document back to its state before Core Generate.
 `run_staged_core_layout_export` does not supply those GUI checks independently.
 
-`dispatch_freecad_export` continues to make temporary objects in that document.
-Its cleanup does not report some errors from object removal or recompute.
-The current host checks show document preservation for completed exports
-and errors from `dispatch_freecad_export`.
-They give no acceptance for cleanup errors that the operation does not report.
-That finding stays open for Exit 9B-5.
+## Separate objects for export
+
+After PR #162, the usual Core Generate route uses `CoreExportDocument` for
+each task. The B16 launcher supplies this class through
+`export_dispatcher_factory`. Its construction does not operate on the host.
+The application command API and the Phase 7 comparison route stay unchanged.
+
+`CoreExportDocument` calls `App.newDocument` with `hidden=True` and
+`temp=True`. It examines the returned `App.Document` and its registered
+identity before it supplies that object to `dispatch_freecad_export`.
+The object must have `Temporary=True` and an empty `FileName`.
+The task and its records stay unchanged.
+The operation never supplies the editable `App.Document` to that function.
+Objects of type `App::FeaturePython` keep the existing `Label` values in the
+new `App.Document`. They contain no copied `Shape` or other source properties.
+This lets FreeCAD apply its previous rules for duplicate `Label` values.
+The operation changes no preference and supplies none of these objects for export.
+
+Before the operation returns, it closes only the registered `App.Document`
+that it created and whose identity it proves.
+It checks the previous registered identities and active state.
+In the GUI, it puts the previous selection and preselection back.
+It checks object identities, selected subelements and picked coordinates.
+This check covers all previous registered documents.
+It does not prove the previous order of selection events between different objects.
+
+An error in this work prevents final file writes.
+An object with uncertain ownership stays open.
+A close error gives diagnostic information.
+If the owned object stays registered, the diagnostic identifies that object.
+The software does not close or change a previous `App.Document` to recover.
+Contradictory results from `App.ActiveDocument` and `App.activeDocument()`
+cause rejection before it creates an object for export.
+
+The original exception stays the same object.
+Additional cleanup errors become exception notes.
+The application includes those notes in its error report for an `Exception`.
+A `BaseException` continues to propagate after cleanup.
+
+The frozen `dispatch_freecad_export` still does not report some errors from
+object removal or recompute. Its objects now belong to the separate
+`App.Document` in this route. A successful close removes that entire object.
+This change supplies no new guarantee for the Phase 7 comparison route,
+selected export or arbitrary asynchronous interruption.
+The complete output-set requirement for Exit 9B-5 stays unresolved.
 
 ## Validation and limits
 
