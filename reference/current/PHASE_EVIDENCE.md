@@ -14,21 +14,22 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 1/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel). Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11. The other five exits stay Pending. |
-| What changed | [D-P9-013](#phase-9b-core-export-policy-panel) authorises a different unused directory for each Core Generate export. The complete set must become visible together. CSV stays optional. Returned paths change and previous output stays unchanged. The six exit criteria stay unchanged. |
-| What now works | Standalone and qualified FreeCAD checks give PASS results for the complete-set operation. Six actual Core Generate GUI cases check CSV on/off, failures, final paths, previous output and editable-document preservation. |
+| What changed | [D-P9-013](#phase-9b-core-export-policy-panel) authorises a different new directory for each Core Generate export. The full set must become available together. CSV stays optional. Returned paths change and previous output stays unchanged. The six exit criteria stay unchanged. |
+| What now works | Standalone and qualified FreeCAD checks give PASS results for the full-set operation. Six actual Core Generate GUI cases check CSV on/off, failures, final paths, previous output and editable-document preservation. |
 | Limitations/findings | The [Exit 9B-2 admission](#phase-9b-exit-2-acceptance-panel) keeps representative-workflow limits, selected export scope, normalisations, the observed SVG difference and `production_ready=False`. All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay. Output stays private-development and project status stays `unknown`. |
-| Owner decision | D-P9-013 authorises only the export policy and its bounded implementation. It accepts no exit or durability or restart-recovery claim. D-P9-012 remains the authority for the one accepted Phase 9B exit. All other exits and production conditions stay. The Phase 9A closeout and earlier decisions keep their accepted limits. |
-| Next action | Complete the bounded implementation, validation and independent review. After CI gives a PASS result for the exact PR head, publish the draft PR. Do not merge or begin another outcome. |
+| Owner decision | D-P9-013 authorises only the export policy and its bounded implementation. It accepts no exit. It gives no assurance that files stay available after a system interruption. It adds no recovery after FreeCAD stops and starts again. D-P9-012 stays the authority for the one accepted Phase 9B exit. All other exits and production conditions stay. <br><br>The Phase 9A closeout and earlier decisions keep their accepted limits. |
+| Next action | Complete the bounded implementation, validation and independent review. After CI gives a PASS result for the exact PR head, publish the draft PR. Do not merge or start another outcome. |
 
 <a id="phase-9b-core-export-policy-panel"></a>
 
 ## D-P9-013 Core Generate export policy panel — 2026-10-11
 
-**Decision boundary:** Richard approves the Core Generate export policy and
+**Decision boundary:** Richard accepts the Core Generate export policy and
 one bounded implementation towards Exit 9B-5.
 The starting source is protected `main`
 `6586eda3addaf955be06b69753c906252b72adbe`.
 This Level 3 decision changes output policy. It accepts no phase exit.
+
 Phase 9B stays Open at 1/6 under D-P9-012. Only Exit 9B-2 is Evidenced and
 owner-accepted. The other five exits stay Pending.
 Phase 9A stays closed at 4/4 for its frozen reference-only scope.
@@ -41,36 +42,37 @@ Phase 9A stays closed at 4/4 for its frozen reference-only scope.
 >
 > Qualify atomic publication without claiming durability or restart recovery. Preserve all other export and acceptance boundaries.
 
-**Approved policy:** Each Core Generate export uses a different unused
+**Approved policy:** Each Core Generate export uses a different new
 child directory inside the output directory that the operator selects.
 All requested files pass their existing checks before one directory operation
-makes the complete set visible at its final path.
-An existing final path must not be replaced.
+makes the full set available at its final path.
+The operation must not replace an existing final path.
 The operation stops with a diagnostic if the host cannot provide this behaviour.
-CSV stays optional. A requested CSV belongs to that same output set.
+CSV stays optional. A requested CSV is part of that same output set.
 
 Member filenames and content requirements stay the same, except that output
 paths and CSV paths identify the new final directory.
 The Core Generate controls must show this changed behaviour.
-A choice to replace previous outputs no longer applies to this route.
-All previously published output files and directories stay unchanged.
+A control that permits replacement of previous outputs no longer applies to this route.
+All previous output files and directories stay unchanged.
 The [architecture](../ARCHITECTURE.md#d-p9-013-core-generate-complete-output-set)
 and [successor contract](../contracts/core-layout-export-set.md) own the technical conditions.
 
 **Evidence and conditions:** The existing preparation and isolated-FreeCAD
 proofs below establish the previous bounded behaviour.
-They do not establish complete-set visibility.
+They do not establish that all files become available together.
 The new standalone and qualified FreeCAD checks give PASS results for the
-approved complete-set operation in the bounded operating conditions.
-The result must report completed output truthfully after an error.
-Once the complete set is visible, cleanup must preserve it.
+approved full-set operation in the bounded operating conditions.
+The result must report completed output accurately after an error.
+Once the full set is available, cleanup must preserve it.
 
-The policy concerns visibility during an operation.
-It gives no assurance that the files survive a system interruption.
+The policy applies to the output that becomes available during an operation.
+It gives no assurance that the files stay available after a system interruption.
 It adds no recovery after FreeCAD stops and starts again.
 The implementation is limited to the qualified Linux ext4 host and an operator-controlled
-output directory. It gives no protection against hostile concurrent changes
-to that directory or assurance for every filesystem.
+output directory. A different process can change that directory during this operation.
+These checks do not prevent that change.
+The implementation gives no assurance for every filesystem.
 
 **Safety/risk panel:** Richard is the project owner, panel chair and deciding
 authority. `/root` presents the policy and bounded implementation.
@@ -97,9 +99,11 @@ unchanged in the [current register](risks.json). No risk closes.
 PR-09 stays Critical/Open/Partial. PR-13 stays Critical/Open/Effective for its
 current scope. PR-17 stays Critical/Open/Partial.
 The named risk owners keep their existing duties and deadlines.
+
 PR-01 and QA-R03 keep wider workflow coverage duties. PR-16 keeps input and
 invalidation duties. PR-17 keeps document preservation and recovery duties.
 PR-09 keeps output rights controls. PR-13 keeps backup and restore duties.
+
 PR-15 and QA-R04 keep performance duties. PR-22 keeps independent acceptance
 control. PR-10 and PR-18 keep comparison and removal conditions.
 The chair evidence and rights risks keep their production duties.
@@ -121,14 +125,15 @@ The retained staging and Phase 7 comparison tests also give PASS results.
 The actual GUI proof uses Core Generate for those six cases.
 The result shows 14 completed files with CSV and 13 without CSV.
 The three errors before completed output show zero completed files.
-An injected error after the complete set becomes visible keeps 14 completed
+An injected error after the full set becomes available keeps 14 completed
 files and reports one additional diagnostic.
 CSV and all completed files stay in the new directory.
+
 The summary and the `Open Folder` request identify that directory.
 The copied fixture stays unchanged. The editable document keeps nine objects
 and gives a PASS result for save/reopen.
 The checks preserve the active document, selection and preselection.
-Actual summary images remain with the GUI evidence.
+Actual summary images stay with the GUI evidence.
 
 The qualified host profile is
 `linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
@@ -142,6 +147,7 @@ The retained staging record is
 `tmp/core-export-staging/native-runs/20261011T152330301258Z/result.json`,
 SHA-256 `af93c3baaa60fdae7febbeef79d6aeb91580cdd46574b7cf73df7ddebdbf9d87`.
 The source hashes in these records match the tested candidate.
+
 They identify the exact tested source independently of later documentation changes.
 These proofs give no crash, arbitrary-interruption or performance assurance.
 
@@ -159,10 +165,10 @@ Output stays private-development and project status stays `unknown`.
 This decision accepts no physical fit, preload, retention, manufacturing
 capability, production package, output clearance, rights, performance result or release.
 
-**Publication boundary:** Complete the bounded implementation, normal validation,
+**Publication boundary:** Complete the bounded implementation, usual validation,
 independent source review and the finite Documentation Review lifecycle.
 After CI gives a PASS result for the exact PR head, publish the draft PR.
-Do not merge or begin another outcome. This decision closes no phase and
+Do not merge or start another outcome. This decision closes no phase and
 accepts no other exit.
 
 <a id="phase-9b-exit-2-acceptance-panel"></a>

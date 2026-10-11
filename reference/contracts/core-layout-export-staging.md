@@ -1,9 +1,9 @@
 # Core Export Files Before Final Output
 
-Status: **Retained Level 2 development contract for `run_staged_core_layout_export`.**
+Status: **Previous Level 2 development contract for `run_staged_core_layout_export`.**
 
 The [D-P9-013 successor](core-layout-export-set.md) supplies the usual Core
-Generate route after the complete-set change.
+Generate route after the full-set change.
 This document preserves the previous operation and its proof limits.
 Descriptions below of the usual route refer to the source before D-P9-013.
 The previous API stays available for comparison and regression checks.
