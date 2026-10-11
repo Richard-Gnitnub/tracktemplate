@@ -1365,7 +1365,9 @@ Project dashboard and current-record consistency:
 This enforces the compact project-plan sections and line budget. It reconciles the frozen Phase 6, Phase 7, Phase 8 and Phase 9A closeouts with
 `current/PHASE_EVIDENCE.md`. It validates that Phase 9A is closed and Phase 9B is
 Open at 1/6. Only Exit 9B-2 is Evidenced and owner-accepted.
-The other five exits stay Pending. It validates the
+The other five exits stay Pending.
+
+It validates the
 detailed frozen and current risk and decision JSON registers. It protects the
 retired descriptive-path redirect.
 It also checks the least-privilege, SHA-pinned standalone CI workflow. It does
