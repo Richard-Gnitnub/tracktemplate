@@ -1189,8 +1189,62 @@ def validate_document_isolation():
     print("CORE_EXPORT_DOCUMENT_CASES=" + str(len(faults)))
 
 
+def validate_cleanup_observers():
+    """Reject completed restoration whose observers change earlier state."""
+    for mode in ("selection-active", "preselection-active", "preselection-selection"):
+        with tempfile.TemporaryDirectory(prefix="core-observer-failure-") as tmp:
+            root = Path(tmp)
+            plan, config = inputs(root, existing=True)
+            before = file_witness(root)
+            app = DocumentHost()
+            selection = app.gui.Selection
+            original_add = selection.addSelection
+            original_hover = selection.setPreselection
+
+            def add_then_change_active(*args):
+                original_add(*args)
+                app.setActiveDocument("Editable")
+
+            def hover_then_change_previous(*args):
+                original_hover(*args)
+                if mode == "preselection-active":
+                    app.setActiveDocument("Editable")
+                else:
+                    selection.clearSelection()
+
+            if mode == "selection-active":
+                selection.addSelection = add_then_change_active
+            else:
+                selection.setPreselection = hover_then_change_previous
+
+            def serialize(_document, _task, path):
+                Path(path).write_bytes(b"complete staged payload")
+
+            result = api.run_staged_core_layout_export(
+                app.documents["Editable"], plan, config, "set", {}, {}, {}, {},
+                dispatch_export_task=documents.CoreExportDocument(
+                    serialize, app=app, gui=app.gui,
+                ),
+                build_manifest_rows=lambda *_args: [],
+                write_export_manifest=lambda *_args: None,
+                failed_export_report=lambda item: (item["error"], item["error"]),
+                skipped_export_report=lambda item: (item["reason"], item["reason"]),
+                export_files_factory=files.CoreLayoutExportFiles,
+            )
+            assert result["successful_files"] == 0, mode
+            assert result["failed_files"] > 0, mode
+            assert file_witness(root) == before, mode
+            expected = "selection" if mode.endswith("-selection") else "active document"
+            assert "Core export final " + expected + " changed." in "\n".join(
+                result["failure_details"]
+            ), mode
+            assert set(app.documents) == {"Editable", "Other"}, mode
+    print("CORE_EXPORT_OBSERVER_CASES=3")
+
+
 def validate():
     validate_document_isolation()
+    validate_cleanup_observers()
     validate_api_route()
     validate_composition_boundary()
     validate_retained_native_composition()

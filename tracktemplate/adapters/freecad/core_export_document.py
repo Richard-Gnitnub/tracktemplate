@@ -166,6 +166,17 @@ def _cleanup(app, gui, owned, previous, active, selection, preselection):
     attempt(restore_active)
     attempt(lambda: _restore_selection(app, gui, selection))
     attempt(lambda: _restore_preselection(app, gui, preselection))
+
+    def verify_final_state():
+        # Restoration notifies GUI observers, which can change earlier state.
+        if _active_document(app) is not active:
+            raise RuntimeError("Core export final active document changed.")
+        if _selection_snapshot(app, gui) != selection:
+            raise RuntimeError("Core export final selection changed.")
+        if _preselection_snapshot(app, gui) != preselection:
+            raise RuntimeError("Core export final preselection changed.")
+
+    attempt(verify_final_state)
     try:
         observed = dict(app.listDocuments())
         if not _same_registry(observed, previous):
