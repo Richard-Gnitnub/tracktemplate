@@ -75,7 +75,10 @@ from tracktemplate.application.transition_export import (
     TransitionDxfExportRequest,
     prepare_transition_dxf_export,
 )
-from tracktemplate.application.core_layout_export import run_core_layout_export
+from tracktemplate.application.core_layout_export import (
+    run_core_layout_export,
+    run_staged_core_layout_export,
+)
 from tracktemplate.domain.alignment import (
     AlignmentStationInterpolation,
     alignment_station_data,
@@ -173,6 +176,7 @@ __all__ = (
     "TransitionDxfExportRequest",
     "prepare_transition_dxf_export",
     "run_core_layout_export",
+    "run_staged_core_layout_export",
     "transition_state_from_json",
     "transition_state_to_json",
     "TRANSITION_PREVIEW_CENTRELINE_LAYER_ID",

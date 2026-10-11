@@ -1,5 +1,7 @@
 """Drive B14 plain-line create-time export and its final-task failure."""
 
+import dataclasses
+import hashlib
 import json
 import os
 import pathlib
@@ -64,6 +66,9 @@ VERSION_MIGRATION_PREFIXES = globals().get(
     (),
 )
 SUCCESS_TEXT = "Curve and straight-track outputs created successfully"
+STAGING_BARRIER = bool(globals().get(
+    "TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False,
+))
 
 module = sys.modules.get(MODULE_NAME)
 if module is None:
@@ -83,6 +88,34 @@ for output_directory in (success_directory, failure_directory):
 def _current_rss_mb():
     reader = getattr(module, "_workflow_current_rss_mb", None)
     return float(reader()) if callable(reader) else 0.0
+
+
+def _destination_files(directory):
+    """Keep final-file bytes separate from files inside a staging directory."""
+    if not directory.exists():
+        return {}
+    return {
+        path.name: {
+            "bytes": path.stat().st_size,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        }
+        for path in sorted(directory.iterdir()) if path.is_file()
+    }
+
+
+def _seed_staging_failure_directory():
+    """Supply copied-run targets that a failed staging run must preserve."""
+    failure_directory.mkdir()
+    for filename in (
+        "Curve_Set_001_Combined_Cutting_Profiles.dxf",
+        CREATE_TIME_EXPORT_FAILED_FILENAME,
+        "Curve_Set_001_Export_Manifest.csv",
+        "unrelated-operator-file.txt",
+    ):
+        (failure_directory / filename).write_bytes(
+            "Existing destination: {}\n".format(filename).encode("utf-8")
+        )
+    return _destination_files(failure_directory)
 
 
 def _yes_button(box):
@@ -143,7 +176,7 @@ def _configure_dialog(dialog, output_directory):
     dialog.production_include_section_box.setChecked(True)
     dialog.production_each_section_box.setChecked(True)
     dialog.production_combined_box.setChecked(True)
-    dialog.production_overwrite_box.setChecked(False)
+    dialog.production_overwrite_box.setChecked(STAGING_BARRIER)
     dialog.production_manifest_box.setChecked(True)
     dialog.production_open_directory_box.setChecked(False)
     for format_key in EXPORT_FORMATS:
@@ -169,7 +202,9 @@ def _configure_dialog(dialog, output_directory):
         "all_formats": production.get("formats") == {
             key: True for key in EXPORT_FORMATS
         },
-        "non_overwrite": production.get("overwrite_existing") is False,
+        ("overwrite_choice" if STAGING_BARRIER else "non_overwrite"): (
+            production.get("overwrite_existing") is STAGING_BARRIER
+        ),
         "manifest": production.get("create_manifest") is True,
         "combined": production.get("create_combined_files") is True,
         "no_open_directory": production.get("open_output_directory") is False,
@@ -200,6 +235,8 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
     if active_document is None:
         raise RuntimeError("The create-time export scenario lost its active document")
     before = ordinary_track_document_snapshot(module, active_document)
+    destination_before = _destination_files(output_directory)
+    output_directory_existed = output_directory.exists()
     state = {
         "name": name,
         "inject_final_task_failure": bool(inject_failure),
@@ -223,6 +260,16 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
     original_dispatch = module.dispatch_freecad_export
     original_export = module.run_production_export
     original_show_summary = module.show_production_export_summary
+    if STAGING_BARRIER:
+        state["destination_before"] = destination_before
+        state["staged_manifest_calls"] = 0
+        state["preflight_warning_questions"] = []
+
+    def require_unpublished_finals(path):
+        if _destination_files(output_directory) != destination_before:
+            raise RuntimeError("Core export published before staging completed")
+        if pathlib.Path(path).resolve().parent == output_directory.resolve():
+            raise RuntimeError("Core export generated a payload at a final path")
 
     def measured_preflight(*args, **kwargs):
         wall_started = time.perf_counter()
@@ -261,6 +308,9 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
         }
         if kind == "deliverable":
             item["deliverable_index"] = deliverable_index
+            if STAGING_BARRIER:
+                require_unpublished_finals(path)
+                item["finals_unchanged_before_generation"] = True
         wall_started = time.perf_counter()
         cpu_started = time.process_time()
         rss_before = _current_rss_mb()
@@ -289,12 +339,30 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
             })
             state["dispatch_calls"].append(item)
 
+    def measured_manifest(path, rows):
+        require_unpublished_finals(path)
+        state["staged_manifest_calls"] += 1
+        return original_export.write_export_manifest(path, rows)
+
     def measured_export(*args, **kwargs):
         wall_started = time.perf_counter()
         cpu_started = time.process_time()
         rss_before = _current_rss_mb()
         objects_before = len(active_document.Objects)
-        summary = original_export(*args, **kwargs)
+        export_call = original_export
+        if STAGING_BARRIER:
+            export_call = dataclasses.replace(
+                original_export,
+                dispatch_export_task=measured_dispatch,
+                write_export_manifest=measured_manifest,
+            )
+        summary = export_call(*args, **kwargs)
+        if STAGING_BARRIER and inject_failure:
+            task_results = summary.get("results") or []
+            if len(task_results) != EXPECTED_TASK_COUNT or any(
+                item.get("success") is not False for item in task_results
+            ):
+                raise RuntimeError("Staging abort reported published task success")
         item = _compact_summary(summary)
         item.update({
             "wall_ms": (time.perf_counter() - wall_started) * 1000.0,
@@ -353,7 +421,22 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
                 ):
                     state["replacement_questions"].append(record)
                     yes_button.click()
+                elif (
+                    STAGING_BARRIER and inject_failure
+                    and "Production preflight warnings" in record["title"]
+                    and yes_button is not None
+                ):
+                    state["preflight_warning_questions"].append(record)
+                    yes_button.click()
                 elif "Production export complete" in record["title"]:
+                    if STAGING_BARRIER:
+                        capture = run_directory / "{}-summary.png".format(name)
+                        if not widget.grab().save(str(capture), "PNG"):
+                            raise RuntimeError("Could not capture export summary")
+                        state["summary_capture"] = str(capture)
+                        state["summary_capture_sha256"] = hashlib.sha256(
+                            capture.read_bytes()
+                        ).hexdigest()
                     state["export_summary_dialogs"].append(record)
                     widget.accept()
                 elif SUCCESS_TEXT in record["text"]:
@@ -409,6 +492,7 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
     normalised_after = create_time_export_document_snapshot(
         after,
         enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+        expected_overwrite_existing=STAGING_BARRIER,
     )
     if normalised_after["output_directory"] != str(output_directory):
         raise RuntimeError("Create-time export persisted the wrong output directory")
@@ -435,12 +519,21 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
     preflight = state["preflight_calls"][0]
     if preflight["task_count"] != EXPECTED_TASK_COUNT:
         raise RuntimeError("Create-time export planned an unexpected task count")
-    expected_issue_codes = ["OUTPUT_DIRECTORY_WILL_BE_CREATED"]
+    expected_warning_count = 3 if STAGING_BARRIER and inject_failure else 0
+    expected_issue_codes = (
+        [] if output_directory_existed
+        else ["OUTPUT_DIRECTORY_WILL_BE_CREATED"]
+    )
+    expected_information_count = len(expected_issue_codes)
+    expected_issue_codes.extend(
+        ["EXISTING_FILE_OVERWRITE"] * expected_warning_count
+    )
     if (
         preflight["issue_counts"].get("blocking", 0)
         or preflight["issue_counts"].get("Error", 0)
-        or preflight["issue_counts"].get("Warning", 0)
-        or preflight["issue_counts"].get("Information", 0) != 1
+        or preflight["issue_counts"].get("Warning", 0) != expected_warning_count
+        or preflight["issue_counts"].get("Information", 0)
+        != expected_information_count
         or preflight["issue_codes"] != expected_issue_codes
     ):
         raise RuntimeError(
@@ -469,6 +562,13 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
         "manifest_requested": True,
         "manifest_created": True,
     }
+    if STAGING_BARRIER and inject_failure:
+        expected_summary.update({
+            "successful_files": 0,
+            "failed_files": EXPECTED_TASK_COUNT,
+            "formats": [],
+            "manifest_created": False,
+        })
     for key, expected in expected_summary.items():
         if summary.get(key) != expected:
             raise RuntimeError(
@@ -480,11 +580,30 @@ def _run_scenario(name, output_directory, expected_initial_directory, inject_fai
         if not any(CREATE_TIME_EXPORT_FAILURE_MESSAGE in value for value in summary["failures"]):
             raise RuntimeError("The create-time failure summary omitted the injected reason")
         final_text = state["final_success_dialogs"][0]["text"]
-        if "13 successful files; 1 failed" not in final_text:
+        expected_counts = (
+            "0 successful files; 13 failed" if STAGING_BARRIER
+            else "13 successful files; 1 failed"
+        )
+        if expected_counts not in final_text:
             raise RuntimeError("The final dialog omitted create-time failure counts")
+        if STAGING_BARRIER:
+            if "Successful files: 0" not in state[
+                "export_summary_dialogs"
+            ][0]["informative_text"]:
+                raise RuntimeError("The export dialog reported false success")
+            if _destination_files(output_directory) != destination_before:
+                raise RuntimeError("Staging failure changed destination bytes")
     else:
         if state["injection_calls"] or summary["failures"]:
             raise RuntimeError("The create-time success scenario reported a failure")
+    if STAGING_BARRIER:
+        if any(path.is_dir() for path in output_directory.iterdir()):
+            raise RuntimeError("Core export retained a temporary directory")
+        if len(state["preflight_warning_questions"]) != int(inject_failure):
+            raise RuntimeError("Unexpected overwrite confirmation count")
+        if state["staged_manifest_calls"] != (0 if inject_failure else 1):
+            raise RuntimeError("Unexpected staged manifest generation count")
+        state["destination_after"] = _destination_files(output_directory)
     if len(active_document.Objects) != 9:
         raise RuntimeError("Create-time export retained an unexpected object count")
     temporary_objects = [
@@ -537,6 +656,8 @@ try:
     )
     result["scenarios"].append(success)
 
+    if STAGING_BARRIER:
+        seeded_destination = _seed_staging_failure_directory()
     failure, failure_document, normalised_failure = _run_scenario(
         "create_time_export_final_task_failure",
         failure_directory,
@@ -584,12 +705,24 @@ try:
         "format_metrics": format_metrics,
     }
 
-    failure_complete = export_directory_snapshot(failure_directory)
-    result["failure_output"] = validate_create_time_failure_snapshot(
-        failure_complete,
-        success_variant,
-        enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
-    )
+    if STAGING_BARRIER:
+        result["failure_output"] = {
+            "prepublication_abort": True,
+            "successful_files": 0,
+            "new_final_files": [],
+            "existing_destination_files": seeded_destination,
+            "destination_bytes_preserved": (
+                _destination_files(failure_directory) == seeded_destination
+            ),
+            "staging_directories": [],
+        }
+    else:
+        failure_complete = export_directory_snapshot(failure_directory)
+        result["failure_output"] = validate_create_time_failure_snapshot(
+            failure_complete,
+            success_variant,
+            enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+        )
 
     document = App.ActiveDocument
     persistence_started = time.perf_counter()
@@ -609,6 +742,7 @@ try:
     normalised_reopened = create_time_export_document_snapshot(
         reopened,
         enforce_expected_hash=ENFORCE_FROZEN_WORKFLOW_HASHES,
+        expected_overwrite_existing=STAGING_BARRIER,
     )
     if normalised_reopened["output_directory"] != str(failure_directory):
         raise RuntimeError("Save/reopen changed the persisted export directory")

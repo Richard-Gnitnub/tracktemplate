@@ -170,12 +170,17 @@ def _new_run_directory(requested, label):
     return run_directory
 
 
-def _embedded_workflow_source(route, document_path):
+def _embedded_workflow_source(route, document_path, *, staging_barrier=False):
     sources = (
         (
             "TRACKTEMPLATE_PHASE3_ROUTE = {!r}\n"
             "TRACKTEMPLATE_EXPECTED_WORKFLOW_DOCUMENT = {!r}\n"
-        ).format(route, str(pathlib.Path(document_path).resolve())),
+            "TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER = {!r}\n"
+            "TRACKTEMPLATE_PHASE7_COMPARISON_EXPORT = {!r}\n"
+        ).format(
+            route, str(pathlib.Path(document_path).resolve()),
+            staging_barrier, route == MODULAR_ROUTE and not staging_barrier,
+        ),
         LOADER_PATH.read_text(encoding="utf-8"),
         "_PHASE7_EXPORT_BINDING_BEFORE = "
         "_PHASE3_SESSION.module.__dict__['run_production_export']\n",
@@ -228,7 +233,9 @@ def _validate_cleanup(state, route):
         )
 
 
-def _validate_routed_report(report, route):
+def _validate_routed_report(report, route, *, staging_barrier=False):
+    if staging_barrier and route != MODULAR_ROUTE:
+        raise RuntimeError("The staging-barrier proof requires the modular route.")
     routing = report.get("routing") or {}
     expected_envelope = ROUTE_ENVELOPES.get(route)
     export_routing = report.get("core_layout_export_routing") or {}
@@ -255,10 +262,18 @@ def _validate_routed_report(report, route):
         or export_routing.get("mixed_route") is not False
     ):
         raise RuntimeError("The routed core-layout export evidence drifted.")
+    expected_export_contract = (
+        "tracktemplate:phase9b:core-layout-export-staging:1"
+        if staging_barrier else "tracktemplate:phase7:core-layout-export:1"
+    )
+    expected_export_command = (
+        "run_staged_core_layout_export"
+        if staging_barrier else "run_core_layout_export"
+    )
     if route == MODULAR_ROUTE and (
         export_routing.get("contract_id")
-        != "tracktemplate:phase7:core-layout-export:1"
-        or export_routing.get("command_name") != "run_core_layout_export"
+        != expected_export_contract
+        or export_routing.get("command_name") != expected_export_command
     ):
         raise RuntimeError("The modular core-layout export contract drifted.")
     if route == LEGACY_ROUTE and (
@@ -302,7 +317,11 @@ def _run_route(args, base_path):
         "run_started_utc": datetime.datetime.now(
             datetime.timezone.utc
         ).isoformat(),
-        "recipe_id": "phase7-b16-core-layout-export-workflow-v1",
+        "recipe_id": (
+            "phase9b-core-layout-export-staging-workflow-v1"
+            if args.staging_barrier
+            else "phase7-b16-core-layout-export-workflow-v1"
+        ),
         "route": args.route,
         "development_checkpoint": "10.2A8A7B16",
         "source_sha256": source_hashes_before,
@@ -344,13 +363,18 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
 
         workflow_job = submit_and_wait(
             client,
-            _embedded_workflow_source(args.route, document_path),
+            _embedded_workflow_source(
+                args.route, document_path,
+                staging_barrier=args.staging_barrier,
+            ),
             "Phase 7 core-layout export {} route".format(args.route),
             args.timeout,
         )
         report = parse_json_output(workflow_job)
         state["workflow"] = report
-        contract = _validate_routed_report(report, args.route)
+        contract = _validate_routed_report(
+            report, args.route, staging_barrier=args.staging_barrier,
+        )
         state["workflow_contract_sha256"] = semantic_digest(contract)
         state["recipe_orchestrator_elapsed_seconds"] = workflow_job.get(
             "orchestrator_elapsed_seconds"
@@ -427,16 +451,21 @@ print(json.dumps({{'document': document.Name, 'objects': len(document.Objects)}}
         result_path,
         args.route,
         source_hashes_before,
+        staging_barrier=args.staging_barrier,
     )
 
 
-def _load_completed_route(path, route, expected_sources):
+def _load_completed_route(
+    path, route, expected_sources, *, staging_barrier=False,
+):
     state = json.loads(path.read_text(encoding="utf-8"))
     if state.get("status") != "completed" or state.get("route") != route:
         raise RuntimeError(
             "The core-layout export {} route did not complete.".format(route)
         )
-    _validate_routed_report(state.get("workflow") or {}, route)
+    _validate_routed_report(
+        state.get("workflow") or {}, route, staging_barrier=staging_barrier,
+    )
     _validate_cleanup(state, route)
     _validate_source_hashes(expected_sources, state, route)
     return state
@@ -574,6 +603,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--route", choices=ROUTES)
     parser.add_argument(
+        "--staging-barrier", action="store_true",
+        help="Exercise the Phase 9B successor through the normal Core GUI.",
+    )
+    parser.add_argument(
         "--base",
         type=pathlib.Path,
         default=(
@@ -588,6 +621,9 @@ def main():
     parser.add_argument("--port", type=int, default=DEFAULT_BRIDGE_PORT)
     parser.add_argument("--timeout", type=float, default=1200.0)
     args = parser.parse_args()
+
+    if args.staging_barrier and args.route != MODULAR_ROUTE:
+        parser.error("--staging-barrier requires --route modular")
 
     if args.port != DEFAULT_BRIDGE_PORT:
         raise SystemExit(

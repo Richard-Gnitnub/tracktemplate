@@ -327,6 +327,57 @@ It gives no acceptance for physical fit or production output.
 The “113-entry register”, frozen Phase 9A paths and accepted conditions stay the same.
 Output stays in private-development status. Phase 9B stays Open at 0/6, with all six exits Pending.
 
+## Core export checks before final files — 2026-10-11
+
+This Level 2 change supplies part of the work for Exit 9B-5 after integration of PR #161.
+The [new operation](../contracts/core-layout-export-staging.md) prepares all
+format files in the plan and CSV before it writes a final file.
+An error during this preparation changes no output from a previous operation.
+The result counts only files written to their final paths.
+If a later final-file write gives an error, the operation does not write the
+prepared CSV to the output directory. A CSV from a previous operation stays
+without a change.
+
+The [standalone test](../../tests/validate_core_export_staging.py) and
+[FreeCAD test](../../tests/freecad_validate_core_export_staging.py) examine
+the changed error conditions, completed output and document preservation.
+The qualified FreeCAD test gives a PASS result for DXF, SVG, STL, STEP and CSV
+comparisons.
+
+The GUI proof uses Core Generate with the accepted copied fixture.
+It writes 14 files when all output operations are complete.
+An injected final STEP error writes no new final files and preserves three
+previous targets and an unrelated file.
+The GUI shows zero completed files and 13 outputs that did not complete.
+The document keeps nine objects and gives PASS results for save/reopen checks.
+The Phase 7 API and its diagnostic for incomplete output stay available.
+
+The host profile is
+`linux-x86_64-flatpak-freecad-1.1.4-py3.13.15-qt6.11.2-coin4.0.10`.
+The GUI record is
+`benchmark-output/freecad-bridge/phase7-core-layout-export-workflow-runs/20261011T124624882644Z-modular/run.json`,
+SHA-256 `b0345b70700bf52a80d1899837ced64c8d311246a29c45f9e5a5db2f6b6bbc5c`.
+The native record is `tmp/core-export-staging/native-runs/20261011T124347568840Z/result.json`,
+SHA-256 `cef975bab1286d434fdd7fd0967b35fa91e6edafd6d7e28cde0c9752ce2755c6`.
+The two records keep their proof limits. Local source and copied-fixture checks
+give PASS results. No operator document changes.
+
+This result does not meet the complete output requirement in the
+[architecture](../ARCHITECTURE.md#6-export-adapter).
+An error during a later file write can keep previous final files in the
+output directory. The conditions for an incomplete output set and its recovery
+stay unresolved for Exit 9B-5. D-P6-003 and D-P6-004 do not change.
+
+`dispatch_freecad_export` does not report some temporary-object cleanup errors.
+Those errors stay outside the demonstrated document-preservation conditions
+and stay unresolved for Exit 9B-5.
+The selected-export route, geometry, numerical limits and 113-entry register
+do not change. There is no new production, rights or performance acceptance.
+
+D-P9-012 continues to apply. Phase 9B stays Open at 1/6, with five exits Pending.
+Phase 9A stays closed for its frozen reference-only scope. Output stays
+private-development and project status stays `unknown`.
+
 ## Phase 9A historical links
 
 These links keep earlier references available at the frozen evidence owner.

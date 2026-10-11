@@ -326,7 +326,9 @@ def compare_logical_exports(reference, candidate):
     return reference.get("logical_sha256", "")
 
 
-def create_time_export_document_snapshot(snapshot, enforce_expected_hash=True):
+def create_time_export_document_snapshot(
+    snapshot, enforce_expected_hash=True, *, expected_overwrite_existing=False,
+):
     """Normalise only the per-run create-time export directory in document state."""
     if not isinstance(snapshot, dict) or not isinstance(snapshot.get("semantic"), dict):
         raise ValueError("Invalid create-time plain-line document snapshot")
@@ -365,7 +367,7 @@ def create_time_export_document_snapshot(snapshot, enforce_expected_hash=True):
         "include_section_number": True,
         "export_each_section": True,
         "create_combined_files": True,
-        "overwrite_existing": False,
+        "overwrite_existing": expected_overwrite_existing,
         "create_manifest": True,
         "open_output_directory": False,
         "current_template_set_only": True,

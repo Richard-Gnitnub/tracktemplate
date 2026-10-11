@@ -41,6 +41,13 @@ CORE_LAYOUT_EXPORT_HOST_OPERATIONS = (
     ("failed_export_report", "_failed_export_report"),
     ("skipped_export_report", "_skipped_export_report"),
 )
+STAGED_CORE_LAYOUT_EXPORT_CONTRACT_ID = (
+    "tracktemplate:phase9b:core-layout-export-staging:1"
+)
+STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS = (
+    ("dispatch_export_task", "dispatch_freecad_export"),
+    *CORE_LAYOUT_EXPORT_HOST_OPERATIONS[1:],
+)
 PRODUCT_FUNCTION_NAMES = FUNCTION_NAMES + (
     "main_circle_centre", "clothoid_exit_displacement",
     "build_concentric_core", "add_common_straight_extensions",
@@ -2457,6 +2464,49 @@ class _CoreLayoutExportAdapter:
         )
 
 
+@dataclass(frozen=True)
+class _StagedCoreLayoutExportAdapter:
+    """Supply host serializers to the successor staging operation."""
+
+    calculation: object
+    dispatch_export_task: object
+    build_manifest_rows: object
+    write_export_manifest: object
+    failed_export_report: object
+    skipped_export_report: object
+    export_files_factory: object
+
+    def __call__(
+        self,
+        doc,
+        plan,
+        config,
+        set_id,
+        platform_config,
+        formation_config,
+        registration_config,
+        template_assembly_config,
+        exporter_override=None,
+    ):
+        return self.calculation(
+            doc,
+            plan,
+            config,
+            set_id,
+            platform_config,
+            formation_config,
+            registration_config,
+            template_assembly_config,
+            exporter_override,
+            dispatch_export_task=self.dispatch_export_task,
+            build_manifest_rows=self.build_manifest_rows,
+            write_export_manifest=self.write_export_manifest,
+            failed_export_report=self.failed_export_report,
+            skipped_export_report=self.skipped_export_report,
+            export_files_factory=self.export_files_factory,
+        )
+
+
 def _selected_export_scope_method(original_scope, selection_snapshot):
     """Retain each set's opening selection for one modal export dialog."""
 
@@ -2487,12 +2537,33 @@ def _selected_export_scope_method(original_scope, selection_snapshot):
 class ModularCoreLayoutWorkflowSession:
     """Add one modular export command to the selected calculation session."""
 
-    def __init__(self, calculation_session, export_calculation):
+    def __init__(
+        self,
+        calculation_session,
+        export_calculation,
+        *,
+        staged=False,
+        export_files_factory=None,
+    ):
+        if staged and not callable(export_files_factory):
+            raise TransitionWorkflowError(
+                "The Core export filesystem adapter is unavailable."
+            )
         self._calculation_session = calculation_session
         self._host = calculation_session._host
+        self._staged_export = staged
+        self._export_files_factory = export_files_factory
+        self._export_operations = (
+            STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS if staged
+            else CORE_LAYOUT_EXPORT_HOST_OPERATIONS
+        )
+        self._export_adapter_type = (
+            _StagedCoreLayoutExportAdapter if staged
+            else _CoreLayoutExportAdapter
+        )
         namespace = self.module.__dict__
         operations = {}
-        for field_name, host_name in CORE_LAYOUT_EXPORT_HOST_OPERATIONS:
+        for field_name, host_name in self._export_operations:
             operation = namespace.get(host_name)
             if not callable(operation):
                 raise TransitionWorkflowError(
@@ -2505,7 +2576,9 @@ class ModularCoreLayoutWorkflowSession:
                 "The modular core-layout export command is unavailable."
             )
         self._export_calculation = export_calculation
-        self._export_adapter = _CoreLayoutExportAdapter(
+        if staged:
+            operations["export_files_factory"] = self._export_files_factory
+        self._export_adapter = self._export_adapter_type(
             calculation=export_calculation,
             **operations,
         )
@@ -2576,14 +2649,21 @@ class ModularCoreLayoutWorkflowSession:
         namespace = self.module.__dict__
         adapter = namespace.get(CORE_LAYOUT_EXPORT_HOST_BINDING)
         if (
-            type(adapter) is not _CoreLayoutExportAdapter
+            type(adapter) is not self._export_adapter_type
             or adapter is not self._export_adapter
             or adapter.calculation is not self._export_calculation
         ):
             raise TransitionWorkflowError(
                 "The modular core-layout export route has a mixed binding."
             )
-        for field_name, host_name in CORE_LAYOUT_EXPORT_HOST_OPERATIONS:
+        if (
+            self._staged_export
+            and adapter.export_files_factory is not self._export_files_factory
+        ):
+            raise TransitionWorkflowError(
+                "The Core export filesystem adapter has a mixed binding."
+            )
+        for field_name, host_name in self._export_operations:
             operation = getattr(adapter, field_name)
             if (
                 namespace.get(host_name) is not operation
@@ -2633,10 +2713,16 @@ class ModularCoreLayoutWorkflowSession:
         self._validate_core_layout_export_binding()
         return {
             "schema_version": 1,
-            "contract_id": CORE_LAYOUT_EXPORT_CONTRACT_ID,
+            "contract_id": (
+                STAGED_CORE_LAYOUT_EXPORT_CONTRACT_ID if self._staged_export
+                else CORE_LAYOUT_EXPORT_CONTRACT_ID
+            ),
             "route": MODULAR_CALCULATION_ROUTE,
             "comparison_route_available": False,
-            "command_name": "run_core_layout_export",
+            "command_name": (
+                "run_staged_core_layout_export" if self._staged_export
+                else "run_core_layout_export"
+            ),
             "host_binding_name": CORE_LAYOUT_EXPORT_HOST_BINDING,
             "caller_name": "run_macro",
             "workflow_version": EXPECTED_WORKFLOW_VERSION,
@@ -2654,6 +2740,8 @@ def load_modular_transition_workflow_session(
     repository_root,
     modular_api,
     contract,
+    *,
+    export_files_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -2678,7 +2766,7 @@ def load_modular_transition_workflow_session(
     export_names = {
         CORE_LAYOUT_EXPORT_HOST_BINDING,
         *(host_name for _field_name, host_name
-          in CORE_LAYOUT_EXPORT_HOST_OPERATIONS),
+          in STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS),
     }
     present = {name for name in export_names if name in namespace}
     caller = namespace.get("run_macro")
@@ -2694,11 +2782,12 @@ def load_modular_transition_workflow_session(
             "The inherited core-layout export route is incomplete."
         )
     try:
-        export_calculation = modular_api.run_core_layout_export
+        export_calculation = modular_api.run_staged_core_layout_export
     except AttributeError as error:
         raise TransitionWorkflowError(
             "The modular core-layout export command is unavailable."
         ) from error
     return ModularCoreLayoutWorkflowSession(
-        calculation_session, export_calculation,
+        calculation_session, export_calculation, staged=True,
+        export_files_factory=export_files_factory,
     )

@@ -271,7 +271,7 @@ def _validate_gui_harness():
         )
         route_source = inspect.getsource(harness._run_route)
         assert route_source.index('state["workflow"] = report') < route_source.index(
-            "contract = _validate_routed_report(report, args.route)"
+            "contract = _validate_routed_report("
         )
         assert "_load_completed_route(" in route_source
         assert "result_path" in route_source

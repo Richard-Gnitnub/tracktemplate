@@ -32,7 +32,6 @@ from tools.freecad_bridge.ordinary_track_recipe import (  # noqa: E402
     ordinary_track_document_snapshot,
 )
 from tracktemplate import api  # noqa: E402
-from tracktemplate.compatibility import transition_workflow  # noqa: E402
 
 
 SENTINEL = "Phase 8 straight-host crossover FreeCAD validation passed"
@@ -88,11 +87,8 @@ def _load_b16():
     assert foundation["matched_profile_id"] == PROFILE
     modular_api, bootstrap = launcher["_load_foundation"](ROOT)
     assert modular_api is api
-    contract = bootstrap.load_contract(
-        ROOT / "reference/contracts/phase1-transition-pilot.json"
-    )
-    session = transition_workflow.load_modular_transition_workflow_session(
-        ROOT, api, contract,
+    session, _routing = launcher["_load_modular_transition_workflow"](
+        ROOT, api, bootstrap,
     )
     return session.module
 

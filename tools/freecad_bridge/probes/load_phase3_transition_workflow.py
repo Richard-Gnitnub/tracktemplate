@@ -71,7 +71,33 @@ _PHASE3_QUALIFICATION = _PHASE3_BOOTSTRAP.require_qualified_runtime(
     / "phase1-compatibility.json"
 )
 _PHASE3_PRODUCT_COMPOSITION = _PHASE3_ROUTE == "modular"
-if _PHASE3_PRODUCT_COMPOSITION:
+if _PHASE3_PRODUCT_COMPOSITION and globals().get(
+    "TRACKTEMPLATE_PHASE7_COMPARISON_EXPORT", False
+):
+    # Retain the explicit Phase 7 diagnostic after the normal route advances.
+    from tracktemplate.compatibility import b15_workflow_host as _phase7_host
+    from tracktemplate.compatibility import transition_workflow as _phase7_api
+
+    _PHASE3_TRANSITION_CONTRACT = _PHASE3_BOOTSTRAP.load_contract(
+        _PHASE3_REPOSITORY_ROOT
+        / "reference"
+        / "contracts"
+        / "phase1-transition-pilot.json"
+    )
+    _PHASE3_SESSION = _phase7_api.ModularCoreLayoutWorkflowSession(
+        _phase7_api.ModularTransitionWorkflowSession(
+            _phase7_host.load_b15_workflow_host(
+                _PHASE3_REPOSITORY_ROOT, _PHASE3_TRANSITION_CONTRACT,
+            ),
+            {
+                name: getattr(_PHASE3_API, name)
+                for name in _phase7_api.PRODUCT_FUNCTION_NAMES
+            },
+        ),
+        _PHASE3_API.run_core_layout_export,
+    )
+    _PHASE3_ROUTING = _PHASE3_SESSION.routing_record()
+elif _PHASE3_PRODUCT_COMPOSITION:
     _PHASE3_SESSION, _PHASE3_ROUTING = (
         _PHASE3_COMPOSITION._load_modular_transition_workflow(
             _PHASE3_REPOSITORY_ROOT,
