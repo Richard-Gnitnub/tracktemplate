@@ -3,9 +3,9 @@
 Status: **Draft Level 2 API for one B16 product route in Phase 7.**
 
 This document preserves the Phase 7 operation and its comparison contract.
-The normal Core Generate route now uses the
+The usual Core Generate route now uses the
 [Phase 9B operation](core-layout-export-staging.md).
-The original API and its partial-output diagnostic stay available for tests.
+The Phase 7 API and its diagnostic for incomplete output stay available for tests.
 
 ## Authority and purpose
 
