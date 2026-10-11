@@ -256,12 +256,23 @@ if phase3_product_composition:
     phase3_revalidated_routing = phase3_session.routing_record()
     phase3_active_route_after = "modular"
     phase7_export_routing = phase3_session.core_layout_export_routing_record()
+    staging_barrier = bool(globals().get(
+        "TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False,
+    ))
+    expected_export_contract = (
+        "tracktemplate:phase9b:core-layout-export-staging:1"
+        if staging_barrier else "tracktemplate:phase7:core-layout-export:1"
+    )
+    expected_export_command = (
+        "run_staged_core_layout_export"
+        if staging_barrier else "run_core_layout_export"
+    )
     if (
         phase7_export_routing.get("contract_id")
-        != "tracktemplate:phase7:core-layout-export:1"
+        != expected_export_contract
         or phase7_export_routing.get("route") != "modular"
         or phase7_export_routing.get("command_name")
-        != "run_core_layout_export"
+        != expected_export_command
         or phase7_export_routing.get("host_binding_name")
         != "run_production_export"
         or phase7_export_routing.get("mixed_route") is not False

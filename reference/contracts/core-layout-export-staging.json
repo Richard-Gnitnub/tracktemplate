@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase9b:core-layout-export-staging:1",
+  "recorded_on": "2026-10-11",
+  "status": "draft",
+  "change_level": 2,
+  "authority": [
+    "Project owner Phase 9B continuation after PR #161 on 2026-10-11"
+  ],
+  "criterion": "9B-5",
+  "contract_document": "reference/contracts/core-layout-export-staging.md",
+  "application_command": "tracktemplate.api.run_staged_core_layout_export",
+  "retained_comparison_command": "tracktemplate.api.run_core_layout_export",
+  "retained_comparison_contract": "tracktemplate:phase7:core-layout-export:1",
+  "host_operations": {
+    "dispatch_export_task": "dispatch_freecad_export",
+    "build_manifest_rows": "build_manifest_rows",
+    "write_export_manifest": "write_export_manifest",
+    "failed_export_report": "_failed_export_report",
+    "skipped_export_report": "_skipped_export_report"
+  },
+  "product_routing": {
+    "record_schema_version": 1,
+    "route": "modular",
+    "comparison_route_available": false,
+    "command_name": "run_staged_core_layout_export",
+    "host_binding_name": "run_production_export",
+    "caller_name": "run_macro"
+  },
+  "prepublication_failure": "no final files changed; zero published successes",
+  "task_publication_failure": "preserve prior published members; withhold prepared CSV; report actual publication results",
+  "cleanup_failure": "preserve actual publication results and add visible diagnostics",
+  "base_exception": "propagate the same instance after owned cleanup; attach cleanup diagnostics as a note",
+  "input_mutation": false,
+  "document_transaction": "Generate remains committed; export failure must preserve the valid editable model",
+  "excluded": [
+    "complete-set atomicity or rollback acceptance",
+    "new output-folder or overwrite choices",
+    "D-P6-003 or D-P6-004 changes",
+    "selected-export behaviour changes",
+    "new restart or durability guarantees",
+    "geometry, manifest schema, numerical-limit or source-classification changes",
+    "phase, exit, physical-fit, manufacturing, rights, production or release acceptance"
+  ],
+  "validation": {
+    "standalone": "tests/validate_core_export_staging.py",
+    "qualified_host": "tests/freecad_validate_core_export_staging.py",
+    "gui_boundary": "actual Core Generate success and failure"
+  },
+  "file_operations": {
+    "factory_keyword": "export_files_factory",
+    "implementation": "tracktemplate.adapters.export.core_layout_files.CoreLayoutExportFiles",
+    "methods": [
+      "open",
+      "stage",
+      "validate",
+      "publish",
+      "cleanup"
+    ]
+  }
+}
