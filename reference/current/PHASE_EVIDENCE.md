@@ -20,6 +20,82 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 | Owner decision | D-P9-013 authorises only the export policy and its bounded implementation. It accepts no exit. It gives no assurance that files stay available after a system interruption. It adds no recovery after FreeCAD stops and starts again. D-P9-012 stays the authority for the one accepted Phase 9B exit. All other exits and production conditions stay. <br><br>The Phase 9A closeout and earlier decisions keep their accepted limits. |
 | Next action | Complete the bounded implementation, validation and independent review. After CI gives a PASS result for the exact PR head, publish the draft PR. Do not merge or start another outcome. |
 
+## Previous files stay available after an output error — 2026-10-11
+
+This Level 2 result supplies evidence for phase exit 9B-5. The usual B16
+`Export selected production items` route keeps previous file data after an
+output error. This includes an error that stops the software before it can put previous
+files back in their initial locations.
+
+If the directory identity is known, the diagnostic gives the directory that
+contains those files. If that identity is unknown, it gives the last known path
+and reports that the current location is unknown. It does not report that the
+output stayed the same when the result is unknown.
+
+The test of the `implementation-defect` gave two `OSError` errors.
+One stopped a new file operation. The other stopped the software before it
+could put a previous file back. The previous software then removed the
+temporary directory and that file. The new `SelectedExportFiles` component
+keeps the directory if its checks do not show all previous files in their
+initial locations.
+
+A completed operation can remove its temporary files. An operation with an
+error can also remove them if it puts all previous files back.
+
+The [test with standalone Python](../../tests/validate_selected_export_rollback.py)
+compares results from completed operations and file bytes with B15. It also
+examines previous files, CSV on/off, rejected paths and the diagnostic after
+errors. The B15 command does not change.
+
+The [FreeCAD test](../../tests/freecad_validate_selected_export_rollback.py)
+and [test that uses `FreeCADGui`](../../tools/freecad_bridge/run_selected_export_rollback_gui.py)
+give PASS results on the qualified host profile for FreeCAD 1.1.4. The FreeCAD
+test compares one `TO-001` bounded scope with `SVG` and `CSV`.
+The comparison rules do not change. The checks show completed output,
+two conditions with errors and the same data after the test writes the
+`App.Document` to a file and opens it again.
+The test with standalone Python examines 23 conditions.
+
+The FreeCAD test result is in
+`tmp/selected-export-rollback/native-runs/20261011T163500394902Z/result.json`,
+SHA-256 `ee7d7bffc2ef2d56987e10df24dfbb29f59b24b78408ea3a73e0aa4ff84389fd`.
+The result from `run_selected_export_rollback_gui.py` is in
+`benchmark-output/freecad-bridge/selected-export-rollback-runs/20261011T163803576148Z/run.json`,
+SHA-256 `e17ed1f98d50ec539d9ec3be5f563d9183c7ea856c63081268e518fd666afca7`.
+
+The two results show that the software files did not change.
+Four images from FreeCAD stay with the result from
+`run_selected_export_rollback_gui.py`. The image after an error does not show
+the full path. The test examines the full diagnostic text in the
+`QMessageBox` that FreeCAD shows.
+
+The usual launcher supplies `SelectedExportFiles`. The B15 command stays
+available. The tests compare its results with the results from the B16 command.
+Migration acceptance stays necessary before removal of the B15 command.
+
+Filenames, CSV data and the data that define product shapes do not change.
+The file for the 113 quantities,
+[`s1-independent-engineering-evidence-map.json`](../lineage/s1-independent-engineering-evidence-map.json),
+does not change. A person can continue to select replacement of previous files.
+
+Before that replacement, the software continues to show this text:
+`Destination files change only when the complete export succeeds.`
+This claim is incorrect if the software cannot put previous files back.
+Independent review records this finding as `REQUIRED_BEFORE_EXIT` for 9B-5.
+The owner of the selected route must correct that claim before phase exit 9B-5.
+
+This result does not make all selected files available together.
+`dispatch_freecad_export` can continue to put temporary `Part::Feature`
+objects in the `App.Document` that a person can change. The duty for this
+operation is not complete.
+The change supplies no operation to put files back after FreeCAD stops and
+starts again. It gives no assurance that files stay available after a system
+interruption. [D-P9-013](#phase-9b-core-export-policy-panel)
+continues to be applicable only to `Core Generate`.
+
+Phase 9B stays `Open` at 1/6. Phase exit 9B-5 and the other four phase exits
+without acceptance stay `Pending`. All production conditions stay the same.
+
 <a id="phase-9b-core-export-policy-panel"></a>
 
 ## D-P9-013 Core Generate export policy panel — 2026-10-11

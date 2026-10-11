@@ -10,6 +10,9 @@ from tracktemplate.application import (
     turnout_edit,
 )
 from tracktemplate.compatibility.core_export_policy import CoreExportPolicy
+from tracktemplate.compatibility.selected_export_workflow import (
+    SelectedExportBinding,
+)
 from tracktemplate.compatibility.crossover_b4_recovery import (
     CrossoverB4RecoveryAdapter,
 )
@@ -2554,6 +2557,7 @@ class ModularCoreLayoutWorkflowSession:
         *,
         staged=False,
         atomic=False,
+        selected_export_files_factory=None,
         export_files_factory=None,
         export_dispatcher_factory=None,
     ):
@@ -2582,6 +2586,11 @@ class ModularCoreLayoutWorkflowSession:
         )
         namespace = self.module.__dict__
         self._core_export_policy = CoreExportPolicy(namespace) if atomic else None
+        self._selected_export_binding = (
+            SelectedExportBinding(
+                namespace, export_files_factory=selected_export_files_factory,
+            ) if selected_export_files_factory is not None else None
+        )
         operations = {}
         for field_name, host_name in self._export_operations:
             operation = namespace.get(host_name)
@@ -2648,6 +2657,10 @@ class ModularCoreLayoutWorkflowSession:
         previous = namespace.get(CORE_LAYOUT_EXPORT_HOST_BINDING, missing)
         policy = self._core_export_policy
         previous_policy = policy.snapshot() if policy is not None else None
+        selected_binding = self._selected_export_binding
+        previous_selected = (
+            selected_binding.snapshot() if selected_binding is not None else None
+        )
         dialog_class = self._selected_export_dialog
         previous_scope = (
             dialog_class.__dict__.get("_current_scope", missing)
@@ -2657,10 +2670,14 @@ class ModularCoreLayoutWorkflowSession:
             namespace[CORE_LAYOUT_EXPORT_HOST_BINDING] = self._export_adapter
             if policy is not None:
                 policy.bind()
+            if selected_binding is not None:
+                selected_binding.bind()
             if dialog_class is not None:
                 dialog_class._current_scope = self._selected_export_scope
             self._validate_core_layout_export_binding()
         except Exception:
+            if selected_binding is not None:
+                selected_binding.restore(previous_selected)
             if policy is not None:
                 policy.restore(previous_policy)
             if previous is missing:
@@ -2679,6 +2696,8 @@ class ModularCoreLayoutWorkflowSession:
         adapter = namespace.get(CORE_LAYOUT_EXPORT_HOST_BINDING)
         if self._core_export_policy is not None:
             self._core_export_policy.validate()
+        if self._selected_export_binding is not None:
+            self._selected_export_binding.validate()
         if (
             type(adapter) is not self._export_adapter_type
             or adapter is not self._export_adapter
@@ -2785,6 +2804,7 @@ def load_modular_transition_workflow_session(
     atomic=True,
     export_files_factory=None,
     export_dispatcher_factory=None,
+    selected_export_files_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -2835,6 +2855,7 @@ def load_modular_transition_workflow_session(
         ) from error
     return ModularCoreLayoutWorkflowSession(
         calculation_session, export_calculation, staged=True, atomic=atomic,
+        selected_export_files_factory=selected_export_files_factory,
         export_files_factory=export_files_factory,
         export_dispatcher_factory=export_dispatcher_factory,
     )

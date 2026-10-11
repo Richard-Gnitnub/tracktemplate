@@ -461,12 +461,12 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
-      "accepted_blob": "sha1:dac0022067c40228c00c64fd18712df9c9ae2ed5",
-      "accepted_sha256": "sha256:beddeb9b6eb6373808e9fbcedb8dbb4bb95c4f75ca137a96601f48f342da6c52",
+      "accepted_blob": "sha1:c828d1d05a83b7d7413669a4f5d7c02ea4cc7ccb",
+      "accepted_sha256": "sha256:a375938b5e238cf71ee79f3753886af0d117629e24a5a7f381105b12a04c5340",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
       "lifecycle_status": "locked",
       "path": "reference/current/PHASE_EVIDENCE.md",
-      "review_receipt": "sha256:21a93b3e7de81df6153589ef6c6f048f6945592846db894c0b0093a8b58a57d7",
+      "review_receipt": "sha256:42611ebd0183ec5846b6a0c4e11d1718cf6fa859847f4b73e132304e42fb53c0",
       "review_result": "BLOCKED"
     },
     {
