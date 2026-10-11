@@ -26,8 +26,8 @@ the two operations and the new route.
 
 ## Inputs and operation
 
-`tracktemplate.api.run_staged_core_layout_export` receives the same nine
-positional inputs as `run_core_layout_export`. The compatibility adapter
+`tracktemplate.api.run_staged_core_layout_export` receives the same first nine
+inputs as `run_core_layout_export`. The compatibility adapter
 supplies `dispatch_export_task`, `build_manifest_rows`,
 `write_export_manifest`, `failed_export_report` and `skipped_export_report`.
 `dispatch_export_task` uses `dispatch_freecad_export`.
@@ -37,56 +37,56 @@ inside `CoreExportDocument` for a test.
 
 The necessary `export_files_factory` input supplies
 `tracktemplate.adapters.export.core_layout_files.CoreLayoutExportFiles`.
-The compatibility adapter supplies and validates this input. The export
-adapter does the work for temporary files, final writes and cleanup.
-The application command controls their sequence and returns diagnostic information.
+The compatibility adapter supplies and validates this input. The
+adapter does the work for temporary files, writes to output paths and cleanup.
+The command controls their sequence and returns diagnostic information.
 
-The call `CoreLayoutExportFiles()` does not operate on files.
+`CoreLayoutExportFiles()` does not operate on files.
 Its result supplies `open`, `stage`, `validate`, `publish` and `cleanup`.
 
-The operation keeps the supplied task identities, sequence and final paths.
-It does not change the plan or configuration. The selected operation receives
+The operation keeps the supplied task identities, sequence and output paths in `plan`.
+It does not change `plan` or `config`. The selected operation receives
 the supplied task and a different temporary output path.
-CSV rows contain the final paths. The selected formats, file names,
-revision allocation and CSV schema stay the same.
+CSV rows contain the output paths in `plan`. The selected `format` values, file names,
+results from `resolve_revision_path` and CSV schema stay the same.
 
-Each final path must be in the selected output directory.
-The operation rejects repeated final paths before it makes temporary files.
+Each output path in `plan` must be in the selected output directory.
+The operation rejects an output path that occurs more than once before it makes temporary files.
 
 The operation first makes a temporary directory for this command invocation only.
-It makes and examines each format file in the plan.
-It then makes and examines the CSV file, if the plan includes one.
+It makes and examines each output file for `plan["tasks"]`.
+It then makes and examines the CSV file, if `plan` includes one.
 The file mode of each temporary file must give a `True` result from `stat.S_ISREG`.
 Each temporary file must also have a byte size of more than zero.
 
 The checks in `dispatch_freecad_export` continue to apply.
-This change adds no format specification or numerical limit.
+This change adds no specification for output or numerical limit.
 
-If an error occurs before the first final file write, no final file changes.
-The result reports zero files written to their final paths.
+If an error occurs before the operation writes a file to an output path in `plan`, no file at those paths changes.
+The result reports zero files written to those output paths.
 The result does not count temporary files. The software reports tasks that it
 did not complete and does not write a CSV with error results to the output directory.
 
-Only after these operations are complete does the software write final files
-in task sequence. If the configuration does not permit replacement, a file
-at the final path causes an error. If replacement is permitted, the software
-can replace only a file whose mode gives a `True` result from `stat.S_ISREG`.
+Only after these operations are complete does the software write files to the output paths in `plan`.
+It writes those files in task sequence.
+If `config` does not let the software replace files, a file at the output path causes an error.
+If `config` lets the software replace files, the software can replace only a file with a mode that gives a `True` result from `stat.S_ISREG`.
 The software rejects a symbolic link or a different file type.
 
-If a final task write gives an error, the software stops more final writes.
+If a file write to a task output path gives an error, the software stops more writes to output paths.
 It does not write the prepared CSV. A CSV from a previous operation stays
 without a change.
 
 Files written before this error stay in the output directory.
 The result counts those files as completed output.
-The software does not put the complete output set back to its initial state.
+The software does not make the complete output set equal to its initial condition.
 
-The software removes only temporary state from this command invocation with
+The software removes only temporary data from this command invocation with
 an identity that it validates. A cleanup error stays in the diagnostic
 information that the operation returns.
 After cleanup, the operation uses `raise` for a `BaseException` that is not an `Exception`.
 It does not replace that `BaseException`.
-A cleanup error adds a note to that `BaseException`.
+The software adds cleanup diagnostic information to that `BaseException` with `add_note`.
 This rule does not change the accepted interruption conditions.
 
 ## Results and caller
@@ -117,51 +117,51 @@ The document transaction completes before export starts. An export error
 does not put the document back to its state before Core Generate.
 `run_staged_core_layout_export` does not supply those GUI checks independently.
 
-## Separate objects for export
+## Isolated objects for output
 
 After PR #162, the usual Core Generate route uses `CoreExportDocument` for
-each task. The B16 launcher supplies this class through
-`export_dispatcher_factory`. Its construction does not operate on the host.
-The application command API and the Phase 7 comparison route stay unchanged.
+each task. The B16 launcher supplies `CoreExportDocument` through
+`export_dispatcher_factory`. `CoreExportDocument(...)` does not operate on FreeCAD.
+The API for `run_staged_core_layout_export` does not change.
+The Phase 7 route used to compare output also stays the same.
 
-`CoreExportDocument` calls `App.newDocument` with `hidden=True` and
-`temp=True`. It examines the returned `App.Document` and its registered
-identity before it supplies that object to `dispatch_freecad_export`.
+`CoreExportDocument` uses `App.newDocument` with `hidden=True` and
+`temp=True`. It compares the returned `App.Document` with `App.listDocuments()`
+before it supplies that object to `dispatch_freecad_export`.
 The object must have `Temporary=True` and an empty `FileName`.
-The task and its records stay unchanged.
-The operation never supplies the editable `App.Document` to that function.
-Objects of type `App::FeaturePython` keep the existing `Label` values in the
+`task` and `task["records"]` stay the same.
+The operation does not supply `editable_doc` to that function.
+
+Objects of type `App::FeaturePython` keep the previous `Label` values in the
 new `App.Document`. They contain no copied `Shape` or other source properties.
 This lets FreeCAD apply its previous rules for duplicate `Label` values.
-The operation changes no preference and supplies none of these objects for export.
+The operation does not change FreeCAD `Preferences`. It supplies none of these objects to `dispatch_freecad_export`.
 
-Before the operation returns, it closes only the registered `App.Document`
-that it created and whose identity it proves.
-It checks the previous registered identities and active state.
-In the GUI, it puts the previous selection and preselection back.
-It checks object identities, selected subelements and picked coordinates.
-This check covers all previous registered documents.
-It does not prove the previous order of selection events between different objects.
+Before the operation returns, it closes only the `App.Document` that it made and that has the same identity in `App.listDocuments()`.
+It checks the previous identities in `App.listDocuments()` and the active condition.
+In the GUI, it puts the previous selection and the condition from `Gui.Selection.getPreselection()` back.
+It checks object identities and the values in `SubElementNames` and `PickedPoints`.
+This check includes all `App.Document` objects that were open before the operation.
+It gives no evidence for the previous sequence of changes to selection between different objects.
 
-An error in this work prevents final file writes.
+An error in this work prevents file writes to output paths in `plan`.
 An object with uncertain ownership stays open.
-A close error gives diagnostic information.
-If the owned object stays registered, the diagnostic identifies that object.
-The software does not close or change a previous `App.Document` to recover.
-Contradictory results from `App.ActiveDocument` and `App.activeDocument()`
-cause rejection before it creates an object for export.
+An error from `App.closeDocument` gives diagnostic information.
+If the owned object stays in `App.listDocuments()`, the diagnostic identifies that object.
+The software does not close or change a previous `App.Document` after an error.
+If `App.ActiveDocument` and `App.activeDocument()` give different results, the software stops before it makes an object for output.
 
-The original exception stays the same object.
-Additional cleanup errors become exception notes.
-The application includes those notes in its error report for an `Exception`.
-A `BaseException` continues to propagate after cleanup.
+The error object stays the same object.
+The software adds cleanup diagnostic information to that object with `add_note`.
+The command includes that information in its error report for an `Exception`.
+The operation uses `raise` for a `BaseException` after cleanup.
 
-The frozen `dispatch_freecad_export` still does not report some errors from
-object removal or recompute. Its objects now belong to the separate
-`App.Document` in this route. A successful close removes that entire object.
-This change supplies no new guarantee for the Phase 7 comparison route,
-selected export or arbitrary asynchronous interruption.
-The complete output-set requirement for Exit 9B-5 stays unresolved.
+The frozen `dispatch_freecad_export` continues not to report some errors from
+object removal or `recompute`. Its objects now belong to the isolated
+`App.Document` in this route. When `App.closeDocument` completes, it removes that `App.Document` and its objects.
+This change adds no assurance for the Phase 7 route used to compare output or for `SelectedProductionExportDialog`.
+The [accepted interruption conditions](../ARCHITECTURE.md#supported-exporter-failure-model) stay the same.
+The complete output requirement for Exit 9B-5 stays unresolved.
 
 ## Validation and limits
 
