@@ -1334,8 +1334,8 @@ def _validate_owner_view(plan: str) -> None:
         'The owner accepts Exit 9B-4 only',
         'D-P9-012 and D-P9-015 keep their accepted limits',
         'This decision accepts no other exit, production clearance or phase closeout',
-        'Complete the Level 3 alignment, independent review and finite documentation lifecycle',
-        'Publish one draft PR after CI gives a PASS result for its exact head',
+        'Complete the Level 3 alignment. Complete independent review. Complete the Documentation Review lifecycle',
+        'After CI gives a PASS result for the exact PR head, publish one draft PR',
         'Stop for integration authority',
         'Keep the completed worktree until independent preservation is proved',
         'Do not force retirement',
@@ -1350,7 +1350,7 @@ def _validate_owner_view(plan: str) -> None:
         '4f1f0d9b1c979241eaf6b357d1b0070b404b9ad275bbf90006faddbb05d4a7cb',
         'c3848cd9458570a74e45d149b682bce0b4439f1c40a5f85b0ce7e3942c3d26a5',
         'fc41ff486f3fc229a2766b52bdac19c4be84ba89c5f6feb569904291bb687a50',
-        '5cb188c52fa9ba6dd99be681fee61968bef7223bb1e638c0a79e914f3b75ef15',
+        '4605e569c86419e61bcf94728b2d1317e006c611a67189e64c868f513b54c8a3',
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -7839,7 +7839,7 @@ def _validate_dp9_017_decision(
             "354cc6c73904450ea0d04e0fedbb27014886fa336787f58a3f440f55d417cc3b"
         )),
         ("exclusions", (
-            "393d32122cc2b5e86a8129c3be7909ed8faa2cb159be8dca51f3452c540cfa69"
+            "6fbb44f990f6e7f282261b818e49a074619fe76af8cb9a0ff4918d7e2800a234"
         )),
     ):
         value = record[field]
@@ -7863,7 +7863,7 @@ def _validate_dp9_017_admission(evidence: str) -> None:
     )
     _require(
         hashlib.sha256(_semantic_text(panel).encode("utf-8")).hexdigest()
-        == "da4376d50316b3cfe78f83a867690344823dbb384ebf3b2a340fc2abaf603769",
+        == "457df354762b7cd57cad5a9f482687d4daa9bc88eb1d2bb52028845aa20e90bd",
         "D-P9-017 accepted evidence or bounded conditions drifted",
     )
     _require_links(
@@ -8993,8 +8993,8 @@ def _validate_decisions(plan: str) -> None:
         and "history/phase-closeouts/PHASE8_GATE_DECISIONS.json"
         in decision_section
         and "current decision register" in decision_flat
-        and "keeps D-P6-008 in full"
-        in decision_flat,
+        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-017 "
+        "and D-GOV-024" in decision_flat,
         "Phase 7 closeout or current decision-register ownership is missing",
     )
     plan_ids = set(
