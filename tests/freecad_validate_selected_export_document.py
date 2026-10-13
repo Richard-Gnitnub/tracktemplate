@@ -261,7 +261,7 @@ def validate():
     module = None
     original_datetime = None
     try:
-        module, routing = CORE.load_product(atomic=True)
+        module, routing = CORE.load_product(atomic=True, selected_atomic=False)
         receipt.update(profile=CORE.PROFILE, core_routing=routing)
         document = PREVIOUS.prepare_document(module, directory)
         original_datetime = module.datetime.datetime

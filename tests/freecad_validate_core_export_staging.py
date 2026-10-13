@@ -65,15 +65,38 @@ def source_hashes():
     return {str(path.relative_to(ROOT)): sha256(path) for path in paths}
 
 
-def load_product(*, atomic=False):
+def load_product(*, atomic=False, selected_atomic=True):
     launcher = runpy.run_path(str(ROOT / "TrackTemplate.FCMacro"))
     foundation = launcher["FOUNDATION_RESULT"]
     assert foundation["matched_profile_id"] == PROFILE
     product, bootstrap = launcher["_load_foundation"](ROOT)
-    if atomic:
+    if atomic and selected_atomic:
         session, routing = launcher["_load_modular_transition_workflow"](
             ROOT, product, bootstrap,
         )
+    elif atomic:
+        # Exercise the retained selected replacement API explicitly.
+        from tracktemplate.compatibility import (
+            load_modular_transition_workflow_session,
+        )
+        from tracktemplate.adapters.export.core_layout_set import (
+            CoreLayoutExportSetFiles,
+        )
+        from tracktemplate.adapters.export.selected_export_files import (
+            SelectedExportFiles,
+        )
+
+        contract = bootstrap.load_contract(
+            ROOT / "reference/contracts/phase1-transition-pilot.json"
+        )
+        session = load_modular_transition_workflow_session(
+            ROOT, product, contract,
+            export_files_factory=CoreLayoutExportSetFiles,
+            export_dispatcher_factory=CoreExportDocument,
+            selected_export_files_factory=SelectedExportFiles,
+            selected_export_atomic=False,
+        )
+        routing = session.routing_record()
     else:
         # Retain the historical staging proof after the normal route advances.
         from tracktemplate.compatibility import b15_workflow_host

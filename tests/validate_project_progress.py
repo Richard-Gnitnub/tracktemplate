@@ -1293,25 +1293,23 @@ def _validate_owner_view(plan: str) -> None:
         "Phase 9B is Open at 1/6 under D-P9-012",
         "Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11",
         "The other five exits stay Pending",
-        "D-GOV-024 authorises Codex to make the Level 2 decision for permanent "
-        "local worktree retirement under the conditions that Recovery owns",
-        "Codex can then remove the worktree and its specified local branch "
-        "that is no longer necessary",
-        "authority applies only after protected main contains the accepted change",
-        "This alignment removes no worktree or branch",
-        "Keep the primary worktree, active state, unique content, ambiguous "
-        "or uniquely owned state, and state without sufficient evidence of "
-        "planned preservation",
-        "Do not delete branches in another repository",
-        "Do not use force removal",
-        "D-GOV-022 is not available through this route",
+        "D-P9-014 authorises the usual B16 selected export to make the "
+        "complete requested set available in a different new directory",
+        "CSV stays optional",
+        "The route no longer offers replacement of previous output",
+        "confirmed requested set through preview, confirmation, preflight "
+        "and execution",
+        "policy applies only to the qualified Linux ext4 host and an "
+        "operator-controlled directory",
+        "It gives no assurance that files stay available after a system interruption",
+        "It adds no recovery after FreeCAD stops and starts again",
         "All 24 risk duties and previous production limits stay",
         "D-P6-008 stays Deferred — unmet",
         "TERM-R04 stays open",
         "Output stays private-development",
         "Project status stays unknown",
-        "D-GOV-024 changes only bounded removal authority and routing for "
-        "local worktree retirement",
+        "D-P9-014 changes only the usual selected-export policy and "
+        "authorises one bounded implementation",
         "It accepts no phase exit or production result",
         "D-P9-012 continues to own the one accepted Phase 9B exit",
         "D-P9-013 stays limited to Core Generate",
@@ -1326,11 +1324,11 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         "f2673cf87fd4bd3a58de0ba035a404cbd1922e33e14f9fb56d5d205e064d2424",
-        "00002165734742019cf003cc819744f5914ae0d0031eb6292b5f37d216e36749",
-        "b24245a0285a153f090f8401314b5ade17413bf757e2b73ad7156d0794d3bbe8",
-        "346eb71fc60940db245634ad822928a7ebd0ec0898dae8bf99185ccb4cba13e0",
-        "8b613ef8356784d611fa47065f6b550379174b4a26a8b2d2b3539436648b9a28",
-        "21ceb09d0454aca7d85985ca98591711fa0d0be47c60e8ca07609bb3c6c228bc",
+        "5ee7c4eae9b6d9679884f02cc5c63f34973807cc9b8de47b02ee1ba754dd780b",
+        "e8ab0bfd01fc83c1083aa9c1a8db70944fb9f1f579ed8b7e30679825dc3c0475",
+        "9c9425dc1578481cf9d2b00a7333c61c9faaa7e21842a3e241636433ac7c42e3",
+        "b2b3b3901501a690331221b2f71a55b8b66fb7001f2966d5c47dd987980f5ac9",
+        "b8231897c5ca5538c45b0efbcdf20dcb0a5febd105bf7103420fa6363d164ac5",
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -1345,8 +1343,8 @@ def _validate_owner_view(plan: str) -> None:
           "#phase-9a-closeout-panel"),
          ("D-P9-012", "current/PHASE_EVIDENCE.md"
           "#phase-9b-exit-2-acceptance-panel"),
-         ("D-GOV-024", "current/PHASE_EVIDENCE.md"
-          "#delegated-local-retirement-panel")),
+         ("D-P9-014", "current/PHASE_EVIDENCE.md"
+          "#phase-9b-selected-export-policy-panel")),
         "project-plan owner view closeout or acceptance route drifted",
     )
     _require(
@@ -7419,7 +7417,7 @@ def _validate_dgov024_panel(evidence: str) -> None:
         evidence,
         "D-GOV-024 local retirement authority panel — 2026-10-13",
     )
-    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][-1]
+    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][5]
     authority = record["authority"].replace("Adopted owner addendum:\n\n", "")
     _require(
         evidence.count('<a id="delegated-local-retirement-panel"></a>') == 1
@@ -7469,8 +7467,197 @@ def _validate_dgov024_panel(evidence: str) -> None:
     )
 
 
+def _validate_dp9_014_decision(
+    record: dict[str, object], fields: set[str],
+) -> None:
+    """Bind only the approved selected-output policy and its limits."""
+    panel = (
+        "reference/current/PHASE_EVIDENCE.md#phase-9b-selected-export-policy-panel"
+    )
+    _require(
+        isinstance(record, dict)
+        and set(record) == fields
+        and record["id"] == "D-P9-014"
+        and record["decided_on"] == "2026-10-13"
+        and record["status"] == "Accepted"
+        and record["evidence"] == panel
+        and record["panel_record"] == panel
+        and record["panel_required_under_current_policy"] is True,
+        "D-P9-014 identity, status or panel routing drifted",
+    )
+    authority = record["authority"]
+    _require(
+        isinstance(authority, str)
+        and hashlib.sha256(authority.encode("utf-8")).hexdigest()
+        == "c6680a48f125ad6d01aa574c7e7dd8e4144b6843baf4b9b8e5e06bb589a8f949",
+        "D-P9-014 exact owner authority drifted",
+    )
+    for field, clauses in (
+        ("decision", (
+            "usual B16 Export selected production items route",
+            "different new directory inside the directory that the operator selects",
+            "One directory operation makes the full requested set available "
+            "without replacement of an existing path",
+            "CSV stays optional and is part of the same set when requested",
+            "Preserve previous output",
+            "Remove replacement of existing output from this usual route",
+            "necessary Level 3 alignment and one bounded implementation towards Exit 9B-5",
+            "keep the confirmed requested set through execution",
+        )),
+        ("exclusions", (
+            "only the existing Linux ext4 host with an operator-controlled output directory",
+            "Claim no assurance that files stay available after a system interruption",
+            "Claim no recovery after FreeCAD stops and starts again",
+            "Claim no assurance for every filesystem or for changes that "
+            "another process makes to the directory during the operation",
+            "Preserve member filenames, content requirements, selected scope, "
+            "record identities and isolated-document operation",
+            "Preserve frozen B14/B15 comparison paths, the previous selected "
+            "command and file adapter, retained comparison APIs, Core Generate "
+            "policy and D-P6-003/D-P6-004 Entry/Exit authority",
+            "Change no geometry, package bytes, numerical limits, persistent "
+            "schema or runtime dependency",
+            "Accept no phase exit or closeout",
+            "Phase 9A stays closed at 4/4 for its frozen reference-only scope",
+            "Phase 9B stays Open at 1/6 under D-P9-012",
+            "Only Exit 9B-2 is Evidenced and owner-accepted",
+            "The other five exits stay Pending",
+            "Preserve all six exact criteria, the 113-entry register, all 24 "
+            "risk duties and legacy-retirement conditions",
+            "D-P6-008 stays Deferred — unmet",
+            "TERM-R04 stays open",
+            "Output stays private-development",
+            "Project status stays unknown",
+            "Accept no production output, physical fit, manufacturing "
+            "capability, rights, performance or release result",
+            "necessary validation, independent review and finite documentation lifecycle",
+            "Publish one exact-green draft PR, then stop",
+            "Do not merge or start another outcome",
+        )),
+    ):
+        _require(isinstance(record[field], str), "D-P9-014 " + field + " missing")
+        flat = _semantic_text(record[field])
+        for clause in clauses:
+            _require(
+                clause in flat,
+                "D-P9-014 " + field + " boundary drifted: " + clause,
+            )
+
+
+def _validate_dp9_014_policy(evidence: str, architecture: str) -> None:
+    """Keep selected publication, confirmation and evidence limits bounded."""
+    panel = direct_section_content(
+        evidence, "D-P9-014 selected export policy panel — 2026-10-13",
+    )
+    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][6]
+    _require(
+        evidence.count('<a id="phase-9b-selected-export-policy-panel"></a>') == 1
+        and _blockquote_paragraphs(panel) == [
+            _semantic_text(paragraph)
+            for paragraph in record["authority"].split("\n\n")
+        ],
+        "D-P9-014 exact panel authority drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "This Level 3 decision changes output paths and replacement behaviour",
+        "It accepts no phase exit",
+        "98f637723154b1038c161bda7456650e37edf28f",
+        "D-P9-013 continues to own Core Generate",
+        "D-P6-003/D-P6-004 keep their Entry/Exit authority",
+        "The previous results and their limits stay",
+        "selected_set_architecture_risk",
+        "examined all 24 risk records",
+        "Proceed with bounded conditions",
+        "a0bdb8dd9459133c9864d858fd1662296119c8bee0e655a29cb62fa3510051ec",
+        "No risk closes",
+        "Phase 9A stays closed at 4/4 for its frozen reference-only scope",
+        "Phase 9B stays Open at 1/6 under D-P9-012",
+        "Only Exit 9B-2 is Evidenced and owner-accepted",
+        "The other five exits stay Pending",
+        "113-entry register and legacy-retirement conditions stay unchanged",
+        "D-P6-008 stays Deferred — unmet",
+        "TERM-R04 stays open",
+        "Output stays private-development",
+        "Project status stays unknown",
+        "qualified Linux ext4 host and an operator-controlled output directory",
+        "It gives no assurance that files stay available after a system interruption",
+        "It adds no recovery after FreeCAD stops and starts again",
+        "Do not merge or start another outcome",
+        "This panel supplies no phase-exit acceptance",
+    ):
+        _require(clause in flat, "D-P9-014 panel boundary drifted: " + clause)
+    _require_links(
+        panel,
+        (("architecture", "../ARCHITECTURE.md"
+          "#d-p9-014-selected-complete-output-set"),
+         ("selected successor contract", "../contracts/selected-export-set.md"),
+         ("current register", "risks.json"),
+         ("standalone selected-set test", "../../tests/validate_selected_export_set.py"),
+         ("real-GUI test", "../../tools/freecad_bridge/run_selected_export_set_gui.py"),
+         ("chair continuity test", "../../tests/freecad_validate_chair_export_continuity.py"),
+         ("selected-set FreeCAD proof", "../../tests/freecad_validate_selected_export_set.py")),
+        "D-P9-014 panel owner route drifted",
+    )
+    section = direct_section_content(
+        architecture, "D-P9-014 selected full output set", level=4,
+    )
+    flat = _semantic_text(section)
+    for clause in (
+        "usual B16 Export selected production items route",
+        "different new directory for each operation",
+        "inside the directory that the operator selects",
+        "All requested files must pass their existing checks before one "
+        "directory operation makes the full set available at its final path",
+        "That operation must not replace an existing path",
+        "If the host cannot supply that operation, export must stop with a diagnostic",
+        "It must not write final files one at a time as a different route",
+        "CSV stays optional. A requested CSV is part of the same set",
+        "Previous output files and directories stay unchanged",
+        "usual selected route no longer offers replacement of existing output",
+        "Member filenames, content requirements, selected scope and record "
+        "identities stay the same",
+        "preview, confirmation, preflight and execution must use the same "
+        "requested output paths and selected records",
+        "After confirmation, the operation must not silently prepare a different set",
+        "saved preference keeps the directory that the operator selects",
+        "result and Open Folder control identify the completed output directory",
+        "only to the qualified Linux ext4 host and an operator-controlled output directory",
+        "It gives no assurance that files stay available after a system interruption",
+        "It adds no recovery after FreeCAD stops and starts again",
+        "It gives no assurance for every filesystem or for changes that "
+        "another process makes to the directory during the operation",
+        "An error after that operation must preserve completed files, counts and paths",
+        "Cleanup must preserve completed output and data whose ownership is unknown",
+        "isolated FreeCAD operation and editable-model preservation conditions stay",
+        "previous selected command and file adapter stay available for comparison",
+        "frozen B14/B15 paths, Core Generate policy, Phase 7 comparison and "
+        "staging APIs, and D-P6-003/D-P6-004 Entry/Exit authority stay unchanged",
+        "This policy accepts no phase exit, production output, rights, "
+        "performance or release result",
+    ):
+        _require(clause in flat, "D-P9-014 architecture boundary drifted: " + clause)
+    _require_links(
+        section,
+        (("D-P9-014", "current/PHASE_EVIDENCE.md"
+          "#phase-9b-selected-export-policy-panel"),
+         ("selected successor contract", "contracts/selected-export-set.md")),
+        "D-P9-014 architecture owner route drifted",
+    )
+
+
+def _validate_dp9_014_contract(document: dict[str, object]) -> None:
+    """Protect the declared selected API, host and confirmation contract."""
+    canonical = json.dumps(document, sort_keys=True, separators=(",", ":"))
+    _require(
+        hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+        == "5b3ba62be5b22a121431aa57aa2be064b731dca6ab64ef40ea9284e3993fade5",
+        "D-P9-014 selected contract boundary drifted",
+    )
+
+
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
-    """Keep prior admissions and the bounded D-GOV-024 delegation."""
+    """Keep prior decisions and the bounded selected-export successor."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
     _require(
         set(document) == set(archive)
@@ -7482,7 +7669,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 6
+        and len(records) == 7
         and records[:2] == [
             archive["decisions"][0], archive["decisions"][11],
         ],
@@ -7493,6 +7680,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     _validate_dp9_012_decision(records[3], set(records[0]))
     _validate_dp9_013_decision(records[4], set(records[0]))
     _validate_dgov024_decision(records[5], set(records[0]))
+    _validate_dp9_014_decision(records[6], set(records[0]))
 
 
 def _validate_phase9a_closeout(evidence: str) -> None:
@@ -7667,7 +7855,7 @@ def _validate_dp9_012_admission(evidence: str) -> None:
         (("D-P9-010", "../history/phase-closeouts/PHASE9A_CLOSEOUT.md"
           "#phase-9a-closeout-panel"),
          ("D-P9-012", "#phase-9b-exit-2-acceptance-panel"),
-         ("D-GOV-024", "#delegated-local-retirement-panel")),
+         ("D-P9-014", "#phase-9b-selected-export-policy-panel")),
         "Phase 9B evidence owner-view route drifted",
     )
 
@@ -8590,7 +8778,8 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
-           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-GOV-023",
+           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014",
+           "D-GOV-023",
            "D-GOV-024"},
         "project-plan decisions differ from the current and frozen registers",
     )
@@ -10360,6 +10549,12 @@ def main() -> None:
     _validate_dp9_013_architecture(_read(ARCHITECTURE_PATH))
     _validate_phase9b_decisions(_load_json(CURRENT_DECISIONS_PATH))
     _validate_dgov024_panel(_read(CURRENT_EVIDENCE_PATH))
+    _validate_dp9_014_policy(
+        _read(CURRENT_EVIDENCE_PATH), _read(ROOT / "reference/ARCHITECTURE.md"),
+    )
+    _validate_dp9_014_contract(
+        _load_json(ROOT / "reference/contracts/selected-export-set.json"),
+    )
     _validate_dp9_004_admission(phase9_holding)
     _validate_dp9_005_evidence_model(phase9_holding)
     _validate_dp9_006_admission(phase9_holding)

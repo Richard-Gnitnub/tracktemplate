@@ -203,6 +203,10 @@ def _prepare_case(module, run_dir, kind):
 
 def _export_once(module, document, kind, directory):
     """Prove semantic and editable-state continuity across real export."""
+    from tracktemplate.application.selected_export_set import (
+        prepare_selected_export_plan,
+    )
+
     identifier = CASES[kind][0]
     helper = EXPORT_HELPERS[kind]
     before = _decision_state(module, document, kind)
@@ -212,6 +216,48 @@ def _export_once(module, document, kind, directory):
               if "Shape" in obj.PropertiesList and not obj.Shape.isNull()}
     prepared = helper._selected_plan(module, document, directory)
     config, plan, skipped, issues, outline, *remaining = prepared
+    assert not module.preflight_blocking_report(issues), issues
+    comparison_plan = plan
+    assert len(comparison_plan["tasks"]) == 1
+    records = comparison_plan["tasks"][0]["records"]
+    scope = comparison_plan["selected_scope"]
+    plan = prepare_selected_export_plan(
+        records, config, helper.SET_ID, scope,
+        plan_export=module.plan_selected_production_export,
+    )
+    assert plan["selected_scope"] == scope
+    for current, previous in zip(plan["tasks"], comparison_plan["tasks"]):
+        assert Path(current["path"]).name == Path(previous["path"]).name
+        assert current["records"] == previous["records"]
+        assert current["format"] == previous["format"]
+    assert len(plan["tasks"]) == len(comparison_plan["tasks"])
+    assert Path(plan["manifest_path"]).name == Path(
+        comparison_plan["manifest_path"],
+    ).name
+    child = Path(plan["output_directory"])
+    assert child.parent == directory and not child.exists()
+    assert config["output_directory"] == str(directory)
+    index = module.production_record_index_for_set(document, helper.SET_ID)
+    catalogue = module.hydrate_production_index_records(document, index)
+    matching = module.filter_production_records_by_selected_scope(
+        catalogue, scope,
+    )
+    settings = module.settings_for_template_set(document, helper.SET_ID)
+    preflight_config = module.selected_export_preflight_config(config, plan)
+    preflight_config["output_directory"] = str(child)
+    issues = module.run_production_preflight(
+        document,
+        module.selected_export_validation_records(catalogue, matching, scope),
+        records, preflight_config, helper.SET_ID,
+        module.read_section_config(settings),
+        module.read_registration_config(settings),
+        module.read_template_assembly_config(settings),
+        settings_obj=settings, plan=plan, include_export_checks=True,
+        probe_export_bounds=True,
+        filename_issues_override=module.selected_export_filename_issues(
+            plan, config, helper.SET_ID,
+        ),
+    )
     assert not module.preflight_blocking_report(issues), issues
     if kind == "crossover":
         warnings = [item for item in issues if item["issue_code"] ==
@@ -224,15 +270,17 @@ def _export_once(module, document, kind, directory):
         module, document, kind, identifier,
     ) == editable, "Production preflight changed editable document state"
     summary = helper._export(module, document, config, plan, skipped)
+    assert summary["publication_state"] == "published"
+    assert summary["output_directory"] == str(child)
     assert summary["successful_files"] == 2 and summary["failed_files"] == 0
     assert summary["formats"] == ["SVG"]
     assert summary["manifest_path"] == plan["manifest_path"]
     if kind == "turnout":
         content, _bindings = helper._output_witness(
-            module, directory, plan, outline, remaining[0],
+            module, child, plan, outline, remaining[0],
         )
     else:
-        content = helper._output_witness(module, directory, plan, outline)
+        content = helper._output_witness(module, child, plan, outline)
     _assert_decisions_equal(before, _decision_state(module, document, kind))
     assert SIGNATURE._document_state(
         module, document, kind, identifier,

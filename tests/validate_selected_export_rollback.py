@@ -9,7 +9,6 @@ import ast
 import copy
 import csv
 import hashlib
-import importlib
 import json
 import os
 from pathlib import Path
@@ -604,7 +603,6 @@ def show_production_export_summary(summary):
 
 
 def validate_binding(base):
-    from types import SimpleNamespace
     from unittest import mock
 
     from tracktemplate import api
@@ -618,7 +616,7 @@ def validate_binding(base):
 
     app = DocumentHost()
     editable = app.documents["Editable"]
-    root = base / "normal-loader"
+    root = base / "retained-comparison-loader"
     root.mkdir()
     host, dialog, collaborators = dialog_host(root, editable)
     original_dispatch = collaborators.dispatch
@@ -645,18 +643,16 @@ def validate_binding(base):
                            return_value=host._host):
         with mock.patch.object(workflow, "ModularTransitionWorkflowSession",
                                return_value=host):
-            parsed = ast.parse((ROOT / "TrackTemplate.FCMacro").read_bytes())
-            loader = next(node for node in parsed.body
-                          if isinstance(node, ast.FunctionDef)
-                          and node.name == "_load_modular_transition_workflow")
-            launcher = {"importlib": importlib}
-            exec(compile(ast.Module(body=[loader], type_ignores=[]),
-                         "<actual launcher>", "exec"), launcher)
-            with mock.patch.object(documents, "CoreExportDocument",
-                                   document_factory):
-                session, _routing = launcher[loader.name](
-                    ROOT, api, SimpleNamespace(load_contract=lambda _path: {}),
-                )
+            from tracktemplate.adapters.export.core_layout_set import (
+                CoreLayoutExportSetFiles,
+            )
+            session = workflow.load_modular_transition_workflow_session(
+                ROOT, api, {},
+                export_files_factory=CoreLayoutExportSetFiles,
+                export_dispatcher_factory=document_factory,
+                selected_export_files_factory=SelectedExportFiles,
+                selected_export_atomic=False,
+            )
     binding = namespace["run_selected_production_export"]
     assert isinstance(binding, SelectedExportBinding)
     assert binding.original_command is original

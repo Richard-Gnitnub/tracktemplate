@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "contract_id": "tracktemplate:phase9b:selected-export-set:1",
+  "recorded_on": "2026-10-13",
+  "status": "draft",
+  "change_level": 3,
+  "authority": [
+    "D-P9-014"
+  ],
+  "criterion": "9B-5",
+  "contract_document": "reference/contracts/selected-export-set.md",
+  "application_command": "tracktemplate.application.selected_export_set.run_atomic_selected_production_export",
+  "application_module": "tracktemplate.application.selected_export_set",
+  "retained_commands": [
+    "tracktemplate.application.selected_export.run_selected_production_export"
+  ],
+  "plan": {
+    "helper": "prepare_selected_export_plan",
+    "signature": "prepare_selected_export_plan(records, config, set_id, scope, *, plan_export, output_directory=None)",
+    "file_creation": false,
+    "child_name": "Selected_Export_<uuidhex>",
+    "required_field": "output_directory",
+    "input_mutation": false,
+    "collision": "reject; no replacement or revised child",
+    "paths": "all output members and optional CSV use one new direct child of the selected parent"
+  },
+  "confirmation": {
+    "policy": "tracktemplate.compatibility.selected_export_policy.SelectedExportPolicy",
+    "configuration": "SelectedExportConfiguration",
+    "unchanged_request": "reuse intended child through preview, confirmation, preflight and execution",
+    "changed_request": "renew confirmation or stop; no silent semantic change",
+    "compared": [
+      "config",
+      "scope",
+      "set_id",
+      "ordered tasks",
+      "selected records",
+      "skipped records",
+      "warnings",
+      "shape BRep identity"
+    ],
+    "parent_preference_retained": true,
+    "replacement_enabled": false,
+    "plain_dict_route": "retained selected planning"
+  },
+  "composition": {
+    "binding": "SelectedExportBinding",
+    "normal_atomic": true,
+    "retained_default_atomic": false,
+    "restore": "original namespace and dialog operations",
+    "public_facade_change": false,
+    "persistence_field_change": false
+  },
+  "file_operations": {
+    "shared_command": "tracktemplate.application.core_export_set.run_atomic_core_layout_export",
+    "implementation": "tracktemplate.adapters.export.core_layout_set.CoreLayoutExportSetFiles",
+    "contract": "reference/contracts/core-layout-export-set.md#command-and-file-operations",
+    "publication_primitive": "renameat2(RENAME_NOREPLACE)",
+    "publication_scope": "one complete validated directory; no per-member final writes",
+    "fallback": false,
+    "input_plan_copy": true,
+    "extra_skipped": "appended to copied plan.skipped"
+  },
+  "host_scope": {
+    "system": "Linux",
+    "filesystem": "ext4",
+    "same_parent": true,
+    "namespace": "operator-controlled; concurrent namespace mutation is not supported"
+  },
+  "csv": {
+    "required": false,
+    "requested_member": "same complete output set",
+    "omitted": "no CSV row builder or writer call",
+    "schema_change": false,
+    "path_values": "final child-directory member paths"
+  },
+  "result": {
+    "existing_fields": "selected command fields retained",
+    "added_fields": [
+      "publication_state",
+      "results"
+    ],
+    "publication_states": [
+      "not-published",
+      "published",
+      "uncertain"
+    ],
+    "prepublication_failure": "zero confirmed completed files; selected parent; no completed CSV path",
+    "published": "full member count and final child paths retained after a later error",
+    "uncertain": "zero confirmed completed files; visible diagnostic; preserve uncertain state",
+    "open_folder": "confirmed published result child only"
+  },
+  "preservation": [
+    "all previous files, directories and symbolic links",
+    "all completed and uncertain output",
+    "unchanged CoreExportDocument completion requirements",
+    "editable document and history",
+    "member filenames, content, selected scope and record identities except approved paths"
+  ],
+  "excluded": [
+    "durability or restart recovery",
+    "universal filesystem support",
+    "hostile concurrent namespace isolation",
+    "malicious writers",
+    "geometry, package bytes, numerical limits or CSV schema changes",
+    "new runtime dependency",
+    "D-P6-003/D-P6-004 changes",
+    "Core Generate or retained comparison API changes",
+    "phase, exit, physical-fit, manufacturing, rights, production, performance or release acceptance"
+  ],
+  "validation": {
+    "standalone": "tests/validate_selected_export_set.py",
+    "qualified_host": "tests/freecad_validate_selected_export_set.py",
+    "real_gui": "tools/freecad_bridge/run_selected_export_set_gui.py",
+    "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-selected-export-policy-panel"
+  }
+}

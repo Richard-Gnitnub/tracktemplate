@@ -8810,8 +8810,8 @@ def validate_delegated_retirement_decision_mutations() -> None:
     """Reject a missing decision, enlarged authority or premature activation."""
     document = json.loads(read("reference/current/gate-decisions.json"))
     for name, transform in (
-        ("missing", lambda rows: rows.pop()),
-        ("extra", lambda rows: rows.append(copy.deepcopy(rows[-1]))),
+        ("missing", lambda rows: rows.pop(5)),
+        ("extra", lambda rows: rows.append(copy.deepcopy(rows[5]))),
     ):
         changed = copy.deepcopy(document)
         transform(changed["decisions"])
@@ -8846,7 +8846,7 @@ def validate_delegated_retirement_decision_mutations() -> None:
         ),
     ):
         changed = copy.deepcopy(document)
-        changed["decisions"][-1][field] = value
+        changed["decisions"][5][field] = value
         expect_rejected(
             "delegated-retirement/record-" + field,
             lambda value=changed: progress._validate_phase9b_decisions(value),
@@ -8866,7 +8866,7 @@ def validate_delegated_retirement_decision_mutations() -> None:
         ("exclusions", "five exits Pending", "five exits Pending", "six exits accepted"),
     ):
         changed = copy.deepcopy(document)
-        record = changed["decisions"][-1]
+        record = changed["decisions"][5]
         record[field] = replace_once(record[field], old, new)
         expect_rejected(
             "delegated-retirement/record-" + name,
@@ -8910,6 +8910,149 @@ def validate_delegated_retirement_decision_mutations() -> None:
             "delegated-retirement/panel-" + old,
             lambda value=changed: progress._validate_dgov024_panel(value),
             "D-GOV-024 " + diagnostic,
+        )
+
+
+def validate_selected_set_policy_mutations() -> None:
+    """Reject widened selected policy and weakened confirmation guarantees."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    original = document["decisions"][6]
+    changed = copy.deepcopy(document)
+    changed["decisions"].pop(6)
+    expect_rejected(
+        "selected-set-policy/decision-missing",
+        lambda: progress._validate_phase9b_decisions(changed),
+        "Phase 9B current decision chain incomplete or widened",
+    )
+    for field, value, diagnostic in (
+        ("id", "D-P9-015", "identity, status or panel routing drifted"),
+        ("decided_on", "2026-10-12", "identity, status or panel routing drifted"),
+        ("status", "Proposed", "identity, status or panel routing drifted"),
+        ("evidence", "other.md", "identity, status or panel routing drifted"),
+        ("panel_record", None, "identity, status or panel routing drifted"),
+        ("panel_required_under_current_policy", False,
+         "identity, status or panel routing drifted"),
+        ("authority", "Accept all exports", "exact owner authority drifted"),
+    ):
+        record = copy.deepcopy(original)
+        record[field] = value
+        expect_rejected(
+            "selected-set-policy/record-" + field,
+            lambda value=record: progress._validate_dp9_014_decision(
+                value, set(original),
+            ),
+            "D-P9-014 " + diagnostic,
+        )
+    for field, name, old, new in (
+        ("decision", "replacement", "without replacement", "with replacement"),
+        ("decision", "csv-required", "CSV stays optional", "CSV is mandatory"),
+        ("decision", "confirmed-request", "keep the confirmed requested set",
+         "replace the confirmed requested set"),
+        ("exclusions", "host-widened", "only the existing Linux ext4 host",
+         "every host"),
+        ("exclusions", "durability", "Claim no assurance that files stay",
+         "Guarantee that files stay"),
+        ("exclusions", "restart", "Claim no recovery", "Guarantee recovery"),
+        ("exclusions", "core-policy", "Core Generate policy", "changed Core policy"),
+        ("exclusions", "exit-accepted", "Accept no phase exit", "Accept every phase exit"),
+        ("exclusions", "phase-count", "Open at 1/6", "Complete at 6/6"),
+        ("exclusions", "register", "113-entry register", "112-entry register"),
+        ("exclusions", "risk-duties", "all 24 risk duties", "no risk duties"),
+        ("exclusions", "output-cleared", "private-development", "project-cleared"),
+        ("exclusions", "merge", "Do not merge", "Merge now"),
+    ):
+        record = copy.deepcopy(original)
+        record[field] = replace_once(record[field], old, new)
+        expect_rejected(
+            "selected-set-policy/record-" + name,
+            lambda value=record: progress._validate_dp9_014_decision(
+                value, set(original),
+            ),
+            "D-P9-014 " + field + " boundary drifted:",
+        )
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    architecture = read("reference/ARCHITECTURE.md")
+    panel = progress.direct_section_content(
+        evidence, "D-P9-014 selected export policy panel — 2026-10-13",
+    )
+    for name, old, new, diagnostic in (
+        ("authority", "> As project owner, I approve the Level 3 selected-export",
+         "> Agent approval:",
+         "exact panel authority drifted or was relocated"),
+        ("exit", "It accepts no phase exit", "It accepts Exit 9B-5",
+         "panel boundary drifted:"),
+        ("risks", "No risk closes", "All risks close",
+         "panel boundary drifted:"),
+        ("core", "D-P9-013 continues to own Core Generate",
+         "D-P9-014 replaces Core Generate authority", "panel boundary drifted:"),
+        ("merge", "Do not merge or start another outcome",
+         "Merge and start another outcome", "panel boundary drifted:"),
+        ("contract-link", "../contracts/selected-export-set.md",
+         "../contracts/core-layout-export-set.md", "panel owner route drifted"),
+    ):
+        mutated = replace_once(evidence, panel, replace_once(panel, old, new))
+        expect_rejected(
+            "selected-set-policy/panel-" + name,
+            lambda value=mutated: progress._validate_dp9_014_policy(
+                value, architecture,
+            ),
+            "D-P9-014 " + diagnostic,
+        )
+    section = progress.direct_section_content(
+        architecture, "D-P9-014 selected full output set", level=4,
+    )
+    for name, old, new in (
+        ("replacement", "must not replace an existing path",
+         "can replace an existing path"),
+        ("fallback", "It must not write final files one at a time",
+         "It can write final files one at a time"),
+        ("confirmed-scope", "must not silently prepare a different set",
+         "can silently prepare a different set"),
+        ("csv", "CSV stays optional", "CSV is mandatory"),
+        ("parent-preference", "saved preference keeps the directory",
+         "saved preference changes the directory"),
+        ("late-result", "preserve completed files, counts and paths",
+         "erase completed files, counts and paths"),
+        ("uncertain-cleanup", "whose ownership is unknown",
+         "whose ownership is known"),
+        ("retained-route", "stay available for comparison",
+         "are removed without comparison"),
+        ("host", "qualified Linux ext4 host", "every filesystem"),
+        ("restart", "It adds no recovery", "It guarantees recovery"),
+    ):
+        mutated = replace_once(
+            architecture, section, replace_once(section, old, new),
+        )
+        expect_rejected(
+            "selected-set-policy/architecture-" + name,
+            lambda value=mutated: progress._validate_dp9_014_policy(
+                evidence, value,
+            ),
+            "D-P9-014 architecture boundary drifted:",
+        )
+    contract = json.loads(read("reference/contracts/selected-export-set.json"))
+    for section_name, field, value in (
+        ("plan", "input_mutation", True),
+        ("plan", "child_name", "Existing_Output"),
+        ("confirmation", "replacement_enabled", True),
+        ("confirmation", "parent_preference_retained", False),
+        ("confirmation", "changed_request", "silently execute new request"),
+        ("confirmation", "compared", ["output paths only"]),
+        ("composition", "retained_default_atomic", True),
+        ("composition", "persistence_field_change", True),
+        ("file_operations", "fallback", True),
+        ("host_scope", "filesystem", "any"),
+        ("csv", "required", True),
+        ("result", "published", "zero completed files after late error"),
+        ("result", "uncertain", "delete uncertain output"),
+        ("result", "open_folder", "parent directory"),
+    ):
+        mutated = copy.deepcopy(contract)
+        mutated[section_name][field] = value
+        expect_rejected(
+            "selected-set-policy/contract-" + section_name + "-" + field,
+            lambda value=mutated: progress._validate_dp9_014_contract(value),
+            "D-P9-014 selected contract boundary drifted",
         )
 
 
@@ -9243,6 +9386,7 @@ def main() -> None:
     validate_visible_recovery_mutations()
     validate_delegated_retirement_mutations()
     validate_delegated_retirement_decision_mutations()
+    validate_selected_set_policy_mutations()
     validate_agents_mutations()
     validate_chief_mutations()
     validate_ontology_mutation()
