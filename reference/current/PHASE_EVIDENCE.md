@@ -13,10 +13,10 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 2/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel) and [D-P9-015](#phase-9b-exit-5-acceptance-panel). Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted. Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending. |
-| What changed | [D-P9-015](#phase-9b-exit-5-acceptance-panel) accepts only Exit 9B-5 under D-P9-013/D-P9-014 on 2026-10-13. All recorded limitations stay. This alignment adds no product implementation. |
-| What now works | Both usual routes make all requested files available in one directory operation without replacement. They preserve the editable `App.Document` in the qualified failure cases. The owner accepts this evidence only for Exit 9B-5. |
+| What changed | [D-P9-015](#phase-9b-exit-5-acceptance-panel) accepts only Exit 9B-5 under D-P9-013/D-P9-014 on 2026-10-13. All recorded limitations stay. This documentation alignment adds no product implementation. |
+| What now works | The two usual routes make all selected files available in one directory operation without replacement. They preserve the editable `App.Document` in the qualified error conditions. The owner accepts this evidence only for Exit 9B-5. |
 | Limitations/findings | The policy applies only to the qualified Linux ext4 host and an operator-controlled directory. It gives no assurance that files stay available after a system interruption. It adds no recovery after FreeCAD stops and starts again. All 24 risk duties and previous production limits stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
-| Owner decision | D-P9-015 accepts Exit 9B-5 only. D-P9-012 keeps its separate Exit 9B-2 acceptance. D-P9-013/D-P9-014 keep their operating conditions. The Phase 9A closeout and previous decisions keep their accepted limits. This decision closes no phase and accepts no production result. |
+| Owner decision | D-P9-015 accepts Exit 9B-5 only. D-P9-012 keeps its own Exit 9B-2 acceptance. D-P9-013/D-P9-014 keep their operating conditions. The Phase 9A closeout and previous decisions keep their accepted limits. This decision closes no phase and accepts no production result. |
 | Next action | Complete independent review of the test changes and the Documentation Review lifecycle. After CI gives a PASS result for the exact PR head, publish one draft PR. Do not merge or start another outcome. |
 
 <a id="phase-9b-exit-5-acceptance-panel"></a>
@@ -27,9 +27,9 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 with all recorded limitations. The accepted source is protected `main`
 `4bc8508b6f4ce4ec0056a684181e91a650da289e` after
 [PR #168](https://github.com/Richard-Gnitnub/tracktemplate/pull/168).
-Its tree is identical to reviewed head `00a5f2e5c8b8965ba80e7bd9b99e63510316eadc`.
+Its tree is the same as the tree at reviewed head `00a5f2e5c8b8965ba80e7bd9b99e63510316eadc`.
 [CI run 38409599795](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/38409599795)
-gave a PASS result for the exact integrated source.
+gave a PASS result for the source at that commit.
 
 Phase 9B is Open at 2/6. Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted.
 Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending. All six exact criteria stay unchanged.
@@ -43,18 +43,18 @@ Phase 9A stays closed at 4/4 for its frozen reference-only scope.
 
 > Export failure cannot replace only part of an accepted output set or corrupt the editable model.
 
-**Accepted evidence:** The independent assessment examined the existing evidence
+**Accepted evidence:** The independent assessment examined the recorded evidence
 for the usual B16 `Core Generate` and `Export selected production items` routes.
 The [D-P9-013 panel](#phase-9b-core-export-policy-panel) and
 [D-P9-014 panel](#phase-9b-selected-export-policy-panel) keep the detailed proofs.
-No new FreeCAD or real-GUI proof is necessary for this authority alignment.
+No new FreeCAD or real-GUI proof is necessary for this documentation alignment.
 
 | Accepted duty | Evidence and limit |
 | --- | --- |
-| Complete output and previous files | Both usual routes use the same directory operation without replacement. The qualified error cases preserve previous output. CSV stays optional and joins the same directory when requested. |
-| Editable state | The separate `CoreExportDocument` keeps temporary objects outside the editable `App.Document`. Qualified errors, source identity/history checks and save/reopen evidence support preservation. A failed close can keep an identified temporary `App.Document`. |
-| Operator decision and results | The selected route preserves the selected data and paths through the operator decision and file operations. Results retain completed counts and paths after a late error. Earlier errors report no completed files. |
-| Formats and chairs | Representative SVG/DXF/STL/STEP and optional CSV checks pass. The selected real-GUI cases use SVG with CSV on and off. Live turnout and crossover chair decisions stay unchanged. |
+| Full output and previous files | The two usual routes use the same directory operation without replacement. The qualified error conditions preserve previous output. CSV stays optional. The directory includes CSV when the operator selects it. |
+| Editable state | `CoreExportDocument` keeps temporary objects outside the editable `App.Document`. The qualified errors, source identity/history checks and save/reopen evidence show that the editable state stays the same. A failed close can keep an identified temporary `App.Document`. |
+| Operator decision and results | The selected route preserves the selected data and paths through the operator decision and file operations. After the final directory becomes available, results keep completed counts and paths if an error occurs. Errors before that operation report no completed files. |
+| Formats and chairs | Representative SVG/DXF/STL/STEP and optional CSV checks pass. The selected real-GUI tests use SVG with CSV on and off. Live turnout and crossover chair decisions stay unchanged. |
 
 The assessment is `tmp/after168/exit9b5-independent-assessment.json` in the primary repository,
 SHA-256 `613fbb737482d448a96cf509a9619006bd2515a22e1d393f6c6ffab6e07a61a3`.
@@ -64,50 +64,55 @@ The final independent source review has SHA-256
 The final selected validation receipt has SHA-256
 `7335fe74f43388adddd78bcd7d4c633797a79cc81af411abbbe6badcf5d41743`.
 
-The Core evidence is reused, not a new check of integrated `main`.
-The Core command, file adapter, `CoreExportDocument` and policy stay unchanged.
-Later changes connect the selected route and retain the previous comparison test setup.
-Independent source review and affected standalone checks cover those changes.
-The final selected FreeCAD and real-GUI proofs also use the shared unchanged operations.
+The assessment uses the recorded Core evidence. It gives no new Core check of `main` at this admission.
+The Core command, file adapter, `CoreExportDocument` and policy stay the same.
+Subsequent changes connect the selected route and keep the previous comparison test setup.
+Independent source review and affected standalone Python checks examine those changes.
+The final selected FreeCAD and real-GUI proofs also use those same operations.
 
 **Findings:** `SR-01`/`SR01-retained` is satisfied only for the usual selected route.
-D-P9-014 supplies accurate operator controls and makes all requested files available together.
+D-P9-014 supplies accurate operator controls and makes all selected files available together.
 `selected-whole-set-retained` is satisfied only for that route by the shared directory operation without replacement.
-The qualified error cases prove preservation of previous output.
+The qualified error conditions prove that previous output stays the same.
+
 The previous APIs that write files separately keep their limits. They receive no new acceptance.
-`SEL-QR-01` and `SEL-QR-02` were resolved before the final independent source review.
-Keep the first blocked review, failed or incomplete proofs and frozen B14/B15 evidence.
+The final independent source review records `SEL-QR-01` and `SEL-QR-02` as resolved.
+Keep the first blocked review, failed proofs or proofs that were not completed and frozen B14/B15 evidence.
 
 **Safety/risk panel:** Richard is the project owner, panel chair and deciding authority.
-`/root` presents the alignment. `/root/selected_set_architecture_risk` challenges the evidence and all 24 risks.
+`/root` gives the information for this documentation alignment. `/root/selected_set_architecture_risk` challenges the evidence and all 24 risks.
 That reviewer authored no retained implementation or test change.
-Earlier work included architecture advice, source review and the independent assessment.
+Previous work included architecture advice, source review and the independent assessment.
+
 The agents share one team and workspace. This is not external organisational independence.
 The Technical Author Lead records the decision but does not supply acceptance authority.
 
-The recommendation is **Proceed with bounded conditions**. Unresolved dissent is `[]`.
-The panel identifies no substantive blocker or critical missing fact.
+The recommendation is **Proceed with bounded conditions**.
+The panel receipt records `unresolved_dissent=[]`, `substantive_blockers=[]` and `critical_missing_facts=[]`.
+
 All 24 risk states, severities, owners, deadlines, treatments and control effectiveness values stay unchanged.
 No risk closes. Each risk owner keeps the duties in the [current register](risks.json).
+
 PR-09 stays Critical/Open/Partial. PR-13 stays Critical/Open/Effective for its current scope.
-PR-17 stays Critical/Open/Partial. Wider workflow, recovery, rights, performance and independent acceptance duties stay.
+PR-17 stays Critical/Open/Partial. The other workflow, recovery, rights, performance and independent acceptance duties stay.
+
 The panel receipt is `tmp/exit9b5-admission/risk-panel-input.json`, SHA-256
 `fcb5843b53a6962ebc111664f8e5c13dfa0660506eb4d8e043120433f2b26f88`.
 
 | Bounded condition | Owner and deadline |
 | --- | --- |
-| Keep this acceptance within the named routes, source, evidence and operating conditions. | Project owner and Phase 9B export owner, at admission and for each later claim. |
-| Preserve all risk duties, historical failures, comparison paths and separate Entry/Exit authority. | Technical Author Lead and current phase owner, before draft publication and thereafter. |
+| Keep this acceptance within the named routes, source, evidence and operating conditions. | Project owner and Phase 9B export owner, at admission and for each subsequent claim. |
+| Preserve all risk duties, historical failures, comparison paths and the different Entry/Exit authority. | Technical Author Lead and current phase owner, before draft publication and thereafter. |
 | Record the two previous selected finding dispositions only for the usual route. | Phase 9B selected-export owner and Technical Author Lead, in this alignment. |
-| Complete the sole Documentation Review, final validation, independent test-change review and exact-head CI checks. Publish one draft PR, then stop. | Technical Author Lead, independent reviewer and change owner, before draft publication. |
+| Complete the sole Documentation Review, final validation, independent review of test changes and CI checks for the PR head. Publish one draft PR with that head. Stop. | Technical Author Lead, independent reviewer and change owner, before draft publication. |
 
 **Preserved limitations:** Qualification applies only to the existing Linux ext4 host with an operator-controlled output directory.
 Unsupported directory operations fail closed. There is no assurance for every filesystem or malicious concurrent changes.
 There is no assurance that files stay available after a system interruption or recovery after FreeCAD stops and starts again.
-D-P6-003/D-P6-004 and accepted D-P6-005 keep their separate Entry/Exit authority.
-Their pair recovery does not become authority for either usual route.
+D-P6-003/D-P6-004 and accepted D-P6-005 keep their own Entry/Exit authority.
+Their pair recovery does not become authority for one of the two usual routes.
 
-Historical GUI recipes keep their recorded host and policy limits; they were not all changed or run again.
+Historical GUI recipes keep their recorded host and policy limits. This cycle did not change or repeat every historical GUI recipe.
 GUI restoration evidence starts at the adapter invocation. It does not accept raw selection event history before the operator decision.
 The folder-action proof checks the target passed to the opener without starting the operating-system file manager.
 Crossover output after save/reopen still has the recorded serialisation difference.
@@ -115,13 +120,15 @@ This decision gives no universal byte-equivalence claim or new numerical toleran
 
 Geometry, package bytes, numerical limits, the 113-entry register and legacy-retirement conditions stay unchanged.
 D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development.
-Project status stays `unknown`. This decision accepts no physical fit, preload, retention,
+Project status stays `unknown`.
+
+This decision accepts no physical fit, preload, retention,
 manufacturing capability, production package, output clearance, rights, performance result or release.
 It closes no phase and accepts no other exit.
 
-**Publication boundary:** Complete only the necessary Level 3 alignment and validation.
+**Publication boundary:** Complete only the necessary Level 3 documentation alignment and validation.
 Publish one draft PR after CI gives a PASS result for its exact head.
-Do not merge or begin new implementation.
+Do not merge. Do not start new implementation.
 
 <a id="phase-9b-selected-export-policy-panel"></a>
 
