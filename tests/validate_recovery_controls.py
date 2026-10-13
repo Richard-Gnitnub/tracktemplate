@@ -3247,36 +3247,59 @@ def _validate_freecad_cli_hidden_tracked_changes(errors):
                 _freecad_cli_retirement_fixture(temp_root, destination)
             )
             unpatched = checkout / "src/unpatched.py"
-            preserved = destination / ".devtools/freecad-cli"
+            original_stat = unpatched.stat()
             if change == "hidden-mode":
                 _run(["git", "config", "core.filemode", "false"], cwd=checkout)
                 unpatched.chmod(unpatched.stat().st_mode | 0o111)
+                # Force a stat mismatch without depending on clock resolution.
+                os.utime(
+                    unpatched,
+                    ns=(
+                        original_stat.st_atime_ns,
+                        original_stat.st_mtime_ns - 2_000_000_000,
+                    ),
+                )
             else:
                 _run(["git", "config", "core.autocrlf", "true"], cwd=checkout)
                 unpatched.write_bytes(b"unchanged\r\n")
-            shutil.copy2(checkout / ".git/config", preserved / ".git/config")
-            shutil.copy2(unpatched, preserved / "src/unpatched.py")
-            plan["inventory_sha256"] = safety._retirement_inventory(target)[
-                "sha256"
-            ]
+            index_before_diff = (checkout / ".git/index").read_bytes()
             diff = _run(
                 ["git", "diff", "--name-only", "HEAD", "--"],
                 cwd=checkout,
             ).stdout.splitlines()
+            if (
+                change == "hidden-mode"
+                and (checkout / ".git/index").read_bytes() == index_before_diff
+            ):
+                errors.append(change + " fixture did not refresh the Git index")
             if "src/unpatched.py" in diff:
                 errors.append(change + " fixture was not hidden by Git diff")
                 continue
+            # Git inspection can refresh the index. Preserve its final state
+            # in a fresh directory instead of overwriting read-only objects.
+            final_destination = destination / "final"
+            shutil.copytree(
+                checkout, final_destination / ".devtools/freecad-cli"
+            )
+            preservation = next(
+                group["preservation"] for group in plan["classifications"]
+                if group["name"] == "reviewed-freecad-cli"
+            )
+            preservation["destination_root"] = str(final_destination)
+            plan["inventory_sha256"] = safety._retirement_inventory(target)[
+                "sha256"
+            ]
             plan_path = temp_root / "nested-retirement-plan.json"
             _write_retirement_plan(plan_path, plan)
             report = safety.audit_worktree_retirement(
                 repository, target, plan_path
             )
-            if (
-                report["readiness"]["retirement_ready"]
-                or "freecad-cli-identity-not-proved" not in report["findings"]
-                or not report["classification"]["preservation_verified"]
-            ):
-                errors.append(change + " passed the raw tracked-state proof")
+            if report["readiness"]["retirement_ready"]:
+                errors.append(change + " incorrectly permitted retirement")
+            if "freecad-cli-identity-not-proved" not in report["findings"]:
+                errors.append(change + " lost the raw tracked-state rejection")
+            if not report["classification"]["preservation_verified"]:
+                errors.append(change + " did not preserve the complete checkout")
 
 
 def _validate_repository_state(errors):
