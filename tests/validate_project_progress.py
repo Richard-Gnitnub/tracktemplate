@@ -1305,23 +1305,23 @@ def _validate_owner_view(plan: str) -> None:
         'Phase 9B is Open at 2/6 under D-P9-012 and D-P9-015',
         'Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted',
         'Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending',
-        'D-P9-016 authorises mandatory dependency JSON for the usual Core Generate output set',
-        'The initial inventory covers curved plain-line template compounds and centrelines',
+        'D-P9-016 authorises mandatory schema-1 JSON for the usual Core Generate output set',
+        'The first bounded scope covers curved plain-line TrackTemplateCompound shapes and centrelines',
         'CSV stays optional',
         'Selected export keeps its accepted behaviour',
-        'Core Generate refuses publication if an inventory is missing, inconsistent or outside the supported scope',
-        'The editable Generate result and prior output remain available',
+        'Core Generate stops before output becomes available if manifest input data are missing or do not agree. It also stops for data not in the supported bounded scope',
+        'The editable Generate result and previous output stay available',
         'The qualified Linux ext4 and recovery limits stay',
         'All 24 risk duties and previous production limits stay',
         'D-P6-008 stays Deferred — unmet',
         'TERM-R04 stays open',
-        'Output stays private-development; project status stays unknown',
-        'D-P9-016 authorises only the policy alignment and one bounded implementation',
+        'Output stays private-development. Project status stays unknown',
+        'D-P9-016 authorises only the policy alignment and one bounded product change',
         'D-P9-012 and D-P9-015 keep their accepted limits',
         'Exit 9B-4 stays Pending',
         'No other acceptance follows',
-        'Publish one exact-green draft PR, then stop',
-        'Do not merge or start another outcome',
+        'After CI gives a PASS result for the exact candidate, publish one draft PR. Then stop',
+        'Do not merge. Do not start one more outcome',
     ):
         _require(
             fragment in owner_view,
@@ -1329,11 +1329,11 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         '0bc86e690acdfab3930ba2af6d8caae11f4a6b849a5b1c69e2e22cfbfb067e9f',
-        'e7dc9d4d09f9a9dc230a393da28d460279968f8f93a44f4061cd3bb01fbc4f24',
-        'f93f6bb1ab1fc7e9861ff3246f8007a32b6d0ab035db936d6d97b128c2a07a23',
-        'e5c912119bec36e48fed7e56eaf153772214d3858a78686b2081f1c12271dd23',
-        '048797090863ba3e3f7c5628fed3d5e61e1aeed18b2568a3a3ed39139284d694',
-        '29fae8eab295c47647d22b8993dd9207f4221c221f6b7aef4da6704a34504ba2',
+        '86f115c621ddc17e0be18f356727be2fc557eccf037f4d1f4f39223dcb5564eb',
+        'fa2e54489d6cababf089cbe5b947e7cc3303a2f35178f422e708a389eed54f29',
+        'f48511b283c5c2dfec68982b97da45a8c5feeaa5a98419a81a6e31096b186d8e',
+        '537602f0d0b51cfa8c70acd74d753c1533254b854489baebd9cc420adb5bd811',
+        'd6d5afc825be152828d106ecaf32ee67d349c0afca9802ba14787da404478800',
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -7784,8 +7784,8 @@ def _validate_dp9_016_decision(record, fields):
     )
     for field, digest in (
         ('authority', 'a5e908a218be9ebe5737f00a7ec30b75ef8cc7d039c9c34f4ace92d60270b5f2'),
-        ('decision', 'c89f9855974b7e3af4b6a12e097e0c3f43ed4a4f91c5a1a375b7a97d719c3965'),
-        ('exclusions', '2d2bb5fb27f5ae514ad5be66728fa3b4cae111098a8f4df7e61c4af228f21902'),
+        ('decision', 'c72c304a6961cde412f2675829bfb139f8a57ccb5d81ce9bc508cb632974a494'),
+        ('exclusions', '3b3d7717666cae1b6d9cf232d8b2f1434b2d70169e957df975971e6999265e25'),
     ):
         _require(
             isinstance(record[field], str)

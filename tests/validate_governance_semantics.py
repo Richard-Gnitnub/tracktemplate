@@ -6631,13 +6631,13 @@ def validate_documentation_profile_mutations() -> None:
         (
             "merge-authorised", "| Next action |",
             "Do not merge", "Merge now",
-            "Do not merge or start another outcome",
+            "Do not merge. Do not start one more outcome",
         ),
         (
             "stop-boundary-waived", "| Next action |",
-            "Do not merge or start another outcome",
+            "Do not merge. Do not start one more outcome",
             "Do not merge; begin another outcome",
-            "Do not merge or start another outcome",
+            "Do not merge. Do not start one more outcome",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:

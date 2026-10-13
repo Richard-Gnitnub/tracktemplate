@@ -124,99 +124,114 @@ adds the mandatory `Core_Dependency_Manifest.json` file to the usual Core Genera
 route. The Core policy supplies `dependency_manifest=True` to the plan helper.
 The plan identifies that file in `dependency_manifest_path`.
 The helper's default keeps previous comparison callers unchanged.
-The selected-export route does not request this additional member.
+The selected-export route does not include this additional member.
 
 The usual Core compatibility adapter supplies `prepare_dependency_manifest`.
-This optional command input has the signature
+This optional command input has this API:
 `prepare(doc, plan, config, set_id) -> build(artifacts)`.
-The application calls it before `open` to validate and capture the inventory.
-A missing plan member or a missing builder causes an error when this route
-requires the manifest. No final output becomes available after that error.
-Other comparison callers can continue to omit this input and plan member.
+`run_staged_core_layout_export()` calls it before `open` to validate and collect manifest input
+data. A missing plan member or a missing builder causes an error when the
+manifest is mandatory. No completed output becomes available after that error.
+Other comparison callers can continue without this input and plan member.
 
-The initial supported scope has one same-set Settings object and curved
-plain-line `TrackTemplateCompound` and `TrackCentreline` records.
+The first supported bounded scope has one Settings object for the same set.
+It has curved plain-line `TrackTemplateCompound` and `TrackCentreline` data.
 The categories are `CuttingProfile`, `Solid` and `Engraving`.
-The inherited `route_id` field is empty. The stable record identity uses the
-`CURVE` token through the existing host identity function.
+The existing `route_id` field is empty. The stable `record_id` identity uses the `CURVE` token through
+`production_record_identity()`.
 
-Enabled straight routes, platforms, formation, sectioning, joints and assembly
-labels are outside the scope. Special trackwork, chair packages, imported
-geometry and replacement sources are also outside it.
-The checks examine actual properties and identities, not a fixture name.
+These inputs must have `enabled` equal to `false`:
+`straight_routes`, `platforms`, `formation_board`, `sectioning`,
+`template_joints` and `assembly_labels`.
+Special trackwork, chair packages, imported shapes and replacement sources
+are not in the bounded scope.
+The checks examine properties and identities, not a fixture name.
 
-Each planned shape and its bound source shape must be present and non-null.
-The original placement matrices must match exactly.
-The check compares temporary copies with their original placements.
-It applies each original placement again to its copy before a final copy
-and exact BRep comparison.
+Each planned shape and the source shape that its identity selects must be
+available and non-null. Their initial `Shape.Placement.toMatrix().A` values
+must be equal. The check makes temporary copies of the two shapes.
+It sets each copy's `Placement` to that copy's initial `Placement` value.
+It then compares the `exportBrepToString()` bytes from one more copy of each.
+The bytes must be equal.
 
-This removes differences from the inherited
-document assignment without a numerical tolerance or a change to the source.
-The check applies to fresh Generate and shapes restored from a saved document.
-It does not independently prove regeneration from the stored inputs.
+This removes differences from the existing document assignment without a
+numerical tolerance or a change to the source shape.
+The check applies to a new Generate operation and shapes restored from a saved document.
+It does not independently prove that the software made these shapes from the
+stored inputs.
 
-The operator gets a diagnostic for an unsupported or inconsistent inventory.
-The output controls show this restriction. The completed Generate transaction
-and previous files remain available after refusal.
+The operator gets a diagnostic if manifest input data do not agree or are
+not in the supported bounded scope. The output controls show this restriction.
+The completed Generate transaction and previous files stay available after
+the software rejects these data.
 
-The signature identifies a versioned snapshot of canonical inputs and the
-actual invocation's production intent. The input reader rejects absent,
-ambiguous, malformed and non-finite data before a helper can supply a default.
+The `canonical_model_sha256` value identifies a versioned copy of canonical
+information and the production intent for the command invocation.
+The input reader rejects missing, ambiguous, malformed and non-finite data
+before a helper can supply a default.
 
 The scalar inputs are `TransitionLength`, `CurveRadius`, `TotalTurnAngle` and
-`MainTemplateWidth`. Lengths use mm; the angle uses degrees.
-The snapshot includes ordered track configuration and the stored configuration
-for straight routes, platforms, formation, sectioning, registration, assembly
-and labels. It includes the set identity and requested export selections.
+`MainTemplateWidth`. Lengths use mm. The angle uses degrees.
+The copy includes ordered track data and the stored data for `straight_routes`,
+`platforms`, `formation_board`, `sectioning`, `registration`, `template_joints`
+and `assembly_labels`. It includes the set identity and export selections
+for this command.
 
 It excludes allocated output directories, timestamps, presets and derived
-geometry. `ProductionRecordIndexJSON` supplies coherence evidence, not the
-canonical input signature. The command changes no stored schema or property.
-A signature does not prove that copied geometry was generated from those inputs.
+shapes. `ProductionRecordIndexJSON` supplies evidence that the data agree.
+It does not supply `canonical_model_sha256`.
+The command changes no stored schema or property.
+The hash does not prove that the software made shape copies from those inputs.
 
-The inventory identifies the inherited B15 source, installed modular generator
-source and actual host/exporter identities. It keeps source licence evidence
-separate from output rights. The source fingerprint identifies installed files.
-It does not attest to cached executing Python code or every host binary.
-The qualified proof uses a fresh process and checks source hashes before and
-after the operation. It requires no Git process, network access,
-repository validator or local research file when the product operates.
+The manifest input data identify the existing B15 source, installed modular
+product source and the identities of FreeCAD and its exporters.
+Source licence evidence and the output rights state are different data.
+The source hashes identify installed files.
+They do not prove the identity of Python code in memory or all files that FreeCAD uses.
+
+The qualified proof uses a new process and checks source hashes before and
+after the operation. The product needs no Git process, network access,
+repository validator or local research file when it operates.
 
 The seven applicable groups in the
 [legacy lineage register](../lineage/phase1-other-snc-legacy-lineage.json)
-retain their exact classifications and project statuses.
-The production-record group remains applicable when CSV is off.
-These broad groups do not prove that every referenced upstream item was an input.
-No S1 package or special-trackwork table is claimed as an input to this scope.
+keep their existing classifications and project statuses without a change.
+The production-record group stays applicable when CSV is off.
+These broad groups do not prove that each source item in these groups was an input.
+The manifest does not identify an S1 package or a special-trackwork table as
+an input to this bounded scope.
 
-The Phase 9 export/provenance owner owns the checked runtime projection of
-those seven groups. The tests bind it to the canonical register.
-That owner must update the projection when the canonical mapping changes.
-The projection must be retired when an accepted replacement owns this scope.
-It is not a new rights register.
+The Phase 9 export/provenance owner owns the checked data that the software
+uses for those seven groups. The tests compare those data with the canonical
+register. That owner must update the data when the canonical mapping changes.
+That owner must remove these data when an accepted replacement owns this
+bounded scope. These data are not a new rights-state register.
 
-After task output and optional CSV are staged, `artifact_inventory()` reads
-only the adapter's owned regular files. It returns each final basename,
-format and SHA-256. `stage_dependency_manifest(payload)` writes the JSON as a
-distinct planned member. `stage(..., manifest=True)` still identifies CSV only.
-The JSON excludes its own hash. Final validation checks all planned members
-and checks the artifact hashes again before publication.
+After the adapter writes task output and optional CSV to the temporary
+directory, `artifact_inventory()` reads only the adapter's owned regular files.
+It returns each output basename, format and SHA-256.
+`stage_dependency_manifest(payload)` writes the JSON as one more planned member.
+`stage(..., manifest=True)` continues to identify CSV only.
+The JSON excludes its own hash.
 
+Validation checks all planned members.
+It checks the output hashes again before the output directory becomes available.
 The result supplies `dependency_manifest_path` only for a plan with that member.
-It supplies the final path after confirmed publication and an empty string
-before publication. The summary distinguishes this JSON from optional CSV.
-Publication, cleanup, uncertain state and errors after publication keep the
-same conditions as the other members.
+It supplies the output path after the output directory becomes available.
+Before that operation, it supplies an empty string.
+The summary distinguishes this JSON from optional CSV.
 
+The directory operation, cleanup, uncertain state and errors after that
+operation keep the same conditions as the other members.
 The manifest uses schema 1, scope `legacy-b14-b15-output`, intended use
 `private-development` and project status `unknown`.
-Unresolved permissions remain unresolved. Non-copyright reviews that were
-not performed remain `not-performed`. Production admission stays disabled.
+Unresolved rights states stay unresolved.
+Non-copyright reviews that were not performed stay `not-performed`.
+`production_admission_enabled` stays `false`.
 
-The existing repository validator supplies independent schema and status
-checks. It cannot establish complete input coverage by itself.
-Successful construction or validation grants no output clearance or exit acceptance.
+The existing repository validator supplies schema and status checks independently. It cannot prove full input coverage by itself.
+Construction or validation of the manifest gives no positive rights claim for
+output and no phase-exit acceptance.
 
 ## Editable model and retained routes
 
