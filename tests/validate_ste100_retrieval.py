@@ -3508,6 +3508,118 @@ def validate_lifecycle_git_boundary() -> None:
         )
 
 
+def validate_review_document_capacity() -> None:
+    """Keep cumulative baselines separate from each review's size limit."""
+    payload = b"# Guide\n\nKeep the accepted instruction.\n"
+    prior_documents = [
+        {
+            "accepted_blob": "sha1:" + STE._lifecycle_blob_oid(payload),
+            "accepted_sha256": "sha256:" + hashlib.sha256(payload).hexdigest(),
+            "issue9_source": "sha256:" + EXPECTED_SOURCE_SHA256,
+            "path": "reference/accepted-{:03d}.md".format(index),
+            "review_receipt": "sha256:" + "a" * 64,
+        }
+        for index in range(64)
+    ]
+    prior_state = {"schema_version": 1, "documents": prior_documents}
+    source_manifest = load_json(SOURCE_MANIFEST)
+
+    def git(root: pathlib.Path, *arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments], cwd=root, check=True,
+            capture_output=True, text=True,
+        ).stdout.strip()
+
+    def commit(root: pathlib.Path, message: str) -> str:
+        git(root, "add", "--all")
+        git(
+            root, "-c", "user.name=TrackTemplate Validation",
+            "-c", "user.email=validation@example.invalid",
+            "commit", "--quiet", "-m", message,
+        )
+        return git(root, "rev-parse", "HEAD")
+
+    with tempfile.TemporaryDirectory() as temporary:
+        root = pathlib.Path(temporary)
+        (root / "reference").mkdir()
+        (root / ".gitignore").write_text("tmp/\n", encoding="utf-8")
+        for document in prior_documents:
+            (root / document["path"]).write_bytes(payload)
+        (root / "reference" / "ste-review-state.json").write_bytes(
+            STE._canonical_json_bytes(prior_state)
+        )
+        git(root, "init", "--quiet")
+        baseline = commit(root, "64 accepted documents")
+        for added_count in (1, 64):
+            for index in range(added_count):
+                (root / "reference" / "new-{:03d}.md".format(index)).write_bytes(
+                    payload
+                )
+            candidate = commit(root, "add {} documents".format(added_count))
+            scope = STE._build_review_scope(
+                baseline_revision=baseline, candidate_revision=candidate,
+                author_id="author", source_manifest=source_manifest, root=root,
+            )
+            require(
+                len(scope["documents"]) == added_count,
+                "cumulative baselines changed the individual review scope",
+            )
+            state, expected = STE._expected_review_state(
+                scope=scope,
+                receipt={"schema_version": 3, "result": "ACCEPT"},
+                receipt_digest="b" * 64, root=root,
+            )
+            require(
+                len(state["documents"]) == 64 + added_count
+                and len(expected) == added_count
+                and state["documents"][:64] == prior_documents
+                and scope["pre_review_state"] == prior_state,
+                "cumulative 65/128-document state lost accepted identities",
+            )
+            require(
+                all(
+                    item["lifecycle_status"] == "locked"
+                    and item["review_result"] == "ACCEPT"
+                    and item["review_receipt"] == "sha256:" + "b" * 64
+                    for item in state["documents"][64:]
+                ),
+                "new cumulative entries lost the original review and closure",
+            )
+
+        excessive_state = copy.deepcopy(state)
+        added_document = dict(state["documents"][-1])
+        added_document["path"] = "reference/new-064.md"
+        excessive_state["documents"].append(added_document)
+        expect_ste_error(
+            "ste-review-state-invalid",
+            lambda: STE._validate_review_state(excessive_state),
+        )
+
+        binding = STE._review_binding(scope, "b" * 64)
+        directory = root / "tmp" / STE.STE_REVIEW_RESULT_DIR.name
+        directory.mkdir(parents=True)
+        binding_path = directory / "binding-{}.json".format(candidate)
+        binding_path.write_bytes(STE._canonical_json_bytes(binding))
+        STE._check_review_restart(scope, root=root)
+        binding["paths"].append("reference/new-064.md")
+        binding_path.write_bytes(STE._canonical_json_bytes(binding))
+        expect_ste_error(
+            "ste-review-binding-invalid",
+            lambda: STE._check_review_restart(scope, root=root),
+        )
+
+        (root / "reference" / "new-064.md").write_bytes(payload)
+        excessive_candidate = commit(root, "65 new review documents")
+        expect_ste_error(
+            "ste-review-scope-too-large",
+            lambda: STE._build_review_scope(
+                baseline_revision=baseline,
+                candidate_revision=excessive_candidate,
+                author_id="author", source_manifest=source_manifest, root=root,
+            ),
+        )
+
+
 def validate_live_source_resolvability() -> None:
     source_path = SOURCE_DIR / "ASD-STE100_ISSUE9.pdf"
     cache_path = SOURCE_DIR / ".cache" / "issue9-cache-v2.json"
@@ -3573,6 +3685,7 @@ def main() -> None:
     validate_documentation_lifecycle()
     validate_finite_documentation_lifecycle()
     validate_lifecycle_git_boundary()
+    validate_review_document_capacity()
     validate_live_source_resolvability()
     validate_semantic_mutations(index)
     print(SENTINEL)

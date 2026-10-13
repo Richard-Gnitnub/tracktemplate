@@ -208,7 +208,7 @@ def validate():
     receipt = {"status": "RUNNING", "source_sha256": sources}
     document = None
     try:
-        module, routing = CORE.load_product(atomic=True)
+        module, routing = CORE.load_product(atomic=True, selected_atomic=False)
         receipt.update(profile=CORE.PROFILE, core_routing=routing)
         document = prepare_document(module, directory)
         expected = success(module, document, directory / "legacy", legacy=True)

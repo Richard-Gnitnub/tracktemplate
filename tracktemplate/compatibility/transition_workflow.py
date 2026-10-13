@@ -2558,6 +2558,7 @@ class ModularCoreLayoutWorkflowSession:
         staged=False,
         atomic=False,
         selected_export_files_factory=None,
+        selected_export_atomic=False,
         export_files_factory=None,
         export_dispatcher_factory=None,
     ):
@@ -2590,6 +2591,7 @@ class ModularCoreLayoutWorkflowSession:
             SelectedExportBinding(
                 namespace, export_files_factory=selected_export_files_factory,
                 export_dispatcher_factory=export_dispatcher_factory,
+                atomic=selected_export_atomic,
             ) if selected_export_files_factory is not None else None
         )
         operations = {}
@@ -2806,6 +2808,7 @@ def load_modular_transition_workflow_session(
     export_files_factory=None,
     export_dispatcher_factory=None,
     selected_export_files_factory=None,
+    selected_export_atomic=False,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -2857,6 +2860,7 @@ def load_modular_transition_workflow_session(
     return ModularCoreLayoutWorkflowSession(
         calculation_session, export_calculation, staged=True, atomic=atomic,
         selected_export_files_factory=selected_export_files_factory,
+        selected_export_atomic=selected_export_atomic,
         export_files_factory=export_files_factory,
         export_dispatcher_factory=export_dispatcher_factory,
     )

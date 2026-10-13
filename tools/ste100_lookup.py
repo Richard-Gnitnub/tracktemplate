@@ -47,6 +47,7 @@ MAX_EXTRACTOR_ERROR_BYTES = 64 * 1024
 MAX_RECEIPT_BYTES = 512 * 1024
 MAX_RECEIPT_ITEMS = 50
 MAX_LIFECYCLE_DOCUMENTS = 64
+MAX_REVIEW_STATE_DOCUMENTS = 128
 MAX_LIFECYCLE_UNITS = 512
 MAX_LIFECYCLE_BLOCKERS = 4096
 MAX_LIFECYCLE_BYTES = 4 * 1024 * 1024
@@ -2812,7 +2813,7 @@ def _validate_review_state(value: object) -> dict[str, object]:
             "The STE review-state register has an unsupported schema.",
             "Use schema version 1 or 2 and one ordered document list.",
         )
-    if len(value["documents"]) > MAX_LIFECYCLE_DOCUMENTS:
+    if len(value["documents"]) > MAX_REVIEW_STATE_DOCUMENTS:
         raise Ste100Error(
             "ste-review-state-invalid",
             "The STE review-state register exceeds its document limit.",

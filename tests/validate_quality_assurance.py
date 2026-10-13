@@ -593,15 +593,20 @@ def validate_documentation_profile(
             "D-P9-010",
             "D-P9-012",
             "D-P9-013",
-            "D-GOV-024",
-            "authorises Codex to make the Level 2 decision for permanent "
-            "local worktree retirement under the conditions that Recovery owns",
-            "This authority applies only after protected `main` contains "
-            "the accepted change",
-            "This alignment removes no worktree or branch",
-            "Do not delete branches in another repository",
-            "Do not use force removal",
-            "D-GOV-022 is not available through this route",
+            "D-P9-014",
+            (
+                "authorises the usual B16 selected export to make the full selected "
+                "output set available in a different new directory"
+            ),
+            "CSV stays optional",
+            "The route prevents replacement of previous output",
+            (
+                "selected data and output paths from the preview through the operator"
+                " decision, checks and file operations"
+            ),
+            "qualified Linux ext4 host and an operator-controlled directory",
+            "It gives no assurance that files stay available after a system interruption",
+            "It adds no recovery after FreeCAD stops and starts again",
             "All 24 risk duties and previous production limits stay",
             "D-P6-008 stays Deferred — unmet",
             "TERM-R04 stays open",
@@ -616,7 +621,7 @@ def validate_documentation_profile(
             "The Phase 9A closeout and previous decisions keep their accepted limits",
             "history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
             "current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel",
-            "current/PHASE_EVIDENCE.md#delegated-local-retirement-panel",
+            "current/PHASE_EVIDENCE.md#phase-9b-selected-export-policy-panel",
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )

@@ -279,6 +279,52 @@ D-P6-003 and D-P6-004 keep their Entry/Exit scope and recovery authority.
 The Phase 7 comparison route, previous staging API and selected-export route stay available.
 This policy accepts no Phase 9B exit, output rights, production capability or performance result.
 
+#### D-P9-014 selected full output set
+
+<a id="d-p9-014-selected-complete-output-set"></a>
+
+[D-P9-014](current/PHASE_EVIDENCE.md#phase-9b-selected-export-policy-panel)
+authorises the usual B16 `Export selected production items` route to use a
+different new directory for each operation.
+This directory is inside the directory that the operator selects.
+All selected files must pass their existing checks before one directory
+operation makes the full set available at its final path.
+That operation must not replace an existing path.
+If the host cannot supply that operation, the selected operation must stop with a diagnostic.
+It must not write final files one at a time as a different route.
+
+CSV stays optional. If the operator selects CSV, it is part of the same set.
+Previous output files and directories stay the same.
+The usual selected route prevents replacement of existing output.
+Filenames, content requirements, selected production data and their identities
+stay the same. Output paths identify the new final directory.
+
+The preview, operator decision, checks before file creation and final operation must use the same output paths and selected production data.
+After the operator accepts those data, the operation must not silently prepare a different set.
+The saved preference keeps the directory that the operator selects.
+The result and `Open Folder` control identify the completed output directory.
+The controls must give accurate information about this product behaviour.
+
+The bounded API requirements apply only to the qualified Linux ext4 host and an
+operator-controlled output directory.
+They give no assurance that files stay available after a system interruption.
+They add no recovery after FreeCAD stops and starts again.
+They give no assurance for every filesystem or for changes that another
+process makes to the directory during the operation.
+
+The operation must report whether the full directory became available.
+An error after that operation must preserve completed files, counts and paths.
+Cleanup must preserve completed output and data whose ownership is unknown.
+The isolated FreeCAD operation and editable-model preservation conditions stay.
+The [selected API requirements](contracts/selected-export-set.md) own the
+API, operating conditions and necessary checks.
+
+The previous selected command and file adapter stay available to compare results.
+The frozen B14/B15 paths and Core Generate policy do not change.
+The Phase 7 APIs used to compare results and prepare files also do not change.
+D-P6-003/D-P6-004 keep their Entry/Exit authority.
+This canonical policy accepts no phase exit, production output, rights, performance or release result.
+
 #### D-P6-003 cross-process recovery authority
 
 For the bounded B16 Entry/Exit DXF-and-manifest pair, D-P6-003 selects a strict

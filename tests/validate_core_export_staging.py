@@ -29,7 +29,6 @@ from tracktemplate import api  # noqa: E402
 from tracktemplate.application import core_layout_export as exports  # noqa: E402
 from tracktemplate.adapters.export import core_layout_files as files  # noqa: E402
 from tracktemplate.adapters.export import core_layout_set as atomic_files  # noqa: E402
-from tracktemplate.adapters.export import selected_export_files  # noqa: E402
 from tracktemplate.adapters.freecad import core_export_document as documents  # noqa: E402
 
 
@@ -629,9 +628,8 @@ def validate_composition_boundary():
         assert kwargs == {
             "export_files_factory": atomic_files.CoreLayoutExportSetFiles,
             "export_dispatcher_factory": documents.CoreExportDocument,
-            "selected_export_files_factory": (
-                selected_export_files.SelectedExportFiles
-            ),
+            "selected_export_files_factory": atomic_files.CoreLayoutExportSetFiles,
+            "selected_export_atomic": True,
         }
         return session
 
@@ -641,9 +639,6 @@ def validate_composition_boundary():
         ),
         "tracktemplate.adapters.export.core_layout_set": atomic_files,
         "tracktemplate.adapters.freecad.core_export_document": documents,
-        "tracktemplate.adapters.export.selected_export_files": (
-            selected_export_files
-        ),
     }
 
     def resolve(name):

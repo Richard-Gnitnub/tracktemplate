@@ -7,6 +7,12 @@ comparison evidence until its migration and removal receive owner acceptance.
 from tracktemplate.application.selected_export import (
     run_selected_production_export,
 )
+from tracktemplate.application.selected_export_set import (
+    run_atomic_selected_production_export,
+)
+from tracktemplate.compatibility.selected_export_policy import (
+    SelectedExportPolicy,
+)
 
 
 HOST_BINDING = "run_selected_production_export"
@@ -23,12 +29,14 @@ class SelectedExportBinding:
     """Keep inherited arguments and bind only the selected-export command."""
 
     def __init__(self, namespace, *, export_files_factory,
-                 export_dispatcher_factory):
+                 export_dispatcher_factory, atomic=False):
         self.namespace = namespace
         self.export_files_factory = export_files_factory
         self._expected_factory = export_files_factory
         self.export_dispatcher_factory = export_dispatcher_factory
         self._expected_dispatcher_factory = export_dispatcher_factory
+        self.atomic = atomic
+        self._expected_atomic = atomic
         self.original_command = namespace.get(HOST_BINDING)
         self.dialog = namespace.get("SelectedProductionExportDialog")
         self.caller = getattr(self.dialog, "export_selected", None)
@@ -48,6 +56,7 @@ class SelectedExportBinding:
             raise RuntimeError(
                 "The inherited selected-export route is incomplete."
             )
+        self.policy = SelectedExportPolicy(namespace) if atomic else None
 
     def __call__(
         self, doc, plan, config, set_id, platform_config, formation_config,
@@ -64,7 +73,9 @@ class SelectedExportBinding:
         operations["dispatch_export_task"] = (
             self.export_dispatcher_factory(serializer)
         )
-        return run_selected_production_export(
+        command = (run_atomic_selected_production_export if self.atomic
+                   else run_selected_production_export)
+        return command(
             doc, plan, config, set_id, platform_config, formation_config,
             registration_config, template_assembly_config, extra_skipped,
             None,
@@ -73,24 +84,35 @@ class SelectedExportBinding:
         )
 
     def snapshot(self):
-        return self.namespace[HOST_BINDING]
+        command = self.namespace[HOST_BINDING]
+        return (command, self.policy.snapshot()) if self.policy else command
 
     def restore(self, previous):
-        self.namespace[HOST_BINDING] = previous
+        if self.policy is not None:
+            self.namespace[HOST_BINDING] = previous[0]
+            self.policy.restore(previous[1])
+        else:
+            self.namespace[HOST_BINDING] = previous
 
     def bind(self):
+        if self.policy is not None:
+            self.policy.bind()
         self.namespace[HOST_BINDING] = self
 
     def validate(self):
         """Reject mixed commands, callbacks or GUI callers before launch."""
+        caller = self.policy.exporter if self.policy else self.caller
+        if self.policy is not None:
+            self.policy.validate()
         if (
             self.namespace.get(HOST_BINDING) is not self
             or self.namespace.get("SelectedProductionExportDialog")
             is not self.dialog
-            or getattr(self.dialog, "export_selected", None) is not self.caller
+            or getattr(self.dialog, "export_selected", None) is not caller
             or self.export_files_factory is not self._expected_factory
             or self.export_dispatcher_factory
             is not self._expected_dispatcher_factory
+            or self.atomic is not self._expected_atomic
             or any(self.namespace.get(name) is not getattr(self, field)
                    for field, name in HOST_OPERATIONS)
         ):
