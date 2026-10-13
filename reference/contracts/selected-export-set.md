@@ -1,6 +1,6 @@
 # Selected Full Output Set
 
-Status: **Development API requirements under D-P9-014. No Phase 9B exit acceptance.**
+Status: **API requirements under D-P9-014. [D-P9-015](../current/PHASE_EVIDENCE.md#phase-9b-exit-5-acceptance-panel) accepts Exit 9B-5 with its recorded limitations.**
 
 ## Purpose and authority
 
@@ -144,7 +144,8 @@ It gives no assurance for every filesystem, malicious writers or changes
 that another process makes to the directory during the operation.
 
 Phase 9A stays closed at 4/4 for its frozen reference-only bounded scope.
-Phase 9B stays Open at 1/6 under D-P9-012, with five exits Pending.
+The [project plan](../PROJECT_PLAN.md#phase-status) owns current phase and exit status.
+[D-P9-015](../current/PHASE_EVIDENCE.md#phase-9b-exit-5-acceptance-panel) owns the bounded Exit 9B-5 acceptance.
 The 113-entry register, geometry, numerical limits and all 24 risk duties stay.
 
 D-P6-008 stays Deferred — unmet. TERM-R04 stays open.

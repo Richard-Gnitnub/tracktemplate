@@ -587,23 +587,22 @@ def validate_documentation_profile(
     require(
         all(fragment in " ".join(owner_view.split()) for fragment in (
             "Phase 9A stays closed at 4/4 under [D-P9-010]",
-            "Phase 9B is Open at 1/6",
-            "Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11",
-            "The other five exits stay Pending",
+            "Phase 9B is Open at 2/6",
+            "Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted",
+            "Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending",
             "D-P9-010",
             "D-P9-012",
             "D-P9-013",
             "D-P9-014",
-            (
-                "authorises the usual B16 selected export to make the full selected "
-                "output set available in a different new directory"
-            ),
-            "CSV stays optional",
-            "The route prevents replacement of previous output",
-            (
-                "selected data and output paths from the preview through the operator"
-                " decision, checks and file operations"
-            ),
+            "D-P9-015",
+            "accepts only Exit 9B-5 under D-P9-013/D-P9-014 on 2026-10-13",
+            "All recorded limitations stay",
+            "This documentation alignment adds no product implementation",
+            "The two usual routes make all selected files available in one "
+            "directory operation without replacement",
+            "They preserve the editable `App.Document` in the qualified "
+            "error conditions",
+            "The owner accepts this evidence only for Exit 9B-5",
             "qualified Linux ext4 host and an operator-controlled directory",
             "It gives no assurance that files stay available after a system interruption",
             "It adds no recovery after FreeCAD stops and starts again",
@@ -612,16 +611,17 @@ def validate_documentation_profile(
             "TERM-R04 stays open",
             "Output stays private-development",
             "Project status stays `unknown`",
-            "It accepts no phase exit or production result",
-            "D-P9-012 continues to own the one accepted Phase 9B exit",
-            "D-P9-013 stays limited to Core Generate",
-            "After CI gives a PASS result for the exact PR head, publish the "
+            "D-P9-015 accepts Exit 9B-5 only",
+            "D-P9-012 keeps its own Exit 9B-2 acceptance",
+            "D-P9-013/D-P9-014 keep their operating conditions",
+            "This decision closes no phase and accepts no production result",
+            "After CI gives a PASS result for the exact PR head, publish one "
             "draft PR",
             "Do not merge or start another outcome",
             "The Phase 9A closeout and previous decisions keep their accepted limits",
             "history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
             "current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel",
-            "current/PHASE_EVIDENCE.md#phase-9b-selected-export-policy-panel",
+            "current/PHASE_EVIDENCE.md#phase-9b-exit-5-acceptance-panel",
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )
