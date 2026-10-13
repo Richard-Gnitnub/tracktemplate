@@ -594,12 +594,16 @@ def validate_documentation_profile(
             "D-P9-012",
             "D-P9-013",
             "D-P9-014",
-            "authorises the usual B16 selected export to make the complete "
-            "requested set available in a different new directory",
+            (
+                "authorises the usual B16 selected export to make the full selected "
+                "output set available in a different new directory"
+            ),
             "CSV stays optional",
-            "The route no longer offers replacement of previous output",
-            "confirmed requested set through preview, confirmation, "
-            "preflight and execution",
+            "The route prevents replacement of previous output",
+            (
+                "selected data and output paths from the preview through the operator"
+                " decision, checks and file operations"
+            ),
             "qualified Linux ext4 host and an operator-controlled directory",
             "It gives no assurance that files stay available after a system interruption",
             "It adds no recovery after FreeCAD stops and starts again",

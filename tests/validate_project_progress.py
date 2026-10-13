@@ -1293,12 +1293,16 @@ def _validate_owner_view(plan: str) -> None:
         "Phase 9B is Open at 1/6 under D-P9-012",
         "Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11",
         "The other five exits stay Pending",
-        "D-P9-014 authorises the usual B16 selected export to make the "
-        "complete requested set available in a different new directory",
+        (
+            "D-P9-014 authorises the usual B16 selected export to make the full "
+            "selected output set available in a different new directory"
+        ),
         "CSV stays optional",
-        "The route no longer offers replacement of previous output",
-        "confirmed requested set through preview, confirmation, preflight "
-        "and execution",
+        "The route prevents replacement of previous output",
+        (
+            "selected data and output paths from the preview through the operator"
+            " decision, checks and file operations"
+        ),
         "policy applies only to the qualified Linux ext4 host and an "
         "operator-controlled directory",
         "It gives no assurance that files stay available after a system interruption",
@@ -1308,8 +1312,10 @@ def _validate_owner_view(plan: str) -> None:
         "TERM-R04 stays open",
         "Output stays private-development",
         "Project status stays unknown",
-        "D-P9-014 changes only the usual selected-export policy and "
-        "authorises one bounded implementation",
+        (
+            "D-P9-014 changes only the canonical policy for the usual selected "
+            "route and authorises one bounded product change"
+        ),
         "It accepts no phase exit or production result",
         "D-P9-012 continues to own the one accepted Phase 9B exit",
         "D-P9-013 stays limited to Core Generate",
@@ -1324,10 +1330,10 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         "f2673cf87fd4bd3a58de0ba035a404cbd1922e33e14f9fb56d5d205e064d2424",
-        "5ee7c4eae9b6d9679884f02cc5c63f34973807cc9b8de47b02ee1ba754dd780b",
-        "e8ab0bfd01fc83c1083aa9c1a8db70944fb9f1f579ed8b7e30679825dc3c0475",
+        "7f5228c49c3c69d131c3142f8c94d5a42d03255c0c51e3fdf1f51a3500acb9a2",
+        "c17a8532b7ec42b1265e154a8b830e089a08b3109bbe2077f1c5dd737989a892",
         "9c9425dc1578481cf9d2b00a7333c61c9faaa7e21842a3e241636433ac7c42e3",
-        "b2b3b3901501a690331221b2f71a55b8b66fb7001f2966d5c47dd987980f5ac9",
+        "3980600a7888d2d054162ce128bbbb60b54d8cabffcdab363e30f3d1dea1b492",
         "b8231897c5ca5538c45b0efbcdf20dcb0a5febd105bf7103420fa6363d164ac5",
     )
     for row, digest in zip(rows, expected_row_digests):
@@ -7496,13 +7502,24 @@ def _validate_dp9_014_decision(
         ("decision", (
             "usual B16 Export selected production items route",
             "different new directory inside the directory that the operator selects",
-            "One directory operation makes the full requested set available "
-            "without replacement of an existing path",
-            "CSV stays optional and is part of the same set when requested",
+            (
+                "One directory operation makes the full selected output set available"
+                " without replacement of an existing path"
+            ),
+            (
+                "CSV stays optional and is part of the same set when the operator "
+                "selects it"
+            ),
             "Preserve previous output",
             "Remove replacement of existing output from this usual route",
-            "necessary Level 3 alignment and one bounded implementation towards Exit 9B-5",
-            "keep the confirmed requested set through execution",
+            (
+                "necessary Level 3 alignment and one bounded product change towards "
+                "Exit 9B-5"
+            ),
+            (
+                "keep the data and output paths that the operator accepted through "
+                "the file operations"
+            ),
         )),
         ("exclusions", (
             "only the existing Linux ext4 host with an operator-controlled output directory",
@@ -7510,11 +7527,15 @@ def _validate_dp9_014_decision(
             "Claim no recovery after FreeCAD stops and starts again",
             "Claim no assurance for every filesystem or for changes that "
             "another process makes to the directory during the operation",
-            "Preserve member filenames, content requirements, selected scope, "
-            "record identities and isolated-document operation",
-            "Preserve frozen B14/B15 comparison paths, the previous selected "
-            "command and file adapter, retained comparison APIs, Core Generate "
-            "policy and D-P6-003/D-P6-004 Entry/Exit authority",
+            (
+                "Preserve filenames, content requirements, selected production data, "
+                "their identities and the isolated FreeCAD operation"
+            ),
+            (
+                "Preserve the frozen B14/B15 paths, previous selected command and "
+                "file adapter, and APIs used to compare results. Preserve the Core "
+                "Generate policy and D-P6-003/D-P6-004 Entry/Exit authority"
+            ),
             "Change no geometry, package bytes, numerical limits, persistent "
             "schema or runtime dependency",
             "Accept no phase exit or closeout",
@@ -7575,7 +7596,7 @@ def _validate_dp9_014_policy(evidence: str, architecture: str) -> None:
         "Phase 9B stays Open at 1/6 under D-P9-012",
         "Only Exit 9B-2 is Evidenced and owner-accepted",
         "The other five exits stay Pending",
-        "113-entry register and legacy-retirement conditions stay unchanged",
+        "113-entry register and legacy-retirement conditions stay the same",
         "D-P6-008 stays Deferred — unmet",
         "TERM-R04 stays open",
         "Output stays private-development",
@@ -7591,12 +7612,12 @@ def _validate_dp9_014_policy(evidence: str, architecture: str) -> None:
         panel,
         (("architecture", "../ARCHITECTURE.md"
           "#d-p9-014-selected-complete-output-set"),
-         ("selected successor contract", "../contracts/selected-export-set.md"),
+         ("selected API requirements", "../contracts/selected-export-set.md"),
          ("current register", "risks.json"),
          ("standalone selected-set test", "../../tests/validate_selected_export_set.py"),
          ("real-GUI test", "../../tools/freecad_bridge/run_selected_export_set_gui.py"),
          ("chair continuity test", "../../tests/freecad_validate_chair_export_continuity.py"),
-         ("selected-set FreeCAD proof", "../../tests/freecad_validate_selected_export_set.py")),
+         ("selected-set FreeCAD test", "../../tests/freecad_validate_selected_export_set.py")),
         "D-P9-014 panel owner route drifted",
     )
     section = direct_section_content(
@@ -7607,41 +7628,70 @@ def _validate_dp9_014_policy(evidence: str, architecture: str) -> None:
         "usual B16 Export selected production items route",
         "different new directory for each operation",
         "inside the directory that the operator selects",
-        "All requested files must pass their existing checks before one "
-        "directory operation makes the full set available at its final path",
+        (
+            "All selected files must pass their existing checks before one "
+            "directory operation makes the full set available at its final path"
+        ),
         "That operation must not replace an existing path",
-        "If the host cannot supply that operation, export must stop with a diagnostic",
+        (
+            "If the host cannot supply that operation, the selected operation "
+            "must stop with a diagnostic"
+        ),
         "It must not write final files one at a time as a different route",
-        "CSV stays optional. A requested CSV is part of the same set",
-        "Previous output files and directories stay unchanged",
-        "usual selected route no longer offers replacement of existing output",
-        "Member filenames, content requirements, selected scope and record "
-        "identities stay the same",
-        "preview, confirmation, preflight and execution must use the same "
-        "requested output paths and selected records",
-        "After confirmation, the operation must not silently prepare a different set",
+        (
+            "CSV stays optional. If the operator selects CSV, it is part of the "
+            "same set"
+        ),
+        "Previous output files and directories stay the same",
+        "usual selected route prevents replacement of existing output",
+        (
+            "Filenames, content requirements, selected production data and their "
+            "identities stay the same"
+        ),
+        (
+            "preview, operator decision, checks before file creation and final "
+            "operation must use the same output paths and selected production "
+            "data"
+        ),
+        (
+            "After the operator accepts those data, the operation must not "
+            "silently prepare a different set"
+        ),
         "saved preference keeps the directory that the operator selects",
         "result and Open Folder control identify the completed output directory",
         "only to the qualified Linux ext4 host and an operator-controlled output directory",
-        "It gives no assurance that files stay available after a system interruption",
-        "It adds no recovery after FreeCAD stops and starts again",
-        "It gives no assurance for every filesystem or for changes that "
-        "another process makes to the directory during the operation",
+        (
+            "They give no assurance that files stay available after a system "
+            "interruption"
+        ),
+        "They add no recovery after FreeCAD stops and starts again",
+        (
+            "They give no assurance for every filesystem or for changes that "
+            "another process makes to the directory during the operation"
+        ),
         "An error after that operation must preserve completed files, counts and paths",
         "Cleanup must preserve completed output and data whose ownership is unknown",
         "isolated FreeCAD operation and editable-model preservation conditions stay",
-        "previous selected command and file adapter stay available for comparison",
-        "frozen B14/B15 paths, Core Generate policy, Phase 7 comparison and "
-        "staging APIs, and D-P6-003/D-P6-004 Entry/Exit authority stay unchanged",
-        "This policy accepts no phase exit, production output, rights, "
-        "performance or release result",
+        (
+            "previous selected command and file adapter stay available to compare"
+            " results"
+        ),
+        (
+            "frozen B14/B15 paths and Core Generate policy do not change. The "
+            "Phase 7 APIs used to compare results and prepare files also do not "
+            "change. D-P6-003/D-P6-004 keep their Entry/Exit authority"
+        ),
+        (
+            "This canonical policy accepts no phase exit, production output, "
+            "rights, performance or release result"
+        ),
     ):
         _require(clause in flat, "D-P9-014 architecture boundary drifted: " + clause)
     _require_links(
         section,
         (("D-P9-014", "current/PHASE_EVIDENCE.md"
           "#phase-9b-selected-export-policy-panel"),
-         ("selected successor contract", "contracts/selected-export-set.md")),
+         ("selected API requirements", "contracts/selected-export-set.md")),
         "D-P9-014 architecture owner route drifted",
     )
 

@@ -8946,8 +8946,8 @@ def validate_selected_set_policy_mutations() -> None:
     for field, name, old, new in (
         ("decision", "replacement", "without replacement", "with replacement"),
         ("decision", "csv-required", "CSV stays optional", "CSV is mandatory"),
-        ("decision", "confirmed-request", "keep the confirmed requested set",
-         "replace the confirmed requested set"),
+        ("decision", "confirmed-request", "keep the data and output paths that the operator accepted",
+         "replace the data and output paths that the operator accepted"),
         ("exclusions", "host-widened", "only the existing Linux ext4 host",
          "every host"),
         ("exclusions", "durability", "Claim no assurance that files stay",
@@ -9015,10 +9015,10 @@ def validate_selected_set_policy_mutations() -> None:
          "erase completed files, counts and paths"),
         ("uncertain-cleanup", "whose ownership is unknown",
          "whose ownership is known"),
-        ("retained-route", "stay available for comparison",
+        ("retained-route", "stay available to compare results",
          "are removed without comparison"),
         ("host", "qualified Linux ext4 host", "every filesystem"),
-        ("restart", "It adds no recovery", "It guarantees recovery"),
+        ("restart", "They add no recovery", "It guarantees recovery"),
     ):
         mutated = replace_once(
             architecture, section, replace_once(section, old, new),
