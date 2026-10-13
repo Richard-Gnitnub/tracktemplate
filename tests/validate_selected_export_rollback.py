@@ -494,12 +494,12 @@ def validate_plan_rejection(base):
     return cases
 
 
-def dialog_host(root):
+def dialog_host(root, document=None):
     """Load the real selected dialog callback above synthetic host services."""
     from types import ModuleType, SimpleNamespace
 
     plan, config = inputs(root)
-    document = object()
+    document = object() if document is None else document
     collaborators = Collaborators(document, plan, root)
     module = ModuleType("selected_export_binding_fixture")
     namespace = module.__dict__
@@ -613,9 +613,32 @@ def validate_binding(base):
         SelectedExportBinding,
     )
 
+    from tracktemplate.adapters.freecad import core_export_document as documents
+    from validate_core_export_staging import DocumentHost
+
+    app = DocumentHost()
+    editable = app.documents["Editable"]
     root = base / "normal-loader"
     root.mkdir()
-    host, dialog, collaborators = dialog_host(root)
+    host, dialog, collaborators = dialog_host(root, editable)
+    original_dispatch = collaborators.dispatch
+    isolated_calls = []
+
+    def isolated_dispatch(document, task, path):
+        assert document is not editable
+        assert app.listDocuments().get(document.Name) is document
+        isolated_calls.append(document)
+        collaborators.document = document
+        try:
+            original_dispatch(document, task, path)
+        finally:
+            collaborators.document = editable
+
+    collaborators.dispatch = isolated_dispatch
+    isolation = documents.CoreExportDocument
+
+    def document_factory(serializer):
+        return isolation(serializer, app=app, gui=app.gui)
     namespace = host.module.__dict__
     original = namespace["run_selected_production_export"]
     with mock.patch.object(workflow, "load_b15_workflow_host",
@@ -629,12 +652,15 @@ def validate_binding(base):
             launcher = {"importlib": importlib}
             exec(compile(ast.Module(body=[loader], type_ignores=[]),
                          "<actual launcher>", "exec"), launcher)
-            session, _routing = launcher[loader.name](
-                ROOT, api, SimpleNamespace(load_contract=lambda _path: {}),
-            )
+            with mock.patch.object(documents, "CoreExportDocument",
+                                   document_factory):
+                session, _routing = launcher[loader.name](
+                    ROOT, api, SimpleNamespace(load_contract=lambda _path: {}),
+                )
     binding = namespace["run_selected_production_export"]
     assert isinstance(binding, SelectedExportBinding)
     assert binding.original_command is original
+    assert binding.export_dispatcher_factory is document_factory
     session.core_layout_export_routing_record()
     factory = binding.export_files_factory
     binding.export_files_factory = None
@@ -654,6 +680,8 @@ def validate_binding(base):
     finally:
         binding.export_files_factory = factory
     result, = namespace["shown"]
+    assert len(isolated_calls) == len(dialog.plan["tasks"])
+    assert set(app.documents) == {"Editable", "Other"}
     assert result["successful_files"] == 0 and result["failed_files"] >= 1
     observed = regular_files(root)
     assert all(value in observed.values()
@@ -681,6 +709,143 @@ def validate_binding(base):
     return 2
 
 
+def validate_selected_isolation(base):
+    """Exercise normal and override serializers through the selected binding."""
+    from tracktemplate import api
+    from tracktemplate.adapters.freecad.core_export_document import (
+        CoreExportDocument,
+    )
+    from tracktemplate.compatibility import transition_workflow as workflow
+    from validate_core_export_staging import DocumentHost
+
+    cases = 0
+    for mode in ("normal", "override", "falsy-override", "serialize", "close",
+                 "interrupt"):
+        root = base / ("isolated-" + mode)
+        root.mkdir()
+        app = DocumentHost()
+        editable = app.documents["Editable"]
+        registry = app.listDocuments()
+        objects = dict(editable.objects)
+        active = app.ActiveDocument
+        selection = list(app.gui.Selection.entries)
+        hover = app.gui.Selection.hover
+        host, dialog, collaborators = dialog_host(root, editable)
+        calls = []
+
+        def serializer(document, task, path):
+            assert all(document is not item for item in registry.values())
+            assert document.Temporary is True and not document.FileName
+            assert app.documents.get(document.Name) is document
+            assert task is dialog.plan["tasks"][len(calls)]
+            collaborators.unchanged()
+            calls.append(document)
+            document.addObject("App::FeaturePython", "UnremovedExportObject")
+            if mode == "serialize":
+                raise OSError("controlled selected serializer failure")
+            if mode == "interrupt":
+                raise KeyboardInterrupt("controlled selected interruption")
+            Path(path).write_bytes(payload(task))
+
+        def factory(operation):
+            return CoreExportDocument(operation, app=app, gui=app.gui)
+
+        collaborators.dispatch = serializer
+        if mode == "close":
+            def close_failure(_name):
+                raise RuntimeError("controlled selected document close failure")
+            app.close_fault = close_failure
+        session = workflow.ModularCoreLayoutWorkflowSession(
+            host, api.run_core_layout_export,
+            selected_export_files_factory=SelectedExportFiles,
+            export_dispatcher_factory=factory,
+        )
+        binding = host.module.run_selected_production_export
+        session.core_layout_export_routing_record()
+        if mode == "normal":
+            binding.export_dispatcher_factory = lambda operation: operation
+            try:
+                session.core_layout_export_routing_record()
+            except RuntimeError:
+                pass
+            else:
+                raise AssertionError("A replaced isolation factory passed")
+            finally:
+                binding.export_dispatcher_factory = factory
+            session.core_layout_export_routing_record()
+            cases += 1
+
+        class FalsySerializer:
+            def __bool__(self):
+                return False
+
+            def __call__(self, *args):
+                return serializer(*args)
+
+        override = None
+        if mode in ("override", "falsy-override"):
+            override = serializer if mode == "override" else FalsySerializer()
+
+            def forbidden(*_args):
+                raise AssertionError("Explicit override was ignored")
+
+            collaborators.dispatch = forbidden
+        try:
+            summary = binding(
+                editable, dialog.plan, dialog._current_config(),
+                "SET-SELECTED", {}, {}, {}, {}, exporter_override=override,
+            )
+        except KeyboardInterrupt as error:
+            assert mode == "interrupt"
+            assert str(error) == "controlled selected interruption"
+        else:
+            assert mode != "interrupt"
+            if mode in ("normal", "override", "falsy-override"):
+                assert summary["successful_files"] == 3, summary
+                assert summary["failed_files"] == 0, summary
+                assert len(calls) == 2
+                for task in dialog.plan["tasks"]:
+                    assert Path(task["path"]).read_bytes() == payload(task)
+            else:
+                assert summary["successful_files"] == 0, summary
+                assert summary["failed_files"] == 1, summary
+                assert "controlled selected" in diagnostics(summary), summary
+                if mode == "close":
+                    assert app.created[0] in diagnostics(summary)
+        assert editable.objects == objects
+        assert all(app.documents[name] is value
+                   for name, value in registry.items())
+        assert app.ActiveDocument is active
+        assert sorted(app.gui.Selection.entries) == sorted(selection)
+        assert app.gui.Selection.hover == hover
+        if mode == "close":
+            assert set(app.documents) == set(registry) | {app.created[0]}
+        else:
+            assert app.documents == registry
+        if mode in ("serialize", "close", "interrupt"):
+            assert regular_files(root) == collaborators.before
+        cases += 1
+
+    for invalid in (None, object()):
+        root = base / ("missing-isolation-" + str(cases))
+        root.mkdir()
+        host, _dialog, _collaborators = dialog_host(root)
+        original = host.module.run_selected_production_export
+        try:
+            workflow.ModularCoreLayoutWorkflowSession(
+                host, api.run_core_layout_export,
+                selected_export_files_factory=SelectedExportFiles,
+                export_dispatcher_factory=invalid,
+            )
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("Selected export accepted no isolation")
+        assert host.module.run_selected_production_export is original
+        cases += 1
+    return cases
+
+
 def main():
     with tempfile.TemporaryDirectory(prefix="tt-selected-rollback-") as area:
         root = Path(area)
@@ -690,6 +855,7 @@ def main():
             "prepublication_failure": validate_prepublication_failures(root),
             "uncertain_cleanup": validate_uncertain_cleanup(root),
             "binding": validate_binding(root),
+            "selected_isolation": validate_selected_isolation(root),
             "plan_rejection": validate_plan_rejection(root),
         }
     print(json.dumps(counts, sort_keys=True))

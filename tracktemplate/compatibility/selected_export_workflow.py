@@ -1,4 +1,4 @@
-"""Bind corrected selected-export rollback to the inherited GUI caller.
+"""Bind isolated selected serialization and rollback to the GUI caller.
 
 The modular command owns the normal B16 route. The frozen B15 command stays
 comparison evidence until its migration and removal receive owner acceptance.
@@ -22,10 +22,13 @@ HOST_OPERATIONS = (
 class SelectedExportBinding:
     """Keep inherited arguments and bind only the selected-export command."""
 
-    def __init__(self, namespace, *, export_files_factory):
+    def __init__(self, namespace, *, export_files_factory,
+                 export_dispatcher_factory):
         self.namespace = namespace
         self.export_files_factory = export_files_factory
         self._expected_factory = export_files_factory
+        self.export_dispatcher_factory = export_dispatcher_factory
+        self._expected_dispatcher_factory = export_dispatcher_factory
         self.original_command = namespace.get(HOST_BINDING)
         self.dialog = namespace.get("SelectedProductionExportDialog")
         self.caller = getattr(self.dialog, "export_selected", None)
@@ -40,6 +43,7 @@ class SelectedExportBinding:
                 is not namespace for value in originals)
             or code is None or HOST_BINDING not in code.co_names
             or not callable(export_files_factory)
+            or not callable(export_dispatcher_factory)
         ):
             raise RuntimeError(
                 "The inherited selected-export route is incomplete."
@@ -50,13 +54,21 @@ class SelectedExportBinding:
         registration_config, template_assembly_config, extra_skipped=None,
         exporter_override=None,
     ):
+        serializer = (
+            self.dispatch_export_task if exporter_override is None
+            else exporter_override
+        )
+        operations = {
+            field: getattr(self, field) for field, _name in HOST_OPERATIONS
+        }
+        operations["dispatch_export_task"] = (
+            self.export_dispatcher_factory(serializer)
+        )
         return run_selected_production_export(
             doc, plan, config, set_id, platform_config, formation_config,
             registration_config, template_assembly_config, extra_skipped,
-            exporter_override,
-            **{
-                field: getattr(self, field) for field, _name in HOST_OPERATIONS
-            },
+            None,
+            **operations,
             export_files_factory=self.export_files_factory,
         )
 
@@ -77,6 +89,8 @@ class SelectedExportBinding:
             is not self.dialog
             or getattr(self.dialog, "export_selected", None) is not self.caller
             or self.export_files_factory is not self._expected_factory
+            or self.export_dispatcher_factory
+            is not self._expected_dispatcher_factory
             or any(self.namespace.get(name) is not getattr(self, field)
                    for field, name in HOST_OPERATIONS)
         ):

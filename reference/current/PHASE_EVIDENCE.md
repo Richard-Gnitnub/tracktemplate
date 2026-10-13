@@ -20,6 +20,64 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 | Owner decision | D-P9-013 authorises only the export policy and its bounded implementation. It accepts no exit. It gives no assurance that files stay available after a system interruption. It adds no recovery after FreeCAD stops and starts again. D-P9-012 stays the authority for the one accepted Phase 9B exit. All other exits and production conditions stay. <br><br>The Phase 9A closeout and earlier decisions keep their accepted limits. |
 | Next action | Complete the bounded implementation, validation and independent review. After CI gives a PASS result for the exact PR head, publish the draft PR. Do not merge or start another outcome. |
 
+## Selected export keeps temporary objects out of the editable document — 2026-10-13
+
+This Level 2 result supplies evidence for phase exit 9B-5. The usual B16
+`Export selected production items` route uses `CoreExportDocument` to write
+each selected output in a separate temporary `App.Document`.
+The component does not change. A test of the previous software left a
+temporary `Part::Feature` in the editable document after two errors.
+The new route keeps that object outside the editable document.
+
+The [standalone test](../../tests/validate_selected_export_rollback.py)
+gives a PASS result for 32 conditions.
+The [FreeCAD test](../../tests/freecad_validate_selected_export_document.py)
+gives a PASS result on the qualified host profile for FreeCAD 1.1.4.
+It compares one `TO-001` scope with B15 and a repeated B16 operation.
+The `DXF`, `SVG`, `STL`, `STEP` and `CSV` results agree under the existing
+comparison rules. Those rules do not change.
+Eight additional conditions examine completed operations, rejected state and errors.
+They check document identity, object data, history and active-document state.
+The data stay the same after the test writes the document to a file and opens it again.
+
+If FreeCAD cannot close the temporary document, the diagnostic identifies that
+document. It stays available. No new output becomes available, and previous
+files stay unchanged. That condition does not restore the initial document registry.
+
+The FreeCAD result is in
+`tmp/selected-export-document/native-runs/20261011T173230900002Z/result.json`,
+SHA-256 `99b06c54b945d0dde35caa9cea057998ec13949d10e7aa686183cb55094b6b12`.
+The previous FreeCAD test for selected output also gives a PASS result.
+Its result is in
+`tmp/selected-export-rollback/native-runs/20261013T055057267159Z/result.json`,
+SHA-256 `d10834e53865745cb1cd9c730fd2832fc0e0c091e81f801faa3c6b41b03e7bd9`.
+
+The [test that uses `FreeCADGui`](../../tools/freecad_bridge/run_selected_export_document_gui.py)
+gives a PASS result for a completed selected operation and a controlled output error.
+It checks unchanged object data, history, visibility and data after the document opens again.
+The checks also show restored active document, selection, picked points and
+preselection around the `CoreExportDocument` call.
+The inherited preview and confirmation can change those states before that call.
+The test does not claim to restore the state from before confirmation.
+The result and four images from FreeCAD are in
+`benchmark-output/freecad-bridge/selected-export-document-runs/20261013T055940671786Z/`.
+The result file is `run.json`,
+SHA-256 `b7917e08d9adcea9c6e2116372f085ed2998b925319ff4d8fdab811a7ff0d9cb`.
+All three FreeCAD results show that the software files did not change.
+
+The B15 command stays available as comparison evidence. Filenames, output
+content, product geometry and the file for the 113 quantities do not change.
+The [previous finding about confirmation text](#previous-files-stay-available-after-an-output-error--2026-10-11)
+stays `REQUIRED_BEFORE_EXIT` for 9B-5.
+This result does not make all selected files available together.
+It adds no recovery after FreeCAD stops and starts again.
+It gives no assurance that files stay available after a system interruption.
+[D-P9-013](#phase-9b-core-export-policy-panel) continues to apply only to `Core Generate`.
+
+Phase 9B stays `Open` at 1/6. Phase exit 9B-5 stays `Pending`.
+Phase 9A stays closed at 4/4 for its frozen reference-only scope.
+All production conditions stay the same.
+
 ## Previous files stay available after an output error — 2026-10-11
 
 This Level 2 result supplies evidence for phase exit 9B-5. The usual B16
