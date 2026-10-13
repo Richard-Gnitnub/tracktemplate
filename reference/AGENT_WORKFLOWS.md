@@ -1134,6 +1134,10 @@ make protected main current
     ↓
 repeat IDE workspace alignment before branch creation
     ↓
+examine only the previous PR's recorded local worktree and branch under D-GOV-024 after its accepted merge
+    ↓
+use the Recovery-owned procedure and record its disposition
+    ↓
 select one authorised evidenced gap
     ↓
 state outcome, criterion, level, regression risk and acceptance evidence
@@ -1170,6 +1174,19 @@ material edit, Technical Lead is not necessary. When no authorised work
 advances the phase sufficiently, Continue stops on clean protected `main`
 before branch creation. Continue does not mark a new published draft ready or
 merge it in the same invocation.
+
+After the previous merge, use
+[D-GOV-024](RECOVERY_AND_BACKUP.md#delegated-local-retirement) and the
+[worktree retirement procedure](RECOVERY_AND_BACKUP.md#worktree-retirement).
+First, make sure that local `main` is clean and equal to protected `main`.
+Do the IDE workspace alignment again.
+Examine only the previous PR's recorded local worktree and branch.
+Examine their identities again directly before removal.
+
+This assessment gives no removal authority during the merge or for other worktrees and branches.
+Record the disposition if the worktree stays or is missing.
+If you cannot examine local Git state, record that limitation.
+Do not examine other worktrees or branches for removal.
 
 Delegated publication cannot mutate the reviewed source. A CI `BLOCKER` for
 source or tests must identify the exact reviewed commit. It goes back to the

@@ -92,7 +92,7 @@
 - Never run `git clean`; ignored paths contain evidence and operator data that
   Git and GitHub do not protect.
 - Do not use destructive reset/checkout/restore, force push, branch/tag deletion
-  or broad recursive deletion during routine work.
+  or broad recursive deletion during routine work. Only [D-GOV-024](reference/RECOVERY_AND_BACKUP.md#delegated-local-retirement) supplies bounded local removal authority without a new owner decision. Use this authority only after protected `main` contains its accepted change.
 - Never target `/`, `$HOME`, `~`, the workspace root, unresolved variables,
   wildcards or command substitutions for deletion, overwrite or recursive move.
 - Do not run the IDE, FreeCAD automation or project tools as root.
