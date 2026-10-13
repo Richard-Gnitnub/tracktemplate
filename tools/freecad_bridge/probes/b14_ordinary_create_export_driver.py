@@ -4,6 +4,7 @@ import copy
 import csv
 import dataclasses
 import hashlib
+import importlib.util
 import json
 import os
 import pathlib
@@ -82,6 +83,15 @@ if module is None:
 document = App.ActiveDocument
 if document is None or not str(document.FileName or ""):
     raise RuntimeError("Open a saved copied B14 plain-line fixture before export")
+
+if ATOMIC_SET:
+    _witness_path = (pathlib.Path(module.__file__).resolve().parent
+                     / "tests/freecad_validate_core_export_atomic.py")
+    _witness_spec = importlib.util.spec_from_file_location(
+        "core_dependency_gui_witness", _witness_path,
+    )
+    dependency_witness = importlib.util.module_from_spec(_witness_spec)
+    _witness_spec.loader.exec_module(dependency_witness)
 
 run_directory = pathlib.Path(str(document.FileName)).resolve().parent
 success_directory = run_directory / "create-time-export-success"
@@ -197,6 +207,10 @@ def _configure_dialog(dialog, output_directory, *, manifest=True):
             raise RuntimeError("Atomic Core exposes the obsolete overwrite option")
         if dialog.production_overwrite_box.text() != "New folder for each export":
             raise RuntimeError("Atomic Core does not explain its folder policy")
+        if dialog.production_manifest_box.text() != (
+            "Optional CSV; dependency JSON is always included"
+        ):
+            raise RuntimeError("Core does not distinguish optional CSV from JSON")
 
     values = dialog.values()
     production = values[15]
@@ -245,6 +259,7 @@ def _configure_dialog(dialog, output_directory, *, manifest=True):
 def _run_scenario(
     name, output_directory, expected_initial_directory, inject_failure,
     *, inject_close_failure=False, manifest=True, publication_failure=None,
+    inventory_failure=None,
 ):
     active_document = App.ActiveDocument
     if active_document is None:
@@ -385,6 +400,12 @@ def _run_scenario(
             state["planned_child"] = plan["output_directory"]
             state["planned_paths"] = [task["path"] for task in plan["tasks"]]
             state["planned_manifest"] = plan.get("manifest_path", "")
+            state["planned_dependency"] = plan["dependency_manifest_path"]
+            if pathlib.Path(state["planned_dependency"]) != (
+                pathlib.Path(state["planned_child"])
+                / dependency_witness.DEPENDENCY_FILENAME
+            ):
+                raise RuntimeError("Core planned an incorrect dependency JSON path")
             if pathlib.Path(state["planned_child"]).parent != output_directory:
                 raise RuntimeError("Core planned a child outside the selected parent")
             if any(pathlib.Path(path).parent != pathlib.Path(state["planned_child"])
@@ -411,7 +432,22 @@ def _run_scenario(
                     if publication_failure == "postpublication":
                         raise OSError("controlled GUI postpublication diagnostic")
 
-            export_call = dataclasses.replace(export_call, export_files_factory=FaultFiles)
+            settings = next(
+                obj for obj in active_document.Objects
+                if getattr(obj, "GeneratedRole", None) == "Settings"
+                and getattr(obj, "TemplateSetID", None) == args[3]
+            )
+            state["persisted_generation_origin"] = settings.GeneratorVersion
+            if not callable(original_export.prepare_dependency_manifest):
+                raise RuntimeError("Normal Core lacks its dependency inventory")
+
+            export_call = dataclasses.replace(
+                export_call, export_files_factory=FaultFiles,
+                prepare_dependency_manifest=(
+                    None if inventory_failure == "missing"
+                    else original_export.prepare_dependency_manifest
+                ),
+            )
         retained_documents = []
         if inject_close_failure:
             from tracktemplate.adapters.freecad.core_export_document import (
@@ -433,6 +469,18 @@ def _run_scenario(
                 export_dispatcher_factory=lambda serializer: (
                     CoreExportDocument(serializer, app=CloseFault())
                 ),
+            )
+        restore_inventory = None
+        if ATOMIC_SET and inventory_failure == "malformed":
+            restore_inventory = dependency_witness.inject_duplicate_track_key(
+                settings,
+            )
+            state["inventory_fault_boundary"] = (
+                "Test-owned duplicate-key JSON installed before export entry"
+            )
+        if ATOMIC_SET:
+            inventory_entry = dependency_witness.helpers.document_state(
+                module, active_document,
             )
         witness = None
         if ISOLATED_EXPORT:
@@ -476,6 +524,10 @@ def _run_scenario(
         try:
             state["inside_production_export"] = True
             summary = export_call(*args, **kwargs)
+            if ATOMIC_SET and dependency_witness.helpers.document_state(
+                module, active_document,
+            ) != inventory_entry:
+                raise RuntimeError("Core changed exact export-entry document state")
             if ISOLATED_EXPORT:
                 expected_registry = dict(registry)
                 if inject_close_failure:
@@ -524,6 +576,8 @@ def _run_scenario(
                 }
         finally:
             state["inside_production_export"] = False
+            if restore_inventory is not None:
+                restore_inventory()
             for retained_document in retained_documents:
                 if App.listDocuments().get(retained_document.Name) is not retained_document:
                     raise RuntimeError("Fixture cleanup lost document identity")
@@ -542,6 +596,7 @@ def _run_scenario(
             state["atomic_summary"] = {
                 key: summary[key] for key in (
                     "publication_state", "output_directory", "manifest_path",
+                    "dependency_manifest_path",
                 )
             }
             for item_result, task in zip(summary["results"], args[1]["tasks"]):
@@ -710,7 +765,8 @@ def _run_scenario(
         raise RuntimeError("Create-time export planned an unexpected task count")
     if ATOMIC_SET:
         _validate_atomic_scenario(state, output_directory, destination_before,
-                                  manifest, inject_failure, publication_failure)
+                                  manifest, inject_failure, publication_failure,
+                                  inventory_failure)
         state.pop("active", None)
         state.pop("seen", None)
         return state, after, normalised_after
@@ -856,11 +912,15 @@ def _atomic_document_contract(snapshot, *, manifest):
     return create_time_export_document_snapshot(candidate, enforce_expected_hash=False)
 
 
-def _validate_atomic_scenario(state, parent, before, manifest, preparation_failure, publication_failure):
+def _validate_atomic_scenario(
+    state, parent, before, manifest, preparation_failure, publication_failure,
+    inventory_failure,
+):
     summary = state["summary_payloads"][0]
     atomic = state["atomic_summary"]
     child = pathlib.Path(state["planned_child"])
-    published = not preparation_failure and publication_failure in (None, "postpublication")
+    published = (not preparation_failure and not inventory_failure
+                 and publication_failure in (None, "postpublication"))
     if atomic["publication_state"] != ("published" if published else "not-published"):
         raise RuntimeError("Core reported the wrong publication state")
     expected_directory = str(child if published else parent)
@@ -870,10 +930,17 @@ def _validate_atomic_scenario(state, parent, before, manifest, preparation_failu
         raise RuntimeError("Open Folder did not receive the summary directory")
     if atomic["manifest_path"] != (state["planned_manifest"] if published and manifest else ""):
         raise RuntimeError("Core returned an incorrect CSV path")
-    if summary["successful_files"] != (EXPECTED_TASK_COUNT + int(manifest) if published else 0):
+    if atomic["dependency_manifest_path"] != (
+        state["planned_dependency"] if published else ""
+    ):
+        raise RuntimeError("Core returned an incorrect dependency JSON path")
+    if summary["successful_files"] != (
+        EXPECTED_TASK_COUNT + int(manifest) + 1 if published else 0
+    ):
         raise RuntimeError("Core lost or invented published successes")
     expected_failures = (1 if publication_failure == "postpublication" else
-                         EXPECTED_TASK_COUNT + int(bool(publication_failure)) if not published else 0)
+                         EXPECTED_TASK_COUNT + int(bool(publication_failure or inventory_failure))
+                         if not published else 0)
     if summary["failed_files"] != expected_failures:
         raise RuntimeError("Core diagnostics count differs: {}".format(summary))
     if summary["manifest_requested"] is not manifest or summary["manifest_created"] is not (published and manifest):
@@ -887,9 +954,13 @@ def _validate_atomic_scenario(state, parent, before, manifest, preparation_failu
         raise RuntimeError("Atomic GUI preflight did not identify its fresh child")
     probes = [item for item in state["dispatch_calls"] if item["kind"] == "preflight_probe"]
     deliverables = [item for item in state["dispatch_calls"] if item["kind"] == "deliverable"]
-    if len(probes) != 10 or len(deliverables) != EXPECTED_TASK_COUNT:
+    if len(probes) != 10 or len(deliverables) != (
+        0 if inventory_failure else EXPECTED_TASK_COUNT
+    ):
         raise RuntimeError("Atomic GUI dispatch count differs")
-    if state["staged_manifest_calls"] != int(manifest and not preparation_failure):
+    if state["staged_manifest_calls"] != int(
+        manifest and not preparation_failure and not inventory_failure
+    ):
         raise RuntimeError("Atomic GUI built an unrequested or premature CSV")
     if _destination_files(parent) != before:
         raise RuntimeError("Atomic GUI changed existing parent outputs")
@@ -897,6 +968,7 @@ def _validate_atomic_scenario(state, parent, before, manifest, preparation_failu
         raise RuntimeError("Atomic GUI retained owned unpublished files")
     if published:
         expected_names = {pathlib.Path(path).name for path in state["planned_paths"]}
+        expected_names.add(dependency_witness.DEPENDENCY_FILENAME)
         if manifest:
             expected_names.add(pathlib.Path(state["planned_manifest"]).name)
         if {path.name for path in child.iterdir()} != expected_names:
@@ -908,6 +980,15 @@ def _validate_atomic_scenario(state, parent, before, manifest, preparation_failu
                 raise RuntimeError("CSV does not identify final child members")
             if any(row["Export status"] != "Success" for row in rows):
                 raise RuntimeError("Complete-set CSV reports an unsuccessful member")
+        expected_paths = list(state["planned_paths"])
+        if manifest:
+            expected_paths.append(state["planned_manifest"])
+        state["dependency_manifest"] = (
+            dependency_witness.dependency_manifest_witness(
+                atomic["dependency_manifest_path"], expected_paths,
+                state["persisted_generation_origin"],
+            )
+        )
         if str(child) not in state["export_summary_dialogs"][0]["informative_text"]:
             raise RuntimeError("Visible summary omitted published child path")
     elif publication_failure == "collision":
@@ -917,6 +998,22 @@ def _validate_atomic_scenario(state, parent, before, manifest, preparation_failu
             raise RuntimeError("Collision changed foreign bytes")
     elif child.exists():
         raise RuntimeError("Failed atomic export left a visible child")
+    visible = state["export_summary_dialogs"][0]["informative_text"]
+    expected_csv = (atomic["manifest_path"] if published and manifest
+                    else "Requested but not created" if manifest else "Not requested")
+    expected_json = atomic["dependency_manifest_path"] if published else "Not created"
+    if ("Manifest: CSV: " + expected_csv not in visible
+            or "Dependency JSON: " + expected_json not in visible
+            or "Private development only; output rights remain unresolved." not in visible):
+        raise RuntimeError("Visible summary misstates CSV, JSON or rights")
+    expected_inventory_error = {
+        "malformed": "duplicate JSON key",
+        "missing": "dependency inventory is unavailable",
+    }.get(inventory_failure)
+    if expected_inventory_error and not any(
+        expected_inventory_error in value for value in summary["failures"]
+    ):
+        raise RuntimeError("Inventory refusal omitted its diagnostic")
     if preparation_failure and not any(CREATE_TIME_EXPORT_FAILURE_MESSAGE in value for value in summary["failures"]):
         raise RuntimeError("Preparation failure omitted its diagnostic")
     if publication_failure in {"publication", "postpublication"} and not any(
@@ -929,6 +1026,9 @@ def _validate_atomic_scenario(state, parent, before, manifest, preparation_failu
         "old_parent_outputs_unchanged": True, "planned_member_identity_preserved": True,
         "complete_child_inventory": published, "open_folder_path_verified": True,
         "csv_final_paths_verified": published and manifest,
+        "mandatory_json_verified": published,
+        "inventory_refusal_before_serializers": bool(inventory_failure),
+        "visible_csv_json_rights_distinction": True,
         "published_successes_preserved_after_diagnostic": publication_failure == "postpublication",
     }
 
@@ -946,17 +1046,20 @@ def _run_atomic_recipe():
     published_witnesses = {}
     normalised = None
     first_child = None
-    for name, manifest, preparation, publication in (
-        ("create_time_export_success", True, False, None),
-        ("create_time_export_no_csv", False, False, None),
-        ("create_time_export_final_task_failure", True, True, None),
-        ("create_time_export_collision", True, False, "collision"),
-        ("create_time_export_publication_failure", True, False, "publication"),
-        ("create_time_export_postpublication", True, False, "postpublication"),
+    for name, manifest, preparation, publication, inventory in (
+        ("create_time_export_success", True, False, None, None),
+        ("create_time_export_no_csv", False, False, None, None),
+        ("create_time_export_final_task_failure", True, True, None, None),
+        ("create_time_export_collision", True, False, "collision", None),
+        ("create_time_export_publication_failure", True, False, "publication", None),
+        ("create_time_export_postpublication", True, False, "postpublication", None),
+        ("create_time_export_malformed_inventory", True, False, None, "malformed"),
+        ("create_time_export_missing_inventory", True, False, None, "missing"),
     ):
         scenario, snapshot, contract = _run_scenario(
             name, parent, previous_directory, preparation,
             manifest=manifest, publication_failure=publication,
+            inventory_failure=inventory,
         )
         result["scenarios"].append(scenario)
         if normalised is None:
@@ -980,6 +1083,12 @@ def _run_atomic_recipe():
                 )
         previous_directory = str(parent)
     output = export_directory_snapshot(first_child)
+    # The JSON has its own exact schema and hash witness above. Retain the
+    # frozen payload and CSV comparison over exactly the previous inventory.
+    if set(output["files"]) != (
+        set(EXPECTED_EXPORT_FILENAMES) | {dependency_witness.DEPENDENCY_FILENAME}
+    ):
+        raise RuntimeError("Core payload comparison excluded an unexpected file")
     variant = export_variant_snapshot(output)
     logical_hash = validate_export_snapshot(variant)
     metrics = format_export_metrics(module, first_child, variant, shape_summary)

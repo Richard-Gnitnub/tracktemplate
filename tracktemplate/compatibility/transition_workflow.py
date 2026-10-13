@@ -2,6 +2,7 @@
 
 import copy
 from dataclasses import dataclass
+from functools import partial
 import json
 
 from tracktemplate.application import (
@@ -10,6 +11,9 @@ from tracktemplate.application import (
     turnout_edit,
 )
 from tracktemplate.compatibility.core_export_policy import CoreExportPolicy
+from tracktemplate.compatibility.core_dependency_inventory import (
+    prepare_core_dependency_manifest,
+)
 from tracktemplate.compatibility.selected_export_workflow import (
     SelectedExportBinding,
 )
@@ -2483,6 +2487,7 @@ class _StagedCoreLayoutExportAdapter:
     skipped_export_report: object
     export_files_factory: object
     export_dispatcher_factory: object
+    prepare_dependency_manifest: object = None
 
     def __call__(
         self,
@@ -2501,6 +2506,9 @@ class _StagedCoreLayoutExportAdapter:
             else exporter_override
         )
         dispatcher = self.export_dispatcher_factory(serializer)
+        keywords = {}
+        if self.prepare_dependency_manifest is not None:
+            keywords["prepare_dependency_manifest"] = self.prepare_dependency_manifest
         return self.calculation(
             doc,
             plan,
@@ -2517,6 +2525,7 @@ class _StagedCoreLayoutExportAdapter:
             failed_export_report=self.failed_export_report,
             skipped_export_report=self.skipped_export_report,
             export_files_factory=self.export_files_factory,
+            **keywords,
         )
 
 
@@ -2557,6 +2566,7 @@ class ModularCoreLayoutWorkflowSession:
         *,
         staged=False,
         atomic=False,
+        runtime_record=None,
         selected_export_files_factory=None,
         selected_export_atomic=False,
         export_files_factory=None,
@@ -2612,6 +2622,13 @@ class ModularCoreLayoutWorkflowSession:
             operations["export_files_factory"] = self._export_files_factory
             operations["export_dispatcher_factory"] = (
                 self._export_dispatcher_factory
+            )
+        if atomic:
+            operations["prepare_dependency_manifest"] = partial(
+                prepare_core_dependency_manifest, namespace=namespace,
+                source_path=self._host.source_path,
+                source_sha256=self._host.source_sha256,
+                runtime_record=runtime_record,
             )
         self._export_adapter = self._export_adapter_type(
             calculation=export_calculation,
@@ -2805,6 +2822,7 @@ def load_modular_transition_workflow_session(
     contract,
     *,
     atomic=True,
+    runtime_record=None,
     export_files_factory=None,
     export_dispatcher_factory=None,
     selected_export_files_factory=None,
@@ -2859,6 +2877,7 @@ def load_modular_transition_workflow_session(
         ) from error
     return ModularCoreLayoutWorkflowSession(
         calculation_session, export_calculation, staged=True, atomic=atomic,
+        runtime_record=runtime_record,
         selected_export_files_factory=selected_export_files_factory,
         selected_export_atomic=selected_export_atomic,
         export_files_factory=export_files_factory,

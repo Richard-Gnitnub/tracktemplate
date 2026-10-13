@@ -64,6 +64,7 @@ def _load_modular_transition_workflow(
         export_dispatcher_factory=export_document.CoreExportDocument,
         selected_export_files_factory=export_files.CoreLayoutExportSetFiles,
         selected_export_atomic=True,
+        runtime_record=bootstrap.runtime_record,
     )
     return session, session.routing_record()
 

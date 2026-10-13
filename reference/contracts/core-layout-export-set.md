@@ -1,6 +1,6 @@
 # Core Generate Complete Output Set
 
-Status: **API requirements under D-P9-013. [D-P9-015](../current/PHASE_EVIDENCE.md#phase-9b-exit-5-acceptance-panel) accepts Exit 9B-5 with its recorded limitations.**
+Status: **API requirements under D-P9-013 and D-P9-016. [D-P9-015](../current/PHASE_EVIDENCE.md#phase-9b-exit-5-acceptance-panel) accepts Exit 9B-5 with its recorded limitations.**
 
 ## Purpose and authority
 
@@ -19,7 +19,7 @@ The selected-export route and D-P6-003/D-P6-004 Entry/Exit route do not change.
 
 ## Plan and output paths
 
-`prepare_core_export_plan(records, config, set_id, *, plan_export)` prepares
+`prepare_core_export_plan(records, config, set_id, *, plan_export, dependency_manifest=False)` prepares
 the Core Generate plan without file operations.
 It makes a copy of `config` and supplies a new directory inside the selected directory to `plan_export`.
 The new directory name is `Core_Export_<uuidhex>`.
@@ -103,7 +103,8 @@ The result does not count temporary files or supply a completed CSV path.
 Prior output files, directories and symbolic links stay unchanged.
 
 After the full directory becomes available, `successful_files` counts every
-completed file, with CSV only when the operator requests it.
+completed file, including the dependency JSON on the usual Core route.
+It counts CSV only when the operator requests it.
 `output_directory`, task results and `manifest_path` identify final paths in that directory.
 An error after this operation must preserve those counts, paths and files.
 The result includes the additional diagnostic information.
@@ -115,6 +116,107 @@ It must not remove any completed output directory.
 Cleanup errors stay visible in the result.
 A `BaseException` at a tested interruption boundary keeps its identity and
 includes cleanup diagnostics.
+
+## Dependency manifest
+
+[D-P9-016](../current/PHASE_EVIDENCE.md#phase-9b-core-dependency-manifest-panel)
+adds the mandatory `Core_Dependency_Manifest.json` file to the usual Core Generate
+route. The Core policy supplies `dependency_manifest=True` to the plan helper.
+The plan identifies that file in `dependency_manifest_path`.
+The helper's default keeps previous comparison callers unchanged.
+The selected-export route does not request this additional member.
+
+The usual Core compatibility adapter supplies `prepare_dependency_manifest`.
+This optional command input has the signature
+`prepare(doc, plan, config, set_id) -> build(artifacts)`.
+The application calls it before `open` to validate and capture the inventory.
+A missing plan member or a missing builder causes an error when this route
+requires the manifest. No final output becomes available after that error.
+Other comparison callers can continue to omit this input and plan member.
+
+The initial supported scope has one same-set Settings object and curved
+plain-line `TrackTemplateCompound` and `TrackCentreline` records.
+The categories are `CuttingProfile`, `Solid` and `Engraving`.
+The inherited `route_id` field is empty. The stable record identity uses the
+`CURVE` token through the existing host identity function.
+
+Enabled straight routes, platforms, formation, sectioning, joints and assembly
+labels are outside the scope. Special trackwork, chair packages, imported
+geometry and replacement sources are also outside it.
+The checks examine actual properties and identities, not a fixture name.
+
+Each planned shape and its bound source shape must be present and non-null.
+The original placement matrices must match exactly.
+The check compares temporary copies with their original placements.
+It applies each original placement again to its copy before a final copy
+and exact BRep comparison.
+
+This removes differences from the inherited
+document assignment without a numerical tolerance or a change to the source.
+The check applies to fresh Generate and shapes restored from a saved document.
+It does not independently prove regeneration from the stored inputs.
+
+The operator gets a diagnostic for an unsupported or inconsistent inventory.
+The output controls show this restriction. The completed Generate transaction
+and previous files remain available after refusal.
+
+The signature identifies a versioned snapshot of canonical inputs and the
+actual invocation's production intent. The input reader rejects absent,
+ambiguous, malformed and non-finite data before a helper can supply a default.
+
+The scalar inputs are `TransitionLength`, `CurveRadius`, `TotalTurnAngle` and
+`MainTemplateWidth`. Lengths use mm; the angle uses degrees.
+The snapshot includes ordered track configuration and the stored configuration
+for straight routes, platforms, formation, sectioning, registration, assembly
+and labels. It includes the set identity and requested export selections.
+
+It excludes allocated output directories, timestamps, presets and derived
+geometry. `ProductionRecordIndexJSON` supplies coherence evidence, not the
+canonical input signature. The command changes no stored schema or property.
+A signature does not prove that copied geometry was generated from those inputs.
+
+The inventory identifies the inherited B15 source, installed modular generator
+source and actual host/exporter identities. It keeps source licence evidence
+separate from output rights. The source fingerprint identifies installed files.
+It does not attest to cached executing Python code or every host binary.
+The qualified proof uses a fresh process and checks source hashes before and
+after the operation. It requires no Git process, network access,
+repository validator or local research file when the product operates.
+
+The seven applicable groups in the
+[legacy lineage register](../lineage/phase1-other-snc-legacy-lineage.json)
+retain their exact classifications and project statuses.
+The production-record group remains applicable when CSV is off.
+These broad groups do not prove that every referenced upstream item was an input.
+No S1 package or special-trackwork table is claimed as an input to this scope.
+
+The Phase 9 export/provenance owner owns the checked runtime projection of
+those seven groups. The tests bind it to the canonical register.
+That owner must update the projection when the canonical mapping changes.
+The projection must be retired when an accepted replacement owns this scope.
+It is not a new rights register.
+
+After task output and optional CSV are staged, `artifact_inventory()` reads
+only the adapter's owned regular files. It returns each final basename,
+format and SHA-256. `stage_dependency_manifest(payload)` writes the JSON as a
+distinct planned member. `stage(..., manifest=True)` still identifies CSV only.
+The JSON excludes its own hash. Final validation checks all planned members
+and checks the artifact hashes again before publication.
+
+The result supplies `dependency_manifest_path` only for a plan with that member.
+It supplies the final path after confirmed publication and an empty string
+before publication. The summary distinguishes this JSON from optional CSV.
+Publication, cleanup, uncertain state and errors after publication keep the
+same conditions as the other members.
+
+The manifest uses schema 1, scope `legacy-b14-b15-output`, intended use
+`private-development` and project status `unknown`.
+Unresolved permissions remain unresolved. Non-copyright reviews that were
+not performed remain `not-performed`. Production admission stays disabled.
+
+The existing repository validator supplies independent schema and status
+checks. It cannot establish complete input coverage by itself.
+Successful construction or validation grants no output clearance or exit acceptance.
 
 ## Editable model and retained routes
 

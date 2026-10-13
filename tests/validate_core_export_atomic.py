@@ -3,6 +3,7 @@
 
 import copy
 import csv
+import hashlib
 import inspect
 import json
 from pathlib import Path
@@ -41,8 +42,12 @@ def inputs(root, *, manifest=True):
 
 
 def run_case(root, *, manifest=True, fault=None, adapter=None,
-             interruption=None):
+             interruption=None, dependency=False, dependency_fault=None):
     plan, config = inputs(root, manifest=manifest)
+    if dependency:
+        plan["dependency_manifest_path"] = str(
+            Path(plan["output_directory"]) / "Core_Dependency_Manifest.json"
+        )
     before = staging.file_witness(root)
     saved_plan, saved_config = copy.deepcopy(plan), copy.deepcopy(config)
     document = object()
@@ -57,6 +62,26 @@ def run_case(root, *, manifest=True, fault=None, adapter=None,
         document, plan, root, fault, interruption,
     )
     keywords = collaborators.keywords()
+    if dependency and dependency_fault != "missing-builder":
+        def prepare(document_input, plan_input, config_input, set_id):
+            assert document_input is document and plan_input is plan
+            assert config_input is config and set_id == "SET-STAGING"
+            assert staging.file_witness(root) == before
+            if dependency_fault == "missing-inventory":
+                raise ValueError("Dependency inventory not yet supported")
+
+            def build(artifacts):
+                if dependency_fault == "build":
+                    raise ValueError("Incomplete dependency classifications")
+                # Synthetic payload tests only the publication boundary.
+                # The provenance suite validates the actual schema and fields.
+                return {"artifacts": artifacts, "value": (
+                    float("nan") if dependency_fault == "non-finite" else 1
+                )}
+
+            return build
+
+        keywords["prepare_dependency_manifest"] = prepare
     if fault == ("skipped-report", None):
         def broken_report(_item):
             raise RuntimeError("controlled skipped-report failure")
@@ -177,6 +202,72 @@ def validate_application():
     return cases
 
 
+def validate_dependency_members():
+    cases = 0
+    with tempfile.TemporaryDirectory(prefix="tt-core-dependencies-") as area:
+        base = Path(area)
+        for csv_on in (True, False):
+            root = base / str(csv_on)
+            root.mkdir()
+            result, plan, _ = run_case(root, manifest=csv_on, dependency=True)
+            assert result["publication_state"] == "published"
+            assert result["successful_files"] == 5 + int(csv_on)
+            path = Path(result["dependency_manifest_path"])
+            assert str(path) == plan["dependency_manifest_path"]
+            payload = json.loads(path.read_text())
+            expected = [Path(task["path"]) for task in plan["tasks"]]
+            if csv_on:
+                expected.append(Path(plan["manifest_path"]))
+            assert payload["artifacts"] == [
+                {"path": member.name, "format": member.suffix[1:],
+                 "sha256": hashlib.sha256(member.read_bytes()).hexdigest()}
+                for member in expected
+            ]
+            assert {item.name for item in path.parent.iterdir()} == (
+                {item.name for item in expected} | {path.name}
+            )
+            for task in plan["tasks"]:
+                assert Path(task["path"]).read_bytes() == staging.payload(task)
+            cases += 1
+
+        for fault in ("missing-builder", "missing-inventory", "build", "non-finite"):
+            root = base / fault
+            root.mkdir()
+            result, plan, _ = run_case(root, dependency=True, dependency_fault=fault)
+            assert result["publication_state"] == "not-published"
+            assert result["successful_files"] == 0
+            assert result["dependency_manifest_path"] == ""
+            assert result["failures"] and not Path(plan["output_directory"]).exists()
+            cases += 1
+
+        class ChangedAfterHash(CoreLayoutExportSetFiles):
+            def stage_dependency_manifest(self, payload):
+                super().stage_dependency_manifest(payload)
+                stage = next(root.glob(".tracktemplate_core_export_set_*"))
+                (stage / payload["artifacts"][0]["path"]).write_bytes(b"changed\n")
+
+        class FailedJSON(CoreLayoutExportSetFiles):
+            def stage_dependency_manifest(self, payload):
+                raise OSError("Controlled JSON write failure")
+
+        class AfterPublication(CoreLayoutExportSetFiles):
+            def publish(self):
+                super().publish()
+                raise OSError("Controlled postpublication diagnostic")
+
+        for adapter, published in ((ChangedAfterHash, False), (FailedJSON, False),
+                                   (AfterPublication, True)):
+            root = base / adapter.__name__
+            root.mkdir()
+            result, plan, _ = run_case(root, dependency=True, adapter=adapter)
+            assert result["successful_files"] == (6 if published else 0)
+            assert bool(result["dependency_manifest_path"]) is published
+            assert Path(plan["output_directory"]).exists() is published
+            assert result["failed_files"] > 0
+            cases += 1
+    return cases
+
+
 def validate_policy():
     namespace = {"__name__": "core_policy_fixture"}
     exec("""
@@ -188,6 +279,8 @@ def run_production_preflight(doc, catalogue_records, export_records, config,
                              set_id, *args, plan=None, **kwargs):
     observed.append(('preflight', config, plan))
     return ['unchanged checks']
+def show_production_export_summary(summary):
+    observed.append(('summary', summary))
 class CurveInputDialog:
     def _update_production_export_controls(self, *args):
         self.production_overwrite_box.setEnabled(True)
@@ -203,7 +296,19 @@ class CurveInputDialog:
     config = {"output_directory": "/parent", "overwrite_existing": True}
     plain_plan = namespace["plan_production_export"](records, config, "SET")
     assert "output_directory" not in plain_plan
+    assert "dependency_manifest_path" not in plain_plan
     assert namespace["observed"][-1][1] is config
+    summary = {"manifest_path": "", "manifest_requested": False,
+               "dependency_manifest_path": "/parent/child/dependencies.json"}
+    previous_summary = dict(summary)
+    namespace["show_production_export_summary"](summary)
+    assert summary == previous_summary
+    displayed = namespace["observed"][-1][1]
+    assert "CSV: Not requested" in displayed["manifest_path"]
+    assert "Dependency JSON: /parent/child/dependencies.json" in displayed["manifest_path"]
+    plain_summary = {"manifest_path": "/selected/manifest.csv"}
+    namespace["show_production_export_summary"](plain_summary)
+    assert namespace["observed"][-1][1] is plain_summary
     dialog = namespace["CurveInputDialog"]()
     marked = dialog._production_export_values()
     assert isinstance(marked, CoreExportConfiguration)
@@ -214,6 +319,9 @@ class CurveInputDialog:
     assert first["output_directory"] != second["output_directory"]
     assert Path(first["output_directory"]).parent == Path("/parent")
     assert first["tasks"][0]["records"] is records
+    assert first["dependency_manifest_path"] == str(
+        Path(first["output_directory"]) / "Core_Dependency_Manifest.json"
+    )
     before = dict(marked)
     assert namespace["run_production_preflight"](
         None, records, records, marked, "SET", plan=first,
@@ -239,11 +347,17 @@ class CurveInputDialog:
 
 def main():
     assert "run_atomic_core_layout_export" in api.__all__
-    assert inspect.signature(api.run_atomic_core_layout_export) == (
+    signature = inspect.signature(api.run_atomic_core_layout_export)
+    assert signature.parameters["prepare_dependency_manifest"].default is None
+    assert signature.replace(parameters=[
+        value for name, value in signature.parameters.items()
+        if name != "prepare_dependency_manifest"
+    ]) == (
         inspect.signature(api.run_staged_core_layout_export)
     )
     validate_policy()
     cases = validate_application()
+    cases += validate_dependency_members()
     print(SENTINEL + ": {} application cases; isolated policy checks".format(cases))
 
 

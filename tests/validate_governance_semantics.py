@@ -5014,6 +5014,38 @@ def validate_phase9_closeout_opening_mutations() -> None:
         )
 
 
+def validate_core_dependency_policy_mutations():
+    """Reject changes to the bounded dependency policy or its authority."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    record = document["decisions"][8]
+    progress._validate_dp9_016_decision(record, set(record))
+    missing = copy.deepcopy(document)
+    missing["decisions"].pop(8)
+    expect_rejected(
+        "core-dependency/decision-missing",
+        lambda: progress._validate_phase9b_decisions(missing),
+        "Phase 9B current decision chain incomplete or widened",
+    )
+    for field, value in (
+        ("id", "D-P9-017"), ("status", "Proposed"),
+        ("decided_on", "2026-10-12"), ("evidence", "reference/PROJECT_PLAN.md"),
+        ("panel_record", "reference/PROJECT_PLAN.md"),
+        ("panel_required_under_current_policy", False),
+        ("authority", "Agent accepts all Phase 9B exits"),
+        ("decision", "Publish without dependencies and clear every output"),
+        ("exclusions", "Accept Exit 9B-4 and production output"),
+    ):
+        changed = dict(record, **{field: value})
+        diagnostic = (field + " boundary" if field in
+                      {"authority", "decision", "exclusions"}
+                      else "identity, status or panel routing")
+        expect_rejected(
+            "core-dependency/changed-" + field,
+            lambda value=changed: progress._validate_dp9_016_decision(value, set(record)),
+            "D-P9-016 " + diagnostic + " drifted",
+        )
+
+
 def validate_phase9b_exit5_admission_mutations() -> None:
     """Reject wider acceptance, lost operating limits and new work."""
     current = read("reference/current/PHASE_EVIDENCE.md")
@@ -6577,8 +6609,7 @@ def validate_documentation_profile_mutations() -> None:
         (
             "reference-scope-promoted", "| Owner decision |",
             "keep their accepted limits", "lose their accepted limits",
-            "The Phase 9A closeout and previous decisions keep their "
-            "accepted limits",
+            "D-P9-012 and D-P9-015 keep their accepted limits",
         ),
         (
             "risk-duties-removed", "| Limitations/findings |",
@@ -9476,6 +9507,7 @@ def main() -> None:
     validate_phase9_closeout_opening_mutations()
     validate_phase9b_exit2_admission_mutations()
     validate_phase9b_exit5_admission_mutations()
+    validate_core_dependency_policy_mutations()
     validate_phase9b_export_policy_mutations()
     validate_phase9_evidence_model_mutations()
     validate_project_plan_mutations()

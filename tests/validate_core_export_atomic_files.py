@@ -190,7 +190,8 @@ class AtomicFilesProof(unittest.TestCase):
 
     def test_invalid_plans_acquire_no_stage(self):
         cases = ("outside-child", "hidden-child", "outside-member",
-                 "duplicate", "manifest-duplicate", "no-tasks")
+                 "duplicate", "manifest-duplicate", "dependency-duplicate",
+                 "dependency-outside", "no-tasks")
         for case in cases:
             with self.subTest(case=case):
                 plan = self.plan()
@@ -204,6 +205,10 @@ class AtomicFilesProof(unittest.TestCase):
                     plan["tasks"][1]["path"] = plan["tasks"][0]["path"]
                 elif case == "manifest-duplicate":
                     plan["manifest_path"] = plan["tasks"][0]["path"]
+                elif case == "dependency-duplicate":
+                    plan["dependency_manifest_path"] = plan["manifest_path"]
+                elif case == "dependency-outside":
+                    plan["dependency_manifest_path"] = str(self.root / "outside.json")
                 else:
                     plan["tasks"] = []
                 adapter = files.CoreLayoutExportSetFiles()

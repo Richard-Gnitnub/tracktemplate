@@ -29,6 +29,7 @@ if globals().get("TRACKTEMPLATE_CORE_EXPORT_ATOMIC_SET", False):
         "create_time_export_success", "create_time_export_no_csv",
         "create_time_export_final_task_failure", "create_time_export_collision",
         "create_time_export_publication_failure", "create_time_export_postpublication",
+        "create_time_export_malformed_inventory", "create_time_export_missing_inventory",
     )
 elif globals().get("TRACKTEMPLATE_CORE_EXPORT_STAGING_BARRIER", False):
     _PHASE7_EXPECTED_SCENARIOS += (

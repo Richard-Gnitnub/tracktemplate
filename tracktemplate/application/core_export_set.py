@@ -4,7 +4,8 @@ import os
 import uuid
 
 
-def prepare_core_export_plan(records, config, set_id, *, plan_export):
+def prepare_core_export_plan(records, config, set_id, *, plan_export,
+                             dependency_manifest=False):
     """Allocate paths without creating a directory or changing inputs.
 
     The inherited planner retains its member names and ordering. Each
@@ -16,7 +17,12 @@ def prepare_core_export_plan(records, config, set_id, *, plan_export):
     selected = dict(config, output_directory=directory,
                     overwrite_existing=False)
     plan = plan_export(records, selected, set_id)
-    return dict(plan, output_directory=directory)
+    result = dict(plan, output_directory=directory)
+    if dependency_manifest:
+        result["dependency_manifest_path"] = os.path.join(
+            directory, "Core_Dependency_Manifest.json",
+        )
+    return result
 
 
 def run_atomic_core_layout_export(
@@ -36,6 +42,7 @@ def run_atomic_core_layout_export(
     failed_export_report,
     skipped_export_report,
     export_files_factory,
+    prepare_dependency_manifest=None,
 ):
     """Prepare all requested members, then publish their directory once.
 
@@ -50,6 +57,7 @@ def run_atomic_core_layout_export(
         for task in plan["tasks"]
     ]
     manifest_path = plan.get("manifest_path", "")
+    dependency_path = plan.get("dependency_manifest_path", "")
     files = None
     operation_error = ""
     cleanup_errors = []
@@ -67,6 +75,17 @@ def run_atomic_core_layout_export(
             skipped_details.append(detail)
         formats = sorted({item["task"]["format"].upper()
                           for item in results})
+        dependency_builder = None
+        if prepare_dependency_manifest is not None and not dependency_path:
+            raise ValueError("The Core dependency manifest is missing from the plan.")
+        if dependency_path:
+            if not callable(prepare_dependency_manifest):
+                raise ValueError("The Core dependency inventory is unavailable.")
+            dependency_builder = prepare_dependency_manifest(
+                doc, plan, config, set_id,
+            )
+            if not callable(dependency_builder):
+                raise ValueError("The Core dependency inventory is invalid.")
         files = export_files_factory()
         files.open(plan, config["output_directory"])
         dispatcher = (
@@ -97,6 +116,10 @@ def run_atomic_core_layout_export(
                 manifest_path,
                 lambda destination: write_export_manifest(destination, rows),
                 manifest=True,
+            )
+        if dependency_builder is not None:
+            files.stage_dependency_manifest(
+                dependency_builder(files.artifact_inventory()),
             )
         files.validate()
         phase = "publication"
@@ -155,13 +178,16 @@ def run_atomic_core_layout_export(
             else config["output_directory"]
         ),
         "successful_files": (
-            len(results) + int(bool(manifest_path)) if published else 0
+            len(results) + int(bool(manifest_path)) + int(bool(dependency_path))
+            if published else 0
         ),
         "failed_files": len(failures),
         "skipped_objects": len(plan.get("skipped", [])),
         "formats": formats if published else [],
         "manifest_path": manifest_path if published else "",
         "manifest_requested": bool(manifest_path),
+        **({"dependency_manifest_path": dependency_path if published else ""}
+           if dependency_path else {}),
         "failures": failures,
         "failure_details": failure_details,
         "skipped_outputs": skipped_outputs,

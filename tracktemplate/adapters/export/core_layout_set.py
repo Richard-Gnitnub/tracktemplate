@@ -8,6 +8,8 @@ restart recovery guarantees.
 
 import ctypes
 import errno
+import hashlib
+import json
 import os
 import stat
 import sys
@@ -90,6 +92,9 @@ class CoreLayoutExportSetFiles:
         self._expected = {}
         self._completed = set()
         self._manifest_path = ""
+        self._dependency_path = ""
+        self._artifact_formats = {}
+        self._digests = {}
         self._output_directory = ""
         self._opened = False
         self._closed = False
@@ -125,10 +130,18 @@ class CoreLayoutExportSetFiles:
         if not plan["tasks"]:
             raise ValueError("The Core export set contains no output tasks.")
         paths = [_path(task["path"]) for task in plan["tasks"]]
+        self._artifact_formats = {
+            _path(task["path"]): task["format"] for task in plan["tasks"]
+        }
         manifest = plan.get("manifest_path")
         if manifest:
             self._manifest_path = _path(manifest)
             paths.append(self._manifest_path)
+            self._artifact_formats[self._manifest_path] = "csv"
+        dependency = plan.get("dependency_manifest_path")
+        if dependency:
+            self._dependency_path = _path(dependency)
+            paths.append(self._dependency_path)
         if len(paths) != len(set(paths)):
             raise ValueError("The Core export contains duplicate final paths.")
         if any(os.path.dirname(path) != child for path in paths):
@@ -227,6 +240,58 @@ class CoreLayoutExportSetFiles:
                 raise ValueError(
                     "A staged Core export is missing, changed or empty."
                 )
+            if name in self._digests and self._hash_member(name) != self._digests[name]:
+                raise ValueError("A hashed Core export artifact changed.")
+
+    def _hash_member(self, name):
+        area = self._area
+        descriptor = os.open(
+            name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=area["stage_fd"],
+        )
+        with os.fdopen(descriptor, "rb") as stream:
+            before = os.fstat(stream.fileno())
+            if (not stat.S_ISREG(before.st_mode) or before.st_nlink != 1
+                    or before.st_size <= 0
+                    or _identity(before) != area["files"].get(name)):
+                raise ValueError("A Core artifact is not an owned regular file.")
+            digest = hashlib.sha256()
+            for block in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(block)
+            after = os.fstat(stream.fileno())
+        current = _inspect_name(area["stage_fd"], name)
+        if (current is None or _identity(current) != _identity(before)
+                or (after.st_size, after.st_mtime_ns, after.st_ctime_ns)
+                != (before.st_size, before.st_mtime_ns, before.st_ctime_ns)):
+            raise ValueError("A Core artifact changed while its hash was read.")
+        return digest.hexdigest()
+
+    def artifact_inventory(self):
+        """Hash owned staged artifacts; the dependency JSON excludes itself."""
+        if self._closed or self._attempted or not self._dependency_path:
+            raise RuntimeError("The Core dependency inventory is unavailable.")
+        self._require_stage()
+        expected = {self._expected[path] for path in self._artifact_formats}
+        if self._completed != expected or set(os.listdir(self._area["stage_fd"])) != expected:
+            raise ValueError("The Core artifact inventory is incomplete or changed.")
+        inventory = []
+        for path, file_format in self._artifact_formats.items():
+            name = self._expected[path]
+            digest = self._hash_member(name)
+            self._digests[name] = digest
+            inventory.append({"path": name, "format": file_format, "sha256": digest})
+        return inventory
+
+    def stage_dependency_manifest(self, payload):
+        """Stage the separately planned JSON without changing CSV semantics."""
+        if not self._dependency_path or not self._digests:
+            raise ValueError("The Core dependency manifest has no hashed inventory.")
+        content = json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
+
+        def write(destination):
+            with open(destination, "x", encoding="utf-8") as stream:
+                stream.write(content)
+
+        self.stage(self._dependency_path, write)
 
     def stage(self, final_path, writer, *, manifest=False):
         """Write a member and retain its ownership on writer failure."""
