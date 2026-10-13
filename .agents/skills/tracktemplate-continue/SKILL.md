@@ -47,10 +47,10 @@ The literal invocation authorises at most these operations:
    current authority, from repository evidence
 3. Publication of one new pull request in draft state and monitoring of necessary CI
    for its exact head.
-4. After integration and main synchronisation, the bounded local-retirement
-   assessment under [D-GOV-024](../../../reference/RECOVERY_AND_BACKUP.md#delegated-local-retirement).
-   Removal is permitted only after that accepted amendment is integrated into
-   protected `main` and all its conditions pass.
+4. After the previous merge and main synchronisation, the bounded assessment
+   of worktree retirement under [D-GOV-024](../../../reference/RECOVERY_AND_BACKUP.md#delegated-local-retirement).
+   Codex has removal authority only after protected `main` contains that
+   accepted change and all its conditions pass.
 
 It supplies routine Git authority for the previous pull request. It delegates
 publication of the new work to
@@ -111,8 +111,10 @@ work.
    stop.
 3. Identify the previous pull request's exact head SHA, target, scope, review
    state, mergeability, and necessary checks.
-   Record its observed local worktree and branch identity before integration.
-   Record an absent or unavailable local candidate without inventing a target.
+   Before the merge, record its local worktree and branch identity from Git.
+   If the worktree or branch is missing, record that state.
+   If you cannot examine local Git state, record that limitation.
+   Do not invent a worktree or branch identity.
 4. Make sure that all integration conditions listed below apply.
 5. If the pull request is a draft, mark it ready. Merge through the usual
    merge-commit route. Do not delete the branch. Examine the merge commit.
@@ -150,26 +152,27 @@ must do. Do not claim visible UI evidence.
 
 ### Assess the previous local candidate
 
-After successful integration, clean main synchronisation and repeated IDE
-alignment, assess only the previous PR's observed local candidate.
+After the previous merge, make sure that local `main` is clean and equal to protected `main`.
+Do the IDE workspace alignment again. Then examine only the previous PR's recorded local worktree and branch.
 Use [D-GOV-024](../../../reference/RECOVERY_AND_BACKUP.md#delegated-local-retirement)
 and the [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
-Recovery owns eligibility, evidence, commands and the Level 2 decision.
+Recovery owns the conditions, evidence, commands and the Level 2 decision.
 This skill supplies no wider removal authority.
 
-Recheck the observed worktree, branch and HEAD after synchronisation.
-Protect the primary checkout, including a former feature directory now used for `main`.
-Do not sweep unrelated worktrees or branches. Do not delete a branch during merge.
-If the integrated authority or any required proof is absent, retain the target.
-If local access is unavailable, report `assessment unavailable`.
-Do not attempt removal for an absent or already retired candidate.
+After main synchronisation, examine the recorded worktree, branch and HEAD again.
+Keep the primary worktree, also when it was a feature directory before its use for `main`.
+Do not examine other worktrees or branches for removal. Do not delete a branch during the merge.
+If the accepted change or any necessary evidence is missing, keep the worktree and branch.
+If you cannot examine local Git state, report `assessment unavailable`.
+If the worktree is missing or its retirement is complete, do not try to remove it again.
 
-Complete the exact Level 2 decision, evidence and independent review before any
-permitted removal. Recheck identity immediately before action.
-Keep the target after an ordinary Git refusal; no force or remote deletion is permitted.
+Before removal, complete the exact Level 2 decision, evidence and independent review.
+Examine the identity again directly before removal.
+If a usual Git removal command gives a Git error, keep the worktree or branch that Git did not remove.
+Do not use force removal. Do not delete a branch in another repository.
 Do not invoke D-GOV-022 through this route.
-Record the Recovery-owned disposition before selecting the next outcome.
-Missing evidence retains the target; it does not authorise a workaround.
+Before you select the next result, record the disposition that Recovery specifies.
+If necessary evidence is missing, keep the worktree and branch. Do not use a different removal procedure.
 
 ## Reconstruct repository authority
 
