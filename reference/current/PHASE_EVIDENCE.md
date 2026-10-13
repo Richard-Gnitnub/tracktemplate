@@ -1,12 +1,115 @@
 # Phase 9B Opening Record
 
 Status: **Phase 9A is closed at 4/4 under D-P9-010 for its frozen reference-only
-scope. Phase 9B is Open at 2/6 under D-P9-012 and D-P9-015. Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted. Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending.**
+scope. Phase 9B is Open at 3/6 under D-P9-012, D-P9-015 and D-P9-017. Only Exits 9B-2, 9B-4 and 9B-5 are Evidenced and owner-accepted. Exits 9B-1, 9B-3 and 9B-6 stay Pending.**
 
 The [Phase 9A closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md),
 [decisions](../history/phase-closeouts/PHASE9A_GATE_DECISIONS.json) and
 [risk snapshot](../history/phase-closeouts/PHASE9A_RISKS.json) preserve its history.
 The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
+
+<a id="phase-9b-exit-4-acceptance-panel"></a>
+
+## D-P9-017 Phase 9B Exit 4 acceptance panel — 2026-10-13
+
+**Decision boundary:** Richard accepts only Exit 9B-4 under D-P9-016 with all
+recorded limitations. The accepted source is protected `main`
+`0b93551920a5da013266c06ec75dd6f664dd96f2` after
+[PR #171](https://github.com/Richard-Gnitnub/tracktemplate/pull/171).
+Its tree is the same as the reviewed tree at `6dd0636f89e82724f9638b9f5d4c6958512d2aa1`.
+[CI run 38463966509](https://github.com/Richard-Gnitnub/tracktemplate/actions/runs/38463966509)
+gave a PASS result for that exact `main` commit.
+
+Phase 9B is Open at 3/6. Only Exits 9B-2, 9B-4 and 9B-5 are Evidenced and owner-accepted.
+Exits 9B-1, 9B-3 and 9B-6 stay Pending. All six exact criteria stay unchanged.
+Phase 9A stays closed at 4/4 for its frozen reference-only scope.
+
+**Exact owner instruction:**
+
+> As project owner, I accept Phase 9B Exit 9B-4 as Evidenced and owner-accepted under D-P9-016, with all recorded limitations preserved.
+>
+> Complete the necessary Level 3 alignment and publish one exact-green draft PR.
+>
+> Retain the completed worktree until independent preservation is proved. Do not force retirement.
+>
+> No new implementation, additional exit acceptance, production clearance or phase closeout.
+>
+> Stop for integration authority.
+
+**Exact criterion:**
+
+> Representative output manifests reproduce the complete package/dependency classification. They cannot claim `project-cleared` if an applicable input is replaced by a restricted or unresolved source.
+
+**Accepted evidence:** The [D-P9-016 panel](#phase-9b-core-dependency-manifest-panel)
+keeps the implementation evidence, receipt identities and source limitations.
+The [output contract](../contracts/core-layout-export-set.md#dependency-manifest)
+keeps the supported curved plain-line scope and excluded inputs.
+This decision accepts that representative evidence. It does not extend the supported scope.
+
+The native proof gave a PASS result for 14 cases. The real-GUI proof gave a PASS result for eight scenarios
+with CSV on and off. Each completed Core output set includes schema-1 JSON.
+Its ten dependency records identify canonical information, installed product
+source, FreeCAD/exporters and seven inherited lineage groups.
+The checks compare output hashes and preserve the editable model and previous output.
+
+[Manifest tests](../../tests/validate_core_dependency_manifest.py) bind all seven
+lineage groups to the canonical provenance register.
+They reject missing lineage, false clearance claims and changed classifications.
+Restricted, reference-only and unknown inputs cannot produce `project-cleared` output.
+The separate [manifest clearance gate](../../tools/validate_dependency_manifest.py),
+[licensing controls](../../tests/validate_licensing_controls.py) and
+[package checks](../../tests/validate_phase4_chair_definition.py) keep their own boundaries.
+Those separate checks do not show that Core Generate uses a chair package.
+Selected export receives no new manifest requirement or acceptance.
+
+The assessment done independently compared all 82 native and 103 GUI source hashes
+with the accepted `main` commit. Both host receipts match their recorded hashes.
+No new FreeCAD or real-GUI proof is necessary for this documentation alignment.
+Keep `CM-SR-01`, the initial failed review, failed proofs and their classifications.
+The corrected evidence does not replace that history.
+
+**Safety/risk panel:** Richard is the project owner, panel chair and deciding
+authority. `/root` supplies this alignment.
+Read-only reviewer `/root/exit9b4_acceptance_risk` examined the acceptance scope,
+source identities, evidence, limitations and all 24 risk records.
+The reviewer did not write product source, tests or canonical prose for this change.
+The agents share one team and workspace. This is not external organisational independence.
+
+The recommendation is **Proceed with bounded conditions**.
+The panel records no unresolved dissent or blocker. It identifies no critical fact that is missing.
+All 24 risk states, severities, owners, deadlines, treatments and controls stay unchanged.
+No risk closes. Each risk owner keeps the duties in the [current register](risks.json).
+
+PR-09 stays Critical/Open/Partial. PR-13 stays Critical/Open/Effective for its current scope.
+PR-17 stays Critical/Open/Partial.
+
+The panel receipt is `tmp/exit9b4-acceptance-risk.json` in the primary repository,
+SHA-256 `5a92fe95c199209c8e53a26adcfa83f45b47ee81a1d3b67e59276120baec9f9a`.
+
+| Bounded condition | Owner and deadline |
+| --- | --- |
+| Keep this acceptance within the D-P9-016 scope, evidence and operating conditions. | Project owner and Phase 9B export owner, at admission and for each later claim. |
+| Preserve all risk duties, failed evidence and existing acceptance boundaries. | Technical Author Lead and current phase owner, before and after draft publication. |
+| Keep the completed worktree until independent preservation is proved. Do not force retirement. | Change owner, during this cycle and before any later retirement. |
+| Complete independent review. Complete the Documentation Review lifecycle. CI must give a PASS result for the exact PR head. Publish one draft PR. Stop for integration authority. | Technical Author Lead, independent reviewer and change owner, before draft publication. |
+
+**Preserved limitations:** Output stays private-development. Project status stays `unknown`.
+Reference-only and unknown classifications stay unchanged. This decision supplies no compatible rights disposition.
+
+Hashes of installed source files do not show the identity of Python code in memory or all host files.
+A canonical signature does not show independent shape regeneration.
+The qualified Linux ext4 conditions and supported failure model stay.
+There is no assurance for every file system. There is no assurance against changes that another process makes at the same time to cause damage.
+There is no assurance that files stay available after a system interruption
+or that recovery occurs after FreeCAD stops and starts again.
+
+Geometry, package bytes, numerical limits, the 113-entry register and legacy-retirement conditions stay unchanged.
+D-P6-008 stays Deferred — unmet. TERM-R04 stays open.
+
+This decision accepts no physical fit, preload, retention, manufacturing capability,
+production package, output clearance, rights, performance result or release.
+It accepts no other exit and closes no phase. Start no new implementation.
+Publish one exact-green draft PR. Then stop for integration authority.
 
 ## Phase 9B Core dependency manifest panel
 
@@ -164,12 +267,12 @@ Then stop. Do not merge. Do not start one more outcome.
 ## Current owner view
 | Field | Current position |
 | --- | --- |
-| Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 2/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel) and [D-P9-015](#phase-9b-exit-5-acceptance-panel). Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted. Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending. |
-| What changed | [D-P9-016](#phase-9b-core-dependency-manifest-panel) authorises mandatory schema-1 JSON for the usual Core Generate output set. The first bounded scope covers curved plain-line `TrackTemplateCompound` shapes and centrelines. CSV stays optional. |
-| What now works | The manifest records output files, canonical information, source identity and existing classifications. It belongs to the same full output set. Selected export keeps its accepted behaviour. |
-| Limitations/findings | Core Generate stops before output becomes available if manifest input data are missing or do not agree. It also stops for data not in the supported bounded scope. The editable Generate result and previous output stay available. The qualified Linux ext4 and recovery limits stay. <br><br>All 24 risk duties and previous production limits stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
-| Owner decision | D-P9-016 authorises only the policy alignment and one bounded product change. D-P9-012 and D-P9-015 keep their accepted limits. Exit 9B-4 stays Pending. No other acceptance follows. |
-| Next action | Complete validation. Complete source review independently. Complete the Documentation Review lifecycle. <br><br> After CI gives a PASS result for the exact candidate, publish one draft PR. Then stop. Do not merge. Do not start one more outcome. |
+| Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 3/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel), [D-P9-015](#phase-9b-exit-5-acceptance-panel) and [D-P9-017](#phase-9b-exit-4-acceptance-panel). Only Exits 9B-2, 9B-4 and 9B-5 are Evidenced and owner-accepted. Exits 9B-1, 9B-3 and 9B-6 stay Pending. |
+| What changed | [D-P9-017](#phase-9b-exit-4-acceptance-panel) accepts only Exit 9B-4 under D-P9-016 with all recorded limitations. All six exact criteria stay unchanged. |
+| What now works | Representative Core Generate manifests record output hashes and complete dependency classifications for the supported bounded scope. The checks reject missing data, unsupported data and false clearance claims. |
+| Limitations/findings | D-P9-016 keeps the curved plain-line scope and all excluded inputs. This acceptance does not extend manifest support to chair packages or selected export. The qualified Linux ext4 and recovery limits stay. All 24 risk duties stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
+| Owner decision | The owner accepts Exit 9B-4 only. D-P9-012 and D-P9-015 keep their accepted limits. This decision accepts no other exit, production clearance or phase closeout. |
+| Next action | Complete the Level 3 alignment. Complete independent review. Complete the Documentation Review lifecycle. After CI gives a PASS result for the exact PR head, publish one draft PR. Stop for integration authority. <br><br> Keep the completed worktree until independent preservation is proved. Do not force retirement. |
 
 <a id="phase-9b-exit-5-acceptance-panel"></a>
 
@@ -970,10 +1073,11 @@ private-development and project status stays `unknown`.
 
 ## Phase 9B exit conditions
 
-All six criteria stay unchanged. Only Exits 9B-2 and 9B-5 are Evidenced — owner-accepted.
+All six criteria stay unchanged. Only Exits 9B-2, 9B-4 and 9B-5 are Evidenced — owner-accepted.
 [D-P9-012](#phase-9b-exit-2-acceptance-panel) accepts Exit 9B-2 on 2026-10-11.
 [D-P9-015](#phase-9b-exit-5-acceptance-panel) accepts Exit 9B-5 on 2026-10-13.
-Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending.
+[D-P9-017](#phase-9b-exit-4-acceptance-panel) accepts Exit 9B-4 on 2026-10-13.
+Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 
 | Phase 9B exit | Original exit | Exact criterion |
 | --- | ---: | --- |

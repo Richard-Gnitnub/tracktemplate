@@ -4998,19 +4998,20 @@ def validate_phase9_closeout_opening_mutations() -> None:
             "project-plan owner-view row authority drifted: " + field,
         )
     row = table_row_containing(plan, "| 9B | Core RC chair")
-    # Keep historical mutation identities; the former 2/6 rejection now
-    # detects a stale 1/6 count after the owner's second exit acceptance.
+    # Keep historical mutation identities and reject the former 2/6
+    # status after the owner's third exit acceptance.
     for identity, count in (
         ("0/6", "0/6 evidenced"),
         ("2/6", "1/6 evidenced"),
+        ("stale-2/6", "2/6 evidenced"),
         ("6/6", "6/6 evidenced"),
     ):
         changed = replace_once(plan, row,
-                               replace_once(row, "2/6 evidenced", count))
+                               replace_once(row, "3/6 evidenced", count))
         expect_rejected(
             "phase9-current/wrong-exit-count-" + identity,
             lambda value=changed: progress._validate_plan_shape(value),
-            "Phase 9B must stay Open at two evidenced exits",
+            "Phase 9B must stay Open at three evidenced exits",
         )
 
 
@@ -5124,9 +5125,10 @@ def validate_phase9b_exit5_admission_mutations() -> None:
     )
     exits = progress._section(current, "Phase 9B exit conditions")
     for name, before, after in (
-        ("wrong-second-exit", "Only Exits 9B-2 and 9B-5",
-         "Only Exits 9B-2 and 9B-6"),
-        ("wrong-date", "2026-10-13", "2026-10-11"),
+        ("wrong-second-exit", "Only Exits 9B-2, 9B-4 and 9B-5",
+         "Only Exits 9B-2, 9B-4 and 9B-6"),
+        ("wrong-date", "accepts Exit 9B-5 on 2026-10-13",
+         "accepts Exit 9B-5 on 2026-10-11"),
         ("wrong-decision", "D-P9-015", "D-P9-014"),
     ):
         changed = replace_once(current, exits, replace_once(exits, before, after))
@@ -5135,6 +5137,135 @@ def validate_phase9b_exit5_admission_mutations() -> None:
             lambda value=changed: progress._validate_phase9b_holding(value),
             "Phase 9B current criteria or accepted-exit status drifted",
         )
+
+
+def validate_phase9b_exit4_admission_mutations() -> None:
+    """Reject wider acceptance, weaker evidence and forced retirement."""
+    current = read("reference/current/PHASE_EVIDENCE.md")
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    record = document["decisions"][9]
+    progress._validate_dp9_017_decision(record, set(record))
+    progress._validate_dp9_017_admission(current)
+    changed = copy.deepcopy(document)
+    changed["decisions"].pop(9)
+    expect_rejected(
+        "phase9b-exit4/decision-missing",
+        lambda: progress._validate_phase9b_decisions(changed),
+        "Phase 9B current decision chain incomplete or widened",
+    )
+    for field, value, diagnostic in (
+        ("id", "D-P9-016", "identity, status or panel routing"),
+        ("decided_on", "2026-10-11", "identity, status or panel routing"),
+        ("status", "Proposed", "identity, status or panel routing"),
+        ("evidence", "reference/PROJECT_PLAN.md",
+         "identity, status or panel routing"),
+        ("panel_record", None, "identity, status or panel routing"),
+        ("panel_required_under_current_policy", False,
+         "identity, status or panel routing"),
+        ("authority", "Agent acceptance", "exact owner authority"),
+        ("decision", "Accept every production exit", "decision boundary"),
+        ("exclusions", "Clear all output and retire without preservation",
+         "exclusions boundary"),
+    ):
+        changed = dict(record, **{field: value})
+        expect_rejected(
+            "phase9b-exit4/record-" + field,
+            lambda value=changed: progress._validate_dp9_017_decision(
+                value, set(record),
+            ),
+            "D-P9-017 " + diagnostic + " drifted",
+        )
+    panel = progress._section(current, progress.DP9_017_HEADING)
+    for name, before, after in (
+        ("wrong-exit", "Richard accepts only Exit 9B-4",
+         "Richard accepts only Exit 9B-6"),
+        ("source", "0b93551920a5da013266c06ec75dd6f664dd96f2",
+         "unreviewed-source"),
+        ("reviewed-tree", "6dd0636f89e82724f9638b9f5d4c6958512d2aa1",
+         "unreviewed-tree"),
+        ("scope", "It does not extend the supported scope",
+         "It extends the supported scope"),
+        ("native-proof", "native proof gave a PASS result for 14 cases",
+         "native proof gave a PASS result for 15 cases"),
+        ("gui-proof", "real-GUI proof gave a PASS result for eight scenarios",
+         "real-GUI proof gave a PASS result for nine scenarios"),
+        ("dependencies", "ten dependency records", "nine dependency records"),
+        ("lineage", "seven inherited lineage groups",
+         "six inherited lineage groups"),
+        ("refusal", "They reject missing lineage", "They accept missing lineage"),
+        ("clearance", "inputs cannot produce `project-cleared` output",
+         "inputs can produce `project-cleared` output"),
+        ("package-scope", "do not show that Core Generate uses a chair package",
+         "show that Core Generate uses a chair package"),
+        ("selected-export", "Selected export receives no new manifest requirement or acceptance",
+         "Selected export receives a new manifest requirement and acceptance"),
+        ("host-source", "all 82 native and 103 GUI source hashes",
+         "all 83 native and 104 GUI source hashes"),
+        ("failed-evidence", "Keep `CM-SR-01`", "Discard `CM-SR-01`"),
+        ("risk-duties", "No risk closes", "Every risk closes"),
+        ("retirement", "| Keep the completed worktree until independent preservation is proved. Do not force retirement. |",
+         "| Retire the completed worktree without independent preservation. Use force. |"),
+        ("output-status", "Output stays private-development",
+         "Output becomes project-cleared"),
+        ("rights", "This decision supplies no compatible rights disposition",
+         "This decision supplies a compatible rights disposition"),
+        ("executing-code", "do not show the identity of Python code in memory",
+         "show the identity of Python code in memory"),
+        ("canonical-signature", "does not show independent shape regeneration",
+         "shows independent shape regeneration"),
+        ("host", "The qualified Linux ext4 conditions and supported failure model stay",
+         "All hosts and all failure models are accepted"),
+        ("restart", "There is no assurance that files stay available",
+         "There is an assurance that files stay available"),
+        ("register", "the 113-entry register", "a new register"),
+        ("performance", "D-P6-008 stays Deferred — unmet",
+         "D-P6-008 is complete"),
+        ("other-exit", "It accepts no other exit", "It accepts every other exit"),
+        ("phase-closeout", "and closes no phase", "and closes Phase 9B"),
+        ("implementation", "Start no new implementation",
+         "Start new implementation"),
+        ("integration", "Then stop for integration authority",
+         "Then merge without integration authority"),
+    ):
+        changed = replace_once(current, panel, replace_once(panel, before, after))
+        expect_rejected(
+            "phase9b-exit4/panel-" + name,
+            lambda value=changed: progress._validate_dp9_017_admission(value),
+            "D-P9-017 accepted evidence or bounded conditions drifted",
+        )
+    changed = replace_once(current, panel, "\nNo owner decision.\n")
+    changed += "\n## Unrelated material\n" + panel
+    expect_rejected(
+        "phase9b-exit4/authority-relocated",
+        lambda: progress._validate_dp9_017_admission(changed),
+        "D-P9-017 exact panel authority or criterion drifted or was relocated",
+    )
+    changed = replace_once(current, panel, replace_once(
+        panel, "They cannot claim `project-cleared`",
+        "They can claim `project-cleared`",
+    ))
+    expect_rejected(
+        "phase9b-exit4/criterion-widened",
+        lambda: progress._validate_dp9_017_admission(changed),
+        "D-P9-017 exact panel authority or criterion drifted or was relocated",
+    )
+    changed = replace_once(current, panel, replace_once(
+        panel, "/pull/171", "/pull/170",
+    ))
+    expect_rejected(
+        "phase9b-exit4/evidence-link-changed",
+        lambda: progress._validate_dp9_017_admission(changed),
+        "D-P9-017 accepted evidence or risk route drifted",
+    )
+    exits = progress._section(current, "Phase 9B exit conditions")
+    changed = replace_once(current, exits, replace_once(
+        exits, "accepts Exit 9B-4", "accepts Exit 9B-6",
+    ))
+    expect_rejected(
+        "phase9b-exit4/status-wrong-exit",
+        lambda: progress._validate_phase9b_holding(changed),
+        "Phase 9B current criteria or accepted-exit status drifted",
+    )
 
 
 def validate_phase9b_exit2_admission_mutations() -> None:
@@ -5215,8 +5346,8 @@ def validate_phase9b_exit2_admission_mutations() -> None:
     )
     exits = progress._section(current, "Phase 9B exit conditions")
     for name, before, after in (
-        ("wrong-exit", "Only Exits 9B-2 and 9B-5",
-         "Only Exits 9B-1 and 9B-5"),
+        ("wrong-exit", "Only Exits 9B-2, 9B-4 and 9B-5",
+         "Only Exits 9B-1, 9B-4 and 9B-5"),
         ("wrong-date", "2026-10-11", "2026-10-09"),
         ("extra-exits", "9B-6 stay Pending", "9B-6 are accepted"),
     ):
@@ -5229,8 +5360,8 @@ def validate_phase9b_exit2_admission_mutations() -> None:
         )
     view = progress._section(current, "Current owner view")
     changed = replace_once(current, view, replace_once(
-        view, "Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending",
-        "Exits 9B-1, 9B-3, 9B-4 and 9B-6 are accepted",
+        view, "Exits 9B-1, 9B-3 and 9B-6 stay Pending",
+        "Exits 9B-1, 9B-3 and 9B-6 are accepted",
     ))
     expect_rejected(
         "phase9b-exit2/evidence-owner-view-widened",
@@ -6614,30 +6745,30 @@ def validate_documentation_profile_mutations() -> None:
         (
             "risk-duties-removed", "| Limitations/findings |",
             "All 24 risk duties", "No risk duties",
-            "All 24 risk duties and previous production limits stay",
+            "All 24 risk duties stay",
         ),
         (
             "production-conditions-waived", "| Limitations/findings |",
-            "previous production limits stay",
-            "previous production limits are waived",
-            "All 24 risk duties and previous production limits stay",
+            "The qualified Linux ext4 and recovery limits stay",
+            "The qualified Linux ext4 and recovery limits are waived",
+            "The qualified Linux ext4 and recovery limits stay",
         ),
         (
             "phase9b-exits-accepted", "| Current state |",
-            "Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending",
-            "Exits 9B-1, 9B-3, 9B-4 and 9B-6 are accepted",
-            "Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending",
+            "Exits 9B-1, 9B-3 and 9B-6 stay Pending",
+            "Exits 9B-1, 9B-3 and 9B-6 are accepted",
+            "Exits 9B-1, 9B-3 and 9B-6 stay Pending",
         ),
         (
             "merge-authorised", "| Next action |",
-            "Do not merge", "Merge now",
-            "Do not merge. Do not start one more outcome",
+            "Stop for integration authority", "Merge now",
+            "Stop for integration authority",
         ),
         (
             "stop-boundary-waived", "| Next action |",
-            "Do not merge. Do not start one more outcome",
-            "Do not merge; begin another outcome",
-            "Do not merge. Do not start one more outcome",
+            "Stop for integration authority",
+            "Begin another outcome",
+            "Stop for integration authority",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
@@ -9507,6 +9638,7 @@ def main() -> None:
     validate_phase9_closeout_opening_mutations()
     validate_phase9b_exit2_admission_mutations()
     validate_phase9b_exit5_admission_mutations()
+    validate_phase9b_exit4_admission_mutations()
     validate_core_dependency_policy_mutations()
     validate_phase9b_export_policy_mutations()
     validate_phase9_evidence_model_mutations()
