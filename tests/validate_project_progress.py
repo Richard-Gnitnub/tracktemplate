@@ -1307,10 +1307,10 @@ def _validate_owner_view(plan: str) -> None:
         "Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending",
         "D-P9-015 accepts only Exit 9B-5 under D-P9-013/D-P9-014 on 2026-10-13",
         "All recorded limitations stay",
-        "This alignment adds no product implementation",
-        "Both usual routes make all requested files available in one "
+        "This documentation alignment adds no product implementation",
+        "The two usual routes make all selected files available in one "
         "directory operation without replacement",
-        "They preserve the editable App.Document in the qualified failure cases",
+        "They preserve the editable App.Document in the qualified error conditions",
         "The owner accepts this evidence only for Exit 9B-5",
         "policy applies only to the qualified Linux ext4 host and an "
         "operator-controlled directory",
@@ -1322,7 +1322,7 @@ def _validate_owner_view(plan: str) -> None:
         "Output stays private-development",
         "Project status stays unknown",
         "D-P9-015 accepts Exit 9B-5 only",
-        "D-P9-012 keeps its separate Exit 9B-2 acceptance",
+        "D-P9-012 keeps its own Exit 9B-2 acceptance",
         "D-P9-013/D-P9-014 keep their operating conditions",
         "This decision closes no phase and accepts no production result",
         "After CI gives a PASS result for the exact PR head, publish one draft PR",
@@ -1335,10 +1335,10 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         "0bc86e690acdfab3930ba2af6d8caae11f4a6b849a5b1c69e2e22cfbfb067e9f",
-        "ac57ca584659d271d45d1916d9be9fd923bfb71fb1c7b2eb165013080102cc20",
-        "d3141a69cdb7283c8f00dd4f73fd9732b0ab4c12783b0eb8df4aab2ac4b4523d",
+        "32d65835dbb96eb5791e42c58b3ab7a730797ea08e8c5c6f6c94c5ad238ce1a7",
+        "c9b76b3d19da90d3058153878f43da5233fe329c7fd5e315759697c757529baf",
         "9c9425dc1578481cf9d2b00a7333c61c9faaa7e21842a3e241636433ac7c42e3",
-        "19069d5df1845d4c0cea9be930efbdf46f37fe6e473be675857e806c169f2bd5",
+        "24847c3f23287932965e2ff829651157a956bfddec8e30dae2edf0c9c2a947a6",
         "f211affcfe2dbec251e7e06446f15cb0340723e839bde53469fc40138af9c830",
     )
     for row, digest in zip(rows, expected_row_digests):
@@ -7738,7 +7738,7 @@ def _validate_dp9_015_decision(
             "1fc0a78dbc03230221b8ede4ad86f4ed6b0644c1126bcb58d366d4e4f8e9d329"
         )),
         ("exclusions", (
-            "57f31da8e63abc005c7af343550b3de76b2d49758a05747b854134374595c34d"
+            "4a8b2b61899dff4b743b9197155cc1575cbe0a8324d893d6839bbcc644d41406"
         )),
     ):
         value = record[field]
@@ -7761,7 +7761,7 @@ def _validate_dp9_015_admission(evidence: str) -> None:
     )
     _require(
         hashlib.sha256(_semantic_text(panel).encode("utf-8")).hexdigest()
-        == "74ad88e65db4f6148118ef9186631410a2cdbb45a213d03c5ce7132943220b0f",
+        == "add9bbb6aa5e335e5df58df48f92fb65bda85f2fcc65f6fc1ea9915ce880aa55",
         "D-P9-015 accepted evidence or bounded conditions drifted",
     )
     _require_links(

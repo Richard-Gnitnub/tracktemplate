@@ -5063,8 +5063,8 @@ def validate_phase9b_exit5_admission_mutations() -> None:
          "They receive complete acceptance"),
         ("entry-exit", "Their pair recovery does not become authority",
          "Their pair recovery becomes authority"),
-        ("core-proof", "not a new check of integrated `main`",
-         "a new check of integrated `main`"),
+        ("core-proof", "It gives no new Core check of `main` at this admission",
+         "It gives a new Core check of `main` at this admission"),
         ("gui-history", "It does not accept raw selection event history",
          "It accepts raw selection event history"),
         ("byte-equivalence", "no universal byte-equivalence claim",
@@ -5073,8 +5073,8 @@ def validate_phase9b_exit5_admission_mutations() -> None:
         ("output-clearance", "Output stays private-development",
          "Output becomes project-cleared"),
         ("other-exit", "accepts no other exit", "accepts every other exit"),
-        ("merge", "\nDo not merge or begin new implementation.",
-         "\nMerge and begin new implementation."),
+        ("merge", "\nDo not merge. Do not start new implementation.",
+         "\nMerge. Start new implementation."),
     ):
         changed_panel = replace_once(panel, before, after)
         changed = replace_once(current, panel, changed_panel)

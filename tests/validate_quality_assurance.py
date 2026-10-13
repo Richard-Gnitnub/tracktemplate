@@ -597,11 +597,11 @@ def validate_documentation_profile(
             "D-P9-015",
             "accepts only Exit 9B-5 under D-P9-013/D-P9-014 on 2026-10-13",
             "All recorded limitations stay",
-            "This alignment adds no product implementation",
-            "Both usual routes make all requested files available in one "
+            "This documentation alignment adds no product implementation",
+            "The two usual routes make all selected files available in one "
             "directory operation without replacement",
             "They preserve the editable `App.Document` in the qualified "
-            "failure cases",
+            "error conditions",
             "The owner accepts this evidence only for Exit 9B-5",
             "qualified Linux ext4 host and an operator-controlled directory",
             "It gives no assurance that files stay available after a system interruption",
@@ -612,7 +612,7 @@ def validate_documentation_profile(
             "Output stays private-development",
             "Project status stays `unknown`",
             "D-P9-015 accepts Exit 9B-5 only",
-            "D-P9-012 keeps its separate Exit 9B-2 acceptance",
+            "D-P9-012 keeps its own Exit 9B-2 acceptance",
             "D-P9-013/D-P9-014 keep their operating conditions",
             "This decision closes no phase and accepts no production result",
             "After CI gives a PASS result for the exact PR head, publish one "
