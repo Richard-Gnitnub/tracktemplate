@@ -2589,6 +2589,7 @@ class ModularCoreLayoutWorkflowSession:
         self._selected_export_binding = (
             SelectedExportBinding(
                 namespace, export_files_factory=selected_export_files_factory,
+                export_dispatcher_factory=export_dispatcher_factory,
             ) if selected_export_files_factory is not None else None
         )
         operations = {}
