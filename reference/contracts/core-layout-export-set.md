@@ -1,6 +1,6 @@
 # Core Generate Complete Output Set
 
-Status: **Development contract under D-P9-013. No Phase 9B exit acceptance.**
+Status: **API requirements under D-P9-013. [D-P9-015](../current/PHASE_EVIDENCE.md#phase-9b-exit-5-acceptance-panel) accepts Exit 9B-5 with its recorded limitations.**
 
 ## Purpose and authority
 
@@ -161,8 +161,8 @@ It gives no assurance for every filesystem or for changes that another process m
 It gives no assurance for raw GUI selection event history or malicious serializers.
 
 D-P6-003 and D-P6-004 keep their existing Entry/Exit conditions.
-D-P9-012 stays the authority for the one accepted Phase 9B exit.
-Phase 9B stays Open at 1/6, with five exits Pending.
+The [project plan](../PROJECT_PLAN.md#phase-status) owns current phase and exit status.
+[D-P9-015](../current/PHASE_EVIDENCE.md#phase-9b-exit-5-acceptance-panel) owns the bounded Exit 9B-5 acceptance.
 
 Phase 9A stays closed at 4/4 for its frozen reference-only scope.
 Geometry, the 113-entry register and accepted numerical limits stay unchanged.
