@@ -14,10 +14,10 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 1/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel). Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11. The other five exits stay Pending. |
-| What changed | [D-P9-014](#phase-9b-selected-export-policy-panel) authorises the usual B16 selected export to make the complete requested set available in a different new directory. CSV stays optional. The route no longer offers replacement of previous output. |
-| What now works | The selected route keeps the confirmed requested set through preview, confirmation, preflight and execution. Standalone, qualified FreeCAD and real-GUI checks pass for the bounded source and host. The chair decisions stay unchanged. These results give no exit acceptance. |
+| What changed | [D-P9-014](#phase-9b-selected-export-policy-panel) authorises the usual B16 selected export to make the full selected output set available in a different new directory. CSV stays optional. The route prevents replacement of previous output. |
+| What now works | The selected route keeps the selected data and output paths from the preview through the operator decision, checks and file operations. Standalone, qualified FreeCAD and real-GUI checks pass for the bounded source and host. The chair decisions stay the same. These results give no exit acceptance. |
 | Limitations/findings | The policy applies only to the qualified Linux ext4 host and an operator-controlled directory. It gives no assurance that files stay available after a system interruption. It adds no recovery after FreeCAD stops and starts again. All 24 risk duties and previous production limits stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
-| Owner decision | D-P9-014 changes only the usual selected-export policy and authorises one bounded implementation. It accepts no phase exit or production result. D-P9-012 continues to own the one accepted Phase 9B exit. D-P9-013 stays limited to Core Generate. The Phase 9A closeout and previous decisions keep their accepted limits. |
+| Owner decision | D-P9-014 changes only the canonical policy for the usual selected route and authorises one bounded product change. It accepts no phase exit or production result. D-P9-012 continues to own the one accepted Phase 9B exit. D-P9-013 stays limited to Core Generate. The Phase 9A closeout and previous decisions keep their accepted limits. |
 | Next action | Complete independent source/test review and documentation validation. After CI gives a PASS result for the exact PR head, publish the draft PR. Do not merge or start another outcome. |
 
 <a id="phase-9b-selected-export-policy-panel"></a>
@@ -25,10 +25,10 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 ## D-P9-014 selected export policy panel — 2026-10-13
 
 **Decision boundary:** Richard accepts the policy for the usual B16
-`Export selected production items` route and one bounded implementation
+`Export selected production items` route and one bounded product change
 towards Exit 9B-5. This Level 3 decision changes output paths and replacement
 behaviour. It accepts no phase exit.
-The starting source is protected `main`
+The source at the start is protected `main`
 `98f637723154b1038c161bda7456650e37edf28f` after PR #167.
 
 **Exact owner instruction and adopted policy:**
@@ -43,20 +43,20 @@ The adopted policy above preserves the complete approved meaning from
 `tmp/after167/export-outcome-review.md`, SHA-256
 `871eac5ba50679c7b7798df0e3e63fe732443188a7a07b8e9842ac4eb9a21685`.
 The [architecture](../ARCHITECTURE.md#d-p9-014-selected-complete-output-set)
-owns the successor policy.
-The [selected successor contract](../contracts/selected-export-set.md)
-owns its API, operating conditions and required checks.
+owns the canonical policy for the selected operation.
+The [selected API requirements](../contracts/selected-export-set.md)
+own the API, operating conditions and necessary checks.
 D-P9-013 continues to own Core Generate. D-P6-003/D-P6-004 keep their Entry/Exit authority.
 
-**Gap and retained findings:** PR #165 preserved previous file data after
-ordinary output errors. PR #166 isolated the temporary FreeCAD objects.
-Neither result made the complete selected output set available together.
+**Gap and preserved findings:** PR #165 preserved previous file data after
+usual output errors. PR #166 isolated the temporary FreeCAD objects.
+Neither result made all selected output files available together.
 The selected route could leave only some destination files replaced after
 failed restoration.
 
-The inherited confirmation also overstated its guarantee.
-The Phase 9B selected-export/output owner keeps both duties until the
-successor evidence satisfies them. The previous results and their limits stay.
+The inherited dialog also gave an assurance that the operation could not supply.
+The Phase 9B owner for the selected operation keeps both duties until
+evidence shows that the new operation satisfies them. The previous results and their limits stay.
 
 **Safety/risk panel:** Richard is the project owner, panel chair and deciding
 authority. The implementing agent presents the policy and bounded change.
@@ -69,24 +69,22 @@ The agents share one team and workspace. This is not review by a different organ
 
 The receipt is `tmp/selected-export-set/architecture-risk-review.json`, SHA-256
 `a0bdb8dd9459133c9864d858fd1662296119c8bee0e655a29cb62fa3510051ec`.
-Its conditions require one intended directory and confirmed requested set,
-truthful completed counts, optional CSV, composition restoration and real-GUI proof.
+Its conditions specify one directory and the full set of files that the operator accepted.
+They also specify accurate completed counts, optional CSV, restoration of the compatibility component and real-GUI evidence.
 PR-09 keeps rights and output controls. PR-13 keeps backup, restore and
 previous-output preservation duties. PR-17 keeps editable-document recovery duties.
 
-The selected implementation reuses the unchanged full-set file adapter and
-isolated FreeCAD adapter. It adds no different filesystem protocol.
-The independent risk input gives no implementation or phase-exit acceptance.
+The selected product change uses the same file adapter for the full output set and the same isolated FreeCAD adapter. It adds no different filesystem protocol.
+The independent risk input gives no acceptance for the product change or phase exit.
 
 All 24 risk states, severities, owners, deadlines, treatments and controls stay
-unchanged in the [current register](risks.json). No risk closes.
+the same in the [current register](risks.json). No risk closes.
 
 **Implementation evidence:** The [standalone selected-set test](../../tests/validate_selected_export_set.py)
 gives a PASS result for 15 application conditions and 10 GUI-policy conditions.
 The retained selected and Core standalone checks also give PASS results.
-The selected command copies the plan and additional skipped records.
-It reuses the unchanged Core full-set command, file adapter and isolated
-FreeCAD adapter. It adds no different filesystem protocol.
+The selected command makes a copy of `plan` that includes the `extra_skipped` data.
+It uses the same Core command for the full output set, file adapter and isolated FreeCAD adapter. It adds no different filesystem protocol.
 
 The [real-GUI test](../../tools/freecad_bridge/run_selected_export_set_gui.py)
 gives a PASS result for SVG with CSV on or off, cancellation, a writer
@@ -94,63 +92,62 @@ error and an occupied final path. It examines the preview, confirmation and
 result. It clicks the completed-directory button and records the path sent
 to the opener. It does not start the operating system's file manager.
 
-Previous output and editable-document state stay unchanged.
+Previous output and editable-document state stay the same.
 Save and reopen checks pass on FreeCAD 1.1.4.
 The result is
 `benchmark-output/freecad-bridge/selected-export-set-runs/20261013T122523229422Z/run.json`,
 SHA-256 `e3f80743425b5e034e45fa656c00f518e0d18fdf7bf8d6a1b70728c98fcfa9a4`.
 
-The first applicable GUI test exposed a changed scope between previews.
-The inherited row refresh added the paired solid to the highlighted outline.
+The first applicable GUI test showed a change to the selected production data between previews.
+The inherited `refresh_preview` added the related solid to the selected outline.
 The first independent source review gave **BLOCKED** for that defect and
 missing final proofs.
 
-The repair permits one additional inherited preview
-before the final paths become visible. Export stops if the requested set
-still changes. The original GUI assertion stays unchanged and now passes.
-The failed proof and first review remain in `tmp/selected-export-set/`.
+The repair supplies one more inherited preview
+before the final paths become visible. The operation stops if the selected data
+still change. The original GUI assertion stays the same and now passes.
+The failed test and first review remain in `tmp/selected-export-set/`.
 
 The [chair continuity test](../../tests/freecad_validate_chair_export_continuity.py)
 also gives a PASS result on FreeCAD 1.1.4.
 It preserves the exact turnout decisions for 168 chairs and the crossover
 decisions for 355 chairs. Editable state, save, reopen and repeated export
-checks pass. Crossover output hashes still differ after permitted
-normalisation. That existing serialisation limit gives no byte-equality claim.
+checks pass. Crossover output hashes still differ after the tests apply the permitted comparison rules.
+That existing serialisation limit gives no byte-equality claim.
 The result is
 `benchmark-output/chair-export-continuity/20261013T115656443006Z/result.json`,
 SHA-256 `a5a27e6672e5a2e7b00dd014dbb454e8281f49bf62b83188364cb97a49c61517`.
 
-The [selected-set FreeCAD proof](../../tests/freecad_validate_selected_export_set.py)
+The [selected-set FreeCAD test](../../tests/freecad_validate_selected_export_set.py)
 gives a PASS result for eight conditions on FreeCAD 1.1.4.
-It compares DXF, SVG, STL, STEP and CSV with the retained route and a
-repeated operation under the unchanged comparison rules.
-Previous output, editable-document state and history stay unchanged.
+It compares DXF, SVG, STL, STEP and CSV with the previous route and a
+repeated operation under the same comparison rules.
+Previous output, editable-document state and history stay the same.
 Save and reopen checks pass. No temporary document remains.
 
 The result preserves completed file counts after an error that occurs
 after the final directory becomes available. The fixtures, frozen oracles
-and tested source stay unchanged.
+and tested source stay the same.
 The result is
 `tmp/selected-export-set/native-runs/20261013T122514824903Z/result.json`,
 SHA-256 `3ef8dd4f18f03c18cdfef52678dd7b633ab50e3d358d01e203addf4c3692feb4`.
-The combined proof receipt is `tmp/selected-export-set/final-validation-receipt.json`,
+The combined evidence receipt is `tmp/selected-export-set/final-validation-receipt.json`,
 SHA-256 `7335fe74f43388adddd78bcd7d4c633797a79cc81af411abbbe6badcf5d41743`.
-Failed and interrupted proofs remain available in that temporary evidence directory.
-They supply no completed qualification.
+Failed and interrupted tests remain available in that temporary evidence directory.
+They give no completed evidence for the host profile.
 
-Publication requires a PASS result from the second independent source/test
-review. Record that verdict in
+A PASS result from the second independent source/test review is necessary before publication. Record that verdict in
 `tmp/selected-export-set/quality-review-pass2.json`.
 
-Older Phase 8, PR #165 and PR #166 GUI tests retain their recorded policy
-and host limits. They were not changed or repeated as successor proof.
+Older Phase 8, PR #165 and PR #166 GUI tests keep their recorded policy
+and host limits. This cycle did not change them or repeat them as evidence for the new operation.
 The Phase 8 FreeCAD 1.1.3 results remain historical.
 
 **Limits and publication:** Phase 9A stays closed at 4/4 for its frozen
 reference-only scope. Phase 9B stays Open at 1/6 under D-P9-012.
 Only Exit 9B-2 is Evidenced and owner-accepted. The other five exits stay Pending.
 The six exact criteria, geometry, package bytes, numerical limits, the
-113-entry register and legacy-retirement conditions stay unchanged.
+113-entry register and legacy-retirement conditions stay the same.
 
 D-P6-008 stays Deferred — unmet. TERM-R04 stays open.
 Output stays private-development. Project status stays `unknown`.
