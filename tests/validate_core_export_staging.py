@@ -620,6 +620,7 @@ def validate_composition_boundary():
     )
     calls = []
     marker = object()
+    runtime_reader = lambda: {"runtime": "synthetic"}
     routing = {"route": "modular"}
     session = types.SimpleNamespace(routing_record=lambda: routing)
 
@@ -630,6 +631,7 @@ def validate_composition_boundary():
             "export_dispatcher_factory": documents.CoreExportDocument,
             "selected_export_files_factory": atomic_files.CoreLayoutExportSetFiles,
             "selected_export_atomic": True,
+            "runtime_record": runtime_reader,
         }
         return session
 
@@ -657,7 +659,8 @@ def validate_composition_boundary():
     result = namespace[function.name](
         ROOT,
         api,
-        types.SimpleNamespace(load_contract=lambda _path: marker),
+        types.SimpleNamespace(load_contract=lambda _path: marker,
+                              runtime_record=runtime_reader),
     )
     assert result == (session, routing)
     assert set(calls) == set(modules)

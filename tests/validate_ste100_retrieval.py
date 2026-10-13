@@ -3377,6 +3377,520 @@ def validate_finite_documentation_lifecycle() -> None:
         )
 
 
+def validate_repair_evidence_read_boundary() -> None:
+    """Parse the exact evidence bytes hashed before a file replacement."""
+    with tempfile.TemporaryDirectory(prefix="ste-repair-read-") as temporary:
+        root = pathlib.Path(temporary)
+        (root / "tmp").mkdir()
+        path = root / "tmp/evidence.json"
+        original = {"decision": "authorised", "value": 1}
+        payload = STE._canonical_json_bytes(original)
+        path.write_bytes(payload)
+        reference = {
+            "path": "tmp/evidence.json",
+            "sha256": hashlib.sha256(payload).hexdigest(),
+        }
+        original_open = pathlib.Path.open
+        reads = []
+
+        class ReplacedReader:
+            def __init__(self, stream):
+                self.stream = stream
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *arguments):
+                return self.stream.__exit__(*arguments)
+
+            def read(self, *arguments):
+                value = self.stream.read(*arguments)
+                reads.append((arguments, value))
+                with original_open(path, "wb") as stream:
+                    stream.write(b'{"decision": "substituted"}\n')
+                return value
+
+        def replace_after_read(current, *arguments, **keywords):
+            stream = original_open(current, *arguments, **keywords)
+            if current == path and arguments == ("rb",):
+                return ReplacedReader(stream)
+            return stream
+
+        pathlib.Path.open = replace_after_read
+        try:
+            actual = STE._repair_evidence(reference, root=root)
+        finally:
+            pathlib.Path.open = original_open
+        require(
+            actual == original
+            and reads == [((STE.MAX_LIFECYCLE_BYTES + 1,), payload)],
+            "repair evidence did not parse one bounded read of the hashed bytes",
+        )
+        oversized = b" " * (STE.MAX_LIFECYCLE_BYTES + 2)
+        path.write_bytes(oversized)
+        reference["sha256"] = hashlib.sha256(oversized).hexdigest()
+        expect_ste_error(
+            "ste-final-repair-invalid",
+            lambda: STE._repair_evidence(reference, root=root),
+        )
+        duplicate = b'{"decision":"forged","decision":"authorised"}\n'
+        path.write_bytes(duplicate)
+        reference["sha256"] = hashlib.sha256(duplicate).hexdigest()
+        expect_ste_error(
+            "ste-lifecycle-record-invalid",
+            lambda: STE._repair_evidence(reference, root=root),
+        )
+    print("STE repair evidence single-read boundary passed")
+
+
+def validate_deterministic_repair_lifecycle() -> None:
+    """Keep the one review intact through an exactly evidenced code repair."""
+    source_manifest = {
+        "issue": "9",
+        "page_count": 434,
+        "publication_date": "2025-01-15",
+        "sha256": EXPECTED_SOURCE_SHA256,
+        "size_bytes": EXPECTED_SOURCE_SIZE,
+        "standard_id": "ASD-STE100",
+    }
+    binding_paths = (
+        "tests/validate_governance_semantics.py",
+        "tests/validate_project_progress.py",
+        "tests/validate_quality_assurance.py",
+    )
+    tool_path = "tools/ste100_lookup.py"
+    focused_path = "tests/validate_ste100_retrieval.py"
+    before_sources = {
+        tool_path: b"def validate():\n    return False\n",
+        focused_path: b"def test_validate():\n    assert False\n",
+    }
+    after_sources = {
+        tool_path: b"def validate():\n    return True\n",
+        focused_path: b"def test_validate():\n    assert True\n",
+    }
+
+    for path in binding_paths:
+        before_sources[path] = (
+            b'def check(value):\n    assert value == "Unclear instruction."\n'
+        )
+        after_sources[path] = (
+            b'def check(value):\n    assert value == "Clear instruction."\n'
+        )
+
+    def git(root: pathlib.Path, *arguments: str) -> str:
+        return subprocess.run(
+            ["git", *arguments], cwd=root, check=True,
+            capture_output=True, text=True,
+        ).stdout.strip()
+
+    def commit(root: pathlib.Path, message: str) -> str:
+        git(root, "add", "--all")
+        git(
+            root, "-c", "user.name=TrackTemplate Validation",
+            "-c", "user.email=validation@example.invalid",
+            "commit", "--quiet", "-m", message,
+        )
+        return git(root, "rev-parse", "HEAD")
+
+    def digest(payload: bytes) -> str:
+        return hashlib.sha256(payload).hexdigest()
+
+    def fixture(
+        root: pathlib.Path, *, mutate_locked=None, mutate_final=None,
+    ) -> dict[str, object]:
+        for directory in ("reference", "tests", "tools", "tmp"):
+            (root / directory).mkdir()
+        (root / ".gitignore").write_text("tmp/\n", encoding="utf-8")
+        guide = root / "reference/guide.md"
+        guide.write_bytes(b"# Guide\n\nOld instruction.\n")
+        state_path = root / "reference/ste-review-state.json"
+        state_path.write_bytes(STE._canonical_json_bytes(STE._empty_review_state()))
+        for relative, payload in before_sources.items():
+            (root / relative).write_bytes(payload)
+        git(root, "init", "--quiet")
+        baseline = commit(root, "baseline")
+        candidate_bytes = b"# Guide\n\nUnclear instruction.\n"
+        guide.write_bytes(candidate_bytes)
+        candidate = commit(root, "one author candidate")
+        scope_path, scope = STE.freeze_documentation_review(
+            baseline_revision=baseline, author_id="author",
+            source_manifest=source_manifest, root=root,
+        )
+        preimage = b"Unclear instruction."
+        start = candidate_bytes.index(preimage)
+        result = {
+            "blocker_set_complete": True,
+            "blockers": [],
+            "corrections": [{
+                "end_byte": start + len(preimage),
+                "path": "reference/guide.md",
+                "preimage": preimage.decode(),
+                "preimage_sha256": digest(preimage),
+                "replacement": "Clear instruction.",
+                "start_byte": start,
+            }],
+            "full_applicability_considered": True,
+            "independent": True,
+            "issue9_source_sha256": EXPECTED_SOURCE_SHA256,
+            "result": "APPROVED_WITH_EXACT_CORRECTIONS",
+            "reviewer_id": "documentation-reviewer",
+            "schema_version": 3,
+            "scope_sha256": scope["scope_sha256"],
+        }
+        result_path = root / "tmp/review-result.json"
+        result_path.write_bytes(STE._canonical_json_bytes(result))
+        receipt_path, proposal_path, receipt = STE.record_documentation_review(
+            scope_path=scope_path, result_path=result_path,
+            source_manifest=source_manifest, root=root,
+        )
+        require(proposal_path is not None, "repair fixture has no locked state")
+        guide.write_bytes(candidate_bytes.replace(preimage, b"Clear instruction."))
+        state_path.write_bytes(proposal_path.read_bytes())
+        for relative in binding_paths:
+            (root / relative).write_bytes(after_sources[relative])
+        if mutate_locked is not None:
+            mutate_locked(root)
+        locked = commit(root, "exact correction and locked state")
+        try:
+            STE.validate_final_review_state(
+                scope_path=scope_path, receipt_path=receipt_path,
+                source_manifest=source_manifest, root=root,
+            )
+        except STE.Ste100Error as error:
+            require(
+                error.code == "ste-final-unreviewed-mutation",
+                "the initial fixture failed outside its unreviewed bindings",
+            )
+            original_failure = json.dumps({
+                "code": error.code, "detail": str(error),
+            }).encode()
+        else:
+            raise AssertionError("unrecorded binding repair was accepted")
+        for relative in (tool_path, focused_path):
+            (root / relative).write_bytes(after_sources[relative])
+        if mutate_final is not None:
+            mutate_final(root)
+        final = commit(root, "bounded deterministic code repair")
+        return {
+            "baseline": baseline, "candidate": candidate, "locked": locked,
+            "final": final, "scope": scope, "scope_path": scope_path,
+            "receipt": receipt, "receipt_path": receipt_path,
+            "scope_bytes": scope_path.read_bytes(),
+            "receipt_bytes": receipt_path.read_bytes(),
+            "guide_bytes": guide.read_bytes(),
+            "state_bytes": state_path.read_bytes(),
+            "failure_bytes": original_failure,
+        }
+
+    def validate(root: pathlib.Path, item: dict[str, object]):
+        return STE.validate_final_review_state(
+            scope_path=item["scope_path"], receipt_path=item["receipt_path"],
+            source_manifest=source_manifest, root=root,
+        )
+
+    def evidence(root: pathlib.Path, name: str, value) -> dict[str, str]:
+        payload = value if isinstance(value, bytes) else STE._canonical_json_bytes(value)
+        path = root / "tmp" / name
+        path.write_bytes(payload)
+        return {"path": path.relative_to(root).as_posix(), "sha256": digest(payload)}
+
+    def record(root: pathlib.Path, item: dict[str, object]):
+        def at(revision: str, path: str) -> str:
+            payload = subprocess.run(
+                ["git", "show", revision + ":" + path], cwd=root,
+                check=True, capture_output=True,
+            ).stdout
+            return digest(payload)
+
+        identity = {
+            "candidate_revision": item["candidate"],
+            "scope_sha256": item["scope"]["scope_sha256"],
+            "receipt_sha256": digest(item["receipt_bytes"]),
+            "locked_revision": item["locked"],
+            "final_revision": item["final"],
+            "author_id": "repair-author",
+            "binding_files": [{
+                "path": path,
+                "candidate_sha256": at(item["candidate"], path),
+                "locked_sha256": at(item["locked"], path),
+            } for path in binding_paths],
+            "repair_files": [{
+                "path": path,
+                "locked_sha256": at(item["locked"], path),
+                "final_sha256": at(item["final"], path),
+            } for path in (tool_path, focused_path)],
+        }
+        authority = {
+            key: identity[key] for key in (
+                "candidate_revision", "scope_sha256", "receipt_sha256",
+                "locked_revision", "binding_files",
+            )
+        }
+        authority.update({
+            "schema_version": 1,
+            "decision": "authorised-deterministic-repair",
+            "owner_id": "project-owner",
+            "instruction": "Repair only the validator and its focused tests.",
+            "repair_paths": sorted((tool_path, focused_path)),
+        })
+        authority_ref = evidence(root, "repair-authority.json", authority)
+        failure_ref = evidence(root, "original-failure.log", item["failure_bytes"])
+        quality = {
+            **identity,
+            "schema_version": 1,
+            "result": "PASS",
+            "independent": True,
+            "reviewer_id": "source-reviewer",
+            "authority_sha256": authority_ref["sha256"],
+            "failure_sha256": failure_ref["sha256"],
+            "review_scope": "source-and-focused-tests",
+        }
+        return {
+            **identity,
+            "schema_version": 1,
+            "authority": authority_ref,
+            "failure": failure_ref,
+            "quality_review": evidence(root, "repair-quality.json", quality),
+        }
+
+    def record_path(root: pathlib.Path, item: dict[str, object]) -> pathlib.Path:
+        return (
+            root / "tmp/ste100-review-results"
+            / ("repair-" + item["candidate"] + ".json")
+        )
+
+    def write_record(root: pathlib.Path, item, value) -> None:
+        record_path(root, item).write_bytes(STE._canonical_json_bytes(value))
+
+    def reject(root, item, name, code="ste-final-repair-invalid") -> None:
+        try:
+            expect_ste_error(code, lambda: validate(root, item))
+        except AssertionError as error:
+            raise AssertionError(name + ": " + str(error)) from error
+        print("STE deterministic repair rejected: " + name)
+
+    with tempfile.TemporaryDirectory(prefix="ste-repair-record-") as temporary:
+        root = pathlib.Path(temporary)
+        item = fixture(root)
+        valid = record(root, item)
+        reject(root, item, "no repair record", "ste-final-unreviewed-mutation")
+        for key in ("authority", "quality_review", "failure"):
+            changed = copy.deepcopy(valid)
+            changed.pop(key)
+            write_record(root, item, changed)
+            reject(root, item, "missing " + key)
+            changed = copy.deepcopy(valid)
+            changed[key]["path"] = "tmp/missing.json"
+            write_record(root, item, changed)
+            reject(root, item, "absent " + key, "ste-lifecycle-path-invalid")
+            changed = copy.deepcopy(valid)
+            changed[key]["sha256"] = "0" * 64
+            write_record(root, item, changed)
+            reject(root, item, "forged " + key + " hash")
+
+        for key, value in (
+            ("candidate_revision", item["baseline"]),
+            ("scope_sha256", "0" * 64),
+            ("receipt_sha256", "0" * 64),
+            ("final_revision", item["locked"]),
+            ("locked_revision", item["candidate"]),
+            ("schema_version", True),
+            ("unlisted_field", "not authorised"),
+        ):
+            changed = copy.deepcopy(valid)
+            changed[key] = value
+            write_record(root, item, changed)
+            reject(root, item, "wrong " + key)
+
+        for group, fields in (
+            ("binding_files", ("candidate_sha256", "locked_sha256")),
+            ("repair_files", ("locked_sha256", "final_sha256")),
+        ):
+            for field in fields:
+                changed = copy.deepcopy(valid)
+                changed[group][0][field] = "0" * 64
+                write_record(root, item, changed)
+                reject(root, item, group + " wrong " + field)
+            for kind in ("missing", "extra", "duplicate", "ineligible"):
+                changed = copy.deepcopy(valid)
+                entries = changed[group]
+                if kind == "missing":
+                    entries.pop()
+                elif kind == "extra":
+                    entries.append(copy.deepcopy(entries[0]))
+                elif kind == "duplicate":
+                    entries[1] = copy.deepcopy(entries[0])
+                else:
+                    entries[0]["path"] = "tools/unlisted.py"
+                write_record(root, item, changed)
+                reject(root, item, group + " " + kind + " path")
+
+        for key, changes in (
+            ("authority", (
+                ("owner_id", "repair-author"),
+                ("decision", "not-authorised"),
+                ("instruction", " "),
+                ("candidate_revision", item["baseline"]),
+                ("repair_paths", [tool_path, "tracktemplate/product.py"]),
+            )),
+            ("quality_review", (
+                ("result", "FAIL"),
+                ("independent", False),
+                ("reviewer_id", "repair-author"),
+                ("reviewer_id", "author"),
+                ("review_scope", "prose-review"),
+                ("final_revision", item["locked"]),
+                ("authority_sha256", "0" * 64),
+                ("failure_sha256", "0" * 64),
+            )),
+        ):
+            original_bytes = (root / valid[key]["path"]).read_bytes()
+            original = json.loads(original_bytes)
+            for field, value in changes:
+                changed = copy.deepcopy(valid)
+                altered = copy.deepcopy(original)
+                altered[field] = value
+                changed[key] = evidence(root, "mutated-evidence.json", altered)
+                write_record(root, item, changed)
+                reject(root, item, key + " invalid " + field)
+            changed = copy.deepcopy(valid)
+            altered = copy.deepcopy(original)
+            altered.pop("schema_version")
+            changed[key] = evidence(root, "mutated-evidence.json", altered)
+            write_record(root, item, changed)
+            reject(root, item, key + " missing required field")
+
+        for name, payload in (
+            ("wrong failure", b'"ste-final-state-mismatch"'),
+            ("missing rejected path", item["failure_bytes"].replace(
+                binding_paths[0].encode(), b"unlisted.py",
+            )),
+        ):
+            changed = copy.deepcopy(valid)
+            changed["failure"] = evidence(root, "mutated-failure.log", payload)
+            write_record(root, item, changed)
+            reject(root, item, name)
+
+        valid_bytes = STE._canonical_json_bytes(valid)
+        duplicate = valid_bytes.replace(
+            b'{\n', b'{\n  "schema_version": 1,\n', 1,
+        )
+        record_path(root, item).write_bytes(duplicate)
+        reject(root, item, "duplicate JSON field", "ste-lifecycle-record-invalid")
+        write_record(root, item, valid)
+        final = validate(root, item)
+        require(
+            final["candidate_revision"] == item["candidate"]
+            and final["final_revision"] == item["final"]
+            and final["scope_sha256"] == item["scope"]["scope_sha256"]
+            and final["receipt_sha256"] == digest(item["receipt_bytes"])
+            and final["result"] == "APPROVED_WITH_EXACT_CORRECTIONS"
+            and final["status"] == "locked-and-deterministically-validated",
+            "the repair replaced the original review identity or verdict",
+        )
+        for path, expected in (
+            (item["scope_path"], item["scope_bytes"]),
+            (item["receipt_path"], item["receipt_bytes"]),
+            (root / "reference/guide.md", item["guide_bytes"]),
+            (root / "reference/ste-review-state.json", item["state_bytes"]),
+        ):
+            require(path.read_bytes() == expected, "repair changed locked evidence")
+        directory = root / "tmp/ste100-review-results"
+        completion = directory / ("completion-" + item["candidate"] + ".json")
+        binding = directory / ("repair-binding-" + item["candidate"] + ".json")
+        completed_bytes = completion.read_bytes()
+        binding_bytes = binding.read_bytes()
+        require(
+            load_json(binding)["repair_sha256"] == digest(valid_bytes),
+            "the repair completion omitted the exact repair record digest",
+        )
+        require(validate(root, item) == final, "exact repair retry is not idempotent")
+        changed = copy.deepcopy(valid)
+        changed["author_id"] = "replacement-author"
+        quality = load_json(root / valid["quality_review"]["path"])
+        quality["author_id"] = changed["author_id"]
+        changed["quality_review"] = evidence(root, "new-author-review.json", quality)
+        write_record(root, item, changed)
+        reject(root, item, "changed record after completion")
+        write_record(root, item, valid)
+        moved_binding = binding.with_suffix(".preserved")
+        binding.rename(moved_binding)
+        reject(root, item, "replay without original repair binding")
+        moved_binding.rename(binding)
+        (root / tool_path).write_bytes(after_sources[tool_path] + b"# replay\n")
+        item["final"] = commit(root, "attempt repair replay at a new head")
+        write_record(root, item, record(root, item))
+        reject(root, item, "replay at a later head")
+        require(
+            completion.read_bytes() == completed_bytes
+            and binding.read_bytes() == binding_bytes,
+            "a rejected replay changed the original completion or repair binding",
+        )
+
+    def foreign_file(root):
+        (root / "tools/unlisted.py").write_bytes(b"VALUE = True\n")
+
+    def changed_control_flow(root):
+        (root / binding_paths[0]).write_bytes(b"def check(value):\n    return True\n")
+
+    def binding_mode(root):
+        (root / binding_paths[0]).chmod(0o755)
+
+    def binding_type(root):
+        path = root / binding_paths[0]
+        path.unlink()
+        path.symlink_to("validate_project_progress.py")
+
+    def tool_mode(root):
+        (root / tool_path).chmod(0o755)
+
+    def tool_type(root):
+        path = root / tool_path
+        path.unlink()
+        path.symlink_to("../tests/validate_ste100_retrieval.py")
+
+    def changed_prose(root):
+        (root / "reference/guide.md").write_bytes(b"# Guide\n\nOther instruction.\n")
+
+    def changed_state(root):
+        path = root / "reference/ste-review-state.json"
+        value = load_json(path)
+        value["documents"][0]["review_result"] = "ACCEPT"
+        path.write_bytes(STE._canonical_json_bytes(value))
+
+    def prose_mode(root):
+        (root / "reference/guide.md").chmod(0o755)
+
+    def state_mode(root):
+        (root / "reference/ste-review-state.json").chmod(0o755)
+
+    for name, locked_mutation, final_mutation in (
+        ("unlisted locked file", foreign_file, None),
+        ("unlisted final file", None, foreign_file),
+        ("binding control flow", changed_control_flow, None),
+        ("binding Git mode", binding_mode, None),
+        ("binding Git type", binding_type, None),
+        ("tool Git mode", None, tool_mode),
+        ("tool Git type", None, tool_type),
+        ("changed locked prose", changed_prose, None),
+        ("changed final prose", None, changed_prose),
+        ("changed locked state", changed_state, None),
+        ("changed final state", None, changed_state),
+        ("locked prose Git mode", prose_mode, None),
+        ("final prose Git mode", None, prose_mode),
+        ("locked state Git mode", state_mode, None),
+        ("final state Git mode", None, state_mode),
+    ):
+        with tempfile.TemporaryDirectory(prefix="ste-repair-git-") as temporary:
+            root = pathlib.Path(temporary)
+            item = fixture(
+                root, mutate_locked=locked_mutation, mutate_final=final_mutation,
+            )
+            write_record(root, item, record(root, item))
+            reject(root, item, name)
+    print("STE deterministic repair synthetic lifecycle passed")
+
+
 def validate_lifecycle_git_boundary() -> None:
     """Reject inherited Git execution and object-interpretation controls."""
 
@@ -3684,6 +4198,8 @@ def main() -> None:
     validate_cache_and_lookup_behaviour(index)
     validate_documentation_lifecycle()
     validate_finite_documentation_lifecycle()
+    validate_repair_evidence_read_boundary()
+    validate_deterministic_repair_lifecycle()
     validate_lifecycle_git_boundary()
     validate_review_document_capacity()
     validate_live_source_resolvability()

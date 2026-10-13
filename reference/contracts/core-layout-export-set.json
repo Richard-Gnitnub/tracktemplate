@@ -1,11 +1,12 @@
 {
   "schema_version": 1,
   "contract_id": "tracktemplate:phase9b:core-layout-export-set:1",
-  "recorded_on": "2026-10-11",
+  "recorded_on": "2026-10-13",
   "status": "draft",
   "change_level": 3,
   "authority": [
-    "D-P9-013"
+    "D-P9-013",
+    "D-P9-016"
   ],
   "criterion": "9B-5",
   "contract_document": "reference/contracts/core-layout-export-set.md",
@@ -17,12 +18,13 @@
   ],
   "plan": {
     "helper": "prepare_core_export_plan",
-    "signature": "prepare_core_export_plan(records, config, set_id, *, plan_export)",
+    "signature": "prepare_core_export_plan(records, config, set_id, *, plan_export, dependency_manifest=False)",
     "side_effects": "none",
     "child_name": "Core_Export_<uuidhex>",
     "required_field": "output_directory",
     "input_mutation": false,
-    "path_change": "all output members and optional CSV use a unique final child directory beneath the selected parent"
+    "path_change": "all output members and optional CSV use a unique final child directory beneath the selected parent",
+    "dependency_manifest": "Core-only policy supplies dependency_manifest=True; retained comparison callers default to False"
   },
   "product_routing": {
     "record_schema_version": 1,
@@ -39,6 +41,8 @@
     "methods": [
       "open",
       "stage",
+      "artifact_inventory",
+      "stage_dependency_manifest",
       "validate",
       "publish",
       "cleanup"
@@ -68,7 +72,8 @@
   "result": {
     "existing_fields": "Phase 7 fields retained",
     "added_fields": [
-      "publication_state"
+      "publication_state",
+      "dependency_manifest_path (only for a dependency-manifest plan)"
     ],
     "publication_states": [
       "not-published",
@@ -98,7 +103,8 @@
   "validation": {
     "standalone": [
       "tests/validate_core_export_atomic_files.py",
-      "tests/validate_core_export_atomic.py"
+      "tests/validate_core_export_atomic.py",
+      "tests/validate_core_dependency_manifest.py"
     ],
     "qualified_host": "tests/freecad_validate_core_export_atomic.py",
     "gui_command": "tools/freecad_bridge/run-phase7-core-layout-export-workflow --route modular --atomic-set",
@@ -107,6 +113,32 @@
       "tests/freecad_validate_core_export_staging.py",
       "Phase 7 diagnostic route"
     ],
-    "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel"
+    "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel",
+    "dependency_evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-core-dependency-manifest-panel"
+  },
+  "dependency_criterion": "9B-4",
+  "dependency_manifest": {
+    "required_route": "usual Core Generate",
+    "plan_field": "dependency_manifest_path",
+    "filename": "Core_Dependency_Manifest.json",
+    "schema": "reference/schemas/dependency-manifest-v1.schema.json",
+    "schema_version": 1,
+    "prepare_keyword": "prepare_dependency_manifest",
+    "prepare_signature": "prepare(doc, plan, config, set_id) -> build(artifacts)",
+    "preparation": "strict canonical-input and dependency inventory before any staging directory is opened",
+    "first_scope": "curved plain-line template compounds and centrelines only",
+    "unsupported": "visible refusal before publication; retain committed Generate result and previous outputs",
+    "artifacts": "all task payloads and optional CSV, relative final names and actual SHA-256; JSON excludes itself",
+    "hash_integrity": "validate artifact hashes again before publication",
+    "inventory_owner": "Phase 9 export/provenance owner",
+    "inherited_mapping": "seven applicable frozen legacy groups; source classifications remain unchanged",
+    "mapping_update_condition": "update the checked runtime projection when the canonical lineage mapping changes; retire it when an accepted replacement owns this scope",
+    "canonical_signature": "versioned deterministic snapshot of strictly read Settings inputs and actual invocation production intent; no derived Shape or production-index digest",
+    "project_status": "unknown",
+    "intended_uses": [
+      "private-development"
+    ],
+    "production_admission": false,
+    "selected_export_change": false
   }
 }

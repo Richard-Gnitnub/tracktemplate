@@ -8,16 +8,168 @@ The [Phase 9A closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md),
 [risk snapshot](../history/phase-closeouts/PHASE9A_RISKS.json) preserve its history.
 The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 
-## Current owner view
+## Phase 9B Core dependency manifest panel
 
+**Date and decision:** 2026-10-13, D-P9-016. The owner authorises the Core Generate
+dependency-manifest policy and one bounded implementation towards Exit 9B-4.
+The [architecture](../ARCHITECTURE.md#d-p9-016-core-generate-dependency-manifest)
+owns the policy. The [output contract](../contracts/core-layout-export-set.md#dependency-manifest)
+owns its implementation requirements. The [decision register](gate-decisions.json)
+keeps the owner authority and exclusions.
+
+The owner states:
+
+> As project owner, I approve the proposed Level 3 Core Generate dependency-manifest change for Exit 9B-4.
+>
+> Authorise the necessary alignment and one bounded implementation under existing repository governance.
+>
+> Preserve all existing acceptance boundaries. Publish one exact-green draft PR, then stop.
+
+**Outcome:** The usual Core Generate route must include one schema-1 JSON file.
+That file belongs to the same full output set as the selected output files
+and optional CSV.
+The first bounded scope covers curved plain-line `TrackTemplateCompound`
+shapes and centrelines. Missing manifest input data must stop the directory
+operation with a diagnostic that the operator can see. The operation must also stop if these
+data do not agree or are not in the supported bounded scope.
+
+This restriction changes export availability.
+It does not remove the committed editable Generate result.
+The manifest must identify output hashes, canonical information, product
+source, FreeCAD and its exporters, and applicable existing classifications.
+It keeps `reference-only` and `unknown` status.
+It does not change a B14 fixture copy into evidence of a new B16 Generate
+operation. The Core Generate GUI proof must prove this source difference.
+
+**Safety/risk panel:** Richard is the project owner, panel chair and deciding
+authority. `/root` presents the bounded change.
+Read-only reviewer `/root/after170_phase9b_choice` examined the approved policy,
+API, architecture, security and provenance boundaries and all 24 risk records.
+The reviewer wrote no product source, tests or canonical prose.
+The reviewer previously supplied read-only programme advice.
+The agents share one team and workspace. The review does not operate independently of that team.
+
+The recommendation is **Proceed with bounded conditions**.
+The receipt for the review done independently is
+`tmp/core-dependency-manifest/architecture-risk-review.json`, SHA-256
+`0e8e425ed888055de2c82473ed60853becf7e719bf97327b3cb6d2a6bc6352c5`.
+The panel records no unresolved dissent or authority blocker.
+The implementing agent must prove strict input checks and full manifest
+input data for the supported bounded scope.
+The implementing agent must also prove hashes of temporary output files and the specified
+conditions that stop output.
+Qualified FreeCAD, GUI and source review done independently must finish before the
+draft PR with a PASS result from CI for its exact candidate.
+This panel recommendation does not accept the product change.
+
+All 24 risk states, severities, treatments, controls, owners and deadlines stay
+unchanged in the [risk register](risks.json). No risk closes.
+PR-09 stays Critical/Open/Partial. PR-13 stays Critical/Open/Effective for its
+current scope. PR-17 stays Critical/Open/Partial.
+The named risk owners retain their duties and deadlines.
+
+PR-01 and QA-R03 keep wider workflow coverage.
+PR-09 keeps output rights-state controls.
+PR-16 keeps input and invalidation duties.
+PR-17 keeps document preservation and recovery duties.
+PR-13 keeps backup and restore duties.
+
+PR-15 and QA-R04 keep performance duties.
+PR-22 keeps independent acceptance.
+PR-10 and PR-18 keep comparison and removal conditions.
+The chair and rights-state risks keep their production evidence duties.
+
+**Implementation evidence:** The bounded Core route records ten `dependencies`
+items: canonical information, installed product source, FreeCAD/exporters and
+seven existing lineage groups.
+It writes the schema-1 JSON with hashes of output files in the same full
+output set. CSV stays optional.
+Standalone schema checks give a PASS result.
+Checks of rejected data, the directory operation and previous routes also
+give a PASS result.
+
+The qualified native proof gives a PASS result for 14 cases on FreeCAD 1.1.4.
+It keeps the B14 fixture copy, previous outputs and exact state of the
+editable document unchanged.
+It proves legacy output comparison, equal hashes of canonical information
+and source across repeated operations, and save/reopen preservation.
+The software rejects different, translated, rotated and reversed planned shapes
+before it writes temporary output.
+This proof starts from a legacy document copy.
+It does not prove a new B16 Generate operation.
+
+The receipt is
+`tmp/core-export-atomic/native-runs/20261013T185758530171Z/result.json`, SHA-256
+`4c06b93bc25b900e505078122aa95a026d1ec4804bccf58452e667cab3a4d4ee`.
+
+The Core Generate GUI proof gives a PASS result for all eight scenarios on
+the same qualified host profile.
+The current B16 route makes curved plain-line `TrackTemplateCompound` shapes
+and centrelines. The source stays B15.
+Output with CSV contains 15 files. Output without CSV contains 14 files.
+Each output set includes the schema-1 JSON and hashes of the output files.
+
+The GUI proof keeps previous output, the editable model, selection,
+preferences and save/reopen state unchanged.
+Malformed or missing manifest input data give diagnostics that the operator can see.
+No completed output file becomes available in these conditions.
+The summary distinguishes CSV from JSON and states that the output rights
+state stays unresolved.
+The folder-open check verifies its selected path only.
+It does not prove an operating-system file-manager launch.
+
+The receipt is
+`benchmark-output/freecad-bridge/phase7-core-layout-export-workflow-runs/core-dependency-manifest-2/run.json`, SHA-256
+`3d19b16ad873ce845e0cb337072250063c9594436d8eff1e4dc67f4c8e3a9bdf`.
+
+Review done independently found a missing planned-shape check, recorded as
+`CM-SR-01`. Its first repair gave a PASS result for the native fixture copy
+but rejected a new Generate operation.
+Live GUI diagnosis identified the existing document-assignment difference.
+The corrected comparison checks that initial `Shape.Placement.toMatrix().A`
+values are equal. It also checks that the `exportBrepToString()` bytes from
+temporary copies are equal. It changes no source shape or tolerance.
+
+The corrected native and GUI proofs use that corrected source.
+Initial failures, diagnostic evidence and classifications stay in
+`tmp/core-dependency-manifest/`.
+Installed-file hashes do not prove the identity of Python code in
+memory or all files that FreeCAD uses.
+Source hashes are equal before and after each new qualified process.
+
+The source review done independently gives **PASS** with no open blocker.
+The reviewer reconciles the corrected native and GUI proofs with the source.
+The receipt is `tmp/core-dependency-manifest/source-review-final.json`, SHA-256
+`2093fd17a9807e695ab98dbe590641c74d9561315aa6a7495370f220d75e23cc`.
+The initial review receipt and finding remain unchanged.
+
+**Limits and next boundary:** Phase 9A stays closed at 4/4 for its frozen
+reference-only scope. Phase 9B stays Open at 2/6.
+Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted.
+Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending.
+D-P6-008 stays Deferred — unmet. TERM-R04 stays open.
+
+Railway calculations, shapes, the 113-entry register, numerical limits, selected export and frozen
+B14/B15 stay unchanged. Output stays private-development.
+Project status stays `unknown`.
+No physical fit, preload, retention, manufacturing, rights-state, production,
+performance or release acceptance follows.
+The qualified Linux ext4 conditions and supported failure model stay.
+There is no assurance that files stay available after a system interruption
+or that recovery occurs after FreeCAD stops and starts again.
+
+After CI gives a PASS result for the exact candidate, publish one draft PR.
+Then stop. Do not merge. Do not start one more outcome.
+
+## Current owner view
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 2/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel) and [D-P9-015](#phase-9b-exit-5-acceptance-panel). Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted. Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending. |
-| What changed | [D-P9-015](#phase-9b-exit-5-acceptance-panel) accepts only Exit 9B-5 under D-P9-013/D-P9-014 on 2026-10-13. All recorded limitations stay. This documentation alignment adds no product implementation. |
-| What now works | The two usual routes make all selected files available in one directory operation without replacement. They preserve the editable `App.Document` in the qualified error conditions. The owner accepts this evidence only for Exit 9B-5. |
-| Limitations/findings | The policy applies only to the qualified Linux ext4 host and an operator-controlled directory. It gives no assurance that files stay available after a system interruption. It adds no recovery after FreeCAD stops and starts again. All 24 risk duties and previous production limits stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
-| Owner decision | D-P9-015 accepts Exit 9B-5 only. D-P9-012 keeps its own Exit 9B-2 acceptance. D-P9-013/D-P9-014 keep their operating conditions. The Phase 9A closeout and previous decisions keep their accepted limits. This decision closes no phase and accepts no production result. |
-| Next action | Complete independent review of the test changes and the Documentation Review lifecycle. After CI gives a PASS result for the exact PR head, publish one draft PR. Do not merge or start another outcome. |
+| What changed | [D-P9-016](#phase-9b-core-dependency-manifest-panel) authorises mandatory schema-1 JSON for the usual Core Generate output set. The first bounded scope covers curved plain-line `TrackTemplateCompound` shapes and centrelines. CSV stays optional. |
+| What now works | The manifest records output files, canonical information, source identity and existing classifications. It belongs to the same full output set. Selected export keeps its accepted behaviour. |
+| Limitations/findings | Core Generate stops before output becomes available if manifest input data are missing or do not agree. It also stops for data not in the supported bounded scope. The editable Generate result and previous output stay available. The qualified Linux ext4 and recovery limits stay. <br><br>All 24 risk duties and previous production limits stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
+| Owner decision | D-P9-016 authorises only the policy alignment and one bounded product change. D-P9-012 and D-P9-015 keep their accepted limits. Exit 9B-4 stays Pending. No other acceptance follows. |
+| Next action | Complete validation. Complete source review independently. Complete the Documentation Review lifecycle. <br><br> After CI gives a PASS result for the exact candidate, publish one draft PR. Then stop. Do not merge. Do not start one more outcome. |
 
 <a id="phase-9b-exit-5-acceptance-panel"></a>
 

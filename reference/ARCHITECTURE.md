@@ -279,6 +279,39 @@ D-P6-003 and D-P6-004 keep their Entry/Exit scope and recovery authority.
 The Phase 7 comparison route, previous staging API and selected-export route stay available.
 This policy accepts no Phase 9B exit, output rights, production capability or performance result.
 
+#### D-P9-016 Core Generate dependency manifest
+
+[D-P9-016](current/PHASE_EVIDENCE.md#phase-9b-core-dependency-manifest-panel)
+authorises one mandatory schema-1 JSON file in each usual Core Generate
+output set. It uses the existing
+[dependency-manifest schema](schemas/dependency-manifest-v1.schema.json).
+The JSON file and all selected output files become available through the same
+D-P9-013 directory operation. CSV stays optional and keeps its existing schema.
+
+The first bounded scope covers curved plain-line `TrackTemplateCompound`
+shapes and centrelines. The [output contract](contracts/core-layout-export-set.md#dependency-manifest)
+identifies the excluded features and owns the applicable checks.
+Export must stop if manifest input data are missing, do not agree or are
+not in that bounded scope. The operator must see a diagnostic.
+This is a new restriction on export availability with authority from D-P9-016.
+The committed editable Generate result and previous output must stay unchanged.
+No route makes a manifest available as full when data are missing.
+
+The manifest identifies output files, their hashes, product source,
+`canonical_model_sha256` and applicable source classifications.
+It keeps each existing `reference-only` or `unknown` classification and each
+unresolved rights state. Its project status is `unknown`.
+Its intended use is `private-development`.
+The JSON file excludes its own hash. A PASS result from schema validation does
+not prove that the manifest contains all applicable data or has a positive
+rights state for output.
+
+The output contract owns `canonical_model_sha256`, manifest input data,
+the file sequence and operating conditions.
+The selected-export route, previous comparison APIs and frozen B14/B15 stay
+unchanged. D-P9-012 and D-P9-015 keep their historical acceptance and limits.
+Exit 9B-4 stays Pending. This decision accepts no other exit or production result.
+
 #### D-P9-014 selected full output set
 
 <a id="d-p9-014-selected-complete-output-set"></a>

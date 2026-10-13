@@ -1301,45 +1301,39 @@ def _validate_owner_view(plan: str) -> None:
     )
     owner_view = _semantic_text(section)
     for fragment in (
-        "Phase 9A stays closed at 4/4 under D-P9-010",
-        "Phase 9B is Open at 2/6 under D-P9-012 and D-P9-015",
-        "Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted",
-        "Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending",
-        "D-P9-015 accepts only Exit 9B-5 under D-P9-013/D-P9-014 on 2026-10-13",
-        "All recorded limitations stay",
-        "This documentation alignment adds no product implementation",
-        "The two usual routes make all selected files available in one "
-        "directory operation without replacement",
-        "They preserve the editable App.Document in the qualified error conditions",
-        "The owner accepts this evidence only for Exit 9B-5",
-        "policy applies only to the qualified Linux ext4 host and an "
-        "operator-controlled directory",
-        "It gives no assurance that files stay available after a system interruption",
-        "It adds no recovery after FreeCAD stops and starts again",
-        "All 24 risk duties and previous production limits stay",
-        "D-P6-008 stays Deferred — unmet",
-        "TERM-R04 stays open",
-        "Output stays private-development",
-        "Project status stays unknown",
-        "D-P9-015 accepts Exit 9B-5 only",
-        "D-P9-012 keeps its own Exit 9B-2 acceptance",
-        "D-P9-013/D-P9-014 keep their operating conditions",
-        "This decision closes no phase and accepts no production result",
-        "After CI gives a PASS result for the exact PR head, publish one draft PR",
-        "Do not merge or start another outcome",
-        "The Phase 9A closeout and previous decisions keep their accepted limits",
+        'Phase 9A stays closed at 4/4 under D-P9-010',
+        'Phase 9B is Open at 2/6 under D-P9-012 and D-P9-015',
+        'Only Exits 9B-2 and 9B-5 are Evidenced and owner-accepted',
+        'Exits 9B-1, 9B-3, 9B-4 and 9B-6 stay Pending',
+        'D-P9-016 authorises mandatory schema-1 JSON for the usual Core Generate output set',
+        'The first bounded scope covers curved plain-line TrackTemplateCompound shapes and centrelines',
+        'CSV stays optional',
+        'Selected export keeps its accepted behaviour',
+        'Core Generate stops before output becomes available if manifest input data are missing or do not agree. It also stops for data not in the supported bounded scope',
+        'The editable Generate result and previous output stay available',
+        'The qualified Linux ext4 and recovery limits stay',
+        'All 24 risk duties and previous production limits stay',
+        'D-P6-008 stays Deferred — unmet',
+        'TERM-R04 stays open',
+        'Output stays private-development. Project status stays unknown',
+        'D-P9-016 authorises only the policy alignment and one bounded product change',
+        'D-P9-012 and D-P9-015 keep their accepted limits',
+        'Exit 9B-4 stays Pending',
+        'No other acceptance follows',
+        'After CI gives a PASS result for the exact candidate, publish one draft PR. Then stop',
+        'Do not merge. Do not start one more outcome',
     ):
         _require(
             fragment in owner_view,
             "project-plan owner view lost or contradicted: " + fragment,
         )
     expected_row_digests = (
-        "0bc86e690acdfab3930ba2af6d8caae11f4a6b849a5b1c69e2e22cfbfb067e9f",
-        "32d65835dbb96eb5791e42c58b3ab7a730797ea08e8c5c6f6c94c5ad238ce1a7",
-        "c9b76b3d19da90d3058153878f43da5233fe329c7fd5e315759697c757529baf",
-        "9c9425dc1578481cf9d2b00a7333c61c9faaa7e21842a3e241636433ac7c42e3",
-        "24847c3f23287932965e2ff829651157a956bfddec8e30dae2edf0c9c2a947a6",
-        "f211affcfe2dbec251e7e06446f15cb0340723e839bde53469fc40138af9c830",
+        '0bc86e690acdfab3930ba2af6d8caae11f4a6b849a5b1c69e2e22cfbfb067e9f',
+        '86f115c621ddc17e0be18f356727be2fc557eccf037f4d1f4f39223dcb5564eb',
+        'fa2e54489d6cababf089cbe5b947e7cc3303a2f35178f422e708a389eed54f29',
+        'f48511b283c5c2dfec68982b97da45a8c5feeaa5a98419a81a6e31096b186d8e',
+        '537602f0d0b51cfa8c70acd74d753c1533254b854489baebd9cc420adb5bd811',
+        'd6d5afc825be152828d106ecaf32ee67d349c0afca9802ba14787da404478800',
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -1356,8 +1350,8 @@ def _validate_owner_view(plan: str) -> None:
           "#phase-9b-exit-2-acceptance-panel"),
          ("D-P9-015", "current/PHASE_EVIDENCE.md"
           "#phase-9b-exit-5-acceptance-panel"),
-         ("D-P9-015", "current/PHASE_EVIDENCE.md"
-          "#phase-9b-exit-5-acceptance-panel")),
+         ("D-P9-016", "current/PHASE_EVIDENCE.md"
+          "#phase-9b-core-dependency-manifest-panel")),
         "project-plan owner view closeout or acceptance route drifted",
     )
     _require(
@@ -7776,6 +7770,30 @@ def _validate_dp9_015_admission(evidence: str) -> None:
     )
 
 
+def _validate_dp9_016_decision(record, fields):
+    """Bind the new output policy to bounded authority, without exit acceptance."""
+    panel = "reference/current/PHASE_EVIDENCE.md#phase-9b-core-dependency-manifest-panel"
+    _require(
+        isinstance(record, dict) and set(record) == fields
+        and record["id"] == "D-P9-016"
+        and record["decided_on"] == "2026-10-13"
+        and record["status"] == "Accepted"
+        and record["evidence"] == panel and record["panel_record"] == panel
+        and record["panel_required_under_current_policy"] is True,
+        "D-P9-016 identity, status or panel routing drifted",
+    )
+    for field, digest in (
+        ('authority', 'a5e908a218be9ebe5737f00a7ec30b75ef8cc7d039c9c34f4ace92d60270b5f2'),
+        ('decision', 'c72c304a6961cde412f2675829bfb139f8a57ccb5d81ce9bc508cb632974a494'),
+        ('exclusions', '3b3d7717666cae1b6d9cf232d8b2f1434b2d70169e957df975971e6999265e25'),
+    ):
+        _require(
+            isinstance(record[field], str)
+            and hashlib.sha256(record[field].encode("utf-8")).hexdigest() == digest,
+            "D-P9-016 " + field + " boundary drifted",
+        )
+
+
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     """Keep prior decisions and the bounded selected-export successor."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
@@ -7789,7 +7807,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 8
+        and len(records) == 9
         and records[:2] == [
             archive["decisions"][0], archive["decisions"][11],
         ],
@@ -7802,6 +7820,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     _validate_dgov024_decision(records[5], set(records[0]))
     _validate_dp9_014_decision(records[6], set(records[0]))
     _validate_dp9_015_decision(records[7], set(records[0]))
+    _validate_dp9_016_decision(records[8], set(records[0]))
 
 
 def _validate_phase9a_closeout(evidence: str) -> None:
@@ -7978,7 +7997,7 @@ def _validate_dp9_012_admission(evidence: str) -> None:
           "#phase-9a-closeout-panel"),
          ("D-P9-012", "#phase-9b-exit-2-acceptance-panel"),
          ("D-P9-015", "#phase-9b-exit-5-acceptance-panel"),
-         ("D-P9-015", "#phase-9b-exit-5-acceptance-panel")),
+         ("D-P9-016", "#phase-9b-core-dependency-manifest-panel")),
         "Phase 9B evidence owner-view route drifted",
     )
 
@@ -8901,7 +8920,7 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
-           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014", "D-P9-015",
+           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014", "D-P9-015", "D-P9-016",
            "D-GOV-023",
            "D-GOV-024"},
         "project-plan decisions differ from the current and frozen registers",

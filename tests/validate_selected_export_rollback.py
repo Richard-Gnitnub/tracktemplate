@@ -595,7 +595,7 @@ def show_production_export_summary(summary):
     )
     host = SimpleNamespace(
         module=module,
-        _host=SimpleNamespace(source_sha256=LEGACY_SHA256),
+        _host=SimpleNamespace(source_path=LEGACY, source_sha256=LEGACY_SHA256),
         routing_record=lambda: {"route": "modular", "schema_version": 16},
         launch_workflow=lambda: module.run_macro(),
     )

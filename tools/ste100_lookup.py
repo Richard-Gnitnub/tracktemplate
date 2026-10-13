@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 from collections import Counter
 from collections.abc import Callable
 import concurrent.futures
@@ -33,6 +34,16 @@ STE_REVIEW_STATE = ROOT / "reference" / "ste-review-state.json"
 STE_REVIEW_SCOPE_DIR = ROOT / "tmp" / "ste100-review-scopes"
 STE_REVIEW_RESULT_DIR = ROOT / "tmp" / "ste100-review-results"
 STE_REVIEW_PROPOSAL_DIR = ROOT / "tmp" / "ste100-review-state-proposals"
+# Eligibility is not an exemption: each file also needs exact repair proof.
+STE_REPAIR_BINDING_PATHS = frozenset({
+    "tests/validate_governance_semantics.py",
+    "tests/validate_project_progress.py",
+    "tests/validate_quality_assurance.py",
+})
+STE_REPAIR_TOOL_PATHS = frozenset({
+    "tools/ste100_lookup.py",
+    "tests/validate_ste100_retrieval.py",
+})
 SENTINEL = "TRACKTEMPLATE_STE100="
 ERROR_SENTINEL = "TRACKTEMPLATE_STE100_ERROR="
 FINAL_SENTINEL = "TRACKTEMPLATE_STE100_FINAL="
@@ -2672,7 +2683,7 @@ def _lifecycle_changed_paths(
             "--no-textconv",
             "--ignore-submodules=none",
             "--no-renames",
-            "--diff-filter=ACMDR",
+            "--diff-filter=ACMDRT",
             baseline_revision,
             candidate_revision,
             "--",
@@ -3468,6 +3479,21 @@ def _read_lifecycle_json(
     *,
     root: pathlib.Path,
 ) -> dict[str, object]:
+    resolved = _lifecycle_tmp_path(path, subject, root=root)
+    try:
+        with resolved.open("rb") as stream:
+            payload = stream.read(MAX_LIFECYCLE_BYTES + 1)
+    except OSError as error:
+        raise Ste100Error(
+            "ste-lifecycle-record-invalid",
+            "The {} is not readable UTF-8 JSON.".format(subject),
+            "Restore the exact generated lifecycle record.",
+        ) from error
+    return _parse_lifecycle_json(payload, subject)
+
+
+def _parse_lifecycle_json(payload: bytes, subject: str) -> dict[str, object]:
+    """Parse one bounded byte snapshot without reopening its source."""
     def reject_duplicate_members(
         pairs: list[tuple[str, object]],
     ) -> dict[str, object]:
@@ -3482,9 +3508,7 @@ def _read_lifecycle_json(
             value[key] = item
         return value
 
-    resolved = _lifecycle_tmp_path(path, subject, root=root)
     try:
-        payload = resolved.read_bytes()
         if len(payload) > MAX_LIFECYCLE_BYTES:
             raise Ste100Error(
                 "ste-lifecycle-record-too-large",
@@ -3495,7 +3519,7 @@ def _read_lifecycle_json(
             payload.decode("utf-8"),
             object_pairs_hook=reject_duplicate_members,
         )
-    except (OSError, UnicodeDecodeError, ValueError, RecursionError) as error:
+    except (UnicodeDecodeError, ValueError, RecursionError) as error:
         raise Ste100Error(
             "ste-lifecycle-record-invalid",
             "The {} is not readable UTF-8 JSON.".format(subject),
@@ -4491,6 +4515,259 @@ def _validated_review_receipt(
     return receipt, receipt_digest
 
 
+def _repair_require(condition: bool, detail: str) -> None:
+    if not condition:
+        raise Ste100Error(
+            "ste-final-repair-invalid", detail,
+            "Keep the original review and supply exact authorised repair proof.",
+        )
+
+
+def _repair_evidence(
+    reference: object, *, root: pathlib.Path, as_json: bool = True,
+) -> dict[str, object] | bytes:
+    _repair_require(
+        isinstance(reference, dict) and set(reference) == {"path", "sha256"},
+        "Repair evidence must identify one path and SHA-256.",
+    )
+    path = root / _lifecycle_path(reference["path"], "repair evidence")
+    digest = _lifecycle_sha256(reference["sha256"], "repair evidence digest")
+    resolved = _lifecycle_tmp_path(path, "repair evidence", root=root)
+    try:
+        with resolved.open("rb") as stream:
+            payload = stream.read(MAX_LIFECYCLE_BYTES + 1)
+    except OSError as error:
+        raise Ste100Error(
+            "ste-final-repair-invalid", "Repair evidence is unreadable.",
+            "Restore the exact retained repair evidence.",
+        ) from error
+    _repair_require(
+        len(payload) <= MAX_LIFECYCLE_BYTES
+        and _sha256_bytes(payload) == digest,
+        "Repair evidence bytes do not match their recorded identity.",
+    )
+    return (
+        _parse_lifecycle_json(payload, "repair evidence")
+        if as_json else payload
+    )
+
+
+def _repair_file_bytes(
+    revision: str, path: str, digest: object, *, root: pathlib.Path,
+) -> bytes:
+    _lifecycle_sha256(digest, "repair file digest")
+    _code, tree = _lifecycle_git(
+        ["ls-tree", "-z", revision, "--", path], root=root
+    )
+    item = _lifecycle_git_file(revision, path, root=root)
+    _repair_require(
+        item is not None
+        and tree == ("100644 blob " + item[1] + "\t" + path + "\0").encode()
+        and _sha256_bytes(item[0]) == digest,
+        "A repair file is absent, changed, or not a regular file: " + path,
+    )
+    return item[0]
+
+
+def _repair_binding_only(before: bytes, after: bytes) -> bool:
+    """Allow string rebinding only; independent review owns its meaning."""
+    try:
+        trees = [ast.parse(before), ast.parse(after)]
+    except (SyntaxError, ValueError, UnicodeError):
+        return False
+    for tree in trees:
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                node.value = ""
+    return before != after and ast.dump(trees[0]) == ast.dump(trees[1])
+
+
+def _validated_deterministic_repair(
+    *, scope: dict[str, object], receipt: dict[str, object],
+    receipt_digest: str, final_revision: str,
+    expected_state: dict[str, object], expected_documents: dict[str, bytes],
+    unexpected: list[str], root: pathlib.Path,
+) -> dict[str, object] | None:
+    """Verify local attestations, not authenticate the people who made them."""
+    candidate = scope["candidate"]["candidate_revision"]
+    directory = root / "tmp" / STE_REVIEW_RESULT_DIR.name
+    path = directory / ("repair-" + candidate + ".json")
+    if not path.exists() and not path.is_symlink():
+        if not unexpected:
+            return None
+        raise Ste100Error(
+            "ste-final-unreviewed-mutation",
+            "The final candidate contains an unreviewed post-review mutation: "
+            + ", ".join(unexpected) + ".",
+            "Restore the locked bytes and rerun this deterministic check.",
+        )
+    repair = _read_lifecycle_json(path, "deterministic repair", root=root)
+    identity_keys = {
+        "candidate_revision", "scope_sha256", "receipt_sha256",
+        "locked_revision", "final_revision", "author_id",
+        "binding_files", "repair_files",
+    }
+    _repair_require(
+        set(repair) == identity_keys | {
+            "schema_version", "authority", "quality_review", "failure",
+        }
+        and type(repair["schema_version"]) is int
+        and repair["schema_version"] == 1
+        and receipt["schema_version"] == 3
+        and repair["candidate_revision"] == candidate
+        and repair["scope_sha256"] == scope["scope_sha256"]
+        and repair["receipt_sha256"] == receipt_digest
+        and repair["final_revision"] == final_revision,
+        "The repair does not identify this original review and exact final head.",
+    )
+    author = _lifecycle_text(repair["author_id"], "repair author")
+    locked = _lifecycle_revision(repair["locked_revision"], root=root)
+    for before, after in ((candidate, locked), (locked, final_revision)):
+        code, _output = _lifecycle_git(
+            ["merge-base", "--is-ancestor", before, after],
+            root=root, accepted_codes=(0, 1),
+        )
+        _repair_require(code == 0 and before != after,
+                        "The repair revisions do not form the recorded chain.")
+    state_path = STE_REVIEW_STATE.relative_to(ROOT).as_posix()
+    corrected_paths = set(_corrections_by_path(receipt)) | {state_path}
+    binding_files = repair["binding_files"]
+    repair_files = repair["repair_files"]
+    for entries, allowed, before, after, old_key, new_key in (
+        (binding_files, STE_REPAIR_BINDING_PATHS, candidate, locked,
+         "candidate_sha256", "locked_sha256"),
+        (repair_files, STE_REPAIR_TOOL_PATHS, locked, final_revision,
+         "locked_sha256", "final_sha256"),
+    ):
+        _repair_require(isinstance(entries, list) and len(entries) == len(allowed),
+                        "The repair file list is incomplete or overbroad.")
+        names = []
+        for entry in entries:
+            _repair_require(
+                isinstance(entry, dict)
+                and set(entry) == {"path", old_key, new_key},
+                "A repair file entry is not an exact before/after binding.",
+            )
+            name = _lifecycle_path(entry["path"], "repair file")
+            _repair_require(name in allowed and name not in names,
+                            "A repair path is ineligible or duplicated.")
+            names.append(name)
+            old = _repair_file_bytes(before, name, entry[old_key], root=root)
+            new = _repair_file_bytes(after, name, entry[new_key], root=root)
+            _repair_require(old != new, "A recorded repair file did not change.")
+            if entries is binding_files:
+                _repair_require(_repair_binding_only(old, new),
+                                "A test binding repair changed program structure.")
+                _repair_file_bytes(final_revision, name, entry[new_key], root=root)
+        changes = set(_lifecycle_changed_paths(before, after, root=root))
+        if entries is binding_files:
+            changes -= corrected_paths
+        _repair_require(changes == set(names),
+                        "The repair interval contains an unrelated mutation.")
+    _repair_require(
+        set(unexpected) == STE_REPAIR_BINDING_PATHS | STE_REPAIR_TOOL_PATHS,
+        "The final change set does not equal the evidenced repair files.",
+    )
+    # The rejected locked head and final head must contain the same documents.
+    for name, payload in {
+        **expected_documents, state_path: _canonical_json_bytes(expected_state),
+    }.items():
+        for revision in (locked, final_revision):
+            _repair_file_bytes(
+                revision, name, _sha256_bytes(payload), root=root,
+            )
+    authority = _repair_evidence(repair["authority"], root=root)
+    authority_identity = {
+        key: repair[key] for key in (
+            "candidate_revision", "scope_sha256", "receipt_sha256",
+            "locked_revision", "binding_files",
+        )
+    }
+    _repair_require(
+        set(authority) == set(authority_identity) | {
+            "schema_version", "decision", "owner_id", "instruction",
+            "repair_paths",
+        }
+        and all(authority[key] == value
+                for key, value in authority_identity.items())
+        and type(authority["schema_version"]) is int
+        and authority["schema_version"] == 1
+        and authority["decision"] == "authorised-deterministic-repair"
+        and authority["owner_id"] == "project-owner"
+        and authority["repair_paths"] == sorted(STE_REPAIR_TOOL_PATHS)
+        and isinstance(authority["instruction"], str)
+        and bool(authority["instruction"].strip()),
+        "The owner authority does not identify this bounded repair.",
+    )
+    failure = _repair_evidence(repair["failure"], root=root, as_json=False)
+    _repair_require(
+        b'"ste-final-unreviewed-mutation"' in failure
+        and all(name.encode() in failure for name in STE_REPAIR_BINDING_PATHS),
+        "The original failed proof does not identify these rejected bindings.",
+    )
+    quality = _repair_evidence(repair["quality_review"], root=root)
+    _repair_require(
+        set(quality) == identity_keys | {
+            "schema_version", "result", "independent", "reviewer_id",
+            "authority_sha256", "failure_sha256", "review_scope",
+        }
+        and all(quality[key] == repair[key] for key in identity_keys)
+        and type(quality["schema_version"]) is int
+        and quality["schema_version"] == 1
+        and quality["result"] == "PASS"
+        and quality["independent"] is True
+        and quality["review_scope"] == "source-and-focused-tests"
+        and quality["authority_sha256"] == repair["authority"]["sha256"]
+        and quality["failure_sha256"] == repair["failure"]["sha256"],
+        "The independent Quality Review does not bind this exact repair.",
+    )
+    reviewer = _lifecycle_text(quality["reviewer_id"], "repair reviewer")
+    _repair_require(reviewer not in {author, scope["author_id"]},
+                    "The repair author cannot independently review the repair.")
+    binding = {
+        "candidate_revision": candidate, "scope_sha256": scope["scope_sha256"],
+        "receipt_sha256": receipt_digest, "final_revision": final_revision,
+        "repair_sha256": _sha256_bytes(_canonical_json_bytes(repair)),
+    }
+    binding_path = directory / ("repair-binding-" + candidate + ".json")
+    if binding_path.exists() or binding_path.is_symlink():
+        _repair_require(
+            _read_lifecycle_json(binding_path, "repair binding", root=root)
+            == binding, "The initially validated repair record has changed.",
+        )
+    completion_path = directory / ("completion-" + candidate + ".json")
+    if completion_path.exists() or completion_path.is_symlink():
+        completion = _validated_review_completion(
+            completion_path, candidate_revision=candidate,
+            receipt_digest=receipt_digest, root=root,
+        )
+        _repair_require(
+            binding_path.exists()
+            and completion["final_revision"] == final_revision,
+            "A completed review cannot acquire a replacement repair.",
+        )
+    return binding
+
+
+def _bind_deterministic_repair(
+    binding: dict[str, object], *, root: pathlib.Path,
+) -> None:
+    path = root / "tmp" / STE_REVIEW_RESULT_DIR.name / (
+        "repair-binding-" + str(binding["candidate_revision"]) + ".json"
+    )
+    payload = _canonical_json_bytes(binding)
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError:
+        _repair_require(
+            not path.is_symlink() and path.read_bytes() == payload,
+            "A different deterministic repair was already bound.",
+        )
+        return
+    with os.fdopen(descriptor, "wb") as stream:
+        stream.write(payload)
+
+
 def validate_final_review_state(
     *,
     scope_path: pathlib.Path,
@@ -4548,14 +4825,11 @@ def validate_final_review_state(
     correction_paths = set(_corrections_by_path(receipt))
     state_path = STE_REVIEW_STATE.relative_to(ROOT).as_posix()
     unexpected = sorted(set(changed_after_review) - correction_paths - {state_path})
-    if unexpected:
-        raise Ste100Error(
-            "ste-final-unreviewed-mutation",
-            "The final candidate contains an unreviewed post-review mutation: {}.".format(
-                ", ".join(unexpected)
-            ),
-            "Restore the locked bytes and rerun this deterministic check.",
-        )
+    repair_binding = _validated_deterministic_repair(
+        scope=scope, receipt=receipt, receipt_digest=receipt_digest,
+        final_revision=final_revision, expected_state=expected_state,
+        expected_documents=expected_documents, unexpected=unexpected, root=root,
+    )
     for path_text, expected_payload in expected_documents.items():
         actual_item = _lifecycle_git_file(final_revision, path_text, root=root)
         actual_payload = actual_item[0] if actual_item is not None else None
@@ -4575,6 +4849,8 @@ def validate_final_review_state(
             "Restore the exact state proposal and rerun this check.",
         )
     if receipt["schema_version"] == 3:
+        if repair_binding is not None:
+            _bind_deterministic_repair(repair_binding, root=root)
         _record_review_completion(
             candidate_revision=candidate_revision,
             final_revision=final_revision,
