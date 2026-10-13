@@ -1293,26 +1293,32 @@ def _validate_owner_view(plan: str) -> None:
         "Phase 9B is Open at 1/6 under D-P9-012",
         "Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11",
         "The other five exits stay Pending",
-        "D-GOV-024 permits Codex to decide and perform permanent local "
-        "worktree retirement as Level 2 under the Recovery-owned conditions",
-        "It includes the specified obsolete local branch",
-        "authority starts only after accepted integration into protected main",
-        "No worktree or branch removal is performed by this alignment",
-        "primary checkout and active, unique, ambiguous or insufficiently "
-        "preserved state remain protected",
-        "Remote deletion and force removal are excluded",
-        "D-GOV-022 is unavailable through the new route",
-        "All 24 risk duties and prior production limits stay",
-        "D-P6-008 stays Deferred — unmet; TERM-R04 stays open",
-        "Output stays private-development; project status stays unknown",
-        "D-GOV-024 changes only bounded local-retirement authority and routing",
+        "D-GOV-024 authorises Codex to make the Level 2 decision for permanent "
+        "local worktree retirement under the conditions that Recovery owns",
+        "Codex can then remove the worktree and its specified local branch "
+        "that is no longer necessary",
+        "authority applies only after protected main contains the accepted change",
+        "This alignment removes no worktree or branch",
+        "Keep the primary worktree, active state, unique content, ambiguous "
+        "or uniquely owned state, and state without sufficient evidence of "
+        "planned preservation",
+        "Do not delete branches in another repository",
+        "Do not use force removal",
+        "D-GOV-022 is not available through this route",
+        "All 24 risk duties and previous production limits stay",
+        "D-P6-008 stays Deferred — unmet",
+        "TERM-R04 stays open",
+        "Output stays private-development",
+        "Project status stays unknown",
+        "D-GOV-024 changes only bounded removal authority and routing for "
+        "local worktree retirement",
         "It accepts no phase exit or production result",
         "D-P9-012 continues to own the one accepted Phase 9B exit",
-        "D-P9-013 remains limited to Core Generate",
+        "D-P9-013 stays limited to Core Generate",
         "After CI gives a PASS result for the exact PR head, publish the "
         "draft PR",
         "Do not merge or start another outcome",
-        "The Phase 9A closeout and earlier decisions keep their accepted limits",
+        "The Phase 9A closeout and previous decisions keep their accepted limits",
     ):
         _require(
             fragment in owner_view,
@@ -1320,10 +1326,10 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         "f2673cf87fd4bd3a58de0ba035a404cbd1922e33e14f9fb56d5d205e064d2424",
-        "39c95781f93a22993875bfd0e8fed27e48806a93f4d76dab9cabf9bbbdf2889d",
-        "8680e4cc280806043075c91dc78946b5713ddfc2d3cb7bbfbb354384d06fb361",
-        "c43e46f1c86e4568770edba49d5e2ad1458fb1d46421db4e69f89f814f67400f",
-        "b06f64b2326c90cf9f570042cb972c801d1c8aae3463ea8e54c58eadbb13400f",
+        "00002165734742019cf003cc819744f5914ae0d0031eb6292b5f37d216e36749",
+        "b24245a0285a153f090f8401314b5ade17413bf757e2b73ad7156d0794d3bbe8",
+        "346eb71fc60940db245634ad822928a7ebd0ec0898dae8bf99185ccb4cba13e0",
+        "8b613ef8356784d611fa47065f6b550379174b4a26a8b2d2b3539436648b9a28",
         "21ceb09d0454aca7d85985ca98591711fa0d0be47c60e8ca07609bb3c6c228bc",
     )
     for row, digest in zip(rows, expected_row_digests):
@@ -7344,37 +7350,54 @@ def _validate_dgov024_decision(
         (
             "decision",
             (
-                "permanent removal of completed local worktrees and specified "
-                "obsolete local branches as Level 2 under the Recovery-owned conditions",
-                "only after the accepted amendment is integrated into protected main",
-                "Creating or expanding this authority remains Level 3",
+                "Authorise Codex to make Level 2 decisions for permanent "
+                "removal of completed local worktrees under the conditions "
+                "that Recovery owns",
+                "Codex can then remove the specified worktree and its "
+                "specified local branch that is no longer necessary",
+                "only after protected main contains the accepted change",
+                "A new authority or an increase to this authority stays Level 3",
             ),
         ),
         (
             "exclusions",
             (
-                "Preserve exact identity, accepted-history containment, inactivity, "
-                "complete local-state inventory, independent snapshot and restore "
-                "proof, preservation, audit, independent review and post-removal checks",
-                "Missing or failed evidence retains the target",
-                "Protect primary main and active, unique, ambiguous or insufficiently preserved state",
-                "only the previous PR's observed local candidate after clean main "
-                "synchronisation and repeated IDE alignment",
-                "Recheck identity before action",
+                "Preserve exact identity, accepted-history containment, the "
+                "complete local-state inventory, independent preservation, "
+                "snapshot and restore evidence, retirement audit, independent "
+                "review and checks after removal",
+                "Make sure that no person or process uses the worktree",
+                "If necessary evidence is missing or has a FAIL result, keep "
+                "the worktree and branch",
+                "Keep primary main, active state, unique content, ambiguous "
+                "or uniquely owned state, and state without sufficient "
+                "evidence of planned preservation",
+                "only the previous PR's recorded local worktree and branch "
+                "after clean main synchronisation and repeated IDE workspace alignment",
+                "Examine their identities again directly before removal",
                 "Record retired, retained with reason, absent/already retired or assessment unavailable",
-                "Do not sweep unrelated worktrees or branches",
-                "only ordinary git worktree remove and the specified contained git "
+                "Do not examine other worktrees or branches for removal",
+                "only git worktree remove and the specified contained git "
                 "branch -d after worktree removal",
-                "Preserve targets after ordinary Git refusal",
-                "Exclude remote branch deletion, force removal, tag deletion, history "
-                "rewrite, prune, stash and manual recursive deletion",
-                "D-GOV-022 is not available through this delegation",
+                "If a usual Git removal command gives a Git error, keep the "
+                "worktree or branch that Git did not remove",
+                "Do not delete branches in another repository",
+                "Do not use force removal",
+                "Do not delete tags",
+                "Do not change the sequence of existing commits",
+                "Do not use git worktree prune, git stash or manual deletion "
+                "of a directory and its contents",
+                "D-GOV-022 is not available through this authority",
                 "Preserve all frozen decisions and their limits",
-                "Do not merge the new draft or exercise the new retirement authority during this task",
+                "Do not merge the new draft",
+                "Do not use the new removal authority during this task",
                 "Phase 9A stays closed at 4/4 for its frozen reference-only scope",
                 "Phase 9B stays Open at 1/6, with five exits Pending",
-                "all 24 risk duties, D-P6-008 Deferred — unmet, TERM-R04 open, "
-                "private-development output and project status unknown",
+                "Preserve the 113-entry register, geometry and all 24 risk duties",
+                "D-P6-008 stays Deferred — unmet",
+                "TERM-R04 stays open",
+                "Output stays private-development",
+                "Project status stays unknown",
                 "Accept no production, rights, performance, release or phase result",
             ),
         ),
@@ -7405,26 +7428,31 @@ def _validate_dgov024_panel(evidence: str) -> None:
     )
     flat = _semantic_text(panel)
     for clause in (
-        "only after the accepted amendment is integrated into protected main",
+        "After protected main contains the accepted change, Codex can make "
+        "Level 2 decisions for permanent local worktree retirement",
         "The change accepts no retirement target",
         "57bbacbcb19b79f3521ecea333e7c8fbe9f2e199",
         "9526611884e368c3fe8c3b7299e4d48becea45c5",
-        "All 60 existing worktrees and 67 branches remain",
+        "All 60 existing worktrees and 67 branches stay",
         "52 known dirty-file identities and six IDE reference identities stay the same",
         "They give no evidence that a retirement target is ready",
         "retirement_authority_audit",
         "Proceed with bounded conditions",
-        "independent within one agent team, not external organisational review",
+        "The independent review is within one agent team. It is not a "
+        "review by a different organisation",
         "Critical/Open/Mitigate and all backup duties stay",
         "High/Open/Remove and its existing duties stay",
         "Medium/Open/Mitigate and its existing duties stay",
-        "D-GOV-022 is not available through this delegation",
-        "Current target inactivity, snapshot coverage and preservation remain unproved",
-        "Those unknowns prevent removal of an affected target",
-        "after main synchronisation and repeated IDE alignment",
+        "D-GOV-022 is not available through this authority",
+        "Current evidence does not show that no person or process uses each worktree",
+        "It does not prove the snapshot coverage or planned preservation for "
+        "each worktree",
+        "These unknown conditions prevent removal of the applicable "
+        "worktree or branch",
+        "after main synchronisation and repeated IDE workspace alignment",
         "The safety audit stays read-only and unchanged",
-        "This task must not merge the new draft or perform live retirement",
-        "not Phase 9B exit evidence",
+        "This task must not merge the new draft or remove a worktree or branch",
+        "It supplies no Phase 9B exit evidence",
         "Phase 9B stays Open at 1/6, with five exits Pending",
     ):
         _require(clause in flat, "D-GOV-024 panel boundary drifted: " + clause)

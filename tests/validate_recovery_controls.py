@@ -960,18 +960,18 @@ def validate_delegated_post_merge_retirement(
             "activation",
             owner,
             (
-                "only after the accepted amendment is integrated into protected main",
-                "before each decision verify that integration in refs remotes origin main",
-                "publication of a draft pr does not activate it",
+                "only after protected main contains the accepted change",
+                "before each decision make sure that refs remotes origin main contains that change",
+                "publication of a draft pr does not give this authority",
             ),
         ),
         (
             "scope",
             owner,
             (
-                "codex to decide and perform permanent removal of a completed local "
-                "worktree and its specified obsolete local branch as level 2 work",
-                "creating or expanding this authority remains level 3",
+                "codex to make the level 2 decision for permanent removal of a completed local worktree",
+                "codex can then remove that worktree and its specified local branch that is no longer necessary",
+                "a new authority or an increase to this authority stays level 3",
                 "changes no phase production release accepted oracle or product authority",
             ),
         ),
@@ -979,13 +979,14 @@ def validate_delegated_post_merge_retirement(
             "preservation",
             owner,
             (
-                "apply the complete procedure to each exact target",
-                "exact identity accepted history containment inactivity inventory "
-                "preservation snapshot restore audit independent review and post removal checks",
-                "fresh independent snapshot of the current registered worktrees",
-                "applicable restore proof",
-                "obtain independent review of the preservation evidence before removal",
-                "an earlier snapshot does not prove a later estate",
+                "apply the complete procedure to each specified worktree and branch",
+                "keep every check of exact identity accepted history containment local state inventory and planned preservation",
+                "keep the snapshot restore evidence retirement audit independent review and checks after removal",
+                "make sure that no person or process uses the worktree",
+                "use a new snapshot of the current registered worktrees for independent preservation",
+                "complete the applicable restore evidence",
+                "before removal get independent review of the evidence for planned preservation",
+                "a previous snapshot does not prove the state of later worktrees",
             ),
         ),
         (
@@ -993,25 +994,25 @@ def validate_delegated_post_merge_retirement(
             owner,
             (
                 "record the exact level 2 decision in the local retirement plan",
-                "d gov 024 its accepted integration the previous pr and the target identities",
-                "decision must give the preservation evidence and independent review result",
-                "decision authorises only that target and those local actions",
-                "no new owner approval for a target that meets every condition",
-                "an audit pass merged state tracked cleanliness or git ignore rule alone "
-                "gives no removal authority",
+                "identify d gov 024 its accepted merge the previous pr and the exact worktree and branch identities",
+                "the decision must give the evidence for planned preservation and the independent review result",
+                "the decision authorises only that worktree that branch and those local actions",
+                "no new owner approval is necessary if every condition passes",
+                "an audit pass merged state tracked cleanliness or git ignore rule alone gives no removal authority",
             ),
         ),
         (
             "retention",
             owner,
             (
-                "keep the primary checkout including a former feature directory now used "
-                "for primary main",
-                "keep active unique ambiguous or insufficiently preserved state",
-                "keep the target if identity changed or required evidence is missing or failed",
-                "unavailable local access and incomplete containment inactivity inventory "
-                "snapshot restore independent review or audit evidence",
-                "report why the target stays",
+                "keep the primary worktree also when it was a feature directory before its use for primary main",
+                "keep active state unique content ambiguous or uniquely owned state and state without sufficient evidence of planned preservation",
+                "if an identity changed keep the worktree and branch",
+                "if necessary evidence is missing or has a fail result keep the worktree and branch",
+                "these conditions apply when local git state is not available",
+                "they also apply when containment local state inventory snapshot restore independent review or retirement audit evidence is not complete",
+                "they apply when evidence does not show that no person or process uses the worktree",
+                "report why the worktree or branch stays",
             ),
         ),
         (
@@ -1019,55 +1020,58 @@ def validate_delegated_post_merge_retirement(
             owner,
             (
                 "use only git worktree remove without force for worktree removal",
-                "after confirmed worktree removal recheck the local branch identity and "
-                "accepted history containment before git branch d",
-                "already absent worktree require retained retirement proof for that exact "
-                "worktree and branch before any local branch removal",
-                "recheck that no worktree uses that branch",
-                "if the proof is insufficient keep the branch",
-                "do not attempt worktree removal again for an absent target",
+                "after removal make sure that git no longer lists the worktree",
+                "before git branch d examine the local branch identity and accepted history containment again",
+                "if the worktree is already missing get its retained evidence of worktree retirement before branch removal",
+                "the evidence must identify that exact worktree and branch",
+                "make sure again that no worktree uses that branch",
+                "if the evidence is not sufficient keep the branch",
+                "do not try worktree removal again for a missing worktree",
             ),
         ),
         (
             "prohibitions",
             owner,
             (
-                "permits no remote branch deletion force removal tag deletion history "
-                "rewrite git worktree prune git stash or manual recursive deletion",
-                "d gov 022 is not available through this delegation",
-                "if ordinary git removal refuses keep the target registered and preserved",
-                "record the refusal do not use a workaround",
-                "frozen d gov 020 d gov 021 and d gov 022 decisions keep their exact limits",
+                "this authority does not include branch deletion in another repository force removal or tag deletion",
+                "it does not include changes to the sequence of existing commits",
+                "do not use git worktree prune git stash or manual deletion of a directory and its contents",
+                "d gov 022 is not available through this authority",
+                "if git worktree remove gives a git error keep that worktree registered and preserved",
+                "if git branch d gives a git error keep the branch",
+                "record the git error do not use a different removal procedure",
+                "the frozen d gov 020 d gov 021 and d gov 022 decisions keep their exact limits",
             ),
         ),
         (
             "candidate",
             owner,
             (
-                "assesses only the previous pr's observed local candidate",
-                "must not sweep unrelated worktrees or branches",
-                "recheck that candidate after main synchronisation and repeated ide "
-                "alignment then again immediately before action",
+                "the continue workflow examines only the previous pr's recorded local worktree and branch",
+                "it must not examine other worktrees or branches for removal",
+                "after main synchronisation and repeated ide workspace alignment examine that worktree and branch again",
+                "examine their identities again directly before removal",
                 "record one disposition",
-                "an absent target does not prove that this cycle removed it",
-                "preserve unrelated worktrees branches stashes ide state and retained evidence",
+                "a missing worktree does not prove that this cycle removed it",
+                "preserve other worktrees branches stashes ide state and retained evidence",
             ),
         ),
         (
             "draft limit",
             owner,
             (
-                "d gov 024 alignment task publishes a draft pr only",
-                "must not merge that draft or exercise the new retirement authority",
+                "the d gov 024 alignment task publishes a draft pr only",
+                "it must not merge that draft or use the new removal authority",
             ),
         ),
         (
             "Level 2",
             level2,
             (
-                "permanent local worktree retirement as level 2 under its stated conditions",
-                "only after the accepted amendment is integrated into protected main",
-                "creating or expanding this authority remains level 3",
+                "make the level 2 decision for permanent local worktree retirement under its stated conditions",
+                "codex can then remove the worktree and its specified local branch",
+                "this authority applies only after protected main contains the accepted change",
+                "a new authority or an increase to this authority stays level 3",
             ),
         ),
         (
@@ -1075,24 +1079,23 @@ def validate_delegated_post_merge_retirement(
             level3,
             (
                 "irreversible or destructive repository data or external operation is also level 3",
-                "only local retirement exception is the level 2 operation permitted by d gov 024",
+                "for local worktree retirement level 2 applies only when every d gov 024 condition passes",
             ),
         ),
         (
             "gate",
             gate,
             (
-                "item 6 excludes only a local retirement operation that meets all d gov 024 conditions",
-                "operation is level 2 and needs no new owner decision or risk panel",
-                "creation or expansion of the exception is a level 3 gate",
+                "item 6 does not include local worktree retirement that meets all d gov 024 conditions",
+                "that operation is level 2 no new owner decision or risk panel is necessary",
+                "a new authority or an increase to this authority is a level 3 gate",
             ),
         ),
         (
             "Continue authority",
             authority,
             (
-                "only after that accepted amendment is integrated into protected main "
-                "and all its conditions pass",
+                "codex has removal authority only after protected main contains that accepted change and all its conditions pass",
                 "force push history rewrite remote branch deletion or force removal",
                 "local branch deletion or destructive operations outside the integrated d gov 024 authority",
             ),
@@ -1101,8 +1104,10 @@ def validate_delegated_post_merge_retirement(
             "Continue integration",
             integration,
             (
-                "record its observed local worktree and branch identity before integration",
-                "record an absent or unavailable local candidate without inventing a target",
+                "before the merge record its local worktree and branch identity from git",
+                "if the worktree or branch is missing record that state",
+                "if you cannot examine local git state record that limitation",
+                "do not invent a worktree or branch identity",
                 "merge commit route do not delete the branch",
                 "make sure that local main is clean and exactly current",
                 "after synchronisation do the ide comparison again",
@@ -1112,42 +1117,45 @@ def validate_delegated_post_merge_retirement(
             "Continue assessment",
             assessment,
             (
-                "after successful integration clean main synchronisation and repeated ide "
-                "alignment assess only the previous pr's observed local candidate",
-                "recovery owns eligibility evidence commands and the level 2 decision",
-                "supplies no wider removal authority",
-                "recheck the observed worktree branch and head after synchronisation",
-                "protect the primary checkout including a former feature directory now used for main",
-                "do not sweep unrelated worktrees or branches do not delete a branch during merge",
-                "if the integrated authority or any required proof is absent retain the target",
-                "if local access is unavailable report assessment unavailable",
-                "do not attempt removal for an absent or already retired candidate",
-                "decision evidence and independent review before any permitted removal",
-                "recheck identity immediately before action",
-                "keep the target after an ordinary git refusal no force or remote deletion is permitted",
+                "after the previous merge make sure that local main is clean and equal to protected main",
+                "do the ide workspace alignment again then examine only the previous pr's recorded local worktree and branch",
+                "recovery owns the conditions evidence commands and the level 2 decision",
+                "this skill supplies no wider removal authority",
+                "after main synchronisation examine the recorded worktree branch and head again",
+                "keep the primary worktree also when it was a feature directory before its use for main",
+                "do not examine other worktrees or branches for removal do not delete a branch during the merge",
+                "if the accepted change or any necessary evidence is missing keep the worktree and branch",
+                "if you cannot examine local git state report assessment unavailable",
+                "if the worktree is missing or its retirement is complete do not try to remove it again",
+                "before removal complete the exact level 2 decision evidence and independent review",
+                "examine the identity again directly before removal",
+                "if a usual git removal command gives a git error keep the worktree or branch that git did not remove",
+                "do not use force removal do not delete a branch in another repository",
                 "do not invoke d gov 022 through this route",
-                "record the recovery owned disposition before selecting the next outcome",
-                "missing evidence retains the target it does not authorise a workaround",
+                "before you select the next result record the disposition that recovery specifies",
+                "if necessary evidence is missing keep the worktree and branch do not use a different removal procedure",
             ),
         ),
         (
             "workflow route",
             workflow,
             (
-                "post merge assessment uses d gov 024 and the worktree retirement procedure",
-                "follows clean main synchronisation and repeated ide alignment",
-                "only the previous pr's observed local candidate with identity checked again before action",
-                "no merge time deletion or wider removal authority",
-                "record the disposition even if the target stays is absent or cannot be assessed",
-                "do not sweep unrelated worktrees or branches",
+                "after the previous merge use d gov 024 and the worktree retirement procedure",
+                "first make sure that local main is clean and equal to protected main do the ide workspace alignment again",
+                "do the ide workspace alignment again examine only the previous pr's recorded local worktree and branch",
+                "examine their identities again directly before removal",
+                "this assessment gives no removal authority during the merge or for other worktrees and branches",
+                "record the disposition if the worktree stays or is missing",
+                "if you cannot examine local git state record that limitation",
+                "do not examine other worktrees or branches for removal",
             ),
         ),
         (
             "AGENTS route",
             safety_rules,
             (
-                "only delegated local removal exception is d gov 024",
-                "use it only after its accepted amendment is integrated into protected main",
+                "only d gov 024 supplies bounded local removal authority without a new owner decision",
+                "use this authority only after protected main contains its accepted change",
             ),
         ),
     ):
@@ -1164,7 +1172,10 @@ def validate_delegated_post_merge_retirement(
             r"`(git (?:branch|worktree remove)\b[^`]*)`", owner
         )
     ]
-    if deletion_commands != ["git worktree remove", "git branch -d"]:
+    if deletion_commands != [
+        "git worktree remove", "git branch -d",
+        "git worktree remove", "git branch -d",
+    ]:
         raise AssertionError(
             "delegated retirement deletion command flags drifted"
         )

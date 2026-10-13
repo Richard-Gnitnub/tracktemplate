@@ -6444,7 +6444,7 @@ def validate_documentation_profile_mutations() -> None:
             replace_once(plan, owner_view_row, inflated_view)
         ),
         "project-plan owner view lost or contradicted: "
-        "D-P6-008 stays Deferred — unmet; TERM-R04 stays open",
+        "D-P6-008 stays Deferred — unmet",
     )
     owner_view_authority = replace_once(
         plan,
@@ -6479,19 +6479,19 @@ def validate_documentation_profile_mutations() -> None:
         (
             "reference-scope-promoted", "| Owner decision |",
             "keep their accepted limits", "lose their accepted limits",
-            "The Phase 9A closeout and earlier decisions keep their "
+            "The Phase 9A closeout and previous decisions keep their "
             "accepted limits",
         ),
         (
             "risk-duties-removed", "| Limitations/findings |",
             "All 24 risk duties", "No risk duties",
-            "All 24 risk duties and prior production limits stay",
+            "All 24 risk duties and previous production limits stay",
         ),
         (
             "production-conditions-waived", "| Limitations/findings |",
-            "prior production limits stay",
-            "prior production limits are waived",
-            "All 24 risk duties and prior production limits stay",
+            "previous production limits stay",
+            "previous production limits are waived",
+            "All 24 risk duties and previous production limits stay",
         ),
         (
             "phase9b-exits-accepted", "| Current state |",
@@ -8348,8 +8348,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "draft-activates",
-            "does not activate it",
-            "activates it",
+            "does not give this authority",
+            "gives this authority",
             "activation",
         ),
         (
@@ -8366,7 +8366,7 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "all-local-branches",
-            "specified obsolete local branch",
+            "specified local branch that is no longer necessary",
             "local branches",
             "scope",
         ),
@@ -8375,8 +8375,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "expansion-level-two",
-            "Creating or expanding this authority remains Level 3",
-            "Creating or expanding this authority is Level 2",
+            "A new authority or an increase to this authority stays Level 3",
+            "A new authority or an increase to this authority is Level 2",
             "scope",
         ),
         (
@@ -8384,8 +8384,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "earlier-snapshot-suffices",
-            "An earlier snapshot does not prove",
-            "An earlier snapshot proves",
+            "A previous snapshot does not prove",
+            "A previous snapshot proves",
             "preservation",
         ),
         (
@@ -8393,8 +8393,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "snapshot-not-fresh",
-            "fresh independent snapshot",
-            "previous snapshot",
+            "new snapshot of the current registered worktrees",
+            "previous snapshot of the current registered worktrees",
             "preservation",
         ),
         (
@@ -8402,8 +8402,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "restore-optional",
-            "applicable restore proof",
-            "optional restore proof",
+            "Complete the applicable [restore evidence]",
+            "Do not require the [restore evidence]",
             "preservation",
         ),
         (
@@ -8411,8 +8411,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "independent-review-late",
-            "before removal. An earlier",
-            "after removal. An earlier",
+            "Before removal, get independent review",
+            "After removal, get independent review",
             "preservation",
         ),
         (
@@ -8420,7 +8420,7 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "decision-unspecified-targets",
-            "only that target and those local actions",
+            "only that worktree, that branch and those local actions",
             "any available targets and actions",
             "decision",
         ),
@@ -8438,8 +8438,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "primary-removable",
-            "Keep the primary checkout",
-            "Remove the primary checkout",
+            "Keep the primary worktree",
+            "Remove the primary worktree",
             "retention",
         ),
         (
@@ -8447,8 +8447,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "active-removable",
-            "Keep active, unique, ambiguous",
-            "Remove active, unique, ambiguous",
+            "Keep active state, unique content",
+            "Remove active state, unique content",
             "retention",
         ),
         (
@@ -8456,8 +8456,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "changed-identity-removable",
-            "Keep the target if identity changed",
-            "Remove the target if identity changed",
+            "If an identity changed, keep the worktree and branch",
+            "If an identity changed, remove the worktree and branch",
             "retention",
         ),
         (
@@ -8465,8 +8465,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "missing-evidence-removable",
-            "missing or failed",
-            "complete and passed",
+            "missing or has a FAIL result",
+            "complete and has a PASS result",
             "retention",
         ),
         (
@@ -8483,8 +8483,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "branch-first",
-            "After confirmed worktree removal",
-            "Before worktree removal",
+            "After removal, make sure that Git no longer lists the worktree",
+            "Before removal, remove the branch",
             "commands",
         ),
         (
@@ -8492,8 +8492,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "absent-proof-optional",
-            "require retained retirement proof",
-            "use optional retirement proof",
+            "get its retained evidence of worktree retirement before branch removal",
+            "use optional evidence of worktree retirement before branch removal",
             "commands",
         ),
         (
@@ -8501,7 +8501,7 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "branch-used-elsewhere",
-            "Recheck that no worktree",
+            "Make sure again that no worktree",
             "Ignore whether any worktree",
             "commands",
         ),
@@ -8510,8 +8510,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "remote-removal",
-            "permits no remote branch deletion",
-            "permits remote branch deletion",
+            "does not include branch deletion in another repository",
+            "includes branch deletion in another repository",
             "prohibitions",
         ),
         (
@@ -8528,8 +8528,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "refusal-workaround",
-            "Do not use a workaround",
-            "Use a workaround",
+            "Do not use a different removal procedure",
+            "Use a different removal procedure",
             "prohibitions",
         ),
         (
@@ -8537,8 +8537,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "unrelated-targets",
-            "assesses only the previous PR's",
-            "assesses any PR's",
+            "examines only the previous PR's",
+            "examines any PR's",
             "candidate",
         ),
         (
@@ -8546,8 +8546,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "sweep-targets",
-            "must not sweep",
-            "can sweep",
+            "must not examine other worktrees or branches for removal",
+            "can examine other worktrees or branches for removal",
             "candidate",
         ),
         (
@@ -8564,8 +8564,8 @@ def validate_delegated_retirement_mutations() -> None:
             owner,
             2,
             "current-live-retirement",
-            "must not merge that draft or exercise",
-            "can merge that draft and exercise",
+            "must not merge that draft or use",
+            "can merge that draft and use",
             "draft limit",
         ),
         (
@@ -8582,8 +8582,8 @@ def validate_delegated_retirement_mutations() -> None:
             "Level 3 — Authority or release",
             3,
             "blanket-destructive-delegation",
-            "only local-retirement exception",
-            "general destructive exception",
+            "Level 2 applies only when every",
+            "Level 2 applies without any",
             "Level 3",
         ),
         (
@@ -8591,8 +8591,8 @@ def validate_delegated_retirement_mutations() -> None:
             "True gates and safety/risk panels",
             2,
             "gate-excludes-all-deletion",
-            "excludes only a local-retirement operation",
-            "excludes every destructive operation",
+            "does not include local worktree retirement that meets all",
+            "does not include any destructive operation even without",
             "gate",
         ),
         (
@@ -8600,8 +8600,8 @@ def validate_delegated_retirement_mutations() -> None:
             "Authority for one cycle",
             2,
             "continue-premature-authority",
-            "only after that accepted amendment",
-            "before that accepted amendment",
+            "only after protected `main` contains that",
+            "before protected `main` contains that",
             "Continue authority",
         ),
         (
@@ -8609,8 +8609,8 @@ def validate_delegated_retirement_mutations() -> None:
             "Examine and integrate the previous pull request",
             2,
             "continue-invents-target",
-            "without inventing a target",
-            "by inventing a target",
+            "Do not invent a worktree or branch identity",
+            "Invent a worktree or branch identity",
             "Continue integration",
         ),
         (
@@ -8627,8 +8627,8 @@ def validate_delegated_retirement_mutations() -> None:
             assessment,
             3,
             "continue-not-primary-safe",
-            "Protect the primary checkout",
-            "Remove the primary checkout",
+            "Keep the primary worktree",
+            "Remove the primary worktree",
             "Continue assessment",
         ),
         (
@@ -8636,8 +8636,8 @@ def validate_delegated_retirement_mutations() -> None:
             assessment,
             3,
             "continue-missing-proof-removes",
-            "absent, retain the target",
-            "absent, remove the target",
+            "If the accepted change or any necessary evidence is missing, keep the worktree and branch",
+            "If the accepted change or any necessary evidence is missing, remove the worktree and branch",
             "Continue assessment",
         ),
         (
@@ -8645,8 +8645,8 @@ def validate_delegated_retirement_mutations() -> None:
             assessment,
             3,
             "continue-refusal-force",
-            "no force or remote deletion is permitted",
-            "force and remote deletion are permitted",
+            "Do not use force removal. Do not delete a branch in another repository",
+            "Use force removal. Delete a branch in another repository",
             "Continue assessment",
         ),
         (
@@ -8663,8 +8663,8 @@ def validate_delegated_retirement_mutations() -> None:
             assessment,
             3,
             "continue-wider-owner",
-            "Recovery owns eligibility",
-            "Continue owns eligibility",
+            "Recovery owns the conditions",
+            "Continue owns the conditions",
             "Continue assessment",
         ),
         (
@@ -8672,8 +8672,8 @@ def validate_delegated_retirement_mutations() -> None:
             "Normal workflow order",
             2,
             "workflow-wider-target",
-            "It concerns only the previous PR's",
-            "It concerns any PR's",
+            "Examine only the previous PR's",
+            "Examine any PR's",
             "workflow route",
         ),
         (
@@ -8681,8 +8681,8 @@ def validate_delegated_retirement_mutations() -> None:
             "Repository and System Safety",
             2,
             "agents-premature",
-            "Use it only after",
-            "Use it before",
+            "Use this authority only after",
+            "Use this authority before",
             "AGENTS route",
         ),
     )
@@ -8724,8 +8724,10 @@ def validate_delegated_retirement_mutations() -> None:
     ):
         changed = list(documents)
         section = recovery_controls.direct_section_content(changed[0], owner)
+        prefix = "Before " if old.startswith("`git branch") else "Use only "
         changed[0] = replace_once(
-            changed[0], section, replace_once(section, old, new),
+            changed[0], section,
+            replace_once(section, prefix + old, prefix + new),
         )
         expect_rejected(
             "delegated-retirement/command-" + new.strip("`"),
@@ -8850,23 +8852,24 @@ def validate_delegated_retirement_decision_mutations() -> None:
             lambda value=changed: progress._validate_phase9b_decisions(value),
             "D-GOV-024 " + diagnostic,
         )
-    for field, old, new in (
-        ("decision", "only after", "before"),
-        ("decision", "authority remains Level 3", "authority becomes Level 2"),
+    for field, name, old, new in (
+        ("decision", "only after", "only after", "before"),
+        ("decision", "authority remains Level 3", "authority stays Level 3", "authority becomes Level 2"),
         (
             "exclusions",
             "evidence retains the target",
-            "evidence permits removal",
+            "If necessary evidence is missing or has a FAIL result, keep the worktree and branch",
+            "If necessary evidence is missing or has a FAIL result, remove the worktree and branch",
         ),
-        ("exclusions", "D-GOV-022 is not available", "D-GOV-022 is available"),
-        ("exclusions", "Do not merge the new draft", "Merge the new draft"),
-        ("exclusions", "five exits Pending", "six exits accepted"),
+        ("exclusions", "D-GOV-022 is not available", "D-GOV-022 is not available", "D-GOV-022 is available"),
+        ("exclusions", "Do not merge the new draft", "Do not merge the new draft", "Merge the new draft"),
+        ("exclusions", "five exits Pending", "five exits Pending", "six exits accepted"),
     ):
         changed = copy.deepcopy(document)
         record = changed["decisions"][-1]
         record[field] = replace_once(record[field], old, new)
         expect_rejected(
-            "delegated-retirement/record-" + old,
+            "delegated-retirement/record-" + name,
             lambda value=changed: progress._validate_phase9b_decisions(value),
             "D-GOV-024 " + field + " boundary drifted:",
         )
