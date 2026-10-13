@@ -46,7 +46,7 @@ The [output contract](../contracts/core-layout-export-set.md#dependency-manifest
 keeps the supported curved plain-line scope and excluded inputs.
 This decision accepts that representative evidence. It does not extend the supported scope.
 
-The native proof passed 14 cases. The real-GUI proof passed eight scenarios
+The native proof gave a PASS result for 14 cases. The real-GUI proof gave a PASS result for eight scenarios
 with CSV on and off. Each completed Core output set includes schema-1 JSON.
 Its ten dependency records identify canonical information, installed product
 source, FreeCAD/exporters and seven inherited lineage groups.
@@ -59,11 +59,11 @@ Restricted, reference-only and unknown inputs cannot produce `project-cleared` o
 The separate [manifest clearance gate](../../tools/validate_dependency_manifest.py),
 [licensing controls](../../tests/validate_licensing_controls.py) and
 [package checks](../../tests/validate_phase4_chair_definition.py) keep their own boundaries.
-Those separate checks do not prove that Core Generate consumes a chair package.
+Those separate checks do not show that Core Generate uses a chair package.
 Selected export receives no new manifest requirement or acceptance.
 
-The independent assessment verified all 82 native and 103 GUI source hashes
-against the accepted `main` commit. Both host receipts match their recorded hashes.
+The assessment done independently compared all 82 native and 103 GUI source hashes
+with the accepted `main` commit. Both host receipts match their recorded hashes.
 No new FreeCAD or real-GUI proof is necessary for this documentation alignment.
 Keep `CM-SR-01`, the initial failed review, failed proofs and their classifications.
 The corrected evidence does not replace that history.
@@ -72,13 +72,14 @@ The corrected evidence does not replace that history.
 authority. `/root` supplies this alignment.
 Read-only reviewer `/root/exit9b4_acceptance_risk` examined the acceptance scope,
 source identities, evidence, limitations and all 24 risk records.
-The reviewer authored no retained implementation, test or canonical prose.
+The reviewer did not write product source, tests or canonical prose for this change.
 The agents share one team and workspace. This is not external organisational independence.
 
 The recommendation is **Proceed with bounded conditions**.
-The panel records no unresolved dissent, substantive blocker or critical missing fact.
+The panel records no unresolved dissent or blocker. It identifies no critical fact that is missing.
 All 24 risk states, severities, owners, deadlines, treatments and controls stay unchanged.
 No risk closes. Each risk owner keeps the duties in the [current register](risks.json).
+
 PR-09 stays Critical/Open/Partial. PR-13 stays Critical/Open/Effective for its current scope.
 PR-17 stays Critical/Open/Partial.
 
@@ -87,22 +88,24 @@ SHA-256 `5a92fe95c199209c8e53a26adcfa83f45b47ee81a1d3b67e59276120baec9f9a`.
 
 | Bounded condition | Owner and deadline |
 | --- | --- |
-| Keep this acceptance within the D-P9-016 scope, evidence and operating conditions. | Project owner and Phase 9B export owner, at admission and for each subsequent claim. |
-| Preserve all risk duties, failed evidence and existing acceptance boundaries. | Technical Author Lead and current phase owner, before draft publication and thereafter. |
-| Keep the completed worktree until independent preservation is proved. Do not force retirement. | Change owner, throughout this cycle and before any later retirement. |
-| Complete independent review, the finite documentation lifecycle and CI checks for the exact PR head. Publish one draft PR. Stop for integration authority. | Technical Author Lead, independent reviewer and change owner, before draft publication. |
+| Keep this acceptance within the D-P9-016 scope, evidence and operating conditions. | Project owner and Phase 9B export owner, at admission and for each later claim. |
+| Preserve all risk duties, failed evidence and existing acceptance boundaries. | Technical Author Lead and current phase owner, before and after draft publication. |
+| Keep the completed worktree until independent preservation is proved. Do not force retirement. | Change owner, during this cycle and before any later retirement. |
+| Complete independent review. Complete the Documentation Review lifecycle. CI must give a PASS result for the exact PR head. Publish one draft PR. Stop for integration authority. | Technical Author Lead, independent reviewer and change owner, before draft publication. |
 
 **Preserved limitations:** Output stays private-development. Project status stays `unknown`.
 Reference-only and unknown classifications stay unchanged. This decision supplies no compatible rights disposition.
-Hashes of installed source files do not prove the identity of executing Python code or all host files.
-A canonical signature does not prove independent shape regeneration.
+
+Hashes of installed source files do not show the identity of Python code in memory or all host files.
+A canonical signature does not show independent shape regeneration.
 The qualified Linux ext4 conditions and supported failure model stay.
-There is no assurance for every filesystem or malicious concurrent changes.
+There is no assurance for every file system. There is no assurance against changes that another process makes at the same time to cause damage.
 There is no assurance that files stay available after a system interruption
-or recovery after FreeCAD stops and starts again.
+or that recovery occurs after FreeCAD stops and starts again.
 
 Geometry, package bytes, numerical limits, the 113-entry register and legacy-retirement conditions stay unchanged.
 D-P6-008 stays Deferred — unmet. TERM-R04 stays open.
+
 This decision accepts no physical fit, preload, retention, manufacturing capability,
 production package, output clearance, rights, performance result or release.
 It accepts no other exit and closes no phase. Start no new implementation.
@@ -269,7 +272,7 @@ Then stop. Do not merge. Do not start one more outcome.
 | What now works | Representative Core Generate manifests record output hashes and complete dependency classifications for the supported bounded scope. The checks reject missing data, unsupported data and false clearance claims. |
 | Limitations/findings | D-P9-016 keeps the curved plain-line scope and all excluded inputs. This acceptance does not extend manifest support to chair packages or selected export. The qualified Linux ext4 and recovery limits stay. All 24 risk duties stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
 | Owner decision | The owner accepts Exit 9B-4 only. D-P9-012 and D-P9-015 keep their accepted limits. This decision accepts no other exit, production clearance or phase closeout. |
-| Next action | Complete the Level 3 alignment, independent review and finite documentation lifecycle. Publish one draft PR after CI gives a PASS result for its exact head. Stop for integration authority. Keep the completed worktree until independent preservation is proved. Do not force retirement. |
+| Next action | Complete the Level 3 alignment. Complete independent review. Complete the Documentation Review lifecycle. After CI gives a PASS result for the exact PR head, publish one draft PR. Stop for integration authority. <br><br> Keep the completed worktree until independent preservation is proved. Do not force retirement. |
 
 <a id="phase-9b-exit-5-acceptance-panel"></a>
 
