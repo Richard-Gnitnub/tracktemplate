@@ -1293,27 +1293,25 @@ def _validate_owner_view(plan: str) -> None:
         "Phase 9B is Open at 1/6 under D-P9-012",
         "Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11",
         "The other five exits stay Pending",
-        "D-P9-013 authorises a different new directory for each Core "
-        "Generate export",
-        "The full set must become available together",
-        "CSV stays optional",
-        "Returned paths change and previous output stays unchanged",
-        "representative-workflow limits, selected export scope, "
-        "normalisations, the observed SVG difference and production_ready=False",
-        "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
-        "Output stays private-development and project status stays unknown",
-        "D-P9-013 authorises only the export policy and its bounded "
-        "implementation",
-        "It accepts no exit",
-        "It gives no assurance that files stay available after a system "
-        "interruption",
-        "It adds no recovery after FreeCAD stops and starts again",
-        "D-P9-012 stays the authority for the one accepted Phase 9B exit",
+        "D-GOV-024 permits Codex to decide and perform permanent local "
+        "worktree retirement as Level 2 under the Recovery-owned conditions",
+        "It includes the specified obsolete local branch",
+        "authority starts only after accepted integration into protected main",
+        "No worktree or branch removal is performed by this alignment",
+        "primary checkout and active, unique, ambiguous or insufficiently "
+        "preserved state remain protected",
+        "Remote deletion and force removal are excluded",
+        "D-GOV-022 is unavailable through the new route",
+        "All 24 risk duties and prior production limits stay",
+        "D-P6-008 stays Deferred — unmet; TERM-R04 stays open",
+        "Output stays private-development; project status stays unknown",
+        "D-GOV-024 changes only bounded local-retirement authority and routing",
+        "It accepts no phase exit or production result",
+        "D-P9-012 continues to own the one accepted Phase 9B exit",
+        "D-P9-013 remains limited to Core Generate",
         "After CI gives a PASS result for the exact PR head, publish the "
         "draft PR",
         "Do not merge or start another outcome",
-        "The six exit criteria stay unchanged",
-        "All other exits and production conditions stay",
         "The Phase 9A closeout and earlier decisions keep their accepted limits",
     ):
         _require(
@@ -1322,10 +1320,10 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         "f2673cf87fd4bd3a58de0ba035a404cbd1922e33e14f9fb56d5d205e064d2424",
-        "191a5f40c6caa7e91f0dd76c346c12b6782fc517a7b81f6c8fe49b9b3bdb0d89",
-        "e858a5aab8fe7e947a8fb8167d5d044dc46d70e26cf8a077f22de9a253659e91",
-        "ffa2ba3bed72b670a541a694eae5f744b78256af032f747cb21eabb869b44b4c",
-        "ed180eb367a371abfcef8e9a7a2cd7fd8e81f2c5ab2b2daa47b16208a213750c",
+        "39c95781f93a22993875bfd0e8fed27e48806a93f4d76dab9cabf9bbbdf2889d",
+        "8680e4cc280806043075c91dc78946b5713ddfc2d3cb7bbfbb354384d06fb361",
+        "c43e46f1c86e4568770edba49d5e2ad1458fb1d46421db4e69f89f814f67400f",
+        "b06f64b2326c90cf9f570042cb972c801d1c8aae3463ea8e54c58eadbb13400f",
         "21ceb09d0454aca7d85985ca98591711fa0d0be47c60e8ca07609bb3c6c228bc",
     )
     for row, digest in zip(rows, expected_row_digests):
@@ -1341,10 +1339,8 @@ def _validate_owner_view(plan: str) -> None:
           "#phase-9a-closeout-panel"),
          ("D-P9-012", "current/PHASE_EVIDENCE.md"
           "#phase-9b-exit-2-acceptance-panel"),
-         ("D-P9-013", "current/PHASE_EVIDENCE.md"
-          "#phase-9b-core-export-policy-panel"),
-         ("Exit 9B-2 admission", "current/PHASE_EVIDENCE.md"
-          "#phase-9b-exit-2-acceptance-panel")),
+         ("D-GOV-024", "current/PHASE_EVIDENCE.md"
+          "#delegated-local-retirement-panel")),
         "project-plan owner view closeout or acceptance route drifted",
     )
     _require(
@@ -7318,20 +7314,147 @@ def _validate_dp9_013_decision(
         )
 
 
+def _validate_dgov024_decision(
+    record: dict[str, object],
+    fields: set[str],
+) -> None:
+    """Bind only the integrated local-retirement exception to its owner."""
+    panel = (
+        "reference/current/PHASE_EVIDENCE.md#delegated-local-retirement-panel"
+    )
+    _require(
+        isinstance(record, dict)
+        and set(record) == fields
+        and record["id"] == "D-GOV-024"
+        and record["decided_on"] == "2026-10-13"
+        and record["status"] == "Accepted"
+        and record["evidence"] == panel
+        and record["panel_record"] == panel
+        and record["panel_required_under_current_policy"] is True,
+        "D-GOV-024 identity, status or panel routing drifted",
+    )
+    authority = record["authority"]
+    _require(
+        isinstance(authority, str)
+        and hashlib.sha256(authority.encode("utf-8")).hexdigest()
+        == "47bf598fcf46073b1635c7d6f36e2ba4d6a1d9dca3b4941d35c07b0823206b24",
+        "D-GOV-024 exact owner authority drifted",
+    )
+    for field, clauses in (
+        (
+            "decision",
+            (
+                "permanent removal of completed local worktrees and specified "
+                "obsolete local branches as Level 2 under the Recovery-owned conditions",
+                "only after the accepted amendment is integrated into protected main",
+                "Creating or expanding this authority remains Level 3",
+            ),
+        ),
+        (
+            "exclusions",
+            (
+                "Preserve exact identity, accepted-history containment, inactivity, "
+                "complete local-state inventory, independent snapshot and restore "
+                "proof, preservation, audit, independent review and post-removal checks",
+                "Missing or failed evidence retains the target",
+                "Protect primary main and active, unique, ambiguous or insufficiently preserved state",
+                "only the previous PR's observed local candidate after clean main "
+                "synchronisation and repeated IDE alignment",
+                "Recheck identity before action",
+                "Record retired, retained with reason, absent/already retired or assessment unavailable",
+                "Do not sweep unrelated worktrees or branches",
+                "only ordinary git worktree remove and the specified contained git "
+                "branch -d after worktree removal",
+                "Preserve targets after ordinary Git refusal",
+                "Exclude remote branch deletion, force removal, tag deletion, history "
+                "rewrite, prune, stash and manual recursive deletion",
+                "D-GOV-022 is not available through this delegation",
+                "Preserve all frozen decisions and their limits",
+                "Do not merge the new draft or exercise the new retirement authority during this task",
+                "Phase 9A stays closed at 4/4 for its frozen reference-only scope",
+                "Phase 9B stays Open at 1/6, with five exits Pending",
+                "all 24 risk duties, D-P6-008 Deferred — unmet, TERM-R04 open, "
+                "private-development output and project status unknown",
+                "Accept no production, rights, performance, release or phase result",
+            ),
+        ),
+    ):
+        _require(
+            isinstance(record[field], str), "D-GOV-024 " + field + " missing"
+        )
+        flat = _semantic_text(record[field])
+        for clause in clauses:
+            _require(
+                clause in flat,
+                "D-GOV-024 " + field + " boundary drifted: " + clause,
+            )
+
+
+def _validate_dgov024_panel(evidence: str) -> None:
+    """Keep the amendment separate from live removal or exit acceptance."""
+    panel = direct_section_content(
+        evidence,
+        "D-GOV-024 local retirement authority panel — 2026-10-13",
+    )
+    record = _load_json(CURRENT_DECISIONS_PATH)["decisions"][-1]
+    authority = record["authority"].replace("Adopted owner addendum:\n\n", "")
+    _require(
+        evidence.count('<a id="delegated-local-retirement-panel"></a>') == 1
+        and "\n\n".join(_blockquote_paragraphs(panel)) == authority,
+        "D-GOV-024 exact panel authority drifted or was relocated",
+    )
+    flat = _semantic_text(panel)
+    for clause in (
+        "only after the accepted amendment is integrated into protected main",
+        "The change accepts no retirement target",
+        "57bbacbcb19b79f3521ecea333e7c8fbe9f2e199",
+        "9526611884e368c3fe8c3b7299e4d48becea45c5",
+        "All 60 existing worktrees and 67 branches remain",
+        "52 known dirty-file identities and six IDE reference identities stay the same",
+        "They give no evidence that a retirement target is ready",
+        "retirement_authority_audit",
+        "Proceed with bounded conditions",
+        "independent within one agent team, not external organisational review",
+        "Critical/Open/Mitigate and all backup duties stay",
+        "High/Open/Remove and its existing duties stay",
+        "Medium/Open/Mitigate and its existing duties stay",
+        "D-GOV-022 is not available through this delegation",
+        "Current target inactivity, snapshot coverage and preservation remain unproved",
+        "Those unknowns prevent removal of an affected target",
+        "after main synchronisation and repeated IDE alignment",
+        "The safety audit stays read-only and unchanged",
+        "This task must not merge the new draft or perform live retirement",
+        "not Phase 9B exit evidence",
+        "Phase 9B stays Open at 1/6, with five exits Pending",
+    ):
+        _require(clause in flat, "D-GOV-024 panel boundary drifted: " + clause)
+    _require_links(
+        panel,
+        (
+            (
+                "Recovery owner",
+                "../RECOVERY_AND_BACKUP.md#delegated-local-retirement",
+            ),
+            ("decision register", "gate-decisions.json"),
+        ),
+        "D-GOV-024 panel owner route drifted",
+    )
+
+
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
-    """Keep prior admissions and the bounded D-P9-013 export policy."""
+    """Keep prior admissions and the bounded D-GOV-024 delegation."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
     _require(
         set(document) == set(archive)
         and document["schema_version"] == 1
         and document["current_phase"] == 9
-        and document["updated_on"] == "2026-10-11",
+        and document["updated_on"] == "2026-10-13",
         "Phase 9B current decision header drifted",
     )
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 5
+        and len(records) == 6
         and records[:2] == [
             archive["decisions"][0], archive["decisions"][11],
         ],
@@ -7341,6 +7464,7 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     _validate_dp9_011_decision(records[2], set(records[0]))
     _validate_dp9_012_decision(records[3], set(records[0]))
     _validate_dp9_013_decision(records[4], set(records[0]))
+    _validate_dgov024_decision(records[5], set(records[0]))
 
 
 def _validate_phase9a_closeout(evidence: str) -> None:
@@ -7515,8 +7639,7 @@ def _validate_dp9_012_admission(evidence: str) -> None:
         (("D-P9-010", "../history/phase-closeouts/PHASE9A_CLOSEOUT.md"
           "#phase-9a-closeout-panel"),
          ("D-P9-012", "#phase-9b-exit-2-acceptance-panel"),
-         ("D-P9-013", "#phase-9b-core-export-policy-panel"),
-         ("Exit 9B-2 admission", "#phase-9b-exit-2-acceptance-panel")),
+         ("D-GOV-024", "#delegated-local-retirement-panel")),
         "Phase 9B evidence owner-view route drifted",
     )
 
@@ -8439,7 +8562,8 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
-           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-GOV-023"},
+           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-GOV-023",
+           "D-GOV-024"},
         "project-plan decisions differ from the current and frozen registers",
     )
 
@@ -10207,6 +10331,7 @@ def main() -> None:
     _validate_dp9_013_policy(_read(CURRENT_EVIDENCE_PATH))
     _validate_dp9_013_architecture(_read(ARCHITECTURE_PATH))
     _validate_phase9b_decisions(_load_json(CURRENT_DECISIONS_PATH))
+    _validate_dgov024_panel(_read(CURRENT_EVIDENCE_PATH))
     _validate_dp9_004_admission(phase9_holding)
     _validate_dp9_005_evidence_model(phase9_holding)
     _validate_dp9_006_admission(phase9_holding)

@@ -59,6 +59,12 @@ diff.
 Do not update the project plan or run a risk panel for Level 2. If the change
 transfers authority, reclassify it as Level 3 before retention.
 
+[D-GOV-024](RECOVERY_AND_BACKUP.md#delegated-local-retirement) permits Codex to
+decide and perform permanent local worktree retirement as Level 2 under its
+stated conditions. It includes the specified local branch removal.
+This authority applies only after the accepted amendment is integrated into
+protected `main`. Creating or expanding this authority remains Level 3.
+
 ### Level 3 — Authority or release
 
 Level 3 includes phase closure and an enabled legacy migration. It includes
@@ -67,6 +73,8 @@ package clearance, and a governance or licence authority change.
 
 Beta packaging and packaging for release qualification are Level 3. An irreversible or
 destructive repository, data, or external operation is also Level 3.
+The only local-retirement exception is the Level 2 operation permitted by
+[D-GOV-024](RECOVERY_AND_BACKUP.md#delegated-local-retirement).
 
 Complete the full evidence review. Run a safety/risk panel. Get an explicit
 project-owner decision. Update the project plan.
@@ -109,6 +117,11 @@ Level 3 contains only these changes:
 4. Production-output or chair-package clearance.
 5. A governance, licence, or provenance authority change.
 6. An irreversible or destructive repository, data, or external operation.
+
+Item 6 excludes only a local-retirement operation that meets all
+[D-GOV-024 conditions](RECOVERY_AND_BACKUP.md#delegated-local-retirement).
+That operation is Level 2 and needs no new owner decision or risk panel.
+The creation or expansion of the exception is a Level 3 gate.
 
 Do not run a panel for Level 1 or Level 2. Removal of development-only
 duplication is not retirement of an accepted oracle. The accepted oracle and

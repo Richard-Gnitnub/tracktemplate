@@ -14,11 +14,89 @@ The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 1/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel). Only Exit 9B-2 is Evidenced and owner-accepted on 2026-10-11. The other five exits stay Pending. |
-| What changed | [D-P9-013](#phase-9b-core-export-policy-panel) authorises a different new directory for each Core Generate export. The full set must become available together. CSV stays optional. Returned paths change and previous output stays unchanged. The six exit criteria stay unchanged. |
-| What now works | Standalone and qualified FreeCAD checks give PASS results for the full-set operation. Six actual Core Generate GUI cases check CSV on/off, failures, final paths, previous output and editable-document preservation. |
-| Limitations/findings | The [Exit 9B-2 admission](#phase-9b-exit-2-acceptance-panel) keeps representative-workflow limits, selected export scope, normalisations, the observed SVG difference and `production_ready=False`. All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay. Output stays private-development and project status stays `unknown`. |
-| Owner decision | D-P9-013 authorises only the export policy and its bounded implementation. It accepts no exit. It gives no assurance that files stay available after a system interruption. It adds no recovery after FreeCAD stops and starts again. D-P9-012 stays the authority for the one accepted Phase 9B exit. All other exits and production conditions stay. <br><br>The Phase 9A closeout and earlier decisions keep their accepted limits. |
+| What changed | [D-GOV-024](#delegated-local-retirement-panel) permits Codex to decide and perform permanent local worktree retirement as Level 2 under the Recovery-owned conditions. It includes the specified obsolete local branch. The authority starts only after accepted integration into protected `main`. |
+| What now works | The existing read-only retirement audit and preservation procedure supply the controls. This alignment connects those controls to the post-merge workflow. No worktree or branch removal is performed by this alignment. |
+| Limitations/findings | The primary checkout and active, unique, ambiguous or insufficiently preserved state remain protected. Remote deletion and force removal are excluded. D-GOV-022 is unavailable through the new route. All 24 risk duties and prior production limits stay. D-P6-008 stays Deferred — unmet; TERM-R04 stays open. Output stays private-development; project status stays `unknown`. |
+| Owner decision | D-GOV-024 changes only bounded local-retirement authority and routing. It accepts no phase exit or production result. D-P9-012 continues to own the one accepted Phase 9B exit. D-P9-013 remains limited to Core Generate. The Phase 9A closeout and earlier decisions keep their accepted limits. |
 | Next action | Complete the bounded implementation, validation and independent review. After CI gives a PASS result for the exact PR head, publish the draft PR. Do not merge or start another outcome. |
+
+<a id="delegated-local-retirement-panel"></a>
+
+## D-GOV-024 local retirement authority panel — 2026-10-13
+
+Richard authorises this bounded Level 3 change. Codex can decide and perform
+permanent local retirement as Level 2 only after the accepted amendment is
+integrated into protected `main`.
+The [Recovery owner](../RECOVERY_AND_BACKUP.md#delegated-local-retirement)
+defines the applicable conditions. The change accepts no retirement target.
+
+The starting source is protected `main`
+`57bbacbcb19b79f3521ecea333e7c8fbe9f2e199` after PR #166 integration.
+The exact approved PR head is `9526611884e368c3fe8c3b7299e4d48becea45c5`.
+The merge has the same tree as that head. The primary checkout is clean and
+synchronised. All 60 existing worktrees and 67 branches remain.
+The 52 known dirty-file identities and six IDE reference identities stay the same.
+
+**Owner instruction:**
+
+> Integrate pr 166, then switch to a small bit of housekeeping.
+>
+> Chatgpt pro reviewed the git estate and the failing worktree and branch removal see attached md file for reccomendations. Review file then implement. I agree all level 3 changes in advance to improve efficiency of this repair.
+
+**Adopted owner addendum:**
+
+> As project owner, I authorise the bounded Level 3 governance change needed to make eligible post-merge worktree and local branch retirement a Level 2 decision delegated to Codex.
+>
+> Once accepted and integrated, Codex may decide and perform permanent deletion of eligible completed local worktrees and obsolete local branches, without my approval for each target. Preserve existing identity, containment, inactivity, inventory, preservation, audit and independent-review requirements. Retain active, unique, ambiguous or insufficiently preserved material.
+>
+> Reconcile the canonical classification and Continue exclusions, connect retirement to the post-merge workflow, and update dependent checks. Remote branch deletion and force removal are excluded.
+>
+> Publish one independently reviewed draft PR with the required diff and preservation evidence. Do not merge or exercise the new retirement authority during this task.
+
+The supplied handover has SHA-256
+`90ec3bf59205e4604633c43e85d79d10bb38760b5461e0f9dac4416efb6a32a3`.
+Its newer addendum replaces the earlier proposal to change only routing.
+The earlier external environment failures and GitHub refusal remain historical
+findings. Current development, documentation and publication preflights pass.
+They give no evidence that a retirement target is ready.
+
+**Panel:** Richard is decision authority. The implementing agent presents the
+change. A separate read-only agent, `retirement_authority_audit`, challenges
+risk and authority. Its recommendation is **Proceed with bounded conditions**.
+The review is independent within one agent team, not external organisational review.
+There is no substantive dissent.
+
+| Risk | Challenge and retained control | Result |
+| --- | --- | --- |
+| PR-13 — Critical | Permanent deletion can lose local data. Require current independent preservation, restore evidence, exact target checks and independent review. Missing or failed proof retains the target. | Critical/Open/Mitigate and all backup duties stay. No target is accepted. |
+| PR-22 — High | A narrow exception must not become general destructive authority. Require accepted integration, an exact Level 2 decision and independent review. Authority expansion remains Level 3. | High/Open/Remove and its existing duties stay. |
+| PR-12 — Medium | Live rules must agree while frozen decisions retain their history. Align the canonical owners and dependent checks. | Medium/Open/Mitigate and its existing duties stay. |
+
+The panel requires protection of primary `main` and active, unique, ambiguous
+or insufficiently preserved state. It requires retention after an ordinary Git
+refusal. Force removal, remote deletion and unrelated-target sweeps are excluded.
+D-GOV-022 is not available through this delegation.
+Current target inactivity, snapshot coverage and preservation remain unproved.
+Those unknowns prevent removal of an affected target; they do not authorise assumptions.
+
+**Decision:** Proceed with these bounded conditions. Record the new authority
+once in the [decision register](gate-decisions.json).
+The Engineering Policy owns classification. Recovery owns eligibility and
+procedure. Continue and Agent Workflows route the previous PR's observed candidate
+after main synchronisation and repeated IDE alignment.
+The safety audit stays read-only and unchanged.
+
+Before draft publication, the change owner must complete the focused positive
+and negative checks, independent source/test review and the finite documentation lifecycle.
+Required CI must pass for the exact draft head.
+Preserve failed evidence and existing review limitations.
+This task must not merge the new draft or perform live retirement.
+
+This is governance/tooling work requested by the owner, not Phase 9B exit evidence.
+The governance-budget exception applies because the task changes removal authority.
+The 113-entry register, product geometry, production boundaries and all risk
+duties stay unchanged. Phase 9A stays closed at 4/4 for its frozen reference-only
+scope. Phase 9B stays Open at 1/6, with five exits Pending.
 
 ## Selected output keeps temporary objects in a different `App.Document` — 2026-10-13
 

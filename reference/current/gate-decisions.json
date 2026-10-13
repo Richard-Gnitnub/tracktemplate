@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 9,
-  "updated_on": "2026-10-11",
+  "updated_on": "2026-10-13",
   "decisions": [
     {
       "id": "D-P6-008",
@@ -57,6 +57,17 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel"
+    },
+    {
+      "id": "D-GOV-024",
+      "decided_on": "2026-10-13",
+      "status": "Accepted",
+      "decision": "Permit Codex to decide and perform permanent removal of completed local worktrees and specified obsolete local branches as Level 2 under the Recovery-owned conditions. The authority applies only after the accepted amendment is integrated into protected main. Creating or expanding this authority remains Level 3.",
+      "authority": "Integrate pr 166, then switch to a small bit of housekeeping.\n\nChatgpt pro reviewed the git estate and the failing worktree and branch removal see attached md file for reccomendations. Review file then implement. I agree all level 3 changes in advance to improve efficiency of this repair.\n\nAdopted owner addendum:\n\nAs project owner, I authorise the bounded Level 3 governance change needed to make eligible post-merge worktree and local branch retirement a Level 2 decision delegated to Codex.\n\nOnce accepted and integrated, Codex may decide and perform permanent deletion of eligible completed local worktrees and obsolete local branches, without my approval for each target. Preserve existing identity, containment, inactivity, inventory, preservation, audit and independent-review requirements. Retain active, unique, ambiguous or insufficiently preserved material.\n\nReconcile the canonical classification and Continue exclusions, connect retirement to the post-merge workflow, and update dependent checks. Remote branch deletion and force removal are excluded.\n\nPublish one independently reviewed draft PR with the required diff and preservation evidence. Do not merge or exercise the new retirement authority during this task.",
+      "exclusions": "Preserve exact identity, accepted-history containment, inactivity, complete local-state inventory, independent snapshot and restore proof, preservation, audit, independent review and post-removal checks. Missing or failed evidence retains the target. Protect primary main and active, unique, ambiguous or insufficiently preserved state.\n\nContinue assesses only the previous PR's observed local candidate after clean main synchronisation and repeated IDE alignment. Recheck identity before action. Record retired, retained with reason, absent/already retired or assessment unavailable. Do not sweep unrelated worktrees or branches.\n\nPermit only ordinary git worktree remove and the specified contained git branch -d after worktree removal. Preserve targets after ordinary Git refusal. Exclude remote branch deletion, force removal, tag deletion, history rewrite, prune, stash and manual recursive deletion. D-GOV-022 is not available through this delegation. Preserve all frozen decisions and their limits.\n\nThis Level 3 alignment publishes one independently reviewed exact-green draft PR only. Do not merge the new draft or exercise the new retirement authority during this task.\n\nPhase 9A stays closed at 4/4 for its frozen reference-only scope. Phase 9B stays Open at 1/6, with five exits Pending. Preserve the 113-entry register, geometry, all 24 risk duties, D-P6-008 Deferred — unmet, TERM-R04 open, private-development output and project status unknown. Accept no production, rights, performance, release or phase result.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#delegated-local-retirement-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#delegated-local-retirement-panel"
     }
   ]
 }

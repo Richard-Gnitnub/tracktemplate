@@ -593,33 +593,27 @@ def validate_documentation_profile(
             "D-P9-010",
             "D-P9-012",
             "D-P9-013",
-            "authorises a different new directory for each Core Generate "
-            "export",
-            "The full set must become available together",
-            "CSV stays optional",
-            "Returned paths change and previous output stays unchanged",
-            "representative-workflow limits, selected export scope, "
-            "normalisations, the observed SVG difference and "
-            "`production_ready=False`",
-            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
-            "Output stays private-development and project status stays "
+            "D-GOV-024",
+            "permanent local worktree retirement as Level 2 under the "
+            "Recovery-owned conditions",
+            "The authority starts only after accepted integration into protected `main`",
+            "No worktree or branch removal is performed by this alignment",
+            "Remote deletion and force removal are excluded",
+            "D-GOV-022 is unavailable through the new route",
+            "All 24 risk duties and prior production limits stay",
+            "D-P6-008 stays Deferred — unmet; TERM-R04 stays open",
+            "Output stays private-development; project status stays "
             "`unknown`",
-            "D-P9-013 authorises only the export policy and its bounded "
-            "implementation",
-            "It accepts no exit",
-            "It gives no assurance that files stay available after a system "
-            "interruption",
-            "It adds no recovery after FreeCAD stops and starts again",
-            "D-P9-012 stays the authority for the one accepted Phase 9B exit",
+            "It accepts no phase exit or production result",
+            "D-P9-012 continues to own the one accepted Phase 9B exit",
+            "D-P9-013 remains limited to Core Generate",
             "After CI gives a PASS result for the exact PR head, publish the "
             "draft PR",
             "Do not merge or start another outcome",
-            "The six exit criteria stay unchanged",
-            "All other exits and production conditions stay",
             "The Phase 9A closeout and earlier decisions keep their accepted limits",
             "history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel",
             "current/PHASE_EVIDENCE.md#phase-9b-exit-2-acceptance-panel",
-            "current/PHASE_EVIDENCE.md#phase-9b-core-export-policy-panel",
+            "current/PHASE_EVIDENCE.md#delegated-local-retirement-panel",
         )),
         "PROJECT_PLAN owner view contradicts current authority",
     )

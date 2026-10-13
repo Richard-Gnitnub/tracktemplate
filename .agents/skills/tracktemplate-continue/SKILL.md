@@ -47,6 +47,10 @@ The literal invocation authorises at most these operations:
    current authority, from repository evidence
 3. Publication of one new pull request in draft state and monitoring of necessary CI
    for its exact head.
+4. After integration and main synchronisation, the bounded local-retirement
+   assessment under [D-GOV-024](../../../reference/RECOVERY_AND_BACKUP.md#delegated-local-retirement).
+   Removal is permitted only after that accepted amendment is integrated into
+   protected `main` and all its conditions pass.
 
 It supplies routine Git authority for the previous pull request. It delegates
 publication of the new work to
@@ -61,8 +65,10 @@ The invocation does not authorise these items:
 - Production-output or chair clearance
 - Licensing or provenance decisions
 - Tags or releases
-- Force push, history rewrite, or branch deletion
-- Protection bypass or destructive operations
+- Force push, history rewrite, remote branch deletion or force removal
+- Local branch deletion or destructive operations outside the integrated
+  [D-GOV-024 authority](../../../reference/RECOVERY_AND_BACKUP.md#delegated-local-retirement)
+- Protection bypass
 - Wider product scope.
 
 For an unresolved product or user-experience choice, stop for the owner. Do
@@ -105,6 +111,8 @@ work.
    stop.
 3. Identify the previous pull request's exact head SHA, target, scope, review
    state, mergeability, and necessary checks.
+   Record its observed local worktree and branch identity before integration.
+   Record an absent or unavailable local candidate without inventing a target.
 4. Make sure that all integration conditions listed below apply.
 5. If the pull request is a draft, mark it ready. Merge through the usual
    merge-commit route. Do not delete the branch. Examine the merge commit.
@@ -139,6 +147,29 @@ disposable state for review or integration.
 If the physical PyCharm window is not observable, report that limitation.
 Name the project-path and branch-indicator confirmations that the operator
 must do. Do not claim visible UI evidence.
+
+### Assess the previous local candidate
+
+After successful integration, clean main synchronisation and repeated IDE
+alignment, assess only the previous PR's observed local candidate.
+Use [D-GOV-024](../../../reference/RECOVERY_AND_BACKUP.md#delegated-local-retirement)
+and the [worktree retirement procedure](../../../reference/RECOVERY_AND_BACKUP.md#worktree-retirement).
+Recovery owns eligibility, evidence, commands and the Level 2 decision.
+This skill supplies no wider removal authority.
+
+Recheck the observed worktree, branch and HEAD after synchronisation.
+Protect the primary checkout, including a former feature directory now used for `main`.
+Do not sweep unrelated worktrees or branches. Do not delete a branch during merge.
+If the integrated authority or any required proof is absent, retain the target.
+If local access is unavailable, report `assessment unavailable`.
+Do not attempt removal for an absent or already retired candidate.
+
+Complete the exact Level 2 decision, evidence and independent review before any
+permitted removal. Recheck identity immediately before action.
+Keep the target after an ordinary Git refusal; no force or remote deletion is permitted.
+Do not invoke D-GOV-022 through this route.
+Record the Recovery-owned disposition before selecting the next outcome.
+Missing evidence retains the target; it does not authorise a workaround.
 
 ## Reconstruct repository authority
 

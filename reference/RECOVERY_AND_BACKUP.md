@@ -161,6 +161,11 @@ run:
    target; and
 5. a post-action inventory stating what changed and how it can be recovered.
 
+[D-GOV-024](#delegated-local-retirement) is the only standing exception for
+local worktree and local branch removal. Its accepted, integrated authority
+and exact Level 2 decision replace the per-target owner decision in item 1.
+All other applicable recovery requirements stay mandatory.
+
 Temporary directories created specifically for one test may be removed by
 their owning test after their resolved path is proved to be beneath the
 temporary root. This exception never applies to the repository, a home
@@ -303,6 +308,9 @@ The pull-request state `MERGED` gives no removal authority. Tracked cleanliness
 gives no removal authority. Use Git to show accepted-history containment for
 tracked files. The pull-request state does not contain a local-state type for
 ignored files or other local files.
+
+For delegated Level 2 work, first apply
+[D-GOV-024](#delegated-local-retirement). All steps below remain mandatory.
 
 Before worktree retirement, use this procedure:
 
@@ -487,6 +495,68 @@ and no branch. Do not delete a branch for that worktree.
 If the project owner gives no removal authority for the branch on GitHub,
 do not remove a branch on GitHub. Do not use `git worktree prune`. During this
 procedure, do not change a different worktree.
+
+<a id="delegated-local-retirement"></a>
+
+## D-GOV-024 local retirement authority
+
+[D-GOV-024](current/PHASE_EVIDENCE.md#delegated-local-retirement-panel) permits
+Codex to decide and perform permanent removal of a completed local worktree
+and its specified obsolete local branch as Level 2 work.
+This authority applies only after the accepted amendment is integrated into
+protected `main`. Before each decision, verify that integration in
+`refs/remotes/origin/main`. Publication of a draft PR does not activate it.
+
+The [worktree retirement procedure](#worktree-retirement) owns all required
+evidence and commands. Apply the complete procedure to each exact target.
+Keep the exact identity, accepted-history containment, inactivity, inventory,
+preservation, snapshot, restore, audit, independent review and post-removal checks.
+Use a fresh independent snapshot of the current registered worktrees and the
+applicable restore proof. Obtain independent review of the preservation evidence
+before removal. An earlier snapshot does not prove a later estate.
+
+Record the exact Level 2 decision in the local retirement plan. Identify
+D-GOV-024, its accepted integration, the previous PR and the target identities.
+The decision must give the preservation evidence and independent review result.
+The decision authorises only that target and those local actions.
+Codex needs no new owner approval for a target that meets every condition.
+An audit `PASS`, `MERGED` state, tracked cleanliness or Git ignore rule alone
+gives no removal authority.
+
+Keep the primary checkout, including a former feature directory now used for
+primary `main`. Keep active, unique, ambiguous or insufficiently preserved state.
+Keep the target if identity changed or required evidence is missing or failed.
+This includes unavailable local access and incomplete containment, inactivity,
+inventory, snapshot, restore, independent review or audit evidence.
+Report why the target stays. A wider action needs its applicable owner decision.
+
+Use only `git worktree remove` without `--force` for worktree removal.
+After confirmed worktree removal, recheck the local branch identity and
+accepted-history containment before `git branch -d`.
+For an already absent worktree, require retained retirement proof for that exact
+worktree and branch before any local branch removal. Recheck that no worktree
+uses that branch. If the proof is insufficient, keep the branch.
+Do not attempt worktree removal again for an absent target.
+
+This delegation permits no remote branch deletion, force removal, tag deletion,
+history rewrite, `git worktree prune`, `git stash` or manual recursive deletion.
+D-GOV-022 is not available through this delegation.
+If ordinary Git removal refuses, keep the target registered and preserved.
+Record the refusal. Do not use a workaround.
+The frozen D-GOV-020, D-GOV-021 and D-GOV-022 decisions keep their exact limits.
+
+The Continue workflow assesses only the previous PR's observed local candidate.
+It must not sweep unrelated worktrees or branches. Recheck that candidate after
+main synchronisation and repeated IDE alignment, then again immediately before action.
+Record one disposition: `retired`, `retained with reason`,
+`absent/already retired` or `assessment unavailable`.
+An absent target does not prove that this cycle removed it.
+Preserve unrelated worktrees, branches, stashes, IDE state and retained evidence.
+
+Creating or expanding this authority remains Level 3. It changes no phase,
+production, release, accepted-oracle or product authority.
+The D-GOV-024 alignment task publishes a draft PR only.
+It must not merge that draft or exercise the new retirement authority.
 
 ## Backup and restore acceptance
 

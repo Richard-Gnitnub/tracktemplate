@@ -6435,7 +6435,7 @@ def validate_documentation_profile_mutations() -> None:
     owner_view_row = table_row_containing(plan, "| Limitations/findings |")
     inflated_view = replace_once(
         owner_view_row,
-        "D-P6-008 Deferred — unmet",
+        "D-P6-008 stays Deferred — unmet",
         "D-P6-008 is complete",
     )
     expect_rejected(
@@ -6443,8 +6443,8 @@ def validate_documentation_profile_mutations() -> None:
         lambda: progress._validate_owner_view(
             replace_once(plan, owner_view_row, inflated_view)
         ),
-        "project-plan owner view lost or contradicted: All 24 risk duties, "
-        "D-P6-008 Deferred — unmet and TERM-R04 stay",
+        "project-plan owner view lost or contradicted: "
+        "D-P6-008 stays Deferred — unmet; TERM-R04 stays open",
     )
     owner_view_authority = replace_once(
         plan,
@@ -6485,13 +6485,13 @@ def validate_documentation_profile_mutations() -> None:
         (
             "risk-duties-removed", "| Limitations/findings |",
             "All 24 risk duties", "No risk duties",
-            "All 24 risk duties, D-P6-008 Deferred — unmet and TERM-R04 stay",
+            "All 24 risk duties and prior production limits stay",
         ),
         (
-            "production-conditions-waived", "| Owner decision |",
-            "All other exits and production conditions stay",
-            "All other exits and production conditions are waived",
-            "All other exits and production conditions stay",
+            "production-conditions-waived", "| Limitations/findings |",
+            "prior production limits stay",
+            "prior production limits are waived",
+            "All 24 risk duties and prior production limits stay",
         ),
         (
             "phase9b-exits-accepted", "| Current state |",
@@ -8319,6 +8319,597 @@ def validate_visible_recovery_mutations() -> None:
     )
 
 
+def validate_delegated_retirement_mutations() -> None:
+    """Reject premature, widened or insufficiently preserved retirement."""
+    documents = [
+        read(path)
+        for path in (
+            "reference/RECOVERY_AND_BACKUP.md",
+            "reference/ENGINEERING_POLICY.md",
+            ".agents/skills/tracktemplate-continue/SKILL.md",
+            "reference/AGENT_WORKFLOWS.md",
+            "AGENTS.md",
+        )
+    ]
+    owner = recovery_controls.DELEGATED_RETIREMENT_HEADING
+    assessment = recovery_controls.CONTINUE_RETIREMENT_HEADING
+    cases = (
+        (
+            0,
+            owner,
+            2,
+            "activation-before-integration",
+            "only after",
+            "before",
+            "activation",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "draft-activates",
+            "does not activate it",
+            "activates it",
+            "activation",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "wrong-accepted-ref",
+            "refs/remotes/origin/main",
+            "refs/heads/topic",
+            "activation",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "all-local-branches",
+            "specified obsolete local branch",
+            "local branches",
+            "scope",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "expansion-level-two",
+            "Creating or expanding this authority remains Level 3",
+            "Creating or expanding this authority is Level 2",
+            "scope",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "earlier-snapshot-suffices",
+            "An earlier snapshot does not prove",
+            "An earlier snapshot proves",
+            "preservation",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "snapshot-not-fresh",
+            "fresh independent snapshot",
+            "previous snapshot",
+            "preservation",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "restore-optional",
+            "applicable restore proof",
+            "optional restore proof",
+            "preservation",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "independent-review-late",
+            "before removal. An earlier",
+            "after removal. An earlier",
+            "preservation",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "decision-unspecified-targets",
+            "only that target and those local actions",
+            "any available targets and actions",
+            "decision",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "audit-grants-authority",
+            "gives no removal authority",
+            "gives removal authority",
+            "decision",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "primary-removable",
+            "Keep the primary checkout",
+            "Remove the primary checkout",
+            "retention",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "active-removable",
+            "Keep active, unique, ambiguous",
+            "Remove active, unique, ambiguous",
+            "retention",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "changed-identity-removable",
+            "Keep the target if identity changed",
+            "Remove the target if identity changed",
+            "retention",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "missing-evidence-removable",
+            "missing or failed",
+            "complete and passed",
+            "retention",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "force-command",
+            "without `--force`",
+            "with `--force`",
+            "commands",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "branch-first",
+            "After confirmed worktree removal",
+            "Before worktree removal",
+            "commands",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "absent-proof-optional",
+            "require retained retirement proof",
+            "use optional retirement proof",
+            "commands",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "branch-used-elsewhere",
+            "Recheck that no worktree",
+            "Ignore whether any worktree",
+            "commands",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "remote-removal",
+            "permits no remote branch deletion",
+            "permits remote branch deletion",
+            "prohibitions",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "invoke-old-force-exception",
+            "D-GOV-022 is not available",
+            "D-GOV-022 is available",
+            "prohibitions",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "refusal-workaround",
+            "Do not use a workaround",
+            "Use a workaround",
+            "prohibitions",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "unrelated-targets",
+            "assesses only the previous PR's",
+            "assesses any PR's",
+            "candidate",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "sweep-targets",
+            "must not sweep",
+            "can sweep",
+            "candidate",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "absent-claimed-retired",
+            "does not prove that this cycle removed it",
+            "proves that this cycle removed it",
+            "candidate",
+        ),
+        (
+            0,
+            owner,
+            2,
+            "current-live-retirement",
+            "must not merge that draft or exercise",
+            "can merge that draft and exercise",
+            "draft limit",
+        ),
+        (
+            1,
+            "Level 2 — Behavioural",
+            3,
+            "classification-premature",
+            "only after",
+            "before",
+            "Level 2",
+        ),
+        (
+            1,
+            "Level 3 — Authority or release",
+            3,
+            "blanket-destructive-delegation",
+            "only local-retirement exception",
+            "general destructive exception",
+            "Level 3",
+        ),
+        (
+            1,
+            "True gates and safety/risk panels",
+            2,
+            "gate-excludes-all-deletion",
+            "excludes only a local-retirement operation",
+            "excludes every destructive operation",
+            "gate",
+        ),
+        (
+            2,
+            "Authority for one cycle",
+            2,
+            "continue-premature-authority",
+            "only after that accepted amendment",
+            "before that accepted amendment",
+            "Continue authority",
+        ),
+        (
+            2,
+            "Examine and integrate the previous pull request",
+            2,
+            "continue-invents-target",
+            "without inventing a target",
+            "by inventing a target",
+            "Continue integration",
+        ),
+        (
+            2,
+            "Examine and integrate the previous pull request",
+            2,
+            "merge-time-deletion",
+            "Do not delete the branch",
+            "Delete the branch",
+            "Continue integration",
+        ),
+        (
+            2,
+            assessment,
+            3,
+            "continue-not-primary-safe",
+            "Protect the primary checkout",
+            "Remove the primary checkout",
+            "Continue assessment",
+        ),
+        (
+            2,
+            assessment,
+            3,
+            "continue-missing-proof-removes",
+            "absent, retain the target",
+            "absent, remove the target",
+            "Continue assessment",
+        ),
+        (
+            2,
+            assessment,
+            3,
+            "continue-refusal-force",
+            "no force or remote deletion is permitted",
+            "force and remote deletion are permitted",
+            "Continue assessment",
+        ),
+        (
+            2,
+            assessment,
+            3,
+            "continue-use-dgov022",
+            "Do not invoke D-GOV-022",
+            "Invoke D-GOV-022",
+            "Continue assessment",
+        ),
+        (
+            2,
+            assessment,
+            3,
+            "continue-wider-owner",
+            "Recovery owns eligibility",
+            "Continue owns eligibility",
+            "Continue assessment",
+        ),
+        (
+            3,
+            "Normal workflow order",
+            2,
+            "workflow-wider-target",
+            "It concerns only the previous PR's",
+            "It concerns any PR's",
+            "workflow route",
+        ),
+        (
+            4,
+            "Repository and System Safety",
+            2,
+            "agents-premature",
+            "Use it only after",
+            "Use it before",
+            "AGENTS route",
+        ),
+    )
+    for index, heading, level, name, old, new, diagnostic in cases:
+        changed = list(documents)
+        section = recovery_controls.direct_section_content(
+            changed[index],
+            heading,
+            level=level,
+        )
+        changed[index] = replace_once(
+            changed[index],
+            section,
+            replace_once(section, old, new),
+        )
+        expect_rejected(
+            "delegated-retirement/" + name,
+            lambda value=changed: (
+                recovery_controls.validate_delegated_post_merge_retirement(
+                    *value
+                )
+            ),
+            "delegated retirement " + diagnostic + " lacks:",
+        )
+
+    for old, new, diagnostic in (
+        (
+            "`git branch -d`", "`git branch -D`",
+            "delegated retirement deletion command flags drifted",
+        ),
+        (
+            "`git branch -d`", "`git branch d`",
+            "delegated retirement deletion command flags drifted",
+        ),
+        (
+            "`git worktree remove`", "`git worktree remove --force`",
+            "delegated retirement commands lacks:",
+        ),
+    ):
+        changed = list(documents)
+        section = recovery_controls.direct_section_content(changed[0], owner)
+        changed[0] = replace_once(
+            changed[0], section, replace_once(section, old, new),
+        )
+        expect_rejected(
+            "delegated-retirement/command-" + new.strip("`"),
+            lambda value=changed: (
+                recovery_controls.validate_delegated_post_merge_retirement(
+                    *value
+                )
+            ),
+            diagnostic,
+        )
+
+    for old, new in (
+        ("`retained with reason`", "`retained`"),
+        ("`absent/already retired`", "`retired`"),
+        ("`assessment unavailable`", "`assessment unavailable`, `approved`"),
+    ):
+        changed = list(documents)
+        section = recovery_controls.direct_section_content(changed[0], owner)
+        changed[0] = replace_once(
+            changed[0],
+            section,
+            replace_once(section, old, new),
+        )
+        expect_rejected(
+            "delegated-retirement/disposition-" + old.strip("`"),
+            lambda value=changed: (
+                recovery_controls.validate_delegated_post_merge_retirement(
+                    *value
+                )
+            ),
+            "delegated retirement dispositions drifted",
+        )
+
+    changed = list(documents)
+    section = recovery_controls.direct_section_content(
+        changed[2],
+        assessment,
+        level=3,
+    )
+    block = "### " + assessment + section
+    changed[2] = replace_once(changed[2], block, "")
+    changed[2] = replace_once(
+        changed[2],
+        "## Align the operator workspace",
+        block + "\n## Align the operator workspace",
+    )
+    expect_rejected(
+        "delegated-retirement/assessment-before-integration",
+        lambda: recovery_controls.validate_delegated_post_merge_retirement(
+            *changed
+        ),
+        "delegated retirement Continue order drifted",
+    )
+
+    for index, heading, level in (
+        (0, owner, 2),
+        (2, assessment, 3),
+    ):
+        changed = list(documents)
+        marker = "#" * level + " " + heading
+        changed[index] = replace_once(
+            changed[index],
+            marker,
+            marker + "\n\n" + "#" * (level + 1) + " Unrelated vocabulary",
+        )
+        expect_rejected(
+            "delegated-retirement/controls-relocated-" + str(index),
+            lambda value=changed: (
+                recovery_controls.validate_delegated_post_merge_retirement(
+                    *value
+                )
+            ),
+            "delegated retirement "
+            + ("activation" if index == 0 else "Continue assessment")
+            + " lacks:",
+        )
+
+
+def validate_delegated_retirement_decision_mutations() -> None:
+    """Reject a missing decision, enlarged authority or premature activation."""
+    document = json.loads(read("reference/current/gate-decisions.json"))
+    for name, transform in (
+        ("missing", lambda rows: rows.pop()),
+        ("extra", lambda rows: rows.append(copy.deepcopy(rows[-1]))),
+    ):
+        changed = copy.deepcopy(document)
+        transform(changed["decisions"])
+        expect_rejected(
+            "delegated-retirement/decision-" + name,
+            lambda value=changed: progress._validate_phase9b_decisions(value),
+            "Phase 9B current decision chain incomplete or widened",
+        )
+    for field, value, diagnostic in (
+        ("id", "D-GOV-025", "identity, status or panel routing drifted"),
+        (
+            "decided_on",
+            "2026-10-12",
+            "identity, status or panel routing drifted",
+        ),
+        ("status", "Proposed", "identity, status or panel routing drifted"),
+        (
+            "evidence",
+            "unrelated.md",
+            "identity, status or panel routing drifted",
+        ),
+        ("panel_record", None, "identity, status or panel routing drifted"),
+        (
+            "panel_required_under_current_policy",
+            False,
+            "identity, status or panel routing drifted",
+        ),
+        (
+            "authority",
+            "Codex may delete any worktree.",
+            "exact owner authority drifted",
+        ),
+    ):
+        changed = copy.deepcopy(document)
+        changed["decisions"][-1][field] = value
+        expect_rejected(
+            "delegated-retirement/record-" + field,
+            lambda value=changed: progress._validate_phase9b_decisions(value),
+            "D-GOV-024 " + diagnostic,
+        )
+    for field, old, new in (
+        ("decision", "only after", "before"),
+        ("decision", "authority remains Level 3", "authority becomes Level 2"),
+        (
+            "exclusions",
+            "evidence retains the target",
+            "evidence permits removal",
+        ),
+        ("exclusions", "D-GOV-022 is not available", "D-GOV-022 is available"),
+        ("exclusions", "Do not merge the new draft", "Merge the new draft"),
+        ("exclusions", "five exits Pending", "six exits accepted"),
+    ):
+        changed = copy.deepcopy(document)
+        record = changed["decisions"][-1]
+        record[field] = replace_once(record[field], old, new)
+        expect_rejected(
+            "delegated-retirement/record-" + old,
+            lambda value=changed: progress._validate_phase9b_decisions(value),
+            "D-GOV-024 " + field + " boundary drifted:",
+        )
+    evidence = read("reference/current/PHASE_EVIDENCE.md")
+    panel = progress.direct_section_content(
+        evidence,
+        "D-GOV-024 local retirement authority panel — 2026-10-13",
+    )
+    for old, new, diagnostic in (
+        (
+            "The change accepts no retirement target",
+            "The change accepts all retirement targets",
+            "panel boundary drifted:",
+        ),
+        (
+            "They give no evidence that a retirement target is ready",
+            "They prove every retirement target is ready",
+            "panel boundary drifted:",
+        ),
+        (
+            "D-GOV-022 is not available",
+            "D-GOV-022 is available",
+            "panel boundary drifted:",
+        ),
+        (
+            "This task must not merge the new draft",
+            "This task can merge the new draft",
+            "panel boundary drifted:",
+        ),
+        (
+            "> Once accepted and integrated,",
+            "> Before acceptance and integration,",
+            "exact panel authority drifted or was relocated",
+        ),
+    ):
+        changed = replace_once(evidence, panel, replace_once(panel, old, new))
+        expect_rejected(
+            "delegated-retirement/panel-" + old,
+            lambda value=changed: progress._validate_dgov024_panel(value),
+            "D-GOV-024 " + diagnostic,
+        )
+
+
 def validate_agents_mutations() -> None:
     """Reject every removed or abstracted explicit AGENTS safeguard."""
     agents = read("AGENTS.md")
@@ -8647,6 +9238,8 @@ def main() -> None:
     validate_documentation_profile_mutations()
     validate_transition_export_validation_mutations()
     validate_visible_recovery_mutations()
+    validate_delegated_retirement_mutations()
+    validate_delegated_retirement_decision_mutations()
     validate_agents_mutations()
     validate_chief_mutations()
     validate_ontology_mutation()
