@@ -1,4 +1,4 @@
-"""Derive a nominal base-plan outline from explicit exact dimensions.
+"""Derive isolated nominal base-plan and hole sections from exact lengths.
 
 The right-handed geometric frame has its origin at the bounding
 rectangle's centre. All points have Z=0. This frame establishes no rail,
@@ -6,9 +6,13 @@ seat or mounting datum and no relation to a canonical chair placement.
 The gross outline has four lines and four circular quarter arcs. Optional
 circular apertures give a separate net plan. Neither calculation supplies
 thickness, a source grid, manufacturing allowance or source data.
+The separate axisymmetric hole section has its own underside-centred
+frame, explicit height and actual rounded-mouth radius. It adds no
+relation to the plan outline or any canonical chair definition.
 """
 
 from dataclasses import dataclass, fields
+from decimal import Context, Decimal, DecimalException, localcontext
 from fractions import Fraction
 
 
@@ -284,3 +288,110 @@ def compute_chair_base_aperture_geometry(parameters, apertures):
         outline.perimeter_constant_mm,
         outline.perimeter_pi_coefficient_mm + 2 * radius_sum,
     )
+
+
+@dataclass(frozen=True)
+class ChairBaseNominalHoleParameters:
+    """Required full-size mm lengths for one axisymmetric nominal hole.
+
+    The mouth radius is the actual rounded opening at the top plane,
+    not a virtual intersection of the straight wall with that plane.
+    The axis is +Z, the underside is Z=0, and its centre is X=Y=0.
+    """
+
+    lower_radius_mm: Fraction
+    mouth_radius_mm: Fraction
+    top_height_mm: Fraction
+    round_radius_mm: Fraction
+
+
+@dataclass(frozen=True)
+class ChairBaseNominalHoleProfile:
+    """Immutable meridian in XZ, with Decimal coordinates in full-size mm.
+
+    The wall joins lower_mm to tangent_mm. The mouth-round joins
+    tangent_mm through round_midpoint_mm to mouth_mm, about
+    round_centre_mm. Their shared tangent is G1, not G2. wall_slope is
+    dR/dZ; wall_secant is sqrt(1 + wall_slope**2), both dimensionless.
+    This section supplies no outer surface, cap or physical tolerance.
+    """
+
+    parameters: ChairBaseNominalHoleParameters
+    wall_slope: Decimal
+    wall_secant: Decimal
+    lower_mm: tuple
+    tangent_mm: tuple
+    mouth_mm: tuple
+    round_centre_mm: tuple
+    round_midpoint_mm: tuple
+
+
+def compute_chair_base_nominal_hole_profile(parameters):
+    """Derive an outward tapered wall and tangent circular mouth-round.
+
+    Require H > f and M > r0 + f. With h=H-f and d=M-r0, the unique
+    positive slope solves d=h*k+f*sqrt(1+k*k). Rationalisation avoids
+    subtracting close radical terms. Exact Fraction differences precede
+    the isolated 80-digit Decimal calculation. A relative 1e-70 residual
+    check guards calculation precision; it is not a physical tolerance.
+    Reject a section whose strict ordering cannot survive that precision.
+    """
+    if not isinstance(parameters, ChairBaseNominalHoleParameters):
+        raise TypeError("parameters must be ChairBaseNominalHoleParameters")
+    for field in fields(parameters):
+        value = getattr(parameters, field.name)
+        if not isinstance(value, Fraction):
+            raise TypeError(field.name + " must be an exact Fraction")
+        if value <= 0:
+            raise ValueError(field.name + " must be positive")
+    p = parameters
+    h = p.top_height_mm - p.round_radius_mm
+    d = p.mouth_radius_mm - p.lower_radius_mm
+    if h <= 0 or d <= p.round_radius_mm:
+        raise ValueError("require H > f and M > r0 + f")
+
+    def decimal(value):
+        return Decimal(value.numerator) / Decimal(value.denominator)
+
+    try:
+        # A fresh Context also isolates rounding and traps from the caller.
+        with localcontext(Context(prec=80)):
+            r0, mouth, height, radius = (
+                decimal(getattr(p, name)) for name in (
+                    "lower_radius_mm", "mouth_radius_mm",
+                    "top_height_mm", "round_radius_mm",
+                )
+            )
+            hd, dd = decimal(h), decimal(d)
+            radical = decimal(h*h + d*d - p.round_radius_mm**2).sqrt()
+            slope = decimal(d*d - p.round_radius_mm**2) / (
+                dd * hd + radius * radical
+            )
+            secant = (1 + slope*slope).sqrt()
+            tr = mouth - radius / secant
+            tz = hd + radius * slope / secant
+            # Normalise the sum of the two unit radial vectors to get
+            # an interior arc point without angles or sampled geometry.
+            bisector = (2 + 2*slope/secant).sqrt()
+            mr = mouth - radius / secant / bisector
+            mz = hd + radius * (1 + slope/secant) / bisector
+            scale = max(mouth, height)
+            residuals = (
+                abs(dd - hd*slope - radius*secant) / scale,
+                abs(tr - r0 - slope*tz) / scale,
+                abs(((tr-mouth)/radius)**2
+                    + ((tz-hd)/radius)**2 - 1),
+                abs(((mr-mouth)/radius)**2
+                    + ((mz-hd)/radius)**2 - 1),
+            )
+            if (not (0 < slope and r0 < tr < mr < mouth
+                     and 0 < tz < mz < height)
+                    or max(residuals) > Decimal("1e-70")):
+                raise ValueError("hole profile exceeds calculation precision")
+            zero = Decimal(0)
+            return ChairBaseNominalHoleProfile(
+                p, slope, secant, (r0, zero, zero), (tr, zero, tz),
+                (mouth, zero, height), (mouth, zero, hd), (mr, zero, mz),
+            )
+    except DecimalException as error:
+        raise ValueError("hole profile exceeds calculation range") from error

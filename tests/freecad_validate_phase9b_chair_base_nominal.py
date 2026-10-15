@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove nominal gross and aperture plan faces with synthetic data."""
+"""Prove nominal plan faces and isolated hole surfaces with synthetic data."""
 
 from dataclasses import replace
 from fractions import Fraction
@@ -25,6 +25,7 @@ from tracktemplate.adapters.freecad import (  # noqa: E402
 from tracktemplate.domain.chair_base_nominal import (  # noqa: E402
     ChairBaseNominalAperture,
     ChairBaseNominalParameters,
+    ChairBaseNominalHoleParameters,
 )
 
 
@@ -462,6 +463,169 @@ def check_apertures(parameters, gross_measurements):
     return first
 
 
+def synthetic_hole_parameters(scale=Fraction(1)):
+    """Supply a hand-solvable synthetic tapered hole, not source data."""
+    return ChairBaseNominalHoleParameters(
+        2*scale, Fraction(17, 2)*scale, 8*scale, scale,
+    )
+
+
+def check_hole_shell(parameters, scale=1.0):
+    """Measure the shell using independently derived synthetic constants."""
+    shell = native.construct_chair_base_nominal_hole_shell(parameters)
+    assert shell.ShapeType == "Shell" and shell.isValid()
+    assert not shell.isClosed()
+    assert tuple(len(getattr(shell, name)) for name in (
+        "Vertexes", "Edges", "Wires", "Faces", "Shells", "Solids",
+    )) == (3, 5, 2, 2, 1, 0)
+    wall, = (f for f in shell.Faces if isinstance(f.Surface, Part.Cone))
+    rounding, = (f for f in shell.Faces if isinstance(f.Surface, Part.Toroid))
+    assert abs(wall.Surface.Radius - 2*scale) <= 1e-7
+    assert abs(wall.Surface.SemiAngle - math.atan(3/4)) <= 1e-12
+    assert abs(rounding.Surface.MajorRadius - 8.5*scale) <= 1e-7
+    assert abs(rounding.Surface.MinorRadius - scale) <= 1e-7
+    assert_point(rounding.Surface.Center, (0, 0, 7*scale))
+    box = shell.optimalBoundingBox(False, False)
+    assert_point((box.XMin, box.YMin, box.ZMin), (-8.5*scale, -8.5*scale, 0))
+    assert_point((box.XMax, box.YMax, box.ZMax),
+                 (8.5*scale, 8.5*scale, 8*scale))
+    alpha = math.atan(4/3)
+    areas = (92.15*math.pi, 2*math.pi*(8.5*alpha-0.4))
+    for face, area in zip((wall, rounding), areas):
+        assert abs(face.Area-area*scale**2) <= face.Length*1e-7
+    assert abs(shell.Area-math.pi*(91.35+17*alpha)*scale**2) <= (
+        shell.Length*1e-7
+    )
+    for radius, z, expected_owners in (
+        (2, 0, (wall,)), (7.7, 7.6, (wall, rounding)),
+        (8.5, 8, (rounding,)),
+    ):
+        ring, = (edge for edge in shell.Edges if (
+            isinstance(edge.Curve, Part.Circle)
+            and math.dist(tuple(edge.Curve.Center), (0, 0, z*scale)) <= 1e-7
+        ))
+        assert abs(ring.Curve.Radius-radius*scale) <= 1e-7
+        assert abs(ring.Length-2*math.pi*radius*scale) <= 1e-7
+        owners = [face for face in shell.Faces
+                  if any(ring.isSame(edge) for edge in face.Edges)]
+        assert len(owners) == len(expected_owners)
+        assert all(any(face.isSame(owner) for owner in owners)
+                   for face in expected_owners)
+    # Independent meridian parameterisation tests interior points as well
+    # as both boundaries and the common tangent, away from the seam.
+    samples = [(wall, 2, 0, -.8, .6),
+               (wall, 4.85, 3.8, -.8, .6),
+               (wall, 7.7, 7.6, -.8, .6)]
+    for psi in (0, alpha/2, alpha):
+        samples.append((rounding, 8.5-math.sin(psi),
+                        7+math.cos(psi), -math.sin(psi), math.cos(psi)))
+    for face, radius, z, radial_normal, normal_z in samples:
+        for theta in (.3, 1.8, 3.2, 5.1):
+            c, s = math.cos(theta), math.sin(theta)
+            point = App.Vector(radius*c*scale, radius*s*scale, z*scale)
+            u, v = face.Surface.parameter(point)
+            assert_point(face.valueAt(u, v), tuple(point))
+            assert_point(face.normalAt(u, v),
+                         (radial_normal*c, radial_normal*s, normal_z))
+    return shell
+
+
+def check_hole_failures(parameters):
+    """Reject invalid input and injected native faults without mutation."""
+    original = native._make_hole_shell
+    operations = (native.construct_chair_base_nominal_hole_shell,
+                  native.validate_chair_base_nominal_hole_exact_geometry)
+
+    def forbidden(_profile):
+        raise AssertionError("invalid parameters reached native construction")
+
+    native._make_hole_shell = forbidden
+    try:
+        for invalid, error_type in (
+            (None, TypeError),
+            (replace(parameters, lower_radius_mm=2.0), TypeError),
+            (replace(parameters, round_radius_mm=Fraction(0)), ValueError),
+            (replace(parameters, top_height_mm=Fraction(1)), ValueError),
+            (replace(parameters, mouth_radius_mm=Fraction(3)), ValueError),
+        ):
+            for operation in operations:
+                try:
+                    operation(invalid)
+                except error_type:
+                    pass
+                else:
+                    raise AssertionError("invalid hole parameters accepted")
+    finally:
+        native._make_hole_shell = original
+
+    def fail_kernel(_profile):
+        raise Part.OCCError("injected nominal hole failure")
+
+    def reverse_normals(profile):
+        shell = original(profile)
+        shell.reverse()
+        return shell
+
+    def grow_tolerance(profile):
+        shell = original(profile)
+        shell.fixTolerance(1e-4)
+        return shell
+
+    def wrong_dimensions(profile):
+        shell = original(profile)
+        shell.translate(App.Vector(0, 0, 1))
+        return shell
+
+    try:
+        for replacement in (
+            lambda _profile: Part.Shape(),
+            lambda _profile: Part.makeCone(2, 8, 8),
+            fail_kernel, reverse_normals, grow_tolerance, wrong_dimensions,
+        ):
+            native._make_hole_shell = replacement
+            for operation in operations:
+                try:
+                    operation(parameters)
+                except native.ChairBaseNominalExactGeometryError as error:
+                    assert_recoverable(error)
+                    if replacement is fail_kernel:
+                        assert isinstance(error.__cause__, Part.OCCError)
+                else:
+                    raise AssertionError("invalid native hole accepted")
+    finally:
+        native._make_hole_shell = original
+
+
+def check_holes():
+    """Prove fresh, deterministic, scaled and recoverable hole construction."""
+    parameters = synthetic_hole_parameters()
+    first = native.validate_chair_base_nominal_hole_exact_geometry(parameters)
+    assert first == native.validate_chair_base_nominal_hole_exact_geometry(
+        parameters,
+    )
+    assert first["valid"] and not first["closed"]
+    assert first["solid_count"] == 0
+    assert first["normal_side"] == "into-bore"
+    assert [(item["surface_id"], item["surface_kind"])
+            for item in first["faces"]] == [
+        ("wall", "cone"), ("mouth-round", "torus"),
+    ]
+    assert first["numerical_length_budget_mm"] == 1e-7
+    assert first["maximum_kernel_tolerance_mm"] <= 1e-7
+    for key in ("production_geometry_authorized", "document_mutation",
+                "filesystem_mutation"):
+        assert first[key] is False
+    for scale in (Fraction(1), Fraction(1, 5), Fraction(7, 2)):
+        check_hole_shell(synthetic_hole_parameters(scale), float(scale))
+    # Semantic surface matching is independent of a shell's face order.
+    shell = native.construct_chair_base_nominal_hole_shell(parameters)
+    reversed_order = Part.makeShell(list(reversed(shell.Faces)))
+    profile = native.compute_chair_base_nominal_hole_profile(parameters)
+    assert native._measure_hole_shell(reversed_order, profile) == first
+    check_hole_failures(parameters)
+    return first
+
+
 def main():
     qualification = bootstrap.require_qualified_runtime(
         ROOT / "reference/contracts/phase1-compatibility.json",
@@ -513,6 +677,7 @@ def main():
             check_rejections(parameters)
             check_native_failures(parameters)
             aperture_measurements = check_apertures(parameters, first)
+            hole_measurements = check_holes()
             assert document_state() == before
             assert Path.cwd() == directory
             assert filesystem_state(directory) == files_before
@@ -523,6 +688,8 @@ def main():
             ],
             "synthetic_geometry": first,
             "synthetic_aperture_geometry": aperture_measurements,
+            "synthetic_hole_geometry": hole_measurements,
+            "connected_open_wall_and_tangent_round": True,
             "circular_apertures_remove_material": True,
             "empty_apertures_preserve_gross_geometry": True,
             "independent_native_geometry_checks": True,

@@ -7,7 +7,7 @@ independently hand-calculated. They describe no prototype chair.
 """
 
 from dataclasses import FrozenInstanceError, fields, replace
-from decimal import Decimal
+from decimal import Context, Decimal, ROUND_UP, localcontext
 from fractions import Fraction
 from pathlib import Path
 import sys
@@ -21,7 +21,9 @@ from tracktemplate.domain.chair_base_nominal import (  # noqa: E402
     ChairBaseNominalAperture,
     ChairBaseNominalLine,
     ChairBaseNominalParameters,
+    ChairBaseNominalHoleParameters,
     compute_chair_base_aperture_geometry,
+    compute_chair_base_nominal_hole_profile,
     compute_chair_base_nominal_geometry,
 )
 
@@ -442,6 +444,121 @@ def validate_aperture_input_contract():
         )
 
 
+def validate_hole_profile():
+    """Prove the actual-mouth section from a hand-solvable 3-4-5 triangle."""
+    parameters = ChairBaseNominalHoleParameters(
+        Fraction(2), Fraction(17, 2), Fraction(8), Fraction(1),
+    )
+    profile = compute_chair_base_nominal_hole_profile(parameters)
+    assert profile.parameters == parameters
+    assert profile.wall_slope == Decimal("0.75")
+    assert profile.wall_secant == Decimal("1.25")
+    assert profile.lower_mm == (2, 0, 0)
+    assert profile.tangent_mm == (Decimal("7.7"), 0, Decimal("7.6"))
+    assert profile.mouth_mm == (Decimal("8.5"), 0, 8)
+    assert profile.round_centre_mm == (Decimal("8.5"), 0, 7)
+    with localcontext(Context(prec=110)):
+        root5 = Decimal(5).sqrt()
+        expected = (Decimal("8.5") - 1/root5, 0, 7 + 2/root5)
+        assert max(abs(a-b) for a, b in zip(
+            profile.round_midpoint_mm, expected,
+        )) < Decimal("1e-77")
+    for record, attribute in ((parameters, "mouth_radius_mm"),
+                              (profile, "tangent_mm")):
+        try:
+            setattr(record, attribute, None)
+        except FrozenInstanceError:
+            pass
+        else:
+            raise AssertionError("hole record is mutable")
+    # A caller's low precision and rounding mode cannot change the result.
+    with localcontext(Context(prec=6, rounding=ROUND_UP)):
+        assert profile == compute_chair_base_nominal_hole_profile(parameters)
+    with localcontext(Context(prec=100)):
+        for factor in (Fraction(1, 73), Fraction(7, 3), Fraction(10**40)):
+            scaled = ChairBaseNominalHoleParameters(**{
+                field.name: getattr(parameters, field.name) * factor
+                for field in fields(parameters)
+            })
+            result = compute_chair_base_nominal_hole_profile(scaled)
+            multiplier = Decimal(factor.numerator) / factor.denominator
+            assert abs(result.wall_slope - profile.wall_slope) < (
+                Decimal("1e-77")
+            )
+            for name in ("lower_mm", "tangent_mm", "mouth_mm",
+                         "round_centre_mm", "round_midpoint_mm"):
+                for before, after in zip(getattr(profile, name),
+                                         getattr(result, name)):
+                    assert abs(after-before*multiplier) <= (
+                        abs(multiplier)*Decimal("1e-76")
+                    )
+
+
+def validate_hole_radical_and_boundaries():
+    """Use a separate quadratic root and strict-domain boundary cases."""
+    parameters = ChairBaseNominalHoleParameters(*map(Fraction, (3, 7, 5, 1)))
+    result = compute_chair_base_nominal_hole_profile(parameters)
+    # d=h=4, f=1 gives 15*k^2 - 32*k + 15 = 0. The smaller
+    # root alone satisfies the original unsquared equation with k>0.
+    with localcontext(Context(prec=120)):
+        expected = (Decimal(16) - Decimal(31).sqrt()) / 15
+        assert abs(result.wall_slope-expected) < Decimal("1e-78")
+        k, q = result.wall_slope, result.wall_secant
+        tr, _y, tz = result.tangent_mm
+        assert abs(4 - 4*k - q) < Decimal("1e-77")
+        assert abs(tr - 3 - k*tz) < Decimal("1e-77")
+        assert abs((tr-7)*k + tz-4) < Decimal("1e-77")
+        assert abs((tr-7)**2 + (tz-4)**2 - 1) < Decimal("1e-77")
+    for field in fields(parameters):
+        for invalid in (0, 1.0, True, "1", Decimal(1), None,
+                        float("nan"), float("inf")):
+            try:
+                compute_chair_base_nominal_hole_profile(replace(
+                    parameters, **{field.name: invalid},
+                ))
+            except TypeError:
+                pass
+            else:
+                raise AssertionError("non-Fraction hole length accepted")
+        for invalid in (Fraction(0), Fraction(-1)):
+            try:
+                compute_chair_base_nominal_hole_profile(replace(
+                    parameters, **{field.name: invalid},
+                ))
+            except ValueError:
+                pass
+            else:
+                raise AssertionError("nonpositive hole length accepted")
+    for invalid in (
+        replace(parameters, top_height_mm=Fraction(1)),
+        replace(parameters, top_height_mm=Fraction(1, 2)),
+        replace(parameters, mouth_radius_mm=Fraction(4)),
+        replace(parameters, mouth_radius_mm=Fraction(7, 2)),
+    ):
+        try:
+            compute_chair_base_nominal_hole_profile(invalid)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("unsupported hole section accepted")
+    for invalid in (None, (), synthetic_parameters()):
+        try:
+            compute_chair_base_nominal_hole_profile(invalid)
+        except TypeError:
+            pass
+        else:
+            raise AssertionError("wrong parameter record accepted")
+    for near in (
+        replace(parameters, mouth_radius_mm=4+Fraction(1, 10**30)),
+        replace(parameters, top_height_mm=1+Fraction(1, 10**30)),
+        replace(parameters, top_height_mm=Fraction(2)),  # h=f, no pole
+    ):
+        profile = compute_chair_base_nominal_hole_profile(near)
+        assert profile.wall_slope > 0
+        assert profile.lower_mm[0] < profile.tangent_mm[0]
+        assert profile.tangent_mm[2] < profile.mouth_mm[2]
+
+
 def main():
     """Run pure analytical evidence without importing a CAD host."""
     validate_asymmetric_outline()
@@ -450,6 +567,8 @@ def main():
     validate_aperture_metrics_and_invariants()
     validate_aperture_boundaries()
     validate_aperture_input_contract()
+    validate_hole_profile()
+    validate_hole_radical_and_boundaries()
     forbidden = {"FreeCAD", "Part", "FreeCADGui", "PySide", "pivy"}
     assert not forbidden.intersection(sys.modules)
     print("Phase 9B nominal chair-base standalone validation passed")
