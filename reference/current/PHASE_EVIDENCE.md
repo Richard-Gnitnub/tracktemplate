@@ -1489,3 +1489,30 @@ The result is not a complete base or chair. It gives no acceptance for physical 
 
 The numerical checks, frozen S1 geometry, canonical definitions and 113-entry register do not change.
 Phase 9B stays Open at 3/6. Exits 9B-1 and 9B-3 stay Pending.
+
+## Connected S1 bottom and hole surfaces — 2026-10-15
+
+This Level 2 change connects the bottom face and three holes from drawing No. 4.
+It supplies evidence needed for work on Exit 9B-1.
+
+The [FreeCAD software](../../tracktemplate/adapters/freecad/chair_base_nominal_exact.py) makes one open `Part.Shell` with seven connected faces.
+The faces connect at each lower hole edge.
+The outer edge and three top openings stay open.
+The surfaces do not make a closed volume.
+The local No. 4 result keeps the earlier dimensions, hole positions and rounded top edges.
+
+The standalone Python checks and qualified FreeCAD checks give PASS results.
+These checks use independently calculated results.
+The local No. 4 checks give PASS results for connected edges and persistence (save/reopen).
+They also give PASS results when the software makes the same surfaces again.
+
+FreeCAD images show the connected surfaces and a section through the holes.
+Local evidence is in `tmp/nominal-underside-shell/visual-proof-final/No4-connected-underside-native-visual-proof.json` and `tmp/nominal-underside-shell/visual-inspection-final.json`.
+
+The earlier conditions for the [base shape](#s1-base-shape-from-drawing-no-4--2026-10-11), [hole positions](#s1-base-holes-from-drawing-no-4--2026-10-11) and [alternative A](#s1-hole-surfaces-from-drawing-no-4--2026-10-15) stay the same.
+The inputs come from printed dimensions, not physical measurements.
+The drawing revision and rights state stay unknown.
+This result is not a complete base or chair. It gives no acceptance for physical fit or production.
+
+The numerical limits, frozen S1 geometry, canonical definitions and 113-entry register do not change.
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.

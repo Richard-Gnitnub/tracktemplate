@@ -6,12 +6,13 @@ seat or mounting datum and no relation to a canonical chair placement.
 The gross outline has four lines and four circular quarter arcs. Optional
 circular apertures give a separate net plan. Neither calculation supplies
 thickness, a source grid, manufacturing allowance or source data.
-The separate axisymmetric hole section has its own underside-centred
-frame, explicit height and actual rounded-mouth radius. It adds no
-relation to the plan outline or any canonical chair definition.
+The standalone axisymmetric hole section has its own underside-centred
+frame, explicit height and actual rounded-mouth radius. Optional assembly
+relates its lower ring to identified plan apertures at Z=0. Neither route
+supplies a canonical chair definition or outer casting surfaces.
 """
 
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, fields, replace
 from decimal import Context, Decimal, DecimalException, localcontext
 from fractions import Fraction
 
@@ -395,3 +396,43 @@ def compute_chair_base_nominal_hole_profile(parameters):
             )
     except DecimalException as error:
         raise ValueError("hole profile exceeds calculation range") from error
+
+
+@dataclass(frozen=True)
+class ChairBaseNominalUndersideGeometry:
+    """Validated underside and one shared profile for its identified bores.
+
+    Aperture XY centres place parallel +Z bore axes at the common Z=0
+    underside. The lower junction is intentionally sharp (C0). The
+    existing wall-to-round tangency remains G1. No outer casting extent,
+    top face, rail datum or physical clearance is inferred.
+    """
+
+    aperture_geometry: ChairBaseApertureGeometry
+    hole_profile: ChairBaseNominalHoleProfile
+
+
+def compute_chair_base_nominal_underside_geometry(
+    base_parameters, apertures, hole_parameters,
+):
+    """Validate exact placements before composing an open underside shell.
+
+    Require a nonempty aperture tuple with lower radii exactly equal to
+    the shared hole radius. Require the projected actual-mouth discs to
+    lie strictly inside the footprint and strictly apart. This is a
+    conservative supported construction domain, not an outer-casting or
+    physical-clearance specification. Input identities and order remain.
+    """
+    planar = compute_chair_base_aperture_geometry(base_parameters, apertures)
+    if not apertures:
+        raise ValueError("underside assembly requires at least one aperture")
+    profile = compute_chair_base_nominal_hole_profile(hole_parameters)
+    if any(aperture.radius_mm != hole_parameters.lower_radius_mm
+           for aperture in apertures):
+        raise ValueError("aperture and hole lower radii must agree exactly")
+    compute_chair_base_aperture_geometry(
+        base_parameters, tuple(replace(
+            aperture, radius_mm=hole_parameters.mouth_radius_mm,
+        ) for aperture in apertures),
+    )
+    return ChairBaseNominalUndersideGeometry(planar, profile)
