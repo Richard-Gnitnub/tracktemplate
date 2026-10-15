@@ -1458,3 +1458,34 @@ historical record that now owns the evidence.
 
 <a id="tt-doc-001-documentation-architecture-panel"></a>
 [Historical TT-DOC-001 decision](../history/phase-closeouts/PHASE6_CLOSEOUT.md#tt-doc-001-documentation-architecture-panel).
+
+## S1 hole surfaces from drawing No. 4 — 2026-10-15
+
+This Level 2 change adds two connected surfaces in one hole.
+It supplies evidence for part of Exit 9B-1.
+
+The project owner selected alternative A: the printed `1 7/16 in` dimension gives an opening of `36.5125 mm` across its rounded top edge.
+This selection applies only to the Level 2 change. The drawing does not show whether alternative A or B applies.
+
+Alternative B extends the straight wall to the top level and applies the dimension there.
+For alternative B, the calculated diameter of the opening is about `39.4952576 mm`.
+
+The [Python software](../../tracktemplate/domain/chair_base_nominal.py) uses specified `Fraction` inputs and gives `Decimal` results.
+The [FreeCAD software](../../tracktemplate/adapters/freecad/chair_base_nominal_exact.py) makes one open `Part.Shell` with two connected surfaces.
+These surfaces do not make a closed volume.
+The software adds no outer base surface and does not set the position of a chair.
+The outline and lower openings do not change.
+
+The [standalone Python checks](../../tests/validate_phase9b_chair_base_nominal.py) and [FreeCAD checks](../../tests/freecad_validate_phase9b_chair_base_nominal.py) on the qualified host profile give PASS results.
+The checks use results calculated independently of the software.
+The checks give PASS results when the software makes the same surfaces again.
+The persistence checks (save/reopen) and regression tests for the frozen reference also give PASS results.
+Three FreeCAD images show the two surfaces, a section and the rounded top edge.
+Local evidence is in `tmp/nominal-hole-mouth/visual-proof-qualified/No4-hole-mouth-native-visual-proof.json`.
+
+The inputs come from printed dimensions, not from measurements of a chair.
+The drawing revision and the rights state for the source stay unknown.
+The result is not a complete base or chair. It gives no acceptance for physical fit or production.
+
+The numerical checks, frozen S1 geometry, canonical definitions and 113-entry register do not change.
+Phase 9B stays Open at 3/6. Exits 9B-1 and 9B-3 stay Pending.

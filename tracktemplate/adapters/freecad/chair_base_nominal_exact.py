@@ -1,8 +1,10 @@
-"""Construct transient base-plan faces from explicit nominal lengths.
+"""Construct transient base-plan faces and isolated nominal hole surfaces.
 
 This internal development primitive supplies no chair definition or rail datum.
 It creates no document object, file, solid, plinth or production output.
 Optional apertures describe one plane, not three-dimensional hole walls.
+A separate explicit primitive constructs an open conical wall and tangent
+toroidal mouth-round, with no relation to a plan face or chair placement.
 The existing numerical checks do not establish a physical fit tolerance.
 """
 
@@ -18,6 +20,7 @@ from tracktemplate.adapters.freecad.chair_seat_exact import (
 from tracktemplate.domain.chair_base_nominal import (
     ChairBaseNominalArc,
     compute_chair_base_aperture_geometry,
+    compute_chair_base_nominal_hole_profile,
     compute_chair_base_nominal_geometry,
 )
 
@@ -376,4 +379,223 @@ def construct_chair_base_aperture_face(parameters, apertures):
 def validate_chair_base_aperture_exact_geometry(parameters, apertures):
     """Construct a fresh aperture face and return neutral measurements."""
     _face, measurements = _construct_apertures_and_measure(parameters, apertures)
+    return measurements
+
+
+def _make_hole_shell(profile):
+    """Revolve one connected open meridian, without sewing or healing."""
+    wall = Part.makeLine(_vector(profile.lower_mm),
+                         _vector(profile.tangent_mm))
+    rounding = Part.Arc(
+        _vector(profile.tangent_mm), _vector(profile.round_midpoint_mm),
+        _vector(profile.mouth_mm),
+    ).toShape()
+    wire = Part.Wire([wall, rounding])
+    _require(
+        not wire.isNull() and wire.isValid() and not wire.isClosed(),
+        "invalid-hole-meridian", "expected a connected open meridian",
+    )
+    shell = wire.revolve(App.Vector(), App.Vector(0, 0, 1), 360)
+    # The lower-to-upper meridian revolves with outward/downward normals.
+    # Reverse the whole shell to face into the bore and upwards at its lip.
+    shell.reverse()
+    return shell
+
+
+def _measure_hole_shell(shell, profile):
+    """Check surface identities, connected topology and nominal geometry."""
+    epsilon = NUMERICAL_LENGTH_TOLERANCE_MM
+    _require(
+        not shell.isNull() and shell.ShapeType == "Shell" and shell.isValid()
+        and not shell.isClosed()
+        and (len(shell.Vertexes), len(shell.Edges), len(shell.Wires),
+             len(shell.Faces), len(shell.Shells), len(shell.Solids))
+        == (3, 5, 2, 2, 1, 0),
+        "unexpected-hole-topology", "expected one open two-face shell",
+    )
+    cones = [face for face in shell.Faces
+             if isinstance(face.Surface, Part.Cone)]
+    tori = [face for face in shell.Faces
+            if isinstance(face.Surface, Part.Toroid)]
+    _require(
+        len(cones) == len(tori) == 1, "hole-surface-kind-mismatch",
+        "expected one conical wall and one toroidal mouth-round",
+    )
+    wall, rounding = cones[0], tori[0]
+    p = profile.parameters
+    r0, mouth, height, radius = (
+        float(getattr(p, name)) for name in (
+            "lower_radius_mm", "mouth_radius_mm", "top_height_mm",
+            "round_radius_mm",
+        )
+    )
+    slope, secant = float(profile.wall_slope), float(profile.wall_secant)
+    tr, _y, tz = map(float, profile.tangent_mm)
+    centre_z = float(profile.round_centre_mm[2])
+    cone, torus = wall.Surface, rounding.Surface
+    _require(
+        math.dist(tuple(cone.Center), (0, 0, 0)) <= epsilon
+        and math.dist(tuple(cone.Axis), (0, 0, 1)) <= epsilon
+        and abs(cone.Radius - r0) <= epsilon
+        and abs(math.tan(cone.SemiAngle) - slope) <= epsilon
+        and math.dist(tuple(torus.Center), (0, 0, centre_z)) <= epsilon
+        and min(math.dist(tuple(torus.Axis), axis)
+                for axis in ((0, 0, 1), (0, 0, -1))) <= epsilon
+        and abs(torus.MajorRadius - mouth) <= epsilon
+        and abs(torus.MinorRadius - radius) <= epsilon,
+        "hole-surface-dimensions-mismatch",
+        "native cone or torus differs from the analytical section",
+    )
+    # Axis-aligned circles identify the two open boundaries and the one
+    # shared junction. The other two edges are periodic meridian seams.
+    rings = [edge for edge in shell.Edges if (
+        isinstance(edge.Curve, Part.Circle)
+        and abs(abs(edge.Curve.Axis.z) - 1) <= epsilon
+    )]
+    _require(len(rings) == 3, "hole-ring-count-mismatch",
+             "expected three coaxial circular edges")
+    ring_measurements = []
+    for identity, expected_radius, z, owners in (
+        ("lower", r0, 0.0, (wall,)),
+        ("wall-round-junction", tr, tz, (wall, rounding)),
+        ("mouth", mouth, height, (rounding,)),
+    ):
+        matches = [edge for edge in rings if math.dist(
+            tuple(edge.Curve.Center), (0, 0, z),
+        ) <= epsilon]
+        _require(len(matches) == 1, "hole-ring-position-mismatch", identity)
+        edge = matches[0]
+        rings.remove(edge)
+        attached = [face for face in shell.Faces
+                    if any(edge.isSame(other) for other in face.Edges)]
+        _require(
+            abs(edge.Curve.Radius - expected_radius) <= epsilon
+            and abs(edge.Length - 2*math.pi*expected_radius) <= epsilon
+            and len(attached) == len(owners)
+            and all(any(face.isSame(owner) for face in attached)
+                    for owner in owners),
+            "hole-ring-connectivity-mismatch", identity,
+        )
+        ring_measurements.append({
+            "boundary_id": identity, "radius_mm": edge.Curve.Radius,
+            "height_mm": edge.Curve.Center.z,
+            "attached_face_count": len(attached),
+        })
+
+    maximum_surface_residual = 0.0
+    maximum_normal_residual = 0.0
+    for face, points in (
+        (wall, (profile.lower_mm, profile.tangent_mm)),
+        (rounding, (profile.tangent_mm, profile.round_midpoint_mm,
+                    profile.mouth_mm)),
+    ):
+        for point in points:
+            r, _y, z = map(float, point)
+            if face.isSame(wall):
+                radial_normal, normal_z = -1/secant, slope/secant
+            else:
+                radial_normal = (r-mouth)/radius
+                normal_z = (z-centre_z)/radius
+            for angle in (0.0, math.pi/2, math.pi, 3*math.pi/2):
+                c, s = math.cos(angle), math.sin(angle)
+                expected = (r*c, r*s, z)
+                u, v = face.Surface.parameter(App.Vector(*expected))
+                maximum_surface_residual = max(
+                    maximum_surface_residual,
+                    math.dist(tuple(face.valueAt(u, v)), expected),
+                )
+                maximum_normal_residual = max(
+                    maximum_normal_residual,
+                    math.dist(tuple(face.normalAt(u, v)),
+                              (radial_normal*c, radial_normal*s, normal_z)),
+                )
+    _require(
+        maximum_surface_residual <= epsilon
+        and maximum_normal_residual <= epsilon,
+        "hole-surface-or-normal-mismatch",
+        "expected tangent bore-facing surfaces and a positive Z mouth normal",
+    )
+    # Standard BoundBox can conservatively enclose a trimmed torus. Ask
+    # the kernel for its exact-surface bounds, without mesh or tolerance.
+    box = shell.optimalBoundingBox(False, False)
+    bounds = (box.XMin, box.YMin, box.ZMin, box.XMax, box.YMax, box.ZMax)
+    bounds_residual = max(abs(a-b) for a, b in zip(
+        bounds, (-mouth, -mouth, 0, mouth, mouth, height),
+    ))
+    _require(bounds_residual <= epsilon, "hole-bounds-mismatch",
+             "native bounds differ from the analytical section")
+    alpha = math.atan2(1, slope)
+    expected_areas = (
+        math.pi*(r0+tr)*math.hypot(tr-r0, tz),
+        2*math.pi*radius*(mouth*alpha - radius*(1-slope/secant)),
+    )
+    face_measurements = []
+    for identity, kind, face, expected in zip(
+        ("wall", "mouth-round"), ("cone", "torus"),
+        (wall, rounding), expected_areas,
+    ):
+        area_budget = max(face.Length*epsilon, abs(expected)*1e-12)
+        _require(
+            math.isfinite(face.Area) and face.Area > 0
+            and math.isfinite(expected) and math.isfinite(area_budget)
+            and abs(face.Area-expected) <= area_budget,
+            "hole-area-mismatch", identity,
+        )
+        face_measurements.append({
+            "surface_id": identity, "surface_kind": kind,
+            "area_mm2": face.Area, "numerical_area_budget_mm2": area_budget,
+        })
+    tolerance = shell.getTolerance(1)
+    _require(
+        tolerance <= KERNEL_TOLERANCE_MM or math.isclose(
+            tolerance, KERNEL_TOLERANCE_MM, rel_tol=1e-12, abs_tol=0,
+        ),
+        "hole-tolerance-growth", "kernel tolerance grew during construction",
+    )
+    return {
+        "frame_id": "geometric-hole-axis-underside",
+        "length_unit": "mm", "length_basis": "full-size",
+        "mouth_radius_semantics": "actual-rounded-opening",
+        "freecad_version": ".".join(App.Version()[:3]),
+        "opencascade_version": Part.OCC_VERSION,
+        "vertex_count": 3, "edge_count": 5, "wire_count": 2,
+        "face_count": 2, "shell_count": 1, "solid_count": 0,
+        "valid": True, "closed": False, "normal_side": "into-bore",
+        "bounds_mm": bounds, "area_mm2": shell.Area,
+        "faces": face_measurements, "rings": ring_measurements,
+        "wall_slope": slope, "wall_secant": secant,
+        "maximum_surface_residual_mm": maximum_surface_residual,
+        "maximum_normal_residual": maximum_normal_residual,
+        "maximum_bounds_residual_mm": bounds_residual,
+        "numerical_length_budget_mm": epsilon,
+        "maximum_kernel_tolerance_mm": tolerance,
+        "production_geometry_authorized": False,
+        "document_mutation": False, "filesystem_mutation": False,
+    }
+
+
+def _construct_hole_and_measure(parameters):
+    profile = compute_chair_base_nominal_hole_profile(parameters)
+    try:
+        shell = _make_hole_shell(profile)
+        return shell, _measure_hole_shell(shell, profile)
+    except (Part.OCCError, OverflowError, ValueError) as error:
+        raise ChairBaseNominalExactGeometryError(
+            "hole-kernel-construction-failed", str(error),
+        ) from error
+
+
+def construct_chair_base_nominal_hole_shell(parameters):
+    """Return checked transient wall and round surfaces, without caps.
+
+    This isolated primitive creates no document object or outer chair
+    geometry. The caller owns provenance, placement and later disposal.
+    """
+    shell, _measurements = _construct_hole_and_measure(parameters)
+    return shell
+
+
+def validate_chair_base_nominal_hole_exact_geometry(parameters):
+    """Construct a fresh hole shell and return neutral measurements."""
+    _shell, measurements = _construct_hole_and_measure(parameters)
     return measurements
