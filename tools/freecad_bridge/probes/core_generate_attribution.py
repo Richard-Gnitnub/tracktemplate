@@ -96,6 +96,11 @@ def _run_attribution():
     witnesses = _load_baseline(root)
     require = witnesses._require
     mode = globals()["TRACKTEMPLATE_ATTRIBUTION_MODE"]
+    profile = globals().get(
+        "TRACKTEMPLATE_ATTRIBUTION_PROFILE", attribution.PROFILE
+    )
+    sentinel, _run_root = attribution.profile_settings(profile)
+    line_profile = profile == attribution.lines.PROFILE
     require(mode in ("control", "observed"), "Unknown observation mode")
     directory = (
         Path(globals()["TRACKTEMPLATE_ATTRIBUTION_DIRECTORY"]) / "probe"
@@ -126,11 +131,15 @@ def _run_attribution():
     pending = copy.deepcopy(module._PENDING_IMPORTED_CONFIGURATION)
     registry = dict(App.listDocuments())
     original_profiler = sys.getprofile()
-    observer = attribution.Observer(_targets(module, witnesses))
+    observer = (
+        attribution.lines.LineObserver(module.run_macro)
+        if line_profile
+        else attribution.Observer(_targets(module, witnesses))
+    )
     action = {"label": "first-generate", "status": "incomplete"}
     report = {
         "schema_version": 1,
-        "profile_id": attribution.PROFILE,
+        "profile_id": profile,
         "host_profile_id": host,
         "host_qualification": qualification,
         "mode": mode,
@@ -160,6 +169,22 @@ def _run_attribution():
             "or acceptance claim.",
         ],
     }
+    if line_profile:
+        report["limitations"] = [
+            item
+            for item in report["limitations"]
+            if not item.startswith("Selected Python frames")
+            and not item.startswith("Each remainder")
+        ] + [
+            "Only exact run_macro code-local source-line events are observed.",
+            "Each consecutive source-line interval includes called Python, "
+            "native, modal GUI, harness work and observer cost; it is not "
+            "a pure native-call or product-stage duration.",
+            "Multiline statements can produce multiple line visits; "
+            "source context identifies the full statement without claiming "
+            "a single visit measures that whole statement.",
+            "Root and external remainders stay explicit.",
+        ]
     try:
         witnesses.ordinary_track_snapshot(
             module,
@@ -281,7 +306,7 @@ def _run_attribution():
             routing_preserved=True,
             dependency_classification_verified=True,
         )
-        report.update(status="completed", sentinel=attribution.SENTINEL)
+        report.update(status="completed", sentinel=sentinel)
     except BaseException:
         report.update(status="failed", traceback=traceback.format_exc())
         raise
@@ -297,7 +322,10 @@ def _run_attribution():
                 pending_configuration_restored=(
                     module._PENDING_IMPORTED_CONFIGURATION == pending
                 ),
-                observer_restored=sys.getprofile() is original_profiler,
+                observer_restored=(
+                    sys.getprofile() is original_profiler
+                    and (mode == "control" or observer.restored)
+                ),
             )
             require(
                 all(
@@ -318,7 +346,7 @@ def _run_attribution():
             raise
         finally:
             attribution.baseline._write(directory / "probe.json", report)
-    attribution.validate_probe(report, mode)
+    attribution.validate_probe(report, mode, profile)
     print(json.dumps(report, sort_keys=True))
 
 
