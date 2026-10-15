@@ -25,6 +25,7 @@ from tracktemplate.domain.chair_base_nominal import (  # noqa: E402
     compute_chair_base_aperture_geometry,
     compute_chair_base_nominal_hole_profile,
     compute_chair_base_nominal_geometry,
+    compute_chair_base_nominal_underside_geometry,
 )
 
 
@@ -559,6 +560,123 @@ def validate_hole_radical_and_boundaries():
         assert profile.tangent_mm[2] < profile.mouth_mm[2]
 
 
+def synthetic_underside_inputs(scale=Fraction(1)):
+    """Supply one invented large outline and three equal small bores."""
+    base = ChairBaseNominalParameters(*(
+        Fraction(value) * scale for value in (200, 300, 10, 20, 30, 40)
+    ))
+    apertures = tuple(ChairBaseNominalAperture(
+        name, (Fraction(x) * scale, Fraction(y) * scale, Fraction(0)),
+        2 * scale,
+    ) for name, x, y in (("first", -40, -60), ("second", 30, 50),
+                         ("third", 40, -50)))
+    hole = ChairBaseNominalHoleParameters(
+        2 * scale, Fraction(17, 2) * scale, 8 * scale, scale,
+    )
+    return base, apertures, hole
+
+
+def validate_underside_composition():
+    """Prove immutable exact placement, ordering and unchanged primitives."""
+    inputs = synthetic_underside_inputs()
+    base, apertures, hole = inputs
+    result = compute_chair_base_nominal_underside_geometry(*inputs)
+    assert result.aperture_geometry == compute_chair_base_aperture_geometry(
+        base, apertures,
+    )
+    assert result.hole_profile == compute_chair_base_nominal_hole_profile(hole)
+    assert result.aperture_geometry.apertures == apertures
+    assert result.aperture_geometry.area_constant_mm2 == 57000
+    assert result.aperture_geometry.area_pi_coefficient_mm2 == 738
+    assert result.aperture_geometry.outline.bounds_mm == (
+        -100, -150, 0, 100, 150, 0,
+    )
+    assert result == compute_chair_base_nominal_underside_geometry(*inputs)
+    try:
+        result.hole_profile = None
+    except FrozenInstanceError:
+        pass
+    else:
+        raise AssertionError("assembly geometry is mutable")
+    reordered = apertures[2:] + apertures[:2]
+    assert compute_chair_base_nominal_underside_geometry(
+        base, reordered, hole,
+    ).aperture_geometry.apertures == reordered
+    for scale in (Fraction(1, 5), Fraction(7, 2)):
+        scaled = compute_chair_base_nominal_underside_geometry(
+            *synthetic_underside_inputs(scale),
+        )
+        assert scaled.aperture_geometry.area_constant_mm2 == 57000 * scale**2
+        assert scaled.aperture_geometry.area_pi_coefficient_mm2 == (
+            738 * scale**2
+        )
+        assert scaled.hole_profile.wall_slope == result.hole_profile.wall_slope
+
+
+def validate_underside_domain():
+    """Reject mouth contact even where the smaller lower circles fit."""
+    base, apertures, hole = synthetic_underside_inputs()
+
+    def at(x, y=Fraction(0), name="one"):
+        return ChairBaseNominalAperture(
+            name, (Fraction(x), Fraction(y), Fraction(0)), Fraction(2),
+        )
+
+    invalid_projections = (
+        (at(0), at(17, name="two")),
+        (at(0), at(16, name="two")),
+        (at(Fraction(183, 2)),),
+        (at(92),),
+        (at(Fraction(829, 10), Fraction(686, 5)),),
+        (at(Fraction(416, 5), Fraction(688, 5)),),
+    )
+    for candidate in invalid_projections:
+        # These exact lower apertures are admissible on their own.
+        compute_chair_base_aperture_geometry(base, candidate)
+        try:
+            compute_chair_base_nominal_underside_geometry(
+                base, candidate, hole,
+            )
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("unsupported projected mouth discs accepted")
+    epsilon = Fraction(1, 1024)
+    for candidate, accepted in (
+        ((at(0), at(17 + epsilon, name="two")), True),
+        ((at(0), at(17 - epsilon, name="two")), False),
+        ((at(Fraction(183, 2) - epsilon),), True),
+        ((at(Fraction(183, 2) + epsilon),), False),
+    ):
+        try:
+            compute_chair_base_nominal_underside_geometry(
+                base, candidate, hole,
+            )
+        except ValueError:
+            assert not accepted
+        else:
+            assert accepted
+    for candidate, shared, error_type in (
+        ((), hole, ValueError),
+        (list(apertures), hole, TypeError),
+        ((apertures[0], apertures[0]), hole, ValueError),
+        ((replace(apertures[0], radius_mm=Fraction(3)),), hole, ValueError),
+        ((replace(apertures[0], centre_mm=(Fraction(0), Fraction(0),
+                                          Fraction(1))),), hole, ValueError),
+        (apertures, replace(hole, lower_radius_mm=2.0), TypeError),
+        (apertures, replace(hole, mouth_radius_mm=Fraction(3)), ValueError),
+        (apertures, None, TypeError),
+    ):
+        try:
+            compute_chair_base_nominal_underside_geometry(
+                base, candidate, shared,
+            )
+        except error_type:
+            pass
+        else:
+            raise AssertionError("invalid assembly inputs accepted")
+
+
 def main():
     """Run pure analytical evidence without importing a CAD host."""
     validate_asymmetric_outline()
@@ -569,6 +687,8 @@ def main():
     validate_aperture_input_contract()
     validate_hole_profile()
     validate_hole_radical_and_boundaries()
+    validate_underside_composition()
+    validate_underside_domain()
     forbidden = {"FreeCAD", "Part", "FreeCADGui", "PySide", "pivy"}
     assert not forbidden.intersection(sys.modules)
     print("Phase 9B nominal chair-base standalone validation passed")

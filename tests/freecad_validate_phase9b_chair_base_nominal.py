@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prove nominal plan faces and isolated hole surfaces with synthetic data."""
+"""Prove synthetic nominal faces, bores and their connected open assembly."""
 
 from dataclasses import replace
 from fractions import Fraction
@@ -26,6 +26,7 @@ from tracktemplate.domain.chair_base_nominal import (  # noqa: E402
     ChairBaseNominalAperture,
     ChairBaseNominalParameters,
     ChairBaseNominalHoleParameters,
+    compute_chair_base_nominal_underside_geometry,
 )
 
 
@@ -626,6 +627,276 @@ def check_holes():
     return first
 
 
+def synthetic_underside_inputs(scale=Fraction(1), offset=(0, 0)):
+    """Place three equal synthetic bores in a larger invented outline."""
+    apertures = tuple(ChairBaseNominalAperture(
+        name, (Fraction(x + offset[0]) * scale,
+               Fraction(y + offset[1]) * scale, Fraction(0)), 2 * scale,
+    ) for name, x, y in (("first", -40, -60), ("second", 30, 50),
+                         ("third", 40, -50)))
+    return (synthetic_parameters(10 * scale), apertures,
+            synthetic_hole_parameters(scale))
+
+
+def check_underside_shell(inputs, scale=1.0):
+    """Check independent areas, translated surfaces and shared-edge uses."""
+    shell = native.construct_chair_base_nominal_underside_shell(*inputs)
+    assert shell.ShapeType == "Shell" and shell.isValid()
+    assert not shell.isClosed()
+    assert tuple(len(getattr(shell, name)) for name in (
+        "Vertexes", "Edges", "Wires", "Faces", "Shells", "Solids",
+    )) == (17, 23, 10, 7, 1, 0)
+    underside, = (face for face in shell.Faces
+                  if isinstance(face.Surface, Part.Plane))
+    assert_point(underside.normalAt(0, 0), (0, 0, -1))
+    assert len(underside.Wires) == 4 and underside.OuterWire.isClosed()
+    alpha = math.atan(4 / 3)
+    expected_area = (57000 + math.pi * (1012.05 + 51 * alpha)) * scale**2
+    assert abs(shell.Area - expected_area) <= shell.Length * 1e-7
+    assert abs(underside.Area - (57000 + 738 * math.pi) * scale**2) <= (
+        underside.Length * 1e-7
+    )
+    box = shell.optimalBoundingBox(False, False)
+    assert_point((box.XMin, box.YMin, box.ZMin),
+                 (-100 * scale, -150 * scale, 0))
+    assert_point((box.XMax, box.YMax, box.ZMax),
+                 (100 * scale, 150 * scale, 8 * scale))
+    free, seams, joins, total_uses = [], 0, 0, 0
+    for edge in shell.Edges:
+        uses = [(index, occurrence.Orientation)
+                for index, face in enumerate(shell.Faces)
+                for wire in face.Wires for occurrence in wire.OrderedEdges
+                if occurrence.isSame(edge)]
+        total_uses += len(uses)
+        if len(uses) == 1:
+            free.append(edge)
+        else:
+            assert len(uses) == 2
+            assert {orientation for _index, orientation in uses} == {
+                "Forward", "Reversed",
+            }
+            if uses[0][0] == uses[1][0]:
+                seams += 1
+            else:
+                joins += 1
+    assert (len(free), seams, joins, total_uses) == (11, 6, 6, 35)
+    assert abs(sum(edge.Length for edge in free)
+               - (800 + 101 * math.pi) * scale) <= 11e-7
+    expected_free = list(underside.OuterWire.Edges)
+    for aperture in inputs[1]:
+        x, y, _z = map(float, aperture.centre_mm)
+        wall, = (face for face in shell.Faces if (
+            isinstance(face.Surface, Part.Cone)
+            and math.dist(tuple(face.Surface.Center), (x, y, 0)) <= 1e-7
+        ))
+        rounding, = (face for face in shell.Faces if (
+            isinstance(face.Surface, Part.Toroid)
+            and math.dist(tuple(face.Surface.Center), (x, y, 7 * scale))
+            <= 1e-7
+        ))
+        assert abs(wall.Area - 92.15 * math.pi * scale**2) <= (
+            wall.Length * 1e-7
+        )
+        round_area = 2 * math.pi * (8.5 * alpha - .4) * scale**2
+        assert abs(rounding.Area - round_area) <= rounding.Length * 1e-7
+        for radius, z, owners in (
+            (2, 0, (underside, wall)),
+            (7.7, 7.6, (wall, rounding)),
+            (8.5, 8, (rounding,)),
+        ):
+            ring, = (edge for edge in shell.Edges if (
+                isinstance(edge.Curve, Part.Circle)
+                and math.dist(tuple(edge.Curve.Center), (x, y, z * scale))
+                <= 1e-7
+            ))
+            assert abs(ring.Curve.Radius - radius * scale) <= 1e-7
+            actual = [face for face in shell.Faces
+                      if any(ring.isSame(edge) for edge in face.Edges)]
+            assert len(actual) == len(owners)
+            assert all(any(face.isSame(owner) for face in actual)
+                       for owner in owners)
+            if z == 8:
+                assert ring.isClosed()
+                expected_free.append(ring)
+        for face, radius, z, normal_r, normal_z in (
+            (wall, 4.85, 3.8, -.8, .6),
+            (rounding, 8.5 - 1 / math.sqrt(5), 7 + 2 / math.sqrt(5),
+             -1 / math.sqrt(5), 2 / math.sqrt(5)),
+        ):
+            for angle in (1.3, 4.1):
+                c, s = math.cos(angle), math.sin(angle)
+                point = App.Vector(x + radius * c * scale,
+                                   y + radius * s * scale, z * scale)
+                u, v = face.Surface.parameter(point)
+                assert_point(face.valueAt(u, v), tuple(point))
+                assert_point(face.normalAt(u, v),
+                             (normal_r * c, normal_r * s, normal_z))
+    assert all(any(edge.isSame(expected) for edge in free)
+               for expected in expected_free)
+    return shell
+
+
+def check_underside_failures(inputs):
+    """Reject unsupported composition and native faults without mutation."""
+    base, apertures, hole = inputs
+    original = native._make_underside_shell
+    operations = (native.construct_chair_base_nominal_underside_shell,
+                  native.validate_chair_base_nominal_underside_exact_geometry)
+
+    def forbidden(_geometry):
+        raise AssertionError("invalid assembly reached native construction")
+
+    native._make_underside_shell = forbidden
+    try:
+        touching = tuple(ChairBaseNominalAperture(
+            str(index), (Fraction(x), Fraction(0), Fraction(0)), Fraction(2),
+        ) for index, x in enumerate((0, 17)))
+        for invalid, error_type in (
+            ((None, apertures, hole), TypeError),
+            ((base, (), hole), ValueError),
+            ((base, list(apertures), hole), TypeError),
+            ((base, touching, hole), ValueError),
+            ((base, (replace(apertures[0], radius_mm=Fraction(3)),), hole),
+             ValueError),
+            ((base, (replace(apertures[0], centre_mm=(Fraction(0), Fraction(0),
+                                                     Fraction(1))),), hole),
+             ValueError),
+        ):
+            for operation in operations:
+                try:
+                    operation(*invalid)
+                except error_type:
+                    pass
+                else:
+                    raise AssertionError("invalid assembly input accepted")
+    finally:
+        native._make_underside_shell = original
+
+    def fail_kernel(_geometry):
+        raise Part.OCCError("injected underside assembly failure")
+
+    def disconnected(_geometry):
+        # makeShell can join coincident independent edges. The construction
+        # guard must reject that repair rather than accept its valid result.
+        plane = native.construct_chair_base_aperture_face(base, apertures)
+        plane.reverse()
+        faces = [plane]
+        for aperture in apertures:
+            bore = native.construct_chair_base_nominal_hole_shell(hole)
+            bore.translate(App.Vector(*map(float, aperture.centre_mm)))
+            faces.extend(bore.Faces)
+        return native._make_identity_preserving_shell(faces)
+
+    def reverse_plane(geometry):
+        faces = original(geometry).Faces
+        for face in faces:
+            if isinstance(face.Surface, Part.Plane):
+                face.reverse()
+        return Part.makeShell(faces)
+
+    def displaced(geometry):
+        shell = original(geometry)
+        shell.translate(App.Vector(1, 0, 0))
+        return shell
+
+    def grown_tolerance(geometry):
+        shell = original(geometry)
+        shell.fixTolerance(1e-4)
+        return shell
+
+    try:
+        for replacement in (
+            lambda _geometry: Part.Shape(),
+            lambda geometry: Part.makeCompound([original(geometry)]),
+            fail_kernel, disconnected, reverse_plane, displaced,
+            grown_tolerance,
+        ):
+            native._make_underside_shell = replacement
+            for operation in operations:
+                try:
+                    operation(*inputs)
+                except native.ChairBaseNominalExactGeometryError as error:
+                    assert_recoverable(error)
+                    if replacement is fail_kernel:
+                        assert isinstance(error.__cause__, Part.OCCError)
+                else:
+                    raise AssertionError("invalid native assembly accepted")
+    finally:
+        native._make_underside_shell = original
+
+    make_shell = Part.makeShell
+    geometry = compute_chair_base_nominal_underside_geometry(*inputs)
+    existing = original(geometry)
+
+    def measure_existing(*_inputs):
+        return native._measure_underside_shell(existing, geometry)
+
+    def rebuilt(faces):
+        return make_shell(faces).copy()
+
+    def reoriented(faces):
+        shell = make_shell(faces)
+        shell.reverse()
+        return shell
+
+    try:
+        for replacement in (rebuilt, reoriented):
+            Part.makeShell = replacement
+            for operation in operations + (measure_existing,):
+                try:
+                    operation(*inputs)
+                except native.ChairBaseNominalExactGeometryError as error:
+                    assert_recoverable(error)
+                    assert error.code == "underside-construction-changed"
+                else:
+                    raise AssertionError("changed shell construction accepted")
+    finally:
+        Part.makeShell = make_shell
+
+
+def check_undersides():
+    """Check repeatability, identity order, scales and recoverable failures."""
+    inputs = synthetic_underside_inputs()
+    validate = native.validate_chair_base_nominal_underside_exact_geometry
+    first = validate(*inputs)
+    assert first == validate(*inputs)
+    assert first["connected"] and not first["closed"]
+    assert [hole["aperture_id"] for hole in first["holes"]] == [
+        "first", "second", "third",
+    ]
+    assert first["free_boundary_loop_count"] == 4
+    assert first["free_boundary_edge_count"] == 11
+    assert first["periodic_seam_count"] == first["shared_junction_count"] == 6
+    assert first["numerical_length_budget_mm"] == 1e-7
+    tolerance = first["maximum_kernel_tolerance_mm"]
+    assert tolerance <= 1e-7 or math.isclose(tolerance, 1e-7, rel_tol=1e-12)
+    for key in ("production_geometry_authorized", "document_mutation",
+                "filesystem_mutation"):
+        assert first[key] is False
+    for scale in (Fraction(1), Fraction(1, 5), Fraction(7, 2)):
+        check_underside_shell(synthetic_underside_inputs(scale), float(scale))
+    check_underside_shell(synthetic_underside_inputs(offset=(1, 2)))
+    shell = native.construct_chair_base_nominal_underside_shell(*inputs)
+    reordered = native._measure_underside_shell(
+        Part.makeShell(list(reversed(shell.Faces))),
+        compute_chair_base_nominal_underside_geometry(*inputs),
+    )
+    assert reordered["holes"] == first["holes"]
+    assert reordered["underside"] == first["underside"]
+    assert reordered["bounds_mm"] == first["bounds_mm"]
+    changed_order = validate(
+        inputs[0], inputs[1][2:] + inputs[1][:2], inputs[2],
+    )
+    assert changed_order["holes"] == first["holes"][2:] + first["holes"][:2]
+    single = native.validate_chair_base_nominal_underside_exact_geometry(
+        inputs[0], inputs[1][:1], inputs[2],
+    )
+    assert (single["face_count"], single["free_boundary_loop_count"],
+            single["shared_junction_count"]) == (3, 2, 2)
+    check_underside_failures(inputs)
+    return first
+
+
 def main():
     qualification = bootstrap.require_qualified_runtime(
         ROOT / "reference/contracts/phase1-compatibility.json",
@@ -678,6 +949,7 @@ def main():
             check_native_failures(parameters)
             aperture_measurements = check_apertures(parameters, first)
             hole_measurements = check_holes()
+            underside_measurements = check_undersides()
             assert document_state() == before
             assert Path.cwd() == directory
             assert filesystem_state(directory) == files_before
@@ -689,6 +961,8 @@ def main():
             "synthetic_geometry": first,
             "synthetic_aperture_geometry": aperture_measurements,
             "synthetic_hole_geometry": hole_measurements,
+            "synthetic_underside_geometry": underside_measurements,
+            "shared_lower_edges_and_connected_open_shell": True,
             "connected_open_wall_and_tangent_round": True,
             "circular_apertures_remove_material": True,
             "empty_apertures_preserve_gross_geometry": True,

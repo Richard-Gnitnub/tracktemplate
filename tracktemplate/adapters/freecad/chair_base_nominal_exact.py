@@ -3,8 +3,9 @@
 This internal development primitive supplies no chair definition or rail datum.
 It creates no document object, file, solid, plinth or production output.
 Optional apertures describe one plane, not three-dimensional hole walls.
-A separate explicit primitive constructs an open conical wall and tangent
-toroidal mouth-round, with no relation to a plan face or chair placement.
+A standalone primitive constructs an open conical wall and tangent
+toroidal mouth-round. Optional composition joins these bore surfaces to
+a fresh downward-facing underside through shared lower circular edges.
 The existing numerical checks do not establish a physical fit tolerance.
 """
 
@@ -22,6 +23,7 @@ from tracktemplate.domain.chair_base_nominal import (
     compute_chair_base_aperture_geometry,
     compute_chair_base_nominal_hole_profile,
     compute_chair_base_nominal_geometry,
+    compute_chair_base_nominal_underside_geometry,
 )
 
 
@@ -598,4 +600,306 @@ def construct_chair_base_nominal_hole_shell(parameters):
 def validate_chair_base_nominal_hole_exact_geometry(parameters):
     """Construct a fresh hole shell and return neutral measurements."""
     _shell, measurements = _construct_hole_and_measure(parameters)
+    return measurements
+
+
+def _underside_ring(shape, centre, radius):
+    """Find one complete ring by its measured centre, radius and axis."""
+    epsilon = NUMERICAL_LENGTH_TOLERANCE_MM
+    matches = [edge for edge in shape.Edges if (
+        isinstance(edge.Curve, Part.Circle)
+        and math.dist(tuple(edge.Curve.Center), centre) <= epsilon
+        and abs(edge.Curve.Radius - radius) <= epsilon
+        and abs(edge.Curve.Axis.z - 1) <= epsilon
+        and abs(edge.Length - 2 * math.pi * radius) <= epsilon
+    )]
+    _require(len(matches) == 1, "underside-ring-mismatch",
+             "expected one identified circular boundary")
+    return matches[0]
+
+
+def _make_identity_preserving_shell(faces):
+    """Reject any constructor repair or reorientation of supplied topology."""
+    faces = tuple(faces)
+    before_uses = [edge for face in faces for wire in face.Wires
+                   for edge in wire.OrderedEdges]
+    before_tolerance = max(face.getTolerance(1) for face in faces)
+    # FreeCAD's wrapper can sew an invalid shell. Accept only unchanged faces.
+    shell = Part.makeShell(faces)
+    remaining = list(shell.Faces)
+    _require(len(remaining) == len(faces), "underside-construction-changed",
+             "shell construction changed the supplied face count")
+    for face in faces:
+        matches = [index for index, other in enumerate(remaining)
+                   if face.isEqual(other)]
+        _require(len(matches) == 1, "underside-construction-changed",
+                 "shell construction replaced or reoriented a supplied face")
+        remaining.pop(matches[0])
+    after_uses = [edge for face in shell.Faces for wire in face.Wires
+                  for edge in wire.OrderedEdges]
+    _require(
+        len(before_uses) == len(after_uses)
+        and all(sum(edge.isEqual(other) for other in before_uses)
+                == sum(edge.isEqual(other) for other in after_uses)
+                for edge in before_uses)
+        and shell.getTolerance(1) == before_tolerance,
+        "underside-construction-changed",
+        "shell construction changed edge uses or kernel tolerance",
+    )
+    return shell
+
+
+def _make_underside_shell(geometry):
+    """Share actual bore edges with a fresh downward-facing underside."""
+    planar = geometry.aperture_geometry
+    gross = _make_face(planar.outline)
+    wires = [gross.OuterWire]
+    faces = []
+    for aperture in planar.apertures:
+        hole = construct_chair_base_nominal_hole_shell(
+            geometry.hole_profile.parameters,
+        )
+        hole.translate(_vector(aperture.centre_mm))
+        lower = _underside_ring(
+            hole, tuple(map(float, aperture.centre_mm)),
+            float(aperture.radius_mm),
+        )
+        # Orientation belongs to this edge wrapper, not its TShape.
+        # Preserve identity while making the usual clockwise inner wire.
+        if lower.Orientation == "Reversed":
+            lower.reverse()
+        inner = Part.Wire([lower])
+        inner.reverse()
+        wires.append(inner)
+        faces.extend(hole.Faces)
+    underside = Part.Face(wires)
+    underside.reverse()
+    return _make_identity_preserving_shell([underside] + faces)
+
+
+def _underside_edge_uses(shell):
+    """Include both oriented uses of each periodic meridian seam."""
+    occurrences = [
+        (index, edge)
+        for index, face in enumerate(shell.Faces)
+        for wire in face.Wires for edge in wire.OrderedEdges
+    ]
+    return [(edge, [(index, other.Orientation)
+                    for index, other in occurrences if edge.isSame(other)])
+            for edge in shell.Edges]
+
+
+def _measure_underside_shell(shell, geometry):
+    """Prove shared topology, then reuse the constituent measurements."""
+    epsilon = NUMERICAL_LENGTH_TOLERANCE_MM
+    planar = geometry.aperture_geometry
+    count = len(planar.apertures)
+    _require(
+        not shell.isNull() and shell.ShapeType == "Shell" and shell.isValid()
+        and not shell.isClosed()
+        and (len(shell.Vertexes), len(shell.Edges), len(shell.Wires),
+             len(shell.Faces), len(shell.Shells), len(shell.Solids))
+        == (8 + 3 * count, 8 + 5 * count, 1 + 3 * count,
+            1 + 2 * count, 1, 0),
+        "unexpected-underside-topology",
+        "expected one open underside-and-bores shell",
+    )
+    planes = [face for face in shell.Faces
+              if isinstance(face.Surface, Part.Plane)]
+    _require(len(planes) == 1, "underside-plane-count",
+             "expected one underside plane")
+    underside = planes[0]
+    _require(
+        math.dist(tuple(underside.normalAt(0, 0)), (0, 0, -1)) <= epsilon,
+        "underside-normal-mismatch", "expected a negative Z underside normal",
+    )
+    positive = underside.copy()
+    positive.reverse()
+    plane_measurements = _measure_aperture_face(positive, planar)
+    edge_uses = _underside_edge_uses(shell)
+
+    def face_index(face):
+        return next(index for index, other in enumerate(shell.Faces)
+                    if face.isSame(other))
+
+    def uses_of(edge):
+        return next(uses for other, uses in edge_uses if edge.isSame(other))
+
+    remaining = [face for face in shell.Faces
+                 if not face.isSame(underside)]
+    expected_free = list(underside.OuterWire.Edges)
+    holes = []
+    profile = geometry.hole_profile
+    for aperture in planar.apertures:
+        centre = tuple(map(float, aperture.centre_mm))
+        wall_matches = [face for face in remaining if (
+            isinstance(face.Surface, Part.Cone)
+            and math.dist(tuple(face.Surface.Center), centre) <= epsilon
+        )]
+        round_centre = (centre[0], centre[1],
+                        float(profile.round_centre_mm[2]))
+        round_matches = [face for face in remaining if (
+            isinstance(face.Surface, Part.Toroid)
+            and math.dist(tuple(face.Surface.Center), round_centre) <= epsilon
+        )]
+        _require(len(wall_matches) == len(round_matches) == 1,
+                 "underside-hole-identity-mismatch", aperture.aperture_id)
+        wall, rounding = wall_matches[0], round_matches[0]
+        remaining = [face for face in remaining
+                     if not (face.isSame(wall) or face.isSame(rounding))]
+        # Measure a disposable copy in the original local hole frame.
+        # The returned assembly and its shared native edges stay in place.
+        local = _make_identity_preserving_shell([wall, rounding]).copy()
+        local.translate(-_vector(aperture.centre_mm))
+        measured = _measure_hole_shell(local, profile)
+        lower = _underside_ring(wall, centre, float(aperture.radius_mm))
+        lower_uses = uses_of(lower)
+        _require(
+            len(lower_uses) == 2
+            and {index for index, _orientation in lower_uses}
+            == {face_index(underside), face_index(wall)}
+            and {orientation for _index, orientation in lower_uses}
+            == {"Forward", "Reversed"},
+            "underside-lower-junction-mismatch", aperture.aperture_id,
+        )
+        mouth_centre = (centre[0], centre[1],
+                        float(profile.parameters.top_height_mm))
+        mouth = _underside_ring(
+            rounding, mouth_centre, float(profile.parameters.mouth_radius_mm),
+        )
+        _require(mouth.isClosed(), "underside-mouth-not-closed",
+                 aperture.aperture_id)
+        expected_free.append(mouth)
+        holes.append({
+            "aperture_id": aperture.aperture_id, "centre_mm": centre,
+            "faces": measured["faces"], "area_mm2": measured["area_mm2"],
+            "lower_shared_edge": True, "opposite_lower_traversal": True,
+        })
+    _require(not remaining, "underside-unmatched-face",
+             "every bore face must have an aperture identity")
+
+    adjacency = {index: set() for index in range(len(shell.Faces))}
+    free_edges, seam_count, shared_count = [], 0, 0
+    for edge, uses in edge_uses:
+        _require(len(uses) in (1, 2), "underside-edge-use-count",
+                 "expected one boundary use or two manifold uses")
+        if len(uses) == 1:
+            free_edges.append(edge)
+            continue
+        _require({orientation for _index, orientation in uses}
+                 == {"Forward", "Reversed"},
+                 "underside-edge-orientation", "edge uses must oppose")
+        first, second = (index for index, _orientation in uses)
+        if first == second:
+            seam_count += 1
+        else:
+            shared_count += 1
+            adjacency[first].add(second)
+            adjacency[second].add(first)
+    visited, pending = set(), [face_index(underside)]
+    while pending:
+        index = pending.pop()
+        if index not in visited:
+            visited.add(index)
+            pending.extend(adjacency[index] - visited)
+    _require(
+        len(visited) == len(shell.Faces)
+        and seam_count == shared_count == 2 * count,
+        "underside-connectivity-mismatch", "expected one connected manifold",
+    )
+    _require(
+        len(free_edges) == len(expected_free) == 8 + count
+        and all(any(edge.isSame(expected) for edge in free_edges)
+                for expected in expected_free)
+        and underside.OuterWire.isClosed(),
+        "underside-free-boundary-mismatch",
+        "only the gross outline and mouth rings may remain free",
+    )
+    box = shell.optimalBoundingBox(False, False)
+    bounds = (box.XMin, box.YMin, box.ZMin, box.XMax, box.YMax, box.ZMax)
+    expected_bounds = tuple(map(float, planar.outline.bounds_mm[:5])) + (
+        float(profile.parameters.top_height_mm),
+    )
+    bounds_residual = max(abs(a - b) for a, b in zip(bounds, expected_bounds))
+    _require(bounds_residual <= epsilon, "underside-bounds-mismatch",
+             "assembly bounds differ from the nominal envelope")
+    expected_area = plane_measurements["area_mm2"] + sum(
+        hole["area_mm2"] for hole in holes
+    )
+    area_budget = max(shell.Length * epsilon, abs(expected_area) * 1e-12)
+    _require(
+        math.isfinite(shell.Area) and shell.Area > 0
+        and math.isfinite(area_budget)
+        and abs(shell.Area - expected_area) <= area_budget,
+        "underside-area-mismatch", "expected the sum of constituent areas",
+    )
+    tolerance = shell.getTolerance(1)
+    _require(
+        tolerance <= KERNEL_TOLERANCE_MM or math.isclose(
+            tolerance, KERNEL_TOLERANCE_MM, rel_tol=1e-12, abs_tol=0,
+        ),
+        "underside-tolerance-growth", "kernel tolerance grew at a junction",
+    )
+    return {
+        "frame_id": "geometric-base-plan-centre-underside",
+        "length_unit": "mm", "length_basis": "full-size",
+        "freecad_version": ".".join(App.Version()[:3]),
+        "opencascade_version": Part.OCC_VERSION,
+        "vertex_count": len(shell.Vertexes), "edge_count": len(shell.Edges),
+        "wire_count": len(shell.Wires), "face_count": len(shell.Faces),
+        "shell_count": 1, "solid_count": 0, "valid": True, "closed": False,
+        "connected": True, "bore_count": count,
+        "underside": {"surface_id": "underside", "normal": (0.0, 0.0, -1.0),
+                      "area_mm2": plane_measurements["area_mm2"]},
+        "holes": holes, "bounds_mm": bounds, "area_mm2": shell.Area,
+        "free_boundary_loop_count": 1 + count,
+        "free_boundary_edge_count": len(free_edges),
+        "free_boundary_length_mm": sum(edge.Length for edge in free_edges),
+        "periodic_seam_count": seam_count,
+        "shared_junction_count": shared_count,
+        "maximum_bounds_residual_mm": bounds_residual,
+        "numerical_length_budget_mm": epsilon,
+        "numerical_area_budget_mm2": area_budget,
+        "maximum_kernel_tolerance_mm": tolerance,
+        "production_geometry_authorized": False,
+        "document_mutation": False, "filesystem_mutation": False,
+    }
+
+
+def _construct_underside_and_measure(
+    base_parameters, apertures, hole_parameters,
+):
+    geometry = compute_chair_base_nominal_underside_geometry(
+        base_parameters, apertures, hole_parameters,
+    )
+    try:
+        shell = _make_underside_shell(geometry)
+        return shell, _measure_underside_shell(shell, geometry)
+    except (Part.OCCError, OverflowError, ValueError) as error:
+        raise ChairBaseNominalExactGeometryError(
+            "underside-kernel-construction-failed", str(error),
+        ) from error
+
+
+def construct_chair_base_nominal_underside_shell(
+    base_parameters, apertures, hole_parameters,
+):
+    """Return one transient connected open underside-and-bores shell.
+
+    No document, file, outer casting, cap or solid is created. The caller
+    owns input provenance and any later display or disposal.
+    """
+    shell, _measurements = _construct_underside_and_measure(
+        base_parameters, apertures, hole_parameters,
+    )
+    return shell
+
+
+def validate_chair_base_nominal_underside_exact_geometry(
+    base_parameters, apertures, hole_parameters,
+):
+    """Construct a fresh assembly and return neutral numerical evidence."""
+    _shell, measurements = _construct_underside_and_measure(
+        base_parameters, apertures, hole_parameters,
+    )
     return measurements
