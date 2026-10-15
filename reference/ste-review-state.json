@@ -310,6 +310,15 @@
       "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
     },
     {
+      "accepted_blob": "sha1:43801a622d951fc4f0963bd2fb94eead90a492cc",
+      "accepted_sha256": "sha256:09b85441b94892d87f38c934ddfac718f1c37342725561cfb2583ac40c1a7aa0",
+      "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
+      "lifecycle_status": "locked",
+      "path": "reference/benchmarks/2026-10-13-phase9b-core-generate-baseline.md",
+      "review_receipt": "sha256:e09ed58d408c07f8393618f8d184b0e053c5cb02cb5f9c7ca5ca38a145ad38a3",
+      "review_result": "APPROVED_WITH_EXACT_CORRECTIONS"
+    },
+    {
       "accepted_blob": "sha1:8282765c3da5081114d17b016b7c61e61a60503d",
       "accepted_sha256": "sha256:c201f053a665efd22fd661a50d425b290af54cbd2fbf4283190d4af2514cd8d3",
       "issue9_source": "sha256:d1f4ea9e7cd6e46b47aa9057209f99e78c0e9cfc4e27a5b07895b05c1a166431",
