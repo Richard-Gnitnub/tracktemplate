@@ -26,6 +26,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools import core_generate_baseline as baseline  # noqa: E402
+from tools import core_generate_line_observer as lines  # noqa: E402
 
 
 PROFILE = "phase9b-core-generate-attribution-v1"
@@ -45,6 +46,8 @@ NEW_FILES = (
     "tools/core_generate_attribution.py",
     "tools/freecad_bridge/probes/core_generate_attribution.py",
     "tests/validate_core_generate_attribution.py",
+    "tools/core_generate_line_observer.py",
+    "tests/validate_core_generate_line_observer.py",
 )
 
 
@@ -149,32 +152,37 @@ class Observer:
     def result(self, action):
         if self.errors or not self.restored:
             raise ValueError("Invalid observer: " + repr(self.errors))
-        spans = [dict(span) for span in self.spans]
-        for span in spans:
-            children = [item for item in spans if item["parent"] == span["id"]]
-            span["remainder_ns"] = {
-                clock: span[clock + "_end_ns"]
-                - span[clock + "_start_ns"]
-                - sum(
-                    child[clock + "_end_ns"] - child[clock + "_start_ns"]
-                    for child in children
-                )
-                for clock in CLOCKS
-            }
-        roots = [span for span in spans if span["parent"] is None]
-        if len(roots) != 1 or roots[0]["name"] != "run_macro":
-            raise ValueError("Expected exactly one observed run_macro")
-        result = {
-            "spans": spans,
-            "mapping": self.mapping,
-            "boundary_remainder_ns": {
-                clock: round(action[clock + "_ms"] * 1000000)
-                - (roots[0][clock + "_end_ns"] - roots[0][clock + "_start_ns"])
-                for clock in CLOCKS
-            },
+        return reconcile_spans(action, self.spans, self.mapping)
+
+
+def reconcile_spans(action, spans, mapping):
+    """Reconcile integer spans shared by the two diagnostic observers."""
+    spans = [dict(span) for span in spans]
+    for span in spans:
+        children = [item for item in spans if item["parent"] == span["id"]]
+        span["remainder_ns"] = {
+            clock: span[clock + "_end_ns"]
+            - span[clock + "_start_ns"]
+            - sum(
+                child[clock + "_end_ns"] - child[clock + "_start_ns"]
+                for child in children
+            )
+            for clock in CLOCKS
         }
-        validate_attribution(action, result)
-        return result
+    roots = [span for span in spans if span["parent"] is None]
+    if len(roots) != 1 or roots[0]["name"] != "run_macro":
+        raise ValueError("Expected exactly one observed run_macro")
+    result = {
+        "spans": spans,
+        "mapping": mapping,
+        "boundary_remainder_ns": {
+            clock: round(action[clock + "_ms"] * 1000000)
+            - (roots[0][clock + "_end_ns"] - roots[0][clock + "_start_ns"])
+            for clock in CLOCKS
+        },
+    }
+    validate_attribution(action, result)
+    return result
 
 
 def _integer(value):
@@ -240,13 +248,23 @@ def validate_attribution(action, attribution):
     return attribution
 
 
-def validate_probe(report, mode):
+def profile_settings(profile):
+    """Keep the earlier profile as the default; reject unknown profiles."""
+    if profile == PROFILE:
+        return SENTINEL, RUN_ROOT
+    if profile == lines.PROFILE:
+        return lines.SENTINEL, ROOT / "benchmark-output/core-generate-lines"
+    raise ValueError("Unknown Core Generate diagnostic profile")
+
+
+def validate_probe(report, mode, profile=PROFILE):
     """Require the first action, correctness witnesses and restored state."""
+    sentinel, _run_root = profile_settings(profile)
     if (
-        report.get("profile_id") != PROFILE
+        report.get("profile_id") != profile
         or report.get("schema_version") != 1
         or report.get("status") != "completed"
-        or report.get("sentinel") != SENTINEL
+        or report.get("sentinel") != sentinel
         or report.get("mode") != mode
         or not report.get("host_profile_id")
     ):
@@ -282,7 +300,12 @@ def validate_probe(report, mode):
     ):
         raise ValueError("Missing output identity")
     if mode == "observed":
-        validate_attribution(action, report.get("attribution", {}))
+        validator = (
+            lines.validate_lines
+            if profile == lines.PROFILE
+            else validate_attribution
+        )
+        validator(action, report.get("attribution", {}))
     elif mode != "control" or report.get("attribution") is not None:
         raise ValueError("Control contains observer evidence")
     return report
@@ -301,7 +324,7 @@ def _distribution(values):
     }
 
 
-def summarize(samples):
+def summarize(samples, profile=PROFILE):
     """Retain three paired differences; never subtract stage medians."""
     sequence = [
         (block, mode) for block, order in enumerate(ORDER, 1) for mode in order
@@ -319,7 +342,7 @@ def summarize(samples):
             or sample.get("fixture_after") != baseline.FIXTURE_SHA256
         ):
             raise ValueError("Sample preservation or cleanup failed")
-        validate_probe(sample["probe"], sample["mode"])
+        validate_probe(sample["probe"], sample["mode"], profile)
     for key in ("host_profile_id",):
         if len({item["probe"][key] for item in samples}) != 1:
             raise ValueError("Host profiles differ")
@@ -334,6 +357,13 @@ def summarize(samples):
         mode: [item for item in samples if item["mode"] == mode]
         for mode in ("control", "observed")
     }
+    if profile == lines.PROFILE:
+        sources = [
+            item["probe"]["attribution"]["source"]
+            for item in grouped["observed"]
+        ]
+        if any(source != sources[0] for source in sources):
+            raise ValueError("Observed source/code provenance differs")
     result = {"action": {}, "observer_difference": {}, "exclusive_areas": {}}
     for clock in CLOCKS:
         values = {
@@ -384,6 +414,11 @@ def summarize(samples):
         )
         for clock in CLOCKS
     }
+    if profile == lines.PROFILE:
+        result["inclusive_source_line_areas"] = result.pop("exclusive_areas")
+        result["largest_inclusive_source_line_areas"] = result.pop(
+            "largest_exclusive_areas"
+        )
     return result
 
 
@@ -409,7 +444,7 @@ def _finish_sample(record, base, directory, client):
         baseline._write(directory / "sample.json", record)
 
 
-def _sample(base, directory, timeout, mode, block):
+def _sample(base, directory, timeout, mode, block, profile=PROFILE):
     instance = os.environ.get("TRACKTEMPLATE_BRIDGE_INSTANCE_FILE")
     if (
         os.environ.get("TRACKTEMPLATE_ATTRIBUTION_CHILD") != "1"
@@ -462,6 +497,7 @@ def _sample(base, directory, timeout, mode, block):
                     str(directory)
                 ),
                 "TRACKTEMPLATE_ATTRIBUTION_MODE = {!r}".format(mode),
+                "TRACKTEMPLATE_ATTRIBUTION_PROFILE = {!r}".format(profile),
                 baseline.LOADER.read_text(),
                 PROBE.read_text(),
             )
@@ -470,7 +506,7 @@ def _sample(base, directory, timeout, mode, block):
             client, code, "Core Generate attribution", timeout
         )
         baseline._write(directory / "bridge-result.json", job)
-        record["probe"] = validate_probe(parse_json_output(job), mode)
+        record["probe"] = validate_probe(parse_json_output(job), mode, profile)
         record["status"] = "completed"
     except BaseException as error:
         record.update(status="failed", error=repr(error))
@@ -485,6 +521,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base", type=pathlib.Path, required=True)
     parser.add_argument("--run-dir", type=pathlib.Path)
+    parser.add_argument(
+        "--profile", choices=(PROFILE, lines.PROFILE), default=PROFILE
+    )
     parser.add_argument("--timeout", type=float, default=1200)
     parser.add_argument(
         "--sample", action="store_true", help=argparse.SUPPRESS
@@ -500,15 +539,18 @@ def main():
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y%m%dT%H%M%S%fZ"
     )
-    directory = (args.run_dir or RUN_ROOT / stamp).resolve()
-    if not directory.is_relative_to(RUN_ROOT.resolve()):
+    _sentinel, run_root = profile_settings(args.profile)
+    directory = (args.run_dir or run_root / stamp).resolve()
+    if not directory.is_relative_to(run_root.resolve()):
         parser.error("Output must stay under the attribution run root")
     if args.sample:
-        _sample(base, directory, args.timeout, args.mode, args.block)
+        _sample(
+            base, directory, args.timeout, args.mode, args.block, args.profile
+        )
         return
     directory.mkdir(parents=True, exist_ok=False)
     record = {
-        "profile_id": PROFILE,
+        "profile_id": args.profile,
         "status": "started",
         "order": ORDER,
         "source_head": baseline._git("rev-parse", "HEAD"),
@@ -547,6 +589,8 @@ def main():
                     "/usr/bin/python3",
                     str(pathlib.Path(__file__).resolve()),
                     "--sample",
+                    "--profile",
+                    args.profile,
                     "--base",
                     str(base),
                     "--run-dir",
@@ -592,7 +636,7 @@ def main():
                         }
                     )
                     baseline._write(directory / "series.json", record)
-        record["summary"] = summarize(record["samples"])
+        record["summary"] = summarize(record["samples"], args.profile)
         if (
             subprocess.check_output(
                 [
