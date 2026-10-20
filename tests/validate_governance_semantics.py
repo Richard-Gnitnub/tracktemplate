@@ -6738,20 +6738,20 @@ def validate_documentation_profile_mutations() -> None:
             "Phase 9A stays closed at 4/4 under D-P9-010",
         ),
         (
-            "reference-scope-promoted", "| Owner decision |",
-            "keep their accepted limits", "lose their accepted limits",
-            "D-P9-012 and D-P9-015 keep their accepted limits",
+            "reference-scope-promoted", "| Limitations/findings |",
+            "All previous acceptance limits", "No previous acceptance limits",
+            "All previous acceptance limits and all 24 risk duties stay",
         ),
         (
             "risk-duties-removed", "| Limitations/findings |",
-            "All 24 risk duties", "No risk duties",
-            "All 24 risk duties stay",
+            "all 24 risk duties", "no risk duties",
+            "All previous acceptance limits and all 24 risk duties stay",
         ),
         (
             "production-conditions-waived", "| Limitations/findings |",
-            "The qualified Linux ext4 and recovery limits stay",
-            "The qualified Linux ext4 and recovery limits are waived",
-            "The qualified Linux ext4 and recovery limits stay",
+            "Physical fit, production and rights clearance are not accepted",
+            "Physical fit, production and rights clearance are accepted",
+            "Physical fit, production and rights clearance are not accepted",
         ),
         (
             "phase9b-exits-accepted", "| Current state |",
@@ -6761,14 +6761,19 @@ def validate_documentation_profile_mutations() -> None:
         ),
         (
             "merge-authorised", "| Next action |",
-            "Stop for integration authority", "Merge now",
-            "Stop for integration authority",
+            "Complete independent review and the Documentation Review "
+            "lifecycle for this documentation alignment",
+            "Merge now",
+            "Complete independent review and the Documentation Review "
+            "lifecycle for this documentation alignment",
         ),
         (
             "stop-boundary-waived", "| Next action |",
-            "Stop for integration authority",
-            "Begin another outcome",
-            "Stop for integration authority",
+            "Make and validate the Templot chairs through the TrackTemplate "
+            "path that the project uses",
+            "Begin another outcome without owner authority",
+            "Make and validate the Templot chairs through the TrackTemplate "
+            "path that the project uses",
         ),
     )
     for name, field, original, replacement, diagnostic in closeout_cases:
