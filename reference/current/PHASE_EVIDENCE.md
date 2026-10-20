@@ -8,6 +8,164 @@ The [Phase 9A closeout](../history/phase-closeouts/PHASE9A_CLOSEOUT.md),
 [risk snapshot](../history/phase-closeouts/PHASE9A_RISKS.json) preserve its history.
 The [project plan](../PROJECT_PLAN.md) owns current phase and exit status.
 
+<a id="candidate-bound-documentation-exception-panel"></a>
+
+## D-GOV-025 candidate-bound documentation exception — 2026-10-20
+
+**Owner decision:** Richard approves one Level 3 exception for candidate
+`895b2b31ece814783780053b1bcdde24fb927b5d414830af3443222f5a336617`
+and original review
+`5523e04fbf26155ffec3e4cb48fc477e6326ded4f75ded4fb9e23af500cfb6b9`.
+The original review keeps its `BLOCKED` verdict, empty correction record
+and null completion proposal.
+
+**Permitted route:** Record the accepted meanings in the
+[occurrence-specific appendix](../TERMINOLOGY.md#candidate-bound-inventory-terminology).
+Obtain one late correction supplement from original reviewer
+`/root/offline_verifier_implementation` for the existing 21 findings and
+every recorded occurrence. Freeze the exact recipe. Qualify the local
+verifier and obtain independent code review before one application.
+Rebuild the preserved derived cache. Make only the specified consequential
+repairs to the three validators. Record actual validation results in a
+local content-hash receipt. Obtain independent result review and stop.
+
+**Safety/risk panel:** Richard is the deciding project owner. `/root` is
+the Technical Author Lead and change owner. Original author
+`/root/offline_pair_measurement` challenged the proposed exception.
+The owner expressly accepts that risk-challenge independence limitation.
+The agents share one team and workspace. The original reviewer retains
+linguistic responsibility. A separate code reviewer checks the local
+verifier before application.
+
+The recommendation is **Proceed with bounded conditions**. The panel used
+the original candidate, original review, accepted factual disposition and
+static audit of the ordinary STE tooling. That tooling cannot complete
+this uncommitted packet. Its source, canonical review state and historical
+bindings stay unchanged.
+
+The principal risks are authority expansion and false review or validation
+attribution. The [risk register](risks.json) keeps all 24 risk duties.
+No risk closes. PR-09 retains the private-output limit, PR-13 retains
+preservation duties, and PR-22 retains the panel duty.
+
+| Bounded condition | Owner and deadline |
+| --- | --- |
+| Preserve the original candidate, review, empty correction record, source identities and failed evidence. | Technical Author Lead, before and throughout execution. |
+| Keep accepted meanings, occurrence contexts and exclusions exact. Keep existing registered meanings unchanged. | Terminology and subject owners, before the supplement freezes. |
+| Account for all 21 findings and every occurrence through exact corrections or explicit owner-supported dispositions. No dummy replacements or new findings search. | Original reviewer, before application. |
+| Qualify the local verifier and obtain independent code review. Verify exact preimages, complete scope and preservation. | Validation owner and separate code reviewer, before application. |
+| Stop on incomplete coverage, unresolved meaning, identity mismatch, unexpected validation failure, a blocking review or changes outside the permitted scope. Permit no second supplement, application or wording cycle. | Technical Author Lead, throughout execution. |
+
+**Resulting limits:** This is local exception completion only when its
+validation and result review pass. It is not linguistic `ACCEPT`, global
+terminology admission or ordinary Git lifecycle completion. These companion
+additions inherit no linguistic acceptance. No commit, push, PR or merge is
+authorised.
+
+The inventory, evidence, unsupported entries, LMS pause and consumed
+allowances stay unchanged. Phase 9A stays closed at 4/4. Phase 9B stays Open
+at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending. No geometry work, rights,
+programme, production or exit acceptance follows.
+
+
+<a id="lms-chair-record-and-templot-development-panel"></a>
+
+## D-P9-018 LMS chair record and private Templot chair development — 2026-10-18
+
+**Owner decision:** Record the completed LMS chair development model as the
+owner's "prototype". Pause more LMS chair development until after Phase 11.
+Make all chairs from the Templot geometry for private modelling
+and TrackTemplate development. Adapt those chairs through the
+TrackTemplate path that the project uses. This is Level 3 direction for private development, not
+phase acceptance or a change to third-party rights.
+
+**Exact owner instruction:**
+
+> thank you codex, that was a great first go. We shall record this as a prototype. We will pause LMS chair development for now and pick it up again as a feature post phase 11. What I really want to do now is model every templot chair using templot geometry which we've already established. This is for personal use as per provenance i don't intend to widely distribute templot designs apart from my own private modelling.
+>
+> So, lets do that. lets build out every chair in the templot inventory. adapt into tracktemplate as previously established and then use that inventory of templot chairs to enable track template development. In the meantime I will have a think with what to do about LMS chairing/
+
+**LMS evidence kept for this work:** The local worktree is `lms-chair-development`, at
+base commit `e5b2638f22e459f555ce4d27d3c0ab1f7bcd7707`. Its directory is
+`tmp/lms-chair-development`. The directory README records how the model was made
+and the limitations of the model.
+
+The native development model contains three parts: a complete casting,
+a key and a reference rail. All twelve native checks give PASS results.
+FreeCAD document reload also gives a PASS result. Six native viewport captures
+show the model and sections. The independent review gives
+**PASS WITH FINDINGS** for this bounded native result.
+
+The full validation suite gives a **FAIL** result because STEP reload gives a FAIL result
+with `BOPAlgo_InvalidCurveOnSurface`. The STEP files stay output with a FAIL result.
+The native result does not change that FAIL result.
+
+Physical fit, continuous key
+insertion, preload, retention and manufacturing capability stay unproved.
+The recorded native tolerance is `1.000001e-6 mm`. This is more than the
+former P1 `1e-7 mm` native tolerance ceiling. The model does not prove P1
+exterior equivalence. Keep the previous stopped work and all evidence with a FAIL result.
+
+| Record kept in the directory | SHA-256 |
+| --- | --- |
+| `README.md` | `eacb739f3ca2efc7840505c9f614b6bbb4c834e462167f5dbe188d407e263aa1` |
+| `independent-review.md` | `932b419ac52781ffbc9ee6d702f76c6aa4d92e9059bfda7d19b9cd989d9ca5b9` |
+| `validation-02/result.json` | `b83103477329cd52651a8b270d09951b1e10d688c86ea7fe520f305245f34fd7` |
+| `build-03/visual-proof-02/capture-result.json` | `976b7a7a6a8ba2578343f39a230f89f9f6ba1880a9133ee2365fceda1331f380` |
+
+**Private development scope:** Use the Templot geometry
+and record its exact source coverage. A chair name alone does not prove that the adapter makes the geometry. Keep a record of missing source geometry and source geometry that the adapter does not make.
+Do not make geometry that the source does not contain or report the complete set as made without evidence for the claim. These chairs can help TrackTemplate development.
+This direction does not make all Templot families mandatory for the Core
+release candidate or change an accepted chair definition.
+
+The [licensing boundary](../LICENSING_BOUNDARIES.md) and
+[provenance owner](../PROVENANCE.md) keep source classifications, notices and
+the conditions for clearance. Research data and outputs stay local,
+untracked and private-development. Personal use gives no third-party
+permission or positive rights finding. No public distribution is authorised.
+
+**Safety/risk panel:** Richard is the project owner and has decision
+authority. `/root` owns the development work. `/root/offline_pair_measurement`
+prepares this documentation alignment and previously reviewed the LMS development model.
+Read-only challenger `/root/offline_verifier_implementation` examined the new
+direction.
+
+The reviewer wrote the local S1/L1 builder, but did not write this
+documentation, the Pascal tool or the generic adapter. The agents share one
+team and workspace. This is not external organisational independence.
+
+The recommendation is **Proceed with bounded conditions**.
+The challenge keeps neutral chair definitions authoritative. A Pascal tool
+can help local development. It is not a mandatory product runtime dependency.
+Unchanged arithmetic does not prove equivalence to the complete Templot program.
+
+The [risk register](risks.json) keeps all 24 risk states, owners, deadlines
+and controls. No risk closes.
+
+PR-09 keeps the private-output limit.
+PR-13 keeps preservation duties. PR-22 keeps the independent panel duty.
+Unresolved source geometry and rights stay with their owners.
+
+| Bounded condition | Owner and deadline |
+| --- | --- |
+| Preserve the LMS model, output with a FAIL result and previous evidence. Keep more LMS development paused until after Phase 11. | Development owner, during this work. |
+| Distinguish declared chairs, available source geometry, generated chair components and validated assemblies. Keep unsupported loose-pin modes and all FAIL results in view. Keep data and output private. | Chair-definition and provenance owners, before each development use or completion claim. |
+| Record hashes for the source, source members and extracted fragments. Record the compiler, the data that control it, all global variables and inputs. | Development owner, before each generation claim. |
+| Check source positions, planes and complete coverage after the adapter puts faces into groups or divides them into triangles. Record the measured differences and FAIL results. | Geometry and validation owners, before each geometry claim. |
+| Complete the Documentation Review lifecycle. Preserve all exits that the plan records and rights limits. | Change owner and Technical Author Lead, before this documentation alignment becomes the controlled baseline. |
+
+**Limits for this decision:** Phase 9A stays closed at 4/4 for its frozen reference-only
+scope. Phase 9B stays Open at 3/6. Only Exits 9B-2, 9B-4 and 9B-5 are
+Evidenced and owner-accepted. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+
+All six exact criteria stay unchanged. D-P6-008 stays Deferred — unmet.
+TERM-R04 stays open. Project status stays `unknown`.
+
+This decision accepts no production package, output clearance, rights,
+performance result, release or phase closeout. It gives no publication or
+integration authority. Previous decisions and their evidence stay unchanged.
+
 <a id="phase-9b-exit-4-acceptance-panel"></a>
 
 ## D-P9-017 Phase 9B Exit 4 acceptance panel — 2026-10-13
@@ -268,11 +426,11 @@ Then stop. Do not merge. Do not start one more outcome.
 | Field | Current position |
 | --- | --- |
 | Current state | Phase 9A stays closed at 4/4 under [D-P9-010](../history/phase-closeouts/PHASE9A_CLOSEOUT.md#phase-9a-closeout-panel). Phase 9B is Open at 3/6 under [D-P9-012](#phase-9b-exit-2-acceptance-panel), [D-P9-015](#phase-9b-exit-5-acceptance-panel) and [D-P9-017](#phase-9b-exit-4-acceptance-panel). Only Exits 9B-2, 9B-4 and 9B-5 are Evidenced and owner-accepted. Exits 9B-1, 9B-3 and 9B-6 stay Pending. |
-| What changed | [D-P9-017](#phase-9b-exit-4-acceptance-panel) accepts only Exit 9B-4 under D-P9-016 with all recorded limitations. All six exact criteria stay unchanged. |
-| What now works | Representative Core Generate manifests record output hashes and complete dependency classifications for the supported bounded scope. The checks reject missing data, unsupported data and false clearance claims. |
-| Limitations/findings | D-P9-016 keeps the curved plain-line scope and all excluded inputs. This acceptance does not extend manifest support to chair packages or selected export. The qualified Linux ext4 and recovery limits stay. All 24 risk duties stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
-| Owner decision | The owner accepts Exit 9B-4 only. D-P9-012 and D-P9-015 keep their accepted limits. This decision accepts no other exit, production clearance or phase closeout. |
-| Next action | Complete the Level 3 alignment. Complete independent review. Complete the Documentation Review lifecycle. After CI gives a PASS result for the exact PR head, publish one draft PR. Stop for integration authority. <br><br> Keep the completed worktree until independent preservation is proved. Do not force retirement. |
+| What changed | [D-P9-018](#lms-chair-record-and-templot-development-panel) records the completed LMS chair development model as the owner's "prototype". More LMS chair development is paused until after Phase 11. |
+| What now works | The LMS chair that the project keeps has three parts: a complete casting, a key and a rail. Its native checks and FreeCAD reload give PASS results. Independent review gives PASS WITH FINDINGS for the native development model. |
+| Limitations/findings | The full LMS validation suite gives a FAIL result because STEP reload gives a FAIL result. STEP output is not qualified. Physical fit, production and rights clearance are not accepted. All previous acceptance limits and all 24 risk duties stay. <br><br>D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Output stays private-development. Project status stays `unknown`. |
+| Owner decision | Make all chairs in the Templot source for private modelling and TrackTemplate development. Keep the source geometry and provenance. This direction accepts no phase exit and gives no public distribution authority. |
+| Next action | Make and validate the Templot chairs through the TrackTemplate path that the project uses. Record source coverage and unresolved geometry accurately. Preserve the LMS model and its evidence with a FAIL result. Complete independent review and the Documentation Review lifecycle for this documentation alignment. |
 
 <a id="phase-9b-exit-5-acceptance-panel"></a>
 

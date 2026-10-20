@@ -337,3 +337,915 @@ scope. It must include proportionate tests for affected UI or persisted values.
 It must also include updated source fingerprints. The evidence must confirm
 that geometry, ordering, identities, production data, and exports are
 unchanged.
+
+<a id="candidate-bound-inventory-terminology"></a>
+
+## Candidate-bound inventory terminology — D-GOV-025
+
+This appendix records only the owner's occurrence-specific admissions and factual dispositions for candidate `895b2b31ece814783780053b1bcdde24fb927b5d414830af3443222f5a336617` and original `BLOCKED` review `5523e04fbf26155ffec3e4cb48fc477e6326ded4f75ded4fb9e23af500cfb6b9`.
+
+The original global entries and meanings remain unchanged. The appendix grants no global terminology admission, linguistic acceptance, rights or programme acceptance. Its companion-record authority is D-GOV-025. It does not inherit the original three-document review's linguistic coverage.
+
+The exact occurrence IDs refer to the immutable original review: the finding ID, a colon, and its one-based occurrence number. The separate local terminology ledger retains these same meanings, contexts, exclusions, evidence and IDs.
+
+### T001: `LMS chair development model`
+
+Category: noun.
+
+Meaning: The same procedural digital development result: generator and native FCStd, with casting, separate key and reference rail.
+
+Context:
+
+- The retained local result is in /home/richard/.codex/worktrees/lms-chair-development/TrackTemplateMacro/tmp/lms-chair-development.
+- It is the owner's prototype, with modeller's licence.
+- Native PASS WITH FINDINGS; full validation still FAIL because STEP reload fails.
+- The user paused further LMS work until after Phase 11.
+
+Exclusions:
+
+- Not a physical casting or a production-cleared neutral ChairDefinition package.
+- Not former P1 exterior-equivalence proof or physical-fit qualification.
+- The recorded name variants identify the same result, not different models.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-1:001, TERMS-5:001, TERMS-7:001, TERMS-9:001.
+
+### T002: `model`
+
+Category: noun.
+
+Meaning: The same procedural digital development result: generator and native FCStd, with casting, separate key and reference rail.
+
+Context:
+
+- The retained local result is in /home/richard/.codex/worktrees/lms-chair-development/TrackTemplateMacro/tmp/lms-chair-development.
+- It is the owner's prototype, with modeller's licence.
+- Native PASS WITH FINDINGS; full validation still FAIL because STEP reload fails.
+- The user paused further LMS work until after Phase 11.
+
+Exclusions:
+
+- Not a physical casting or a production-cleared neutral ChairDefinition package.
+- Not former P1 exterior-equivalence proof or physical-fit qualification.
+- The recorded name variants identify the same result, not different models.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-1:002, TERMS-1:007, TERMS-1:015, TERMS-3:002, TERMS-5:002, TERMS-5:007, TERMS-5:012, TERMS-5:018, TERMS-5:030, TERMS-5:036, TERMS-7:002, TERMS-7:007, TERMS-7:015, TERMS-9:002, TERMS-9:008, TERMS-9:010.
+
+### T003: `complete casting`
+
+Category: noun.
+
+Meaning: The single valid closed native casting solid, with 521 faces, in the LMS result.
+
+Context:
+
+- The term identifies the casting component of the procedural digital development result.
+
+Exclusions:
+
+- Not historical geometry equivalence or manufacturing approval.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-1:003, TERMS-5:008, TERMS-7:003.
+
+### T004: `native checks`
+
+Category: noun.
+
+Meaning: The twelve separately reported native checks with native_verdict PASS.
+
+Context:
+
+- The checks belong to the retained LMS native result.
+
+Exclusions:
+
+- This does not include the failed STEP check or prove continuous insertion or physical fit.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-1:004, TERMS-5:010, TERMS-7:004.
+
+### T005: `FreeCAD reload`
+
+Category: noun.
+
+Meaning: The separate GUI FCStd reopen/reload proof, PASS.
+
+Context:
+
+- The proof belongs to the retained LMS FreeCAD document.
+
+Exclusions:
+
+- Not STEP read-back, full-suite PASS, physical-fit qualification or production acceptance.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-1:005, TERMS-7:005.
+
+### T006: `native development model`
+
+Category: noun.
+
+Meaning: The same procedural digital development result: generator and native FCStd, with casting, separate key and reference rail.
+
+Context:
+
+- The retained local result is in /home/richard/.codex/worktrees/lms-chair-development/TrackTemplateMacro/tmp/lms-chair-development.
+- It is the owner's prototype, with modeller's licence.
+- Native PASS WITH FINDINGS; full validation still FAIL because STEP reload fails.
+- The user paused further LMS work until after Phase 11.
+
+Exclusions:
+
+- Not a physical casting or a production-cleared neutral ChairDefinition package.
+- Not former P1 exterior-equivalence proof or physical-fit qualification.
+- The recorded name variants identify the same result, not different models.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-1:006, TERMS-5:006, TERMS-7:006, TERMS-9:007.
+
+### T007: `STEP reload`
+
+Category: noun.
+
+Meaning: Failed STEP read-back with BOPAlgo_InvalidCurveOnSurface.
+
+Context:
+
+- The full suite remains FAIL and STEP delivery is not qualified.
+
+Exclusions:
+
+- Native PASS does not remove the failed STEP result.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-1:008, TERMS-5:013, TERMS-7:008, TERMS-9:009.
+
+### T008: `rights clearance`
+
+Category: noun.
+
+Meaning: Intended-use/dependency admissibility under the licensing and provenance owners; none newly accepted.
+
+Context:
+
+- The original D-P9-018 statements exclude acceptance of rights clearance.
+
+Exclusions:
+
+- Personal use supplies neither third-party permission nor a positive rights finding.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-RIGHTS: retained factual disposition supplied by /root on 2026-10-20; reference/LICENSING_BOUNDARIES.md:93-111,146-183,275-318; reference/PROVENANCE.md:13-28,43-50; tmp/templot-inventory/owner-direction.json
+
+Original occurrences: TERMS-1:009, TERMS-7:009.
+
+### T009: `private modelling`
+
+Category: noun.
+
+Meaning: The owner's personal modelling and private TrackTemplate development.
+
+Context:
+
+- This is the private use authorised in the recorded owner direction.
+
+Exclusions:
+
+- Existing Private research use remains the narrower Phase 9A meaning.
+- Personal use supplies neither third-party permission nor a positive rights finding.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-RIGHTS: retained factual disposition supplied by /root on 2026-10-20; reference/LICENSING_BOUNDARIES.md:93-111,146-183,275-318; reference/PROVENANCE.md:13-28,43-50; tmp/templot-inventory/owner-direction.json
+
+Original occurrences: TERMS-1:010, TERMS-3:005, TERMS-5:005, TERMS-7:010, TERMS-9:005.
+
+### T010: `geometry`
+
+Category: noun.
+
+Meaning: Shape information.
+
+Context:
+
+- The lowercase uses identify shape information in the LMS result or Templot chair adaptation.
+- Templot source-derived dimensions and placements belong to that shape information.
+
+Exclusions:
+
+- Not independent prototype authority, physical-fit qualification or production clearance.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-1:011, TERMS-1:014, TERMS-3:004, TERMS-3:006, TERMS-5:004, TERMS-5:021, TERMS-5:023, TERMS-5:025, TERMS-5:026, TERMS-5:035, TERMS-5:038, TERMS-5:048, TERMS-7:011, TERMS-7:014, TERMS-9:004, TERMS-9:019, TERMS-9:020.
+
+### T011: `public distribution`
+
+Category: noun.
+
+Meaning: Distribution beyond the authorised private use; not authorised.
+
+Context:
+
+- The recorded direction permits personal modelling and private TrackTemplate development.
+
+Exclusions:
+
+- Personal use supplies neither third-party permission nor a positive rights finding.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-RIGHTS: retained factual disposition supplied by /root on 2026-10-20; reference/LICENSING_BOUNDARIES.md:93-111,146-183,275-318; reference/PROVENANCE.md:13-28,43-50; tmp/templot-inventory/owner-direction.json
+
+Original occurrences: TERMS-1:012, TERMS-3:007, TERMS-5:028, TERMS-7:012, TERMS-9:017.
+
+### T012: `source coverage`
+
+Category: noun.
+
+Meaning: Source inventory branch/label coverage or complete source-face ledger, according to occurrence.
+
+Context:
+
+- TERMS-1:013, TERMS-5:022 and TERMS-7:013 concern coverage of the declared chair inventory and unresolved source geometry.
+- The source-adaptation condition separately requires complete coverage of source faces after grouping or triangulation.
+
+Exclusions:
+
+- Neither type of coverage implies physical fit.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-1:013, TERMS-5:022, TERMS-7:013.
+
+### T013: `LMS development model`
+
+Category: noun.
+
+Meaning: The same procedural digital development result: generator and native FCStd, with casting, separate key and reference rail.
+
+Context:
+
+- The retained local result is in /home/richard/.codex/worktrees/lms-chair-development/TrackTemplateMacro/tmp/lms-chair-development.
+- It is the owner's prototype, with modeller's licence.
+- Native PASS WITH FINDINGS; full validation still FAIL because STEP reload fails.
+- The user paused further LMS work until after Phase 11.
+
+Exclusions:
+
+- Not a physical casting or a production-cleared neutral ChairDefinition package.
+- Not former P1 exterior-equivalence proof or physical-fit qualification.
+- The recorded name variants identify the same result, not different models.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-3:001, TERMS-5:029.
+
+### T014: `Templot geometry`
+
+Category: noun.
+
+Meaning: 556b-derived shape, dimensions and placements.
+
+Context:
+
+- The original candidate refers to the established Templot source used for private chair development.
+
+Exclusions:
+
+- Not independent prototype authority.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-3:003, TERMS-5:003, TERMS-5:020, TERMS-9:003, TERMS-9:018.
+
+### T015: `reference rail`
+
+Category: noun.
+
+Meaning: The frozen Templot 556b A0 Code 75 bullhead profile.
+
+Context:
+
+- It is the rail reference in the retained LMS development result.
+
+Exclusions:
+
+- Not measured manufactured rail.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-5:009.
+
+### T016: `native viewport captures`
+
+Category: noun.
+
+Meaning: Six genuine FreeCAD activeView images.
+
+Context:
+
+- The images belong to the retained LMS native visual evidence.
+
+Exclusions:
+
+- The retained whole-window Start-page captures are not chair proof.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-5:011.
+
+### T017: `preload`
+
+Category: noun.
+
+Meaning: Initial mechanical loading from the assembled rail/chair/key interface.
+
+Context:
+
+- The LMS development result does not prove this physical interface or manufacturing property.
+- No load cases, insertion path, manufacturing criteria or thresholds were supplied or implied.
+
+Exclusions:
+
+- Unproved; digital geometry and sampled offsets do not establish mechanical loading.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-5:014, TERMS-9:012.
+
+### T018: `retention`
+
+Category: noun.
+
+Meaning: Ability of the rail/chair/key interface to keep the rail and key in position.
+
+Context:
+
+- The LMS development result does not prove this physical interface or manufacturing property.
+- No load cases, insertion path, manufacturing criteria or thresholds were supplied or implied.
+
+Exclusions:
+
+- Unproved; digital geometry and sampled offsets do not establish retention.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-5:015, TERMS-9:013.
+
+### T019: `manufacturing capability`
+
+Category: noun.
+
+Meaning: Ability to manufacture the intended physical item.
+
+Context:
+
+- The LMS development result does not prove this physical interface or manufacturing property.
+- No load cases, insertion path, manufacturing criteria or thresholds were supplied or implied.
+
+Exclusions:
+
+- Unproved; the native digital result does not establish manufacturing capability.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-5:016, TERMS-9:014.
+
+### T020: `native tolerance ceiling`
+
+Category: noun.
+
+Meaning: The former P1 kernel ceiling of 1e-7 mm in the recorded limitation.
+
+Context:
+
+- This ceiling is not achieved by the LMS result: actual maximum kernel tolerance is 1.000001e-6 mm.
+- The separate numerical/contact comparison tolerance remains 1e-7 mm.
+
+Exclusions:
+
+- Do not equate the numerical/contact comparison tolerance with the native kernel ceiling.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-5:017.
+
+### T021: `exterior equivalence`
+
+Category: noun.
+
+Meaning: Equivalence of the whole model exterior to former P1 geometry.
+
+Context:
+
+- Not proved because modeller's licence changed bosses, pedestal and collars.
+
+Exclusions:
+
+- The LMS native result is not a former P1 exterior-equivalence proof.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-5:019, TERMS-9:015.
+
+### T022: `source geometry`
+
+Category: noun.
+
+Meaning: Upstream shape information before host adaptation.
+
+Context:
+
+- The source inventory and source faces determine the available shape information.
+
+Exclusions:
+
+- Do not invent unavailable geometry or infer physical fit from source coverage.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:024, TERMS-5:034, TERMS-5:037.
+
+### T023: `source classifications`
+
+Category: noun.
+
+Meaning: The mandatory provenance categories, distinct from output clearance statuses.
+
+Context:
+
+- The licensing and provenance owners retain those source classifications and notices.
+
+Exclusions:
+
+- No new source or output rights determination is made.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-RIGHTS: retained factual disposition supplied by /root on 2026-10-20; reference/LICENSING_BOUNDARIES.md:93-111,146-183,275-318; reference/PROVENANCE.md:13-28,43-50; tmp/templot-inventory/owner-direction.json
+
+Original occurrences: TERMS-5:027, TERMS-9:016.
+
+### T024: `organisational independence`
+
+Category: noun.
+
+Meaning: External organisational independence, which the recorded panel expressly excludes.
+
+Context:
+
+- The agents have separate author and reviewer roles but share one team and workspace.
+- The reviewer authored the local S1/L1 builder, not the candidate documentation, Pascal tool or generic adapter.
+
+Exclusions:
+
+- No external organisational independence is claimed.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-ROLES: retained factual disposition supplied by /root on 2026-10-20; original review independence record; reference/ENGINEERING_POLICY.md:130-145
+
+Original occurrences: TERMS-5:031.
+
+### T025: `arithmetic`
+
+Category: noun.
+
+Meaning: Selected source expressions.
+
+Context:
+
+- The Pascal development tool calls the selected unchanged source arithmetic.
+
+Exclusions:
+
+- Not complete-program parity.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:032.
+
+### T026: `private-output limit`
+
+Category: noun.
+
+Meaning: Local, untracked, private-development output.
+
+Context:
+
+- The original PR-09 duty retains this private-output limit.
+
+Exclusions:
+
+- No project-cleared production claim follows.
+- Personal use supplies neither third-party permission nor a positive rights finding.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-RIGHTS: retained factual disposition supplied by /root on 2026-10-20; reference/LICENSING_BOUNDARIES.md:93-111,146-183,275-318; reference/PROVENANCE.md:13-28,43-50; tmp/templot-inventory/owner-direction.json
+
+Original occurrences: TERMS-5:033.
+
+### T027: `loose-pin modes`
+
+Category: noun.
+
+Meaning: The excluded separate loose-jaw pin/slot source branch, explicitly rejected by the harness.
+
+Context:
+
+- The source-inventory condition requires unsupported modes to remain explicit.
+
+Exclusions:
+
+- Not a supported generated mode or an available complete chair.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:039.
+
+### T028: `source members`
+
+Category: noun.
+
+Meaning: Archive files identified by original byte hashes.
+
+Context:
+
+- The source-lineage condition records the archive files used by the extracted Pascal tool.
+
+Exclusions:
+
+- Not chair members.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:040.
+
+### T029: `extracted fragments`
+
+Category: noun.
+
+Meaning: Selected retained Pascal bodies after declared CP1252 decoding and CRLF normalization, with span/hash binding.
+
+Context:
+
+- The source-lineage condition identifies the original archive bytes and selected Pascal bodies.
+
+Exclusions:
+
+- Different from the existing PDF Extract sense.
+- No complete-program equivalence follows from these selected bodies.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:041.
+
+### T030: `compiler`
+
+Category: noun.
+
+Meaning: The existing Free Pascal translation tool, version 3.2.2+dfsg32.
+
+Context:
+
+- The generation record binds the compiler and its controlling inputs.
+
+Exclusions:
+
+- Not a new mandatory product runtime dependency.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:042.
+
+### T031: `global variables`
+
+Category: noun.
+
+Meaning: Pascal program-scope configuration, dimension and output state.
+
+Context:
+
+- The generation record must identify all such source-generator state and inputs.
+
+Exclusions:
+
+- Not environment variables.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:043.
+
+### T032: `generation claim`
+
+Category: noun.
+
+Meaning: A request produced its bounded coordinate output.
+
+Context:
+
+- The claim is bound to source, compiler and input records.
+
+Exclusions:
+
+- Not a validated native chair.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:044.
+
+### T033: `planes`
+
+Category: noun.
+
+Meaning: Infinite supporting planes of source faces, with finite boundaries separately retained.
+
+Context:
+
+- The adapter checks source-face positions and planes when grouping or triangulating faces.
+
+Exclusions:
+
+- A supporting plane alone does not prove the finite face boundary or complete source coverage.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:045.
+
+### T034: `triangles`
+
+Category: noun.
+
+Meaning: Finite three-vertex faces, with original source 1-3 diagonals preserved.
+
+Context:
+
+- The adapter's subdivision must preserve source geometry and coverage.
+
+Exclusions:
+
+- No replacement geometry, fitting or complete-program equivalence is implied.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:046.
+
+### T035: `Geometry`
+
+Category: noun.
+
+Meaning: The geometry specialist role.
+
+Context:
+
+- TERMS-5:047 is the owner label 'Geometry and validation owners'.
+
+Exclusions:
+
+- Distinct from the lowercase shape-information uses; not an assertion of geometry approval.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: TERMS-5:047.
+
+### T036: `LMS native development model`
+
+Category: noun.
+
+Meaning: The same procedural digital development result: generator and native FCStd, with casting, separate key and reference rail.
+
+Context:
+
+- The retained local result is in /home/richard/.codex/worktrees/lms-chair-development/TrackTemplateMacro/tmp/lms-chair-development.
+- It is the owner's prototype, with modeller's licence.
+- Native PASS WITH FINDINGS; full validation still FAIL because STEP reload fails.
+- The user paused further LMS work until after Phase 11.
+
+Exclusions:
+
+- Not a physical casting or a production-cleared neutral ChairDefinition package.
+- Not former P1 exterior-equivalence proof or physical-fit qualification.
+- The recorded name variants identify the same result, not different models.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-9:006.
+
+### T037: `continuous key insertion`
+
+Category: noun.
+
+Meaning: An unobstructed insertion movement over its full path.
+
+Context:
+
+- The LMS result does not establish continuous key insertion.
+
+Exclusions:
+
+- The ten sampled offsets do not establish an unobstructed full path.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: TERMS-9:011.
+
+### T038: `alignment`
+
+Category: existing noun meaning; occurrence-specific disambiguation.
+
+Meaning: Documentation alignment.
+
+Context:
+
+- All five recorded occurrences refer to reconciling the documentation with its authority and evidence.
+- The exact corrections use the existing registered compound 'documentation alignment'.
+
+Exclusions:
+
+- The existing bare 'alignment' meaning of track centreline remains unchanged.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GOVERNANCE: original reviewer's retained terminology/factual disposition; reference/TERMINOLOGY.md:133,155,169,201,205,240,253
+
+Original occurrences: MEANING-11:001, MEANING-12:001, MEANING-12:002, MEANING-13:001, MEANING-14:001.
+
+### T039: `package`
+
+Category: existing noun meanings; occurrence-specific disambiguation.
+
+Meaning: Occurrence-specific referents: the local LMS directory, or the existing neutral, versioned ChairDefinition package.
+
+Context:
+
+- MEANING-15:001, MEANING-15:002 and MEANING-15:003 identify the local directory and its README/evidence; exact corrections use 'directory'.
+- MEANING-15:004 and MEANING-16:001 are negative production-package denials and use the existing ChairDefinition package meaning.
+
+Exclusions:
+
+- Do not assign the local-directory meaning to the production-package denials.
+- No production package or package rights are accepted.
+- The existing global package meaning remains unchanged.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GOVERNANCE: original reviewer's retained terminology/factual disposition; reference/TERMINOLOGY.md:133,155,169,201,205,240,253
+
+Original occurrences: MEANING-15:001, MEANING-15:002, MEANING-15:003, MEANING-15:004, MEANING-16:001.
+
+### T040: `qualified`
+
+Category: verb; candidate-bound extended past-participle use.
+
+Meaning: STEP output passing the required export and read-back checks.
+
+Context:
+
+- VOCAB-2:005, VOCAB-8:005, MEANING-17:001 and MEANING-18:001 are the negative statement that STEP output is not qualified.
+- The failed STEP read-back remains a FAIL result.
+
+Exclusions:
+
+- Not the existing qualification of an exact host profile; that registered meaning remains unchanged.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GOVERNANCE: original reviewer's retained terminology/factual disposition; reference/TERMINOLOGY.md:133,155,169,201,205,240,253; FD-LMS: retained factual disposition supplied by /root/offline_pair_measurement on 2026-10-20; LMS README.md:3-23,34-39,48-62,82-102,121-124; independent-review.md:11-22,34-47,66-86,107-110; validation-02/result.json:673-682,1481-1508; build-03/result.json:417-432; build-03/visual-proof-02/capture-result.json:2-120
+
+Original occurrences: VOCAB-2:005, VOCAB-8:005, MEANING-17:001, MEANING-18:001.
+
+### T041: `extracted`
+
+Category: verb; candidate-bound extended past-participle use.
+
+Meaning: Selected retained Pascal bodies after declared CP1252 decoding and CRLF normalization, with span/hash binding.
+
+Context:
+
+- The source-lineage condition identifies the original archive bytes and selected Pascal bodies.
+
+Exclusions:
+
+- Different from the existing PDF Extract sense.
+- No complete-program equivalence follows from these selected bodies.
+
+Evidence:
+
+- authority.md: Earlier bounded terminology authority and exact execution scope
+- FD-GEOMETRY: retained factual disposition supplied by /root/exterior_strategy_geometry on 2026-10-20; original D-P9-018 source-adaptation scope and source-bound inventory evidence
+
+Original occurrences: MEANING-19:001.

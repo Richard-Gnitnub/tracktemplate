@@ -1320,25 +1320,25 @@ def _validate_owner_view(plan: str) -> None:
         'Phase 9B is Open at 3/6 under D-P9-012, D-P9-015 and D-P9-017',
         'Only Exits 9B-2, 9B-4 and 9B-5 are Evidenced and owner-accepted',
         'Exits 9B-1, 9B-3 and 9B-6 stay Pending',
-        'D-P9-017 accepts only Exit 9B-4 under D-P9-016 with all recorded limitations',
-        'All six exact criteria stay unchanged',
-        'Representative Core Generate manifests record output hashes and complete dependency classifications for the supported bounded scope',
-        'The checks reject missing data, unsupported data and false clearance claims',
-        'D-P9-016 keeps the curved plain-line scope and all excluded inputs',
-        'This acceptance does not extend manifest support to chair packages or selected export',
-        'The qualified Linux ext4 and recovery limits stay',
-        'All 24 risk duties stay',
+        'records the completed LMS chair development model as the owner\'s "prototype"',
+        'More LMS chair development is paused until after Phase 11',
+        'The LMS chair that the project keeps has three parts: a complete casting, a key and a rail',
+        'Its native checks and FreeCAD reload give PASS results',
+        'Independent review gives PASS WITH FINDINGS for the native development model',
+        'The full LMS validation suite gives a FAIL result because STEP reload gives a FAIL result',
+        'STEP output is not qualified',
+        'Physical fit, production and rights clearance are not accepted',
+        'All previous acceptance limits and all 24 risk duties stay',
         'D-P6-008 stays Deferred — unmet',
         'TERM-R04 stays open',
         'Output stays private-development. Project status stays unknown',
-        'The owner accepts Exit 9B-4 only',
-        'D-P9-012 and D-P9-015 keep their accepted limits',
-        'This decision accepts no other exit, production clearance or phase closeout',
-        'Complete the Level 3 alignment. Complete independent review. Complete the Documentation Review lifecycle',
-        'After CI gives a PASS result for the exact PR head, publish one draft PR',
-        'Stop for integration authority',
-        'Keep the completed worktree until independent preservation is proved',
-        'Do not force retirement',
+        'Make all chairs in the Templot source for private modelling and TrackTemplate development',
+        'Keep the source geometry and provenance',
+        'This direction accepts no phase exit and gives no public distribution authority',
+        'Make and validate the Templot chairs through the TrackTemplate path that the project uses',
+        'Record source coverage and unresolved geometry accurately',
+        'Preserve the LMS model and its evidence with a FAIL result',
+        'Complete independent review and the Documentation Review lifecycle for this documentation alignment',
     ):
         _require(
             fragment in owner_view,
@@ -1346,11 +1346,11 @@ def _validate_owner_view(plan: str) -> None:
         )
     expected_row_digests = (
         '08466b883890ebea25814fb3e6a360396bb071ecd40aa7a114820472f381b7f4',
-        'f096253095298e0365694778656e9c9274253e7de800982f938442180399b5ab',
-        '4f1f0d9b1c979241eaf6b357d1b0070b404b9ad275bbf90006faddbb05d4a7cb',
-        'c3848cd9458570a74e45d149b682bce0b4439f1c40a5f85b0ce7e3942c3d26a5',
-        'fc41ff486f3fc229a2766b52bdac19c4be84ba89c5f6feb569904291bb687a50',
-        '4605e569c86419e61bcf94728b2d1317e006c611a67189e64c868f513b54c8a3',
+        'f74b01318e2128b9e13024e67a65e924df2b8e8c5c24e2ffe7183643a794cac5',
+        '2b0934f85362b3286b2822563086f615d070b7e86b1452543104362a6ecca755',
+        '71030a1fdbdbc15423fa655c1c354faa3406debc84d376a611e73b98c2ccb688',
+        '7e8380443e7e9c868e501654033ca09f130c9d308810b124d4af98b004a9b2d3',
+        'd38437d78ed96da99ee692d0785ac053b8ea22325cc28adefabf12bfce7ebcfa',
     )
     for row, digest in zip(rows, expected_row_digests):
         _require(
@@ -1369,8 +1369,8 @@ def _validate_owner_view(plan: str) -> None:
           "#phase-9b-exit-5-acceptance-panel"),
          ("D-P9-017", "current/PHASE_EVIDENCE.md"
           "#phase-9b-exit-4-acceptance-panel"),
-         ("D-P9-017", "current/PHASE_EVIDENCE.md"
-          "#phase-9b-exit-4-acceptance-panel")),
+         ("D-P9-018", "current/PHASE_EVIDENCE.md"
+          "#lms-chair-record-and-templot-development-panel")),
         "project-plan owner view closeout or acceptance route drifted",
     )
     _require(
@@ -1414,6 +1414,24 @@ def _validate_plan_shape(plan: str) -> dict[int | str, dict[str, object]]:
         "PROJECT_PLAN.md lost the Core/Layout paragraph separation",
     )
     compact_plan = plan.replace(required_separator, required_separator.replace("\n\n", "\n"), 1)
+    # D-GOV-025 exempts only these two exact added decision rows.
+    for decision_id, expected_digest in (
+        ('D-P9-018',
+         'c9a090af7402fef052700aeea35b9c9120a98e6e8109ff25de9bd486bc10f316'),
+        ('D-GOV-025',
+         '2f808aa6ee67c50d23b176474cdfe78830179379e9c9ae61e3eac09e270e69e1'),
+    ):
+        added_rows = [
+            line for line in compact_plan.splitlines()
+            if line.startswith("| " + decision_id + " |")
+        ]
+        _require(
+            len(added_rows) == 1
+            and hashlib.sha256(added_rows[0].encode("utf-8")).hexdigest()
+            == expected_digest,
+            "authorised added dashboard row drifted: " + decision_id,
+        )
+        compact_plan = compact_plan.replace(added_rows[0] + "\n", "", 1)
     _require(
         len(compact_plan.splitlines()) <= 190,
         "PROJECT_PLAN.md exceeded its 190-line dashboard content budget",
@@ -7884,19 +7902,19 @@ def _validate_dp9_017_admission(evidence: str) -> None:
 
 
 def _validate_phase9b_decisions(document: dict[str, object]) -> None:
-    """Keep prior decisions and the bounded selected-export successor."""
+    """Keep the ten prior decisions and two exact authorised additions."""
     archive = _load_json(PHASE9A_DECISIONS_PATH)
     _require(
         set(document) == set(archive)
         and document["schema_version"] == 1
         and document["current_phase"] == 9
-        and document["updated_on"] == "2026-10-13",
+        and document["updated_on"] == "2026-10-20",
         "Phase 9B current decision header drifted",
     )
     records = document["decisions"]
     _require(
         isinstance(records, list)
-        and len(records) == 10
+        and len(records) == 12
         and records[:2] == [
             archive["decisions"][0], archive["decisions"][11],
         ],
@@ -7911,6 +7929,20 @@ def _validate_phase9b_decisions(document: dict[str, object]) -> None:
     _validate_dp9_015_decision(records[7], set(records[0]))
     _validate_dp9_016_decision(records[8], set(records[0]))
     _validate_dp9_017_decision(records[9], set(records[0]))
+    for index, identity, expected_digest in (
+        (10, 'D-P9-018',
+         'be3af2a2720606f2ebc0f48a2ffccd64a0466ea5c9ed022727ba5fbf0aaa5458'),
+        (11, 'D-GOV-025',
+         '84000ba1268c06fb705a30a91063f1ce3c4c34097106cbc8ad612da0b08d0b98'),
+    ):
+        encoded = json.dumps(
+            records[index], ensure_ascii=False, sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        _require(
+            hashlib.sha256(encoded).hexdigest() == expected_digest,
+            identity + " exact authorised decision drifted",
+        )
 
 
 def _validate_phase9a_closeout(evidence: str) -> None:
@@ -8089,7 +8121,7 @@ def _validate_dp9_012_admission(evidence: str) -> None:
          ("D-P9-012", "#phase-9b-exit-2-acceptance-panel"),
          ("D-P9-015", "#phase-9b-exit-5-acceptance-panel"),
          ("D-P9-017", "#phase-9b-exit-4-acceptance-panel"),
-         ("D-P9-017", "#phase-9b-exit-4-acceptance-panel")),
+         ("D-P9-018", "#lms-chair-record-and-templot-development-panel")),
         "Phase 9B evidence owner-view route drifted",
     )
 
@@ -8993,7 +9025,7 @@ def _validate_decisions(plan: str) -> None:
         and "history/phase-closeouts/PHASE8_GATE_DECISIONS.json"
         in decision_section
         and "current decision register" in decision_flat
-        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-017 "
+        and "keeps D-P6-008 in full and records D-P9-010 through D-P9-018 "
         "and D-GOV-024" in decision_flat,
         "Phase 7 closeout or current decision-register ownership is missing",
     )
@@ -9012,9 +9044,9 @@ def _validate_decisions(plan: str) -> None:
         | {"D-P7-001", "D-GOV-019", "D-P7-002", "D-P7-003", "D-P7-004", "D-P7-005", "D-P7-006", "D-P8-001", "D-GOV-020", "D-GOV-021", "D-GOV-022", "D-P8-002", "D-P8-003", "D-P8-004", "D-P8-005", "D-P8-006"}
         | {"D-P9-001", "D-P9-002", "D-P9-003", "D-P9-004",
            "D-P9-005", "D-P9-006", "D-P9-007", "D-P9-008", "D-P9-009",
-           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014", "D-P9-015", "D-P9-016", "D-P9-017",
+           "D-P9-010", "D-P9-011", "D-P9-012", "D-P9-013", "D-P9-014", "D-P9-015", "D-P9-016", "D-P9-017", "D-P9-018",
            "D-GOV-023",
-           "D-GOV-024"},
+           "D-GOV-024", "D-GOV-025"},
         "project-plan decisions differ from the current and frozen registers",
     )
 

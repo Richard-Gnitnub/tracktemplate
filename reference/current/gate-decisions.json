@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_phase": 9,
-  "updated_on": "2026-10-13",
+  "updated_on": "2026-10-20",
   "decisions": [
     {
       "id": "D-P6-008",
@@ -112,6 +112,28 @@
       "evidence": "reference/current/PHASE_EVIDENCE.md#phase-9b-exit-4-acceptance-panel",
       "panel_required_under_current_policy": true,
       "panel_record": "reference/current/PHASE_EVIDENCE.md#phase-9b-exit-4-acceptance-panel"
+    },
+    {
+      "id": "D-P9-018",
+      "decided_on": "2026-10-18",
+      "status": "Accepted",
+      "decision": "Record the completed LMS chair development model as the owner's \"prototype\". Pause more LMS chair development until after Phase 11. Make all chairs from the Templot geometry for private modelling and TrackTemplate development. Adapt those chairs through the TrackTemplate path that the project uses.",
+      "authority": "thank you codex, that was a great first go. We shall record this as a prototype. We will pause LMS chair development for now and pick it up again as a feature post phase 11. What I really want to do now is model every templot chair using templot geometry which we've already established. This is for personal use as per provenance i don't intend to widely distribute templot designs apart from my own private modelling.\n\nSo, lets do that. lets build out every chair in the templot inventory. adapt into tracktemplate as previously established and then use that inventory of templot chairs to enable track template development. In the meantime I will have a think with what to do about LMS chairing/",
+      "exclusions": "The LMS native development model has PASS results and independent review gives PASS WITH FINDINGS. Its full validation suite stays FAIL because STEP reload gives a FAIL result. Keep the model, output with a FAIL result and previous evidence. Accept no physical fit, continuous key insertion, preload, retention, manufacturing capability or P1 exterior equivalence.\n\nKeep source classifications, notices, provenance and unresolved rights. Research data and outputs stay local, untracked and private-development. Personal use gives no third-party permission or positive rights finding. No public distribution is authorised.\n\nRecord missing Templot geometry and Templot geometry that the adapter does not make. Do not make geometry that the source does not contain or claim the complete set is made without evidence. This direction does not make all Templot families mandatory for the Core release candidate or change an accepted chair definition.\n\nPhase 9A stays closed at 4/4 for its frozen reference-only scope. Phase 9B stays Open at 3/6. Only Exits 9B-2, 9B-4 and 9B-5 are Evidenced and owner-accepted. Exits 9B-1, 9B-3 and 9B-6 stay Pending.\n\nPreserve all six exact criteria, all 24 risk duties and previous decisions. D-P6-008 stays Deferred — unmet. TERM-R04 stays open. Project status stays unknown. Accept no production package, output clearance, rights, performance result, release or phase closeout.\n\nThe independent panel's recommendation is \"Proceed with bounded conditions\". Complete the Documentation Review lifecycle before this documentation alignment becomes the controlled baseline. This decision gives no publication or integration authority.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#lms-chair-record-and-templot-development-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#lms-chair-record-and-templot-development-panel"
+    },
+    {
+      "id": "D-GOV-025",
+      "decided_on": "2026-10-20",
+      "status": "Accepted",
+      "decision": "Approve one candidate-bound Level 3 documentation exception for the frozen D-P9-018 candidate and original BLOCKED review.",
+      "authority": "As project owner, I approve the six-step candidate-bound Level 3\nexception in your latest reviewed proposal, including its disclosed\nrisk-challenge independence limitation.\n\nBind this authority to original candidate:\n895b2b31ece814783780053b1bcdde24fb927b5d414830af3443222f5a336617\n\nand original BLOCKED review:\n5523e04fbf26155ffec3e4cb48fc477e6326ded4f75ded4fb9e23af500cfb6b9\n\nComplete that route through the existing owners. I expressly authorise\nthe one late correction supplement, occurrence-specific terminology\nappendix, local content-hash completion receipt, preserved-cache rebuild\nand only the specified consequential validator repairs.\n\nLimit retained edits to the proposal’s file scope. Qualify the local\nverifier and obtain independent code review before applying the frozen\nrecipe once. Keep linguistic judgement with the named original reviewer;\nthe verifier does not establish conformance.\n\nPreserve the original candidate, BLOCKED verdict and empty correction\nrecord. Account for all 21 findings and every occurrence without dummy\nreplacements or a new findings search.\n\nOne supplement and one application only. Apply the proposal’s stop\nconditions; no second wording cycle, broader repair or general framework.\n\nReport local exception completion and actual validation results.\nDo not claim linguistic ACCEPT, global terminology admission or ordinary\nGit lifecycle completion. Companion additions inherit no linguistic acceptance.\n\nNo geometry work, rights or programme acceptance, commit, push, PR or merge.\nPreserve the inventory, evidence, unsupported entries, LMS pause and all\nconsumed allowances. Stop after independent result review.",
+      "exclusions": "One late supplement and one exact application only. Preserve the original candidate, BLOCKED verdict, empty correction record and all failed evidence. Local exception completion is not linguistic ACCEPT, global terminology admission or ordinary Git lifecycle completion. Companion additions inherit no linguistic acceptance. No geometry work, rights or programme acceptance, commit, push, PR or merge. Preserve the inventory, evidence, unsupported entries, LMS pause, all consumed allowances and all phase and production limits. Stop after independent result review.",
+      "evidence": "reference/current/PHASE_EVIDENCE.md#candidate-bound-documentation-exception-panel",
+      "panel_required_under_current_policy": true,
+      "panel_record": "reference/current/PHASE_EVIDENCE.md#candidate-bound-documentation-exception-panel"
     }
   ]
 }
