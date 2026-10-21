@@ -1795,7 +1795,8 @@ The tests compare source data before and after the command, `Undo` and `Redo`.
 The `transaction_failure_cleanup` check gives a PASS result.
 The results stay in `tmp/chair-frame-recovery/native-s1-01/`, `native-s1j-01/`, `native-combined-01/` and `gui-combined-01/`.
 
-The independent review gives a PASS result for the source and tests in `tmp/chair-frame-recovery/quality-review-01.json`.
+The independent review gives a PASS result for the source and tests.
+The result stays in `tmp/chair-frame-recovery/quality-review-01.json`.
 The reviewer examined the four `overview.png` and `chair-closeup.png` files in `gui-combined-01/s1/` and `gui-combined-01/s1j/`.
 
 All previous evidence, with the `native-04` limitation and the independent review results of BLOCKED, stays available.
