@@ -1,4 +1,4 @@
-"""Materialise one explicit private S1 preview in an isolated document.
+"""Materialise one private S1 or S1J preview in an isolated document.
 
 Five validated model components remain separate, centrally keyed and
 reference-only. The seven display layers have no production/export tags,
@@ -45,9 +45,10 @@ from tracktemplate.adapters.freecad.core_export_document import (
 )
 from tracktemplate.application.chair_model_research import (
     prepare_chair_model_research,
+    prepare_chair_s1j_model_research,
 )
 from tracktemplate.domain.chair_assembly import CHAIR_ASSEMBLY_ROLES
-from tracktemplate.domain.chair_placement import S1Placement
+from tracktemplate.domain.chair_placement import S1Placement, S1JPlacement
 
 
 _LAYERS = (
@@ -66,13 +67,16 @@ def _require(condition, message):
         raise RuntimeError("S1 reference preview: " + message)
 
 
-def _placements(values):
+def _placements(values, placement_type=S1Placement):
     """Revalidate caller records without trusting a frozen instance alone."""
     if not isinstance(values, tuple) or not values:
         raise ValueError("S1 preview placements must be a nonempty tuple")
-    if any(type(value) is not S1Placement for value in values):
-        raise TypeError("S1 preview requires S1Placement records")
-    result = tuple(S1Placement(
+    if any(type(value) is not placement_type for value in values):
+        family = "S1J" if placement_type is S1JPlacement else "S1"
+        raise TypeError(
+            f"{family} preview requires {placement_type.__name__} records"
+        )
+    result = tuple(placement_type(
         value.position_id, value.rail_id, value.timber_id,
         value.origin_mm, value.x_axis, value.y_axis,
     ) for value in values)
@@ -264,13 +268,14 @@ def _verify_stored_layers(stored_layers, layers, model, placements):
         ), "stored layer volume changed")
 
 
-def create_s1_reference_preview(
+def _create_reference_preview(
     package, manifest_text, model_request, placements, context_shapes,
-    source_receipt, verify_source,
+    source_receipt, verify_source, *, family, placement_type, prepare_model,
+    layer_specs,
 ):
     """Create a private seven-layer snapshot, preserving source documents.
 
-    The caller supplies current analysed S1 placements and a callback that
+    The caller supplies current analysed family placements and a callback that
     raises if the complete source context has changed. The callback runs
     immediately before commit. On failure, only the invocation-owned
     preview is aborted/closed; prior registry, active document and exact GUI
@@ -281,11 +286,13 @@ def create_s1_reference_preview(
     package, fit, key-direction, production, persistence or export authority.
     """
     if not callable(verify_source):
-        raise TypeError("S1 preview requires a source verification callback")
-    placements = _placements(placements)
+        raise TypeError(
+            f"{family} preview requires a source verification callback"
+        )
+    placements = _placements(placements, placement_type)
     json.dumps(source_receipt, allow_nan=False)
     receipt = deepcopy(source_receipt)
-    model = prepare_chair_model_research(package, manifest_text, model_request)
+    model = prepare_model(package, manifest_text, model_request)
     gui = None
     if App.GuiUp:
         import FreeCADGui as gui
@@ -295,7 +302,7 @@ def create_s1_reference_preview(
              "previous active document is unregistered")
     selection = _selection_snapshot(App, gui)
     preselection = _preselection_snapshot(App, gui)
-    name = "TrackTemplateS1Reference_" + uuid.uuid4().hex
+    name = "TrackTemplate" + family + "Reference_" + uuid.uuid4().hex
     _require(name not in previous, "preview document name already exists")
     owned = None
     transaction = False
@@ -303,7 +310,7 @@ def create_s1_reference_preview(
         layers, placed = _build_layers(model, placements, context_shapes)
         layer_measurements = [dict(
             _measure_layer(shape), name=spec[0], role=spec[1],
-        ) for spec, shape in zip(_LAYERS, layers)]
+        ) for spec, shape in zip(layer_specs, layers)]
         result = {
             "document_name": name, "source_receipt": receipt,
             "package_signature": package.content_signature,
@@ -326,7 +333,7 @@ def create_s1_reference_preview(
         _require(_same_registry(dict(App.listDocuments()), previous),
                  "document registry changed during preparation")
         document = App.newDocument(
-            name, "Private S1 - " + receipt.get(
+            name, f"Private {family} - " + receipt.get(
                 "coverage_summary", "reference only",
             ) + " - central keys", False, False,
         )
@@ -340,13 +347,13 @@ def create_s1_reference_preview(
                  and _same_registry(observed, expected),
                  "new document ownership is unclear")
         document.UndoMode = 1
-        document.openTransaction("Create private S1 reference preview")
+        document.openTransaction(f"Create private {family} reference preview")
         transaction = True
-        for (object_name, label, colour), shape in zip(_LAYERS, layers):
+        for (object_name, label, colour), shape in zip(layer_specs, layers):
             obj = document.addObject("Part::Feature", object_name)
             _require(document.getObject(object_name) is obj,
                      "display object ownership is unclear")
-            obj.Label = "Private S1 reference - " + label
+            obj.Label = f"Private {family} reference - " + label
             obj.Shape = shape
             if gui is not None:
                 obj.ViewObject.ShapeColor = colour
@@ -356,7 +363,7 @@ def create_s1_reference_preview(
         _require(document.recompute() is not False, "preview recompute failed")
         _require(len(document.Objects) == 7, "unexpected preview object count")
         _verify_stored_layers(
-            tuple(document.getObject(spec[0]).Shape for spec in _LAYERS),
+            tuple(document.getObject(spec[0]).Shape for spec in layer_specs),
             layers, model, placements,
         )
         _restore_selection(App, gui, selection)
@@ -380,12 +387,53 @@ def create_s1_reference_preview(
             try:
                 owned[1].abortTransaction()
             except BaseException as abort_error:
-                error.add_note("S1 preview abort failed: " + str(abort_error))
+                error.add_note(
+                    f"{family} preview abort failed: " + str(abort_error)
+                )
         errors, interruption = _cleanup(
             App, gui, owned, previous, active, selection, preselection,
         )
         if errors:
-            error.add_note("S1 preview cleanup failed: " + "; ".join(errors))
+            error.add_note(
+                f"{family} preview cleanup failed: " + "; ".join(errors)
+            )
         if interruption is not None:
-            error.add_note("S1 preview cleanup was interrupted.")
+            error.add_note(f"{family} preview cleanup was interrupted.")
         raise
+
+
+def create_s1_reference_preview(
+    package, manifest_text, model_request, placements, context_shapes,
+    source_receipt, verify_source,
+):
+    """Create the existing private seven-layer S1 snapshot transaction."""
+    return _create_reference_preview(
+        package, manifest_text, model_request, placements, context_shapes,
+        source_receipt, verify_source, family="S1",
+        placement_type=S1Placement, prepare_model=prepare_chair_model_research,
+        layer_specs=_LAYERS,
+    )
+
+
+def create_s1j_reference_preview(
+    package, manifest_text, model_request, placements, context_shapes,
+    source_receipt, verify_source,
+):
+    """Create a private S1J snapshot through the same seven-layer lifecycle.
+
+    Reject another family's package or placements before document creation.
+    Preserve source and foreign documents, selection and rollback semantics.
+    The result is a derived research view, with no production, persistence,
+    physical-fit, directional-key or export authority.
+    """
+    layer_specs = tuple(
+        (name.replace("S1", "S1J", 1), label, colour)
+        for name, label, colour in _LAYERS
+    )
+    return _create_reference_preview(
+        package, manifest_text, model_request, placements, context_shapes,
+        source_receipt, verify_source, family="S1J",
+        placement_type=S1JPlacement,
+        prepare_model=prepare_chair_s1j_model_research,
+        layer_specs=layer_specs,
+    )

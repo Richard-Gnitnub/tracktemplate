@@ -1706,3 +1706,39 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## S1J chairs at C10 positions — 2026-10-21
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+The [command](../../tracktemplate/compatibility/chair_reference_preview.py) makes a different `App.Document` when a person starts it. It does not write that `App.Document` to a file.
+The [software](../../tracktemplate/adapters/freecad/chair_reference_preview.py) makes five S1J components in seven `Part::Feature` items.
+For the copied C10 input, the window title shows `4/5 S1J; 1 unresolved`.
+The evidence identifies all 168 chair positions and gives a cause for each position that the software does not show.
+The S1 command gives the same `37/54 S1; 17 unresolved` result.
+
+The [S1J selection test](../../tests/validate_phase9b_s1j_reference_preview.py) gives 28 PASS results.
+The [component test](../../tests/validate_phase9b_chair_s1j.py), S1 tests and previous regression tests also give PASS results.
+The [FreeCAD test](../../tests/freecad_validate_phase9b_s1_reference_preview.py) gives PASS results on the qualified host profile for S1J and S1.
+These results include `source_unchanged`, `undo_redo`, `transaction_failure_cleanup` and `analysis_rejections`.
+The independent reviewer examined clear `overview.png` and `chair-closeup.png` images for S1J and S1.
+The results and images stay in `tmp/s1j-preview/gui-s1j-02/` and `tmp/s1j-preview/gui-s1-01/`.
+
+The checks compare only `S1JBasePlinth` and `S1JRailSeat` values with Templot data.
+They give a PASS result in `tmp/s1j-preview/source-components-result.json`.
+These checks do not compare the complete `S1JOuterJaw` and `S1JInnerJaw` shapes with Templot data.
+
+Local evidence keeps `private-input-build-01` and `native-s1j-01` with FAIL results.
+The `native-s1j-01` result has the failure class `environment-or-profile-defect`.
+The image at `tmp/s1j-preview/gui-s1j-01/chair-closeup.png` does not show a chair.
+Local evidence also keeps the initial `BLOCKED` quality review in `tmp/s1j-preview/quality-review-01.json`.
+
+The first repair changed only `build_reference_inputs.py`. The second changed only `_images` in the FreeCAD test.
+Product software stayed the same during those repairs.
+The independent review gives a PASS result for the source and tests in `tmp/s1j-preview/quality-review-02.json`.
+
+The conditions in D-P9-018 stay the same.
+This result gives no acceptance for physical fit, the direction of the `S1JCentralKey` component, persistence, production, export behaviour or phase exits.
+This result gives no positive rights claim.
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.

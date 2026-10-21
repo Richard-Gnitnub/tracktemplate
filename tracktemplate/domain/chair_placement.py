@@ -1,4 +1,4 @@
-"""Place model-mm S1 reference geometry in an existing analytical frame.
+"""Place model-mm S1 and S1J references in an existing analytical frame.
 
 The chair-local origin is the rail-section centre at the base mounting
 plane. Its +X runs along the rail, +Y points from gauge to field, and +Z
@@ -93,11 +93,11 @@ class S1Placement:
         return result
 
 
-def prepare_s1_placements(records):
+def _prepare_placements(records, chair_code, placement_type, family):
     """Freeze supported plan instances in stable position-identity order.
 
-    The caller supplies only selected S1 records from the current analysed
-    plan. Its centre_point and base_z already contain the intended model-mm
+    The caller supplies selected records of one family from the analysed plan.
+    Its centre_point and base_z already contain the intended model-mm
     translation. Legacy local_y_axis points opposite canonical +X, while
     outward_axis is canonical +Y. No source record is changed.
 
@@ -107,23 +107,26 @@ def prepare_s1_placements(records):
     try:
         iterator = iter(records)
     except TypeError as error:
-        raise ValueError("S1 placement records must be iterable") from error
+        raise ValueError(f"{family} placement records must be iterable") from error
     result = []
     identities = set()
     for record in iterator:
         if not isinstance(record, Mapping):
-            raise ValueError("S1 placement record must be a mapping")
+            raise ValueError(f"{family} placement record must be a mapping")
         code = record.get("chair_code")
-        if isinstance(code, bool) or not isinstance(code, int) or code != 1:
-            raise ValueError("S1 placement requires integer chair_code 1")
+        if (isinstance(code, bool) or not isinstance(code, int)
+                or code != chair_code):
+            raise ValueError(
+                f"{family} placement requires integer chair_code {chair_code}"
+            )
         position_id = _identity(
             record.get("chair_position_identity"), "position_id",
         )
         if position_id in identities:
-            raise ValueError("S1 placement position identity is duplicated")
+            raise ValueError(f"{family} placement position identity is duplicated")
         centre = _coordinates(record.get("centre_point"), 2, "centre_point")
         local_y = _coordinates(record.get("local_y_axis"), 2, "local_y_axis")
-        placement = S1Placement(
+        placement = placement_type(
             position_id=position_id,
             rail_id=record.get("rail_identity"),
             timber_id=record.get("timber_identity"),
@@ -134,5 +137,24 @@ def prepare_s1_placements(records):
         identities.add(position_id)
         result.append(placement)
     if not result:
-        raise ValueError("S1 placement records must not be empty")
+        raise ValueError(f"{family} placement records must not be empty")
     return tuple(sorted(result, key=lambda item: item.position_id))
+
+
+@dataclass(frozen=True)
+class S1JPlacement(S1Placement):
+    """A joint-chair family tag on the same proper model-mm frame."""
+
+
+def prepare_s1_placements(records):
+    """Freeze only integer-code-1 records in stable position order."""
+    return _prepare_placements(records, 1, S1Placement, "S1")
+
+
+def prepare_s1j_placements(records):
+    """Freeze only integer-code-7 records in stable position order.
+
+    The frame and model-mm datum retain the same analytical meaning as
+    the S1 route. No unresolved position is given a replacement frame.
+    """
+    return _prepare_placements(records, 7, S1JPlacement, "S1J")

@@ -69,6 +69,9 @@ def _load_modular_transition_workflow(
         selected_export_atomic=True,
         runtime_record=bootstrap.runtime_record,
         s1_reference_preview_factory=chair_preview.create_s1_reference_preview,
+        s1j_reference_preview_factory=(
+            chair_preview.create_s1j_reference_preview
+        ),
     )
     return session, session.routing_record()
 

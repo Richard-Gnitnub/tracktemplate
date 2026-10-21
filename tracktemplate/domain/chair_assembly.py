@@ -53,6 +53,22 @@ def assemble_chair_components(components):
     must agree. These checks are mathematical consistency constraints,
     not physical rail-fit or prototype acceptance criteria.
     """
+    return _assemble_chair_components(components)
+
+
+def assemble_s1j_chair_components(components):
+    """Compose a wider base and seat with the unchanged S1 jaw pattern.
+
+    The base and seat share one width. Both jaws share a different,
+    narrower reference width. Equal purpose names do not merge those
+    meanings. All other shared inputs and frame checks remain mandatory.
+    The key stays central, with no physical-fit or production claim.
+    """
+    return _assemble_chair_components(components, s1j=True)
+
+
+def _assemble_chair_components(components, *, s1j=False):
+    """Check the selected finite assembly without changing its components."""
     if not isinstance(components, tuple) or len(components) != 5:
         raise ValueError("assembly requires exactly five named components")
     for item, role, expected in zip(
@@ -63,12 +79,22 @@ def assemble_chair_components(components):
             raise ValueError("assembly component role, order or type differs")
     geometries = tuple(item[1] for item in components)
     for name in _SHARED_PARAMETERS:
+        if s1j and name == "chair_half_width_mm":
+            continue
         values = [getattr(g.parameters, name) for g in geometries
                   if hasattr(g.parameters, name)]
         if any(value != values[0] for value in values[1:]):
             raise ValueError("assembly shared input differs: " + name)
 
     outer, inner = geometries[3].parameters, geometries[4].parameters
+    if s1j:
+        base, seat = geometries[0].parameters, geometries[1].parameters
+        if base.chair_half_width_mm != seat.chair_half_width_mm:
+            raise ValueError("S1J base and seat widths differ")
+        if outer.chair_half_width_mm != inner.chair_half_width_mm:
+            raise ValueError("S1J jaw reference widths differ")
+        if base.chair_half_width_mm <= outer.chair_half_width_mm:
+            raise ValueError("S1J base must be wider than the jaw reference")
     for stage in ("top", "mid"):
         if getattr(inner, "outer_" + stage + "_height_mm") != getattr(
             outer, stage + "_height_mm",

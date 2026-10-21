@@ -16,6 +16,7 @@ from tracktemplate.application.chair_research import (
     ChairAssemblyResearchResult,
     ChairResearchError,
     prepare_chair_assembly_research,
+    prepare_chair_s1j_assembly_research,
 )
 from tracktemplate.domain.chair_model_scale import (
     ChairModelAssemblyGeometry,
@@ -116,7 +117,26 @@ def prepare_chair_model_research(package, manifest_text, request):
     binds the complete request to the original package and manifest
     signatures; it does not replace either original signature.
     """
-    full_size = prepare_chair_assembly_research(package, manifest_text)
+    return _prepare_chair_model_research(
+        package, manifest_text, request, prepare_chair_assembly_research,
+    )
+
+
+def prepare_chair_s1j_model_research(package, manifest_text, request):
+    """Project the finite S1J package into the unchanged 4 mm/ft frame.
+
+    Reject other assembly rule sets before projection. The same explicit
+    request, signature binding and reference-only restrictions apply.
+    This operation changes no package, document, file or acceptance state.
+    """
+    return _prepare_chair_model_research(
+        package, manifest_text, request, prepare_chair_s1j_assembly_research,
+    )
+
+
+def _prepare_chair_model_research(package, manifest_text, request, prepare):
+    """Project only the assembly selected by an internal finite wrapper."""
+    full_size = prepare(package, manifest_text)
     frame = package.to_record()["definition"]["frame"]
     request_record = _validate_request(request, frame)
     request_json = _canonical_json(request_record)
