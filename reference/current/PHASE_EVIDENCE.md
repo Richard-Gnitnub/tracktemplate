@@ -1731,7 +1731,7 @@ These checks do not compare the complete `S1JOuterJaw` and `S1JInnerJaw` shapes 
 Local evidence keeps `private-input-build-01` and `native-s1j-01` with FAIL results.
 The `native-s1j-01` result has the failure class `environment-or-profile-defect`.
 The image at `tmp/s1j-preview/gui-s1j-01/chair-closeup.png` does not show a chair.
-Local evidence also keeps the initial `BLOCKED` review in `tmp/s1j-preview/quality-review-01.json`.
+Local evidence also keeps the initial `BLOCKED` quality review in `tmp/s1j-preview/quality-review-01.json`.
 
 The first repair changed only `build_reference_inputs.py`. The second changed only `_images` in the FreeCAD test.
 Product software stayed the same during those repairs.
