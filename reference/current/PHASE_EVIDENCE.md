@@ -1751,9 +1751,9 @@ The [command](../../tracktemplate/compatibility/chair_reference_preview.py) make
 It does not write that `App.Document` to a file.
 The [software](../../tracktemplate/adapters/freecad/chair_reference_preview.py) makes five components for each chair type.
 The `App.Document` has twelve `Part::Feature` items.
-The previous geometry and packages do not change.
+The shapes of the chair components and the packages do not change.
 
-For the copied C10 input, the window title shows `41/59 S1/S1J; 18 unresolved; 37/54 S1; 4/5 S1J`.
+For the copy of the C10 input, the window title shows `41/59 S1/S1J; 18 unresolved; 37/54 S1; 4/5 S1J`.
 The evidence identifies all 168 chair positions.
 It gives a cause for each of the 127 positions that the software does not show.
 
@@ -1763,15 +1763,15 @@ The test also gives PASS results with the FreeCAD window open.
 These results include `common_context`, `before_document_rejections`, `rollback_owned_document`, `subprecision_rejection`, `source_unchanged`, `foreign_unchanged`, `undo_redo`, `transaction_failure_cleanup` and `analysis_rejections`.
 The results stay in `tmp/combined-preview/native-combined-02/` and `tmp/combined-preview/gui-combined-01/`.
 
-The independent reviewer examined four clear images in `gui-combined-01/s1/` and `gui-combined-01/s1j/`.
+The independent reviewer examined the four `overview.png` and `chair-closeup.png` files in `gui-combined-01/s1/` and `gui-combined-01/s1j/`.
 The independent review gives a PASS result for the source and tests in `tmp/combined-preview/quality-review-01.json`.
 Local evidence keeps the previous `native-combined-01` result and the `proof-drafting/` files.
-The `native-combined-01` result applies only to previous source and tests.
-The previous S1 and S1J evidence, with the `native-04` limitation, stays unchanged.
+The `native-combined-01` result is only for previous source and tests.
+The previous S1 and S1J evidence, with the `native-04` limitation, does not change.
 
 The conditions in D-P9-018 stay the same.
 This result gives no acceptance for physical fit or the direction of the `S1CentralKey` and `S1JCentralKey` components.
-It gives no acceptance for persistence, production, export behaviour, performance or phase exits.
+It gives no acceptance for persistence, production, export behaviour, product performance or phase exits.
 This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
