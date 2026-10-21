@@ -2571,6 +2571,7 @@ class ModularCoreLayoutWorkflowSession:
         selected_export_atomic=False,
         export_files_factory=None,
         export_dispatcher_factory=None,
+        s1_reference_preview_factory=None,
     ):
         staged = staged or atomic
         if staged and not callable(export_files_factory):
@@ -2587,6 +2588,7 @@ class ModularCoreLayoutWorkflowSession:
         self._atomic_export = atomic
         self._export_files_factory = export_files_factory
         self._export_dispatcher_factory = export_dispatcher_factory
+        self._s1_reference_preview_factory = s1_reference_preview_factory
         self._export_operations = (
             STAGED_CORE_LAYOUT_EXPORT_HOST_OPERATIONS if staged
             else CORE_LAYOUT_EXPORT_HOST_OPERATIONS
@@ -2810,6 +2812,21 @@ class ModularCoreLayoutWorkflowSession:
             "mixed_route": False,
         }
 
+    def preview_s1_reference_chairs(
+        self, source_document, turnout_id, package, manifest_text,
+        model_request,
+    ):
+        """Inspect private S1 references at current confirmed C10 positions."""
+        from tracktemplate.compatibility.chair_reference_preview import (
+            preview_s1_reference_chairs,
+        )
+
+        self.routing_record()
+        return preview_s1_reference_chairs(
+            self.module, source_document, turnout_id, package, manifest_text,
+            model_request, self._s1_reference_preview_factory,
+        )
+
     def launch_workflow(self):
         """Launch after restoring and checking both selected route groups."""
         self._bind_core_layout_export()
@@ -2827,6 +2844,7 @@ def load_modular_transition_workflow_session(
     export_dispatcher_factory=None,
     selected_export_files_factory=None,
     selected_export_atomic=False,
+    s1_reference_preview_factory=None,
 ):
     """Load the inherited host and bind only the modular implementation."""
     try:
@@ -2882,4 +2900,5 @@ def load_modular_transition_workflow_session(
         selected_export_atomic=selected_export_atomic,
         export_files_factory=export_files_factory,
         export_dispatcher_factory=export_dispatcher_factory,
+        s1_reference_preview_factory=s1_reference_preview_factory,
     )

@@ -50,6 +50,9 @@ def _load_modular_transition_workflow(
     export_document = importlib.import_module(
         "tracktemplate.adapters.freecad.core_export_document"
     )
+    chair_preview = importlib.import_module(
+        "tracktemplate.adapters.freecad.chair_reference_preview"
+    )
     transition_contract = bootstrap.load_contract(
         repository_root
         / "reference"
@@ -65,6 +68,7 @@ def _load_modular_transition_workflow(
         selected_export_files_factory=export_files.CoreLayoutExportSetFiles,
         selected_export_atomic=True,
         runtime_record=bootstrap.runtime_record,
+        s1_reference_preview_factory=chair_preview.create_s1_reference_preview,
     )
     return session, session.routing_record()
 
