@@ -5,11 +5,14 @@ select the retained private reference; otherwise use invented geometry.
 No production, fit, persistence or Phase 9B acceptance follows.
 """
 
+import copy
 import datetime
+from fractions import Fraction
 import hashlib
 import importlib.util
 import io
 import json
+import math
 import os
 from pathlib import Path
 import runpy
@@ -43,6 +46,7 @@ from tracktemplate.application.chair_model_research import (  # noqa: E402
     prepare_chair_s1j_model_research,
 )
 from tracktemplate.compatibility.chair_reference_preview import (  # noqa: E402
+    _recover_positions,
     _select_positions,
     _select_s1j_positions,
     _source_context,
@@ -66,6 +70,143 @@ def _continuity_helpers():
 
 
 continuity = _continuity_helpers()
+
+
+def _face_crossing(centre, tangent, points):
+    """Solve raw face sections independently by tangent dot products."""
+    centre = tuple(Fraction(value) for value in centre)
+    tangent = tuple(Fraction(value) for value in tangent)
+    roots = []
+    for index, (a, b) in enumerate(zip(points, points[1:])):
+        a, b = (tuple(Fraction(value) for value in point) for point in (a, b))
+        ha = sum(t * (p - c) for t, p, c in zip(tangent, a, centre))
+        hb = sum(t * (p - c) for t, p, c in zip(tangent, b, centre))
+        assert not ha == hb == 0
+        if ha == hb:
+            continue
+        fraction = -ha / (hb - ha)
+        if 0 <= fraction <= 1:
+            point = tuple(x + fraction * (y - x) for x, y in zip(a, b))
+            roots.append((index, fraction, point))
+    assert len(roots) == 1, roots
+    return roots[0]
+
+
+def _placement_recovery(module, analysis, plan, rails, timbers, family):
+    """Prove retained frames and recovery against raw named face sections."""
+    select = _select_positions if family == "S1" else _select_s1j_positions
+    code, old_count, extra_count = (1, 37, 17) if family == "S1" else (7, 4, 1)
+    raw_before = json.dumps((analysis, plan, rails, timbers), sort_keys=True)
+    old, old_excluded = select(module, analysis, plan)
+    assert len(old) == old_count
+    placements, excluded, records = _recover_positions(
+        module, analysis, plan, rails, timbers, old, old_excluded, code,
+    )
+    by_id = {item.position_id: item for item in placements}
+    assert all(by_id[item.position_id] == item for item in old)
+    assert all(by_id[item.position_id] is item for item in old)
+    original_ids = {item.position_id for item in old}
+    recovered_ids = set(by_id) - original_ids
+    assert len(recovered_ids) == len(records) == extra_count
+    assert recovered_ids == {item["position_id"] for item in records}
+    positions = {item["stable_chair_position_identity"]: item
+                 for item in analysis["positions"]}
+    rail_map = {item["stable_identity"]: item for item in rails}
+    reasons = {item["chair_position_identity"]: item["reason"]
+               for item in plan["analytical_only"]}
+    datums = {item["base_z"] for item in plan["instances"]}
+    assert len(datums) == 1
+    base_z = next(iter(datums))
+    observations = []
+    for record in records:
+        identity = record["position_id"]
+        placement, position = by_id[identity], positions[identity]
+        centre = position["centre_point"]
+        tangent = position["local_rail_tangent"]
+        rail = rail_map[position["rail_identity"]]
+        assert record["original_reason"] == reasons[identity]
+        assert record["rail_id"] == placement.rail_id == (
+            rail["stable_identity"]
+        )
+        assert record["timber_id"] == placement.timber_id == (
+            position["timber_identity"]
+        )
+        assert record["chair_code"] == position["chair_code"] == code
+        assert placement.origin_mm == (*centre, base_z)
+        witness = record["frame_evidence"]
+        assert witness["method"] == "accepted-tangent-normal-intersection-v1"
+        assert tuple(witness["centre_point_mm"]) == tuple(centre)
+        assert tuple(witness["local_rail_tangent"]) == tuple(tangent)
+        sides = []
+        for face in ("gauge", "outer"):
+            index, fraction, point = _face_crossing(
+                centre, tangent, rail[face + "_face_points"],
+            )
+            evidence = witness[face + "_face"]
+            exact_point = tuple(Fraction(value)
+                                for value in evidence["point_mm_exact"])
+            assert point == exact_point
+            assert len(evidence["segments"]) == 1
+            segment = evidence["segments"][0]
+            assert segment["index"] == index
+            assert Fraction(segment["fraction_exact"]) == fraction
+            side = (-Fraction(tangent[1]) * (point[0] - Fraction(centre[0]))
+                    + Fraction(tangent[0]) * (point[1] - Fraction(centre[1])))
+            assert side * Fraction(
+                evidence["normal_parameter_mm_exact"],
+            ) > 0
+            sides.append(side)
+        assert sides[0] * sides[1] < 0
+        sign = 1 if sides[0] > 0 else -1
+        length = math.hypot(*tangent)
+        y_axis = (sign * tangent[1] / length, -sign * tangent[0] / length)
+        x_axis = (y_axis[1], -y_axis[0])
+        assert placement.x_axis == x_axis and placement.y_axis == y_axis
+        observations.append({
+            "position_id": identity, "centre_mm": centre, "base_z_mm": base_z,
+            "face_sides_exact": [str(side) for side in sides],
+        })
+    assert json.dumps((analysis, plan, rails, timbers), sort_keys=True) == (
+        raw_before
+    )
+    victim = positions[records[0]["position_id"]]
+    rejected_faces = {}
+    for case in ("missing", "ambiguous"):
+        changed_rails = copy.deepcopy(rails)
+        changed = next(item for item in changed_rails
+                       if item["stable_identity"] == victim["rail_identity"])
+        if case == "missing":
+            changed.pop("gauge_face_points")
+        else:
+            centre = victim["centre_point"]
+            tangent = victim["local_rail_tangent"]
+            normal = (-tangent[1], tangent[0])
+            changed["gauge_face_points"] = [
+                tuple(c + along * t + across * n
+                      for c, t, n in zip(centre, tangent, normal))
+                for along, across in ((1, 1), (-1, 1), (1, 2))
+            ]
+        retained, refusals, recovered = _recover_positions(
+            module, analysis, plan, changed_rails, timbers,
+            old, old_excluded, code,
+        )
+        victim_id = victim["stable_chair_position_identity"]
+        assert victim_id not in {item.position_id for item in retained}
+        assert victim_id not in {item["position_id"] for item in recovered}
+        refusal = next(item for item in refusals
+                       if item["position_id"] == victim_id)
+        assert refusal["reason"] == reasons[victim_id]
+        assert all(item in retained for item in old)
+        rejected_faces[case] = refusal
+    assert json.dumps((analysis, plan, rails, timbers), sort_keys=True) == (
+        raw_before
+    )
+    return placements, excluded, records, {
+        "unchanged_legacy_count": old_count,
+        "independent_recovery_count": extra_count,
+        "positions": observations,
+        "named_face_rejections": rejected_faces,
+    }
 
 
 def _inputs(family="S1"):
@@ -351,12 +492,10 @@ def validate(family="S1"):
     assert family in {"S1", "S1J"}, "Unsupported proof family"
     assert not App.listDocuments(), "Use an empty isolated FreeCAD host"
     selected, excluded_count, confirmed, unresolved = (
-        (37, 131, 54, 17) if family == "S1" else (4, 164, 5, 1)
+        (54, 114, 54, 0) if family == "S1" else (5, 163, 5, 0)
     )
     prepare_model = (prepare_chair_model_research if family == "S1"
                      else prepare_chair_s1j_model_research)
-    select_positions = (_select_positions if family == "S1"
-                        else _select_s1j_positions)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y%m%dT%H%M%S%fZ",
     )
@@ -402,16 +541,20 @@ def validate(family="S1"):
                          if "Shape" in obj.PropertiesList}
         package, text = _inputs(family)
         model = prepare_model(package, text, REQUEST)
-        _binding, analysis, _settings, plan = _source_context(
+        _binding, analysis, _settings, plan, rails, timbers = _source_context(
             module, document, "TO-001", family,
         )
-        placements, excluded = select_positions(module, analysis, plan)
+        placements, excluded, recovered, proof = _placement_recovery(
+            module, analysis, plan, rails, timbers, family,
+        )
+        receipt["placement_recovery"] = proof
         started = time.perf_counter()
         result = preview_chairs(
             document, "TO-001", package, text, REQUEST,
         )
         receipt["construction_seconds"] = time.perf_counter() - started
         receipt["preview"] = result
+        assert result["source_receipt"]["recovered_positions"] == recovered
         preview = App.getDocument(result["document_name"])
         assert App.ActiveDocument is preview
         assert not preview.FileName and len(preview.Objects) == 7

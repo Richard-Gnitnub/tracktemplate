@@ -1776,3 +1776,33 @@ This result gives no positive rights claim.
 
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
 More work on LMS chairs is not permitted until after Phase 11.
+
+## Remaining S1 and S1J chairs at C10 positions — 2026-10-21
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+
+For the C10 test input, the [command](../../tracktemplate/compatibility/chair_reference_preview.py) now shows `59/59 S1/S1J; 0 unresolved; 54/54 S1; 5/5 S1J`.
+The result identifies all 168 positions, with the 109 positions that the command does not show.
+The [software](../../tracktemplate/domain/chair_placement.py) uses the `centre_point` and `local_rail_tangent` values for 18 more chairs.
+It gets the direction from `gauge_face_points` and `outer_face_points` with `Fraction` values.
+The previous 41 `S1Placement` and `S1JPlacement` values do not change.
+The chair components, packages and source data do not change.
+
+The [test with standalone Python](../../tests/validate_phase9b_chair_frame_recovery.py) and the [command test](../../tests/validate_phase9b_chair_frame_preview.py) give PASS results.
+The S1 and S1J tests and the [test for the two chair types](../../tests/freecad_validate_phase9b_s1_s1j_reference_preview.py) give PASS results on the qualified host profile.
+The test for the two chair types also gives a PASS result with the FreeCAD window open.
+The tests compare source data before and after the command, `Undo` and `Redo`.
+The `transaction_failure_cleanup` check gives a PASS result.
+The results stay in `tmp/chair-frame-recovery/native-s1-01/`, `native-s1j-01/`, `native-combined-01/` and `gui-combined-01/`.
+
+The independent review gives a PASS result for the source and tests in `tmp/chair-frame-recovery/quality-review-01.json`.
+The reviewer examined the four `overview.png` and `chair-closeup.png` files in `gui-combined-01/s1/` and `gui-combined-01/s1j/`.
+
+All previous evidence, with the `native-04` limitation and the independent review results of BLOCKED, stays available.
+The conditions in D-P9-018 stay the same.
+This result gives no acceptance for physical fit or the direction of the `S1CentralKey` and `S1JCentralKey` components.
+It gives no acceptance for persistence, production, export behaviour, product performance or phase exits.
+This result gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.

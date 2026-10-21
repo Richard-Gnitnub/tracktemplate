@@ -8,6 +8,7 @@ it adds no scale, reflection, embedding allowance or fit compensation.
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from fractions import Fraction
 import math
 from numbers import Real
 import sys
@@ -158,3 +159,119 @@ def prepare_s1j_placements(records):
     the S1 route. No unresolved position is given a replacement frame.
     """
     return _prepare_placements(records, 7, S1JPlacement, "S1J")
+
+
+def _cross(first, second):
+    return first[0] * second[1] - first[1] * second[0]
+
+
+def _normal_face_intersection(centre, normal, points, name):
+    """Find one exact crossing of a closed-segment face polyline.
+
+    Fractions represent the supplied binary64 coordinates exactly.
+    Adjacent segments meeting on the line count as one crossing. Other
+    repeated crossings and coincident segments have ambiguous topology.
+    """
+    if not isinstance(points, (tuple, list)) or len(points) < 2:
+        raise ValueError(name + " needs at least two points")
+    coordinates = [
+        tuple(Fraction(value) for value in _coordinates(point, 2, name))
+        for point in points
+    ]
+    crossing = None
+    segments = []
+    for index, (first, second) in enumerate(zip(
+        coordinates, coordinates[1:],
+    )):
+        direction = (second[0] - first[0], second[1] - first[1])
+        if direction == (0, 0):
+            raise ValueError(name + " contains a degenerate segment")
+        offset = (first[0] - centre[0], first[1] - centre[1])
+        denominator = _cross(normal, direction)
+        if denominator == 0:
+            if _cross(offset, normal) == 0:
+                raise ValueError(name + " contains a coincident segment")
+            continue
+        fraction = _cross(offset, normal) / denominator
+        if not 0 <= fraction <= 1:
+            continue
+        parameter = _cross(offset, direction) / denominator
+        point = (
+            centre[0] + parameter * normal[0],
+            centre[1] + parameter * normal[1],
+        )
+        if crossing is not None:
+            previous = segments[-1]
+            if (
+                point != crossing[0]
+                or previous["index"] + 1 != index
+                or previous["fraction_exact"] != "1"
+                or fraction != 0
+            ):
+                raise ValueError(name + " has multiple intersections")
+        crossing = point, parameter
+        segments.append({"index": index, "fraction_exact": str(fraction)})
+    if crossing is None:
+        raise ValueError(name + " has no normal-line intersection")
+    point, parameter = crossing
+    if parameter == 0:
+        raise ValueError(name + " passes through the chair centre")
+    return parameter, {
+        "point_mm_exact": [str(value) for value in point],
+        "normal_parameter_mm_exact": str(parameter),
+        "segments": segments,
+    }
+
+
+def recover_reference_frame(
+    centre_point, local_rail_tangent, gauge_face_points, outer_face_points,
+):
+    """Derive a private reference frame from explicit rail-face crossings.
+
+    Inputs are a model-mm XY centre, its existing dimensionless unit rail
+    tangent and two named face polylines in model mm. Intersect the normal
+    line through that centre with each face. Exactly one crossing on each
+    side establishes which side faces the gauge. No nearest-point normal,
+    tolerance widening, centre movement or source mutation is used.
+
+    Return proper planar ``x_axis`` and ``y_axis`` tuples and a JSON-safe
+    ``witness``. +Y points from gauge to field; +Z points up. The existing
+    unit-vector roundoff allowance applies only to the input/output axes.
+    Intersection predicates use exact fractions of the supplied floats.
+    Rational strings retain exact points, segment fractions and parameters
+    along the original tangent-normal vector without decimal rounding.
+
+    Raise ValueError for malformed, nonfinite or nonunit inputs,
+    degenerate/coincident segments, absent or ambiguous crossings, a face
+    through the centre, or faces that do not straddle the centre.
+    """
+    centre = _coordinates(centre_point, 2, "centre_point")
+    tangent = _coordinates(local_rail_tangent, 2, "local_rail_tangent")
+    magnitude = math.hypot(*tangent)
+    if abs(magnitude - 1) > _FRAME_ROUNDOFF:
+        raise ValueError("Reference recovery requires a unit rail tangent")
+    exact_centre = tuple(Fraction(value) for value in centre)
+    normal = (-Fraction(tangent[1]), Fraction(tangent[0]))
+    gauge, gauge_witness = _normal_face_intersection(
+        exact_centre, normal, gauge_face_points, "Gauge face",
+    )
+    outer, outer_witness = _normal_face_intersection(
+        exact_centre, normal, outer_face_points, "Outer face",
+    )
+    if (gauge > 0) == (outer > 0):
+        raise ValueError("Rail faces do not straddle the chair centre")
+    sign = 1 if gauge > 0 else -1
+    y_axis = (sign * tangent[1] / magnitude,
+              -sign * tangent[0] / magnitude)
+    x_axis = (y_axis[1], -y_axis[0])
+    return {
+        "x_axis": x_axis,
+        "y_axis": y_axis,
+        "witness": {
+            "method": "accepted-tangent-normal-intersection-v1",
+            "centre_point_mm": list(centre),
+            "local_rail_tangent": list(tangent),
+            "gauge_face": gauge_witness,
+            "outer_face": outer_witness,
+        },
+    }

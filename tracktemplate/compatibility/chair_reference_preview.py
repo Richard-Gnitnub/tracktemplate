@@ -7,10 +7,15 @@ chairs. Exact full-precision records bind the preview to one source state.
 
 import hashlib
 import json
+import math
+from numbers import Real
 
 from tracktemplate.domain.chair_placement import (
+    S1Placement,
+    S1JPlacement,
     prepare_s1_placements,
     prepare_s1j_placements,
+    recover_reference_frame,
 )
 
 
@@ -43,7 +48,102 @@ def _source_context(module, document, turnout_id, family="S1"):
         "kind": kind, "configuration": config, "analysis": analysis,
         "settings": settings, "rails": rails, "timbers": timbers,
         "plan": plan,
-    }), analysis, settings, plan
+    }), analysis, settings, plan, rails, timbers
+
+
+def _recover_positions(
+    module, analysis, plan, rails, timbers, placements, excluded, chair_code,
+):
+    """Resolve only a named-face frame refusal in the private preview.
+
+    Keep the inherited plan and all its existing placements unchanged.
+    A unique section through both named faces can establish the gauge
+    side of an existing analytical tangent. Missing or ambiguous evidence
+    leaves the position excluded, with its original reason intact.
+    """
+    original_reason = (
+        "gauge normal is not perpendicular to the local rail tangent"
+    )
+    candidates = [item for item in excluded
+                  if type(item["chair_code"]) is int
+                  and item["chair_code"] == chair_code
+                  and item["reason"] == original_reason]
+    if not candidates:
+        return placements, excluded, []
+
+    def indexed(records, field):
+        result = {}
+        for record in records:
+            identity = record.get(field)
+            if (not isinstance(identity, str) or not identity.strip()
+                    or identity in result):
+                raise ValueError("Preview source identities are ambiguous.")
+            result[identity] = record
+        return result
+
+    positions = indexed(analysis["positions"], "stable_chair_position_identity")
+    rail_by_id = indexed(rails, "stable_identity")
+    timber_by_id = indexed(timbers, "stable_identity")
+    datums = [item.get("base_z") for item in plan["instances"]]
+    if (not datums or any(
+        isinstance(value, bool) or not isinstance(value, Real)
+        or not math.isfinite(value) for value in datums
+    ) or any(value != datums[0] for value in datums)):
+        raise ValueError("Preview placement datum is missing or inconsistent.")
+    placement_type = {1: S1Placement, 7: S1JPlacement}[chair_code]
+    recovered, evidence, refused = [], [], {}
+    for item in candidates:
+        identity = item["position_id"]
+        position = positions[identity]
+        if (position.get("assignment_status")
+                != module.CHAIR_ASSIGNMENT_CONFIRMED
+                or position.get("deliberate_omission")
+                or position.get("special_assignment_deferred")):
+            refused[identity] = "The family assignment is not confirmed."
+            continue
+        rail = rail_by_id.get(position["rail_identity"])
+        timber = timber_by_id.get(position["timber_identity"])
+        if rail is None or timber is None:
+            refused[identity] = "The named rail or timber source is missing."
+            continue
+        supported, reason = module._chair_supported_physical_position(position)
+        if not supported:
+            refused[identity] = reason
+            continue
+        try:
+            frame = recover_reference_frame(
+                position.get("centre_point"),
+                position.get("local_rail_tangent"),
+                rail.get("gauge_face_points"), rail.get("outer_face_points"),
+            )
+            placement = placement_type(
+                position_id=identity, rail_id=position["rail_identity"],
+                timber_id=position["timber_identity"],
+                origin_mm=(*position["centre_point"], datums[0]),
+                x_axis=frame["x_axis"], y_axis=frame["y_axis"],
+            )
+        except ValueError as error:
+            refused[identity] = str(error)
+            continue
+        recovered.append(placement)
+        evidence.append({
+            "position_id": identity, "rail_id": placement.rail_id,
+            "timber_id": placement.timber_id, "chair_code": chair_code,
+            "original_reason": original_reason,
+            "frame_evidence": frame["witness"],
+        })
+    recovered_ids = {item.position_id for item in recovered}
+    remaining = [
+        dict(item, placement_recovery_reason=refused[item["position_id"]])
+        if item["position_id"] in refused else item
+        for item in excluded if item["position_id"] not in recovered_ids
+    ]
+    return (
+        tuple(sorted(
+            (*placements, *recovered), key=lambda item: item.position_id,
+        )),
+        remaining, sorted(evidence, key=lambda item: item["position_id"]),
+    )
 
 
 def _select_family_positions(
@@ -158,7 +258,7 @@ def _context_shapes_and_verifier(
     def verify_source():
         if App.getDocument(document_name) is not source_document:
             raise ValueError("The preview source document is no longer open.")
-        current, _analysis, _settings, _plan = _source_context(
+        current, *_context = _source_context(
             module, source_document, turnout_id, family,
         )
         if current != signature_text or any(
@@ -197,10 +297,15 @@ def _preview_reference_chairs(
         raise ValueError(
             f"The {family} reference preview adapter is unavailable."
         )
-    signature_text, analysis, settings, plan = _open_source_context(
-        module, source_document, turnout_id, family,
+    signature_text, analysis, settings, plan, rails, timbers = (
+        _open_source_context(
+            module, source_document, turnout_id, family,
+        )
     )
     placements, excluded = select_positions(module, analysis, plan)
+    placements, excluded, recovered = _recover_positions(
+        module, analysis, plan, rails, timbers, placements, excluded, chair_code,
+    )
     context_shapes, verify_source = _context_shapes_and_verifier(
         module, source_document, turnout_id, family, signature_text,
     )
@@ -216,6 +321,7 @@ def _preview_reference_chairs(
         "analysis_position_count": len(analysis["positions"]),
         f"selected_{family.lower()}_count": len(placements),
         "excluded_positions": excluded,
+        "recovered_positions": recovered,
         f"confirmed_{family.lower()}_count": len(confirmed_positions),
         f"unresolved_confirmed_{family.lower()}_count": unresolved_count,
         "coverage_summary": "{}/{} {}; {} unresolved".format(
@@ -326,11 +432,19 @@ def preview_s1_s1j_reference_chairs(
     """
     if not callable(create_preview):
         raise ValueError("The S1/S1J reference preview adapter is unavailable.")
-    signature_text, analysis, settings, plan = _open_source_context(
-        module, source_document, turnout_id, "S1/S1J",
+    signature_text, analysis, settings, plan, rails, timbers = (
+        _open_source_context(
+            module, source_document, turnout_id, "S1/S1J",
+        )
     )
     s1_placements, s1j_placements, excluded = _select_s1_s1j_positions(
         module, analysis, plan,
+    )
+    s1_placements, excluded, s1_recovered = _recover_positions(
+        module, analysis, plan, rails, timbers, s1_placements, excluded, 1,
+    )
+    s1j_placements, excluded, s1j_recovered = _recover_positions(
+        module, analysis, plan, rails, timbers, s1j_placements, excluded, 7,
     )
     context_shapes, verify_source = _context_shapes_and_verifier(
         module, source_document, turnout_id, "S1/S1J", signature_text,
@@ -343,6 +457,9 @@ def preview_s1_s1j_reference_chairs(
         "source_analysis_signature": analysis["geometry_signature"],
         "analysis_position_count": len(analysis["positions"]),
         "excluded_positions": excluded,
+        "recovered_positions": sorted(
+            (*s1_recovered, *s1j_recovered), key=lambda item: item["position_id"],
+        ),
         "embed_depth_mm": settings["future_chair_embed_depth"],
         "embedding_basis": "source template top minus source embed depth",
         "model_support_adjustments_applied": False,
