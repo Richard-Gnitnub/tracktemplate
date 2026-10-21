@@ -623,6 +623,7 @@ def validate_composition_boundary():
     runtime_reader = lambda: {"runtime": "synthetic"}
     preview_factory = lambda *args: None
     joint_preview_factory = lambda *args: None
+    combined_preview_factory = lambda *args: None
     routing = {"route": "modular"}
     session = types.SimpleNamespace(routing_record=lambda: routing)
 
@@ -636,6 +637,7 @@ def validate_composition_boundary():
             "runtime_record": runtime_reader,
             "s1_reference_preview_factory": preview_factory,
             "s1j_reference_preview_factory": joint_preview_factory,
+            "s1_s1j_reference_preview_factory": combined_preview_factory,
         }
         return session
 
@@ -649,6 +651,7 @@ def validate_composition_boundary():
             types.SimpleNamespace(
                 create_s1_reference_preview=preview_factory,
                 create_s1j_reference_preview=joint_preview_factory,
+                create_s1_s1j_reference_preview=combined_preview_factory,
             )
         ),
     }

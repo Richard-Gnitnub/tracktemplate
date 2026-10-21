@@ -72,6 +72,9 @@ def _load_modular_transition_workflow(
         s1j_reference_preview_factory=(
             chair_preview.create_s1j_reference_preview
         ),
+        s1_s1j_reference_preview_factory=(
+            chair_preview.create_s1_s1j_reference_preview
+        ),
     )
     return session, session.routing_record()
 

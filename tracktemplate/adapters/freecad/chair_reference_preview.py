@@ -293,26 +293,14 @@ def _create_reference_preview(
     json.dumps(source_receipt, allow_nan=False)
     receipt = deepcopy(source_receipt)
     model = prepare_model(package, manifest_text, model_request)
-    gui = None
-    if App.GuiUp:
-        import FreeCADGui as gui
-    previous = dict(App.listDocuments())
-    active = _active_document(App)
-    _require(active is None or previous.get(active.Name) is active,
-             "previous active document is unregistered")
-    selection = _selection_snapshot(App, gui)
-    preselection = _preselection_snapshot(App, gui)
-    name = "TrackTemplate" + family + "Reference_" + uuid.uuid4().hex
-    _require(name not in previous, "preview document name already exists")
-    owned = None
-    transaction = False
-    try:
+
+    def prepare_layers():
         layers, placed = _build_layers(model, placements, context_shapes)
         layer_measurements = [dict(
             _measure_layer(shape), name=spec[0], role=spec[1],
         ) for spec, shape in zip(layer_specs, layers)]
         result = {
-            "document_name": name, "source_receipt": receipt,
+            "source_receipt": receipt,
             "package_signature": package.content_signature,
             "manifest_signature": model.manifest_signature,
             "request_signature": model.request_signature,
@@ -330,6 +318,39 @@ def _create_reference_preview(
                 "Snapshot only; no live invalidation or persistence contract.",
             ],
         }
+
+        def verify_layers(stored):
+            _verify_stored_layers(stored, layers, model, placements)
+
+        return layers, result, verify_layers
+
+    return _materialise_preview(
+        family, receipt, layer_specs, prepare_layers, verify_source,
+    )
+
+
+def _materialise_preview(
+    family, receipt, layer_specs, prepare_layers, verify_source,
+):
+    """Apply one prepared snapshot through the shared document lifecycle."""
+    gui = None
+    if App.GuiUp:
+        import FreeCADGui as gui
+    previous = dict(App.listDocuments())
+    active = _active_document(App)
+    _require(active is None or previous.get(active.Name) is active,
+             "previous active document is unregistered")
+    selection = _selection_snapshot(App, gui)
+    preselection = _preselection_snapshot(App, gui)
+    name = "TrackTemplate" + family + "Reference_" + uuid.uuid4().hex
+    _require(name not in previous, "preview document name already exists")
+    owned = None
+    transaction = False
+    try:
+        layers, result, verify_layers = prepare_layers()
+        result = {"document_name": name, **result}
+        _require(len(layers) == len(layer_specs),
+                 "unexpected prepared layer count")
         _require(_same_registry(dict(App.listDocuments()), previous),
                  "document registry changed during preparation")
         document = App.newDocument(
@@ -361,11 +382,11 @@ def _create_reference_preview(
                 if not shape.Solids:
                     obj.ViewObject.DisplayMode = "Wireframe"
         _require(document.recompute() is not False, "preview recompute failed")
-        _require(len(document.Objects) == 7, "unexpected preview object count")
-        _verify_stored_layers(
-            tuple(document.getObject(spec[0]).Shape for spec in layer_specs),
-            layers, model, placements,
-        )
+        _require(len(document.Objects) == len(layer_specs),
+                 "unexpected preview object count")
+        verify_layers(tuple(
+            document.getObject(spec[0]).Shape for spec in layer_specs
+        ))
         _restore_selection(App, gui, selection)
         _restore_preselection(App, gui, preselection)
         App.setActiveDocument(name)
@@ -436,4 +457,96 @@ def create_s1j_reference_preview(
         placement_type=S1JPlacement,
         prepare_model=prepare_chair_s1j_model_research,
         layer_specs=layer_specs,
+    )
+
+
+def create_s1_s1j_reference_preview(
+    s1_package, s1_manifest_text, s1j_package, s1j_manifest_text,
+    model_request, s1_placements, s1j_placements, context_shapes,
+    source_receipt, verify_source,
+):
+    """Create one private S1/S1J snapshot with one undoable transaction.
+
+    Both fixed families must prepare successfully before document creation.
+    Context wires are shared; each family's five component layers, package
+    signatures and stable placement identities remain separate. Any failure
+    closes only the invocation-owned document and restores prior GUI state.
+    No production, export, fit or persistence authority follows.
+    """
+    if not callable(verify_source):
+        raise TypeError("S1/S1J preview requires a source verification callback")
+    s1_placements = _placements(s1_placements, S1Placement)
+    s1j_placements = _placements(s1j_placements, S1JPlacement)
+    if {item.position_id for item in s1_placements}.intersection(
+        item.position_id for item in s1j_placements
+    ):
+        raise ValueError("S1/S1J preview placement identities overlap")
+    json.dumps(source_receipt, allow_nan=False)
+    receipt = deepcopy(source_receipt)
+    layer_specs = _LAYERS[:2] + tuple(
+        (name, "S1 " + label, colour)
+        for name, label, colour in _LAYERS[2:]
+    ) + tuple(
+        (name.replace("S1", "S1J", 1), "S1J " + label, colour)
+        for name, label, colour in _LAYERS[2:]
+    )
+
+    def prepare_layers():
+        s1_model = prepare_chair_model_research(
+            s1_package, s1_manifest_text, model_request,
+        )
+        s1j_model = prepare_chair_s1j_model_research(
+            s1j_package, s1j_manifest_text, model_request,
+        )
+        s1_layers, s1_placed = _build_layers(
+            s1_model, s1_placements, context_shapes,
+        )
+        s1j_layers, s1j_placed = _build_layers(
+            s1j_model, s1j_placements, context_shapes,
+        )
+        layers = s1_layers + s1j_layers[2:]
+        families = []
+        for family, model, placed in (
+            ("S1", s1_model, s1_placed), ("S1J", s1j_model, s1j_placed),
+        ):
+            families.append({
+                "family": family,
+                "package_signature": model.package.content_signature,
+                "manifest_signature": model.manifest_signature,
+                "request_signature": model.request_signature,
+                "placement_count": len(placed), "placements": placed,
+            })
+        result = {
+            "source_receipt": receipt, "families": families,
+            "project_status": "reference-only",
+            "intended_uses": ["private-development"],
+            "production_geometry_authorized": False,
+            "key_placement": "central-reference-only",
+            "length_unit": "mm", "length_basis": "model",
+            "numerical_length_budget_mm": NUMERICAL_LENGTH_TOLERANCE_MM,
+            "placement_count": len(s1_placements) + len(s1j_placements),
+            "layer_count": len(layers),
+            "layers": [dict(
+                _measure_layer(shape), name=spec[0], role=spec[1],
+            ) for spec, shape in zip(layer_specs, layers)],
+            "limits": [
+                "Private reference; no production or export authority.",
+                "Central key; no directional-key or physical-fit acceptance.",
+                "Snapshot only; no live invalidation or persistence contract.",
+            ],
+        }
+
+        def verify_layers(stored):
+            _verify_stored_layers(
+                stored[:7], s1_layers, s1_model, s1_placements,
+            )
+            _verify_stored_layers(
+                stored[:2] + stored[7:], s1j_layers,
+                s1j_model, s1j_placements,
+            )
+
+        return layers, result, verify_layers
+
+    return _materialise_preview(
+        "S1S1J", receipt, layer_specs, prepare_layers, verify_source,
     )
