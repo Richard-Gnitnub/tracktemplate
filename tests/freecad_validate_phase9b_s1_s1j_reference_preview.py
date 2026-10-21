@@ -115,7 +115,7 @@ def _assert_result(result, document, models, placements, contexts):
     assert App.ActiveDocument is document
     assert not document.FileName and document.Temporary is False
     assert tuple(obj.Name for obj in document.Objects) == LAYER_NAMES
-    assert result["placement_count"] == 41 and result["layer_count"] == 12
+    assert result["placement_count"] == 59 and result["layer_count"] == 12
     assert tuple(item["name"] for item in result["layers"]) == LAYER_NAMES
     assert result["project_status"] == "reference-only"
     assert result["intended_uses"] == ["private-development"]
@@ -145,7 +145,7 @@ def _assert_result(result, document, models, placements, contexts):
         assert len(layers) == 5
         assert all(len(obj.Shape.Solids) == len(family_placements)
                    for obj in layers)
-    assert len(placements[0]) == 37 and len(placements[1]) == 4
+    assert len(placements[0]) == 54 and len(placements[1]) == 5
     assert all(obj.TypeId == "Part::Feature" for obj in document.Objects)
     assert all("GeneratedBy" not in obj.PropertiesList
                for obj in document.Objects)
@@ -160,16 +160,16 @@ def _assert_result(result, document, models, placements, contexts):
         "geometry_signature"
     ]
     for field, expected in (
-        ("analysis_position_count", 168), ("selected_s1_count", 37),
-        ("confirmed_s1_count", 54), ("unresolved_confirmed_s1_count", 17),
-        ("selected_s1j_count", 4), ("confirmed_s1j_count", 5),
-        ("unresolved_confirmed_s1j_count", 1), ("selected_count", 41),
-        ("confirmed_count", 59), ("unresolved_confirmed_count", 18),
+        ("analysis_position_count", 168), ("selected_s1_count", 54),
+        ("confirmed_s1_count", 54), ("unresolved_confirmed_s1_count", 0),
+        ("selected_s1j_count", 5), ("confirmed_s1j_count", 5),
+        ("unresolved_confirmed_s1j_count", 0), ("selected_count", 59),
+        ("confirmed_count", 59), ("unresolved_confirmed_count", 0),
     ):
         assert source[field] == expected, (field, source[field])
     excluded = source["excluded_positions"]
     excluded_ids = [item["position_id"] for item in excluded]
-    assert len(excluded_ids) == len(set(excluded_ids)) == 127
+    assert len(excluded_ids) == len(set(excluded_ids)) == 109
     assert excluded_ids == sorted(excluded_ids)
     assert selected_ids.isdisjoint(excluded_ids)
     assert selected_ids | set(excluded_ids) == {
@@ -181,7 +181,7 @@ def _assert_result(result, document, models, placements, contexts):
     for item in excluded:
         if item["position_id"] in analytical:
             assert item["reason"] == analytical[item["position_id"]]
-    for label in ("41/59", "18 unresolved", "37/54 S1", "4/5 S1J"):
+    for label in ("59/59", "0 unresolved", "54/54 S1", "5/5 S1J"):
         assert label in document.Label, document.Label
 
 
@@ -259,13 +259,15 @@ def validate():
             prepare_chair_model_research(*packages[0], helpers.REQUEST),
             prepare_chair_s1j_model_research(*packages[1], helpers.REQUEST),
         )
-        _signature, analysis, _settings, plan = binding._source_context(
-            module, source, "TO-001", "S1/S1J",
-        )
-        placements = (
-            binding._select_positions(module, analysis, plan)[0],
-            binding._select_s1j_positions(module, analysis, plan)[0],
-        )
+        context = binding._source_context(module, source, "TO-001", "S1/S1J")
+        _signature, analysis, _settings, plan, rails, timbers = context
+        recovered = tuple(helpers._placement_recovery(
+            module, analysis, plan, rails, timbers, family,
+        ) for family in ("S1", "S1J"))
+        placements = tuple(item[0] for item in recovered)
+        receipt["placement_recovery"] = {
+            family: item[3] for family, item in zip(("S1", "S1J"), recovered)
+        }
         arguments = (source, "TO-001", *packages[0], *packages[1],
                      helpers.REQUEST)
         contexts = []
@@ -281,6 +283,10 @@ def validate():
             result = command(*arguments)
         receipt["construction_seconds"] = time.perf_counter() - started
         receipt["preview"] = result
+        assert result["source_receipt"]["recovered_positions"] == sorted(
+            recovered[0][2] + recovered[1][2],
+            key=lambda item: item["position_id"],
+        )
         preview = App.getDocument(result["document_name"])
         _assert_result(result, preview, models, placements, contexts)
         assert App.listDocuments() == dict(registry, **{preview.Name: preview})
@@ -302,13 +308,20 @@ def validate():
         receipt["undo_redo"] = "PASS"
         if App.GuiUp:
             receipt["images"] = {}
-            for family, family_placements in zip(("S1", "S1J"), placements):
+            for family, family_placements, recovery in zip(
+                ("S1", "S1J"), placements, recovered,
+            ):
+                recovered_ids = {item["position_id"] for item in recovery[2]}
+                recovered_placements = tuple(
+                    item for item in family_placements
+                    if item.position_id in recovered_ids
+                )
                 image_dir = run_dir / family.lower()
                 image_dir.mkdir()
                 receipt["images"][family] = [
                     str(Path(family.lower()) / name)
                     for name in helpers._images(
-                        preview, family_placements, image_dir,
+                        preview, recovered_placements, image_dir,
                     )
                 ]
             unchanged("combined viewport captures", check_selection=False)
