@@ -622,6 +622,7 @@ def validate_composition_boundary():
     marker = object()
     runtime_reader = lambda: {"runtime": "synthetic"}
     preview_factory = lambda *args: None
+    joint_preview_factory = lambda *args: None
     routing = {"route": "modular"}
     session = types.SimpleNamespace(routing_record=lambda: routing)
 
@@ -634,6 +635,7 @@ def validate_composition_boundary():
             "selected_export_atomic": True,
             "runtime_record": runtime_reader,
             "s1_reference_preview_factory": preview_factory,
+            "s1j_reference_preview_factory": joint_preview_factory,
         }
         return session
 
@@ -644,7 +646,10 @@ def validate_composition_boundary():
         "tracktemplate.adapters.export.core_layout_set": atomic_files,
         "tracktemplate.adapters.freecad.core_export_document": documents,
         "tracktemplate.adapters.freecad.chair_reference_preview": (
-            types.SimpleNamespace(create_s1_reference_preview=preview_factory)
+            types.SimpleNamespace(
+                create_s1_reference_preview=preview_factory,
+                create_s1j_reference_preview=joint_preview_factory,
+            )
         ),
     }
 

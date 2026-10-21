@@ -8,8 +8,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 No upstream dimensional collection is embedded here. Inputs and results
 use full-size millimetres in the accepted right-handed chair frame.
-This rule excludes filler, special-chair branches and manufacturing
-corrections. It constructs a seat component, not an assembled chair.
+Family selection belongs to the application package contract. This
+neutral formula accepts explicit seat widths and excludes filler and
+manufacturing corrections. It constructs one seat component.
 """
 
 from dataclasses import dataclass, fields

@@ -23,6 +23,7 @@ from tracktemplate.domain.chair_assembly import (
     CHAIR_ASSEMBLY_ROLES,
     ChairAssemblyGeometry,
     assemble_chair_components,
+    assemble_s1j_chair_components,
 )
 from tracktemplate.domain.chair_base import (
     ChairBaseGeometry,
@@ -71,6 +72,8 @@ CHAIR_OUTER_JAW_RESEARCH_RULE_ID = (
 CHAIR_INNER_JAW_RESEARCH_RULE_ID = (
     "tracktemplate.chair.inner-jaw-reference.v1"
 )
+CHAIR_S1J_BASE_RESEARCH_RULE_ID = "tracktemplate.chair.s1j-base-reference.v1"
+CHAIR_S1J_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.s1j-seat-reference.v1"
 CHAIR_L1_BASE_RESEARCH_RULE_ID = "tracktemplate.chair.l1-base-reference.v1"
 CHAIR_L1_SEAT_RESEARCH_RULE_ID = "tracktemplate.chair.l1-seat-reference.v1"
 CHAIR_L1_OUTER_JAW_RESEARCH_RULE_ID = (
@@ -332,7 +335,7 @@ def _parameter_map(
 
 def _procedures(
     definition, quantities, *, key=False, base=False, outer_jaw=False,
-    inner_jaw=False, assembly=False, l1=False,
+    inner_jaw=False, assembly=False, l1=False, s1j=False,
 ):
     _require(
         sum((key, base, outer_jaw, inner_jaw)) <= 1,
@@ -370,6 +373,11 @@ def _procedures(
         else:
             rule_id = CHAIR_L1_SEAT_RESEARCH_RULE_ID
             parameter_type = ChairL1SeatParameters
+    if s1j:
+        if base:
+            rule_id = CHAIR_S1J_BASE_RESEARCH_RULE_ID
+        elif not (key or outer_jaw or inner_jaw):
+            rule_id = CHAIR_S1J_SEAT_RESEARCH_RULE_ID
     procedures = definition["procedures"]
     _require(
         len(procedures) == 2,
@@ -787,6 +795,17 @@ def prepare_chair_assembly_research(package, manifest_text):
     return _prepare_assembly_research(package, manifest_text)
 
 
+def prepare_chair_s1j_assembly_research(package, manifest_text):
+    """Construct the finite S1J pattern from an unadmitted neutral package.
+
+    Explicit S1J base and seat rules use the existing constructors with
+    separate width inputs. Both jaws and the central key retain their
+    S1 rules. Source quantities and provenance remain package inputs.
+    The operation has no document, filesystem or admission side effect.
+    """
+    return _prepare_assembly_research(package, manifest_text, s1j=True)
+
+
 def prepare_chair_l1_assembly_research(package, manifest_text):
     """Construct only the finite reference-only L1 body from package v1.
 
@@ -799,8 +818,10 @@ def prepare_chair_l1_assembly_research(package, manifest_text):
     return _prepare_assembly_research(package, manifest_text, l1=True)
 
 
-def _prepare_assembly_research(package, manifest_text, *, l1=False):
-    """Use one validated construction path for two finite rule sets."""
+def _prepare_assembly_research(
+    package, manifest_text, *, l1=False, s1j=False,
+):
+    """Use one validated construction path for three finite rule sets."""
     if not isinstance(package, ChairDefinitionPackage):
         raise TypeError("package must be a ChairDefinitionPackage")
     try:
@@ -826,6 +847,12 @@ def _prepare_assembly_research(package, manifest_text, *, l1=False):
          construct_chair_inner_jaw, ChairInnerJawResearchResult,
          {"inner_jaw": True}),
     )
+    if s1j:
+        specifications = (
+            (CHAIR_S1J_BASE_RESEARCH_RULE_ID, *specifications[0][1:]),
+            (CHAIR_S1J_SEAT_RESEARCH_RULE_ID, *specifications[1][1:]),
+            *specifications[2:],
+        )
     if l1:
         specifications = (
             (CHAIR_L1_BASE_RESEARCH_RULE_ID, ChairL1BaseParameters,
@@ -881,7 +908,7 @@ def _prepare_assembly_research(package, manifest_text, *, l1=False):
                         procedure_ids=[construction["procedure_id"]],
                     )])
         _, _, selected = _procedures(
-            view, quantities, assembly=True, l1=l1, **flags,
+            view, quantities, assembly=True, l1=l1, s1j=s1j, **flags,
         )
         component_id = _component_contract(
             view, placement, construction, **flags,
@@ -912,8 +939,11 @@ def _prepare_assembly_research(package, manifest_text, *, l1=False):
                 procedure_id=procedure["procedure_id"],
                 geometry=constructor(parameters),
             ))
-        assemble = (assemble_l1_chair_components if l1
-                    else assemble_chair_components)
+        if s1j:
+            assemble = assemble_s1j_chair_components
+        else:
+            assemble = (assemble_l1_chair_components if l1
+                        else assemble_chair_components)
         geometry = assemble(tuple(
             (role, result.geometry)
             for role, result in zip(CHAIR_ASSEMBLY_ROLES, results)

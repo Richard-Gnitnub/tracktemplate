@@ -1,4 +1,4 @@
-"""Exercise private S1 placement and recovery on one copied C10 fixture.
+"""Exercise private S1 and S1J placement and recovery on one copied C10 fixture.
 
 Use an empty qualified host. Optional local package and manifest paths
 select the retained private reference; otherwise use invented geometry.
@@ -40,9 +40,11 @@ from tracktemplate.application.chair_definition import (  # noqa: E402
 )
 from tracktemplate.application.chair_model_research import (  # noqa: E402
     prepare_chair_model_research,
+    prepare_chair_s1j_model_research,
 )
 from tracktemplate.compatibility.chair_reference_preview import (  # noqa: E402
     _select_positions,
+    _select_s1j_positions,
     _source_context,
 )
 import validate_phase9a_chair_assembly as assembly_tests  # noqa: E402
@@ -66,14 +68,23 @@ def _continuity_helpers():
 continuity = _continuity_helpers()
 
 
-def _inputs():
-    package_path = os.environ.get("TRACKTEMPLATE_S1_REFERENCE_PACKAGE")
-    manifest_path = os.environ.get("TRACKTEMPLATE_S1_REFERENCE_MANIFEST")
+def _inputs(family="S1"):
+    package_path = os.environ.get(f"TRACKTEMPLATE_{family}_REFERENCE_PACKAGE")
+    manifest_path = os.environ.get(f"TRACKTEMPLATE_{family}_REFERENCE_MANIFEST")
     if package_path or manifest_path:
         assert package_path and manifest_path
         text = Path(manifest_path).read_text(encoding="utf-8")
         package = chair_definition_package_from_json(
             Path(package_path).read_text(encoding="utf-8"), text,
+        )
+        return package, text
+    if family == "S1J":
+        from validate_phase9b_chair_s1j import synthetic_s1j_package_records
+
+        record, manifest = synthetic_s1j_package_records()
+        text = assembly_tests.seat_tests.canonical_json(manifest)
+        package = chair_definition_package_from_json(
+            assembly_tests.seat_tests.canonical_json(record), text,
         )
         return package, text
     record, manifest = assembly_tests.synthetic_assembly_package_records()
@@ -254,11 +265,18 @@ def _images(document, placements, run_dir):
     window = Gui.getMainWindow()
     captures = []
 
-    def capture(name):
+    def capture(name, *, target=None):
         view.redraw()
         for _iteration in range(5):
             Gui.updateGui()
             QtWidgets.QApplication.processEvents()
+        if target is not None:
+            assert tuple(view.getCameraNode().position.getValue()) == (
+                target["stored_camera_position_mm"]
+            )
+            assert tuple(view.getCameraOrientation().Q) == (
+                target["orientation_q"]
+            )
         assert App.ActiveDocument is document
         assert Gui.activeDocument().Document is document
         area = window.findChild(QtWidgets.QMdiArea)
@@ -288,20 +306,39 @@ def _images(document, placements, run_dir):
             "mdi_title": subwindow.windowTitle(), "camera": camera,
             "original_update_behaviour": str(behaviour),
             "restored_update_behaviour": str(widget.updateBehavior()),
+            "target": target,
         })
 
     view.viewTop()
     view.fitAll()
     capture("overview.png")
     view.viewAxonometric()
+    # The view command queues its rotation. Finish it before placing the
+    # camera, or the pending rotation will move the selected chair away.
+    view.redraw()
+    for _iteration in range(5):
+        Gui.updateGui()
+        QtWidgets.QApplication.processEvents()
     camera = view.getCameraOrientation()
-    centre = App.Vector(*placements[len(placements) // 2].origin_mm)
+    placement = placements[len(placements) // 2]
+    centre = App.Vector(*placement.origin_mm)
     node = view.getCameraNode()
-    node.position.setValue(tuple(centre + camera.multVec(
-        App.Vector(0, 0, 30),
-    )))
+    intended = tuple(centre + camera.multVec(App.Vector(0, 0, 30)))
+    node.position.setValue(intended)
     node.height.setValue(18.0)
-    capture("chair-closeup.png")
+    stored = tuple(node.position.getValue())
+    # Coin camera coordinates use single precision. This is a rounding
+    # bound for the view only; it changes no geometry or source comparison.
+    rounding_bound = max(1.0, *(abs(value) for value in intended)) * 2**-23
+    assert max(abs(a - b) for a, b in zip(stored, intended)) <= rounding_bound
+    capture("chair-closeup.png", target={
+        "position_id": placement.position_id,
+        "point_mm": tuple(centre),
+        "intended_camera_position_mm": intended,
+        "stored_camera_position_mm": stored,
+        "orientation_q": tuple(camera.Q),
+        "camera_rounding_bound_mm": rounding_bound,
+    })
     assert captures[0]["camera"] != captures[1]["camera"]
     (run_dir / "capture-state.json").write_text(
         json.dumps(captures, indent=2) + "\n", encoding="utf-8",
@@ -309,18 +346,27 @@ def _images(document, placements, run_dir):
     return [item["file"] for item in captures]
 
 
-def validate():
+def validate(family="S1"):
     """Run one isolated proof and retain raw receipts, including failures."""
+    assert family in {"S1", "S1J"}, "Unsupported proof family"
     assert not App.listDocuments(), "Use an empty isolated FreeCAD host"
+    selected, excluded_count, confirmed, unresolved = (
+        (37, 131, 54, 17) if family == "S1" else (4, 164, 5, 1)
+    )
+    prepare_model = (prepare_chair_model_research if family == "S1"
+                     else prepare_chair_s1j_model_research)
+    select_positions = (_select_positions if family == "S1"
+                        else _select_s1j_positions)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime(
         "%Y%m%dT%H%M%S%fZ",
     )
     run_dir = Path(os.environ.get(
-        "TRACKTEMPLATE_S1_PREVIEW_RUN_DIR",
-        ROOT / "benchmark-output/s1-reference-preview" / stamp,
+        f"TRACKTEMPLATE_{family}_PREVIEW_RUN_DIR",
+        ROOT / "benchmark-output" / (family.lower() + "-reference-preview")
+        / stamp,
     )).resolve()
     run_dir.mkdir(parents=True, exist_ok=False)
-    receipt = {"status": "RUNNING", "gui": bool(App.GuiUp)}
+    receipt = {"status": "RUNNING", "gui": bool(App.GuiUp), "family": family}
     try:
         receipt["archive_controls"] = _archive_controls()
         launcher = runpy.run_path(str(ROOT / "TrackTemplate.FCMacro"))
@@ -329,6 +375,9 @@ def validate():
             ROOT, api, bootstrap,
         )
         module = session.module
+        preview_chairs = getattr(
+            session, "preview_" + family.lower() + "_reference_chairs",
+        )
         receipt["profile"] = launcher["FOUNDATION_RESULT"][
             "matched_profile_id"
         ]
@@ -351,14 +400,14 @@ def validate():
         source_objects = {obj.Name: obj for obj in document.Objects}
         source_shapes = {obj.Name: obj.Shape for obj in document.Objects
                          if "Shape" in obj.PropertiesList}
-        package, text = _inputs()
-        model = prepare_chair_model_research(package, text, REQUEST)
+        package, text = _inputs(family)
+        model = prepare_model(package, text, REQUEST)
         _binding, analysis, _settings, plan = _source_context(
-            module, document, "TO-001",
+            module, document, "TO-001", family,
         )
-        placements, excluded = _select_positions(module, analysis, plan)
+        placements, excluded = select_positions(module, analysis, plan)
         started = time.perf_counter()
-        result = session.preview_s1_reference_chairs(
+        result = preview_chairs(
             document, "TO-001", package, text, REQUEST,
         )
         receipt["construction_seconds"] = time.perf_counter() - started
@@ -370,10 +419,16 @@ def validate():
         assert result["manifest_signature"] == model.manifest_signature
         assert result["request_signature"] == model.request_signature
         assert len(placements) + len(excluded) == 168
-        assert len(placements) == 37 and len(excluded) == 131
-        assert result["source_receipt"]["confirmed_s1_count"] == 54
-        assert result["source_receipt"]["unresolved_confirmed_s1_count"] == 17
-        assert "37/54 S1; 17 unresolved" in preview.Label
+        assert len(placements) == selected and len(excluded) == excluded_count
+        assert result["source_receipt"][
+            "confirmed_" + family.lower() + "_count"
+        ] == confirmed
+        assert result["source_receipt"][
+            "unresolved_confirmed_" + family.lower() + "_count"
+        ] == unresolved
+        assert (
+            f"{selected}/{confirmed} {family}; {unresolved} unresolved"
+        ) in preview.Label
         assert all(len(obj.Shape.Solids) == len(placements)
                    for obj in preview.Objects[2:])
         assert all("GeneratedBy" not in obj.PropertiesList
@@ -405,7 +460,36 @@ def validate():
 
         # A sub-micrometre source change aliases the legacy cache key, but
         # must invalidate the full-precision preview binding before commit.
-        create = preview_adapter.create_s1_reference_preview
+        create = getattr(
+            preview_adapter, "create_" + family.lower() + "_reference_preview",
+        )
+        other_family = "S1J" if family == "S1" else "S1"
+        other_package, other_text = _inputs(other_family)
+        before_rejection = App.listDocuments()
+        try:
+            preview_chairs(document, "TO-001", other_package, other_text, REQUEST)
+        except ValueError as error:
+            receipt["other_family_package_rejected"] = str(error)
+        else:
+            raise AssertionError("Another family's package was accepted")
+        other_select = (_select_s1j_positions if family == "S1"
+                        else _select_positions)
+        other_placements, _other_excluded = other_select(module, analysis, plan)
+        roles = module._turnout_objects_by_role(document, "TO-001")
+        context_shapes = tuple(roles[role].Shape.copy() for role in (
+            module.TURNOUT_RAIL_ROLE, module.TURNOUT_TIMBER_ROLE,
+        ))
+        try:
+            create(package, text, REQUEST, other_placements, context_shapes,
+                   result["source_receipt"], lambda: None)
+        except TypeError as error:
+            assert family + "Placement" in str(error), str(error)
+            receipt["other_family_placements_rejected"] = str(error)
+        else:
+            raise AssertionError("Another family's placements were accepted")
+        assert App.listDocuments() == before_rejection
+        assert App.ActiveDocument is document
+        assert _state(module, document) == original
         original_top = module._chair_physical_top_z
         registry = App.listDocuments()
 
@@ -419,10 +503,12 @@ def validate():
 
             return create(*args[:-1], changed_source)
 
-        with patch.object(session, "_s1_reference_preview_factory",
-                          side_effect=stale_during_build):
+        with patch.object(
+            session, "_" + family.lower() + "_reference_preview_factory",
+            side_effect=stale_during_build,
+        ):
             receipt["subprecision_rejection"] = _reject(lambda: (
-                session.preview_s1_reference_chairs(
+                preview_chairs(
                     document, "TO-001", package, text, REQUEST,
                 )
             ), "source changed")
@@ -450,7 +536,7 @@ def validate():
                 )
             before_documents = App.listDocuments()
             try:
-                session.preview_s1_reference_chairs(
+                preview_chairs(
                     negative, "TO-001", package, text, REQUEST,
                 )
             except ValueError as error:
@@ -477,9 +563,10 @@ def validate():
         )
         for name in tuple(App.listDocuments()):
             App.closeDocument(name)
-    print(SENTINEL)
+    print(SENTINEL if family == "S1" else
+          "Phase 9B S1J reference preview FreeCAD validation passed")
     return receipt
 
 
 if __name__ in {"__main__", "freecad_validate_phase9b_s1_reference_preview"}:
-    validate()
+    validate(os.environ.get("TRACKTEMPLATE_REFERENCE_PROOF_FAMILY", "S1"))

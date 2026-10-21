@@ -1,4 +1,4 @@
-"""Bind an explicit private S1 preview to current C10 chair analysis.
+"""Bind explicit private S1 and S1J previews to current C10 chair analysis.
 
 The inherited host supplies railway decisions and placement context. This
 adapter neither changes them nor substitutes the reference for production
@@ -8,7 +8,10 @@ chairs. Exact full-precision records bind the preview to one source state.
 import hashlib
 import json
 
-from tracktemplate.domain.chair_placement import prepare_s1_placements
+from tracktemplate.domain.chair_placement import (
+    prepare_s1_placements,
+    prepare_s1j_placements,
+)
 
 
 def _canonical_json(record):
@@ -18,7 +21,7 @@ def _canonical_json(record):
     )
 
 
-def _source_context(module, document, turnout_id):
+def _source_context(module, document, turnout_id, family="S1"):
     """Read current decisions without using the rounded solid-plan cache."""
     kind, config, analysis, settings, rails, timbers = (
         module._chair_generation_context(document, "turnout", turnout_id)
@@ -28,7 +31,9 @@ def _source_context(module, document, turnout_id):
         or config.get("size") != module.TURNOUT_SIZE_C10
         or module.TURNOUT_DEFAULT_SCALE != 76.2
     ):
-        raise ValueError("S1 reference preview requires one C10 at 1:76.2.")
+        raise ValueError(
+            f"{family} reference preview requires one C10 at 1:76.2."
+        )
     plan = module._A8A7B15_BUILD_SOLID_PLAN(
         document, kind, config, analysis, rails, timbers, settings,
     )
@@ -41,8 +46,10 @@ def _source_context(module, document, turnout_id):
     }), analysis, settings, plan
 
 
-def _select_positions(module, analysis, plan):
-    """Account for every analysis position; select only resolved S1 bodies."""
+def _select_family_positions(
+    module, analysis, plan, chair_code, family, prepare_placements,
+):
+    """Account for every analysis position; select only resolved family bodies."""
     positions = analysis.get("positions", [])
     by_id = {}
     for position in positions:
@@ -70,17 +77,19 @@ def _select_positions(module, analysis, plan):
             raise ValueError("Chair plan and analysis assignments disagree.")
         if (
             type(instance["chair_code"]) is int
-            and instance["chair_code"] == 1
+            and instance["chair_code"] == chair_code
         ):
             if (
                 type(position.get("chair_code")) is not int
-                or position["chair_code"] != 1
+                or position["chair_code"] != chair_code
                 or position.get("assignment_status")
                 != module.CHAIR_ASSIGNMENT_CONFIRMED
                 or position.get("deliberate_omission")
                 or position.get("special_assignment_deferred")
             ):
-                raise ValueError("S1 position is not a confirmed assignment.")
+                raise ValueError(
+                    f"{family} position is not a confirmed assignment."
+                )
             selected.append(instance)
         else:
             excluded.append({
@@ -88,7 +97,9 @@ def _select_positions(module, analysis, plan):
                 "rail_id": position["rail_identity"],
                 "timber_id": position["timber_identity"],
                 "chair_code": instance["chair_code"],
-                "reason": "Only the five-component S1 reference is selected.",
+                "reason": (
+                    f"Only the five-component {family} reference is selected."
+                ),
             })
     for item in plan["analytical_only"]:
         identity = item.get("chair_position_identity")
@@ -106,14 +117,14 @@ def _select_positions(module, analysis, plan):
         })
     if accounted != set(by_id):
         raise ValueError("Chair plan does not account for every position.")
-    return prepare_s1_placements(selected), sorted(
+    return prepare_placements(selected), sorted(
         excluded, key=lambda item: item["position_id"],
     )
 
 
-def preview_s1_reference_chairs(
+def _preview_reference_chairs(
     module, source_document, turnout_id, package, manifest_text, model_request,
-    create_preview,
+    create_preview, *, family, chair_code, select_positions,
 ):
     """Create a separate unsaved reference view; leave the source intact.
 
@@ -125,7 +136,9 @@ def preview_s1_reference_chairs(
     import FreeCAD as App
 
     if not callable(create_preview):
-        raise ValueError("The S1 reference preview adapter is unavailable.")
+        raise ValueError(
+            f"The {family} reference preview adapter is unavailable."
+        )
     if (
         source_document is None
         or App.getDocument(source_document.Name) is not source_document
@@ -134,9 +147,9 @@ def preview_s1_reference_chairs(
         raise ValueError("Select an open source document and one turnout ID.")
     document_name = source_document.Name
     signature_text, analysis, settings, plan = _source_context(
-        module, source_document, turnout_id,
+        module, source_document, turnout_id, family,
     )
-    placements, excluded = _select_positions(module, analysis, plan)
+    placements, excluded = select_positions(module, analysis, plan)
     roles = module._turnout_objects_by_role(source_document, turnout_id)
     context_objects = tuple(roles.get(role) for role in (
         module.TURNOUT_RAIL_ROLE, module.TURNOUT_TIMBER_ROLE,
@@ -152,7 +165,7 @@ def preview_s1_reference_chairs(
         if App.getDocument(document_name) is not source_document:
             raise ValueError("The preview source document is no longer open.")
         current, _analysis, _settings, _plan = _source_context(
-            module, source_document, turnout_id,
+            module, source_document, turnout_id, family,
         )
         if current != signature_text or any(
             source_document.getObject(obj.Name) is not obj
@@ -161,16 +174,16 @@ def preview_s1_reference_chairs(
         ):
             raise ValueError("The preview source changed during construction.")
 
-    confirmed_s1 = {
+    confirmed_positions = {
         position["stable_chair_position_identity"]
         for position in analysis["positions"]
         if type(position.get("chair_code")) is int
-        and position["chair_code"] == 1
+        and position["chair_code"] == chair_code
         and position.get("assignment_status")
         == module.CHAIR_ASSIGNMENT_CONFIRMED
     }
-    unresolved_s1 = sum(item["position_id"] in confirmed_s1
-                        for item in excluded)
+    unresolved_count = sum(item["position_id"] in confirmed_positions
+                           for item in excluded)
     source_receipt = {
         "document_name": document_name, "turnout_id": turnout_id,
         "source_context_signature": "sha256:" + hashlib.sha256(
@@ -178,11 +191,12 @@ def preview_s1_reference_chairs(
         ).hexdigest(),
         "source_analysis_signature": analysis["geometry_signature"],
         "analysis_position_count": len(analysis["positions"]),
-        "selected_s1_count": len(placements), "excluded_positions": excluded,
-        "confirmed_s1_count": len(confirmed_s1),
-        "unresolved_confirmed_s1_count": unresolved_s1,
-        "coverage_summary": "{}/{} S1; {} unresolved".format(
-            len(placements), len(confirmed_s1), unresolved_s1,
+        f"selected_{family.lower()}_count": len(placements),
+        "excluded_positions": excluded,
+        f"confirmed_{family.lower()}_count": len(confirmed_positions),
+        f"unresolved_confirmed_{family.lower()}_count": unresolved_count,
+        "coverage_summary": "{}/{} {}; {} unresolved".format(
+            len(placements), len(confirmed_positions), family, unresolved_count,
         ),
         "embed_depth_mm": settings["future_chair_embed_depth"],
         "embedding_basis": "source template top minus source embed depth",
@@ -193,4 +207,47 @@ def preview_s1_reference_chairs(
     return create_preview(
         package, manifest_text, model_request, placements, context_shapes,
         source_receipt, verify_source,
+    )
+
+
+def _select_positions(module, analysis, plan):
+    """Keep the existing S1 selection and exclusion contract."""
+    return _select_family_positions(
+        module, analysis, plan, 1, "S1", prepare_s1_placements,
+    )
+
+
+def _select_s1j_positions(module, analysis, plan):
+    """Select only resolved S1J instances; retain all exclusion reasons."""
+    return _select_family_positions(
+        module, analysis, plan, 7, "S1J", prepare_s1j_placements,
+    )
+
+
+def preview_s1_reference_chairs(
+    module, source_document, turnout_id, package, manifest_text, model_request,
+    create_preview,
+):
+    """Create the existing private S1 snapshot from current C10 analysis."""
+    return _preview_reference_chairs(
+        module, source_document, turnout_id, package, manifest_text,
+        model_request, create_preview, family="S1", chair_code=1,
+        select_positions=_select_positions,
+    )
+
+
+def preview_s1j_reference_chairs(
+    module, source_document, turnout_id, package, manifest_text, model_request,
+    create_preview,
+):
+    """Create a separate unsaved S1J snapshot from current C10 analysis.
+
+    Preserve source state, stable identities and unresolved positions.
+    A complete source comparison precedes the preview transaction commit.
+    This explicit research operation gives no production or fit authority.
+    """
+    return _preview_reference_chairs(
+        module, source_document, turnout_id, package, manifest_text,
+        model_request, create_preview, family="S1J", chair_code=7,
+        select_positions=_select_s1j_positions,
     )
