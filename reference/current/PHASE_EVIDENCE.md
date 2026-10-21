@@ -1675,3 +1675,34 @@ This result does not supply all surfaces of this chair component or chair. It gi
 
 The limits for the checks, frozen S1 shapes, `ChairDefinition` data and the “113-entry register” do not change.
 Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+
+## S1 chairs at C10 positions — 2026-10-21
+
+This Level 2 change supplies evidence for part of Exit 9B-3 with the conditions in [D-P9-018](#lms-chair-record-and-templot-development-panel).
+The [command](../../tracktemplate/compatibility/chair_reference_preview.py) makes a different `App.Document` when a person starts it. It does not write that `App.Document` to a file.
+The [software](../../tracktemplate/adapters/freecad/chair_reference_preview.py) uses the previous software for the five S1 components and makes seven `Part::Feature` items.
+For the C10 input in a new file with the source data, the window title shows `37/54 S1; 17 unresolved`.
+
+The evidence identifies all 168 chair positions. It gives a cause for each of the 17 S1 positions that the software does not show.
+
+The [test with standalone Python](../../tests/validate_phase9b_s1_reference_preview.py) gives 177 PASS results.
+The previous checks in `foundation-final.log`, `workflows-final.log`, `export-contract-final.log` and `dependency-manifest.log` also give PASS results.
+The previous result from a qualified host profile for FreeCAD stays in `tmp/s1-preview/final-validation-exception-01/native-05/result.json`.
+
+A person can see the FreeCAD window title during the [test](../../tests/freecad_validate_phase9b_s1_reference_preview.py).
+The test gives PASS results for `source_unchanged`, `undo_redo`, `transaction_failure_cleanup` and `analysis_rejections`.
+The `analysis_rejections` data identify the `missing` and `stale` conditions.
+The file `tmp/s1-preview/engineering-repair-20261021-01/gui-01-verification.json` contains the result and identifies the clear `overview.png` and `chair-closeup.png` files.
+
+Only the test changed in the last repair. Product software stayed the same.
+The independent reviewer gives a PASS result for the source and tests in `tmp/s1-preview/engineering-repair-20261021-01/quality-review.json`.
+
+The initial evidence with FAIL results and the `BLOCKED` quality review stay in `tmp/s1-preview/`.
+The `native-04` evidence has no data for the source before and after its check with a FAIL result.
+
+The conditions in D-P9-018 stay the same.
+This result gives no acceptance for physical fit, the direction of the `S1CentralKey` component, persistence, production, export behaviour or phase exits.
+This result gives no positive rights claim.
+
+Phase 9B stays Open at 3/6. Exits 9B-1, 9B-3 and 9B-6 stay Pending.
+More work on LMS chairs is not permitted until after Phase 11.
